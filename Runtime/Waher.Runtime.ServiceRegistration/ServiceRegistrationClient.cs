@@ -189,7 +189,7 @@ namespace Waher.Runtime.ServiceRegistration
 		/// <typeparam name="T">Element type</typeparam>
 		/// <param name="Array1">Array 1</param>
 		/// <param name="Array2">Array 2</param>
-		/// <returns></returns>
+		/// <returns>If arrays are equal</returns>
 		public static bool Equals<T>(T[] Array1, T[] Array2)
 		{
 			if ((Array1 is null) ^ (Array2 is null))

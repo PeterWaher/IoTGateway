@@ -105,7 +105,7 @@ namespace Waher.Networking.HTTP
 			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
 				new Uri(this.header.GetURL(false, false)));
 		}
-		
+
 		/// <summary>
 		/// Reads posted binary data
 		/// </summary>
@@ -209,9 +209,24 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Host reference.
+		/// Host reference. (Value of Host header, without the port number)
 		/// </summary>
-		public string Host => this.header?.Host?.Value;
+		public string Host
+		{
+			get
+			{
+				string s = this.header?.Host?.Value;
+				if (string.IsNullOrEmpty(s))
+					return s;
+
+				int i = s.LastIndexOf(':');
+
+				if (int.TryParse(s.Substring(i + 1), out _))
+					return s.Substring(0, i);
+				else
+					return s;
+			}
+		}
 
 #if WINDOWS_UWP
 		/// <summary>

@@ -1240,12 +1240,14 @@ will return a vector corresponding to the point under the mouse.
 
 The following table lists variables that control graph output:
 
-| Varaible     | Type    | Description                      | Current value              |
-|--------------|---------|----------------------------------|----------------------------|
-| GraphWidth   | Double  | Width of graph, in pixels.       | {try GraphWidth catch ""}  |
-| GraphHeight  | Double  | Height of graph, in pixels.      | {try GraphHeight catch ""} |
-| GraphBgColor | Color   | Background color.                | {try BgColor catch ""}     |
-| GraphFgColor | Color   | Foreground color.                | {try BgColor catch ""}     |
+| Varaible             | Type    | Description                      | Current value                   |
+|----------------------|---------|----------------------------------|---------------------------------|
+| `GraphWidth`         | Double  | Width of graph, in pixels.       | `{{GraphWidth ??? ""}}`         |
+| `GraphHeight`        | Double  | Height of graph, in pixels.      | `{{GraphHeight ??? ""}}`        |
+| `GraphBgColor`       | Color   | Background color.                | `{{GraphBgColor ??? ""}}`       |
+| `GraphFgColor`       | Color   | Foreground color.                | `{{GraphFgColor ??? ""}}`       |
+| `GraphLabelFontSize` | Double  | Label font size.                 | `{{GraphLabelFontSize ??? ""}}` |
+
 
 You can combine graphs using the `+` operator, as long as graph axes are compatible:
 
@@ -2009,6 +2011,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Base64Encode(Data)`                               | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
 | `Base64UrlDecode(Data)`                            | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
 | `Base64UrlEncode(Data)`                            | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
+| `CustomEncode(Binary,ContentType)`                 | Can be used to return custom encoded data from web services. | [Example][CustomEncodeExample] |
 | `Decode(Content,Type)`                             | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
 | `Delete(Url,Accept/Headers,[Certificate])`         | Deletes a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. The second argument is required, to differ the function from the `Delete(x)` function, that destroys a variable `x` and disposes of its value. The headers can be an empty object `{}`. If providing a `Certificate`, mutual TLS can be used. | [Example][DeleteExample] |
 | `Duration(s)`                                      | Parses a string `s` into a Duration value. | `Duration("PT10H30M")` |
@@ -2045,6 +2048,7 @@ The following functions are available in the `Waher.Script.Content` library.
 [Base64EncodeExample]: Prompt.md?Expression=Base64Encode(Encode("Hello")[0])
 [Base64UrlDecodeExample]: Prompt.md?Expression=Decode(Base64UrlDecode("SGVsbG8"),"text/plain")
 [Base64UrlEncodeExample]: Prompt.md?Expression=Base64UrlEncode(Encode("Hello")[0])
+[CustomEncodeExample]: Prompt.md?Expression=CustomEncode(Bin,"application/x-mytype")
 [DecodeExample]: Prompt.md?Expression=Decode(Csv,%22text/csv%22)
 [DeleteExample]: Prompt.md?Expression=Delete(%22URL%22,{})
 [EncodeExample]: Prompt.md?Expression=Encode("Hello",[%22text/plain%22])
@@ -2183,6 +2187,7 @@ The following functions are available in the `Waher.Content.Markdown` library.
 |------------------------------------|-------------|---------|
 | `CssContent(s)`                    | Encodes a string as a CSS Content object for encoding, as results of web service calls. | [Example][CssContentExample] |
 | `FromMarkdown(Markdown)`           | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
+| `HtmlContent(s)`                   | Encodes a string as an HTML Content object for encoding, as results of web service calls. | [Example][HtmlContentExample] |
 | `InitScriptFile(FileName)`         | Evaluates the script in the file defined by `FileName` if not evaluated before, or if timestamp is newer than previous evaluation. | [Example][InitScriptFileExample] |
 | `JavaScriptContent(s)`             | Encodes a string as a JavaScript Content object for encoding, as results of web service calls. | [Example][JavaScriptContentExample] |
 | `LoadMarkdown(FileName[,Headers])` | Loads a markdown file and preprocesses it before returning it as a string. By default, Markdown headers are removed. If you wish Markdown headers to be included, set `Headers` to `true`. | [Example][LoadMarkdownExample] |
@@ -2205,6 +2210,7 @@ The following context-specific constants (read-only variables) are available in 
 | `EndPosition`   | The ending position of the script in the markdown document.           |
 
 [CssContentExample]: Prompt.md?Expression=CssContent(%22CSS content%22)
+[HtmlContentExample]: Prompt.md?Expression=HtmlContent(%22%3Cp%3EHTML+content%3C%2Fp%3E%22)
 [JavaScriptContentExample]: Prompt.md?Expression=JavaScriptContent(%22javascript content%22)
 [LoadMarkdownExample]: Prompt.md?Expression=LoadMarkdown(%22File.md%22)
 [MarkdownContentExample]: Prompt.md?Expression=MarkdownContent(%22*markdown content*%22)
@@ -2255,6 +2261,17 @@ The following functions are available in the `Waher.Content.Xsl` library.
 | `Transform(XML,XSLT)`    | Transforms an XML document using an XSL Transform (XSLT). | [Example][TransformExample] |
 
 [TransformExample]: Prompt.md?Expression=Transform(LoadFile(%22Data.xml%22),LoadFile(%22Transform.xslt%22))
+
+#### Layout Extensions (Waher.Layout.Layout2D)
+
+The following functions are available in the `Waher.Layout.Layout2D` library.
+
+| Function                                  | Description | Example |
+|-------------------------------------------|-------------|---------|
+| `Layout(Xml)`                             | Creates a bitmapped graph from a layout. The Layout can be an XML Document, XML Element or XML as a string. | `Layout(Xml)`             |
+| `Legend(Labels,Colors,FgColor,NrColumns)` | Creates a legend that can be displayed in association with a graph containing multiple series.              | `Legend(Labels,Colors,4)` |
+
+In the following subsections, specialized HTTP Error functions are listed.
 
 #### Web Extensions (Waher.Networking.HTTP\[.UWP\])
 
@@ -3094,6 +3111,155 @@ Example:
 DROP COLLECTION
 	WebUsers
 ```
+
+### Access to Ledger
+
+The following extensions are made available by the `Waher.Script.Persistence` library.
+
+#### RECORD OBJECT
+
+You can record an object ex nihilo into a collection in the Leger using the 
+`RECORD ... OBJECT` statement.
+
+Syntax:
+
+```
+RECORD
+INTO Source
+[NEW|UPDATE|DELETE] OBJECT ...
+```
+
+Example:
+
+```
+record
+into PersistedEvent 
+new object
+{
+	Timestamp:Now, 
+	Message:"Kilroy was here", 
+	Object:"Here", 
+	Actor:"Kilroy"
+}
+```
+
+**Note**: Object recorded directly to the ledger are not stored in the object database at
+the same time. Object stored on the object database may be stored automatically in the
+ledger, depending on the class definition and its corresponding archiving attributes.
+
+#### RECORD OBJECTS
+
+You can record a vector or set of objects ex nihilo into a collection in the Ledger using the 
+`RECORD ... OBJECTS` statement.
+
+Syntax:
+
+```
+RECORD
+INTO Source
+[NEW|UPDATE|DELETE] OBJECTS [Object1, ..., ObjectN]
+```
+
+Example:
+
+```
+record
+into PersistedEvent 
+new objects
+[{
+	Timestamp:Now, 
+	Message:"Kilroy was here", 
+	Object:"Here", 
+	Actor:"Kilroy"
+},
+{
+	Timestamp:Now, 
+	Message:"Kilroy was here again", 
+	Object:"Here", 
+	Actor:"Kilroy"
+}]
+```
+
+#### REPLAY
+
+`REPLAY` statements can be executed against the ledger to extract entries matching certain
+search criteria. By default, events matching the criteria will be output in the order they 
+appear in the collections provided. You can direct the results to a given destination, which
+can evaluate to a file name (in case the export with be an XML file) or an object instance 
+implementing the `Waher.Persistence.Serialization.ILedgerExport` interface, or any of the
+keywords `XML`, `JSON`, `COUNTERS` or `TABLE`, or evaluate to string values same as the
+these keywords. If no `TO` clause is available, the default destination is `JSON` if no 
+columns have been provided (i.e. `*` has been used), or `TABLE`, if columns have been 
+provided. If an `ILedgerExport` interface or a file name is provided, the result of the 
+execution (apart from exporting the replay to the destination) in the script environment 
+will be the the same as providing a `COUNTERS` destination.
+
+Syntax:
+
+```
+REPLAY [TOP maxcount]
+	* |
+	column1 [[as ]name1][, column2 [[as ]name2][, ...]]
+FROM
+	source1[ as sourcename1][, source2[ as sourcename2][, ...]]
+[WHERE
+	conditions]
+[OFFSET
+	offset]
+[TO
+	destination]
+```
+
+Example:
+
+```
+replay
+	EventId,
+	Level,
+	Message
+from
+	PersistedEvent
+where 
+	Type="Error" 
+to
+	xml
+```
+
+**Note**: The Ledger does not have indices as the object database does. Replaying events
+from the ledger often replay all encrypted blocks in entire collections, which may be time, 
+memory and compute intensive operations.
+
+##### Ledger event variables
+
+When writing `REPLAY` conditions, you can refer to object properties using variable references.
+There are also a set of predefined event propertyy names you can use to create conditions including
+event property values. You can also access block and collection information. Block information
+depends on the ledger registered. Some variables are available for all ledgers, others are
+ledger-specific. If you need to check object properties with the same names as these event or
+block property names, you can use `this` to refer to the object referenced by the event. For instance,
+`Timestamp` would refer to the `Timestamp` property of the event, not a `Timestamp` property on
+the associated object. Referring to `this.Timestamp` would access the `Timestamp` property on the
+associated object.
+
+Event properties available in `REPLAY` conditions:
+
+| Event Property | Ledger       | Description                                                   |
+|:---------------|:-------------|:--------------------------------------------------------------|
+| `Collection`   | All          | Collection containg the block that contains the event.        |
+| `BlockId`      | All          | Block ID containing the event.                                |
+| `ObjectId`     | All          | Object ID of the associated object.                           |
+| `TypeName`     | All          | Type name of the associated object.                           |
+| `EntryType`    | All          | An enumeration of type `Waher.Persistence.EntryType`, that can take the values `New`, `Update` or `Delete`. (`Clear` is also a value, but not an option in conditional statements, as it is not used in association with objects. |
+| `Timestamp`    | All          | The timestamp of the event.                                   |
+| `this`         | All          | A reference to the recorded object associated with the event. |
+| `Bytes`        | Neuro-Ledger | Number of bytes of the current block.                         |
+| `Created`      | Neuro-Ledger | When the block was created.                                   |
+| `Creator`      | Neuro-Ledger | The creator of the block.                                     |
+| `Digest`       | Neuro-Ledger | The digest of the block.                                      |
+| `Expires`      | Neuro-Ledger | When the block expires.                                       |
+| `FileName`     | Neuro-Ledger | Local file name of the block.                                 |
+| `Signature`    | Neuro-Ledger | Signature of the block.                                       |
+
 
 ### XML
 

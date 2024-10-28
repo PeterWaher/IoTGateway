@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
@@ -65,13 +66,7 @@ namespace Waher.Persistence.Files.Searching
 		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
 		/// will be null, even if there exists an object at the current position.
 		/// </summary>
-		public bool CurrentTypeCompatible
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public bool CurrentTypeCompatible => true;
 
 		/// <summary>
 		/// Gets the Object ID of the current object.
@@ -106,6 +101,27 @@ namespace Waher.Persistence.Files.Searching
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
 
 		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
+
+		/// <summary>
+		/// Resets the enumerator.
+		/// </summary>
+		public void Reset() => this.isCurrent = false;
+
+		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
@@ -114,7 +130,7 @@ namespace Waher.Persistence.Files.Searching
 		public Task<bool> MoveNextAsyncLocked()
 		{
 			this.isCurrent = !this.isCurrent;
-			return Task.FromResult<bool>(this.isCurrent);
+			return Task.FromResult(this.isCurrent);
 		}
 
 		/// <summary>
@@ -166,5 +182,24 @@ namespace Waher.Persistence.Files.Searching
 			return (SortOrder[0] == "-" + s);
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueAfterLocked(T LastItem)
+		{
+			this.isCurrent = true;
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueBeforeLocked(T LastItem)
+		{
+			this.isCurrent = true;
+			return Task.CompletedTask;
+		}
 	}
 }

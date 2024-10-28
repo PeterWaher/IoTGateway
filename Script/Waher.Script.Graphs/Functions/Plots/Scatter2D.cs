@@ -94,7 +94,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
-			return new Graph2D(X, Y, new Scatter2DPainter(), false, false, this,
+			return new Graph2D(Variables, X, Y, new Scatter2DPainter(), false, false, this,
 				Color?.AssociatedObjectValue ?? Graph.DefaultColor, Size?.AssociatedObjectValue ?? 5.0);
 		}
 	}

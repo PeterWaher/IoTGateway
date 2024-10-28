@@ -46,7 +46,7 @@ namespace Waher.Content
 
 					if (i == c - 1)
 					{
-						ConversionState State2 = new ConversionState(FromType, Intermediate, State.FromFileName, State.LocalResourceName, 
+						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName, State.LocalResourceName, 
 							State.URL, State.ToContentType, State.To, State.Session, State.PossibleContentTypes);
 
 						if (await this.sequence[i].Value.ConvertAsync(State2))

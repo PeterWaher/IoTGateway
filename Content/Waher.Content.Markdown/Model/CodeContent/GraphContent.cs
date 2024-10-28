@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
-using Waher.Script;
 using System.Xml;
 using System;
 using Waher.Content.Xml;
@@ -31,6 +30,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		}
 
 		/// <summary>
+		/// If script is evaluated for this type of code block.
+		/// </summary>
+		public bool EvaluatesScript => true;
+
+		/// <summary>
 		/// Is called on the object when an instance of the element has been created in a document.
 		/// </summary>
 		/// <param name="Document">Document containing the instance.</param>
@@ -48,7 +52,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
 			Graph G = await GetGraph(Rows);
-			return G.CreatePixels(Document.Settings.Variables ?? new Variables());
+			return G.CreatePixels();
 		}
 
 		/// <summary>

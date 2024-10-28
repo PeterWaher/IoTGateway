@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files
@@ -16,7 +15,7 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// Cursor enumerator
 	/// </summary>
-	public class CursorEnumerator<T> : IEnumerator<T>, IEnumerator, IAsyncEnumerator
+	public class CursorEnumerator<T> : IAsyncEnumerator<T>
 	{
 		private readonly int timeoutMilliseconds;
 		private readonly GetNewCursorCallback<T> resetFunction;

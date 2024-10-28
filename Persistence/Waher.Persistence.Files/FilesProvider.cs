@@ -3,12 +3,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Events;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Profiling;
@@ -630,7 +630,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Object Serializer</returns>
 		public Task<IObjectSerializer> GetObjectSerializer(Type Type)
 		{
-			return this.serializers?.GetObjectSerializer(Type) 
+			return this.serializers?.GetObjectSerializer(Type)
 				?? throw new InvalidOperationException("Service is shutting down.");
 		}
 
@@ -641,7 +641,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Object Serializer if exists, or null if not.</returns>
 		public Task<IObjectSerializer> GetObjectSerializerNoCreate(Type Type)
 		{
-			return this.serializers?.GetObjectSerializerNoCreate(Type) 
+			return this.serializers?.GetObjectSerializerNoCreate(Type)
 				?? throw new InvalidOperationException("Service is shutting down.");
 		}
 
@@ -1207,7 +1207,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets a new file ID.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>New File ID.</returns>
 		internal int GetNewFileId()
 		{
 			lock (this.synchObjNrFiles)
@@ -2175,6 +2175,41 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, 
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
+
+			if (File is null)
+				return new T[0];
+
+			await File.CheckIndicesInitialized(Serializer);
+			await File.BeginRead();
+			try
+			{
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				await ResultSet.ContinueAfterLocked(ContinueAfter);
+				return await LoadAllLocked<T>(ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
+			}
+		}
+
 		internal static async Task<IEnumerable<T>> LoadAllLocked<T>(ICursor<T> ResultSet)
 		{
 			LinkedList<T> Result = new LinkedList<T>();
@@ -2247,6 +2282,151 @@ namespace Waher.Persistence.Files
 			{
 				await File.EndRead();
 			}
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(string Collection, int Offset, int MaxCount, 
+			Filter Filter, T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection, false);
+
+			if (File is null)
+				return new T[0];
+
+			await File.CheckIndicesInitialized<T>();
+			await File.BeginRead();
+			try
+			{
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				await ResultSet.ContinueAfterLocked(ContinueAfter);
+				return await LoadAllLocked<T>(ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
+			}
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(int PageSize, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(0, PageSize, SortOrder);
+			return new Page<T>(PageSize, null, null, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(0, PageSize, Filter, SortOrder);
+			return new Page<T>(PageSize, null, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<object>> FindFirst(string Collection, int PageSize, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> Items = await this.Find(Collection, 0, PageSize, SortOrder);
+			return new Page<object>(PageSize, Collection, null, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<object>> FindFirst(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> Items = await this.Find(Collection, 0, PageSize, Filter, SortOrder);
+			return new Page<object>(PageSize, Collection, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(Collection, 0, PageSize, Filter, SortOrder);
+			return new Page<T>(PageSize, Collection, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the next page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<T>> FindNext<T>(IPage<T> Page)
+			where T : class
+		{
+			if (Page is Page<T> CurrentPage)
+				return CurrentPage.FindNext();
+			else
+				throw new IOException("Incompatible page.");
+		}
+
+		/// <summary>
+		/// Finds the next page of objects in a given collection.
+		/// </summary>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<object>> FindNext(IPage<object> Page)
+		{
+			if (Page is Page<object> CurrentPage)
+				return CurrentPage.FindNext();
+			else
+				throw new IOException("Incompatible page.");
 		}
 
 		/// <summary>
@@ -2671,7 +2851,7 @@ namespace Waher.Persistence.Files
 				return null;
 
 			if (Object is GenericObject GenObj)
-				return GenObj; 
+				return GenObj;
 
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
 			string CollectionName = await Serializer.CollectionName(Object);
@@ -2682,13 +2862,16 @@ namespace Waher.Persistence.Files
 			Output.FlushBits();
 			byte[] Bin = Output.GetSerialization();
 
-			Serializer = await this.GetObjectSerializerEx(typeof(GenericObject));
+			ObjectSerializer Deserializer = await this.GetObjectSerializerEx(typeof(GenericObject));
 
 			BinaryDeserializer Input = new BinaryDeserializer(CollectionName, Encoding.UTF8, Bin, 0);
-			object Result = await Serializer.Deserialize(Input, null, false);
+			object Result = await Deserializer.Deserialize(Input, null, false);
 
 			if (Result is GenericObject GenObj2)
+			{
+				GenObj2.ArchivingTime = Serializer.GetArchivingTimeDays(Object);
 				return GenObj2;
+			}
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
 		}
@@ -2821,8 +3004,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output, string[] CollectionNames)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			return this.Export(Output, CollectionNames, null);
 		}
@@ -2834,14 +3017,16 @@ namespace Waher.Persistence.Files
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public async Task<bool> Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
 			ObjectBTreeFile[] Files = this.Files;
 			IDatabaseExportFilter Filter = Output as IDatabaseExportFilter;
+			bool Continue;
 
 			Thread?.Start();
-			await Output.StartDatabase();
+			if (!await Output.StartDatabase())
+				return false;
 			try
 			{
 				foreach (ObjectBTreeFile File in Files)
@@ -2853,7 +3038,8 @@ namespace Waher.Persistence.Files
 						continue;
 
 					Thread?.NewState(File.CollectionName);
-					await Output.StartCollection(File.CollectionName);
+					if (!await Output.StartCollection(File.CollectionName))
+						return false;
 					try
 					{
 						IndexBTreeFile[] Indices = File.Indices;
@@ -2862,16 +3048,21 @@ namespace Waher.Persistence.Files
 						{
 							foreach (IndexBTreeFile Index in Indices)
 							{
-								await Output.StartIndex();
+								if (!await Output.StartIndex())
+									return false;
 
 								string[] FieldNames = Index.FieldNames;
 								bool[] Ascending = Index.Ascending;
 								int i, c = Math.Min(FieldNames.Length, Ascending.Length);
 
 								for (i = 0; i < c; i++)
-									await Output.ReportIndexField(FieldNames[i], Ascending[i]);
+								{
+									if (!await Output.ReportIndexField(FieldNames[i], Ascending[i]))
+										return false;
+								}
 
-								await Output.EndIndex();
+								if (!await Output.EndIndex())
+									return false;
 							}
 						}
 
@@ -2890,23 +3081,34 @@ namespace Waher.Persistence.Files
 									if (!(Filter is null) && !Filter.CanExportObject(Obj))
 										continue;
 
-									await Output.StartObject(ObjectIdToString(Obj.ObjectId), Obj.TypeName);
+									if (await Output.StartObject(ObjectIdToString(Obj.ObjectId), Obj.TypeName) is null)
+										return false;
 									try
 									{
 										foreach (KeyValuePair<string, object> P in Obj)
-											await Output.ReportProperty(P.Key, P.Value);
+										{
+											if (!await Output.ReportProperty(P.Key, P.Value))
+												return false;
+										}
 									}
 									catch (Exception ex)
 									{
-										this.ReportException(ex, Output);
+										if (!await this.ReportException(ex, Output))
+											return false;
 									}
 									finally
 									{
-										await Output.EndObject();
+										Continue = await Output.EndObject();
 									}
+
+									if (!Continue)
+										return false;
 								}
 								else if (!(e.CurrentObjectId is null))
-									await Output.ReportError("Unable to load object " + ObjectIdToString(e.CurrentObjectId) + ".");
+								{
+									if (!await Output.ReportError("Unable to load object " + ObjectIdToString(e.CurrentObjectId) + "."))
+										return false;
+								}
 							}
 						}
 						finally
@@ -2916,25 +3118,32 @@ namespace Waher.Persistence.Files
 					}
 					catch (Exception ex)
 					{
-						this.ReportException(ex, Output);
+						if (!await this.ReportException(ex, Output))
+							return false;
 					}
 					finally
 					{
-						await Output.EndCollection();
+						Continue = !await Output.EndCollection();
 					}
+
+					if (!Continue)
+						return false;
 				}
 			}
 			catch (Exception ex)
 			{
 				Thread?.Exception(ex);
-				this.ReportException(ex, Output);
+				if (!await this.ReportException(ex, Output))
+					return false;
 			}
 			finally
 			{
-				await Output.EndDatabase();
+				Continue = await Output.EndDatabase();
 				Thread?.Idle();
 				Thread?.Stop();
 			}
+
+			return Continue;
 		}
 
 		internal static string ObjectIdToString(object ObjectId)
@@ -2945,17 +3154,22 @@ namespace Waher.Persistence.Files
 				return ObjectId.ToString();
 		}
 
-		private void ReportException(Exception ex, IDatabaseExport Output)
+		private async Task<bool> ReportException(Exception ex, IDatabaseExport Output)
 		{
 			ex = Log.UnnestException(ex);
 
 			if (ex is AggregateException ex2)
 			{
 				foreach (Exception ex3 in ex2.InnerExceptions)
-					Output.ReportException(ex3);
+				{
+					if (!await Output.ReportException(ex3))
+						return false;
+				}
+
+				return true;
 			}
 			else
-				Output.ReportException(ex);
+				return await Output.ReportException(ex);
 		}
 
 		/// <summary>

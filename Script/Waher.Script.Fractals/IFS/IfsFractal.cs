@@ -296,9 +296,8 @@ namespace Waher.Script.Fractals.IFS
 
 			if (!(Matrices is null))
 			{
-				return CalcIfs(xc, yc, dr, N, Matrices.ToArray(), Weights.ToArray(), Colors.ToArray(),
-					dimx, dimy, Seed, this, this.FractalZoomScript,
-					new object[] { dimx, dimy, N, FunctionsExpression, Seed });
+				return CalcIfs(Variables, xc, yc, dr, N, Matrices.ToArray(), Weights.ToArray(), Colors.ToArray(), dimx, dimy, Seed, 
+					this, this.FractalZoomScript, new object[] { dimx, dimy, N, FunctionsExpression, Seed });
 			}
 			else
 			{
@@ -350,9 +349,8 @@ namespace Waher.Script.Fractals.IFS
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcIfs(double xCenter, double yCenter, double rDelta, long N,
-			DoubleMatrix[] Functions, double[] Weights, SKColor[] Colors, int Width, int Height, int Seed,
-			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcIfs(Variables Variables, double xCenter, double yCenter, double rDelta, long N, DoubleMatrix[] Functions,
+			double[] Weights, SKColor[] Colors, int Width, int Height, int Seed, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			DoubleMatrix M;
 			double[,] E;
@@ -517,7 +515,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
@@ -709,7 +707,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 		}
 	}
 }

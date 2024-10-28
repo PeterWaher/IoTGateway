@@ -238,13 +238,13 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 			else if (!(CoefficientsZ is null))
 			{
-				return CalcHalley(rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
+				return CalcHalley(Variables, rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
 				   this, this.FractalZoomScript,
 				   new object[] { Palette, dimx, dimy, R, CoefficientsZ, ColorExpression });
 			}
 			else
 			{
-				return CalcHalley(rc, ic, dr, R, Coefficients, Palette, dimx, dimy,
+				return CalcHalley(Variables, rc, ic, dr, R, Coefficients, Palette, dimx, dimy,
 					this, this.FractalZoomScript,
 					new object[] { Palette, dimx, dimy, R, Coefficients, ColorExpression });
 			}
@@ -296,7 +296,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
+		public static FractalGraph CalcHalley(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R,
 			double[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node,
 			FractalZoomScript FractalZoomScript, object State)
 		{
@@ -426,16 +426,16 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
-			Complex[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node,
-			FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcHalley(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R,
+			Complex[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, 
+			object State)
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
@@ -595,7 +595,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
@@ -740,7 +740,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 

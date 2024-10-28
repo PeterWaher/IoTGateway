@@ -7,14 +7,12 @@ using Waher.Content.Json;
 using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Operators.Comparisons;
 using Waher.Security;
 
 namespace Waher.IoTGateway
@@ -51,6 +49,16 @@ namespace Waher.IoTGateway
 	/// </summary>
 	public class ClientEvents : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
 	{
+		/// <summary>
+		/// Number of seconds before a Tab ID is purged, unless references or kept alive.
+		/// </summary>
+		public const int TabIdCacheTimeoutSeconds = 30;
+
+		/// <summary>
+		/// Half of <see cref="TabIdCacheTimeoutSeconds"/>.
+		/// </summary>
+		public const int TabIdCacheTimeoutSecondsHalf = TabIdCacheTimeoutSeconds / 2;
+
 		/// <summary>
 		/// Resource managing asynchronous events to web clients.
 		/// </summary>
@@ -237,7 +245,9 @@ namespace Waher.IoTGateway
 				}
 			}
 
-			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue) && !(Queue.SyncObj is null))
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue) && 
+				!string.IsNullOrEmpty(Queue.SessionID) &&
+				!(Queue.SyncObj is null))
 			{
 				Queue.WebSocket = Socket;
 				Queue.Uri = Uri;
@@ -424,12 +434,58 @@ namespace Waher.IoTGateway
 				{
 					await Queue.SyncObj.EndWrite();
 				}
+
+				if (Queue.KeepAliveUntil > DateTime.Now)
+					return;
 			}
 
 			Uri Uri = new Uri(Location);
 			Remove(TabID, Uri.LocalPath);
 		}
 
+		/// <summary>
+		/// Keeps a Tab alive, even though it might be temporarily offline or disconnected.
+		/// </summary>
+		/// <param name="TabID">Tab ID identifying the tab.</param>
+		/// <param name="KeepAliveUntil">Keep the tab alive at least until this 
+		/// point in time, unless it reconnects again.</param>
+		public static void KeepTabAlive(string TabID, DateTime KeepAliveUntil)
+		{
+			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+			{
+				Queue = new TabQueue(TabID, string.Empty, new Variables());
+				eventsByTabID[TabID] = Queue;
+			}
+
+			DateTime Now = DateTime.Now;
+
+			if (KeepAliveUntil >= Now.AddSeconds(TabIdCacheTimeoutSeconds))
+			{
+				DateTime CurrentKeepAliveTime = Queue.KeepAliveUntil;
+
+				if (CurrentKeepAliveTime < KeepAliveUntil)
+				{
+					Queue.KeepAliveUntil = KeepAliveUntil;
+
+					if (CurrentKeepAliveTime == DateTime.MinValue)
+						Gateway.ScheduleEvent(KeepTabAlive, Now.AddSeconds(TabIdCacheTimeoutSecondsHalf), TabID);
+				}
+			}
+		}
+
+		private static void KeepTabAlive(object State)
+		{
+			if (State is string TabID &&
+				eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+			{
+				DateTime Now = DateTime.Now;
+
+				if (Queue.KeepAliveUntil < Now)
+					Queue.KeepAliveUntil = DateTime.MinValue;
+				else
+					Gateway.ScheduleEvent(KeepTabAlive, Now.AddSeconds(TabIdCacheTimeoutSecondsHalf), TabID);
+			}
+		}
 
 		private static readonly Cache<string, TabQueue> eventsByTabID = GetTabQueueCache();
 		private static readonly Cache<string, TabQueue> timeoutByTabID = GetTabTimeoutCache();
@@ -477,7 +533,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, TabQueue> GetTabQueueCache()
 		{
-			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30), true);
+			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(TabIdCacheTimeoutSeconds), true);
 			Result.Removed += QueueCacheItem_Removed;
 			return Result;
 		}
@@ -1221,6 +1277,7 @@ namespace Waher.IoTGateway
 			public HttpResponse Response = null;
 			public WebSocket WebSocket = null;
 			public Uri Uri = null;
+			public DateTime KeepAliveUntil = DateTime.MinValue;
 			public (string, string, string)[] Query = null;
 
 			public TabQueue(string ID, string SessionID, Variables Session)

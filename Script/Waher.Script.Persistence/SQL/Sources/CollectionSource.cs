@@ -7,13 +7,14 @@ using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Settings;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Data Source defined by a collection name
-	/// </summary>
-	public class CollectionSource : IDataSource
+    /// <summary>
+    /// Data Source defined by a collection name
+    /// </summary>
+    public class CollectionSource : IDataSource
 	{
 		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
 		private readonly string collectionName;

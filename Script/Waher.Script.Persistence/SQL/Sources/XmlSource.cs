@@ -8,13 +8,14 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Persistence.Functions;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Data Source defined by XML.
-	/// </summary>
-	public class XmlSource : IDataSource
+    /// <summary>
+    /// Data Source defined by XML.
+    /// </summary>
+    public class XmlSource : IDataSource
 	{
 		private readonly XmlDocument xmlDocument;
 		private readonly XmlNode xmlNode;

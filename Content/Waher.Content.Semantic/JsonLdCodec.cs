@@ -161,7 +161,7 @@ namespace Waher.Content.Semantic
 		/// <returns>If File Extension was recognized and Content Type found.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == JsonLdFileExtensions[0])
+			if (string.Compare(FileExtension, JsonLdFileExtensions[0], true) == 0)
 			{
 				ContentType = JsonLdContentTypes[0];
 				return true;

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata minClientVersion="3.2">
 		<id>Waher.Networking.XMPP.Chat.UWP</id>
-		<version>2.0.8</version>
+		<version>2.0.9</version>
 		<title>Waher.Networking.XMPP.Chat.UWP</title>
 		<authors>Peter Waher</authors>
 		<owners>Waher Data AB</owners>
@@ -15,23 +15,23 @@
 		<copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</copyright>
 		<tags>networking communication xmpp iot chat</tags>
 		<dependencies>
-			<dependency id="Waher.Content" version="2.6.12"/>
+			<dependency id="Waher.Content" version="2.6.13"/>
 			<dependency id="Waher.Content.Emoji" version="2.0.1"/>
 			<dependency id="Waher.Content.Images" version="2.1.8"/>
 			<dependency id="Waher.Content.Html" version="2.3.2"/>
-			<dependency id="Waher.Content.Markdown" version="3.1.1"/>
+			<dependency id="Waher.Content.Markdown" version="3.2.0"/>
 			<dependency id="Waher.Content.Xml" version="2.3.2"/>
 			<dependency id="Waher.Networking.UWP" version="2.3.0"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="3.2.0"/>
-			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="3.2.0"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="3.2.1"/>
+			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="3.2.2"/>
 			<dependency id="Waher.Networking.XMPP.Control.UWP" version="3.0.1"/>
-			<dependency id="Waher.Networking.XMPP.Sensor.UWP" version="3.0.1"/>
+			<dependency id="Waher.Networking.XMPP.Sensor.UWP" version="3.0.2"/>
 			<dependency id="Waher.Runtime.Cache" version="1.0.8"/>
-			<dependency id="Waher.Runtime.Inventory" version="1.1.6"/>
-			<dependency id="Waher.Script" version="2.6.10"/>
-			<dependency id="Waher.Script.Graphs" version="2.1.7"/>
-			<dependency id="Waher.Security" version="1.0.8"/>
-			<dependency id="Waher.Things" version="2.0.1"/>
+			<dependency id="Waher.Runtime.Inventory" version="1.1.7"/>
+			<dependency id="Waher.Script" version="2.7.0"/>
+			<dependency id="Waher.Script.Graphs" version="2.2.1"/>
+			<dependency id="Waher.Security" version="1.0.9"/>
+			<dependency id="Waher.Things" version="2.0.3"/>
 		</dependencies>
 	</metadata>
 	<files>

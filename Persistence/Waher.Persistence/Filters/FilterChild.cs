@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Persistence.Filters
+﻿namespace Waher.Persistence.Filters
 {
 	/// <summary>
 	/// Abstract base class for filters having a single child-filters.

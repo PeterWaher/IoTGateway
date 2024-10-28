@@ -14,7 +14,6 @@ using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 
-
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
 
@@ -26,7 +25,7 @@ using Waher.Persistence.FilesLW.Test.Classes;
 namespace Waher.Persistence.FilesLW.Test
 #endif
 {
-	[TestClass]
+    [TestClass]
 	public abstract class DBFilesBTreeTests
 	{
 		internal const string MasterFileName = "Data\\Files.master";
@@ -191,24 +190,11 @@ namespace Waher.Persistence.FilesLW.Test
 				DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049),
 				DateTimeOffset = new DateTimeOffset(new DateTime(1900, 1, 1), TimeSpan.Zero).AddDays(gen.NextDouble() * 73049),
 				TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000)),
-				Guid = Guid.NewGuid()
+				Guid = Guid.NewGuid(),
+				String = GenerateRandomString(MaxStringLength),
+				ShortString = GenerateRandomString(10)
 			};
 
-			int i, c = gen.Next(10, MaxStringLength);
-			char[] ch = new char[c];
-
-			for (i = 0; i < c; i++)
-				ch[i] = (char)gen.Next(32, 127);
-
-			Result.String = new string(ch);
-
-			c = 10;
-			ch = new char[c];
-
-			for (i = 0; i < c; i++)
-				ch[i] = (char)gen.Next(32, 127);
-
-			Result.ShortString = new string(ch);
 			Result.CIString = Result.ShortString;
 
 			switch (gen.Next(4))
@@ -235,6 +221,17 @@ namespace Waher.Persistence.FilesLW.Test
 			return Result;
 		}
 
+		internal static string GenerateRandomString(int MaxStringLength)
+		{
+			int i, c = gen.Next(10, MaxStringLength);
+			char[] ch = new char[c];
+
+			for (i = 0; i < c; i++)
+				ch[i] = (char)gen.Next(32, 127);
+
+			return new string(ch);
+		}
+
 		internal static Default CreateDefault(int MaxStringLength)
 		{
 			Default Result = new()
@@ -255,16 +252,9 @@ namespace Waher.Persistence.FilesLW.Test
 				Single = (float)gen.NextDouble(),
 				DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049),
 				TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000)),
-				Guid = Guid.NewGuid()
+				Guid = Guid.NewGuid(),
+				String = GenerateRandomString(MaxStringLength)
 			};
-
-			int i, c = gen.Next(10, MaxStringLength);
-			char[] ch = new char[c];
-
-			for (i = 0; i < c; i++)
-				ch[i] = (char)gen.Next(32, 127);
-
-			Result.String = new string(ch);
 
 			switch (gen.Next(4))
 			{

@@ -30,6 +30,9 @@ namespace Waher.Things.Script.Parameters
         {
         }
 
+        /// <summary>
+        /// Internet Content-Type of text value.
+        /// </summary>
         [Page(2, "Script", 100)]
         [Header(63, "Content-Type:")]
         [ToolTip(64, "Content-Type of text.")]

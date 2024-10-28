@@ -19,12 +19,15 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Modbus</PackageTags>
     <NeutralLanguage>Enligsh</NeutralLanguage>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
-    <FileVersion>1.0.4</FileVersion>
-    <Version>1.0.4</Version>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Remove="Language\Waher.Things.Modbus.en.lng" />
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>

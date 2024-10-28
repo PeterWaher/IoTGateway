@@ -1090,6 +1090,9 @@ namespace Waher.Runtime.Inventory
 					Grade Grade = Enumerator.Supports(Object);
 					if (Grade > BestGrade)
 					{
+						if (Grade == Grade.Perfect)
+							return Enumerator;
+
 						Best = Enumerator;
 						BestGrade = Grade;
 					}

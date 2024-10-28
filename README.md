@@ -20,8 +20,9 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Themes](#themes)
 * [Things](#things)
 * [Utilities](#utilities)
-* [Web Services](#webServices)
-* [Environment Variables](#environmentVariables)
+* [Web Services](#web-services)
+* [Environment Variables](#environment-variables)
+* [Compiling Solution](#compiling-solution)
 
 Neuro-Foundation License
 ===========================
@@ -85,8 +86,8 @@ communiction with devices, as well as host online content.
 
 | Project                         | Type          | Link                                                      | Project description |
 |---------------------------------|---------------|-----------------------------------------------------------|---------------------|
-| **Waher.IoTClient.Setup**       | Wix           |                                                           | The [Waher.IoTClient.Setup](Waher.IoTClient.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Client, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
-| **Waher.IoTClient.Win32**       | Wix           |                                                           | The [Waher.IoTClient.Win32](Waher.IoTClient.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Client. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTClient.Setup**       | Wix           | (Obsolete)                                                | The [Waher.IoTClient.Setup](Waher.IoTClient.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Client, it also installs any prerequisites, such as the correct .NET framework. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTClient.Win32**       | Wix           | (Obsolete)                                                | The [Waher.IoTClient.Win32](Waher.IoTClient.Win32) project creates a Windows MSI package that installs the Windows 32-bit files for the IoT Client. Project is based on in [Wix framework](https://www.firegiant.com/wix/). |
 | **Waher.IoTGateway**            | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.IoTGateway/) | The [Waher.IoTGateway](Waher.IoTGateway) project is a class library that defines the IoT Gateway. The gateway can host any web content. It converts markdown to HTML in real-time. It can be administrated over XMPP using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
 | **Waher.IoTGateway.App**        | UWP           |                                                           | The [Waher.IoTGateway.App](Waher.IoTGateway.App) project is a Universal Windows Platform application version of the IoT Gateway. It can be installed on IoT devices running Windows 10 IoT. |
 | **Waher.IoTGateway.Build**      | .NET 6.0      |                                                           | The [Waher.IoTGateway.Build](Waher.IoTGateway.Build) project contains MSBuild script for building setup files. Can be used in an auto-build environment. |
@@ -311,6 +312,7 @@ their annotated class definitions.
 | **Waher.Persistence.MongoDB**                | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.MongoDB/)                | The [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project provides a [MongoDB](https://www.mongodb.org/) database provider that can be used for object persistence through the [Waher.Persistence](Persistence/Waher.Persistence) library. |
 | **Waher.Persistence.Serialization**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.Serialization/)          | The [Waher.Persistence.Serialization](Persistence/Waher.Persistence.Serialization) project defines a library that serializes objects to binary form using meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Compatible with Waher.Persistence.Serialization.Compiled. |
 | **Waher.Persistence.Serialization.Compiled** | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.Serialization.Compiled/) | The [Waher.Persistence.Serialization.Compiled](Persistence/Waher.Persistence.Serialization.Compiled) project defines a library that serializes objects to binary form using meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Dynamic code is compiled. Compatible with Waher.Persistence.Serialization. |
+| **Waher.Persistence.XmlLedger**              | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.XmlLedger/)              | The [Waher.Persistence.XmlLedger](Persistence/Waher.Persistence.XmlLedger) project provides a simple ledger that records anything that happens in the database to XML files in the program data folder. Files are kept of a configurable amount of time. |
 
 The folder also contains the following unit test projects:
 
@@ -320,6 +322,7 @@ The folder also contains the following unit test projects:
 | **Waher.Persistence.FilesLW.Test**        | .NET 6.0 | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
 | **Waher.Persistence.FullTextSearch.Test** | .NET 6.0 | The [Waher.Persistence.FullTextSearch.Test](Persistence/Waher.Persistence.FullTextSearch.Test) project contains unit tests for the [Waher.Persistence.FullTextSearch](Persistence/Waher.Persistence.FullTextSearch) project. |
 | **Waher.Persistence.MongoDB.Test**        | .NET 6.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+| **Waher.Persistence.XmlLedger.Test**      | .NET 8.0 | The [Waher.Persistence.XmlLedger.Test](Persistence/Waher.Persistence.XmlLedger.Test) project contains unit tests for the [Waher.Persistence.XmlLedger](Persistence/Waher.Persistence.XmlLedger) project. |
 
 Runtime
 ----------------------
@@ -464,6 +467,7 @@ to form more complex devices, such as concentrators or bridges.
 |---------------------------|---------------|----------------------------------------------------------------|---------------------|
 | **Waher.Things**          | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things/)          | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
 | **Waher.Things.Arduino**  | UWP           | [NuGet](https://www.nuget.org/packages/Waher.Things.Arduino/)  | The [Waher.Things.Arduino](Things/Waher.Things.Arduino) project is a class library that publishes nodes for interaction with Arduinos and connected modules via Firmata. |
+| **Waher.Things.Ieee1451** | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Ieee1451/) | The [Waher.Things.Ieee1451](Things/Waher.Things.Ieee1451) project is a class library that publishes nodes that communicate using the IEEE 1451 family of standards. |
 | **Waher.Things.Files**    | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Files/)    | The [Waher.Things.Files](Things/Waher.Things.Files) project publishes nodes that permit you to define sensor and actuator nodes in the network based on files in the file-system. |
 | **Waher.Things.Gpio**     | UWP           | [NuGet](https://www.nuget.org/packages/Waher.Things.Gpio/)     | The [Waher.Things.Gpio](Things/Waher.Things.Gpio) project is a class library that publishes nodes for interaction with onboard General Purpose Input/Output (GPIO) modules. |
 | **Waher.Things.Ip**       | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Ip/)       | The [Waher.Things.Ip](Things/Waher.Things.Ip) project is a class library that publishes nodes representing nodes on an IP network. |
@@ -473,9 +477,14 @@ to form more complex devices, such as concentrators or bridges.
 | **Waher.Things.Script**   | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Script/)   | The [Waher.Things.Script](Things/Waher.Things.Script) project is a class library that publishes nodes that permit you to define sensors and actuators using script. |
 | **Waher.Things.Semantic** | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Semantic/) | The [Waher.Things.Semantic](Things/Waher.Things.Semantic) project is a class library that publishes nodes representing Semantic Web devices. It also makes other non-semantic metering devices available via semantic web interfaces, such as SPARQL queries. |
 | **Waher.Things.Snmp**     | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Snmp/)     | The [Waher.Things.Snmp](Things/Waher.Things.Snmp) project is a class library that publishes nodes representing SNMP devices on the local area network. |
-| **Waher.Things.Test**     | .NET 6.0      |                                                                | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
 | **Waher.Things.Virtual**  | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Virtual/)  | The [Waher.Things.Virtual](Things/Waher.Things.Virtual) project is a class library that publishes virtual nodes that can act as placeholders for software that wishes to publish nodes on the network. |
 | **Waher.Things.Xmpp**     | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Xmpp/)     | The [Waher.Things.Xmpp](Things/Waher.Things.Xmpp) project is a class library that publishes nodes for communication with devices over XMPP. |
+
+The folder also contains the following unit test projects:
+
+| Project                   | Type     | Project description |
+|---------------------------|----------|---------------------|
+| **Waher.Things.Test**     | .NET 6.0 | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
 
 Utilities
 ----------------------

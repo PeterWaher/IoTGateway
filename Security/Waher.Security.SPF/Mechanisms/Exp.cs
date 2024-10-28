@@ -45,7 +45,7 @@ namespace Waher.Security.SPF.Mechanisms
 		/// <summary>
 		/// Evaluates the explanation.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Evaluated value.</returns>
 		public async Task<string> Evaluate()
 		{
 			try

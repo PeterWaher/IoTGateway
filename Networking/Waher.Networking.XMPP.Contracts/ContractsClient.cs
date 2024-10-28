@@ -748,21 +748,41 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Defines if End-to-End encryption should use the keys used by the contracts client to perform signatures.
 		/// </summary>
 		/// <param name="UseLocalKeys">If local keys should be used in End-to-End encryption.</param>
-		public async Task EnableE2eEncryption(bool UseLocalKeys)
+		public Task EnableE2eEncryption(bool UseLocalKeys)
+		{
+			return this.EnableE2eEncryption(UseLocalKeys, true);
+		}
+
+		/// <summary>
+		/// Defines if End-to-End encryption should use the keys used by the contracts client to perform signatures.
+		/// </summary>
+		/// <param name="UseLocalKeys">If local keys should be used in End-to-End encryption.</param>
+		/// <param name="CreateKeysIfNone">If local keys should be created, if none available.</param>
+		public async Task EnableE2eEncryption(bool UseLocalKeys, bool CreateKeysIfNone)
 		{
 			bool Reload = !(this.localKeys is null);
 
 			this.localKeysForE2e = UseLocalKeys;
 
 			if (Reload)
-				await this.LoadKeys(true);
+				await this.LoadKeys(CreateKeysIfNone);
 		}
 
 		/// <summary>
 		/// Enables End-to-End encryption with a separate set of keys.
 		/// </summary>
 		/// <param name="E2eEndpoint">Endpoint managing the keys on the network.</param>
-		public async Task EnableE2eEncryption(EndpointSecurity E2eEndpoint)
+		public Task EnableE2eEncryption(EndpointSecurity E2eEndpoint)
+		{
+			return this.EnableE2eEncryption(E2eEndpoint, true);
+		}
+
+		/// <summary>
+		/// Enables End-to-End encryption with a separate set of keys.
+		/// </summary>
+		/// <param name="E2eEndpoint">Endpoint managing the keys on the network.</param>
+		/// <param name="CreateKeysIfNone">If local keys should be created, if none available.</param>
+		public async Task EnableE2eEncryption(EndpointSecurity E2eEndpoint, bool CreateKeysIfNone)
 		{
 			bool Reload = !(this.localKeys is null);
 
@@ -770,7 +790,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.localE2eEndpoint = E2eEndpoint;
 
 			if (Reload)
-				await this.LoadKeys(true);
+				await this.LoadKeys(CreateKeysIfNone);
 		}
 
 		/// <summary>
@@ -4885,6 +4905,42 @@ namespace Waher.Networking.XMPP.Contracts
 		#region SendContractProposal
 
 		/// <summary>
+		/// Sends a contract proposal to a recipient. If the contract contains encrypted parameters, and End-to-End encryption is
+		/// enabled, the proposal will be sent End-to-End encrypted with the shared secret.
+		/// </summary>
+		/// <param name="Contract">Proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		public Task SendContractProposal(Contract Contract, string Role, string To)
+		{
+			return this.SendContractProposal(Contract, Role, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a contract proposal to a recipient. If the contract contains encrypted parameters, and End-to-End encryption is
+		/// enabled, the proposal will be sent End-to-End encrypted with the shared secret.
+		/// </summary>
+		/// <param name="Contract">Proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		/// <param name="Message">Optional message included in message.</param>
+		public async Task SendContractProposal(Contract Contract, string Role, string To, string Message)
+		{
+			if (Contract.HasEncryptedParameters)
+			{
+				Tuple<SymmetricCipherAlgorithms, string, byte[]> T = await this.TryLoadContractSharedSecret(Contract.ContractId);
+
+				if (!(T is null))
+				{
+					this.SendContractProposal(Contract.ContractId, Role, To, Message, T.Item3, T.Item1);
+					return;
+				}
+			}
+				
+			this.SendContractProposal(Contract.ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
+		}
+
+		/// <summary>
 		/// Sends a contract proposal to a recipient.
 		/// </summary>
 		/// <param name="ContractId">ID of proposed contract.</param>
@@ -6294,7 +6350,7 @@ namespace Waher.Networking.XMPP.Contracts
 							LegalIdentity TempId = LegalIdentity.Parse(Doc.DocumentElement);
 
 							if (TempId.State == IdentityState.Created &&
-								TempId["JID"].ToLower() == XmppClient.GetBareJID(From).ToLower())
+								string.Compare(TempId["JID"], XmppClient.GetBareJID(From), true) == 0)
 							{
 								Identity = TempId;
 								PeerReview = true;

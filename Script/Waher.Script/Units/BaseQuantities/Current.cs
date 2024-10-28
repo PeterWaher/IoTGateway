@@ -18,11 +18,17 @@
 		public string Name => "Current";
 
 		/// <summary>
-		/// Reference unit of base quantity.
+		/// Reference unit of category.
 		/// </summary>
 		public AtomicUnit ReferenceUnit => referenceUnit;
 
+		/// <summary>
+		/// Reference unit for category.
+		/// </summary>
+		public Unit Reference => reference;
+
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("A");
+		private static readonly Unit reference = new Unit(referenceUnit);
 
 		/// <summary>
 		/// Base Units supported.

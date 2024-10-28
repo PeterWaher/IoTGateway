@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Collections.Generic;
 using System.Xml;
 using System.Windows;
@@ -415,38 +414,41 @@ namespace Waher.Client.WPF.Controls
 
 		private void Node_Updated(object sender, EventArgs e)
 		{
-			lock (this.syncObj)
+			if (this.refreshTimer > DateTime.MinValue)
 			{
-				this.refreshTimer?.Dispose();
-				this.refreshTimer = new Timer(this.RefreshTree, null, 250, Timeout.Infinite);
+				MainWindow.Scheduler?.Remove(this.refreshTimer);
+				this.refreshTimer = DateTime.MinValue;
 			}
+
+			this.refreshTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(250), this.RefreshTree, null);
 		}
 
 		public void ShowStatus(string Message)
 		{
-			lock (this.syncObj)
+			if (this.status == Message)
+				return;
+
+			this.status = Message;
+
+			if (this.statusTimer > DateTime.MinValue)
 			{
-				if (this.status == Message)
-					return;
-
-				this.status = Message;
-
-				this.statusTimer?.Dispose();
-				this.statusTimer = new Timer(this.SetStatus, null, 250, Timeout.Infinite);
+				MainWindow.Scheduler?.Remove(this.statusTimer);
+				this.statusTimer = DateTime.MinValue;
 			}
+
+			this.statusTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(250), this.SetStatus, null);
 		}
 
 		private string status = string.Empty;
-		private Timer refreshTimer = null;
-		private Timer statusTimer = null;
-		private readonly object syncObj = new object();
+		private DateTime refreshTimer = DateTime.MinValue;
+		private DateTime statusTimer = DateTime.MinValue;
 
 		private void RefreshTree(object _)
 		{
-			lock (this.syncObj)
+			if (this.statusTimer > DateTime.MinValue)
 			{
-				this.refreshTimer?.Dispose();
-				this.refreshTimer = null;
+				MainWindow.Scheduler?.Remove(this.statusTimer);
+				this.statusTimer = DateTime.MinValue;
 			}
 
 			MainWindow.UpdateGui(() =>
@@ -458,10 +460,10 @@ namespace Waher.Client.WPF.Controls
 
 		private void SetStatus(object _)
 		{
-			lock (this.syncObj)
+			if (this.statusTimer > DateTime.MinValue)
 			{
-				this.statusTimer?.Dispose();
-				this.statusTimer = null;
+				MainWindow.Scheduler?.Remove(this.statusTimer);
+				this.statusTimer = DateTime.MinValue;
 			}
 
 			MainWindow.UpdateGui(() =>

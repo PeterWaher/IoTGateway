@@ -39,19 +39,22 @@ namespace Waher.Utility.Extract.ExportFormats
 		/// <summary>
 		/// Starts export of files.
 		/// </summary>
-		Task StartFiles();
+		/// <returns>If export can continue.</returns>
+		Task<bool> StartFiles();
 
 		/// <summary>
 		/// Ends export of files.
 		/// </summary>
-		Task EndFiles();
+		/// <returns>If export can continue.</returns>
+		Task<bool> EndFiles();
 
 		/// <summary>
 		/// Export file.
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="File">File stream</param>
-		Task ExportFile(string FileName, Stream File);
+		/// <returns>If export can continue.</returns>
+		Task<bool> ExportFile(string FileName, Stream File);
 
 	}
 }

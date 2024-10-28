@@ -206,15 +206,12 @@ namespace Waher.Things.Modbus
 		/// <summary>
 		/// Modbus Gateway node.
 		/// </summary>
-		public ModbusGatewayNode Gateway
+		public async Task<ModbusGatewayNode> GetGateway()
 		{
-			get
-			{
-				if (this.Parent is ModbusGatewayNode GatewayNode)
-					return GatewayNode;
-				else
-					throw new Exception("Modbus Gateway node not found.");
-			}
+			if (await this.GetParent() is ModbusGatewayNode GatewayNode)
+				return GatewayNode;
+			else
+				throw new Exception("Modbus Gateway node not found.");
 		}
 
 		/// <summary>
@@ -239,7 +236,8 @@ namespace Waher.Things.Modbus
 
 		private async Task StartReadoutOfRegisters(ISensorReadout Request)
 		{
-			ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+			ModbusGatewayNode Gateway = await this.GetGateway();
+			ModbusTcpClient Client = await Gateway.GetTcpIpConnection();
 			await Client.Enter();
 			try
 			{

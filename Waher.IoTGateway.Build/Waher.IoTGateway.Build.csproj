@@ -58,8 +58,10 @@
     
     <MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 
+		<!--
     <MSBuild Projects="..\Waher.IoTClient.Win32\Waher.IoTClient.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
     <MSBuild Projects="..\Waher.IoTClient.Setup\Waher.IoTClient.Setup.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+		-->
   </Target>
 
 </Project>

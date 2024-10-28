@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Script.Model;
+using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
-	/// <summary>
-	/// Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
-	/// </summary>
-	public class FullOuterJoinedSource : JoinedSource
+    /// <summary>
+    /// Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.
+    /// </summary>
+    public class FullOuterJoinedSource : JoinedSource
 	{
 		/// <summary>
 		/// Data source formed through an (FULL [OUTER]|OUTER) JOIN of two sources.

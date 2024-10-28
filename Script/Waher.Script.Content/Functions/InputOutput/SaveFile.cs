@@ -69,7 +69,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 			string FileName = Argument2.AssociatedObjectValue.ToString();
 
 			if (Obj is Graph G)
-				Obj = G.CreatePixels(Variables);
+				Obj = G.CreatePixels();
 
 			byte[] Bin = null;
 

@@ -51,7 +51,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = await this .source.GetSource(Variables);
+			IDataSource Source = await this.source.GetSource(Variables);
 			await Source.DropCollection();
 			return ObjectValue.Null;
 		}

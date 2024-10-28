@@ -23,6 +23,7 @@ AppPackages/
 packages/
 BundleArtifacts/
 TestResults/
+publish/
 
 # User files
 *.suo

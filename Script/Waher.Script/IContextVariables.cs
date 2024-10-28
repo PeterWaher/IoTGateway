@@ -25,6 +25,7 @@
 		/// </summary>
 		/// <param name="Name">Variable name.</param>
 		/// <param name="Value">Associated variable object value.</param>
-		void Add(string Name, object Value);
+		/// <returns>Reference to variable that was added.</returns>
+		Variable Add(string Name, object Value);
 	}
 }

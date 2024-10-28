@@ -133,7 +133,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "webform")
+			if (string.Compare(FileExtension, "webform", true) == 0)
 			{
 				ContentType = WwwFormCodec.ContentType;
 				return true;

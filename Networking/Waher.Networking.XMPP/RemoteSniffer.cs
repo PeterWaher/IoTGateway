@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP
 		/// If the sniffer has expired.
 		/// </summary>
 		/// <param name="Now"></param>
-		/// <returns></returns>
+		/// <returns>If sniffer has expired.</returns>
 		private bool HasExpired(DateTime Now)
 		{
 			if (Now.ToUniversalTime() >= this.expires)

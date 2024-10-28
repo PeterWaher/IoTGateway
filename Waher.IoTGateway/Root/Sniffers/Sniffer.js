@@ -12,7 +12,7 @@
                 else
                     Resource += "?";
 
-                Resource += "SnifferId=" + encodeURI(xhttp.responseText);
+                Resource += "SnifferId=" + encodeURIComponent(xhttp.responseText);
 
                 var Window = window.open(Resource, "_blank");
                 Window.focus();

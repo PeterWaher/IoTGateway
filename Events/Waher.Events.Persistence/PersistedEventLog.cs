@@ -181,7 +181,7 @@ namespace Waher.Events.Persistence
 		/// <param name="MaxCount">Maximum number of events to return.</param>
 		/// <param name="From">Return events greater than or equal to this timestamp.</param>
 		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
-		/// <returns></returns>
+		/// <returns>Enumerable set of events.</returns>
 		public Task<IEnumerable<PersistedEvent>> GetEvents(int Offset, int MaxCount, DateTime From, DateTime To)
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
@@ -197,7 +197,7 @@ namespace Waher.Events.Persistence
 		/// <param name="Type">Event Type</param>
 		/// <param name="From">Return events greater than or equal to this timestamp.</param>
 		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
-		/// <returns></returns>
+		/// <returns>Enumerable set of events.</returns>
 		public Task<IEnumerable<PersistedEvent>> GetEventsOfType(int Offset, int MaxCount, EventType Type, DateTime From, DateTime To)
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
@@ -214,7 +214,7 @@ namespace Waher.Events.Persistence
 		/// <param name="Object">Object identity.</param>
 		/// <param name="From">Return events greater than or equal to this timestamp.</param>
 		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
-		/// <returns></returns>
+		/// <returns>Enumerable set of events.</returns>
 		public Task<IEnumerable<PersistedEvent>> GetEventsOfObject(int Offset, int MaxCount, string Object, DateTime From, DateTime To)
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
@@ -231,7 +231,7 @@ namespace Waher.Events.Persistence
 		/// <param name="Actor">Actor identity.</param>
 		/// <param name="From">Return events greater than or equal to this timestamp.</param>
 		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
-		/// <returns></returns>
+		/// <returns>Enumerable set of events.</returns>
 		public Task<IEnumerable<PersistedEvent>> GetEventsOfActor(int Offset, int MaxCount, string Actor, DateTime From, DateTime To)
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
@@ -248,7 +248,7 @@ namespace Waher.Events.Persistence
 		/// <param name="EventId">Event identity.</param>
 		/// <param name="From">Return events greater than or equal to this timestamp.</param>
 		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
-		/// <returns></returns>
+		/// <returns>Enumerable set of events.</returns>
 		public Task<IEnumerable<PersistedEvent>> GetEventsOfEventId(int Offset, int MaxCount, string EventId, DateTime From, DateTime To)
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(
@@ -265,7 +265,7 @@ namespace Waher.Events.Persistence
 		/// <param name="Facility">Facility identity.</param>
 		/// <param name="From">Return events greater than or equal to this timestamp.</param>
 		/// <param name="To">Return events lesser than or equal to this timestamp.</param>
-		/// <returns></returns>
+		/// <returns>Enumerable set of events.</returns>
 		public Task<IEnumerable<PersistedEvent>> GetEventsOfFacility(int Offset, int MaxCount, string Facility, DateTime From, DateTime To)
 		{
 			return Database.Find<PersistedEvent>(Offset, MaxCount, new FilterAnd(

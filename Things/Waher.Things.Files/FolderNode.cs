@@ -171,7 +171,6 @@ namespace Waher.Things.Files
 		/// <summary>
 		/// Synchronizes folder, subfolders, files and nodes.
 		/// </summary>
-		/// <returns></returns>
 		public Task Synchronize()
 		{
 			this.timer?.Dispose();
@@ -673,6 +672,9 @@ namespace Waher.Things.Files
 			}
 		}
 
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
 		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
 
 		/// <summary>

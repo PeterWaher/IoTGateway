@@ -6,12 +6,11 @@ using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
-using Waher.Things.Metering;
 
 namespace Waher.Things.Mqtt.Model
 {
 	/// <summary>
-	/// TODO
+	/// MQTT Broker connection object.
 	/// </summary>
 	public class MqttBroker : IDisposable
 	{
@@ -34,7 +33,7 @@ namespace Waher.Things.Mqtt.Model
 		private DateTime nextCheck;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Broker connection object.
 		/// </summary>
 		public MqttBroker(MqttBrokerNode Node, string Host, int Port, bool Tls, bool TrustServer, string UserName, string Password,
 			string ConnectionSubscription, string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
@@ -56,6 +55,11 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		internal MqttClient Client => this.mqttClient;
+
+		/// <summary>
+		/// Reference to broker node.
+		/// </summary>
+		public MqttBrokerNode Node => this.node;
 
 		private void Open()
 		{
@@ -117,12 +121,37 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
+		/// Publishes binary data to a topic.
+		/// </summary>
+		/// <param name="Topic">Topic</param>
+		/// <param name="QoS">Quality of Service</param>
+		/// <param name="Retain">If data should be retained</param>
+		/// <param name="Data">Binary Data</param>
+		public Task Publish(string Topic, MqttQualityOfService QoS, bool Retain, byte[] Data)
+		{
+			return this.Client.PUBLISH(Topic, QoS, Retain, Data);
+		}
+
+		/// <summary>
+		/// Publishes text data to a topic.
+		/// </summary>
+		/// <param name="Topic">Topic</param>
+		/// <param name="QoS">Quality of Service</param>
+		/// <param name="Retain">If data should be retained</param>
+		/// <param name="Data">Text Data</param>
+		public Task Publish(string Topic, MqttQualityOfService QoS, bool Retain, string Data)
+		{
+			return this.Publish(Topic, QoS, Retain, Encoding.UTF8.GetBytes(Data));
+		}
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public async Task DataReceived(MqttContent Content)
 		{
-			MqttTopic Topic = await this.GetTopic(Content.Topic, true);
-			Topic?.DataReported(Content);
+			MqttTopic Topic = await this.GetTopic(Content.Topic, true, true);
+			if (!(Topic is null))
+				await Topic.DataReported(Content);
 		}
 
 		/// <summary>
@@ -155,7 +184,15 @@ namespace Waher.Things.Mqtt.Model
 						await this.node.RemoveErrorAsync("Error");
 
 						if (!string.IsNullOrEmpty(this.connectionSubscription))
-							await this.mqttClient.SUBSCRIBE(this.connectionSubscription, MqttQualityOfService.AtLeastOnce);
+						{
+							string[] Parts = this.connectionSubscription.Split(',');
+							int i, c = Parts.Length;
+
+							for (i = 0; i < c; i++)
+								Parts[i] = Parts[i].Trim();
+
+							await this.mqttClient.SUBSCRIBE(MqttQualityOfService.AtLeastOnce, Parts);
+						}
 						break;
 
 					case MqttState.Error:
@@ -177,7 +214,7 @@ namespace Waher.Things.Mqtt.Model
 
 		private Task MqttClient_OnContentReceived(object Sender, MqttContent Content)
 		{
-			lock (this.queue)
+			lock (this.topics)
 			{
 				if (this.processing)
 				{
@@ -189,6 +226,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 
 			this.Process(Content);
+
 			return Task.CompletedTask;
 		}
 
@@ -201,10 +239,11 @@ namespace Waher.Things.Mqtt.Model
 			{
 				while (true)
 				{
-					MqttTopic Topic = await this.GetTopic(Content.Topic, true);
-					Topic?.DataReported(Content);
+					MqttTopic Topic = await this.GetTopic(Content.Topic, true, true);
+					if (!(Topic is null))
+						await Topic.DataReported(Content);
 
-					lock (this.queue)
+					lock (this.topics)
 					{
 						if (this.queue.First is null)
 						{
@@ -242,81 +281,87 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets the Node responsible for managing a Topic
 		/// </summary>
-		public async Task<MqttTopic> GetTopic(string TopicString, bool CreateNew)
+		public async Task<MqttTopic> GetTopic(string TopicString, bool CreateNew, bool IgnoreGuids)
 		{
 			if (string.IsNullOrEmpty(TopicString))
 				return null;
 
-			string[] Parts = TopicString.Split('/');
-			MqttTopic Topic;
+			MqttTopicRepresentation Representation = new MqttTopicRepresentation(TopicString, TopicString.Split('/'), 0);
+			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew);
+
+			if (Topic is null)
+				return null;
+			else if (Representation.MoveNext(Topic))
+				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, this);
+			else
+				return Topic;
+		}
+
+		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew)
+		{
+			string CurrentSegment = Representation.CurrentSegment;
+			MqttTopic Topic, Topic2;
 
 			lock (this.topics)
 			{
-				if (!this.topics.TryGetValue(Parts[0], out Topic))
-					Topic = null;
+				if (this.topics.TryGetValue(CurrentSegment, out Topic))
+					return Topic;
 			}
 
-			if (Topic is null)
-			{
-				if (System.Guid.TryParse(Parts[0].Replace('_', '-'), out Guid _))
-					return null;
+			if (Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
+				return null;
 
-				if (this.node.HasChildren)
+			if (this.node.HasChildren)
+			{
+				foreach (INode Child in await this.node.ChildNodes)
 				{
-					foreach (INode Child in await this.node.ChildNodes)
+					if (Child is IMqttTopicNode TopicNode && TopicNode.LocalTopic == CurrentSegment)
 					{
-						if (Child is MqttTopicNode Topic2 && Topic2.LocalTopic == Parts[0])
+						lock (this.topics)
 						{
-							Topic = new MqttTopic(Topic2, Parts[0], Parts[0], null, this);
-							break;
+							if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+								return Topic2;
+							else
+							{
+								Topic = new MqttTopic(TopicNode, CurrentSegment, CurrentSegment, null, this);
+								this.topics[CurrentSegment] = Topic;
+								return Topic;
+							}
 						}
 					}
 				}
-
-				MqttTopicNode Node = null;
-
-				if (Topic is null)
-				{
-					if (!CreateNew)
-						return null;
-
-					Node = new MqttTopicNode()
-					{
-						NodeId = await MeteringNode.GetUniqueNodeId(Parts[0]),
-						LocalTopic = Parts[0]
-					};
-
-					Topic = new MqttTopic(Node, Parts[0], Parts[0], null, this);
-				}
-
-				lock (this.topics)
-				{
-					if (this.topics.ContainsKey(Parts[0]))
-						Topic = this.topics[Parts[0]];
-					else
-						this.topics[Parts[0]] = Topic;
-				}
-
-				if (!(Node is null))
-				{
-					if (Node != Topic.Node)
-						await Node.DestroyAsync();
-					else
-						await this.node.AddAsync(Node);
-				}
 			}
 
-			if (Parts.Length == 1)
-				return Topic;
-			else
-				return await Topic.GetTopic(Parts, 1, CreateNew, this);
+			if (!CreateNew)
+				return null;
+
+			IMqttTopicNode AddNode = Types.FindBest<IMqttTopicNode, MqttTopicRepresentation>(Representation);
+			if (AddNode is null)
+				return null;
+
+			AddNode = await AddNode.CreateNew(Representation);
+			Topic = new MqttTopic(AddNode, AddNode.LocalTopic, AddNode.LocalTopic, null, this);
+
+			lock (this.topics)
+			{
+				if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+					return Topic2;
+				else
+					this.topics[CurrentSegment] = Topic;
+			}
+
+			await this.node.AddAsync(AddNode);
+
+			return Topic;
 		}
 
 		/// <summary>
-		/// TODO
+		/// Removes a child topic
 		/// </summary>
+		/// <param name="LocalTopic">Local topic name.</param>
+		/// <returns>If local topic was found and removed.</returns>
 		public bool Remove(string LocalTopic)
 		{
 			if (!(LocalTopic is null))

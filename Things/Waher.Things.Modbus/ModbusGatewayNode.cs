@@ -52,12 +52,45 @@ namespace Waher.Things.Modbus
 
 		#region ISniffable
 
+		/// <summary>
+		/// Registered sniffers
+		/// </summary>
 		public ISniffer[] Sniffers => this.sniffers.Sniffers;
+
+		/// <summary>
+		/// If sniffers are registered
+		/// </summary>
 		public bool HasSniffers => this.sniffers.HasSniffers;
+
+		/// <summary>
+		/// Adds a sniffer
+		/// </summary>
+		/// <param name="Sniffer">Sniffer</param>
 		public void Add(ISniffer Sniffer) => this.sniffers.Add(Sniffer);
+
+		/// <summary>
+		/// Adds a range of sniffers
+		/// </summary>
+		/// <param name="Sniffers">Sniffrs</param>
 		public void AddRange(IEnumerable<ISniffer> Sniffers) => this.sniffers.AddRange(Sniffers);
+
+		/// <summary>
+		/// Removes a sniffer
+		/// </summary>
+		/// <param name="Sniffer">Sniffer</param>
+		/// <returns>If sniffer was found and removed.</returns>
 		public bool Remove(ISniffer Sniffer) => this.sniffers.Remove(Sniffer);
+
+		/// <summary>
+		/// Gets an enumerator of registered sniffers.
+		/// </summary>
+		/// <returns>Enumerator</returns>
 		public IEnumerator<ISniffer> GetEnumerator() => this.sniffers.GetEnumerator();
+
+		/// <summary>
+		/// Gets an enumerator of registered sniffers.
+		/// </summary>
+		/// <returns>Enumerator</returns>
 		IEnumerator IEnumerable.GetEnumerator() => this.sniffers.GetEnumerator();
 
 		#endregion

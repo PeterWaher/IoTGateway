@@ -7,9 +7,15 @@ using Waher.Things.Ip;
 
 namespace Waher.Things.Xmpp
 {
+	/// <summary>
+	/// Module for managing XMPP nodes
+	/// </summary>
 	[Singleton]
 	public class XmppModule : IModule
 	{
+		/// <summary>
+		/// Starts the module.
+		/// </summary>
 		public async Task Start()
 		{
 			try
@@ -33,6 +39,9 @@ namespace Waher.Things.Xmpp
 			}
 		}
 
+		/// <summary>
+		/// Stops the module.
+		/// </summary>
 		public Task Stop()
 		{
 			return Task.CompletedTask;

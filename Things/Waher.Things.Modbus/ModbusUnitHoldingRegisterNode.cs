@@ -131,17 +131,17 @@ namespace Waher.Things.Modbus
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
 		public async Task StartReadout(ISensorReadout Request)
 		{
-			ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+			ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 			await Client.Enter();
 			try
 			{
-				ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+				ushort[] Values = await Client.ReadMultipleRegisters((byte)(await this.GetUnitNode()).UnitId, (ushort)this.RegisterNr, 1);
 				ushort Raw = CheckOrder(this.SwitchByteOrder, Values[0]);
 				double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
 				int NrDec = Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor))));
 				DateTime TP = DateTime.UtcNow;
 
-				ThingReference This = this.ReportAs;
+				ThingReference This = await this.GetReportAs();
 				List<Field> Fields = new List<Field>
 				{
 					new QuantityField(This, TP, this.GetFieldName(), Value, (byte)NrDec, this.Unit, FieldType.Momentary, FieldQoS.AutomaticReadout, true)
@@ -162,6 +162,10 @@ namespace Waher.Things.Modbus
 			}
 		}
 
+		/// <summary>
+		/// Gets the field name of the node.
+		/// </summary>
+		/// <returns>Field name</returns>
 		public string GetFieldName()
 		{
 			if (string.IsNullOrEmpty(this.FieldName))
@@ -182,11 +186,11 @@ namespace Waher.Things.Modbus
 					this.Offset, ((65535 * this.Multiplier) / this.Divisor) + this.Offset,
 					async (Node) =>
 					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
-							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+							ushort[] Values = await Client.ReadMultipleRegisters((byte)(await this.GetUnitNode()).UnitId, (ushort)this.RegisterNr, 1);
 							return ((CheckOrder(this.SwitchByteOrder, Values[0]) * this.Multiplier) / this.Divisor) + this.Offset;
 						}
 						finally
@@ -196,12 +200,12 @@ namespace Waher.Things.Modbus
 					},
 					async (Node, Value) =>
 					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
 							ushort Raw = (ushort)Math.Min(65535, Math.Max(0, ((Value - this.Offset) * this.Divisor) / this.Multiplier));
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr,
+							ushort WritenValue = await Client.WriteRegister((byte)(await this.GetUnitNode()).UnitId, (ushort)this.RegisterNr,
 								CheckOrder(this.SwitchByteOrder, Raw));
 
 							if (WritenValue != Value)
@@ -219,11 +223,11 @@ namespace Waher.Things.Modbus
 				Parameters.Add(new Int32ControlParameter("Value", "Modbus", this.RawName, "Raw register output", 0, 65535,
 					async (Node) =>
 					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
-							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+							ushort[] Values = await Client.ReadMultipleRegisters((byte)(await this.GetUnitNode()).UnitId, (ushort)this.RegisterNr, 1);
 							return CheckOrder(this.SwitchByteOrder, Values[0]);
 						}
 						finally
@@ -233,11 +237,11 @@ namespace Waher.Things.Modbus
 					},
 					async (Node, Value) =>
 					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr,
+							ushort WritenValue = await Client.WriteRegister((byte)(await this.GetUnitNode()).UnitId, (ushort)this.RegisterNr,
 								CheckOrder(this.SwitchByteOrder, (ushort)Value));
 
 							if (WritenValue != Value)

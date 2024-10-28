@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SkiaSharp;
-using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Threading;
+using Waher.Script;
 using Waher.Script.Graphs;
 
 namespace Waher.Content.Markdown.Consolidation
@@ -315,7 +315,7 @@ namespace Waher.Content.Markdown.Consolidation
 			if (Update)
 				await this.Raise(this.Updated, Source);
 			else
-				await this .Raise(this.Added, Source);
+				await this.Raise(this.Added, Source);
 
 			return Result;
 		}
@@ -518,51 +518,40 @@ namespace Waher.Content.Markdown.Consolidation
 
 							if (this.legend.Count > 0)
 							{
+								string[] Labels = new string[this.legend.Count];
+								SKColor[] Colors = new SKColor[this.legend.Count];
+								bool First = true;
+
 								Markdown.AppendLine();
-								Markdown.AppendLine("```layout");
-								Markdown.AppendLine("<Layout2D xmlns=\"http://waher.se/Schema/Layout2D.xsd\"");
-								Markdown.AppendLine("background=\"WhiteBackground\" pen=\"BlackPen\"");
-								Markdown.AppendLine("font=\"Text\" textColor=\"Black\">");
-								Markdown.AppendLine("<SolidPen id=\"BlackPen\" color=\"Black\" width=\"1px\"/>");
+								Markdown.Append("{{Legend([");
 
 								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
 								{
-									Markdown.Append("<SolidBackground id=\"Graph");
-									Markdown.Append(P.Value.Value.ToString());
-									Markdown.Append("\" color=\"#");
-									Markdown.Append(P.Value.Key.Red.ToString("X2"));
-									Markdown.Append(P.Value.Key.Green.ToString("X2"));
-									Markdown.Append(P.Value.Key.Blue.ToString("X2"));
+									if (First)
+										First = false;
+									else
+										Markdown.Append(',');
 
-									if (P.Value.Key.Alpha != 255)
-										Markdown.Append(P.Value.Key.Alpha.ToString("X2"));
-
-									Markdown.AppendLine("\"/>");
+									Markdown.Append(Expression.ToString(P.Key));
 								}
 
-								Markdown.AppendLine("<Grid columns=\"4\">");
+								Markdown.Append("],[");
+								First = true;
 
 								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
 								{
-									Markdown.AppendLine("<Cell>");
-									Markdown.AppendLine("<Margins left=\"1mm\" top=\"1mm\" bottom=\"1mm\" right=\"1mm\">");
-									Markdown.Append("<RoundedRectangle radiusX=\"5mm\" radiusY=\"5mm\" fill=\"Graph");
-									Markdown.Append(P.Value.Value.ToString());
-									Markdown.AppendLine("\">");
-									Markdown.AppendLine("<Margins left=\"0.5em\" right=\"0.5em\" top=\"0.25em\" bottom=\"0.25em\">");
-									Markdown.Append("<Label text=\"");
-									Markdown.Append(XML.Encode(P.Key));
-									Markdown.AppendLine("\" x=\"50%\" y=\"50%\" halign=\"Center\" valign=\"Center\"/>");
-									Markdown.AppendLine("</Margins>");
-									Markdown.AppendLine("</RoundedRectangle>");
-									Markdown.AppendLine("</Margins>");
-									Markdown.AppendLine("</Cell>");
+									if (First)
+										First = false;
+									else
+										Markdown.Append(',');
+
+									Markdown.Append(Graph.ToRGBAStyle(P.Value.Key));
 								}
 
-								Markdown.AppendLine("</Grid>");
-								Markdown.AppendLine("</Layout2D>");
-								Markdown.AppendLine("```");
+								Markdown.AppendLine("],4)}}");
 							}
+
+							Markdown.AppendLine();
 						}
 						catch (Exception ex)
 						{

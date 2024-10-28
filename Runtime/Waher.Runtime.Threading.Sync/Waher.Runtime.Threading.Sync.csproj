@@ -17,12 +17,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>threading runtime thread affinity synchronization asynchronous mutex</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageIcon>Icon_64x64.png</PackageIcon>
-    <Version>1.0.1</Version>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
+		<Version>1.0.2</Version>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

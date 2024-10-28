@@ -1,22 +1,22 @@
-﻿using System;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Loader;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Text;
+using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
+using Waher.Persistence.Exceptions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
-using System.Linq;
 
 namespace Waher.Persistence.MongoDB.Serialization
 {
@@ -43,6 +43,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 		private readonly System.Reflection.TypeInfo typeInfo;
 		private readonly bool backupCollection = true;
 		private readonly string noBackupReason = null;
+		private readonly PropertyInfo archiveProperty = null;
+		private readonly FieldInfo archiveField = null;
+		private readonly int archiveDays = 0;
+		private bool archive = false;
+		private bool archiveDynamic = false;
 
 		/// <summary>
 		/// Database provider.
@@ -112,6 +117,37 @@ namespace Waher.Persistence.MongoDB.Serialization
 				ParameterInfo[] Parameters = this.obsoleteMethod.GetParameters();
 				if (Parameters.Length != 1 || Parameters[0].ParameterType != typeof(Dictionary<string, object>))
 					throw new Exception("Obsolete method " + ObsoleteMethodAttribute.MethodName + " on " + this.type.FullName + " has invalid arguments.");
+			}
+
+			ArchivingTimeAttribute ArchivingTimeAttribute = this.typeInfo.GetCustomAttribute<ArchivingTimeAttribute>(true);
+			if (ArchivingTimeAttribute is null)
+				this.archive = false;
+			else
+			{
+				this.archive = true;
+				if (!string.IsNullOrEmpty(ArchivingTimeAttribute.PropertyName))
+				{
+					this.archiveProperty = this.type.GetRuntimeProperty(ArchivingTimeAttribute.PropertyName);
+
+					if (this.archiveProperty is null)
+					{
+						this.archiveField = this.type.GetRuntimeField(ArchivingTimeAttribute.PropertyName);
+						this.archiveProperty = null;
+
+						if (this.archiveField is null)
+							throw new SerializationException("Archiving time property or field not found: " + ArchivingTimeAttribute.PropertyName, this.type);
+						else if (this.archiveField.FieldType != typeof(int))
+							throw new SerializationException("Invalid field type for the archiving time: " + this.archiveField.Name, this.type);
+					}
+					else if (this.archiveProperty.PropertyType != typeof(int))
+						throw new SerializationException("Invalid property type for the archiving time: " + this.archiveProperty.Name, this.type);
+					else
+						this.archiveField = null;
+
+					this.archiveDynamic = !(this.archiveProperty is null && this.archiveField is null);
+				}
+				else
+					this.archiveDays = ArchivingTimeAttribute.Days;
 			}
 
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
@@ -1514,7 +1550,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
 				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadObjectId().ToString();");
 				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-				CSharp.AppendLine(); 
+				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.RegularExpression:");
 				CSharp.AppendLine("\t\t\t\t\t\t\t\tFieldValue = Reader.ReadRegularExpression().Pattern;");
 				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
@@ -2177,7 +2213,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				sb.AppendLine("Code generated:");
 				sb.AppendLine();
 				sb.AppendLine(CSharpCode);
-				
+
 				throw new Exception("Unable to serialize objects of type " + Type.FullName +
 					". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
 			}
@@ -2263,6 +2299,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		internal static Task RemoveIndex(IMongoCollection<BsonDocument> Collection, List<BsonDocument> Indices, string[] FieldNames)
 		{
 			BsonDocument ToRemove = null;
+			bool Found;
 
 			foreach (BsonDocument Index in Indices)
 			{
@@ -2273,7 +2310,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
 				IEnumerator e2 = FieldNames.GetEnumerator();
 
-				bool Found = true;
+				Found = true;
 
 				while (e1.MoveNext() && e2.MoveNext())
 				{
@@ -2294,7 +2331,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (ToRemove is null)
 				return Task.CompletedTask;
 
-			if (!ToRemove.Names.Contains("name"))
+			Found = false;
+
+			foreach (string s in ToRemove.Names)
+			{
+				if (s == "name")
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			if (!Found)
 				throw new IOException("MongoDB index name not found.");
 
 			string Name = ToRemove["name"].AsString;
@@ -2636,6 +2684,41 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// Internal reference to constant collection name.
 		/// </summary>
 		internal string CollectionNameConstant => this.collectionName;
+
+		/// <summary>
+		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
+		/// </summary>
+		public virtual int GetArchivingTimeDays(object Object)
+		{
+			if (!this.archive)
+				return 0;
+
+			if (!(this.archiveProperty is null))
+				return (int)this.archiveProperty.GetValue(Object);
+
+			if (!(this.archiveField is null))
+				return (int)this.archiveField.GetValue(Object);
+
+			return this.archiveDays;
+		}
+
+		/// <summary>
+		/// If objects of this type can be archived.
+		/// </summary>
+		public bool ArchiveObjects
+		{
+			get => this.archive;
+			internal set => this.archive = value;
+		}
+
+		/// <summary>
+		/// If each object contains the information for how long time it can be archived.
+		/// </summary>
+		public bool ArchiveTimeDynamic
+		{
+			get => this.archiveDynamic;
+			internal set => this.archiveDynamic = value;
+		}
 
 		/// <summary>
 		/// Tries to get the serialization info for a member.

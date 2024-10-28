@@ -33,6 +33,8 @@ namespace Waher.Content.Markdown
 		private bool videoControls = true;
 		private bool embedEmojis = false;
 		private bool allowScriptTag = true;
+		private bool allowHtml = true;
+		private bool allowInlineScript = true;
 
 		/// <summary>
 		/// Contains settings that the Markdown parser uses to customize its behavior.
@@ -178,12 +180,30 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// If the HTML SCRIPT tag should be allowed or not.s
+		/// If the HTML SCRIPT tag should be allowed or not.
 		/// </summary>
 		public bool AllowScriptTag
 		{
 			get => this.allowScriptTag;
 			set => this.allowScriptTag = value;
+		}
+
+		/// <summary>
+		/// If HTML tags are allowed to be embedded in the Markdown.
+		/// </summary>
+		public bool AllowHtml
+		{
+			get => this.allowHtml;
+			set => this.allowHtml = value;
+		}
+
+		/// <summary>
+		/// If inline script is allowed embedded in the Markdown.
+		/// </summary>
+		public bool AllowInlineScript
+		{
+			get => this.allowInlineScript;
+			set => this.allowInlineScript = value;
 		}
 
 		/// <summary>

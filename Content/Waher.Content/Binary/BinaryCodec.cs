@@ -93,7 +93,7 @@ namespace Waher.Content.Binary
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "bin")
+			if (string.Compare(FileExtension, "bin", true) == 0)
 			{
 				ContentType = DefaultContentType;
 				return true;

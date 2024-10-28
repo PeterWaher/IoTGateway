@@ -51,7 +51,7 @@ namespace Waher.Content.Rss
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == RssCodec.FileExtension)
+			if (string.Compare(FileExtension, RssCodec.FileExtension, true) == 0)
 			{
 				ContentType = RssCodec.ContentType;
 				return true;
@@ -71,7 +71,7 @@ namespace Waher.Content.Rss
 		/// <returns>If the Content-Type was recognized.</returns>
 		public bool TryGetFileExtension(string ContentType, out string FileExtension)
 		{
-			if (ContentType.ToLower() == RssCodec.ContentType)
+			if (string.Compare(ContentType, RssCodec.ContentType, true) == 0)
 			{
 				FileExtension = RssCodec.FileExtension;
 				return true;
@@ -91,7 +91,7 @@ namespace Waher.Content.Rss
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType.ToLower() == RssCodec.ContentType)
+			if (string.Compare(ContentType, RssCodec.ContentType, true) == 0)
 			{
 				Grade = Grade.Excellent;
 				return true;

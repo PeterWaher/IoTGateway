@@ -30,6 +30,7 @@ namespace Waher.Client.WPF.Model.Legal
 			Result.contractsClient.SetKeySettingsInstance(string.Empty, true);
 
 			await Result.contractsClient.LoadKeys(true);
+			await Result.contractsClient.EnableE2eEncryption(true, false);
 
 			Result.contractsClient.IdentityUpdated += Result.ContractsClient_IdentityUpdated;
 

@@ -197,7 +197,6 @@ namespace Waher.Runtime.Threading.Sync
         /// <summary>
         /// Releases the mutex earlier aquired via a call to WaitOne.
         /// </summary>
-        /// <returns></returns>
         public async Task ReleaseMutex()
         {
             await this.Executor.Execute(this.ReleaseMutexSync);

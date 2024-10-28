@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.MQTT
+﻿namespace Waher.Networking.MQTT
 {
 	/// <summary>
 	/// Contains information in the MQTT header.

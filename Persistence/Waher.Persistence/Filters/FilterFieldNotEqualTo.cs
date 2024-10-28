@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Persistence.Filters
+﻿namespace Waher.Persistence.Filters
 {
 	/// <summary>
 	/// This filter selects objects that have a named field not equal to a given value.

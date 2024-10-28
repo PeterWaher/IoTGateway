@@ -330,7 +330,7 @@ function AcceptContactGroups(Control, Row, Button, BareJid)
 				{
 					s = Loop.getAttribute("data-tag");
 					if (s !== null && s.length > 0)
-						xhttp.setRequestHeader("X-Group-" + (++i), encodeURI(s));
+						xhttp.setRequestHeader("X-Group-" + (++i), encodeURIComponent(s));
 				}
 
 				if (Loop.getAttribute("data-keep") === "1")
@@ -625,7 +625,7 @@ function AddGroup(Control, ObjectId)
 
 function OpenGroup(Group)
 {
-	var Window = window.open("/Settings/Roster.md?Group=" + encodeURI(Group), "_blank");
+	var Window = window.open("/Settings/Roster.md?Group=" + encodeURIComponent(Group), "_blank");
 	Window.focus();
 }
 

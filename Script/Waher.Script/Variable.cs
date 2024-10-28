@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
 namespace Waher.Script
@@ -68,7 +67,7 @@ namespace Waher.Script
         /// Sets the value of the variable.
         /// </summary>
         /// <param name="Value">Value of variable.</param>
-        internal void SetValue(object Value)
+        public void SetValue(object Value)
         {
             this.value = Expression.Encapsulate(Value);
         }
@@ -86,10 +85,7 @@ namespace Waher.Script
 		/// <summary>
 		/// Object Value of variable.
 		/// </summary>
-		public object ValueObject
-		{
-			get { return this.value.AssociatedObjectValue; }
-		}
+		public object ValueObject => this.value.AssociatedObjectValue;
 
 		/// <inheritdoc/>
 		public override string ToString()

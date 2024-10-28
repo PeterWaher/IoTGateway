@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Serialization;
@@ -112,13 +111,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Serializer used to deserialize <see cref="Current"/>.
 		/// </summary>
-		public IObjectSerializer CurrentSerializer
-		{
-			get
-			{
-				return this.currentSerializer;
-			}
-		}
+		public IObjectSerializer CurrentSerializer => this.currentSerializer;
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -128,6 +121,22 @@ namespace Waher.Persistence.Files
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
+
+		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -333,5 +342,32 @@ namespace Waher.Persistence.Files
 			return this.file.ReverseSortOrder(ConstantFields, SortOrder);
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueAfterLocked(T LastItem)
+		{
+			if (this.currentSerializer is null)
+				this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+
+			byte[] Bin = await this.recordHandler.Serialize(IndexBTreeFile.GuidMax, LastItem, this.currentSerializer, MissingFieldAction.Last);
+
+			await this.e.ContinueAfterLocked(Bin);
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueBeforeLocked(T LastItem)
+		{
+			if (this.currentSerializer is null)
+				this.currentSerializer = await this.provider.GetObjectSerializer(typeof(T));
+
+			byte[] Bin = await this.recordHandler.Serialize(Guid.Empty, LastItem, this.currentSerializer, MissingFieldAction.First);
+
+			await this.e.ContinueBeforeLocked(Bin);
+		}
 	}
 }

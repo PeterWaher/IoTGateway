@@ -72,7 +72,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					if (Parser.NextToken() != ")")
 						return false;
 
-					if (Parser.NextToken().ToUpper() != "VALUES")
+					if (string.Compare(Parser.NextToken(), "VALUES", true) != 0)
 						return false;
 
 					if (Parser.NextToken() != "(")

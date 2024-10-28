@@ -10,13 +10,13 @@
 			<Column alignment="Center" />
 			<Column alignment="Left" />
 			<Row>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>No</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Center">
 					<InlineText>headers</InlineText>
 				</Cell>
-				<Cell>
+				<Cell alignment="Left">
 					<InlineText>table</InlineText>
 				</Cell>
 			</Row>

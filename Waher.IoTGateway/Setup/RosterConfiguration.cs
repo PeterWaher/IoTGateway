@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,8 +10,10 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Events;
+using Waher.Layout.Layout2D.Model.Conditional;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
+using Waher.Persistence;
 using Waher.Runtime.Language;
 using Waher.Script;
 
@@ -193,7 +196,7 @@ namespace Waher.IoTGateway.Setup
 
 		private async Task XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			if (e.FromBareJID.ToLower() == Gateway.XmppClient.BareJID.ToLower())
+			if (string.Compare(e.FromBareJID, Gateway.XmppClient.BareJID, true) == 0)
 				return;
 
 			if (this.AcceptSubscriptionRequest(e.FromBareJID))
@@ -377,7 +380,11 @@ namespace Waher.IoTGateway.Setup
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
-			if (!XmppClient.BareJidRegEx.IsMatch(JID))
+			string JidToValidate = JID;
+			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain) && JidToValidate.EndsWith("@"))
+				JidToValidate += "example.org";
+
+			if (!XmppClient.BareJidRegEx.IsMatch(JidToValidate))
 				await Response.Write("0");
 			else
 			{

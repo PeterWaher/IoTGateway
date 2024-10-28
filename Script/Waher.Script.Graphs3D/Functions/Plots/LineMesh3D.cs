@@ -81,7 +81,7 @@ namespace Waher.Script.Graphs3D.Functions.Plots
 
 			IElement Color = Arguments.Length <= 3 ? null : Arguments[3];
 
-			return new Graph3D(X, Y, Z, null, new LineMesh3DPainter(), false, false, false, this,
+			return new Graph3D(Variables, X, Y, Z, null, new LineMesh3DPainter(), false, false, false, this,
 				Color?.AssociatedObjectValue ?? Graph.DefaultColor);
 		}
 	}

@@ -221,10 +221,62 @@
 							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' On='uninstall'/>
 						</Component>
 						<Component Id='MicrosoftLibraries' Guid='B2FC6B57-783C-45B5-A84E-BD5F1F173506'>
-							<File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' KeyPath='yes' />
+							<File Id='AWSSDK.Core.dll' Name='AWSSDK.Core.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\AWSSDK.Core.dll' Vital='yes' KeyPath='yes' />
+							<File Id='AWSSDK.SecurityToken.dll' Name='AWSSDK.SecurityToken.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\AWSSDK.SecurityToken.dll' Vital='yes' />
+							<File Id='clretwrc.dll' Name='clretwrc.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\clretwrc.dll' Vital='yes' />
+							<File Id='clrjit.dll' Name='clrjit.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\clrjit.dll' Vital='yes' />
+							<File Id='coreclr.dll' Name='coreclr.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\coreclr.dll' Vital='yes' />
+							<File Id='createdump.exe' Name='createdump.exe' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\createdump.exe' Vital='yes' />
+							<File Id='dbgshim.dll' Name='dbgshim.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\dbgshim.dll' Vital='yes' />
+							<File Id='hostfxr.dll' Name='hostfxr.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\hostfxr.dll' Vital='yes' />
+							<File Id='hostpolicy.dll' Name='hostpolicy.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\hostpolicy.dll' Vital='yes' />
+							<File Id='Microsoft.CodeAnalysis.CSharp.dll' Name='Microsoft.CodeAnalysis.CSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.CodeAnalysis.CSharp.dll' Vital='yes' />
+							<File Id='Microsoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.CodeAnalysis.dll' Vital='yes' />
+							<File Id='Microsoft.CSharp.dll' Name='Microsoft.CSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.CSharp.dll' Vital='yes' />
+							<File Id='Microsoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.DiaSymReader.Native.x86.dll' Vital='yes' />
+							<File Id='Microsoft.Extensions.DependencyInjection.Abstractions.dll' Name='Microsoft.Extensions.DependencyInjection.Abstractions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Extensions.DependencyInjection.Abstractions.dll' Vital='yes' />
+							<File Id='Microsoft.Extensions.Logging.Abstractions.dll' Name='Microsoft.Extensions.Logging.Abstractions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Extensions.Logging.Abstractions.dll' Vital='yes' />
+							<File Id='Microsoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.VisualBasic.Core.dll' Vital='yes' />
+							<File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' />
+							<File Id='Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Registry.dll' Vital='yes' />
+							<File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.VisualBasic.dll' Vital='yes' />
+							<File Id='mscordaccore.dll' Name='mscordaccore.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\mscordaccore.dll' Vital='yes' />
+							<File Id='mscordaccore_x86_x86_6.0.21.52210.dll' Name='mscordaccore_x86_x86_6.0.21.52210.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\mscordaccore_x86_x86_6.0.21.52210.dll' Vital='yes' />
+							<File Id='mscordbi.dll' Name='mscordbi.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\mscordbi.dll' Vital='yes' />
+							<File Id='mscorlib.dll' Name='mscorlib.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\mscorlib.dll' Vital='yes' />
+							<File Id='mscorrc.dll' Name='mscorrc.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\mscorrc.dll' Vital='yes' />
+							<File Id='msquic.dll' Name='msquic.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\msquic.dll' Vital='yes' />
 							<File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\netstandard.dll' Vital='yes' />
+							<File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\ucrtbase.dll' Vital='yes' />
+							<File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\WindowsBase.dll' Vital='yes' />
+							<RemoveFile Id='RemoveAWSSDK.Core.dll' Name='AWSSDK.Core.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveAWSSDK.SecurityToken.dll' Name='AWSSDK.SecurityToken.dll' On='uninstall'/>
+							<RemoveFile Id='Removeclretwrc.dll' Name='clretwrc.dll' On='uninstall'/>
+							<RemoveFile Id='Removeclrjit.dll' Name='clrjit.dll' On='uninstall'/>
+							<RemoveFile Id='Removecoreclr.dll' Name='coreclr.dll' On='uninstall'/>
+							<RemoveFile Id='Removecreatedump.exe' Name='createdump.exe' On='uninstall'/>
+							<RemoveFile Id='Removedbgshim.dll' Name='dbgshim.dll' On='uninstall'/>
+							<RemoveFile Id='Removehostpolicy.dll' Name='hostpolicy.dll' On='uninstall'/>
+							<RemoveFile Id='Removehostfxr.dll' Name='hostfxr.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.CodeAnalysis.CSharp.dll' Name='Microsoft.CodeAnalysis.CSharp.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.CSharp.dll' Name='Microsoft.CSharp.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.Extensions.DependencyInjection.Abstractions.dll' Name='Microsoft.Extensions.DependencyInjection.Abstractions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.Extensions.Logging.Abstractions.dll' Name='Microsoft.Extensions.Logging.Abstractions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordaccore.dll' Name='mscordaccore.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordaccore_x86_x86_6.0.21.52210.dll' Name='mscordaccore_x86_x86_6.0.21.52210.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordbi.dll' Name='mscordbi.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscorlib.dll' Name='mscorlib.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscorrc.dll' Name='mscorrc.dll' On='uninstall'/>
+							<RemoveFile Id='Removemsquic.dll' Name='msquic.dll' On='uninstall'/>
 							<RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
+							<RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
 						</Component>
 						<Component Id='ExternalLibraries' Guid='65C7C4CA-DE10-4838-8301-B23824CDFA23'>
 							<File Id='ICSharpCode.AvalonEdit.dll' Name='ICSharpCode.AvalonEdit.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\ICSharpCode.AvalonEdit.dll' Vital='yes'/>

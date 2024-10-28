@@ -15,7 +15,7 @@
 		public HttpFieldExpect(string Key, string Value)
 			: base(Key, Value)
 		{
-			this.continue100 = Value.ToLower() == "100-continue";
+			this.continue100 = string.Compare(Value, "100-continue", true) == 0;
 		}
 
 		/// <summary>

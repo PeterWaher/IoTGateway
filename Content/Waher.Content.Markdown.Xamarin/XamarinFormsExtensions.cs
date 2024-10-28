@@ -64,6 +64,8 @@ namespace Waher.Content.Markdown.Xamarin
 		public static async Task GenerateXamarinForms(this MarkdownDocument Document, StringBuilder Output, XmlWriterSettings XmlSettings,
 			XamlSettings XamlSettings)
 		{
+			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
+
 			using (XamarinFormsXamlRenderer Renderer = new XamarinFormsXamlRenderer(Output, XmlSettings, XamlSettings))
 			{
 				await Document.RenderDocument(Renderer);
@@ -78,7 +80,10 @@ namespace Waher.Content.Markdown.Xamarin
 		/// <param name="XamlSettings">XAML Settings.</param>
 		public static async Task GenerateXamarinForms(this MarkdownDocument Document, StringBuilder Output, XamlSettings XamlSettings)
 		{
-			using (XamarinFormsXamlRenderer Renderer = new XamarinFormsXamlRenderer(Output, XML.WriterSettings(false, true), XamlSettings))
+			XmlWriterSettings XmlSettings = XML.WriterSettings(false, true);
+			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
+
+			using (XamarinFormsXamlRenderer Renderer = new XamarinFormsXamlRenderer(Output, XmlSettings, XamlSettings))
 			{
 				await Document.RenderDocument(Renderer);
 			}

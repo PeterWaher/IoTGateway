@@ -4110,7 +4110,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Generates a new id attribute value.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Next id</returns>
 		public string NextId()
 		{
 			uint SeqNr;

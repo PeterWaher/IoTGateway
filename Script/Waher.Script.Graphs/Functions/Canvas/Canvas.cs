@@ -77,7 +77,7 @@ namespace Waher.Script.Graphs.Functions.Canvas
 			SKColor? Color = c > 2 ? Graph.ToColor(Arguments[2].AssociatedObjectValue) : (SKColor?)null;
 			SKColor? BgColor = c > 3 ? Graph.ToColor(Arguments[3].AssociatedObjectValue) : (SKColor?)null;
 
-			return new CanvasGraph(Width, Height, Color, BgColor);
+			return new CanvasGraph(Variables, Width, Height, Color, BgColor);
 		}
 	}
 }

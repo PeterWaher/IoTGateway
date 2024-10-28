@@ -208,20 +208,17 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (!(f is null))
 			{
-				return CalcNewton(rc, ic, dr, R, f, fDef, Variables, N, dimx, dimy,
-					this, this.FractalZoomScript,
+				return CalcNewton(rc, ic, dr, R, f, fDef, Variables, N, dimx, dimy, this, this.FractalZoomScript,
 					new object[] { dimx, dimy, N, R, fDef });
 			}
 			else if (!(CoefficientsZ is null))
 			{
-				return CalcNewton(rc, ic, dr, R, CoefficientsZ, N, dimx, dimy,
-					this, this.FractalZoomScript,
+				return CalcNewton(Variables, rc, ic, dr, R, CoefficientsZ, N, dimx, dimy, this, this.FractalZoomScript,
 					new object[] { dimx, dimy, N, R, CoefficientsZ });
 			}
 			else
 			{
-				return CalcNewton(rc, ic, dr, R, Coefficients, N, dimx, dimy,
-					this, this.FractalZoomScript,
+				return CalcNewton(Variables, rc, ic, dr, R, Coefficients, N, dimx, dimy, this, this.FractalZoomScript,
 					new object[] { dimx, dimy, N, R, Coefficients });
 			}
 		}
@@ -268,8 +265,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R, double[] Coefficients, 
-			int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcNewton(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R, 
+			double[] Coefficients, int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
@@ -438,14 +435,14 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcNewton(double rCenter, double iCenter, double rDelta, Complex R, Complex[] Coefficients, 
-			int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
+		public static FractalGraph CalcNewton(Variables Variables, double rCenter, double iCenter, double rDelta, Complex R, 
+			Complex[] Coefficients, int N, int Width, int Height, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
@@ -636,7 +633,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>
@@ -836,7 +833,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 			}
 
 			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
-			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
+			return new FractalGraph(Variables, Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
 		/// <summary>

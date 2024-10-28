@@ -1,6 +1,4 @@
-﻿using System;
-
-#if !LW
+﻿#if !LW
 namespace Waher.Persistence.Files.Test.Classes
 #else
 using Waher.Persistence.Files;

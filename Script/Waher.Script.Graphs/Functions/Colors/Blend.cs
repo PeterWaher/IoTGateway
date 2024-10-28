@@ -108,11 +108,11 @@ namespace Waher.Script.Graphs.Functions.Colors
 			if (Img1 is null && Img2 is null)
 				return new ObjectValue(BlendColors(c1, c2, p));
 			else if (Img1 is null)
-				return new GraphBitmap(BlendColors(Img2, c1, 1 - p));
+				return new GraphBitmap(Variables, BlendColors(Img2, c1, 1 - p));
 			else if (Img2 is null)
-				return new GraphBitmap(BlendColors(Img1, c2, p));
+				return new GraphBitmap(Variables, BlendColors(Img1, c2, p));
 			else
-				return new GraphBitmap(BlendColors(Img1, Img2, p));
+				return new GraphBitmap(Variables, BlendColors(Img1, Img2, p));
 		}
 
 		/// <summary>

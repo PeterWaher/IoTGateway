@@ -10,10 +10,14 @@ using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Ip;
+using Waher.Things.Xmpp.Commands;
 using Waher.Things.Xmpp.Model;
 
 namespace Waher.Things.Xmpp
 {
+	/// <summary>
+	/// Node representing an XMPP broker.
+	/// </summary>
 	public class XmppBrokerNode : IpHostPort, ISniffable
 	{
 		private readonly Dictionary<CaseInsensitiveString, RosterItemNode> roster = new Dictionary<CaseInsensitiveString, RosterItemNode>();
@@ -24,6 +28,9 @@ namespace Waher.Things.Xmpp
 		private bool trustServer = false;
 		private bool allowInsecureMechanisms = false;
 
+		/// <summary>
+		/// Node representing an XMPP broker.
+		/// </summary>
 		public XmppBrokerNode()
 			: base()
 		{
@@ -31,6 +38,9 @@ namespace Waher.Things.Xmpp
 			this.Tls = true;
 		}
 
+		/// <summary>
+		/// User name
+		/// </summary>
 		[Page(2, "XMPP")]
 		[Header(13, "User Name:")]
 		[ToolTip(14, "User name used during authentication process.")]
@@ -41,6 +51,9 @@ namespace Waher.Things.Xmpp
 			set => this.userName = value;
 		}
 
+		/// <summary>
+		/// Password
+		/// </summary>
 		[Page(2, "XMPP")]
 		[Header(15, "Password:")]
 		[ToolTip(16, "Password used during authentication process.")]
@@ -52,6 +65,9 @@ namespace Waher.Things.Xmpp
 			set => this.password = value;
 		}
 
+		/// <summary>
+		/// Password authentication mechanism
+		/// </summary>
 		[Page(2, "XMPP")]
 		[Header(17, "Password Hash Mechanism:")]
 		[ToolTip(18, "Mechanism used for password hash.")]
@@ -62,6 +78,9 @@ namespace Waher.Things.Xmpp
 			set => this.passwordMechanism = value;
 		}
 
+		/// <summary>
+		/// If broker server should be trusted
+		/// </summary>
 		[Page(2, "XMPP")]
 		[Header(19, "Trust Server Certificate")]
 		[ToolTip(20, "If the server certificate should be trusted, even if it does not validate.")]
@@ -72,6 +91,9 @@ namespace Waher.Things.Xmpp
 			set => this.trustServer = value;
 		}
 
+		/// <summary>
+		/// If insecure authentication mechanisms should be trusted
+		/// </summary>
 		[Page(2, "XMPP")]
 		[Header(21, "Allow Insecure Mechanisms")]
 		[ToolTip(22, "If insecure mechanisms are permitted during authentication.")]
@@ -90,17 +112,30 @@ namespace Waher.Things.Xmpp
 		[ToolTip(33, "If a presence subscription comes from a JID that matches this regular expression, it will be automatically accepted.")]
 		public string AutoAcceptPattern { get; set; }
 
+		/// <summary>
+		/// Gets the type name of the node.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(XmppBrokerNode), 23, "XMPP Broker");
 		}
 
+		/// <summary>
+		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
+		/// </summary>
+		/// <param name="Child">Presumptive child node.</param>
+		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult(Child is XmppNode || Child is SourceNode || Child is PartitionNode ||
+			return Task.FromResult(Child is ConcentratorNode || Child is ConcentratorSourceNode || Child is ConcentratorPartitionNode ||
 				Child is ConcentratorDevice || Child is RosterItemNode || Child is XmppExtensionNode);
 		}
 
+		/// <summary>
+		/// Destroys the node. If it is a child to a parent node, it is removed from the parent first.
+		/// </summary>
 		public override Task DestroyAsync()
 		{
 			if (!string.IsNullOrEmpty(this.brokerKey))
@@ -109,6 +144,9 @@ namespace Waher.Things.Xmpp
 			return base.DestroyAsync();
 		}
 
+		/// <summary>
+		/// Key representing the node.
+		/// </summary>
 		[IgnoreMember]
 		public string Key
 		{
@@ -124,6 +162,9 @@ namespace Waher.Things.Xmpp
 			}
 		}
 
+		/// <summary>
+		/// Persists changes to the node, and generates a node updated event.
+		/// </summary>
 		protected override Task NodeUpdated()
 		{
 			this.GetBroker();
@@ -180,7 +221,7 @@ namespace Waher.Things.Xmpp
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.GetEnumerator"/>
+		/// <see cref="IEnumerable{ISniffer}.GetEnumerator"/>
 		/// </summary>
 		public IEnumerator<ISniffer> GetEnumerator()
 		{
@@ -194,8 +235,15 @@ namespace Waher.Things.Xmpp
 
 		#endregion
 
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
 		public override Task<IEnumerable<ICommand>> Commands => this.GetCommands();
 
+		/// <summary>
+		/// Gets available commands.
+		/// </summary>
+		/// <returns>Enumerable set of commands.</returns>
 		public async Task<IEnumerable<ICommand>> GetCommands()
 		{
 			List<ICommand> Result = new List<ICommand>();
@@ -206,6 +254,12 @@ namespace Waher.Things.Xmpp
 			return Result;
 		}
 
+		/// <summary>
+		/// Gets displayable parameters.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
 		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
@@ -219,6 +273,12 @@ namespace Waher.Things.Xmpp
 
 		#region Roster
 
+		/// <summary>
+		/// Gets a roster item.
+		/// </summary>
+		/// <param name="BareJID">Bare JID of item.</param>
+		/// <param name="CreateIfNotExists">If a roster item should be created, in case one does not exist.</param>
+		/// <returns>Roster item, or null if none, and none created.</returns>
 		public async Task<RosterItemNode> GetRosterItem(string BareJID, bool CreateIfNotExists)
 		{
 			RosterItemNode Result;
@@ -265,6 +325,10 @@ namespace Waher.Things.Xmpp
 				return null;
 		}
 
+		/// <summary>
+		/// Adds a new child to the node.
+		/// </summary>
+		/// <param name="Child">New child to add.</param>
 		public override async Task AddAsync(INode Child)
 		{
 			await base.AddAsync(Child);
@@ -294,6 +358,11 @@ namespace Waher.Things.Xmpp
 			}
 		}
 
+		/// <summary>
+		/// Removes a child from the node.
+		/// </summary>
+		/// <param name="Child">Child to remove.</param>
+		/// <returns>If the Child node was found and removed.</returns>
 		public override async Task<bool> RemoveAsync(INode Child)
 		{
 			if (!await base.RemoveAsync(Child))

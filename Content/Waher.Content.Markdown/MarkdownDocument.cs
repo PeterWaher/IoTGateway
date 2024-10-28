@@ -1,30 +1,30 @@
-﻿using System;
-using System.IO;
+﻿using SkiaSharp;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Emoji;
+using Waher.Content.Json;
 using Waher.Content.Markdown.Functions;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
 using Waher.Script;
-using Waher.Content.Json;
-using Waher.Script.Model;
-using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
+using Waher.Script.Model;
 using Waher.Script.Operators.Matrices;
-using Waher.Content.Markdown.Rendering;
 
 namespace Waher.Content.Markdown
 {
@@ -1540,7 +1540,7 @@ namespace Waher.Content.Markdown
 				Content = this.ParseBlock(Block, Blocks, ref BlockIndex, EndBlock);
 				if (!(Content.First is null))
 				{
-					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML)
+					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML && this.settings.AllowHtml)
 						Elements.AddLast(new HtmlBlock(this, Content));
 					else if (Content.First.Next is null && Content.First.Value.OutsideParagraph)
 					{
@@ -2114,7 +2114,9 @@ namespace Waher.Content.Markdown
 								Url = Text.ToString();
 								if (Url.StartsWith("abbr:", StringComparison.CurrentCultureIgnoreCase))
 								{
-									if (ch2 != ')' && ch2 != 0)
+									if (ch2 == ')')
+										State.NextChar();
+									else if (ch2 != 0)
 									{
 										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ')')
 											Text.Append(ch2);
@@ -2464,7 +2466,7 @@ namespace Waher.Content.Markdown
 							}
 						}
 
-						if (!char.IsLetter(ch2) && ch2 != '/')
+						if ((!char.IsLetter(ch2) && ch2 != '/') || !this.settings.AllowHtml)
 						{
 							Text.Append(ch);
 							break;
@@ -2707,7 +2709,7 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '{':
-						if (this.settings.Variables is null)
+						if (!this.settings.AllowInlineScript || this.settings.Variables is null)
 						{
 							int Pos = State.CurrentPosition - 1;
 							if (Pos < this.markdownText.Length && this.markdownText[Pos] == '{')

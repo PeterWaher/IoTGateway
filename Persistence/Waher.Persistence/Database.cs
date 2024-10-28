@@ -354,6 +354,176 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static Task<IPage<T>> FindFirst<T>(int PageSize, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.FindFirst<T>(PageSize, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static Task<IPage<T>> FindFirst<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.FindFirst<T>(PageSize, Filter, SortOrder);
+		}
+
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static Task<IPage<object>> FindFirst(string Collection, int PageSize, params string[] SortOrder)
+		{
+			return Provider.FindFirst(Collection, PageSize, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static Task<IPage<object>> FindFirst(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.FindFirst(Collection, PageSize, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static Task<IPage<T>> FindFirst<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.FindFirst<T>(Collection, PageSize, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds the next page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public static Task<IPage<T>> FindNext<T>(IPage<T> Page)
+			where T : class
+		{
+			return Provider.FindNext(Page);
+		}
+
+		/// <summary>
+		/// Finds the next page of objects in a given collection.
+		/// </summary>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public static Task<IPage<object>> FindNext(IPage<object> Page)
+		{
+			return Provider.FindNext(Page);
+		}
+
+		/// <summary>
+		/// Enumerates objects of a given class <typeparamref name="T"/> available in the 
+		/// database, by retrieving items from the database in page chunks and looping
+		/// through them page for page.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Enumerator of objects matching the search criteria.</returns>
+		public static async Task<PaginatedEnumerator<T>> Enumerate<T>(int PageSize, params string[] SortOrder)
+			where T : class
+		{
+			return new PaginatedEnumerator<T>(await FindFirst<T>(PageSize, SortOrder));
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static async Task<PaginatedEnumerator<T>> Enumerate<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return new PaginatedEnumerator<T>(await FindFirst<T>(PageSize, Filter, SortOrder));
+		}
+
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static async Task<PaginatedEnumerator<object>> Enumerate(string Collection, int PageSize, params string[] SortOrder)
+		{
+			return new PaginatedEnumerator<object>(await FindFirst(Collection, PageSize, SortOrder));
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static async Task<PaginatedEnumerator<object>> Enumerate(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+		{
+			return new PaginatedEnumerator<object>(await FindFirst(Collection, PageSize, Filter, SortOrder));
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public static async Task<PaginatedEnumerator<T>> Enumerate<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return new PaginatedEnumerator<T>(await FindFirst<T>(Collection, PageSize, Filter, SortOrder));
+		}
+
+		/// <summary>
 		/// Finds the first object of a given class <typeparamref name="T"/> and deletes the rest.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
@@ -364,7 +534,7 @@ namespace Waher.Persistence
 		public async static Task<T> FindFirstDeleteRest<T>(params string[] SortOrder)
 			where T : class
 		{
-			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, SortOrder));
+			return await FirstDeleteRest(await Provider.Find<T>(0, int.MaxValue, SortOrder));
 		}
 
 		private static async Task<T> FirstDeleteRest<T>(IEnumerable<T> Set)
@@ -384,7 +554,7 @@ namespace Waher.Persistence
 				{
 					try
 					{
-						await Database.Delete(Obj);
+						await Delete(Obj);
 					}
 					catch (KeyNotFoundException)
 					{
@@ -408,7 +578,7 @@ namespace Waher.Persistence
 		public static async Task<T> FindFirstDeleteRest<T>(Filter Filter, params string[] SortOrder)
 			where T : class
 		{
-			return await FirstDeleteRest<T>(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
+			return await FirstDeleteRest(await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
 		}
 
 		/// <summary>
@@ -422,7 +592,7 @@ namespace Waher.Persistence
 		public async static Task<T> FindFirstIgnoreRest<T>(params string[] SortOrder)
 			where T : class
 		{
-			return FirstIgnoreRest<T>(await Provider.Find<T>(0, 1, SortOrder));
+			return FirstIgnoreRest(await Provider.Find<T>(0, 1, SortOrder));
 		}
 
 		private static T FirstIgnoreRest<T>(IEnumerable<T> Set)
@@ -446,7 +616,7 @@ namespace Waher.Persistence
 		public static async Task<T> FindFirstIgnoreRest<T>(Filter Filter, params string[] SortOrder)
 			where T : class
 		{
-			return FirstIgnoreRest<T>(await Provider.Find<T>(0, 1, Filter, SortOrder));
+			return FirstIgnoreRest(await Provider.Find<T>(0, 1, Filter, SortOrder));
 		}
 
 		/// <summary>
@@ -960,8 +1130,8 @@ namespace Waher.Persistence
 		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(IDatabaseExport Output)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(IDatabaseExport Output)
 		{
 			return Export(Output, null);
 		}
@@ -971,8 +1141,8 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(IDatabaseExport Output, string[] CollectionNames)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			return Provider.Export(Output, CollectionNames);
 		}
@@ -983,8 +1153,8 @@ namespace Waher.Persistence
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
 			return Provider.Export(Output, CollectionNames, Thread);
 		}

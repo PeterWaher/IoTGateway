@@ -98,18 +98,69 @@ namespace Waher.Script.Graphs
 		public const string GraphFgColorVariableName = "GraphFgColor";
 
 		/// <summary>
+		/// Variable name for graph width
+		/// </summary>
+		public const string GraphWidthVariableName = "GraphWidth";
+
+		/// <summary>
+		/// Variable name for graph height
+		/// </summary>
+		public const string GraphHeightVariableName = "GraphHeight";
+
+		/// <summary>
+		/// Variable name for graph label font size
+		/// </summary>
+		public const string GraphLabelFontSizeVariableName = "GraphLabelFontSize";
+
+		/// <summary>
 		/// Default color: Red
 		/// </summary>
 		public static readonly SKColor DefaultColor = SKColors.Red;
 
+		private readonly GraphSettings settings;
 		private bool sameScale = false;
 
 		/// <summary>
 		/// Base class for graphs.
 		/// </summary>
-		public Graph()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public Graph(Variables Variables)
+			: this(Variables, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Base class for graphs.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		public Graph(Variables Variables, int? DefaultWidth, int? DefaultHeight)
 			: base()
 		{
+			this.settings = this.GetSettingsProt(Variables, DefaultWidth, DefaultHeight);
+		}
+
+		/// <summary>
+		/// Base class for graphs.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		public Graph(GraphSettings Settings)
+			: base()
+		{
+			this.settings = Settings;
+		}
+
+		/// <summary>
+		/// Base class for graphs.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		public Graph(GraphSettings Settings, int? DefaultWidth, int? DefaultHeight)
+			: base()
+		{
+			this.settings = this.GetSettingsProt(Settings, DefaultWidth, DefaultHeight);
 		}
 
 		/// <summary>
@@ -130,6 +181,11 @@ namespace Waher.Script.Graphs
 		/// Associated Semi-Group.
 		/// </summary>
 		public override ISemiGroup AssociatedSemiGroup => SetOfGraphs.Instance;
+
+		/// <summary>
+		/// Graph settings available during creation.
+		/// </summary>
+		public GraphSettings Settings => this.settings;
 
 		/// <summary>
 		/// Tries to add an element to the current element, from the left, element-wise.
@@ -156,9 +212,10 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <returns>Graph settings.</returns>
+		[Obsolete("Graph Settings now available via the Settings property on the Graph object directly.")]
 		public GraphSettings GetSettings(Variables Variables)
 		{
-			return this.GetSettings(Variables, null, null);
+			return this.GetSettingsProt(Variables, null, null);
 		}
 
 		/// <summary>
@@ -168,19 +225,41 @@ namespace Waher.Script.Graphs
 		/// <param name="DefaultWidth">Default width.</param>
 		/// <param name="DefaultHeight">Default height.</param>
 		/// <returns>Graph settings.</returns>
+		[Obsolete("Graph Settings now available via the Settings property on the Graph object directly.")]
 		public GraphSettings GetSettings(Variables Variables, int? DefaultWidth, int? DefaultHeight)
+		{
+			return this.GetSettingsProt(Variables, DefaultWidth, DefaultHeight);
+		}
+
+		/// <summary>
+		/// Extracts Graph Settings from a collection of variables.
+		/// </summary>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <param name="DefaultWidth">Default width, if defined.</param>
+		/// <param name="DefaultHeight">Default height, if defined.</param>
+		/// <returns>Graph Settings.</returns>
+		protected GraphSettings GetSettingsProt(Variables Variables, int? DefaultWidth, int? DefaultHeight)
 		{
 			GraphSettings Settings = new GraphSettings();
 			Tuple<int, int> Size;
 			Variable v;
 
 			if (DefaultWidth.HasValue)
+			{
 				Settings.Width = DefaultWidth.Value;
+				Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
+				Settings.MarginRight = Settings.MarginLeft;
+			}
 
 			if (DefaultHeight.HasValue)
+			{
 				Settings.Height = DefaultHeight.Value;
+				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
+				Settings.MarginBottom = Settings.MarginTop;
+				Settings.LabelFontSize = 12.0 * Math.Min(Settings.Width, Settings.Height) / 480;
+			}
 
-			if (!((Size = this.RecommendedBitmapSize) is null))
+			if (!((Size = this.RecommendedBitmapSize) is null) && Size.Item1 > 0 && Size.Item2 > 0)
 			{
 				Settings.Width = Size.Item1;
 				Settings.Height = Size.Item2;
@@ -190,28 +269,34 @@ namespace Waher.Script.Graphs
 
 				Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
 				Settings.MarginBottom = Settings.MarginTop;
-				Settings.LabelFontSize = 12.0 * Settings.Height / 480;
+				Settings.LabelFontSize = 12.0 * Math.Min(Settings.Width, Settings.Height) / 480;
 			}
 			else
 			{
-				if (Variables.TryGetVariable("GraphWidth", out v) && v.ValueObject is double d && d >= 1)
+				bool SizeChanged = false;
+
+				if (Variables.TryGetVariable(GraphWidthVariableName, out v) && v.ValueObject is double d && d >= 1)
 				{
 					Settings.Width = (int)Math.Round(d);
 					Settings.MarginLeft = (int)Math.Round(15 * d / 640);
 					Settings.MarginRight = Settings.MarginLeft;
+					SizeChanged = true;
 				}
-				else if (!Variables.ContainsVariable("GraphWidth"))
-					Variables["GraphWidth"] = (double)Settings.Width;
+				else if (!Variables.ContainsVariable(GraphWidthVariableName))
+					Variables[GraphWidthVariableName] = (double)Settings.Width;
 
-				if (Variables.TryGetVariable("GraphHeight", out v) && v.ValueObject is double d2 && d2 >= 1)
+				if (Variables.TryGetVariable(GraphHeightVariableName, out v) && v.ValueObject is double d2 && d2 >= 1)
 				{
 					Settings.Height = (int)Math.Round(d2);
 					Settings.MarginTop = (int)Math.Round(15 * d2 / 480);
 					Settings.MarginBottom = Settings.MarginTop;
-					Settings.LabelFontSize = 12 * d2 / 480;
+					SizeChanged = true;
 				}
-				else if (!Variables.ContainsVariable("GraphHeight"))
-					Variables["GraphHeight"] = (double)Settings.Height;
+				else if (!Variables.ContainsVariable(GraphHeightVariableName))
+					Variables[GraphHeightVariableName] = (double)Settings.Height;
+
+				if (SizeChanged)
+					Settings.LabelFontSize = 12 * Math.Min(Settings.Width, Settings.Height) / 480;
 			}
 
 			int i = 0;
@@ -231,7 +316,52 @@ namespace Waher.Script.Graphs
 			if (i == 2)
 				Settings.GridColor = Functions.Colors.Blend.BlendColors(Settings.BackgroundColor, Settings.AxisColor, 0.4);
 
+			if (Variables.TryGetVariable(GraphLabelFontSizeVariableName, out v) && v.ValueObject is double d3 && d3 > 0)
+			{
+				Settings.LabelFontSize = d3;
+				Settings.MarginTop = (int)(15 * Settings.LabelFontSize / 12);
+				Settings.MarginBottom = Settings.MarginTop;
+				Settings.MarginLeft = Settings.MarginTop;
+				Settings.MarginRight = Settings.MarginTop;
+			}
+
 			return Settings;
+		}
+
+		/// <summary>
+		/// Creates a new set of Graph Settings from an existing set of settings, optionally modified for a new size.
+		/// </summary>
+		/// <param name="Settings0">Original graph settings.</param>
+		/// <param name="DefaultWidth">Default width, if defined.</param>
+		/// <param name="DefaultHeight">Default height, if defined.</param>
+		/// <returns>Graph Settings.</returns>
+		protected GraphSettings GetSettingsProt(GraphSettings Settings0, int? DefaultWidth, int? DefaultHeight)
+		{
+			GraphSettings Settings = Settings0.Copy();
+			Tuple<int, int> Size;
+
+			if (DefaultWidth.HasValue)
+				Settings.Width = DefaultWidth.Value;
+
+			if (DefaultHeight.HasValue)
+				Settings.Height = DefaultHeight.Value;
+
+			if (!((Size = this.RecommendedBitmapSize) is null) && Size.Item1 > 0 && Size.Item2 > 0)
+			{
+				Settings.Width = Size.Item1;
+				Settings.Height = Size.Item2;
+			}
+
+			return Settings;
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <returns>Bitmap</returns>
+		public PixelInformation CreatePixels()
+		{
+			return this.CreatePixels(null, out GraphSettings _, out object[] _);
 		}
 
 		/// <summary>
@@ -247,12 +377,33 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
+		/// <param name="Settings">Settings used to create the graph.</param>
+		/// <returns>Bitmap</returns>
+		public PixelInformation CreatePixels(out GraphSettings Settings)
+		{
+			return this.CreatePixels(null, out Settings, out object[] _);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
 		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <param name="Settings">Settings used to create the graph.</param>
 		/// <returns>Bitmap</returns>
 		public PixelInformation CreatePixels(Variables Variables, out GraphSettings Settings)
 		{
 			return this.CreatePixels(Variables, out Settings, out object[] _);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public PixelInformation CreatePixels(out object[] States)
+		{
+			return this.CreatePixels(null, out GraphSettings _, out States);
 		}
 
 		/// <summary>
@@ -270,6 +421,18 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Creates a bitmap of the graph.
 		/// </summary>
+		/// <param name="Settings">Settings used to create the graph.</param>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public PixelInformation CreatePixels(out GraphSettings Settings, out object[] States)
+		{
+			return this.CreatePixels(null, out Settings, out States);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
 		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <param name="Settings">Settings used to create the graph.</param>
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
@@ -277,8 +440,8 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public PixelInformation CreatePixels(Variables Variables, out GraphSettings Settings, out object[] States)
 		{
-			Settings = this.GetSettings(Variables);
-			return this.CreatePixels(Settings, out States);
+			Settings = Variables is null ? this.settings : this.GetSettingsProt(Variables, null, null);
+			return this.CreatePixels(this.settings, out States);
 		}
 
 		/// <summary>
@@ -393,7 +556,7 @@ namespace Waher.Script.Graphs
 			}
 			else if (Vector is ObjectVector OV)
 			{
-				if (Min.AssociatedObjectValue is IPhysicalQuantity PMinQ && 
+				if (Min.AssociatedObjectValue is IPhysicalQuantity PMinQ &&
 					Max.AssociatedObjectValue is IPhysicalQuantity PMaxQ)
 				{
 					PhysicalQuantity MinQ = PMinQ.ToPhysicalQuantity();
@@ -420,7 +583,7 @@ namespace Waher.Script.Graphs
 
 					return Scale(Vector2, MinQ.Magnitude, MaxQ.Magnitude, MinQ.Unit, Offset, Size);
 				}
-				else if (Min.AssociatedObjectValue is double MinD && 
+				else if (Min.AssociatedObjectValue is double MinD &&
 					Max.AssociatedObjectValue is double MaxD)
 				{
 					int i = 0;
@@ -439,7 +602,7 @@ namespace Waher.Script.Graphs
 
 					return Scale(Vector2, MinD, MaxD, Offset, Size);
 				}
-				else if (Min.AssociatedObjectValue is DateTime MinDT && 
+				else if (Min.AssociatedObjectValue is DateTime MinDT &&
 					Max.AssociatedObjectValue is DateTime MaxDT)
 				{
 					int i = 0;
@@ -585,7 +748,7 @@ namespace Waher.Script.Graphs
 		{
 			// (v-Offset)*(Max-Min)/Size+Min
 
-			if (Min.AssociatedObjectValue is double DMin && 
+			if (Min.AssociatedObjectValue is double DMin &&
 				Max.AssociatedObjectValue is double DMax)
 				return new DoubleNumber((Value - Offset) * (DMax - DMin) / Size + DMin);
 			else
@@ -649,7 +812,7 @@ namespace Waher.Script.Graphs
 			}
 			else if (Object is string s && Functions.Colors.Color.TryParse(s, out Color))
 				return true;
-			else 
+			else
 			{
 				Color = Graph.DefaultColor;
 				return (Object is null);
@@ -774,7 +937,7 @@ namespace Waher.Script.Graphs
 			{
 				return new DateTimeVector(GetLabels(DTMin, DTMax, ApproxNrLabels, out LabelType));
 			}
-			else if (Min.AssociatedObjectValue is IPhysicalQuantity PQMin && 
+			else if (Min.AssociatedObjectValue is IPhysicalQuantity PQMin &&
 				Max.AssociatedObjectValue is IPhysicalQuantity PQMax)
 			{
 				LabelType = LabelType.PhysicalQuantity;

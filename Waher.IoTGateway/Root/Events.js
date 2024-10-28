@@ -268,7 +268,7 @@ function CheckEventsXHTTP(TabID)
 
 function EvaluateEvent(Event)
 {
-	if (Event && Event.type.match(/^[a-zA-Z0-9]+$/g))
+	if (Event && Event.type.match(/^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$/g))
 	{
 		try
 		{

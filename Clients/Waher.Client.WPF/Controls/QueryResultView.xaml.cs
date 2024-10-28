@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -8,15 +10,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
-using Microsoft.Win32;
-using SkiaSharp;
 using Waher.Client.WPF.Controls.Report;
 using Waher.Client.WPF.Model.Concentrator;
+using Waher.Content.Markdown;
+using Waher.Content.Markdown.Wpf;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
@@ -46,7 +49,7 @@ namespace Waher.Client.WPF.Controls
 			this.query = Query;
 			this.headerLabel = HeaderLabel;
 		
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public static async Task<QueryResultView> CreateAsync(Node Node, NodeQuery Query, TextBlock HeaderLabel)
@@ -444,15 +447,22 @@ namespace Waher.Client.WPF.Controls
 			if (Obj is null)
 				return Task.CompletedTask;
 
-			this.UpdateGui(new ThreadStart(() =>
+			this.UpdateGui(new ThreadStart(async () =>
 			{
-				this.Add(new ReportObject(Obj, e.Object.Binary, e.Object.ContentType));
+				try
+				{
+					await this.Add(new ReportObject(Obj, e.Object.Binary, e.Object.ContentType));
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}));
 
 			return Task.CompletedTask;
 		}
 
-		private void Add(ReportObject Event)
+		private async Task Add(ReportObject Event)
 		{
 			lock (this.elements)
 			{
@@ -481,6 +491,22 @@ namespace Waher.Client.WPF.Controls
 					Width = Pixels.Width,
 					Height = Pixels.Height
 				});
+			}
+			else if (Event.Object is MarkdownDocument Markdown)
+			{
+				string Xaml = await Markdown.GenerateXAML();
+				object Parsed = XamlReader.Parse(Xaml);
+
+				if (Parsed is UIElement Element)
+					this.currentPanel.Children.Add(Element);
+				else
+				{
+					this.currentPanel.Children.Add(new TextBlock()
+					{
+						Text = Parsed?.ToString() ?? string.Empty,
+						Margin = new Thickness(0, 0, 0, 6)
+					});
+				}
 			}
 			else
 			{
@@ -640,7 +666,7 @@ namespace Waher.Client.WPF.Controls
 							break;
 
 						case "Object":
-							this.Add(await ReportObject.CreateAsync(E));
+							await this.Add(await ReportObject.CreateAsync(E));
 							break;
 
 						case "SectionStart":

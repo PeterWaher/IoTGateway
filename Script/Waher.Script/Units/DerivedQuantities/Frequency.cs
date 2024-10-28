@@ -21,6 +21,13 @@ namespace Waher.Script.Units.DerivedQuantities
 		public string Name => "Frequency";
 
 		/// <summary>
+		/// Reference unit of category.
+		/// </summary>
+		public Unit Reference => reference;
+
+		private static readonly Unit reference = new Unit(new AtomicUnit("Hz"));
+
+		/// <summary>
 		/// Derived Units supported.
 		/// </summary>
 		public KeyValuePair<string, PhysicalQuantity>[] DerivedUnits

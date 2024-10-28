@@ -56,6 +56,8 @@
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryCodec.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
+    <Compile Include=".bak\Waher.Content\Binary\CustomEncoder.cs" />
+    <Compile Include=".bak\Waher.Content\Binary\CustomEncoding.cs" />
     <Compile Include=".bak\Waher.Content\Binary\EncodedObject.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileReference.cs" />
@@ -108,9 +110,6 @@
     <Compile Include=".bak\Waher.Content\NamedDictionary.cs" />
     <Compile Include=".bak\Waher.Content\RemoteCertificateEventArgs.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Text\IJsonEncodingHint.cs" />
-    <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Text\JsonOutput.cs" />
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\TsvCodec.cs" />
     <Compile Include=".bak\Waher.Content\TSV.cs" />
@@ -322,6 +321,7 @@
     <Compile Include=".bak\Waher.Script\TypeConversion\UInt32ToDouble.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\UInt64ToDouble.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\UInt8ToDouble.cs" />
+    <Compile Include=".bak\Waher.Script\Units\IUnitCategory.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include=".bak\Waher.Content.Xml\XML.cs" />

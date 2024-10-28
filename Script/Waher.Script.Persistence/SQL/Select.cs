@@ -8,14 +8,15 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Persistence.SQL.Enumerators;
 using Waher.Script.Persistence.SQL.Groups;
 
 namespace Waher.Script.Persistence.SQL
 {
-	/// <summary>
-	/// Executes a SELECT statement against the object database.
-	/// </summary>
-	public class Select : ScriptNode, IEvaluateAsync
+    /// <summary>
+    /// Executes a SELECT statement against the object database.
+    /// </summary>
+    public class Select : ScriptNode, IEvaluateAsync
 	{
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
@@ -97,10 +98,10 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("Columns and ColumnNames must be of equal length.", nameof(ColumnNames));
 
-			if (this.columnNames is null ^ this.columns is null)
+			if (this.groupByNames is null ^ this.groupBy is null)
 				throw new ArgumentException("GroupBy and GroupByNames must both be null or not null.", nameof(GroupByNames));
 
-			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
+			if (!(this.groupBy is null) && this.groupBy.Length != this.groupByNames.Length)
 				throw new ArgumentException("GroupBy and GroupByNames must be of equal length.", nameof(GroupByNames));
 
 			this.selectOneObject = this.CalcSelectOneObject();
@@ -240,6 +241,7 @@ namespace Waher.Script.Persistence.SQL
 			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
 			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
 			ScriptNode[] Columns2 = this.columns;
+			bool Columns2Cloned = false;
 			IResultSetEnumerator e;
 			RecordEnumerator e2;
 			int NrRecords = 0;
@@ -249,21 +251,25 @@ namespace Waher.Script.Persistence.SQL
 				c = this.columns.Length;
 				for (i = 0; i < c; i++)
 				{
-					if (this.columns[i] is VariableReference Ref)
-						ColumnIndices[Ref.VariableName] = i;
-					else if (this.columnNames[i] is VariableReference Ref2)
+					if (this.columnNames[i] is VariableReference Ref2)
 					{
 						ColumnIndices[Ref2.VariableName] = i;
 
-						if (AdditionalFields is null)
+						if (!Columns2Cloned)
 						{
-							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
-							Columns2 = (ScriptNode[])Columns2.Clone();
+							Columns2Cloned = true;
+							Columns2 = (ScriptNode[])this.columns.Clone();
 						}
 
+						Columns2[i] = Ref2;
+
+						if (AdditionalFields is null)
+							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
+
 						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
-						Columns2[i] = new VariableReference(Ref2.VariableName, Ref2.Start, Ref2.Length, Ref2.Expression);
 					}
+					else if (this.columns[i] is VariableReference Ref)
+						ColumnIndices[Ref.VariableName] = i;
 				}
 			}
 			else

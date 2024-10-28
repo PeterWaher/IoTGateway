@@ -62,7 +62,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "tlv")
+			if (string.Compare(FileExtension, "tlv", true) == 0)
 			{
 				ContentType = TlvDecoder.ContentType;
 				return true;

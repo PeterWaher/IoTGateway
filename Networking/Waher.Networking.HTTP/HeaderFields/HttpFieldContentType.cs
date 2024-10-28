@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 
 				foreach (KeyValuePair<string, string> P in this.fields)
 				{
-					if (P.Key.ToLower() == "charset")
+					if (string.Compare(P.Key, "charset", true) == 0)
 					{
 						this.charset = P.Value;
 						break;

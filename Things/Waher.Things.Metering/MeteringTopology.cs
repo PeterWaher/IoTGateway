@@ -78,7 +78,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public DateTime LastChanged
 		{
-			get { return this.lastChanged; }
+			get => this.lastChanged;
 			internal set
 			{
 				if (this.lastChanged != value)
@@ -126,7 +126,7 @@ namespace Waher.Things.Metering
 		/// <returns>Node, if found, null otherwise.</returns>
 		public static async Task<MeteringNode> GetNode(IThingReference NodeRef)
 		{
-			if (NodeRef.SourceId != SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
+			if (NodeRef is null || NodeRef.SourceId != SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
 				return null;
 
 			lock (nodes)
@@ -375,6 +375,35 @@ namespace Waher.Things.Metering
 		/// Event raised when a node in the metering topology reports a new momentary value.
 		/// </summary>
 		public static event NewMomentaryValuesHandler OnNewMomentaryValues = null;
+
+		/// <summary>
+		/// Deletes orphaned nodes in the metering topology source.
+		/// </summary>
+		/// <returns>Number of nodes deleted.</returns>
+		public static async Task<int> DeleteOrphans()
+		{
+			int Result = 0;
+
+			foreach (MeteringNode Node in await Database.Find<MeteringNode>())
+			{
+				if (Node.ParentId == Guid.Empty)
+					continue;
+
+				MeteringNode ParentNode = await Database.TryLoadObject<MeteringNode>(Node.ParentId);
+				if (ParentNode is null)
+				{
+					await Database.Delete(Node);
+					Result++;
+
+					lock (nodes)
+					{
+						nodes.Remove(Node.NodeId);
+					}
+				}
+			}
+		
+			return Result;
+		}
 
 	}
 }

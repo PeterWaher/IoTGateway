@@ -62,7 +62,7 @@ namespace Waher.Security.JWT
 					if (!Header.TryGetValue("alg", out object Alg) || !(Alg is string AlgStr))
 						throw new ArgumentException("Invalid alg header field.", nameof(Token));
 
-					if (string.IsNullOrEmpty(AlgStr) || AlgStr.ToLower() == "none")
+					if (string.IsNullOrEmpty(AlgStr) || string.Compare(AlgStr, "none", true) == 0)
 						this.algorithm = null;
 					else if (!JwsAlgorithm.TryGetAlgorithm(AlgStr, out this.algorithm))
 						throw new ArgumentException("Unrecognized algorithm reference in header field.", nameof(Token));

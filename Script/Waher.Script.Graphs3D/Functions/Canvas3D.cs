@@ -66,7 +66,7 @@ namespace Waher.Script.Graphs3D.Functions
 			if (Oversampling <= 0)
 				throw new ScriptRuntimeException("Invalid oversampling.", this);
 
-			return new Graphs3D.Canvas3D(Width, Height, Oversampling, BackgroundColor);
+			return new Graphs3D.Canvas3D(Variables, Width, Height, Oversampling, BackgroundColor);
 		}
 	}
 }

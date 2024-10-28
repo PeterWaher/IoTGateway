@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
@@ -14,7 +15,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// <summary>
 	/// Represents an MQTT topic with Physical Quantity data.
 	/// </summary>
-	public class QuantityData : Data
+	public class QuantityData : MqttData
 	{
 		/// <summary>
 		/// TODO
@@ -28,6 +29,18 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with Physical Quantity data.
 		/// </summary>
+		public QuantityData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with Physical Quantity data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Value">Data value</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Value unit.</param>
 		public QuantityData(MqttTopic Topic, double Value, byte NrDecimals, string Unit)
 			: base(Topic)
 		{
@@ -37,25 +50,30 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
+		/// <param name="Content">Published MQTT Content</param>
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
-			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
+			string s = Content.DataString;
 			Match M = RegEx.Match(s);
 			if (M.Success && CommonTypes.TryParse(M.Groups["Magnitude"].Value, out this.value, out this.nrDecimals))
 			{
 				this.unit = M.Groups["Unit"].Value;
-				this.timestamp = DateTime.Now;
-				this.qos = Content.Header.QualityOfService;
-				this.retain = Content.Header.Retain;
+				this.Timestamp = DateTime.UtcNow;
+				this.QoS = Content.Header.QualityOfService;
+				this.Retain = Content.Header.Retain;
+
+				return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
 			}
 			else
-				throw new Exception("Invalid physical quantity value.");
+				return Task.FromResult(DataProcessingResult.Incompatible);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -63,12 +81,17 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
-			Request.ReportFields(Last, new QuantityField(ThingReference, this.timestamp, this.Append(Prefix, "Value"),
+			Request.ReportFields(Last, new QuantityField(ThingReference, this.Timestamp, this.Append(Prefix, "Value"),
 				this.value, this.nrDecimals, this.unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -88,18 +111,36 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					(n, v) =>
 					{
 						this.value = v;
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v, this.nrDecimals) + " " + this.unit));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(CommonTypes.Encode(v, this.nrDecimals) + " " + this.unit));
 						return Task.CompletedTask;
 					})
 			};
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			this.Information(Output, this.value.ToString("F" + this.nrDecimals.ToString()) + " " + this.unit);
+		}
+
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Perfect;
+
+		/// <summary>
+		/// Creates a new instance of the data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Content">MQTT Content</param>
+		/// <returns>New object instance.</returns>
+		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
+		{
+			IMqttData Result = new QuantityData(Topic, default, default, default);
+			Result.DataReported(Topic, Content);
+			return Result;
 		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
@@ -15,7 +16,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	/// <summary>
 	/// Represents an MQTT topic with JSON-encoded data.
 	/// </summary>
-	public class JsonData : Data
+	public class JsonData : MqttData
 	{
 		private string json;
 		private object value;
@@ -23,6 +24,17 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Represents an MQTT topic with JSON-encoded data.
 		/// </summary>
+		public JsonData()
+			: base()
+		{
+		}
+
+		/// <summary>
+		/// Represents an MQTT topic with JSON-encoded data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Json">String-representation of JSON object.</param>
+		/// <param name="Value">Data value</param>
 		public JsonData(MqttTopic Topic, string Json, object Value)
 			: base(Topic)
 		{
@@ -31,20 +43,38 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Called when new data has been published.
 		/// </summary>
-		public override void DataReported(MqttContent Content)
+		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
+		/// <param name="Content">Published MQTT Content</param>
+		/// <returns>Data processing result</returns>
+		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
-			string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
-			this.value = JSON.Parse(s);
-			this.json = s;
-			this.timestamp = DateTime.Now;
-			this.qos = Content.Header.QualityOfService;
-			this.retain = Content.Header.Retain;
+			string s = Content.DataString;
+
+			if ((s.StartsWith("{") && s.EndsWith("}")) || (s.StartsWith("[") && s.EndsWith("]")))
+			{
+				try
+				{
+					this.value = JSON.Parse(s);
+					this.json = s;
+					this.Timestamp = DateTime.UtcNow;
+					this.QoS = Content.Header.QualityOfService;
+					this.Retain = Content.Header.Retain;
+
+					return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
+				}
+				catch (Exception)
+				{
+					return Task.FromResult(DataProcessingResult.Incompatible);
+				}
+			}
+			else
+				return Task.FromResult(DataProcessingResult.Incompatible);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeName(Language Language)
 		{
@@ -52,13 +82,19 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts a readout of the data.
 		/// </summary>
-		public override void StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
+		/// <param name="ThingReference">Thing reference.</param>
+		/// <param name="Request">Sensor-data request</param>
+		/// <param name="Prefix">Field-name prefix.</param>
+		/// <param name="Last">If the last readout call for request.</param>
+		public override Task StartReadout(ThingReference ThingReference, ISensorReadout Request, string Prefix, bool Last)
 		{
 			List<Field> Fields = new List<Field>();
 			this.AppendFields(ThingReference, Fields, Request, this.value, Prefix);
 			Request.ReportFields(Last, Fields.ToArray());
+		
+			return Task.CompletedTask;
 		}
 
 		private void AppendFields(ThingReference ThingReference, List<Field> Fields, ISensorReadout Request, object Value, string Prefix)
@@ -103,47 +139,47 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		private void Add(ThingReference ThingReference, List<Field> Fields, string Name, object Value, ISensorReadout Request)
 		{
 			if (Value is null)
-				this.Add(Fields, new StringField(ThingReference, this.timestamp, Name, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new StringField(ThingReference, this.Timestamp, Name, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (Value is string s)
 			{
 				if (System.TimeSpan.TryParse(s, out TimeSpan TimeSpan))
-					this.Add(Fields, new TimeField(ThingReference, this.timestamp, Name, TimeSpan, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new TimeField(ThingReference, this.Timestamp, Name, TimeSpan, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 				else if (System.DateTime.TryParse(s, out DateTime DateTime))
 				{
 					if (DateTime.TimeOfDay == TimeSpan.Zero)
-						this.Add(Fields, new DateField(ThingReference, this.timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+						this.Add(Fields, new DateField(ThingReference, this.Timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 					else
-						this.Add(Fields, new DateTimeField(ThingReference, this.timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+						this.Add(Fields, new DateTimeField(ThingReference, this.Timestamp, Name, DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 				}
 				else if (CommonTypes.TryParseRfc822(s, out DateTimeOffset DateTimeOffset))
-					this.Add(Fields, new DateTimeField(ThingReference, this.timestamp, Name, DateTimeOffset.DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new DateTimeField(ThingReference, this.Timestamp, Name, DateTimeOffset.DateTime, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 				else if (Content.Duration.TryParse(s, out Duration Duration))
-					this.Add(Fields, new DurationField(ThingReference, this.timestamp, Name, Duration, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new DurationField(ThingReference, this.Timestamp, Name, Duration, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 				else
-					this.Add(Fields, new StringField(ThingReference, this.timestamp, Name, s, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new StringField(ThingReference, this.Timestamp, Name, s, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			}
 			else if (Value is int i)
-				this.Add(Fields, new Int32Field(ThingReference, this.timestamp, Name, i, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new Int32Field(ThingReference, this.Timestamp, Name, i, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (Value is long l)
-				this.Add(Fields, new Int64Field(ThingReference, this.timestamp, Name, l, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new Int64Field(ThingReference, this.Timestamp, Name, l, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (Value is double d)
 			{
 				string s2 = CommonTypes.Encode(d);
 
 				if (CommonTypes.TryParse(s2, out d, out byte NrDec))
-					this.Add(Fields, new QuantityField(ThingReference, this.timestamp, Name, d, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new QuantityField(ThingReference, this.Timestamp, Name, d, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			}
 			else if (Value is decimal d2)
 			{
 				string s2 = CommonTypes.Encode(d2);
 
 				if (CommonTypes.TryParse(s2, out d2, out byte NrDec))
-					this.Add(Fields, new QuantityField(ThingReference, this.timestamp, Name, (double)d2, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+					this.Add(Fields, new QuantityField(ThingReference, this.Timestamp, Name, (double)d2, NrDec, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			}
 			else if (Value is bool b)
-				this.Add(Fields, new BooleanField(ThingReference, this.timestamp, Name, b, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new BooleanField(ThingReference, this.Timestamp, Name, b, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else
-				this.Add(Fields, new StringField(ThingReference, this.timestamp, Name, Value.ToString(), FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
+				this.Add(Fields, new StringField(ThingReference, this.Timestamp, Name, Value.ToString(), FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 		}
 
 		/// <summary>
@@ -164,19 +200,36 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 					{
 						this.value = JSON.Parse(v);
 						this.json = v;
-						this.topic.MqttClient.PUBLISH(this.topic.FullTopic, this.qos, this.retain, Encoding.UTF8.GetBytes(v));
+						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(v));
 						return Task.CompletedTask;
 					})
 			};
 		}
 
 		/// <summary>
-		/// TODO
+		/// Outputs the parsed data to the sniffer.
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
 			this.Information(Output, this.json);
 		}
 
+		/// <summary>
+		/// Default support.
+		/// </summary>
+		public override Grade DefaultSupport => Grade.Excellent;
+
+		/// <summary>
+		/// Creates a new instance of the data.
+		/// </summary>
+		/// <param name="Topic">MQTT Topic</param>
+		/// <param name="Content">MQTT Content</param>
+		/// <returns>New object instance.</returns>
+		public override IMqttData CreateNew(MqttTopic Topic, MqttContent Content)
+		{
+			IMqttData Result = new JsonData(Topic, default, default);
+			Result.DataReported(Topic, Content);
+			return Result;
+		}
 	}
 }

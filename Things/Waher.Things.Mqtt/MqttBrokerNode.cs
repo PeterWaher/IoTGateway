@@ -13,7 +13,7 @@ using Waher.Things.Mqtt.Model;
 namespace Waher.Things.Mqtt
 {
 	/// <summary>
-	/// TODO
+	/// Node representing a connection to an MQTT broker.
 	/// </summary>
 	public class MqttBrokerNode : IpHostPort, ISniffable
 	{
@@ -28,7 +28,7 @@ namespace Waher.Things.Mqtt
 		private bool trustServer = false;
 
 		/// <summary>
-		/// TODO
+		/// Node representing a connection to an MQTT broker.
 		/// </summary>
 		public MqttBrokerNode()
 			: base()
@@ -81,7 +81,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		[Page(2, "MQTT")]
 		[Header(46, "Connection Subscription:")]
-		[ToolTip(47, "Subscription topic executed when connecting. Empty means no subscription will be performed.")]
+		[ToolTip(47, "Subscription topic executed when connecting. Empty means no subscription will be performed. Multiple subjects can be comma-separated.")]
 		[DefaultValue("#")]
 		public string ConnectionSubscription
 		{
@@ -145,7 +145,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Type name representing data.
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
@@ -200,7 +200,11 @@ namespace Waher.Things.Mqtt
 			return base.NodeUpdated();
 		}
 
-		internal MqttBroker GetBroker()
+		/// <summary>
+		/// Gets the corresponding broker node.
+		/// </summary>
+		/// <returns>MQTT Broker connection object.</returns>
+		public MqttBroker GetBroker()
 		{
 			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.TrustServer, this.userName, this.password,
 				this.connectionSubscription, this.willTopic, this.willData, this.willRetain, this.willQoS);
@@ -293,8 +297,11 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets displayable parameters.
 		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
 		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;

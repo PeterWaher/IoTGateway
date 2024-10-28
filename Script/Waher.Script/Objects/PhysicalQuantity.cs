@@ -158,7 +158,7 @@ namespace Waher.Script.Objects
 			if (!(obj is PhysicalQuantity E))
 				return false;
 
-			if (this.unit.Equals(E.unit))
+			if (this.unit.Equals(E.unit, true))
 				return this.magnitude == E.magnitude;
 			else
 			{
@@ -302,7 +302,7 @@ namespace Waher.Script.Objects
 
 			PhysicalQuantity Q = PQ.ToPhysicalQuantity();
 
-			if (this.unit.Equals(Q.unit))
+			if (this.unit.Equals(Q.unit, true))
 				return this.magnitude.CompareTo(Q.magnitude);
 
 			if (!Unit.TryConvert(Q.magnitude, Q.unit, this.unit, out double d))

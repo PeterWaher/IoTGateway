@@ -312,7 +312,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						{
 							StringBuilder Msg = new StringBuilder();
 
-							Msg.Append("Report server responded with error: ");
+							Msg.Append("Remote server responded with error: ");
 							Msg.Append(await Response2.Content.ReadAsStringAsync());
 
 							if (!(E2e is null))

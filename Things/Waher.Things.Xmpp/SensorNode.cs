@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
+using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Xmpp
@@ -11,7 +12,7 @@ namespace Waher.Things.Xmpp
 	/// <summary>
 	/// A node in a concentrator.
 	/// </summary>
-	public class SensorNode : XmppNode, ISensor
+	public class SensorNode : ConcentratorNode, ISensor
 	{
 		/// <summary>
 		/// A node in a concentrator.
@@ -56,12 +57,12 @@ namespace Waher.Things.Xmpp
 				string SID = string.Empty;
 				string PID = string.Empty;
 
-				INode Loop = this.Parent;
+				INode Loop = await this.GetParent();
 				while (!(Loop is null))
 				{
-					if (Loop is SourceNode SourceNode)
+					if (Loop is ConcentratorSourceNode SourceNode)
 						SID = SourceNode.RemoteSourceID;
-					else if (Loop is PartitionNode PartitionNode)
+					else if (Loop is ConcentratorPartitionNode PartitionNode)
 						PID = PartitionNode.RemotePartitionID;
 					else if (Loop is ConcentratorDevice ConcentratorDevice)
 					{
@@ -69,7 +70,10 @@ namespace Waher.Things.Xmpp
 						break;
 					}
 
-					Loop = Loop.Parent;
+					if (Loop is MeteringNode MeteringNode)
+						Loop = await MeteringNode.GetParent();
+					else
+						Loop = Loop.Parent;
 				}
 
 				RosterItem Item = Client.GetRosterItem(JID);

@@ -18,6 +18,9 @@ using Waher.Security.Users;
 
 namespace Waher.Things.Ip.Model
 {
+	/// <summary>
+	/// Node acting as a TCP/IP proxy opening a port for incoming communication and proxying it to another port on a remote machine .
+	/// </summary>
 	public class ProxyPort : Sniffable, IDisposable
 	{
 		private readonly LinkedList<TcpListener> tcpListeners = new LinkedList<TcpListener>();
@@ -47,6 +50,18 @@ namespace Waher.Things.Ip.Model
 			this.remoteIps = RemoteIps;
 		}
 
+		/// <summary>
+		/// Creates a port proxy object.
+		/// </summary>
+		/// <param name="Node">Proxy node.</param>
+		/// <param name="Host">Host</param>
+		/// <param name="Port">Port number</param>
+		/// <param name="Tls">If TLS should be used</param>
+		/// <param name="TrustServer">If server should be trusted</param>
+		/// <param name="ListeningPort">Listening port</param>
+		/// <param name="AuthorizedAccess">If authorized access is required.</param>
+		/// <param name="RemoteIps">Permitted remote IP ranges.</param>
+		/// <returns>Proxy port object.</returns>
 		public static async Task<ProxyPort> Create(IpHostPortProxy Node, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort,
 			bool AuthorizedAccess, IpCidr[] RemoteIps)
 		{
@@ -451,11 +466,18 @@ namespace Waher.Things.Ip.Model
 			}
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
 		public void Dispose()
 		{
 			this.Close();
 		}
 
+		/// <summary>
+		/// Removes a proxy client connection.
+		/// </summary>
+		/// <param name="Connection">Connection to remove.</param>
 		public void Remove(ProxyClientConncetion Connection)
 		{
 			lock (this.connections)
@@ -466,19 +488,37 @@ namespace Waher.Things.Ip.Model
 			Connection.Dispose();
 		}
 
+		/// <summary>
+		/// Increment uplink counter.
+		/// </summary>
+		/// <param name="NrBytes">Number of bytes</param>
 		public void IncUplink(int NrBytes)
 		{
 			this.nrBytesUplink += NrBytes;
 		}
 
+		/// <summary>
+		/// Increment downlink counter.
+		/// </summary>
+		/// <param name="NrBytes">Number of bytes</param>
 		public void IncDownlink(int NrBytes)
 		{
 			this.nrBytesDownlink += NrBytes;
 		}
 
+		/// <summary>
+		/// Number of bytes send uplink
+		/// </summary>
 		public long NrBytesUplink => this.nrBytesUplink;
+
+		/// <summary>
+		/// Number of bytes send downlink
+		/// </summary>
 		public long NrBytesDownlink => this.nrBytesDownlink;
 
+		/// <summary>
+		/// Number of connections.
+		/// </summary>
 		public int NrConnctions
 		{
 			get

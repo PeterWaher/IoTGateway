@@ -448,7 +448,7 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 			}
 
-			if (DomainName.ToLower() == "localhost")
+			if (string.Compare(DomainName, "localhost", true) == 0)
 				throw new BadRequestException("localhost is not a valid domain name.");
 
 			List<string> AlternativeNames = new List<string>();
@@ -456,7 +456,7 @@ namespace Waher.IoTGateway.Setup
 
 			while (Parameters.TryGetValue("altDomainName" + Index.ToString(), out Obj) && Obj is string AltDomainName && !string.IsNullOrEmpty(AltDomainName))
 			{
-				if (AltDomainName.ToLower() == "localhost")
+				if (string.Compare(AltDomainName, "localhost", true) == 0)
 					throw new BadRequestException("localhost is not a valid domain name.");
 
 				AlternativeNames.Add(AltDomainName);
@@ -465,7 +465,7 @@ namespace Waher.IoTGateway.Setup
 
 			if (Parameters.TryGetValue("altDomainName", out Obj) && Obj is string AltDomainName2 && !string.IsNullOrEmpty(AltDomainName2))
 			{
-				if (AltDomainName2.ToLower() == "localhost")
+				if (string.Compare(AltDomainName2, "localhost", true) == 0)
 					throw new BadRequestException("localhost is not a valid domain name.");
 
 				AlternativeNames.Add(AltDomainName2);
@@ -1818,7 +1818,7 @@ namespace Waher.IoTGateway.Setup
 				if (!this.TryGetEnvironmentVariable(GATEWAY_DOMAIN_NAME, true, out string Value))
 					return true;
 
-				if (Value.ToLower() == "localhost")
+				if (string.Compare(Value, "localhost", true) == 0)
 				{
 					this.LogEnvironmentError("localhost is not a valid domain name.", GATEWAY_DOMAIN_NAME, Value);
 					return false;
@@ -1835,7 +1835,7 @@ namespace Waher.IoTGateway.Setup
 
 					foreach (string Part in Parts)
 					{
-						if (Part.ToLower() == "localhost")
+						if (string.Compare(Part, "localhost", true) == 0)
 						{
 							this.LogEnvironmentError("localhost is not a valid alternative domain name.", GATEWAY_DOMAIN_ALT, Value);
 							return false;

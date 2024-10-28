@@ -64,7 +64,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// Access to grouped properties.
 		/// </summary>
 		/// <param name="Name">Named property</param>
-		/// <returns></returns>
+		/// <returns>Property value.</returns>
 		public object this[string Name]
 		{
 			get

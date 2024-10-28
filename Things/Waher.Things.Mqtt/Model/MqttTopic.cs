@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.Metering;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Mqtt.Model
 {
 	/// <summary>
-	/// TODO
+	/// MQTT Topic information.
 	/// </summary>
 	public class MqttTopic
 	{
 		private readonly SortedDictionary<string, MqttTopic> topics = new SortedDictionary<string, MqttTopic>();
-		private readonly MqttTopicNode node;
+		private readonly IMqttTopicNode node;
+		private readonly ThingReference nodeReference;
 		private readonly MqttTopic parent;
 		private readonly MqttBroker broker;
 		private readonly string localTopic;
@@ -30,34 +27,48 @@ namespace Waher.Things.Mqtt.Model
 		private long dataCount = 0;
 		private Exception ex = null;
 		private DateTime exTP = DateTime.MinValue;
-		private Data data = null;
+		private IMqttData data = null;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Topic information.
 		/// </summary>
-		public MqttTopic(MqttTopicNode Node, string FullTopic, string LocalTopic, MqttTopic Parent, MqttBroker Broker)
+		public MqttTopic(IMqttTopicNode Node, string FullTopic, string LocalTopic, MqttTopic Parent, MqttBroker Broker)
 		{
 			this.node = Node;
 			this.fullTopic = FullTopic;
 			this.localTopic = LocalTopic;
 			this.parent = Parent;
 			this.broker = Broker;
+
+			this.nodeReference = Node as ThingReference;
+			if (this.nodeReference is null && !(Node is null))
+				this.nodeReference = new ThingReference(Node.NodeId, Node.SourceId, Node.Partition);
 		}
 
 		/// <summary>
-		/// TODO
+		/// Reference to the MQTT Topic Node
 		/// </summary>
-		public MqttTopicNode Node => this.node;
+		public IMqttTopicNode Node => this.node;
 
 		/// <summary>
-		/// TODO
+		/// MQTT Broker
+		/// </summary>
+		public MqttBroker Broker => this.broker;
+
+		/// <summary>
+		/// Local topic name.
 		/// </summary>
 		public string LocalTopic => this.localTopic;
 
 		/// <summary>
-		/// TODO
+		/// Full topic name
 		/// </summary>
 		public string FullTopic => this.fullTopic;
+
+		/// <summary>
+		/// Current parsed data.
+		/// </summary>
+		public IMqttData Data => this.data;
 
 		private MqttTopic[] GetChildNodes()
 		{
@@ -77,89 +88,91 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		internal async Task<MqttTopic> GetTopic(string[] Parts, int Index, bool CreateNew, MqttBroker Broker)
+		internal async Task<MqttTopic> GetTopic(MqttTopicRepresentation Representation, bool CreateNew, bool IgnoreGuids, MqttBroker Broker)
 		{
-			MqttTopic Topic;
+			MqttTopic Topic = await this.GetLocalTopic(Representation, CreateNew, IgnoreGuids, Broker);
+
+			if (Topic is null)
+				return null;
+			else if (Representation.MoveNext(Topic))
+				return await Topic.GetTopic(Representation, CreateNew, IgnoreGuids, Broker);
+			else
+				return Topic;
+		}
+
+		private async Task<MqttTopic> GetLocalTopic(MqttTopicRepresentation Representation, bool CreateNew, bool IgnoreGuids, MqttBroker Broker)
+		{
+			string CurrentSegment = Representation.CurrentSegment;
+			MqttTopic Topic, Topic2;
 
 			lock (this.topics)
 			{
-				if (!this.topics.TryGetValue(Parts[Index], out Topic))
-					Topic = null;
+				if (this.topics.TryGetValue(CurrentSegment, out Topic))
+					return Topic;
 			}
 
-			if (Topic is null)
-			{
-				if (System.Guid.TryParse(Parts[Index].Replace('_', '-'), out Guid _))
-					return null;
+			if (IgnoreGuids && Guid.TryParse(CurrentSegment.Replace('_', '-'), out Guid _))
+				return null;
 
-				if (this.node.HasChildren)
+			if (this.node.HasChildren)
+			{
+				foreach (INode Child in await this.node.ChildNodes)
 				{
-					foreach (INode Child in await this.node.ChildNodes)
+					if (Child is IMqttTopicNode TopicNode && TopicNode.LocalTopic == CurrentSegment)
 					{
-						if (Child is MqttTopicNode Topic2 && Topic2.LocalTopic == Parts[Index])
+						lock (this.topics)
 						{
-							Topic = new MqttTopic(Topic2, Topic2.FullTopic, Parts[Index], null, Broker);
-							break;
+							if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+								return Topic2;
+							else
+							{
+								Topic = new MqttTopic(TopicNode, Representation.ProcessedSegments, CurrentSegment, null, Broker);
+								this.topics[CurrentSegment] = Topic;
+								return Topic;
+							}
 						}
 					}
 				}
-
-				MqttTopicNode Node = null;
-
-				if (Topic is null)
-				{
-					if (!CreateNew)
-						return null;
-
-					StringBuilder sb = new StringBuilder();
-					int i;
-
-					for (i = 0; i < Index; i++)
-					{
-						sb.Append(Parts[i]);
-						sb.Append('/');
-					}
-
-					sb.Append(Parts[Index]);
-
-					string FullTopic = sb.ToString();
-
-					Node = new MqttTopicNode()
-					{
-						NodeId = await MeteringNode.GetUniqueNodeId(FullTopic),
-						LocalTopic = Parts[Index]
-					};
-
-					Topic = new MqttTopic(Node, FullTopic, Parts[Index], this, Broker);
-				}
-
-				lock (this.topics)
-				{
-					if (this.topics.ContainsKey(Parts[Index]))
-						Topic = this.topics[Parts[Index]];
-					else
-						this.topics[Parts[Index]] = Topic;
-				}
-
-				if (!(Node is null))
-				{
-					if (Node != Topic.Node)
-						await Node.DestroyAsync();
-					else
-						await this.node.AddAsync(Node);
-				}
 			}
 
-			Index++;
-			if (Parts.Length == Index)
-				return Topic;
-			else
-				return await Topic.GetTopic(Parts, Index, CreateNew, Broker);
+			if (!CreateNew)
+				return null;
+
+			IMqttTopicNode AddNode = Types.FindBest<IMqttTopicNode, MqttTopicRepresentation>(Representation);
+			if (AddNode is null)
+				return null;
+
+			AddNode = await AddNode.CreateNew(Representation);
+			Topic = new MqttTopic(AddNode, Representation.ProcessedSegments, AddNode.LocalTopic, null, Broker);
+
+			lock (this.topics)
+			{
+				if (this.topics.TryGetValue(CurrentSegment, out Topic2))
+					return Topic2;
+				else
+					this.topics[CurrentSegment] = Topic;
+			}
+
+			await this.node.AddAsync(AddNode);
+
+			return Topic;
 		}
 
 		/// <summary>
-		/// TODO
+		/// Sets the parsed data of a topic.
 		/// </summary>
+		/// <typeparam name="T">Type of data.</typeparam>
+		/// <param name="Data">Parsed data.</param>
+		public void SetData<T>(T Data)
+			where T : IMqttData
+		{
+			this.data = Data;
+		}
+
+		/// <summary>
+		/// Called when new data has been published.
+		/// </summary>
+		/// <param name="Content">Published MQTT Content</param>
 		public async Task DataReported(MqttContent Content)
 		{
 			int Len = Content.Data.Length;
@@ -171,197 +184,96 @@ namespace Waher.Things.Mqtt.Model
 
 			this.dataCount += Len;
 
+			bool NewMomentaryValues;
+
 			try
 			{
 				if (this.data is null)
-					this.data = await this.FindDataType(Content);
-				else
-					this.data.DataReported(Content);
+					this.data = this.FindDataType(Content).CreateNew(this, Content);
+
+				switch (await this.data.DataReported(this, Content))
+				{
+					case DataProcessingResult.Incompatible:
+					default:
+						this.data = null;
+						this.data = this.FindDataType(Content).CreateNew(this, Content);
+						NewMomentaryValues = false;
+						break;
+
+					case DataProcessingResult.Processed:
+						NewMomentaryValues = false;
+						break;
+
+					case DataProcessingResult.ProcessedNewMomentaryValues:
+						NewMomentaryValues = true;
+						break;
+				}
 
 				await this.SetOk();
 			}
 			catch (Exception)
 			{
-				try
-				{
-					this.data = await this.FindDataType(Content);
-				}
-				catch (Exception ex2)
-				{
-					await this.Exception(ex2);
-					return;
-				}
+				this.data = this.FindDataType(Content).CreateNew(this, Content);
+				NewMomentaryValues = false;
 			}
 
 			if (this.broker.Client?.HasSniffers ?? false)
 				this.data.SnifferOutput(this.broker.Client);
 
-			try
+			if (NewMomentaryValues)
 			{
-				InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
-					new ThingReference[] { this.node }, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-					(sender, e) =>
-					{
-						this.node.NewMomentaryValues(e.Fields);
-
-						MqttTopic Current = this;
-						MqttTopic Parent = this.parent;
-
-						while (!(Parent is null))
+				try
+				{
+					InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
+						new IThingReference[] { this.node }, FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
+						(sender, e) =>
 						{
-							foreach (Field F in e.Fields)
-							{
-								if (F.Name == "Value")
-									F.Name = Current.localTopic;
-								else
-									F.Name = Current.localTopic + ", " + F.Name;
+							this.node.NewMomentaryValues(e.Fields);
 
-								Parent.node.NewMomentaryValues(F);
+							MqttTopic Current = this;
+							MqttTopic Parent = this.parent;
+
+							while (!(Parent is null))
+							{
+								foreach (Field F in e.Fields)
+								{
+									if (F.Name == "Value")
+										F.Name = Current.localTopic;
+									else
+										F.Name = Current.localTopic + ", " + F.Name;
+
+									Parent.node.NewMomentaryValues(F);
+								}
+
+								Current = Parent;
+								Parent = Parent.parent;
 							}
 
-							Current = Parent;
-							Parent = Parent.parent;
-						}
+							return Task.CompletedTask;
+						},
+						(sender, e) =>
+						{
+							return Task.CompletedTask;
+						}, null);
 
-						return Task.CompletedTask;
-					},
-					(sender, e) =>
-					{
-						return Task.CompletedTask;
-					}, null);
-
-				this.StartReadout(Request);
-			}
-			catch (Exception ex)
-			{
-				await this.Exception(ex);
+					await this.StartReadout(Request, true);
+				}
+				catch (Exception ex)
+				{
+					await this.Exception(ex);
+				}
 			}
 		}
 
-		private async Task<Data> FindDataType(MqttContent Content)
+		private IMqttData FindDataType(MqttContent Content)
 		{
 			try
 			{
-				string s = CommonTypes.GetString(Content.Data, Encoding.UTF8);
+				IMqttData Data = Types.FindBest<IMqttData, MqttContent>(Content);
+				if (!(Data is null))
+					return Data;
 
-				if (long.TryParse(s, out long i))
-				{
-					await this.RemoveWarning();
-					return new IntegerData(this, i);
-				}
-
-				if (CommonTypes.TryParse(s, out double x, out byte NrDecimals))
-				{
-					await this.RemoveWarning();
-					return new FloatingPointData(this, x, NrDecimals);
-				}
-
-				if (CommonTypes.TryParse(s, out bool b))
-				{
-					await this.RemoveWarning();
-					return new BooleanData(this, b);
-				}
-
-				if (System.Guid.TryParse(s, out Guid Guid))
-				{
-					await this.RemoveWarning();
-					return new GuidData(this, Guid);
-				}
-
-				if (System.TimeSpan.TryParse(s, out TimeSpan TimeSpan))
-				{
-					await this.RemoveWarning();
-					return new TimeSpanData(this, TimeSpan);
-				}
-
-				if (System.DateTime.TryParse(s, out DateTime DateTime))
-				{
-					await this.RemoveWarning();
-					return new DateTimeData(this, DateTime);
-				}
-
-				if (CommonTypes.TryParseRfc822(s, out DateTimeOffset DateTimeOffset))
-				{
-					await this.RemoveWarning();
-					return new DateTimeOffsetData(this, DateTimeOffset);
-				}
-
-				if (Waher.Content.Duration.TryParse(s, out Duration Duration))
-				{
-					await this.RemoveWarning();
-					return new DurationData(this, Duration);
-				}
-
-				if (s.StartsWith("<") && s.EndsWith(">"))
-				{
-					try
-					{
-						XmlDocument Doc = new XmlDocument()
-						{
-							PreserveWhitespace = true
-						};
-						Doc.LoadXml(s);
-						await this.RemoveWarning();
-						return new XmlData(this, s, Doc);
-					}
-					catch (Exception)
-					{
-						// Not XML
-					}
-				}
-
-				if ((s.StartsWith("{") && s.EndsWith("}")) || (s.StartsWith("[") && s.EndsWith("]")))
-				{
-					try
-					{
-						object Obj = JSON.Parse(s);
-						await this.RemoveWarning();
-						return new JsonData(this, s, Obj);
-					}
-					catch (Exception)
-					{
-						// Not JSON
-					}
-				}
-
-				if (s.IndexOfAny(controlCharacters) >= 0)
-				{
-					await this.RemoveWarning();
-					return new BinaryData(this, Content.Data);
-				}
-
-				if (Base64Data.RegEx.IsMatch(s))
-				{
-					await this.RemoveWarning();
-					byte[] Data = Convert.FromBase64String(s.Trim());
-					if (Data.Length > 0)
-						return new Base64Data(this, Data);
-				}
-
-				if (HexStringData.RegEx.IsMatch(s))
-				{
-					await this.RemoveWarning();
-					byte[] Data = Security.Hashes.StringToBinary(s.Trim());
-					if (Data.Length > 0)
-						return new HexStringData(this, Data);
-				}
-
-				Match M = QuantityData.RegEx.Match(s);
-				if (M.Success && CommonTypes.TryParse(M.Groups["Magnitude"].Value, out x, out NrDecimals))
-				{
-					await this.RemoveWarning();
-					return new QuantityData(this, x, NrDecimals, M.Groups["Unit"].Value);
-				}
-
-				if (!this.hasWarning.HasValue || !this.hasWarning.Value)
-				{
-					if (!(this.node is null))
-						await this.node.LogWarningAsync("Format", "Unrecognized string format: " + s);
-
-					this.hasWarning = true;
-				}
-
-				return new StringData(this, s);
+				return new BinaryData(this, Content.Data);
 			}
 			catch (Exception)
 			{
@@ -369,37 +281,18 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private async Task RemoveWarning()
-		{
-			if (!this.hasWarning.HasValue || this.hasWarning.Value)
-			{
-				this.hasWarning = false;
-
-				if (!(this.node is null))
-					await this.node.RemoveWarningAsync("Format");
-			}
-		}
-
-		private bool? hasWarning = null;
-
-		private static readonly char[] controlCharacters = new char[]
-		{
-			'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x0b', '\x0c', '\x0e', '\x0f',
-			'\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f'
-		};
-
 		private Task SetOk()
 		{
 			this.ex = null;
 			this.exTP = DateTime.MinValue;
 
-			return this.node.RemoveErrorAsync("Eror");
+			return this.node.RemoveErrorAsync("Error");
 		}
 
 		private Task Exception(Exception ex)
 		{
 			this.ex = ex;
-			this.exTP = DateTime.Now;
+			this.exTP = DateTime.UtcNow;
 
 			return this.node.LogErrorAsync("Error", ex.Message);
 		}
@@ -413,11 +306,14 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Starts the readout of the sensor.
 		/// </summary>
-		public void StartReadout(ISensorReadout Request)
+		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
+		/// be reported by the caller (false).</param>
+		public Task StartReadout(ISensorReadout Request, bool DoneAfter)
 		{
-			Task.Run(() => this.StartReadout(this.node, Request, string.Empty, true));
+			return this.StartReadout(this.nodeReference, Request, string.Empty, DoneAfter);
 		}
 
 		/// <summary>
@@ -442,17 +338,24 @@ namespace Waher.Things.Mqtt.Model
 					Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
 				else if (this.data is null)
 				{
-					if (Last)
-						Request.ReportFields(true);
+					this.data = await this.node.GetDefaultDataObject();
+
+					if (this.data is null)
+					{
+						if (Last)
+							Request.ReportFields(true);
+					}
+					else
+						await this.data.StartReadout(ThingReference, Request, Prefix, Last);
 				}
 				else
-					this.data.StartReadout(ThingReference, Request, Prefix, Last);
+					await this.data.StartReadout(ThingReference, Request, Prefix, Last);
 
 				await this.node.RemoveErrorAsync("Readout");
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(Last, new ThingError(ThingReference, DateTime.Now, ex.Message));
+				Request.ReportErrors(Last, new ThingError(ThingReference, DateTime.UtcNow, ex.Message));
 				await this.node.LogErrorAsync("Readout", ex.Message);
 			}
 		}
@@ -490,14 +393,21 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Removes a child topic
 		/// </summary>
+		/// <param name="LocalTopic">Local topic name.</param>
+		/// <returns>If local topic was found and removed.</returns>
 		public bool Remove(string LocalTopic)
 		{
-			lock (this.topics)
+			if (!(LocalTopic is null))
 			{
-				return this.topics.Remove(LocalTopic);
+				lock (this.topics)
+				{
+					return this.topics.Remove(LocalTopic);
+				}
 			}
+			else
+				return false;
 		}
 
 		/// <summary>

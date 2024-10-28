@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Waher.Persistence.Exceptions;
-using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
@@ -20,6 +20,7 @@ namespace Waher.Persistence.Files
 		private BlockHeader currentHeader;
 		private BinaryDeserializer currentReader;
 		private IObjectSerializer defaultSerializer;
+		private ObjectSerializer defaultSerializerEx;
 		private IObjectSerializer currentSerializer;
 		private BlockInfo startingPoint;
 		private IRecordHandler recordHandler;
@@ -63,10 +64,11 @@ namespace Waher.Persistence.Files
 			if (Result.defaultSerializer is null && typeof(T) != typeof(object))
 				Result.defaultSerializer = await File.Provider.GetObjectSerializer(typeof(T));
 
-			if (Result.defaultSerializer is ObjectSerializer Serializer &&
-				Serializer.HasObjectIdField)
+			Result.defaultSerializerEx = Result.defaultSerializer as ObjectSerializer;
+
+			if (!(Result.defaultSerializerEx is null) && Result.defaultSerializerEx.HasObjectIdField)
 			{
-				Result.objectIdMemberName = Serializer.ObjectIdMemberName;
+				Result.objectIdMemberName = Result.defaultSerializerEx.ObjectIdMemberName;
 				Result.fieldCount = 1;
 			}
 
@@ -196,6 +198,22 @@ namespace Waher.Persistence.Files
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
+
+		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -1165,11 +1183,95 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Index of current block
 		/// </summary>
-		public uint CurrentBlockIndex => currentBlockIndex;
+		public uint CurrentBlockIndex => this.currentBlockIndex;
 
 		/// <summary>
 		/// Current object position, within block.
 		/// </summary>
-		public int CurrentObjectPosition => currentObjPos;
+		public int CurrentObjectPosition => this.currentObjPos;
+
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueAfterLocked(T LastItem)
+		{
+			ObjectSerializer Serializer = this.defaultSerializerEx ??
+				await this.file.Provider.GetObjectSerializerEx(typeof(T));
+
+			object ObjectId = await Serializer.GetObjectId(LastItem, false, null);
+			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MoveNextAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(ObjectId, true);
+				this.SetStartingPoint(Info);
+			}
+		}
+
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastKey">Key of Last item in a previous process.</param>
+		public async Task ContinueAfterLocked(byte[] LastKey)
+		{
+			BlockInfo Info = await this.file.FindNodeLocked(LastKey, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MoveNextAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(LastKey, true);
+				this.SetStartingPoint(Info);
+			}
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public async Task ContinueBeforeLocked(T LastItem)
+		{
+			ObjectSerializer Serializer = this.defaultSerializerEx ??
+				await this.file.Provider.GetObjectSerializerEx(typeof(T));
+
+			Guid ObjectId = await Serializer.GetObjectId(LastItem, false, null);
+			BlockInfo Info = await this.file.FindNodeLocked(ObjectId, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MovePreviousAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(ObjectId, true);
+				this.SetStartingPoint(Info);
+			}
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastKey">Key of Last item in a previous process.</param>
+		public async Task ContinueBeforeLocked(byte[] LastKey)
+		{
+			BlockInfo Info = await this.file.FindNodeLocked(LastKey, false);
+			if (!(Info is null))
+			{
+				this.SetStartingPoint(Info);
+				await this.MovePreviousAsyncLocked();
+			}
+			else
+			{
+				Info = await this.file.FindNodeLocked(LastKey, true);
+				this.SetStartingPoint(Info);
+			}
+		}
 	}
 }

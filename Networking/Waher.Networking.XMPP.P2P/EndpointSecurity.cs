@@ -81,6 +81,7 @@ namespace Waher.Networking.XMPP.P2P
 		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private readonly object synchObject = new object();
 		private readonly int securityStrength;
+		private readonly bool ephemeralKeys;
 		private Aes256 aes = new Aes256();
 		private AeadChaCha20Poly1305 acp = new AeadChaCha20Poly1305();
 		private ChaCha20 cha = new ChaCha20();
@@ -134,9 +135,15 @@ namespace Waher.Networking.XMPP.P2P
 			this.contacts = new Dictionary<string, IE2eEndpoint[]>(StringComparer.CurrentCultureIgnoreCase);
 
 			if (!(LocalEndpoints is null))
+			{
 				this.keys = LocalEndpoints;
+				this.ephemeralKeys = false;
+			}
 			else
+			{
 				this.keys = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
+				this.ephemeralKeys = true;
+			}
 
 			if (!(this.client is null))
 			{
@@ -312,7 +319,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (endpointTypes.TryGetValue(Key, out Endpoint))
 				return true;
-			else if (initialized)
+			else if (initialized || endpointTypes.Count > 0)
 				return false;
 
 			CreateEndpoints(128, 0, int.MaxValue);
@@ -389,7 +396,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		private Task Client_OnStateChanged(object Sender, XmppState NewState)
 		{
-			if (NewState == XmppState.RequestingSession)
+			if (NewState == XmppState.RequestingSession && this.ephemeralKeys)
 				this.GenerateNewKey();
 
 			return Task.CompletedTask;

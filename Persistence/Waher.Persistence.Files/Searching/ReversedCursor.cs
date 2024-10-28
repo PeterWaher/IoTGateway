@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 
@@ -87,6 +88,27 @@ namespace Waher.Persistence.Files.Searching
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
 
 		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
+
+		/// <summary>
+		/// Resets the enumerator.
+		/// </summary>
+		public void Reset() => this.cursor.Reset();
+
+		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
@@ -130,6 +152,24 @@ namespace Waher.Persistence.Files.Searching
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
 			return this.cursor.SameSortOrder(ConstantFields, SortOrder);
+		}
+
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueAfterLocked(T LastItem)
+		{
+			return this.cursor.ContinueBeforeLocked(LastItem);
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueBeforeLocked(T LastItem)
+		{
+			return this.cursor.ContinueAfterLocked(LastItem);
 		}
 	}
 }

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Waher.Things.Ieee1451\Waher.Things.Ieee1451.csproj" />
     <ProjectReference Include="..\Waher.Things.Ip\Waher.Things.Ip.csproj" />
   </ItemGroup>
 

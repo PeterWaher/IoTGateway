@@ -122,6 +122,12 @@
 			</Abbreviation>
 			<InlineText>.</InlineText>
 		</Paragraph>
+		<Paragraph>
+			<Abbreviation description="Hi">
+				<InlineText>Hello</InlineText>
+			</Abbreviation>
+			<InlineText>, how are you?</InlineText>
+		</Paragraph>
 	</elements>
 	<references>
 		<reference key="id">

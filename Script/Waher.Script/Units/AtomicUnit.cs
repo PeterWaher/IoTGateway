@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script.Units
+﻿namespace Waher.Script.Units
 {
 	/// <summary>
 	/// Represents an atomic unit.

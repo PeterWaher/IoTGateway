@@ -3254,7 +3254,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Payload size.</returns>
 		public Task<int> GetPayloadSize(BinaryDeserializer Reader)
 		{
-			return Task.FromResult<int>(0);
+			return Task.FromResult(0);
 		}
 
 		/// <summary>
@@ -3264,7 +3264,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
 		public Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader)
 		{
-			return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(0, false));
+			return Task.FromResult(new KeyValuePair<int, bool>(0, false));
 		}
 
 		/// <summary>

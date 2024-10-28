@@ -22,7 +22,13 @@
 		/// </summary>
 		public AtomicUnit ReferenceUnit => referenceUnit;
 
+		/// <summary>
+		/// Reference unit of category.
+		/// </summary>
+		public Unit Reference => reference;
+
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("K");
+		private static readonly Unit reference = new Unit(referenceUnit);
 
 		/// <summary>
 		/// Base Units supported.
@@ -34,9 +40,9 @@
 				return new string[]
 				{
 					"°C",
-					"C",
+					//"C",		// To avoid confusion with the Coulomb unit C
 					"°F",
-					"F",
+					//"F",		// To avoid confusion with the Faraday unit F
 					"K"
 				};
 			}
@@ -56,12 +62,12 @@
 				switch (BaseUnit)
 				{
 					case "°C":
-					case "C":
+					//case "C":		// To avoid confusion with the Coulomb unit C
 						Magnitude += 273.15;
 						return true;
 
 					case "°F":
-					case "F":
+					//case "F":		// To avoid confusion with the Faraday unit F
 						Magnitude = (Magnitude - 32) / 1.8 + 273.15;
 						return true;
 
@@ -87,12 +93,12 @@
 				switch (BaseUnit)
 				{
 					case "°C":
-					case "C":
+					//case "C":		// To avoid confusion with the Coulomb unit C
 						Magnitude -= 273.15;
 						return true;
 
 					case "°F":
-					case "F":
+					//case "F":		// To avoid confusion with the Faraday unit F
 						Magnitude = (Magnitude - 273.15) * 1.8 + 32;
 						return true;
 

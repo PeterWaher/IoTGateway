@@ -20,7 +20,8 @@ namespace Waher.Things.Xmpp.Model
 		/// <param name="Tls">If TLS is used</param>
 		/// <param name="UserName">User name</param>
 		/// <param name="Password">Password</param>
-		/// <returns></returns>
+		/// <param name="PasswordMechanism">Password autnetication mechanism</param>
+		/// <returns>Key</returns>
 		public static string GetKey(string Host, int Port, bool Tls, string UserName, string Password, string PasswordMechanism)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -35,6 +36,20 @@ namespace Waher.Things.Xmpp.Model
 			return Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 		}
 
+		/// <summary>
+		/// Gets an XMPP broker object instance.
+		/// </summary>
+		/// <param name="Node">XMPP Broker node.</param>
+		/// <param name="Key">Key</param>
+		/// <param name="Host">Host</param>
+		/// <param name="Port">Port number</param>
+		/// <param name="Tls">If TLS should be used</param>
+		/// <param name="UserName">User name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="PasswordMechanism">Password authentication mechanism</param>
+		/// <param name="TrustServer">If server should be trusted</param>
+		/// <param name="AllowInsecureMechanisms">If insecure mechanisms should be permitted.</param>
+		/// <returns>XMPP broker object instance.</returns>
 		public static async Task<XmppBroker> GetBroker(XmppBrokerNode Node, string Key, string Host, int Port, bool Tls, 
 			string UserName, string Password, string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
 		{
@@ -63,6 +78,10 @@ namespace Waher.Things.Xmpp.Model
 			}
 		}
 
+		/// <summary>
+		/// Destroys a broker object instance
+		/// </summary>
+		/// <param name="Key">Key</param>
 		public static void DestroyBroker(string Key)
 		{
 			XmppBroker Broker;

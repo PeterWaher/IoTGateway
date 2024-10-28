@@ -29,7 +29,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <summary>
 		/// Converts content to these content types. 
 		/// </summary>
-		public string[] ToContentTypes => InternetContent.CanEncodeContentTypes;
+		public string[] ToContentTypes => new string[] { "*" };
 
 		/// <summary>
 		/// How well the content is converted.
@@ -97,7 +97,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 
 				KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
 				await State.To.WriteAsync(P.Key, 0, P.Key.Length);
-				State.ToContentType += "; charset=utf-8";
+				State.ToContentType = P.Value;
 			}
 
 			return true;

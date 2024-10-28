@@ -65,7 +65,7 @@ namespace Waher.Content.Dsn
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "dsn")
+			if (string.Compare(FileExtension, "dsn", true) == 0)
 			{
 				ContentType = DeliveryStatusDecoder.ContentType;
 				return true;

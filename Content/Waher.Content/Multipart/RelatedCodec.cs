@@ -95,7 +95,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "related")
+			if (string.Compare(FileExtension, "related", true) == 0)
 			{
 				ContentType = RelatedCodec.ContentType;
 				return true;

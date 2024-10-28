@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
@@ -12,9 +13,9 @@ namespace Waher.Persistence.Files.Searching
 	internal class RangesCursor<T> : ICursor<T>
 	{
 		private readonly RangeInfo[] ranges;
-		private readonly RangeInfo[] currentLimits;
 		private readonly IndexBTreeFile index;
 		private readonly IApplicableFilter[] additionalfilters;
+		private RangeInfo[] currentLimits;
 		private ICursor<T> currentRange;
 		private KeyValuePair<string, IApplicableFilter>[] startRangeFilters;
 		private KeyValuePair<string, IApplicableFilter>[] endRangeFilters;
@@ -43,12 +44,7 @@ namespace Waher.Persistence.Files.Searching
 			this.nrRanges = this.ranges.Length;
 			this.provider = Provider;
 
-			int i;
-
-			this.currentLimits = new RangeInfo[this.nrRanges];
-
-			for (i = 0; i < this.nrRanges; i++)
-				this.currentLimits[i] = this.ranges[i].Copy();
+			this.Reset();
 		}
 
 		/// <summary>
@@ -56,13 +52,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public T Current
-		{
-			get
-			{
-				return this.CurrentCursor.Current;
-			}
-		}
+		public T Current => this.CurrentCursor.Current;
 
 		private ICursor<T> CurrentCursor
 		{
@@ -78,38 +68,20 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// Serializer used to deserialize <see cref="Current"/>.
 		/// </summary>
-		public IObjectSerializer CurrentSerializer
-		{
-			get
-			{
-				return this.CurrentCursor.CurrentSerializer;
-			}
-		}
+		public IObjectSerializer CurrentSerializer => this.CurrentCursor.CurrentSerializer;
 
 		/// <summary>
 		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
 		/// will be null, even if there exists an object at the current position.
 		/// </summary>
-		public bool CurrentTypeCompatible
-		{
-			get
-			{
-				return this.CurrentCursor.CurrentTypeCompatible;
-			}
-		}
+		public bool CurrentTypeCompatible => this.CurrentCursor.CurrentTypeCompatible;
 
 		/// <summary>
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
 		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
-		public Guid CurrentObjectId
-		{
-			get
-			{
-				return this.CurrentCursor.CurrentObjectId;
-			}
-		}
+		public Guid CurrentObjectId => this.CurrentCursor.CurrentObjectId;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -127,6 +99,36 @@ namespace Waher.Persistence.Files.Searching
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
+
+		/// <summary>
+		/// Gets the element in the collection at the current position of the enumerator.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
+		object IEnumerator.Current => this.Current;
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MoveNext() => this.MoveNextAsyncLocked().Result;
+
+		/// <summary>
+		/// Resets the enumerator.
+		/// </summary>
+		public void Reset()
+		{
+			int i;
+
+			this.currentLimits = new RangeInfo[this.nrRanges];
+			this.currentRange = null;
+
+			for (i = 0; i < this.nrRanges; i++)
+				this.currentLimits[i] = this.ranges[i].Copy();
+		}
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
@@ -590,5 +592,22 @@ namespace Waher.Persistence.Files.Searching
 			return this.index.ReverseSortOrder(ConstantFields, SortOrder);
 		}
 
+		/// <summary>
+		/// Continues operating after a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueAfterLocked(T LastItem)
+		{
+			throw new NotSupportedException("Paginated search is not supported for queries with multiple ranges.");
+		}
+
+		/// <summary>
+		/// Continues operating before a given item.
+		/// </summary>
+		/// <param name="LastItem">Last item in a previous process.</param>
+		public Task ContinueBeforeLocked(T LastItem)
+		{
+			throw new NotSupportedException("Paginated search is not supported for queries with multiple ranges.");
+		}
 	}
 }

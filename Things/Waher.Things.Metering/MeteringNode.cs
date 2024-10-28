@@ -24,7 +24,7 @@ namespace Waher.Things.Metering
 	[ArchivingTime]
 	[Index("NodeId")]
 	[Index("ParentId", "NodeId")]
-	public abstract class MeteringNode : INode, ILifeCycleManagement
+	public abstract class MeteringNode : IMeteringNode
 	{
 		private Guid objectId = Guid.Empty;
 		private Guid parentId = Guid.Empty;
@@ -250,7 +250,7 @@ namespace Waher.Things.Metering
 		public virtual async Task LogMessageAsync(MessageType Type, string EventId, string Body)
 		{
 			if (this.objectId == Guid.Empty)
-				throw new InvalidOperationException("You can only log messages on persisted nodes.");
+				return;
 
 			bool Updated = false;
 
@@ -408,7 +408,7 @@ namespace Waher.Things.Metering
 		public virtual async Task<bool> RemoveMessageAsync(MessageType Type, string EventId)
 		{
 			if (this.objectId == Guid.Empty)
-				throw new InvalidOperationException("You can only log messages on persisted nodes.");
+				return false;
 
 			bool Removed = false;
 
@@ -620,22 +620,49 @@ namespace Waher.Things.Metering
 		/// Parent Node, or null if a root node.
 		/// </summary>
 		[IgnoreMember]
-		public INode Parent
+		[Obsolete("Use the asynchronous GetParent() method instead.")]
+		public INode Parent => this.GetParent().Result;
+
+		/// <summary>
+		/// Gets the parent of the node.
+		/// </summary>
+		/// <returns>Parent instance.</returns>
+		/// <exception cref="Exception">If parent is not found.</exception>
+		public async Task<INode> GetParent()
 		{
-			get
-			{
-				if (!(this.parent is null))
-					return this.parent;
-
-				if (this.parentId == Guid.Empty)
-					return null;
-
-				this.parent = this.LoadParent().Result;
-				if (this.parent is null)
-					throw new Exception("Parent not found.");
-
+			if (!(this.parent is null))
 				return this.parent;
+
+			if (this.parentId == Guid.Empty)
+				return null;
+
+			this.parent = await this.LoadParent();
+			if (this.parent is null)
+				throw new Exception("Parent not found.");
+
+			return this.parent;
+		}
+
+		/// <summary>
+		/// Tries to get an ancestor node of a given type, if one exists.
+		/// </summary>
+		/// <returns>Ancestor Node of given type, if found, null otherwise.</returns>
+		public async Task<T> GetAncestor<T>()
+			where T : INode
+		{
+			INode Loop = await this.GetParent();
+
+			while (!(Loop is null))
+			{
+				if (Loop is T Ancestor)
+					return Ancestor;
+				else if (Loop is MeteringNode MeteringNode)
+					Loop = await MeteringNode.GetParent();
+				else
+					Loop = Loop.Parent;
 			}
+
+			return default;
 		}
 
 		/// <summary>
@@ -724,7 +751,7 @@ namespace Waher.Things.Metering
 			// Do nothing by default.
 		}
 
-		private async Task<MeteringNode> LoadParent()
+		internal async Task<MeteringNode> LoadParent()
 		{
 			if (!(this.parent is null))
 				return this.parent;
@@ -903,12 +930,12 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node was moved up.</returns>
-		public virtual Task<bool> MoveUpAsync(RequestOrigin Caller)
+		public virtual async Task<bool> MoveUpAsync(RequestOrigin Caller)
 		{
-			if (!(this.Parent is MeteringNode Parent))
-				return Task.FromResult(false);
+			if (!(await this.GetParent() is MeteringNode Parent))
+				return false;
 			else
-				return Parent.MoveUpAsync(this, Caller);
+				return await Parent.MoveUpAsync(this, Caller);
 		}
 
 		/// <summary>
@@ -916,12 +943,12 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node was moved down.</returns>
-		public virtual Task<bool> MoveDownAsync(RequestOrigin Caller)
+		public virtual async Task<bool> MoveDownAsync(RequestOrigin Caller)
 		{
-			if (!(this.Parent is MeteringNode Parent))
-				return Task.FromResult(false);
+			if (!(await this.GetParent() is MeteringNode Parent))
+				return false;
 			else
-				return Parent.MoveDownAsync(this, Caller);
+				return await Parent.MoveDownAsync(this, Caller);
 		}
 
 		/// <summary>
@@ -1186,7 +1213,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public async virtual Task DestroyAsync()
 		{
-			if (!(this.Parent is null))
+			if (!(await this.GetParent() is null))
 			{
 				if (this.parent.childrenLoaded)
 				{

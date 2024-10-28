@@ -95,7 +95,7 @@ namespace Waher.Content.Multipart
 			{
 				foreach (KeyValuePair<string, string> P in Fields)
 				{
-					if (P.Key.ToUpper() == "BOUNDARY")
+					if (string.Compare(P.Key, "BOUNDARY", true) == 0)
 					{
 						Boundary = P.Value;
 						break;
@@ -415,7 +415,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "formdata")
+			if (string.Compare(FileExtension, "formdata", true) == 0)
 			{
 				ContentType = FormDataDecoder.ContentType;
 				return true;

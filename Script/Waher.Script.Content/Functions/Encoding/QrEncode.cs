@@ -107,7 +107,7 @@ namespace Waher.Script.Content.Functions.Encoding
 					Rgba = M.ToRGBA(Width, Height, e.Function, e.AntiAlias);
 			}
 
-			return new GraphBitmap(PixelInformation.FromRaw(SKColorType.Rgba8888, Rgba, Width, Height, Width << 2));
+			return new GraphBitmap(Variables, PixelInformation.FromRaw(SKColorType.Rgba8888, Rgba, Width, Height, Width << 2));
 		}
 
 		/// <summary>

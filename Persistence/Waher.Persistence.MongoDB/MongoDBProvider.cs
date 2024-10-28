@@ -10,6 +10,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB.Serialization;
 using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
@@ -142,7 +143,7 @@ namespace Waher.Persistence.MongoDB
 		/// Gets a collection.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
-		/// <returns></returns>
+		/// <returns>Collection</returns>
 		public IMongoCollection<BsonDocument> GetCollection(string CollectionName)
 		{
 			IMongoCollection<BsonDocument> Result;
@@ -450,7 +451,40 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
-			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, 
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			string CollectionName = Serializer.CollectionName(null);
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Find(Serializer, Collection, Offset, MaxCount, BsonFilter, ContinueAfter, SortOrder);
 		}
 
 		/// <summary>
@@ -476,7 +510,7 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
 		}
 
 		/// <summary>
@@ -506,7 +540,39 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
-			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, null, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection Name</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="ContinueAfter">Continue returning results after this object.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public Task<IEnumerable<T>> Find<T>(string CollectionName, int Offset, int MaxCount, Filter Filter, 
+			T ContinueAfter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IMongoCollection<BsonDocument> Collection;
+			FilterDefinition<BsonDocument> BsonFilter;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			if (Filter is null)
+				BsonFilter = new BsonDocument();
+			else
+				BsonFilter = this.Convert(Filter, Serializer);
+
+			return this.Find(Serializer, Collection, Offset, MaxCount, BsonFilter, ContinueAfter, SortOrder);
 		}
 
 		/// <summary>
@@ -553,10 +619,13 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
-			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, T ContinueAfter, params string[] SortOrder)
 			where T : class
 		{
-			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
+			if (!(ContinueAfter is null))
+				throw new NotImplementedException("Paginated searches not implemented in MongoDB provider.");
+
+			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find(BsonFilter);
 
 			if (SortOrder.Length > 0)
 			{
@@ -979,6 +1048,116 @@ namespace Waher.Persistence.MongoDB
 				return new NotSupportedException("Filter values of type " + Value.GetType().FullName +
 					" for field " + TypeName + "." + FieldName + " not supported.");
 			}
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(int PageSize, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(0, PageSize, SortOrder);
+			return new Page<T>(PageSize, null, null, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(0, PageSize, Filter, SortOrder);
+			return new Page<T>(PageSize, null, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<object>> FindFirst(string Collection, int PageSize, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> Items = await this.Find(Collection, 0, PageSize, SortOrder);
+			return new Page<object>(PageSize, Collection, null, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<object>> FindFirst(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(object));
+			IEnumerable<object> Items = await this.Find(Collection, 0, PageSize, Filter, SortOrder);
+			return new Page<object>(PageSize, Collection, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public async Task<IPage<T>> FindFirst<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			IEnumerable<T> Items = await this.Find<T>(Collection, 0, PageSize, Filter, SortOrder);
+			return new Page<T>(PageSize, Collection, Filter, SortOrder, Items, Serializer, this);
+		}
+
+		/// <summary>
+		/// Finds the next page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<T>> FindNext<T>(IPage<T> Page)
+			where T : class
+		{
+			if (Page is Page<T> CurrentPage)
+				return CurrentPage.FindNext();
+			else
+				throw new IOException("Incompatible page.");
+		}
+
+		/// <summary>
+		/// Finds the next page of objects in a given collection.
+		/// </summary>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<object>> FindNext(IPage<object> Page)
+		{
+			if (Page is Page<object> CurrentPage)
+				return CurrentPage.FindNext();
+			else
+				throw new IOException("Incompatible page.");
 		}
 
 		/// <summary>
@@ -1656,8 +1835,8 @@ namespace Waher.Persistence.MongoDB
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output, string[] CollectionNames)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(IDatabaseExport Output, string[] CollectionNames)
 		{
 			return this.Export(Output, CollectionNames, null);
 		}
@@ -1668,11 +1847,14 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public async Task<bool> Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
+			bool Continue;
+
 			Thread?.Start();
-			await Output.StartDatabase();
+			if (!await Output.StartDatabase())
+				return false;
 			try
 			{
 				IDatabaseExportFilter Filter = Output as IDatabaseExportFilter;
@@ -1694,25 +1876,31 @@ namespace Waher.Persistence.MongoDB
 
 					IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
 
-					await Output.StartCollection(CollectionName);
+					if (!await Output.StartCollection(CollectionName))
+						return false;
 					try
 					{
 						foreach (BsonDocument Index in (await Collection.Indexes.ListAsync()).ToEnumerable())
 						{
-							await Output.StartIndex();
+							if (!await Output.StartIndex())
+								return false;
 
 							foreach (BsonElement E in Index.Elements)
 							{
 								if (E.Name == "key")
 								{
 									foreach (BsonElement E2 in E.Value.AsBsonDocument.Elements)
-										await Output.ReportIndexField(E2.Name, E2.Value.AsInt32 > 0);
+									{
+										if (!await Output.ReportIndexField(E2.Name, E2.Value.AsInt32 > 0))
+											return false;
+									}
 
 									break;
 								}
 							}
 
-							await Output.EndIndex();
+							if (!await Output.EndIndex())
+								return false;
 						}
 
 						foreach (BsonDocument Doc in (await Collection.FindAsync<BsonDocument>(Builders<BsonDocument>.Filter.Empty)).ToEnumerable())
@@ -1727,68 +1915,93 @@ namespace Waher.Persistence.MongoDB
 								if (!(Filter is null) && !Filter.CanExportObject(Obj))
 									continue;
 
-								await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
+								if (await Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName) is null)
+									return false;
 								try
 								{
 									foreach (KeyValuePair<string, object> P in Obj)
 									{
 										if (P.Value is ObjectId ObjectId)
-											await Output.ReportProperty(P.Key, GeneratedObjectSerializerBase.ObjectIdToGuid(ObjectId));
+										{
+											if (!await Output.ReportProperty(P.Key, GeneratedObjectSerializerBase.ObjectIdToGuid(ObjectId)))
+												return false;
+										}
 										else
-											await Output.ReportProperty(P.Key, P.Value);
+										{
+											if (!await Output.ReportProperty(P.Key, P.Value))
+												return false;
+										}
 									}
 								}
 								catch (Exception ex)
 								{
 									Thread?.Exception(ex);
-									this.ReportException(ex, Output);
+									if (!await this.ReportException(ex, Output))
+										return false;
 								}
 								finally
 								{
-									await Output.EndObject();
+									Continue = await Output.EndObject();
 								}
+
+								if (!Continue)
+									return false;
 							}
 							else if (!(Object is null))
-								await Output.ReportError("Unable to load object " + Doc["_id"].AsString + ".");
+							{
+								if (!await Output.ReportError("Unable to load object " + Doc["_id"].AsString + "."))
+									return false;
+							}
 						}
 					}
 					catch (Exception ex)
 					{
 						Thread?.Exception(ex);
-						this.ReportException(ex, Output);
+						if (!await this.ReportException(ex, Output))
+							return false;
 					}
 					finally
 					{
-						await Output.EndCollection();
+						Continue = await Output.EndCollection();
 					}
+
+					if (!Continue)
+						return false;
 				}
 			}
 			catch (Exception ex)
 			{
 				Thread?.Exception(ex);
-				this.ReportException(ex, Output);
+				if (!await this.ReportException(ex, Output))
+					return false;
 			}
 			finally
 			{
-				await Output.EndDatabase();
+				Continue = await Output.EndDatabase();
 				Thread?.Idle();
 				Thread?.Stop();
 			}
+
+			return Continue;
 		}
 
-		private void ReportException(Exception ex, IDatabaseExport Output)
+		private async Task<bool> ReportException(Exception ex, IDatabaseExport Output)
 		{
-			ex = Events.Log.UnnestException(ex);
+			ex = Log.UnnestException(ex);
 
 			if (ex is AggregateException ex2)
 			{
 				foreach (Exception ex3 in ex2.InnerExceptions)
-					Output.ReportException(ex3);
+				{
+					if (!await Output.ReportException(ex3))
+						return false;
+				}
+
+				return true;
 			}
 			else
-				Output.ReportException(ex);
+				return await Output.ReportException(ex);
 		}
-
 
 		/// <summary>
 		/// Performs an iteration of contents of the entire database.
@@ -2077,7 +2290,7 @@ namespace Waher.Persistence.MongoDB
 
 			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
 
-			Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
+			ObjectSerializer Deserializer = this.GetObjectSerializerEx(typeof(GenericObject));
 
 			BsonDocumentReader Reader = new BsonDocumentReader(Doc);
 			BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
@@ -2086,8 +2299,11 @@ namespace Waher.Persistence.MongoDB
 				NominalType = typeof(GenericObject)
 			};
 
-			if (Serializer.Deserialize(Context, Args) is GenericObject Obj)
-				return Task.FromResult<GenericObject>(Obj);
+			if (Deserializer.Deserialize(Context, Args) is GenericObject Obj)
+			{
+				Obj.ArchivingTime = Serializer.GetArchivingTimeDays(Object);
+				return Task.FromResult(Obj);
+			}
 			else
 				throw new InvalidOperationException("Unable to generalize object.");
 		}

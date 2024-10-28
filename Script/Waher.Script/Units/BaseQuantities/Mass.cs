@@ -24,7 +24,13 @@ namespace Waher.Script.Units.BaseQuantities
 		/// </summary>
 		public AtomicUnit ReferenceUnit => referenceUnit;
 
+		/// <summary>
+		/// Reference unit of category.
+		/// </summary>
+		public Unit Reference => reference;
+
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("g");
+		private static readonly Unit reference = new Unit(referenceUnit);
 
 		/// <summary>
 		/// Base Units supported.

@@ -75,13 +75,13 @@ namespace Waher.Things.Modbus
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
 		public async Task StartReadout(ISensorReadout Request)
 		{
-			ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+			ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 			await Client.Enter();
 			try
 			{
-				BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, 1);
+				BitArray Bits = await Client.ReadCoils((byte)(await this.GetUnitNode()).UnitId, (ushort)this.CoilNr, 1);
 
-				Request.ReportFields(true, new BooleanField(this.ReportAs, DateTime.UtcNow, this.GetFieldName(), Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+				Request.ReportFields(true, new BooleanField(await this.GetReportAs(), DateTime.UtcNow, this.GetFieldName(), Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 			}
 			catch (Exception ex)
 			{
@@ -93,6 +93,10 @@ namespace Waher.Things.Modbus
 			}
 		}
 
+		/// <summary>
+		/// Gets the field name of the node.
+		/// </summary>
+		/// <returns>Field name</returns>
 		public string GetFieldName()
 		{
 			if (string.IsNullOrEmpty(this.FieldName))
@@ -112,11 +116,11 @@ namespace Waher.Things.Modbus
 				new BooleanControlParameter("Value", "Modbus", this.GetFieldName(), "Coil output",
 					async (Node) =>
 					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
-							BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, 1);
+							BitArray Bits = await Client.ReadCoils((byte)(await this.GetUnitNode()).UnitId, (ushort)this.CoilNr, 1);
 							return Bits[0];
 						}
 						finally
@@ -126,11 +130,11 @@ namespace Waher.Things.Modbus
 					},
 					async (Node, Value) =>
 					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						ModbusTcpClient Client = await (await this.GetGateway()).GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
-							bool WritenValue = await Client.WriteCoil((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, Value);
+							bool WritenValue = await Client.WriteCoil((byte)(await this.GetUnitNode()).UnitId, (ushort)this.CoilNr, Value);
 
 							if (WritenValue != Value)
 								throw new Exception("Coil value not changed.");

@@ -20,11 +20,11 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing persistence SQL</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.5.1</AssemblyVersion>
-    <FileVersion>2.5.1</FileVersion>
-    <PackageIconUrl />
-    <Version>2.5.1</Version>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <AssemblyVersion>2.6.0</AssemblyVersion>
+    <FileVersion>2.6.0</FileVersion>
+		<Version>2.6.0</Version>
+		<PackageIconUrl />
+		<FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Persistence\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
@@ -37,6 +37,7 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />

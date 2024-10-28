@@ -387,14 +387,14 @@ namespace Waher.Script
 			switch (char.ToUpper(this.PeekNextChar()))
 			{
 				case 'D':
-					if (this.PeekNextToken().ToUpper() == "DO")
+					if (string.Compare(this.PeekNextToken(), "DO", true) == 0)
 					{
 						this.pos += 2;
 
 						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement(false));
 
 						this.SkipWhiteSpace();
-						if (this.PeekNextToken().ToUpper() != "WHILE")
+						if (string.Compare(this.PeekNextToken(), "WHILE", true) != 0)
 							throw new SyntaxException("Expected WHILE.", this.pos, this.script);
 
 						this.pos += 5;
@@ -407,7 +407,7 @@ namespace Waher.Script
 						return ParseLists ? this.ParseList() : this.ParseIf();
 
 				case 'W':
-					if (this.PeekNextToken().ToUpper() == "WHILE")
+					if (string.Compare(this.PeekNextToken(), "WHILE", true) == 0)
 					{
 						this.pos += 5;
 
@@ -416,7 +416,7 @@ namespace Waher.Script
 						this.SkipWhiteSpace();
 						if (this.PeekNextChar() == ':')
 							this.pos++;
-						else if (this.PeekNextToken().ToUpper() == "DO")
+						else if (string.Compare(this.PeekNextToken(), "DO", true) == 0)
 							this.pos += 2;
 						else
 							throw new SyntaxException("DO or : expected.", this.pos, this.script);
@@ -443,7 +443,7 @@ namespace Waher.Script
 							this.SkipWhiteSpace();
 							if (this.PeekNextChar() == ':')
 								this.pos++;
-							else if (this.PeekNextToken().ToUpper() == "DO")
+							else if (string.Compare(this.PeekNextToken(), "DO", true) == 0)
 								this.pos += 2;
 							else
 								throw new SyntaxException("DO or : expected.", this.pos, this.script);
@@ -456,7 +456,7 @@ namespace Waher.Script
 							this.pos += 3;
 							this.SkipWhiteSpace();
 
-							if (this.PeekNextToken().ToUpper() == "EACH")
+							if (string.Compare(this.PeekNextToken(), "EACH", true) == 0)
 							{
 								this.pos += 4;
 								In = this.AssertOperandNotNull(this.ParseIf()) as In;
@@ -470,7 +470,7 @@ namespace Waher.Script
 								this.SkipWhiteSpace();
 								if (this.PeekNextChar() == ':')
 									this.pos++;
-								else if (this.PeekNextToken().ToUpper() == "DO")
+								else if (string.Compare(this.PeekNextToken(), "DO", true) == 0)
 									this.pos += 2;
 								else
 									throw new SyntaxException("DO or : expected.", this.pos, this.script);
@@ -485,7 +485,7 @@ namespace Waher.Script
 									throw new SyntaxException("Assignment expected", this.pos, this.script);
 
 								this.SkipWhiteSpace();
-								if (this.PeekNextToken().ToUpper() != "TO")
+								if (string.Compare(this.PeekNextToken(), "TO", true) != 0)
 									throw new SyntaxException("Expected TO.", this.pos, this.script);
 
 								this.pos += 2;
@@ -494,7 +494,7 @@ namespace Waher.Script
 								ScriptNode Step;
 
 								this.SkipWhiteSpace();
-								if (this.PeekNextToken().ToUpper() == "STEP")
+								if (string.Compare(this.PeekNextToken(), "STEP", true) == 0)
 								{
 									this.pos += 4;
 									Step = this.AssertOperandNotNull(this.ParseIf());
@@ -505,7 +505,7 @@ namespace Waher.Script
 								this.SkipWhiteSpace();
 								if (this.PeekNextChar() == ':')
 									this.pos++;
-								else if (this.PeekNextToken().ToUpper() == "DO")
+								else if (string.Compare(this.PeekNextToken(), "DO", true) == 0)
 									this.pos += 2;
 								else
 									throw new SyntaxException("DO or : expected.", this.pos, this.script);
@@ -520,7 +520,7 @@ namespace Waher.Script
 					}
 
 				case 'T':
-					if (this.PeekNextToken().ToUpper() == "TRY")
+					if (string.Compare(this.PeekNextToken(), "TRY", true) == 0)
 					{
 						this.pos += 3;
 
@@ -539,7 +539,7 @@ namespace Waher.Script
 								ScriptNode Catch = this.AssertOperandNotNull(this.ParseStatement(false));
 
 								this.SkipWhiteSpace();
-								if (this.PeekNextToken().ToUpper() == "FINALLY")
+								if (string.Compare(this.PeekNextToken(), "FINALLY", true) == 0)
 								{
 									this.pos += 7;
 									Finally = this.AssertOperandNotNull(this.ParseStatement(false));
@@ -630,7 +630,7 @@ namespace Waher.Script
 			ScriptNode IfFalse;
 			int Start = this.pos;
 
-			if (char.ToUpper(this.PeekNextChar()) == 'I' && this.PeekNextToken().ToUpper() == "IF")
+			if (char.ToUpper(this.PeekNextChar()) == 'I' && string.Compare(this.PeekNextToken(), "IF", true) == 0)
 			{
 				this.pos += 2;
 				this.SkipWhiteSpace();
@@ -638,7 +638,7 @@ namespace Waher.Script
 				Condition = this.AssertOperandNotNull(this.ParseAssignments());
 
 				this.SkipWhiteSpace();
-				if (this.PeekNextToken().ToUpper() == "THEN")
+				if (string.Compare(this.PeekNextToken(), "THEN", true) == 0)
 					this.pos += 4;
 				else
 					throw new SyntaxException("THEN expected.", this.pos, this.script);
@@ -646,7 +646,7 @@ namespace Waher.Script
 				IfTrue = this.AssertOperandNotNull(this.ParseStatement(false));
 
 				this.SkipWhiteSpace();
-				if (this.PeekNextToken().ToUpper() == "ELSE")
+				if (string.Compare(this.PeekNextToken(), "ELSE", true) == 0)
 				{
 					this.pos += 4;
 					IfFalse = this.AssertOperandNotNull(this.ParseStatement(false));
@@ -1548,7 +1548,7 @@ namespace Waher.Script
 								this.pos += 2;
 
 								this.SkipWhiteSpace();
-								if (this.PeekNextToken().ToUpper() == "NOT")
+								if (string.Compare(this.PeekNextToken(), "NOT", true) == 0)
 								{
 									this.pos += 3;
 									Right = this.AssertRightOperandNotNull(this.ParseComparison());
@@ -1608,7 +1608,7 @@ namespace Waher.Script
 								this.pos += 3;
 
 								this.SkipWhiteSpace();
-								if (this.PeekNextToken().ToUpper() == "IN")
+								if (string.Compare(this.PeekNextToken(), "IN", true) == 0)
 								{
 									this.pos += 2;
 									Right = this.AssertRightOperandNotNull(this.ParseComparison());
@@ -1908,7 +1908,7 @@ namespace Waher.Script
 								int Bak = this.pos;
 								this.pos += 3;
 								this.SkipWhiteSpace();
-								if (this.PeekNextToken().ToUpper() == "LIKE")
+								if (string.Compare(this.PeekNextToken(), "LIKE", true) == 0)
 								{
 									this.pos += 4;
 									Right = this.AssertRightOperandNotNull(this.ParseShifts());
@@ -2008,7 +2008,7 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				if (char.ToUpper(ch = this.PeekNextChar()) == 'U')
 				{
-					if (this.PeekNextToken().ToUpper() == "UNION")
+					if (string.Compare(this.PeekNextToken(), "UNION", true) == 0)
 					{
 						this.pos += 5;
 						Right = this.AssertRightOperandNotNull(this.ParseIntersections());
@@ -2200,7 +2200,7 @@ namespace Waher.Script
 			while (true)
 			{
 				this.SkipWhiteSpace();
-				if (char.ToUpper(this.PeekNextChar()) == 'O' && this.PeekNextToken().ToUpper() == "OVER")
+				if (char.ToUpper(this.PeekNextChar()) == 'O' && string.Compare(this.PeekNextToken(), "OVER", true) == 0)
 				{
 					this.pos += 4;
 					Right = this.AssertRightOperandNotNull(this.ParseFactors());
@@ -2276,7 +2276,7 @@ namespace Waher.Script
 						}
 
 					case 'D':
-						if (this.PeekNextToken().ToUpper() == "DOT")
+						if (string.Compare(this.PeekNextToken(), "DOT", true) == 0)
 						{
 							this.pos += 3;
 							Right = this.AssertRightOperandNotNull(this.ParsePowers());
@@ -2287,7 +2287,7 @@ namespace Waher.Script
 							return Left;
 
 					case 'M':
-						if (this.PeekNextToken().ToUpper() == "MOD")
+						if (string.Compare(this.PeekNextToken(), "MOD", true) == 0)
 						{
 							this.pos += 3;
 							Right = this.AssertRightOperandNotNull(this.ParsePowers());
@@ -2321,7 +2321,7 @@ namespace Waher.Script
 								continue;
 
 							case 'M':
-								if (this.PeekNextToken().ToUpper() == "MOD")
+								if (string.Compare(this.PeekNextToken(), "MOD", true) == 0)
 								{
 									this.pos += 3;
 									Right = this.AssertRightOperandNotNull(this.ParsePowers());
@@ -2480,7 +2480,7 @@ namespace Waher.Script
 					return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start, this);
 
 				case 'N':
-					if (this.PeekNextToken().ToUpper() == "NOT")
+					if (string.Compare(this.PeekNextToken(), "NOT", true) == 0)
 					{
 						this.pos += 3;
 						return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start, this);
@@ -2558,7 +2558,7 @@ namespace Waher.Script
 							return Node;
 						}
 
-						if (char.ToUpper(ch) == 'M' && this.PeekNextToken().ToUpper() == "MOD")
+						if (char.ToUpper(ch) == 'M' && string.Compare(this.PeekNextToken(), "MOD", true) == 0)
 						{
 							this.pos--;
 							return Node;
@@ -2986,7 +2986,8 @@ namespace Waher.Script
 		{
 			Prefix Prefix;
 			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
-			KeyValuePair<AtomicUnit, int>[] CompoundFactors;
+			KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundFactors;
+			bool HasCompoundFactors;
 			string Name, Name2, s;
 			int Start = this.pos;
 			int LastCompletion = Start;
@@ -3125,22 +3126,21 @@ namespace Waher.Script
 							this.pos = Start;
 							return null;
 						}
-						else if (Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
+						else if (HasCompoundFactors = Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
 						{
-							Prefix = Prefix.None;
+							Prefix = CompoundFactors.Key;
 							Name = Name2;
 						}
 						else if (Unit.ContainsDerivedOrBaseUnit(Name2))
 						{
 							Prefix = Prefix.None;
 							Name = Name2;
-							CompoundFactors = null;
 						}
-						else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
-							CompoundFactors = null;
+						else
+							HasCompoundFactors = Unit.TryGetCompoundUnit(Name, out CompoundFactors);
 					}
-					else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
-						CompoundFactors = null;
+					else
+						HasCompoundFactors = Unit.TryGetCompoundUnit(Name, out CompoundFactors);
 
 					while (ch > 0 && (ch <= ' ' || ch == 160))
 						ch = this.NextChar();
@@ -3191,25 +3191,25 @@ namespace Waher.Script
 					else
 						Exponent = 1;
 
-					if (CompoundFactors is null)
+					if (HasCompoundFactors)
+					{
+						if (LastDivision)
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+						}
+						else
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+						}
+					}
+					else
 					{
 						if (LastDivision)
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
 						else
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
-					}
-					else
-					{
-						if (LastDivision)
-						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
-						}
-						else
-						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
-						}
 					}
 				}
 

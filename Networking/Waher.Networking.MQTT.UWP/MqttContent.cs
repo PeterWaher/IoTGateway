@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Waher.Networking.MQTT
 {
@@ -9,9 +7,10 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	public class MqttContent
 	{
+		private readonly string topic;
+		private readonly byte[] data;
+		private string dataString = null;
 		private MqttHeader header;
-		private string topic;
-		private byte[] data;
 		private BinaryInput dataInput = null;
 
 		/// <summary>
@@ -41,6 +40,20 @@ namespace Waher.Networking.MQTT
 		/// Binary Data
 		/// </summary>
 		public byte[] Data => this.data;
+
+		/// <summary>
+		/// String representation of UTF-8 encoded binary data.
+		/// </summary>
+		public string DataString
+		{
+			get
+			{
+				if (this.dataString is null)
+					this.dataString = Encoding.UTF8.GetString(this.data);
+
+				return this.dataString;
+			}
+		}
 
 		/// <summary>
 		/// Data stream that can be used to parse incoming data.

@@ -359,7 +359,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Creates a new serializer of the same type and properties.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Serializer</returns>
 		public ISerializer CreateNew()
 		{
 			this.output.WriteLine("Embedded serializer");

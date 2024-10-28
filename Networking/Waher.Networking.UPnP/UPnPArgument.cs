@@ -45,7 +45,7 @@ namespace Waher.Networking.UPnP
 						break;
 
 					case "direction":
-						if (N.InnerText.ToLower() == "out")
+						if (string.Compare(N.InnerText, "out", true) == 0)
 							this.direction = ArgumentDirection.Out;
 						else
 							this.direction = ArgumentDirection.In;

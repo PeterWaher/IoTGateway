@@ -65,7 +65,7 @@ namespace Waher.Script.Content
 			if (!(Object is PixelInformation Pixels))
 			{
 				if (Object is Graph G)
-					Pixels = G.CreatePixels(new Variables());
+					Pixels = G.CreatePixels();
 				else
 					throw new ArgumentException("Object not PixelInformation or Graph.", nameof(Object));
 			}
@@ -81,7 +81,7 @@ namespace Waher.Script.Content
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == ImageCodec.FileExtensionPng)
+			if (string.Compare(FileExtension, ImageCodec.FileExtensionPng, true) == 0)
 			{
 				ContentType = ImageCodec.ContentTypePng;
 				return true;

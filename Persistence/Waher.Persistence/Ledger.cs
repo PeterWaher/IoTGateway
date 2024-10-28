@@ -268,8 +268,8 @@ namespace Waher.Persistence
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(ILedgerExport Output)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(ILedgerExport Output)
 		{
 			return Provider.Export(Output, null);
 		}
@@ -278,24 +278,125 @@ namespace Waher.Persistence
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(ILedgerExport Output, string[] CollectionNames)
+		/// <param name="Restriction">Optional restrictions to apply.
+		/// If null, all information available in the ledger will be exported.</param>
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(ILedgerExport Output, LedgerExportRestriction Restriction)
 		{
-			return Provider.Export(Output, CollectionNames);
+			return Provider.Export(Output, Restriction);
 		}
 
 		/// <summary>
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Restriction">Optional restrictions to apply.
+		/// If null, all information available in the ledger will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread)
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public static Task<bool> Export(ILedgerExport Output, LedgerExportRestriction Restriction, ProfilerThread Thread)
 		{
-			return Provider.Export(Output, CollectionNames, Thread);
+			return Provider.Export(Output, Restriction, Thread);
 		}
 
+		private static readonly object listeningSynchObj = new object();
+		private static int listeningCounter = 0;
+
+		/// <summary>
+		/// Makes the ledger listen on database events.
+		/// Each call to <see cref="StartListeningToDatabaseEvents"/> must be followed by a call
+		/// to <see cref="StopListeningToDatabaseEvents"/> when listening should stop.
+		/// </summary>
+		public static void StartListeningToDatabaseEvents()
+		{
+			lock (listeningSynchObj)
+			{
+				if (listeningCounter == 0)
+				{
+					Database.ObjectInserted += Database_ObjectInserted;
+					Database.ObjectUpdated += Database_ObjectUpdated;
+					Database.ObjectDeleted += Database_ObjectDeleted;
+					Database.CollectionCleared += Database_CollectionCleared;
+
+					listeningCounter++;
+				}
+			}
+
+		}
+
+		/// <summary>
+		/// Makes the ledger listen on database events.
+		/// Each call to <see cref="StartListeningToDatabaseEvents"/> must be followed by a call
+		/// to <see cref="StopListeningToDatabaseEvents"/> when listening should stop.
+		/// </summary>
+		public static void StopListeningToDatabaseEvents()
+		{
+			lock (listeningSynchObj)
+			{
+				if (listeningCounter > 0)
+				{
+					listeningCounter--;
+
+					if (listeningCounter == 0)
+					{
+						Database.ObjectInserted -= Database_ObjectInserted;
+						Database.ObjectUpdated -= Database_ObjectUpdated;
+						Database.ObjectDeleted -= Database_ObjectDeleted;
+						Database.CollectionCleared -= Database_CollectionCleared;
+					}
+				}
+			}
+		}
+
+		private static async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
+		{
+			try
+			{
+				GenericObject Obj = await Database.Generalize(e.Object);
+				await NewEntry(Obj);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		private static async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		{
+			try
+			{
+				GenericObject Obj = await Database.Generalize(e.Object);
+				await UpdatedEntry(Obj);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		private static async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		{
+			try
+			{
+				GenericObject Obj = await Database.Generalize(e.Object);
+				await DeletedEntry(Obj);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		private static async Task Database_CollectionCleared(object Sender, CollectionEventArgs e)
+		{
+			try
+			{
+				await ClearedCollection(e.Collection);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
 	}
 }

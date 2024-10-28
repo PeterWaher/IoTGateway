@@ -137,6 +137,100 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public Task<IPage<T>> FindFirst<T>(int PageSize, params string[] SortOrder)
+			where T : class
+		{
+			return Task.FromResult<IPage<T>>(new EmptyPage<T>());
+		}
+
+		/// <summary>
+		/// Finds the first page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public Task<IPage<T>> FindFirst<T>(int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Task.FromResult<IPage<T>>(new EmptyPage<T>());
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public Task<IPage<object>> FindFirst(string Collection, int PageSize, params string[] SortOrder)
+		{
+			return Task.FromResult<IPage<object>>(new EmptyPage<object>());
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public Task<IPage<object>> FindFirst(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+		{
+			return Task.FromResult<IPage<object>>(new EmptyPage<object>());
+		}
+
+		/// <summary>
+		/// Finds the first page of objects in a given collection.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="PageSize">Number of items on a page.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>First page of objects.</returns>
+		public Task<IPage<T>> FindFirst<T>(string Collection, int PageSize, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Task.FromResult<IPage<T>>(new EmptyPage<T>());
+		}
+
+		/// <summary>
+		/// Finds the next page of objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<T>> FindNext<T>(IPage<T> Page)
+			where T : class
+		{
+			return Task.FromResult<IPage<T>>(new EmptyPage<T>());
+		}
+
+		/// <summary>
+		/// Finds the next page of objects in a given collection.
+		/// </summary>
+		/// <param name="Page">Page reference.</param>
+		/// <returns>Next page, directly following <paramref name="Page"/>.</returns>
+		public Task<IPage<object>> FindNext(IPage<object> Page)
+		{
+			return Task.FromResult<IPage<object>>(new EmptyPage<object>());
+		}
+
+		/// <summary>
 		/// Updates an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
@@ -363,8 +457,8 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>public Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output, string[] CollectionNames) => Task.CompletedTask;
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(IDatabaseExport Output, string[] CollectionNames) => Task.FromResult(true);
 
 		/// <summary>
 		/// Performs an export of the database.
@@ -372,8 +466,8 @@ namespace Waher.Persistence
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		public Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread) => Task.CompletedTask;
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		public Task<bool> Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread) => Task.FromResult(true);
 
 		/// <summary>
 		/// Performs an iteration of contents of the entire database.

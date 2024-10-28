@@ -72,7 +72,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			if (this.handlerType is null || this.handlerType != typeof(T))
 			{
-				this.handler = GetCodeBlockHandler<T>(this.language);
+				this.handler = GetCodeBlockHandler<T>(this.language, this.Document.Settings.AllowInlineScript);
 				this.handlerType = typeof(T);
 			}
 
@@ -140,7 +140,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 		}
 
-		internal static T GetCodeBlockHandler<T>(string Language)
+		internal static T GetCodeBlockHandler<T>(string Language, bool AllowScript)
 			where T : ICodeContentRenderer
 		{
 			ICodeContentRenderer[] Handlers;
@@ -197,7 +197,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (ICodeContentRenderer Content in Handlers)
 			{
 				ContentGrade = Content.Supports(Language);
-				if (ContentGrade > BestGrade && Content is T TypedContent)
+				if (ContentGrade > BestGrade && Content is T TypedContent && (AllowScript || !Content.EvaluatesScript))
 				{
 					BestGrade = ContentGrade;
 					Best = TypedContent;

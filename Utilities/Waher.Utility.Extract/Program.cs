@@ -10,6 +10,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Console;
 using Waher.Runtime.Temporary;
 using Waher.Utility.Extract.ExportFormats;
@@ -18,8 +19,6 @@ namespace Waher.Utility.Extract
 {
 	class Program
 	{
-		public const string ExportNamepace = "http://waher.se/Schema/Export.xsd";
-
 		private const byte TYPE_BOOLEAN = 0;
 		private const byte TYPE_BYTE = 1;
 		private const byte TYPE_INT16 = 2;
@@ -285,7 +284,7 @@ namespace Waher.Utility.Extract
 			bool BlockStarted = false;
 			bool FilesStarted = false;
 
-			if (!r.ReadToFollowing("Export", ExportNamepace))
+			if (!r.ReadToFollowing("Export", XmlFileLedger.Namespace))
 				throw new Exception("Invalid backup XML file.");
 
 			await Import.Start();
@@ -1351,7 +1350,7 @@ namespace Waher.Utility.Extract
 
 			XmlElement KeyAes256 = Doc.DocumentElement;
 			if (KeyAes256.LocalName != "KeyAes256" ||
-				KeyAes256.NamespaceURI != ExportNamepace ||
+				KeyAes256.NamespaceURI != XmlFileLedger.Namespace ||
 				!KeyAes256.HasAttribute("key") ||
 				!KeyAes256.HasAttribute("iv"))
 			{

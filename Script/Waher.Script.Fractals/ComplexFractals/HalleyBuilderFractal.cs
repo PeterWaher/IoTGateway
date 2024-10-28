@@ -191,8 +191,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
                 throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
 
-            return HalleyFractal.CalcHalley(rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
-                this, this.FractalZoomScript,
+            return HalleyFractal.CalcHalley(Variables, rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy, this, this.FractalZoomScript,
                 new object[] { Palette, dimx, dimy, R, CoefficientsZ, ColorExpression, rc, ic });
         }
 

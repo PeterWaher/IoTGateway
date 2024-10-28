@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Persistence.Filters
+﻿namespace Waher.Persistence.Filters
 {
 	/// <summary>
 	/// Delegate for custom filters.

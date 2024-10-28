@@ -118,20 +118,25 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Name">Variable name.</param>
 		/// <param name="Value">Associated variable object value.</param>
-		public virtual void Add(string Name, object Value)
+		/// <returns>Reference to variable that was added.</returns>
+		public virtual Variable Add(string Name, object Value)
 		{
+			Variable Result;
+
 			if (this.active)
 			{
 				lock (this.variables)
 				{
-					if (this.variables.TryGetValue(Name, out Variable v))
-						v.SetValue(Value);
+					if (this.variables.TryGetValue(Name, out Result))
+						Result.SetValue(Value);
 					else
-						this.variables[Name] = new Variable(Name, Value);
+						this.variables[Name] = Result = new Variable(Name, Value);
 				}
 			}
 			else
 				throw new ScriptAbortedException();
+
+			return Result;
 		}
 
 		/// <summary>

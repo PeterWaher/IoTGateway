@@ -3688,7 +3688,6 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Performs a backup of the system.
 		/// </summary>
-		/// <returns></returns>
 		public static async Task DoBackup()
 		{
 			DateTime Now = DateTime.Now;
@@ -4345,7 +4344,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Request">Current HTTP Request</param>
 		/// <param name="UserVariable">Name of user variable</param>
-		/// <returns></returns>
+		/// <returns>Array of web menu items.</returns>
 		public static WebMenuItem[] GetSettingsMenu(HttpRequest Request, string UserVariable)
 		{
 			List<WebMenuItem> Result = new List<WebMenuItem>();
@@ -4822,7 +4821,7 @@ namespace Waher.IoTGateway
 
 							foreach (KeyValuePair<string, string> Field in Fields)
 							{
-								if (Field.Key.ToUpper() == "CHARSET")
+								if (string.Compare(Field.Key, "CHARSET", true) == 0)
 									Encoding = InternetContent.GetEncoding(Field.Value);
 							}
 						}

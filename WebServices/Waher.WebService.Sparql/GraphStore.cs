@@ -119,6 +119,11 @@ namespace Waher.WebService.Sparql
 			await Response.Return(Graph);
 		}
 
+		/// <summary>
+		/// Gets an origin object from an HTTP request object.
+		/// </summary>
+		/// <param name="Request">HTTP request object.</param>
+		/// <returns>Request origin object.</returns>
 		public static Task<RequestOrigin> GetOrigin(HttpRequest Request)
 		{
 			if (Request.User is IRequestOrigin RequestOrigin)

@@ -637,6 +637,7 @@
 							<File Id='Waher.Persistence.FullTextSearch.dll' Name='Waher.Persistence.FullTextSearch.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.FullTextSearch.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.Compiled.dll' Name='Waher.Persistence.Serialization.Compiled.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.dll' Vital='yes'/>
+							<File Id='Waher.Persistence.XmlLedger.dll' Name='Waher.Persistence.XmlLedger.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.XmlLedger.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Console.dll' Name='Waher.Runtime.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Console.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Counters.dll' Name='Waher.Runtime.Counters.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.dll' Vital='yes'/>
@@ -689,6 +690,7 @@
 							<File Id='Waher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.SpaceGravel.dll'/>
 							<File Id='Waher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.WinterDawn.dll'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
+							<File Id='Waher.Things.Ieee1451.dll' Name='Waher.Things.Ieee1451.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.dll' Vital='yes'/>
 							<File Id='Waher.Things.Files.dll' Name='Waher.Things.Files.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.dll' Vital='yes'/>
 							<File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
 							<File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.dll' Vital='yes'/>
@@ -774,6 +776,7 @@
 							<RemoveFile Id='RemoveWaher.Persistence.FullTextSearch.dll' Name='Waher.Persistence.FullTextSearch.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.dll' Name='Waher.Persistence.Serialization.Compiled.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.XmlLedger.dll' Name='Waher.Persistence.XmlLedger.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Console.dll' Name='Waher.Runtime.Console.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Counters.dll' Name='Waher.Runtime.Counters.dll' On='uninstall'/>
@@ -826,6 +829,7 @@
 							<RemoveFile Id='RemoveWaher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Ieee1451.dll' Name='Waher.Things.Ieee1451.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Files.dll' Name='Waher.Things.Files.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.dll' Name='Waher.Things.Metering.dll' On='uninstall'/>
@@ -906,6 +910,7 @@
 							<File Id='Waher.Persistence.FullTextSearch.pdb' Name='Waher.Persistence.FullTextSearch.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.FullTextSearch.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.Compiled.pdb' Name='Waher.Persistence.Serialization.Compiled.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.XmlLedger.pdb' Name='Waher.Persistence.XmlLedger.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.XmlLedger.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Console.pdb' Name='Waher.Runtime.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Console.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Counters.pdb' Name='Waher.Runtime.Counters.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.pdb' Vital='yes'/>
@@ -942,6 +947,7 @@
 							<File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.pdb' Vital='yes'/>
 							<File Id='Waher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
+							<File Id='Waher.Things.Ieee1451.pdb' Name='Waher.Things.Ieee1451.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Files.pdb' Name='Waher.Things.Files.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.pdb' Vital='yes'/>
 							<File Id='Waher.Things.IP.pdb' Name='Waher.Things.IP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.pdb' Vital='yes'/>
@@ -1020,6 +1026,7 @@
 							<RemoveFile Id='RemoveWaher.Persistence.FullTextSearch.pdb' Name='Waher.Persistence.FullTextSearch.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.pdb' Name='Waher.Persistence.Serialization.Compiled.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.XmlLedger.pdb' Name='Waher.Persistence.XmlLedger.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Console.pdb' Name='Waher.Runtime.Console.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Counters.pdb' Name='Waher.Runtime.Counters.pdb' On='uninstall'/>
@@ -1056,6 +1063,7 @@
 							<RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Ieee1451.pdb' Name='Waher.Things.Ieee1451.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Files.pdb' Name='Waher.Things.Files.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.pdb' Name='Waher.Things.IP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
@@ -1692,6 +1700,9 @@
 							<File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Index.md'/>
 							<File Id='Login.md' Name='Login.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.md'/>
 							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md'/>
+							<File Id='MarkdownEditor.cssx' Name='MarkdownEditor.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.cssx'/>
+							<File Id='MarkdownEditor.js' Name='MarkdownEditor.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.js'/>
+							<File Id='MarkdownEditor.md' Name='MarkdownEditor.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.md'/>
 							<File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
 							<File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js'/>
 							<File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
@@ -1724,6 +1735,9 @@
 							<RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
 							<RemoveFile Id='RemoveLogin.md' Name='Login.md' On='uninstall'/>
 							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
+							<RemoveFile Id='RemoveMarkdownEditor.cssx' Name='MarkdownEditor.cssx' On='uninstall'/>
+							<RemoveFile Id='RemoveMarkdownEditor.js' Name='MarkdownEditor.js' On='uninstall'/>
+							<RemoveFile Id='RemoveMarkdownEditor.md' Name='MarkdownEditor.md' On='uninstall'/>
 							<RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
 							<RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
 							<RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>
@@ -1827,29 +1841,33 @@
 								<File Id='MarkdownLab.css' Name='MarkdownLab.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.css' KeyPath='yes'/>
 								<File Id='MarkdownLab.js' Name='MarkdownLab.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.js'/>
 								<File Id='MarkdownLab.md' Name='MarkdownLab.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.md'/>
-								<File Id='MarkdownLabHtml.md' Name='MarkdownLabHtml.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabHtml.md'/>
-								<File Id='MarkdownLabLaTeXArticle.md' Name='MarkdownLabLaTeXArticle.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXArticle.md'/>
-								<File Id='MarkdownLabLaTeXBook.md' Name='MarkdownLabLaTeXBook.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXBook.md'/>
-								<File Id='MarkdownLabLaTeXReport.md' Name='MarkdownLabLaTeXReport.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXReport.md'/>
-								<File Id='MarkdownLabLaTeXStandalone.md' Name='MarkdownLabLaTeXStandalone.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXStandalone.md'/>
-								<File Id='MarkdownLabSmartContract.md' Name='MarkdownLabSmartContract.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabSmartContract.md'/>
-								<File Id='MarkdownLabText.md' Name='MarkdownLabText.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabText.md'/>
-								<File Id='MarkdownLabXamarinForms.md' Name='MarkdownLabXamarinForms.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXamarinForms.md'/>
-								<File Id='MarkdownLabXaml.md' Name='MarkdownLabXaml.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXaml.md'/>
-								<File Id='MarkdownLabXml.md' Name='MarkdownLabXml.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXml.md'/>
+								<File Id='MarkdownLabHtml.ws' Name='MarkdownLabHtml.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabHtml.ws'/>
+								<File Id='MarkdownLabJavaScript.ws' Name='MarkdownLabJavaScript.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabJavaScript.ws'/>
+								<File Id='MarkdownLabLaTeXArticle.ws' Name='MarkdownLabLaTeXArticle.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXArticle.ws'/>
+								<File Id='MarkdownLabLaTeXBook.ws' Name='MarkdownLabLaTeXBook.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXBook.ws'/>
+								<File Id='MarkdownLabLaTeXReport.ws' Name='MarkdownLabLaTeXReport.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXReport.ws'/>
+								<File Id='MarkdownLabLaTeXStandalone.ws' Name='MarkdownLabLaTeXStandalone.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXStandalone.ws'/>
+								<File Id='MarkdownLabMarkdown.ws' Name='MarkdownLabMarkdown.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabMarkdown.ws'/>
+								<File Id='MarkdownLabSmartContract.ws' Name='MarkdownLabSmartContract.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabSmartContract.ws'/>
+								<File Id='MarkdownLabText.ws' Name='MarkdownLabText.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabText.ws'/>
+								<File Id='MarkdownLabXamarinForms.ws' Name='MarkdownLabXamarinForms.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXamarinForms.ws'/>
+								<File Id='MarkdownLabXaml.ws' Name='MarkdownLabXaml.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXaml.ws'/>
+								<File Id='MarkdownLabXml.ws' Name='MarkdownLabXml.ws' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXml.ws'/>
 								<RemoveFile Id='RemoveMarkdownLab.css' Name='MarkdownLab.css' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLab.js' Name='MarkdownLab.js' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLab.md' Name='MarkdownLab.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabHtml.md' Name='MarkdownLabHtml.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabLaTeXArticle.md' Name='MarkdownLabLaTeXArticle' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabLaTeXBook.md' Name='MarkdownLabLaTeXBook' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabLaTeXReport.md' Name='MarkdownLabLaTeXReport' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabLaTeXStandalone.md' Name='MarkdownLabLaTeXStandalone' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabSmartContract.md' Name='MarkdownLabSmartContract.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabText.md' Name='MarkdownLabText.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabXamarinForms.md' Name='MarkdownLabXamarinForms.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabXaml.md' Name='MarkdownLabXaml.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabXml.md' Name='MarkdownLabXml.md' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabHtml.ws' Name='MarkdownLabHtml.ws' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabJavaScript.ws' Name='MarkdownLabJavaScript.ws' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXArticle.ws' Name='MarkdownLabLaTeXArticle' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXBook.ws' Name='MarkdownLabLaTeXBook' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXReport.ws' Name='MarkdownLabLaTeXReport' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXStandalone.ws' Name='MarkdownLabLaTeXStandalone' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownMarkdown.ws' Name='MarkdownMarkdown' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabSmartContract.ws' Name='MarkdownLabSmartContract.ws' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabText.ws' Name='MarkdownLabText.ws' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabXamarinForms.ws' Name='MarkdownLabXamarinForms.ws' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabXaml.ws' Name='MarkdownLabXaml.ws' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabXml.ws' Name='MarkdownLabXml.ws' On='uninstall'/>
 							</Component>
 						</Directory>
 						<Directory Id='PlantUmlLab' Name='PlantUmlLab'>
@@ -2228,6 +2246,7 @@
 							<File Id='Waher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.en.lng' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.IoTGateway.es.lng' Name='Waher.IoTGateway.es.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.es.lng' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng'/>
+							<File Id='Waher.Things.Ieee1451.en.lng' Name='Waher.Things.Ieee1451.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Ieee1451.en.lng'/>
 							<File Id='Waher.Things.Files.en.lng' Name='Waher.Things.Files.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Files.en.lng'/>
 							<File Id='Waher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.IP.en.lng'/>
 							<File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Metering.en.lng'/>
@@ -2241,6 +2260,7 @@
 							<RemoveFile Id='RemoveWaher.IoTGateway.en.lng' Name='Waher.IoTGateway.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.es.lng' Name='Waher.IoTGateway.es.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Ieee1451.en.lng' Name='Waher.Things.Ieee1451.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Files.en.lng' Name='Waher.Things.Files.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.en.lng' Name='Waher.Things.IP.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' On='uninstall'/>

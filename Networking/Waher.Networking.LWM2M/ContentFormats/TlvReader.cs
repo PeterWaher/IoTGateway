@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.LWM2M.ContentFormats
 {
@@ -21,15 +21,12 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <summary>
 		/// If the reader has reached the end of the file.
 		/// </summary>
-		public bool EOF
-		{
-			get { return this.ms.Position >= this.ms.Length; }
-		}
+		public bool EOF => this.ms.Position >= this.ms.Length;
 
 		/// <summary>
 		/// Reads a TLV record from the stream.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Array of bytes.</returns>
 		public TlvRecord ReadRecord()
 		{
 			byte b = (byte)this.ms.ReadByte();
@@ -69,7 +66,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 
 			byte[] Raw = new byte[Len];
 
-			this.ms.Read(Raw, 0, Len);
+			this.ms.ReadAll(Raw, 0, Len);
 
 			return new TlvRecord(Type, Id, Raw);
 		}

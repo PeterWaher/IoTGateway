@@ -87,17 +87,19 @@ namespace Waher.Persistence
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		Task Export(ILedgerExport Output, string[] CollectionNames);
+		/// <param name="Restriction">Optional restrictions to apply.
+		/// If null, all information available in the ledger will be exported.</param>
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		Task<bool> Export(ILedgerExport Output, LedgerExportRestriction Restriction);
 
 		/// <summary>
 		/// Performs an export of the entire ledger.
 		/// </summary>
 		/// <param name="Output">Ledger will be output to this interface.</param>
-		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Restriction">Optional restrictions to apply.
+		/// If null, all information available in the ledger will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
-		/// <returns>Task object for synchronization purposes.</returns>
-		Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread);
+		/// <returns>If export process was completed (true), or terminated by <paramref name="Output"/> (false).</returns>
+		Task<bool> Export(ILedgerExport Output, LedgerExportRestriction Restriction, ProfilerThread Thread);
 	}
 }

@@ -92,7 +92,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement AreaColor = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(X, Y, new Plot2DAreaPainter(), false, true, this,
+			return new Graph2D(Variables, X, Y, new Plot2DAreaPainter(), false, true, this,
 				AreaColor?.AssociatedObjectValue ?? new SKColor(Graph.DefaultColor.Red, Graph.DefaultColor.Green, Graph.DefaultColor.Blue, 192));
 		}
 	}

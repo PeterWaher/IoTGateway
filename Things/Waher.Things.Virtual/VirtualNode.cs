@@ -186,6 +186,12 @@ namespace Waher.Things.Virtual
 			}
 		}
 
+		/// <summary>
+		/// Tries to get a meta-data value
+		/// </summary>
+		/// <param name="Name">Meta-data name</param>
+		/// <param name="Value">Value, if meta-data tag found.</param>
+		/// <returns>If a meta-data tag was found with the corresponding name.</returns>
 		public bool TryGetMetaDataValue(string Name, out object Value)
 		{
 			if (this.metaDataByName is null)
@@ -425,6 +431,12 @@ namespace Waher.Things.Virtual
 			this.MetaData = Values;
 		}
 
+		/// <summary>
+		/// Gets displayable parameters.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>Set of displayable parameters.</returns>
 		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
@@ -528,8 +540,6 @@ namespace Waher.Things.Virtual
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		/// <param name="DoneAfter">If readout is done after reporting fields (true), or if more fields will
-		/// be reported by the caller (false).</param>
 		public Task StartReadout(ISensorReadout Request)
 		{
 			return this.StartReadout(Request, true);
@@ -581,9 +591,9 @@ namespace Waher.Things.Virtual
 		{
 			get
 			{
-				if (this.TryGetMetaDataValue("Callback", out object Obj) && Obj is string CallbackUrl &&
-					this.TryGetMetaDataValue("Payload", out Obj) && Obj is string PayloadScript &&
-					this.TryGetMetaDataValue("FieldName", out Obj) && Obj is string FieldName &&
+				if (this.TryGetMetaDataValue("Callback", out object Obj) && Obj is string &&
+					this.TryGetMetaDataValue("Payload", out Obj) && Obj is string &&
+					this.TryGetMetaDataValue("FieldName", out Obj) && Obj is string &&
 					this.TryGetMetaDataValue("FieldValue", out object FieldValue))
 				{
 					return
@@ -612,7 +622,7 @@ namespace Waher.Things.Virtual
         /// Get control parameters for the actuator.
         /// </summary>
         /// <returns>Collection of control parameters for actuator.</returns>
-        public Task<ControlParameter[]> GetControlParameters()
+        public virtual Task<ControlParameter[]> GetControlParameters()
 		{
 			List<ControlParameter> Parameters = new List<ControlParameter>();
 

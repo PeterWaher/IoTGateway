@@ -54,16 +54,38 @@ namespace Waher.Script.Graphs3D
 		//private readonly bool showZeroZ = false;
 
 		/// <summary>
-		/// Base class for two-dimensional graphs.
+		/// Base class for three-dimensional graphs.
 		/// </summary>
-		public Graph3D()
-			: base()
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		public Graph3D(Variables Variables)
+			: this(Variables, null, null)
 		{
 		}
 
 		/// <summary>
-		/// Base class for two-dimensional graphs.
+		/// Base class for three-dimensional graphs.
 		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
+		/// <param name="DefaultWidth">Default width.</param>
+		/// <param name="DefaultHeight">Default height.</param>
+		public Graph3D(Variables Variables, int? DefaultWidth, int? DefaultHeight)
+			: base(Variables, DefaultWidth, DefaultHeight)
+		{
+		}
+
+		/// <summary>
+		/// Base class for three-dimensional graphs.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		public Graph3D(GraphSettings Settings)
+			: base(Settings)
+		{
+		}
+
+		/// <summary>
+		/// Base class for three-dimensional graphs.
+		/// </summary>
+		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		/// <param name="X">X-axis</param>
 		/// <param name="Y">Y-axis</param>
 		/// <param name="Z">Z-axis</param>
@@ -74,9 +96,9 @@ namespace Waher.Script.Graphs3D
 		/// <param name="ShowZeroZ">If the z-axis (z=0) should always be shown.</param>
 		/// <param name="Node">Node creating the graph.</param>
 		/// <param name="Parameters">Graph-specific parameters.</param>
-		public Graph3D(IMatrix X, IMatrix Y, IMatrix Z, Vector4[,] Normals, IPainter3D Painter,
+		public Graph3D(Variables Variables, IMatrix X, IMatrix Y, IMatrix Z, Vector4[,] Normals, IPainter3D Painter,
 			bool ShowZeroX, bool ShowZeroY, bool ShowZeroZ, ScriptNode Node, params object[] Parameters)
-			: base()
+			: base(Variables)
 		{
 			int c = X.Columns;
 			int d = X.Rows;
@@ -357,7 +379,7 @@ namespace Waher.Script.Graphs3D
 			if (G.x.First is null)
 				return this;
 
-			Graph3D Result = new Graph3D()
+			Graph3D Result = new Graph3D(this.Settings)
 			{
 				axisTypeX = this.axisTypeX,
 				axisTypeY = this.axisTypeY,
@@ -677,7 +699,7 @@ namespace Waher.Script.Graphs3D
 			DrawingVolume.YLabelPositions = YLabelPositions;
 			DrawingVolume.ZLabelPositions = ZLabelPositions;
 
-			Canvas3D Canvas = new Canvas3D(Settings.Width, Settings.Height, this.overSampling, Settings.BackgroundColor);
+			Canvas3D Canvas = new Canvas3D(Settings, Settings.Width, Settings.Height, this.overSampling, Settings.BackgroundColor);
 
 			Canvas.Perspective(Settings.Height / 2, 2000);
 			Canvas.RotateX(-(float)this.inclination, new Vector3(0, 0, 1500));

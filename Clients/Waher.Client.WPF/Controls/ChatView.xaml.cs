@@ -4,7 +4,6 @@ using System.IO;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -41,7 +40,7 @@ namespace Waher.Client.WPF.Controls
 
 		private readonly Dictionary<string, Consolidator> threads = new Dictionary<string, Consolidator>();
 		private readonly TreeNode node;
-		private Timer timer;
+		private DateTime timer = DateTime.MinValue;
 		private bool muc;
 		private bool consolidate = true;
 
@@ -58,10 +57,8 @@ namespace Waher.Client.WPF.Controls
 				this.FromColumn.Width = w;
 				this.ContentColumn.Width -= w;
 
-				this.timer = new Timer(this.MucSelfPing, null, 60000, 60000);
+				this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.MucSelfPing, null);
 			}
-			else
-				this.timer = null;
 
 			this.DataContext = this;
 		}
@@ -96,8 +93,11 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			this.timer?.Dispose();
-			this.timer = null;
+			if (this.timer > DateTime.MinValue)
+			{
+				MainWindow.Scheduler?.Remove(this.timer);
+				this.timer = DateTime.MinValue;
+			}
 
 			this.Node?.ViewClosed();
 		}
@@ -269,7 +269,7 @@ namespace Waher.Client.WPF.Controls
 							}
 
 							ConsolidationTag Rec = (ConsolidationTag)Consolidation.Tag;
-							MainWindow.Scheduler.Remove(Rec.UpdateTP);
+							MainWindow.Scheduler?.Remove(Rec.UpdateTP);
 
 							await Consolidation.Add(ChatItem.GetShortFrom(From), Markdown);
 
@@ -656,6 +656,8 @@ namespace Waher.Client.WPF.Controls
 
 		private void MucSelfPing(object State)
 		{
+			this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.MucSelfPing, null);
+
 			if (this.node is RoomNode RoomNode)
 			{
 				RoomNode.MucClient.SelfPing(RoomNode.RoomId, RoomNode.Domain, RoomNode.NickName, (sender, e) =>

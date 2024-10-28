@@ -41,7 +41,8 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Starts export
 		/// </summary>
-		public override Task Start()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> Start()
 		{
 			PropertyInfo PI = Database.Provider.GetType().GetProperty("DeleteObsoleteKeys");
 			if (!(PI is null) && PI.PropertyType == typeof(bool))
@@ -53,7 +54,8 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Ends export
 		/// </summary>
-		public override Task End()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> End()
 		{
 			PropertyInfo PI = Database.Provider.GetType().GetProperty("DeleteObsoleteKeys");
 			if (!(PI is null) && PI.PropertyType == typeof(bool))
@@ -65,19 +67,25 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called when a collection is started.
 		/// </summary>
-		/// <param name="CollectionName"></param>
-		public override async Task StartCollection(string CollectionName)
+		/// <param name="CollectionName">Name of collection</param>
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> StartCollection(string CollectionName)
 		{
-			await base.StartCollection(CollectionName);
+			if (!await base.StartCollection(CollectionName))
+				return false;
+
 			await Database.Provider.Clear(CollectionName);
 			await Database.StartBulk();
 			this.nrObjectsInBulk = 0;
+
+			return true;
 		}
 
 		/// <summary>
 		/// Is called when a collection is finished.
 		/// </summary>
-		public override async Task EndCollection()
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> EndCollection()
 		{
 			int c = this.objects.Count;
 			if (c > 0)
@@ -98,15 +106,18 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			await Database.EndBulk();
-			await base.EndCollection();
+
+			return await base.EndCollection();
 		}
 
 		/// <summary>
 		/// Is called when an index in a collection is finished.
 		/// </summary>
-		public override Task EndIndex()
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> EndIndex()
 		{
-			return Database.Provider.AddIndex(this.collectionName, this.index.ToArray());
+			await Database.Provider.AddIndex(this.collectionName, this.index.ToArray());
+			return true;
 		}
 
 		/// <summary>
@@ -114,6 +125,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="ObjectId">ID of object.</param>
 		/// <param name="TypeName">Type name of object.</param>
+		/// <returns>Object ID of object, after optional mapping. null means export cannot continue</returns>
 		public override async Task<string> StartObject(string ObjectId, string TypeName)
 		{
 			ObjectId = await base.StartObject(ObjectId, TypeName);
@@ -124,7 +136,8 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called when an object is finished.
 		/// </summary>
-		public override async Task EndObject()
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> EndObject()
 		{
 			if (!(this.obj is null))
 			{
@@ -156,7 +169,7 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			await base.EndObject();
+			return await base.EndObject();
 		}
 
 		/// <summary>
@@ -164,7 +177,8 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="PropertyName">Property name.</param>
 		/// <param name="PropertyValue">Property value.</param>
-		public override Task ReportProperty(string PropertyName, object PropertyValue)
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
 			if (!(this.obj is null))
 			{
@@ -223,19 +237,23 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="TypeName">Type name of object.</param>
 		/// <param name="EntryType">Type of entry</param>
 		/// <param name="EntryTimestamp">Timestamp of entry</param>
-		/// <returns>Object ID of object, after optional mapping.</returns>
-		public override async Task<string> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
-			ObjectId = await base.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+			if (!await base.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp))
+				return false;
+
 			this.obj = new GenericObject(this.collectionName, TypeName, string.IsNullOrEmpty(ObjectId) ? Guid.Empty : Guid.Parse(ObjectId));
 			this.entryType = EntryType;
-			return ObjectId;
+			
+			return true;
 		}
 
 		/// <summary>
 		/// Is called when an entry is finished.
 		/// </summary>
-		public override async Task EndEntry()
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> EndEntry()
 		{
 			if (this.entryType == EntryType.Clear)
 				await Database.Provider.Clear(this.collectionName);
@@ -269,13 +287,14 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			await base.EndEntry();
+			return await base.EndEntry();
 		}
 
 		/// <summary>
 		/// Starts export of files.
 		/// </summary>
-		public override Task StartFiles()
+		/// <returns>If export can continue.</returns>
+		public override Task<bool> StartFiles()
 		{
 			string Folder2;
 
@@ -296,7 +315,8 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="FileName">Name of file</param>
 		/// <param name="File">File stream</param>
-		public override async Task ExportFile(string FileName, Stream File)
+		/// <returns>If export can continue.</returns>
+		public override async Task<bool> ExportFile(string FileName, Stream File)
 		{
 			await base.ExportFile(FileName, File);
 
@@ -345,6 +365,8 @@ namespace Waher.IoTGateway.Setup
 					}
 				}
 			}
+
+			return true;
 		}
 
 	}

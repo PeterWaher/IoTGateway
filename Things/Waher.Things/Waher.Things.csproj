@@ -16,11 +16,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.0.2</AssemblyVersion>
-    <FileVersion>2.0.2</FileVersion>
-    <PackageIconUrl />
-    <Version>2.0.2</Version>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <AssemblyVersion>2.0.3</AssemblyVersion>
+    <FileVersion>2.0.3</FileVersion>
+		<Version>2.0.3</Version>
+		<PackageIconUrl />
+		<FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Things\Waher.Things\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>

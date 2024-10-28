@@ -10,9 +10,10 @@
     <Company>Waher Data AB</Company>
     <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.11.5</AssemblyVersion>
-    <FileVersion>1.11.5</FileVersion>
-    <Authors>Peter Waher</Authors>
+    <AssemblyVersion>1.12.0</AssemblyVersion>
+    <FileVersion>1.12.0</FileVersion>
+		<Version>1.12.0</Version>
+		<Authors>Peter Waher</Authors>
     <Product>Waher.IoTGateway</Product>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.MongoDB</PackageProjectUrl>
@@ -21,7 +22,6 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database MongoDB</PackageTags>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <Version>1.11.5</Version>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 

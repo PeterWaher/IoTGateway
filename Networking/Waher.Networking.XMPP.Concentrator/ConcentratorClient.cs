@@ -14,7 +14,6 @@ using Waher.Networking.XMPP.Concentrator.Queries;
 using Waher.Things;
 using Waher.Things.SourceEvents;
 using Waher.Things.DisplayableParameters;
-using Waher.Script.Functions.Runtime;
 
 namespace Waher.Networking.XMPP.Concentrator
 {

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
-using Waher.Networking.MQTT;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.Metering;
@@ -215,6 +213,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ms.WriteByte((byte)(ChannelId >> 8));
 				ms.WriteByte((byte)ChannelId);
 				ms.WriteByte(0);    // TedsOffset MSB
+				ms.WriteByte(0);
+				ms.WriteByte(0);
 				ms.WriteByte(0);    // TedsOffset LSB
 
 				using (MemoryStream ms2 = new MemoryStream())
@@ -269,26 +269,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		{
 			byte[] Bin = Record.RawValue;
 			int RecordLen = Bin?.Length ?? 0;
-			int i = 0;
-			int j = RecordLen;
-			int k = 0;
-
-			while (j > 0)
-			{
-				i++;
-				k <<= 8;
-				k |= (byte)j;
-				j >>= 8;
-			}
+			if (RecordLen > 255)
+				throw new Exception("Record length exceeds 255 bytes in length.");
 
 			ms2.WriteByte(Record.Type);
-			ms2.WriteByte((byte)i);
-
-			while (i > 0)
-			{
-				ms2.WriteByte((byte)k);
-				k >>= 8;
-			}
+			ms2.WriteByte((byte)RecordLen);
 
 			if (RecordLen > 0)
 				ms2.Write(Bin, 0, RecordLen);

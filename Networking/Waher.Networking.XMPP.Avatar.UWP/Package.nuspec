@@ -15,17 +15,17 @@
     <copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</copyright>
     <tags>networking communication xmpp avatar</tags>
     <dependencies>
-			<dependency id="Waher.Content" version="2.6.12"/>
+			<dependency id="Waher.Content" version="2.6.13"/>
 			<dependency id="Waher.Content.Images" version="2.1.8"/>
 			<dependency id="Waher.Content.Xml" version="2.3.2"/>
       <dependency id="Waher.Events" version="1.2.1"/>
       <dependency id="Waher.Networking.UWP" version="2.3.0"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="3.2.0"/>
+      <dependency id="Waher.Networking.XMPP.UWP" version="3.2.1"/>
       <dependency id="Waher.Networking.XMPP.PEP.UWP" version="2.0.6"/>
       <dependency id="Waher.Networking.XMPP.PubSub.UWP" version="2.0.8"/>
-      <dependency id="Waher.Persistence" version="1.11.1"/>
+      <dependency id="Waher.Persistence" version="1.12.0"/>
       <dependency id="Waher.Runtime.Settings" version="1.1.1"/>
-      <dependency id="Waher.Security" version="1.0.8"/>
+      <dependency id="Waher.Security" version="1.0.9"/>
     </dependencies>
   </metadata>
   <files>

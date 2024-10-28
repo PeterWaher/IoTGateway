@@ -208,14 +208,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
 		/// <returns>Result</returns>
-		public async Task<DataSourceReference[]> GetRootDataSourcesAsync(string To)
+		public Task<DataSourceReference[]> GetRootDataSourcesAsync(string To)
 		{
-			TaskCompletionSource<DataSourcesEventArgs> Result = new TaskCompletionSource<DataSourcesEventArgs>();
+			TaskCompletionSource<DataSourceReference[]> Result = new TaskCompletionSource<DataSourceReference[]>();
 
 			this.GetRootDataSources(To, (_, e) =>
 			{
 				if (e.Ok)
-					Result.TrySetResult(e);
+					Result.TrySetResult(e.DataSources);
 				else
 					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get root data sources."));
 
@@ -223,7 +223,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			}, null);
 
-			return (await Result.Task).DataSources;
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -248,14 +248,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Parent Data Source ID.</param>
 		/// <returns>Result</returns>
-		public async Task<DataSourceReference[]> GetChildDataSourcesAsync(string To, string SourceID)
+		public Task<DataSourceReference[]> GetChildDataSourcesAsync(string To, string SourceID)
 		{
-			TaskCompletionSource<DataSourcesEventArgs> Result = new TaskCompletionSource<DataSourcesEventArgs>();
+			TaskCompletionSource<DataSourceReference[]> Result = new TaskCompletionSource<DataSourceReference[]>();
 
 			this.GetChildDataSources(To, SourceID, (_, e) =>
 			{
 				if (e.Ok)
-					Result.TrySetResult(e);
+					Result.TrySetResult(e.DataSources);
 				else
 					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get child data sources."));
 
@@ -263,7 +263,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			}, null);
 
-			return (await Result.Task).DataSources;
+			return Result.Task;
 		}
 
 		/// <summary>
@@ -965,6 +965,37 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// Gets information about all root nodes in a data source.
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="SourceID">Data source ID.</param>
+		/// <param name="Parameters">If node parameters should be included in response.</param>
+		/// <param name="Messages">If messages should be included in the response.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <returns>Information about the root nodes.</returns>
+		public Task<NodeInformation[]> GetRootNodesAsync(string To, string SourceID, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken)
+		{
+			TaskCompletionSource<NodeInformation[]> Result = new TaskCompletionSource<NodeInformation[]>();
+
+			this.GetRootNodes(To, SourceID, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, (_, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.NodesInformation);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get root nodes."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Gets information about all child nodes of a node in a data source.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Node">Node reference.</param>
 		/// <param name="Parameters">If node parameters should be included in response.</param>
 		/// <param name="Messages">If messages should be included in the response.</param>
@@ -982,7 +1013,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Gets information about all root nodes in a data source.
+		/// Gets information about all child nodes of a node in a data source.
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="NodeID">Node ID</param>
@@ -1014,6 +1045,58 @@ namespace Waher.Networking.XMPP.Concentrator
 				return this.NodesResponse(e, Parameters, Messages, Callback, State);
 
 			}, State);
+		}
+
+		/// <summary>
+		/// Gets information about all child nodes of a node in a data source.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Parameters">If node parameters should be included in response.</param>
+		/// <param name="Messages">If messages should be included in the response.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <returns>Information about the root nodes.</returns>
+		public Task<NodeInformation[]> GetChildNodesAsync(string To, IThingReference Node, bool Parameters, bool Messages, 
+			string Language, string ServiceToken, string DeviceToken, string UserToken)
+		{
+			return this.GetChildNodesAsync(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
+				ServiceToken, DeviceToken, UserToken);
+		}
+
+		/// <summary>
+		/// Gets information about all child nodes of a node in a data source.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Parameters">If node parameters should be included in response.</param>
+		/// <param name="Messages">If messages should be included in the response.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <returns>Information about the root nodes.</returns>
+		public Task<NodeInformation[]> GetChildNodesAsync(string To, string NodeID, string SourceID, string Partition, 
+			bool Parameters, bool Messages, string Language, string ServiceToken, string DeviceToken, string UserToken)
+		{
+			TaskCompletionSource<NodeInformation[]> Result = new TaskCompletionSource<NodeInformation[]>();
+
+			this.GetChildNodes(To, NodeID, SourceID, Partition, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, (_, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.NodesInformation);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get child nodes."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
 		}
 
 		/// <summary>

@@ -281,6 +281,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				}
 			}
 
+			if (Unit.Prefix != Prefix.None)
+				Value *= Math.Pow(10, (int)Unit.Prefix);
+
 			return true;
 		}
 	}

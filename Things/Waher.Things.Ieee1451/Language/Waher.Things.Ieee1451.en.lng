@@ -3,7 +3,7 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Ieee1451">
 			<String id="1">IEEE 1451.0 Proxy TIM</String>
-			<String id="2"></String>
+			<String id="2">IEEE 1451.0 Proxy Channel</String>
 			<String id="3"></String>
 			<String id="4"></String>
 			<String id="5">IEEE 1451.0 NCAP</String>
@@ -44,7 +44,7 @@
 			<String id="30">Node ID of device to represent using this channel node.</String>
 			<String id="31">Proxy Field Name:</String>
 			<String id="32">Name of field to represent using this channel node.</String>
-			<String id="33">IEEE 1451.0 Proxy Channel</String>
+			<String id="33"></String>
 			<String id="34">Proxy Node ID</String>
 			<String id="35">Proxy Field Name</String>
 		</Namespace>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
@@ -83,7 +82,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(MqttNcapTopicNode), 33, "IEEE 1451.0 Proxy Channel");
+			return Language.GetStringAsync(typeof(Ieee1451Parser), 2, "IEEE 1451.0 Proxy Channel");
 		}
 
 		/// <summary>

@@ -163,6 +163,11 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
+		/// If the node can be read.
+		/// </summary>
+		public override bool IsReadable => true;
+
+		/// <summary>
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using Waher.Script.Abstraction.Sets;
+using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Units;
-using System.Text;
 
 namespace Waher.Script.Objects
 {
@@ -14,12 +14,12 @@ namespace Waher.Script.Objects
 	public sealed class Measurement : FieldElement, IComparable, IPhysicalQuantity     // Not a proper field, as division is not the inversion of multiplication
 	{
 		/// <summary>
-		/// 0
+		/// Zero element (0)
 		/// </summary>
 		public static readonly Measurement ZeroElement = new Measurement(0, Unit.Empty, 0);
 
 		/// <summary>
-		/// 1
+		/// Unit element (1)
 		/// </summary>
 		public static readonly Measurement OneElement = new Measurement(1, Unit.Empty, 1);
 
@@ -72,26 +72,17 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Estimate of measurement
 		/// </summary>
-		public PhysicalQuantity Estimate
-		{
-			get { return new PhysicalQuantity(this.magnitude, this.unit); }
-		}
+		public PhysicalQuantity Estimate => new PhysicalQuantity(this.magnitude, this.unit);
 
 		/// <summary>
 		/// Estimate of measurement
 		/// </summary>
-		public PhysicalQuantity Max
-		{
-			get { return new PhysicalQuantity(this.magnitude + this.error, this.unit); }
-		}
+		public PhysicalQuantity Max => new PhysicalQuantity(this.magnitude + this.error, this.unit);
 
 		/// <summary>
 		/// Estimate of measurement
 		/// </summary>
-		public PhysicalQuantity Min
-		{
-			get { return new PhysicalQuantity(this.magnitude - this.error, this.unit); }
-		}
+		public PhysicalQuantity Min => new PhysicalQuantity(this.magnitude - this.error, this.unit);
 
 		/// <summary>
 		/// Converts underlying object to a physical quantity.
@@ -253,18 +244,12 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
-		public override IAbelianGroupElement Zero
-		{
-			get { return ZeroElement; }
-		}
+		public override IAbelianGroupElement Zero => ZeroElement;
 
 		/// <summary>
 		/// Returns the identity element of the commutative ring with identity.
 		/// </summary>
-		public override ICommutativeRingWithIdentityElement One
-		{
-			get { return OneElement; }
-		}
+		public override ICommutativeRingWithIdentityElement One => OneElement;
 
 		/// <summary>
 		/// Converts the value to a .NET type.

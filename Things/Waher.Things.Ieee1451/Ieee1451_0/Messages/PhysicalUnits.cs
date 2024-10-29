@@ -206,9 +206,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// </summary>
 		/// <param name="Unit">Script unit.</param>
 		///	<param name="Value">Reference value.</param>
+		///	<param name="NrDecimals">Number of decimals.</param>
 		/// <param name="Units">IEEE 1451 units object, if successful.</param>
 		/// <returns>If able to convert the unit.</returns>
-		public static bool TryCreate(Unit Unit, ref double Value, out PhysicalUnits Units)
+		public static bool TryCreate(Unit Unit, ref double Value, ref double NrDecimals, out PhysicalUnits Units)
 		{
 			Units = new PhysicalUnits()
 			{
@@ -226,7 +227,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			if (Unit.HasFactors)
 			{
-				Unit = Unit.ToReferenceUnits(ref Value);
+				Unit = Unit.ToReferenceUnits(ref Value, ref NrDecimals);
 
 				foreach (KeyValuePair<AtomicUnit, int> P in Unit.Factors)
 				{
@@ -253,6 +254,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						case "g":
 							Units.Kilograms = Exp;
 							Value *= Math.Pow(1000, -P.Value);
+							NrDecimals += P.Value;
 							break;
 
 						case "s":
@@ -282,7 +284,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			}
 
 			if (Unit.Prefix != Prefix.None)
-				Value *= Math.Pow(10, (int)Unit.Prefix);
+			{
+				int i = (int)Unit.Prefix;
+				Value *= Math.Pow(10, i);
+				NrDecimals -= i;
+			}
 
 			return true;
 		}

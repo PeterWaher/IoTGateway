@@ -28,7 +28,7 @@ namespace Waher.Script.Units.BaseQuantities
 		/// Reference unit for category.
 		/// </summary>
 		public Unit Reference => reference;
-		
+
 		private static readonly AtomicUnit referenceUnit = new AtomicUnit("m");
 		private static readonly Unit reference = new Unit(referenceUnit);
 
@@ -70,70 +70,79 @@ namespace Waher.Script.Units.BaseQuantities
 		/// Tries to convert a magnitude from a specified base unit, to the reference unit.
 		/// </summary>
 		/// <param name="Magnitude">Magnitude</param>
+		/// <param name="NrDecimals">Number of decimals to use when presenting magnitude.</param>
 		/// <param name="BaseUnit">Base unit of <paramref name="Magnitude"/>.</param>
 		/// <param name="Exponent">Exponent.</param>
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
-		public bool ToReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent)
+		public bool ToReferenceUnit(ref double Magnitude, ref double NrDecimals, string BaseUnit, int Exponent)
 		{
+			double k;
+
 			switch (BaseUnit)
 			{
 				case "m":
 					return true;
 
 				case "Å":
-					Magnitude *= Math.Pow(1e-10, Exponent);
-					return true;
+					k = Math.Pow(1e-10, Exponent);
+					break;
 
 				case "in":
 				case "inch":
-					Magnitude *= Math.Pow(0.0254, Exponent);
-					return true;
+					k = Math.Pow(0.0254, Exponent);
+					break;
 
 				case "ft":
 				case "foot":
-					Magnitude *= Math.Pow(0.3048, Exponent);
-					return true;
+					k = Math.Pow(0.3048, Exponent);
+					break;
 
 				case "yd":
 				case "yard":
-					Magnitude *= Math.Pow(0.9144, Exponent);
-					return true;
+					k = Math.Pow(0.9144, Exponent);
+					break;
 
 				case "SM":
-					Magnitude *= Math.Pow(1609.344, Exponent);
-					return true;
+					k = Math.Pow(1609.344, Exponent);
+					break;
 
 				case "NM":
-					Magnitude *= Math.Pow(1852, Exponent);
-					return true;
+					k = Math.Pow(1852, Exponent);
+					break;
 
 				case "px":
-					Magnitude *= Math.Pow(0.0254 / 96, Exponent);
-					return true;
+					k = Math.Pow(0.0254 / 96, Exponent);
+					break;
 
 				case "pt":
-					Magnitude *= Math.Pow(0.0254 / 72, Exponent);
-					return true;
+					k = Math.Pow(0.0254 / 72, Exponent);
+					break;
 
 				case "pc":
-					Magnitude *= Math.Pow(0.0254 / 6, Exponent);
-					return true;
+					k = Math.Pow(0.0254 / 6, Exponent);
+					break;
 
 				default:
 					return false;
 			}
+
+			Magnitude *= k;
+			NrDecimals -= Math.Log10(k);
+
+			return true;
 		}
 
 		/// <summary>
 		/// Tries to convert a magnitude to a specified base unit, from the reference unit.
 		/// </summary>
 		/// <param name="Magnitude">Magnitude</param>
+		/// <param name="NrDecimals">Number of decimals to use when presenting magnitude.</param>
 		/// <param name="BaseUnit">Desired base unit of <paramref name="Magnitude"/>.</param>
 		/// <param name="Exponent">Exponent.</param>
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
-		public bool FromReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent)
+		public bool FromReferenceUnit(ref double Magnitude, ref double NrDecimals, string BaseUnit, int Exponent)
 		{
-			return this.ToReferenceUnit(ref Magnitude, BaseUnit, -Exponent);
+			return this.ToReferenceUnit(ref Magnitude, ref NrDecimals, BaseUnit, -Exponent);
 		}
 
 	}

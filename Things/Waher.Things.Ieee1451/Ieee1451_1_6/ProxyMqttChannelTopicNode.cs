@@ -305,7 +305,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			Field[] Fields = await this.TryReadSensor(string.Empty);
 			if (Fields is null)
-				return;	// TODO: Error response
+				return; // TODO: Error response
 
 			Field MainField = this.GetMainField(Fields);
 			string StringValue;
@@ -314,16 +314,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				Unit.TryParse(Quantity.Unit, out Unit MainUnit))
 			{
 				double Value = Quantity.Value;
+				double NrDecimals = Quantity.NrDecimals;
 
-				if (PhysicalUnits.TryCreate(MainUnit, ref Value, out _))
+				if (PhysicalUnits.TryCreate(MainUnit, ref Value, ref NrDecimals, out _))
 				{
-					if (Value == Quantity.Value)
-						StringValue = CommonTypes.Encode(Quantity.Value, Quantity.NrDecimals);
-					else
-					{
-						byte NrDecimals = CommonTypes.GetNrDecimals(Value);
-						StringValue = CommonTypes.Encode(Value, NrDecimals);
-					}
+					byte NrDec = (byte)(NrDecimals < 0 ? 0 : NrDecimals > 255 ? 255 : Math.Round(NrDecimals));
+					StringValue = CommonTypes.Encode(Value, NrDec);
 				}
 				else
 					StringValue = CommonTypes.Encode(Quantity.Value, Quantity.NrDecimals);
@@ -408,8 +404,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 						Unit.TryParse(Quantity.Unit, out Unit MainUnit))
 					{
 						double Value = Quantity.Value;
+						double NrDecimals = Quantity.NrDecimals;
 
-						if (PhysicalUnits.TryCreate(MainUnit, ref Value, out PhysicalUnits Ieee1451Unit))
+						if (PhysicalUnits.TryCreate(MainUnit, ref Value, ref NrDecimals, out PhysicalUnits Ieee1451Unit))
 							Records.Add(new Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds.PhysicalUnits(Ieee1451Unit));
 					}
 

@@ -13,23 +13,29 @@ namespace Waher.Script.Test
 			Unit MilliAmpere = Unit.Parse("mA");
 			Unit KiloAmpere = Unit.Parse("kA");
 
-			Assert.IsTrue(Unit.TryConvert(2, Ampere, MilliAmpere, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Ampere, 0, MilliAmpere, out double x, out byte NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Ampere, KiloAmpere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Ampere, 0, KiloAmpere, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliAmpere, KiloAmpere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliAmpere, 0, KiloAmpere, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliAmpere, Ampere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliAmpere, 0, Ampere, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloAmpere, Ampere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloAmpere, 0, Ampere, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloAmpere, MilliAmpere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloAmpere, 0, MilliAmpere, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -39,23 +45,29 @@ namespace Waher.Script.Test
 			Unit MilliMeter = Unit.Parse("mm");
 			Unit KiloMeter = Unit.Parse("km");
 
-			Assert.IsTrue(Unit.TryConvert(2, Meter, MilliMeter, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Meter, 0, MilliMeter, out double x, out byte NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Meter, KiloMeter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Meter, 0, KiloMeter, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliMeter, KiloMeter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliMeter, 0, KiloMeter, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliMeter, Meter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliMeter, 0, Meter, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloMeter, Meter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloMeter, 0, Meter, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloMeter, MilliMeter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloMeter, 0, MilliMeter, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -65,23 +77,29 @@ namespace Waher.Script.Test
 			Unit Gram = Unit.Parse("g");
 			Unit Tonne = Unit.Parse("t");
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloGram, Gram, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloGram, 0, Gram, out double x, out byte NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloGram, Tonne, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloGram, 0, Tonne, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Gram, Tonne, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Gram, 0, Tonne, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Gram, KiloGram, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Gram, 0, KiloGram, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Tonne, KiloGram, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Tonne, 0, KiloGram, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Tonne, Gram, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Tonne, 0, Gram, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -91,11 +109,13 @@ namespace Waher.Script.Test
 			Unit Farenheit = Unit.Parse("°F");
 			Unit Kelvin = Unit.Parse("K");
 
-			Assert.IsTrue(Unit.TryConvert(2, Celcius, Farenheit, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Celcius, 1, Farenheit, out double x, out byte NrDec));
 			Assert.AreEqual(35.6, x);
+			Assert.AreEqual(1, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Celcius, Kelvin, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Celcius, 1, Kelvin, out x, out NrDec));
 			Assert.AreEqual(275.15, x);
+			Assert.AreEqual(1, NrDec);
 		}
 
 		[TestMethod]
@@ -105,11 +125,17 @@ namespace Waher.Script.Test
 			Unit Minute = Unit.Parse("min");
 			Unit Second = Unit.Parse("s");
 
-			Assert.IsTrue(Unit.TryConvert(2, Hour, Minute, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Hour, 0, Minute, out double x, out byte NrDec));
 			Assert.AreEqual(120, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Hour, Second, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Hour, 0, Second, out x, out NrDec));
 			Assert.AreEqual(7200, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(12, Minute, 0, Hour, out x, out NrDec));
+			Assert.AreEqual(0.2, x);
+			Assert.AreEqual(2, NrDec);
 		}
 
 		[TestMethod]
@@ -121,20 +147,25 @@ namespace Waher.Script.Test
 			Unit MegaBtu = Unit.Parse("MBTU");
 			Unit GramMetersSquaredPerSecondsSquared = Unit.Parse("g*m^2/s^2");
 
-			Assert.IsTrue(Unit.TryConvert(2, Joule, KiloWattHour, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Joule, 0, KiloWattHour, out double x, out byte NrDec));
 			Assert.AreEqual(0.002 / 3600, x);
+			Assert.AreEqual(7, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloWattHour, Joule, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloWattHour, 0, Joule, out x, out NrDec));
 			Assert.AreEqual(2000 * 3600, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, GigaJoule, MegaBtu, out x));
+			Assert.IsTrue(Unit.TryConvert(2, GigaJoule, 0, MegaBtu, out x, out NrDec));
 			Assert.AreEqual(2 / 1.055055853, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MegaBtu, GigaJoule, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MegaBtu, 0, GigaJoule, out x, out NrDec));
 			Assert.AreEqual(2 * 1.055055853, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Joule, GramMetersSquaredPerSecondsSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Joule, 0, GramMetersSquaredPerSecondsSquared, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -147,35 +178,45 @@ namespace Waher.Script.Test
 			Unit KiloMetersPerHour2 = Unit.Parse("kph");
 			Unit Knots = Unit.Parse("kt");
 
-			Assert.IsTrue(Unit.TryConvert(2, StatuteMilesPerHour, MilesPerHours, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, StatuteMilesPerHour, 0, MilesPerHours, out double x, out byte NrDec));
 			Assert.AreEqual(2, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilesPerHours, StatuteMilesPerHour, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilesPerHours, 0, StatuteMilesPerHour, out x, out NrDec));
 			Assert.AreEqual(2, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, KiloMetersPerHour, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, 0, KiloMetersPerHour, out x, out NrDec));
 			Assert.AreEqual(7.2, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, KiloMetersPerHour2, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, 0, KiloMetersPerHour2, out x, out NrDec));
 			Assert.AreEqual(7.2, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour, MetersPerSecond, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour, 0, MetersPerSecond, out x, out NrDec));
 			Assert.AreEqual(2 / 3.6, x);
+			Assert.AreEqual(1, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour2, MetersPerSecond, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour2, 0, MetersPerSecond, out x, out NrDec));
 			Assert.AreEqual(2 / 3.6, x);
+			Assert.AreEqual(1, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Knots, MetersPerSecond, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Knots, 0, MetersPerSecond, out x, out NrDec));
 			Assert.AreEqual(2 * 0.514444, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, Knots, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, 0, Knots, out x, out NrDec));
 			Assert.AreEqual(2 / 0.514444, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Knots, KiloMetersPerHour, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Knots, 0, KiloMetersPerHour, out x, out NrDec));
 			Assert.AreEqual(3.6 * 2 * 0.514444, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour, Knots, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour, 0, Knots, out x, out NrDec));
 			Assert.AreEqual(1.079914539882972, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -185,23 +226,29 @@ namespace Waher.Script.Test
 			Unit MilliFarad = Unit.Parse("mF");
 			Unit SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared = Unit.Parse("s^4*A²/(g*m²)");
 
-			Assert.IsTrue(Unit.TryConvert(2, Farad, MilliFarad, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Farad, 0, MilliFarad, out double x, out byte NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Farad, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Farad, 0, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliFarad, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliFarad, 0, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliFarad, Farad, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliFarad, 0, Farad, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, Farad, out x));
+			Assert.IsTrue(Unit.TryConvert(2, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, 0, Farad, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, MilliFarad, out x));
+			Assert.IsTrue(Unit.TryConvert(2, SecondsToThePowerOfFourAmperesSquaredPerGramsAndMeterSquared, 0, MilliFarad, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -210,11 +257,13 @@ namespace Waher.Script.Test
 			Unit MilliCoulomb = Unit.Parse("mC");
 			Unit SecondAmpere = Unit.Parse("s*A");
 
-			Assert.IsTrue(Unit.TryConvert(2, MilliCoulomb, SecondAmpere, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, MilliCoulomb, 0, SecondAmpere, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, SecondAmpere, MilliCoulomb, out x));
+			Assert.IsTrue(Unit.TryConvert(2, SecondAmpere, 0, MilliCoulomb, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -224,23 +273,29 @@ namespace Waher.Script.Test
 			Unit KiloNewton = Unit.Parse("kN");
 			Unit GramMeterPerSecondSquared = Unit.Parse("g*m/s^2");
 
-			Assert.IsTrue(Unit.TryConvert(2, Newton, KiloNewton, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Newton, 0, KiloNewton, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloNewton, Newton, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloNewton, 0, Newton, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Newton, GramMeterPerSecondSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Newton, 0, GramMeterPerSecondSquared, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, GramMeterPerSecondSquared, Newton, out x));
+			Assert.IsTrue(Unit.TryConvert(2, GramMeterPerSecondSquared, 0, Newton, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloNewton, GramMeterPerSecondSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloNewton, 0, GramMeterPerSecondSquared, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, GramMeterPerSecondSquared, KiloNewton, out x));
+			Assert.IsTrue(Unit.TryConvert(2, GramMeterPerSecondSquared, 0, KiloNewton, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 		}
 
 		[TestMethod]
@@ -250,23 +305,29 @@ namespace Waher.Script.Test
 			Unit CyclesPerSecond = Unit.Parse("cps");
 			Unit RevolutionsPerMinute = Unit.Parse("rpm");
 
-			Assert.IsTrue(Unit.TryConvert(2, Herz, CyclesPerSecond, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Herz, 0, CyclesPerSecond, out double x, out byte NrDec));
 			Assert.AreEqual(2, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Herz, RevolutionsPerMinute, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Herz, 0, RevolutionsPerMinute, out x, out NrDec));
 			Assert.AreEqual(120, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, CyclesPerSecond, Herz, out x));
+			Assert.IsTrue(Unit.TryConvert(2, CyclesPerSecond, 0, Herz, out x, out NrDec));
 			Assert.AreEqual(2, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, RevolutionsPerMinute, Herz, out x));
+			Assert.IsTrue(Unit.TryConvert(2, RevolutionsPerMinute, 0, Herz, out x, out NrDec));
 			Assert.AreEqual(2.0 / 60, x);
+			Assert.AreEqual(2, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, CyclesPerSecond, RevolutionsPerMinute, out x));
+			Assert.IsTrue(Unit.TryConvert(2, CyclesPerSecond, 0, RevolutionsPerMinute, out x, out NrDec));
 			Assert.AreEqual(120, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, RevolutionsPerMinute, CyclesPerSecond, out x));
+			Assert.IsTrue(Unit.TryConvert(2, RevolutionsPerMinute, 0, CyclesPerSecond, out x, out NrDec));
 			Assert.AreEqual(2.0 / 60, x);
+			Assert.AreEqual(2, NrDec);
 		}
 
 		[TestMethod]
@@ -276,23 +337,29 @@ namespace Waher.Script.Test
 			Unit KiloWatt = Unit.Parse("kW");
 			Unit GramMetersSquaredPerSecondsCube = Unit.Parse("g*m^2/s^3");
 
-			Assert.IsTrue(Unit.TryConvert(2, Watt, KiloWatt, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Watt, 0, KiloWatt, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloWatt, Watt, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloWatt, 0, Watt, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Watt, GramMetersSquaredPerSecondsCube, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Watt, 0, GramMetersSquaredPerSecondsCube, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, GramMetersSquaredPerSecondsCube, Watt, out x));
+			Assert.IsTrue(Unit.TryConvert(2, GramMetersSquaredPerSecondsCube, 0, Watt, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloWatt, GramMetersSquaredPerSecondsCube, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloWatt, 0, GramMetersSquaredPerSecondsCube, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, GramMetersSquaredPerSecondsCube, KiloWatt, out x));
+			Assert.IsTrue(Unit.TryConvert(2, GramMetersSquaredPerSecondsCube, 0, KiloWatt, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 		}
 
 		[TestMethod]
@@ -306,35 +373,49 @@ namespace Waher.Script.Test
 			Unit Atm = Unit.Parse("atm");
 			Unit GramsPerMetersAndSecondsSquared = Unit.Parse("g/(m*s^2)");
 
-			Assert.IsTrue(Unit.TryConvert(2, Pascal, KiloPascal, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Pascal, 0, KiloPascal, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloPascal, Pascal, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloPascal, 0, Pascal, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Bar, Millibar, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Bar, 0, Millibar, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Millibar, Bar, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Millibar, 0, Bar, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Pascal, Millibar, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Pascal, 0, Millibar, out x, out NrDec));
 			Assert.AreEqual(0.02, x);
+			Assert.AreEqual(2, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Millibar, Pascal, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Millibar, 0, Pascal, out x, out NrDec));
 			Assert.AreEqual(200, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Atm, Millibar, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Atm, 0, Millibar, out x, out NrDec));
 			Assert.AreEqual(2 * 1013.25, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Millibar, Atm, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Millibar, 0, Atm, out x, out NrDec));
 			Assert.AreEqual(0.0019738465334320256, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Psi, Pascal, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Psi, 0, Pascal, out x, out NrDec));
 			Assert.AreEqual(13789.514000000001, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Atm, Psi, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Atm, 0, Psi, out x, out NrDec));
 			Assert.AreEqual(29.39189880078442, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Pascal, 0, GramsPerMetersAndSecondsSquared, out x, out NrDec));
+			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 		}
 
 		[TestMethod]
@@ -344,23 +425,29 @@ namespace Waher.Script.Test
 			Unit KiloOhm = Unit.Parse("kOhm");
 			Unit MeterSquaredGramsPerSecondCubeAndAmpereSquared = Unit.Parse("m^2*g/(s^3*A^2)");
 
-			Assert.IsTrue(Unit.TryConvert(2, Ohm, KiloOhm, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Ohm, 0, KiloOhm, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloOhm, Ohm, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloOhm, 0, Ohm, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Ohm, MeterSquaredGramsPerSecondCubeAndAmpereSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Ohm, 0, MeterSquaredGramsPerSecondCubeAndAmpereSquared, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpereSquared, Ohm, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpereSquared, 0, Ohm, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloOhm, MeterSquaredGramsPerSecondCubeAndAmpereSquared, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloOhm, 0, MeterSquaredGramsPerSecondCubeAndAmpereSquared, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpereSquared, KiloOhm, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpereSquared, 0, KiloOhm, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 		}
 
 		[TestMethod]
@@ -370,23 +457,29 @@ namespace Waher.Script.Test
 			Unit KiloVolt = Unit.Parse("kV");
 			Unit MeterSquaredGramsPerSecondCubeAndAmpere = Unit.Parse("m^2*g/(s^3*A)");
 
-			Assert.IsTrue(Unit.TryConvert(2, Volt, KiloVolt, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Volt, 0, KiloVolt, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloVolt, Volt, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloVolt, 0, Volt, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Volt, MeterSquaredGramsPerSecondCubeAndAmpere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Volt, 0, MeterSquaredGramsPerSecondCubeAndAmpere, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpere, Volt, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpere, 0, Volt, out x, out NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, KiloVolt, MeterSquaredGramsPerSecondCubeAndAmpere, out x));
+			Assert.IsTrue(Unit.TryConvert(2, KiloVolt, 0, MeterSquaredGramsPerSecondCubeAndAmpere, out x, out NrDec));
 			Assert.AreEqual(2000000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpere, KiloVolt, out x));
+			Assert.IsTrue(Unit.TryConvert(2, MeterSquaredGramsPerSecondCubeAndAmpere, 0, KiloVolt, out x, out NrDec));
 			Assert.AreEqual(0.000002, x);
+			Assert.AreEqual(6, NrDec);
 		}
 
 		[TestMethod]
@@ -396,17 +489,21 @@ namespace Waher.Script.Test
 			Unit DeciLiter = Unit.Parse("dl");
 			Unit CubicMeter = Unit.Parse("m^3");
 
-			Assert.IsTrue(Unit.TryConvert(2, Liter, CubicMeter, out double x));
+			Assert.IsTrue(Unit.TryConvert(2, Liter, 0, CubicMeter, out double x, out byte NrDec));
 			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, CubicMeter, Liter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, CubicMeter, 0, Liter, out x, out NrDec));
 			Assert.AreEqual(2000, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, Liter, DeciLiter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, Liter, 0, DeciLiter, out x, out NrDec));
 			Assert.AreEqual(20, x);
+			Assert.AreEqual(0, NrDec);
 
-			Assert.IsTrue(Unit.TryConvert(2, DeciLiter, Liter, out x));
+			Assert.IsTrue(Unit.TryConvert(2, DeciLiter, 0, Liter, out x, out NrDec));
 			Assert.AreEqual(0.2, x);
+			Assert.AreEqual(1, NrDec);
 		}
 
 	}

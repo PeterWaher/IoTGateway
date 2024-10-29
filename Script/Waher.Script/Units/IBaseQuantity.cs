@@ -25,18 +25,20 @@
 		/// Tries to convert a magnitude from a specified base unit, to the reference unit.
 		/// </summary>
 		/// <param name="Magnitude">Magnitude</param>
+		/// <param name="NrDecimals">Number of decimals to use when presenting magnitude.</param>
 		/// <param name="BaseUnit">Base unit of <paramref name="Magnitude"/>.</param>
 		/// <param name="Exponent">Exponent.</param>
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
-		bool ToReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent);
+		bool ToReferenceUnit(ref double Magnitude, ref double NrDecimals, string BaseUnit, int Exponent);
 
 		/// <summary>
 		/// Tries to convert a magnitude to a specified base unit, from the reference unit.
 		/// </summary>
 		/// <param name="Magnitude">Magnitude</param>
+		/// <param name="NrDecimals">Number of decimals to use when presenting magnitude.</param>
 		/// <param name="BaseUnit">Desired base unit of <paramref name="Magnitude"/>.</param>
 		/// <param name="Exponent">Exponent.</param>
 		/// <returns>If the conversion was successful. If not, the magnitude value is unchanged.</returns>
-		bool FromReferenceUnit(ref double Magnitude, string BaseUnit, int Exponent);
+		bool FromReferenceUnit(ref double Magnitude, ref double NrDecimals, string BaseUnit, int Exponent);
 	}
 }

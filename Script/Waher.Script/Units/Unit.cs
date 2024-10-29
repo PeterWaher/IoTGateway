@@ -803,8 +803,21 @@ namespace Waher.Script.Units
 		/// Converts the unit to a series of reference unit factors. (Unrecognized units will be assumed to be reference units.)
 		/// </summary>
 		/// <param name="Magnitude">Reference magnitude.</param>
+		/// <param name="NrDecimals"></param>
 		/// <returns>Unit consisting of reference unit factors.</returns>
 		public Unit ToReferenceUnits(ref double Magnitude)
+		{
+			double x = 0;
+			return this.ToReferenceUnits(ref Magnitude, ref x);
+		}
+
+		/// <summary>
+		/// Converts the unit to a series of reference unit factors. (Unrecognized units will be assumed to be reference units.)
+		/// </summary>
+		/// <param name="Magnitude">Reference magnitude.</param>
+		/// <param name="NrDecimals">Number of decimals to present.</param>
+		/// <returns>Unit consisting of reference unit factors.</returns>
+		public Unit ToReferenceUnits(ref double Magnitude, ref double NrDecimals)
 		{
 			if (this.hasReferenceUnits)
 				return this;
@@ -840,15 +853,20 @@ namespace Waher.Script.Units
 							this.Add(ReferenceFactors, Factor.Key, Factor.Value);
 						else if (baseUnits.TryGetValue(Name, out IBaseQuantity BaseQuantity))
 						{
-							if (BaseQuantity.ToReferenceUnit(ref Magnitude, Name, FactorExponent))
+							if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, FactorExponent))
 								this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, FactorExponent);
 							else
 								this.Add(ReferenceFactors, Factor.Key, Factor.Value);
 						}
 						else if (derivedUnits.TryGetValue(Name, out PhysicalQuantity Quantity))
 						{
-							Magnitude *= Math.Pow(Quantity.Magnitude, FactorExponent);
-							Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
+							if (FactorExponent != 0)
+							{
+								double k = Math.Pow(Quantity.Magnitude, FactorExponent);
+								Magnitude *= k;
+								NrDecimals -= Math.Log10(k);
+								Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
+							}
 
 							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
 							{
@@ -856,7 +874,7 @@ namespace Waher.Script.Units
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.ToReferenceUnit(ref Magnitude, Name, Segment.Value * FactorExponent))
+									if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
 										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
 									else
 										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
@@ -875,7 +893,7 @@ namespace Waher.Script.Units
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.ToReferenceUnit(ref Magnitude, Name, Segment.Value * FactorExponent))
+									if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
 										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
 									else
 										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
@@ -890,7 +908,10 @@ namespace Waher.Script.Units
 
 					Unit Result = new Unit(Prefixes.ExponentToPrefix(Exponent, out FactorExponent), ReferenceFactors);
 					if (FactorExponent != 0)
+					{
 						Magnitude *= Math.Pow(10, FactorExponent);
+						NrDecimals -= FactorExponent;
+					}
 
 					Result.hasBaseUnits = true;
 					Result.hasReferenceUnits = true;
@@ -910,8 +931,21 @@ namespace Waher.Script.Units
 		/// Converts the unit to a series of reference unit factors. (Unrecognized units will be assumed to be reference units.)
 		/// </summary>
 		/// <param name="Magnitude">Reference magnitude.</param>
+		/// <param name="NrDecimals">Number of decimals to present.</param>
 		/// <returns>Unit consisting of reference unit factors.</returns>
 		public Unit FromReferenceUnits(ref double Magnitude)
+		{
+			double x = 0;
+			return this.FromReferenceUnits(ref Magnitude, ref x);
+		}
+
+		/// <summary>
+		/// Converts the unit to a series of reference unit factors. (Unrecognized units will be assumed to be reference units.)
+		/// </summary>
+		/// <param name="Magnitude">Reference magnitude.</param>
+		/// <param name="NrDecimals">Number of decimals to present.</param>
+		/// <returns>Unit consisting of reference unit factors.</returns>
+		public Unit FromReferenceUnits(ref double Magnitude, ref double NrDecimals)
 		{
 			if (this.hasReferenceUnits)
 				return this;
@@ -947,15 +981,20 @@ namespace Waher.Script.Units
 							this.Add(ReferenceFactors, Factor.Key, Factor.Value);
 						else if (baseUnits.TryGetValue(Name, out IBaseQuantity BaseQuantity))
 						{
-							if (BaseQuantity.FromReferenceUnit(ref Magnitude, Name, FactorExponent))
+							if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, FactorExponent))
 								this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, FactorExponent);
 							else
 								this.Add(ReferenceFactors, Factor.Key, Factor.Value);
 						}
 						else if (derivedUnits.TryGetValue(Name, out PhysicalQuantity Quantity))
 						{
-							Magnitude /= Math.Pow(Quantity.Magnitude, FactorExponent);
-							Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
+							if (FactorExponent != 0)
+							{
+								double k = Math.Pow(Quantity.Magnitude, FactorExponent);
+								Magnitude /= k;
+								NrDecimals += Math.Log10(k);
+								Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
+							}
 
 							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
 							{
@@ -963,7 +1002,7 @@ namespace Waher.Script.Units
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.FromReferenceUnit(ref Magnitude, Name, Segment.Value * FactorExponent))
+									if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
 										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
 									else
 										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
@@ -982,7 +1021,7 @@ namespace Waher.Script.Units
 									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.FromReferenceUnit(ref Magnitude, Name, Segment.Value * FactorExponent))
+									if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
 										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
 									else
 										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
@@ -997,7 +1036,10 @@ namespace Waher.Script.Units
 
 					Unit Result = new Unit(Prefixes.ExponentToPrefix(Exponent, out FactorExponent), ReferenceFactors);
 					if (FactorExponent != 0)
+					{
 						Magnitude *= Math.Pow(10, FactorExponent);
+						NrDecimals -= FactorExponent;
+					}
 
 					Result.hasBaseUnits = true;
 					Result.hasReferenceUnits = true;
@@ -1160,9 +1202,27 @@ namespace Waher.Script.Units
 		/// <returns>If conversion was successful.</returns>
 		public static bool TryConvert(double From, Unit FromUnit, Unit ToUnit, out double To)
 		{
+			return TryConvert(From, FromUnit, 0, ToUnit, out To, out _);
+		}
+
+		/// <summary>
+		/// Tries to convert a magnitude in one unit to a magnitude in another.
+		/// </summary>
+		/// <param name="From">Original magnitude.</param>
+		/// <param name="FromUnit">Original unit.</param>
+		/// <param name="FromNrDec">Number of decimals used for <paramref name="From"/>.</param>
+		/// <param name="ToUnit">Desired unit.</param>
+		/// <param name="To">Converted magnitude.</param>
+		/// <param name="ToNrDec">Number of decimals used for <paramref name="To"/>.</param>
+		/// <returns>If conversion was successful.</returns>
+		public static bool TryConvert(double From, Unit FromUnit, byte FromNrDec, Unit ToUnit, out double To, out byte ToNrDec)
+		{
+			int ToNrDec2;
+
 			if (FromUnit.Equals(ToUnit, false))
 			{
 				To = From;
+				ToNrDec = FromNrDec;
 
 				if (FromUnit.prefix != ToUnit.prefix)
 				{
@@ -1170,20 +1230,42 @@ namespace Waher.Script.Units
 					ExponentDiff -= Prefixes.PrefixToExponent(ToUnit.prefix);
 
 					if (ExponentDiff != 0)
+					{
 						To *= Math.Pow(10, ExponentDiff);
+						ToNrDec2 = ToNrDec - ExponentDiff;
+						if (ToNrDec2 < 0)
+							ToNrDec = 0;
+						else if (ToNrDec2 > 255)
+							ToNrDec = 255;
+						else
+							ToNrDec = (byte)ToNrDec2;
+					}
 				}
 
 				return true;
 			}
 
-			FromUnit = FromUnit.ToReferenceUnits(ref From);
+			double NrDec = FromNrDec;
+
+			FromUnit = FromUnit.ToReferenceUnits(ref From, ref NrDec);
 			To = From;
-			ToUnit = ToUnit.FromReferenceUnits(ref To);
+			ToUnit = ToUnit.FromReferenceUnits(ref To, ref NrDec);
+			ToNrDec2 = (int)Math.Round(NrDec);
 
 			Unit Div = Divide(FromUnit, ToUnit, out int Exponent);
 			Exponent += Prefixes.PrefixToExponent(Div.prefix);
 			if (Exponent != 0)
+			{
 				To *= Math.Pow(10, Exponent);
+				ToNrDec2 -= Exponent;
+			}
+
+			if (ToNrDec2 < 0)
+				ToNrDec = 0;
+			else if (ToNrDec2 > 255)
+				ToNrDec = 255;
+			else
+				ToNrDec = (byte)ToNrDec2;
 
 			return !Div.HasFactors;
 		}

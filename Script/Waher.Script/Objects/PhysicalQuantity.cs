@@ -74,18 +74,12 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated Field.
 		/// </summary>
-		public override IField AssociatedField
-		{
-			get { return associatedField; }
-		}
+		public override IField AssociatedField => associatedField;
 
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public override object AssociatedObjectValue
-		{
-			get { return this; }
-		}
+		public override object AssociatedObjectValue => this;
 
 		/// <summary>
 		/// Tries to multiply an element to the current element.

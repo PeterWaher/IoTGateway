@@ -183,18 +183,12 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
-		public override IAbelianGroupElement Zero
-		{
-			get { return ZeroElement; }
-		}
+		public override IAbelianGroupElement Zero => ZeroElement;
 
 		/// <summary>
 		/// Returns the identity element of the commutative ring with identity.
 		/// </summary>
-		public override ICommutativeRingWithIdentityElement One
-		{
-			get { return OneElement; }
-		}
+		public override ICommutativeRingWithIdentityElement One => OneElement;
 
 		/// <summary>
 		/// Converts the value to a .NET type.

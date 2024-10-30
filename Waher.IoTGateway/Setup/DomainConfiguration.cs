@@ -103,7 +103,18 @@ namespace Waher.IoTGateway.Setup
 		public bool UseDomainName
 		{
 			get => this.useDomainName;
-			set => this.useDomainName = value;
+			set
+			{
+				this.useDomainName = value;
+				if (!this.useDomainName)
+				{
+					this.domain = string.Empty;
+					this.alternativeDomains = null;
+					this.dynamicDns = false;
+					this.useEncryption = false;
+					this.customCA = false;
+				}
+			}
 		}
 
 		/// <summary>

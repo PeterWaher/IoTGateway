@@ -298,6 +298,11 @@ html body fieldset
         height: 100%;
     }
 
+    #native-header nav > ul > li > ul
+    {
+        border-top: 1px transparent solid
+    }
+
     #native-header li > ul
     {
         margin-inline-start: 0;

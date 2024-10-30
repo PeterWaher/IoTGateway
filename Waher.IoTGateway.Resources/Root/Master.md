@@ -1,6 +1,6 @@
 Copyright: /Copyright.md
 CSS: {{Theme.CSSX}}
-Javascript: Nav.js
+Javascript: Master.js
 
 <header id="native-header">
 <nav>

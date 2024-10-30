@@ -794,7 +794,7 @@ namespace Waher.Runtime.Settings
         {
             using (Semaphore Semaphore = await Semaphores.BeginWrite("hostsetting:" + Host + " " + Key))
             {
-                foreach (HostSetting Setting in await Database.FindDelete<HostSetting>(new FilterAnd(
+                foreach (HostSetting _ in await Database.FindDelete<HostSetting>(new FilterAnd(
                     new FilterFieldEqualTo("Host", Host), new FilterFieldEqualTo("Key", Key))))
                 {
                     return true;

@@ -80,8 +80,6 @@ namespace Waher.Security
 
 			foreach (byte b in Data)
 			{
-				Response.Append(b.ToString("x2"));
-
 				if (SpaceDelimiter)
 				{
 					if (First)
@@ -89,6 +87,8 @@ namespace Waher.Security
 					else
 						Response.Append(' ');
 				}
+
+				Response.Append(b.ToString("x2"));
 			}
 
 			return Response.ToString();

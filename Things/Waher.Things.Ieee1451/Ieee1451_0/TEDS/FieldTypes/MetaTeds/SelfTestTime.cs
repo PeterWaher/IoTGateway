@@ -50,7 +50,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
 				Class = RecordTypeId.Class,
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-                Time = RawValue.NextSingle()
+                Time = RawValue.NextSingle(nameof(SelfTestTime))
             };
         }
 

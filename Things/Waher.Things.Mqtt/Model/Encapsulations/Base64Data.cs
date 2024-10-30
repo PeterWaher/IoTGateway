@@ -18,16 +18,17 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	public class Base64Data : MqttData
 	{
 		/// <summary>
-		/// TODO
+		/// Regular expression for BASE64-encoded data.
 		/// </summary>
 		public const string RegExString = @"^\s*(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\s*$";
 
 		/// <summary>
-		/// TODO
+		/// Parsed regular expression for BASE64-encoded data.
 		/// </summary>
 		public static readonly Regex RegEx = new Regex(RegExString, RegexOptions.Compiled | RegexOptions.Singleline);
 
 		private byte[] value;
+		private bool firstReport = true;
 
 		/// <summary>
 		/// Represents an MQTT topic with base64-encoded binary data.
@@ -63,10 +64,20 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				try
 				{
 					this.value = Convert.FromBase64String(s);
+
+					if (this.firstReport)
+						this.firstReport = false;
+					else
+					{
+						IMqttData Processor = Topic.FindDataType(Content);
+						if (!(Processor is Base64Data))
+							return Task.FromResult(DataProcessingResult.Incompatible);
+					}
+
 					this.Timestamp = DateTime.UtcNow;
 					this.QoS = Content.Header.QualityOfService;
 					this.Retain = Content.Header.Retain;
-					return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
+					return Task.FromResult(DataProcessingResult.Processed);
 				}
 				catch (Exception)
 				{

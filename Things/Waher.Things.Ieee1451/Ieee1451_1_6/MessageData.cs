@@ -165,7 +165,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Topic">MQTT Topic Node. If null, synchronous result should be returned.</param>
 		/// <param name="Content">Published MQTT Content</param>
 		/// <returns>Data processing result</returns>
-		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
+		public override async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
 			byte[] Data;
 
@@ -195,7 +195,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					}
 					catch (Exception)
 					{
-						return Task.FromResult(DataProcessingResult.Incompatible);
+						return DataProcessingResult.Processed;
 					}
 					break;
 
@@ -206,15 +206,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					}
 					catch (Exception)
 					{
-						return Task.FromResult(DataProcessingResult.Incompatible);
+						return DataProcessingResult.Processed;
 					}
 					break;
 			}
 
-			if (!Ieee1451Parser.TryParseMessage(Data, out Message Message))
-				return Task.FromResult(DataProcessingResult.Incompatible);
+			Message Message = await Ieee1451Parser.TryParseMessage(Data, Content.Sniffable);
+			if (Message is null)
+				return DataProcessingResult.Processed;
 
-			return Ncap.MessageReceived(this, Topic, Message);
+			return await Ncap.MessageReceived(this, Topic, Message);
 		}
 
 		/// <summary>
@@ -299,7 +300,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			TedsAccessMessage TedsMessage = await this.RequestTEDS(Code, TimeoutMilliseconds, 0);   // Do not use cached message. Force readout.
 
-			if (TedsMessage.TryParseTeds(out ushort ErrorCode, out Teds Teds))
+			(ushort ErrorCode, Teds Teds) = await TedsMessage.TryParseTeds();
+			if (!(Teds is null))
 			{
 				if (ErrorCode != 0)
 					Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));

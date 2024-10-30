@@ -658,7 +658,7 @@ namespace Waher.Networking.MQTT
 
 						int c = Packet.BytesLeft;
 						byte[] Data = Packet.ReadBytes(c);
-						MqttContent Content = new MqttContent(Header, Topic, Data);
+						MqttContent Content = new MqttContent(Header, Topic, Data, this);
 
 						switch (Header.QualityOfService)
 						{

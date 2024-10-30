@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using Waher.Networking.Sniffers;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.Metering;
@@ -22,9 +24,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
+		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public TedsAccessMessage(NetworkServiceType NetworkServiceType, TedsAccessService TedsAccessService,
-			MessageType MessageType, byte[] Body, byte[] Tail)
-			: base(NetworkServiceType, (byte)TedsAccessService, MessageType, Body, Tail)
+			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			: base(NetworkServiceType, (byte)TedsAccessService, MessageType, Body, Tail, Sniffable)
 		{
 			this.TedsAccessService = TedsAccessService;
 		}
@@ -42,51 +45,44 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Tries to parse a TEDS from the message.
 		/// </summary>
-		/// <param name="ErrorCode">Error code, if available.</param>
-		/// <param name="Teds">TEDS object, if successful.</param>
-		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseTeds(out ushort ErrorCode, out Teds Teds)
+		/// <returns>Error Code and parsed TEDS. If not able to parse TEDS, null is returned for the TEDS component.</returns>
+		public Task<(ushort ErrorCode, Teds Teds)> TryParseTeds()
 		{
-			return this.TryParseTeds(true, out ErrorCode, out Teds);
+			return this.TryParseTeds(true);
 		}
 
 		/// <summary>
 		/// Tries to parse a TEDS from the message.
 		/// </summary>
 		/// <param name="CheckChecksum">If checksum should be checked.</param>
-		/// <param name="ErrorCode">Error code, if available.</param>
-		/// <param name="Teds">TEDS object, if successful.</param>
-		/// <returns>If able to parse a TEDS object.</returns>
-		public bool TryParseTeds(bool CheckChecksum, out ushort ErrorCode, out Teds Teds)
+		/// <returns>Error Code and parsed TEDS. If not able to parse TEDS, null is returned for the TEDS component.</returns>
+		public async Task<(ushort ErrorCode, Teds Teds)> TryParseTeds(bool CheckChecksum)
 		{
 			if (!(this.data is null))
-			{
-				ErrorCode = this.errorCode;
-				Teds = this.data;
-				return true;
-			}
+				return (this.errorCode, this.data);
 
-			Teds = null;
+			ushort ErrorCode;
+			Teds Teds;
 
 			try
 			{
 				if (this.MessageType == MessageType.Reply)
-					ErrorCode = this.NextUInt16();
+					ErrorCode = this.NextUInt16(nameof(ErrorCode));
 				else
 					ErrorCode = 0;
 
 				ChannelAddress ChannelInfo = this.NextChannelId(true);
-				uint TedsOffset = this.NextUInt32();
+				uint TedsOffset = this.NextUInt32(nameof(TedsOffset));
 				int Start = this.Position;
-				uint Len = this.NextUInt32();
+				uint Len = this.NextUInt32(nameof(Len));
 				if (Len < 2)
-					return this.MessageType == MessageType.Command;
+					return (ErrorCode, null);
 
 				Len -= 2;
 				if (Len > int.MaxValue)
-					return false;
+					return (ErrorCode, null);
 
-				byte[] Data = this.NextUInt8Array((int)Len);
+				byte[] Data = this.NextUInt8Array(nameof(Data), (int)Len);
 				ushort CheckSum = 0;
 
 				while (Start < this.Position)
@@ -94,21 +90,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 				CheckSum ^= 0xffff;
 
-				ushort CheckSum2 = this.NextUInt16();
+				ushort CheckSum2 = this.NextUInt16(nameof(CheckSum));
 				if (CheckChecksum && CheckSum != CheckSum2)
-					return false;
+					return (ErrorCode, null);
 
-				Binary TedsBlock = new Binary(Data);
+				Binary TedsBlock = new Binary(Data, this.Sniffable, true);
 				ParsingState State = new ParsingState();
 
 				this.data = Teds = new Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
 				this.errorCode = ErrorCode;
-				return true;
+
+				if (this.HasSniffers)
+					await TedsBlock.LogInformationToSniffer();
+
+				return (ErrorCode, Teds);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				ErrorCode = 0xffff;
-				return false;
+				if (this.HasSniffers)
+					await this.Sniffable.Exception(ex);
+
+				return (0xffff, null);
 			}
 		}
 
@@ -126,9 +128,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			try
 			{
 				Channel = this.NextChannelId(true);
-				TedsAccessCode = (TedsAccessCode)this.NextUInt8();
-				TedsOffset = this.NextUInt32();
-				TimeoutSeconds = this.NextTimeDurationSeconds();
+				TedsAccessCode = (TedsAccessCode)this.NextUInt8(nameof(TedsAccessCode));
+				TedsOffset = this.NextUInt32(nameof(TedsOffset));
+				TimeoutSeconds = this.NextTimeDurationSeconds(nameof(TimeoutSeconds));
 
 				return true;
 			}

@@ -52,7 +52,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 		/// <returns>Parsed TEDS record.</returns>
 		public override TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State)
 		{
-			State.NameFormatText = RawValue.NextBoolean();
+			State.NameFormatText = RawValue.NextBoolean(nameof(Format));
 
 			return new Format()
 			{

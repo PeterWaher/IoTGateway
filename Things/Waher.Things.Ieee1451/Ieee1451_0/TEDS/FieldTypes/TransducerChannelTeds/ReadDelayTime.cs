@@ -52,7 +52,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 				Class = RecordTypeId.Class,
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-				Value = RawValue.NextSingle()
+				Value = RawValue.NextSingle(nameof(ReadDelayTime))
 			};
 		}
 

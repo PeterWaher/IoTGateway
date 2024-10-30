@@ -1,4 +1,6 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿using Waher.Networking.Sniffers;
+
+namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Message
@@ -18,9 +20,10 @@
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
+		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public Message(NetworkServiceType NetworkServiceType, byte NetworkServiceId,
-			MessageType MessageType, byte[] Body, byte[] Tail)
-			: base(Body)
+			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			: base(Body, Sniffable, false)
 		{
 			this.NetworkServiceType = NetworkServiceType;
 			this.NetworkServiceId = NetworkServiceId;
@@ -86,16 +89,16 @@
 		/// <param name="AppId">If App ID should be parsed.</param>
 		/// <param name="NcapId">If NCAP ID should be parsed.</param>
 		/// <param name="TimId">If TIM ID should be parsed.</param>
-		/// <param name="Channel">If Channel ID should be parsed.</param>
+		/// <param name="ChannelId">If Channel ID should be parsed.</param>
 		/// <returns>Channel ID information.</returns>
-		public ChannelAddress NextChannelId(bool AppId, bool NcapId, bool TimId, bool Channel)
+		public ChannelAddress NextChannelId(bool AppId, bool NcapId, bool TimId, bool ChannelId)
 		{
 			return new ChannelAddress()
 			{
-				ApplicationId = AppId ? this.NextUuid() : null,
-				NcapId = NcapId ? this.NextUuid() : null,
-				TimId = TimId ? this.NextUuid() : null,
-				ChannelId = Channel ? this.NextUInt16() : (ushort)0
+				ApplicationId = AppId ? this.NextUuid(nameof(AppId)) : null,
+				NcapId = NcapId ? this.NextUuid(nameof(NcapId)) : null,
+				TimId = TimId ? this.NextUuid(nameof(TimId)) : null,
+				ChannelId = ChannelId ? this.NextUInt16(nameof(ChannelId)) : (ushort)0
 			};
 		}
 	}

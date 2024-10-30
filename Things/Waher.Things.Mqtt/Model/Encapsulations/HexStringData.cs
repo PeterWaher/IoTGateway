@@ -19,16 +19,17 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	public class HexStringData : MqttData
 	{
 		/// <summary>
-		/// TODO
+		/// Regular expression for hexadecimal string data.
 		/// </summary>
 		public const string RegExString = @"^\s*([A-Fa-f0-9]{2}){1,}\s*$";
 
 		/// <summary>
-		/// TODO
+		/// Parsed regular expression for hexadecimal string data.
 		/// </summary>
 		public static readonly Regex RegEx = new Regex(RegExString, RegexOptions.Compiled | RegexOptions.Singleline);
 
 		private byte[] value;
+		private bool firstReport = true;
 
 		/// <summary>
 		/// Represents an MQTT topic with binary data encoded as decimal strings.
@@ -65,12 +66,21 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				if (Data is null)
 					return Task.FromResult(DataProcessingResult.Incompatible);
 
+				if (this.firstReport)
+					this.firstReport = false;
+				else
+				{
+					IMqttData Processor = Topic.FindDataType(Content);
+					if (!(Processor is HexStringData))
+						return Task.FromResult(DataProcessingResult.Incompatible);
+				}
+
 				this.value = Data;
 				this.Timestamp = DateTime.UtcNow;
 				this.QoS = Content.Header.QualityOfService;
 				this.Retain = Content.Header.Retain;
 
-				return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
+				return Task.FromResult(DataProcessingResult.Processed);
 			}
 			else
 				return Task.FromResult(DataProcessingResult.Incompatible);
@@ -106,7 +116,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			}
 
 			Request.ReportFields(Last, Data);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -123,10 +133,10 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			return new ControlParameter[]
 			{
 				new StringControlParameter("Value", "Publish", "Value:", "HEX value of topic.", RegExString,
-					(n) => Task.FromResult<string>(Security.Hashes.BinaryToString(this.value)),
+					(n) => Task.FromResult(Hashes.BinaryToString(this.value)),
 					(n, v) =>
 					{
-						this.value = Security.Hashes.StringToBinary(v);
+						this.value = Hashes.StringToBinary(v);
 						this.Topic.MqttClient.PUBLISH(this.Topic.FullTopic, this.QoS, this.Retain, Encoding.UTF8.GetBytes(v));
 						return Task.CompletedTask;
 					})

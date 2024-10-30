@@ -2,6 +2,7 @@
 using System;
 using Waher.Things.Metering;
 using System.Text;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -18,9 +19,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
+		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public DiscoveryMessage(NetworkServiceType NetworkServiceType, DiscoveryService DiscoveryService,
-			MessageType MessageType, byte[] Body, byte[] Tail)
-			: base(NetworkServiceType, (byte)DiscoveryService, MessageType, Body, Tail)
+			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			: base(NetworkServiceType, (byte)DiscoveryService, MessageType, Body, Tail, Sniffable)
 		{
 			this.DiscoveryService = DiscoveryService;
 		}
@@ -272,7 +274,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				else
 				{
 					if (this.MessageType == MessageType.Reply)
-						ErrorCode = this.NextUInt16();
+						ErrorCode = this.NextUInt16(nameof(ErrorCode));
 					else
 						ErrorCode = 0;
 
@@ -280,9 +282,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					{
 						case DiscoveryService.NCAPAnnouncement:
 							Channel = this.NextNcapId(false);
-							string Name = this.NextString();
-							AddressType AddressType = (AddressType)this.NextUInt8();
-							byte[] Address = this.NextUInt8Array();
+							string Name = this.NextString(nameof(Name));
+							AddressType AddressType = (AddressType)this.NextUInt8(nameof(AddressType));
+							byte[] Address = this.NextUInt8Array(nameof(Address));
 							Data = new DiscoveryDataIpEntity(Channel, Name, AddressType, Address);
 							return true;
 
@@ -298,7 +300,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						case DiscoveryService.NCAPTIMAnnouncement:
 							Channel = this.NextTimId(false);
-							Name = this.NextString();
+							Name = this.NextString(nameof(Name));
 							Data = new DiscoveryDataEntity(Channel, Name);
 							return true;
 
@@ -309,7 +311,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						case DiscoveryService.NCAPTIMTransducerAnnouncement:
 							Channel = this.NextChannelId(false);
-							Name = this.NextString();
+							Name = this.NextString(nameof(Name));
 							Data = new DiscoveryDataEntity(Channel, Name);
 							return true;
 
@@ -320,25 +322,25 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						case DiscoveryService.NCAPDiscovery:
 							Channel = this.NextNcapId(true);
-							Name = this.NextString();
-							AddressType = (AddressType)this.NextUInt8();
-							Address = this.NextUInt8Array();
+							Name = this.NextString(nameof(Name));
+							AddressType = (AddressType)this.NextUInt8(nameof(AddressType));
+							Address = this.NextUInt8Array(nameof(Address));
 							Data = new DiscoveryDataIpEntity(Channel, Name, AddressType, Address);
 							return true;
 
 						case DiscoveryService.NCAPTIMDiscovery:
 							Channel = this.NextNcapId(true);
-							ushort Nr = this.NextUInt16();
-							byte[][] Ids = this.NextUuidArray(Nr);
-							string[] Names = this.NextStringArray(Nr);
+							ushort Nr = this.NextUInt16(nameof(Nr));
+							byte[][] Ids = this.NextUuidArray(nameof(Ids), Nr);
+							string[] Names = this.NextStringArray(nameof(Names), Nr);
 							Data = new DiscoveryDataEntities(Channel, Names, Ids);
 							return true;
 
 						case DiscoveryService.NCAPTIMTransducerDiscovery:
 							Channel = this.NextTimId(true);
-							Nr = this.NextUInt16();
-							ushort[] Channels = this.NextUInt16Array(Nr);
-							Names = this.NextStringArray(Nr);
+							Nr = this.NextUInt16(nameof(Nr));
+							ushort[] Channels = this.NextUInt16Array(nameof(Channels), Nr);
+							Names = this.NextStringArray(nameof(Names), Nr);
 							Data = new DiscoveryDataChannels(Channel, Names, Channels);
 							return true;
 

@@ -265,7 +265,12 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private IMqttData FindDataType(MqttContent Content)
+		/// <summary>
+		/// FInds best implementation to process binary data.
+		/// </summary>
+		/// <param name="Content">Content</param>
+		/// <returns>Best processor of data.</returns>
+		public IMqttData FindDataType(MqttContent Content)
 		{
 			try
 			{

@@ -64,7 +64,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <returns>Parsed TEDS record.</returns>
 		public override TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State)
         {
-			State.Units = RawValue.NextPhysicalUnits();
+			State.Units = RawValue.NextPhysicalUnits(nameof(PhysicalUnits));
 
             return new PhysicalUnits()
             {

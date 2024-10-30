@@ -110,11 +110,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 			{
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-				FamilyMember = RawValue.NextUInt8(),
-				FamilySubMember = RawValue.NextUInt8(),
-				Class = RawValue.NextUInt8(),
-				Version = RawValue.NextUInt8(),
-				TupleLength = RawValue.NextUInt8()
+				FamilyMember = RawValue.NextUInt8(nameof(this.FamilyMember)),
+				FamilySubMember = RawValue.NextUInt8(nameof(this.FamilySubMember)),
+				Class = RawValue.NextUInt8(nameof(this.Class)),
+				Version = RawValue.NextUInt8(nameof(this.Version)),
+				TupleLength = RawValue.NextUInt8(nameof(this.TupleLength))
 			};
 		}
 

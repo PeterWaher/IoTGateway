@@ -64,7 +64,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
 				Class = RecordTypeId.Class,
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-                NrChannels = RawValue.NextUInt16()
+                NrChannels = RawValue.NextUInt16(nameof(NrTransducerChannels))
             };
         }
 

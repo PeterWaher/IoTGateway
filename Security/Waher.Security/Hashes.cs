@@ -60,14 +60,36 @@ namespace Waher.Security
 		/// <summary>
 		/// Converts an array of bytes to a string with their hexadecimal representations (in lower case).
 		/// </summary>
-		/// <param name="Data"></param>
+		/// <param name="Data">Binary Data</param>
 		/// <returns>Hexadecimal string representation.</returns>
 		public static string BinaryToString(byte[] Data)
 		{
+			return BinaryToString(Data, false);
+		}
+
+		/// <summary>
+		/// Converts an array of bytes to a string with their hexadecimal representations (in lower case).
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="SpaceDelimiter">If bytes are to be separated by space characters.</param>
+		/// <returns>Hexadecimal string representation.</returns>
+		public static string BinaryToString(byte[] Data, bool SpaceDelimiter)
+		{
 			StringBuilder Response = new StringBuilder();
+			bool First = true;
 
 			foreach (byte b in Data)
+			{
 				Response.Append(b.ToString("x2"));
+
+				if (SpaceDelimiter)
+				{
+					if (First)
+						First = false;
+					else
+						Response.Append(' ');
+				}
+			}
 
 			return Response.ToString();
 		}
@@ -326,7 +348,7 @@ namespace Waher.Security
 		public static byte[] ComputeSHA256Hash(byte[] Data)
 		{
 			byte[] Result;
-			
+
 			using (SHA256 SHA256 = SHA256.Create())
 			{
 				Result = SHA256.ComputeHash(Data);
@@ -563,7 +585,7 @@ namespace Waher.Security
 		public static byte[] ComputeHMACSHA256Hash(byte[] Key, byte[] Data)
 		{
 			byte[] Result;
-			
+
 			using (HMACSHA256 HMACSHA256 = new HMACSHA256(Key))
 			{
 				Result = HMACSHA256.ComputeHash(Data);

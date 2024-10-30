@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Waher.Content;
+using Waher.Networking.Sniffers;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -24,9 +25,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
+		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public TransducerAccessMessage(NetworkServiceType NetworkServiceType, TransducerAccessService TransducerAccessService,
-			MessageType MessageType, byte[] Body, byte[] Tail)
-			: base(NetworkServiceType, (byte)TransducerAccessService, MessageType, Body, Tail)
+			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			: base(NetworkServiceType, (byte)TransducerAccessService, MessageType, Body, Tail, Sniffable)
 		{
 			this.TransducerAccessService = TransducerAccessService;
 		}
@@ -64,7 +66,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			{
 				this.Position = 0;
 				if (this.MessageType == MessageType.Reply)
-					ErrorCode = this.NextUInt16();
+					ErrorCode = this.NextUInt16(nameof(ErrorCode));
 				else
 					ErrorCode = 0;
 
@@ -74,8 +76,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				switch (this.TransducerAccessService)
 				{
 					case TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM:
-						string Value = this.NextString();
-						DateTime Timestamp = this.NextTime().ToDateTime();
+						string Value = this.NextString(nameof(Value));
+						DateTime Timestamp = this.NextTime(nameof(Timestamp)).ToDateTime();
 
 						if (CommonTypes.TryParse(Value, out double NumericValue, out byte NrDecimals))
 						{
@@ -133,8 +135,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			try
 			{
 				Channel = this.NextChannelId(true);
-				SamplingMode = (SamplingMode)this.NextUInt8();
-				TimeoutSeconds = this.NextTimeDurationSeconds();
+				SamplingMode = (SamplingMode)this.NextUInt8(nameof(SamplingMode));
+				TimeoutSeconds = this.NextTimeDurationSeconds(nameof(TimeoutSeconds));
 
 				return true;
 			}

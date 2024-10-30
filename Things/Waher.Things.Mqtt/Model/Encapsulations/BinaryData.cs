@@ -16,6 +16,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	public class BinaryData : MqttData
 	{
 		private byte[] value;
+		private bool firstReport = true;
 
 		/// <summary>
 		/// Represents an MQTT topic with binary data.
@@ -44,12 +45,21 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <returns>Data processing result</returns>
 		public override Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content)
 		{
+			if (this.firstReport)
+				this.firstReport = false;
+			else
+			{
+				IMqttData Processor = Topic.FindDataType(Content);
+				if (!(Processor is BinaryData))
+					return Task.FromResult(DataProcessingResult.Incompatible);
+			}
+
 			this.value = Content.Data;
 			this.Timestamp = DateTime.UtcNow;
 			this.QoS = Content.Header.QualityOfService;
 			this.Retain = Content.Header.Retain;
 			
-			return Task.FromResult(DataProcessingResult.ProcessedNewMomentaryValues);
+			return Task.FromResult(DataProcessingResult.Processed);
 		}
 
 		/// <summary>

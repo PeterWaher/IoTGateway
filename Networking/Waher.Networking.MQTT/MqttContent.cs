@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.MQTT
 {
@@ -7,6 +8,7 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	public class MqttContent
 	{
+		private readonly ISniffable sniffable;
 		private readonly string topic;
 		private readonly byte[] data;
 		private string dataString = null;
@@ -19,11 +21,13 @@ namespace Waher.Networking.MQTT
 		/// <param name="Header">MQTT Header</param>
 		/// <param name="Topic">Topic</param>
 		/// <param name="Data">Binary Data</param>
-		public MqttContent(MqttHeader Header, string Topic, byte[] Data)
+		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
+		public MqttContent(MqttHeader Header, string Topic, byte[] Data, ISniffable Sniffable)
 		{
 			this.header = Header;
 			this.topic = Topic;
 			this.data = Data;
+			this.sniffable = Sniffable;
 		}
 
 		/// <summary>
@@ -40,6 +44,11 @@ namespace Waher.Networking.MQTT
 		/// Binary Data
 		/// </summary>
 		public byte[] Data => this.data;
+
+		/// <summary>
+		/// Sniffable interface on which the message was received.
+		/// </summary>
+		public ISniffable Sniffable => this.sniffable;
 
 		/// <summary>
 		/// String representation of UTF-8 encoded binary data.

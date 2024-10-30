@@ -20,6 +20,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	public abstract class Ncap : MqttData
 	{
 		private byte[] value;
+		private bool firstMessage = true;
 
 		/// <summary>
 		/// Abstract base class for IEEE 1451.1.6 NCAPs.
@@ -47,20 +48,22 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="Content">Published MQTT Content</param>
 		/// <param name="Data">Binary data</param>
 		/// <returns>Data processing result</returns>
-		public Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
+		public async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
 		{
-			if (!Ieee1451Parser.TryParseMessage(Data, out Message Message))
-				return Task.FromResult(DataProcessingResult.Incompatible);
+			Message Message = await Ieee1451Parser.TryParseMessage(Data, Content.Sniffable);
+			if (Message is null)
+				return this.firstMessage ? DataProcessingResult.Incompatible : DataProcessingResult.Processed;
 
+			this.firstMessage = false;
 			this.value = Data;
 			this.Timestamp = DateTime.UtcNow;
 			this.QoS = Content.Header.QualityOfService;
 			this.Retain = Content.Header.Retain;
 
 			if (Topic is null)
-				return Task.FromResult(DataProcessingResult.Processed);
+				return DataProcessingResult.Processed;
 
-			return MessageReceived(this, Topic, Message);
+			return await MessageReceived(this, Topic, Message);
 		}
 
 		/// <summary>
@@ -128,7 +131,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 			else if (Message is TedsAccessMessage TedsAccessMessage)
 			{
-				if (TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds))
+				(ushort ErrorCode, Teds Teds) = await TedsAccessMessage.TryParseTeds(true);
+				if (!(Teds is null))
 				{
 					await RemoveErrorAsync(This, "TedsResponseError");
 
@@ -333,7 +337,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					case TransducerAccessService.Callback:
 					case TransducerAccessService.AsyncReadTransducerBlockDataFromMultipleChannelOfMultipleTIMs:
 					case TransducerAccessService.CallbackAsyncReadTransducerBlockDataFromMultipleChannelOfMultipleTIMs:
-						return;	// TODO
+						return; // TODO
 				}
 			}
 			else if (Message is TedsAccessMessage TedsAccessMessage)

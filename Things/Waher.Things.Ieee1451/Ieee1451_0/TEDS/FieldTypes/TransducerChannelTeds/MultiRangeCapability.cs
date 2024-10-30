@@ -48,7 +48,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 				Class = RecordTypeId.Class,
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-				Available = RawValue.NextBoolean()
+				Available = RawValue.NextBoolean(nameof(MultiRangeCapability))
 			};
 		}
 

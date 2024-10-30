@@ -51,7 +51,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
 				Class = RecordTypeId.Class,
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-                Timeout = RawValue.NextSingle()
+                Timeout = RawValue.NextSingle(nameof(SlowAccessTimeout))
             };
         }
 

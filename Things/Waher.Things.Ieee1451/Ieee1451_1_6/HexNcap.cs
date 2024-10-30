@@ -14,6 +14,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// </summary>
 	public class HexNcap : Ncap
 	{
+		private bool firstMessage = true;
+
 		/// <summary>
 		/// Hex-encoded IEEE 1451.1.6 NCAP.
 		/// </summary>
@@ -43,15 +45,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			string s = Content.DataString;
 
 			if (!HexStringData.RegEx.IsMatch(s))
-				return DataProcessingResult.Incompatible;
+				return this.firstMessage ? DataProcessingResult.Incompatible : DataProcessingResult.Processed;
 
 			try
 			{
+				this.firstMessage = false;
 				return await this.DataReported(Topic, Content, Hashes.StringToBinary(s));
 			}
 			catch (Exception)
 			{
-				return DataProcessingResult.Incompatible;
+				return DataProcessingResult.Processed;
 			}
 		}
 

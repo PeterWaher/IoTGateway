@@ -1,4 +1,6 @@
-﻿namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
+﻿using Waher.Networking.Sniffers;
+
+namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
 	/// <summary>
 	/// IEEE 1451.0 Event Notification Message
@@ -13,9 +15,10 @@
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
+		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public EventNotificationMessage(NetworkServiceType NetworkServiceType, EventNotificationService EventNotificationService, 
-			MessageType MessageType, byte[] Body, byte[] Tail)
-			: base(NetworkServiceType, (byte)EventNotificationService, MessageType, Body, Tail)
+			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			: base(NetworkServiceType, (byte)EventNotificationService, MessageType, Body, Tail, Sniffable)
 		{
 			this.EventNotificationService = EventNotificationService;
 		}

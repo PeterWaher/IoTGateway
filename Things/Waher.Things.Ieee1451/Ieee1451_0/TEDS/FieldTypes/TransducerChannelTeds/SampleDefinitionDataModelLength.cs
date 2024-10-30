@@ -43,7 +43,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <returns>Parsed TEDS record.</returns>
 		public override TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State)
 		{
-			State.SampleDefinition.DataModelLength = RawValue.NextUInt8();
+			State.SampleDefinition.DataModelLength = RawValue.NextUInt8(null);
+
+			if (RawValue.HasSniffers)
+				RawValue.SniffValue(nameof(this.DataModelLength), State.SampleDefinition.DataModelLength.ToString());
 
 			return new SampleDefinitionDataModelLength()
 			{

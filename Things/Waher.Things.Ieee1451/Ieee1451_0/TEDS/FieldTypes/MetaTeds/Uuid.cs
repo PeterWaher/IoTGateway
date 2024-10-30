@@ -62,7 +62,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
 				Class = RecordTypeId.Class,
 				Type = RecordTypeId.Type,
 				RawValue = RawValue.Body,
-                Identity = RawValue.NextUInt8Array(16)
+                Identity = RawValue.NextUInt8Array(nameof(this.Identity), 16)
             };
         }
 
@@ -76,7 +76,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
 		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields, Teds Teds)
 		{
 			Fields.Add(new StringField(Thing, Timestamp, "IEEE 1451 UUID",
-                Hashes.BinaryToString(this.Identity), FieldType.Identity, 
+                Hashes.BinaryToString(this.Identity, true), FieldType.Identity, 
                 FieldQoS.AutomaticReadout));
         }
     }

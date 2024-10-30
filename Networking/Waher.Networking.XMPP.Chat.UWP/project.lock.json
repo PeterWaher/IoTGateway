@@ -3006,6 +3006,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }
@@ -6049,6 +6050,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }
@@ -9128,6 +9130,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }
@@ -12180,6 +12183,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }
@@ -15268,6 +15272,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }
@@ -18320,6 +18325,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }
@@ -21408,6 +21414,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Content": "2.6.13",
+          "Waher.Content.Xml": "2.3.2",
           "Waher.Persistence": "1.12.0",
           "Waher.Runtime.Threading": "1.2.2"
         }

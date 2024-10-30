@@ -195,36 +195,14 @@ table
     max-width: 100%;
     margin-bottom: 1.5em;
     border-collapse: collapse;
-    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.1);
     border-collapse: separate;
     border-width: 0;
     border-spacing:0;
-}
-
-table caption
-{
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
 }
 
 table > colgroup {
     width: 100%;
 }
-
-table
-{
-    margin-bottom: 1.5em;
-    border-collapse: collapse;
-    box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.1);
-    border-collapse: separate;
-    border-width: 0;
-    border-spacing:0;
-}
-
-table caption
-{
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-}
-
 
 table, th, td
 {
@@ -301,14 +279,9 @@ html body fieldset
         display: flex;
         position: relative;
         overflow: visible;
-        border: 1px rgb(209, 209, 209) solid;
         border-bottom: none;
     }
 
-    #native-header li > ul > li:last-of-type
-    {
-        border-bottom: 1px rgb(209, 209, 209) solid;
-    }
 
     /* endregion Header */
 
@@ -318,10 +291,6 @@ html body fieldset
     #native-header li:hover > a 
     {
         color: inherit !important;
-    }
-
-    #native-header li > ul > li:nth-child(1) {
-        border-top: 1px rgb(209, 209, 209) solid;
     }
 
     #native-header li > ul > li > a 
@@ -351,7 +320,6 @@ html body fieldset
         height: 0;
         position: absolute;
         left: 100%;
-        margin-top: -1px;
     }
 
     /*#endregion Dropdown*/

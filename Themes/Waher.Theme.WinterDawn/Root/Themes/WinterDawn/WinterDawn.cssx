@@ -6,6 +6,7 @@ header#native-header
 {
     background-image: url(¤Theme.GetBannerImage(2000,600)¤);
     background-repeat: no-repeat;
+    background-size: cover;
     padding: 1.5rem;
 }
 

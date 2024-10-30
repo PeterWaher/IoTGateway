@@ -53,7 +53,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public override void SnifferOutput(ISniffable Output)
 		{
-			this.Information(Output, "BINARY-encoded binary IEEE 1451.1.6 message");
 		}
 
 		/// <summary>

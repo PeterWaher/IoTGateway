@@ -24,6 +24,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		private readonly int len;
 		private readonly bool multiRow;
 		private readonly bool hasSniffer;
+		private readonly Binary containerPacket;
 		private int pos = 0;
 		private bool firstOutput = true;
 
@@ -42,6 +43,25 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			this.hasSniffer = Sniffable?.HasSniffers ?? false;
 			this.snifferOutput = this.hasSniffer ? new StringBuilder() : null;
 			this.multiRow = MultiRow;
+			this.containerPacket = null;
+		}
+
+		/// <summary>
+		/// IEEE 1451.0 Message
+		/// </summary>
+		/// <param name="Body">Binary Body</param>
+		/// <param name="ContainerPacket">Packet containing the current binary block</param>
+		public Binary(byte[] Body, Binary ContainerPacket)
+		{
+			this.Body = Body;
+			this.len = this.Body.Length;
+
+			this.Sniffable = ContainerPacket.Sniffable;
+			this.hasSniffer = ContainerPacket.hasSniffer;
+			this.snifferOutput = ContainerPacket.snifferOutput;
+			this.multiRow = ContainerPacket.multiRow;
+			this.firstOutput = ContainerPacket.firstOutput;
+			this.containerPacket = ContainerPacket;
 		}
 
 		/// <summary>
@@ -108,16 +128,21 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		{
 			if (this.hasSniffer)
 			{
-				if (this.firstOutput)
-					this.firstOutput = false;
-				else if (this.multiRow)
-					this.snifferOutput.AppendLine();
-				else
-					this.snifferOutput.Append(", ");
+				if (this.containerPacket is null)
+				{
+					if (this.firstOutput)
+						this.firstOutput = false;
+					else if (this.multiRow)
+						this.snifferOutput.AppendLine();
+					else
+						this.snifferOutput.Append(", ");
 
-				this.snifferOutput.Append(Name);
-				this.snifferOutput.Append('=');
-				this.snifferOutput.Append(Value);
+					this.snifferOutput.Append(Name);
+					this.snifferOutput.Append('=');
+					this.snifferOutput.Append(Value);
+				}
+				else
+					this.containerPacket.SniffValue(Name, Value);
 			}
 		}
 

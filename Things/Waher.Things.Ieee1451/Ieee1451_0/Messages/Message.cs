@@ -23,7 +23,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public Message(NetworkServiceType NetworkServiceType, byte NetworkServiceId,
 			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
-			: base(Body, Sniffable, false)
+			: base(Body, Sniffable, true)
 		{
 			this.NetworkServiceType = NetworkServiceType;
 			this.NetworkServiceId = NetworkServiceId;

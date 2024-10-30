@@ -50,7 +50,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Data processing result</returns>
 		public async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
 		{
-			Message Message = await Ieee1451Parser.TryParseMessage(Data, Content.Sniffable);
+			Message Message = await Ieee1451Parser.TryParseMessage(Data, Topic is null ? null : Content.Sniffable);
 			if (Message is null)
 				return this.firstMessage ? DataProcessingResult.Incompatible : DataProcessingResult.Processed;
 
@@ -75,12 +75,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Data processing result</returns>
 		public static async Task<DataProcessingResult> MessageReceived(MqttData This, MqttTopic Topic, Message Message)
 		{
+			DataProcessingResult Result = DataProcessingResult.Processed;
+
 			try
 			{
+
 				switch (Message.MessageType)
 				{
 					case MessageType.Reply:
-						return await ProcessReply(This, Topic, Message);
+						Result = await ProcessReply(This, Topic, Message);
+						break;
 
 					case MessageType.Command:
 						await ProcessRequest(This, Message);
@@ -92,13 +96,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					default:
 						break;
 				}
+
+				await Message.LogInformationToSniffer();
 			}
 			catch (Exception ex)
 			{
 				await LogErrorAsync(This, string.Empty, ex.Message);
 			}
 
-			return DataProcessingResult.Processed;
+			return Result;
 		}
 
 		internal static async Task<DataProcessingResult> ProcessReply(MqttData This, MqttTopic Topic, Message Message)

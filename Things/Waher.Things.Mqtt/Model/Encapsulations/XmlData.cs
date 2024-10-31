@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Sensor;
@@ -21,6 +22,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 	{
 		private string xml;
 		private XmlDocument value;
+		private bool first = true;
 
 		/// <summary>
 		/// Represents an MQTT topic with XML data.
@@ -54,6 +56,14 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 			try
 			{
 				string s = Content.DataString;
+
+				if (this.first)
+				{
+					if (!XML.IsValidXml(s))
+						return Task.FromResult(DataProcessingResult.Incompatible);
+
+					this.first = false;
+				}
 
 				this.value = new XmlDocument()
 				{

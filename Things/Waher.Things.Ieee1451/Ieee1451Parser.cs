@@ -17,6 +17,16 @@ namespace Waher.Things.Ieee1451
 		/// Tries to parse an IEEE 1451.0-encoded data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
+		/// <returns>Message object, if able to parse the message, null otherwise.</returns>
+		public static Task<Message> TryParseMessage(byte[] Data)
+		{
+			return TryParseMessage(Data, null);
+		}
+
+		/// <summary>
+		/// Tries to parse an IEEE 1451.0-encoded data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		/// <returns>Message object, if able to parse the message, null otherwise.</returns>
 		public static async Task<Message> TryParseMessage(byte[] Data, ISniffable Sniffable)

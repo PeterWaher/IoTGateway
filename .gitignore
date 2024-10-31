@@ -63,3 +63,6 @@ Temporary Items
 
 # Backup files
 *.bak
+
+# Non distributable third party downloads
+Utilities\PsExec.exe

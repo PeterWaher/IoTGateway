@@ -142,8 +142,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
 			if (Topic.SegmentIndex > 0 &&
-				Topic.CurrentParentTopic.Node is MqttTimTopicNode &&
-				!(Topic.CurrentParentTopic.Node is MqttChannelTopicNode) &&
+				Topic.CurrentParentTopic?.Node is MqttTimTopicNode &&
+				!(Topic.CurrentParentTopic?.Node is MqttChannelTopicNode) &&
 				int.TryParse(Topic.CurrentSegment, out _))
 			{
 				return Grade.Excellent;

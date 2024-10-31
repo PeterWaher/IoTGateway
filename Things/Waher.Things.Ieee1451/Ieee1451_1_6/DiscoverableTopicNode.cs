@@ -50,9 +50,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>How well the node supports a given topic, from the segment index presented.</returns>
 		public override Grade Supports(MqttTopicRepresentation Topic)
 		{
-			if ((Topic.CurrentParentTopic.Node is RootTopic ||
-				Topic.CurrentParentTopic.Node is DiscoverableTopicNode) &&
-				!(Topic.CurrentParentTopic.Node is MqttNcapTopicNode))
+			if ((Topic.CurrentParentTopic?.Node is RootTopic ||
+				Topic.CurrentParentTopic?.Node is DiscoverableTopicNode) &&
+				!(Topic.CurrentParentTopic?.Node is MqttNcapTopicNode))
 			{
 				return Grade.Ok;
 			}

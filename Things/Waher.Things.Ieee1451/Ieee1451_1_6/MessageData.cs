@@ -5,6 +5,7 @@ using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Script.Units;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt.Model;
@@ -290,7 +291,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			DateTime TP = DateTime.UtcNow;
 
-			this.GetTimeouts(out int TimeoutMilliseconds, out int _, out int RefreshTedsHours);
+			this.GetTimeouts(out int TimeoutMilliseconds, out int _, out int RefreshTedsHours, out _);
 
 			lock (this.teds)
 			{
@@ -321,19 +322,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			return (null, DateTime.MinValue);
 		}
 
-		private void GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours)
+		private void GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours, out Unit PreferredUnit)
 		{
 			if (this.Topic.Node is MqttNcapTopicNode NcapNode)
 			{
 				TimeoutMilliseconds = NcapNode.TimeoutMilliseconds;
 				StaleSeconds = NcapNode.StaleSeconds;
 				RefreshTedsHours = NcapNode.RefreshTedsHours;
+
+				if (!(NcapNode is MqttChannelTopicNode ChannelNode) || 
+					string.IsNullOrEmpty(ChannelNode.PreferredUnit) ||
+					!Unit.TryParse(ChannelNode.PreferredUnit, out PreferredUnit))
+				{
+					PreferredUnit = null;
+				}
 			}
 			else
 			{
 				TimeoutMilliseconds = 10000;
 				StaleSeconds = 60;
 				RefreshTedsHours = 24;
+				PreferredUnit = null;
 			}
 		}
 
@@ -348,7 +357,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			try
 			{
-				this.GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours);
+				this.GetTimeouts(out int TimeoutMilliseconds, out int StaleSeconds, out int RefreshTedsHours, out Unit PreferredUnit);
 
 				if (this.channelId > 0)         // Channel
 				{
@@ -369,7 +378,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 					TransducerAccessMessage TransducerMessage = await this.RequestTransducerData(SamplingMode.Immediate, TimeoutMilliseconds, StaleSeconds);
 
-					if (TransducerMessage.TryParseTransducerData(ThingReference, Teds, out ushort ErrorCode, out TransducerData TransducerData))
+					if (TransducerMessage.TryParseTransducerData(ThingReference, Teds, PreferredUnit, out ushort ErrorCode, out TransducerData TransducerData))
 					{
 						if (ErrorCode != 0)
 							Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));

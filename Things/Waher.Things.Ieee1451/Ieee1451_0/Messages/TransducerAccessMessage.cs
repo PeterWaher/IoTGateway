@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.Sniffers;
+using Waher.Script.Units;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -48,10 +49,11 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// </summary>
 		/// <param name="Thing">Thing associated with fields.</param>
 		/// <param name="ChannelTeds">Channel TEDS, if available.</param>
+		/// <param name="PreferredUnit">Preferred unit.</param>
 		/// <param name="ErrorCode">Error code, if available.</param>
 		/// <param name="Data">Transducer Data, if successful.</param>
 		/// <returns>If able to parse transducer data.</returns>
-		public bool TryParseTransducerData(ThingReference Thing, Teds ChannelTeds, out ushort ErrorCode, out TransducerData Data)
+		public bool TryParseTransducerData(ThingReference Thing, Teds ChannelTeds, Unit PreferredUnit, out ushort ErrorCode, out TransducerData Data)
 		{
 			if (!(this.data is null))
 			{
@@ -87,7 +89,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 							if (!(ChannelTeds is null))
 							{
 								FieldName = ChannelTeds.FieldName ?? FieldName;
-								Unit = ChannelTeds.Unit;
+
+								if (!(PreferredUnit is null) &&
+									!(ChannelTeds.FieldUnit is null) &&
+									Script.Units.Unit.TryConvert(NumericValue, ChannelTeds.FieldUnit, NrDecimals, PreferredUnit, out double ConvertedValue, out byte NrDec2))
+								{
+									NumericValue = ConvertedValue;
+									Unit = PreferredUnit.ToString();
+									NrDecimals = NrDec2;
+								}
+								else
+									Unit = ChannelTeds.Unit;
 							}
 
 							Fields.Add(new QuantityField(Thing, Timestamp, FieldName,

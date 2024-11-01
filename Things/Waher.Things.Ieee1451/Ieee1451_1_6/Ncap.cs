@@ -79,7 +79,6 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			try
 			{
-
 				switch (Message.MessageType)
 				{
 					case MessageType.Reply:
@@ -115,7 +114,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (Message is TransducerAccessMessage TransducerAccessMessage)
 			{
 				ThingReference Ref = new ThingReference(This.Topic.Node);
-				if (TransducerAccessMessage.TryParseTransducerData(Ref, null, out ushort ErrorCode, out TransducerData Data))
+				if (TransducerAccessMessage.TryParseTransducerData(Ref, null, null, out ushort ErrorCode, out TransducerData Data))
 				{
 					await RemoveErrorAsync(This, "TransducerResponseError");
 

@@ -14,6 +14,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 	/// </summary>
 	public class MqttChannelTopicNode : MqttTimTopicNode
 	{
+		private string preferredUnit;
 		private int channelId;
 
 		/// <summary>
@@ -35,6 +36,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		{
 			get => this.channelId;
 			set => this.channelId = value;
+		}
+
+		/// <summary>
+		/// Preferred Unit
+		/// </summary>
+		[Page(1, "IEEE 1451")]
+		[Header(33, "Preferred Unit:", 300)]
+		[ToolTip(36, "Preferred unit to use for transducer values.")]
+		public string PreferredUnit
+		{
+			get => this.preferredUnit;
+			set => this.preferredUnit = value;
 		}
 
 		/// <summary>

@@ -64,7 +64,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <returns>Parsed TEDS record.</returns>
 		public override TedsRecord Parse(ClassTypePair RecordTypeId, Binary RawValue, ParsingState State)
 		{
-			TransducerChannelType Type = (TransducerChannelType)RawValue.NextUInt8(null);
+			TransducerChannelType Type = RawValue.NextUInt8<TransducerChannelType>(null);
 
 			if (RawValue.HasSniffers)
 				RawValue.SniffValue(nameof(this.TransducerType), Type.ToString());

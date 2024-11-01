@@ -164,6 +164,25 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
+		/// Gets the next <see cref="byte"/>
+		/// </summary>
+		/// <returns>Next Value</returns>
+		public T NextUInt8<T>(string Name)
+			where T : Enum
+		{
+			if (this.pos >= this.len)
+				throw UnexpectedEndOfData();
+
+			byte b = this.Body[this.pos++];
+			T Result = (T)Enum.ToObject(typeof(T), b);
+
+			if (this.hasSniffer && !string.IsNullOrEmpty(Name))
+				this.SniffValue(Name, Result.ToString());
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Gets the next <see cref="sbyte"/>
 		/// </summary>
 		/// <returns>Next Value</returns>

@@ -283,7 +283,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						case DiscoveryService.NCAPAnnouncement:
 							Channel = this.NextNcapId(false);
 							string Name = this.NextString(nameof(Name));
-							AddressType AddressType = (AddressType)this.NextUInt8(nameof(AddressType));
+							AddressType AddressType = this.NextUInt8<AddressType>(nameof(AddressType));
 							byte[] Address = this.NextUInt8Array(nameof(Address));
 							Data = new DiscoveryDataIpEntity(Channel, Name, AddressType, Address);
 							return true;
@@ -323,7 +323,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 						case DiscoveryService.NCAPDiscovery:
 							Channel = this.NextNcapId(true);
 							Name = this.NextString(nameof(Name));
-							AddressType = (AddressType)this.NextUInt8(nameof(AddressType));
+							AddressType = this.NextUInt8<AddressType>(nameof(AddressType));
 							Address = this.NextUInt8Array(nameof(Address));
 							Data = new DiscoveryDataIpEntity(Channel, Name, AddressType, Address);
 							return true;

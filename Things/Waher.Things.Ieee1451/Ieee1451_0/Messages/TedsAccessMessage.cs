@@ -128,7 +128,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			try
 			{
 				Channel = this.NextChannelId(true);
-				TedsAccessCode = (TedsAccessCode)this.NextUInt8(nameof(TedsAccessCode));
+				TedsAccessCode = this.NextUInt8<TedsAccessCode>(nameof(TedsAccessCode));
 				TedsOffset = this.NextUInt32(nameof(TedsOffset));
 				TimeoutSeconds = this.NextTimeDurationSeconds(nameof(TimeoutSeconds));
 

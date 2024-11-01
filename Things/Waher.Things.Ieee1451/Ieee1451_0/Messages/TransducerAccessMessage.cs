@@ -147,7 +147,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			try
 			{
 				Channel = this.NextChannelId(true);
-				SamplingMode = (SamplingMode)this.NextUInt8(nameof(SamplingMode));
+				SamplingMode = this.NextUInt8<SamplingMode>(nameof(SamplingMode));
 				TimeoutSeconds = this.NextTimeDurationSeconds(nameof(TimeoutSeconds));
 
 				return true;

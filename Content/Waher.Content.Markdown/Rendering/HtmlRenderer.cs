@@ -208,7 +208,7 @@ namespace Waher.Content.Markdown.Rendering
 			// add default viewport
             if (!this.Document.TryGetMetaData("VIEWPORT", out Values) || Values.Length == 0)
             {
-                this.Output.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+                this.Output.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>");
 
             }
 

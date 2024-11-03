@@ -55,7 +55,7 @@
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[User Name:<br/>
-<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="max-width:20em" />]]></Label>
+<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">Command</textarea>]]></Label>

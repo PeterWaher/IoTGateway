@@ -60,7 +60,7 @@
 		<Paragraph>
 			<InlineText>User Name:</InlineText>
 			<LineBreak />
-			<Html><![CDATA[<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="max-width:20em" />]]></Html>
+			<Html><![CDATA[<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />]]></Html>
 		</Paragraph>
 		<HtmlBlock>
 			<Html><![CDATA[<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">]]></Html>

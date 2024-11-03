@@ -20,6 +20,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
         }
 
 		/// <summary>
+		/// TEDS Physical units (§6.5.2.6)
+		/// </summary>
+		/// <param name="Units">Physical units to encode.</param>
+		public PhysicalUnits(Messages.PhysicalUnits Units)
+			: base(3, 12, new byte[] 
+			{ 
+				(byte)Units.Interpretation,
+				Units.Radians,
+				Units.Steradians,
+				Units.Meters,
+				Units.Kilograms,
+				Units.Seconds,
+				Units.Amperes,
+				Units.Kelvins,
+				Units.Moles,
+				Units.Candelas
+			})
+		{
+		}
+
+		/// <summary>
 		/// Units
 		/// </summary>
 		public Messages.PhysicalUnits Units { get; set; }

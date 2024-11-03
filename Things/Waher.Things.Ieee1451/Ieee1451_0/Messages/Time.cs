@@ -9,6 +9,30 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 	public struct Time
 	{
 		/// <summary>
+		/// Time representation in IEEE 1451.0
+		/// </summary>
+		/// <param name="Seconds">Seconds</param>
+		/// <param name="Nanoseconds">Nano-seconds</param>
+		public Time(ulong Seconds, uint Nanoseconds)
+		{
+			this.Seconds = Seconds;
+			this.NanoSeconds = Nanoseconds;
+		}
+
+		/// <summary>
+		/// Time representation in IEEE 1451.0
+		/// </summary>
+		/// <param name="Timestamp">Timestamp</param>
+		public Time(DateTime Timestamp)
+		{
+			TimeSpan TS = Timestamp.ToUniversalTime().Subtract(JSON.UnixEpoch);
+			double Seconds = TS.TotalSeconds;
+			double FloorSeconds = Math.Floor(Seconds);
+			this.Seconds = (ulong)FloorSeconds;
+			this.NanoSeconds = (uint)((Seconds - FloorSeconds) * 1e9);
+		}
+
+		/// <summary>
 		/// Seconds
 		/// </summary>
 		public ulong Seconds;

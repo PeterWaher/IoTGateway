@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Script.Units;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds;
 using Waher.Things.Metering;
@@ -195,8 +199,30 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		}
 
 		/// <summary>
+		/// Tries to read the proxy node. If not successful, an error is logged on the node,
+		/// and null is returned. If successful, the error is removed, and the fields are
+		/// returned.
+		/// </summary>
+		/// <param name="Actor">Actor</param>
+		/// <returns></returns>
+		public async Task<Field[]> TryReadSensor(string Actor)
+		{
+			try
+			{
+				Field[] Result = await this.ReadSensor(Actor);
+				return Result;
+			}
+			catch (Exception ex)
+			{
+				await this.LogErrorAsync("ProxyError", ex.Message);
+				return null;
+			}
+		}
+
+		/// <summary>
 		/// Reads the transducer value.
 		/// </summary>
+		/// <param name="Actor">Actor</param>
 		/// <returns>Fields read</returns>
 		/// <exception cref="Exception">If proxy node is not found, is not a sensor, or cannot be read.</exception>
 		public async Task<Field[]> ReadSensor(string Actor)
@@ -230,6 +256,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					return Task.CompletedTask;
 				}, null);
 
+			await Sensor.StartReadout(Readout);
+
 			_ = Task.Delay(this.TimeoutMilliseconds).ContinueWith(
 				(_) => Completed.TrySetException(new TimeoutException()));
 
@@ -241,6 +269,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					throw new Exception(Error.ErrorMessage);
 			}
 
+			await this.RemoveErrorAsync("ProxyError");
+
 			return Fields.ToArray();
 		}
 
@@ -250,10 +280,80 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <param name="TransducerAccessMessage">Message</param>
 		/// <param name="SamplingMode">Sampling mode.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
-		public Task TransducerDataRequest(TransducerAccessMessage TransducerAccessMessage,
+		public async Task TransducerDataRequest(TransducerAccessMessage TransducerAccessMessage,
 			SamplingMode SamplingMode, double TimeoutSeconds)
 		{
-			return Task.CompletedTask;  // TODO
+			if (!(await this.GetParent() is ProxyMqttTimTopicNode TimNode))
+				return;
+
+			if (!(await TimNode.GetParent() is ProxyMqttNcapTopicNode NcapNode))
+				return;
+
+			if (!(await NcapNode.GetParent() is DiscoverableTopicNode CommunicationNode))
+				return;
+
+			MqttBrokerNode BrokerNode = await CommunicationNode.GetBroker();
+			if (BrokerNode is null)
+				return;
+
+			MqttBroker Broker = BrokerNode.GetBroker();
+			if (Broker is null)
+				return;
+
+			string Topic = await CommunicationNode.GetFullTopic();
+			if (string.IsNullOrEmpty(Topic))
+				return;
+
+			Field[] Fields = await this.TryReadSensor(string.Empty);
+			if (Fields is null)
+				return;	// TODO: Error response
+
+			Field MainField = this.GetMainField(Fields);
+			string StringValue;
+
+			if (MainField is QuantityField Quantity &&
+				Unit.TryParse(Quantity.Unit, out Unit MainUnit))
+			{
+				double Value = Quantity.Value;
+
+				if (PhysicalUnits.TryCreate(MainUnit, ref Value, out _))
+				{
+					if (Value == Quantity.Value)
+						StringValue = CommonTypes.Encode(Quantity.Value, Quantity.NrDecimals);
+					else
+					{
+						byte NrDecimals = CommonTypes.GetNrDecimals(Value);
+						StringValue = CommonTypes.Encode(Value, NrDecimals);
+					}
+				}
+				else
+					StringValue = CommonTypes.Encode(Quantity.Value, Quantity.NrDecimals);
+			}
+			else if (MainField is null)
+				return; // TODO: Error response
+			else
+				StringValue = MainField.ObjectValue?.ToString() ?? string.Empty;
+
+			byte[] Response = TransducerAccessMessage.SerializeResponse(0, this.NcapIdBinary, this.TimIdBinary,
+				(ushort)this.ChannelId, StringValue, MainField.Timestamp);
+
+			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
+		}
+
+		/// <summary>
+		/// Gets the main field, from a set of fields.
+		/// </summary>
+		/// <param name="Fields">Set of fields.</param>
+		/// <returns>Main field, if found, null otherwise.</returns>
+		public Field GetMainField(Field[] Fields)
+		{
+			foreach (Field Field in Fields)
+			{
+				if (Field.Type == FieldType.Momentary && Field.Name == this.proxyFieldName)
+					return Field;
+			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -291,15 +391,43 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			switch (TedsAccessCode)
 			{
+				case TedsAccessCode.MetaTEDS:
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary,
+						this.TimIdBinary, (ushort)this.ChannelId,
+						new TedsId(99, 255, (byte)TedsAccessCode.MetaTEDS, 2, 1));
+					break;
+
+				case TedsAccessCode.ChanTEDS:
+					Field[] Fields = await this.TryReadSensor(TedsAccessCode.ToString());
+					if (Fields is null)
+						return;
+
+					List<TedsRecord> Records = new List<TedsRecord>();
+					Field MainField = this.GetMainField(Fields);
+
+					if (MainField is QuantityField Quantity &&
+						Unit.TryParse(Quantity.Unit, out Unit MainUnit))
+					{
+						double Value = Quantity.Value;
+
+						if (PhysicalUnits.TryCreate(MainUnit, ref Value, out PhysicalUnits Ieee1451Unit))
+							Records.Add(new Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds.PhysicalUnits(Ieee1451Unit));
+					}
+
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary,
+						this.TimIdBinary, (ushort)this.ChannelId,
+						new TedsId(99, 255, (byte)TedsAccessCode.ChanTEDS, 2, 1),
+						Records.ToArray());
+					break;
+
 				case TedsAccessCode.XdcrName:
 					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary,
-						this.TimIdBinary, (ushort)this.ChannelId, new TedsId(),
+						this.TimIdBinary, (ushort)this.ChannelId,
+						new TedsId(99, 255, (byte)TedsAccessCode.XdcrName, 2, 1),
 						new Format(true),
 						new Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds.Content(this.EntityName));
 					break;
 
-				case TedsAccessCode.ChanTEDS:
-				case TedsAccessCode.MetaTEDS:
 				default:
 					return;
 			}

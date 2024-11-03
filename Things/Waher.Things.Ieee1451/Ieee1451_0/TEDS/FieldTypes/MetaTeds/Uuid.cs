@@ -20,6 +20,19 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
         {
         }
 
+		/// <summary>
+		/// TEDS Universal unique identifier (§6.4.2.2)
+		/// </summary>
+	    /// <param name="Uuid">Binary representation of UUID.</param>
+        public Uuid(byte[] Uuid)
+            : base(1, 4, Uuid)
+        {
+            if (Uuid is null || Uuid.Length != 16)
+                throw new ArgumentException("Invalid UUID", nameof(Uuid));
+
+            this.Identity = Uuid;
+        }
+
         /// <summary>
         /// Unique identifier
         /// </summary>

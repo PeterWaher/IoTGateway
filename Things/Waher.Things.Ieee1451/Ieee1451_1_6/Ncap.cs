@@ -274,40 +274,66 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			if (Message is TransducerAccessMessage TransducerAccessMessage)
 			{
-				if (TransducerAccessMessage.TryParseRequest(out ChannelAddress Address,
-					out SamplingMode SamplingMode, out double TimeoutSeconds))
+				switch (TransducerAccessMessage.TransducerAccessService)
 				{
-					await RemoveErrorAsync(This, "TransducerRequestError");
-
-					StringBuilder sb = new StringBuilder();
-
-					sb.Append(This.Topic.FullTopic);
-					sb.Append('/');
-					sb.Append(Hashes.BinaryToString(Address.NcapId));
-
-					if (!MessageSwitch.IsZero(Address.TimId))
-					{
-						sb.Append('/');
-						sb.Append(Hashes.BinaryToString(Address.TimId));
-
-						if (Address.ChannelId != 0)
+					case TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM:
+						if (TransducerAccessMessage.TryParseRequest(out ChannelAddress Address,
+							out SamplingMode SamplingMode, out double TimeoutSeconds))
 						{
+							await RemoveErrorAsync(This, "TransducerRequestError");
+
+							StringBuilder sb = new StringBuilder();
+
+							sb.Append(This.Topic.FullTopic);
 							sb.Append('/');
-							sb.Append(Address.ChannelId.ToString());
+							sb.Append(Hashes.BinaryToString(Address.NcapId));
+
+							if (!MessageSwitch.IsZero(Address.TimId))
+							{
+								sb.Append('/');
+								sb.Append(Hashes.BinaryToString(Address.TimId));
+
+								if (Address.ChannelId != 0)
+								{
+									sb.Append('/');
+									sb.Append(Address.ChannelId.ToString());
+								}
+							}
+
+							SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
+
+							if (!(SubTopic?.Node is ITransducerNode TransducerNode))
+								return;
+
+							await TransducerNode.TransducerDataRequest(TransducerAccessMessage, SamplingMode, TimeoutSeconds);
 						}
-					}
+						else
+						{
+							await LogErrorAsync(This, "TransducerRequestError", "Unable to parse Transducer request.");
+							return;
+						}
+						break;
 
-					SubTopic = await This.Topic.Broker.GetTopic(sb.ToString(), true, false);
-
-					if (!(SubTopic?.Node is ITransducerNode TransducerNode))
-						return;
-
-					await TransducerNode.TransducerDataRequest(TransducerAccessMessage, SamplingMode, TimeoutSeconds);
-				}
-				else
-				{
-					await LogErrorAsync(This, "TransducerRequestError", "Unable to parse Transducer request.");
-					return;
+					case TransducerAccessService.SyncReadTransducerBlockDataFromAChannelOfATIM:
+					case TransducerAccessService.SyncReadTransducerSampleDataFromMulitipleChannelsOfATIM:
+					case TransducerAccessService.SyncReadTransducerBlockDataFromMulitipleChannelsOfATIM:
+					case TransducerAccessService.SyncReadTransducerSampleDataFromMultipleChannelsOfMultipleTIMs:
+					case TransducerAccessService.SyncReadTransducerBlockDataFromMultipleChannelsOfMultipleTIMs:
+					case TransducerAccessService.SyncWriteTransducerSampleDataFromAChannelOfATIM:
+					case TransducerAccessService.SyncWriteTransducerBlockDataFromAChannelOfATIM:
+					case TransducerAccessService.SyncWriteTransducerSampleDataFromMulitipleChannelsOfATIM:
+					case TransducerAccessService.SyncWriteTransducerBlockDataFromMulitipleChannelsOfATIM:
+					case TransducerAccessService.SyncWriteTransducerSampleDataFromMultipleChannelsOfMultipleTIMs:
+					case TransducerAccessService.SyncWriteTransducerBlockDataFromMultipleChannelsOfMultipleTIMs:
+					case TransducerAccessService.AsyncReadTransducerBlockDataFromAChannelOfATIM:
+					case TransducerAccessService.CallbackAsyncReadTransducerBlockDataFromAChannelOfATIM:
+					case TransducerAccessService.AsyncReadTransducerStreamDataFromAChannelOfATIM:
+					case TransducerAccessService.CallbackAsyncReadTransducerStreamDataFromAChannelOfATIM:
+					case TransducerAccessService.AsyncReadTransducerBlockDataFromMultipleChannelsOfATIM:
+					case TransducerAccessService.Callback:
+					case TransducerAccessService.AsyncReadTransducerBlockDataFromMultipleChannelOfMultipleTIMs:
+					case TransducerAccessService.CallbackAsyncReadTransducerBlockDataFromMultipleChannelOfMultipleTIMs:
+						return;	// TODO
 				}
 			}
 			else if (Message is TedsAccessMessage TedsAccessMessage)

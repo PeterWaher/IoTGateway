@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Waher.Content;
-using Waher.Script.Units;
-using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -179,6 +178,62 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				return Ieee1451Parser.SerializeMessage(
 					TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM,
 					MessageType.Command, ms.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Serializes a request for transducer data.
+		/// </summary>
+		/// <param name="ErrorCode">Error code.</param>
+		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="TimId">TIM ID, or null if none.</param>
+		/// <param name="ChannelId">Channel ID, or 0 if none.</param>
+		/// <param name="Value">String-representation of value.</param>
+		/// <param name="Timestamp">Timestamp of value.</param>
+		/// <returns>Binary serialization.</returns>
+		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId, byte[] TimId, ushort ChannelId,
+			string Value, DateTime Timestamp)
+		{
+			if (NcapId is null)
+				NcapId = new byte[16];
+			else if (NcapId.Length != 16)
+				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
+
+			if (TimId is null)
+				TimId = new byte[16];
+			else if (TimId.Length != 16)
+				throw new ArgumentException("Invalid TIM UUID.", nameof(TimId));
+
+			using (MemoryStream ms = new MemoryStream())
+			{
+				ms.WriteByte((byte)(ErrorCode >> 8));
+				ms.WriteByte((byte)ErrorCode);
+				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				ms.Write(NcapId, 0, 16); // NCAP ID
+				ms.Write(TimId, 0, 16); // TIM ID
+				ms.WriteByte((byte)(ChannelId >> 8));
+				ms.WriteByte((byte)ChannelId);
+
+				byte[] Bin = Encoding.UTF8.GetBytes(Value);
+				ms.Write(Bin, 0, Bin.Length);
+				ms.WriteByte(0);
+
+				Time Time = new Time(Timestamp);
+
+				ms.WriteByte((byte)(Time.Seconds >> 40));
+				ms.WriteByte((byte)(Time.Seconds >> 32));
+				ms.WriteByte((byte)(Time.Seconds >> 24));
+				ms.WriteByte((byte)(Time.Seconds >> 16));
+				ms.WriteByte((byte)(Time.Seconds >> 8));
+				ms.WriteByte((byte)Time.Seconds);
+				ms.WriteByte((byte)(Time.NanoSeconds >> 24));
+				ms.WriteByte((byte)(Time.NanoSeconds >> 16));
+				ms.WriteByte((byte)(Time.NanoSeconds >> 8));
+				ms.WriteByte((byte)Time.NanoSeconds);
+
+				return Ieee1451Parser.SerializeMessage(
+					TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM,
+					MessageType.Reply, ms.ToArray());
 			}
 		}
 	}

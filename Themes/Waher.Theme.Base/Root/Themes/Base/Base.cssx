@@ -164,13 +164,8 @@ header#native-header
     padding: 0;
     margin: 0;
     color: inherit;
-}
-
-#native-header nav > div > #toggle-nav > svg {
-    background-color: transparent;
-    height: 100%;
-    width: 100%;
-    color: inherit;
+    font-size: 30px;
+    line-height: 100%;
 }
 
 #native-header nav > div > p {

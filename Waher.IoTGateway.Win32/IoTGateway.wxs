@@ -29,7 +29,7 @@
 		<Property Id="ErrorIcon">error_icon</Property>
 		<Property Id="QuestionIcon">question_icon</Property>
 		<Directory Id='TARGETDIR' Name='SourceDir'>
-			<Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Redist\MSVC\14.29.30133\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
+			<Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.29.30133\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
 			<Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
 				<Directory Id='WaherDataAB' Name='Waher Data AB'>
 					<Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
@@ -1705,8 +1705,8 @@
 							<File Id='MarkdownEditor.cssx' Name='MarkdownEditor.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.cssx'/>
 							<File Id='MarkdownEditor.js' Name='MarkdownEditor.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.js'/>
 							<File Id='MarkdownEditor.md' Name='MarkdownEditor.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.md'/>
+							<File Id='Master.js' Name='Master.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.js'/>
 							<File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Master.md'/>
-							<File Id='Nav.js' Name='Nav.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Nav.js'/>
 							<File Id='Prompt.js' Name='Prompt.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.js'/>
 							<File Id='Prompt.md' Name='Prompt.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Prompt.md'/>
 							<File Id='ProposeContract.js' Name='ProposeContract.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\ProposeContract.js' />
@@ -1741,6 +1741,7 @@
 							<RemoveFile Id='RemoveMarkdownEditor.cssx' Name='MarkdownEditor.cssx' On='uninstall'/>
 							<RemoveFile Id='RemoveMarkdownEditor.js' Name='MarkdownEditor.js' On='uninstall'/>
 							<RemoveFile Id='RemoveMarkdownEditor.md' Name='MarkdownEditor.md' On='uninstall'/>
+							<RemoveFile Id='RemoveMaster.js' Name='Master.js' On='uninstall'/>
 							<RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
 							<RemoveFile Id='RemovePrompt.js' Name='Prompt.js' On='uninstall'/>
 							<RemoveFile Id='RemovePrompt.md' Name='Prompt.md' On='uninstall'/>

@@ -29,6 +29,7 @@
 			<Content fileName="LegalIdentities.md"/>
 			<Content fileName="LegalIdentity.js"/>
 			<Content fileName="LegalIdentity.md"/>
+			<Content fileName="Master.js"/>
 			<Content fileName="Master.md"/>
 			<Content fileName="Next.js"/>
 			<Content fileName="Notification.js"/>

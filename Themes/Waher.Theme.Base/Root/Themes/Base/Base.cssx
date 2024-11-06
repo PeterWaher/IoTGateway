@@ -1,0 +1,428 @@
+*
+{
+    box-sizing: border-box;
+}
+
+img
+{
+    max-width:100%;
+}
+
+a
+{
+    word-wrap: break-word;
+}
+
+iframe
+{
+    max-width: 100%;
+}
+
+body
+{
+    font-family: ¤Theme.FontFamily¤;
+    color:¤TextColor¤;
+    padding: 0;
+    margin: 0;
+    width:100%;
+    height:100%;
+    position:relative;
+}
+
+main
+{
+    box-sizing: border-box;
+    display: block;
+    width: 90%;
+    margin: auto;
+    margin-top: 5em;
+    z-index:2;
+}
+
+
+/*#region Footnotes*/
+
+.footnote-ref
+{
+    text-decoration: none;
+}
+
+.footnote-backref
+{
+    text-decoration:none;
+}
+
+.footnote-backref:before
+{
+    content: " ";
+}
+
+div.footnotes > hr
+{
+    display:none;
+}
+
+.footnotes
+{
+    position: absolute;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 2em;
+    padding: 0.5em;
+}
+
+div.footnotes + p
+{
+    display:none;
+}
+
+/*#endregion Footnotes*/
+
+
+
+/* region Header */
+
+#native-header
+{
+    padding-inline: 1.5em;
+    position: fixed;
+    float:top;
+    top: 0;
+    width: 100%;
+    z-index:3;
+}
+
+#native-header nav > ul
+{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+	display:flex;
+}
+
+header#native-header a
+{
+    text-decoration: none;
+}
+
+header#native-header li
+{
+    list-style-type: none;
+}
+
+header#native-header
+{
+    box-sizing: border-box;
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index:3;
+}
+
+#native-header #toggle-nav {
+    display: none;
+}
+
+#native-header #small-pagpage-name {
+    display: none;
+}
+
+#native-header #large-pagpage-name {
+    display: block;
+    flex: 1;
+    text-align: center;
+}
+
+#native-header li:has(#large-pagpage-name) 
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+}
+
+#native-header nav > ul > li {
+	opacity:0;
+}
+
+#native-header:hover > nav > ul > li
+{
+	opacity:1;
+}
+
+#native-header nav > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#native-header nav > div > #toggle-nav {
+    background-color: transparent;
+    height: 34px;
+    width: 34px;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font-size: 30px;
+    line-height: 100%;
+}
+
+#native-header nav > div > p {
+    padding: 0;
+    margin: 0;
+    height: fit-content; 
+}
+
+#native-header nav button {
+    box-shadow: none;
+}
+
+#native-header nav > div > button:hover {
+    box-shadow: none !important;
+}
+
+/* endregion Header */
+
+
+table 
+{
+    max-width: 100%;
+    margin-bottom: 1.5em;
+    border-collapse: collapse;
+    border-collapse: separate;
+    border-width: 0;
+    border-spacing:0;
+}
+
+table > colgroup {
+    width: 100%;
+}
+
+table, th, td
+{
+    border: 0;
+}
+
+
+table 
+{
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    width: fit-content;
+    border-radius: 8px;
+}
+
+table > colgroup {
+    width: 100%;
+}
+
+/* region MISC */
+
+section
+{
+    padding: min(2em, 5%);
+    margin: 3em 0 3em 0;
+}
+
+fieldset
+{
+    margin-block:2em;
+    margin-inline: min(2em, 5%)
+    padding-block:2em;
+    padding-inline: min(2em, 5%)
+	-webkit-column-break-inside: avoid;
+	break-inside: avoid;
+}
+
+
+html body fieldset
+{
+    max-width: 100%;
+    min-inline-size: unset;
+}
+
+/* endregion MISC */
+
+
+@media screen and (min-width: 901px) {
+    /* region Header */
+
+    #native-header > nav > ul > li > a
+    {
+        height: 100%;
+    }
+
+    #native-header nav > ul > li:hover > ul
+    {
+        display:block;
+        position:absolute;
+        margin: 0;
+        margin-left:-1px;
+        padding: 0;
+    }
+
+    #native-header nav ul > li > a
+    {
+        width: 100%;
+        text-align: left;
+    }
+
+    #native-header li > ul > li
+    {
+        display: flex;
+        position: relative;
+        overflow: visible;
+        border-bottom: none;
+    }
+
+
+    /* endregion Header */
+
+
+    /*#region Dropdown*/
+
+    #native-header li:hover > a 
+    {
+        color: inherit !important;
+    }
+
+    #native-header li > ul > li > a 
+    {
+        height: 100%;
+    }
+
+    #native-header nav > ul > li > ul
+    {
+        border-top: 1px transparent solid
+    }
+
+    #native-header li > ul
+    {
+        margin-inline-start: 0;
+    }
+    
+    #native-header li > ul > li:hover > ul
+    {
+        display: block;
+    }
+
+    #native-header li > ul 
+    {
+        overflow-x: visible;
+    }
+
+    #native-header li > ul > li > ul
+    {
+        padding: 0px;
+        display: none;
+        height: 0;
+        position: absolute;
+        left: 100%;
+    }
+
+    /*#endregion Dropdown*/
+}
+
+@media screen and (max-width: 900px) {
+    main
+    {
+        width: 100%;
+    }
+
+    /* region Header */
+
+    body #native-header {
+        max-height: 100%;
+    }
+    
+    body header#native-header {
+        background-position: initial;
+        background-repeat: initial;
+        background-size: initial;
+        padding-top: 0;
+        padding-bottom: 1.5em;
+    }
+
+    #native-header > nav {
+        display: flex;
+        flex-direction: column;
+        max-height: 100vh;
+        padding-top: 1.5em;
+    }
+    
+    #native-header > nav > ul {
+        flex-shrink: 1;
+    }
+    
+    #native-header[data-visible] > nav > div {
+        margin-bottom: 1rem;
+    }
+    
+    #native-header > nav > ul {
+        margin-bottom: 1rem;
+        overflow-y: auto;
+    }
+
+    header#native-header li > *
+    {
+        text-align: left;
+    }
+    
+    header#native-header > nav > ul > li
+    {
+        opacity:1;
+    }
+
+    #native-header #small-pagpage-name {
+        display: block;
+    }
+
+    #native-header li:has(#large-pagpage-name) {
+        display: none;
+    }
+
+    #native-header #toggle-nav {
+        display: inline-block;
+    }
+
+
+    #native-header nav > ul {
+        flex-direction: column;
+    }
+
+    header#native-header > nav > ul {
+        display: none;
+    }
+
+    header#native-header[data-visible] nav > ul {
+       display: flex;
+    }
+
+    header#native-header nav > ul > li
+    {
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    body header#native-header > nav ul > li > ul
+    {
+        display: none;
+        position: static;
+    }
+    
+    header#native-header  li > ul[expanded]
+    {
+        display: block;
+    }
+
+    /* endregion Header */
+
+    img
+    {
+        display: block;
+        margin: auto;
+    }
+
+}

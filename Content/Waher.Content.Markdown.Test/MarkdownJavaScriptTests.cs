@@ -287,5 +287,10 @@ namespace Waher.Content.Markdown.Test
 		{
 			await DoTest("Test_33_SingleNoHeaderTable.md", "Test_33_SingleNoHeaderTable.js", true, "<tbody>", "</tbody>");
 		}
-	}
+        [TestMethod]
+        public async Task Test_34_SpecifiedViewportHeader()
+        {
+            await DoTest("Test_34_SpecifiedViewportHeader.md", "Test_34_SpecifiedViewportHeader.js");
+        }
+    }
 }

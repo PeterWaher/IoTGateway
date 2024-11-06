@@ -1,18 +1,23 @@
-Copyright: /Copyright.md
+﻿Copyright: /Copyright.md
 CSS: {{Theme.CSSX}}
+Javascript: Master.js
 
-<header>
+<header id="native-header">
 <nav>
-
-* [Home](/Index.md)
-* [Markdown](/Markdown.md)
-* [Script](/Script.md)
-* [Admin](/Admin.md)
-* [%Title]
-* [License](/Copyright.md)
-* [IoT Gateway](https://github.com/PeterWaher/IoTGateway)
-* [Waher Data](http://waher.se/)
-
+<div>
+<button id="toggle-nav" onClick="nativeHeader.ToggleNav()">☰</button>
+<p id="small-pagpage-name">
+**[%Title]**
+</p>
+</div>
+- [Home](/)
+- [TAG](https://www.trustanchorgroup.com/)
+- [Lab](http://lab.tagroot.io/)
+- [Admin](/Admin.md)
+- <p id="large-pagpage-name">[%Title]</p>
+- [LinkedIn](https://www.linkedin.com/company/trust-anchor-group)
+- [Twitter](https://twitter.com/group_anchor)
+- [Contact](/Feedback.md)
 </nav>
 </header>
 <main>
@@ -20,8 +25,3 @@ CSS: {{Theme.CSSX}}
 [%Details]
 
 </main>
-<footer>
-<span>
-This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2024. All rights reserved.
-</span>
-</footer>

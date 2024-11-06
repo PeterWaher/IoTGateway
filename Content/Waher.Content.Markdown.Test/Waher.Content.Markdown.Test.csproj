@@ -56,6 +56,7 @@
     <None Remove="HTML\Test_31_Justification2.html" />
     <None Remove="HTML\Test_32_TablesAndNotes.html" />
     <None Remove="HTML\Test_33_SingleNoHeaderTable.html" />
+    <None Remove="HTML\Test_34_SpecifiedViewportHeader.html" />
     <None Remove="JavaScript\Test_01_Paragraphs.js" />
     <None Remove="JavaScript\Test_02_Links.js" />
     <None Remove="JavaScript\Test_03_TextFormatting.js" />
@@ -89,6 +90,7 @@
     <None Remove="JavaScript\Test_31_Justification2.js" />
     <None Remove="JavaScript\Test_32_TablesAndNotes.js" />
     <None Remove="JavaScript\Test_33_SingleNoHeaderTable.js" />
+    <None Remove="JavaScript\Test_34_SpecifiedViewportHeader.js" />
     <None Remove="Markdown\Diff\Diff\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\Diff\Test_02_Paragraphs.md" />
     <None Remove="Markdown\Diff\Diff\Test_03_Bullets.md" />
@@ -131,6 +133,7 @@
     <None Remove="Markdown\Generated\Test_31_Justification2.md" />
     <None Remove="Markdown\Generated\Test_32_TablesAndNotes.md" />
     <None Remove="Markdown\Generated\Test_33_SingleNoHeaderTable.md" />
+	<None Remove="Markdown\Generated\Test_34_SpecifiedViewportHeader.md" />
     <None Remove="Markdown\Syntax\Test_25_HashTags.md" />
     <None Remove="Markdown\Syntax\Test_26_Comments.md" />
     <None Remove="Markdown\Syntax\Test_27_Contract.md" />
@@ -140,6 +143,7 @@
     <None Remove="Markdown\Syntax\Test_31_Justification2.md" />
     <None Remove="Markdown\Syntax\Test_32_TablesAndNotes.md" />
     <None Remove="Markdown\Syntax\Test_33_SingleNoHeaderTable.md" />
+	<None Remove="Markdown\Syntax\Test_34_SpecifiedViewportHeader.md" />
     <None Remove="Markdown\Test_01_Paragraphs.md" />
     <None Remove="Markdown\Test_02_Links.md" />
     <None Remove="Markdown\Test_03_TextFormatting.md" />
@@ -197,6 +201,7 @@
     <None Remove="PlainText\Test_31_Justification2.txt" />
     <None Remove="PlainText\Test_32_TablesAndNotes.txt" />
     <None Remove="PlainText\Test_33_SingleNoHeaderTable.txt" />
+    <None Remove="PlainText\Test_34_SpecifiedViewportHeader.txt" />
     <None Remove="SC\Test_01_Paragraphs.xml" />
     <None Remove="SC\Test_02_Links.xml" />
     <None Remove="SC\Test_03_TextFormatting.xml" />
@@ -230,6 +235,7 @@
     <None Remove="SC\Test_31_Justification2.xml" />
     <None Remove="SC\Test_32_TablesAndNotes.xml" />
     <None Remove="SC\Test_33_SingleNoHeaderTable.xml" />
+    <None Remove="SC\Test_34_SpecifiedViewportHeader.xml" />
     <None Remove="XAML\Test_01_Paragraphs.xml" />
     <None Remove="XAML\Test_02_Links.xml" />
     <None Remove="XAML\Test_03_TextFormatting.xml" />
@@ -263,6 +269,7 @@
     <None Remove="XAML\Test_31_Justification2.xml" />
     <None Remove="XAML\Test_32_TablesAndNotes.xml" />
     <None Remove="XAML\Test_33_SingleNoHeaderTable.xml" />
+    <None Remove="XAML\Test_34_SpecifiedViewportHeader.xml" />
     <None Remove="XF\Test_01_Paragraphs.xml" />
     <None Remove="XF\Test_02_Links.xml" />
     <None Remove="XF\Test_03_TextFormatting.xml" />
@@ -296,6 +303,7 @@
     <None Remove="XF\Test_31_Justification2.xml" />
     <None Remove="XF\Test_32_TablesAndNotes.xml" />
     <None Remove="XF\Test_33_SingleNoHeaderTable.xml" />
+    <None Remove="XF\Test_34_SpecifiedViewportHeader.xml" />
     <None Remove="XML\Test_01_Paragraphs.xml" />
     <None Remove="XML\Test_02_Links.xml" />
     <None Remove="XML\Test_03_TextFormatting.xml" />
@@ -329,9 +337,13 @@
     <None Remove="XML\Test_31_Justification2.xml" />
     <None Remove="XML\Test_32_TablesAndNotes.xml" />
     <None Remove="XML\Test_33_SingleNoHeaderTable.xml" />
+    <None Remove="XML\Test_34_SpecifiedViewportHeader.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="HTML\Test_34_SpecifiedViewportHeader.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="HTML\Test_33_SingleNoHeaderTable.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -530,6 +542,9 @@
     <Content Include="JavaScript\Test_32_TablesAndNotes.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="JavaScript\Test_34_SpecifiedViewportHeader.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Markdown\Diff\Diff\Test_01_Simple.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -593,9 +608,6 @@
     <Content Include="Markdown\Generated\Test_12_Typography.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Markdown\Generated\Test_33_SingleNoHeaderTable.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Markdown\Generated\Test_13_Tables.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -650,12 +662,21 @@
     <Content Include="Markdown\Generated\Test_30_Incomplete.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Markdown\Generated\Test_31_Justification2.md">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
     <Content Include="Markdown\Generated\Test_32_TablesAndNotes.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Markdown\Generated\Test_31_Justification2.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+	<Content Include="Markdown\Generated\Test_33_SingleNoHeaderTable.md">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
+	<Content Include="Markdown\Generated\Test_34_SpecifiedViewportHeader.md">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
+	<Content Include="Markdown\Syntax\Test_34_SpecifiedViewportHeader.md">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
     <Content Include="Markdown\Syntax\Test_33_SingleNoHeaderTable.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -953,6 +974,9 @@
     <Content Include="SC\Test_27_Contract.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="SC\Test_34_SpecifiedViewportHeader.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="XAML\Test_33_SingleNoHeaderTable.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1050,6 +1074,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XAML\Test_24_Subscript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XAML\Test_34_SpecifiedViewportHeader.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XF\Test_01_Paragraphs.xml">
@@ -1151,6 +1178,9 @@
     <Content Include="XF\Test_26_Comments.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XF\Test_34_SpecifiedViewportHeader.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="XML\Test_13_Tables.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1250,6 +1280,9 @@
     <Content Include="XML\Test_24_Subscript.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XML\Test_34_SpecifiedViewportHeader.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -1275,6 +1308,12 @@
     <ProjectReference Include="..\Waher.Content.Markdown.Xml\Waher.Content.Markdown.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PlainText\Test_34_SpecifiedViewportHeader.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

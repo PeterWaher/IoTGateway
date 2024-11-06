@@ -151,7 +151,7 @@ You can choose to reject the contract, by pressing the *Reject* button below.[[;
 		]] The legal identity used for signatures is protected by a password. You will also need to provide the password below.
 
 Password:  
-<input id="Password" name="Password" type="password" style="width:20em" />
+<input id="Password" name="Password" type="password" style="max-width:20em" />
 [[;
 	]]
 

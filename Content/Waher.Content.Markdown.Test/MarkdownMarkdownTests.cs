@@ -231,5 +231,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			await DoTest("Test_33_SingleNoHeaderTable.md");
 		}
-	}
+
+        [TestMethod]
+        public async Task Test_34_SpecifiedViewportHeader()
+        {
+            await DoTest("Test_34_SpecifiedViewportHeader.md");
+        }
+    }
 }

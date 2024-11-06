@@ -28,6 +28,7 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    <None Include="Properties\PublishProfiles\Debug win-x86.pubxml.user" />
   </ItemGroup>
 
   <ItemGroup>

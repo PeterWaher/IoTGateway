@@ -88,6 +88,7 @@
     <ProjectReference Include="..\Themes\Waher.Theme.Retro64\Waher.Theme.Retro64.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.SpaceGravel\Waher.Theme.SpaceGravel.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.WinterDawn\Waher.Theme.WinterDawn.csproj" />
+	<ProjectReference Include="..\Themes\Waher.Theme.Base\Waher.Theme.Base.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Files\Waher.Things.Files.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Ieee1451\Waher.Things.Ieee1451.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj" />

@@ -1,0 +1,12 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_34_SpecifiedViewportHeader.md" />
+		</tag>
+		<tag xmlns="VIEWPORT">
+			<value lineBreak="false" xmlns="width=500, initial-scale=1.0" />
+		</tag>
+	</metaData>
+	<elements />
+	<references />
+</parsedMakdown>

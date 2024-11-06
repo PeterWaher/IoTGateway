@@ -208,6 +208,7 @@
     <None Remove="Root\MarkdownLab\MarkdownLabXaml.ws" />
     <None Remove="Root\MarkdownLab\MarkdownLabXml.ws" />
     <None Remove="Root\Master.md" />
+	<None Remove="Root\Master.js" />
     <None Remove="Root\PlantUmlLab\Examples\Activity.uml" />
     <None Remove="Root\PlantUmlLab\Examples\Archimate.uml" />
     <None Remove="Root\PlantUmlLab\Examples\Class.uml" />
@@ -905,6 +906,9 @@
     <Content Include="Root\Master.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="Root\Master.js">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
     <Content Include="Root\robots.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

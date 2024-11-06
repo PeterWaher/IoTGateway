@@ -17,10 +17,10 @@ Login
 You need to login to proceed.
 
 User Name:  
-<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />
+<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="max-width:20em" />
 
 Password:  
-<input id="Password" name="Password" type="password" style="width:20em" />
+<input id="Password" name="Password" type="password" style="max-width:20em" />
 
 {{if exists(LoginError) then]]
 <div class='error'>

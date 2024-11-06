@@ -538,8 +538,11 @@ namespace Waher.IoTGateway.Setup
 				this.passwordType = string.Empty;
 			}
 
-			this.client?.Dispose();
-			this.client = null;
+			if (!(this.client is null))
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 
 			this.Connect(TabID);
 
@@ -654,8 +657,11 @@ namespace Waher.IoTGateway.Setup
 							{
 								await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK0", "Connection established.", false, "User");
 
-								this.client.Dispose();
-								this.client = null;
+								if (!(this.client is null))
+								{
+									await this.client.DisposeAsync();
+									this.client = null;
+								}
 
 								this.Step = 1;
 								this.Updated = DateTime.Now;
@@ -819,8 +825,11 @@ namespace Waher.IoTGateway.Setup
 						if (!string.IsNullOrEmpty(TabID))
 							await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionOK1", JSON.Encode(ConnectionInfo, false), true, "User");
 
-						this.client.Dispose();
-						this.client = null;
+						if (!(this.client is null))
+						{
+							await this.client.DisposeAsync();
+							this.client = null;
+						}
 
 						this.Step = 2;
 						this.Updated = DateTime.Now;
@@ -965,8 +974,11 @@ namespace Waher.IoTGateway.Setup
 							else
 								await ClientEvents.PushEvent(new string[] { TabID }, "ConnectionError", Msg, false, "User");
 
-							this.client.Dispose();
-							this.client = null;
+							if (!(this.client is null))
+							{
+								await this.client.DisposeAsync();
+								this.client = null;
+							}
 
 							this.testConnection?.TrySetResult(false);
 							return;

@@ -8,16 +8,10 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Search
 {
-	/// <summary>
-	/// Delegate for search form events or callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SearchFormEventHandler(object Sender, SearchFormEventArgs e);
-
 	/// <summary>
 	/// Event arguments for search form responses.
 	/// </summary>
@@ -71,65 +65,57 @@ namespace Waher.Networking.XMPP.Search
 		/// <summary>
 		/// First name
 		/// </summary>
-		public string FirstName
-		{
-			get
-			{
-				return this.GetField(this.first, "first");
-			}
-
-			set
-			{
-				this.SetField(ref this.first, "first", value);
-			}
-		}
+		public string FirstName => this.GetField(this.first, "first");
 
 		/// <summary>
 		/// Last name
 		/// </summary>
-		public string LastName
-		{
-			get
-			{
-				return this.GetField(this.last, "last");
-			}
-
-			set
-			{
-				this.SetField(ref this.last, "last", value);
-			}
-		}
+		public string LastName => this.GetField(this.last, "last");
 
 		/// <summary>
 		/// Nick name
 		/// </summary>
-		public string NickName
-		{
-			get
-			{
-				return this.GetField(this.nick, "nick");
-			}
-
-			set
-			{
-				this.SetField(ref this.nick, "nick", value);
-			}
-		}
+		public string NickName => this.GetField(this.nick, "nick");
 
 		/// <summary>
 		/// EMail 
 		/// </summary>
-		public string EMail
-		{
-			get
-			{
-				return this.GetField(this.email, "email");
-			}
+		public string EMail => this.GetField(this.email, "email");
 
-			set
-			{
-				this.SetField(ref this.email, "email", value);
-			}
+		/// <summary>
+		/// Sets the first name
+		/// </summary>
+		public Task SetFirstName(string Value)
+		{
+			this.first = Value;
+			return this.SetField("first", Value);
+		}
+
+		/// <summary>
+		/// Sets the last name
+		/// </summary>
+		public Task SetLastName(string Value)
+		{
+			this.last = Value;
+			return this.SetField("last", Value);
+		}
+
+		/// <summary>
+		/// Sets the nick name
+		/// </summary>
+		public Task SetNickName(string Value)
+		{
+			this.nick = Value;
+			return this.SetField("nick", Value);
+		}
+
+		/// <summary>
+		/// Sets the email address
+		/// </summary>
+		public Task SetEMail(string Value)
+		{
+			this.email = Value;
+			return this.SetField("email", Value);
 		}
 
 		/// <summary>
@@ -152,15 +138,13 @@ namespace Waher.Networking.XMPP.Search
 			return string.Empty;
 		}
 
-		private void SetField(ref string FixedValue, string Var, string Value)
+		private async Task SetField(string Var, string Value)
 		{
-			FixedValue = Value;
-
 			if (!(this.searchForm is null))
 			{
 				Field Field = this.searchForm[Var];
 				if (!(Field is null))
-					Field.SetValue(Value);
+					await Field.SetValue(Value);
 			}
 
 			switch (Var)
@@ -188,7 +172,7 @@ namespace Waher.Networking.XMPP.Search
 		/// </summary>
 		/// <param name="Callback">Callback method called when response of search request is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SendSearchRequest(SearchResultEventHandler Callback, object State)
+		public Task SendSearchRequest(EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -228,7 +212,7 @@ namespace Waher.Networking.XMPP.Search
 
 				Xml.Append("</query>");
 
-				this.client.SendIqSet(this.From, Xml.ToString(), this.OldSearchResult, new object[] { Callback, State });
+				return this.client.SendIqSet(this.From, Xml.ToString(), this.OldSearchResult, new object[] { Callback, State });
 			}
 			else
 			{
@@ -236,14 +220,14 @@ namespace Waher.Networking.XMPP.Search
 
 				Xml.Append("</query>");
 
-				this.client.SendIqSet(this.From, Xml.ToString(), this.FormSearchResult, new object[] { Callback, State });
+				return this.client.SendIqSet(this.From, Xml.ToString(), this.FormSearchResult, new object[] { Callback, State });
 			}
 		}
 
 		private Task OldSearchResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
+			EventHandlerAsync<SearchResultEventArgs> Callback = (EventHandlerAsync<SearchResultEventArgs>)P[0];
 			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
 			List<Field> Headers = new List<Field>();
@@ -318,7 +302,7 @@ namespace Waher.Networking.XMPP.Search
 			return this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
 		}
 
-		private async Task CallResponseMethod(SearchResultEventHandler Callback, object State, List<Dictionary<string, string>> Records,
+		private async Task CallResponseMethod(EventHandlerAsync<SearchResultEventArgs> Callback, object State, List<Dictionary<string, string>> Records,
 			Field[] Headers, IqResultEventArgs e)
 		{
 			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), Headers, e)
@@ -334,7 +318,7 @@ namespace Waher.Networking.XMPP.Search
 				}
 				catch (Exception ex)
 				{
-					this.client.Exception(ex);
+					await this.client.Exception(ex);
 				}
 			}
 		}
@@ -342,7 +326,7 @@ namespace Waher.Networking.XMPP.Search
 		private Task FormSearchResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
+			EventHandlerAsync<SearchResultEventArgs> Callback = (EventHandlerAsync<SearchResultEventArgs>)P[0];
 			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
 			List<Field> Headers = new List<Field>();
@@ -423,11 +407,11 @@ namespace Waher.Networking.XMPP.Search
 		/// Performs a synchronous search request
 		/// </summary>
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
-		public Task<SearchResultEventArgs> SearchAsync()
+		public async Task<SearchResultEventArgs> SearchAsync()
 		{
 			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
 
-			this.SendSearchRequest((sender, e) =>
+			await this.SendSearchRequest((sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e);
@@ -437,7 +421,7 @@ namespace Waher.Networking.XMPP.Search
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 	}

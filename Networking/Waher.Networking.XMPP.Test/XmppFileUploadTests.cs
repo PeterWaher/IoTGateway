@@ -116,9 +116,13 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
-			this.client1?.Dispose();
+			if (this.client1 is not null)
+			{
+				await this.client1.DisposeAsync();
+				this.client1 = null;
+			}
 
 			if (this.ex1 is not null)
 				throw new TargetInvocationException(this.ex1);
@@ -137,6 +141,8 @@ namespace Waher.Networking.XMPP.Test
 					Done.Set();
 				else
 					Error.Set();
+
+				return Task.CompletedTask;
 			});
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }), 5000);

@@ -5,6 +5,7 @@ using System.Text;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Script.Units;
+using Waher.Security;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 
@@ -170,13 +171,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ChannelId">Channel ID, or 0 if none.</param>
 		/// <param name="SamplingMode">Sampling mode.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, ushort ChannelId,
-			SamplingMode SamplingMode, double TimeoutSeconds)
+			SamplingMode SamplingMode, double TimeoutSeconds, StringBuilder SnifferOutput)
 		{
 			using (MemoryStream ms = new MemoryStream())
 			{
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
+				ms.Write(AppId, 0, 16);
 				ms.Write(NcapId ?? EmptyUuid, 0, 16);
 				ms.Write(TimId ?? EmptyUuid, 0, 16);
 				ms.WriteByte((byte)(ChannelId >> 8));
@@ -189,9 +193,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Array.Reverse(Bin);
 				ms.Write(Bin, 0, 8);
 
-				return Ieee1451Parser.SerializeMessage(
+				byte[] Result = Ieee1451Parser.SerializeMessage(
 					TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM,
-					MessageType.Command, ms.ToArray());
+					MessageType.Command, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId ?? EmptyUuid));
+					SnifferOutput.Append("TIM ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(TimId ?? EmptyUuid));
+					SnifferOutput.Append("Channel ID: ");
+					SnifferOutput.AppendLine(ChannelId.ToString());
+					SnifferOutput.Append("Sampling Mode: ");
+					SnifferOutput.AppendLine(SamplingMode.ToString());
+					SnifferOutput.Append("Timeout (s): ");
+					SnifferOutput.AppendLine(TimeoutSeconds.ToString());
+				}
+
+				return Result;
 			}
 		}
 
@@ -204,9 +226,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ChannelId">Channel ID, or 0 if none.</param>
 		/// <param name="Value">String-representation of value.</param>
 		/// <param name="Timestamp">Timestamp of value.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId, byte[] TimId, ushort ChannelId,
-			string Value, DateTime Timestamp)
+			string Value, DateTime Timestamp, StringBuilder SnifferOutput)
 		{
 			if (NcapId is null)
 				NcapId = new byte[16];
@@ -220,11 +243,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			using (MemoryStream ms = new MemoryStream())
 			{
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
 				ms.WriteByte((byte)(ErrorCode >> 8));
 				ms.WriteByte((byte)ErrorCode);
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
-				ms.Write(TimId, 0, 16); // TIM ID
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
+				ms.Write(TimId, 0, 16);
 				ms.WriteByte((byte)(ChannelId >> 8));
 				ms.WriteByte((byte)ChannelId);
 
@@ -245,9 +270,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ms.WriteByte((byte)(Time.NanoSeconds >> 8));
 				ms.WriteByte((byte)Time.NanoSeconds);
 
-				return Ieee1451Parser.SerializeMessage(
+				byte[] Result = Ieee1451Parser.SerializeMessage(
 					TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM,
-					MessageType.Reply, ms.ToArray());
+					MessageType.Reply, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+					SnifferOutput.Append("TIM ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(TimId));
+					SnifferOutput.Append("Channel ID: ");
+					SnifferOutput.AppendLine(ChannelId.ToString());
+					SnifferOutput.Append("Value: ");
+					SnifferOutput.AppendLine(Value);
+					SnifferOutput.Append("Timestamp: ");
+					SnifferOutput.AppendLine(Timestamp.ToString());
+				}
+
+				return Result;
 			}
 		}
 	}

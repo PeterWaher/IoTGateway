@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence;
@@ -217,7 +218,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					Tag = ListBox
 				});
 
-				Button.Click += GetListButton_Click;
+				Button.Click += this.GetListButton_Click;
 			}
 
 			Details.Children.Add(TextBlock = new TextBlock()
@@ -233,7 +234,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "Yes"
 			});
 
-			Button.Click += YesButton_Click;
+			Button.Click += this.YesButton_Click;
 
 			Details.Children.Add(Button = new Button()
 			{
@@ -241,7 +242,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "No"
 			});
 
-			Button.Click += NoButton_Click;
+			Button.Click += this.NoButton_Click;
 
 			string s = this.RemoteJID;
 			int i = s.IndexOf('@');
@@ -255,7 +256,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					Content = "Yes, to anyone from " + s
 				});
 
-				Button.Click += YesDomainButton_Click;
+				Button.Click += this.YesDomainButton_Click;
 
 				Details.Children.Add(Button = new Button()
 				{
@@ -263,7 +264,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					Content = "No, to no one from " + s
 				});
 
-				Button.Click += NoDomainButton_Click;
+				Button.Click += this.NoDomainButton_Click;
 			}
 
 			Details.Children.Add(Button = new Button()
@@ -272,7 +273,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "Yes, to anyone"
 			});
 
-			Button.Click += YesAllButton_Click;
+			Button.Click += this.YesAllButton_Click;
 
 			Details.Children.Add(Button = new Button()
 			{
@@ -280,7 +281,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "No, to no one"
 			});
 
-			Button.Click += NoAllButton_Click;
+			Button.Click += this.NoAllButton_Click;
 
 			this.AddTokens(Details, this.client, this.YesTokenButton_Click, this.NoTokenButton_Click);
 		}
@@ -337,27 +338,34 @@ namespace Waher.Client.WPF.Controls.Questions
 			}
 		}
 
-		private void GetListButton_Click(object sender, RoutedEventArgs e)
+		private async void GetListButton_Click(object sender, RoutedEventArgs e)
 		{
-			XmppClient Client = this.client.Client;
-
-			((Button)sender).IsEnabled = false;
-
-			RosterItem Item = Client[this.JID];
-			if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+			try
 			{
-				if (!this.registered)
-				{
-					this.registered = true;
-					this.questionView.Owner.RegisterRosterEventHandler(this.JID, this.RosterItemUpdated);
-				}
+				XmppClient Client = this.client.Client;
 
-				Client.RequestPresenceSubscription(this.JID);
+				((Button)sender).IsEnabled = false;
+
+				RosterItem Item = Client[this.JID];
+				if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+				{
+					if (!this.registered)
+					{
+						this.registered = true;
+						this.questionView.Owner.RegisterRosterEventHandler(this.JID, this.RosterItemUpdated);
+					}
+
+					await Client.RequestPresenceSubscription(this.JID);
+				}
+				else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
+					await Client.RequestPresenceSubscription(this.JID);
+				else
+					await this.DoRequest(Item);
 			}
-			else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
-				Client.RequestPresenceSubscription(this.JID);
-			else
-				this.DoRequest(Item);
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		public override void Dispose()
@@ -371,31 +379,29 @@ namespace Waher.Client.WPF.Controls.Questions
 			base.Dispose();
 		}
 
-		private Task RosterItemUpdated(object Sender, RosterItem Item)
+		private async Task RosterItemUpdated(object Sender, RosterItem Item)
 		{
 			if ((Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To) && Item.HasLastPresence && Item.LastPresence.IsOnline)
 			{
 				this.questionView.Owner.UnregisterRosterEventHandler(this.JID, this.RosterItemUpdated);
-				this.DoRequest(Item);
+				await this.DoRequest(Item);
 			}
-
-			return Task.CompletedTask;
 		}
 
-		private void DoRequest(RosterItem Item)
+		private async Task DoRequest(RosterItem Item)
 		{
 			SensorDataClientRequest Request;
 
 			this.fieldsSorted = new SortedDictionary<string, bool>();
 
 			if (this.IsNode)
-				Request = this.questionView.Owner.SensorClient.RequestReadout(Item.LastPresenceFullJid,
+				Request = await this.questionView.Owner.SensorClient.RequestReadout(Item.LastPresenceFullJid,
 					new ThingReference[] { this.GetNodeReference() }, FieldType.All);
 			else
-				Request = this.questionView.Owner.SensorClient.RequestReadout(Item.LastPresenceFullJid, FieldType.All);
+				Request = await this.questionView.Owner.SensorClient.RequestReadout(Item.LastPresenceFullJid, FieldType.All);
 
-			Request.OnStateChanged += Request_OnStateChanged;
-			Request.OnFieldsReceived += Request_OnFieldsReceived;
+			Request.OnStateChanged += this.Request_OnStateChanged;
+			Request.OnFieldsReceived += this.Request_OnFieldsReceived;
 		}
 
 		private async Task Request_OnStateChanged(object Sender, SensorDataReadoutState NewState)

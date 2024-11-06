@@ -29,10 +29,13 @@ namespace Waher.Networking.MQTT.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
-			this.client?.Dispose();
-			this.client = null;
+			if (this.client is not null)
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 		}
 
 		[TestMethod]

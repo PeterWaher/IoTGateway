@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Xml;
+using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.PubSub
+namespace Waher.Networking.XMPP.PubSub.Events
 {
-	/// <summary>
-	/// Delegate for item event notificaction event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task ItemNotificationEventHandler(object Sender, ItemNotificationEventArgs e);
-
 	/// <summary>
 	/// Event argument for item notification events.
 	/// </summary>

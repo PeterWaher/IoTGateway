@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -110,11 +111,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Executes the command.
 		/// </summary>
-		public Task ExecuteCommandAsync()
+		public async Task ExecuteCommandAsync()
 		{
-			byte[] Request = DiscoveryMessage.SerializeRequest();
-			MqttBroker Broker = this.brokerNode.GetBroker();
-			return Broker.Publish(this.Topic, MqttQualityOfService.AtLeastOnce, false, Request);
+			StringBuilder ToSniffer = this.brokerNode.HasSniffers ? new StringBuilder() : null;
+			byte[] Request = DiscoveryMessage.SerializeRequest(ToSniffer);
+			MqttBroker Broker = await this.brokerNode.GetBroker();
+
+			if (!(ToSniffer is null))
+				await this.brokerNode.Information(ToSniffer.ToString());
+
+			await Broker.Publish(this.Topic, MqttQualityOfService.AtLeastOnce, false, Request);
 		}
 	}
 }

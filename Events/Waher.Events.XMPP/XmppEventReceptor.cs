@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Networking;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Events.XMPP
 {
@@ -88,28 +90,19 @@ namespace Waher.Events.XMPP
 				Facility = e.FromBareJID;
 
 			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
-			EventEventHandlerAsync h = this.OnEvent;
+			EventHandlerAsync<EventEventArgs> h = this.OnEvent;
 
 			if (h is null)
 				Log.Event(Event);
 			else
-			{
-				try
-				{
-					await h(this, new EventEventArgs(e, Event));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+				await h.Raise(this, new EventEventArgs(e, Event));
 		}
 
 		/// <summary>
 		/// Event raised whenever an event has been received. If no event handler is defined, the default action is to log the event
 		/// to <see cref="Log"/>.
 		/// </summary>
-		public event EventEventHandlerAsync OnEvent = null;
+		public event EventHandlerAsync<EventEventArgs> OnEvent = null;
 
 		/// <summary>
 		/// Tries to parse a simple value.
@@ -313,7 +306,7 @@ namespace Waher.Events.XMPP
 				Type = "xs:anyURI";
 			else
 				Type = null;
-			
+
 			return !(Type is null);
 		}
 

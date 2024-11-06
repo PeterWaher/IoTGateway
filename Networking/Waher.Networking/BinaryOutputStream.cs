@@ -54,7 +54,7 @@ namespace Waher.Networking
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Packet, EventHandler Callback)
+		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync Callback)
 		{
 			return this.SendAsync(Packet, 0, Packet.Length, Callback);
 		}
@@ -79,7 +79,7 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandler Callback)
+		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
 		{
 			await this.output.WriteAsync(Buffer, Offset, Count);
 
@@ -87,7 +87,7 @@ namespace Waher.Networking
 			{
 				try
 				{
-					Callback(this, EventArgs.Empty);
+					await Callback(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

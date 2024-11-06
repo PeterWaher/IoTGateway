@@ -60,11 +60,11 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 			{
 				if (b)
 				{
-					Database.CollectionCleared += Database_CollectionCleared;
-					Database.CollectionRepaired += Database_CollectionRepaired;
-					Database.ObjectDeleted += Database_ObjectDeleted;
-					Database.ObjectInserted += Database_ObjectInserted;
-					Database.ObjectUpdated += Database_ObjectUpdated;
+					Database.CollectionCleared += this.Database_CollectionCleared;
+					Database.CollectionRepaired += this.Database_CollectionRepaired;
+					Database.ObjectDeleted += this.Database_ObjectDeleted;
+					Database.ObjectInserted += this.Database_ObjectInserted;
+					Database.ObjectUpdated += this.Database_ObjectUpdated;
 
 					Search.ObjectAddedToIndex += this.Search_ObjectAddedToIndex;
 					Search.ObjectUpdatedInIndex += this.Search_ObjectUpdatedInIndex;
@@ -72,11 +72,11 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 				}
 				else
 				{
-					Database.CollectionCleared -= Database_CollectionCleared;
-					Database.CollectionRepaired -= Database_CollectionRepaired;
-					Database.ObjectDeleted -= Database_ObjectDeleted;
-					Database.ObjectInserted -= Database_ObjectInserted;
-					Database.ObjectUpdated -= Database_ObjectUpdated;
+					Database.CollectionCleared -= this.Database_CollectionCleared;
+					Database.CollectionRepaired -= this.Database_CollectionRepaired;
+					Database.ObjectDeleted -= this.Database_ObjectDeleted;
+					Database.ObjectInserted -= this.Database_ObjectInserted;
+					Database.ObjectUpdated -= this.Database_ObjectUpdated;
 
 					Search.ObjectAddedToIndex -= this.Search_ObjectAddedToIndex;
 					Search.ObjectUpdatedInIndex -= this.Search_ObjectUpdatedInIndex;
@@ -107,11 +107,11 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				this.TransmitText(await GetJSON(e.Object));
+				await this.TransmitText(await GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
-				this.TransmitText("Object of type " + e.Object.GetType().FullName + " inserted.");
+				await this.TransmitText("Object of type " + e.Object.GetType().FullName + " inserted.");
 			}
 		}
 
@@ -119,11 +119,11 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				this.ReceiveText(await GetJSON(e.Object));
+				await this.ReceiveText(await GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
-				this.ReceiveText("Object of type " + e.Object.GetType().FullName + " updated.");
+				await this.ReceiveText("Object of type " + e.Object.GetType().FullName + " updated.");
 			}
 		}
 
@@ -131,19 +131,19 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				this.Error(await GetJSON(e.Object));
+				await this.Error(await GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
-				this.Error("Object of type " + e.Object.GetType().FullName + " deleted.");
+				await this.Error("Object of type " + e.Object.GetType().FullName + " deleted.");
 			}
 		}
 
-		private async void Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
+		private async Task Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
 		{
 			try
 			{
-				this.Warning("Collection has been repaired: " + e.Collection);
+				await this.Warning("Collection has been repaired: " + e.Collection);
 
 				if (!(e.Flagged is null))
 				{
@@ -159,26 +159,22 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 
 		private Task Database_CollectionCleared(object Sender, CollectionEventArgs e)
 		{
-			this.Information("Collection has been cleared: " + e.Collection);
-			return Task.CompletedTask;
+			return this.Information("Collection has been cleared: " + e.Collection);
 		}
 
 		private Task Search_ObjectAddedToIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			this.Information("Object added to full-text-search index: " + e.Reference.IndexCollection);
-			return Task.CompletedTask;
+			return this.Information("Object added to full-text-search index: " + e.Reference.IndexCollection);
 		}
 
 		private Task Search_ObjectUpdatedInIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			this.Information("Object updated in full-text-search index: " + e.Reference.IndexCollection);
-			return Task.CompletedTask;
+			return this.Information("Object updated in full-text-search index: " + e.Reference.IndexCollection);
 		}
 
 		private Task Search_ObjectRemovedFromIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			this.Information("Object removed from full-text-search index: " + e.Reference.IndexCollection);
-			return Task.CompletedTask;
+			return this.Information("Object removed from full-text-search index: " + e.Reference.IndexCollection);
 		}
 	}
 }

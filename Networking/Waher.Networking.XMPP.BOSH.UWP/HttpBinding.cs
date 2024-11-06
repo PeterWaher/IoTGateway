@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// </summary>
 		public const string BoshNamespace = "urn:xmpp:xbosh";
 
-		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+		private LinkedList<KeyValuePair<string, EventHandlerAsync>> outputQueue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
 		private readonly LinkedList<string> keys = new LinkedList<string>();
 		private HttpClient[] httpClients;
 		private XmppBindingInterface bindingInterface;
@@ -268,8 +268,8 @@ namespace Waher.Networking.XMPP.BOSH
 
 				if (this.xmppClient.HasSniffers)
 				{
-					this.xmppClient.Information("Initiating session.");
-					this.xmppClient.TransmitText(s);
+					await this.xmppClient.Information("Initiating session.");
+					await this.xmppClient.TransmitText(s);
 				}
 
 				HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, XmlCodec.DefaultContentType);
@@ -297,7 +297,7 @@ namespace Waher.Networking.XMPP.BOSH
 				string XmlResponse = Encoding.GetString(Bin);
 
 				if (this.xmppClient.HasSniffers)
-					this.xmppClient.ReceiveText(XmlResponse);
+					await this.xmppClient.ReceiveText(XmlResponse);
 
 				ResponseXml = new XmlDocument()
 				{
@@ -494,14 +494,14 @@ namespace Waher.Networking.XMPP.BOSH
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandler DeliveryCallback)
+		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync DeliveryCallback)
 		{
 			if (this.terminated)
 				return false;
 
 			try
 			{
-				LinkedList<KeyValuePair<string, EventHandler>> Queued = null;
+				LinkedList<KeyValuePair<string, EventHandlerAsync>> Queued = null;
 				StringBuilder Xml;
 				long Rid;
 				int ClientIndex = -1;
@@ -533,12 +533,12 @@ namespace Waher.Networking.XMPP.BOSH
 								if (!string.IsNullOrEmpty(Packet))
 								{
 									this.xmppClient?.Information("Outbound stanza queued.");
-									this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
+									this.outputQueue.AddLast(new KeyValuePair<string, EventHandlerAsync>(Packet, DeliveryCallback));
 								}
 
 								if (!(Queued is null))
 								{
-									LinkedListNode<KeyValuePair<string, EventHandler>> Loop = Queued.Last;
+									LinkedListNode<KeyValuePair<string, EventHandlerAsync>> Loop = Queued.Last;
 
 									while (!(Loop is null))
 									{
@@ -555,7 +555,7 @@ namespace Waher.Networking.XMPP.BOSH
 							if (!(this.outputQueue.First is null))
 							{
 								Queued = this.outputQueue;
-								this.outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+								this.outputQueue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
 							}
 						}
 
@@ -598,7 +598,7 @@ namespace Waher.Networking.XMPP.BOSH
 
 					if (!(Queued is null))
 					{
-						foreach (KeyValuePair<string, EventHandler> P in Queued)
+						foreach (KeyValuePair<string, EventHandlerAsync> P in Queued)
 						{
 							await this.RaiseOnSent(P.Key);
 							Xml.Append(P.Key);
@@ -607,7 +607,7 @@ namespace Waher.Networking.XMPP.BOSH
 							{
 								try
 								{
-									P.Value(this, EventArgs.Empty);
+									await P.Value(this, EventArgs.Empty);
 								}
 								catch (Exception ex)
 								{
@@ -626,7 +626,7 @@ namespace Waher.Networking.XMPP.BOSH
 						{
 							try
 							{
-								DeliveryCallback(this.xmppClient, EventArgs.Empty);
+								await DeliveryCallback(this.xmppClient, EventArgs.Empty);
 							}
 							catch (Exception ex)
 							{
@@ -662,7 +662,7 @@ namespace Waher.Networking.XMPP.BOSH
 						if (!(this.outputQueue.First is null))
 						{
 							Queued = this.outputQueue;
-							this.outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+							this.outputQueue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
 						}
 						else
 						{
@@ -700,7 +700,7 @@ namespace Waher.Networking.XMPP.BOSH
 					string XmlResponse = Encoding.GetString(Bin).Trim();
 
 					if (this.xmppClient.HasSniffers)
-						this.xmppClient.ReceiveText(XmlResponse);
+						await this.xmppClient.ReceiveText(XmlResponse);
 
 					await this.BodyReceived(XmlResponse, false);
 				}

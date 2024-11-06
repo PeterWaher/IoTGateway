@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 using Waher.Things;
 
 namespace Waher.Networking.XMPP.Control
@@ -11,9 +8,9 @@ namespace Waher.Networking.XMPP.Control
 	/// </summary>
 	public class SetResultEventArgs : IqResultEventArgs
 	{
-		private bool performed;
-		private ThingReference[] nodes;
-		private string[] parameterNames;
+		private readonly bool performed;
+		private readonly ThingReference[] nodes;
+		private readonly string[] parameterNames;
 
 		internal SetResultEventArgs(IqResultEventArgs e, bool Performed, ThingReference[] Nodes, string[] ParameterNames, object State)
 			: base(e)
@@ -40,6 +37,5 @@ namespace Waher.Networking.XMPP.Control
 		/// was performed. If this array is null, all parameters were set.
 		/// </summary>
 		public string[] ParameterNames => this.parameterNames;
-
 	}
 }

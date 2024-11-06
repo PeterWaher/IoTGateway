@@ -108,27 +108,26 @@ namespace Waher.Networking
 #endif
 		}
 
-#if WINDOWS_UWP
-		private void NetworkChange_NetworkAddressChanged(object sender)
+		private async void NetworkChange_NetworkAddressChanged(object sender
+#if !WINDOWS_UWP
+			, EventArgs e
+#endif
+			)
 		{
-			Task _ = this.NetworkChanged();
+			try
+			{
+				await this.NetworkChanged();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		/// <summary>
 		/// Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
 		/// </summary>
 		public async Task NetworkChanged()
-#else
-		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
-		{
-			this.NetworkChanged();
-		}
-
-		/// <summary>
-		/// Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
-		/// </summary>
-		public void NetworkChanged()
-#endif
 		{
 			try
 			{
@@ -144,12 +143,14 @@ namespace Waher.Networking
 				LinkedList<TcpListener> Listeners = this.listeners;
 				this.listeners = new LinkedList<TcpListener>();
 
-				this.Open(Listeners);
+				await this.Open(Listeners);
 
 				foreach (TcpListener L in Listeners)
 					L.Stop();
 #endif
-				this.OnNetworkChanged?.Invoke(this, EventArgs.Empty);
+				EventHandlerAsync h = this.OnNetworkChanged;
+				if (!(h is null))
+					await h(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -160,7 +161,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when the network has been changed.
 		/// </summary>
-		public event EventHandler OnNetworkChanged = null;
+		public event EventHandlerAsync OnNetworkChanged = null;
 
 #if WINDOWS_UWP
 		/// <summary>
@@ -477,13 +478,35 @@ namespace Waher.Networking
 
 				if (this.AcceptConnection(Connection).Result)
 				{
-					this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+					Task.Run(async () =>
+					{
+						try
+						{
+							await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+							await this.Added(Connection);
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					});
+
 					BinaryTcpClient.Continue();
-					Task.Run(() => this.Added(Connection));
 				}
 				else
 				{
-					this.Warning("Connection rejected from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+					Task.Run(async () =>
+					{
+						try
+						{
+							await this.Warning("Connection rejected from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					});
+
 					Connection.Client.Dispose();
 				}
 			}
@@ -543,7 +566,7 @@ namespace Waher.Networking
 
 							if (await this.AcceptConnection(Connection))
 							{
-								this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+								await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 								if (this.tls)
 								{
@@ -557,7 +580,7 @@ namespace Waher.Networking
 							}
 							else
 							{
-								this.Warning("Connection rejected from " + Client.Client.RemoteEndPoint.ToString() + ".");
+								await this.Warning("Connection rejected from " + Client.Client.RemoteEndPoint.ToString() + ".");
 								Connection.Client.Dispose();
 							}
 						}
@@ -610,14 +633,14 @@ namespace Waher.Networking
 		{
 			try
 			{
-				this.Information("Switching to TLS.");
+				await this.Information("Switching to TLS.");
 
 				await Connection.Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
 					this.clientCertificates, null, this.trustClientCertificates);
 
 				if (this.HasSniffers)
 				{
-					this.Information("TLS established" +
+					await this.Information("TLS established" +
 						". Cipher Strength: " + Connection.Client.CipherStrength.ToString() +
 						", Hash Strength: " + Connection.Client.HashStrength.ToString() +
 						", Key Exchange Strength: " + Connection.Client.KeyExchangeStrength.ToString());
@@ -639,7 +662,7 @@ namespace Waher.Networking
 							sb.Append(", Hash: ");
 							sb.Append(Convert.ToBase64String(Connection.Client.RemoteCertificate.GetCertHash()));
 
-							this.Information(sb.ToString());
+							await this.Information(sb.ToString());
 						}
 					}
 				}
@@ -721,7 +744,7 @@ namespace Waher.Networking
 		/// </summary>
 		public event EventHandlerAsync<ServerConnectionEventArgs> OnClientConnected;
 
-		private async void Connections_Removed(object Sender, CacheItemEventArgs<Guid, ServerTcpConnection> e)
+		private async Task Connections_Removed(object Sender, CacheItemEventArgs<Guid, ServerTcpConnection> e)
 		{
 			try
 			{
@@ -758,7 +781,7 @@ namespace Waher.Networking
 			}
 
 			if (this.HasSniffers)
-				this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
 			EventHandlerAsync<ServerConnectionDataEventArgs> h = this.OnDataReceived;
 			if (!(h is null))
@@ -779,14 +802,14 @@ namespace Waher.Networking
 		/// </summary>
 		public event EventHandlerAsync<ServerConnectionDataEventArgs> OnDataReceived;
 
-		internal void DataSent(byte[] Data)
+		internal Task DataSent(byte[] Data)
 		{
 			lock (this.synchObj)
 			{
 				this.nrBytesTx += Data.Length;
 			}
 
-			this.TransmitBinary(Data);
+			return this.TransmitBinary(Data);
 		}
 
 		/// <summary>

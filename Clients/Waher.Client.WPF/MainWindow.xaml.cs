@@ -40,6 +40,7 @@ using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Model.Muc;
 using Waher.Runtime.Settings;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Client.WPF
 {
@@ -1021,23 +1022,30 @@ namespace Waher.Client.WPF
 			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
 		}
 
-		private void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			if (Node is null || !Node.CanReadSensorData)
-				return;
+			try
+			{
+				TreeNode Node = this.SelectedNode;
+				if (Node is null || !Node.CanReadSensorData)
+					return;
 
-			SensorDataClientRequest Request = Node.StartSensorDataMomentaryReadout();
-			if (Request is null)
-				return;
+				SensorDataClientRequest Request = await Node.StartSensorDataMomentaryReadout();
+				if (Request is null)
+					return;
 
-			TabItem TabItem = NewTab(Node.Header);
-			this.Tabs.Items.Add(TabItem);
+				TabItem TabItem = NewTab(Node.Header);
+				this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node, false);
-			TabItem.Content = View;
+				SensorDataView View = new SensorDataView(Request, Node, false);
+				TabItem.Content = View;
 
-			this.Tabs.SelectedItem = TabItem;
+				this.Tabs.SelectedItem = TabItem;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private void ReadDetailed_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -1046,23 +1054,30 @@ namespace Waher.Client.WPF
 			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
 		}
 
-		private void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			if (Node is null || !Node.CanReadSensorData)
-				return;
+			try
+			{
+				TreeNode Node = this.SelectedNode;
+				if (Node is null || !Node.CanReadSensorData)
+					return;
 
-			SensorDataClientRequest Request = Node.StartSensorDataFullReadout();
-			if (Request is null)
-				return;
+				SensorDataClientRequest Request = await Node.StartSensorDataFullReadout();
+				if (Request is null)
+					return;
 
-			TabItem TabItem = NewTab(Node.Header);
-			this.Tabs.Items.Add(TabItem);
+				TabItem TabItem = NewTab(Node.Header);
+				this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node, false);
-			TabItem.Content = View;
+				SensorDataView View = new SensorDataView(Request, Node, false);
+				TabItem.Content = View;
 
-			this.Tabs.SelectedItem = TabItem;
+				this.Tabs.SelectedItem = TabItem;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private void SubscribeToMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -1071,29 +1086,36 @@ namespace Waher.Client.WPF
 			e.CanExecute = (!(Node is null) && Node.CanSubscribeToSensorData);
 		}
 
-		private void SubscribeToMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void SubscribeToMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			if (Node is null || !Node.CanSubscribeToSensorData)
-				return;
+			try
+			{
+				TreeNode Node = this.SelectedNode;
+				if (Node is null || !Node.CanSubscribeToSensorData)
+					return;
 
-			SensorDataClientRequest Request;
+				SensorDataClientRequest Request;
 
-			if (Node.CanReadSensorData)
-				Request = Node.StartSensorDataMomentaryReadout();
-			else
-				Request = Node.SubscribeSensorDataMomentaryReadout(new FieldSubscriptionRule[0]);
+				if (Node.CanReadSensorData)
+					Request = await Node.StartSensorDataMomentaryReadout();
+				else
+					Request = await Node.SubscribeSensorDataMomentaryReadout(new FieldSubscriptionRule[0]);
 
-			if (Request is null)
-				return;
+				if (Request is null)
+					return;
 
-			TabItem TabItem = NewTab(Node.Header);
-			this.Tabs.Items.Add(TabItem);
+				TabItem TabItem = NewTab(Node.Header);
+				this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node, true);
-			TabItem.Content = View;
+				SensorDataView View = new SensorDataView(Request, Node, true);
+				TabItem.Content = View;
 
-			this.Tabs.SelectedItem = TabItem;
+				this.Tabs.SelectedItem = TabItem;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private void Configure_CanExecute(object sender, CanExecuteRoutedEventArgs e)

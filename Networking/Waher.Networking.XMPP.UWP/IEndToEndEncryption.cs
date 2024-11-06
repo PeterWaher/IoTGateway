@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP
 {
@@ -52,7 +53,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Data">Data to encrypt.</param>
 		/// <param name="EndpointReference">Endpoint used for encryption.</param>
 		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
-		byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference);
+		Task<byte[]> Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference);
 
 		/// <summary>
 		/// Decrypts binary data received from an XMPP client out of band.
@@ -65,7 +66,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Data">Data to decrypt.</param>
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
 		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
-		byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
+		Task<byte[]> Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
 			IE2eSymmetricCipher SymmetricCipher);
 
 		/// <summary>
@@ -105,22 +106,21 @@ namespace Waher.Networking.XMPP
 		/// <param name="DataXml">Data to encrypt.</param>
 		/// <param name="Xml">XML containing the encrypted data will be output here.</param>
 		/// <returns>If encryption was possible to the recipient, or not.</returns>
-		bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
+		Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
 
-        /// <summary>
-        /// Decrypts data from XML that has been received over XMPP.
-        /// </summary>
-        /// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
-        /// <param name="Id">ID Attribute.</param>
-        /// <param name="Type">Type Attribute.</param>
-        /// <param name="From">From attribute.</param>
-        /// <param name="To">To attribute.</param>
-        /// <param name="E2eElement">XML element containing the encrypted data.</param>
-        /// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
-        /// <param name="EndpointReference">Endpoint reference</param>
-        /// <returns>Decrypted data.</returns>
-        string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
-            IE2eSymmetricCipher SymmetricCipher, out string EndpointReference);
+		/// <summary>
+		/// Decrypts data from XML that has been received over XMPP.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="Id">ID Attribute.</param>
+		/// <param name="Type">Type Attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="E2eElement">XML element containing the encrypted data.</param>
+		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
+		/// <returns>Decrypted XML, together with an endpoint reference, if successful, null otherwise..</returns>
+		Task<Tuple<string, string>> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
+            IE2eSymmetricCipher SymmetricCipher);
 
 		/// <summary>
 		/// Sends an end-to-end encrypted message, if possible. If recipient does not support end-to-end
@@ -141,9 +141,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		void SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS, MessageType Type, 
+		Task SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS, MessageType Type, 
 			string Id, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
-			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State);
+			string ParentThreadId, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State);
 
 		/// <summary>
 		/// Sends an IQ Get request.
@@ -156,8 +156,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>ID of IQ stanza</returns>
-		uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandlerAsync Callback, object State);
+		Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State);
 
 		/// <summary>
 		/// Sends an IQ Get request.
@@ -172,8 +172,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza</returns>
-		uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries);
+		Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries);
 
 		/// <summary>
 		/// Sends an IQ Get request.
@@ -191,8 +191,8 @@ namespace Waher.Networking.XMPP
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
-		uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
+		Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
 			int MaxRetryTimeout);
 
 		/// <summary>
@@ -206,8 +206,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>ID of IQ stanza</returns>
-		uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandlerAsync Callback, object State);
+		Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State);
 
 		/// <summary>
 		/// Sends an IQ Set request.
@@ -222,8 +222,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza</returns>
-		uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries);
+		Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries);
 
 		/// <summary>
 		/// Sends an IQ Set request.
@@ -241,8 +241,8 @@ namespace Waher.Networking.XMPP
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
-		uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
+		Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, 
 			int MaxRetryTimeout);
 
 		/// <summary>
@@ -254,7 +254,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Id">ID attribute of original IQ request.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="Xml">XML to embed into the response.</param>
-		void SendIqResult(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml);
+		Task SendIqResult(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml);
 
 		/// <summary>
 		/// Returns an error response to an IQ Get/Set request.
@@ -265,7 +265,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Id">ID attribute of original IQ request.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="Xml">XML to embed into the response.</param>
-		void SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml);
+		Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml);
 
 		/// <summary>
 		/// Returns an error response to an IQ Get/Set request.
@@ -276,7 +276,6 @@ namespace Waher.Networking.XMPP
 		/// <param name="Id">ID attribute of original IQ request.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="ex">Internal exception object.</param>
-		void SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, Exception ex);
-
+		Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, Exception ex);
 	}
 }

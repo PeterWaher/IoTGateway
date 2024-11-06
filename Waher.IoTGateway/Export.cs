@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Networking;
 using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway
@@ -165,13 +166,17 @@ namespace Waher.IoTGateway
 				if (!(BackupConfiguration.Instance is null))
 					await BackupConfiguration.Instance.UpdateExportFolder(await GetFullExportFolderAsync());
 
-				try
+				EventHandlerAsync h = OnExportFolderUpdated;
+				if (!(h is null))
 				{
-					OnExportFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
+					try
+					{
+						await h(BackupConfiguration.Instance, EventArgs.Empty);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
 				}
 			}
 		}
@@ -181,7 +186,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when the export folder has been updated.
 		/// </summary>
-		public static event EventHandler OnExportFolderUpdated;
+		public static event EventHandlerAsync OnExportFolderUpdated;
 
 		/// <summary>
 		/// Key folder
@@ -207,13 +212,17 @@ namespace Waher.IoTGateway
 
 				BackupConfiguration.Instance?.UpdateExportKeyFolder(await GetFullKeyExportFolderAsync());
 
-				try
+				EventHandlerAsync h = OnExportKeyFolderUpdated;
+				if (!(h is null))
 				{
-					OnExportKeyFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
+					try
+					{
+						await h(BackupConfiguration.Instance, EventArgs.Empty);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
 				}
 			}
 		}
@@ -223,7 +232,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when the export key folder has been updated.
 		/// </summary>
-		public static event EventHandler OnExportKeyFolderUpdated;
+		public static event EventHandlerAsync OnExportKeyFolderUpdated;
 
 		/// <summary>
 		/// If the database should be exported.

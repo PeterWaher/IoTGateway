@@ -174,7 +174,7 @@ namespace Waher.Runtime.Queue
 			}
 
 			this.RaiseDisposed();
-			
+
 			return Task.FromResult(Record.Value);
 		}
 
@@ -310,7 +310,10 @@ namespace Waher.Runtime.Queue
 
 			try
 			{
-				this.Disposed?.Invoke(this, EventArgs.Empty);
+				EventHandler h = this.Disposed;
+
+				if (!(h is null))
+					h(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{

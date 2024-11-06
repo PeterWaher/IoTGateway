@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
@@ -9,7 +8,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void RemoteEndpointEventHandler(object Sender, RemoteEndpointEventArgs e);
+	public delegate Task RemoteEndpointEventHandler(object Sender, RemoteEndpointEventArgs e);
 
 	/// <summary>
 	/// Base class for event arguments with a remote endpoint attribute.

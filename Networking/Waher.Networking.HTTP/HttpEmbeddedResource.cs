@@ -163,9 +163,10 @@ namespace Waher.Networking.HTTP
 			return base.RemoveReference(Server);
 		}
 
-		private void Server_ETagSaltChanged(object sender, EventArgs e)
+		private Task Server_ETagSaltChanged(object sender, EventArgs e)
 		{
 			this.etag = null;
+			return Task.CompletedTask;
 		}
 	}
 }

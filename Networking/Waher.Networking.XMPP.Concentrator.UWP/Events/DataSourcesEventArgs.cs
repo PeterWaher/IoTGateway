@@ -1,14 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for data sources callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task DataSourcesEventHandler(object Sender, DataSourcesEventArgs e);
-
 	/// <summary>
 	/// Event arguments for data sources responses.
 	/// </summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
@@ -79,5 +80,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
                 Hashes.BinaryToString(this.Identity, true), FieldType.Identity, 
                 FieldQoS.AutomaticReadout));
         }
-    }
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public override void AppendDetails(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.Append("UUID=");
+			SnifferOutput.AppendLine(Hashes.BinaryToString(this.Identity, true));
+		}
+	}
 }

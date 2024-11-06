@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Events;
 
@@ -229,9 +230,9 @@ namespace Waher.Networking.XMPP.RDP
 			this.SendMessage(Xml.ToString());
 		}
 
-		private void SendMessage(string Xml)
+		private Task SendMessage(string Xml)
 		{
-			this.client.E2E.SendMessage(this.client.Client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+			return this.client.E2E.SendMessage(this.client.Client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
 				string.Empty, this.remoteJid, Xml, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 

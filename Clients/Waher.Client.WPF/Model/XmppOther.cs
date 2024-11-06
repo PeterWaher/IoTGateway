@@ -37,17 +37,17 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override SensorDataClientRequest StartSensorDataFullReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			return this.DoReadout(Waher.Things.SensorData.FieldType.All);
 		}
 
-		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			return this.DoReadout(Waher.Things.SensorData.FieldType.Momentary);
 		}
 
-		private SensorDataClientRequest DoReadout(Waher.Things.SensorData.FieldType Types)
+		private async Task<SensorDataClientRequest> DoReadout(Waher.Things.SensorData.FieldType Types)
 		{
 			XmppClient Client = this.XmppAccountNode.Client;
 			string Id = Guid.NewGuid().ToString();
@@ -58,10 +58,10 @@ namespace Waher.Client.WPF.Model
 			CustomSensorDataClientRequest Request = new CustomSensorDataClientRequest(Id, string.Empty, string.Empty, null,
 				Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.Now, string.Empty, string.Empty, string.Empty);
 
-			Request.Accept(false);
-			Request.Started();
+			await Request.Accept(false);
+			await Request.Started();
 
-			Client.SendServiceDiscoveryRequest(Jid, (sender, e) =>
+			await Client.SendServiceDiscoveryRequest(Jid, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -157,16 +157,18 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override void Recycle(MainWindow Window)
+		public override Task Recycle(MainWindow Window)
 		{
 			if (!this.XmppAccountNode.IsOnline)
-				return;
+				return Task.CompletedTask;
 
 			RosterItem Item = this.XmppAccountNode.Client[this.BareJID];
 			if (Item is null || !Item.HasLastPresence || !Item.LastPresence.IsOnline)
-				return;
+				return Task.CompletedTask;
 
 			this.XmppAccountNode.CheckType(this, Item.LastPresenceFullJid);
+
+			return Task.CompletedTask;
 		}
 
 	}

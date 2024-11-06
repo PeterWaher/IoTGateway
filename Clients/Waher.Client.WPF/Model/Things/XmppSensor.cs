@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
@@ -27,36 +28,36 @@ namespace Waher.Client.WPF.Model.Things
 		public override bool CanReadSensorData => true;
 		public override bool CanSubscribeToSensorData => this.suportsEvents;
 
-		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public override async Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
-				return SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.Momentary);
+				return await SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.Momentary);
 			else
 				return null;
 		}
 
-		public override SensorDataClientRequest StartSensorDataFullReadout()
+		public override async Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
-				return SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
+				return await SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
 			else
 				throw new NotSupportedException();
 		}
 
-		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
+		public override async Task<SensorDataSubscriptionRequest> SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
-				return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
+				return await SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
 					Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 			}
 			else

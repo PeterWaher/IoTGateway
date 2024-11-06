@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 
@@ -12,7 +9,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ResynchEventHandler(object Sender, ResynchEventArgs e);
+	public delegate Task ResynchEventHandler(object Sender, ResynchEventArgs e);
 
 	/// <summary>
 	/// Peer connection event arguments.

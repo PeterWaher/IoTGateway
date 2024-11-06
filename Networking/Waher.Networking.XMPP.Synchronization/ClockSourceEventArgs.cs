@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Synchronization
 {
-	/// <summary>
-	/// Delegate for clock source callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event argument</param>
-	public delegate void ClockSourceEventHandler(object Sender, ClockSourceEventArgs e);
-
 	/// <summary>
 	/// Event arguments containing the response of a clock source request.
 	/// </summary>

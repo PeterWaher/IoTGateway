@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -57,7 +58,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Stanza_Test_04_Presence()
+		public async Task Stanza_Test_04_Presence()
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
@@ -77,23 +78,21 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Done2 = new(false);
 				ManualResetEvent Error2 = new(false);
 
-				this.client2.OnPresenceSubscribe += (sender, e) =>
+				this.client2.OnPresenceSubscribe += async (sender, e) =>
 				{
 					if (e.FromBareJID == this.client1.BareJID)
 					{
-						e.Accept();
+						await e.Accept();
 						Done2.Set();
 					}
 					else
 					{
-						e.Decline();
+						await e.Decline();
 						Error2.Set();
 					}
-
-					return Task.CompletedTask;
 				};
 
-				this.client1.RequestPresenceSubscription(this.client2.BareJID);
+				await this.client1.RequestPresenceSubscription(this.client2.BareJID);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
 			}
@@ -103,7 +102,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.CustomPresenceXml += this.AddCustomXml;
 			try
 			{
-				this.client2.SetPresence(Availability.Chat);
+				await this.client2.SetPresence(Availability.Chat);
 			}
 			finally
 			{
@@ -125,8 +124,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			this.client1.RegisterIqGetHandler("query", "test", (sender, e) =>
 			{
-				e.IqResult("<response xmlns='test'/>");
-				return Task.CompletedTask;
+				return e.IqResult("<response xmlns='test'/>");
 			}, true);
 
 			this.client2.IqGet(this.client1.FullJID, "<query xmlns='test'/>", 10000);
@@ -138,8 +136,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			this.client1.RegisterIqSetHandler("query", "test", (sender, e) =>
 			{
-				e.IqResult("<response xmlns='test'/>");
-				return Task.CompletedTask;
+				return e.IqResult("<response xmlns='test'/>");
 			}, true);
 
 			this.client2.IqSet(this.client1.FullJID, "<query xmlns='test'/>", 10000);

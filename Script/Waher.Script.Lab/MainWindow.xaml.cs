@@ -141,7 +141,7 @@ namespace Waher.Script.Lab
 				{
 					IElement Ans;
 
-					async void Preview(object sender2, PreviewEventArgs e2)
+					async Task Preview(object sender2, PreviewEventArgs e2)
 					{
 						try
 						{

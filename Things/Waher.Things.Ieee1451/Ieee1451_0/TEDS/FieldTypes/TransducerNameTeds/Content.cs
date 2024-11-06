@@ -81,5 +81,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds
 			Fields.Add(new StringField(Thing, Timestamp, "Name", this.Name,
 				FieldType.Identity, FieldQoS.AutomaticReadout));
 		}
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public override void AppendDetails(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.Append("Content=");
+			SnifferOutput.AppendLine(this.Name);
+		}
 	}
 }

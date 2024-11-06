@@ -110,6 +110,7 @@ namespace Waher.Things.Script
 				v.OnPreview += (sender, e) =>
 				{
 					ScriptNode.ReportFields(Request, e.Preview.AssociatedObjectValue, false);
+					return Task.CompletedTask;
 				};
 
 				object Obj = await ScriptNode.ParsedSensorDataScript.EvaluateAsync(v);
@@ -120,7 +121,7 @@ namespace Waher.Things.Script
 			catch (Exception ex)
 			{
 				await this.LogErrorAsync("ScriptError", ex.Message);
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 

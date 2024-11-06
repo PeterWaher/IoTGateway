@@ -15,8 +15,10 @@ using System.Security.Cryptography.X509Certificates;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.Provisioning.Cache;
+using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -242,9 +244,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		private Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
 			if (this.managePresenceSubscriptionRequests)
-				e.Accept();
-
-			return Task.CompletedTask;
+				return e.Accept();
+			else
+				return Task.CompletedTask;
 		}
 
 		private async Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
@@ -254,38 +256,36 @@ namespace Waher.Networking.XMPP.Provisioning
 				if (string.Compare(e.From, this.provisioningServerAddress, true) == 0)
 				{
 					Log.Informational("Presence subscription from provisioning server accepted.", this.provisioningServerAddress, this.provisioningServerAddress);
-					e.Accept();
+					await e.Accept();
 				}
 				else if (!string.IsNullOrEmpty(this.ownerJid) && string.Compare(e.From, this.ownerJid, true) == 0)
 				{
 					Log.Informational("Presence subscription from owner accepted.", this.ownerJid, this.provisioningServerAddress);
-					e.Accept();
+					await e.Accept();
 				}
 				else
 					await this.IsFriend(XmppClient.GetBareJID(e.From), this.CheckIfFriendCallback, e);
 			}
 		}
 
-		private Task CheckIfFriendCallback(object Sender, IsFriendResponseEventArgs e2)
+		private async Task CheckIfFriendCallback(object Sender, IsFriendResponseEventArgs e2)
 		{
 			PresenceEventArgs e = (PresenceEventArgs)e2.State;
 
 			if (e2.Ok && e2.Friend)
 			{
 				Log.Informational("Presence subscription accepted.", e.FromBareJID, this.provisioningServerAddress);
-				e.Accept();
+				await e.Accept();
 
 				RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
 				if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-					this.client.RequestPresenceSubscription(e.FromBareJID);
+					await this.client.RequestPresenceSubscription(e.FromBareJID);
 			}
 			else
 			{
 				Log.Notice("Presence subscription declined.", e.FromBareJID, this.provisioningServerAddress);
-				e.Decline();
+				await e.Decline();
 			}
-
-			return Task.CompletedTask;
 		}
 
 		#endregion
@@ -302,9 +302,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Callback method called, when token is available.</param>
 		/// <param name="State">State object that will be passed on to the callback method.</param>
 #if WINDOWS_UWP
-		public void GetToken(Certificate Certificate, TokenCallback Callback, object State)
+		public Task GetToken(Certificate Certificate, EventHandlerAsync<TokenEventArgs> Callback, object State)
 #else
-		public void GetToken(X509Certificate2 Certificate, TokenCallback Callback, object State)
+		public Task GetToken(X509Certificate2 Certificate, EventHandlerAsync<TokenEventArgs> Callback, object State)
 #endif
 		{
 			if (!Certificate.HasPrivateKey)
@@ -319,11 +319,11 @@ namespace Waher.Networking.XMPP.Provisioning
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
 			string Base64 = Convert.ToBase64String(Bin);
 #endif
-			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='" + NamespaceProvisioningTokenCurrent + "'>" + Base64 + "</getToken>",
+			return this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='" + NamespaceProvisioningTokenCurrent + "'>" + Base64 + "</getToken>",
 				this.GetTokenResponse, new object[] { Certificate, Callback, State });
 		}
 
-		private Task GetTokenResponse(object Sender, IqResultEventArgs e)
+		private async Task GetTokenResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 #if WINDOWS_UWP
@@ -351,12 +351,10 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = Convert.ToBase64String(Bin);
 #endif
 
-				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='" + NamespaceProvisioningTokenCurrent + "' seqnr='" +
+				await this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='" + NamespaceProvisioningTokenCurrent + "' seqnr='" +
 					SeqNr.ToString() + "'>" + Response + "</getTokenChallengeResponse>",
 					this.GetTokenChallengeResponse, P);
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private async Task GetTokenChallengeResponse(object Sender, IqResultEventArgs e)
@@ -367,7 +365,7 @@ namespace Waher.Networking.XMPP.Provisioning
 #else
 			X509Certificate2 Certificate = (X509Certificate2)P[0];
 #endif
-			TokenCallback Callback = (TokenCallback)P[1];
+			EventHandlerAsync<TokenEventArgs> Callback = (EventHandlerAsync<TokenEventArgs>)P[1];
 			object State = P[2];
 			XmlElement E = e.FirstElement;
 			string Token;
@@ -432,7 +430,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 		}
 
-		private Task TokenChallengeHandler(object Sender, IqEventArgs e)
+		private async Task TokenChallengeHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
 			string Token = XML.Attribute(E, "token");
@@ -461,24 +459,20 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = Convert.ToBase64String(Bin);
 #endif
 
-				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioningTokenCurrent + "'>" + Response + "</tokenChallengeResponse>");
+				await e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioningTokenCurrent + "'>" + Response + "</tokenChallengeResponse>");
 			}
 			else
-				this.client.SendIqGet(Use.RemoteCertificateJid, e.Query.OuterXml, this.ForwardedTokenChallengeResponse, e);
-
-			return Task.CompletedTask;
+				await this.client.SendIqGet(Use.RemoteCertificateJid, e.Query.OuterXml, this.ForwardedTokenChallengeResponse, e);
 		}
 
-		private Task ForwardedTokenChallengeResponse(object Sender, IqResultEventArgs e2)
+		private async Task ForwardedTokenChallengeResponse(object Sender, IqResultEventArgs e2)
 		{
 			IqEventArgs e = (IqEventArgs)e2.State;
 
 			if (e2.Ok)
-				e.IqResult(e2.FirstElement?.OuterXml ?? string.Empty);
+				await e.IqResult(e2.FirstElement?.OuterXml ?? string.Empty);
 			else
-				e.IqError(e2.ErrorElement?.OuterXml ?? string.Empty);
-
-			return Task.CompletedTask;
+				await e.IqError(e2.ErrorElement?.OuterXml ?? string.Empty);
 		}
 
 		/// <summary>
@@ -488,7 +482,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Token">Token corresponding to the requested certificate.</param>
 		/// <param name="Callback">Callback method called, when certificate is available.</param>
 		/// <param name="State">State object that will be passed on to the callback method.</param>
-		public void GetCertificate(string Token, CertificateCallback Callback, object State)
+		public Task GetCertificate(string Token, EventHandlerAsync<CertificateEventArgs> Callback, object State)
 		{
 			string Address = this.provisioningServerAddress;
 			int i = Token.IndexOf(':');
@@ -499,7 +493,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Token = Token.Substring(i + 1);
 			}
 
-			this.client.SendIqGet(Address, "<getCertificate xmlns='" + NamespaceProvisioningTokenCurrent + "'>" +
+			return this.client.SendIqGet(Address, "<getCertificate xmlns='" + NamespaceProvisioningTokenCurrent + "'>" +
 				XML.Encode(Token) + "</getCertificate>", async (sender, e) =>
 				{
 					if (!(Callback is null))
@@ -538,7 +532,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="JID">JID</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task IsFriend(string JID, IsFriendCallback Callback, object State)
+		public async Task IsFriend(string JID, EventHandlerAsync<IsFriendResponseEventArgs> Callback, object State)
 		{
 			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(JID, this.ownerJid, true) == 0) ||
 				string.Compare(JID, this.provisioningServerAddress, true) == 0)
@@ -568,7 +562,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		private async Task IsFriendCallback(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			IsFriendCallback Callback = (IsFriendCallback)P[0];
+			EventHandlerAsync<IsFriendResponseEventArgs> Callback = (EventHandlerAsync<IsFriendResponseEventArgs>)P[0];
 			object State = P[1];
 			string JID;
 			bool Result;
@@ -709,8 +703,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="UserTokens">Any user tokens provided.</param>
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<IThingReference> Nodes, IEnumerable<string> FieldNames,
-			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
+		public Task CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<IThingReference> Nodes, IEnumerable<string> FieldNames,
+			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, EventHandlerAsync<CanReadResponseEventArgs> Callback, object State)
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
@@ -745,7 +739,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					}
 				}
 
-				return;
+				return Task.CompletedTask;
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -807,7 +801,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("</canRead>");
 			}
 
-			this.CachedIqGet(Xml.ToString(), async (sender, e) =>
+			return this.CachedIqGet(Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<IThingReference> Nodes2 = null;
@@ -1011,7 +1005,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="UserTokens">Any user tokens provided.</param>
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
+		public Task CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
@@ -1047,7 +1041,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					}
 				}
 
-				return;
+				return Task.CompletedTask;
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -1086,7 +1080,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("</canControl>");
 			}
 
-			this.CachedIqGet(Xml.ToString(), async (sender, e) =>
+			return this.CachedIqGet(Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<IThingReference> Nodes2 = null;
@@ -1193,12 +1187,12 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		#region Cached queries
 
-		private Task<bool> CachedIqGet(string Xml, IqResultEventHandlerAsync Callback, object State)
+		private Task<bool> CachedIqGet(string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.CachedIq(Xml, "get", Callback, State);
 		}
 
-		private async Task<bool> CachedIq(string Xml, string Method, IqResultEventHandlerAsync Callback, object State)
+		private async Task<bool> CachedIq(string Xml, string Method, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			CachedQuery Query = await Database.FindFirstDeleteRest<CachedQuery>(new FilterAnd(
 				new FilterFieldEqualTo("Xml", Xml), new FilterFieldEqualTo("Method", Method)));
@@ -1241,7 +1235,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 			else
 			{
-				this.client.SendIq(null, this.provisioningServerAddress, Xml, Method, this.CachedIqCallback, new object[] { Callback, State, Xml, Method },
+				await this.client.SendIq(null, this.provisioningServerAddress, Xml, Method, this.CachedIqCallback, new object[] { Callback, State, Xml, Method },
 					this.client.DefaultRetryTimeout, this.client.DefaultNrRetries,
 					this.client.DefaultDropOff, this.client.DefaultMaxRetryTimeout);
 
@@ -1252,7 +1246,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		private async Task CachedIqCallback(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			IqResultEventHandlerAsync Callback = (IqResultEventHandlerAsync)P[0];
+			EventHandlerAsync<IqResultEventArgs> Callback = (EventHandlerAsync<IqResultEventArgs>)P[0];
 			object State = P[1];
 			string Xml = (string)P[2];
 			string Method = (string)P[3];
@@ -1304,10 +1298,10 @@ namespace Waher.Networking.XMPP.Provisioning
 			if (e.From == this.provisioningServerAddress)
 			{
 				await this.ClearInternalCache();
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 			}
 			else
-				e.IqError(new ForbiddenException("Unauthorized sender.", e.IQ));
+				await e.IqError(new ForbiddenException("Unauthorized sender.", e.IQ));
 		}
 
 		private async Task ClearCacheHandler(object Sender, MessageEventArgs e)
@@ -1343,27 +1337,15 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		#region Owner side
 
-		private async Task IsFriendHandler(object Sender, MessageEventArgs e)
+		private Task IsFriendHandler(object Sender, MessageEventArgs e)
 		{
-			IsFriendEventHandler h = this.IsFriendQuestion;
-
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new IsFriendEventArgs(this, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.IsFriendQuestion.Raise(this, new IsFriendEventArgs(this, e));
 		}
 
 		/// <summary>
 		/// Event is raised when the provisioning server asks the owner if a device is allowed to accept a friendship request.
 		/// </summary>
-		public event IsFriendEventHandler IsFriendQuestion = null;
+		public event EventHandlerAsync<IsFriendEventArgs> IsFriendQuestion = null;
 
 		/// <summary>
 		/// Sends a response to a previous "Is Friend" question.
@@ -1375,9 +1357,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Range">The range of the response.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void IsFriendResponse(string JID, string RemoteJID, string Key, bool IsFriend, RuleRange Range, IqResultEventHandlerAsync Callback, object State)
+		public Task IsFriendResponse(string JID, string RemoteJID, string Key, bool IsFriend, RuleRange Range, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.IsFriendResponse(this.provisioningServerAddress, JID, RemoteJID, Key, IsFriend, Range, Callback, State);
+			return this.IsFriendResponse(this.provisioningServerAddress, JID, RemoteJID, Key, IsFriend, Range, Callback, State);
 		}
 
 		/// <summary>
@@ -1391,8 +1373,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Range">The range of the response.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void IsFriendResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool IsFriend,
-			RuleRange Range, IqResultEventHandlerAsync Callback, object State)
+		public Task IsFriendResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool IsFriend,
+			RuleRange Range, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1415,30 +1397,18 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(ProvisioningServiceJID, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(ProvisioningServiceJID, Xml.ToString(), Callback, State);
 		}
 
-		private async Task CanReadHandler(object Sender, MessageEventArgs e)
+		private Task CanReadHandler(object Sender, MessageEventArgs e)
 		{
-			CanReadEventHandler h = this.CanReadQuestion;
-
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new CanReadEventArgs(this, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.CanReadQuestion.Raise(this, new CanReadEventArgs(this, e));
 		}
 
 		/// <summary>
 		/// Event is raised when the provisioning server asks the owner if a device is allowed to be read.
 		/// </summary>
-		public event CanReadEventHandler CanReadQuestion = null;
+		public event EventHandlerAsync<CanReadEventArgs> CanReadQuestion = null;
 
 		/// <summary>
 		/// Sends a response to a previous "Can Read" question, based on the JID of the caller.
@@ -1452,10 +1422,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseCaller(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseCaller(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromJid/>", Callback, State);
+			return this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1471,10 +1441,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseCaller(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseCaller(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromJid/>", Callback, State);
+			return this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1489,10 +1459,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseDomain(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseDomain(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDomain/>", Callback, State);
+			return this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1508,10 +1478,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseDomain(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseDomain(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDomain/>", Callback, State);
+			return this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1527,10 +1497,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseService(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseService(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1547,10 +1517,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseService(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseService(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1566,10 +1536,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseDevice(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseDevice(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1586,10 +1556,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseDevice(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseDevice(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1605,10 +1575,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseUser(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseUser(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1625,10 +1595,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseUser(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseUser(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1643,10 +1613,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseAll(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseAll(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<all/>", Callback, State);
+			return this.CanReadResponse(JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<all/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1662,10 +1632,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanReadResponseAll(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanReadResponseAll(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<all/>", Callback, State);
+			return this.CanReadResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, "<all/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1681,10 +1651,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="OriginXml">Origin XML.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		private void CanReadResponse(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, string OriginXml, IqResultEventHandlerAsync Callback, object State)
+		private Task CanReadResponse(string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, string OriginXml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanReadResponse(this.provisioningServerAddress, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, OriginXml, Callback, State);
+			return this.CanReadResponse(this.provisioningServerAddress, JID, RemoteJID, Key, CanRead, FieldTypes, FieldNames, Node, OriginXml, Callback, State);
 		}
 
 		/// <summary>
@@ -1701,8 +1671,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="OriginXml">Origin XML.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		private void CanReadResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
-			IThingReference Node, string OriginXml, IqResultEventHandlerAsync Callback, object State)
+		private Task CanReadResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanRead, FieldType FieldTypes, string[] FieldNames,
+			IThingReference Node, string OriginXml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1771,30 +1741,18 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append(OriginXml);
 			Xml.Append("</canReadRule>");
 
-			this.client.SendIqSet(ProvisioningServiceJID, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(ProvisioningServiceJID, Xml.ToString(), Callback, State);
 		}
 
-		private async Task CanControlHandler(object Sender, MessageEventArgs e)
+		private Task CanControlHandler(object Sender, MessageEventArgs e)
 		{
-			CanControlEventHandler h = this.CanControlQuestion;
-
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new CanControlEventArgs(this, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.CanControlQuestion.Raise(this, new CanControlEventArgs(this, e));
 		}
 
 		/// <summary>
 		/// Event is raised when the provisioning server asks the owner if a device is allowed to be controlled.
 		/// </summary>
-		public event CanControlEventHandler CanControlQuestion = null;
+		public event EventHandlerAsync<CanControlEventArgs> CanControlQuestion = null;
 
 		/// <summary>
 		/// Sends a response to a previous "Can Control" question, based on the JID of the caller.
@@ -1807,10 +1765,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseCaller(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseCaller(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromJid/>", Callback, State);
+			return this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1825,10 +1783,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseCaller(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseCaller(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromJid/>", Callback, State);
+			return this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromJid/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1842,10 +1800,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseDomain(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseDomain(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDomain/>", Callback, State);
+			return this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1860,10 +1818,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseDomain(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseDomain(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDomain/>", Callback, State);
+			return this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDomain/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1878,10 +1836,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseService(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseService(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1897,10 +1855,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseService(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseService(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromService token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1915,10 +1873,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseDevice(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseDevice(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1934,10 +1892,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseDevice(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseDevice(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromDevice token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1952,10 +1910,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseUser(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseUser(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1971,10 +1929,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseUser(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			string Token, IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseUser(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			string Token, IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
+			return this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<fromUser token='" + XML.Encode(Token) + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -1988,10 +1946,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseAll(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseAll(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<all/>", Callback, State);
+			return this.CanControlResponse(JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<all/>", Callback, State);
 		}
 
 		/// <summary>
@@ -2006,10 +1964,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Node">Optional node reference. Can be null or <see cref="ThingReference.Empty"/>.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CanControlResponseAll(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, IqResultEventHandlerAsync Callback, object State)
+		public Task CanControlResponseAll(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<all/>", Callback, State);
+			return this.CanControlResponse(ProvisioningServiceJID, JID, RemoteJID, Key, CanControl, ParameterNames, Node, "<all/>", Callback, State);
 		}
 
 		/// <summary>
@@ -2024,10 +1982,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="OriginXml">Origin XML.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		private void CanControlResponse(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, string OriginXml, IqResultEventHandlerAsync Callback, object State)
+		private Task CanControlResponse(string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, string OriginXml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.CanControlResponse(this.provisioningServerAddress, JID, RemoteJID, Key, CanControl, ParameterNames, Node, OriginXml, Callback, State);
+			return this.CanControlResponse(this.provisioningServerAddress, JID, RemoteJID, Key, CanControl, ParameterNames, Node, OriginXml, Callback, State);
 		}
 
 		/// <summary>
@@ -2043,8 +2001,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="OriginXml">Origin XML.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		private void CanControlResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
-			IThingReference Node, string OriginXml, IqResultEventHandlerAsync Callback, object State)
+		private Task CanControlResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool CanControl, string[] ParameterNames,
+			IThingReference Node, string OriginXml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2090,15 +2048,15 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append(OriginXml);
 			Xml.Append("</canControlRule>");
 
-			this.client.SendIqSet(ProvisioningServiceJID, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(ProvisioningServiceJID, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
 		/// Clears the rule caches of all owned devices.
 		/// </summary>
-		public void ClearDeviceCaches()
+		public Task ClearDeviceCaches()
 		{
-			this.ClearDeviceCache(null, null, null);
+			return this.ClearDeviceCache(null, null, null);
 		}
 
 		/// <summary>
@@ -2106,9 +2064,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ClearDeviceCaches(IqResultEventHandlerAsync Callback, object State)
+		public Task ClearDeviceCaches(EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ClearDeviceCache(null, Callback, State);
+			return this.ClearDeviceCache(null, Callback, State);
 		}
 
 		/// <summary>
@@ -2116,9 +2074,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="DeviceJID">Bare JID of device whose rule cache is to be cleared.
 		/// If null, all owned devices will get their rule caches cleared.</param>
-		public void ClearDeviceCache(string DeviceJID)
+		public Task ClearDeviceCache(string DeviceJID)
 		{
-			this.ClearDeviceCache(DeviceJID, null, null);
+			return this.ClearDeviceCache(DeviceJID, null, null);
 		}
 
 		/// <summary>
@@ -2128,9 +2086,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// If null, all owned devices will get their rule caches cleared.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ClearDeviceCache(string DeviceJID, IqResultEventHandlerAsync Callback, object State)
+		public Task ClearDeviceCache(string DeviceJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ClearDeviceCache(this.provisioningServerAddress, DeviceJID, Callback, State);
+			return this.ClearDeviceCache(this.provisioningServerAddress, DeviceJID, Callback, State);
 		}
 
 		/// <summary>
@@ -2141,7 +2099,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// If null, all owned devices will get their rule caches cleared.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ClearDeviceCache(string ServiceJID, string DeviceJID, IqResultEventHandlerAsync Callback, object State)
+		public Task ClearDeviceCache(string ServiceJID, string DeviceJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2156,7 +2114,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -2166,9 +2124,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MaxCount">Maximum number of things to return.</param>
 		/// <param name="Callback">Method to call when result has been received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetDevices(int Offset, int MaxCount, SearchResultEventHandler Callback, object State)
+		public Task GetDevices(int Offset, int MaxCount, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
-			this.GetDevices(this.provisioningServerAddress, Offset, MaxCount, Callback, State);
+			return this.GetDevices(this.provisioningServerAddress, Offset, MaxCount, Callback, State);
 		}
 
 		/// <summary>
@@ -2179,7 +2137,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MaxCount">Maximum number of things to return.</param>
 		/// <param name="Callback">Method to call when result has been received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetDevices(string ServiceJID, int Offset, int MaxCount, SearchResultEventHandler Callback, object State)
+		public Task GetDevices(string ServiceJID, int Offset, int MaxCount, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -2191,7 +2149,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append(MaxCount.ToString());
 			Request.Append("'/>");
 
-			this.client.SendIqGet(ServiceJID, Request.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceJID, Request.ToString(), (sender, e) =>
 			{
 				ThingRegistryClient.ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 				return Task.CompletedTask;
@@ -2201,9 +2159,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Deletes te device rules of all owned devices.
 		/// </summary>
-		public void DeleteDeviceRules()
+		public Task DeleteDeviceRules()
 		{
-			this.DeleteDeviceRules(null, string.Empty, string.Empty, string.Empty, null, null);
+			return this.DeleteDeviceRules(null, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -2211,9 +2169,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DeleteDeviceRules(IqResultEventHandlerAsync Callback, object State)
+		public Task DeleteDeviceRules(EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.DeleteDeviceRules(null, string.Empty, string.Empty, string.Empty, Callback, State);
+			return this.DeleteDeviceRules(null, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2221,9 +2179,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
 		/// If null, all owned devices will get their rules deleted.</param>
-		public void DeleteDeviceRules(string DeviceJID)
+		public Task DeleteDeviceRules(string DeviceJID)
 		{
-			this.DeleteDeviceRules(DeviceJID, string.Empty, string.Empty, string.Empty, null, null);
+			return this.DeleteDeviceRules(DeviceJID, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -2233,9 +2191,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// If null, all owned devices will get their rules deleted.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DeleteDeviceRules(string DeviceJID, IqResultEventHandlerAsync Callback, object State)
+		public Task DeleteDeviceRules(string DeviceJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.DeleteDeviceRules(DeviceJID, string.Empty, string.Empty, string.Empty, Callback, State);
+			return this.DeleteDeviceRules(DeviceJID, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2248,9 +2206,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of device.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DeleteDeviceRules(string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task DeleteDeviceRules(string DeviceJID, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.DeleteDeviceRules(this.provisioningServerAddress, DeviceJID, NodeId, SourceId, Partition, Callback, State);
+			return this.DeleteDeviceRules(this.provisioningServerAddress, DeviceJID, NodeId, SourceId, Partition, Callback, State);
 		}
 
 		/// <summary>
@@ -2264,7 +2222,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of device.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DeleteDeviceRules(string ServiceJID, string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task DeleteDeviceRules(string ServiceJID, string DeviceJID, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2281,7 +2239,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.AppendNodeInfo(Xml, NodeId, SourceId, Partition);
 			Xml.Append("/>");
 
-			this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
 		}
 
 		#endregion
@@ -2294,7 +2252,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="DeviceBareJid">Device Bare JID</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void FindDecisionSupportService(string DeviceBareJid, ServiceEventHandler Callback, object State)
+		public void FindDecisionSupportService(string DeviceBareJid, EventHandlerAsync<ServiceEventArgs> Callback, object State)
 		{
 			this.client.FindComponent(DeviceBareJid, NamespacesProvisioningDevice, Callback, State);
 		}
@@ -2316,7 +2274,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="DeviceBareJid">Device Bare JID</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void FindProvisioningService(string DeviceBareJid, ServiceEventHandler Callback, object State)
+		public void FindProvisioningService(string DeviceBareJid, EventHandlerAsync<ServiceEventArgs> Callback, object State)
 		{
 			this.client.FindComponent(DeviceBareJid, NamespacesProvisioningOwner, Callback, State);
 		}

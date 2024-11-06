@@ -127,18 +127,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 		/// <param name="Teds">TEDS containing records.</param>
 		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields, Teds Teds)
 		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append("IEEE 1451.");
-			sb.Append(this.FamilyMember.ToString());
-
-			if (this.FamilySubMember != 0xff)
-			{
-				sb.Append('.');
-				sb.Append(this.FamilySubMember.ToString());
-			}
-
-			Fields.Add(new StringField(Thing, Timestamp, "Family", sb.ToString(),
+			Fields.Add(new StringField(Thing, Timestamp, "Family", this.FamilyName,
 				FieldType.Identity, FieldQoS.AutomaticReadout));
 
 			Fields.Add(new BooleanField(Thing, Timestamp, ((TedsAccessCode)this.Class).ToString(), true,
@@ -146,6 +135,40 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes
 
 			Fields.Add(new Int32Field(Thing, Timestamp, "TEDS Version", this.Version,
 				FieldType.Identity, FieldQoS.AutomaticReadout));
+		}
+
+		/// <summary>
+		/// Family name
+		/// </summary>
+		public string FamilyName
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("IEEE 1451.");
+				sb.Append(this.FamilyMember.ToString());
+
+				if (this.FamilySubMember != 0xff)
+				{
+					sb.Append('.');
+					sb.Append(this.FamilySubMember.ToString());
+				}
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public override void AppendDetails(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.Append("Family=");
+			SnifferOutput.Append(this.FamilyName);
+			SnifferOutput.Append(", TEDSVersion=");
+			SnifferOutput.AppendLine(this.Version.ToString());
 		}
 	}
 }

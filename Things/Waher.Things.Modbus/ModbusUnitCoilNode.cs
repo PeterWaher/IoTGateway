@@ -81,11 +81,11 @@ namespace Waher.Things.Modbus
 			{
 				BitArray Bits = await Client.ReadCoils((byte)(await this.GetUnitNode()).UnitId, (ushort)this.CoilNr, 1);
 
-				Request.ReportFields(true, new BooleanField(await this.GetReportAs(), DateTime.UtcNow, this.GetFieldName(), Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+				await Request.ReportFields(true, new BooleanField(await this.GetReportAs(), DateTime.UtcNow, this.GetFieldName(), Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			finally
 			{

@@ -3,33 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
-using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Sensor
 {
-	/// <summary>
-	/// Delegate for events triggered when a readout changes state.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewState">New State.</param>
-	public delegate Task SensorDataReadoutStateChangedEventHandler(object Sender, SensorDataReadoutState NewState);
-
-	/// <summary>
-	/// Delegate for events triggered when readout errors have been received.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewErrors">New errors received. For a list of all errors received, see <see cref="SensorDataClientRequest.Errors"/>.</param>
-	public delegate Task SensorDataReadoutErrorsReportedEventHandler(object Sender, IEnumerable<ThingError> NewErrors);
-
-	/// <summary>
-	/// Delegate for events triggered when readout fields have been received.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewFields">New fields received. For a list of all fields received, see <see cref="SensorDataClientRequest.ReadFields"/>.</param>
-	public delegate Task SensorDataReadoutFieldsReportedEventHandler(object Sender, IEnumerable<Field> NewFields);
-
 	/// <summary>
 	/// Manages a sensor data client request.
 	/// </summary>
@@ -85,37 +64,26 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				this.state = NewState;
 
-				SensorDataReadoutStateChangedEventHandler h = this.OnStateChanged;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, NewState);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnStateChanged.Raise(this, NewState);
 			}
 		}
 
 		/// <summary>
 		/// Event raised whenever the state of the sensor data readout changes.
 		/// </summary>
-		public event SensorDataReadoutStateChangedEventHandler OnStateChanged = null;
+		public event EventHandlerAsync<SensorDataReadoutState> OnStateChanged = null;
 
 		/// <summary>
 		/// Event raised whenever readout errors have been received. The event will report newest errors received.
 		/// For a list of all errors received, see <see cref="Errors"/>.
 		/// </summary>
-		public event SensorDataReadoutErrorsReportedEventHandler OnErrorsReceived = null;
+		public event EventHandlerAsync<IEnumerable<ThingError>> OnErrorsReceived = null;
 
 		/// <summary>
 		/// Event raised whenever fields have been received. The event will report newest fields received.
 		/// For a list of all fields received, see <see cref="ReadFields"/>.
 		/// </summary>
-		public event SensorDataReadoutFieldsReportedEventHandler OnFieldsReceived = null;
+		public event EventHandlerAsync<IEnumerable<Field>> OnFieldsReceived = null;
 
 		internal async Task Fail(string Reason)
 		{
@@ -123,7 +91,7 @@ namespace Waher.Networking.XMPP.Sensor
 			await this.SetState(SensorDataReadoutState.Failure);
 		}
 
-		internal virtual async Task LogErrors(IEnumerable<ThingError> Errors)
+		internal virtual Task LogErrors(IEnumerable<ThingError> Errors)
 		{
 			lock (this.synchObject)
 			{
@@ -133,21 +101,10 @@ namespace Waher.Networking.XMPP.Sensor
 				this.errors.AddRange(Errors);
 			}
 
-			SensorDataReadoutErrorsReportedEventHandler h = this.OnErrorsReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, Errors);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnErrorsReceived.Raise(this, Errors);
 		}
 
-		internal virtual async Task LogFields(IEnumerable<Field> Fields)
+		internal virtual Task LogFields(IEnumerable<Field> Fields)
 		{
 			lock (this.synchObject)
 			{
@@ -161,18 +118,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			SensorDataReadoutFieldsReportedEventHandler h = this.OnFieldsReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, Fields);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnFieldsReceived.Raise(this, Fields);
 		}
 
 		internal void Clear()
@@ -251,12 +197,10 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.Append(XML.Encode(this.Id));
 			Xml.Append("'/>");
 
-			this.sensorClient?.Client?.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
-
-			return Task.CompletedTask;
+			return this.sensorClient?.Client?.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
 		}
 
-		private Task CancelResponse(object Sender, IqResultEventArgs e)
+		private Task CancelResponse(object _, IqResultEventArgs e)
 		{
 			if (e.Ok)
 				return this.Cancelled();

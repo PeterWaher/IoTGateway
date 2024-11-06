@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for Direct invitation event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task DirectInvitationMessageEventHandler(object Sender, DirectInvitationMessageEventArgs e);
-
 	/// <summary>
 	/// Message from a MUC room containing an invitation.
 	/// </summary>

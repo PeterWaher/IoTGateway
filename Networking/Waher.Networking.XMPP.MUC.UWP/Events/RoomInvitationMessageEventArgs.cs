@@ -1,15 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for MUC Room invitation event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task RoomInvitationMessageEventHandler(object Sender, RoomInvitationMessageEventArgs e);
-
 	/// <summary>
 	/// Message from a MUC room containing an invitation.
 	/// </summary>
@@ -66,9 +59,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nick-name to use in the room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Accept(string NickName, UserPresenceEventHandlerAsync Callback, object State)
+		public Task Accept(string NickName, EventHandlerAsync<UserPresenceEventArgs> Callback, object State)
 		{
-			this.mucClient.EnterRoom(this.RoomId, this.Domain, NickName, this.password, Callback, State);
+			return this.mucClient.EnterRoom(this.RoomId, this.Domain, NickName, this.password, Callback, State);
 		}
 
 		/// <summary>
@@ -83,18 +76,18 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Declines the invitation, and enters the room.
 		/// </summary>
-		public void Decline()
+		public Task Decline()
 		{
-			this.Decline(string.Empty, string.Empty);
+			return this.Decline(string.Empty, string.Empty);
 		}
 
 		/// <summary>
 		/// Declines the invitation, and enters the room.
 		/// </summary>
 		/// <param name="Reason">Reason for declining invitation.</param>
-		public void Decline(string Reason)
+		public Task Decline(string Reason)
 		{
-			this.Decline(Reason, string.Empty);
+			return this.Decline(Reason, string.Empty);
 		}
 
 		/// <summary>
@@ -102,9 +95,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// </summary>
 		/// <param name="Reason">Reason for declining invitation.</param>
 		/// <param name="Language">Language of text.</param>
-		public void Decline(string Reason, string Language)
+		public Task Decline(string Reason, string Language)
 		{
-			this.mucClient.DeclineInvitation(this.RoomId, this.Domain, this.inviteFrom, Reason, Language);
+			return this.mucClient.DeclineInvitation(this.RoomId, this.Domain, this.inviteFrom, Reason, Language);
 		}
 	}
 }

@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
-	/// <summary>
-	/// Delegate for stream validation events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ValidateStreamEventHandler(object Sender, ValidateStreamEventArgs e);
-
 	/// <summary>
 	/// Event argument for stream validation events.
 	/// </summary>
@@ -64,6 +56,5 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			else
 				return false;
 		}
-
 	}
 }

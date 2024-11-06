@@ -8,7 +8,7 @@ using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 
@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			if (this.requiresE2e && !e.UsesE2eEncryption)
 			{
-				e.IqError(new StanzaErrors.ForbiddenException("End-to-end encryption required.", e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException("End-to-end encryption required.", e.IQ));
 				return;
 			}
 			

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P
@@ -11,7 +8,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void PeerAddressEventHandler(object Sender, PeerAddressEventArgs e);
+	public delegate Task PeerAddressEventHandler(object Sender, PeerAddressEventArgs e);
 
 	/// <summary>
 	/// Peer address event arguments.

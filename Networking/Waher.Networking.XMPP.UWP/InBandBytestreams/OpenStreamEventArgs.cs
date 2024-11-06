@@ -1,14 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
-	/// <summary>
-	/// Delegate for open transmission stream callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task OpenStreamEventHandler(object Sender, OpenStreamEventArgs e);
-
 	/// <summary>
 	/// Event argument for open transmission stream callback methods.
 	/// </summary>
@@ -26,6 +19,5 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// Outgoing stream.
 		/// </summary>
 		public OutgoingStream Output => this.output;
-
 	}
 }

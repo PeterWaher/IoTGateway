@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.PubSub
+namespace Waher.Networking.XMPP.PubSub.Events
 {
-	/// <summary>
-	/// Delegate for node callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task NodeEventHandler(object Sender, NodeEventArgs e);
-
 	/// <summary>
 	/// Event arguments for node callback events.
 	/// </summary>

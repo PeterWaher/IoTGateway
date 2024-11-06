@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Abuse
 {
@@ -73,7 +74,7 @@ namespace Waher.Networking.XMPP.Abuse
             if (Client.State == XmppState.Connected)
                 this.BeginSearchSupport();
 
-            this.client.OnStateChanged += Client_OnStateChanged;
+            this.client.OnStateChanged += this.Client_OnStateChanged;
         }
 
 		/// <summary>
@@ -161,7 +162,7 @@ namespace Waher.Networking.XMPP.Abuse
 
         private void BeginSearchSupport()
         {
-            Client.SendServiceDiscoveryRequest(Client.Domain, async (sender, e) =>
+			this.Client.SendServiceDiscoveryRequest(this.Client.Domain, async (sender, e) =>
             {
                 if (e.Ok)
                 {
@@ -171,7 +172,7 @@ namespace Waher.Networking.XMPP.Abuse
                     this.supportsAbuseReason = e.HasFeature(NamespaceAbuseReason);
 
                     if (this.supportsBlocking)
-                        this.StartGetBlockList(null, null);
+                        await this.StartGetBlockList(null, null);
                 }
                 else
                 {
@@ -181,25 +182,14 @@ namespace Waher.Networking.XMPP.Abuse
                     this.supportsAbuseReason = false;
                 }
 
-                IqResultEventHandlerAsync h = this.OnSearchSupportResponse;
-                if (!(h is null))
-                {
-                    try
-                    {
-                        await h(this, e);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Exception(ex);
-                    }
-                }
+                await this.OnSearchSupportResponse.Raise(this, e);
             }, null);
         }
 
 		/// <summary>
 		/// Event raised when information about reporting support has been returned.
 		/// </summary>
-        public event IqResultEventHandlerAsync OnSearchSupportResponse = null;
+        public event EventHandlerAsync<IqResultEventArgs> OnSearchSupportResponse = null;
 
         /// <summary>
         /// If the server supports the blocking extension.
@@ -245,9 +235,9 @@ namespace Waher.Networking.XMPP.Abuse
         /// </summary>
         /// <param name="Callback">Callback method to call when response is available.</param>
         /// <param name="State">State object to pass on to callback method.</param>
-        public void StartGetBlockList(BlockListEventHandler Callback, object State)
+        public Task StartGetBlockList(EventHandlerAsync<BlockListEventArgs> Callback, object State)
         {
-            this.client.SendIqGet(string.Empty, "<blocklist xmlns='" + NamespaceBlocking + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(string.Empty, "<blocklist xmlns='" + NamespaceBlocking + "'/>", async (sender, e) =>
             {
                 List<string> JIDs = new List<string>();
                 XmlElement E, E2;
@@ -275,19 +265,7 @@ namespace Waher.Networking.XMPP.Abuse
                     }
                 }
 
-                if (!(Callback is null))
-                {
-                    BlockListEventArgs e2 = new BlockListEventArgs(e, JIDs.ToArray(), State);
-
-                    try
-                    {
-                        await Callback(this, e2);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Exception(ex);
-                    }
-                }
+                await Callback.Raise(this, new BlockListEventArgs(e, JIDs.ToArray(), State));
 
             }, null);
         }
@@ -312,7 +290,7 @@ namespace Waher.Networking.XMPP.Abuse
         /// <param name="Reason">Reason for blocking JID.</param>
         /// <param name="Callback">Callback method.</param>
         /// <param name="State">State object to pass on to callback method.</param>
-        public async Task BlockJID(string JID, ReportingReason Reason, IqResultEventHandlerAsync Callback, object State)
+        public async Task BlockJID(string JID, ReportingReason Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
         {
             bool Blocked;
 
@@ -350,7 +328,7 @@ namespace Waher.Networking.XMPP.Abuse
                 else
                     Xml.Append("'/></block>");
 
-                this.client.SendIqSet(this.client.Domain, Xml.ToString(), async (sender, e) =>
+                await this.client.SendIqSet(this.client.Domain, Xml.ToString(), async (sender, e) =>
                 {
                     if (e.Ok)
                     {
@@ -368,7 +346,7 @@ namespace Waher.Networking.XMPP.Abuse
                 await this.CallCallback(Callback, State, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State));
         }
 
-        private async Task CallCallback(IqResultEventHandlerAsync Callback, object State, IqResultEventArgs e)
+        private async Task CallCallback(EventHandlerAsync<IqResultEventArgs> Callback, object State, IqResultEventArgs e)
         {
             if (!(Callback is null))
             {
@@ -390,7 +368,7 @@ namespace Waher.Networking.XMPP.Abuse
         /// <param name="JID">JID to unblock.</param>
         /// <param name="Callback">Callback method.</param>
         /// <param name="State">State object to pass on to callback method.</param>
-        public async Task UnblockJID(string JID, IqResultEventHandlerAsync Callback, object State)
+        public async Task UnblockJID(string JID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
         {
             bool Blocked;
 
@@ -404,7 +382,7 @@ namespace Waher.Networking.XMPP.Abuse
                 await this.CallCallback(Callback, State, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, true, State));
             else if (this.supportsBlocking)
             {
-                this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'><item jid='" + JID + "'/></unblock>", 
+				await this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'><item jid='" + JID + "'/></unblock>", 
                     async (sender, e) =>
                     {
                         if (e.Ok)
@@ -428,11 +406,11 @@ namespace Waher.Networking.XMPP.Abuse
         /// </summary>
         /// <param name="Callback">Callback method.</param>
         /// <param name="State">State object to pass on to callback method.</param>
-        public async Task UnblockAll(IqResultEventHandlerAsync Callback, object State)
+        public async Task UnblockAll(EventHandlerAsync<IqResultEventArgs> Callback, object State)
         {
             if (this.supportsBlocking)
             {
-                this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'/>", async (sender, e) =>
+				await this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'/>", async (sender, e) =>
                 {
                     if (e.Ok)
                     {

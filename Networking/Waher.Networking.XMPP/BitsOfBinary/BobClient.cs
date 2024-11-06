@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Waher.Content.Xml;
-using Waher.Events;
-using Waher.Networking.XMPP.StanzaErrors;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Events;
+using Waher.Networking.XMPP.Events;
+using Waher.Networking.XMPP.StanzaErrors;
 
 namespace Waher.Networking.XMPP.BitsOfBinary
 {
@@ -150,7 +151,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 				StreamReader r = new StreamReader(f, Encoding.ASCII);
 				string Xml = await r.ReadToEndAsync();
 			
-				e.IqResult(Xml);
+				await e.IqResult(Xml);
 			}
 		}
 
@@ -161,7 +162,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// <param name="ContentId">Content ID</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetData(string To, string ContentId, BitsOfBinaryEventHandler Callback, object State)
+		public Task GetData(string To, string ContentId, EventHandlerAsync<BitsOfBinaryEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -171,7 +172,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			Xml.Append(ContentId);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{

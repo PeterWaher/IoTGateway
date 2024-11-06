@@ -120,21 +120,23 @@ namespace Waher.Things.Gpio
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public Task StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
 				if (this.pin is null)
 				{
-					if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
+					GpioController Controller = await this.GetController();
+
+					if (!(Controller is null) && !Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
 					{
 						string Id = Status.ToString();
 						string s = this.GetStatusMessage(Status);
 
-						this.LogErrorAsync(Id, s);
+						await this.LogErrorAsync(Id, s);
 
-						Request.ReportErrors(true, new ThingError(this, s));
-						return Task.CompletedTask;
+						await Request.ReportErrors(true, new ThingError(this, s));
+						return;
 					}
 
 					this.SetDriveMode(this.mode);
@@ -169,14 +171,12 @@ namespace Waher.Things.Gpio
 						typeof(Controller).Namespace, 16));
 				}
 
-				Request.ReportFields(true, Fields);
+				await Request.ReportFields(true, Fields);
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -198,38 +198,40 @@ namespace Waher.Things.Gpio
 		/// </summary>
 		public Task<ControlParameter[]> GetControlParameters()
 		{
-			return Task.FromResult<ControlParameter[]>(new ControlParameter[]
+			return Task.FromResult(new ControlParameter[]
 			{
 				new BooleanControlParameter("Value", "Output", "Value:", "Value of output.", this.GetValue, this.SetValue)
 			});
 		}
 
-		private Task<bool?> GetValue(IThingReference Node)
+		private async Task<bool?> GetValue(IThingReference Node)
 		{
 			if (this.pin is null)
 			{
-				if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus _))
+				GpioController Controller = await this.GetController();
+
+				if (!(Controller is null) && !Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus _))
 					return null;
 
 				this.SetDriveMode(this.mode);
 			}
 
-			return Task.FromResult<bool?>(this.pin.Read() == GpioPinValue.High);
+			return this.pin.Read() == GpioPinValue.High;
 		}
 
-		private Task SetValue(IThingReference Node, bool Value)
+		private async Task SetValue(IThingReference Node, bool Value)
 		{
 			if (this.pin is null)
 			{
-				if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
+				GpioController Controller = await this.GetController();
+
+				if (!(Controller is null) && !Controller.TryOpenPin(this.PinNr, GpioSharingMode.Exclusive, out this.pin, out GpioOpenStatus Status))
 					throw new Exception(this.GetStatusMessage(Status));
 
 				this.SetDriveMode(this.mode);
 			}
 
 			this.pin.Write(Value ? GpioPinValue.High : GpioPinValue.Low);
-		
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

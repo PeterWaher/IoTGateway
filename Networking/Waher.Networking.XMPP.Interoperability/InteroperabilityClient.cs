@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Threading;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
-using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Interoperability
 {
@@ -40,9 +40,9 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// <param name="Destination">JID of entity.</param>
 		/// <param name="Callback">Method to call when response or error is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendGetInterfacesRequest(string Destination, InteroperabilityInterfacesClientEventHandler Callback, object State)
+		public Task SendGetInterfacesRequest(string Destination, EventHandlerAsync<InteroperabilityClientEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(Destination, "<getInterfaces xmlns='" + InteroperabilityServer.NamespaceInteroperability + "'/>",
+			return this.client.SendIqGet(Destination, "<getInterfaces xmlns='" + InteroperabilityServer.NamespaceInteroperability + "'/>",
 				this.GetInterfacesResult, new object[] { Callback, State });
 		}
 
@@ -50,7 +50,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		{
 			List<string> Interfaces = new List<string>();
 			object[] P = (object[])e.State;
-			InteroperabilityInterfacesClientEventHandler Callback = (InteroperabilityInterfacesClientEventHandler)P[0];
+			EventHandlerAsync<InteroperabilityClientEventArgs> Callback = (EventHandlerAsync<InteroperabilityClientEventArgs>)P[0];
 			object State = P[1];
 
 			if (e.Ok)

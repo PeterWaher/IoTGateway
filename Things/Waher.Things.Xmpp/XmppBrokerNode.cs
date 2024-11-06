@@ -233,6 +233,54 @@ namespace Waher.Things.Xmpp
 			return this.GetBroker().Result?.Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();
 		}
 
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public async Task ReceiveBinary(byte[] Data) => (await this.GetBroker()).Client?.ReceiveBinary(Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public async Task TransmitBinary(byte[] Data) => (await this.GetBroker()).Client?.TransmitBinary(Data);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public async Task ReceiveText(string Text) => (await this.GetBroker()).Client?.ReceiveText(Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public async Task TransmitText(string Text) => (await this.GetBroker()).Client?.TransmitText(Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public async Task Information(string Comment) => (await this.GetBroker()).Client?.Information(Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public async Task Warning(string Warning) => (await this.GetBroker()).Client?.Warning(Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public async Task Error(string Error) => (await this.GetBroker()).Client?.Error(Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(Exception Exception) => (await this.GetBroker()).Client?.Exception(Exception);
+
 		#endregion
 
 		/// <summary>

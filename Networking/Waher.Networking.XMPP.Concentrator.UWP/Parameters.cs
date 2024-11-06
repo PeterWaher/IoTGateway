@@ -1,18 +1,19 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Content;
-using Waher.Runtime.Language;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
-using Waher.Things.Attributes;
+using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Inventory;
-using Waher.Content.Xml;
+using Waher.Runtime.Language;
+using Waher.Things.Attributes;
 
 namespace Waher.Networking.XMPP.Concentrator
 {

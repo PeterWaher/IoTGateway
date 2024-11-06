@@ -125,7 +125,7 @@ namespace Waher.IoTGateway.Setup
 
 			await base.InitSetup(WebServer);
 
-			WebServer.ETagSalt = this.Updated.Ticks.ToString();
+			await WebServer.SetETagSalt(this.Updated.Ticks.ToString());
 
 			if (Directory.Exists(ThemesFolder))
 			{
@@ -270,7 +270,7 @@ namespace Waher.IoTGateway.Setup
 			this.Updated = DateTime.Now;
 			await Database.Update(this);
 
-			Gateway.HttpServer.ETagSalt = this.Updated.Ticks.ToString();
+			await Gateway.HttpServer.SetETagSalt(this.Updated.Ticks.ToString());
 
 			await ClientEvents.PushEvent(new string[] { TabID }, "ThemeOk", JSON.Encode(new KeyValuePair<string, object>[]
 			{

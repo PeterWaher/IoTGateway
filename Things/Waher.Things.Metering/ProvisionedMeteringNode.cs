@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Images;
+using Waher.Networking;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
@@ -203,7 +204,7 @@ namespace Waher.Things.Metering
 
 			if (string.IsNullOrEmpty(BareJid))
 				return string.Empty;
-			
+
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("iotdisco:JID=");
@@ -252,7 +253,9 @@ namespace Waher.Things.Metering
 
 					GetQrCodeUrlEventArgs e = new GetQrCodeUrlEventArgs(Uri);
 
-					QrCodeUrlRequested?.Invoke(this, e);
+					EventHandlerAsync<GetQrCodeUrlEventArgs> h = QrCodeUrlRequested;
+					if (!(h is null))
+						await h(this, e);
 
 					if (!string.IsNullOrEmpty(e.Url))
 					{
@@ -273,6 +276,6 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Event raised when a QR code URL is requested.
 		/// </summary>
-		public static event EventHandler<GetQrCodeUrlEventArgs> QrCodeUrlRequested;
+		public static event EventHandlerAsync<GetQrCodeUrlEventArgs> QrCodeUrlRequested;
 	}
 }

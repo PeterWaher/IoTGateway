@@ -55,9 +55,10 @@ namespace Waher.Networking
 			return Task.CompletedTask;
 		}
 
-		private void Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object sender, EventArgs e)
 		{
 			this.Dispose();
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -87,7 +88,7 @@ namespace Waher.Networking
 				return false;
 			}
 
-			this.Server.DataSent(Data);
+			await this.Server.DataSent(Data);
 
 			return true;
 		}

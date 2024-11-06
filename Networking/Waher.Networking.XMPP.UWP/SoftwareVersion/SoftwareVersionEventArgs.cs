@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
+
 
 namespace Waher.Networking.XMPP.SoftwareVersion
 {

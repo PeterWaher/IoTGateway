@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 
 namespace Waher.Security.DTLS.Test
@@ -58,8 +59,16 @@ namespace Waher.Security.DTLS.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.client.OnHandshakeSuccessful += (sender, e) => Done.Set();
-			this.client.OnHandshakeFailed += (sender, e) => Error.Set();
+			this.client.OnHandshakeSuccessful += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
+			this.client.OnHandshakeFailed += (sender, e) => 
+			{ 
+				Error.Set(); 
+				return Task.CompletedTask;
+			};
 
 			this.client.StartHandshake(string.Empty, 
 				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 }));
@@ -84,6 +93,8 @@ namespace Waher.Security.DTLS.Test
 				{
 					Error.Set();
 				}
+			
+				return Task.CompletedTask;
 			};
 
 			this.Test_01_Handshake();
@@ -109,6 +120,8 @@ namespace Waher.Security.DTLS.Test
 					Done1.Set();
 				else
 					Error1.Set();
+			
+				return Task.CompletedTask;
 			};
 
 			this.server.OnStateChanged += (sender, e) =>
@@ -117,6 +130,8 @@ namespace Waher.Security.DTLS.Test
 					Done2.Set();
 				else
 					Error2.Set();
+			
+				return Task.CompletedTask;
 			};
 
 			this.client.Dispose();

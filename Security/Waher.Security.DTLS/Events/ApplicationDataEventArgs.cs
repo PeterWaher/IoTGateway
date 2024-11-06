@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
@@ -9,7 +7,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void ApplicationDataEventHandler(object Sender, ApplicationDataEventArgs e);
+	public delegate Task ApplicationDataEventHandler(object Sender, ApplicationDataEventArgs e);
 
 	/// <summary>
 	/// Event arguments for application data events.

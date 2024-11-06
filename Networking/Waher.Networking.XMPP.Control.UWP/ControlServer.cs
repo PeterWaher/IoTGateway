@@ -13,6 +13,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Inventory;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Control
 {
@@ -157,38 +158,38 @@ namespace Waher.Networking.XMPP.Control
 				return h(Node);
 		}
 
-		internal static void ParameterNotFound(string Name, IqEventArgs e)
+		internal static Task ParameterNotFound(string Name, IqEventArgs e)
 		{
-			e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+			return e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Parameter not found.</paramError></error>");
 		}
 
-		internal static void NotFound(IqEventArgs e)
+		internal static Task NotFound(IqEventArgs e)
 		{
-			e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
+			return e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
 		}
 
-		internal static void ParameterWrongType(string Name, IqEventArgs e)
+		internal static Task ParameterWrongType(string Name, IqEventArgs e)
 		{
-			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+			return e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Invalid parameter type.</paramError></error>");
 		}
 
-		internal static void ParameterSyntaxError(string Name, IqEventArgs e)
+		internal static Task ParameterSyntaxError(string Name, IqEventArgs e)
 		{
-			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+			return e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Syntax error.</paramError></error>");
 		}
 
-		internal static void ParameterValueInvalid(string Name, IqEventArgs e)
+		internal static Task ParameterValueInvalid(string Name, IqEventArgs e)
 		{
-			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+			return e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 				e.Query.NamespaceURI + "\" n=\"" + Name + "\">Value not valid.</paramError></error>");
 		}
 
-		internal static void ParameterBadRequest(IqEventArgs e)
+		internal static Task ParameterBadRequest(IqEventArgs e)
 		{
-			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
+			return e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
 		}
 
 		/// <summary>
@@ -263,7 +264,7 @@ namespace Waher.Networking.XMPP.Control
 						Form = new DataForm(this.client, E, null, null, e.From, e.To);
 						if (Form.Type != FormType.Submit)
 						{
-							ParameterBadRequest(e);
+							await ParameterBadRequest(e);
 							return;
 						}
 
@@ -275,7 +276,7 @@ namespace Waher.Networking.XMPP.Control
 						break;
 
 					default:
-						ParameterBadRequest(e);
+						await ParameterBadRequest(e);
 						return;
 				}
 			}
@@ -299,7 +300,7 @@ namespace Waher.Networking.XMPP.Control
 							BooleanControlParameter BooleanControlParameter = Parameter as BooleanControlParameter;
 							if (BooleanControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -318,7 +319,7 @@ namespace Waher.Networking.XMPP.Control
 							ColorControlParameter ColorControlParameter = Parameter as ColorControlParameter;
 							if (ColorControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -337,7 +338,7 @@ namespace Waher.Networking.XMPP.Control
 							DateControlParameter DateControlParameter = Parameter as DateControlParameter;
 							if (DateControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -356,7 +357,7 @@ namespace Waher.Networking.XMPP.Control
 							DateTimeControlParameter DateTimeControlParameter = Parameter as DateTimeControlParameter;
 							if (DateTimeControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -375,7 +376,7 @@ namespace Waher.Networking.XMPP.Control
 							DoubleControlParameter DoubleControlParameter = Parameter as DoubleControlParameter;
 							if (DoubleControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -394,7 +395,7 @@ namespace Waher.Networking.XMPP.Control
 							DurationControlParameter DurationControlParameter = Parameter as DurationControlParameter;
 							if (DurationControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -417,14 +418,14 @@ namespace Waher.Networking.XMPP.Control
 								Type T = Types.GetType(XML.Attribute(E, "t"));
 								if (T is null)
 								{
-									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+									await e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Type not found.</paramError></error>");
 									return;
 								}
 
 								if (!T.GetTypeInfo().IsEnum)
 								{
-									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+									await e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Type is not an enumeration.</paramError></error>");
 									return;
 								}
@@ -437,7 +438,7 @@ namespace Waher.Networking.XMPP.Control
 								}
 								catch (Exception)
 								{
-									e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+									await e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
 										e.Query.NamespaceURI + "\" n=\"" + Name + "\">Value not valid element of enumeration.</paramError></error>");
 									return;
 								}
@@ -450,7 +451,7 @@ namespace Waher.Networking.XMPP.Control
 								Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, StringValue, e));
 							else
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 						}
@@ -467,7 +468,7 @@ namespace Waher.Networking.XMPP.Control
 							Int32ControlParameter Int32ControlParameter = Parameter as Int32ControlParameter;
 							if (Int32ControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -486,7 +487,7 @@ namespace Waher.Networking.XMPP.Control
 							Int64ControlParameter Int64ControlParameter = Parameter as Int64ControlParameter;
 							if (Int64ControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -508,7 +509,7 @@ namespace Waher.Networking.XMPP.Control
 								Operations.AddLast(new MultiLineTextControlOperation(Node, MultiLineTextControlParameter, XML.Attribute(E, "v"), e));
 							else
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 						}
@@ -525,7 +526,7 @@ namespace Waher.Networking.XMPP.Control
 							TimeControlParameter TimeControlParameter = Parameter as TimeControlParameter;
 							if (TimeControlParameter is null)
 							{
-								ParameterWrongType(Name, e);
+								await ParameterWrongType(Name, e);
 								return;
 							}
 
@@ -541,7 +542,7 @@ namespace Waher.Networking.XMPP.Control
 							Parameters = await this.GetControlParametersByName(Node);
 							if (Parameters is null)
 							{
-								NotFound(e);
+								await NotFound(e);
 								return;
 							}
 
@@ -549,7 +550,7 @@ namespace Waher.Networking.XMPP.Control
 							{
 								if (!Parameters.TryGetValue(Field.Var, out Parameter))
 								{
-									ParameterNotFound(Field.Var, e);
+									await ParameterNotFound(Field.Var, e);
 									return;
 								}
 
@@ -565,7 +566,7 @@ namespace Waher.Networking.XMPP.Control
 				string[] ParameterNames2 = new string[ParameterNames.Count];
 				ParameterNames.Keys.CopyTo(ParameterNames2, 0);
 
-				this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames2,
+				await this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames2,
 					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
@@ -625,7 +626,7 @@ namespace Waher.Networking.XMPP.Control
 						}
 						else
 						{
-							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+							await e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
 								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
 						}
 
@@ -693,7 +694,7 @@ namespace Waher.Networking.XMPP.Control
 			else
 				Xml.Append("\"/>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task<ControlParameter> GetParameter(IThingReference Node, string Name, IqEventArgs e)
@@ -702,13 +703,13 @@ namespace Waher.Networking.XMPP.Control
 
 			if (Parameters is null)
 			{
-				NotFound(e);
+				await NotFound(e);
 				return null;
 			}
 
 			if (!Parameters.TryGetValue(Name, out ControlParameter Parameter))
 			{
-				ParameterNotFound(Name, e);
+				await ParameterNotFound(Name, e);
 				return null;
 			}
 
@@ -757,7 +758,7 @@ namespace Waher.Networking.XMPP.Control
 				Parameters = await this.GetControlParameters(null);
 				if (Parameters is null)
 				{
-					NotFound(e);
+					await NotFound(e);
 					return;
 				}
 			}
@@ -777,7 +778,7 @@ namespace Waher.Networking.XMPP.Control
 						Parameters = await this.GetControlParameters(Node);
 						if (Parameters is null)
 						{
-							NotFound(e);
+							await NotFound(e);
 							return;
 						}
 
@@ -791,7 +792,7 @@ namespace Waher.Networking.XMPP.Control
 						Parameters2 = await this.GetControlParametersByName(Node);
 						if (Parameters2 is null)
 						{
-							NotFound(e);
+							await NotFound(e);
 							return;
 						}
 
@@ -835,7 +836,7 @@ namespace Waher.Networking.XMPP.Control
 				for (i = 0; i < c; i++)
 					ParameterNames[i] = Parameters[i].Name;
 
-				this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames,
+				await this.provisioningClient.CanControl(e.FromBareJid, Nodes, ParameterNames,
 					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
@@ -857,7 +858,7 @@ namespace Waher.Networking.XMPP.Control
 
 								if (Parameters.Length == 0)
 								{
-									e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+									await e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
 										"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
 									return;
 								}
@@ -867,7 +868,7 @@ namespace Waher.Networking.XMPP.Control
 						}
 						else
 						{
-							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+							await e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
 								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
 						}
 					}, null);
@@ -949,7 +950,7 @@ namespace Waher.Networking.XMPP.Control
 		private async Task ReturnForm(IqEventArgs e, ControlParameter[] Parameters, LinkedList<IThingReference> Nodes)
 		{
 			string Form = (await SerializeControlForm(Parameters, Nodes?.First?.Value, this.GetControlFormTitle(Nodes)));
-			e.IqResult(Form);
+			await e.IqResult(Form);
 		}
 
 

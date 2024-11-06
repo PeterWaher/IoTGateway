@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
@@ -42,5 +44,53 @@ namespace Waher.Networking.Sniffers
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		Task ReceiveBinary(byte[] Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		Task TransmitBinary(byte[] Data);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		Task ReceiveText(string Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		Task TransmitText(string Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		Task Information(string Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		Task Warning(string Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		Task Error(string Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		Task Exception(Exception Exception);
 	}
 }

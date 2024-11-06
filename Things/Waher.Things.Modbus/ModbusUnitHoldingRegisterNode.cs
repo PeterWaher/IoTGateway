@@ -150,11 +150,11 @@ namespace Waher.Things.Modbus
 				if (!string.IsNullOrEmpty(this.RawName))
 					Fields.Add(new Int32Field(This, TP, this.RawName, Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 
-				Request.ReportFields(true, Fields.ToArray());
+				await Request.ReportFields(true, Fields.ToArray());
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			finally
 			{

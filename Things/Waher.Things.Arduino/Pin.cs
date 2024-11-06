@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Maker.RemoteWiring;
+﻿using Microsoft.Maker.RemoteWiring;
+using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
@@ -52,15 +52,12 @@ namespace Waher.Things.Arduino
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public RemoteDevice Device
+		public async Task<RemoteDevice> GetDevice()
 		{
-			get
-			{
-				if (this.Parent is UsbConnectedDevice Device)
-					return Device.Device;
-				else
-					return null;
-			}
+			if (await this.GetParent() is UsbConnectedDevice Device)
+				return Device.Device;
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -68,7 +65,7 @@ namespace Waher.Things.Arduino
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -76,23 +73,21 @@ namespace Waher.Things.Arduino
 		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is UsbConnectedDevice);
+			return Task.FromResult(Parent is UsbConnectedDevice);
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public override Task DestroyAsync()
+		public override async Task DestroyAsync()
 		{
-			Task Result = base.DestroyAsync();
+			await base.DestroyAsync();
 
-			if (this.Parent is UsbConnectedDevice UsbConnectedDevice)
+			if (await this.GetParent() is UsbConnectedDevice UsbConnectedDevice)
 			{
 				UsbState State = Module.GetState(UsbConnectedDevice.PortName);
 				State?.RemovePin(this.PinNrStr, this);
 			}
-
-			return Result;
 		}
 
 	}

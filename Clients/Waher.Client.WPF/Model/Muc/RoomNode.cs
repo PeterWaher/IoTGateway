@@ -104,18 +104,13 @@ namespace Waher.Client.WPF.Model.Muc
 		public override string ToolTip => this.name;
 		public override bool CanRecycle => true;
 
-		public override void Recycle(MainWindow Window)
+		public override Task Recycle(MainWindow Window)
 		{
 			this.entered = false;
+			return Task.CompletedTask;
 		}
 
-		public override string TypeName
-		{
-			get
-			{
-				return "Multi-User Chat Room";
-			}
-		}
+		public override string TypeName => "Multi-User Chat Room";
 
 		public override ImageSource ImageResource
 		{
@@ -466,7 +461,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 					if (e.HasFeature(MultiUserChatClient.NamespaceJabberConference))
 					{
-						this.MucClient.InviteDirect(this.roomId, this.domain, BareJid, Reason, string.Empty, this.password);
+						await this.MucClient.InviteDirect(this.roomId, this.domain, BareJid, Reason, string.Empty, this.password);
 						MainWindow.ShowStatus("Direct Invitation sent.");
 						InvitationSent = true;
 					}
@@ -474,7 +469,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 				if (!InvitationSent)
 				{
-					this.MucClient.Invite(this.roomId, this.domain, Form.BareJid.Text, Form.Reason.Text);
+					await this.MucClient.Invite(this.roomId, this.domain, Form.BareJid.Text, Form.Reason.Text);
 					MainWindow.ShowStatus("Invitation sent.");
 				}
 			}
@@ -489,10 +484,10 @@ namespace Waher.Client.WPF.Model.Muc
 		public override async Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			if (Markdown is null)
-				this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message, string.Empty, ThreadId);
+				await this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message, string.Empty, ThreadId);
 			else
 			{
-				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, await XmppContact.MultiFormatMessage(Message, Markdown),
+				await this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, await XmppContact.MultiFormatMessage(Message, Markdown),
 					string.Empty, ThreadId);
 			}
 		}
@@ -725,6 +720,8 @@ namespace Waher.Client.WPF.Model.Muc
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get room registration form." : e2.ErrorText);
+		
+				return Task.CompletedTask;
 			}, null);
 		}
 

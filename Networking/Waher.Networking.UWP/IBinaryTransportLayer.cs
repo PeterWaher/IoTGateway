@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Networking
 {
@@ -25,14 +21,6 @@ namespace Waher.Networking
 	/// <param name="Count">Number of bytes read.</param>
 	/// <returns>If the process should be continued.</returns>
 	public delegate Task<bool> BinaryDataReadEventHandler(object Sender, byte[] Buffer, int Offset, int Count);
-
-	/// <summary>
-	/// Asynchronous Event Handler.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	/// <returns>If the process should be continued.</returns>
-	public delegate Task AsyncEventHandler(object Sender, EventArgs e);
 
 	/// <summary>
 	/// Interface for binary transport layers.

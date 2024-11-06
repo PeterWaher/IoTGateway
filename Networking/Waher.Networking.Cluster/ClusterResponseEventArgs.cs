@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster
 {
@@ -10,7 +9,7 @@ namespace Waher.Networking.Cluster
 	/// <typeparam name="ResponseType">Type of expected response.</typeparam>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event handler.</param>
-	public delegate void ClusterResponseEventHandler<ResponseType>(object Sender, ClusterResponseEventArgs<ResponseType> e);
+	public delegate Task ClusterResponseEventHandler<ResponseType>(object Sender, ClusterResponseEventArgs<ResponseType> e);
 
 	/// <summary>
 	/// Event arguments for cluster message acknowledgement events.

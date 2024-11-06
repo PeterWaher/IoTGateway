@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.Communication
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.DNS.Communication
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void DnsMessageEventHandler(object Sender, DnsMessageEventArgs e);
+	public delegate Task DnsMessageEventHandler(object Sender, DnsMessageEventArgs e);
 
 	/// <summary>
 	/// DNS Messge event arguments.

@@ -170,13 +170,13 @@ namespace Waher.Things.Ip.Model
 
 								if (!Match)
 								{
-									this.Error("Remote IP not approved. Conncetion reused.");
+									await this.Error("Remote IP not approved. Conncetion reused.");
 									Client.Dispose();
 									continue;
 								}
 							}
 
-							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+							await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 							BinaryTcpClient Incoming = new BinaryTcpClient(Client);
 							BinaryTcpClient Outgoing = null;
@@ -202,7 +202,7 @@ namespace Waher.Things.Ip.Model
 							catch (Exception ex)
 							{
 								await this.node.LogErrorAsync("UnableToConnect", "Unable to connect to remote endpoint: " + ex.Message);
-								this.Exception(ex);
+								await this.Exception(ex);
 								Incoming.DisposeWhenDone();
 								Outgoing?.Dispose();
 								continue;
@@ -290,7 +290,7 @@ namespace Waher.Things.Ip.Model
 			{
 				try
 				{
-					this.Information("Switching to TLS.");
+					await this.Information("Switching to TLS.");
 
 					await Incoming.UpgradeToTlsAsServer(Certificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, ClientCertificates.Optional);
 
@@ -298,7 +298,7 @@ namespace Waher.Things.Ip.Model
 					{
 						if (Incoming.RemoteCertificate is null)
 						{
-							this.Error("No remote certificate found. mTLS is required.");
+							await this.Error("No remote certificate found. mTLS is required.");
 							Incoming.Dispose();
 							Outgoing.Dispose();
 							return;
@@ -306,7 +306,7 @@ namespace Waher.Things.Ip.Model
 
 						if (!Incoming.RemoteCertificateValid)
 						{
-							this.Error("Remote certificate not valid.");
+							await this.Error("Remote certificate not valid.");
 							Incoming.Dispose();
 							Outgoing.Dispose();
 							return;
@@ -331,7 +331,7 @@ namespace Waher.Things.Ip.Model
 						{
 							string Msg = "Invalid login: No user found matching certificate subject.";
 							LoginAuditor.Fail(Msg, User.UserName, RemoteEndpoint, "PROXY");
-							this.Error(Msg);
+							await this.Error(Msg);
 							Incoming.Dispose();
 							Outgoing.Dispose();
 							return;
@@ -342,7 +342,7 @@ namespace Waher.Things.Ip.Model
 
 					if (this.HasSniffers)
 					{
-						this.Information("TLS established" +
+						await this.Information("TLS established" +
 							". Cipher Strength: " + Incoming.CipherStrength.ToString() +
 							", Hash Strength: " + Incoming.HashStrength.ToString() +
 							", Key Exchange Strength: " + Incoming.KeyExchangeStrength.ToString());
@@ -364,7 +364,7 @@ namespace Waher.Things.Ip.Model
 								sb.Append(", Hash: ");
 								sb.Append(Convert.ToBase64String(Incoming.RemoteCertificate.GetCertHash()));
 
-								this.Information(sb.ToString());
+								await this.Information(sb.ToString());
 							}
 						}
 					}

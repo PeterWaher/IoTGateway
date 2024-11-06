@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Runtime.Cache
 {
@@ -40,7 +39,7 @@ namespace Waher.Runtime.Cache
     /// </summary>
     /// <param name="Sender">Sender of event.</param>
     /// <param name="e">Event arguments.</param>
-    public delegate void CacheItemEventHandler<KeyType, ValueType>(object Sender, CacheItemEventArgs<KeyType, ValueType> e);
+    public delegate Task CacheItemEventHandler<KeyType, ValueType>(object Sender, CacheItemEventArgs<KeyType, ValueType> e);
 
     /// <summary>
     /// Event arguments for cache item removal events.

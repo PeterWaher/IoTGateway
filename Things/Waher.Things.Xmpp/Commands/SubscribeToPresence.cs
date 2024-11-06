@@ -43,7 +43,7 @@ namespace Waher.Things.Xmpp.Commands
 		public override async Task ExecuteCommandAsync()
 		{
 			XmppClient Client = await this.GetXmppClient();
-			Client.RequestPresenceSubscription(this.ConnectedDevice.JID);
+			await Client.RequestPresenceSubscription(this.ConnectedDevice.JID);
 		}
 
 		/// <summary>

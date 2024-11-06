@@ -10,6 +10,7 @@ using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Client.WPF.Dialogs.Legal;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 
 namespace Waher.Client.WPF.Model.Legal
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.SensorData;
@@ -61,6 +62,25 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 		/// <param name="Teds">TEDS containing records.</param>
 		public override void AddFields(ThingReference Thing, DateTime Timestamp, List<Field> Fields, Teds Teds)
 		{
+		}
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public override void AppendDetails(StringBuilder SnifferOutput)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			foreach (TedsRecord Record in this.Definition)
+				Record.Append(sb);
+
+			string s = sb.ToString().Trim();
+			s = s.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", ", ");
+
+			SnifferOutput.Append("Definition=(");
+			SnifferOutput.Append(s);
+			SnifferOutput.AppendLine(")");
 		}
 	}
 }

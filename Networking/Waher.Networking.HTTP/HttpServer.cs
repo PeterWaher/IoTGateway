@@ -268,7 +268,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Adapts the server to changes in the network. This method can be called automatically by calling the constructor accordingly.
 		/// </summary>
-		public void NetworkChanged()
+		public async void NetworkChanged()
 #endif
 		{
 			try
@@ -314,7 +314,9 @@ namespace Waher.Networking.HTTP
 				this.AddHttpPorts(HttpPorts, Listeners);
 				this.AddHttpsPorts(HttpsPorts, Listeners);
 #endif
-				this.OnNetworkChanged?.Invoke(this, EventArgs.Empty);
+				EventHandlerAsync h = this.OnNetworkChanged;
+				if (!(h is null))
+					await h(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -325,7 +327,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when the network has been changed.
 		/// </summary>
-		public event EventHandler OnNetworkChanged = null;
+		public event EventHandlerAsync OnNetworkChanged = null;
 
 		/// <summary>
 		/// If the server is to adapt to network changes automatically.
@@ -743,23 +745,26 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Salt value used when calculating ETag values.
 		/// </summary>
-		public string ETagSalt
-		{
-			get => this.eTagSalt;
-			set
-			{
-				if (this.eTagSalt != value)
-				{
-					this.eTagSalt = value;
+		public string ETagSalt => this.eTagSalt;
 
-					try
-					{
-						this.ETagSaltChanged?.Invoke(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+		/// <summary>
+		/// Sets a new salt value used when calculating ETag values.
+		/// </summary>
+		public async Task SetETagSalt(string NewSalt)
+		{
+			if (this.eTagSalt != NewSalt)
+			{
+				this.eTagSalt = NewSalt;
+
+				try
+				{
+					EventHandlerAsync h = this.ETagSaltChanged;
+					if (!(h is null))
+						await h(this, EventArgs.Empty);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -777,7 +782,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when the <see cref="ETagSalt"/> value has changed.
 		/// </summary>
-		public event EventHandler ETagSaltChanged = null;
+		public event EventHandlerAsync ETagSaltChanged = null;
 
 		private int[] GetPorts(bool Http, bool Https)
 		{
@@ -873,7 +878,7 @@ namespace Waher.Networking.HTTP
 		{
 			this.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, null, LockSettings);
 		}
-	
+
 		/// <summary>
 		/// Configures Mutual-TLS capabilities of the server. Affects all connections, all resources.
 		/// </summary>
@@ -998,7 +1003,7 @@ namespace Waher.Networking.HTTP
 
 						if (!(Client is null))
 						{
-							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+							await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
 							BinaryTcpClient.Bind(true);
@@ -1079,7 +1084,7 @@ namespace Waher.Networking.HTTP
 				{
 					if (this.HasSniffers)
 					{
-						this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
+						await this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
 							", Trust Certificates: " + TrustCertificates.ToString() + ")");
 					}
 
@@ -1088,7 +1093,7 @@ namespace Waher.Networking.HTTP
 
 					if (this.HasSniffers)
 					{
-						this.Information("TLS established" +
+						await this.Information("TLS established" +
 							". Cipher Strength: " + Client.CipherStrength.ToString() +
 							", Hash Strength: " + Client.HashStrength.ToString() +
 							", Key Exchange Strength: " + Client.KeyExchangeStrength.ToString());
@@ -1110,7 +1115,7 @@ namespace Waher.Networking.HTTP
 								sb.Append(", Hash: ");
 								sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetCertHash()));
 
-								this.Information(sb.ToString());
+								await this.Information(sb.ToString());
 							}
 						}
 					}
@@ -1304,7 +1309,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Registered resource.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
 			return this.Register(ResourceName, GET, true, false, false, AuthenticationSchemes);
@@ -1320,7 +1324,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Registered resource.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
 			return this.Register(ResourceName, GET, Synchronous, false, false, AuthenticationSchemes);
@@ -1337,7 +1340,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Registered resource.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
@@ -1356,12 +1358,10 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			return this.Register(new HttpGetDelegateResource(ResourceName, new SyncHandler(GET).Call, Synchronous,
-				HandlesSubPaths, UserSessions, AuthenticationSchemes));
+			return this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
 		}
 
 		/// <summary>
@@ -1373,7 +1373,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
 			return this.Register(ResourceName, GET, POST, true, false, false, AuthenticationSchemes);
@@ -1390,7 +1389,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
@@ -1409,7 +1407,6 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
@@ -1429,156 +1426,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		/// <returns>Reference to generated HTTP resource object.</returns>
 		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		[Obsolete("Use handlers that return System.Threading.Task.")]
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
-			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(new HttpGetPostDelegateResource(ResourceName, new SyncHandler(GET).Call, new SyncHandler(POST).Call,
-				Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
-		}
-
-		private class SyncHandler
-		{
-			private readonly HttpMethodHandler h;
-
-			public SyncHandler(HttpMethodHandler h)
-			{
-				this.h = h;
-			}
-
-			public Task Call(HttpRequest Request, HttpResponse Response)
-			{
-				this.h(Request, Response);
-				return Task.CompletedTask;
-			}
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Registered resource.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(ResourceName, GET, true, false, false, AuthenticationSchemes);
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
-		/// (i.e. sends the response from another thread).</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Registered resource.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, bool Synchronous, params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(ResourceName, GET, Synchronous, false, false, AuthenticationSchemes);
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
-		/// (i.e. sends the response from another thread).</param>
-		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Registered resource.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, bool Synchronous, bool HandlesSubPaths,
-			params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(ResourceName, GET, Synchronous, HandlesSubPaths, false, AuthenticationSchemes);
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
-		/// (i.e. sends the response from another thread).</param>
-		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		/// <param name="UserSessions">If the resource uses user sessions.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Reference to generated HTTP resource object.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, bool Synchronous, bool HandlesSubPaths,
-			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Reference to generated HTTP resource object.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, HttpMethodHandlerAsync POST, params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(ResourceName, GET, POST, true, false, false, AuthenticationSchemes);
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
-		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
-		/// (i.e. sends the response from another thread).</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Reference to generated HTTP resource object.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, HttpMethodHandlerAsync POST, bool Synchronous,
-			params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(ResourceName, GET, POST, Synchronous, false, false, AuthenticationSchemes);
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
-		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
-		/// (i.e. sends the response from another thread).</param>
-		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Reference to generated HTTP resource object.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, HttpMethodHandlerAsync POST, bool Synchronous, bool HandlesSubPaths,
-			params HttpAuthenticationScheme[] AuthenticationSchemes)
-		{
-			return this.Register(ResourceName, GET, POST, Synchronous, HandlesSubPaths, false, AuthenticationSchemes);
-		}
-
-		/// <summary>
-		/// Registers a resource with the server.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">PSOT method handler.</param>
-		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
-		/// (i.e. sends the response from another thread).</param>
-		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		/// <param name="UserSessions">If the resource uses user sessions.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		/// <returns>Reference to generated HTTP resource object.</returns>
-		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-		public HttpResource Register(string ResourceName, HttpMethodHandlerAsync GET, HttpMethodHandlerAsync POST, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
 			return this.Register(new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
@@ -1775,14 +1623,14 @@ namespace Waher.Networking.HTTP
 		}
 
 
-		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		private async Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
 		{
 			CacheItemEventHandler<string, Variables> h = this.SessionRemoved;
 			if (!(h is null))
 			{
 				try
 				{
-					h(this, e);
+					await h(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -1995,7 +1843,7 @@ namespace Waher.Networking.HTTP
 			return this.currentRequests?.TryGetValue(Request, out RequestInfo _) == false;
 		}
 
-		private void CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)
+		private Task CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)
 		{
 			RequestInfo Info = e.Value;
 
@@ -2005,6 +1853,8 @@ namespace Waher.Networking.HTTP
 					new KeyValuePair<string, object>("From", Info.ClientAddress),
 					new KeyValuePair<string, object>("Method", Info.Method));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

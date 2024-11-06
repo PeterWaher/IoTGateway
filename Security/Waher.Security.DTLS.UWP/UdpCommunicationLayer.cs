@@ -45,11 +45,14 @@ namespace Waher.Security.DTLS
 					if (this.disposed)
 						return;
 
-					this.ReceiveBinary(Data.Buffer);
+					await this.ReceiveBinary(Data.Buffer);
 
 					try
 					{
-						this.PacketReceived?.Invoke(Data.Buffer, Data.RemoteEndPoint);
+						DataReceivedEventHandler h = this.PacketReceived;
+
+						if (!(h is null))
+							await h(Data.Buffer, Data.RemoteEndPoint);
 					}
 					catch (Exception ex)
 					{
@@ -64,7 +67,7 @@ namespace Waher.Security.DTLS
 			catch (Exception ex)
 			{
 				if (!this.disposed)
-					this.Exception(ex);
+					await this.Exception(ex);
 			}
 		}
 
@@ -110,7 +113,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				this.Exception(ex);
+				await this.Exception(ex);
 			}
 		}
 
@@ -124,10 +127,10 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Packet">Datagram</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		public void SendPacket(byte[] Packet, object RemoteEndpoint)
+		public Task SendPacket(byte[] Packet, object RemoteEndpoint)
 		{
 			IPEndPoint EP = (IPEndPoint)RemoteEndpoint;
-			Task _ = this.BeginTransmit(Packet, EP);
+			return this.BeginTransmit(Packet, EP);
 		}
 
 		/// <summary>

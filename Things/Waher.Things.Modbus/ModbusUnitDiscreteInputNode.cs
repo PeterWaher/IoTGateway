@@ -83,12 +83,12 @@ namespace Waher.Things.Modbus
 
 				ThingReference This = await this.GetReportAs();
 
-				Request.ReportFields(true,
+				await Request.ReportFields(true,
 					new BooleanField(This, TP, this.GetFieldName(), Values[0], FieldType.Momentary, FieldQoS.AutomaticReadout));
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			finally
 			{

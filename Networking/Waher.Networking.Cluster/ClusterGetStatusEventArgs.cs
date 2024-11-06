@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.Cluster
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event handler.</param>
-	public delegate void ClusterGetStatusEventHandler(object Sender, ClusterGetStatusEventArgs e);
+	public delegate Task ClusterGetStatusEventHandler(object Sender, ClusterGetStatusEventArgs e);
 
 	/// <summary>
 	/// Event arguments for cluster get status events.

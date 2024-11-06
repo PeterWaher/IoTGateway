@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Security;
 
@@ -41,7 +42,7 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static MqttBroker GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, bool TrustServer,
+		public static async Task<MqttBroker> GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, bool TrustServer,
 			string UserName, string Password, string ConnectionSubscription, string WillTopic, string WillData, bool WillRetain, 
 			MqttQualityOfService WillQoS)
 		{
@@ -55,7 +56,7 @@ namespace Waher.Things.Mqtt.Model
 
 			if (!(Broker is null))
 			{
-				Broker.SetWill(WillTopic, WillData, WillRetain, WillQoS);
+				await Broker.SetWill(WillTopic, WillData, WillRetain, WillQoS);
 				return Broker;
 			}
 			else
@@ -63,38 +64,43 @@ namespace Waher.Things.Mqtt.Model
 				Broker = new MqttBroker(Node, Host, Port, Tls, TrustServer, UserName, Password, ConnectionSubscription,
 					WillTopic, WillData, WillRetain, WillQoS);
 
+				MqttBroker Result;
+				MqttBroker Obsolete;
+
 				lock (brokers)
 				{
-					if (brokers.ContainsKey(Key))
-					{
-						Broker.Dispose();
-						return brokers[Key];
-					}
+					if (brokers.TryGetValue(Key, out Result))
+						Obsolete = Broker;
 					else
 					{
-						brokers[Key] = Broker;
-						return Broker;
+						brokers[Key] = Result = Broker;
+						Obsolete = null;
 					}
 				}
+
+				if (!(Obsolete is null))
+					await Obsolete.DisposeAsync();
+
+				return Result;
 			}
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static void DestroyBroker(string Key)
+		public static Task DestroyBroker(string Key)
 		{
 			MqttBroker Broker;
 
 			lock (brokers)
 			{
 				if (!brokers.TryGetValue(Key, out Broker))
-					return;
+					return Task.CompletedTask;
 
 				brokers.Remove(Key);
 			}
 
-			Broker.Dispose();
+			return Broker.DisposeAsync();
 		}
 
 	}

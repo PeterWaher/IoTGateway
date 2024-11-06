@@ -205,10 +205,19 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestCleanup]
-		public virtual void TearDown()
+		public virtual async Task TearDown()
 		{
-			this.client?.Dispose();
-			this.component?.Dispose();
+			if (this.client is not null)
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
+
+			if (this.component is not null)
+			{
+				await this.component.DisposeAsync();
+				this.component = null;
+			}
 
 			if (this.clientEx is not null)
 				throw new TargetInvocationException(this.clientEx);

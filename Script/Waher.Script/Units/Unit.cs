@@ -803,7 +803,6 @@ namespace Waher.Script.Units
 		/// Converts the unit to a series of reference unit factors. (Unrecognized units will be assumed to be reference units.)
 		/// </summary>
 		/// <param name="Magnitude">Reference magnitude.</param>
-		/// <param name="NrDecimals"></param>
 		/// <returns>Unit consisting of reference unit factors.</returns>
 		public Unit ToReferenceUnits(ref double Magnitude)
 		{
@@ -931,7 +930,6 @@ namespace Waher.Script.Units
 		/// Converts the unit to a series of reference unit factors. (Unrecognized units will be assumed to be reference units.)
 		/// </summary>
 		/// <param name="Magnitude">Reference magnitude.</param>
-		/// <param name="NrDecimals">Number of decimals to present.</param>
 		/// <returns>Unit consisting of reference unit factors.</returns>
 		public Unit FromReferenceUnits(ref double Magnitude)
 		{

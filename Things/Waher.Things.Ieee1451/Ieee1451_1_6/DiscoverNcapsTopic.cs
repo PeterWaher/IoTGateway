@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Language;
-using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
@@ -103,8 +103,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// </summary>
 		public async Task ExecuteCommandAsync()
 		{
-			byte[] Request = DiscoveryMessage.SerializeRequest();
-			MqttBroker Broker = this.brokerNode.GetBroker();
+			StringBuilder ToSniffer = this.brokerNode.HasSniffers ? new StringBuilder() : null;
+			byte[] Request = DiscoveryMessage.SerializeRequest(ToSniffer);
+			MqttBroker Broker = await this.brokerNode.GetBroker();
+
+			if (!(ToSniffer is null))
+				await this.brokerNode.Information(ToSniffer.ToString());
+
 			await Broker.Publish(await this.topicNode.GetFullTopic(), MqttQualityOfService.AtLeastOnce, false, Request);
 		}
 	}

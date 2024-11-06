@@ -138,9 +138,9 @@
     <Compile Include="Authentication\ScramAuthenticationMethod.cs" />
     <Compile Include="Authentication\ScramSha1.cs" />
     <Compile Include="Authentication\ScramSha256.cs" />
+    <Compile Include="Availability.cs" />
     <Compile Include="BitsOfBinary\BitsOfBinaryEventArgs.cs" />
     <Compile Include="BitsOfBinary\BobClient.cs" />
-    <Compile Include="CustomPresenceEventArgs.cs" />
     <Compile Include="DataForms\DataForm.cs" />
     <Compile Include="DataForms\DataFormEventArgs.cs" />
     <Compile Include="DataForms\DataTypes\AnyUriDataType.cs" />
@@ -173,7 +173,7 @@
     <Compile Include="DataForms\FieldTypes\TextMultiField.cs" />
     <Compile Include="DataForms\FieldTypes\TextPrivateField.cs" />
     <Compile Include="DataForms\FieldTypes\TextSingleField.cs" />
-    <Compile Include="DataForms\FormResultToFormCallback.cs" />
+    <Compile Include="DataForms\FormType.cs" />
     <Compile Include="DataForms\ICustomFormProperties.cs" />
     <Compile Include="DataForms\IPropertyFormAnnotation.cs" />
     <Compile Include="DataForms\Layout\FieldReference.cs" />
@@ -189,7 +189,16 @@
     <Compile Include="DataForms\ValidationMethods\RangeValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
-    <Compile Include="DeliveryEventArgs.cs" />
+    <Compile Include="ErrorType.cs" />
+    <Compile Include="Events\CustomPresenceEventArgs.cs" />
+    <Compile Include="Events\DeliveryEventArgs.cs" />
+    <Compile Include="Events\IqEventArgs.cs" />
+    <Compile Include="Events\IqResultEventArgs.cs" />
+    <Compile Include="Events\MessageEventArgs.cs" />
+    <Compile Include="Events\MessageFormEventArgs.cs" />
+    <Compile Include="Events\PresenceEventArgs.cs" />
+    <Compile Include="Events\PrivateXmlEventArgs.cs" />
+    <Compile Include="Events\ValidateSenderEventArgs.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadClient.cs" />
     <Compile Include="HttpFileUpload\HttpFileUploadEventArgs.cs" />
     <Compile Include="IAlternativeTransport.cs" />
@@ -203,15 +212,11 @@
     <Compile Include="InBandBytestreams\OutgoingStream.cs" />
     <Compile Include="InBandBytestreams\StreamClosedEventArgs.cs" />
     <Compile Include="InBandBytestreams\ValidateStreamEventArgs.cs" />
-    <Compile Include="IqEventArgs.cs" />
     <Compile Include="IqResponses.cs" />
-    <Compile Include="IqResultEventArgs.cs" />
     <Compile Include="IXmppExtension.cs" />
-    <Compile Include="MessageEventArgs.cs" />
-    <Compile Include="MessageFormEventArgs.cs" />
+    <Compile Include="MessageType.cs" />
     <Compile Include="PendingRequest.cs" />
-    <Compile Include="PresenceEventArgs.cs" />
-    <Compile Include="PrivateXmlEventArgs.cs" />
+    <Compile Include="PresenceType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QoSLevel.cs" />
     <Compile Include="RemoteSniffer.cs" />
@@ -279,7 +284,6 @@
     <Compile Include="StreamErrors\UnsupportedFeatureException.cs" />
     <Compile Include="StreamErrors\UnsupportedStanzaTypeException.cs" />
     <Compile Include="StreamErrors\UnsupportedVersionException.cs" />
-    <Compile Include="ValidateSenderEventArgs.cs" />
     <Compile Include="XmppBindingInterface.cs" />
     <Compile Include="XmppClient.cs" />
     <Compile Include="XmppComponent.cs" />
@@ -341,6 +345,7 @@
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Authentication\*.cs" "$(ProjectDir)Authentication" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\AuthenticationErrors\*.cs" "$(ProjectDir)AuthenticationErrors" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\DataForms\*.cs" "$(ProjectDir)DataForms" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Events\*.cs" "$(ProjectDir)Events" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Search\*.cs" "$(ProjectDir)Search" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\ServiceDiscovery\*.cs" "$(ProjectDir)ServiceDiscovery" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\SoftwareVersion\*.cs" "$(ProjectDir)SoftwareVersion" /S /R /Y

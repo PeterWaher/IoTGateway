@@ -110,7 +110,7 @@ namespace Waher.Client.MqttEventViewer
 
 				if (!(this.mqtt is null))
 				{
-					this.mqtt.Dispose();
+					this.mqtt.DisposeAsync().Wait();    // TODO: Avoid blocking calls.
 					this.mqtt = null;
 				}
 

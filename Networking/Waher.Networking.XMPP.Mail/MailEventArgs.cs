@@ -1,37 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Mail
 {
-	/// <summary>
-	/// Mail priority
-	/// </summary>
-	public enum Priority
-	{
-		/// <summary>
-		/// High (1)
-		/// </summary>
-		High = 1,
-
-		/// <summary>
-		/// Normal (3)
-		/// </summary>
-		Normal = 3,
-
-		/// <summary>
-		/// Low (5)
-		/// </summary>
-		Low = 5
-	}
-
-	/// <summary>
-	/// Delegate for mail event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task MailEventHandler(object Sender, MailEventArgs e);
-
 	/// <summary>
 	/// Event arguments for mail message events
 	/// </summary>

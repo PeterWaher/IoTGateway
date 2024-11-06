@@ -123,14 +123,14 @@ namespace Waher.Security.DTLS.Ciphers
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
-		public abstract void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
+		public abstract Task SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Sends the Server Key Exchange message flight.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
-		public abstract void SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
+		public abstract Task SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
@@ -206,10 +206,10 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
 		/// <param name="Resendable">If flight of records is resendable.</param>
-		public virtual void SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable)
+		public virtual async Task SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable)
 		{
 			if (State.masterSecret is null)
-				Endpoint.SendAlert(AlertLevel.fatal, AlertDescription.handshake_failure, State);
+				await Endpoint.SendAlert(AlertLevel.fatal, AlertDescription.handshake_failure, State);
 			else
 			{
 				string Label;
@@ -233,10 +233,10 @@ namespace Waher.Security.DTLS.Ciphers
 
 				VerifyData = this.PRF(State.masterSecret, Label, HandshakeHash, 12);
 
-				Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, Resendable, State);
+				await Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, Resendable, State);
 
 				if (State.clientFinished && State.serverFinished)
-					Endpoint.HandshakeSuccess(State);
+					await Endpoint.HandshakeSuccess(State);
 			}
 		}
 

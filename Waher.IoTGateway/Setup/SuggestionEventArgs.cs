@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -9,7 +9,7 @@ namespace Waher.IoTGateway.Setup
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SuggesstionsEventHandler(object Sender, SuggestionEventArgs e);
+	public delegate Task SuggesstionsEventHandler(object Sender, SuggestionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for suggestion event handlers.

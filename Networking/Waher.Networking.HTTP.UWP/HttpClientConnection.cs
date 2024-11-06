@@ -86,23 +86,44 @@ namespace Waher.Networking.HTTP
 
 		private Task Client_OnError(object Sender, Exception Exception)
 		{
-			this.Dispose();
-			return Task.CompletedTask;
+			return this.DisposeAsync();
 		}
 
-		private void Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object sender, EventArgs e)
 		{
-			this.Dispose();
+			return this.DisposeAsync();
 		}
 
-		public void Dispose()
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		[Obsolete("Use the DisposeAsync() method.")]
+		public async void Dispose()
+		{
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!this.disposed)
 			{
 				this.disposed = true;
 
-				this.webSocket?.Dispose();
-				this.webSocket = null;
+				if (!(this.webSocket is null))
+				{
+					await this.webSocket.DisposeAsync();
+					this.webSocket = null;
+				}
 
 				this.headerStream?.Dispose();
 				this.headerStream = null;
@@ -176,7 +197,7 @@ namespace Waher.Networking.HTTP
 
 				if (this.HasSniffers)
 				{
-					this.ReceiveText(Header);
+					await this.ReceiveText(Header);
 
 					HttpFieldContentType ContentType = this.header.ContentType;
 					if (ContentType is null)
@@ -253,7 +274,7 @@ namespace Waher.Networking.HTTP
 					byte[] Data2 = new byte[d];
 					this.headerStream.Position = 0;
 					await this.headerStream.ReadAllAsync(Data2, 0, d);
-					this.ReceiveBinary(Data2);
+					await this.ReceiveBinary(Data2);
 				}
 
 				await this.SendResponse(null, null, new HttpException(431, "Request Header Fields Too Large",
@@ -393,19 +414,19 @@ namespace Waher.Networking.HTTP
 				if (Offset == 0 && NrAccepted == Data.Length)
 				{
 					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data));
+						await this.ReceiveText(this.rxEncoding.GetString(Data));
 					else
-						this.ReceiveBinary(Data);
+						await this.ReceiveBinary(Data);
 				}
 				else
 				{
 					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
+						await this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
 					else
 					{
 						byte[] Data2 = new byte[NrAccepted];
 						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
-						this.ReceiveBinary(Data2);
+						await this.ReceiveBinary(Data2);
 					}
 				}
 			}
@@ -663,13 +684,13 @@ namespace Waher.Networking.HTTP
 			{
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				await this.SendResponse(Request, null, new NotImplementedException(ex.Message), !Result);
 			}
 			catch (IOException ex)
 			{
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
@@ -687,7 +708,7 @@ namespace Waher.Networking.HTTP
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
 				ex = XML.AnnotateException(ex);
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
@@ -695,7 +716,7 @@ namespace Waher.Networking.HTTP
 			{
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
@@ -796,7 +817,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (System.NotImplementedException ex)
 			{
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -814,7 +835,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (IOException ex)
 			{
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -840,7 +861,7 @@ namespace Waher.Networking.HTTP
 			catch (XmlException ex)
 			{
 				ex = XML.AnnotateException(ex);
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -858,7 +879,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Log.Exception(ex);
+				await this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -934,7 +955,7 @@ namespace Waher.Networking.HTTP
 			finally
 			{
 				if (DisposeResponse)
-					Response.Dispose();
+					await Response.DisposeAsync();
 			}
 		}
 

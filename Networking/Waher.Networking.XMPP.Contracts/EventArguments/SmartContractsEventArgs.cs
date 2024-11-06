@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.Contracts
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for smart contracts callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task SmartContractsEventHandler(object Sender, SmartContractsEventArgs e);
-
 	/// <summary>
 	/// Event arguments for smart contracts responses
 	/// </summary>

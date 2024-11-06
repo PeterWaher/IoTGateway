@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Temporary;
 
@@ -256,7 +257,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 						if (!(this.serverlessMessaging is null))
 						{
-							this.serverlessMessaging.GetPeerConnection(e.From, this.SendP2P, new SendP2pRec()
+							await this.serverlessMessaging.GetPeerConnection(e.From, this.SendP2P, new SendP2pRec()
 							{
 								item = Item,
 								method = Method,
@@ -327,7 +328,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					if (!(this.serverlessMessaging is null))
 					{
-						this.serverlessMessaging.GetPeerConnection(e.From, (sender, e2) =>
+						await this.serverlessMessaging.GetPeerConnection(e.From, (sender, e2) =>
 						{
 							if (e2.Client is null)
 								Result.TrySetResult(this.httpxClient);
@@ -342,6 +343,8 @@ namespace Waher.Networking.XMPP.HTTPX
 								else
 									Result.TrySetResult(this.httpxClient);
 							}
+
+							return Task.CompletedTask;
 						}, null);
 					}
 					else
@@ -372,7 +375,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			public HttpResponse response;
 		}
 
-		private void SendP2P(object Sender, PeerConnectionEventArgs e)
+		private async Task SendP2P(object Sender, PeerConnectionEventArgs e)
 		{
 			SendP2pRec Rec = (SendP2pRec)e.State;
 
@@ -380,7 +383,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (e.Client is null)
 				{
-					this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+					await this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
 						Rec.localUrl, Rec.request, Rec.response);
 				}
 				else
@@ -389,19 +392,19 @@ namespace Waher.Networking.XMPP.HTTPX
 						e.Client.TryGetTag("HttpxClient", out object Obj) &&
 						Obj is HttpxClient Client)
 					{
-						this.SendRequest(Client, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+						await this.SendRequest(Client, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
 							Rec.localUrl, Rec.request, Rec.response);
 					}
 					else
 					{
-						this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
+						await this.SendRequest(this.httpxClient, Rec.fullJID, Rec.method, XmppClient.GetBareJID(Rec.fullJID),
 							Rec.localUrl, Rec.request, Rec.response);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Task _ = Rec.response.SendResponse(ex);
+				await Rec.response.SendResponse(ex);
 			}
 		}
 

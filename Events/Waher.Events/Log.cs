@@ -106,7 +106,9 @@ namespace Waher.Events
 				}
 			}
 
-			Terminating?.Invoke(null, EventArgs.Empty);
+			EventHandler h = Terminating;
+			if (!(h is null))
+				h(null, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -820,7 +822,7 @@ namespace Waher.Events
 				Type T = Exception.GetType();
 				if (Array.IndexOf(nestedExceptionTypes, T) < 0)
 				{
-					if (Exception is AggregateException AggregateException && 
+					if (Exception is AggregateException AggregateException &&
 						AggregateException.InnerExceptions.Count == 1)
 					{
 						Exception = AggregateException.InnerExceptions[0];

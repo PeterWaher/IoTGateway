@@ -7,7 +7,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpGetPostDelegateResource : HttpGetDelegateResource, IHttpPostMethod
 	{
-		private readonly HttpMethodHandlerAsync post;
+		private readonly HttpMethodHandler post;
 
 		/// <summary>
 		/// HTTP resource defined by GET and POST delegate methods.
@@ -20,7 +20,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpGetPostDelegateResource(string ResourceName, HttpMethodHandlerAsync GET, HttpMethodHandlerAsync POST, bool Synchronous, bool HandlesSubPaths,
+		public HttpGetPostDelegateResource(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName, GET, Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes)
 		{

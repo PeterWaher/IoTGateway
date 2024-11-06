@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP
 {
@@ -7,8 +8,8 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	internal class PendingRequest
 	{
-		private readonly IqResultEventHandlerAsync iqCallback;
-		private readonly PresenceEventHandlerAsync presenceCallback;
+		private readonly EventHandlerAsync<IqResultEventArgs> iqCallback;
+		private readonly EventHandlerAsync<PresenceEventArgs> presenceCallback;
 		private DateTime timeout;
 		private readonly string to;
 		private string xml;
@@ -19,7 +20,7 @@ namespace Waher.Networking.XMPP
 		private readonly uint seqNr;
 		private readonly bool dropOff;
 
-		internal PendingRequest(uint SeqNr, IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, 
+		internal PendingRequest(uint SeqNr, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, 
 			string To)
 		{
 			this.seqNr = SeqNr;
@@ -35,7 +36,7 @@ namespace Waher.Networking.XMPP
 			this.timeout = DateTime.Now.AddMilliseconds(RetryTimeout);
 		}
 
-		internal PendingRequest(uint SeqNr, PresenceEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout,
+		internal PendingRequest(uint SeqNr, EventHandlerAsync<PresenceEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout,
 			string To)
 		{
 			this.seqNr = SeqNr;
@@ -73,12 +74,12 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Callback method (for IQ stanzas) to call when a result or error is returned.
 		/// </summary>
-		public IqResultEventHandlerAsync IqCallback => this.iqCallback;
+		public EventHandlerAsync<IqResultEventArgs> IqCallback => this.iqCallback;
 
 		/// <summary>
 		/// Callback method (for Presence stanzas) to call when a result or error is returned.
 		/// </summary>
-		public PresenceEventHandlerAsync PresenceCallback => this.presenceCallback;
+		public EventHandlerAsync<PresenceEventArgs> PresenceCallback => this.presenceCallback;
 
 		/// <summary>
 		/// State object passed in the original request.

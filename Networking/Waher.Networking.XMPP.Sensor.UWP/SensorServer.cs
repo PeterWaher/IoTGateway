@@ -4,21 +4,15 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Runtime.Timing;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Runtime.Timing;
 
 namespace Waher.Networking.XMPP.Sensor
 {
-	/// <summary>
-	/// Delegate for sensor data readout request events, on a sensor server.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Request">Readout request to process.</param>
-	public delegate Task SensorDataReadoutEventHandler(object Sender, SensorDataServerRequest Request);
-
 	/// <summary>
 	/// Implements an XMPP sensor server interface.
 	/// 
@@ -111,14 +105,14 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
-		private Task Client_OnPresence(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			Dictionary<string, Subscription> Subscriptions;
 
 			lock (this.subscriptionsByThing)
 			{
 				if (!this.subscriptionsByJID.TryGetValue(e.From, out Subscriptions))
-					return Task.CompletedTask;
+					return;
 			}
 
 			foreach (Subscription Subscription in Subscriptions.Values)
@@ -129,11 +123,9 @@ namespace Waher.Networking.XMPP.Sensor
 				{
 					Subscription.SupressedTrigger = false;
 					Subscription.LastTrigger = DateTime.Now;
-					this.TriggerSubscription(Subscription);
+					await this.TriggerSubscription(Subscription);
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private Task Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
@@ -363,17 +355,17 @@ namespace Waher.Networking.XMPP.Sensor
 						Request.FieldNames = P.FieldNames;
 						Request.Types = P.FieldTypes;
 
-						this.AcceptRequest(Request, e, Id);
+						await this.AcceptRequest(Request, e, Id);
 					}
 					else
 					{
-						e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+						await e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
 							"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
 					}
 				});
 			}
 			else
-				this.AcceptRequest(Request, e, Id);
+				await this.AcceptRequest(Request, e, Id);
 		}
 
 		/// <summary>
@@ -402,14 +394,14 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Origin">Origin of request.</param>
 		/// <returns>If approved or partially approved, the result will contain the information about what has
 		/// been approved. If not approved, null is returned.</returns>
-		public Task<ApprovedReadoutParameters> CanReadAsync(FieldType FieldTypes, IThingReference[] Nodes, string[] FieldNames,
+		public async Task<ApprovedReadoutParameters> CanReadAsync(FieldType FieldTypes, IThingReference[] Nodes, string[] FieldNames,
 			RequestOrigin Origin)
 		{
 			TaskCompletionSource<ApprovedReadoutParameters> Result = new TaskCompletionSource<ApprovedReadoutParameters>();
 
 			if (!(this.provisioningClient is null))
 			{
-				this.provisioningClient.CanRead(Origin.From, FieldTypes, Nodes, FieldNames,
+				await this.provisioningClient.CanRead(Origin.From, FieldTypes, Nodes, FieldNames,
 					Origin.ServiceTokens, Origin.DeviceTokens, Origin.UserTokens,
 					(sender2, e2) =>
 					{
@@ -424,12 +416,12 @@ namespace Waher.Networking.XMPP.Sensor
 			else
 				Result.TrySetResult(new ApprovedReadoutParameters(Nodes, FieldNames, FieldTypes));
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		private static readonly char[] space = new char[] { ' ' };
 
-		private void AcceptRequest(SensorDataServerRequest Request, IqEventArgs e, string Id)
+		private async Task AcceptRequest(SensorDataServerRequest Request, IqEventArgs e, string Id)
 		{
 			string Key = e.From + " " + Id;
 			bool NewRequest;
@@ -442,34 +434,34 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (Request.When > DateTime.Now)
 			{
-				e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "' queued='true'/>");
+				await e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "' queued='true'/>");
 				Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
 			}
 			else
 			{
-				e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "'/>");
-				this.PerformReadout(Request);
+				await e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "'/>");
+				await this.PerformReadout(Request);
 			}
 		}
 
-		private void StartReadout(object P)
+		private Task StartReadout(object P)
 		{
 			SensorDataServerRequest Request = (SensorDataServerRequest)P;
 
 			this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<started xmlns='" + Request.Namespace + "' id='" +
 				XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 
-			this.PerformReadout(Request);
+			return this.PerformReadout(Request);
 		}
 
-		private void PerformReadout(SensorDataServerRequest Request)
+		private async Task PerformReadout(SensorDataServerRequest Request)
 		{
 			Request.Started = true;
 
-			SensorDataReadoutEventHandler h = this.OnExecuteReadoutRequest;
+			EventHandlerAsync<SensorDataServerRequest> h = this.OnExecuteReadoutRequest;
 			if (h is null)
 			{
-				this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + Request.Namespace + "' id='" +
+				await this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + Request.Namespace + "' id='" +
 					XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 
 				lock (this.requests)
@@ -481,11 +473,11 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				try
 				{
-					h(this, Request);
+					await h(this, Request);
 				}
 				catch (Exception ex)
 				{
-					Request.ReportErrors(true, new ThingError(string.Empty, string.Empty, string.Empty, DateTime.Now, ex.Message));
+					await Request.ReportErrors(true, new ThingError(string.Empty, string.Empty, string.Empty, DateTime.Now, ex.Message));
 				}
 			}
 		}
@@ -503,13 +495,14 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="OnErrorsReported">Callback method when errors are reported.</param>
 		/// <param name="State">State object passed on to callback methods.</param>
 		/// <returns>Request object.</returns>
-		public InternalReadoutRequest DoInternalReadout(string Actor, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
-			InternalReadoutFieldsEventHandler OnFieldsReported, InternalReadoutErrorsEventHandler OnErrorsReported, object State)
+		public async Task<InternalReadoutRequest> DoInternalReadout(string Actor, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
+			EventHandlerAsync<InternalReadoutFieldsEventArgs> OnFieldsReported, EventHandlerAsync<InternalReadoutErrorsEventArgs> OnErrorsReported, object State)
 		{
 			InternalReadoutRequest Request = new InternalReadoutRequest(Actor, Nodes, Types, Fields, From, To, OnFieldsReported, OnErrorsReported, State);
+			EventHandlerAsync<SensorDataServerRequest> h = this.OnExecuteReadoutRequest;
 
-			this.OnExecuteReadoutRequest?.Invoke(this, Request);
-
+			await h.Raise(this, Request);
+			
 			return Request;
 		}
 
@@ -524,7 +517,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Event raised when a readout request is to be executed.
 		/// </summary>
-		public event SensorDataReadoutEventHandler OnExecuteReadoutRequest = null;
+		public event EventHandlerAsync<SensorDataServerRequest> OnExecuteReadoutRequest = null;
 
 		private Task CancelHandler(object Sender, IqEventArgs e)
 		{
@@ -543,9 +536,7 @@ namespace Waher.Networking.XMPP.Sensor
 			if (!(Request is null) && !Request.Started)
 				this.scheduler.Remove(Request.When);
 
-			e.IqResult(string.Empty);
-
-			return Task.CompletedTask;
+			return e.IqResult(string.Empty);
 		}
 
 		private async Task SubscribeHandler(object Sender, IqEventArgs e)
@@ -724,7 +715,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (!(this.provisioningClient is null))
 			{
-				this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields?.Keys,
+				await this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields?.Keys,
 					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
@@ -769,27 +760,25 @@ namespace Waher.Networking.XMPP.Sensor
 								}
 							}
 
-							this.PerformSubscription(Req, e, Id, Fields, e2.Nodes, e2.FieldTypes,
+							return this.PerformSubscription(Req, e, Id, Fields, e2.Nodes, e2.FieldTypes,
 								ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
 						}
 						else
 						{
-							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
+							return e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
 								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
 						}
-
-						return Task.CompletedTask;
 
 					}, null);
 			}
 			else
 			{
-				this.PerformSubscription(Req, e, Id, Fields, Nodes?.ToArray(), FieldTypes,
+				await this.PerformSubscription(Req, e, Id, Fields, Nodes?.ToArray(), FieldTypes,
 					ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
 			}
 		}
 
-		private void PerformSubscription(bool Req, IqEventArgs e, string Id, Dictionary<string, FieldSubscriptionRule> FieldNames,
+		private async Task PerformSubscription(bool Req, IqEventArgs e, string Id, Dictionary<string, FieldSubscriptionRule> FieldNames,
 			IThingReference[] Nodes, FieldType FieldTypes, string ServiceToken, string DeviceToken, string UserToken,
 			Duration? MaxAge, Duration? MinInterval, Duration? MaxInterval)
 		{
@@ -822,13 +811,13 @@ namespace Waher.Networking.XMPP.Sensor
 
 				if (Request.When > Now)
 				{
-					e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "' queued='true'/>");
+					await e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "' queued='true'/>");
 					Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
 				}
 				else
 				{
-					e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "'/>");
-					this.PerformReadout(Request);
+					await e.IqResult("<accepted xmlns='" + e.Query.NamespaceURI + "' id='" + XML.Encode(Id) + "'/>");
+					await this.PerformReadout(Request);
 				}
 			}
 
@@ -878,7 +867,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (!Req)
-				e.IqResult("<accepted xmlns='" + Subscription.Namespace.Replace(":iot:events:", ":iot:sd:") + "' id='" + XML.Encode(Id) + "'/>");
+				await e.IqResult("<accepted xmlns='" + Subscription.Namespace.Replace(":iot:events:", ":iot:sd:") + "' id='" + XML.Encode(Id) + "'/>");
 
 			this.UpdateSubscriptionTimers(Now, Subscription);
 		}
@@ -894,7 +883,7 @@ namespace Waher.Networking.XMPP.Sensor
 				this.scheduler.Add(ReferenceTimestamp + D.Value, this.CheckMaxInterval, Subscription);
 		}
 
-		private void CheckMinInterval(object P)
+		private async Task CheckMinInterval(object P)
 		{
 			Subscription Subscription = (Subscription)P;
 
@@ -905,11 +894,11 @@ namespace Waher.Networking.XMPP.Sensor
 				if (Subscription.MinInterval.HasValue)
 					Subscription.LastTrigger += Subscription.MinInterval.Value;
 
-				this.TriggerSubscription(Subscription);
+				await this.TriggerSubscription(Subscription);
 			}
 		}
 
-		private void CheckMaxInterval(object P)
+		private async Task CheckMaxInterval(object P)
 		{
 			Subscription Subscription = (Subscription)P;
 			if (!Subscription.Active)
@@ -922,7 +911,7 @@ namespace Waher.Networking.XMPP.Sensor
 			if (TP <= DateTime.Now)
 			{
 				Subscription.LastTrigger = TP;
-				this.TriggerSubscription(Subscription);
+				await this.TriggerSubscription(Subscription);
 			}
 			else
 				this.scheduler.Add(TP, this.CheckMaxInterval, Subscription);
@@ -971,11 +960,9 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (Found)
-				e.IqResult(string.Empty);
+				return e.IqResult(string.Empty);
 			else
-				e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
-
-			return Task.CompletedTask;
+				return e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
 		}
 
 		private readonly Dictionary<IThingReference, LinkedList<Subscription>> subscriptionsByThing = new Dictionary<IThingReference, LinkedList<Subscription>>();
@@ -985,9 +972,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(params Field[] Values)
+		public Task NewMomentaryValues(params Field[] Values)
 		{
-			this.NewMomentaryValues(null, Values, null);
+			return this.NewMomentaryValues(null, Values, null);
 		}
 
 		/// <summary>
@@ -995,18 +982,18 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(IThingReference Reference, params Field[] Values)
+		public Task NewMomentaryValues(IThingReference Reference, params Field[] Values)
 		{
-			this.NewMomentaryValues(Reference, Values, null);
+			return this.NewMomentaryValues(Reference, Values, null);
 		}
 
 		/// <summary>
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(IEnumerable<Field> Values)
+		public Task NewMomentaryValues(IEnumerable<Field> Values)
 		{
-			this.NewMomentaryValues(null, Values, null);
+			return this.NewMomentaryValues(null, Values, null);
 		}
 
 		/// <summary>
@@ -1014,11 +1001,10 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
+		public Task NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
 		{
-			this.NewMomentaryValues(Reference, Values, null);
+			return this.NewMomentaryValues(Reference, Values, null);
 		}
-
 
 		/// <summary>
 		/// Reports newly measured values.
@@ -1026,7 +1012,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
 		/// <param name="ExceptJID">Only check subscriptions not from this JID.</param>
-		internal void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values, string ExceptJID)
+		internal async Task NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values, string ExceptJID)
 		{
 			LinkedList<Subscription> Triggered = null;
 
@@ -1059,11 +1045,11 @@ namespace Waher.Networking.XMPP.Sensor
 			if (!(Triggered is null))
 			{
 				foreach (Subscription Subscription in Triggered)
-					this.TriggerSubscription(Subscription);
+					await this.TriggerSubscription(Subscription);
 			}
 		}
 
-		private void TriggerSubscription(Subscription Subscription)
+		private async Task TriggerSubscription(Subscription Subscription)
 		{
 			string Key = Subscription.From + " " + Subscription.Id;
 
@@ -1079,7 +1065,8 @@ namespace Waher.Networking.XMPP.Sensor
 					this.requests[Key] = Request;
 			}
 
-			this.PerformReadout(Request);
+			await this.PerformReadout(Request);
+
 			this.UpdateSubscriptionTimers(Subscription.LastTrigger, Subscription);
 		}
 

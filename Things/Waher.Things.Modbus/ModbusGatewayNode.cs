@@ -93,6 +93,54 @@ namespace Waher.Things.Modbus
 		/// <returns>Enumerator</returns>
 		IEnumerator IEnumerable.GetEnumerator() => this.sniffers.GetEnumerator();
 
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(byte[] Data) => this.sniffers.ReceiveBinary(Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(byte[] Data) => this.sniffers.TransmitBinary(Data);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(string Text) => this.sniffers.ReceiveText(Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(string Text) => this.sniffers.TransmitText(Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(string Comment) => this.sniffers.Information(Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(string Warning) => this.sniffers.Warning(Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public Task Error(string Error) => this.sniffers.Error(Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(Exception Exception) => this.sniffers.Exception(Exception);
+
 		#endregion
 
 		#region TCP/IP connections
@@ -109,7 +157,7 @@ namespace Waher.Things.Modbus
 			return Result;
 		}
 
-		private static void Result_Removed(object Sender, CacheItemEventArgs<string, ModbusTcpClient> e)
+		private static Task Result_Removed(object Sender, CacheItemEventArgs<string, ModbusTcpClient> e)
 		{
 			try
 			{
@@ -119,6 +167,8 @@ namespace Waher.Things.Modbus
 			{
 				Log.Exception(ex);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

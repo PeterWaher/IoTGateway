@@ -162,12 +162,12 @@ namespace Waher.Things.Ip
 						}
 					}
 
-					Request.ReportFields(false, Fields);
+					await Request.ReportFields(false, Fields);
 				}
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(false, new ThingError(this, ex.Message));
+				await Request.ReportErrors(false, new ThingError(this, ex.Message));
 			}
 
 			await base.StartReadout(Request);

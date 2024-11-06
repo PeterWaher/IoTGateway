@@ -1,12 +1,11 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.Cluster.Test.TestObjects;
 using Waher.Networking.Cluster.Messages;
+using Waher.Networking.Cluster.Test.TestObjects;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.Cluster.Test
 {
@@ -18,11 +17,11 @@ namespace Waher.Networking.Cluster.Test
 		private ClusterEndpoint endpoint2 = null;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Runtime.Inventory.Types.Initialize(
 				typeof(EndpointTests).Assembly,
-				typeof(Waher.Networking.Cluster.ClusterEndpoint).Assembly);
+				typeof(ClusterEndpoint).Assembly);
 		}
 
 		[TestInitialize]
@@ -30,38 +29,52 @@ namespace Waher.Networking.Cluster.Test
 		{
 			this.endpoint1 = new ClusterEndpoint(clusterAddress, 12345, "UnitTest",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
-			this.endpoint1.GetStatus += (sender, e) => e.Status = 1;
+			this.endpoint1.GetStatus += (sender, e) => 
+			{ 
+				e.Status = 1;
+				return Task.CompletedTask;
+			};
 
 			foreach (IPEndPoint Endpoint in this.endpoint1.Endpoints)
 			{
 				this.endpoint2 = new ClusterEndpoint(Endpoint.Address, Endpoint.Port, "UnitTest");
-				this.endpoint2.GetStatus += (sender, e) => e.Status = 2;
+				this.endpoint2.GetStatus += (sender, e) =>
+				{
+					e.Status = 2;
+					return Task.CompletedTask;
+				};
 				this.endpoint2.AddRemoteStatus(Endpoint, null);
 				break;
 			}
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
-			this.endpoint1?.Dispose();
-			this.endpoint1 = null;
+			if (this.endpoint1 is not null)
+			{
+				await this.endpoint1.DisposeAsync();
+				this.endpoint1 = null;
+			}
 
-			this.endpoint2?.Dispose();
-			this.endpoint2 = null;
+			if (this.endpoint2 is not null)
+			{
+				await this.endpoint2.DisposeAsync();
+				this.endpoint2 = null;
+			}
 		}
 
 		[TestMethod]
-		public void Test_01_Send_Unacknowledged_Message()
+		public async Task Test_01_Send_Unacknowledged_Message()
 		{
-			this.TestUnacknowledgedMessage("Hello World!");
+			await this.TestUnacknowledgedMessage("Hello World!");
 		}
 
-		private void TestUnacknowledgedMessage(string Text)
+		private async Task TestUnacknowledgedMessage(string Text)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			Message Msg = new Message()
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
+			Message Msg = new()
 			{
 				Text = Text,
 				Timestamp = DateTime.Now
@@ -79,34 +92,38 @@ namespace Waher.Networking.Cluster.Test
 					else
 						Error.Set();
 				}
+
+				return Task.CompletedTask;
 			};
 
-			this.endpoint2.SendMessageUnacknowledged(Msg);
+			await this.endpoint2.SendMessageUnacknowledged(Msg);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 		[TestMethod]
-		public void Test_02_Fragmentation()
+		public async Task Test_02_Fragmentation()
 		{
-			this.TestUnacknowledgedMessage(new string('x', 80000));
+			await this.TestUnacknowledgedMessage(new string('x', 80000));
 		}
 
 		[TestMethod]
-		public void Test_03_LargeMessage()
+		public async Task Test_03_LargeMessage()
 		{
-			this.TestUnacknowledgedMessage(new string('x', 1000000));
+			await this.TestUnacknowledgedMessage(new string('x', 1000000));
 		}
 
 		[TestMethod]
 		public void Test_04_EndpointStatuses()
 		{
-			ManualResetEvent AliveReceived = new ManualResetEvent(false);
+			ManualResetEvent AliveReceived = new(false);
 
 			this.endpoint1.OnMessageReceived += (sender, e) =>
 			{
 				if (e.Message is Alive)
 					AliveReceived.Set();
+
+				return Task.CompletedTask;
 			};
 
 			Assert.IsTrue(AliveReceived.WaitOne(10000), "Alive message not received.");
@@ -119,19 +136,19 @@ namespace Waher.Networking.Cluster.Test
 		}
 
 		[TestMethod]
-		public void Test_05_Send_Acknowledged_Message()
+		public async Task Test_05_Send_Acknowledged_Message()
 		{
-			this.TestAcknowledgedMessage("Hello World!");
+			await this.TestAcknowledgedMessage("Hello World!");
 		}
 
-		private void TestAcknowledgedMessage(string Text)
+		private async Task TestAcknowledgedMessage(string Text)
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 
-			Message Msg = new Message()
+			Message Msg = new()
 			{
 				Text = Text,
 				Timestamp = DateTime.Now
@@ -149,9 +166,11 @@ namespace Waher.Networking.Cluster.Test
 					else
 						Error1.Set();
 				}
+
+				return Task.CompletedTask;
 			};
 
-			this.endpoint2.SendMessageAcknowledged(Msg, (sender, e) =>
+			await this.endpoint2.SendMessageAcknowledged(Msg, (sender, e) =>
 			{
 				if (e.Message == Msg &&
 					e.Responses.Length == 1 &&
@@ -163,6 +182,8 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error2.Set();
+
+				return Task.CompletedTask;
 			}, 1);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 20000));
@@ -170,15 +191,15 @@ namespace Waher.Networking.Cluster.Test
 		}
 
 		[TestMethod]
-		public void Test_06_Fragmentation_Ack()
+		public async Task Test_06_Fragmentation_Ack()
 		{
-			this.TestAcknowledgedMessage(new string('x', 80000));
+			await this.TestAcknowledgedMessage(new string('x', 80000));
 		}
 
 		[TestMethod]
-		public void Test_07_LargeMessage_Ack()
+		public async Task Test_07_LargeMessage_Ack()
 		{
-			this.TestAcknowledgedMessage(new string('x', 1000000));
+			await this.TestAcknowledgedMessage(new string('x', 1000000));
 		}
 
 		[TestMethod]
@@ -192,17 +213,17 @@ namespace Waher.Networking.Cluster.Test
 		}
 
 		[TestMethod]
-		public void Test_09_RequestResponse()
+		public async Task Test_09_RequestResponse()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			Add Add = new Add()
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
+			Add Add = new()
 			{
 				A = 3,
 				B = 4
 			};
 
-			this.endpoint2.ExecuteCommand<int>(Add, (sender, e) =>
+			await this.endpoint2.ExecuteCommand<int>(Add, (sender, e) =>
 			{
 				if (e.Ok &&
 					e.Responses.Length == 1 &&
@@ -214,23 +235,25 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error.Set();
+
+				return Task.CompletedTask;
 			}, 9);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 		[TestMethod]
-		public void Test_10_RequestResponse_Error()
+		public async Task Test_10_RequestResponse_Error()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			Error ErrorCommand = new Error()
+			ManualResetEvent Done = new(false);
+			ManualResetEvent Error = new(false);
+			Error ErrorCommand = new()
 			{
 				A = 3,
 				B = 4
 			};
 
-			this.endpoint2.ExecuteCommand<int>(ErrorCommand, (sender, e) =>
+			await this.endpoint2.ExecuteCommand<int>(ErrorCommand, (sender, e) =>
 			{
 				if (!e.Ok &&
 					e.Responses.Length == 1 &&
@@ -243,25 +266,27 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error.Set();
+
+				return Task.CompletedTask;
 			}, 10);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 		[TestMethod]
-		public void Test_11_Send_Assured_Message()
+		public async Task Test_11_Send_Assured_Message()
 		{
-			this.TestAssuredMessage("Hello World!");
+			await this.TestAssuredMessage("Hello World!");
 		}
 
-		private void TestAssuredMessage(string Text)
+		private async Task TestAssuredMessage(string Text)
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 
-			Message Msg = new Message()
+			Message Msg = new()
 			{
 				Text = Text,
 				Timestamp = DateTime.Now
@@ -279,9 +304,11 @@ namespace Waher.Networking.Cluster.Test
 					else
 						Error1.Set();
 				}
+
+				return Task.CompletedTask;
 			};
 
-			this.endpoint2.SendMessageAssured(Msg, (sender, e) =>
+			await this.endpoint2.SendMessageAssured(Msg, (sender, e) =>
 			{
 				if (e.Message == Msg &&
 					e.Responses.Length == 1 &&
@@ -293,6 +320,8 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error2.Set();
+
+				return Task.CompletedTask;
 			}, 1);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 20000));
@@ -300,15 +329,15 @@ namespace Waher.Networking.Cluster.Test
 		}
 
 		[TestMethod]
-		public void Test_12_Fragmentation_Assured()
+		public async Task Test_12_Fragmentation_Assured()
 		{
-			this.TestAssuredMessage(new string('x', 80000));
+			await this.TestAssuredMessage(new string('x', 80000));
 		}
 
 		[TestMethod]
-		public void Test_13_LargeMessage_Assured()
+		public async Task Test_13_LargeMessage_Assured()
 		{
-			this.TestAssuredMessage(new string('x', 1000000));
+			await this.TestAssuredMessage(new string('x', 1000000));
 		}
 
 		[TestMethod]
@@ -333,8 +362,8 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_16_Lock()
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
 
 			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
 			{
@@ -347,6 +376,8 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error1.Set();
+
+				return Task.CompletedTask;
 			}, 16);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
@@ -355,10 +386,10 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_17_Lock_Collision()
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 
 			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
 			{
@@ -371,6 +402,8 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error1.Set();
+
+				return Task.CompletedTask;
 			}, 17.1);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
@@ -386,20 +419,22 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error2.Set();
+
+				return Task.CompletedTask;
 			}, 17.2);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
 		}
 
 		[TestMethod]
-		public void Test_18_Lock_Collision_Release()
+		public async Task Test_18_Lock_Collision_Release()
 		{
-			ManualResetEvent Done1 = new ManualResetEvent(false);
-			ManualResetEvent Error1 = new ManualResetEvent(false);
-			ManualResetEvent Done2 = new ManualResetEvent(false);
-			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done1 = new(false);
+			ManualResetEvent Error1 = new(false);
+			ManualResetEvent Done2 = new(false);
+			ManualResetEvent Error2 = new(false);
 
-			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			await this.endpoint2.Lock("Resource", 2000, (sender, e) =>
 			{
 				if (e.LockSuccessful &&
 					e.Resource == "Resource" &&
@@ -410,11 +445,13 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error1.Set();
+
+				return Task.CompletedTask;
 			}, 18.1);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
 
-			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			await this.endpoint2.Lock("Resource", 2000, (sender, e) =>
 			{
 				if (e.LockSuccessful &&
 					e.Resource == "Resource" &&
@@ -425,9 +462,11 @@ namespace Waher.Networking.Cluster.Test
 				}
 				else
 					Error2.Set();
+
+				return Task.CompletedTask;
 			}, 18.2);
 
-			this.endpoint2.Release("Resource");
+			await this.endpoint2.Release("Resource");
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
 		}

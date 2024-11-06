@@ -52,14 +52,14 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
-		void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
+		Task SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Sends the Server Key Exchange message flight.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
-		void SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
+		Task SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
@@ -77,7 +77,7 @@ namespace Waher.Security.DTLS
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
 		/// <param name="Resendable">If flight of records is resendable.</param>
-		void SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable);
+		Task SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable);
 
 		/// <summary>
 		/// Verifies the claims in a finished message.

@@ -183,10 +183,13 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestCleanup]
-		public void TearDown()
+		public async Task TearDown()
 		{
-			this.client?.Dispose();
-			this.client = null;
+			if (this.client is not null)
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 
 			if (this.ex is not null && this.ex.GetType() != this.permittedExceptionType)
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(this.ex).Throw();
@@ -206,37 +209,42 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Connection_Test_03_Disconnect()
+		public async Task Connection_Test_03_Disconnect()
 		{
 			this.WaitConnected(10000);
 
-			this.client.Dispose();
+			if (this.client is not null)
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
+
 			this.WaitOffline(10000);
 			this.ex = null;
 		}
 
 		[TestMethod]
-		public void Connection_Test_04_NotAuthorized()
+		public async Task Connection_Test_04_NotAuthorized()
 		{
-			this.Connection_Test_03_Disconnect();
+			await this.Connection_Test_03_Disconnect();
 
 			this.client = new XmppClient("waher.se", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
 			this.client.OnConnectionError += this.Client_OnConnectionError;
 			this.client.OnError += this.Client_OnError;
 			this.client.OnStateChanged += this.Client_OnStateChanged;
-			this.client.Connect();
+			await this.client.Connect();
 
 			this.WaitError(10000);
 		}
 
 		[TestMethod]
-		public void Connection_Test_05_Reconnect()
+		public async Task Connection_Test_05_Reconnect()
 		{
 			this.WaitConnected(10000);
 
 			this.permittedExceptionType = typeof(OperationCanceledException);
 
-			this.client.HardOffline();
+			await this.client.HardOffline();
 			this.WaitOffline(10000);
 
 			Thread.Sleep(100);
@@ -245,7 +253,7 @@ namespace Waher.Networking.XMPP.Test
 			this.error.Reset();
 			this.connected.Reset();
 
-			this.client.Reconnect();
+			await this.client.Reconnect();
 			this.WaitConnected(10000);
 		}
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -10,7 +9,6 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
-using Waher.Security;
 
 namespace Waher.Networking.XMPP.WebSocket
 {
@@ -25,7 +23,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// </summary>
 		public const string FramingNamespace = "urn:ietf:params:xml:ns:xmpp-framing";
 
-		private readonly LinkedList<KeyValuePair<string, EventHandler>> queue = new LinkedList<KeyValuePair<string, EventHandler>>();
+		private readonly LinkedList<KeyValuePair<string, EventHandlerAsync>> queue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
 		private XmppClient xmppClient;
 		private XmppBindingInterface bindingInterface;
 		private ClientWebSocket webSocketClient;
@@ -180,7 +178,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				// TODO: this.xmppClient.TrustServer
 
 				if (this.xmppClient.HasSniffers)
-					this.xmppClient.Information("Initiating session.");
+					await this.xmppClient.Information("Initiating session.");
 
 				await this.SendAsync("<?");
 
@@ -415,7 +413,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			string s = Encoding.UTF8.GetString(this.inputBuffer.Array, 0, Count);
 
 			if (this.xmppClient.HasSniffers)
-				this.xmppClient.ReceiveText(s);
+				await this.xmppClient.ReceiveText(s);
 
 			if (Response.EndOfMessage)
 				return s;
@@ -432,7 +430,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				sb.Append(s);
 
 				if (this.xmppClient.HasSniffers)
-					this.xmppClient.ReceiveText(s);
+					await this.xmppClient.ReceiveText(s);
 			}
 			while (!Response.EndOfMessage && !this.disposed);
 
@@ -462,7 +460,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandler DeliveryCallback)
+		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync DeliveryCallback)
 		{
 			if (this.terminated)
 				return false;
@@ -488,7 +486,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				if (this.writing)
 				{
 					this.xmppClient?.Information("Outbound stanza queued.");
-					this.queue.AddLast(new KeyValuePair<string, EventHandler>(Packet, DeliveryCallback));
+					this.queue.AddLast(new KeyValuePair<string, EventHandlerAsync>(Packet, DeliveryCallback));
 					return true;
 				}
 				else
@@ -504,7 +502,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					if (HasSniffers)
 						this.xmppClient?.TransmitText(Packet);
 
-					ArraySegment<byte> Buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(Packet));
+					ArraySegment<byte> Buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(Packet));
 					await this.webSocketClient?.SendAsync(Buffer, WebSocketMessageType.Text, true, CancellationToken.None);
 
 					this.bindingInterface.NextPing = DateTime.Now.AddMinutes(1);
@@ -515,7 +513,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					{
 						try
 						{
-							DeliveryCallback(this.xmppClient, EventArgs.Empty);
+							await DeliveryCallback(this.xmppClient, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{
@@ -527,7 +525,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					{
 						if (!(this.queue.First is null))
 						{
-							LinkedListNode<KeyValuePair<string, EventHandler>> Node = this.queue.First;
+							LinkedListNode<KeyValuePair<string, EventHandlerAsync>> Node = this.queue.First;
 							Packet = Node.Value.Key;
 							DeliveryCallback = Node.Value.Value;
 							this.queue.RemoveFirst();

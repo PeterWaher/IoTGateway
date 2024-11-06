@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {

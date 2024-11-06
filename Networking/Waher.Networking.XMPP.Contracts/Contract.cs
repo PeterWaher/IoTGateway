@@ -2158,11 +2158,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Event raised when a parameter value needs to be formatted for display to a human user.
 		/// </summary>
-		public event ParameterValueFormattingEventHandler FormatParameterDisplay;
+		public event EventHandlerAsync<ParameterValueFormattingEventArgs> FormatParameterDisplay;
 
 		internal object FormatParameterValue(string Name, object Value)
 		{
-			ParameterValueFormattingEventHandler h = this.FormatParameterDisplay;
+			EventHandlerAsync<ParameterValueFormattingEventArgs> h = this.FormatParameterDisplay;
 
 			if (h is null)
 				return Value;

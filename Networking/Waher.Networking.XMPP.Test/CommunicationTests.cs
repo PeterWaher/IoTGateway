@@ -244,10 +244,19 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		public virtual void DisposeClients()
+		public virtual async Task DisposeClients()
 		{
-			this.client1?.Dispose();
-			this.client2?.Dispose();
+			if (this.client1 is not null)
+			{
+				await this.client1.DisposeAsync();
+				this.client1 = null;
+			}
+
+			if (this.client2 is not null)
+			{
+				await this.client2.DisposeAsync();
+				this.client2 = null;
+			}
 
 			if (this.ex1 is not null)
 				throw new TargetInvocationException(this.ex1);

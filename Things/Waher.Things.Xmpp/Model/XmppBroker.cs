@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Things.Xmpp.Model
 {
@@ -112,7 +113,7 @@ namespace Waher.Things.Xmpp.Model
 				}
 			}
 
-			this.xmppClient.Connect();
+			await this.xmppClient.Connect();
 		}
 
 		private async Task Close()
@@ -138,7 +139,7 @@ namespace Waher.Things.Xmpp.Model
 				this.xmppClient.OnRosterItemRemoved -= this.XmppClient_OnRosterItemRemoved;
 				this.xmppClient.OnRosterItemUpdated -= this.XmppClient_OnRosterItemUpdated;
 
-				this.xmppClient.Dispose();
+				await this.xmppClient.DisposeAsync();
 				this.xmppClient = null;
 			}
 		}
@@ -181,7 +182,7 @@ namespace Waher.Things.Xmpp.Model
 		{
 			if (this.node is null)
 			{
-				e.Decline();
+				await e.Decline();
 				return;
 			}
 
@@ -189,7 +190,7 @@ namespace Waher.Things.Xmpp.Model
 
 			if (string.IsNullOrEmpty(this.node.AutoAcceptPattern))
 			{
-				e.Decline();
+				await e.Decline();
 
 				if (!(RosterItem is null))
 					await RosterItem.LogInformationAsync("Presence subscription received and declined.");
@@ -204,7 +205,7 @@ namespace Waher.Things.Xmpp.Model
 
 				if (M.Success && M.Index == 0 && M.Length == e.FromBareJID.Length)
 				{
-					e.Accept();
+					await e.Accept();
 
 					if (RosterItem is null)
 						RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
@@ -213,7 +214,7 @@ namespace Waher.Things.Xmpp.Model
 				}
 				else
 				{
-					e.Decline();
+					await e.Decline();
 
 					if (!(RosterItem is null))
 						await RosterItem.LogInformationAsync("Presence subscription received and declined.");
@@ -221,7 +222,7 @@ namespace Waher.Things.Xmpp.Model
 			}
 			catch (Exception ex)
 			{
-				e.Decline();
+				await e.Decline();
 
 				if (!(RosterItem is null))
 					await RosterItem.LogInformationAsync("Presence subscription received and declined.");
@@ -241,7 +242,7 @@ namespace Waher.Things.Xmpp.Model
 
 		private async Task XmppClient_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
-			e.Accept();
+			await e.Accept();
 
 			if (this.node is null)
 				return;

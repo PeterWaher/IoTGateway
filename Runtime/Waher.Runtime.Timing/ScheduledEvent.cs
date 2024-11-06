@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Runtime.Timing
@@ -47,7 +46,8 @@ namespace Waher.Runtime.Timing
 				ScheduledEventCallbackAsync Callback = (ScheduledEventCallbackAsync)P[0];
 				State = P[1];
 
-				await (Callback?.Invoke(State) ?? Task.CompletedTask);
+				if (!(Callback is null))
+					await Callback(State);
 			}
 			catch (Exception ex)
 			{
@@ -75,13 +75,16 @@ namespace Waher.Runtime.Timing
 		/// </summary>
 		public void Execute()
 		{
-			try
+			if (!(this.eventMethod is null))
 			{
-				this.eventMethod?.Invoke(this.state);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
+				try
+				{
+					this.eventMethod(this.state);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 		}
 

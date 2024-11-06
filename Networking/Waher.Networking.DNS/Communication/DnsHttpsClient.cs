@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -63,12 +62,12 @@ namespace Waher.Networking.DNS.Communication
 					{
 						byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 
-						this.ReceiveBinary(Bin);
+						await this.ReceiveBinary(Bin);
 
 						try
 						{
 							DnsMessage DnsResponse = new DnsMessage(Bin);
-							this.ProcessIncomingMessage(DnsResponse);
+							await this.ProcessIncomingMessage(DnsResponse);
 						}
 						catch (Exception ex)
 						{
@@ -81,7 +80,7 @@ namespace Waher.Networking.DNS.Communication
 						ID <<= 8;
 						ID |= Message[1];
 
-						this.ProcessMessageFailure(ID);
+						await this.ProcessMessageFailure(ID);
 					}
 				}
 			}

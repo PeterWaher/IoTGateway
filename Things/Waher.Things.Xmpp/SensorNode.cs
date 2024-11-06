@@ -46,7 +46,7 @@ namespace Waher.Things.Xmpp
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 				return;
 			}
 
@@ -79,18 +79,18 @@ namespace Waher.Things.Xmpp
 				RosterItem Item = Client.GetRosterItem(JID);
 				if (Item is null)
 				{
-					Request.ReportErrors(true, new ThingError(this, "JID not available in roster."));
+					await Request.ReportErrors(true, new ThingError(this, "JID not available in roster."));
 					return;
 				}
 
 				if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
 				{
-					Request.ReportErrors(true, new ThingError(this, "Concentrator not online."));
+					await Request.ReportErrors(true, new ThingError(this, "Concentrator not online."));
 					return;
 				}
 
 				TaskCompletionSource<bool> Done = new TaskCompletionSource<bool>();
-				SensorDataClientRequest Request2 = SensorClient.RequestReadout(Item.LastPresenceFullJid,
+				SensorDataClientRequest Request2 = await SensorClient.RequestReadout(Item.LastPresenceFullJid,
 					new IThingReference[] { new ThingReference(NID, SID, PID) }, Request.Types, Request.FieldNames,
 					Request.From, Request.To, Request.When, Request.ServiceToken, Request.DeviceToken, Request.UserToken);
 
@@ -138,7 +138,7 @@ namespace Waher.Things.Xmpp
 				};
 			}
 			else
-				Request.ReportErrors(true, new ThingError(this, "No XMPP Sensor Client available."));
+				await Request.ReportErrors(true, new ThingError(this, "No XMPP Sensor Client available."));
 		}
 	}
 }

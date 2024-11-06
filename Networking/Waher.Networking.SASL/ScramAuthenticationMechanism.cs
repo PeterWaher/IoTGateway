@@ -195,7 +195,7 @@ namespace Waher.Networking.SASL
 			string ClientProofStr = Convert.ToBase64String(ClientProof);
 			if (Proof == ClientProofStr)
 			{
-				Connection.SetAccount(Account);
+				await Connection.SetAccount(Account);
 
 				string Response = "v=" + Convert.ToBase64String(ServerSignature);
 				Response = Convert.ToBase64String(Encoding.UTF8.GetBytes(Response));

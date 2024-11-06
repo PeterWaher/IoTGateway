@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -438,13 +438,29 @@ namespace Waher.Networking.HTTP
 		/// Releases the unmanaged resources used by the System.IO.StreamWriter and optionally releases the managed resources.
 		/// </summary>
 		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
-		public void Dispose()
+		[Obsolete("Use the DisposeAsync() method.")]
+		public async void Dispose()
+		{
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.disposed = true;
 
-			if (this.closeAfterResponse)
+			if (this.closeAfterResponse && !(this.clientConnection is null))
 			{
-				this.clientConnection?.Dispose();
+				await this.clientConnection.DisposeAsync();
 				this.clientConnection = null;
 			}
 
@@ -540,7 +556,7 @@ namespace Waher.Networking.HTTP
 				this.httpServer?.RequestResponded(this.httpRequest, this.statusCode);
 
 				if (this.transferEncoding is null)
-					this.StartSendResponse(false);
+					await this.StartSendResponse(false);
 				else
 					await this.transferEncoding.ContentSentAsync();
 
@@ -691,7 +707,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private void StartSendResponse(bool ExpectContent)
+		private async Task StartSendResponse(bool ExpectContent)
 		{
 			if (this.transferEncoding is null)
 			{
@@ -869,12 +885,12 @@ namespace Waher.Networking.HTTP
 
 					this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
 					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
-					this.clientConnection.TransmitText(Header);
+					await this.clientConnection.TransmitText(Header);
 				}
 				else
 				{
 					this.transferEncoding = this.desiredTransferEncoding;
-					this.transferEncoding.BeforeContentAsync(this, ExpectContent);
+					await this.transferEncoding.BeforeContentAsync(this, ExpectContent);
 				}
 			}
 		}
@@ -1056,7 +1072,7 @@ namespace Waher.Networking.HTTP
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				this.StartSendResponse(true);
+				await this.StartSendResponse(true);
 
 			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
 
@@ -1078,6 +1094,7 @@ namespace Waher.Networking.HTTP
 				this.responseStream.SendAsync(Data, 0, Data.Length, (sender, e) =>
 				{
 					Result.TrySetResult(true);
+					return Task.CompletedTask;
 				});
 
 				return Result.Task;
@@ -1095,7 +1112,7 @@ namespace Waher.Networking.HTTP
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				this.StartSendResponse(true);
+				await this.StartSendResponse(true);
 
 			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
 

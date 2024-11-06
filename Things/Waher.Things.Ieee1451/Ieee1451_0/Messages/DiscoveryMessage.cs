@@ -1,8 +1,9 @@
-﻿using System.IO;
-using System;
-using Waher.Things.Metering;
+﻿using System;
+using System.IO;
 using System.Text;
 using Waher.Networking.Sniffers;
+using Waher.Security;
+using Waher.Things.Metering;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
@@ -40,14 +41,24 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Serializes an NCAP Discovery request.
 		/// </summary>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
-		public static byte[] SerializeRequest()
+		public static byte[] SerializeRequest(StringBuilder SnifferOutput)
 		{
 			using (MemoryStream ms = new MemoryStream())
 			{
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+				ms.Write(AppId, 0, 16);
 
-				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Command, ms.ToArray());
+				byte[] Result = Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Command, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId, true));
+				}
+
+				return Result;
 			}
 		}
 
@@ -55,18 +66,31 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Serializes an NCAP TIM Discovery request.
 		/// </summary>
 		/// <param name="NcapId">NCAP ID</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
-		public static byte[] SerializeRequest(byte[] NcapId)
+		public static byte[] SerializeRequest(byte[] NcapId, StringBuilder SnifferOutput)
 		{
 			if (NcapId is null || NcapId.Length != 16)
 				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
 
 			using (MemoryStream ms = new MemoryStream())
 			{
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
 
-				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMDiscovery, MessageType.Command, ms.ToArray());
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
+
+				byte[] Result = Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMDiscovery, MessageType.Command, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+				}
+
+				return Result;
 			}
 		}
 
@@ -75,8 +99,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// </summary>
 		/// <param name="NcapId">NCAP ID</param>
 		/// <param name="TimId">TIM ID</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
-		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId)
+		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, StringBuilder SnifferOutput)
 		{
 			if (NcapId is null || NcapId.Length != 16)
 				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
@@ -86,11 +111,25 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			using (MemoryStream ms = new MemoryStream())
 			{
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
-				ms.Write(TimId, 0, 16); // TIM ID
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
 
-				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Command, ms.ToArray());
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
+				ms.Write(TimId, 0, 16);
+
+				byte[] Result = Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Command, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+					SnifferOutput.Append("TIM ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(TimId));
+				}
+
+				return Result;
 			}
 		}
 
@@ -100,19 +139,22 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="ErrorCode">Error code.</param>
 		/// <param name="NcapId">NCAP ID</param>
 		/// <param name="Name">Name of NCAP</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
-			string Name)
+			string Name, StringBuilder SnifferOutput)
 		{
 			if (NcapId is null || NcapId.Length != 16)
 				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
 
 			using (MemoryStream ms = new MemoryStream())
 			{
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
 				ms.WriteByte((byte)(ErrorCode >> 8));
 				ms.WriteByte((byte)ErrorCode);
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
 
 				byte[] Bin = Encoding.UTF8.GetBytes(Name);
 				ms.Write(Bin, 0, Bin.Length);
@@ -123,7 +165,22 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				ms.WriteByte(0);
 				ms.WriteByte(1);
 
-				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Reply, ms.ToArray());
+				byte[] Result = Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPDiscovery, MessageType.Reply, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("Error Code: ");
+					SnifferOutput.AppendLine(ErrorCode.ToString());
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+					SnifferOutput.Append("Name: ");
+					SnifferOutput.AppendLine(Name);
+					SnifferOutput.AppendLine("IPv4: 127.0.0.1");
+				}
+
+				return Result;
 			}
 		}
 
@@ -134,9 +191,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="NcapId">NCAP ID</param>
 		/// <param name="TimIds">TIM IDs</param>
 		/// <param name="TimNames">Names of TIMs</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
-			byte[][] TimIds, string[] TimNames)
+			byte[][] TimIds, string[] TimNames, StringBuilder SnifferOutput)
 		{
 			if (NcapId is null || NcapId.Length != 16)
 				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
@@ -156,16 +214,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			using (MemoryStream ms = new MemoryStream())
 			{
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
 				ms.WriteByte((byte)(ErrorCode >> 8));
 				ms.WriteByte((byte)ErrorCode);
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
 
 				ms.WriteByte((byte)(c >> 8));
 				ms.WriteByte((byte)c);
 
 				for (i = 0; i < c; i++)
-					ms.Write(TimIds[i], 0, 16); // TIM ID
+					ms.Write(TimIds[i], 0, 16);
 
 				for (i = 0; i < c; i++)
 				{
@@ -174,7 +234,35 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					ms.WriteByte(0);
 				}
 
-				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMDiscovery, MessageType.Reply, ms.ToArray());
+				byte[] Result = Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMDiscovery, MessageType.Reply, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("Error Code: ");
+					SnifferOutput.AppendLine(ErrorCode.ToString());
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+
+					for (i = 0; i < c; i++)
+					{
+						SnifferOutput.Append("TIM ID ");
+						SnifferOutput.Append((i + 1).ToString());
+						SnifferOutput.Append(": ");
+						SnifferOutput.AppendLine(Hashes.BinaryToString(TimIds[i], true));
+					}
+
+					for (i = 0; i < c; i++)
+					{
+						SnifferOutput.Append("TIM Name ");
+						SnifferOutput.Append((i + 1).ToString());
+						SnifferOutput.Append(": ");
+						SnifferOutput.AppendLine(TimNames[i]);
+					}
+				}
+
+				return Result;
 			}
 		}
 
@@ -186,9 +274,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="TimId">TIM ID</param>
 		/// <param name="ChannelIds">Transfucer channel IDs</param>
 		/// <param name="ChannelNames">Names of transducer channels</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId,
-			byte[] TimId, ushort[] ChannelIds, string[] ChannelNames)
+			byte[] TimId, ushort[] ChannelIds, string[] ChannelNames, StringBuilder SnifferOutput)
 		{
 			if (NcapId is null || NcapId.Length != 16)
 				throw new ArgumentException("Invalid NCAP UUID.", nameof(NcapId));
@@ -205,11 +294,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			using (MemoryStream ms = new MemoryStream())
 			{
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
 				ms.WriteByte((byte)(ErrorCode >> 8));
 				ms.WriteByte((byte)ErrorCode);
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
-				ms.Write(TimId, 0, 16); // TIM ID
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
+				ms.Write(TimId, 0, 16);
 
 				ms.WriteByte((byte)(c >> 8));
 				ms.WriteByte((byte)c);
@@ -229,7 +320,37 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					ms.WriteByte(0);
 				}
 
-				return Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Reply, ms.ToArray());
+				byte[] Result = Ieee1451Parser.SerializeMessage(DiscoveryService.NCAPTIMTransducerDiscovery, MessageType.Reply, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("Error Code: ");
+					SnifferOutput.AppendLine(ErrorCode.ToString());
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+					SnifferOutput.Append("TIM ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(TimId));
+
+					for (i = 0; i < c; i++)
+					{
+						SnifferOutput.Append("Channel ID ");
+						SnifferOutput.Append((i + 1).ToString());
+						SnifferOutput.Append(": ");
+						SnifferOutput.AppendLine(ChannelIds[i].ToString());
+					}
+
+					for (i = 0; i < c; i++)
+					{
+						SnifferOutput.Append("Channel Name ");
+						SnifferOutput.Append((i + 1).ToString());
+						SnifferOutput.Append(": ");
+						SnifferOutput.AppendLine(ChannelNames[i]);
+					}
+				}
+
+				return Result;
 			}
 		}
 

@@ -8,7 +8,9 @@ using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.PEP;
+using Waher.Networking.XMPP.PEP.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings;
@@ -191,7 +193,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 					Request.Append("</data></query>");
 
-					this.client.SendIqSet(this.client.BareJID, Request.ToString(), null, null);
+					await this.client.SendIqSet(this.client.BareJID, Request.ToString(), null, null);
 				}
 
 				this.pep?.Publish(new UserAvatarImage()
@@ -209,13 +211,11 @@ namespace Waher.Networking.XMPP.Avatar
 		/// If the remote endpoint is not authoized, the corresponding stanza exception
 		/// should be thrown.
 		/// </summary>
-		public event IqEventHandlerAsync ValidateAccess = null;
+		public event EventHandlerAsync<IqEventArgs> ValidateAccess = null;
 
 		private async Task QueryAvatarHandler(object Sender, IqEventArgs e)
 		{
-			IqEventHandlerAsync h = this.ValidateAccess;
-			if (!(h is null))
-				await h(this, e);
+			await this.ValidateAccess.Raise(this, e);
 
 			Avatar Avatar = this.localAvatar ?? this.defaultAvatar;
 
@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.Avatar
 			Response.Append(Convert.ToBase64String(Avatar.Binary));
 			Response.Append("</data></query>");
 
-			e.IqResult(Response.ToString());
+			await e.IqResult(Response.ToString());
 		}
 
 		private async Task Client_OnStateChanged(object Sender, XmppState NewState)
@@ -383,19 +383,19 @@ namespace Waher.Networking.XMPP.Avatar
 									case AvatarType.Xep0008:
 										if (this.e2e is null)
 										{
-											this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>",
+											await this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>",
 												this.AvatarResponse, new object[] { BareJID, Hash });
 										}
 										else
 										{
-											this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
+											await this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
 												FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
 												new object[] { BareJID, Hash });
 										}
 										break;
 
 									case AvatarType.Xep0153:
-										this.client.SendIqGet(InMuc ? FullJID : BareJID, "<vCard xmlns='vcard-temp'/>",
+										await this.client.SendIqGet(InMuc ? FullJID : BareJID, "<vCard xmlns='vcard-temp'/>",
 											(Sender2, e2) =>
 											{
 												lock (this.requestingAvatar)
@@ -442,7 +442,7 @@ namespace Waher.Networking.XMPP.Avatar
 				await this.ParseAvatar(BareJID, Hash, e2.FirstElement);
 			else
 			{
-				this.Client.SendIqGet(BareJID, "<query xmlns='storage:client:avatar'/>",
+				await this.Client.SendIqGet(BareJID, "<query xmlns='storage:client:avatar'/>",
 					async (sender3, e3) =>
 					{
 						if (e3.Ok)
@@ -700,7 +700,7 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <summary>
 		/// Event raised when a vCard has been received. vCards can be requested to get access to embedded Avatars.
 		/// </summary>
-		public event IqResultEventHandlerAsync VCardReceived = null;
+		public event EventHandlerAsync<IqResultEventArgs> VCardReceived = null;
 
 		private async Task Client_OnRosterItemAdded(object _, RosterItem Item)
 		{
@@ -716,11 +716,13 @@ namespace Waher.Networking.XMPP.Avatar
 			{
 				await Database.Insert(Avatar);
 
-				this.AvatarAdded?.Invoke(this, new AvatarEventArgs(Item.BareJid, Avatar));
+				AvatarEventHandler h = this.AvatarAdded;
+				if (!(h is null))
+					await h(this, new AvatarEventArgs(Item.BareJid, Avatar));
 			}
 			else
 			{
-				this.client.SendIqGet(Item.BareJid, "<vCard xmlns='vcard-temp'/>",
+				await this.client.SendIqGet(Item.BareJid, "<vCard xmlns='vcard-temp'/>",
 					(Sender2, e2) => Task.Run(() => this.ParseVCard(e2, false)), null);
 			}
 		}
@@ -778,18 +780,15 @@ namespace Waher.Networking.XMPP.Avatar
 
 								await Database.Insert(Avatar);
 
-								this.AvatarAdded?.Invoke(this, new AvatarEventArgs(Jid, Avatar));
+								AvatarEventHandler h = this.AvatarAdded;
+								if (!(h is null))
+									await h(this, new AvatarEventArgs(Jid, Avatar));
 							}
 						}
 					}
 
 					if (RaiseEvent)
-					{
-						IqResultEventHandlerAsync h = this.VCardReceived;
-
-						if (!(h is null))
-							await h(this, e);
-					}
+						await this.VCardReceived.Raise(this, e);
 				}
 			}
 			catch (Exception ex)
@@ -826,7 +825,7 @@ namespace Waher.Networking.XMPP.Avatar
 			return Task.CompletedTask;
 		}
 
-		private async Task Pep_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
+		private async Task Pep_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArgs e)
 		{
 			UserAvatarReference Best = null;
 

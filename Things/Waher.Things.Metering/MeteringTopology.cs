@@ -18,7 +18,7 @@ namespace Waher.Things.Metering
 	/// </summary>
 	/// <param name="Reference">Thing reporting new momentary values.</param>
 	/// <param name="Values">New momentary values.</param>
-	public delegate void NewMomentaryValuesHandler(IThingReference Reference, IEnumerable<Field> Values);
+	public delegate Task NewMomentaryValuesHandler(IThingReference Reference, IEnumerable<Field> Values);
 
 	/// <summary>
 	/// Defines the Metering Topology data source. This data source contains a tree structure of persistent 
@@ -351,13 +351,17 @@ namespace Waher.Things.Metering
 		{
 			await Database.InsertLazy(Event);
 
-			try
+			SourceEventEventHandler h = instance?.OnEvent;
+			if (!(h is null))
 			{
-				instance?.OnEvent?.Invoke(instance, Event);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
+				try
+				{
+					await h(instance, Event);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 		}
 
@@ -366,9 +370,13 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
+		public static Task NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
 		{
-			OnNewMomentaryValues?.Invoke(Reference, Values);
+			NewMomentaryValuesHandler h = OnNewMomentaryValues;
+			if (h is null)
+				return Task.CompletedTask;
+			else
+				return h(Reference, Values);
 		}
 
 		/// <summary>
@@ -401,7 +409,7 @@ namespace Waher.Things.Metering
 					}
 				}
 			}
-		
+
 			return Result;
 		}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script
@@ -7,8 +8,8 @@ namespace Waher.Script
 	/// Delegate for preview events.
 	/// </summary>
 	/// <param name="Sender"></param>
-	/// <param name="e"></param>
-	public delegate void PreviewEventHandler(object Sender, PreviewEventArgs e);
+	/// <param name="e">Event arguments</param>
+	public delegate Task PreviewEventHandler(object Sender, PreviewEventArgs e);
 
 	/// <summary>
 	/// Event arguments for preview events.

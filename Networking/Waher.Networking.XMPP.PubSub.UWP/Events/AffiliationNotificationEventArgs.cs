@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.PubSub
+namespace Waher.Networking.XMPP.PubSub.Events
 {
-	/// <summary>
-	/// Delegate for affiliation event notificaction event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task AffiliationNotificationEventHandler(object Sender, AffiliationNotificationEventArgs e);
-
 	/// <summary>
 	/// Event argument for affiliation event notification events.
 	/// </summary>
@@ -49,6 +41,5 @@ namespace Waher.Networking.XMPP.PubSub
 		/// New affiliation status.
 		/// </summary>
 		public AffiliationStatus Status => this.status;
-
 	}
 }

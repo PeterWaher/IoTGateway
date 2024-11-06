@@ -112,7 +112,8 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public async Task<MqttTopic> GetTopic()
 		{
-			MqttBroker Broker = (await this.GetBroker())?.GetBroker();
+			MqttBrokerNode BrokerNode = await this.GetBroker();
+			MqttBroker Broker = await BrokerNode.GetBroker();
 			if (Broker is null)
 				return null;
 			else
@@ -186,7 +187,7 @@ namespace Waher.Things.Mqtt
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 

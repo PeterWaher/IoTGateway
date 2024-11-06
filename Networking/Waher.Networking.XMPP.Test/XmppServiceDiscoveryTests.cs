@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Runtime.Console;
 
@@ -8,7 +9,7 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppServiceDiscoveryTests : CommunicationTests
 	{
 		[TestMethod]
-		public void ServiceDiscovery_Test_01_Server()
+		public async Task ServiceDiscovery_Test_01_Server()
 		{
 			this.ConnectClients();
 			try
@@ -18,7 +19,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
@@ -38,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void ServiceDiscovery_Test_02_Account()
+		public async Task ServiceDiscovery_Test_02_Account()
 		{
 			this.ConnectClients();
 			try
@@ -48,12 +49,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void ServiceDiscovery_Test_03_Client()
+		public async Task ServiceDiscovery_Test_03_Client()
 		{
 			this.ConnectClients();
 			try
@@ -63,12 +64,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void ServiceDiscovery_Test_04_ServerItems()
+		public async Task ServiceDiscovery_Test_04_ServerItems()
 		{
 			this.ConnectClients();
 			try
@@ -78,7 +79,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
@@ -92,7 +93,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void ServiceDiscovery_Test_05_ServerItemFeatures()
+		public async Task ServiceDiscovery_Test_05_ServerItemFeatures()
 		{
 			this.ConnectClients();
 			try
@@ -112,12 +113,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void ServiceDiscovery_Test_06_AccountItems()
+		public async Task ServiceDiscovery_Test_06_AccountItems()
 		{
 			this.ConnectClients();
 			try
@@ -127,7 +128,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 

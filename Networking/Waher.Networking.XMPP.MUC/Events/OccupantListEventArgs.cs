@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for occupant list callback events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task OccupantListEventHandler(object Sender, OccupantListEventArgs e);
-
 	/// <summary>
 	/// Event arguments for a occupant list event handlers.
 	/// </summary>

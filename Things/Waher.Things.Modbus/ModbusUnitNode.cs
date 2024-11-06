@@ -258,7 +258,7 @@ namespace Waher.Things.Modbus
 							Fields.AddLast(new Int32Field(this, TP, "Input Register 3" + (Offset + i).ToString("D5"),
 								ModbusUnitHoldingRegisterNode.CheckOrder(this.SwitchByteOrder, Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
 
-						Request.ReportFields(false, Fields);
+						await Request.ReportFields(false, Fields);
 						Fields.Clear();
 						Offset += StepSize;
 					}
@@ -284,7 +284,7 @@ namespace Waher.Things.Modbus
 								ModbusUnitHoldingRegisterNode.CheckOrder(this.SwitchByteOrder, Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
-						Request.ReportFields(false, Fields);
+						await Request.ReportFields(false, Fields);
 						Fields.Clear();
 						Offset += StepSize;
 					}
@@ -307,7 +307,7 @@ namespace Waher.Things.Modbus
 						for (i = 0; i < StepSize; i++)
 							Fields.AddLast(new BooleanField(this, TP, "Coil 0" + (Offset + i).ToString("D5"), Bits[i], FieldType.Momentary, FieldQoS.AutomaticReadout));
 
-						Request.ReportFields(false, Fields);
+						await Request.ReportFields(false, Fields);
 						Fields.Clear();
 						Offset += StepSize;
 					}
@@ -330,7 +330,7 @@ namespace Waher.Things.Modbus
 						for (i = 0; i < StepSize; i++)
 							Fields.AddLast(new BooleanField(this, TP, "Discrete Input 1" + (Offset + i).ToString("D5"), Bits[i], FieldType.Momentary, FieldQoS.AutomaticReadout));
 
-						Request.ReportFields(false, Fields);
+						await Request.ReportFields(false, Fields);
 						Fields.Clear();
 						Offset += StepSize;
 					}
@@ -340,11 +340,11 @@ namespace Waher.Things.Modbus
 					}
 				}
 
-				Request.ReportFields(true);
+				await Request.ReportFields(true);
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			finally
 			{
@@ -398,9 +398,9 @@ namespace Waher.Things.Modbus
 					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
 
 					if (ReadoutCompleted.Task.IsCompleted)
-						Request.ReportFields(true);
+						await Request.ReportFields(true);
 					else
-						Request.ReportErrors(true, new ThingError(this, "Timeout."));
+						await Request.ReportErrors(true, new ThingError(this, "Timeout."));
 				}
 			}
 		}

@@ -1,15 +1,8 @@
-﻿using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
+﻿using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for custom sniffer callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CustomSnifferEventHandler(object Sender, CustomSnifferEventArgs e);
-
 	/// <summary>
 	/// Event arguments for custom sniffer events.
 	/// </summary>

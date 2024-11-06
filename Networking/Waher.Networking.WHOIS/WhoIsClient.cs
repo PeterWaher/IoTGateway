@@ -97,10 +97,10 @@ namespace Waher.Networking.WHOIS
 		/// <summary>
 		/// Method called when the connection has been disconnected.
 		/// </summary>
-		protected override void Disconnected()
+		protected override Task Disconnected()
 		{
 			this.closed.Set();
-			base.Disconnected();
+			return base.Disconnected();
 		}
 
 		/// <summary>

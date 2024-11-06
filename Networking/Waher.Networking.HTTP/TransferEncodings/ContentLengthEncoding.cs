@@ -81,19 +81,19 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					if (Offset == 0 && c == Data.Length)
 					{
 						if (this.txText)
-							this.clientConnection.TransmitText(this.textEncoding.GetString(Data));
+							await this.clientConnection.TransmitText(this.textEncoding.GetString(Data));
 						else
-							this.clientConnection.TransmitBinary(Data);
+							await this.clientConnection.TransmitBinary(Data);
 					}
 					else
 					{
 						if (this.txText)
-							this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
+							await this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
 						else
 						{
 							byte[] Data2 = new byte[c];
 							Array.Copy(Data, Offset, Data2, 0, c);
-							this.clientConnection.TransmitBinary(Data2);
+							await this.clientConnection.TransmitBinary(Data2);
 						}
 					}
 				}

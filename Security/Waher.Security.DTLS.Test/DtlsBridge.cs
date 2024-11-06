@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Test
 {
@@ -20,14 +19,13 @@ namespace Waher.Security.DTLS.Test
 
 		public event DataReceivedEventHandler PacketReceived;
 
-		public void SendPacket(byte[] Packet, object RemoteEndpoint)
+		public async Task SendPacket(byte[] Packet, object RemoteEndpoint)
 		{
-			if (!(this.remoteBridge is null))
+			if (this.remoteBridge is not null)
 			{
-				Task.Run(() =>
-				{
-					this.remoteBridge.PacketReceived?.Invoke(Packet, RemoteEndpoint);
-				});
+				DataReceivedEventHandler h = this.remoteBridge.PacketReceived;
+				if (h is not null)
+					await h(Packet, RemoteEndpoint);
 			}
 		}
 	}

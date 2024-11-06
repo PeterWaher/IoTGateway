@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for boolean response callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task BooleanResponseEventHandler(object Sender, BooleanResponseEventArgs e);
-
 	/// <summary>
 	/// Event arguments for boolean response responses.
 	/// </summary>

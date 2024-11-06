@@ -21,6 +21,8 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
+using Waher.Networking;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Client.WPF.Model.Concentrator
 {
@@ -299,7 +301,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <summary>
 		/// Starts readout of momentary sensor data values.
 		/// </summary>
-		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public override async Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
@@ -307,7 +309,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
-				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
+				return await SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.Momentary);
 			}
 			else
@@ -317,7 +319,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <summary>
 		/// Starts readout of all sensor data values.
 		/// </summary>
-		public override SensorDataClientRequest StartSensorDataFullReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
@@ -335,7 +337,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <summary>
 		/// Starts subscription of momentary sensor data values.
 		/// </summary>
-		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
+		public override async Task<SensorDataSubscriptionRequest> SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
@@ -343,7 +345,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
-				return SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
+				return await SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[]
 					{
 						new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition)
@@ -364,7 +366,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		public override void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
@@ -669,7 +671,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		/// <param name="Sniffer">Sniffer object.</param>
 		/// <returns>If the sniffer was found and removed.</returns>
-		public override bool RemoveSniffer(ISniffer Sniffer)
+		public override async Task<bool> RemoveSniffer(ISniffer Sniffer)
 		{
 			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
@@ -681,7 +683,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				return this.ConcentratorClient.UnregisterSniffer(FullJid, this.nodeInfo, TabSniffer.SnifferId,
+				return await this.ConcentratorClient.UnregisterSniffer(FullJid, this.nodeInfo, TabSniffer.SnifferId,
 					string.Empty, string.Empty, string.Empty, (sender, e) =>
 					{
 						MainWindow.MouseDefault();
@@ -831,7 +833,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 										ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
 
 										if (Dialog.Empty)
-											e2.Form.Submit();
+											await e2.Form.Submit();
 										else
 											Dialog.ShowDialog();
 									});
@@ -978,24 +980,22 @@ namespace Waher.Client.WPF.Model.Concentrator
 			NodeInformation Parent, NodeInformation Node, StringBuilder sb)
 		{
 			TaskCompletionSource<DataForm> Request = new TaskCompletionSource<DataForm>();
-			Task ParametersResult(object Sender, DataFormEventArgs e)
+			async Task ParametersResult(object Sender, DataFormEventArgs e)
 			{
 				if (e.Ok)
 				{
 					if (e.Form.CanCancel)
-						e.Form.Cancel();
+						await e.Form.Cancel();
 
 					Request.TrySetResult(e.Form);
 				}
 				else
 					Request.TrySetException(e.StanzaError ?? new Exception("Unable to get node information."));
-
-				return Task.CompletedTask;
 			};
 
 			MainWindow.ShowStatus("Copying " + Node.NodeId + "...");
 
-			ConcentratorClient.GetNodeParametersForEdit(FullJid, Node, "en", string.Empty, string.Empty, string.Empty,
+			await ConcentratorClient.GetNodeParametersForEdit(FullJid, Node, "en", string.Empty, string.Empty, string.Empty,
 				ParametersResult, null, null);
 
 			DataForm Form = await Request.Task;
@@ -1029,7 +1029,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TaskCompletionSource<NodeInformation[]> NodesInformation = new TaskCompletionSource<NodeInformation[]>();
 
-				ConcentratorClient.GetChildNodes(FullJid, Node, true, false, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				await ConcentratorClient.GetChildNodes(FullJid, Node, true, false, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 				{
 					if (e.Ok)
 						NodesInformation.TrySetResult(e.NodesInformation);
@@ -1199,8 +1199,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 			TaskCompletionSource<Node> Request = new TaskCompletionSource<Node>();
 			int IdCounter = 0;
 
-			ConcentratorClient.GetParametersForNewNode(FullJid, Parent.nodeInfo, NodeType, "en", string.Empty, string.Empty, string.Empty,
-				(object Sender, DataFormEventArgs e) =>
+			await ConcentratorClient.GetParametersForNewNode(FullJid, Parent.nodeInfo, NodeType, "en", string.Empty, string.Empty, string.Empty,
+				async (object Sender, DataFormEventArgs e) =>
 				{
 					try
 					{
@@ -1222,27 +1222,27 @@ namespace Waher.Client.WPF.Model.Concentrator
 											NodeType + " to node " + Parent.NodeId + ". Required field " + Field.Var +
 											" did not have a value in the node being pasted from the clipboard. " +
 											"Error reported: " + Field.Error));
-										return Task.CompletedTask;
+										return;
 									}
 									else if (Field.Var == "NodeId")
 									{
 										if (IdCounter++ == 0)
-											Field.SetValue(InputField.ValueString);
+											await Field.SetValue(InputField.ValueString);
 										else
-											Field.SetValue(InputField.ValueString + " (" + IdCounter.ToString() + ")");
+											await Field.SetValue(InputField.ValueString + " (" + IdCounter.ToString() + ")");
 									}
 									else if (IdCounter > 1)
 									{
 										Request.TrySetException(new Exception("Unable to add node of type " +
 											NodeType + " to node " + Parent.NodeId + ". Value in clipboard for field " +
 											Field.Var + " was not acceptable. Error reported: " + Field.Error));
-										return Task.CompletedTask;
+										return;
 									}
 									else
-										Field.SetValue(InputField.ValueStrings);
+										await Field.SetValue(InputField.ValueStrings);
 								}
 								else if (!(InputField is null))
-									Field.SetValue(InputField.ValueStrings);
+									await Field.SetValue(InputField.ValueStrings);
 							}
 
 							List<Networking.XMPP.DataForms.Field> ExtendedFields = null;
@@ -1266,7 +1266,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 							if (!(ExtendedFields is null))
 								e.Form.Fields = ExtendedFields.ToArray();
 
-							e.Form.Submit();
+							await e.Form.Submit();
 						}
 						else
 						{
@@ -1279,7 +1279,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Request.TrySetException(ex);
 					}
 
-					return Task.CompletedTask;
 				}, (object Sender, NodeInformationEventArgs e) =>
 				{
 					if (e.Ok)

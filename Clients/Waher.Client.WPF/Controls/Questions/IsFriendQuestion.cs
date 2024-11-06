@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Client.WPF.Controls.Questions
@@ -71,7 +72,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "Yes"
 			});
 
-			Button.Click += YesButton_Click;
+			Button.Click += this.YesButton_Click;
 
 			Details.Children.Add(Button = new Button()
 			{
@@ -79,7 +80,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "No"
 			});
 
-			Button.Click += NoButton_Click;
+			Button.Click += this.NoButton_Click;
 
 			string s = this.RemoteJID;
 			int i = s.IndexOf('@');
@@ -93,7 +94,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					Content = "Yes, to anyone from " + s
 				});
 
-				Button.Click += YesDomainButton_Click;
+				Button.Click += this.YesDomainButton_Click;
 
 				Details.Children.Add(Button = new Button()
 				{
@@ -101,7 +102,7 @@ namespace Waher.Client.WPF.Controls.Questions
 					Content = "No, to no one from " + s
 				});
 
-				Button.Click += NoDomainButton_Click;
+				Button.Click += this.NoDomainButton_Click;
 			}
 
 			Details.Children.Add(Button = new Button()
@@ -110,7 +111,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "Yes, to anyone"
 			});
 
-			Button.Click += YesAllButton_Click;
+			Button.Click += this.YesAllButton_Click;
 
 			Details.Children.Add(Button = new Button()
 			{
@@ -118,7 +119,7 @@ namespace Waher.Client.WPF.Controls.Questions
 				Content = "No, to no one"
 			});
 
-			Button.Click += NoAllButton_Click;
+			Button.Click += this.NoAllButton_Click;
 		}
 
 		internal static string GetDomain(string s)

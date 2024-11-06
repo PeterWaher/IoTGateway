@@ -47,7 +47,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			return "http://localhost:8081" + this.ResourceName + "/" + Key;
 		}
 
-		private void Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<PostBackEventHandler, object>> e)
+		private Task Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<PostBackEventHandler, object>> e)
 		{
 			lock (this.synchObj)
 			{
@@ -57,6 +57,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					this.queries = null;
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		public Task POST(HttpRequest Request, HttpResponse Response)

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.MQTT;
+﻿using Waher.Networking.MQTT;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Events.MQTT
 {
@@ -17,10 +15,10 @@ namespace Waher.Events.MQTT
 	/// </summary>
 	public class EventEventArgs : MqttContent
 	{
-		private Event ev;
+		private readonly Event ev;
 
-		internal EventEventArgs(MqttContent e, Event Event)
-			: base(e.Header, e.Topic, e.Data)
+		internal EventEventArgs(MqttContent e, Event Event, ISniffable Sniffable)
+			: base(e.Header, e.Topic, e.Data, Sniffable)
 		{
 			this.ev = Event;
 		}

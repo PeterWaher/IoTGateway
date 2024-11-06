@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.XMPP.DataForms;
+﻿using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for room registration callback events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void RoomRegistrationEventHandler(object Sender, RoomRegistrationEventArgs e);
-
 	/// <summary>
 	/// Event arguments for a room registration event handlers.
 	/// </summary>

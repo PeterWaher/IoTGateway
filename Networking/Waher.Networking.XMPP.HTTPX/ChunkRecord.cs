@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -11,7 +12,20 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 		}
 
-		public abstract void Dispose();
+		[Obsolete("Use the DisposeAsync() method.")]
+		public async void Dispose()
+		{
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		public abstract Task DisposeAsync();
 
 		internal abstract Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data);
 		internal abstract Task Fail(string Message);

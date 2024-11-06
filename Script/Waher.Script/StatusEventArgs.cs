@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Script
 {
@@ -6,8 +7,8 @@ namespace Waher.Script
 	/// Delegate for status events.
 	/// </summary>
 	/// <param name="Sender"></param>
-	/// <param name="e"></param>
-	public delegate void StatusEventHandler(object Sender, StatusEventArgs e);
+	/// <param name="e">Event arguments</param>
+	public delegate Task StatusEventHandler(object Sender, StatusEventArgs e);
 
 	/// <summary>
 	/// Event arguments for status events.

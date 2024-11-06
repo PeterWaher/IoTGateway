@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Net;
+using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Events
 {
@@ -10,7 +8,7 @@ namespace Waher.Security.DTLS.Events
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void UdpTransmissionEventHandler(object Sender, UdpTransmissionEventArgs e);
+	public delegate Task UdpTransmissionEventHandler(object Sender, UdpTransmissionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for UDP transmission events.

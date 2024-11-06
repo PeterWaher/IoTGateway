@@ -37,7 +37,7 @@ namespace Waher.Client.WPF.Controls
 			this.node = Node;
 			this.subscription = Subscription;
 
-			InitializeComponent();
+			this.InitializeComponent();
 
 			if (!(this.request is null))
 			{
@@ -52,12 +52,25 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
+			try
+			{
+				this.DisposeAsync().Wait();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		public async Task DisposeAsync()
+		{ 
 			if (!(this.request is null))
 			{
 				if (this.request is SensorDataSubscriptionRequest Subscription)
-					Subscription.Unsubscribe();
+					await Subscription.Unsubscribe();
 
 				this.request.OnStateChanged -= this.Request_OnStateChanged;
 				this.request.OnFieldsReceived -= this.Request_OnFieldsReceived;
@@ -162,7 +175,7 @@ namespace Waher.Client.WPF.Controls
 			return Task.CompletedTask;
 		}
 
-		private Task OnStateChanged(object P)
+		private async Task OnStateChanged(object P)
 		{
 			SensorDataReadoutState NewState = (SensorDataReadoutState)P;
 
@@ -186,7 +199,7 @@ namespace Waher.Client.WPF.Controls
 
 				case SensorDataReadoutState.Done:
 					this.StateLabel.Content = "Done";
-					this.Done();
+					await this.Done();
 					break;
 
 				case SensorDataReadoutState.Cancelled:
@@ -195,18 +208,16 @@ namespace Waher.Client.WPF.Controls
 
 				case SensorDataReadoutState.Failure:
 					this.StateLabel.Content = "Failure";
-					this.Done();
+					await this.Done();
 					break;
 
 				default:
 					this.StateLabel.Content = NewState.ToString();
 					break;
 			}
-
-			return Task.CompletedTask;
 		}
 
-		private void Done()
+		private async Task Done()
 		{
 			lock (this.nodes)
 			{
@@ -240,7 +251,7 @@ namespace Waher.Client.WPF.Controls
 				this.request.OnErrorsReceived -= this.Request_OnErrorsReceived;
 				this.request = null;
 
-				this.request = this.node.SubscribeSensorDataMomentaryReadout(Rules.ToArray());
+				this.request = await this.node.SubscribeSensorDataMomentaryReadout(Rules.ToArray());
 
 				this.request.OnStateChanged += this.Request_OnStateChanged;
 				this.request.OnFieldsReceived += this.Request_OnFieldsReceived;

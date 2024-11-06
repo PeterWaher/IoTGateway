@@ -168,7 +168,8 @@ namespace Waher.Content.Getters
 			{
 				RemoteCertificateEventArgs e = new RemoteCertificateEventArgs(Certificate, Chain, SslPolicyErrors);
 
-				this.callback?.Invoke(Sender, e);
+				if (!(this.callback is null))
+					this.callback(Sender, e);
 
 				if (e.IsValid.HasValue)
 					return e.IsValid.Value;

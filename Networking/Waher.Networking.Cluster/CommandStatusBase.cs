@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster
 {
@@ -34,7 +34,7 @@ namespace Waher.Networking.Cluster
 		/// Raises the response event.
 		/// </summary>
 		/// <param name="CurrentStatus">Current status of endpoints in cluster.</param>
-		public abstract void RaiseResponseEvent(EndpointStatus[] CurrentStatus);
+		public abstract Task RaiseResponseEvent(EndpointStatus[] CurrentStatus);
 
 		/// <summary>
 		/// Adds an error from an endpoint.

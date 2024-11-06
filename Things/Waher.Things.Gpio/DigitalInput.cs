@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.Devices.Gpio;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
+using Windows.Devices.Gpio;
 
 namespace Waher.Things.Gpio
 {
@@ -99,24 +99,26 @@ namespace Waher.Things.Gpio
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public Task StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
 				if (this.pin is null)
 				{
-					if (!this.Controller.TryOpenPin(this.PinNr, GpioSharingMode.SharedReadOnly, out this.pin, out GpioOpenStatus Status))
+					GpioController Controller = await this.GetController();
+
+					if (!(Controller is null) && !Controller.TryOpenPin(this.PinNr, GpioSharingMode.SharedReadOnly, out this.pin, out GpioOpenStatus Status))
 					{
 						string Id = Status.ToString();
 						string s = this.GetStatusMessage(Status);
 
-						this.LogErrorAsync(Id, s);
+						await this.LogErrorAsync(Id, s);
 
-						Request.ReportErrors(true, new ThingError(this, s));
-						return Task.CompletedTask;
+						await Request.ReportErrors(true, new ThingError(this, s));
+						return;
 					}
 
-					this.pin.ValueChanged += Pin_ValueChanged;
+					this.pin.ValueChanged += this.Pin_ValueChanged;
 
 					this.SetDriveMode(this.mode);
 				}
@@ -150,14 +152,12 @@ namespace Waher.Things.Gpio
 						typeof(Controller).Namespace, 16));
 				}
 
-				Request.ReportFields(true, Fields);
+				await Request.ReportFields(true, Fields);
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private void Pin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)

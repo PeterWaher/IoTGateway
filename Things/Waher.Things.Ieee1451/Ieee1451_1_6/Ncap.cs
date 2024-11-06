@@ -8,6 +8,7 @@ using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Metering;
+using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
@@ -184,8 +185,14 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 								if (Created)
 								{
-									byte[] Request = DiscoveryMessage.SerializeRequest(NcapEntity.Channel.NcapId);
 									MqttBroker Broker = Topic.Broker;
+									MqttBrokerNode BrokerNode = Broker.Node;
+									StringBuilder ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+									byte[] Request = DiscoveryMessage.SerializeRequest(NcapEntity.Channel.NcapId, ToSniffer);
+
+									if (!(ToSniffer is null))
+										await BrokerNode.Information(ToSniffer.ToString());
+
 									await Broker.Publish(This.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 								}
 							}
@@ -221,8 +228,14 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 									if (Created)
 									{
-										byte[] Request = DiscoveryMessage.SerializeRequest(TimEntities.Channel.NcapId, TimEntities.Identities[i]);
 										MqttBroker Broker = Topic.Broker;
+										MqttBrokerNode BrokerNode = Broker.Node;
+										StringBuilder ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+										byte[] Request = DiscoveryMessage.SerializeRequest(TimEntities.Channel.NcapId, TimEntities.Identities[i], ToSniffer);
+
+										if (!(ToSniffer is null))
+											await BrokerNode.Information(ToSniffer.ToString());
+
 										await Broker.Publish(This.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 									}
 								}

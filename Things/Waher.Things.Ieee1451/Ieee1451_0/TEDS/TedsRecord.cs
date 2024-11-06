@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.SensorData;
@@ -111,6 +113,29 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS
 		public override string ToString()
 		{
 			return Convert.ToBase64String(this.RawValue);
+		}
+
+		/// <summary>
+		/// Appends record to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public void Append(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.Append("Class ");
+			SnifferOutput.Append(this.Class.ToString());
+			SnifferOutput.Append(", Type ");
+			SnifferOutput.Append(this.Type.ToString());
+			SnifferOutput.Append(", ");
+			this.AppendDetails(SnifferOutput);
+		}
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public virtual void AppendDetails(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.AppendLine(Hashes.BinaryToString(this.RawValue, true));
 		}
 	}
 }

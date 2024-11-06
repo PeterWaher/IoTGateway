@@ -25,21 +25,21 @@ namespace Waher.Networking.XMPP.Test
 			this.bobClient2 = new BobClient(this.client2, "Bob2");
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
-			if (!(this.bobClient1 is null))
+			if (this.bobClient1 is not null)
 			{
 				this.bobClient1.Dispose();
 				this.bobClient1 = null;
 			}
 
-			if (!(this.bobClient2 is null))
+			if (this.bobClient2 is not null)
 			{
 				this.bobClient2.Dispose();
 				this.bobClient2 = null;
 			}
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]
@@ -48,14 +48,14 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				string s = "Hello world.";
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
 				string ContentId = await this.bobClient2.StoreData(Bin, PlainTextCodec.DefaultContentType);
 
-				this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
+				await this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
 				{
 					if (e.Ok && e.ContentId == ContentId && e.ContentType == PlainTextCodec.DefaultContentType && Encoding.UTF8.GetString(e.Data) == s)
 						Done.Set();
@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
@@ -79,14 +79,14 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				string s = "Hello world.";
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
 				string ContentId = await this.bobClient2.StoreData(Bin, PlainTextCodec.DefaultContentType, DateTime.Now.AddMinutes(1));
 
-				this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
+				await this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
 				{
 					double d;
 
@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 	}

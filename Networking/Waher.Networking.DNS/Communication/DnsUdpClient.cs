@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Waher.Events;
 
 namespace Waher.Networking.DNS.Communication
 {
@@ -39,10 +38,9 @@ namespace Waher.Networking.DNS.Communication
 			this.udp = new UdpClient(Family)
 			{
 				//DontFragment = true,
-				MulticastLoopback = false
+				MulticastLoopback = false,
+				Ttl = 30
 			};
-
-			this.udp.Ttl = 30;
 			this.udp.Client.Bind(new IPEndPoint(Address, 0));
 
 			this.BeginReceive();
@@ -106,16 +104,16 @@ namespace Waher.Networking.DNS.Communication
 					if (this.disposed)
 						return;
 
-					this.ReceiveBinary(Data.Buffer);
+					await this.ReceiveBinary(Data.Buffer);
 
 					try
 					{
 						DnsMessage Message = new DnsMessage(Data.Buffer);
-						this.ProcessIncomingMessage(Message);
+						await this.ProcessIncomingMessage(Message);
 					}
 					catch (Exception ex)
 					{
-						Log.Error("Unable to process DNS packet: " + ex.Message);
+						await this.Error("Unable to process DNS packet: " + ex.Message);
 					}
 				}
 			}
@@ -125,7 +123,7 @@ namespace Waher.Networking.DNS.Communication
 			}
 			catch (Exception ex)
 			{
-				this.Exception(ex);
+				await this.Exception(ex);
 			}
 		}
 

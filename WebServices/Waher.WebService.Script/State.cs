@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Content.Html;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Rendering;
@@ -114,27 +114,29 @@ namespace Waher.WebService.Script
 			this.SendNewResult(Result);
 		}
 
-		private void SendNewResult(IElement Result)
+		private Task SendNewResult(IElement Result)
 		{
 			lock (expressions)
 			{
 				expressions.Remove(this.tag);
 			}
 
-			Task.Run(() => this.SendResult(Result, false));
+			return this.SendResult(Result, false);
 		}
 
-		private void SendNewPreview(IElement Result)
+		private Task SendNewPreview(IElement Result)
 		{
-			Task.Run(() => this.SendResult(Result, true));
+			return this.SendResult(Result, true);
 		}
 
-		private void Expression_OnPreview(object Sender, PreviewEventArgs e)
+		private Task Expression_OnPreview(object Sender, PreviewEventArgs e)
 		{
 			lock (this.synchObj)
 			{
 				this.preview = e.Preview;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		internal void SetRequestResponse(HttpRequest Request, HttpResponse Response, IUser User)
@@ -311,7 +313,7 @@ namespace Waher.WebService.Script
 					this.response.ContentType = HtmlCodec.DefaultContentType;
 					await this.response.Write("<p><font style=\"color:green\"><code>" + new string('.', this.counter) + "</code></font></p>");
 					await this.response.SendResponse();
-					this.response.Dispose();
+					await this.response.DisposeAsync();
 				}
 
 				if (ms >= this.timeout)
@@ -543,7 +545,7 @@ namespace Waher.WebService.Script
 				this.response.SetHeader("X-More", More ? "1" : "0");
 				await this.response.Write(Bin);
 				await this.response.SendResponse();
-				this.response.Dispose();
+				await this.response.DisposeAsync();
 			}
 			catch (Exception ex)
 			{

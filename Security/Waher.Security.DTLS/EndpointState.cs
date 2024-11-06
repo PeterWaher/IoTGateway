@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
@@ -109,24 +110,22 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		public object RemoteEndpoint
-		{
-			get { return remoteEndpoint; }
-		}
+		public object RemoteEndpoint => this.remoteEndpoint;
 
 		/// <summary>
 		/// Current DTLS state.
 		/// </summary>
-		public DtlsState State
+		public DtlsState State => this.state;
+
+		/// <summary>
+		/// Sets the current DTLS state.
+		/// </summary>
+		internal async Task SetState(DtlsState NewState)
 		{
-			get => this.state;
-			internal set
+			if (this.state != NewState)
 			{
-				if (this.state != value)
-				{
-					this.state = value;
-					this.localEndpoint.StateChanged(this.remoteEndpoint, value);
-				}
+				this.state = NewState;
+				await this.localEndpoint.StateChanged(this.remoteEndpoint, NewState);
 			}
 		}
 

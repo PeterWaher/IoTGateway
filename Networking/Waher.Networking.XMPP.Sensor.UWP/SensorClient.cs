@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -129,7 +130,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Destination">JID of sensor to read.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, FieldType Types)
 		{
 			return this.RequestReadout(Destination, null, Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -141,7 +142,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, string[] Fields, FieldType Types)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, string[] Fields, FieldType Types)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -154,7 +155,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -168,7 +169,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -183,7 +184,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, When, string.Empty, string.Empty, string.Empty);
 		}
@@ -201,7 +202,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken);
@@ -214,7 +215,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -227,7 +228,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, string[] Fields, FieldType Types)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, ThingReference[] Nodes, string[] Fields, FieldType Types)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -241,7 +242,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -256,7 +257,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -272,7 +273,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
+		public Task<SensorDataClientRequest> RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, To, When, string.Empty, string.Empty, string.Empty);
 		}
@@ -291,7 +292,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataClientRequest RequestReadout(string Destination, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
+		public async Task<SensorDataClientRequest> RequestReadout(string Destination, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -411,7 +412,7 @@ namespace Waher.Networking.XMPP.Sensor
 				this.requests[Id] = Request;
 			}
 
-			this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);
+			await this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);
 
 			return Request;
 		}
@@ -918,7 +919,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
 			bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, null, Types, Fields, null, null, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -933,7 +934,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types,
 			Duration? MinInterval, Duration? MaxInterval, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, null, Types, null, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -949,7 +950,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration? MinInterval, Duration? MaxInterval, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, null, Types, Fields, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -965,7 +966,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, null, Types, null, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -982,7 +983,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, null, Types, Fields, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -1001,7 +1002,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)
 		{
@@ -1022,7 +1023,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)
 		{
@@ -1038,7 +1039,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
 			bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, Nodes, Types, Fields, null, null, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -1054,7 +1055,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
 			Duration? MinInterval, Duration? MaxInterval, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, Nodes, Types, null, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -1071,7 +1072,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxInterval">Optional largest desired event interval.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration? MinInterval, Duration? MaxInterval, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, Nodes, Types, Fields, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -1088,7 +1089,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, Nodes, Types, null, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -1106,7 +1107,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="MaxAge">Optional maximum age of historical data.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, Nodes, Types, Fields, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
@@ -1126,7 +1127,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
+		public Task<SensorDataSubscriptionRequest> Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)
 		{
@@ -1148,7 +1149,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="UserToken">Optional user token.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, IThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+		public async Task<SensorDataSubscriptionRequest> Subscribe(string Destination, IThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)
 		{
@@ -1299,7 +1300,7 @@ namespace Waher.Networking.XMPP.Sensor
 				this.requests[Id] = Request;
 			}
 
-			this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);
+			await this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);
 
 			return Request;
 		}

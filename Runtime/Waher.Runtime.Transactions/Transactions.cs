@@ -27,7 +27,7 @@ namespace Waher.Runtime.Transactions
 			TransactionModule.Register(this);
 		}
 
-		private async void Transactions_Removed(object Sender, CacheItemEventArgs<Guid, T> e)
+		private async Task Transactions_Removed(object Sender, CacheItemEventArgs<Guid, T> e)
 		{
 			if (e.Reason != RemovedReason.Manual)
 			{

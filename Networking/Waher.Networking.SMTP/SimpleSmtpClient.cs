@@ -105,44 +105,43 @@ namespace Waher.Networking.SMTP
 			this.client.OnInformation += this.Client_OnInformation;
 			this.client.OnWarning += this.Client_OnWarning;
 
-			this.Information("Connecting to " + this.host + ":" + this.port.ToString());
+			await this.Information("Connecting to " + this.host + ":" + this.port.ToString());
 			await this.client.ConnectAsync(this.host, this.port);
-			this.Information("Connected to " + this.host + ":" + this.port.ToString());
+			await this.Information("Connected to " + this.host + ":" + this.port.ToString());
 
 			await this.AssertOkResult();
 		}
 
-		private void Client_OnWarning(ref string Text)
+		private Task Client_OnWarning(ref string Text)
 		{
-			this.Warning(Text);
+			return this.Warning(Text);
 		}
 
-		private void Client_OnInformation(ref string Text)
+		private Task Client_OnInformation(ref string Text)
 		{
-			this.Information(Text);
+			return this.Information(Text);
 		}
 
 		private Task Client_OnError(object Sender, Exception Exception)
 		{
-			this.Error(Exception.Message);
-			return Task.CompletedTask;
+			return this.Error(Exception.Message);
 		}
 
-		private Task<bool> Client_OnSent(object Sender, string Text)
+		private async Task<bool> Client_OnSent(object Sender, string Text)
 		{
-			this.TransmitText(Text);
-			return Task.FromResult(true);
+			await this.TransmitText(Text);
+			return true;
 		}
 
-		private Task<bool> Client_OnReceived(object Sender, string Row)
+		private async Task<bool> Client_OnReceived(object Sender, string Row)
 		{
 			if (string.IsNullOrEmpty(Row))
 			{
-				this.Error("No response returned.");
-				return Task.FromResult(true);
+				await this.Error("No response returned.");
+				return true;
 			}
 
-			this.ReceiveText(Row);
+			await this.ReceiveText(Row);
 
 			int i = Row.IndexOfAny(spaceHyphen);
 			if (i < 0)
@@ -150,8 +149,8 @@ namespace Waher.Networking.SMTP
 
 			if (!int.TryParse(Row.Substring(0, i), out int Code))
 			{
-				this.Error("Invalid response returned.");
-				return Task.FromResult(true);
+				await this.Error("Invalid response returned.");
+				return true;
 			}
 
 			bool More = i < Row.Length && Row[i] == '-';
@@ -172,7 +171,7 @@ namespace Waher.Networking.SMTP
 				}
 			}
 
-			return Task.FromResult(true);
+			return true;
 		}
 
 		/// <summary>
@@ -380,9 +379,9 @@ namespace Waher.Networking.SMTP
 
 				await this.client.PauseReading();
 
-				this.Information("Starting TLS handshake.");
+				await this.Information("Starting TLS handshake.");
 				await this.client.UpgradeToTlsAsClient(null, SslProtocols.Tls12, this.trustCertificate);
-				this.Information("TLS handshake complete.");
+				await this.Information("TLS handshake complete.");
 				this.client.Continue();
 
 				ResponseDomain = await this.EHLO(Domain);

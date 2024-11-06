@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 
@@ -132,7 +133,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				BlockSize = this.blockSize;
 
 			if (BlockSize == 0)
-				this.SendClose();
+				await this.SendClose();
 			else
 			{
 				byte[] Block = new byte[BlockSize];
@@ -169,9 +170,9 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				this.isWriting = true;
 
 				if (!(this.e2e is null))
-					this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), this.BlockAck, Seq);
+					await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), this.BlockAck, Seq);
 				else
-					this.client.SendIqSet(this.to, Xml.ToString(), this.BlockAck, Seq);
+					await this.client.SendIqSet(this.to, Xml.ToString(), this.BlockAck, Seq);
 			}
 		}
 
@@ -207,7 +208,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 					if (this.done)
 					{
-						this.SendClose();
+						await this.SendClose();
 						this.Dispose();
 					}
 				}
@@ -222,19 +223,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		{
 			this.opened = true;
 
-			OpenStreamEventHandler h = this.OnOpened;
-			if (!(h is null))
-			{
-				try
-				{
-					OpenStreamEventArgs e2 = new OpenStreamEventArgs(e, this);
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnOpened.Raise(this, new OpenStreamEventArgs(e, this));
 
 			if (!this.isWriting && this.tempStream.Length - this.pos >= this.blockSize)
 				await this.WriteBlockLocked();
@@ -243,7 +232,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// Event raised when stream han been opened.
 		/// </summary>
-		public OpenStreamEventHandler OnOpened = null;
+		public EventHandlerAsync<OpenStreamEventArgs> OnOpened = null;
 
 		/// <summary>
 		/// Closes the session.
@@ -257,11 +246,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				if (this.tempStream.Length > this.pos)
 					await this.WriteBlockLocked();
 				else
-					this.SendClose();
+					await this.SendClose();
 			}
 		}
 
-		private void SendClose()
+		private Task SendClose()
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -272,9 +261,9 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append("'/>");
 
 			if (!(this.e2e is null))
-				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), null, null);
+				return this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), null, null);
 			else
-				this.client.SendIqSet(this.to, Xml.ToString(), null, null);
+				return this.client.SendIqSet(this.to, Xml.ToString(), null, null);
 		}
 
 		internal void Abort()

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
+using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.Metering;
@@ -154,13 +156,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="TedsAccessCode">TEDS access code.</param>
 		/// <param name="TedsOffset">TEDS offset.</param>
 		/// <param name="TimeoutSeconds">Timeout, in seconds.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeRequest(byte[] NcapId, byte[] TimId, ushort ChannelId,
-			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds)
+			TedsAccessCode TedsAccessCode, uint TedsOffset, double TimeoutSeconds, StringBuilder SnifferOutput)
 		{
 			using (MemoryStream ms = new MemoryStream())
 			{
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
+				ms.Write(AppId, 0, 16);
 				ms.Write(NcapId ?? EmptyUuid, 0, 16);
 				ms.Write(TimId ?? EmptyUuid, 0, 16);
 				ms.WriteByte((byte)(ChannelId >> 8));
@@ -177,8 +182,27 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				Array.Reverse(Bin);
 				ms.Write(Bin, 0, 8);
 
-				return Ieee1451Parser.SerializeMessage(TedsAccessService.Read,
-					MessageType.Command, ms.ToArray());
+				byte[] Result = Ieee1451Parser.SerializeMessage(TedsAccessService.Read, MessageType.Command, ms.ToArray(), SnifferOutput);
+
+				if (!(SnifferOutput is null))
+				{
+					SnifferOutput.Append("App ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+					SnifferOutput.Append("NCAP ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId ?? EmptyUuid));
+					SnifferOutput.Append("TIM ID: ");
+					SnifferOutput.AppendLine(Hashes.BinaryToString(TimId ?? EmptyUuid));
+					SnifferOutput.Append("Channel ID: ");
+					SnifferOutput.AppendLine(ChannelId.ToString());
+					SnifferOutput.Append("TEDS Access Code: ");
+					SnifferOutput.AppendLine(TedsAccessCode.ToString());
+					SnifferOutput.Append("TEDS Offset: ");
+					SnifferOutput.AppendLine(TedsOffset.ToString());
+					SnifferOutput.Append("Timeout (s): ");
+					SnifferOutput.AppendLine(TimeoutSeconds.ToString());
+				}
+
+				return Result;
 			}
 		}
 
@@ -189,11 +213,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="NcapId">NCAP ID</param>
 		/// <param name="TimId">TIM ID</param>
 		/// <param name="ChannelId">Channel ID</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <param name="TedsHeader">TEDS header record.</param>
 		/// <param name="Records">Records</param>
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeResponse(ushort ErrorCode, byte[] NcapId, byte[] TimId,
-			ushort ChannelId, TedsId TedsHeader, params TedsRecord[] Records)
+			ushort ChannelId, StringBuilder SnifferOutput, TedsId TedsHeader, params TedsRecord[] Records)
 		{
 			if (NcapId is null)
 				NcapId = new byte[16];
@@ -207,11 +232,13 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			using (MemoryStream ms = new MemoryStream())
 			{
+				byte[] AppId = MeteringTopology.Root.ObjectId.ToByteArray();
+
 				ms.WriteByte((byte)(ErrorCode >> 8));
 				ms.WriteByte((byte)ErrorCode);
-				ms.Write(MeteringTopology.Root.ObjectId.ToByteArray(), 0, 16); // App ID
-				ms.Write(NcapId, 0, 16); // NCAP ID
-				ms.Write(TimId, 0, 16); // TIM ID
+				ms.Write(AppId, 0, 16);
+				ms.Write(NcapId, 0, 16);
+				ms.Write(TimId, 0, 16);
 				ms.WriteByte((byte)(ChannelId >> 8));
 				ms.WriteByte((byte)ChannelId);
 				ms.WriteByte(0);    // TedsOffset MSB
@@ -261,9 +288,34 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 					ms.WriteByte((byte)(Checksum >> 8));
 					ms.WriteByte((byte)Checksum);
-				}
 
-				return Ieee1451Parser.SerializeMessage(TedsAccessService.Read, MessageType.Reply, ms.ToArray());
+					byte[] Result = Ieee1451Parser.SerializeMessage(TedsAccessService.Read, MessageType.Reply, ms.ToArray(), SnifferOutput);
+
+					if (!(SnifferOutput is null))
+					{
+						SnifferOutput.Append("Error Code: ");
+						SnifferOutput.AppendLine(ErrorCode.ToString());
+						SnifferOutput.Append("App ID: ");
+						SnifferOutput.AppendLine(Hashes.BinaryToString(AppId));
+						SnifferOutput.Append("NCAP ID: ");
+						SnifferOutput.AppendLine(Hashes.BinaryToString(NcapId));
+						SnifferOutput.Append("TIM ID: ");
+						SnifferOutput.AppendLine(Hashes.BinaryToString(TimId));
+						SnifferOutput.Append("Channel ID: ");
+						SnifferOutput.AppendLine(ChannelId.ToString());
+						SnifferOutput.AppendLine("TEDS Offset: 0");
+
+						TedsHeader.Append(SnifferOutput);
+
+						foreach (TedsRecord Record in Records)
+							Record.Append(SnifferOutput);
+
+						SnifferOutput.AppendLine(Checksum.ToString());
+						SnifferOutput.AppendLine("TEDS Offset: 0");
+					}
+
+					return Result;
+				}
 			}
 		}
 

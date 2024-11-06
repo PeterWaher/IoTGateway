@@ -108,6 +108,7 @@
     <Compile Include="BinaryOutputStream.cs" />
     <Compile Include="BinaryTcpServer.cs" />
     <Compile Include="ClientCertificates.cs" />
+    <Compile Include="EventHandlerExtensions.cs" />
     <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="RowTcpClient.cs" />
     <Compile Include="ServerConnectionAcceptEventArgs.cs" />

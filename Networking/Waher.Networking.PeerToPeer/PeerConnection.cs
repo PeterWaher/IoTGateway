@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Networking.PeerToPeer
@@ -35,10 +35,10 @@ namespace Waher.Networking.PeerToPeer
 			this.tcpConnection = TcpConnection;
 			this.encapsulatePackets = EncapsulatePackets;
 
-			this.tcpConnection.OnDisconnected += TcpConnection_OnDisconnected;
-			this.tcpConnection.OnError += TcpConnection_OnError;
-			this.tcpConnection.OnReceived += TcpConnection_OnReceived;
-			this.tcpConnection.OnSent += TcpConnection_OnSent;
+			this.tcpConnection.OnDisconnected += this.TcpConnection_OnDisconnected;
+			this.tcpConnection.OnError += this.TcpConnection_OnError;
+			this.tcpConnection.OnReceived += this.TcpConnection_OnReceived;
+			this.tcpConnection.OnSent += this.TcpConnection_OnSent;
 		}
 
 		private async Task TcpConnection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
@@ -141,13 +141,12 @@ namespace Waher.Networking.PeerToPeer
 
 		private Task TcpConnection_OnError(object _, Exception _2)
 		{
-			this.Closed();
-			return Task.CompletedTask;
+			return this.Closed();
 		}
 
-		private void TcpConnection_OnDisconnected(object sender, EventArgs e)
+		private Task TcpConnection_OnDisconnected(object sender, EventArgs e)
 		{
-			this.Closed();
+			return this.Closed();
 		}
 
 		/// <summary>
@@ -194,7 +193,23 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		[Obsolete("Use DisposeAsync()")]
+		public async void Dispose()
+		{
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public Task DisposeAsync()
 		{
 			this.disposed = true;
 
@@ -204,7 +219,7 @@ namespace Waher.Networking.PeerToPeer
 			this.tcpConnection?.Dispose();
 			this.tcpConnection = null;
 
-			this.Closed();
+			return this.Closed();
 		}
 
 		/// <summary>
@@ -223,7 +238,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public Task SendTcp(byte[] Packet, EventHandler Callback)
+		public Task SendTcp(byte[] Packet, EventHandlerAsync Callback)
 		{
 			if (this.disposed)
 				return Task.CompletedTask;
@@ -289,7 +304,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="IncludeNrPreviousPackets">Number of previous packets to include in the datagram. Note that the network limits
 		/// total size of datagram packets.</param>
-		public void SendUdp(byte[] Packet, int IncludeNrPreviousPackets)
+		public Task SendUdp(byte[] Packet, int IncludeNrPreviousPackets)
 		{
 			byte[] EncodedPacket = this.EncodePacket(Packet, true);
 
@@ -333,7 +348,7 @@ namespace Waher.Networking.PeerToPeer
 				else
 					this.nrHistoricPackets++;
 
-				this.network.SendUdp(this.remoteEndpoint, ToSend);
+				return this.network.SendUdp(this.remoteEndpoint, ToSend);
 			}
 		}
 
@@ -363,7 +378,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public event BinaryDataReadEventHandler OnReceived = null;
 
-		private void Closed()
+		private async Task Closed()
 		{
 			if (!this.closed)
 			{
@@ -376,27 +391,27 @@ namespace Waher.Networking.PeerToPeer
 						this.resynchCallback(this, EventArgs.Empty);
 
 						this.closed = true;
-						this.Dispose();
+						await this.DisposeAsync();
 					}
 					catch (Exception ex)
 					{
 						Log.Exception(ex);
-						this.RaiseOnClosed();
+						await this.RaiseOnClosed();
 					}
 				}
 				else
-					this.RaiseOnClosed();
+					await this.RaiseOnClosed();
 			}
 		}
 
-		private void RaiseOnClosed()
+		private async Task RaiseOnClosed()
 		{
-			EventHandler h = this.OnClosed;
+			EventHandlerAsync h = this.OnClosed;
 			if (!(h is null))
 			{
 				try
 				{
-					h(this, EventArgs.Empty);
+					await h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{
@@ -408,7 +423,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Event raised when a connection has been closed for some reason.
 		/// </summary>
-		public event EventHandler OnClosed = null;
+		public event EventHandlerAsync OnClosed = null;
 
 		/// <summary>
 		/// State object that applications can use to attach information to a connection.
@@ -545,26 +560,33 @@ namespace Waher.Networking.PeerToPeer
 			this.idleTimer = new Timer(this.IdleTimerCallback, null, 5000, 5000);
 		}
 
-		private void IdleTimerCallback(object P)
+		private async void IdleTimerCallback(object P)
 		{
-			if ((DateTime.Now - this.lastTcpPacket).TotalSeconds > 10)
+			try
 			{
-				try
-				{
-					this.SendTcp(new byte[0]);
-				}
-				catch (Exception)
+				if ((DateTime.Now - this.lastTcpPacket).TotalSeconds > 10)
 				{
 					try
 					{
-						this.Closed();
-						this.Dispose();
+						await this.SendTcp(new byte[0]);
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
-						Log.Exception(ex);
+						try
+						{
+							await this.Closed();
+							await this.DisposeAsync();
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
 					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace Waher.Networking.HTTP
 	public class HttpGetDelegateResource : HttpResource, IHttpGetMethod
 	{
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
-		private readonly HttpMethodHandlerAsync get;
+		private readonly HttpMethodHandler get;
 		private readonly bool synchronous;
 		private readonly bool handlesSubPaths;
 		private readonly bool userSessions;
@@ -23,7 +23,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpGetDelegateResource(string ResourceName, HttpMethodHandlerAsync GET, bool Synchronous, bool HandlesSubPaths,
+		public HttpGetDelegateResource(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster
 {
@@ -9,7 +7,7 @@ namespace Waher.Networking.Cluster
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event handler.</param>
-	public delegate void ClusterMessageAckEventHandler(object Sender, ClusterMessageAckEventArgs e);
+	public delegate Task ClusterMessageAckEventHandler(object Sender, ClusterMessageAckEventArgs e);
 
 	/// <summary>
 	/// Event arguments for cluster message acknowledgement events.

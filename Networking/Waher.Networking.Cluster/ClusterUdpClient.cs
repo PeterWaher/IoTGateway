@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Text;
 using Waher.Events;
 
 namespace Waher.Networking.Cluster
@@ -66,11 +64,11 @@ namespace Waher.Networking.Cluster
 			{
 				while (!this.disposed)
 				{
-					UdpReceiveResult Data = await client.ReceiveAsync();
+					UdpReceiveResult Data = await this.client.ReceiveAsync();
 					if (this.disposed)
 						return;
 
-					this.endpoint.Information(Data.Buffer.Length.ToString() + " bytes received. (" + DateTime.Now.TimeOfDay.ToString() + ")");
+					await this.endpoint.Information(Data.Buffer.Length.ToString() + " bytes received. (" + DateTime.Now.TimeOfDay.ToString() + ")");
 
 					try
 					{
@@ -159,7 +157,7 @@ namespace Waher.Networking.Cluster
 					}
 					catch (Exception ex)
 					{
-						this.endpoint.Exception(ex);
+						await this.endpoint.Exception(ex);
 						Log.Exception(ex);
 					}
 				}
@@ -170,7 +168,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.endpoint.Exception(ex);
+				await this.endpoint.Exception(ex);
 			}
 		}
 
@@ -262,7 +260,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.endpoint.Exception(ex);
+				await this.endpoint.Exception(ex);
 
 				lock (this.outputQueue)
 				{

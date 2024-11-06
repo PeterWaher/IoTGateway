@@ -33,7 +33,7 @@ namespace Waher.Things.Mqtt
 			foreach (INode Child in await Node.ChildNodes)
 			{
 				if (Child is MqttBrokerNode BrokerNode)
-					BrokerNode.GetBroker(); // Makes sure it is initialized.
+					await BrokerNode.GetBroker(); // Makes sure it is initialized.
 				else if (Child is IpHost IpHost)
 					await this.CheckNode(IpHost);
 			}

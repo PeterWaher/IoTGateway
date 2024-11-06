@@ -21,6 +21,7 @@ namespace Waher.Networking.XMPP.Test
 			Proxy.StartSearch((sender, e) =>
 			{
 				Done.Set();
+				return Task.CompletedTask;
 			});
 
 			Assert.IsTrue(Done.WaitOne(30000), "Search not complete.");
@@ -218,6 +219,8 @@ namespace Waher.Networking.XMPP.Test
 			Proxy1.StartSearch((sender, e) =>
 			{
 				Done1.Set();
+				return Task.CompletedTask;
+
 			});
 
 			ManualResetEvent Done2 = new(false);
@@ -226,6 +229,8 @@ namespace Waher.Networking.XMPP.Test
 			Proxy2.StartSearch((sender, e) =>
 			{
 				Done2.Set();
+				return Task.CompletedTask;
+
 			});
 
 			Assert.IsTrue(Done1.WaitOne(30000), "Search not complete.");

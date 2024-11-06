@@ -19,7 +19,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		public ConnectToForm()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 			this.ConnectionMethod_SelectionChanged(this, null);
 		}
 
@@ -46,147 +46,154 @@ namespace Waher.Client.WPF.Dialogs
 			this.DialogResult = false;
 		}
 
-		private void ConnectButton_Click(object sender, RoutedEventArgs e)
+		private async void ConnectButton_Click(object sender, RoutedEventArgs e)
 		{
-			XmppCredentials Credentials = new XmppCredentials()
+			try
 			{
-				Host = this.XmppServer.Text,
-				Account = this.AccountName.Text
-			};
+				XmppCredentials Credentials = new XmppCredentials()
+				{
+					Host = this.XmppServer.Text,
+					Account = this.AccountName.Text
+				};
 
-			switch ((TransportMethod)this.ConnectionMethod.SelectedIndex)
-			{
-				case TransportMethod.TraditionalSocket:
-					if (!int.TryParse(this.XmppPort.Text, out int Port) || Port <= 0 || Port > 65535)
-					{
-						MessageBox.Show(this, "Invalid port number. Valid port numbers are positive integers between 1 and 65535. The default port number is " +
-							XmppCredentials.DefaultPort.ToString() + ".", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.XmppPort.Focus();
-						return;
-					}
+				switch ((TransportMethod)this.ConnectionMethod.SelectedIndex)
+				{
+					case TransportMethod.TraditionalSocket:
+						if (!int.TryParse(this.XmppPort.Text, out int Port) || Port <= 0 || Port > 65535)
+						{
+							MessageBox.Show(this, "Invalid port number. Valid port numbers are positive integers between 1 and 65535. The default port number is " +
+								XmppCredentials.DefaultPort.ToString() + ".", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.XmppPort.Focus();
+							return;
+						}
 
-					Credentials.Port = Port;
-					break;
+						Credentials.Port = Port;
+						break;
 
-				case TransportMethod.WS:
-					Uri Uri;
-					try
-					{
-						Uri = new Uri(this.UrlEndpoint.Text);
-					}
-					catch (Exception)
-					{
-						MessageBox.Show(this, "Invalid URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.UrlEndpoint.Focus();
-						return;
-					}
+					case TransportMethod.WS:
+						Uri Uri;
+						try
+						{
+							Uri = new Uri(this.UrlEndpoint.Text);
+						}
+						catch (Exception)
+						{
+							MessageBox.Show(this, "Invalid URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.UrlEndpoint.Focus();
+							return;
+						}
 
-					string Scheme = Uri.Scheme.ToLower();
+						string Scheme = Uri.Scheme.ToLower();
 
-					if (Scheme != "ws" && Scheme != "wss")
-					{
-						MessageBox.Show(this, "Resource must be an WS or WSS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.UrlEndpoint.Focus();
-						return;
-					}
+						if (Scheme != "ws" && Scheme != "wss")
+						{
+							MessageBox.Show(this, "Resource must be an WS or WSS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.UrlEndpoint.Focus();
+							return;
+						}
 
-					if (!Uri.IsAbsoluteUri)
-					{
-						MessageBox.Show(this, "URI must be an absolute URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.UrlEndpoint.Focus();
-						return;
-					}
+						if (!Uri.IsAbsoluteUri)
+						{
+							MessageBox.Show(this, "URI must be an absolute URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.UrlEndpoint.Focus();
+							return;
+						}
 
-					Credentials.UriEndpoint = this.UrlEndpoint.Text;
-					break;
+						Credentials.UriEndpoint = this.UrlEndpoint.Text;
+						break;
 
-				case TransportMethod.BOSH:
-					try
-					{
-						Uri = new Uri(this.UrlEndpoint.Text);
-					}
-					catch (Exception)
-					{
-						MessageBox.Show(this, "Invalid URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.UrlEndpoint.Focus();
-						return;
-					}
+					case TransportMethod.BOSH:
+						try
+						{
+							Uri = new Uri(this.UrlEndpoint.Text);
+						}
+						catch (Exception)
+						{
+							MessageBox.Show(this, "Invalid URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.UrlEndpoint.Focus();
+							return;
+						}
 
-					Scheme = Uri.Scheme.ToLower();
+						Scheme = Uri.Scheme.ToLower();
 
-					if (Scheme != "http" && Scheme != "https")
-					{
-						MessageBox.Show(this, "Resource must be an HTTP or HTTPS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.UrlEndpoint.Focus();
-						return;
-					}
+						if (Scheme != "http" && Scheme != "https")
+						{
+							MessageBox.Show(this, "Resource must be an HTTP or HTTPS URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.UrlEndpoint.Focus();
+							return;
+						}
 
-					if (!Uri.IsAbsoluteUri)
-					{
-						MessageBox.Show(this, "URI must be an absolute URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-						this.UrlEndpoint.Focus();
-						return;
-					}
+						if (!Uri.IsAbsoluteUri)
+						{
+							MessageBox.Show(this, "URI must be an absolute URI.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+							this.UrlEndpoint.Focus();
+							return;
+						}
 
-					Credentials.UriEndpoint = this.UrlEndpoint.Text;
-					break;
+						Credentials.UriEndpoint = this.UrlEndpoint.Text;
+						break;
+				}
+
+				bool Create = this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value;
+				if (Create && this.Password.Password != this.RetypePassword.Password)
+				{
+					MessageBox.Show(this, "The two passwords must match.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+					this.Password.Focus();
+					return;
+				}
+
+				await this.CloseClient();
+				this.ConnectButton.IsEnabled = false;
+				this.XmppServer.IsEnabled = false;
+				this.ConnectionMethod.IsEnabled = false;
+				this.XmppPort.IsEnabled = false;
+				this.UrlEndpoint.IsEnabled = false;
+				this.AccountName.IsEnabled = false;
+				this.Password.IsEnabled = false;
+				this.RetypePassword.IsEnabled = false;
+				this.TrustServerCertificate.IsEnabled = false;
+				this.CreateAccount.IsEnabled = false;
+
+				if (this.Password.Password == this.passwordHash && !string.IsNullOrEmpty(this.passwordHash))
+				{
+					Credentials.Password = this.passwordHash;
+					Credentials.PasswordType = this.passwordHashMethod;
+				}
+				else
+					Credentials.Password = this.Password.Password;
+
+				if (this.AllowInsecureAuthentication.IsChecked.HasValue && this.AllowInsecureAuthentication.IsChecked.Value)
+				{
+					Credentials.AllowPlain = true;
+					Credentials.AllowCramMD5 = true;
+					Credentials.AllowDigestMD5 = true;
+				}
+
+				if (this.TrustServerCertificate.IsChecked.HasValue && this.TrustServerCertificate.IsChecked.Value)
+					Credentials.TrustServer = true;
+
+				this.client = new XmppClient(Credentials, "en", typeof(App).Assembly)
+				{
+					AllowQuickLogin = true
+				};
+
+				if (Create)
+				{
+					this.client.AllowRegistration(this.ApiKey.Text, this.Secret.Password);
+					this.client.OnRegistrationForm += this.Client_OnRegistrationForm;
+				}
+
+				this.client.OnStateChanged += this.Client_OnStateChanged;
+				this.client.OnConnectionError += this.Client_OnConnectionError;
+				await this.client.Connect();
 			}
-
-			bool Create = this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value;
-			if (Create && this.Password.Password != this.RetypePassword.Password)
+			catch (Exception ex)
 			{
-				MessageBox.Show(this, "The two passwords must match.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-				this.Password.Focus();
-				return;
+				MainWindow.ErrorBox(ex.Message);
 			}
-
-			this.CloseClient();
-			this.ConnectButton.IsEnabled = false;
-			this.XmppServer.IsEnabled = false;
-			this.ConnectionMethod.IsEnabled = false;
-			this.XmppPort.IsEnabled = false;
-			this.UrlEndpoint.IsEnabled = false;
-			this.AccountName.IsEnabled = false;
-			this.Password.IsEnabled = false;
-			this.RetypePassword.IsEnabled = false;
-			this.TrustServerCertificate.IsEnabled = false;
-			this.CreateAccount.IsEnabled = false;
-
-			if (this.Password.Password == this.passwordHash && !string.IsNullOrEmpty(this.passwordHash))
-			{
-				Credentials.Password = this.passwordHash;
-				Credentials.PasswordType = this.passwordHashMethod;
-			}
-			else
-				Credentials.Password = this.Password.Password;
-
-			if (this.AllowInsecureAuthentication.IsChecked.HasValue && this.AllowInsecureAuthentication.IsChecked.Value)
-			{
-				Credentials.AllowPlain = true;
-				Credentials.AllowCramMD5 = true;
-				Credentials.AllowDigestMD5 = true;
-			}
-
-			if (this.TrustServerCertificate.IsChecked.HasValue && this.TrustServerCertificate.IsChecked.Value)
-				Credentials.TrustServer = true;
-
-			this.client = new XmppClient(Credentials, "en", typeof(App).Assembly)
-			{
-				AllowQuickLogin = true
-			};
-
-			if (Create)
-			{
-				this.client.AllowRegistration(this.ApiKey.Text, this.Secret.Password);
-				this.client.OnRegistrationForm += Client_OnRegistrationForm;
-			}
-
-			this.client.OnStateChanged += this.Client_OnStateChanged;
-			this.client.OnConnectionError += this.Client_OnConnectionError;
-			this.client.Connect();
 		}
 
-		private Task Client_OnRegistrationForm(object _, DataForm Form)
+		private async Task Client_OnRegistrationForm(object _, DataForm Form)
 		{
 			Field FormType = Form["FORM_TYPE"];
 			if (!(FormType is null) && FormType.ValueString == "urn:xmpp:captcha")
@@ -198,9 +205,7 @@ namespace Waher.Client.WPF.Dialogs
 				});
 			}
 			else
-				Form.Submit();
-
-			return Task.CompletedTask;
+				await Form.Submit();
 		}
 
 		private Task Client_OnStateChanged(object Sender, XmppState NewState)
@@ -209,7 +214,7 @@ namespace Waher.Client.WPF.Dialogs
 			return Task.CompletedTask;
 		}
 
-		private Task XmppStateChanged(object P)
+		private async Task XmppStateChanged(object P)
 		{
 			XmppState NewState = (XmppState)P;
 
@@ -268,27 +273,25 @@ namespace Waher.Client.WPF.Dialogs
 					}
 
 					this.ConnectionState.Content = "Connected.";
-					this.CloseClient();
+					await this.CloseClient();
 					this.DialogResult = true;
 					break;
 
 				case XmppState.Error:
 					this.ConnectionState.Content = "Error.";
-					this.CloseClient();
+					await this.CloseClient();
 					break;
 
 			}
-
-			return Task.CompletedTask;
 		}
 
-		private void CloseClient()
+		private async Task CloseClient()
 		{
 			if (!(this.client is null))
 			{
 				XmppClient Client = this.client;
 				this.client = null;
-				Client.Dispose();
+				await Client.DisposeAsync();
 			}
 
 			this.ConnectButton.IsEnabled = true;

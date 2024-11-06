@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.MUC
@@ -102,30 +103,30 @@ namespace Waher.Networking.XMPP.MUC
 			if (TryParseUserPresence(e, out UserPresenceEventArgs e2))
 			{
 				if (e2.RoomDestroyed)
-					return this.RoomDestroyed?.Invoke(this, e2) ?? Task.CompletedTask;
+					return this.RoomDestroyed.Raise(this, e2);
 				else if (string.IsNullOrEmpty(e2.NickName))
-					return this.RoomPresence?.Invoke(this, e2) ?? Task.CompletedTask;
+					return this.RoomPresence.Raise(this, e2);
 				else
-					return this.OccupantPresence?.Invoke(this, e2) ?? Task.CompletedTask;
+					return this.OccupantPresence.Raise(this, e2);
 			}
-			else
-				return Task.CompletedTask;
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Event raised when user presence is received from a room occupant.
 		/// </summary>
-		public event UserPresenceEventHandlerAsync OccupantPresence;
+		public event EventHandlerAsync<UserPresenceEventArgs> OccupantPresence;
 
 		/// <summary>
 		/// Event raised when user presence is received from a room.
 		/// </summary>
-		public event UserPresenceEventHandlerAsync RoomPresence;
+		public event EventHandlerAsync<UserPresenceEventArgs> RoomPresence;
 
 		/// <summary>
 		/// Event raised when a room where the client is an occupant is destroyed.
 		/// </summary>
-		public event UserPresenceEventHandlerAsync RoomDestroyed;
+		public event EventHandlerAsync<UserPresenceEventArgs> RoomDestroyed;
 
 		private static bool TryParseUserPresence(PresenceEventArgs e, out UserPresenceEventArgs Result)
 		{
@@ -281,10 +282,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nickname to use in the chat room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void EnterRoom(string RoomId, string Domain, string NickName,
-			UserPresenceEventHandlerAsync Callback, object State)
+		public Task EnterRoom(string RoomId, string Domain, string NickName,
+			EventHandlerAsync<UserPresenceEventArgs> Callback, object State)
 		{
-			this.EnterRoom(RoomId, Domain, NickName, string.Empty, Callback, State);
+			return this.EnterRoom(RoomId, Domain, NickName, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -296,8 +297,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Password">Password</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void EnterRoom(string RoomId, string Domain, string NickName, string Password,
-			UserPresenceEventHandlerAsync Callback, object State)
+		public Task EnterRoom(string RoomId, string Domain, string NickName, string Password,
+			EventHandlerAsync<UserPresenceEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -313,7 +314,7 @@ namespace Waher.Networking.XMPP.MUC
 				Xml.Append("</password></x>");
 			}
 
-			this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
+			return this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
 				Xml.ToString(), (sender, e) =>
 				{
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
@@ -325,7 +326,10 @@ namespace Waher.Networking.XMPP.MUC
 						};
 					}
 
-					return Callback?.Invoke(this, e2) ?? Task.CompletedTask;
+					if (Callback is null)
+						return Task.CompletedTask;
+					else
+						return Callback(this, e2);
 				}, State);
 		}
 
@@ -349,17 +353,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nickname to use in the chat room.</param>
 		/// <param name="Password">Password</param>
 		/// <returns>Room entry response.</returns>
-		public Task<UserPresenceEventArgs> EnterRoomAsync(string RoomId, string Domain, string NickName, string Password)
+		public async Task<UserPresenceEventArgs> EnterRoomAsync(string RoomId, string Domain, string NickName, string Password)
 		{
 			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
 
-			this.EnterRoom(RoomId, Domain, NickName, Password, (sender, e) =>
+			await this.EnterRoom(RoomId, Domain, NickName, Password, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -374,10 +378,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nickname used in the chat room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void LeaveRoom(string RoomId, string Domain, string NickName,
-			UserPresenceEventHandlerAsync Callback, object State)
+		public Task LeaveRoom(string RoomId, string Domain, string NickName,
+			EventHandlerAsync<UserPresenceEventArgs> Callback, object State)
 		{
-			this.client.SendDirectedPresence("unavailable", RoomId + "@" + Domain + "/" + NickName,
+			return this.client.SendDirectedPresence("unavailable", RoomId + "@" + Domain + "/" + NickName,
 				string.Empty, (sender, e) =>
 				{
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
@@ -389,7 +393,10 @@ namespace Waher.Networking.XMPP.MUC
 						};
 					}
 
-					return Callback?.Invoke(this, e2) ?? Task.CompletedTask;
+					if (Callback is null)
+						return Task.CompletedTask;
+					else
+						return Callback(this, e2);
 				}, State);
 		}
 
@@ -400,18 +407,18 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="NickName">Nickname to use in the chat room.</param>
 		/// <returns>Room entry response.</returns>
-		public Task<UserPresenceEventArgs> LeaveRoomAsync(string RoomId, string Domain,
+		public async Task<UserPresenceEventArgs> LeaveRoomAsync(string RoomId, string Domain,
 			string NickName)
 		{
 			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
 
-			this.LeaveRoom(RoomId, Domain, NickName, (sender, e) =>
+			await this.LeaveRoom(RoomId, Domain, NickName, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -425,8 +432,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void CreateInstantRoom(string RoomId, string Domain,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task CreateInstantRoom(string RoomId, string Domain,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -436,7 +443,7 @@ namespace Waher.Networking.XMPP.MUC
 			Xml.Append(XmppClient.NamespaceData);
 			Xml.Append("' type='submit'/></query>");
 
-			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -445,17 +452,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> CreateInstantRoomAsync(string RoomId, string Domain)
+		public async Task<IqResultEventArgs> CreateInstantRoomAsync(string RoomId, string Domain)
 		{
 			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
 
-			this.CreateInstantRoom(RoomId, Domain, (sender, e) =>
+			await this.CreateInstantRoom(RoomId, Domain, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -469,10 +476,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetRoomConfiguration(string RoomId, string Domain, DataFormEventHandler Callback, object State)
+		public Task GetRoomConfiguration(string RoomId, string Domain, EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
-			this.GetRoomConfiguration(RoomId, Domain, new FormResultToFormCallback(Callback).Callback, State);
+			return this.GetRoomConfiguration(RoomId, Domain, Callback, null, State);
 		}
 
 		/// <summary>
@@ -483,35 +489,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetRoomConfiguration(string RoomId, string Domain, DataFormEventHandler Callback,
-			IqResultEventHandlerAsync SubmissionCallback, object State)
-		{
-			this.GetRoomConfiguration(RoomId, Domain, new FormResultToFormCallback(Callback).Callback, SubmissionCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the configuration form for a room.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomConfiguration(string RoomId, string Domain, DataFormResultEventHandler Callback, object State)
-		{
-			this.GetRoomConfiguration(RoomId, Domain, Callback, null, State);
-		}
-
-		/// <summary>
-		/// Gets the configuration form for a room.
-		/// </summary>
-		/// <param name="RoomId">Room ID.</param>
-		/// <param name="Domain">Domain of service hosting the room.</param>
-		/// <param name="Callback">Method to call when response is returned.</param>
-		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomConfiguration(string RoomId, string Domain, DataFormResultEventHandler Callback, 
-			IqResultEventHandlerAsync SubmissionCallback, object State)
+		public Task GetRoomConfiguration(string RoomId, string Domain, EventHandlerAsync<DataFormEventArgs> Callback,
+			EventHandlerAsync<IqResultEventArgs> SubmissionCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -519,7 +498,7 @@ namespace Waher.Networking.XMPP.MUC
 			Xml.Append(NamespaceMucOwner);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
 			{
 				DataForm Form = null;
 
@@ -546,13 +525,16 @@ namespace Waher.Networking.XMPP.MUC
 					}
 				}
 
-				return Callback?.Invoke(this, new DataFormEventArgs(Form, e)) ?? Task.CompletedTask;
+				if (Callback is null)
+					return Task.CompletedTask;
+				else
+					return Callback(this, new DataFormEventArgs(Form, e));
 			}, State);
 		}
 
 		private class ConfigState
 		{
-			public IqResultEventHandlerAsync SubmissionCallback;
+			public EventHandlerAsync<IqResultEventArgs> SubmissionCallback;
 			public object State;
 		}
 
@@ -560,7 +542,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// Submits a room configuration form.
 		/// </summary>
 		/// <param name="ConfigurationForm">Room configuration form.</param>
-		public Task SubmitConfigurationForm(DataForm ConfigurationForm)
+		public async Task SubmitConfigurationForm(DataForm ConfigurationForm)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
@@ -572,14 +554,14 @@ namespace Waher.Networking.XMPP.MUC
 						Result.TrySetResult(true);
 					else
 						Result.TrySetException(e.StanzaError is null ? new Exception("Unable to configure room.") : e.StanzaError);
-						
+
 					return Task.CompletedTask;
 				}
 			};
 
-			this.SubmitConfigurationForm(this, ConfigurationForm);
+			await this.SubmitConfigurationForm(this, ConfigurationForm);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		private Task SubmitConfigurationForm(object Sender, DataForm ConfigurationForm)
@@ -595,20 +577,22 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml2.Append("</query>");
 
-			this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
+			return this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
 			{
 				e3.State = State?.State;
-				return State?.SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
-			}, null);
 
-			return Task.CompletedTask;
+				if (State?.SubmissionCallback is null)
+					return Task.CompletedTask;
+				else
+					return State.SubmissionCallback(this, e3);
+			}, null);
 		}
 
 		/// <summary>
 		/// Cancels a room configuration form.
 		/// </summary>
 		/// <param name="ConfigurationForm">Room configuration form.</param>
-		public Task CancelConfigurationForm(DataForm ConfigurationForm)
+		public async Task CancelConfigurationForm(DataForm ConfigurationForm)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
@@ -621,9 +605,9 @@ namespace Waher.Networking.XMPP.MUC
 				}
 			};
 
-			this.CancelConfigurationForm(this, ConfigurationForm);
+			await this.CancelConfigurationForm(this, ConfigurationForm);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		private Task CancelConfigurationForm(object Sender, DataForm ConfigurationForm)
@@ -639,14 +623,16 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml2.Append("</query>");
 
-			this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
+			return this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
 			{
 				e3.Ok = false;
 				e3.State = State?.State;
-				return State?.SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
-			}, null);
 
-			return Task.CompletedTask;
+				if (State?.SubmissionCallback is null)
+					return Task.CompletedTask;
+				else
+					return State.SubmissionCallback(this, e3);
+			}, null);
 		}
 
 		/// <summary>
@@ -668,12 +654,12 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>Configuration Form, if found, or null if not supported.</returns>
-		public Task<DataForm> GetRoomConfigurationAsync(string RoomId, string Domain,
-			IqResultEventHandlerAsync SubmissionCallback, object State)
+		public async Task<DataForm> GetRoomConfigurationAsync(string RoomId, string Domain,
+			EventHandlerAsync<IqResultEventArgs> SubmissionCallback, object State)
 		{
 			TaskCompletionSource<DataForm> Result = new TaskCompletionSource<DataForm>();
 
-			this.GetRoomConfiguration(RoomId, Domain, (sender, e) =>
+			await this.GetRoomConfiguration(RoomId, Domain, (sender, e) =>
 			{
 				if (!e.Ok)
 					throw e.StanzaError ?? new XmppException("Unable to get room configuration.");
@@ -682,7 +668,7 @@ namespace Waher.Networking.XMPP.MUC
 				return Task.CompletedTask;
 			}, SubmissionCallback, State);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -698,9 +684,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Message">Message body.</param>
-		public void SendGroupChatMessage(string RoomId, string Domain, string Message)
+		public Task SendGroupChatMessage(string RoomId, string Domain, string Message)
 		{
-			this.SendGroupChatMessage(RoomId, Domain, Message, string.Empty, string.Empty, string.Empty);
+			return this.SendGroupChatMessage(RoomId, Domain, Message, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -713,9 +699,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendGroupChatMessage(string RoomId, string Domain, string Message, string Language)
+		public Task SendGroupChatMessage(string RoomId, string Domain, string Message, string Language)
 		{
-			this.SendGroupChatMessage(RoomId, Domain, Message, Language, string.Empty, string.Empty);
+			return this.SendGroupChatMessage(RoomId, Domain, Message, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -729,9 +715,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendGroupChatMessage(string RoomId, string Domain, string Message, string Language, string ThreadId)
+		public Task SendGroupChatMessage(string RoomId, string Domain, string Message, string Language, string ThreadId)
 		{
-			this.SendGroupChatMessage(RoomId, Domain, Message, Language, ThreadId, string.Empty);
+			return this.SendGroupChatMessage(RoomId, Domain, Message, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -746,9 +732,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendGroupChatMessage(string RoomId, string Domain, string Message, string Language, string ThreadId, string ParentThreadId)
+		public Task SendGroupChatMessage(string RoomId, string Domain, string Message, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
+			return this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				string.Empty, Message, string.Empty, Language, ThreadId, ParentThreadId);
 		}
 
@@ -761,9 +747,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Xml">Message body.</param>
-		public void SendCustomGroupChatMessage(string RoomId, string Domain, string Xml)
+		public Task SendCustomGroupChatMessage(string RoomId, string Domain, string Xml)
 		{
-			this.SendCustomGroupChatMessage(RoomId, Domain, Xml, string.Empty,
+			return this.SendCustomGroupChatMessage(RoomId, Domain, Xml, string.Empty,
 				string.Empty, string.Empty);
 		}
 
@@ -777,9 +763,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendCustomGroupChatMessage(string RoomId, string Domain, string Xml, string Language)
+		public Task SendCustomGroupChatMessage(string RoomId, string Domain, string Xml, string Language)
 		{
-			this.SendCustomGroupChatMessage(RoomId, Domain, Xml, Language, string.Empty, string.Empty);
+			return this.SendCustomGroupChatMessage(RoomId, Domain, Xml, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -793,9 +779,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendCustomGroupChatMessage(string RoomId, string Domain, string Xml, string Language, string ThreadId)
+		public Task SendCustomGroupChatMessage(string RoomId, string Domain, string Xml, string Language, string ThreadId)
 		{
-			this.SendCustomGroupChatMessage(RoomId, Domain, Xml, Language, ThreadId, string.Empty);
+			return this.SendCustomGroupChatMessage(RoomId, Domain, Xml, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -810,52 +796,44 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendCustomGroupChatMessage(string RoomId, string Domain,
+		public Task SendCustomGroupChatMessage(string RoomId, string Domain,
 			string Xml, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
+			return this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				 Xml, string.Empty, string.Empty, Language, ThreadId, ParentThreadId);
 		}
 
-		private Task Client_OnGroupChatMessage(object Sender, MessageEventArgs e)
+		private async Task Client_OnGroupChatMessage(object Sender, MessageEventArgs e)
 		{
 			if (!TryParseOccupantJid(e.From, false, out string RoomId, out string Domain, out string NickName))
-				return Task.CompletedTask;
+				return;
 
-			try
+			if (string.IsNullOrEmpty(NickName))
 			{
-				if (string.IsNullOrEmpty(NickName))
-				{
-					RoomMessageEventArgs e2 = new RoomMessageEventArgs(e, RoomId, Domain);
-					this.RoomMessage?.Invoke(this, e2);
-				}
+				RoomMessageEventArgs e2 = new RoomMessageEventArgs(e, RoomId, Domain);
+
+				await this.RoomMessage.Raise(this, e2);
+			}
+			else
+			{
+				RoomOccupantMessageEventArgs e2 = new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName);
+
+				if (string.IsNullOrEmpty(e.Body) && !string.IsNullOrEmpty(e.Subject))
+					await this.RoomSubject.Raise(this, e2);
 				else
-				{
-					RoomOccupantMessageEventArgs e2 = new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName);
-
-					if (string.IsNullOrEmpty(e.Body) && !string.IsNullOrEmpty(e.Subject))
-						this.RoomSubject?.Invoke(this, e2);
-					else
-						this.RoomOccupantMessage?.Invoke(this, e2);
-				}
+					await this.RoomOccupantMessage.Raise(this, e2);
 			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Event raised when a group chat message from a MUC room was received.
 		/// </summary>
-		public event RoomMessageEventHandler RoomMessage;
+		public event EventHandlerAsync<RoomMessageEventArgs> RoomMessage;
 
 		/// <summary>
 		/// Event raised when a group chat message from a MUC room occupant was received.
 		/// </summary>
-		public event RoomOccupantMessageEventHandler RoomOccupantMessage;
+		public event EventHandlerAsync<RoomOccupantMessageEventArgs> RoomOccupantMessage;
 
 		#endregion
 
@@ -864,7 +842,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Event raised when a room subject message was received.
 		/// </summary>
-		public event RoomOccupantMessageEventHandler RoomSubject;
+		public event EventHandlerAsync<RoomOccupantMessageEventArgs> RoomSubject;
 
 		/// <summary>
 		/// Sends a simple group chat message to a chat room.
@@ -875,9 +853,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Subject">Room subject.</param>
-		public void ChangeRoomSubject(string RoomId, string Domain, string Subject)
+		public Task ChangeRoomSubject(string RoomId, string Domain, string Subject)
 		{
-			this.ChangeRoomSubject(RoomId, Domain, Subject, string.Empty);
+			return this.ChangeRoomSubject(RoomId, Domain, Subject, string.Empty);
 		}
 
 		/// <summary>
@@ -890,9 +868,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="Subject">Room subject.</param>
 		/// <param name="Language">Language</param>
-		public void ChangeRoomSubject(string RoomId, string Domain, string Subject, string Language)
+		public Task ChangeRoomSubject(string RoomId, string Domain, string Subject, string Language)
 		{
-			this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
+			return this.client.SendMessage(MessageType.GroupChat, RoomId + "@" + Domain,
 				string.Empty, string.Empty, Subject, Language, string.Empty, string.Empty);
 		}
 
@@ -910,9 +888,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Message">Message body.</param>
-		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message)
+		public Task SendPrivateMessage(string RoomId, string Domain, string NickName, string Message)
 		{
-			this.SendPrivateMessage(RoomId, Domain, NickName, Message, string.Empty, string.Empty, string.Empty);
+			return this.SendPrivateMessage(RoomId, Domain, NickName, Message, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -926,9 +904,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language)
+		public Task SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language)
 		{
-			this.SendPrivateMessage(RoomId, Domain, NickName, Message, Language, string.Empty, string.Empty);
+			return this.SendPrivateMessage(RoomId, Domain, NickName, Message, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -943,9 +921,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Message">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language, string ThreadId)
+		public Task SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language, string ThreadId)
 		{
-			this.SendPrivateMessage(RoomId, Domain, NickName, Message, Language, ThreadId, string.Empty);
+			return this.SendPrivateMessage(RoomId, Domain, NickName, Message, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -961,9 +939,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language, string ThreadId, string ParentThreadId)
+		public Task SendPrivateMessage(string RoomId, string Domain, string NickName, string Message, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.Chat, RoomId + "@" + Domain + "/" + NickName,
+			return this.client.SendMessage(MessageType.Chat, RoomId + "@" + Domain + "/" + NickName,
 				"<x xmlns='" + NamespaceMucUser + "'/>", Message, string.Empty,
 				Language, ThreadId, ParentThreadId);
 		}
@@ -978,9 +956,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Xml">Message body.</param>
-		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml)
+		public Task SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml)
 		{
-			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, string.Empty, string.Empty, string.Empty);
+			return this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -994,9 +972,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nick-name of recipient.</param>
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
-		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml, string Language)
+		public Task SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml, string Language)
 		{
-			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, Language, string.Empty, string.Empty);
+			return this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -1011,9 +989,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Xml">Message body.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml, string Language, string ThreadId)
+		public Task SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml, string Language, string ThreadId)
 		{
-			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, Language, ThreadId, string.Empty);
+			return this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, Language, ThreadId, string.Empty);
 		}
 
 		/// <summary>
@@ -1029,10 +1007,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName,
+		public Task SendCustomPrivateMessage(string RoomId, string Domain, string NickName,
 			string Xml, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.SendCustomPrivateMessage(string.Empty, RoomId, Domain, NickName, Xml, Language, ThreadId, ParentThreadId);
+			return this.SendCustomPrivateMessage(string.Empty, RoomId, Domain, NickName, Xml, Language, ThreadId, ParentThreadId);
 		}
 
 		/// <summary>
@@ -1049,10 +1027,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendCustomPrivateMessage(string MessageId, string RoomId, string Domain, string NickName,
+		public Task SendCustomPrivateMessage(string MessageId, string RoomId, string Domain, string NickName,
 			string Xml, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, RoomId + "@" + Domain + "/" + NickName,
+			return this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, RoomId + "@" + Domain + "/" + NickName,
 				 Xml + "<x xmlns='" + NamespaceMucUser + "'/>", string.Empty, string.Empty, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -1060,10 +1038,10 @@ namespace Waher.Networking.XMPP.MUC
 
 		#region Room Invitations
 
-		private Task UserMessageHandler(object Sender, MessageEventArgs e)
+		private async Task UserMessageHandler(object Sender, MessageEventArgs e)
 		{
 			if (!TryParseOccupantJid(e.From, false, out string RoomId, out string Domain, out string NickName))
-				return Task.CompletedTask;
+				return;
 
 			if (string.IsNullOrEmpty(NickName))
 			{
@@ -1111,63 +1089,33 @@ namespace Waher.Networking.XMPP.MUC
 
 				if (!string.IsNullOrEmpty(InvitationFrom))
 				{
-					try
-					{
-						RoomInvitationMessageEventArgs e2 = new RoomInvitationMessageEventArgs(this, e, RoomId, Domain,
-							InvitationFrom, Reason, Password);
-
-						this.RoomInvitationReceived?.Invoke(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					await this.RoomInvitationReceived.Raise(this, new RoomInvitationMessageEventArgs(this, e, RoomId, Domain,
+						InvitationFrom, Reason, Password));
 				}
 				else if (!string.IsNullOrEmpty(DeclinedFrom))
 				{
-					try
-					{
-						RoomDeclinedMessageEventArgs e2 = new RoomDeclinedMessageEventArgs(e, RoomId, Domain, DeclinedFrom, Reason);
-
-						this.RoomDeclinedInvitationReceived?.Invoke(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					await this.RoomDeclinedInvitationReceived.Raise(this, new RoomDeclinedMessageEventArgs(e, RoomId, Domain,
+						DeclinedFrom, Reason));
 				}
 			}
 			else
-			{
-				try
-				{
-					RoomOccupantMessageEventArgs e2 = new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName);
-
-					this.PrivateMessageReceived?.Invoke(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
-
-			return Task.CompletedTask;
+				await this.PrivateMessageReceived.Raise(this, new RoomOccupantMessageEventArgs(e, RoomId, Domain, NickName));
 		}
 
 		/// <summary>
 		/// Event raised when a group chat message from a MUC room occupant was received.
 		/// </summary>
-		public event RoomOccupantMessageEventHandler PrivateMessageReceived;
+		public event EventHandlerAsync<RoomOccupantMessageEventArgs> PrivateMessageReceived;
 
 		/// <summary>
 		/// Event raised when an invitation from a MUC room has been received.
 		/// </summary>
-		public event RoomInvitationMessageEventHandler RoomInvitationReceived;
+		public event EventHandlerAsync<RoomInvitationMessageEventArgs> RoomInvitationReceived;
 
 		/// <summary>
 		/// Event raised when an invitation from a MUC room has been declined.
 		/// </summary>
-		public event RoomDeclinedMessageEventHandler RoomDeclinedInvitationReceived;
+		public event EventHandlerAsync<RoomDeclinedMessageEventArgs> RoomDeclinedInvitationReceived;
 
 		/// <summary>
 		/// Sends an invitation to the room.
@@ -1175,9 +1123,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
-		public void Invite(string RoomId, string Domain, string BareJid)
+		public Task Invite(string RoomId, string Domain, string BareJid)
 		{
-			this.Invite(RoomId, Domain, BareJid, string.Empty, string.Empty);
+			return this.Invite(RoomId, Domain, BareJid, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -1187,9 +1135,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
 		/// <param name="Reason">Reason for sending the invitation.</param>
-		public void Invite(string RoomId, string Domain, string BareJid, string Reason)
+		public Task Invite(string RoomId, string Domain, string BareJid, string Reason)
 		{
-			this.Invite(RoomId, Domain, BareJid, Reason, string.Empty);
+			return this.Invite(RoomId, Domain, BareJid, Reason, string.Empty);
 		}
 
 		/// <summary>
@@ -1200,7 +1148,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
 		/// <param name="Reason">Reason for sending the invitation.</param>
 		/// <param name="Language">Language</param>
-		public void Invite(string RoomId, string Domain, string BareJid, string Reason, string Language)
+		public Task Invite(string RoomId, string Domain, string BareJid, string Reason, string Language)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1219,7 +1167,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("</invite></x>");
 
-			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
+			return this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
 				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
 		}
 
@@ -1231,7 +1179,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="InviteFrom">Original invitation was sent from.</param>
 		/// <param name="Reason">Reason for declining the invitation.</param>
 		/// <param name="Language">Language</param>
-		public void DeclineInvitation(string RoomId, string Domain, string InviteFrom, string Reason, string Language)
+		public Task DeclineInvitation(string RoomId, string Domain, string InviteFrom, string Reason, string Language)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1250,7 +1198,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("</decline></x>");
 
-			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
+			return this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain,
 				Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty);
 		}
 
@@ -1264,9 +1212,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID</param>
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
-		public void InviteDirect(string RoomId, string Domain, string BareJid)
+		public Task InviteDirect(string RoomId, string Domain, string BareJid)
 		{
-			this.InviteDirect(RoomId, Domain, BareJid, string.Empty, string.Empty, string.Empty, string.Empty);
+			return this.InviteDirect(RoomId, Domain, BareJid, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -1276,9 +1224,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain hosting the room.</param>
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
 		/// <param name="Reason">Reason for sending the invitation.</param>
-		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason)
+		public Task InviteDirect(string RoomId, string Domain, string BareJid, string Reason)
 		{
-			this.InviteDirect(RoomId, Domain, BareJid, Reason, string.Empty, string.Empty, string.Empty);
+			return this.InviteDirect(RoomId, Domain, BareJid, Reason, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -1289,9 +1237,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="BareJid">Bare JID of entity to invite.</param>
 		/// <param name="Reason">Reason for sending the invitation.</param>
 		/// <param name="Language">Language</param>
-		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language)
+		public Task InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language)
 		{
-			this.InviteDirect(RoomId, Domain, BareJid, Reason, Language, string.Empty, string.Empty);
+			return this.InviteDirect(RoomId, Domain, BareJid, Reason, Language, string.Empty, string.Empty);
 		}
 
 		/// <summary>
@@ -1303,9 +1251,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for sending the invitation.</param>
 		/// <param name="Language">Language</param>
 		/// <param name="Password">Password required to enter room.</param>
-		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password)
+		public Task InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password)
 		{
-			this.InviteDirect(RoomId, Domain, BareJid, Reason, Language, Password, string.Empty);
+			return this.InviteDirect(RoomId, Domain, BareJid, Reason, Language, Password, string.Empty);
 		}
 
 		/// <summary>
@@ -1318,9 +1266,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="Password">Password required to enter room.</param>
 		/// <param name="ThreadId">If the invitation is a continuation of a private thread.</param>
-		public void InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password, string ThreadId)
+		public Task InviteDirect(string RoomId, string Domain, string BareJid, string Reason, string Language, string Password, string ThreadId)
 		{
-			this.InviteDirect(null, RoomId, Domain, BareJid, Reason, Language, Password, ThreadId);
+			return this.InviteDirect(null, RoomId, Domain, BareJid, Reason, Language, Password, ThreadId);
 		}
 
 		/// <summary>
@@ -1334,7 +1282,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Language">Language</param>
 		/// <param name="Password">Password required to enter room.</param>
 		/// <param name="ThreadId">If the invitation is a continuation of a private thread.</param>
-		public void InviteDirect(IEndToEndEncryption Endpoint, string RoomId, string Domain, string BareJid, string Reason, string Language, 
+		public Task InviteDirect(IEndToEndEncryption Endpoint, string RoomId, string Domain, string BareJid, string Reason, string Language,
 			string Password, string ThreadId)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1368,49 +1316,39 @@ namespace Waher.Networking.XMPP.MUC
 
 			if (Endpoint is null)
 			{
-				this.client.SendMessage(MessageType.Normal, BareJid, Xml.ToString(), string.Empty, string.Empty, Language,
+				return this.client.SendMessage(MessageType.Normal, BareJid, Xml.ToString(), string.Empty, string.Empty, Language,
 					string.Empty, string.Empty);
 			}
 			else
 			{
-				Endpoint.SendMessage(this.Client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+				return Endpoint.SendMessage(this.Client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
 					string.Empty, BareJid, Xml.ToString(), string.Empty, string.Empty, Language, string.Empty, string.Empty, null, null);
 			}
 		}
 
 		private async Task DirectInvitationMessageHandler(object Sender, MessageEventArgs e)
 		{
-			DirectInvitationMessageEventHandler h = this.DirectInvitationReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					string RoomJid = XML.Attribute(e.Content, "jid");
-					string Password = XML.Attribute(e.Content, "password");
-					string Reason = XML.Attribute(e.Content, "reason");
-					string ThreadId = XML.Attribute(e.Content, "thread");
-					bool Continue = XML.Attribute(e.Content, "continue", false);
-					int i = RoomJid.IndexOf('@');
+			string RoomJid = XML.Attribute(e.Content, "jid");
+			string Password = XML.Attribute(e.Content, "password");
+			string Reason = XML.Attribute(e.Content, "reason");
+			string ThreadId = XML.Attribute(e.Content, "thread");
+			bool Continue = XML.Attribute(e.Content, "continue", false);
+			int i = RoomJid.IndexOf('@');
 
-					if (i < 0)
-						return;
+			if (i < 0)
+				return;
 
-					string RoomId = RoomJid.Substring(0, i);
-					string Domain = RoomJid.Substring(i + 1);
+			string RoomId = RoomJid.Substring(0, i);
+			string Domain = RoomJid.Substring(i + 1);
 
-					await h(this, new DirectInvitationMessageEventArgs(this, e, RoomId, Domain, Reason, Password, Continue, ThreadId));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.DirectInvitationReceived.Raise(this, new DirectInvitationMessageEventArgs(this, e, RoomId,
+				Domain, Reason, Password, Continue, ThreadId));
 		}
 
 		/// <summary>
 		/// Event raised when a direct invitation from a peer has been received.
 		/// </summary>
-		public event DirectInvitationMessageEventHandler DirectInvitationReceived;
+		public event EventHandlerAsync<DirectInvitationMessageEventArgs> DirectInvitationReceived;
 
 		#endregion
 
@@ -1424,10 +1362,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nickname to use in the chat room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ChangeNickName(string RoomId, string Domain, string NickName,
-			UserPresenceEventHandlerAsync Callback, object State)
+		public Task ChangeNickName(string RoomId, string Domain, string NickName,
+			EventHandlerAsync<UserPresenceEventArgs> Callback, object State)
 		{
-			this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
+			return this.client.SendDirectedPresence(string.Empty, RoomId + "@" + Domain + "/" + NickName,
 				string.Empty, (sender, e) =>
 				{
 					if (!TryParseUserPresence(e, out UserPresenceEventArgs e2))
@@ -1439,7 +1377,10 @@ namespace Waher.Networking.XMPP.MUC
 						};
 					}
 
-					return Callback?.Invoke(this, e2) ?? Task.CompletedTask;
+					if (Callback is null)
+						return Task.CompletedTask;
+					else
+						return Callback(this, e2);
 				}, State);
 		}
 
@@ -1450,18 +1391,18 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="NickName">Nickname to use in the chat room.</param>
 		/// <returns>Room entry response.</returns>
-		public Task<UserPresenceEventArgs> ChangeNickNameAsync(string RoomId, string Domain,
+		public async Task<UserPresenceEventArgs> ChangeNickNameAsync(string RoomId, string Domain,
 			string NickName)
 		{
 			TaskCompletionSource<UserPresenceEventArgs> Result = new TaskCompletionSource<UserPresenceEventArgs>();
 
-			this.ChangeNickName(RoomId, Domain, NickName, (sender, e) =>
+			await this.ChangeNickName(RoomId, Domain, NickName, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -1477,10 +1418,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Availability">Occupant availability.</param>
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
-			PresenceEventHandlerAsync Callback, object State)
+		public Task SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
+			EventHandlerAsync<PresenceEventArgs> Callback, object State)
 		{
-			this.SetPresence(RoomId, Domain, NickName, Availability, null, Callback, State);
+			return this.SetPresence(RoomId, Domain, NickName, Availability, null, Callback, State);
 		}
 
 		/// <summary>
@@ -1493,8 +1434,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Status">Custom status</param>
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
-			KeyValuePair<string, string>[] Status, PresenceEventHandlerAsync Callback, object State)
+		public async Task SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
+			KeyValuePair<string, string>[] Status, EventHandlerAsync<PresenceEventArgs> Callback, object State)
 		{
 			string Type = string.Empty;
 			StringBuilder Xml = new StringBuilder();
@@ -1546,9 +1487,9 @@ namespace Waher.Networking.XMPP.MUC
 				}
 			}
 
-			this.client.AddCustomPresenceXml(Availability, Xml);
+			await this.client.AddCustomPresenceXml(Availability, Xml);
 
-			this.client.SendDirectedPresence(Type, RoomId + "@" + Domain + "/" + NickName, Xml.ToString(), Callback, State);
+			await this.client.SendDirectedPresence(Type, RoomId + "@" + Domain + "/" + NickName, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1573,17 +1514,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Availability">Occupant availability.</param>
 		/// <param name="Status">Custom status</param>
 		/// <returns>Task object that finishes when stanza has been sent.</returns>
-		public Task SetPresenceAsync(string RoomId, string Domain, string NickName,
+		public async Task SetPresenceAsync(string RoomId, string Domain, string NickName,
 			Availability Availability, params KeyValuePair<string, string>[] Status)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.SetPresence(RoomId, Domain, NickName, Availability, Status, (sender, e) =>
+			await this.SetPresence(RoomId, Domain, NickName, Availability, Status, (sender, e) =>
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion
@@ -1597,10 +1538,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomRegistrationForm(string RoomId, string Domain, RoomRegistrationEventHandler Callback,
+		public Task GetRoomRegistrationForm(string RoomId, string Domain, EventHandlerAsync<RoomRegistrationEventArgs> Callback,
 			object State)
 		{
-			this.GetRoomRegistrationForm(RoomId, Domain, Callback, null, State);
+			return this.GetRoomRegistrationForm(RoomId, Domain, Callback, null, State);
 		}
 
 		/// <summary>
@@ -1611,8 +1552,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomRegistrationForm(string RoomId, string Domain, RoomRegistrationEventHandler Callback,
-			IqResultEventHandlerAsync SubmissionCallback, object State)
+		public async Task GetRoomRegistrationForm(string RoomId, string Domain, EventHandlerAsync<RoomRegistrationEventArgs> Callback,
+			EventHandlerAsync<IqResultEventArgs> SubmissionCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1620,7 +1561,7 @@ namespace Waher.Networking.XMPP.MUC
 			Xml.Append(XmppClient.NamespaceRegister);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
+			await this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), async (sender, e) =>
 			{
 				DataForm Form = null;
 				bool AlreadyRegistered = false;
@@ -1659,12 +1600,13 @@ namespace Waher.Networking.XMPP.MUC
 
 											Xml2.Append("</query>");
 
-											this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
+											return this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
 											{
-												return SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
+												if (SubmissionCallback is null)
+													return Task.CompletedTask;
+												else
+													return SubmissionCallback(this, e3);
 											}, null);
-
-											return Task.CompletedTask;
 										},
 										(sender2, Form2) =>
 										{
@@ -1678,13 +1620,15 @@ namespace Waher.Networking.XMPP.MUC
 
 											Xml2.Append("</query>");
 
-											this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
+											return this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
 											{
 												e3.Ok = false;
-												return SubmissionCallback?.Invoke(this, e3) ?? Task.CompletedTask;
-											}, null);
 
-											return Task.CompletedTask;
+												if (SubmissionCallback is null)
+													return Task.CompletedTask;
+												else
+													return SubmissionCallback(this, e3);
+											}, null);
 										},
 										e.From, e.To)
 									{
@@ -1699,16 +1643,17 @@ namespace Waher.Networking.XMPP.MUC
 
 				RoomRegistrationEventArgs e2 = new RoomRegistrationEventArgs(e, Form, AlreadyRegistered, UserName);
 
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, e2);
+					try
+					{
+						await Callback(this, e2);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-
-				return Task.CompletedTask;
 			}, State);
 		}
 
@@ -1731,26 +1676,34 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>Room Registration response.</returns>
-		public Task<RoomRegistrationEventArgs> GetRoomRegistrationFormAsync(string RoomId, string Domain,
-			IqResultEventHandlerAsync SubmissionCallback, object State)
+		public async Task<RoomRegistrationEventArgs> GetRoomRegistrationFormAsync(string RoomId, string Domain,
+			EventHandlerAsync<IqResultEventArgs> SubmissionCallback, object State)
 		{
 			TaskCompletionSource<RoomRegistrationEventArgs> Result = new TaskCompletionSource<RoomRegistrationEventArgs>();
 
-			this.GetRoomRegistrationForm(RoomId, Domain, (sender, e) => Result.TrySetResult(e),
-				SubmissionCallback, State);
+			await this.GetRoomRegistrationForm(RoomId, Domain, (sender, e) =>
+			{
+				Result.TrySetResult(e);
+				return Task.CompletedTask;
+			}, SubmissionCallback, State);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		private Task RegistrationRequestHandler(object Sender, MessageFormEventArgs e)
 		{
-			return this.RegistrationRequest?.Invoke(this, e) ?? Task.CompletedTask;
+			EventHandlerAsync<MessageFormEventArgs> h = RegistrationRequest;
+
+			if (h is null)
+				return Task.CompletedTask;
+			else
+				return h(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when someone has made a request to register with a room to which the client is an administrator.
 		/// </summary>
-		public event MessageFormEventHandlerAsync RegistrationRequest;
+		public event EventHandlerAsync<MessageFormEventArgs> RegistrationRequest;
 
 		#endregion
 
@@ -1763,11 +1716,14 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomInformation(string RoomId, string Domain, RoomInformationEventHandler Callback, object State)
+		public Task GetRoomInformation(string RoomId, string Domain, EventHandlerAsync<RoomInformationEventArgs> Callback, object State)
 		{
-			this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, (sender, e) =>
+			return this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, (sender, e) =>
 			{
-				return Callback?.Invoke(this, new RoomInformationEventArgs(e)) ?? Task.CompletedTask;
+				if (Callback is null)
+					return Task.CompletedTask;
+				else
+					return Callback(this, new RoomInformationEventArgs(e));
 			}, State);
 		}
 
@@ -1777,17 +1733,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <returns>Room information response.</returns>
-		public Task<RoomInformationEventArgs> GetRoomInformationAsync(string RoomId, string Domain)
+		public async Task<RoomInformationEventArgs> GetRoomInformationAsync(string RoomId, string Domain)
 		{
 			TaskCompletionSource<RoomInformationEventArgs> Result = new TaskCompletionSource<RoomInformationEventArgs>();
 
-			this.GetRoomInformation(RoomId, Domain, (sender, e) =>
+			await this.GetRoomInformation(RoomId, Domain, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1797,11 +1753,15 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetMyNickName(string RoomId, string Domain, ServiceDiscoveryEventHandler Callback, object State)
+		public Task GetMyNickName(string RoomId, string Domain, EventHandlerAsync<ServiceDiscoveryEventArgs> Callback, object State)
 		{
-			this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, "x-roomuser-item", (sender, e) =>
+			return this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, "x-roomuser-item", (sender, e) =>
 			{
-				return Callback?.Invoke(this, e) ?? Task.CompletedTask;
+
+				if (Callback is null)
+					return Task.CompletedTask;
+				else
+					return Callback(this, e);
 			}, State);
 		}
 
@@ -1811,17 +1771,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <returns>Information about my registered nick-name, if any, and if supported by the service.</returns>
-		public Task<ServiceDiscoveryEventArgs> GetMyNickNameAsync(string RoomId, string Domain)
+		public async Task<ServiceDiscoveryEventArgs> GetMyNickNameAsync(string RoomId, string Domain)
 		{
 			TaskCompletionSource<ServiceDiscoveryEventArgs> Result = new TaskCompletionSource<ServiceDiscoveryEventArgs>();
 
-			this.GetMyNickName(RoomId, Domain, (sender, e) =>
+			await this.GetMyNickName(RoomId, Domain, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1831,9 +1791,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomItems(string RoomId, string Domain, ServiceItemsDiscoveryEventHandler Callback, object State)
+		public Task GetRoomItems(string RoomId, string Domain, EventHandlerAsync<ServiceItemsDiscoveryEventArgs> Callback, object State)
 		{
-			this.client.SendServiceItemsDiscoveryRequest(RoomId + "@" + Domain, Callback, State);
+			return this.client.SendServiceItemsDiscoveryRequest(RoomId + "@" + Domain, Callback, State);
 		}
 
 		/// <summary>
@@ -1855,10 +1815,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nick-name of occupant.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void OccupantServiceDiscovery(string RoomId, string Domain, string NickName,
-			ServiceDiscoveryEventHandler Callback, object State)
+		public Task OccupantServiceDiscovery(string RoomId, string Domain, string NickName,
+			EventHandlerAsync<ServiceDiscoveryEventArgs> Callback, object State)
 		{
-			this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain + "/" + NickName, Callback, State);
+			return this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain + "/" + NickName, Callback, State);
 		}
 
 		/// <summary>
@@ -1881,10 +1841,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nick-name of occupant.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void OccupantServiceItemsDiscovery(string RoomId, string Domain, string NickName,
-			ServiceItemsDiscoveryEventHandler Callback, object State)
+		public Task OccupantServiceItemsDiscovery(string RoomId, string Domain, string NickName,
+			EventHandlerAsync<ServiceItemsDiscoveryEventArgs> Callback, object State)
 		{
-			this.client.SendServiceItemsDiscoveryRequest(RoomId + "@" + Domain + "/" + NickName, Callback, State);
+			return this.client.SendServiceItemsDiscoveryRequest(RoomId + "@" + Domain + "/" + NickName, Callback, State);
 		}
 
 		/// <summary>
@@ -1916,10 +1876,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ConfigureOccupant(string RoomId, string Domain, string OccupantNickName,
-			Role Role, string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task ConfigureOccupant(string RoomId, string Domain, string OccupantNickName,
+			Role Role, string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain,
+			return this.ConfigureOccupant(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantNickName, Role, Reason),
 				Callback, State);
 		}
@@ -1937,10 +1897,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ConfigureOccupant(string RoomId, string Domain, string OccupantBareJid,
-			Affiliation Affiliation, string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task ConfigureOccupant(string RoomId, string Domain, string OccupantBareJid,
+			Affiliation Affiliation, string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain,
+			return this.ConfigureOccupant(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, Affiliation, Reason),
 				Callback, State);
 		}
@@ -1960,10 +1920,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ConfigureOccupant(string RoomId, string Domain, string OccupantBareJid, string OccupantNickName,
-			Affiliation? Affiliation, Role? Role, string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task ConfigureOccupant(string RoomId, string Domain, string OccupantBareJid, string OccupantNickName,
+			Affiliation? Affiliation, Role? Role, string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain,
+			return this.ConfigureOccupant(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantNickName, OccupantBareJid, Affiliation, Role, Reason),
 				Callback, State);
 		}
@@ -1979,10 +1939,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Change">Configuration to perform.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ConfigureOccupant(string RoomId, string Domain, MucOccupantConfiguration Change,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task ConfigureOccupant(string RoomId, string Domain, MucOccupantConfiguration Change,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupants(RoomId, Domain, new MucOccupantConfiguration[] { Change }, Callback, State);
+			return this.ConfigureOccupants(RoomId, Domain, new MucOccupantConfiguration[] { Change }, Callback, State);
 		}
 
 		/// <summary>
@@ -1996,8 +1956,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Changes">Configurations to perform.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ConfigureOccupants(string RoomId, string Domain, MucOccupantConfiguration[] Changes,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task ConfigureOccupants(string RoomId, string Domain, MucOccupantConfiguration[] Changes,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2048,7 +2008,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("</query>");
 
-			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -2120,17 +2080,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Changes">Configurations to perform.</param>
 		/// <returns>Response to request.</returns>
-		public Task<IqResultEventArgs> ConfigureOccupantsAsync(string RoomId, string Domain, params MucOccupantConfiguration[] Changes)
+		public async Task<IqResultEventArgs> ConfigureOccupantsAsync(string RoomId, string Domain, params MucOccupantConfiguration[] Changes)
 		{
 			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
 
-			this.ConfigureOccupants(RoomId, Domain, Changes, (sender, e) =>
+			await this.ConfigureOccupants(RoomId, Domain, Changes, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2148,10 +2108,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Kick(string RoomId, string Domain, string OccupantNickName,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task Kick(string RoomId, string Domain, string OccupantNickName,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Kick(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
+			return this.Kick(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2166,10 +2126,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Kick(string RoomId, string Domain, string OccupantNickName,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task Kick(string RoomId, string Domain, string OccupantNickName,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.None, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.None, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2219,10 +2179,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantVoice(string RoomId, string Domain, string OccupantNickName,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task GrantVoice(string RoomId, string Domain, string OccupantNickName,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.GrantVoice(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
+			return this.GrantVoice(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2237,10 +2197,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantVoice(string RoomId, string Domain, string OccupantNickName,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task GrantVoice(string RoomId, string Domain, string OccupantNickName,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Participant, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Participant, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2286,10 +2246,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeVoice(string RoomId, string Domain, string OccupantNickName,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeVoice(string RoomId, string Domain, string OccupantNickName,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.RevokeVoice(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
+			return this.RevokeVoice(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2304,10 +2264,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeVoice(string RoomId, string Domain, string OccupantNickName,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeVoice(string RoomId, string Domain, string OccupantNickName,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Visitor, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Visitor, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2353,10 +2313,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Affiliation">Optional affiliation.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetOccupants(string RoomId, string Domain, Affiliation Affiliation,
-			OccupantListEventHandler Callback, object State)
+		public Task GetOccupants(string RoomId, string Domain, Affiliation Affiliation,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, Affiliation, null, Callback, State);
+			return this.GetOccupants(RoomId, Domain, Affiliation, null, Callback, State);
 		}
 
 		/// <summary>
@@ -2370,10 +2330,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Role">Role.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetOccupants(string RoomId, string Domain, Role Role,
-			OccupantListEventHandler Callback, object State)
+		public Task GetOccupants(string RoomId, string Domain, Role Role,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, null, Role, Callback, State);
+			return this.GetOccupants(RoomId, Domain, null, Role, Callback, State);
 		}
 
 		/// <summary>
@@ -2388,8 +2348,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Role">Optional role.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetOccupants(string RoomId, string Domain, Affiliation? Affiliation,
-			Role? Role, OccupantListEventHandler Callback, object State)
+		public Task GetOccupants(string RoomId, string Domain, Affiliation? Affiliation,
+			Role? Role, EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2413,7 +2373,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("/></query>");
 
-			this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(RoomId + "@" + Domain, Xml.ToString(), (sender, e) =>
 			{
 				List<MucOccupant> Occupants = new List<MucOccupant>();
 
@@ -2434,7 +2394,10 @@ namespace Waher.Networking.XMPP.MUC
 					}
 				}
 
-				return Callback?.Invoke(this, new OccupantListEventArgs(e, Occupants.ToArray())) ?? Task.CompletedTask;
+				if (Callback is null)
+					return Task.CompletedTask;
+				else
+					return Callback(this, new OccupantListEventArgs(e, Occupants.ToArray()));
 			}, State);
 		}
 
@@ -2479,17 +2442,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Affiliation">Optional affiliation.</param>
 		/// <param name="Role">Optional role.</param>
 		/// <returns>Response with occupants, if ok.</returns>
-		public Task<OccupantListEventArgs> GetOccupantsAsync(string RoomId, string Domain, Affiliation? Affiliation, Role? Role)
+		public async Task<OccupantListEventArgs> GetOccupantsAsync(string RoomId, string Domain, Affiliation? Affiliation, Role? Role)
 		{
 			TaskCompletionSource<OccupantListEventArgs> Result = new TaskCompletionSource<OccupantListEventArgs>();
 
-			this.GetOccupants(RoomId, Domain, Affiliation, Role, (sender, e) =>
+			await this.GetOccupants(RoomId, Domain, Affiliation, Role, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -2497,9 +2460,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// </summary>
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
-		public void RequestVoice(string RoomId, string Domain)
+		public Task RequestVoice(string RoomId, string Domain)
 		{
-			this.RequestRole(RoomId, Domain, Role.Participant);
+			return this.RequestRole(RoomId, Domain, Role.Participant);
 		}
 
 		/// <summary>
@@ -2508,8 +2471,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="RoomId">Room ID.</param>
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Role">Requested role.</param>
-		public void RequestRole(string RoomId, string Domain, Role Role)
-		{ 
+		public Task RequestRole(string RoomId, string Domain, Role Role)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<x xmlns='");
@@ -2523,19 +2486,24 @@ namespace Waher.Networking.XMPP.MUC
 			Xml.Append(Role.ToString().ToLower());
 			Xml.Append("</value></field></x>");
 
-			this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain, Xml.ToString(),
+			return this.client.SendMessage(MessageType.Normal, RoomId + "@" + Domain, Xml.ToString(),
 				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 
 		private Task UserRequestHandler(object Sender, MessageFormEventArgs e)
 		{
-			return this.OccupantRequest?.Invoke(this, e) ?? Task.CompletedTask;
+			EventHandlerAsync<MessageFormEventArgs> h = this.OccupantRequest;
+
+			if (h is null)
+				return Task.CompletedTask;
+			else
+				return h(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when a request has been received from an occupant in a room.
 		/// </summary>
-		public event MessageFormEventHandlerAsync OccupantRequest;
+		public event EventHandlerAsync<MessageFormEventArgs> OccupantRequest;
 
 		/// <summary>
 		/// Gets a list of occupants with voice (participants).
@@ -2544,10 +2512,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetVoiceList(string RoomId, string Domain,
-			OccupantListEventHandler Callback, object State)
+		public Task GetVoiceList(string RoomId, string Domain,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, null, Role.Participant, Callback, State);
+			return this.GetOccupants(RoomId, Domain, null, Role.Participant, Callback, State);
 		}
 
 		/// <summary>
@@ -2576,10 +2544,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Ban(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task Ban(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Ban(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+			return this.Ban(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2594,10 +2562,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Ban(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task Ban(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Outcast, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Outcast, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2639,10 +2607,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetBannedOccupants(string RoomId, string Domain,
-			OccupantListEventHandler Callback, object State)
+		public Task GetBannedOccupants(string RoomId, string Domain,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, Affiliation.Outcast, null, Callback, State);
+			return this.GetOccupants(RoomId, Domain, Affiliation.Outcast, null, Callback, State);
 		}
 
 		/// <summary>
@@ -2671,10 +2639,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantMembership(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task GrantMembership(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.GrantMembership(RoomId, Domain, OccupantBareJid, string.Empty, string.Empty, Callback, State);
+			return this.GrantMembership(RoomId, Domain, OccupantBareJid, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2689,10 +2657,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantMembership(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task GrantMembership(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.GrantMembership(RoomId, Domain, OccupantBareJid, string.Empty, Reason, Callback, State);
+			return this.GrantMembership(RoomId, Domain, OccupantBareJid, string.Empty, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2708,10 +2676,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantMembership(string RoomId, string Domain, string OccupantBareJid,
-			string DefaultNickName, string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task GrantMembership(string RoomId, string Domain, string OccupantBareJid,
+			string DefaultNickName, string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain,
+			return this.ConfigureOccupant(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, DefaultNickName, Affiliation.Member, Reason),
 				Callback, State);
 		}
@@ -2778,10 +2746,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeMembership(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeMembership(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.RevokeMembership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+			return this.RevokeMembership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2796,10 +2764,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeMembership(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeMembership(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.None, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.None, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2841,10 +2809,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetMemberList(string RoomId, string Domain,
-			OccupantListEventHandler Callback, object State)
+		public Task GetMemberList(string RoomId, string Domain,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, Affiliation.Member, null, Callback, State);
+			return this.GetOccupants(RoomId, Domain, Affiliation.Member, null, Callback, State);
 		}
 
 		/// <summary>
@@ -2873,10 +2841,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantModeratorStatus(string RoomId, string Domain, string OccupantNickName,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task GrantModeratorStatus(string RoomId, string Domain, string OccupantNickName,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.GrantModeratorStatus(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
+			return this.GrantModeratorStatus(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2891,10 +2859,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantModeratorStatus(string RoomId, string Domain, string OccupantNickName,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task GrantModeratorStatus(string RoomId, string Domain, string OccupantNickName,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Moderator, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Moderator, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -2940,10 +2908,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantNickName">Nick-name of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeModeratorStatus(string RoomId, string Domain, string OccupantNickName,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeModeratorStatus(string RoomId, string Domain, string OccupantNickName,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.RevokeModeratorStatus(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
+			return this.RevokeModeratorStatus(RoomId, Domain, OccupantNickName, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -2958,10 +2926,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeModeratorStatus(string RoomId, string Domain, string OccupantNickName,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeModeratorStatus(string RoomId, string Domain, string OccupantNickName,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Participant, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantNickName, Role.Participant, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -3003,10 +2971,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetModeratorList(string RoomId, string Domain,
-			OccupantListEventHandler Callback, object State)
+		public Task GetModeratorList(string RoomId, string Domain,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, null, Role.Moderator, Callback, State);
+			return this.GetOccupants(RoomId, Domain, null, Role.Moderator, Callback, State);
 		}
 
 		/// <summary>
@@ -3035,10 +3003,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantOwnership(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task GrantOwnership(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.GrantOwnership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+			return this.GrantOwnership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -3053,10 +3021,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantOwnership(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task GrantOwnership(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain,
+			return this.ConfigureOccupant(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Owner, Reason),
 				Callback, State);
 		}
@@ -3105,10 +3073,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeOwnership(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeOwnership(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.RevokeOwnership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+			return this.RevokeOwnership(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -3123,10 +3091,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeOwnership(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeOwnership(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Admin, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Admin, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -3168,10 +3136,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetOwnerList(string RoomId, string Domain,
-			OccupantListEventHandler Callback, object State)
+		public Task GetOwnerList(string RoomId, string Domain,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, Affiliation.Owner, null, Callback, State);
+			return this.GetOccupants(RoomId, Domain, Affiliation.Owner, null, Callback, State);
 		}
 
 		/// <summary>
@@ -3200,10 +3168,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantAdministrator(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task GrantAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.GrantAdministrator(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+			return this.GrantAdministrator(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -3218,10 +3186,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GrantAdministrator(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task GrantAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain,
+			return this.ConfigureOccupant(RoomId, Domain,
 				new MucOccupantConfiguration(OccupantBareJid, string.Empty, Affiliation.Admin, Reason),
 				Callback, State);
 		}
@@ -3270,10 +3238,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="OccupantBareJid">Bare JID of the occupant to modify.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeAdministrator(string RoomId, string Domain, string OccupantBareJid,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.RevokeAdministrator(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
+			return this.RevokeAdministrator(RoomId, Domain, OccupantBareJid, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -3288,10 +3256,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Reason for change.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RevokeAdministrator(string RoomId, string Domain, string OccupantBareJid,
-			string Reason, IqResultEventHandlerAsync Callback, object State)
+		public Task RevokeAdministrator(string RoomId, string Domain, string OccupantBareJid,
+			string Reason, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Member, Reason, Callback, State);
+			return this.ConfigureOccupant(RoomId, Domain, OccupantBareJid, Affiliation.Member, Reason, Callback, State);
 		}
 
 		/// <summary>
@@ -3333,10 +3301,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAdminList(string RoomId, string Domain,
-			OccupantListEventHandler Callback, object State)
+		public Task GetAdminList(string RoomId, string Domain,
+			EventHandlerAsync<OccupantListEventArgs> Callback, object State)
 		{
-			this.GetOccupants(RoomId, Domain, Affiliation.Admin, null, Callback, State);
+			return this.GetOccupants(RoomId, Domain, Affiliation.Admin, null, Callback, State);
 		}
 
 		/// <summary>
@@ -3361,9 +3329,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DestroyRoom(string RoomId, string Domain, IqResultEventHandlerAsync Callback, object State)
+		public Task DestroyRoom(string RoomId, string Domain, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.DestroyRoom(RoomId, Domain, string.Empty, string.Empty, Callback, State);
+			return this.DestroyRoom(RoomId, Domain, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -3374,10 +3342,10 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Reason">Optional reason for destroying the room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DestroyRoom(string RoomId, string Domain, string Reason,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task DestroyRoom(string RoomId, string Domain, string Reason,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.DestroyRoom(RoomId, Domain, Reason, string.Empty, Callback, State);
+			return this.DestroyRoom(RoomId, Domain, Reason, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -3389,8 +3357,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="AlternateRoomJid">Optional alternative Room JID</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DestroyRoom(string RoomId, string Domain, string Reason,
-			string AlternateRoomJid, IqResultEventHandlerAsync Callback, object State)
+		public Task DestroyRoom(string RoomId, string Domain, string Reason,
+			string AlternateRoomJid, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3416,7 +3384,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			Xml.Append("</query>");
 
-			this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(RoomId + "@" + Domain, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -3447,18 +3415,18 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Reason">Optional reason for destroying the room.</param>
 		/// <param name="AlternateRoomJid">Optional alternative Room JID</param>
-		public Task<IqResultEventArgs> DestroyRoomAsync(string RoomId, string Domain, string Reason,
+		public async Task<IqResultEventArgs> DestroyRoomAsync(string RoomId, string Domain, string Reason,
 			string AlternateRoomJid)
 		{
 			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
 
-			this.DestroyRoom(RoomId, Domain, Reason, AlternateRoomJid, (sender, e) =>
+			await this.DestroyRoom(RoomId, Domain, Reason, AlternateRoomJid, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3476,9 +3444,9 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nick-name used in room.</param>
 		/// <param name="Callback">Method to call when response is returned from room.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SelfPing(string RoomId, string Domain, string NickName, IqResultEventHandlerAsync Callback, object State)
+		public Task SelfPing(string RoomId, string Domain, string NickName, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(RoomId + "@" + Domain + "/" + NickName, "<ping xmlns='" + XmppClient.NamespacePing + "'/>", Callback, State);
+			return this.client.SendIqGet(RoomId + "@" + Domain + "/" + NickName, "<ping xmlns='" + XmppClient.NamespacePing + "'/>", Callback, State);
 		}
 
 		/// <summary>
@@ -3491,17 +3459,17 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="NickName">Nick-name used in room.</param>
 		/// <returns>Response to ping request.</returns>
-		public Task<IqResultEventArgs> SelfPingAsync(string RoomId, string Domain, string NickName)
+		public async Task<IqResultEventArgs> SelfPingAsync(string RoomId, string Domain, string NickName)
 		{
 			TaskCompletionSource<IqResultEventArgs> Result = new TaskCompletionSource<IqResultEventArgs>();
 
-			this.client.SendIqGet(RoomId + "@" + Domain + "/" + NickName, "<ping xmlns='" + XmppClient.NamespacePing + "'/>", (sender, e) =>
+			await this.client.SendIqGet(RoomId + "@" + Domain + "/" + NickName, "<ping xmlns='" + XmppClient.NamespacePing + "'/>", (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion

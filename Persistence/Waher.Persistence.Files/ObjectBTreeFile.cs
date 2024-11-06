@@ -87,21 +87,21 @@ namespace Waher.Persistence.Files
 
 			public void Raise(object Object)
 			{
-				if (this.ObjectCallback is null)
-					this.ObjectsCallback?.Invoke(new object[] { Object });
-				else
+				if (!(this.ObjectCallback is null))
 					this.ObjectCallback(Object);
+				else if (!(this.ObjectsCallback is null))
+					this.ObjectsCallback(new object[] { Object });
 			}
 
 			public void Raise(IEnumerable<object> Objects)
 			{
-				if (this.ObjectCallback is null)
-					this.ObjectsCallback?.Invoke(Objects);
-				else
+				if (!(this.ObjectCallback is null))
 				{
 					foreach (object Object in Objects)
 						this.ObjectCallback(Object);
 				}
+				else if (!(this.ObjectsCallback is null))
+					this.ObjectsCallback(Objects);
 			}
 		}
 
@@ -1377,7 +1377,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Object);
+			if (!(Callback is null))
+				Callback(Object);
 
 			return ObjectId;
 		}
@@ -1447,7 +1448,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer, object State)
@@ -2221,7 +2223,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Object);
+			if (!(Callback is null))
+				Callback(Object);
 		}
 
 		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
@@ -2292,7 +2295,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
@@ -2567,7 +2571,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Object);
+			if (!(Callback is null))
+				Callback(Object);
 		}
 
 		private async Task DeleteObjectLocked(object Object, ObjectSerializer Serializer)
@@ -2653,7 +2658,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
@@ -6413,7 +6419,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 
 			return Objects;
 		}
@@ -6502,7 +6509,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 
 			return Objects;
 		}

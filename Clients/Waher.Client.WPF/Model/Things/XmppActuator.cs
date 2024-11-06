@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
@@ -31,7 +33,7 @@ namespace Waher.Client.WPF.Model.Things
 		public override bool CanReadSensorData => this.isSensor;
 		public override bool CanSubscribeToSensorData => this.suportsEvents;
 
-		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public override async Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			if (this.isSensor)
 			{
@@ -39,7 +41,7 @@ namespace Waher.Client.WPF.Model.Things
 				SensorClient SensorClient;
 
 				if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
-					return SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.Momentary);
+					return await SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.Momentary);
 				else
 					return null;
 			}
@@ -47,7 +49,7 @@ namespace Waher.Client.WPF.Model.Things
 				throw new NotSupportedException();
 		}
 
-		public override SensorDataClientRequest StartSensorDataFullReadout()
+		public override async Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			if (this.isSensor)
 			{
@@ -55,7 +57,7 @@ namespace Waher.Client.WPF.Model.Things
 				SensorClient SensorClient;
 
 				if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
-					return SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
+					return await SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
 				else
 					return null;
 			}
@@ -63,7 +65,7 @@ namespace Waher.Client.WPF.Model.Things
 				throw new NotSupportedException();
 		}
 
-		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
+		public override async Task<SensorDataSubscriptionRequest> SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			if (this.isSensor)
 			{
@@ -72,7 +74,7 @@ namespace Waher.Client.WPF.Model.Things
 
 				if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
 				{
-					return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
+					return await SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
 						Duration.FromSeconds(1), Duration.FromMinutes(1), false);
 				}
 				else
@@ -91,7 +93,7 @@ namespace Waher.Client.WPF.Model.Things
 
 		protected override bool UseActuatorControl => true;
 
-		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		public override void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			ControlClient ControlClient;

@@ -6,18 +6,12 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Things;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
+using Waher.Things;
 
 namespace Waher.Networking.XMPP.Control
 {
-	/// <summary>
-	/// Delegate for set reslt callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SetResultCallback(object Sender, SetResultEventArgs e);
-
 	/// <summary>
 	/// Implements an XMPP control client interface.
 	/// 
@@ -74,9 +68,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, bool Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, bool Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -88,9 +82,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, bool Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, bool Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -105,8 +99,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, bool Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, bool Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -116,7 +110,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(CommonTypes.Encode(Value));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -126,9 +120,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, ColorReference Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, ColorReference Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -140,9 +134,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, ColorReference Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, ColorReference Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -157,8 +151,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, ColorReference Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, ColorReference Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -168,7 +162,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -179,9 +173,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Value">Value to set.</param>
 		/// <param name="DateOnly">If only the date-portion should be configured (true), or if both date and time should be configured (false).</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, DateTime Value, bool DateOnly, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, DateTime Value, bool DateOnly, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, DateOnly, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, DateOnly, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -194,9 +188,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, DateTime Value, bool DateOnly, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, DateTime Value, bool DateOnly, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, DateOnly, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, DateOnly, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -212,8 +206,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, DateTime Value, bool DateOnly, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, DateTime Value, bool DateOnly, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -227,7 +221,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(XML.Encode(Value, DateOnly));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -237,9 +231,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, double Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, double Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -251,9 +245,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, double Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, double Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -268,8 +262,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, double Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, double Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -279,7 +273,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(CommonTypes.Encode(Value));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -289,9 +283,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, Duration Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, Duration Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -303,9 +297,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, Duration Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, Duration Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -320,8 +314,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, Duration Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, Duration Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -331,7 +325,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -341,9 +335,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, Enum Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, Enum Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -355,9 +349,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, Enum Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, Enum Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -372,8 +366,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, Enum Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, Enum Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -385,7 +379,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(XML.Encode(Value.GetType().FullName));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -395,9 +389,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, int Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, int Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -409,9 +403,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, int Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, int Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -426,8 +420,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, int Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, int Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -437,7 +431,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -447,9 +441,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, long Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, long Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -461,9 +455,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, long Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, long Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -478,8 +472,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, long Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, long Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -489,7 +483,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -499,9 +493,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, string Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, string Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -513,9 +507,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, string Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, string Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -530,8 +524,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, string Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, string Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -541,7 +535,7 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(XML.Encode(Value));
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -551,9 +545,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, TimeSpan Value, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, TimeSpan Value, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -565,9 +559,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, TimeSpan Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, TimeSpan Value, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -582,8 +576,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when set operation completes or fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
-		public void Set(string To, string ControlParameterName, TimeSpan Value, string ServiceToken, string DeviceToken, string UserToken,
-			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(string To, string ControlParameterName, TimeSpan Value, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
@@ -593,13 +587,13 @@ namespace Waher.Networking.XMPP.Control
 			Xml.Append(Value.ToString());
 			Xml.Append("'/></set>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return this.client.SendIqSet(To, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		private async Task SetResultCallback(object _, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			SetResultCallback Callback = (SetResultCallback)P[0];
+			EventHandlerAsync<SetResultEventArgs> Callback = (EventHandlerAsync<SetResultEventArgs>)P[0];
 			if (Callback is null)
 				return;
 
@@ -741,9 +735,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="To">Full JID of remote actuator.</param>
 		/// <param name="Language">Preferred language.</param>
 		/// <param name="Nodes">Node(s) to get the form from, if residing behind a concentrator.</param>
-		public void GetForm(string To, string Language, params ThingReference[] Nodes)
+		public Task GetForm(string To, string Language, params ThingReference[] Nodes)
 		{
-			this.GetForm(To, Language, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+			return this.GetForm(To, Language, string.Empty, string.Empty, string.Empty, null, null, Nodes);
 		}
 
 		/// <summary>
@@ -754,9 +748,9 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to get the form from, if residing behind a concentrator.</param>
-		public void GetForm(string To, string Language, DataFormResultEventHandler Callback, object State, params ThingReference[] Nodes)
+		public Task GetForm(string To, string Language, EventHandlerAsync<DataFormEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
-			this.GetForm(To, Language, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+			return this.GetForm(To, Language, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
 		}
 
 		/// <summary>
@@ -770,19 +764,19 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to get the form from, if residing behind a concentrator.</param>
-		public void GetForm(string To, string Language, string ServiceToken, string DeviceToken, string UserToken,
-			DataFormResultEventHandler Callback, object State, params ThingReference[] Nodes)
+		public Task GetForm(string To, string Language, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<DataFormEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = this.CommandHeader("getForm", Language, ServiceToken, DeviceToken, UserToken, Nodes);
 			Xml.Append("</getForm>");
 
-			this.client.SendIqGet(To, Xml.ToString(), this.GetFormResult, new object[] { Callback, State, Nodes });
+			return this.client.SendIqGet(To, Xml.ToString(), this.GetFormResult, new object[] { Callback, State, Nodes });
 		}
 
 		private async Task GetFormResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			DataFormResultEventHandler Callback = (DataFormResultEventHandler)P[0];
+			EventHandlerAsync<DataFormEventArgs> Callback = (EventHandlerAsync<DataFormEventArgs>)P[0];
 			if (Callback is null)
 				return;
 
@@ -833,7 +827,7 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Nodes">Any nodes to control.</param>
-		public void Set(DataForm Form, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		public Task Set(DataForm Form, EventHandlerAsync<SetResultEventArgs> Callback, object State, params ThingReference[] Nodes)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -846,7 +840,7 @@ namespace Waher.Networking.XMPP.Control
 
 			Xml.Append("</set>");
 
-			Form.Client.SendIqSet(Form.From, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
+			return Form.Client.SendIqSet(Form.From, Xml.ToString(), this.SetResultCallback, new object[] { Callback, State });
 		}
 
 		private Task CancelForm(object Sender, DataForm Form)

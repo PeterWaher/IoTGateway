@@ -52,7 +52,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					}
 					catch (Exception)
 					{
-						this.client.CancelTransfer(this.e.From, this.streamId);
+						await this.client.CancelTransfer(this.e.From, this.streamId);
 						return false;
 					}
 				}
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.nextChunk++;
 
 				if (Last)
-					this.Done();
+					await this.Done();
 				else
 				{
 					while (!(this.chunks is null))
@@ -87,7 +87,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 									if (Chunk.Last)
 									{
-										this.Done();
+										await this.Done();
 										this.chunks.Clear();
 									}
 
@@ -111,15 +111,18 @@ namespace Waher.Networking.XMPP.HTTPX
 			return true;
 		}
 
-		private void Done()
+		private async Task Done()
 		{
-			try
+			if (!(this.response is null))
 			{
-				this.response?.Dispose();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
+				try
+				{
+					await this.response.DisposeAsync();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 		}
 
@@ -140,15 +143,18 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (!this.response.HeaderSent)
 				await this.response.SendResponse(new InternalServerErrorException(Message));
 
-			this.client.CancelTransfer(this.e.From, this.streamId);
+			await this.client.CancelTransfer(this.e.From, this.streamId);
 
-			this.Done();
+			await this.Done();
 		}
 
-		public override void Dispose()
+		public override async Task DisposeAsync()
 		{
-			this.response?.Dispose();
-			this.response = null;
+			if (!(this.response is null))
+			{
+				await this.response.DisposeAsync();
+				this.response = null;
+			}
 
 			this.chunks?.Clear();
 			this.chunks = null;

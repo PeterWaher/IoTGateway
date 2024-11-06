@@ -11,9 +11,11 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.IoTGateway.Setup.Legal;
+using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -1342,7 +1344,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
 		public Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
-			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			if (this.protectWithPassword)
 				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
@@ -1361,7 +1363,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
 		public async Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose, string Password,
-			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			if (!HasApprovedLegalIdentities)
 				return false;
@@ -1414,7 +1416,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
 		public Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
-			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			if (this.protectWithPassword)
 				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
@@ -1433,7 +1435,7 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
 		public async Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose, string Password,
-			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			if (!HasApprovedLegalIdentities)
 				return false;
@@ -1476,12 +1478,12 @@ namespace Waher.IoTGateway.Setup
 			return true;
 		}
 
-		private readonly Dictionary<string, LegalIdentityPetitionResponseEventHandler> identityPetitionCallbackMethods = new Dictionary<string, LegalIdentityPetitionResponseEventHandler>();
-		private readonly Dictionary<string, ContractPetitionResponseEventHandler> contractPetitionCallbackMethods = new Dictionary<string, ContractPetitionResponseEventHandler>();
+		private readonly Dictionary<string, EventHandlerAsync<LegalIdentityPetitionResponseEventArgs>> identityPetitionCallbackMethods = new Dictionary<string, EventHandlerAsync<LegalIdentityPetitionResponseEventArgs>>();
+		private readonly Dictionary<string, EventHandlerAsync<ContractPetitionResponseEventArgs>> contractPetitionCallbackMethods = new Dictionary<string, EventHandlerAsync<ContractPetitionResponseEventArgs>>();
 
 		private Task ContractsClient_PetitionedIdentityResponseReceived(object Sender, LegalIdentityPetitionResponseEventArgs e)
 		{
-			LegalIdentityPetitionResponseEventHandler Callback;
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback;
 			string PetitionId = e.PetitionId;
 
 			lock (this.identityPetitionCallbackMethods)
@@ -1506,7 +1508,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
 		{
-			ContractPetitionResponseEventHandler Callback;
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback;
 			string PetitionId = e.PetitionId;
 
 			lock (this.contractPetitionCallbackMethods)

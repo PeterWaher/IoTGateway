@@ -106,7 +106,7 @@ namespace Waher.Networking.SASL
 
 			if (Password == Account.Password)
 			{
-				Connection.SetAccount(Account);
+				await Connection.SetAccount(Account);
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(null);
 

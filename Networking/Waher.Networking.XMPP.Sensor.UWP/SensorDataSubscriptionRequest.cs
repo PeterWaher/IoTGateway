@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking.XMPP.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -84,7 +85,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Removes the subscription.
 		/// </summary>
-		public void Unsubscribe()
+		public async Task Unsubscribe()
 		{
 			if (this.unsubscribed)
 				return;
@@ -101,11 +102,11 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.Append(this.Id);
 				Xml.Append("'/>");
 
-				this.sensorClient.Client.SendIqSet(this.RemoteJID, Xml.ToString(), this.UnsubscribeResponse, null);
+				await this.sensorClient.Client.SendIqSet(this.RemoteJID, Xml.ToString(), this.UnsubscribeResponse, null);
 			}
 		}
 
-		private Task UnsubscribeResponse(object Sender, IqResultEventArgs e)
+		private Task UnsubscribeResponse(object _, IqResultEventArgs e)
 		{
 			if (!e.Ok)
 				return this.Fail(e.ErrorText);
@@ -116,10 +117,7 @@ namespace Waher.Networking.XMPP.Sensor
 		internal override Task LogFields(IEnumerable<Field> Fields)
 		{
 			if (!this.unsubscribed)
-			{
-				this.Unsubscribe();
-				return Task.CompletedTask;
-			}
+				return this.Unsubscribe();
 			else
 				return base.LogFields(Fields);
 		}
@@ -127,10 +125,7 @@ namespace Waher.Networking.XMPP.Sensor
 		internal override Task LogErrors(IEnumerable<ThingError> Errors)
 		{
 			if (!this.unsubscribed)
-			{
-				this.Unsubscribe();
-				return Task.CompletedTask;
-			}
+				return this.Unsubscribe();
 			else
 				return base.LogErrors(Errors);
 		}

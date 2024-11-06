@@ -1,15 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
-namespace Waher.Networking.XMPP.Contracts
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for smart contract proposal events.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task ContractProposalEventHandler(object Sender, ContractProposalEventArgs e);
-
 	/// <summary>
 	/// Event arguments for smart contract proposals
 	/// </summary>

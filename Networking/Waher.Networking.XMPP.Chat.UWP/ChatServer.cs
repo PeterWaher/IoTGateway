@@ -1,7 +1,7 @@
-﻿using System;
-using SkiaSharp;
-using System.IO;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +15,7 @@ using Waher.Events;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
@@ -32,8 +33,8 @@ using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 using Waher.Security;
 using Waher.Things;
-using Waher.Things.SensorData;
 using Waher.Things.ControlParameters;
+using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Chat
 {
@@ -265,7 +266,7 @@ namespace Waher.Networking.XMPP.Chat
 					Xml.Append("<immediate xmlns='urn:xmpp:smtp'/>");
 			}
 
-			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, Xml.ToString(), PlainText,
+			await this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, Xml.ToString(), PlainText,
 				string.IsNullOrEmpty(OrgSubject) ? string.Empty : "Re: " + OrgSubject, string.Empty, string.Empty,
 				string.Empty, null, null);
 		}
@@ -383,7 +384,7 @@ namespace Waher.Networking.XMPP.Chat
 			if (this.httpUpload is null)
 			{
 				this.httpUpload = new HttpFileUploadClient(this.client);
-				this.httpUpload.Discover(null);
+				await this.httpUpload.Discover(null);
 			}
 
 			if (!Variables.TryGetVariable(" Menu ", out Variable v) ||
@@ -526,7 +527,7 @@ namespace Waher.Networking.XMPP.Chat
 						}
 						else
 						{
-							this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, async (sender3, e3) =>
+							await this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, async (sender3, e3) =>
 							{
 								if (e3.CanRead && e3.FieldTypes == FieldType.All)
 								{
@@ -616,21 +617,21 @@ namespace Waher.Networking.XMPP.Chat
 
 						IThingReference[] NodeReferences = new IThingReference[] { ThingRef ?? ThingReference.Empty };
 						FieldType FieldTypes = Full ? FieldType.All : FieldType.AllExceptHistorical;
-						InternalReadoutFieldsEventHandler FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
-						InternalReadoutErrorsEventHandler ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
+						EventHandlerAsync<InternalReadoutFieldsEventArgs> FieldsHandler = Full ? (EventHandlerAsync<InternalReadoutFieldsEventArgs>)this.AllFieldsRead : this.MomentaryFieldsRead;
+						EventHandlerAsync<InternalReadoutErrorsEventArgs> ErrorsHandler = Full ? (EventHandlerAsync<InternalReadoutErrorsEventArgs>)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
 
 						this.InitReadout(e.From);
 						await this.SendChatMessage(e.From, e.Subject, Row, "Readout started...", Support, false);
 
 						if (!(this.provisioningClient is null))
 						{
-							this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+							await this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 								FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
 								async (sender2, e2) =>
 								{
 									if (e2.Ok && e2.CanRead)
 									{
-										this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+										await this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
 											DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
 											new object[] { e.From, true, null, Support, e.Subject, RowNr, NrRows });
 									}
@@ -640,7 +641,7 @@ namespace Waher.Networking.XMPP.Chat
 						}
 						else
 						{
-							this.sensorServer.DoInternalReadout(e.From, NodeReferences, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
+							await this.sensorServer.DoInternalReadout(e.From, NodeReferences, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
 								FieldsHandler, ErrorsHandler, new object[] { e.From, true, null, Support, e.Subject, RowNr, NrRows });
 						}
 						break;
@@ -859,8 +860,8 @@ namespace Waher.Networking.XMPP.Chat
 							string Field = s.Substring(0, s.Length - (Full ? 2 : 1)).Trim();
 
 							FieldTypes = Full ? FieldType.All : FieldType.AllExceptHistorical;
-							FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
-							ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
+							FieldsHandler = Full ? (EventHandlerAsync<InternalReadoutFieldsEventArgs>)this.AllFieldsRead : this.MomentaryFieldsRead;
+							ErrorsHandler = Full ? (EventHandlerAsync<InternalReadoutErrorsEventArgs>)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
 
 							if (!(this.concentratorServer is null))
 							{
@@ -915,13 +916,13 @@ namespace Waher.Networking.XMPP.Chat
 								{
 									if (!(this.provisioningClient is null))
 									{
-										this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+										await this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 											FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
 											async (sender2, e2) =>
 											{
 												if (e2.Ok && e2.CanRead)
 												{
-													this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+													await this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
 														DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
 														new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 												}
@@ -931,7 +932,7 @@ namespace Waher.Networking.XMPP.Chat
 									}
 									else
 									{
-										this.sensorServer.DoInternalReadout(e.From, NodeReferences,
+										await this.sensorServer.DoInternalReadout(e.From, NodeReferences,
 											FieldTypes, null, DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
 											new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 									}
@@ -940,13 +941,13 @@ namespace Waher.Networking.XMPP.Chat
 								{
 									if (!(this.provisioningClient is null))
 									{
-										this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+										await this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 											FieldTypes, NodeReferences, new string[] { Field }, new string[0], new string[0], new string[0],
 											async (sender2, e2) =>
 											{
 												if (e2.Ok && e2.CanRead)
 												{
-													this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+													await this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
 														DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
 														new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 												}
@@ -956,7 +957,7 @@ namespace Waher.Networking.XMPP.Chat
 									}
 									else
 									{
-										this.sensorServer.DoInternalReadout(e.From, NodeReferences,
+										await this.sensorServer.DoInternalReadout(e.From, NodeReferences,
 											FieldTypes, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
 											new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 									}
@@ -968,13 +969,13 @@ namespace Waher.Networking.XMPP.Chat
 
 								if (!(this.provisioningClient is null))
 								{
-									this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
+									await this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 										FieldTypes, null, null, new string[0], new string[0], new string[0],
 										async (sender2, e2) =>
 										{
 											if (e2.Ok && e2.CanRead)
 											{
-												this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
+												await this.sensorServer.DoInternalReadout(e.From, e2.Nodes, e2.FieldTypes, e2.FieldsNames,
 													DateTime.MinValue, DateTime.MaxValue, FieldsHandler, ErrorsHandler,
 													new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 											}
@@ -984,7 +985,7 @@ namespace Waher.Networking.XMPP.Chat
 								}
 								else
 								{
-									this.sensorServer.DoInternalReadout(e.From, null, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
+									await this.sensorServer.DoInternalReadout(e.From, null, FieldTypes, null, DateTime.MinValue, DateTime.MaxValue,
 										FieldsHandler, ErrorsHandler, new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 								}
 							}
@@ -1114,7 +1115,7 @@ namespace Waher.Networking.XMPP.Chat
 												await this.Execute(s, e.From, Support, e.Subject, Row, Last, true);
 											else if (!(this.provisioningClient is null))
 											{
-												this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef ?? ThingReference.Empty },
+												await this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef ?? ThingReference.Empty },
 													new string[] { ParameterName }, new string[0], new string[0], new string[0], async (sender2, e2) =>
 													{
 														if (e2.Ok && e2.CanControl)
@@ -1175,7 +1176,7 @@ namespace Waher.Networking.XMPP.Chat
 				for (j = 0; j < c; j++)
 					ParameterNames[j] = Parameters[j].Name;
 
-				this.provisioningClient.CanControl(e.FromBareJID, null, ParameterNames,
+				await this.provisioningClient.CanControl(e.FromBareJID, null, ParameterNames,
 					new string[0], new string[0], new string[0], async (sender2, e2) =>
 					{
 						if (e2.Ok && e2.CanControl)
@@ -1534,7 +1535,7 @@ namespace Waher.Networking.XMPP.Chat
 				string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + "." + ImageCodec.FileExtensionPng;
 				string ContentType = ImageCodec.ContentTypePng;
 
-				this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (sender, e) =>
+				await this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (sender, e) =>
 				{
 					try
 					{
@@ -1623,7 +1624,7 @@ namespace Waher.Networking.XMPP.Chat
 			return Variables;
 		}
 
-		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
 		{
 			if (!(this.bobClient is null) &&
 				e.Value.TryGetVariable(" ContentIDs ", out Variable v) &&
@@ -1632,6 +1633,8 @@ namespace Waher.Networking.XMPP.Chat
 				foreach (string ContentID in ContentIDs.Keys)
 					this.bobClient.DeleteData(ContentID);
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string _, string Field)

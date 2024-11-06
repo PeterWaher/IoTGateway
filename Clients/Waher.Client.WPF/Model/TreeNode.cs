@@ -12,6 +12,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things.DisplayableParameters;
+using Waher.Networking;
 
 namespace Waher.Client.WPF.Model
 {
@@ -436,7 +437,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Window">Window</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual void Recycle(MainWindow Window)
+		public virtual Task Recycle(MainWindow Window)
 		{
 			throw new NotSupportedException();
 		}
@@ -495,7 +496,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Sniffer">Sniffer object.</param>
 		/// <returns>If the sniffer was found and removed.</returns>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual bool RemoveSniffer(ISniffer Sniffer)
+		public virtual Task<bool> RemoveSniffer(ISniffer Sniffer)
 		{
 			throw new NotSupportedException();
 		}
@@ -537,24 +538,18 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If it's possible to read sensor data from the node.
 		/// </summary>
-		public virtual bool CanReadSensorData
-		{
-			get { return false; }
-		}
+		public virtual bool CanReadSensorData => false;
 
 		/// <summary>
 		/// If it's possible to subscribe to sensor data from the node.
 		/// </summary>
-		public virtual bool CanSubscribeToSensorData
-		{
-			get { return false; }
-		}
+		public virtual bool CanSubscribeToSensorData => false;
 
 		/// <summary>
 		/// Starts readout of momentary sensor data values.
 		/// </summary>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public virtual Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			throw new NotSupportedException();
 		}
@@ -563,7 +558,7 @@ namespace Waher.Client.WPF.Model
 		/// Starts readout of all sensor data values.
 		/// </summary>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual SensorDataClientRequest StartSensorDataFullReadout()
+		public virtual Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			throw new NotSupportedException();
 		}
@@ -573,7 +568,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Rules">Any rules to apply.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
+		public virtual Task<SensorDataSubscriptionRequest> SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			throw new NotSupportedException();
 		}
@@ -581,10 +576,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If it's possible to configure control parameters on the node.
 		/// </summary>
-		public virtual bool CanConfigure
-		{
-			get { return false; }
-		}
+		public virtual bool CanConfigure => false;
 
 		/// <summary>
 		/// Starts configuration of the node.
@@ -609,7 +601,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		public virtual void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			throw new NotSupportedException();
 		}

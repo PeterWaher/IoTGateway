@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.DataForms
 {
@@ -224,9 +225,9 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		/// <param name="Value">Value.</param>
 		/// <returns>Parsed value.</returns>
-		public object SetValue(string Value)
+		public async Task<object> SetValue(string Value)
 		{
-			object[] Result = this.SetValue(new string[] { Value });
+			object[] Result = await this.SetValue(new string[] { Value });
 			if (Result is null || Result.Length == 0)
 				return null;
 			else
@@ -240,7 +241,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		/// <param name="Value">Value(s).</param>
 		/// <returns>Parsed value(s).</returns>
-		public object[] SetValue(params string[] Value)
+		public async Task<object[]> SetValue(params string[] Value)
 		{
 			object[] Result = this.Validate(Value);
 
@@ -258,13 +259,13 @@ namespace Waher.Networking.XMPP.DataForms
 				this.form.ExportXml(Xml, "submit", true, false);
 				Xml.Append("</submit>");
 
-				this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);
+				await this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);
 			}
 
 			return Result;
 		}
 
-		private Task FormUpdated(object Sender, IqResultEventArgs e)
+		private async Task FormUpdated(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok && Sender is XmppClient Client && !(Client is null))
 			{
@@ -273,12 +274,10 @@ namespace Waher.Networking.XMPP.DataForms
 					if (N.LocalName == "x")
 					{
 						DataForm UpdatedForm = new DataForm(Client, (XmlElement)N, null, null, e.From, e.To);
-						this.form.Join(UpdatedForm);
+						await this.form.Join(UpdatedForm);
 					}
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		internal bool Serialize(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)

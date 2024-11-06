@@ -1,17 +1,11 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.Control;
-using Waher.Content;
-using Waher.Runtime.Inventory;
-using Waher.Things;
-using Waher.Things.ControlParameters;
 using System.Threading.Tasks;
-using Waher.Script.Operators.Membership;
+using Waher.Content;
+using Waher.Networking.XMPP.Control;
+using Waher.Runtime.Inventory;
+using Waher.Things.ControlParameters;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -21,7 +15,7 @@ namespace Waher.Networking.XMPP.Test
 		private ControlClient controlClient;
 		private ControlServer controlServer;
 		private bool b = false;
-		private ColorReference cl = new ColorReference(0, 0, 0);
+		private ColorReference cl = new(0, 0, 0);
 		private DateTime d = DateTime.Today;
 		private DateTime dt = DateTime.Now;
 		private double db = 0;
@@ -87,21 +81,21 @@ namespace Waher.Networking.XMPP.Test
 					(sender, value) => { this.t = value; return Task.CompletedTask; }));
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
-			if (!(this.controlServer is null))
+			if (this.controlServer is not null)
 			{
 				this.controlServer.Dispose();
 				this.controlServer = null;
 			}
 
-			if (!(this.controlClient is null))
+			if (this.controlClient is not null)
 			{
 				this.controlClient.Dispose();
 				this.controlClient = null;
 			}
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]
@@ -110,8 +104,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.b = false;
 
@@ -140,8 +134,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.cl = new ColorReference(0, 0, 0);
 
@@ -172,8 +166,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.d = DateTime.MinValue;
 
@@ -202,8 +196,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				DateTime Now = DateTime.Now;
 				this.dt = DateTime.MinValue;
@@ -235,8 +229,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.db = 0;
 
@@ -265,8 +259,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.dr = Duration.Zero;
 
@@ -295,8 +289,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.e = TypeCode.Boolean;
 
@@ -325,8 +319,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.i = 0;
 
@@ -355,8 +349,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.l = 0;
 
@@ -385,8 +379,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				this.s = string.Empty;
 
@@ -415,8 +409,8 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
-				ManualResetEvent Error = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
+				ManualResetEvent Error = new(false);
 
 				TimeSpan Time = DateTime.Now.TimeOfDay;
 				this.t = TimeSpan.Zero;

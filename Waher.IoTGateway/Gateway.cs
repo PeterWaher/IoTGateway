@@ -50,14 +50,19 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
+using Waher.Networking.XMPP.PEP.Events;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.PubSub;
+using Waher.Networking.XMPP.PubSub.Events;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
@@ -137,8 +142,8 @@ namespace Waher.IoTGateway
 		private const int MaxChunkSize = 4096;
 
 		private static readonly LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
-		private static readonly Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
-		private static readonly Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
+		private static readonly Dictionary<int, EventHandlerAsync> serviceCommandByNr = new Dictionary<int, EventHandlerAsync>();
+		private static readonly Dictionary<EventHandlerAsync, int> serviceCommandNrByCallback = new Dictionary<EventHandlerAsync, int>();
 		private static readonly Dictionary<string, DateTime> lastUnauthorizedAccess = new Dictionary<string, DateTime>();
 		private static readonly DateTime startTime = DateTime.Now;
 		private static IDatabaseProvider internalProvider = null;
@@ -1387,7 +1392,7 @@ namespace Waher.IoTGateway
 					}
 
 					if (xmppClient.State != XmppState.Connected)
-						xmppClient.Connect();
+						await xmppClient.Connect();
 				}
 			}
 			catch (Exception ex)
@@ -1414,7 +1419,7 @@ namespace Waher.IoTGateway
 			return true;
 		}
 
-		private static void ProvisionedMeteringNode_QrCodeUrlRequested(object sender, GetQrCodeUrlEventArgs e)
+		private static Task ProvisionedMeteringNode_QrCodeUrlRequested(object sender, GetQrCodeUrlEventArgs e)
 		{
 			StringBuilder Link = new StringBuilder();
 			Link.Append("https://");
@@ -1428,6 +1433,8 @@ namespace Waher.IoTGateway
 			Link.Append(WebUtility.UrlEncode(e.Text));
 
 			e.Url = Link.ToString();
+
+			return Task.CompletedTask;
 		}
 
 		private static async Task StartingMd(HttpRequest Request, HttpResponse Response)
@@ -1875,7 +1882,7 @@ namespace Waher.IoTGateway
 					!(Configuration.Certificate is null) &&
 					!(Configuration.PrivateKey is null))
 				{
-					UpdateCertificate(Configuration);
+					await UpdateCertificate(Configuration);
 
 					if (checkCertificate > DateTime.MinValue)
 					{
@@ -1910,7 +1917,7 @@ namespace Waher.IoTGateway
 			return H.ComputeVariable(System.Text.Encoding.UTF8.GetBytes(UserName + ":" + domain + ":" + Password));
 		}
 
-		internal static bool UpdateCertificate(DomainConfiguration Configuration)
+		internal static async Task<bool> UpdateCertificate(DomainConfiguration Configuration)
 		{
 			try
 			{
@@ -1930,7 +1937,10 @@ namespace Waher.IoTGateway
 				try
 				{
 					webServer?.UpdateCertificate(Certificate);
-					OnNewCertificate?.Invoke(typeof(Gateway), new Events.CertificateEventArgs(certificate));
+
+					CertificateEventHandler h = OnNewCertificate;
+					if (!(h is null))
+						await h(typeof(Gateway), new Events.CertificateEventArgs(certificate));
 				}
 				catch (Exception ex)
 				{
@@ -1961,7 +1971,7 @@ namespace Waher.IoTGateway
 					if (await Configuration.CreateCertificate())
 					{
 						Log.Notice("Certificate created.");
-						if (!UpdateCertificate(Configuration))
+						if (!await UpdateCertificate(Configuration))
 							Log.Error("Unable to update gatetway with new certificate.");
 					}
 					else
@@ -2284,7 +2294,11 @@ namespace Waher.IoTGateway
 				{
 					using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
 					{
-						xmppClient.SetPresence(Availability.Offline, (sender, e) => OfflineSent.Set());
+						await xmppClient.SetPresence(Availability.Offline, (sender, e) =>
+						{
+							OfflineSent.Set();
+							return Task.CompletedTask;
+						});
 						OfflineSent.WaitOne(1000);
 					}
 
@@ -2296,7 +2310,7 @@ namespace Waher.IoTGateway
 							Disposable.Dispose();
 					}
 
-					xmppClient.Dispose();
+					await xmppClient.DisposeAsync();
 					xmppClient = null;
 				}
 
@@ -2598,7 +2612,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static event EventHandler MinuteTick = null;
 
-		private static Task XmppClient_OnStateChanged(object _, XmppState NewState)
+		private static async Task XmppClient_OnStateChanged(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -2608,10 +2622,22 @@ namespace Waher.IoTGateway
 					MarkdownToHtmlConverter.BareJID = xmppClient.BareJID;
 
 					if (!registered && !(thingRegistryClient is null))
-						Task.Run(Register);
+					{
+						_ = Task.Run(async () =>
+						{
+							try
+							{
+								await Register();
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
+						});
+					}
 
 					if (!socksProxy.HasProxy)
-						socksProxy.StartSearch(null);
+						await socksProxy.StartSearch(null);
 					break;
 
 				case XmppState.Offline:
@@ -2619,11 +2645,9 @@ namespace Waher.IoTGateway
 					connected = false;
 
 					if (immediateReconnect && !(xmppClient is null))
-						xmppClient.Reconnect();
+						await xmppClient.Reconnect();
 					break;
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -2732,7 +2756,7 @@ namespace Waher.IoTGateway
 							FileName = "netstat";
 							Arguments = "-anv -p tcp";
 							WaitForExit = true;
-							
+
 							Thread.NewState("netstat");
 							break;
 
@@ -2757,7 +2781,7 @@ namespace Waher.IoTGateway
 						};
 
 						DateTime Start = DateTime.Now;
-						
+
 						Proc.StartInfo = StartInfo;
 						Proc.Start();
 
@@ -3121,7 +3145,7 @@ namespace Waher.IoTGateway
 			return Task.CompletedTask;
 		}
 
-		private static Task ThingRegistryClient_Disowned(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
+		private static Task ThingRegistryClient_Disowned(object Sender, Networking.XMPP.Provisioning.Events.NodeEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 			{
@@ -3133,7 +3157,7 @@ namespace Waher.IoTGateway
 			return Task.CompletedTask;
 		}
 
-		private static Task ThingRegistryClient_Removed(object Sender, Networking.XMPP.Provisioning.NodeEventArgs e)
+		private static Task ThingRegistryClient_Removed(object Sender, Networking.XMPP.Provisioning.Events.NodeEventArgs e)
 		{
 			if (e.Node.IsEmpty)
 				Log.Informational("Gateway has been removed from the public registry.", ownerJid);
@@ -3159,7 +3183,7 @@ namespace Waher.IoTGateway
 			if (!(GetMetaData is null))
 				MetaData = await GetMetaData(MetaData);
 
-			thingRegistryClient.RegisterThing(MetaData, async (sender2, e2) =>
+			await thingRegistryClient.RegisterThing(MetaData, async (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{
@@ -3349,13 +3373,13 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Executes a service command.
 		/// 
-		/// Command must have been registered with <see cref="RegisterServiceCommand(EventHandler)"/> before being executed.
+		/// Command must have been registered with <see cref="RegisterServiceCommand(EventHandlerAsync)"/> before being executed.
 		/// </summary>
 		/// <param name="CommandNr">Command number.</param>
 		/// <returns>If a service command with the given number was found and executed.</returns>
-		public static bool ExecuteServiceCommand(int CommandNr)
+		public static async Task<bool> ExecuteServiceCommand(int CommandNr)
 		{
-			EventHandler h;
+			EventHandlerAsync h;
 
 			lock (serviceCommandByNr)
 			{
@@ -3372,7 +3396,7 @@ namespace Waher.IoTGateway
 			{
 				try
 				{
-					h(null, EventArgs.Empty);
+					await h(null, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{
@@ -3388,7 +3412,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Callback">Method to call when service command is invoked.</param>
 		/// <returns>Command number assigned to the command.</returns>
-		public static int RegisterServiceCommand(EventHandler Callback)
+		public static int RegisterServiceCommand(EventHandlerAsync Callback)
 		{
 			int i;
 
@@ -3411,7 +3435,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Callback">Method serving the service command.</param>
 		/// <returns>If the command was found and unregistered.</returns>
-		public static bool UnregisterServiceCommand(EventHandler Callback)
+		public static bool UnregisterServiceCommand(EventHandlerAsync Callback)
 		{
 			lock (serviceCommandByNr)
 			{
@@ -3438,13 +3462,15 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised before the application is uninstalled.
 		/// </summary>
-		public static event EventHandler OnBeforeUninstall = null;
+		public static event EventHandlerAsync OnBeforeUninstall = null;
 
-		private static void BeforeUninstall(object Sender, EventArgs e)
+		private static async Task BeforeUninstall(object Sender, EventArgs e)
 		{
 			try
 			{
-				OnBeforeUninstall?.Invoke(Sender, e);
+				EventHandlerAsync h = OnBeforeUninstall;
+				if (!(h is null))
+					await h(Sender, e);
 			}
 			catch (Exception ex)
 			{
@@ -3568,9 +3594,10 @@ namespace Waher.IoTGateway
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(params Field[] Values)
+		public static Task NewMomentaryValues(params Field[] Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Values);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -3578,18 +3605,20 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(IThingReference Reference, params Field[] Values)
+		public static Task NewMomentaryValues(IThingReference Reference, params Field[] Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Reports newly measured values.
 		/// </summary>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(IEnumerable<Field> Values)
+		public static Task NewMomentaryValues(IEnumerable<Field> Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Values);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -3597,9 +3626,10 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Reference">Optional node reference</param>
 		/// <param name="Values">New momentary values.</param>
-		public static void NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
+		public static Task NewMomentaryValues(IThingReference Reference, IEnumerable<Field> Values)
 		{
 			concentratorServer?.SensorServer?.NewMomentaryValues(Reference, Values);
+			return Task.CompletedTask;
 		}
 
 		#endregion
@@ -3620,7 +3650,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="PersonalEventType">Type of personal event.</param>
 		/// <param name="Handler">Event handler.</param>
-		public static void RegisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
+		public static void RegisterHandler(Type PersonalEventType, EventHandlerAsync<PersonalEventNotificationEventArgs> Handler)
 		{
 			pepClient?.RegisterHandler(PersonalEventType, Handler);
 		}
@@ -3631,7 +3661,7 @@ namespace Waher.IoTGateway
 		/// <param name="PersonalEventType">Type of personal event.</param>
 		/// <param name="Handler">Event handler.</param>
 		/// <returns>If the event handler was found and removed.</returns>
-		public static bool UnregisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
+		public static bool UnregisterHandler(Type PersonalEventType, EventHandlerAsync<PersonalEventNotificationEventArgs> Handler)
 		{
 			if (pepClient is null)
 				return false;
@@ -3643,7 +3673,7 @@ namespace Waher.IoTGateway
 		/// Event raisen when an item notification has been received, that is not a personal event, but received from the
 		/// Publish/Subscribe component.
 		/// </summary>
-		public static event ItemNotificationEventHandler PubSubItemNotification
+		public static event EventHandlerAsync<ItemNotificationEventArgs> PubSubItemNotification
 		{
 			add => pepClient.NonPepItemNotification += value;
 			remove => pepClient.NonPepItemNotification -= value;
@@ -3715,13 +3745,17 @@ namespace Waher.IoTGateway
 			if (ExportFolder != KeyFolder)
 				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
 
-			try
+			EventHandlerAsync h = OnAfterBackup;
+			if (!(h is null))
 			{
-				OnAfterBackup?.Invoke(typeof(Gateway), EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
+				try
+				{
+					await h(typeof(Gateway), EventArgs.Empty);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 		}
 
@@ -3731,7 +3765,7 @@ namespace Waher.IoTGateway
 		/// Event raised after a backup has been performed. This event can be used by services to purge the system of old data, without
 		/// affecting any ongoing backup.
 		/// </summary>
-		public static event EventHandler OnAfterBackup = null;
+		public static event EventHandlerAsync OnAfterBackup = null;
 
 		private static void DeleteOldFiles(string Path, long KeepDays, long KeepMonths, long KeepYears, DateTime Now)
 		{
@@ -3782,7 +3816,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static void Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
+		private static Task Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
 		{
 			StringBuilder Msg = new StringBuilder();
 
@@ -3815,23 +3849,23 @@ namespace Waher.IoTGateway
 			}
 
 			Log.Alert(Msg.ToString(), e.Collection);
+
+			return Task.CompletedTask;
 		}
 
 		#endregion
 
 		#region Notifications
 
-		private static async Task MailClient_MailReceived(object Sender, MailEventArgs e)
+		private static Task MailClient_MailReceived(object Sender, MailEventArgs e)
 		{
-			MailEventHandler h = MailReceived;
-			if (!(h is null))
-				await h(Sender, e);
+			return MailReceived.Raise(Sender, e);
 		}
 
 		/// <summary>
 		/// Event raised when a mail has been received.
 		/// </summary>
-		public static event MailEventHandler MailReceived = null;
+		public static event EventHandlerAsync<MailEventArgs> MailReceived = null;
 
 		/// <summary>
 		/// Sends a graph as a notification message to configured notification recipients.
@@ -3894,7 +3928,7 @@ namespace Waher.IoTGateway
 				(string Text, string Html) = await ConvertMarkdown(Markdown);
 
 				foreach (CaseInsensitiveString Admin in Addresses)
-					SendNotification(Admin, Markdown, Text, Html, MessageId, Update);
+					await SendNotification(Admin, Markdown, Text, Html, MessageId, Update);
 			}
 			catch (Exception ex)
 			{
@@ -3938,18 +3972,18 @@ namespace Waher.IoTGateway
 			return NotificationConfiguration.Instance?.Addresses ?? new CaseInsensitiveString[0];
 		}
 
-		private static void SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)
+		private static async Task SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)
 		{
 			if (!(XmppClient is null) && XmppClient.State == XmppState.Connected)
 			{
 				RosterItem Item = XmppClient.GetRosterItem(To);
 				if (Item is null || (Item.State != SubscriptionState.To && Item.State != SubscriptionState.Both))
 				{
-					xmppClient.RequestPresenceSubscription(To);
+					await xmppClient.RequestPresenceSubscription(To);
 					ScheduleEvent(Resend, DateTime.Now.AddMinutes(15), new object[] { To, Markdown, Text, Html, MessageId, Update });
 				}
 				else
-					SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, string.Empty, Update);
+					await SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, string.Empty, Update);
 			}
 			else
 				ScheduleEvent(Resend, DateTime.Now.AddSeconds(30), new object[] { To, Markdown, Text, Html, MessageId, Update });
@@ -3986,7 +4020,7 @@ namespace Waher.IoTGateway
 		public static async Task SendChatMessage(string Markdown, string To, string MessageId, string ThreadId)
 		{
 			(string Text, string Html) = await ConvertMarkdown(Markdown);
-			SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, false);
+			await SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, false);
 		}
 
 		/// <summary>
@@ -4010,7 +4044,7 @@ namespace Waher.IoTGateway
 		public static async Task SendChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
 		{
 			(string Text, string Html) = await ConvertMarkdown(Markdown);
-			SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, true);
+			await SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, true);
 		}
 
 		/// <summary>
@@ -4044,7 +4078,7 @@ namespace Waher.IoTGateway
 		public static async Task SendGroupChatMessage(string Markdown, string To, string MessageId, string ThreadId)
 		{
 			(string Text, string Html) = await ConvertMarkdown(Markdown);
-			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, false);
+			await SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, false);
 		}
 
 		/// <summary>
@@ -4068,7 +4102,7 @@ namespace Waher.IoTGateway
 		public static async Task SendGroupChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
 		{
 			(string Text, string Html) = await ConvertMarkdown(Markdown);
-			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, true);
+			await SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, true);
 		}
 
 		/// <summary>
@@ -4151,7 +4185,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static void SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)
+		private static async Task SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)
 		{
 			if (!(XmppClient is null) && XmppClient.State == XmppState.Connected)
 			{
@@ -4168,7 +4202,7 @@ namespace Waher.IoTGateway
 					MessageId = string.Empty;
 				}
 
-				xmppClient.SendMessage(QoSLevel.Unacknowledged, Type, MessageId, To, Xml.ToString(), string.Empty,
+				await xmppClient.SendMessage(QoSLevel.Unacknowledged, Type, MessageId, To, Xml.ToString(), string.Empty,
 					string.Empty, string.Empty, ThreadId, string.Empty, null, null);
 			}
 		}
@@ -4306,10 +4340,10 @@ namespace Waher.IoTGateway
 			return false;
 		}
 
-		private static void Resend(object P)
+		private static async Task Resend(object P)
 		{
 			object[] P2 = (object[])P;
-			SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
+			await SendNotification((string)P2[0], (string)P2[1], (string)P2[2], (string)P2[3], (string)P2[4], (bool)P2[5]);
 		}
 
 		#endregion
@@ -4548,7 +4582,7 @@ namespace Waher.IoTGateway
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
 		public static Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
-			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Callback, Timeout);
 		}
@@ -4564,7 +4598,7 @@ namespace Waher.IoTGateway
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
 		public static Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose, string Password,
-			LegalIdentityPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Password, Callback, Timeout);
 		}
@@ -4579,7 +4613,7 @@ namespace Waher.IoTGateway
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
 		public static Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
-			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Callback, Timeout);
 		}
@@ -4595,7 +4629,7 @@ namespace Waher.IoTGateway
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition, and the password matched (if protected by password).</returns>
 		public static Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose, string Password,
-			ContractPetitionResponseEventHandler Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
 		{
 			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Password, Callback, Timeout);
 		}

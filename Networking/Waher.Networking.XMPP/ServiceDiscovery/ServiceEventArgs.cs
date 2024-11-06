@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.ServiceDiscovery
 {
-	/// <summary>
-	/// Delegate for service events or callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ServiceEventHandler(object Sender, ServiceEventArgs e);
-
 	/// <summary>
 	/// Event arguments for service responses.
 	/// </summary>

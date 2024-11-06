@@ -181,27 +181,27 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanReadSensorData => this.Account.IsOnline;
 
-		public override SensorDataClientRequest StartSensorDataFullReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			return this.DoReadout(FieldType.All);
 		}
 
-		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			return this.DoReadout(FieldType.Momentary);
 		}
 
-		private SensorDataClientRequest DoReadout(FieldType Types)
+		private async Task<SensorDataClientRequest> DoReadout(FieldType Types)
 		{
 			string Id = Guid.NewGuid().ToString();
 
 			CustomSensorDataClientRequest Request = new CustomSensorDataClientRequest(Id, string.Empty, string.Empty, null,
 				Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.Now, string.Empty, string.Empty, string.Empty);
 
-			Request.Accept(false);
-			Request.Started();
+			await Request.Accept(false);
+			await Request.Started();
 
-			this.Account.Client.SendServiceDiscoveryRequest(this.jid, (sender, e) =>
+			await this.Account.Client.SendServiceDiscoveryRequest(this.jid, (sender, e) =>
 			{
 				if (e.Ok)
 				{

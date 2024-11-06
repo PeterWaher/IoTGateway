@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
-using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Cache;
 using Waher.Security;
@@ -90,7 +90,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="BlockSize">Block size.</param>
 		/// <param name="E2E">End-to-end encryption interface, if such is to be used.</param>
 		/// <returns>Outgoing stream.</returns>
-		public OutgoingStream OpenStream(string To, int BlockSize, IEndToEndEncryption E2E)
+		public Task<OutgoingStream> OpenStream(string To, int BlockSize, IEndToEndEncryption E2E)
 		{
 			return this.OpenStream(To, BlockSize, null, E2E);
 		}
@@ -103,7 +103,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="StreamId">Desired stream ID. If null or empty, one will be created.</param>
 		/// <param name="E2E">End-to-end encryption interface, if such is to be used.</param>
 		/// <returns>Outgoing stream.</returns>
-		public OutgoingStream OpenStream(string To, int BlockSize, string StreamId, IEndToEndEncryption E2E)
+		public async Task<OutgoingStream> OpenStream(string To, int BlockSize, string StreamId, IEndToEndEncryption E2E)
 		{
 			if (string.IsNullOrEmpty(StreamId))
 				StreamId = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
@@ -120,7 +120,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append(StreamId);
 			Xml.Append("' stanza='iq'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
+			await this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -157,19 +157,9 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					  this.maxBlockSize.ToString(), e.IQ);
 			}
 
-			ValidateStreamEventHandler h = this.OnOpen;
 			ValidateStreamEventArgs e2 = new ValidateStreamEventArgs(this.client, e, StreamId, BlockSize);
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			
+			await this.OnOpen.Raise(this, e2);
 
 			if (e2.DataCallback is null || e2.CloseCallback is null)
 				throw new NotAcceptableException("Stream not expected.", e.IQ);
@@ -185,7 +175,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			this.cache[Key] = Input;
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		private Task CloseHandler(object Sender, IqEventArgs e)
@@ -228,9 +218,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				Input.Dispose();
 			}
 
-			e.IqResult(string.Empty);
-		
-			return Task.CompletedTask;
+			return e.IqResult(string.Empty);
 		}
 
 		private void AssertCacheCreated()
@@ -240,12 +228,12 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				if (this.cache is null)
 				{
 					this.cache = new Cache<string, IncomingStream>(1000, TimeSpan.MaxValue, TimeSpan.FromMinutes(1), true);
-					this.cache.Removed += Cache_Removed;
+					this.cache.Removed += this.Cache_Removed;
 				}
 			}
 		}
 
-		private void Cache_Removed(object Sender, CacheItemEventArgs<string, IncomingStream> e)
+		private Task Cache_Removed(object Sender, CacheItemEventArgs<string, IncomingStream> e)
 		{
 			lock (this.synchObject)
 			{
@@ -274,18 +262,20 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			}
 
 			e.Value.Dispose();
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Event raised when a remote entity tries to open an in-band bytestream for transmission of data to the client.
 		/// A stream has to be accepted before data can be successfully received.
 		/// </summary>
-		public event ValidateStreamEventHandler OnOpen = null;
+		public event EventHandlerAsync<ValidateStreamEventArgs> OnOpen = null;
 
 		private async Task DataHandler(object Sender, IqEventArgs e)
 		{
 			if (await this.HandleIncomingData(e.Query, e.From))
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 			else
 				throw new ItemNotFoundException("Stream not recognized.", e.Query);
 		}
@@ -350,7 +340,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				Xml.Append(StreamId);
 				Xml.Append("'/>");
 
-				this.client.SendIqSet(From, Xml.ToString(), null, null);
+				await this.client.SendIqSet(From, Xml.ToString(), null, null);
 
 				return false;
 			}

@@ -50,7 +50,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
 			if (this.sensorServer is not null)
 			{
@@ -64,11 +64,11 @@ namespace Waher.Networking.XMPP.Test
 				this.sensorClient = null;
 			}
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]
-		public void SensorData_Test_01_ReadAll()
+		public async Task SensorData_Test_01_ReadAll()
 		{
 			this.ConnectClients();
 			try
@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataClientRequest Request = this.sensorClient.RequestReadout(this.client2.FullJID, FieldType.All);
+				SensorDataClientRequest Request = await this.sensorClient.RequestReadout(this.client2.FullJID, FieldType.All);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
 					ConsoleOut.WriteLine(NewState.ToString());
@@ -92,7 +92,7 @@ namespace Waher.Networking.XMPP.Test
 				{
 					Fields = NewFields;
 					Done.Set();
-				return Task.CompletedTask;
+					return Task.CompletedTask;
 				};
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000), "Readout not performed correctly");
@@ -102,12 +102,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void SensorData_Test_02_Subscribe_MaxInterval()
+		public async Task SensorData_Test_02_Subscribe_MaxInterval()
 		{
 			this.ConnectClients();
 			try
@@ -116,7 +116,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
@@ -135,7 +135,7 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				};
 
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
@@ -145,12 +145,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void SensorData_Test_03_Subscribe_ChangeBy()
+		public async Task SensorData_Test_03_Subscribe_ChangeBy()
 		{
 			this.ConnectClients();
 			try
@@ -159,7 +159,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
 						new("Temperature", this.temp, 1)
@@ -183,13 +183,13 @@ namespace Waher.Networking.XMPP.Test
 				};
 
 				this.temp += 0.5;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Thread.Sleep(2000);
 
 				this.temp += 0.5;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
@@ -200,7 +200,7 @@ namespace Waher.Networking.XMPP.Test
 				Done.Reset();
 
 				this.temp -= 1;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
@@ -210,12 +210,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void SensorData_Test_04_Subscribe_ChangeUp()
+		public async Task SensorData_Test_04_Subscribe_ChangeUp()
 		{
 			this.ConnectClients();
 			try
@@ -224,7 +224,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
 						new("Temperature", this.temp, 1, null)
@@ -248,13 +248,13 @@ namespace Waher.Networking.XMPP.Test
 				};
 
 				this.temp -= 1;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Thread.Sleep(2000);
 
 				this.temp += 2;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
@@ -264,12 +264,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void SensorData_Test_05_Subscribe_ChangeDown()
+		public async Task SensorData_Test_05_Subscribe_ChangeDown()
 		{
 			this.ConnectClients();
 			try
@@ -278,7 +278,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
 						new("Temperature", this.temp, 1, null)
@@ -302,13 +302,13 @@ namespace Waher.Networking.XMPP.Test
 				};
 
 				this.temp += 1;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Thread.Sleep(2000);
 
 				this.temp -= 2;
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
@@ -318,12 +318,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void SensorData_Test_06_Subscribe_MinInterval()
+		public async Task SensorData_Test_06_Subscribe_MinInterval()
 		{
 			this.ConnectClients();
 			try
@@ -332,7 +332,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
 						new("Temperature", this.temp, 1, null)
@@ -361,11 +361,11 @@ namespace Waher.Networking.XMPP.Test
 				while (Count > 0)
 				{
 					this.temp += 1;
-					this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+					await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 						FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 					this.temp -= 1;
-					this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+					await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 						FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 					switch (WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 100))
@@ -386,12 +386,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void SensorData_Test_07_Unsubscribe()
+		public async Task SensorData_Test_07_Unsubscribe()
 		{
 			this.ConnectClients();
 			try
@@ -400,7 +400,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) =>
 				{
@@ -419,22 +419,22 @@ namespace Waher.Networking.XMPP.Test
 					return Task.CompletedTask;
 				};
 
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
 
 				Done.Reset();
-				Request.Unsubscribe();
+				await Request.Unsubscribe();
 
-				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 				Assert.AreEqual(WaitHandle.WaitTimeout, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unsubscription not performed correctly");
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 	}

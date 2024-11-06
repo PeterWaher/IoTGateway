@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
-using Waher.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Interoperability
 {
@@ -55,19 +54,8 @@ namespace Waher.Networking.XMPP.Interoperability
 			string DeviceToken = XML.Attribute(E, "dt");
 			string UserToken = XML.Attribute(E, "ut");
 
-			InteroperabilityServerInterfacesEventHandler h = this.OnGetInterfaces;
 			InteroperabilityServerEventArgs e2 = new InteroperabilityServerEventArgs(NodeId, SourceId, Partition, ServiceToken, DeviceToken, UserToken);
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnGetInterfaces.Raise(this, e2);
 
 			StringBuilder Xml = new StringBuilder();
 
@@ -84,13 +72,12 @@ namespace Waher.Networking.XMPP.Interoperability
 
 			Xml.Append("</getInterfacesResponse>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		/// <summary>
 		/// Event raised when a client requests supported interoperability interfaces.
 		/// </summary>
-		public event InteroperabilityServerInterfacesEventHandler OnGetInterfaces = null;
-
+		public event EventHandlerAsync<InteroperabilityServerEventArgs> OnGetInterfaces = null;
 	}
 }

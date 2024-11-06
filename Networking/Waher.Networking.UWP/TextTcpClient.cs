@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -127,12 +126,16 @@ namespace Waher.Networking
 		/// Method called when text data has been received.
 		/// </summary>
 		/// <param name="Data">Text data received.</param>
-		protected virtual Task<bool> TextDataReceived(string Data)
+		protected virtual async Task<bool> TextDataReceived(string Data)
 		{
 			if (this.sniffText && this.HasSniffers)
-				this.ReceiveText(Data);
+				await this.ReceiveText(Data);
 
-			return this.OnReceived?.Invoke(this, Data) ?? Task.FromResult(true);
+			TextEventHandler h = this.OnReceived;
+			if (h is null)
+				return true;
+			else
+				return await h(this, Data);
 		}
 
 		/// <summary>
@@ -156,7 +159,7 @@ namespace Waher.Networking
 		/// <param name="Text">Text packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public async virtual Task<bool> SendAsync(string Text, EventHandler Callback)
+		public async virtual Task<bool> SendAsync(string Text, EventHandlerAsync Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Text);
 			this.lastTransmittedBytes = Data.Length;
@@ -174,12 +177,14 @@ namespace Waher.Networking
 		/// Method called when text data has been sent.
 		/// </summary>
 		/// <param name="Text">Text data sent.</param>
-		protected virtual Task TextDataSent(string Text)
+		protected virtual async Task TextDataSent(string Text)
 		{
 			if (this.sniffText && this.HasSniffers)
-				this.TransmitText(Text);
+				await this.TransmitText(Text);
 
-			return this.OnSent?.Invoke(this, Text) ?? Task.CompletedTask;
+			TextEventHandler h = this.OnSent;
+			if (!(h is null))
+				await h(this, Text);
 		}
 
 		/// <summary>

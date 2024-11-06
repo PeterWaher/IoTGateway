@@ -13,6 +13,7 @@ using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.StreamErrors;
 using Waher.Runtime.Cache;
 using Waher.Security;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP
 {
@@ -35,9 +36,9 @@ namespace Waher.Networking.XMPP
 		private readonly LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
 		private readonly Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
 		private readonly SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
-		private readonly Dictionary<string, IqEventHandlerAsync> iqGetHandlers = new Dictionary<string, IqEventHandlerAsync>();
-		private readonly Dictionary<string, IqEventHandlerAsync> iqSetHandlers = new Dictionary<string, IqEventHandlerAsync>();
-		private readonly Dictionary<string, MessageEventHandlerAsync> messageHandlers = new Dictionary<string, MessageEventHandlerAsync>();
+		private readonly Dictionary<string, EventHandlerAsync<IqEventArgs>> iqGetHandlers = new Dictionary<string, EventHandlerAsync<IqEventArgs>>();
+		private readonly Dictionary<string, EventHandlerAsync<IqEventArgs>> iqSetHandlers = new Dictionary<string, EventHandlerAsync<IqEventArgs>>();
+		private readonly Dictionary<string, EventHandlerAsync<MessageEventArgs>> messageHandlers = new Dictionary<string, EventHandlerAsync<MessageEventArgs>>();
 		private readonly Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private readonly Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
@@ -125,7 +126,7 @@ namespace Waher.Networking.XMPP
 				{
 					this.State = XmppState.StreamNegotiation;
 
-					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
+					await this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
 						"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
 
 					this.ResetState();
@@ -186,7 +187,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex2)
 				{
-					this.Exception(ex2);
+					await this.Exception(ex2);
 				}
 			}
 
@@ -197,9 +198,20 @@ namespace Waher.Networking.XMPP
 			this.State = XmppState.Error;
 		}
 
-		private void Client_OnDisconnected(object sender, EventArgs e)
+		private async Task Client_OnDisconnected(object sender, EventArgs e)
 		{
-			this.Information("Disconnected.");
+			if (this.HasSniffers)
+			{
+				try
+				{
+					await this.Information("Disconnected.");
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			}
+
 			if (this.state != XmppState.Error)
 				this.State = XmppState.Offline;
 		}
@@ -208,7 +220,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Error;
 
-			this.Exception(ex);
+			await this.Exception(ex);
 
 			ExceptionEventHandler h = this.OnError;
 			if (!(h is null))
@@ -219,30 +231,30 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex2)
 				{
-					this.Exception(ex2);
+					await this.Exception(ex2);
 				}
 			}
 		}
 
-		private Task<bool> OnSent(object _, string Text)
+		private async Task<bool> OnSent(object _, string Text)
 		{
-			this.TransmitText(Text);
-			return Task.FromResult(true);
+			await this.TransmitText(Text);
+			return true;
 		}
 
-		private Task<bool> OnReceived(object _, string Text)
+		private async Task<bool> OnReceived(object _, string Text)
 		{
 			if (this.openBracketReceived)
 			{
 				this.openBracketReceived = false;
-				this.ReceiveText("<" + Text);
+				await this.ReceiveText("<" + Text);
 			}
 			else if (Text == "<")
 				this.openBracketReceived = true;
 			else
-				this.ReceiveText(Text);
+				await this.ReceiveText(Text);
 
-			return this.ParseIncoming(Text);
+			return await this.ParseIncoming(Text);
 		}
 
 		/// <summary>
@@ -276,42 +288,58 @@ namespace Waher.Networking.XMPP
 				if (this.state != value)
 				{
 					this.state = value;
-					this.Information("State changed to " + value.ToString());
-					this.RaiseOnStateChanged(value);
+
+					Task.Run(async () =>
+					{
+						try
+						{
+							await this.Information("State changed to " + value.ToString());
+							await this.RaiseOnStateChanged(value);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					});
 				}
 			}
 		}
 
-		private async void RaiseOnStateChanged(XmppState State)
+		private Task RaiseOnStateChanged(XmppState State)
 		{
-			StateChangedEventHandler h = this.OnStateChanged;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, State);
-				}
-				catch (Exception ex)
-				{
-					this.Exception(ex);
-				}
-			}
+			return this.OnStateChanged.Raise(this, State);
 		}
 
 		/// <summary>
 		/// Event raised whenever the internal state of the connection changes.
 		/// </summary>
-		public event StateChangedEventHandler OnStateChanged = null;
+		public event EventHandlerAsync<XmppState> OnStateChanged = null;
 
 		/// <summary>
 		/// Closes the connection and disposes of all resources.
 		/// </summary>
-		public void Dispose()
+		[Obsolete("Use the DisposeAsync() method.")]
+		public async void Dispose()
+		{
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
-				this.BeginWrite(this.streamFooter, this.CleanUp);
+				await this.BeginWrite(this.streamFooter, this.CleanUp);
 			else
-				this.CleanUp(this, EventArgs.Empty);
+				await this.CleanUp(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -325,7 +353,7 @@ namespace Waher.Networking.XMPP
 			this.CleanUp(this, EventArgs.Empty);
 		}
 
-		private void CleanUp(object Sender, EventArgs e)
+		private Task CleanUp(object Sender, EventArgs e)
 		{
 			this.State = XmppState.Offline;
 
@@ -355,6 +383,8 @@ namespace Waher.Networking.XMPP
 			this.DisposeClient();
 
 			this.responses.Dispose();
+
+			return Task.CompletedTask;
 		}
 
 		private void DisposeClient()
@@ -373,7 +403,7 @@ namespace Waher.Networking.XMPP
 			this.Connect();
 		}
 
-		private void BeginWrite(string Xml, EventHandler Callback)
+		private async Task BeginWrite(string Xml, EventHandlerAsync Callback)
 		{
 			if (string.IsNullOrEmpty(Xml))
 			{
@@ -381,7 +411,7 @@ namespace Waher.Networking.XMPP
 				{
 					try
 					{
-						Callback(this, EventArgs.Empty);
+						await Callback(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -391,7 +421,7 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				Task _ = this.client.SendAsync(Xml, Callback);
+				await this.client.SendAsync(Xml, Callback);
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
 		}
@@ -905,7 +935,7 @@ namespace Waher.Networking.XMPP
 					string s = this.streamId + this.sharedSecret;
 					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
 
-					this.BeginWrite("<handshake>" + Hashes.ComputeSHA1HashString(Data) + "</handshake>", null);
+					await this.BeginWrite("<handshake>" + Hashes.ComputeSHA1HashString(Data) + "</handshake>", null);
 				}
 			}
 			catch (Exception ex)
@@ -946,9 +976,9 @@ namespace Waher.Networking.XMPP
 									if (this.responses.TryGet(From, Id, out string ResponseXml, out bool Ok))
 									{
 										if (Ok)
-											this.SendIqResult(Id, To, From, ResponseXml);
+											await this.SendIqResult(Id, To, From, ResponseXml);
 										else
-											this.SendIqError(Id, To, From, ResponseXml);
+											await this.SendIqError(Id, To, From, ResponseXml);
 									}
 									else
 										this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
@@ -958,9 +988,9 @@ namespace Waher.Networking.XMPP
 									if (this.responses.TryGet(From, Id, out ResponseXml, out Ok))
 									{
 										if (Ok)
-											this.SendIqResult(Id, To, From, ResponseXml);
+											await this.SendIqResult(Id, To, From, ResponseXml);
 										else
-											this.SendIqError(Id, To, From, ResponseXml);
+											await this.SendIqError(Id, To, From, ResponseXml);
 									}
 									else
 										this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
@@ -969,10 +999,10 @@ namespace Waher.Networking.XMPP
 								case "result":
 								case "error":
 									uint SeqNr;
-									IqResultEventHandlerAsync Callback;
+									EventHandlerAsync<IqResultEventArgs> Callback;
 									object State;
 									PendingRequest Rec;
-									
+
 									Ok = (Type == "result");
 
 									if (uint.TryParse(Id, out SeqNr))
@@ -1002,7 +1032,7 @@ namespace Waher.Networking.XMPP
 											}
 											catch (Exception ex)
 											{
-												this.Exception(ex);
+												await this.Exception(ex);
 											}
 										}
 									}
@@ -1025,7 +1055,7 @@ namespace Waher.Networking.XMPP
 								this.host = SeeOther.NewHost;
 								this.inputState = -1;
 
-								this.Information("Reconnecting to " + this.host);
+								await this.Information("Reconnecting to " + this.host);
 
 								this.DisposeClient();
 								this.Connect();
@@ -1057,7 +1087,7 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				MessageEventHandlerAsync h = null;
+				EventHandlerAsync<MessageEventArgs> h = null;
 				string Key;
 
 				lock (this.synchObject)
@@ -1079,34 +1109,34 @@ namespace Waher.Networking.XMPP
 				}
 
 				if (!(h is null))
-					this.Information(h.GetMethodInfo().Name);
+					await this.Information(h.GetMethodInfo().Name);
 				else
 				{
 					switch (e.Type)
 					{
 						case MessageType.Chat:
-							this.Information("OnChatMessage()");
+							await this.Information("OnChatMessage()");
 							h = this.OnChatMessage;
 							break;
 
 						case MessageType.Error:
-							this.Information("OnErrorMessage()");
+							await this.Information("OnErrorMessage()");
 							h = this.OnErrorMessage;
 							break;
 
 						case MessageType.GroupChat:
-							this.Information("OnGroupChatMessage()");
+							await this.Information("OnGroupChatMessage()");
 							h = this.OnGroupChatMessage;
 							break;
 
 						case MessageType.Headline:
-							this.Information("OnHeadlineMessage()");
+							await this.Information("OnHeadlineMessage()");
 							h = this.OnHeadlineMessage;
 							break;
 
 						case MessageType.Normal:
 						default:
-							this.Information("OnNormalMessage()");
+							await this.Information("OnNormalMessage()");
 							h = this.OnNormalMessage;
 							break;
 					}
@@ -1120,7 +1150,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						this.Exception(ex);
+						await this.Exception(ex);
 					}
 				}
 			}
@@ -1128,7 +1158,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					this.Exception(ex);
+					await this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -1141,7 +1171,7 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				PresenceEventHandlerAsync Callback;
+				EventHandlerAsync<PresenceEventArgs> Callback;
 				object State;
 				string Id = e.Id;
 				string FromBareJid = e.FromBareJID;
@@ -1182,39 +1212,39 @@ namespace Waher.Networking.XMPP
 					switch (e.Type)
 					{
 						case PresenceType.Available:
-							this.Information("OnPresence()");
+							await this.Information("OnPresence()");
 							Callback = this.OnPresence;
 							break;
 
 						case PresenceType.Unavailable:
-							this.Information("OnPresence()");
+							await this.Information("OnPresence()");
 							Callback = this.OnPresence;
 							break;
 
 						case PresenceType.Error:
 						case PresenceType.Probe:
 						default:
-							this.Information("OnPresence()");
+							await this.Information("OnPresence()");
 							Callback = this.OnPresence;
 							break;
 
 						case PresenceType.Subscribe:
-							this.Information("OnPresenceSubscribe()");
+							await this.Information("OnPresenceSubscribe()");
 							Callback = this.OnPresenceSubscribe;
 							break;
 
 						case PresenceType.Subscribed:
-							this.Information("OnPresenceSubscribed()");
+							await this.Information("OnPresenceSubscribed()");
 							Callback = this.OnPresenceSubscribed;
 							break;
 
 						case PresenceType.Unsubscribe:
-							this.Information("OnPresenceUnsubscribe()");
+							await this.Information("OnPresenceUnsubscribe()");
 							Callback = this.OnPresenceUnsubscribe;
 							break;
 
 						case PresenceType.Unsubscribed:
-							this.Information("OnPresenceUnsubscribed()");
+							await this.Information("OnPresenceUnsubscribed()");
 							Callback = this.OnPresenceUnsubscribed;
 							break;
 					}
@@ -1228,7 +1258,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						this.Exception(ex);
+						await this.Exception(ex);
 					}
 				}
 			}
@@ -1236,7 +1266,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					this.Exception(ex);
+					await this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -1245,11 +1275,11 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private async void ProcessIq(Dictionary<string, IqEventHandlerAsync> Handlers, IqEventArgs e)
+		private async void ProcessIq(Dictionary<string, EventHandlerAsync<IqEventArgs>> Handlers, IqEventArgs e)
 		{
 			try
 			{
-				IqEventHandlerAsync h = null;
+				EventHandlerAsync<IqEventArgs> h = null;
 				string Key;
 
 				lock (this.synchObject)
@@ -1271,7 +1301,7 @@ namespace Waher.Networking.XMPP
 				}
 
 				if (h is null)
-					this.SendIqError(e.Id, e.To, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
+					await this.SendIqError(e.Id, e.To, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
 				else
 				{
 					try
@@ -1280,7 +1310,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						this.SendIqError(e.Id, e.To, e.From, ex);
+						await this.SendIqError(e.Id, e.To, e.From, ex);
 					}
 				}
 			}
@@ -1288,7 +1318,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					this.Exception(ex);
+					await this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -1304,7 +1334,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Namespace">Namespace</param>
 		/// <param name="Handler">Handler to process request.</param>
 		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
-		public void RegisterIqGetHandler(string LocalName, string Namespace, IqEventHandlerAsync Handler, bool PublishNamespaceAsClientFeature)
+		public void RegisterIqGetHandler(string LocalName, string Namespace, EventHandlerAsync<IqEventArgs> Handler, bool PublishNamespaceAsClientFeature)
 		{
 			this.RegisterIqHandler(this.iqGetHandlers, LocalName, Namespace, Handler, PublishNamespaceAsClientFeature);
 		}
@@ -1316,13 +1346,13 @@ namespace Waher.Networking.XMPP
 		/// <param name="Namespace">Namespace</param>
 		/// <param name="Handler">Handler to process request.</param>
 		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
-		public void RegisterIqSetHandler(string LocalName, string Namespace, IqEventHandlerAsync Handler, bool PublishNamespaceAsClientFeature)
+		public void RegisterIqSetHandler(string LocalName, string Namespace, EventHandlerAsync<IqEventArgs> Handler, bool PublishNamespaceAsClientFeature)
 		{
 			this.RegisterIqHandler(this.iqSetHandlers, LocalName, Namespace, Handler, PublishNamespaceAsClientFeature);
 		}
 
-		private void RegisterIqHandler(Dictionary<string, IqEventHandlerAsync> Handlers, string LocalName, string Namespace,
-			IqEventHandlerAsync Handler, bool PublishNamespaceAsClientFeature)
+		private void RegisterIqHandler(Dictionary<string, EventHandlerAsync<IqEventArgs>> Handlers, string LocalName, string Namespace,
+			EventHandlerAsync<IqEventArgs> Handler, bool PublishNamespaceAsClientFeature)
 		{
 			string Key = LocalName + " " + Namespace;
 
@@ -1346,7 +1376,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Handler">Handler to process request.</param>
 		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
 		/// <returns>If the handler was found and removed.</returns>
-		public bool UnregisterIqGetHandler(string LocalName, string Namespace, IqEventHandlerAsync Handler, bool RemoveNamespaceAsClientFeature)
+		public bool UnregisterIqGetHandler(string LocalName, string Namespace, EventHandlerAsync<IqEventArgs> Handler, bool RemoveNamespaceAsClientFeature)
 		{
 			return this.UnregisterIqHandler(this.iqGetHandlers, LocalName, Namespace, Handler, RemoveNamespaceAsClientFeature);
 		}
@@ -1359,19 +1389,19 @@ namespace Waher.Networking.XMPP
 		/// <param name="Handler">Handler to process request.</param>
 		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
 		/// <returns>If the handler was found and removed.</returns>
-		public bool UnregisterIqSetHandler(string LocalName, string Namespace, IqEventHandlerAsync Handler, bool RemoveNamespaceAsClientFeature)
+		public bool UnregisterIqSetHandler(string LocalName, string Namespace, EventHandlerAsync<IqEventArgs> Handler, bool RemoveNamespaceAsClientFeature)
 		{
 			return this.UnregisterIqHandler(this.iqSetHandlers, LocalName, Namespace, Handler, RemoveNamespaceAsClientFeature);
 		}
 
-		private bool UnregisterIqHandler(Dictionary<string, IqEventHandlerAsync> Handlers, string LocalName, string Namespace,
-			IqEventHandlerAsync Handler, bool RemoveNamespaceAsClientFeature)
+		private bool UnregisterIqHandler(Dictionary<string, EventHandlerAsync<IqEventArgs>> Handlers, string LocalName, string Namespace,
+			EventHandlerAsync<IqEventArgs> Handler, bool RemoveNamespaceAsClientFeature)
 		{
 			string Key = LocalName + " " + Namespace;
 
 			lock (this.synchObject)
 			{
-				if (!Handlers.TryGetValue(Key, out IqEventHandlerAsync h))
+				if (!Handlers.TryGetValue(Key, out EventHandlerAsync<IqEventArgs> h))
 					return false;
 
 				if (h != Handler)
@@ -1393,7 +1423,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Namespace">Namespace</param>
 		/// <param name="Handler">Handler to process message.</param>
 		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
-		public void RegisterMessageHandler(string LocalName, string Namespace, MessageEventHandlerAsync Handler, bool PublishNamespaceAsClientFeature)
+		public void RegisterMessageHandler(string LocalName, string Namespace, EventHandlerAsync<MessageEventArgs> Handler, bool PublishNamespaceAsClientFeature)
 		{
 			string Key = LocalName + " " + Namespace;
 
@@ -1417,13 +1447,13 @@ namespace Waher.Networking.XMPP
 		/// <param name="Handler">Handler to remove.</param>
 		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
 		/// <returns>If the handler was found and removed.</returns>
-		public bool UnregisterMessageHandler(string LocalName, string Namespace, MessageEventHandlerAsync Handler, bool RemoveNamespaceAsClientFeature)
+		public bool UnregisterMessageHandler(string LocalName, string Namespace, EventHandlerAsync<MessageEventArgs> Handler, bool RemoveNamespaceAsClientFeature)
 		{
 			string Key = LocalName + " " + Namespace;
 
 			lock (this.synchObject)
 			{
-				if (!this.messageHandlers.TryGetValue(Key, out MessageEventHandlerAsync h))
+				if (!this.messageHandlers.TryGetValue(Key, out EventHandlerAsync<MessageEventArgs> h))
 					return false;
 
 				if (h != Handler)
@@ -1466,52 +1496,52 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when a presence message has been received from a resource.
 		/// </summary>
-		public event PresenceEventHandlerAsync OnPresence = null;
+		public event EventHandlerAsync<PresenceEventArgs> OnPresence = null;
 
 		/// <summary>
 		/// Event raised when a resource is requesting to be informed of the current client's presence
 		/// </summary>
-		public event PresenceEventHandlerAsync OnPresenceSubscribe = null;
+		public event EventHandlerAsync<PresenceEventArgs> OnPresenceSubscribe = null;
 
 		/// <summary>
 		/// Event raised when your presence subscription has been accepted.
 		/// </summary>
-		public event PresenceEventHandlerAsync OnPresenceSubscribed = null;
+		public event EventHandlerAsync<PresenceEventArgs> OnPresenceSubscribed = null;
 
 		/// <summary>
 		/// Event raised when a resource is requesting to be removed from the current client's presence
 		/// </summary>
-		public event PresenceEventHandlerAsync OnPresenceUnsubscribe = null;
+		public event EventHandlerAsync<PresenceEventArgs> OnPresenceUnsubscribe = null;
 
 		/// <summary>
 		/// Event raised when your presence unsubscription has been accepted.
 		/// </summary>
-		public event PresenceEventHandlerAsync OnPresenceUnsubscribed = null;
+		public event EventHandlerAsync<PresenceEventArgs> OnPresenceUnsubscribed = null;
 
 		/// <summary>
 		/// Raised when a chat message has been received, that is not handled by a specific message handler.
 		/// </summary>
-		public event MessageEventHandlerAsync OnChatMessage = null;
+		public event EventHandlerAsync<MessageEventArgs> OnChatMessage = null;
 
 		/// <summary>
 		/// Raised when an error message has been received, that is not handled by a specific message handler.
 		/// </summary>
-		public event MessageEventHandlerAsync OnErrorMessage = null;
+		public event EventHandlerAsync<MessageEventArgs> OnErrorMessage = null;
 
 		/// <summary>
 		/// Raised when a group chat message has been received, that is not handled by a specific message handler.
 		/// </summary>
-		public event MessageEventHandlerAsync OnGroupChatMessage = null;
+		public event EventHandlerAsync<MessageEventArgs> OnGroupChatMessage = null;
 
 		/// <summary>
 		/// Raised when a headline message has been received, that is not handled by a specific message handler.
 		/// </summary>
-		public event MessageEventHandlerAsync OnHeadlineMessage = null;
+		public event EventHandlerAsync<MessageEventArgs> OnHeadlineMessage = null;
 
 		/// <summary>
 		/// Raised when a normal message has been received, that is not handled by a specific message handler.
 		/// </summary>
-		public event MessageEventHandlerAsync OnNormalMessage = null;
+		public event EventHandlerAsync<MessageEventArgs> OnNormalMessage = null;
 
 		/// <summary>
 		/// Component sub-domain on server.
@@ -1529,7 +1559,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>ID of IQ stanza</returns>
-		public uint SendIqGet(string From, string To, string Xml, IqResultEventHandlerAsync Callback, object State)
+		public Task<uint> SendIqGet(string From, string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.SendIq(null, From, To, Xml, "get", Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
 				this.defaultMaxRetryTimeout);
@@ -1546,7 +1576,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza</returns>
-		public uint SendIqGet(string From, string To, string Xml, IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries)
+		public Task<uint> SendIqGet(string From, string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries)
 		{
 			return this.SendIq(null, From, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, false, RetryTimeout);
 		}
@@ -1565,7 +1595,7 @@ namespace Waher.Networking.XMPP
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
-		public uint SendIqGet(string From, string To, string Xml, IqResultEventHandlerAsync Callback, object State,
+		public Task<uint> SendIqGet(string From, string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			return this.SendIq(null, From, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
@@ -1580,7 +1610,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>ID of IQ stanza</returns>
-		public uint SendIqSet(string From, string To, string Xml, IqResultEventHandlerAsync Callback, object State)
+		public Task<uint> SendIqSet(string From, string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.SendIq(null, From, To, Xml, "set", Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
 				this.defaultMaxRetryTimeout);
@@ -1597,7 +1627,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza</returns>
-		public uint SendIqSet(string From, string To, string Xml, IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries)
+		public Task<uint> SendIqSet(string From, string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries)
 		{
 			return this.SendIq(null, From, To, Xml, "set", Callback, State, RetryTimeout, NrRetries, false, RetryTimeout);
 		}
@@ -1616,7 +1646,7 @@ namespace Waher.Networking.XMPP
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
-		public uint SendIqSet(string From, string To, string Xml, IqResultEventHandlerAsync Callback, object State,
+		public Task<uint> SendIqSet(string From, string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			return this.SendIq(null, From, To, Xml, "set", Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
@@ -1629,10 +1659,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">Address of sender.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="Xml">XML to embed into the response.</param>
-		public void SendIqResult(string Id, string From, string To, string Xml)
+		public Task SendIqResult(string Id, string From, string To, string Xml)
 		{
 			this.responses.Add(To, Id, Xml, true);
-			this.SendIq(Id, From, To, Xml, "result", null, null, 0, 0, false, 0);
+			return this.SendIq(Id, From, To, Xml, "result", null, null, 0, 0, false, 0);
 		}
 
 		/// <summary>
@@ -1642,10 +1672,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">Address of sender.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="Xml">XML to embed into the response.</param>
-		public void SendIqError(string Id, string From, string To, string Xml)
+		public Task SendIqError(string Id, string From, string To, string Xml)
 		{
 			this.responses.Add(To, Id, Xml, false);
-			this.SendIq(Id, From, To, Xml, "error", null, null, 0, 0, false, 0);
+			return this.SendIq(Id, From, To, Xml, "error", null, null, 0, 0, false, 0);
 		}
 
 		/// <summary>
@@ -1655,13 +1685,13 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">Address of sender.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="ex">Internal exception object.</param>
-		public void SendIqError(string Id, string From, string To, Exception ex)
+		public async Task SendIqError(string Id, string From, string To, Exception ex)
 		{
 			if (ex is StanzaExceptionException ex2)
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				this.Exception(ex2);
+				await this.Exception(ex2);
 
 				Xml.Append("<error type='");
 				Xml.Append(ex2.ErrorType);
@@ -1673,13 +1703,13 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</text>");
 				Xml.Append("</error>");
 
-				this.SendIqError(Id, From, To, Xml.ToString());
+				await this.SendIqError(Id, From, To, Xml.ToString());
 			}
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				this.Exception(ex);
+				await this.Exception(ex);
 
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>");
@@ -1687,11 +1717,11 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</text>");
 				Xml.Append("</error>");
 
-				this.SendIqError(Id, From, To, Xml.ToString());
+				await this.SendIqError(Id, From, To, Xml.ToString());
 			}
 		}
 
-		private uint SendIq(string Id, string From, string To, string Xml, string Type, IqResultEventHandlerAsync Callback, object State,
+		private async Task<uint> SendIq(string Id, string From, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest = null;
@@ -1752,7 +1782,7 @@ namespace Waher.Networking.XMPP
 			if (!(PendingRequest is null))
 				PendingRequest.Xml = IqXml;
 
-			this.BeginWrite(IqXml, null);
+			await this.BeginWrite(IqXml, null);
 
 			return SeqNr;
 		}
@@ -1786,11 +1816,11 @@ namespace Waher.Networking.XMPP
 		/// <returns>Response XML element.</returns>
 		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
-		public Task<XmlElement> IqGetAsync(string From, string To, string Xml)
+		public async Task<XmlElement> IqGetAsync(string From, string To, string Xml)
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			this.SendIqGet(From, To, Xml, (sender, e) =>
+			await this.SendIqGet(From, To, Xml, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1800,7 +1830,7 @@ namespace Waher.Networking.XMPP
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1832,11 +1862,11 @@ namespace Waher.Networking.XMPP
 		/// <returns>Response XML element.</returns>
 		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
-		public Task<XmlElement> IqSetAsync(string From, string To, string Xml)
+		public async Task<XmlElement> IqSetAsync(string From, string To, string Xml)
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			this.SendIqSet(From, To, Xml, (sender, e) =>
+			await this.SendIqSet(From, To, Xml, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1846,16 +1876,16 @@ namespace Waher.Networking.XMPP
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
 		/// Sets the presence of the connection.
 		/// </summary>
 		/// <param name="From">Address of sender.</param>
-		public void SetPresence(string From)
+		public Task SetPresence(string From)
 		{
-			this.SetPresence(From, Availability.Online, string.Empty, null);
+			return this.SetPresence(From, Availability.Online, string.Empty, null);
 		}
 
 		/// <summary>
@@ -1863,9 +1893,9 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="From">Address of sender.</param>
 		/// <param name="Availability">Client availability.</param>
-		public void SetPresence(string From, Availability Availability)
+		public Task SetPresence(string From, Availability Availability)
 		{
-			this.SetPresence(From, Availability, string.Empty, null);
+			return this.SetPresence(From, Availability, string.Empty, null);
 		}
 
 		/// <summary>
@@ -1874,9 +1904,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">Address of sender.</param>
 		/// <param name="Availability">Client availability.</param>
 		/// <param name="CustomXml">Custom XML.</param>
-		public void SetPresence(string From, Availability Availability, string CustomXml)
+		public Task SetPresence(string From, Availability Availability, string CustomXml)
 		{
-			this.SetPresence(From, Availability, CustomXml, null);
+			return this.SetPresence(From, Availability, CustomXml, null);
 		}
 
 		/// <summary>
@@ -1886,7 +1916,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Availability">Client availability.</param>
 		/// <param name="CustomXml">Custom XML.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public void SetPresence(string From, Availability Availability, string CustomXml, params KeyValuePair<string, string>[] Status)
+		public async Task SetPresence(string From, Availability Availability, string CustomXml, params KeyValuePair<string, string>[] Status)
 		{
 			if (this.state == XmppState.Connected || this.state == XmppState.SettingPresence)
 			{
@@ -1901,28 +1931,28 @@ namespace Waher.Networking.XMPP
 
 				switch (Availability)
 				{
-					case XMPP.Availability.Online:
+					case Availability.Online:
 					default:
 						Xml.Append(">");
 						break;
 
-					case XMPP.Availability.Away:
+					case Availability.Away:
 						Xml.Append("><show>away</show>");
 						break;
 
-					case XMPP.Availability.Chat:
+					case Availability.Chat:
 						Xml.Append("><show>chat</show>");
 						break;
 
-					case XMPP.Availability.DoNotDisturb:
+					case Availability.DoNotDisturb:
 						Xml.Append("><show>dnd</show>");
 						break;
 
-					case XMPP.Availability.ExtendedAway:
+					case Availability.ExtendedAway:
 						Xml.Append("><show>xa</show>");
 						break;
 
-					case XMPP.Availability.Offline:
+					case Availability.Offline:
 						Xml.Append(" type='unavailable'>");
 						break;
 				}
@@ -1952,7 +1982,7 @@ namespace Waher.Networking.XMPP
 
 				Xml.Append("</presence>");
 
-				this.BeginWrite(Xml.ToString(), null);
+				await this.BeginWrite(Xml.ToString(), null);
 			}
 		}
 
@@ -1963,12 +1993,12 @@ namespace Waher.Networking.XMPP
 		/// <param name="BareJid">Bare JID of contact.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object.</param>
-		public void RequestPresenceSubscription(string From, string BareJid, PresenceEventHandlerAsync Callback, object State)
+		public Task RequestPresenceSubscription(string From, string BareJid, EventHandlerAsync<PresenceEventArgs> Callback, object State)
 		{
-			this.RequestPresenceAction(From, BareJid, "subscribe", Callback, State, 0, 0, false, 0, false);
+			return this.RequestPresenceAction(From, BareJid, "subscribe", Callback, State, 0, 0, false, 0, false);
 		}
 
-		private void RequestPresenceAction(string From, string BareJid, string Type, PresenceEventHandlerAsync Callback, object State,
+		private async Task RequestPresenceAction(string From, string BareJid, string Type, EventHandlerAsync<PresenceEventArgs> Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, bool IdMightBeRemoved)
 		{
 			PendingRequest PendingRequest;
@@ -2010,10 +2040,10 @@ namespace Waher.Networking.XMPP
 			if (!(PendingRequest is null))
 				PendingRequest.Xml = PresenceXml;
 
-			this.BeginWrite(PresenceXml, null);
+			await this.BeginWrite(PresenceXml, null);
 		}
 
-		private void PendingPresenceRequest_Removed(object Sender, CacheItemEventArgs<string, uint> e)
+		private async Task PendingPresenceRequest_Removed(object Sender, CacheItemEventArgs<string, uint> e)
 		{
 			PendingRequest PendingRequest;
 
@@ -2048,7 +2078,8 @@ namespace Waher.Networking.XMPP
 
 				PresenceEventArgs e2 = new PresenceEventArgs(this, Doc.DocumentElement);
 
-				PendingRequest.PresenceCallback?.Invoke(this, e2);
+				if (!(PendingRequest.PresenceCallback is null))
+					await PendingRequest.PresenceCallback(this, e2);
 			}
 			catch (Exception ex)
 			{
@@ -2063,12 +2094,12 @@ namespace Waher.Networking.XMPP
 		/// <param name="BareJid">Bare JID of contact.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object.</param>
-		public void RequestPresenceUnsubscription(string From, string BareJid, PresenceEventHandlerAsync Callback, object State)
+		public Task RequestPresenceUnsubscription(string From, string BareJid, EventHandlerAsync<PresenceEventArgs> Callback, object State)
 		{
-			this.RequestPresenceAction(From, BareJid, "unsubscribe", Callback, State, 0, 0, false, 0, false);
+			return this.RequestPresenceAction(From, BareJid, "unsubscribe", Callback, State, 0, 0, false, 0, false);
 		}
 
-		internal void PresenceSubscriptionAccepted(string Id, string From, string BareJid)
+		internal Task PresenceSubscriptionAccepted(string Id, string From, string BareJid)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2085,10 +2116,10 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='subscribed'/>");
 
-			this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null);
 		}
 
-		internal void PresenceSubscriptionDeclined(string Id, string From, string BareJid)
+		internal Task PresenceSubscriptionDeclined(string Id, string From, string BareJid)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2105,10 +2136,10 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='unsubscribed'/>");
 
-			this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null);
 		}
 
-		internal void PresenceUnsubscriptionAccepted(string Id, string From, string BareJid)
+		internal Task PresenceUnsubscriptionAccepted(string Id, string From, string BareJid)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2125,10 +2156,10 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='unsubscribed'/>");
 
-			this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null);
 		}
 
-		internal void PresenceUnsubscriptionDeclined(string Id, string From, string BareJid)
+		internal Task PresenceUnsubscriptionDeclined(string Id, string From, string BareJid)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2145,7 +2176,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='subscribed'/>");
 
-			this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null);
 		}
 
 		/// <summary>
@@ -2154,9 +2185,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="From">Address of sender.</param>
 		/// <param name="To">Destination address</param>
 		/// <param name="Body">Body text of chat message.</param>
-		public void SendChatMessage(string From, string To, string Body)
+		public Task SendChatMessage(string From, string To, string Body)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
+			return this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
@@ -2167,9 +2198,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="To">Destination address</param>
 		/// <param name="Body">Body text of chat message.</param>
 		/// <param name="Subject">Subject</param>
-		public void SendChatMessage(string From, string To, string Body, string Subject)
+		public Task SendChatMessage(string From, string To, string Body, string Subject)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
+			return this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
@@ -2181,9 +2212,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Body">Body text of chat message.</param>
 		/// <param name="Subject">Subject</param>
 		/// <param name="Language">Language used.</param>
-		public void SendChatMessage(string From, string To, string Body, string Subject, string Language)
+		public Task SendChatMessage(string From, string To, string Body, string Subject, string Language)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
+			return this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, Language, string.Empty, string.Empty, null, null);
 		}
 
@@ -2196,9 +2227,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Subject">Subject</param>
 		/// <param name="Language">Language used.</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public void SendChatMessage(string From, string To, string Body, string Subject, string Language, string ThreadId)
+		public Task SendChatMessage(string From, string To, string Body, string Subject, string Language, string ThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
+			return this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, Language, ThreadId, string.Empty, null, null);
 		}
 
@@ -2212,9 +2243,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Language">Language used.</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendChatMessage(string From, string To, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
+		public Task SendChatMessage(string From, string To, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
+			return this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -2230,10 +2261,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="Language">Language used.</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="ParentThreadId">Parent Thread ID</param>
-		public void SendMessage(MessageType Type, string From, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
+		public Task SendMessage(MessageType Type, string From, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, From, To, CustomXml,
+			return this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, From, To, CustomXml,
 				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -2252,10 +2283,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body,
-			string Subject, string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
+		public Task SendMessage(QoSLevel QoS, MessageType Type, string From, string To, string CustomXml, string Body,
+			string Subject, string Language, string ThreadId, string ParentThreadId, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
-			this.SendMessage(QoS, Type, string.Empty, From, To, CustomXml, Body, Subject, Language, ThreadId, ParentThreadId, DeliveryCallback, State);
+			return this.SendMessage(QoS, Type, string.Empty, From, To, CustomXml, Body, Subject, Language, ThreadId, ParentThreadId, DeliveryCallback, State);
 		}
 
 		/// <summary>
@@ -2274,9 +2305,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SendMessage(QoSLevel QoS, MessageType Type, string Id, string From, string To,
+		public async Task SendMessage(QoSLevel QoS, MessageType Type, string Id, string From, string To,
 			string CustomXml, string Body, string Subject, string Language, string ThreadId,
-			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
+			string ParentThreadId, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2351,7 +2382,7 @@ namespace Waher.Networking.XMPP
 			switch (QoS)
 			{
 				case QoSLevel.Unacknowledged:
-					this.BeginWrite(MessageXml, async (sender, e) => await this.DeliveryCallback(DeliveryCallback, State, true));
+					await this.BeginWrite(MessageXml, async (sender, e) => await this.DeliveryCallback(DeliveryCallback, State, true));
 					break;
 
 				case QoSLevel.Acknowledged:
@@ -2362,7 +2393,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
 
-					this.SendIqSet(From, To, Xml.ToString(), (sender, e) => this.DeliveryCallback(DeliveryCallback, State, e.Ok), null,
+					await this.SendIqSet(From, To, Xml.ToString(), (sender, e) => this.DeliveryCallback(DeliveryCallback, State, e.Ok), null,
 						5000, int.MaxValue, true, 3600000);
 					break;
 
@@ -2378,7 +2409,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:assured>");
 
-					this.SendIqSet(From, To, Xml.ToString(), this.AssuredDeliveryStep, new object[] { DeliveryCallback, State, MsgId },
+					await this.SendIqSet(From, To, Xml.ToString(), this.AssuredDeliveryStep, new object[] { DeliveryCallback, State, MsgId },
 						5000, int.MaxValue, true, 3600000);
 					break;
 			}
@@ -2387,7 +2418,7 @@ namespace Waher.Networking.XMPP
 		private async Task AssuredDeliveryStep(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			DeliveryEventHandler DeliveryCallback = (DeliveryEventHandler)P[0];
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback = (EventHandlerAsync<DeliveryEventArgs>)P[0];
 			object State = P[1];
 			string MsgId = (string)P[2];
 
@@ -2407,7 +2438,7 @@ namespace Waher.Networking.XMPP
 							Xml.Append(MsgId);
 							Xml.Append("'/>");
 
-							this.SendIqSet(e.To, e.From, Xml.ToString(), async (sender, e2) => await this.DeliveryCallback(DeliveryCallback, State, e2.Ok), null,
+							await this.SendIqSet(e.To, e.From, Xml.ToString(), async (sender, e2) => await this.DeliveryCallback(DeliveryCallback, State, e2.Ok), null,
 								5000, int.MaxValue, true, 3600000);
 							return;
 						}
@@ -2418,7 +2449,7 @@ namespace Waher.Networking.XMPP
 			await this.DeliveryCallback(DeliveryCallback, State, false);
 		}
 
-		private async Task DeliveryCallback(DeliveryEventHandler Callback, object State, bool Ok)
+		private async Task DeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
 		{
 			if (!(Callback is null))
 			{
@@ -2428,7 +2459,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex)
 				{
-					this.Exception(ex);
+					await this.Exception(ex);
 				}
 			}
 		}
@@ -2449,7 +2480,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private Task AcknowledgedQoSMessageHandler(object Sender, IqEventArgs e)
+		private async Task AcknowledgedQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
@@ -2461,10 +2492,10 @@ namespace Waher.Networking.XMPP
 						To = e.To
 					};
 
-					this.SendIqResult(e.Id, e.To, e.From, string.Empty);
+					await this.SendIqResult(e.Id, e.To, e.From, string.Empty);
 					this.ProcessMessage(e2);
 
-					return Task.CompletedTask;
+					return;
 				}
 			}
 
@@ -2586,7 +2617,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event GetRosterItemEventHandler OnGetRosterItem = null;
 
-		private Task AssuredQoSMessageHandler(object Sender, IqEventArgs e)
+		private async Task AssuredQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			string FromBareJid = XmppClient.GetBareJID(e.From);
 			string MsgId = XML.Attribute(e.Query, "msgId");
@@ -2643,15 +2674,15 @@ namespace Waher.Networking.XMPP
 						this.receivedMessages[FromBareJid + " " + MsgId] = e2;
 					}
 
-					this.SendIqResult(e.Id, e.To, e.From, "<received msgId='" + XML.Encode(MsgId) + "'/>");
-					return Task.CompletedTask;
+					await this.SendIqResult(e.Id, e.To, e.From, "<received msgId='" + XML.Encode(MsgId) + "'/>");
+					return;
 				}
 			}
 
 			throw new BadRequestException(string.Empty, e.Query);
 		}
 
-		private Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
+		private async Task DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;
 			string MsgId = XML.Attribute(e.Query, "msgId");
@@ -2678,15 +2709,13 @@ namespace Waher.Networking.XMPP
 					e2 = null;
 			}
 
-			this.SendIqResult(e.Id, e.To, e.From, string.Empty);
+			await this.SendIqResult(e.Id, e.To, e.From, string.Empty);
 
 			if (!(e2 is null))
 				this.ProcessMessage(e2);
-
-			return Task.CompletedTask;
 		}
 
-		private void SecondTimerCallback(object State)
+		private async void SecondTimerCallback(object State)
 		{
 			try
 			{
@@ -2700,13 +2729,15 @@ namespace Waher.Networking.XMPP
 							if (this.pingResponse)
 							{
 								this.pingResponse = false;
-								this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
+								await this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
 							}
 							else
 							{
 								try
 								{
-									this.Warning("Reconnecting.");
+									if (this.HasSniffers)
+										await this.Warning("Reconnecting.");
+
 									this.Reconnect();
 								}
 								catch (Exception ex)
@@ -2716,11 +2747,13 @@ namespace Waher.Networking.XMPP
 							}
 						}
 						else
-							this.BeginWrite(" ", null);
+							await this.BeginWrite(" ", null);
 					}
 					catch (Exception ex)
 					{
-						this.Exception(ex);
+						if (this.HasSniffers)
+							await this.Exception(ex);
+
 						this.Reconnect();
 					}
 				}
@@ -2772,8 +2805,8 @@ namespace Waher.Networking.XMPP
 						try
 						{
 							if (Retry)
-								this.BeginWrite(Request.Xml, null);
-							else
+								await this.BeginWrite(Request.Xml, null);
+							else if (!(Request.IqCallback is null))
 							{
 								StringBuilder Xml = new StringBuilder();
 
@@ -2793,12 +2826,12 @@ namespace Waher.Networking.XMPP
 								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 									Request.State);
 
-								Request.IqCallback?.Invoke(this, e);
+								await Request.IqCallback(this, e);
 							}
 						}
 						catch (Exception ex)
 						{
-							this.Exception(ex);
+							await this.Exception(ex);
 						}
 					}
 				}
@@ -2840,7 +2873,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="To">Destination address.</param>
 		/// <param name="Callback">Method to call when response or error is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendPing(string From, string To, IqResultEventHandlerAsync Callback, object State)
+		public Task SendPing(string From, string To, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2848,13 +2881,12 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XmppClient.NamespacePing);
 			Xml.Append("'/>");
 
-			this.SendIqGet(From, To, Xml.ToString(), Callback, State, 5000, 0);
+			return this.SendIqGet(From, To, Xml.ToString(), Callback, State, 5000, 0);
 		}
 
 		private Task PingRequestHandler(object Sender, IqEventArgs e)
 		{
-			e.IqResult(string.Empty);
-			return Task.CompletedTask;
+			return e.IqResult(string.Empty);
 		}
 
 		private Task ServiceDiscoveryRequestHandler(object Sender, IqEventArgs e)
@@ -2887,9 +2919,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("</query>");
 
-			e.IqResult(Xml.ToString());
-
-			return Task.CompletedTask;
+			return e.IqResult(Xml.ToString());
 		}
 
 		/// <summary>
@@ -2913,13 +2943,13 @@ namespace Waher.Networking.XMPP
 		/// <param name="BareJID">Bare JID of entity.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object.</param>
-		public void PresenceProbe(string BareJID, PresenceEventHandlerAsync Callback, object State)
+		public Task PresenceProbe(string BareJID, EventHandlerAsync<PresenceEventArgs> Callback, object State)
 		{
-			this.RequestPresenceAction(this.componentSubDomain, BareJID, "probe", Callback, State,
+			return this.RequestPresenceAction(this.componentSubDomain, BareJID, "probe", Callback, State,
 				this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff, this.defaultMaxRetryTimeout, true);
 		}
 
-		private uint GetSeqNr(string BareJID, PresenceEventHandlerAsync Callback, object State, out PendingRequest PendingRequest,
+		private uint GetSeqNr(string BareJID, EventHandlerAsync<PresenceEventArgs> Callback, object State, out PendingRequest PendingRequest,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			DateTime TP;

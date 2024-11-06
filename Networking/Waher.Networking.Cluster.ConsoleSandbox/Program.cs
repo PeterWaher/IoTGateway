@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
@@ -47,6 +48,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 				Endpoint.GetStatus += (sender, e) =>
 				{
 					e.Status = Name;
+					return Task.CompletedTask;
 				};
 
 				Endpoint.EndpointOnline += (sender, e) =>
@@ -57,6 +59,8 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 					}
 
 					ConsoleOut.WriteLine("New endpoint online: " + e.Endpoint.ToString());
+
+					return Task.CompletedTask;
 				};
 
 				Endpoint.EndpointOffline += (sender, e) =>
@@ -70,6 +74,8 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 					}
 
 					ConsoleOut.WriteLine("Endpoint offline: " + e.Endpoint.ToString() + " (" + RemoteName + ")");
+
+					return Task.CompletedTask;
 				};
 
 				Endpoint.EndpointStatus += (sender, e) =>
@@ -89,6 +95,8 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 						if (New)
 							ConsoleOut.WriteLine(e.Endpoint.ToString() + " is " + RemoteName);
 					}
+
+					return Task.CompletedTask;
 				};
 
 				ConsoleKeyInfo KeyInfo = ConsoleIn.ReadKey(true);
@@ -102,7 +110,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 						if (Locked.ContainsKey(s))
 						{
 							ConsoleOut.WriteLine("Releasing " + s + ".");
-							Endpoint.Release(s);
+							Endpoint.Release(s).Wait();
 							ConsoleOut.WriteLine(s + " released.");
 							Locked.Remove(s);
 						}
@@ -121,6 +129,8 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 									ConsoleOut.WriteLine(e.State.ToString() + " is already locked.");
 								else
 									ConsoleOut.WriteLine(e.State.ToString() + " is already locked by " + e.LockedBy.ToString());
+
+								return Task.CompletedTask;
 							}, s);
 						}
 					}

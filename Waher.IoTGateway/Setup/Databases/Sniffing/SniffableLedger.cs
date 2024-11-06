@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
-using Waher.Persistence.Serialization;
 
 namespace Waher.IoTGateway.Setup.Databases.Sniffing
 {
@@ -59,17 +57,17 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 			{
 				if (b)
 				{
-					Ledger.CollectionCleared += Ledger_CollectionCleared;
-					Ledger.EntryAdded += Ledger_EntryAdded;
-					Ledger.EntryUpdated += Ledger_EntryUpdated;
-					Ledger.EntryDeleted += Ledger_EntryDeleted;
+					Ledger.CollectionCleared += this.Ledger_CollectionCleared;
+					Ledger.EntryAdded += this.Ledger_EntryAdded;
+					Ledger.EntryUpdated += this.Ledger_EntryUpdated;
+					Ledger.EntryDeleted += this.Ledger_EntryDeleted;
 				}
 				else
 				{
-					Ledger.CollectionCleared -= Ledger_CollectionCleared;
-					Ledger.EntryAdded -= Ledger_EntryAdded;
-					Ledger.EntryUpdated -= Ledger_EntryUpdated;
-					Ledger.EntryDeleted -= Ledger_EntryDeleted;
+					Ledger.CollectionCleared -= this.Ledger_CollectionCleared;
+					Ledger.EntryAdded -= this.Ledger_EntryAdded;
+					Ledger.EntryUpdated -= this.Ledger_EntryUpdated;
+					Ledger.EntryDeleted -= this.Ledger_EntryDeleted;
 				}
 
 				this.prevHasSniffers = b;
@@ -80,11 +78,11 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				this.TransmitText(await SniffableDatabase.GetJSON(e.Object));
+				await this.TransmitText(await SniffableDatabase.GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
-				this.TransmitText("Entry of type " + e.Object.GetType().FullName + " added.");
+				await this.TransmitText("Entry of type " + e.Object.GetType().FullName + " added.");
 			}
 		}
 
@@ -92,11 +90,11 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				this.ReceiveText(await SniffableDatabase.GetJSON(e.Object));
+				await this.ReceiveText(await SniffableDatabase.GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
-				this.ReceiveText("Entry of type " + e.Object.GetType().FullName + " updated.");
+				await this.ReceiveText("Entry of type " + e.Object.GetType().FullName + " updated.");
 			}
 		}
 
@@ -104,18 +102,17 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				this.Error(await SniffableDatabase.GetJSON(e.Object));
+				await this.Error(await SniffableDatabase.GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
-				this.Error("Entry of type " + e.Object.GetType().FullName + " deleted.");
+				await this.Error("Entry of type " + e.Object.GetType().FullName + " deleted.");
 			}
 		}
 
 		private Task Ledger_CollectionCleared(object Sender, CollectionEventArgs e)
 		{
-			this.Information("Collection has been cleared: " + e.Collection);
-			return Task.CompletedTask;
+			return this.Information("Collection has been cleared: " + e.Collection);
 		}
 	}
 }

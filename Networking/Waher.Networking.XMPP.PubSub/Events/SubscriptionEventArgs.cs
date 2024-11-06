@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 
-namespace Waher.Networking.XMPP.PubSub
+namespace Waher.Networking.XMPP.PubSub.Events
 {
-	/// <summary>
-	/// Delegate for node subscription callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SubscriptionEventHandler(object Sender, SubscriptionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for node subscription callback events.
 	/// </summary>

@@ -1,17 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP.Concentrator.Queries;
+﻿using Waher.Networking.XMPP.Concentrator.Queries;
+using Waher.Networking.XMPP.Events;
 using Waher.Things.Queries;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for node query section callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task NodeQueryEventMessageEventHandler(object Sender, NodeQueryEventMessageEventArgs e);
-
 	/// <summary>
 	/// Event arguments for node query section events.
 	/// </summary>

@@ -30,7 +30,7 @@ namespace Waher.Events.MQTT
 		public MqttEventReceptor(MqttClient Client)
 		{
 			this.client = Client;
-			this.client.OnContentReceived += Client_OnContentReceived;
+			this.client.OnContentReceived += this.Client_OnContentReceived;
 		}
 
 		/// <summary>
@@ -38,7 +38,7 @@ namespace Waher.Events.MQTT
 		/// </summary>
 		public void Dispose()
 		{
-			this.client.OnContentReceived -= Client_OnContentReceived;
+			this.client.OnContentReceived -= this.Client_OnContentReceived;
 		}
 
 		private Task Client_OnContentReceived(object Sender, MqttContent Content)
@@ -209,7 +209,7 @@ namespace Waher.Events.MQTT
 			{
 				try
 				{
-					h(this, new EventEventArgs(Content, Event));
+					h(this, new EventEventArgs(Content, Event, this.client));
 				}
 				catch (Exception ex)
 				{

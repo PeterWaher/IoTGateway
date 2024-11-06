@@ -1,16 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP.DataForms;
+﻿using Waher.Networking.XMPP.DataForms;
 
-namespace Waher.Networking.XMPP.PubSub
+namespace Waher.Networking.XMPP.PubSub.Events
 {
-	/// <summary>
-	/// Delegate for node configuration callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ConfigurationEventHandler(object Sender, ConfigurationEventArgs e);
-
 	/// <summary>
 	/// Event arguments for node configuration callback events.
 	/// </summary>

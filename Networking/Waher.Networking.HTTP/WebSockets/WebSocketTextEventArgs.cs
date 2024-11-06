@@ -1,11 +1,13 @@
-﻿namespace Waher.Networking.HTTP.WebSockets
+﻿using System.Threading.Tasks;
+
+namespace Waher.Networking.HTTP.WebSockets
 {
 	/// <summary>
 	/// Delegate for websocket text events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void WebSocketTextEventHandler(object Sender, WebSocketTextEventArgs e);
+	public delegate Task WebSocketTextEventHandler(object Sender, WebSocketTextEventArgs e);
 
 	/// <summary>
 	/// Event arguments for websocket text events.

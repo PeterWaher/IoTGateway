@@ -13,8 +13,10 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
@@ -34,13 +36,13 @@ using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.Contracts
 {
-	/// <summary>
-	/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
-	/// 
-	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
-	/// https://neuro-foundation.io
-	/// </summary>
-	public class ContractsClient : XmppExtension
+    /// <summary>
+    /// Adds support for legal identities, smart contracts and signatures to an XMPP client.
+    /// 
+    /// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+    /// https://neuro-foundation.io
+    /// </summary>
+    public class ContractsClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:leg:id:1.0
@@ -807,7 +809,7 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Bytes = new byte[Nr];
 
 			this.rnd.GetBytes(Bytes);
-			
+
 			return Bytes;
 		}
 
@@ -933,7 +935,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task GetServerPublicKey(KeyEventHandler Callback, object State)
+		public Task GetServerPublicKey(EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
 			return this.GetServerPublicKey(this.componentAddress, Callback, State);
 		}
@@ -944,7 +946,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity whose public key is requested.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public async Task GetServerPublicKey(string Address, KeyEventHandler Callback, object State)
+		public async Task GetServerPublicKey(string Address, EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
 			KeyEventArgs e0;
 
@@ -973,7 +975,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
+				await this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 				{
 					IE2eEndpoint ServerKey = null;
 					XmlElement E;
@@ -1052,7 +1054,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method called when response is available.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task GetMatchingLocalKey(KeyEventHandler Callback, object State)
+		public Task GetMatchingLocalKey(EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
 			return this.GetMatchingLocalKey(this.componentAddress, Callback, State);
 		}
@@ -1091,7 +1093,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method called when response is available.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public async Task GetMatchingLocalKey(string Address, KeyEventHandler Callback, object State)
+		public async Task GetMatchingLocalKey(string Address, EventHandlerAsync<KeyEventArgs> Callback, object State)
 		{
 			KeyEventArgs e0;
 
@@ -1189,20 +1191,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetIdApplicationAttributes(IdApplicationAttributesEventHandler Callback, object State)
+		public Task GetIdApplicationAttributes(EventHandlerAsync<IdApplicationAttributesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", (sender, e) =>
+			return this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", async (sender, e) =>
 			{
-				try
+				if (!(Callback is null))
 				{
-					Callback?.Invoke(this, new IdApplicationAttributesEventArgs(e));
+					try
+					{
+						await Callback(this, new IdApplicationAttributesEventArgs(e));
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
 				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-
-				return Task.CompletedTask;
 
 			}, State);
 		}
@@ -1211,11 +1214,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets attributes relevant for application for legal identities on the broker.
 		/// </summary>
 		/// <returns>ID Application attributes</returns>
-		public Task<IdApplicationAttributesEventArgs> GetIdApplicationAttributesAsync()
+		public async Task<IdApplicationAttributesEventArgs> GetIdApplicationAttributesAsync()
 		{
 			TaskCompletionSource<IdApplicationAttributesEventArgs> Result = new TaskCompletionSource<IdApplicationAttributesEventArgs>();
 
-			this.GetIdApplicationAttributes((sender, e) =>
+			await this.GetIdApplicationAttributes((sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e);
@@ -1225,7 +1228,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -1238,7 +1241,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Properties">Properties of the legal identity.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task Apply(Property[] Properties, LegalIdentityEventHandler Callback, object State)
+		public Task Apply(Property[] Properties, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			return this.Apply(this.componentAddress, Properties, Callback, State);
 		}
@@ -1250,7 +1253,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Properties">Properties of the legal identity.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public async Task Apply(string Address, Property[] Properties, LegalIdentityEventHandler Callback, object State)
+		public async Task Apply(string Address, Property[] Properties, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
@@ -1293,7 +1296,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					Xml.Append("</identity></apply>");
 
-					this.client.SendIqSet(Address, Xml.ToString(), async (sender2, e2) =>
+					await this.client.SendIqSet(Address, Xml.ToString(), async (sender2, e2) =>
 					{
 						LegalIdentity Identity2 = null;
 						XmlElement E;
@@ -1362,9 +1365,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void ReadyForApproval(string LegalIdentityId, IqResultEventHandlerAsync Callback, object State)
+		public Task ReadyForApproval(string LegalIdentityId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.ReadyForApproval(this.componentAddress, LegalIdentityId, Callback, State);
+			return this.ReadyForApproval(this.componentAddress, LegalIdentityId, Callback, State);
 		}
 
 		/// <summary>
@@ -1376,7 +1379,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void ReadyForApproval(string Address, string LegalIdentityId, IqResultEventHandlerAsync Callback, object State)
+		public Task ReadyForApproval(string Address, string LegalIdentityId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
@@ -1388,7 +1391,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(LegalIdentityId));
 			Xml.Append("\"/>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1397,7 +1400,6 @@ namespace Waher.Networking.XMPP.Contracts
 		/// available information, and choose to automatically approve or reject the application.
 		/// </summary>
 		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
-		/// <returns>Identity object representing the application.</returns>
 		public Task ReadyForApprovalAsync(string LegalIdentityId)
 		{
 			return this.ReadyForApprovalAsync(this.componentAddress, LegalIdentityId);
@@ -1410,12 +1412,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
-		/// <returns>Identity object representing the application.</returns>
-		public Task ReadyForApprovalAsync(string Address, string LegalIdentityId)
+		public async Task ReadyForApprovalAsync(string Address, string LegalIdentityId)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.ReadyForApproval(Address, LegalIdentityId, (sender, e) =>
+			await this.ReadyForApproval(Address, LegalIdentityId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -1426,7 +1427,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion
@@ -1439,7 +1440,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Identity">Legal identity to validate</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public Task Validate(LegalIdentity Identity, IdentityValidationEventHandler Callback, object State)
+		public Task Validate(LegalIdentity Identity, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
 			return this.Validate(Identity, true, Callback, State);
 		}
@@ -1451,7 +1452,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task Validate(LegalIdentity Identity, bool ValidateState, IdentityValidationEventHandler Callback, object State)
+		public async Task Validate(LegalIdentity Identity, bool ValidateState, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
 			if (Identity is null)
 			{
@@ -1559,7 +1560,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
+						await this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
 						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State);
 						return;
 					}
@@ -1689,7 +1690,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return null;
 		}
 
-		private async Task ReturnStatus(IdentityStatus Status, IdentityValidationEventHandler Callback, object State)
+		private async Task ReturnStatus(IdentityStatus Status, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
 			if (!(Callback is null))
 			{
@@ -1759,13 +1760,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!this.IsFromTrustProvider(Identity.Id, e.From))
 			{
-				this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
+				await this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
 				return;
 			}
 
 			if (string.Compare(e.FromBareJID, Identity.Provider, true) != 0)
 			{
-				this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
+				await this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
 				return;
 			}
 
@@ -1773,7 +1774,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (e2.Status != IdentityStatus.Valid)
 				{
-					this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
+					await this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
 
 					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 						new KeyValuePair<string, object>("Status", e2.Status));
@@ -1782,19 +1783,8 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 
 				await this.UpdateSettings(Identity);
+				await this.IdentityUpdated.Raise(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
 
-				LegalIdentityEventHandler h = this.IdentityUpdated;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
-					}
-					catch (Exception ex)
-					{
-						this.client.Exception(ex);
-					}
-				}
 			}, null);
 		}
 
@@ -1957,7 +1947,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Event raised whenever the legal identity has been updated by the server.
 		/// The identity is validated before the event is raised. Invalid identities are discarded.
 		/// </summary>
-		public event LegalIdentityEventHandler IdentityUpdated = null;
+		public event EventHandlerAsync<LegalIdentityEventArgs> IdentityUpdated = null;
 
 		#endregion
 
@@ -1968,9 +1958,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void GetLegalIdentities(LegalIdentitiesEventHandler Callback, object State)
+		public Task GetLegalIdentities(EventHandlerAsync<LegalIdentitiesEventArgs> Callback, object State)
 		{
-			this.GetLegalIdentities(this.componentAddress, Callback, State);
+			return this.GetLegalIdentities(this.componentAddress, Callback, State);
 		}
 
 		/// <summary>
@@ -1979,16 +1969,16 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity on which the legal identities are registered.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void GetLegalIdentities(string Address, LegalIdentitiesEventHandler Callback, object State)
+		public Task GetLegalIdentities(string Address, EventHandlerAsync<LegalIdentitiesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getLegalIdentities xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>",
+			return this.client.SendIqGet(Address, "<getLegalIdentities xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>",
 				this.IdentitiesResponse, new object[] { Callback, State });
 		}
 
 		private async Task IdentitiesResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			LegalIdentitiesEventHandler Callback = (LegalIdentitiesEventHandler)P[0];
+			EventHandlerAsync<LegalIdentitiesEventArgs> Callback = (EventHandlerAsync<LegalIdentitiesEventArgs>)P[0];
 			LegalIdentity[] Identities = null;
 			XmlElement E;
 
@@ -2026,11 +2016,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identities are registered.</param>
 		/// <returns>Set of legal identities registered on the account.</returns>
-		public Task<LegalIdentity[]> GetLegalIdentitiesAsync(string Address)
+		public async Task<LegalIdentity[]> GetLegalIdentitiesAsync(string Address)
 		{
 			TaskCompletionSource<LegalIdentity[]> Result = new TaskCompletionSource<LegalIdentity[]>();
 
-			this.GetLegalIdentities(Address, (sender, e) =>
+			await this.GetLegalIdentities(Address, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identities);
@@ -2041,7 +2031,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2054,9 +2044,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void GetLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		public Task GetLegalIdentity(string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
-			this.GetLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
+			return this.GetLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
 		}
 
 		/// <summary>
@@ -2080,9 +2070,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void GetLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		public Task GetLegalIdentity(string Address, string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+			return this.client.SendIqGet(Address, "<getLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
 				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 			{
 				LegalIdentity Identity = null;
@@ -2114,11 +2104,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="LegalIdentityId">ID of the legal identity to get.</param>
 		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
-		public Task<LegalIdentity> GetLegalIdentityAsync(string Address, string LegalIdentityId)
+		public async Task<LegalIdentity> GetLegalIdentityAsync(string Address, string LegalIdentityId)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.GetLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			await this.GetLegalIdentity(Address, LegalIdentityId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2129,7 +2119,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2142,9 +2132,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void ObsoleteLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		public Task ObsoleteLegalIdentity(string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
-			this.ObsoleteLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
+			return this.ObsoleteLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
 		}
 
 		/// <summary>
@@ -2154,11 +2144,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void ObsoleteLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		public Task ObsoleteLegalIdentity(string Address, string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
-			this.client.SendIqSet(Address, "<obsoleteLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+			return this.client.SendIqSet(Address, "<obsoleteLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
 				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 				{
 					LegalIdentity Identity = null;
@@ -2193,11 +2183,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="LegalIdentityId">ID of the legal identity to obsolete.</param>
 		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
-		public Task<LegalIdentity> ObsoleteLegalIdentityAsync(string Address, string LegalIdentityId)
+		public async Task<LegalIdentity> ObsoleteLegalIdentityAsync(string Address, string LegalIdentityId)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.ObsoleteLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			await this.ObsoleteLegalIdentity(Address, LegalIdentityId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2208,7 +2198,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2221,9 +2211,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void CompromisedLegalIdentity(string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		public Task CompromisedLegalIdentity(string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
-			this.CompromisedLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
+			return this.CompromisedLegalIdentity(this.GetTrustProvider(LegalIdentityId), LegalIdentityId, Callback, State);
 		}
 
 		/// <summary>
@@ -2233,11 +2223,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void CompromisedLegalIdentity(string Address, string LegalIdentityId, LegalIdentityEventHandler Callback, object State)
+		public Task CompromisedLegalIdentity(string Address, string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
-			this.client.SendIqSet(Address, "<compromisedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
+			return this.client.SendIqSet(Address, "<compromisedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
 				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
 				{
 					LegalIdentity Identity = null;
@@ -2272,11 +2262,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
 		/// <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
-		public Task<LegalIdentity> CompromisedLegalIdentityAsync(string Address, string LegalIdentityId)
+		public async Task<LegalIdentity> CompromisedLegalIdentityAsync(string Address, string LegalIdentityId)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.CompromisedLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			await this.CompromisedLegalIdentity(Address, LegalIdentityId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2287,7 +2277,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2301,7 +2291,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task Sign(byte[] Data, SignWith SignWith, SignatureEventHandler Callback, object State)
+		public Task Sign(byte[] Data, SignWith SignWith, EventHandlerAsync<SignatureEventArgs> Callback, object State)
 		{
 			return this.Sign(this.componentAddress, Data, SignWith, Callback, State);
 		}
@@ -2314,7 +2304,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public async Task Sign(string Address, byte[] Data, SignWith SignWith, SignatureEventHandler Callback, object State)
+		public async Task Sign(string Address, byte[] Data, SignWith SignWith, EventHandlerAsync<SignatureEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
@@ -2401,7 +2391,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task Sign(Stream Data, SignWith SignWith, SignatureEventHandler Callback, object State)
+		public Task Sign(Stream Data, SignWith SignWith, EventHandlerAsync<SignatureEventArgs> Callback, object State)
 		{
 			return this.Sign(this.componentAddress, Data, SignWith, Callback, State);
 		}
@@ -2414,7 +2404,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public async Task Sign(string Address, Stream Data, SignWith SignWith, SignatureEventHandler Callback, object State)
+		public async Task Sign(string Address, Stream Data, SignWith SignWith, EventHandlerAsync<SignatureEventArgs> Callback, object State)
 		{
 			this.AssertAllowed();
 
@@ -2490,9 +2480,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Digital signature of data</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void ValidateSignature(string LegalId, byte[] Data, byte[] Signature, LegalIdentityEventHandler Callback, object State)
+		public Task ValidateSignature(string LegalId, byte[] Data, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
-			this.ValidateSignature(this.GetTrustProvider(LegalId), LegalId, Data, Signature, Callback, State);
+			return this.ValidateSignature(this.GetTrustProvider(LegalId), LegalId, Data, Signature, Callback, State);
 		}
 
 		/// <summary>
@@ -2504,7 +2494,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Digital signature of data</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature, LegalIdentityEventHandler Callback, object State)
+		public Task ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2524,7 +2514,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("\"/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -2559,11 +2549,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <returns>Legal identity object.</returns>
-		public Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] Signature)
+		public async Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] Signature)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.ValidateSignature(Address, LegalId, Data, Signature, (sender, e) =>
+			await this.ValidateSignature(Address, LegalId, Data, Signature, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2574,7 +2564,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2603,7 +2593,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public Task CreateContract(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
 			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
-			SmartContractEventHandler Callback, object State)
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			return this.CreateContract(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode,
 				Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, Callback, State);
@@ -2632,7 +2622,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public Task CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
 			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
-			SmartContractEventHandler Callback, object State)
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			return this.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters,
 				Visibility, PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter,
@@ -2663,7 +2653,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
 			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
-			IParameterEncryptionAlgorithm Algorithm, SmartContractEventHandler Callback, object State)
+			IParameterEncryptionAlgorithm Algorithm, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2722,13 +2712,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</createContract>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State, Contract.HasEncryptedParameters, Algorithm?.Algorithm, Algorithm?.Key });
+			await this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State, Contract.HasEncryptedParameters, Algorithm?.Algorithm, Algorithm?.Key });
 		}
 
 		private async Task ContractResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			SmartContractEventHandler Callback = (SmartContractEventHandler)P[0];
+			EventHandlerAsync<SmartContractEventArgs> Callback = (EventHandlerAsync<SmartContractEventArgs>)P[0];
 			Contract Contract = null;
 			XmlElement E;
 
@@ -2830,13 +2820,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <returns>Contract.</returns>
-		public Task<Contract> CreateContractAsync(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
+		public async Task<Contract> CreateContractAsync(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
 			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
 			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration,
+			await this.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration,
 				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
 			{
 				if (e.Ok)
@@ -2848,7 +2838,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2874,9 +2864,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public Task CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
 			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
-			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
+			DateTime? SignBefore, bool CanActAsTemplate, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
-			return this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration, 
+			return this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration,
 				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, null, Callback, State);
 		}
 
@@ -2900,9 +2890,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public Task CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
 			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
-			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
+			DateTime? SignBefore, bool CanActAsTemplate, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
-			return this. CreateContract(Address, TemplateId, Parts, Parameters, Visibility,
+			return this.CreateContract(Address, TemplateId, Parts, Parameters, Visibility,
 				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter,
 				SignBefore, CanActAsTemplate, null, Callback, State);
 		}
@@ -2930,7 +2920,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
 			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate, IParameterEncryptionAlgorithm Algorithm,
-			SmartContractEventHandler Callback, object State)
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 			uint i, c = (uint)(Parameters?.Length ?? 0);
@@ -2964,7 +2954,7 @@ namespace Waher.Networking.XMPP.Contracts
 						P.ProtectedValue = Algorithm.Encrypt(P.Name, P.ParameterType, i, this.client.BareJID, Nonce, P.ObjectValue is null ? null : P.StringValue);
 				}
 			}
-			
+
 			Xml.Append("<createContract xmlns=\"");
 			Xml.Append(NamespaceSmartContractsCurrent);
 			Xml.Append("\"><template archiveOpt=\"");
@@ -3069,7 +3059,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</createContract>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State, HasEncryptedParameters, Algorithm?.Algorithm, Algorithm?.Key });
+			await this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State, HasEncryptedParameters, Algorithm?.Algorithm, Algorithm?.Key });
 		}
 
 		/// <summary>
@@ -3113,13 +3103,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="SignBefore">Signatures will only be accepted until this point in time, if provided.</param>
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <returns>Contract.</returns>
-		public Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
+		public async Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
 			ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional,
 			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.CreateContract(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration,
+			await this.CreateContract(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration,
 				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
 				{
 					if (e.Ok)
@@ -3131,7 +3121,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3143,9 +3133,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContractReferences(IdReferencesEventHandler Callback, object State)
+		public Task GetCreatedContractReferences(EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
-			this.GetCreatedContractReferences(this.componentAddress, 0, int.MaxValue, Callback, State);
+			return this.GetCreatedContractReferences(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3154,9 +3144,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContractReferences(string Address, IdReferencesEventHandler Callback, object State)
+		public Task GetCreatedContractReferences(string Address, EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
-			this.GetCreatedContractReferences(Address, 0, int.MaxValue, Callback, State);
+			return this.GetCreatedContractReferences(Address, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3166,9 +3156,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContractReferences(int Offset, int MaxCount, IdReferencesEventHandler Callback, object State)
+		public Task GetCreatedContractReferences(int Offset, int MaxCount, EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
-			this.GetCreatedContractReferences(this.componentAddress, Offset, MaxCount, Callback, State);
+			return this.GetCreatedContractReferences(this.componentAddress, Offset, MaxCount, Callback, State);
 		}
 
 		/// <summary>
@@ -3179,7 +3169,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContractReferences(string Address, int Offset, int MaxCount, IdReferencesEventHandler Callback, object State)
+		public Task GetCreatedContractReferences(string Address, int Offset, int MaxCount, EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
 			if (Offset < 0)
 				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
@@ -3206,13 +3196,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.IdReferencesResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.IdReferencesResponse, new object[] { Callback, State });
 		}
 
 		private async Task IdReferencesResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			IdReferencesEventHandler Callback = (IdReferencesEventHandler)P[0];
+			EventHandlerAsync<IdReferencesEventArgs> Callback = (EventHandlerAsync<IdReferencesEventArgs>)P[0];
 			XmlElement E = e.FirstElement;
 			List<string> IDs = new List<string>();
 
@@ -3272,11 +3262,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <returns>Contract IDs</returns>
-		public Task<string[]> GetCreatedContractReferencesAsync(string Address, int Offset, int MaxCount)
+		public async Task<string[]> GetCreatedContractReferencesAsync(string Address, int Offset, int MaxCount)
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
 
-			this.GetCreatedContractReferences(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetCreatedContractReferences(Address, Offset, MaxCount, (sender, e) =>
 				{
 					if (e.Ok)
 						Result.SetResult(e.References);
@@ -3287,7 +3277,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3299,9 +3289,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContracts(ContractsEventHandler Callback, object State)
+		public Task GetCreatedContracts(EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
-			this.GetCreatedContracts(this.componentAddress, 0, int.MaxValue, Callback, State);
+			return this.GetCreatedContracts(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3310,9 +3300,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContracts(string Address, ContractsEventHandler Callback, object State)
+		public Task GetCreatedContracts(string Address, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
-			this.GetCreatedContracts(Address, 0, int.MaxValue, Callback, State);
+			return this.GetCreatedContracts(Address, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3322,9 +3312,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContracts(int Offset, int MaxCount, ContractsEventHandler Callback, object State)
+		public Task GetCreatedContracts(int Offset, int MaxCount, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
-			this.GetCreatedContracts(this.componentAddress, Offset, MaxCount, Callback, State);
+			return this.GetCreatedContracts(this.componentAddress, Offset, MaxCount, Callback, State);
 		}
 
 		/// <summary>
@@ -3335,7 +3325,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContracts(string Address, int Offset, int MaxCount, ContractsEventHandler Callback, object State)
+		public Task GetCreatedContracts(string Address, int Offset, int MaxCount, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
 			if (Offset < 0)
 				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
@@ -3362,13 +3352,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
 		}
 
 		private async Task ContractsResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			ContractsEventHandler Callback = (ContractsEventHandler)P[0];
+			EventHandlerAsync<ContractsEventArgs> Callback = (EventHandlerAsync<ContractsEventArgs>)P[0];
 			XmlElement E = e.FirstElement;
 			List<Contract> Contracts = new List<Contract>();
 			List<string> References = new List<string>();
@@ -3441,18 +3431,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <returns>Response with results.</returns>
-		public Task<ContractsEventArgs> GetCreatedContractsAsync(string Address, int Offset, int MaxCount)
+		public async Task<ContractsEventArgs> GetCreatedContractsAsync(string Address, int Offset, int MaxCount)
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			this.GetCreatedContracts(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetCreatedContracts(Address, Offset, MaxCount, (sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3469,7 +3459,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task SignContract(Contract Contract, string Role, bool Transferable, SmartContractEventHandler Callback, object State)
+		public Task SignContract(Contract Contract, string Role, bool Transferable, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			return this.SignContract(this.GetTrustProvider(Contract.ContractId), Contract, Role, Transferable, Callback, State);
 		}
@@ -3486,7 +3476,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public async Task SignContract(string Address, Contract Contract, string Role, bool Transferable,
-			SmartContractEventHandler Callback, object State)
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			if (Contract.HasEncryptedParameters)
 			{
@@ -3523,7 +3513,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(Convert.ToBase64String(e.Signature));
 					Xml.Append("'/>");
 
-					this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+					await this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 				}
 				else if (!(Callback is null))
 					await Callback(this, new SmartContractEventArgs(e, null));
@@ -3581,9 +3571,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContractReferences(IdReferencesEventHandler Callback, object State)
+		public Task GetSignedContractReferences(EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
-			this.GetSignedContractReferences(this.componentAddress, 0, int.MaxValue, Callback, State);
+			return this.GetSignedContractReferences(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3592,9 +3582,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContractReferences(string Address, IdReferencesEventHandler Callback, object State)
+		public Task GetSignedContractReferences(string Address, EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
-			this.GetSignedContractReferences(Address, 0, int.MaxValue, Callback, State);
+			return this.GetSignedContractReferences(Address, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3605,7 +3595,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContractReferences(string Address, int Offset, int MaxCount, IdReferencesEventHandler Callback, object State)
+		public Task GetSignedContractReferences(string Address, int Offset, int MaxCount, EventHandlerAsync<IdReferencesEventArgs> Callback, object State)
 		{
 			if (Offset < 0)
 				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
@@ -3632,7 +3622,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.IdReferencesResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.IdReferencesResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -3662,11 +3652,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <returns>Contract IDs</returns>
-		public Task<string[]> GetSignedContractReferencesAsync(string Address, int Offset, int MaxCount)
+		public async Task<string[]> GetSignedContractReferencesAsync(string Address, int Offset, int MaxCount)
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
 
-			this.GetSignedContractReferences(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetSignedContractReferences(Address, Offset, MaxCount, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.References);
@@ -3677,7 +3667,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3689,9 +3679,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContracts(ContractsEventHandler Callback, object State)
+		public Task GetSignedContracts(EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
-			this.GetSignedContracts(this.componentAddress, 0, int.MaxValue, Callback, State);
+			return this.GetSignedContracts(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3700,9 +3690,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContracts(string Address, ContractsEventHandler Callback, object State)
+		public Task GetSignedContracts(string Address, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
-			this.GetSignedContracts(Address, 0, int.MaxValue, Callback, State);
+			return this.GetSignedContracts(Address, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -3712,9 +3702,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContracts(int Offset, int MaxCount, ContractsEventHandler Callback, object State)
+		public Task GetSignedContracts(int Offset, int MaxCount, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
-			this.GetSignedContracts(this.componentAddress, Offset, MaxCount, Callback, State);
+			return this.GetSignedContracts(this.componentAddress, Offset, MaxCount, Callback, State);
 		}
 
 		/// <summary>
@@ -3725,7 +3715,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContracts(string Address, int Offset, int MaxCount, ContractsEventHandler Callback, object State)
+		public Task GetSignedContracts(string Address, int Offset, int MaxCount, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
 			if (Offset < 0)
 				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
@@ -3752,7 +3742,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -3782,42 +3772,37 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <returns>Response with results.</returns>
-		public Task<ContractsEventArgs> GetSignedContractsAsync(string Address, int Offset, int MaxCount)
+		public async Task<ContractsEventArgs> GetSignedContractsAsync(string Address, int Offset, int MaxCount)
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			this.GetSignedContracts(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetSignedContracts(Address, Offset, MaxCount, (sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
 
 		#region Contract Signature event
 
-		private async Task ContractSignedMessageHandler(object Sender, MessageEventArgs e)
+		private Task ContractSignedMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractSignedEventHandler h = this.ContractSigned;
+			string ContractId = XML.Attribute(e.Content, "contractId");
+			string LegalId = XML.Attribute(e.Content, "legalId");
+			string Role = XML.Attribute(e.Content, "role");
 
-			if (!(h is null))
-			{
-				string ContractId = XML.Attribute(e.Content, "contractId");
-				string LegalId = XML.Attribute(e.Content, "legalId");
-				string Role = XML.Attribute(e.Content, "role");
-
-				await h(this, new ContractSignedEventArgs(ContractId, LegalId, Role));
-			}
+			return this.ContractSigned.Raise(this, new ContractSignedEventArgs(ContractId, LegalId, Role));
 		}
 
 		/// <summary>
 		/// Event raised whenever a contract has been signed.
 		/// </summary>
-		public event ContractSignedEventHandler ContractSigned = null;
+		public event EventHandlerAsync<ContractSignedEventArgs> ContractSigned = null;
 
 		#endregion
 
@@ -3829,9 +3814,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContract(string ContractId, SmartContractEventHandler Callback, object State)
+		public Task GetContract(string ContractId, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
-			this.GetContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
+			return this.GetContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -3841,7 +3826,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContract(string Address, string ContractId, SmartContractEventHandler Callback, object State)
+		public Task GetContract(string Address, string ContractId, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3851,7 +3836,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -3870,11 +3855,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to get.</param>
 		/// <returns>Contract</returns>
-		public Task<Contract> GetContractAsync(string Address, string ContractId)
+		public async Task<Contract> GetContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.GetContract(Address, ContractId, (sender, e) =>
+			await this.GetContract(Address, ContractId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -3885,7 +3870,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -3898,7 +3883,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractIds">IDs of contracts to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContracts(string[] ContractIds, ContractsEventHandler Callback, object State)
+		public async Task GetContracts(string[] ContractIds, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
 			Dictionary<string, List<string>> ByTrustProvider = new Dictionary<string, List<string>>();
 			string LastTrustProvider = string.Empty;
@@ -3929,7 +3914,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (KeyValuePair<string, List<string>> P in ByTrustProvider)
 			{
-				this.GetContracts(P.Key, P.Value.ToArray(), (sender, e) =>
+				await this.GetContracts(P.Key, P.Value.ToArray(), async (sender, e) =>
 				{
 					lock (Contracts)
 					{
@@ -3943,27 +3928,16 @@ namespace Waher.Networking.XMPP.Contracts
 
 						NrLeft--;
 						if (NrLeft > 0)
-							return Task.CompletedTask;
+							return;
 					}
 
-					if (!(Callback is null))
+					ContractsEventArgs e2 = new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray())
 					{
-						try
-						{
-							ContractsEventArgs e2 = new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray())
-							{
-								Ok = Ok
-							};
+						Ok = Ok
+					};
 
-							Callback(this, e2);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await Callback.Raise(this, e2);
 
-					return Task.CompletedTask;
 				}, State);
 			}
 		}
@@ -3975,7 +3949,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractIds">IDs of contracts to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContracts(string Address, string[] ContractIds, ContractsEventHandler Callback, object State)
+		public Task GetContracts(string Address, string[] ContractIds, EventHandlerAsync<ContractsEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3992,7 +3966,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</getContracts>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -4000,18 +3974,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="ContractIds">IDs of contracts to get.</param>
 		/// <returns>Contract</returns>
-		public Task<ContractsEventArgs> GetContractsAsync(string[] ContractIds)
+		public async Task<ContractsEventArgs> GetContractsAsync(string[] ContractIds)
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			this.GetContracts(ContractIds, (sender, e) =>
+			await this.GetContracts(ContractIds, (sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -4020,18 +3994,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractIds">IDs of contracts to get.</param>
 		/// <returns>Contracts that could be retrieved, and references for the IDs that could not be retrieved.</returns>
-		public Task<ContractsEventArgs> GetContractsAsync(string Address, string[] ContractIds)
+		public async Task<ContractsEventArgs> GetContractsAsync(string Address, string[] ContractIds)
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			this.GetContracts(Address, ContractIds, (sender, e) =>
+			await this.GetContracts(Address, ContractIds, (sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -4044,9 +4018,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to obsolete.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void ObsoleteContract(string ContractId, SmartContractEventHandler Callback, object State)
+		public Task ObsoleteContract(string ContractId, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
-			this.ObsoleteContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
+			return this.ObsoleteContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -4056,8 +4030,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to obsolete.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void ObsoleteContract(string Address, string ContractId,
-			SmartContractEventHandler Callback, object State)
+		public Task ObsoleteContract(string Address, string ContractId,
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -4067,7 +4041,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+			return this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -4086,11 +4060,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to obsolete.</param>
 		/// <returns>Contract</returns>
-		public Task<Contract> ObsoleteContractAsync(string Address, string ContractId)
+		public async Task<Contract> ObsoleteContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.ObsoleteContract(Address, ContractId, (sender, e) =>
+			await this.ObsoleteContract(Address, ContractId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -4101,7 +4075,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -4114,9 +4088,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to delete.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void DeleteContract(string ContractId, SmartContractEventHandler Callback, object State)
+		public Task DeleteContract(string ContractId, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
-			this.DeleteContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
+			return this.DeleteContract(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -4126,8 +4100,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of contract to delete.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void DeleteContract(string Address, string ContractId,
-			SmartContractEventHandler Callback, object State)
+		public Task DeleteContract(string Address, string ContractId,
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -4137,7 +4111,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+			return this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -4156,11 +4130,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">ID of contract to delete.</param>
 		/// <returns>Contract</returns>
-		public Task<Contract> DeleteContractAsync(string Address, string ContractId)
+		public async Task<Contract> DeleteContractAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.DeleteContract(Address, ContractId, (sender, e) =>
+			await this.DeleteContract(Address, ContractId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -4171,80 +4145,65 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
 
 		#region Contract Created event
 
-		private async Task ContractCreatedMessageHandler(object Sender, MessageEventArgs e)
+		private Task ContractCreatedMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractReferenceEventHandler h = this.ContractCreated;
+			string ContractId = XML.Attribute(e.Content, "contractId");
 
-			if (!(h is null))
-			{
-				string ContractId = XML.Attribute(e.Content, "contractId");
+			if (!this.IsFromTrustProvider(ContractId, e.From))
+				return Task.CompletedTask;
 
-				if (!this.IsFromTrustProvider(ContractId, e.From))
-					return;
-
-				await h(this, new ContractReferenceEventArgs(ContractId));
-			}
+			return this.ContractCreated.Raise(this, new ContractReferenceEventArgs(ContractId));
 		}
 
 		/// <summary>
 		/// Event raised whenever a contract has been created.
 		/// </summary>
-		public event ContractReferenceEventHandler ContractCreated = null;
+		public event EventHandlerAsync<ContractReferenceEventArgs> ContractCreated = null;
 
 		#endregion
 
 		#region Contract Updated event
 
-		private async Task ContractUpdatedMessageHandler(object Sender, MessageEventArgs e)
+		private Task ContractUpdatedMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractReferenceEventHandler h = this.ContractUpdated;
+			string ContractId = XML.Attribute(e.Content, "contractId");
 
-			if (!(h is null))
-			{
-				string ContractId = XML.Attribute(e.Content, "contractId");
+			if (!this.IsFromTrustProvider(ContractId, e.From))
+				return Task.CompletedTask;
 
-				if (!this.IsFromTrustProvider(ContractId, e.From))
-					return;
-
-				await h(this, new ContractReferenceEventArgs(ContractId));
-			}
+			return this.ContractUpdated.Raise(this, new ContractReferenceEventArgs(ContractId));
 		}
 
 		/// <summary>
 		/// Event raised whenever a contract has been updated.
 		/// </summary>
-		public event ContractReferenceEventHandler ContractUpdated = null;
+		public event EventHandlerAsync<ContractReferenceEventArgs> ContractUpdated = null;
 
 		#endregion
 
 		#region Contract Deleted event
 
-		private async Task ContractDeletedMessageHandler(object Sender, MessageEventArgs e)
+		private Task ContractDeletedMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractReferenceEventHandler h = this.ContractDeleted;
+			string ContractId = XML.Attribute(e.Content, "contractId");
 
-			if (!(h is null))
-			{
-				string ContractId = XML.Attribute(e.Content, "contractId");
+			if (!this.IsFromTrustProvider(ContractId, e.From))
+				return Task.CompletedTask;
 
-				if (!this.IsFromTrustProvider(ContractId, e.From))
-					return;
-
-				await h(this, new ContractReferenceEventArgs(ContractId));
-			}
+			return this.ContractDeleted.Raise(this, new ContractReferenceEventArgs(ContractId));
 		}
 
 		/// <summary>
 		/// Event raised whenever a contract has been deleted.
 		/// </summary>
-		public event ContractReferenceEventHandler ContractDeleted = null;
+		public event EventHandlerAsync<ContractReferenceEventArgs> ContractDeleted = null;
 
 		#endregion
 
@@ -4256,7 +4215,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Contract">Contract to update.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task UpdateContract(Contract Contract, SmartContractEventHandler Callback, object State)
+		public Task UpdateContract(Contract Contract, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			return this.UpdateContract(this.GetTrustProvider(Contract.ContractId), Contract, Callback, State);
 		}
@@ -4269,11 +4228,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public async Task UpdateContract(string Address, Contract Contract,
-			SmartContractEventHandler Callback, object State)
+			EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			if (Contract.HasEncryptedParameters)
 			{
-				Tuple<SymmetricCipherAlgorithms, string, byte[]> KeyInfo = 
+				Tuple<SymmetricCipherAlgorithms, string, byte[]> KeyInfo =
 					await this.TryLoadContractSharedSecret(Contract.ContractId);
 
 				if (!(KeyInfo is null))
@@ -4295,7 +4254,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</updateContract>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
+			await this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -4342,7 +4301,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Contract">Contract to validate</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public Task Validate(Contract Contract, ContractValidationEventHandler Callback, object State)
+		public Task Validate(Contract Contract, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
 			return this.Validate(Contract, true, Callback, State);
 		}
@@ -4354,7 +4313,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task Validate(Contract Contract, bool ValidateState, ContractValidationEventHandler Callback, object State)
+		public async Task Validate(Contract Contract, bool ValidateState, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
 			if (Contract is null)
 			{
@@ -4546,7 +4505,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					SchemaDigest = null;
 
-				this.GetSchema(ContractComponent, Namespace, SchemaDigest, (_, e) =>
+				await this.GetSchema(ContractComponent, Namespace, SchemaDigest, (_, e) =>
 				{
 					if (e.Ok)
 					{
@@ -4777,7 +4736,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
 
-		private async Task ReturnStatus(ContractStatus Status, ContractValidationEventHandler Callback, object State)
+		private async Task ReturnStatus(ContractStatus Status, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
 			if (!(Callback is null))
 			{
@@ -4872,13 +4831,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ReferenceId">Reference ID</param>
 		/// <param name="SignatoryId">ID used for signature</param>
 		/// <returns>If the Signatory ID can be used to sign for the reference ID.</returns>
-		public Task<bool> CanSignAs(CaseInsensitiveString ReferenceId, CaseInsensitiveString SignatoryId)
+		public async Task<bool> CanSignAs(CaseInsensitiveString ReferenceId, CaseInsensitiveString SignatoryId)
 		{
 			string ReferenceDomain = XmppClient.GetDomain(ReferenceId);
 			string SignatoryDomain = XmppClient.GetDomain(SignatoryId);
 
 			if (ReferenceDomain != SignatoryDomain)
-				return Task.FromResult(false);
+				return false;
 
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			StringBuilder Xml = new StringBuilder();
@@ -4891,13 +4850,13 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(SignatoryId));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(ReferenceDomain, Xml.ToString(), (_, e) =>
+			await this.client.SendIqGet(ReferenceDomain, Xml.ToString(), (_, e) =>
 			{
 				Result.TrySetResult(e.Ok);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -4932,12 +4891,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (!(T is null))
 				{
-					this.SendContractProposal(Contract.ContractId, Role, To, Message, T.Item3, T.Item1);
+					await this.SendContractProposal(Contract.ContractId, Role, To, Message, T.Item3, T.Item1);
 					return;
 				}
 			}
-				
-			this.SendContractProposal(Contract.ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
+
+			await this.SendContractProposal(Contract.ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
 		}
 
 		/// <summary>
@@ -4946,9 +4905,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">ID of proposed contract.</param>
 		/// <param name="Role">Proposed role of recipient.</param>
 		/// <param name="To">Recipient Address (Bare or Full JID).</param>
-		public void SendContractProposal(string ContractId, string Role, string To)
+		public Task SendContractProposal(string ContractId, string Role, string To)
 		{
-			this.SendContractProposal(ContractId, Role, To, string.Empty);
+			return this.SendContractProposal(ContractId, Role, To, string.Empty);
 		}
 
 		/// <summary>
@@ -4958,9 +4917,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Role">Proposed role of recipient.</param>
 		/// <param name="To">Recipient Address (Bare or Full JID).</param>
 		/// <param name="Message">Optional message included in message.</param>
-		public void SendContractProposal(string ContractId, string Role, string To, string Message)
+		public Task SendContractProposal(string ContractId, string Role, string To, string Message)
 		{
-			this.SendContractProposal(ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
+			return this.SendContractProposal(ContractId, Role, To, Message, null, SymmetricCipherAlgorithms.Aes256);
 		}
 
 		/// <summary>
@@ -4972,7 +4931,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Message">Optional message included in message.</param>
 		/// <param name="Key">Key used to protect confidential parameters in contract.</param>
 		/// <param name="KeyAlgorithm">Key algorithm used to protect confidential parameters in contract.</param>
-		public void SendContractProposal(string ContractId, string Role, string To, string Message, byte[] Key,
+		public async Task SendContractProposal(string ContractId, string Role, string To, string Message, byte[] Key,
 			SymmetricCipherAlgorithms KeyAlgorithm)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -4998,12 +4957,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 				if (this.localE2eEndpoint is null)
 				{
-					this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+					await this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
 						string.Empty, string.Empty);
 				}
 				else
 				{
-					this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+					await this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
 						string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}
 			}
@@ -5046,77 +5005,66 @@ namespace Waher.Networking.XMPP.Contracts
 						throw new ArgumentException("Recipient not online.", nameof(To));
 				}
 
-				this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.AssertE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+				await this.localE2eEndpoint.SendMessage(this.client, E2ETransmission.AssertE2E, QoSLevel.Unacknowledged, MessageType.Normal,
 					string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 			}
 		}
 
 		private async Task ContractProposalMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractProposalEventHandler h = this.ContractProposalReceived;
-			if (!(h is null))
+			string ContractId = XML.Attribute(e.Content, "contractId");
+			string Role = XML.Attribute(e.Content, "role");
+			string Message = XML.Attribute(e.Content, "message");
+			byte[] Key = null;
+			SymmetricCipherAlgorithms KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
+
+			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				string ContractId = XML.Attribute(e.Content, "contractId");
-				string Role = XML.Attribute(e.Content, "role");
-				string Message = XML.Attribute(e.Content, "message");
-				byte[] Key = null;
-				SymmetricCipherAlgorithms KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
-
-				foreach (XmlNode N in e.Content.ChildNodes)
+				if (N is XmlElement E && E.LocalName == "sharedSecret" && E.NamespaceURI == e.Content.NamespaceURI)
 				{
-					if (N is XmlElement E && E.LocalName == "sharedSecret" && E.NamespaceURI == e.Content.NamespaceURI)
+					if (!e.UsesE2eEncryption)
 					{
-						if (!e.UsesE2eEncryption)
-						{
-							this.client.Error("Confidential Proposal not sent using end-to-end encryption. Message discarded.");
+						await this.client.Error("Confidential Proposal not sent using end-to-end encryption. Message discarded.");
+						return;
+					}
+
+					try
+					{
+						Key = Convert.FromBase64String(XML.Attribute(E, "key"));
+					}
+					catch (Exception)
+					{
+						await this.client.Error("Invalid base64-encoded shared secret. Message discarded.");
+						return;
+					}
+
+					string Cipher = XML.Attribute(E, "algorithm");
+
+					switch (Cipher)
+					{
+						case "aes":
+							KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
+							break;
+
+						case "cha":
+							KeyAlgorithm = SymmetricCipherAlgorithms.ChaCha20;
+							break;
+
+						case "acp":
+							KeyAlgorithm = SymmetricCipherAlgorithms.AeadChaCha20Poly1305;
+							break;
+
+						default:
+							await this.client.Error("Unrecognized key algorithm. Message discarded.");
 							return;
-						}
-
-						try
-						{
-							Key = Convert.FromBase64String(XML.Attribute(E, "key"));
-						}
-						catch (Exception)
-						{
-							this.client.Error("Invalid base64-encoded shared secret. Message discarded.");
-							return;
-						}
-
-						string Cipher = XML.Attribute(E, "algorithm");
-
-						switch (Cipher)
-						{
-							case "aes":
-								KeyAlgorithm = SymmetricCipherAlgorithms.Aes256;
-								break;
-
-							case "cha":
-								KeyAlgorithm = SymmetricCipherAlgorithms.ChaCha20;
-								break;
-
-							case "acp":
-								KeyAlgorithm = SymmetricCipherAlgorithms.AeadChaCha20Poly1305;
-								break;
-
-							default:
-								this.client.Error("Unrecognized key algorithm. Message discarded.");
-								return;
-						}
 					}
 				}
-
-				try
-				{
-					if (!(Key is null))
-						await this.SaveContractSharedSecret(ContractId, e.FromBareJID, Key, KeyAlgorithm, true);
-
-					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message, Key, KeyAlgorithm));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
 			}
+
+			if (!(Key is null))
+				await this.SaveContractSharedSecret(ContractId, e.FromBareJID, Key, KeyAlgorithm, true);
+
+			await this.ContractProposalReceived.Raise(this, new ContractProposalEventArgs(e, ContractId, Role, Message, Key, KeyAlgorithm));
 		}
 
 		internal async Task<bool> SaveContractSharedSecret(string ContractId, string CreatorJid, byte[] Key,
@@ -5171,7 +5119,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Event raised when a new contract proposal has been received.
 		/// </summary>
-		public event ContractProposalEventHandler ContractProposalReceived = null;
+		public event EventHandlerAsync<ContractProposalEventArgs> ContractProposalReceived = null;
 
 		#endregion
 
@@ -5182,9 +5130,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSchemas(SchemaReferencesEventHandler Callback, object State)
+		public Task GetSchemas(EventHandlerAsync<SchemaReferencesEventArgs> Callback, object State)
 		{
-			this.GetSchemas(this.componentAddress, Callback, State);
+			return this.GetSchemas(this.componentAddress, Callback, State);
 		}
 
 		/// <summary>
@@ -5193,9 +5141,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSchemas(string Address, SchemaReferencesEventHandler Callback, object State)
+		public Task GetSchemas(string Address, EventHandlerAsync<SchemaReferencesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getSchemas xmlns='" + NamespaceSmartContractsCurrent + "'/>",
+			return this.client.SendIqGet(Address, "<getSchemas xmlns='" + NamespaceSmartContractsCurrent + "'/>",
 				async (sender, e) =>
 				{
 					XmlElement E = e.FirstElement;
@@ -5230,8 +5178,7 @@ namespace Waher.Networking.XMPP.Contracts
 					else
 						e.Ok = false;
 
-					if (!(Callback is null))
-						await Callback(this, new SchemaReferencesEventArgs(e, Schemas.ToArray()));
+					await Callback.Raise(this, new SchemaReferencesEventArgs(e, Schemas.ToArray()));
 
 				}, State);
 		}
@@ -5250,11 +5197,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <returns>XML Schema references.</returns>
-		public Task<SchemaReference[]> GetSchemasAsync(string Address)
+		public async Task<SchemaReference[]> GetSchemasAsync(string Address)
 		{
 			TaskCompletionSource<SchemaReference[]> Result = new TaskCompletionSource<SchemaReference[]>();
 
-			this.GetSchemas(Address, (sender, e) =>
+			await this.GetSchemas(Address, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.References);
@@ -5265,7 +5212,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -5278,9 +5225,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Namespace">Namespace of schema to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSchema(string Namespace, SchemaEventHandler Callback, object State)
+		public Task GetSchema(string Namespace, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
-			this.GetSchema(this.componentAddress, Namespace, null, Callback, State);
+			return this.GetSchema(this.componentAddress, Namespace, null, Callback, State);
 		}
 
 		/// <summary>
@@ -5290,9 +5237,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSchema(string Namespace, SchemaDigest Digest, SchemaEventHandler Callback, object State)
+		public Task GetSchema(string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
-			this.GetSchema(this.componentAddress, Namespace, Digest, Callback, State);
+			return this.GetSchema(this.componentAddress, Namespace, Digest, Callback, State);
 		}
 
 		/// <summary>
@@ -5302,9 +5249,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Namespace">Namespace of schema to get.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSchema(string Address, string Namespace, SchemaEventHandler Callback, object State)
+		public Task GetSchema(string Address, string Namespace, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
-			this.GetSchema(Address, Namespace, null, Callback, State);
+			return this.GetSchema(Address, Namespace, null, Callback, State);
 		}
 
 		/// <summary>
@@ -5315,7 +5262,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSchema(string Address, string Namespace, SchemaDigest Digest, SchemaEventHandler Callback, object State)
+		public Task GetSchema(string Address, string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -5335,7 +5282,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("</digest></getSchema>");
 			}
 
-			this.client.SendIqGet(Address, Xml.ToString(),
+			return this.client.SendIqGet(Address, Xml.ToString(),
 				async (sender, e) =>
 				{
 					XmlElement E = e.FirstElement;
@@ -5391,11 +5338,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Namespace">Namespace of schema to get.</param>
 		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
 		/// <returns>Binary XML schema.</returns>
-		public Task<byte[]> GetSchemaAsync(string Address, string Namespace, SchemaDigest Digest)
+		public async Task<byte[]> GetSchemaAsync(string Address, string Namespace, SchemaDigest Digest)
 		{
 			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
-			this.GetSchema(Address, Namespace, Digest, (sender, e) =>
+			await this.GetSchema(Address, Namespace, Digest, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Schema);
@@ -5406,7 +5353,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -5419,9 +5366,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContractLegalIdentities(string ContractId, LegalIdentitiesEventHandler Callback, object State)
+		public Task GetContractLegalIdentities(string ContractId, EventHandlerAsync<LegalIdentitiesEventArgs> Callback, object State)
 		{
-			this.GetContractLegalIdentities(this.GetTrustProvider(ContractId), ContractId, false, true, Callback, State);
+			return this.GetContractLegalIdentities(this.GetTrustProvider(ContractId), ContractId, false, true, Callback, State);
 		}
 
 		/// <summary>
@@ -5432,9 +5379,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContractLegalIdentities(string ContractId, bool Current, bool Historic, LegalIdentitiesEventHandler Callback, object State)
+		public Task GetContractLegalIdentities(string ContractId, bool Current, bool Historic, EventHandlerAsync<LegalIdentitiesEventArgs> Callback, object State)
 		{
-			this.GetContractLegalIdentities(this.GetTrustProvider(ContractId), ContractId, Current, Historic, Callback, State);
+			return this.GetContractLegalIdentities(this.GetTrustProvider(ContractId), ContractId, Current, Historic, Callback, State);
 		}
 
 		/// <summary>
@@ -5444,9 +5391,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">Get legal identities related to the contract identified by this identity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContractLegalIdentities(string Address, string ContractId, LegalIdentitiesEventHandler Callback, object State)
+		public Task GetContractLegalIdentities(string Address, string ContractId, EventHandlerAsync<LegalIdentitiesEventArgs> Callback, object State)
 		{
-			this.GetContractLegalIdentities(Address, ContractId, false, true, Callback, State);
+			return this.GetContractLegalIdentities(Address, ContractId, false, true, Callback, State);
 		}
 
 		/// <summary>
@@ -5458,7 +5405,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContractLegalIdentities(string Address, string ContractId, bool Current, bool Historic, LegalIdentitiesEventHandler Callback, object State)
+		public Task GetContractLegalIdentities(string Address, string ContractId, bool Current, bool Historic, EventHandlerAsync<LegalIdentitiesEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -5472,7 +5419,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(CommonTypes.Encode(Historic));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), this.IdentitiesResponse, new object[] { Callback, State });
+			return this.client.SendIqGet(Address, Xml.ToString(), this.IdentitiesResponse, new object[] { Callback, State });
 		}
 
 		/// <summary>
@@ -5516,11 +5463,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Current">If current legal identities are to be returned. (Default=false).</param>
 		/// <param name="Historic">If legal identities at the time of signature are to be returned. (Default=true).</param>
 		/// <returns>Legal identities.</returns>
-		public Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string Address, string ContractId, bool Current, bool Historic)
+		public async Task<LegalIdentity[]> GetContractLegalIdentitiesAsync(string Address, string ContractId, bool Current, bool Historic)
 		{
 			TaskCompletionSource<LegalIdentity[]> Result = new TaskCompletionSource<LegalIdentity[]>();
 
-			this.GetContractLegalIdentities(Address, ContractId, Current, Historic, (sender, e) =>
+			await this.GetContractLegalIdentities(Address, ContractId, Current, Historic, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identities);
@@ -5531,7 +5478,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -5544,9 +5491,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContractNetworkIdentities(string ContractId, NetworkIdentitiesEventHandler Callback, object State)
+		public Task GetContractNetworkIdentities(string ContractId, EventHandlerAsync<NetworkIdentitiesEventArgs> Callback, object State)
 		{
-			this.GetContractNetworkIdentities(this.GetTrustProvider(ContractId), ContractId, Callback, State);
+			return this.GetContractNetworkIdentities(this.GetTrustProvider(ContractId), ContractId, Callback, State);
 		}
 
 		/// <summary>
@@ -5556,7 +5503,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetContractNetworkIdentities(string Address, string ContractId, NetworkIdentitiesEventHandler Callback, object State)
+		public Task GetContractNetworkIdentities(string Address, string ContractId, EventHandlerAsync<NetworkIdentitiesEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -5566,7 +5513,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
 			{
 				NetworkIdentity[] Identities = null;
 				XmlElement E;
@@ -5612,11 +5559,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="ContractId">Get network identities related to the contract identified by this identity.</param>
 		/// <returns>Network identities.</returns>
-		public Task<NetworkIdentity[]> GetContractNetworkIdentitiesAsync(string Address, string ContractId)
+		public async Task<NetworkIdentity[]> GetContractNetworkIdentitiesAsync(string Address, string ContractId)
 		{
 			TaskCompletionSource<NetworkIdentity[]> Result = new TaskCompletionSource<NetworkIdentity[]>();
 
-			this.GetContractNetworkIdentities(Address, ContractId, (sender, e) =>
+			await this.GetContractNetworkIdentities(Address, ContractId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identities);
@@ -5627,7 +5574,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -5640,9 +5587,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Filter">Search filters.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		public Task Search(SearchFilter[] Filter, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
-			this.Search(this.componentAddress, 0, int.MaxValue, Filter, Callback, State);
+			return this.Search(this.componentAddress, 0, int.MaxValue, Filter, Callback, State);
 		}
 
 		/// <summary>
@@ -5652,9 +5599,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Filter">Search filters.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(string Address, SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		public Task Search(string Address, SearchFilter[] Filter, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
-			this.Search(Address, 0, int.MaxValue, Filter, Callback, State);
+			return this.Search(Address, 0, int.MaxValue, Filter, Callback, State);
 		}
 
 		/// <summary>
@@ -5665,9 +5612,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Filter">Search filters.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(int Offset, int MaxCount, SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		public Task Search(int Offset, int MaxCount, SearchFilter[] Filter, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
-			this.Search(this.componentAddress, Offset, MaxCount, Filter, Callback, State);
+			return this.Search(this.componentAddress, Offset, MaxCount, Filter, Callback, State);
 		}
 
 		/// <summary>
@@ -5679,7 +5626,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Filter">Search filters.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(string Address, int Offset, int MaxCount, SearchFilter[] Filter, SearchResultEventHandler Callback, object State)
+		public Task Search(string Address, int Offset, int MaxCount, SearchFilter[] Filter, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			if (Offset < 0)
 				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
@@ -5736,7 +5683,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</searchPublicContracts>");
 
-			this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<string> IDs = null;
@@ -5802,17 +5749,17 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
 		/// <param name="Filter">Search filters.</param>
-		public Task<SearchResultEventArgs> SearchAsync(string Address, int Offset, int MaxCount, SearchFilter[] Filter)
+		public async Task<SearchResultEventArgs> SearchAsync(string Address, int Offset, int MaxCount, SearchFilter[] Filter)
 		{
 			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
 
-			this.Search(Address, Offset, MaxCount, Filter, (sender, e) =>
+			await this.Search(Address, Offset, MaxCount, Filter, (sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -5985,108 +5932,82 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task PetitionIdentityMessageHandler(object Sender, MessageEventArgs e)
 		{
-			LegalIdentityPetitionEventHandler h = this.PetitionForIdentityReceived;
+			string LegalId = XML.Attribute(e.Content, "id");
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			string Purpose = XML.Attribute(e.Content, "purpose");
+			string From = XML.Attribute(e.Content, "from");
+			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
+			LegalIdentity Identity = null;
+			XmlElement Context = null;
 
-			if (!(h is null))
+			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				string LegalId = XML.Attribute(e.Content, "id");
-				string PetitionId = XML.Attribute(e.Content, "pid");
-				string Purpose = XML.Attribute(e.Content, "purpose");
-				string From = XML.Attribute(e.Content, "from");
-				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
-				LegalIdentity Identity = null;
-				XmlElement Context = null;
-
-				foreach (XmlNode N in e.Content.ChildNodes)
+				if (N is XmlElement E)
 				{
-					if (N is XmlElement E)
+					if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
+						Identity = LegalIdentity.Parse(E);
+					else if (!(Context is null))
+						return;
+					else
+						Context = E;
+				}
+			}
+
+			if (Identity is null)
+				return;
+
+			if (string.Compare(e.FromBareJID, this.componentAddress, true) == 0)
+			{
+				await this.Validate(Identity, false, async (sender2, e2) =>
+				{
+					if (e2.Status != IdentityStatus.Valid)
 					{
-						if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
-							Identity = LegalIdentity.Parse(E);
-						else if (!(Context is null))
-							return;
-						else
-							Context = E;
+						await this.client.Error("Invalid legal identity received and discarded.");
+
+						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+							new KeyValuePair<string, object>("Status", e2.Status));
+						return;
 					}
-				}
 
-				if (Identity is null)
-					return;
-
-				if (string.Compare(e.FromBareJID, this.componentAddress, true) == 0)
-				{
-					await this.Validate(Identity, false, async (sender2, e2) =>
-					{
-						if (e2.Status != IdentityStatus.Valid)
-						{
-							this.client.Error("Invalid legal identity received and discarded.");
-
-							Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-								new KeyValuePair<string, object>("Status", e2.Status));
-							return;
-						}
-
-						try
-						{
-							await h(this, new LegalIdentityPetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, ClientEndpoint, Context));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}, null);
-				}
+					await this.PetitionForIdentityReceived.Raise(this, new LegalIdentityPetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, ClientEndpoint, Context));
+				}, null);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when someone requests access to one of the legal identities owned by the client.
 		/// </summary>
-		public event LegalIdentityPetitionEventHandler PetitionForIdentityReceived = null;
+		public event EventHandlerAsync<LegalIdentityPetitionEventArgs> PetitionForIdentityReceived = null;
 
 		private async Task PetitionIdentityResponseMessageHandler(object Sender, MessageEventArgs e)
 		{
-			LegalIdentityPetitionResponseEventHandler h = this.PetitionedIdentityResponseReceived;
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			bool Response = XML.Attribute(e.Content, "response", false);
+			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
+			LegalIdentity Identity = null;
+			XmlElement Context = null;
 
-			if (!(h is null))
+			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				string PetitionId = XML.Attribute(e.Content, "pid");
-				bool Response = XML.Attribute(e.Content, "response", false);
-				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
-				LegalIdentity Identity = null;
-				XmlElement Context = null;
-
-				foreach (XmlNode N in e.Content.ChildNodes)
+				if (N is XmlElement E)
 				{
-					if (N is XmlElement E)
-					{
-						if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
-							Identity = LegalIdentity.Parse(E);
-						else if (!(Context is null))
-							return;
-						else
-							Context = E;
-					}
-				}
-
-				if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
-				{
-					try
-					{
-						await h(this, new LegalIdentityPetitionResponseEventArgs(e, Identity, PetitionId, Response, ClientEndpoint, Context));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
+						Identity = LegalIdentity.Parse(E);
+					else if (!(Context is null))
+						return;
+					else
+						Context = E;
 				}
 			}
+
+			if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
+				await this.PetitionedIdentityResponseReceived.Raise(this, new LegalIdentityPetitionResponseEventArgs(e, Identity, PetitionId, Response, ClientEndpoint, Context));
 		}
 
 		/// <summary>
 		/// Event raised when a response to an identity petition has been received by the client.
 		/// </summary>
-		public event LegalIdentityPetitionResponseEventHandler PetitionedIdentityResponseReceived = null;
+		public event EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> PetitionedIdentityResponseReceived = null;
 
 		#endregion
 
@@ -6373,38 +6294,29 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			SignaturePetitionEventHandler h = PeerReview ? this.PetitionForPeerReviewIDReceived : this.PetitionForSignatureReceived;
+			EventHandlerAsync<SignaturePetitionEventArgs> h = PeerReview ? this.PetitionForPeerReviewIDReceived : this.PetitionForSignatureReceived;
 
-			if (!(h is null))
+			await this.Validate(Identity, false, async (sender2, e2) =>
 			{
-				await this.Validate(Identity, false, async (sender2, e2) =>
+				if (e2.Status != IdentityStatus.Valid && e2.Status != IdentityStatus.NoProviderSignature)
 				{
-					if (e2.Status != IdentityStatus.Valid && e2.Status != IdentityStatus.NoProviderSignature)
-					{
-						this.client.Error("Invalid legal identity received and discarded.");
+					await this.client.Error("Invalid legal identity received and discarded.");
 
-						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-							new KeyValuePair<string, object>("Status", e2.Status));
+					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+						new KeyValuePair<string, object>("Status", e2.Status));
 
-						return;
-					}
+					return;
+				}
 
-					try
-					{
-						await h(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, Content, ClientEndpoint, Context));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}, null);
-			}
+				await h.Raise(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, Content, ClientEndpoint, Context));
+
+			}, null);
 		}
 
 		/// <summary>
 		/// Event raised when someone requests access to one of the legal identities owned by the client.
 		/// </summary>
-		public event SignaturePetitionEventHandler PetitionForSignatureReceived = null;
+		public event EventHandlerAsync<SignaturePetitionEventArgs> PetitionForSignatureReceived = null;
 
 		private async Task PetitionSignatureResponseMessageHandler(object Sender, MessageEventArgs e)
 		{
@@ -6443,71 +6355,61 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!this.contentPerPid.TryGetValue(PetitionId, out KeyValuePair<byte[], bool> P))
 			{
-				this.client.Warning("Petition ID not recognized: " + PetitionId + ".  Response ignored.");
+				await this.client.Warning("Petition ID not recognized: " + PetitionId + ".  Response ignored.");
 				return;
 			}
 
-			SignaturePetitionResponseEventHandler h = P.Value ? this.PetitionedPeerReviewIDResponseReceived : this.PetitionedSignatureResponseReceived;
+			EventHandlerAsync<SignaturePetitionResponseEventArgs> h = P.Value ? this.PetitionedPeerReviewIDResponseReceived : this.PetitionedSignatureResponseReceived;
 
-			if (!(h is null))
+			if (Response)
 			{
-				if (Response)
+				if (Identity is null)
 				{
-					if (Identity is null)
-					{
-						this.client.Warning("Identity missing. Response ignored.");
-						return;
-					}
-
-					if (Signature is null)
-					{
-						this.client.Warning("Signature missing. Response ignored.");
-						return;
-					}
-
-					bool? Result = this.ValidateSignature(Identity, P.Key, Signature);
-					if (!Result.HasValue)
-					{
-						this.client.Warning("Unable to validate signature. Response ignored.");
-						return;
-					}
-
-					if (!Result.Value)
-					{
-						this.client.Warning("Invalid signature. Response ignored.");
-						return;
-					}
+					await this.client.Warning("Identity missing. Response ignored.");
+					return;
 				}
 
-				if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
+				if (Signature is null)
 				{
-					try
-					{
-						this.Client.Information(h.Method.Name);
-
-						await h(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response, ClientEndpoint, Context));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-					finally
-					{
-						this.contentPerPid.Remove(PetitionId);
-					}
+					await this.client.Warning("Signature missing. Response ignored.");
+					return;
 				}
-				else
+
+				bool? Result = this.ValidateSignature(Identity, P.Key, Signature);
+				if (!Result.HasValue)
 				{
-					this.client.Warning("Sender invalid. Response ignored.");
+					await this.client.Warning("Unable to validate signature. Response ignored.");
+					return;
+				}
+
+				if (!Result.Value)
+				{
+					await this.client.Warning("Invalid signature. Response ignored.");
 					return;
 				}
 			}
+
+			if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
+			{
+				try
+				{
+					await this.Client.Information(h.Method.Name);
+
+					await h.Raise(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response, ClientEndpoint, Context));
+				}
+				finally
+				{
+					this.contentPerPid.Remove(PetitionId);
+				}
+			}
+			else
+				await this.client.Warning("Sender invalid. Response ignored.");
 		}
 
 		/// <summary>
 		/// Event raised when a response to a signature petition has been received by the client.
 		/// </summary>
-		public event SignaturePetitionResponseEventHandler PetitionedSignatureResponseReceived = null;
+		public event EventHandlerAsync<SignaturePetitionResponseEventArgs> PetitionedSignatureResponseReceived = null;
 
 		#endregion
 
@@ -6565,12 +6467,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Event raised when someone makes a request to one of the legal identities owned by the client, for a peer review of a newly created legal identity.
 		/// </summary>
-		public event SignaturePetitionEventHandler PetitionForPeerReviewIDReceived = null;
+		public event EventHandlerAsync<SignaturePetitionEventArgs> PetitionForPeerReviewIDReceived = null;
 
 		/// <summary>
 		/// Event raised when a response to a ID Peer Review petition has been received by the client.
 		/// </summary>
-		public event SignaturePetitionResponseEventHandler PetitionedPeerReviewIDResponseReceived = null;
+		public event EventHandlerAsync<SignaturePetitionResponseEventArgs> PetitionedPeerReviewIDResponseReceived = null;
 
 		/// <summary>
 		/// Adds an attachment to a legal identity with information about a peer review of the identity.
@@ -6783,112 +6685,87 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task PetitionContractMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractPetitionEventHandler h = this.PetitionForContractReceived;
+			string ContractId = XML.Attribute(e.Content, "id");
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			string Purpose = XML.Attribute(e.Content, "purpose");
+			string From = XML.Attribute(e.Content, "from");
+			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
+			int i = ContractId.IndexOf('@');
+			LegalIdentity Identity = null;
+			XmlElement Context = null;
 
-			if (!(h is null))
+			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				string ContractId = XML.Attribute(e.Content, "id");
-				string PetitionId = XML.Attribute(e.Content, "pid");
-				string Purpose = XML.Attribute(e.Content, "purpose");
-				string From = XML.Attribute(e.Content, "from");
-				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
-				int i = ContractId.IndexOf('@');
-				LegalIdentity Identity = null;
-				XmlElement Context = null;
+				if (!(N is XmlElement E))
+					continue;
 
-				foreach (XmlNode N in e.Content.ChildNodes)
+				if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
+					Identity = LegalIdentity.Parse(E);
+				else if (!(Context is null))
+					return;
+				else
+					Context = E;
+			}
+
+			if (Identity is null)
+				return;
+
+			if (!this.IsFromTrustProvider(ContractId, e.FromBareJID))
+				return;
+
+			await this.Validate(Identity, false, async (sender2, e2) =>
+			{
+				if (e2.Status != IdentityStatus.Valid)
 				{
-					if (!(N is XmlElement E))
-						continue;
+					await this.client.Error("Invalid identity received and discarded.");
 
-					if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
-						Identity = LegalIdentity.Parse(E);
-					else if (!(Context is null))
-						return;
-					else
-						Context = E;
+					Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
+						new KeyValuePair<string, object>("Status", e2.Status));
+					return;
 				}
 
-				if (Identity is null)
-					return;
+				await this.PetitionForContractReceived.Raise(this, new ContractPetitionEventArgs(e, Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint, Context));
 
-				if (!this.IsFromTrustProvider(ContractId, e.FromBareJID))
-					return;
-
-				await this.Validate(Identity, false, async (sender2, e2) =>
-				{
-					if (e2.Status != IdentityStatus.Valid)
-					{
-						this.client.Error("Invalid identity received and discarded.");
-
-						Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
-							new KeyValuePair<string, object>("Status", e2.Status));
-						return;
-					}
-
-					try
-					{
-						await h(this, new ContractPetitionEventArgs(e, Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint, Context));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}, null);
-			}
+			}, null);
 		}
 
 		/// <summary>
 		/// Event raised when someone requests access to a smart contract to which the client is part.
 		/// </summary>
-		public event ContractPetitionEventHandler PetitionForContractReceived = null;
+		public event EventHandlerAsync<ContractPetitionEventArgs> PetitionForContractReceived = null;
 
 		private async Task PetitionContractResponseMessageHandler(object Sender, MessageEventArgs e)
 		{
-			ContractPetitionResponseEventHandler h = this.PetitionedContractResponseReceived;
+			string PetitionId = XML.Attribute(e.Content, "pid");
+			bool Response = XML.Attribute(e.Content, "response", false);
+			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
+			Contract Contract = null;
+			XmlElement Context = null;
 
-			if (!(h is null))
+			foreach (XmlNode N in e.Content.ChildNodes)
 			{
-				string PetitionId = XML.Attribute(e.Content, "pid");
-				bool Response = XML.Attribute(e.Content, "response", false);
-				string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
-				Contract Contract = null;
-				XmlElement Context = null;
+				if (!(N is XmlElement E))
+					continue;
 
-				foreach (XmlNode N in e.Content.ChildNodes)
+				if (E.LocalName == "contract" && E.NamespaceURI == e.Content.NamespaceURI)
 				{
-					if (!(N is XmlElement E))
-						continue;
-
-					if (E.LocalName == "contract" && E.NamespaceURI == e.Content.NamespaceURI)
-					{
-						ParsedContract Parsed = await Contract.Parse(E, this, false);
-						Contract = Parsed?.Contract;
-					}
-					else if (!(Context is null))
-						return;
-					else
-						Context = E;
+					ParsedContract Parsed = await Contract.Parse(E, this, false);
+					Contract = Parsed?.Contract;
 				}
-
-				if (!Response || string.Compare(e.FromBareJID, Contract?.Provider ?? string.Empty, true) == 0)
-				{
-					try
-					{
-						await h(this, new ContractPetitionResponseEventArgs(e, Contract, PetitionId, Response, ClientEndpoint, Context));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				else if (!(Context is null))
+					return;
+				else
+					Context = E;
 			}
+
+			if (!Response || string.Compare(e.FromBareJID, Contract?.Provider ?? string.Empty, true) == 0)
+				await this.PetitionedContractResponseReceived.Raise(this, new ContractPetitionResponseEventArgs(e, Contract, PetitionId, Response, ClientEndpoint, Context));
 		}
 
 		/// <summary>
 		/// Event raised when a response to a contract petition has been received by the client.
 		/// </summary>
-		public event ContractPetitionResponseEventHandler PetitionedContractResponseReceived = null;
+		public event EventHandlerAsync<ContractPetitionResponseEventArgs> PetitionedContractResponseReceived = null;
 
 		#endregion
 
@@ -6904,7 +6781,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// creating the legal identity object.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AddLegalIdAttachment(string LegalId, string GetUrl, byte[] Signature, LegalIdentityEventHandler Callback, object State)
+		public Task AddLegalIdAttachment(string LegalId, string GetUrl, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -6918,7 +6795,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Convert.ToBase64String(Signature));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -6941,11 +6818,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// The URL is previously provided by the HTTP Upload Service.</param>
 		/// <param name="Signature">Signature of the content of the attachment, made by the same private key used when
 		/// creating the legal identity object.</param>
-		public Task<LegalIdentity> AddLegalIdAttachmentAsync(string LegalId, string GetUrl, byte[] Signature)
+		public async Task<LegalIdentity> AddLegalIdAttachmentAsync(string LegalId, string GetUrl, byte[] Signature)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.AddLegalIdAttachment(LegalId, GetUrl, Signature, (sender, e) =>
+			await this.AddLegalIdAttachment(LegalId, GetUrl, Signature, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
@@ -6956,7 +6833,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -6968,7 +6845,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AddContractAttachment(string ContractId, string GetUrl, byte[] Signature, SmartContractEventHandler Callback, object State)
+		public Task AddContractAttachment(string ContractId, string GetUrl, byte[] Signature, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -6982,7 +6859,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Convert.ToBase64String(Signature));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				Contract Contract = null;
 				XmlElement E;
@@ -7010,11 +6887,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="GetUrl">The GET URL of the attachment to associate with the smart contract.
 		/// The URL might previously have been provided by the HTTP Upload Service.</param>
 		/// <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
-		public Task<Contract> AddContractAttachmentAsync(string ContractId, string GetUrl, byte[] Signature)
+		public async Task<Contract> AddContractAttachmentAsync(string ContractId, string GetUrl, byte[] Signature)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.AddContractAttachment(ContractId, GetUrl, Signature, (sender, e) =>
+			await this.AddContractAttachment(ContractId, GetUrl, Signature, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Contract);
@@ -7025,7 +6902,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -7159,7 +7036,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="AttachmentId">ID of Attachment.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RemoveLegalIdAttachment(string AttachmentId, LegalIdentityEventHandler Callback, object State)
+		public Task RemoveLegalIdAttachment(string AttachmentId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -7169,7 +7046,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(AttachmentId));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -7188,11 +7065,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Removes an attachment from a newly created legal identity.
 		/// </summary>
 		/// <param name="AttachmentId">ID of Attachment.</param>
-		public Task<LegalIdentity> RemoveLegalIdAttachmentAsync(string AttachmentId)
+		public async Task<LegalIdentity> RemoveLegalIdAttachmentAsync(string AttachmentId)
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			this.RemoveLegalIdAttachment(AttachmentId, (sender, e) =>
+			await this.RemoveLegalIdAttachment(AttachmentId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
@@ -7203,7 +7080,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -7212,7 +7089,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="AttachmentId">ID of Attachment.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RemoveContractAttachment(string AttachmentId, SmartContractEventHandler Callback, object State)
+		public Task RemoveContractAttachment(string AttachmentId, EventHandlerAsync<SmartContractEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -7222,7 +7099,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(AttachmentId));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				Contract Contract = null;
 				XmlElement E;
@@ -7247,11 +7124,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Removes an attachment from a proposed or approved contract before it is being signed.
 		/// </summary>
 		/// <param name="AttachmentId">ID of Attachment.</param>
-		public Task<Contract> RemoveContractAttachmentAsync(string AttachmentId)
+		public async Task<Contract> RemoveContractAttachmentAsync(string AttachmentId)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.RemoveContractAttachment(AttachmentId, (sender, e) =>
+			await this.RemoveContractAttachment(AttachmentId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Contract);
@@ -7262,7 +7139,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -7428,9 +7305,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AuthorizeAccessToId(string LegalId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		public Task AuthorizeAccessToId(string LegalId, string RemoteId, bool Authorized, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.AuthorizeAccessToId(this.GetTrustProvider(LegalId), LegalId, RemoteId, Authorized, Callback, State);
+			return this.AuthorizeAccessToId(this.GetTrustProvider(LegalId), LegalId, RemoteId, Authorized, Callback, State);
 		}
 
 		/// <summary>
@@ -7442,7 +7319,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AuthorizeAccessToId(string Address, string LegalId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		public Task AuthorizeAccessToId(string Address, string LegalId, string RemoteId, bool Authorized, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -7456,7 +7333,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(CommonTypes.Encode(Authorized));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -7481,7 +7358,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.AuthorizeAccessToId(Address, LegalId, RemoteId, Authorized, (sender, e) =>
+			await this.AuthorizeAccessToId(Address, LegalId, RemoteId, Authorized, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -7507,9 +7384,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AuthorizeAccessToContract(string ContractId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		public Task AuthorizeAccessToContract(string ContractId, string RemoteId, bool Authorized, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.AuthorizeAccessToContract(this.GetTrustProvider(ContractId), ContractId, RemoteId, Authorized, Callback, State);
+			return this.AuthorizeAccessToContract(this.GetTrustProvider(ContractId), ContractId, RemoteId, Authorized, Callback, State);
 		}
 
 		/// <summary>
@@ -7521,7 +7398,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AuthorizeAccessToContract(string Address, string ContractId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		public Task AuthorizeAccessToContract(string Address, string ContractId, string RemoteId, bool Authorized, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -7535,7 +7412,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(CommonTypes.Encode(Authorized));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -7560,7 +7437,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.AuthorizeAccessToContract(Address, ContractId, RemoteId, Authorized, (sender, e) =>
+			await this.AuthorizeAccessToContract(Address, ContractId, RemoteId, Authorized, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -7583,9 +7460,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetPeerReviewIdServiceProviders(ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
+		public Task GetPeerReviewIdServiceProviders(EventHandlerAsync<ServiceProvidersEventArgs<ServiceProviderWithLegalId>> Callback, object State)
 		{
-			this.GetPeerReviewIdServiceProviders(this.componentAddress, Callback, State);
+			return this.GetPeerReviewIdServiceProviders(this.componentAddress, Callback, State);
 		}
 
 		/// <summary>
@@ -7594,8 +7471,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetPeerReviewIdServiceProviders(string ComponentAddress,
-			ServiceProvidersEventHandler<ServiceProviderWithLegalId> Callback, object State)
+		public Task GetPeerReviewIdServiceProviders(string ComponentAddress,
+			EventHandlerAsync<ServiceProvidersEventArgs<ServiceProviderWithLegalId>> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -7603,7 +7480,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(ComponentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(ComponentAddress, Xml.ToString(), async (sender, e) =>
 			{
 				List<ServiceProviderWithLegalId> Providers = null;
 				XmlElement E;
@@ -7723,11 +7600,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <returns>Peer Review Services available.</returns>
-		public Task<ServiceProviderWithLegalId[]> GetPeerReviewIdServiceProvidersAsync(string ComponentAddress)
+		public async Task<ServiceProviderWithLegalId[]> GetPeerReviewIdServiceProvidersAsync(string ComponentAddress)
 		{
 			TaskCompletionSource<ServiceProviderWithLegalId[]> Providers = new TaskCompletionSource<ServiceProviderWithLegalId[]>();
 
-			this.GetPeerReviewIdServiceProviders(ComponentAddress, (sender, e) =>
+			await this.GetPeerReviewIdServiceProviders(ComponentAddress, (sender, e) =>
 			{
 				if (e.Ok)
 					Providers.TrySetResult(e.ServiceProviders);
@@ -7738,7 +7615,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Providers.Task;
+			return await Providers.Task;
 		}
 
 		#endregion
@@ -7754,9 +7631,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SelectPeerReviewService(string Provider, string ServiceId, IqResultEventHandlerAsync Callback, object State)
+		public Task SelectPeerReviewService(string Provider, string ServiceId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.SelectPeerReviewService(this.componentAddress, Provider, ServiceId, Callback, State);
+			return this.SelectPeerReviewService(this.componentAddress, Provider, ServiceId, Callback, State);
 		}
 
 		/// <summary>
@@ -7769,8 +7646,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SelectPeerReviewService(string ComponentAddress, string Provider, string ServiceId,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task SelectPeerReviewService(string ComponentAddress, string Provider, string ServiceId,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -7782,7 +7659,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(ServiceId));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(ComponentAddress, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(ComponentAddress, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -7805,11 +7682,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ComponentAddress">Address of component.</param>
 		/// <param name="Provider">Identifies the Peer Review Service Provider on the server.</param>
 		/// <param name="ServiceId">Identifies the Peer Review Service hosted by the service provider.</param>
-		public Task SelectPeerReviewServiceAsync(string ComponentAddress, string Provider, string ServiceId)
+		public async Task SelectPeerReviewServiceAsync(string ComponentAddress, string Provider, string ServiceId)
 		{
 			TaskCompletionSource<bool> Providers = new TaskCompletionSource<bool>();
 
-			this.SelectPeerReviewService(ComponentAddress, Provider, ServiceId, (sender, e) =>
+			await this.SelectPeerReviewService(ComponentAddress, Provider, ServiceId, (sender, e) =>
 			{
 				if (e.Ok)
 					Providers.TrySetResult(true);
@@ -7820,31 +7697,19 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Providers.Task;
+			await Providers.Task;
 		}
 
 		#endregion
 
 		#region Petition Client URL event
 
-		private async Task PetitionClientUrlEventHandler(object Sender, MessageEventArgs e)
+		private Task PetitionClientUrlEventHandler(object Sender, MessageEventArgs e)
 		{
 			string PetitionId = XML.Attribute(e.Content, "pid");
 			string Url = XML.Attribute(e.Content, "url");
 
-			PetitionClientUrlEventHandler h = this.PetitionClientUrlReceived;
-
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new PetitionClientUrlEventArgs(e, PetitionId, Url));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.PetitionClientUrlReceived.Raise(this, new PetitionClientUrlEventArgs(e, PetitionId, Url));
 		}
 
 		/// <summary>
@@ -7852,7 +7717,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// petition process. Such an URL must be opened by the client to complete 
 		/// the petition.
 		/// </summary>
-		public event PetitionClientUrlEventHandler PetitionClientUrlReceived;
+		public event EventHandlerAsync<PetitionClientUrlEventArgs> PetitionClientUrlReceived;
 
 		#endregion
 	}

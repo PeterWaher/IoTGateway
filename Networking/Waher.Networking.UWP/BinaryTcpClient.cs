@@ -24,23 +24,6 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking
 {
 	/// <summary>
-	/// Asynchronous version of <see cref="EventArgs"/>.
-	/// </summary>
-	public delegate Task EventHandlerAsync(object Sender, EventArgs e);
-
-	/// <summary>
-	/// Asynchronous version of <see cref="EventArgs"/> with a typed event arguments.
-	/// </summary>
-	public delegate Task EventHandlerAsync<T>(object Sender, T e);
-
-	/// <summary>
-	/// Connection error event handler delegate.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Exception">Information about error received.</param>
-	public delegate Task ExceptionEventHandler(object Sender, Exception Exception);
-
-	/// <summary>
 	/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
 	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
 	/// permitted pace.
@@ -82,7 +65,7 @@ namespace Waher.Networking
 		private class Rec
 		{
 			public byte[] Data;
-			public EventHandler Callback;
+			public EventHandlerAsync Callback;
 			public TaskCompletionSource<bool> Task;
 		}
 
@@ -547,7 +530,7 @@ namespace Waher.Networking
 								break;
 						}
 
-						this.Disconnected();
+						await this.Disconnected();
 						break;
 					}
 
@@ -561,13 +544,13 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						this.Error(ex);
+						await this.Error(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex);
+				await this.Error(ex);
 			}
 			finally
 			{
@@ -592,7 +575,7 @@ namespace Waher.Networking
 
 			if (!Continue && !this.disposed && !this.disposing)
 			{
-				AsyncEventHandler h = this.OnPaused;
+				EventHandlerAsync h = this.OnPaused;
 				if (!(h is null))
 				{
 					try
@@ -601,7 +584,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						this.Error(ex);
+						await this.Error(ex);
 					}
 				}
 			}
@@ -610,20 +593,22 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when reading on the socked has been paused. Call <see cref="Continue"/> to resume reading.
 		/// </summary>
-		public event AsyncEventHandler OnPaused;
+		public event EventHandlerAsync OnPaused;
 
 		/// <summary>
 		/// Method called when the connection has been disconnected.
 		/// </summary>
-		protected virtual void Disconnected()
+		protected virtual async Task Disconnected()
 		{
 			try
 			{
-				this.OnDisconnected?.Invoke(this, EventArgs.Empty);
+				EventHandlerAsync h = this.OnDisconnected;
+                if (!(h is null))
+					await h(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
-				this.Error(ex);
+				await this.Error(ex);
 			}
 		}
 
@@ -634,12 +619,16 @@ namespace Waher.Networking
 		/// <param name="Offset">Start index of first byte read.</param>
 		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		protected virtual Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
+		protected virtual async Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				this.ReceiveBinary(ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(ToArray(Buffer, Offset, Count));
 
-			return this.OnReceived?.Invoke(this, Buffer, Offset, Count) ?? Task.FromResult(true);
+			BinaryDataReadEventHandler h = this.OnReceived;
+			if (h is null)
+				return true;
+			else
+				return await h(this, Buffer, Offset, Count);
 		}
 
 		/// <summary>
@@ -664,18 +653,20 @@ namespace Waher.Networking
 		/// Method called when an exception has been caught.
 		/// </summary>
 		/// <param name="ex">Exception</param>
-		protected virtual void Error(Exception ex)
+		protected virtual async Task Error(Exception ex)
 		{
 			try
 			{
 				if (this.HasSniffers)
-					this.Exception(ex);
+					await this.Exception(ex);
 
-				OnError?.Invoke(this, ex);
+				ExceptionEventHandler h = this.OnError;
+				if (!(h is null))
+					await h(this, ex);
 			}
 			catch (Exception ex2)
 			{
-				this.Error(ex2);
+				await this.Error(ex2);
 			}
 		}
 
@@ -692,7 +683,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when the connection has been disconnected.
 		/// </summary>
-		public event EventHandler OnDisconnected;
+		public event EventHandlerAsync OnDisconnected;
 
 		/// <summary>
 		/// Sends a binary packet.
@@ -710,7 +701,7 @@ namespace Waher.Networking
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Packet, EventHandler Callback)
+		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync Callback)
 		{
 			return this.SendAsync(Packet, 0, Packet.Length, Callback);
 		}
@@ -735,7 +726,7 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandler Callback)
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			this.BeginSend(Buffer, Offset, Count, Result, Callback, true);
@@ -743,7 +734,7 @@ namespace Waher.Networking
 		}
 
 		private async void BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
-			EventHandler Callback, bool CheckSending)
+			EventHandlerAsync Callback, bool CheckSending)
 		{
 			if (Buffer is null)
 				throw new ArgumentException("Cannot be null.", nameof(Buffer));
@@ -759,11 +750,11 @@ namespace Waher.Networking
 				{
 					try
 					{
-						Callback(this, EventArgs.Empty);
+						await Callback(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
-						this.Error(ex);
+						await this.Error(ex);
 					}
 				}
 
@@ -875,7 +866,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						this.Error(ex);
+						await this.Error(ex);
 					}
 
 					Task.TrySetResult(true);
@@ -884,11 +875,11 @@ namespace Waher.Networking
 					{
 						try
 						{
-							Callback(this, EventArgs.Empty);
+							await Callback(this, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{
-							this.Error(ex);
+							await this.Error(ex);
 						}
 					}
 				}
@@ -917,7 +908,7 @@ namespace Waher.Networking
 						}
 						catch (Exception ex)
 						{
-							this.Error(ex);
+							await this.Error(ex);
 						}
 					}
 				}
@@ -938,7 +929,7 @@ namespace Waher.Networking
 				}
 
 				if (!DoDispose)
-					this.Error(ex);
+					await this.Error(ex);
 			}
 		}
 
@@ -975,12 +966,14 @@ namespace Waher.Networking
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte written.</param>
 		/// <param name="Count">Number of bytes written.</param>
-		protected virtual Task BinaryDataSent(byte[] Buffer, int Offset, int Count)
+		protected virtual async Task BinaryDataSent(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				this.TransmitBinary(ToArray(Buffer, Offset, Count));
+				await this.TransmitBinary(ToArray(Buffer, Offset, Count));
 
-			return this.OnSent?.Invoke(this, Buffer, Offset, Count) ?? Task.CompletedTask;
+			BinaryDataWrittenEventHandler h = this.OnSent;
+			if (!(h is null))
+				await h(this, Buffer, Offset, Count);
 		}
 
 		/// <summary>
@@ -1236,9 +1229,9 @@ namespace Waher.Networking
 				this.remoteCertificateValid = false;
 				Result = !RequireCertificate;
 			}
-			else if(SslPolicyErrors == SslPolicyErrors.None)
+			else if (SslPolicyErrors == SslPolicyErrors.None)
 				this.remoteCertificateValid = Result = true;
-			else 
+			else
 			{
 				this.remoteCertificateValid = false;
 				Result = this.trustRemoteEndpoint;
@@ -1252,7 +1245,18 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					this.Error(ex);
+					Task.Run(async () =>
+					{
+						try
+						{
+							await this.Error(ex);
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					});
+
 					Result = false;
 				}
 			}
@@ -1318,10 +1322,20 @@ namespace Waher.Networking
 						SniffMsg.Append("BASE64(Cert): ");
 						SniffMsg.Append(Base64);
 
-						if (this.trustRemoteEndpoint)
-							this.Information(SniffMsg.ToString());
-						else
-							this.Warning(SniffMsg.ToString());
+						Task.Run(async () =>
+						{
+							try
+							{
+								if (this.trustRemoteEndpoint)
+									await this.Information(SniffMsg.ToString());
+								else
+									await this.Warning(SniffMsg.ToString());
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
+						});
 					}
 				}
 				else

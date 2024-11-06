@@ -29,7 +29,7 @@ namespace Waher.Networking
 		/// <param name="Text">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <returns>If data was sent.</returns>
-		Task<bool> SendAsync(string Text, EventHandler DeliveryCallback);
+		Task<bool> SendAsync(string Text, EventHandlerAsync DeliveryCallback);
 
 		/// <summary>
 		/// Event raised when a packet has been sent.

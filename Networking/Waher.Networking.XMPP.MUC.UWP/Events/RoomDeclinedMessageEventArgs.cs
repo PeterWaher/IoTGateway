@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for MUC Room declined event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task RoomDeclinedMessageEventHandler(object Sender, RoomDeclinedMessageEventArgs e);
-
 	/// <summary>
 	/// Message from a MUC room containing a declined invitation.
 	/// </summary>

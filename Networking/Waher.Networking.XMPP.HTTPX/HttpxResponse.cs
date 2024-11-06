@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,9 +9,10 @@ using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
+using Waher.Networking.XMPP.Events;
+using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Temporary;
 using Waher.Security;
-using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -116,7 +117,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							this.response.Append("' e2e='");
 							this.response.Append(CommonTypes.Encode(!(this.e2e is null)));
 							this.response.Append("'/></data>");
-							this.ReturnResponse();
+							await this.ReturnResponse();
 
 							this.socks5Output = new P2P.SOCKS5.OutgoingStream(this.streamId, this.from, this.to, 49152, this.e2e);
 							this.socks5Output.OnAbort += this.OnAbort;
@@ -128,9 +129,9 @@ namespace Waher.Networking.XMPP.HTTPX
 							this.response.Append("<data><ibb sid='");
 							this.response.Append(this.streamId);
 							this.response.Append("'/></data>");
-							this.ReturnResponse();
+							await this.ReturnResponse();
 
-							this.ibbOutput = this.ibbClient.OpenStream(this.to, this.maxChunkSize, this.streamId, this.e2e);
+							this.ibbOutput = await this.ibbClient.OpenStream(this.to, this.maxChunkSize, this.streamId, this.e2e);
 							this.ibbOutput.OnAbort += this.OnAbort;
 						}
 						else
@@ -140,7 +141,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							this.response.Append("<data><chunkedBase64 streamId='");
 							this.response.Append(this.streamId);
 							this.response.Append("'/></data>");
-							this.ReturnResponse();
+							await this.ReturnResponse();
 						}
 
 						lock (activeStreams)
@@ -153,7 +154,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.response.Append("<data><base64>");
 			}
 			else
-				this.ReturnResponse();
+				await this.ReturnResponse();
 		}
 
 		private async Task InitiationCallback(object Sender, P2P.SOCKS5.StreamEventArgs e)
@@ -171,7 +172,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		public override async Task<bool> ContentSentAsync()
 		{
-			this.ReturnResponse();
+			await this.ReturnResponse();
 
 			if (this.chunked.HasValue && this.chunked.Value && !string.IsNullOrEmpty(this.streamId))
 			{
@@ -191,7 +192,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			return true;
 		}
 
-		private void ReturnResponse()
+		private async Task ReturnResponse()
 		{
 			this.AssertNotCancelled();
 
@@ -214,7 +215,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							Resp.Append(Convert.ToBase64String(Digest));
 							Resp.Append("</sha256></data>");
 
-							Task.Run(() => SendPost(this.to, Data, this.postResource, this.client, this.e2e));
+							await SendPost(this.to, Data, this.postResource, this.client, this.e2e);
 
 							this.tempFile = null;
 						}
@@ -231,9 +232,9 @@ namespace Waher.Networking.XMPP.HTTPX
 				Resp.Append("</resp>");
 
 				if (!(this.e2e is null))
-					this.e2e.SendIqResult(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.to, Resp.ToString());
+					await this.e2e.SendIqResult(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.to, Resp.ToString());
 				else
-					this.client.SendIqResult(this.id, this.to, Resp.ToString());
+					await this.client.SendIqResult(this.id, this.to, Resp.ToString());
 			}
 		}
 
@@ -268,7 +269,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							IE2eEndpoint EndpointReference = await E2e.Encrypt(Resource, "POST", Client.FullJID, To, File, Encrypted);
 							if (EndpointReference is null)
 							{
-								Client.Error("Unable to encrypt response back to recipient.");
+								await Client.Error("Unable to encrypt response back to recipient.");
 								return;
 							}
 
@@ -338,14 +339,14 @@ namespace Waher.Networking.XMPP.HTTPX
 								Msg.Append(File.Length.ToString());
 							}
 
-							Client.Error(Msg.ToString());
+							await Client.Error(Msg.ToString());
 						}
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Client.Exception(ex);
+				await Client.Exception(ex);
 			}
 			finally
 			{
@@ -474,12 +475,12 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (!(this.e2e is null))
 			{
-				this.e2e.SendMessage(this.client, E2ETransmission.IgnoreIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal, string.Empty,
+				await this.e2e.SendMessage(this.client, E2ETransmission.IgnoreIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal, string.Empty,
 					this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, this.MessageSent, ChunkSent);
 			}
 			else
 			{
-				this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+				await this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
 					string.Empty, string.Empty, this.MessageSent, ChunkSent);
 			}
 
@@ -498,7 +499,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		public override async Task<bool> FlushAsync()
 		{
-			this.ReturnResponse();
+			await this.ReturnResponse();
 
 			if (this.pos > 0)
 				await this.SendChunk(false);

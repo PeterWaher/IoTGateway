@@ -173,11 +173,11 @@ namespace Waher.Things.Modbus
 				if (!string.IsNullOrEmpty(this.RawName))
 					Fields.Add(new QuantityField(This, TP, this.RawName, Raw, CommonTypes.GetNrDecimals(Raw), string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 
-				Request.ReportFields(true, Fields.ToArray());
+				await Request.ReportFields(true, Fields.ToArray());
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			finally
 			{

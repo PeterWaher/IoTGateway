@@ -7,6 +7,7 @@ using Waher.Content.Multipart;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Mail
 {
@@ -33,7 +34,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			Client.UnregisterMessageHandler("mailInfo", NamespaceMail, this.MailHandler, true);
+			this.Client.UnregisterMessageHandler("mailInfo", NamespaceMail, this.MailHandler, true);
 
 			base.Dispose();
 		}
@@ -43,7 +44,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// </summary>
 		public override string[] Extensions => new string[] { };
 
-		private async Task MailHandler(object Sender, MessageEventArgs e)
+		private Task MailHandler(object Sender, MessageEventArgs e)
 		{
 			string ContentType = XML.Attribute(e.Content, "contentType");
 			string MessageId = XML.Attribute(e.Content, "id");
@@ -164,26 +165,15 @@ namespace Waher.Networking.XMPP.Mail
 				}
 			}
 
-			MailEventHandler h = this.MailReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new MailEventArgs(this, e, ContentType, MessageId, (Mail.Priority)Priority,
-						Date, FromMail, FromHeader, Sender2, Size, MailObjectId, Headers.ToArray(), Attachments?.ToArray(),
-						Inline?.ToArray(), PlainText, Html, Markdown));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.MailReceived.Raise(this, new MailEventArgs(this, e, ContentType, MessageId, (Priority)Priority,
+				Date, FromMail, FromHeader, Sender2, Size, MailObjectId, Headers.ToArray(), Attachments?.ToArray(),
+				Inline?.ToArray(), PlainText, Html, Markdown));
 		}
 
 		/// <summary>
 		/// This event is raised when a mail message has been received.
 		/// </summary>
-		public event MailEventHandler MailReceived = null;
+		public event EventHandlerAsync<MailEventArgs> MailReceived = null;
 
 		/// <summary>
 		/// Gets a message object from the broker.
@@ -191,9 +181,9 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ObjectId">ID of the message object to get.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Get(string ObjectId, MessageObjectEventHandler Callback, object State)
+		public Task Get(string ObjectId, EventHandlerAsync<MessageObjectEventArgs> Callback, object State)
 		{
-			this.Get(ObjectId, string.Empty, Callback, State);
+			return this.Get(ObjectId, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -203,7 +193,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Get(string ObjectId, string ContentType, MessageObjectEventHandler Callback, object State)
+		public Task Get(string ObjectId, string ContentType, EventHandlerAsync<MessageObjectEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -220,7 +210,7 @@ namespace Waher.Networking.XMPP.Mail
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(this.client.Domain, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(this.client.Domain, Xml.ToString(), async (sender, e) =>
 				{
 					XmlElement E;
 					string ResponseContentType = null;
@@ -261,7 +251,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ObjectId">ID of the message object to get.</param>
 		public Task<MessageObject> GetAsync(string ObjectId)
 		{
-			return GetAsync(ObjectId, string.Empty);
+			return this.GetAsync(ObjectId, string.Empty);
 		}
 
 		/// <summary>
@@ -269,11 +259,11 @@ namespace Waher.Networking.XMPP.Mail
 		/// </summary>
 		/// <param name="ObjectId">ID of the message object to get.</param>
 		/// <param name="ContentType">Content-Type of response, if only part of the mail object is desired.</param>
-		public Task<MessageObject> GetAsync(string ObjectId, string ContentType)
+		public async Task<MessageObject> GetAsync(string ObjectId, string ContentType)
 		{
 			TaskCompletionSource<MessageObject> Result = new TaskCompletionSource<MessageObject>();
 			
-			this.Get(ObjectId, ContentType, (sender, e) =>
+			await this.Get(ObjectId, ContentType, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(new MessageObject(e.Data, e.ContentType));
@@ -284,7 +274,7 @@ namespace Waher.Networking.XMPP.Mail
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -293,9 +283,9 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="ObjectId">ID of the message object to delete.</param>
 		/// <param name="Callback">Method to call when response has been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Delete(string ObjectId, IqResultEventHandlerAsync Callback, object State)
+		public Task Delete(string ObjectId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.client.SendIqSet(this.client.Domain, "<delete xmlns='" + NamespaceMail + "' cid='" + XML.Encode(ObjectId) + "'/>",
+			return this.client.SendIqSet(this.client.Domain, "<delete xmlns='" + NamespaceMail + "' cid='" + XML.Encode(ObjectId) + "'/>",
 				Callback, State);
 		}
 
@@ -303,11 +293,11 @@ namespace Waher.Networking.XMPP.Mail
 		/// Deletes a message object from the broker.
 		/// </summary>
 		/// <param name="ObjectId">ID of the message object to delete.</param>
-		public Task DeleteAsync(string ObjectId)
+		public async Task DeleteAsync(string ObjectId)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.Delete(ObjectId, (sender, e) =>
+			await this.Delete(ObjectId, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -318,7 +308,7 @@ namespace Waher.Networking.XMPP.Mail
 
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		/// <summary>
@@ -332,7 +322,7 @@ namespace Waher.Networking.XMPP.Mail
 		/// <param name="FileName">File-name attribute</param>
 		/// <param name="Description">Content description.</param>
 		/// <param name="Xml">XML output.</param>
-		public void AppendContent(string ContentId, string ContentType, byte[] ContentData, ContentDisposition Disposition,
+		public Task AppendContent(string ContentId, string ContentType, byte[] ContentData, ContentDisposition Disposition,
 			string Name, string FileName, string Description, StringBuilder Xml)
 		{
 			Xml.Append("<content xmlns='");
@@ -369,6 +359,8 @@ namespace Waher.Networking.XMPP.Mail
 			Xml.Append("'>");
 			Xml.Append(Convert.ToBase64String(ContentData));		// TODO: Chunked transfer
 			Xml.Append("</content>");
+
+			return Task.CompletedTask;
 		}
 
 	}

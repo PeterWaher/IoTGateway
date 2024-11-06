@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Push
 {
@@ -47,7 +48,7 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="ClientType">Client Type.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void NewToken(string Token, PushMessagingService Service, ClientType ClientType, IqResultEventHandlerAsync Callback, object State)
+		public Task NewToken(string Token, PushMessagingService Service, ClientType ClientType, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -61,7 +62,7 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append(XML.Encode(Token));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -70,11 +71,11 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="Token">Token received from the push service.</param>
 		/// <param name="Service">Service providing the token.</param>
 		/// <param name="ClientType">Client Type.</param>
-		public Task NewTokenAsync(string Token, PushMessagingService Service, ClientType ClientType)
+		public async Task NewTokenAsync(string Token, PushMessagingService Service, ClientType ClientType)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.NewToken(Token, Service, ClientType, (sender, e) =>
+			await this.NewToken(Token, Service, ClientType, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -84,7 +85,7 @@ namespace Waher.Networking.XMPP.Push
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion
@@ -96,7 +97,7 @@ namespace Waher.Networking.XMPP.Push
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RemoveToken(IqResultEventHandlerAsync Callback, object State)
+		public Task RemoveToken(EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -104,17 +105,17 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append(MessagePushNamespace);
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
 		/// Removes the last push token from the server.
 		/// </summary>
-		public Task RemoveTokenAsync()
+		public async Task RemoveTokenAsync()
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.RemoveToken((sender, e) =>
+			await this.RemoveToken((sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -124,7 +125,7 @@ namespace Waher.Networking.XMPP.Push
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion
@@ -136,7 +137,7 @@ namespace Waher.Networking.XMPP.Push
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ClearRules(IqResultEventHandlerAsync Callback, object State)
+		public Task ClearRules(EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -144,17 +145,17 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append(MessagePushNamespace);
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
 		/// Clears available push notification rules for the client.
 		/// </summary>
-		public Task ClearRulesAsync()
+		public async Task ClearRulesAsync()
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.ClearRules((sender, e) =>
+			await this.ClearRules((sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -164,7 +165,7 @@ namespace Waher.Networking.XMPP.Push
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion
@@ -192,8 +193,8 @@ namespace Waher.Networking.XMPP.Push
 		/// </param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AddRule(MessageType MessageType, string LocalName, string Namespace, string Channel, string MessageVariable,
-			string PatternMatchingScript, string ContentScript, IqResultEventHandlerAsync Callback, object State)
+		public Task AddRule(MessageType MessageType, string LocalName, string Namespace, string Channel, string MessageVariable,
+			string PatternMatchingScript, string ContentScript, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -230,7 +231,7 @@ namespace Waher.Networking.XMPP.Push
 
 			Xml.Append("</addRule>");
 
-			this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -252,12 +253,12 @@ namespace Waher.Networking.XMPP.Push
 		/// 
 		/// All other properties defined in the resulting object, will be treated as data tags in the notification.
 		/// </param>
-		public Task AddRuleAsync(MessageType MessageType, string LocalName, string Namespace, string Channel, string MessageVariable,
+		public async Task AddRuleAsync(MessageType MessageType, string LocalName, string Namespace, string Channel, string MessageVariable,
 			string PatternMatchingScript, string ContentScript)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.AddRule(MessageType, LocalName, Namespace, Channel, MessageVariable, PatternMatchingScript, ContentScript, (sender, e) =>
+			await this.AddRule(MessageType, LocalName, Namespace, Channel, MessageVariable, PatternMatchingScript, ContentScript, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -267,7 +268,7 @@ namespace Waher.Networking.XMPP.Push
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion
@@ -282,7 +283,7 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RemoveRule(MessageType MessageType, string LocalName, string Namespace, IqResultEventHandlerAsync Callback, object State)
+		public Task RemoveRule(MessageType MessageType, string LocalName, string Namespace, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -299,7 +300,7 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append(XML.Encode(Namespace));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -308,11 +309,11 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="MessageType">Rule applies to messages of this type.</param>
 		/// <param name="LocalName">Rule applies only if the content of the message matches this local name.</param>
 		/// <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
-		public Task RemoveRuleAsync(MessageType MessageType, string LocalName, string Namespace)
+		public async Task RemoveRuleAsync(MessageType MessageType, string LocalName, string Namespace)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.RemoveRule(MessageType, LocalName, Namespace, (sender, e) =>
+			await this.RemoveRule(MessageType, LocalName, Namespace, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -322,7 +323,7 @@ namespace Waher.Networking.XMPP.Push
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			await Result.Task;
 		}
 
 		#endregion

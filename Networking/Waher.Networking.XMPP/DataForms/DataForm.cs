@@ -4,60 +4,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
-using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.DataForms.Layout;
+using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.DataForms
 {
-	/// <summary>
-	/// Type of data form.
-	/// </summary>
-	public enum FormType
-	{
-		/// <summary>
-		/// Data Form
-		/// </summary>
-		Form,
-
-		/// <summary>
-		/// Form cancellation
-		/// </summary>
-		Cancel,
-
-		/// <summary>
-		/// Form Result
-		/// </summary>
-		Result,
-
-		/// <summary>
-		/// Form submission
-		/// </summary>
-		Submit,
-
-		/// <summary>
-		/// Undefined form type.
-		/// </summary>
-		Undefined
-	}
-
-	/// <summary>
-	/// Data Form callback method delegate.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Form">Data Form.</param>
-	public delegate Task DataFormEventHandler(object Sender, DataForm Form);
-
-	/// <summary>
-	/// Data form IQ result callback method delegate.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task DataFormResultEventHandler(object Sender, DataFormEventArgs e);
-
 	/// <summary>
 	/// Implements support for data forms. Data Forms are defined in the following XEPs:
 	/// 
@@ -85,8 +41,8 @@ namespace Waher.Networking.XMPP.DataForms
 	public class DataForm
 	{
 		private Dictionary<string, Field> fieldsByVar = new Dictionary<string, Field>();
-		private DataFormEventHandler onSubmit;
-		private DataFormEventHandler onCancel;
+		private EventHandlerAsync<DataForm> onSubmit;
+		private EventHandlerAsync<DataForm> onCancel;
 		private readonly XmppClient client;
 		private FormType type;
 		private Field[] fields;
@@ -132,7 +88,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="OnCancel">Method called when the form is cancelled.</param>
 		/// <param name="From">From where the form came.</param>
 		/// <param name="To">To where the form was sent.</param>
-		public DataForm(XmppClient Client, XmlElement X, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To)
+		public DataForm(XmppClient Client, XmlElement X, EventHandlerAsync<DataForm> OnSubmit, EventHandlerAsync<DataForm> OnCancel, 
+			string From, string To)
 		{
 			List<string> Instructions = new List<string>();
 			List<Field> Fields = new List<Field>();
@@ -387,12 +344,12 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="From">From where the form came.</param>
 		/// <param name="To">To where the form was sent.</param>
 		/// <param name="Fields">Data form fields.</param>
-		public DataForm(XmppClient Client, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To, params Field[] Fields)
+		public DataForm(XmppClient Client, EventHandlerAsync<DataForm> OnSubmit, EventHandlerAsync<DataForm> OnCancel, string From, string To, params Field[] Fields)
 			: this(Client, FormType.Form, OnSubmit, OnCancel, From, To, Fields)
 		{
 		}
 
-		private DataForm(XmppClient Client, FormType Type, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To, params Field[] Fields)
+		private DataForm(XmppClient Client, FormType Type, EventHandlerAsync<DataForm> OnSubmit, EventHandlerAsync<DataForm> OnCancel, string From, string To, params Field[] Fields)
 		{
 			this.client = Client;
 			this.onSubmit = OnSubmit;
@@ -429,7 +386,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="To">Recipient address.</param>
 		/// <returns>Parsed data form.</returns>
 		/// <exception cref="Exception">Exception thrown if XML does not represent an XMPP Data Form.</exception>
-		public static DataForm Parse(XmppClient Client, string Xml, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To)
+		public static DataForm Parse(XmppClient Client, string Xml, EventHandlerAsync<DataForm> OnSubmit, EventHandlerAsync<DataForm> OnCancel, string From, string To)
 		{
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(Xml);
@@ -838,17 +795,17 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Submits the form.
 		/// </summary>
 		/// <exception cref="XmppException">If the form cannot be submitted.</exception>
-		public void Submit()
+		public async Task Submit()
 		{
 			if (this.CanSubmit)
 			{
 				try
 				{
-					this.onSubmit(this, this);
+					await this.onSubmit(this, this);
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Exception(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -867,7 +824,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Cancels the form.
 		/// </summary>
 		/// <exception cref="XmppException">If the form cannot be cancelled.</exception>
-		public void Cancel()
+		public async Task Cancel()
 		{
 			if (this.containsPostBackFields)
 			{
@@ -879,17 +836,17 @@ namespace Waher.Networking.XMPP.DataForms
 				this.ExportXml(Xml, "submit", true, false);
 				Xml.Append("</cancel>");
 
-				this.client.SendIqSet(this.from, Xml.ToString(), null, null);
+				await this.client.SendIqSet(this.from, Xml.ToString(), null, null);
 			}
 			else if (this.CanCancel)
 			{
 				try
 				{
-					this.onCancel(this, this);
+					await this.onCancel(this, this);
 				}
 				catch (Exception ex)
 				{
-					Events.Log.Exception(ex);
+					Log.Exception(ex);
 				}
 			}
 			else
@@ -918,7 +875,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		/// <param name="OnSubmit">Callback method for the Submit method.</param>
 		/// <param name="OnCancel">Callback method for the Cancel method.</param>
-		public void SetMethodHandlers(DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel)
+		public void SetMethodHandlers(EventHandlerAsync<DataForm> OnSubmit, EventHandlerAsync<DataForm> OnCancel)
 		{
 			this.onSubmit = OnSubmit;
 			this.onCancel = OnCancel;
@@ -1098,7 +1055,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		/// <param name="FormSignatureKey">Form signature key.</param>
 		/// <param name="FormSignatureSecret">Form signature secret.</param>
-		public void Sign(string FormSignatureKey, string FormSignatureSecret)
+		public async Task Sign(string FormSignatureKey, string FormSignatureSecret)
 		{
 			Field oauth_version = this["oauth_version"];
 			Field oauth_signature_method = this["oauth_signature_method"];
@@ -1125,11 +1082,11 @@ namespace Waher.Networking.XMPP.DataForms
 				string Nonce = Hashes.BinaryToString(XmppClient.GetRandomBytes(16));
 				string TokenSecret = oauth_token_secret.ValueString;
 
-				oauth_consumer_key.SetValue(FormSignatureKey);
-				oauth_timestamp.SetValue(TotalSeconds.ToString());
-				oauth_nonce.SetValue(Nonce);
-				oauth_version.SetValue("1.0");
-				oauth_signature_method.SetValue("HMAC-SHA1");
+				await oauth_consumer_key.SetValue(FormSignatureKey);
+				await oauth_timestamp.SetValue(TotalSeconds.ToString());
+				await oauth_nonce.SetValue(Nonce);
+				await oauth_version.SetValue("1.0");
+				await oauth_signature_method.SetValue("HMAC-SHA1");
 
 				foreach (Field F in this.fields)
 					Sorted[F.Var] = F.ValueString;
@@ -1160,7 +1117,7 @@ namespace Waher.Networking.XMPP.DataForms
 				byte[] Key = Encoding.ASCII.GetBytes(OAuthEncode(FormSignatureSecret) + "&" + OAuthEncode(TokenSecret));
 				byte[] Hash = Hashes.ComputeHMACSHA1Hash(Key, Encoding.ASCII.GetBytes(BStr.ToString()));
 
-				oauth_signature.SetValue(OAuthEncode(Convert.ToBase64String(Hash)));
+				await oauth_signature.SetValue(OAuthEncode(Convert.ToBase64String(Hash)));
 			}
 		}
 
@@ -1191,7 +1148,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// all other changes are transferred to the current form.
 		/// </summary>
 		/// <param name="NewForm">New version of form.</param>
-		public void Join(DataForm NewForm)
+		public async Task Join(DataForm NewForm)
 		{
 			Field[] OldFields = this.fields;
 
@@ -1212,19 +1169,19 @@ namespace Waher.Networking.XMPP.DataForms
 				if (!OldField.Edited)
 					continue;
 
-				NewField.SetValue(OldField.ValueStrings);
+				await NewField.SetValue(OldField.ValueStrings);
 			}
 
-			DataFormEventHandler h = this.OnRemoteUpdate;
+			EventHandlerAsync<DataForm> h = this.OnRemoteUpdate;
 			if (!(h is null))
 			{
 				try
 				{
-					h(this.client, this);
+					await h(this.client, this);
 				}
 				catch (Exception ex)
 				{
-					this.client.Exception(ex);
+					await this.client.Exception(ex);
 				}
 			}
 		}
@@ -1233,17 +1190,17 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Event raised when the form has been remotely updated and might need to be redrawn. Currently edited values are kept,
 		/// but other properties might have changed, new fields have been added, others removed, layout changed, etc.
 		/// </summary>
-		public event DataFormEventHandler OnRemoteUpdate = null;
+		public event EventHandlerAsync<DataForm> OnRemoteUpdate = null;
 
 		/// <summary>
 		/// Method to call when submitting form.
 		/// </summary>
-		public DataFormEventHandler OnSubmit => this.onSubmit;
+		public EventHandlerAsync<DataForm> OnSubmit => this.onSubmit;
 
 		/// <summary>
 		/// Method to call when cancelling form.
 		/// </summary>
-		public DataFormEventHandler OnCancel => this.onCancel;
+		public EventHandlerAsync<DataForm> OnCancel => this.onCancel;
 
 		/// <summary>
 		/// Removes excluded fields.

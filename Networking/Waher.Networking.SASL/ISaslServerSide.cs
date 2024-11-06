@@ -53,7 +53,7 @@ namespace Waher.Networking.SASL
 		/// Sets the account for the connection.
 		/// </summary>
 		/// <param name="Account">Account.</param>
-		void SetAccount(IAccount Account);
+		Task SetAccount(IAccount Account);
 
 		/// <summary>
 		/// Resets the state machine.

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Waher.Events;
+using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -11,8 +11,8 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class InternalReadoutRequest : SensorDataServerRequest
 	{
-		private readonly InternalReadoutFieldsEventHandler onFieldsReported;
-		private readonly InternalReadoutErrorsEventHandler onErrorsReported;
+		private readonly EventHandlerAsync<InternalReadoutFieldsEventArgs> onFieldsReported;
+		private readonly EventHandlerAsync<InternalReadoutErrorsEventArgs> onErrorsReported;
 		private readonly object state;
 
 		/// <summary>
@@ -28,7 +28,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="OnErrorsReported">Callback method when errors are reported.</param>
 		/// <param name="State">State object passed on to callback methods.</param>
 		public InternalReadoutRequest(string Actor, IThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
-			InternalReadoutFieldsEventHandler OnFieldsReported, InternalReadoutErrorsEventHandler OnErrorsReported, object State)
+			EventHandlerAsync<InternalReadoutFieldsEventArgs> OnFieldsReported, EventHandlerAsync<InternalReadoutErrorsEventArgs> OnErrorsReported,
+			object State)
 			: base(string.Empty, null, string.Empty, Actor, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty,
 				  string.Empty, SensorClient.NamespaceSensorDataCurrent)
 		{
@@ -36,30 +37,23 @@ namespace Waher.Networking.XMPP.Sensor
 			this.onErrorsReported = OnErrorsReported;
 			this.state = State;
 		}
-	
+
 		/// <summary>
 		/// Report read fields to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Fields that have been read.</param>
-		public override void ReportFields(bool Done, IEnumerable<Field> Fields)
+		public override Task ReportFields(bool Done, IEnumerable<Field> Fields)
 		{
-			try
-			{
-				List<Field> Filtered = new List<Field>();
+			List<Field> Filtered = new List<Field>();
 
-				foreach (Field F in Fields)
-				{
-					if (this.IsIncluded(F.Name, F.Timestamp, F.Type))
-						Filtered.Add(F);
-				}
-
-				this.onFieldsReported(this, new InternalReadoutFieldsEventArgs(Done, Filtered, this.state));
-			}
-			catch (Exception ex)
+			foreach (Field F in Fields)
 			{
-				Log.Exception(ex);
+				if (this.IsIncluded(F.Name, F.Timestamp, F.Type))
+					Filtered.Add(F);
 			}
+
+			return this.onFieldsReported.Raise(this, new InternalReadoutFieldsEventArgs(Done, Filtered, this.state));
 		}
 
 		/// <summary>
@@ -67,16 +61,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Errors">Errors that have been detected.</param>
-		public override void ReportErrors(bool Done, IEnumerable<ThingError> Errors)
+		public override Task ReportErrors(bool Done, IEnumerable<ThingError> Errors)
 		{
-			try
-			{
-				this.onErrorsReported(this, new InternalReadoutErrorsEventArgs(Done, Errors, this.state));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.onErrorsReported.Raise(this, new InternalReadoutErrorsEventArgs(Done, Errors, this.state));
 		}
 	}
 }

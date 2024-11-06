@@ -231,9 +231,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				if (this.clientConnection.HasSniffers)
 				{
 					if (this.txText)
-						this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
+						await this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
 					else
-						this.clientConnection.TransmitBinary(Chunk);
+						await this.clientConnection.TransmitBinary(Chunk);
 				}
 			}
 
@@ -277,7 +277,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				this.clientConnection.Server.DataTransmitted(5);
 
 				if (this.clientConnection.HasSniffers && !this.txText)
-					this.clientConnection.TransmitBinary(Chunk);
+					await this.clientConnection.TransmitBinary(Chunk);
 			}
 
 			return true;

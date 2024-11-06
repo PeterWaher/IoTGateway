@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
@@ -57,8 +57,16 @@ namespace Waher.Security.DTLS.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (sender, e) => Done.Set();
-			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (sender, e) => Error.Set();
+			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
+			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (sender, e) =>
+			{
+				Error.Set();
+				return Task.CompletedTask;
+			};
 
 			this.dtlsOverUdp.DTLS.StartHandshake(this.remoteEndpoint,
 				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 }));

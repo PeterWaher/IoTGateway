@@ -1,16 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 using Waher.Things.SourceEvents;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for data source section callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SourceEventMessageEventHandler(object Sender, SourceEventMessageEventArgs e);
-
 	/// <summary>
 	/// Event arguments for data source section events.
 	/// </summary>

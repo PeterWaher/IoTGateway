@@ -6,54 +6,14 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Things;
+using Waher.Networking.XMPP.Events;
+using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.Provisioning.SearchOperators;
 using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Things;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
-	/// <summary>
-	/// Delegate for registration callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task RegistrationEventHandler(object Sender, RegistrationEventArgs e);
-
-	/// <summary>
-	/// Delegate for update callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task UpdateEventHandler(object Sender, UpdateEventArgs e);
-
-	/// <summary>
-	/// Delegate for node result callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task NodeResultEventHandler(object Sender, NodeResultEventArgs e);
-
-	/// <summary>
-	/// Delegate for node events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task NodeEventHandler(object Sender, NodeEventArgs e);
-
-	/// <summary>
-	/// Delegate for claimed events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ClaimedEventHandler(object Sender, ClaimedEventArgs e);
-
-	/// <summary>
-	/// Delegate for search result event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SearchResultEventHandler(object Sender, SearchResultEventArgs e);
-
 	/// <summary>
 	/// Implements an XMPP thing registry client interface.
 	/// 
@@ -152,34 +112,34 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(MetaDataTag[], UpdateEventHandler, object)"/> to update 
+		/// Things that have an owner should call <see cref="UpdateThing(MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> to update 
 		/// its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(MetaDataTag[] MetaDataTags, RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(MetaDataTag[] MetaDataTags, EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(false, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.RegisterThing(false, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(string, MetaDataTag[], UpdateEventHandler, object)"/> to 
+		/// Things that have an owner should call <see cref="UpdateThing(string, MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> to 
 		/// update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(string NodeId, MetaDataTag[] MetaDataTags, RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(string NodeId, MetaDataTag[] MetaDataTags, EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(false, NodeId, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.RegisterThing(false, NodeId, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(string, string, MetaDataTag[], UpdateEventHandler, object)"/> to 
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> to 
 		/// update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
@@ -187,15 +147,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(string NodeId, string SourceId, MetaDataTag[] MetaDataTags,
-			RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(string NodeId, string SourceId, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(false, NodeId, SourceId, string.Empty, MetaDataTags, Callback, State);
+			return this.RegisterThing(false, NodeId, SourceId, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(string, string, string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, string, MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> 
 		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
@@ -204,29 +164,29 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
-			RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(false, NodeId, SourceId, Partition, MetaDataTags, Callback, State);
+			return this.RegisterThing(false, NodeId, SourceId, Partition, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(MetaDataTag[], UpdateEventHandler, object)"/> to 
+		/// Things that have an owner should call <see cref="UpdateThing(MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> to 
 		/// update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(bool SelfOwned, MetaDataTag[] MetaDataTags, RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(bool SelfOwned, MetaDataTag[] MetaDataTags, EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(SelfOwned, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.RegisterThing(SelfOwned, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// Things that have an owner should call <see cref="UpdateThing(string, MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> 
 		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
@@ -234,15 +194,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(bool SelfOwned, string NodeId, MetaDataTag[] MetaDataTags,
-			RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(bool SelfOwned, string NodeId, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(SelfOwned, NodeId, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.RegisterThing(SelfOwned, NodeId, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(string, string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> 
 		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
@@ -251,15 +211,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(bool SelfOwned, string NodeId, string SourceId, MetaDataTag[] MetaDataTags,
-			RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(bool SelfOwned, string NodeId, string SourceId, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterThing(SelfOwned, NodeId, SourceId, string.Empty, MetaDataTags, Callback, State);
+			return this.RegisterThing(SelfOwned, NodeId, SourceId, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="UpdateThing(string, string, string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, string, MetaDataTag[], EventHandlerAsync{UpdateEventArgs}, object)"/> 
 		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
@@ -269,8 +229,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(bool SelfOwned, string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
-			RegistrationEventHandler Callback, object State)
+		public Task RegisterThing(bool SelfOwned, string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<RegistrationEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -288,7 +248,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</register>");
 
-			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
@@ -308,16 +268,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						}
 					}
 
-					RegistrationEventArgs e2 = new RegistrationEventArgs(e, State, OwnerJid, IsPublic);
-
-					try
-					{
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					await Callback.Raise(this, new RegistrationEventArgs(e, State, OwnerJid, IsPublic));
 				}
 			}, State);
 		}
@@ -379,9 +330,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data describing the thing.</param>
 		/// <param name="Callback">Method to call when response to claim is returned.</param>
 		/// <param name="State">State object passed on to the callback method.</param>
-		public void Mine(MetaDataTag[] MetaDataTags, NodeResultEventHandler Callback, object State)
+		public Task Mine(MetaDataTag[] MetaDataTags, EventHandlerAsync<NodeResultEventArgs> Callback, object State)
 		{
-			this.Mine(true, MetaDataTags, Callback, State);
+			return this.Mine(true, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
@@ -391,7 +342,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data describing the thing.</param>
 		/// <param name="Callback">Method to call when response to claim is returned.</param>
 		/// <param name="State">State object passed on to the callback method.</param>
-		public void Mine(bool Public, MetaDataTag[] MetaDataTags, NodeResultEventHandler Callback, object State)
+		public Task Mine(bool Public, MetaDataTag[] MetaDataTags, EventHandlerAsync<NodeResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -405,7 +356,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</mine>");
 
-			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
@@ -424,16 +375,7 @@ namespace Waher.Networking.XMPP.Provisioning
 							Node = new ThingReference(NodeId, SourceId, Partition);
 					}
 
-					NodeResultEventArgs e2 = new NodeResultEventArgs(e, State, NodeJid, Node);
-
-					try
-					{
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					await Callback.Raise(this, new NodeResultEventArgs(e, State, NodeJid, Node));
 				}
 			}, State);
 		}
@@ -459,26 +401,15 @@ namespace Waher.Networking.XMPP.Provisioning
 				Node = new ThingReference(NodeId, SourceId, Partition);
 
 			ClaimedEventArgs e2 = new ClaimedEventArgs(e, Node, OwnerJid, Public);
-			ClaimedEventHandler h = this.Claimed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.Claimed.Raise(this, e2);
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when a node has been claimed.
 		/// </summary>
-		public event ClaimedEventHandler Claimed = null;
+		public event EventHandlerAsync<ClaimedEventArgs> Claimed = null;
 
 		/// <summary>
 		/// Removes a publicly claimed thing from the thing registry, so that it does not appear in search results.
@@ -486,9 +417,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ThingJid">JID of thing to disown.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, IqResultEventHandlerAsync Callback, object State)
+		public Task Remove(string ThingJid, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Remove(ThingJid, string.Empty, string.Empty, string.Empty, Callback, State);
+			return this.Remove(ThingJid, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -498,9 +429,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="NodeId">Optional Node ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, IqResultEventHandlerAsync Callback, object State)
+		public Task Remove(string ThingJid, string NodeId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Remove(ThingJid, NodeId, string.Empty, string.Empty, Callback, State);
+			return this.Remove(ThingJid, NodeId, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -511,9 +442,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SourceId">Optional Source ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, string SourceId, IqResultEventHandlerAsync Callback, object State)
+		public Task Remove(string ThingJid, string NodeId, string SourceId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Remove(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
+			return this.Remove(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -525,9 +456,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task Remove(string ThingJid, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Remove(this.thingRegistryAddress, ThingJid, NodeId, SourceId, Partition, Callback, State);
+			return this.Remove(this.thingRegistryAddress, ThingJid, NodeId, SourceId, Partition, Callback, State);
 		}
 
 		/// <summary>
@@ -540,7 +471,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string RegistryJid, string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task Remove(string RegistryJid, string ThingJid, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -554,20 +485,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(RegistryJid, Request.ToString(), async (sender, e) =>
-			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}, State);
+			return this.client.SendIqSet(RegistryJid, Request.ToString(), (sender, e) => Callback.Raise(this, e), State);
 		}
 
 		private async Task RemovedHandler(object Sender, IqEventArgs e)
@@ -584,30 +502,19 @@ namespace Waher.Networking.XMPP.Provisioning
 				Node = new ThingReference(NodeId, SourceId, Partition);
 
 			NodeEventArgs e2 = new NodeEventArgs(e, Node);
-			NodeEventHandler h = this.Removed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.Removed.Raise(this, e2);
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when a node has been removed from the registry.
 		/// </summary>
-		public event NodeEventHandler Removed = null;
+		public event EventHandlerAsync<NodeEventArgs> Removed = null;
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="RegisterThing(MetaDataTag[], RegistrationEventHandler, object)"/> to 
+		/// Things that do not have an owner should call <see cref="RegisterThing(MetaDataTag[], EventHandlerAsync{RegistrationEventArgs}, object)"/> to 
 		/// update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
@@ -616,14 +523,14 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(MetaDataTag[] MetaDataTags, UpdateEventHandler Callback, object State)
+		public Task UpdateThing(MetaDataTag[] MetaDataTags, EventHandlerAsync<UpdateEventArgs> Callback, object State)
 		{
-			this.UpdateThing(string.Empty, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.UpdateThing(string.Empty, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="RegisterThing(string, MetaDataTag[], RegistrationEventHandler, object)"/> to 
+		/// Things that do not have an owner should call <see cref="RegisterThing(string, MetaDataTag[], EventHandlerAsync{RegistrationEventArgs}, object)"/> to 
 		/// update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
@@ -633,14 +540,14 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(string NodeId, MetaDataTag[] MetaDataTags, UpdateEventHandler Callback, object State)
+		public Task UpdateThing(string NodeId, MetaDataTag[] MetaDataTags, EventHandlerAsync<UpdateEventArgs> Callback, object State)
 		{
-			this.UpdateThing(NodeId, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.UpdateThing(NodeId, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="RegisterThing(string, string, MetaDataTag[], RegistrationEventHandler, object)"/> 
+		/// Things that do not have an owner should call <see cref="RegisterThing(string, string, MetaDataTag[], EventHandlerAsync{RegistrationEventArgs}, object)"/> 
 		/// to update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
@@ -651,14 +558,14 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(string NodeId, string SourceId, MetaDataTag[] MetaDataTags, UpdateEventHandler Callback, object State)
+		public Task UpdateThing(string NodeId, string SourceId, MetaDataTag[] MetaDataTags, EventHandlerAsync<UpdateEventArgs> Callback, object State)
 		{
-			this.UpdateThing(NodeId, SourceId, string.Empty, string.Empty, MetaDataTags, Callback, State);
+			return this.UpdateThing(NodeId, SourceId, string.Empty, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="RegisterThing(string, string, string, MetaDataTag[], RegistrationEventHandler, object)"/> to 
+		/// Things that do not have an owner should call <see cref="RegisterThing(string, string, string, MetaDataTag[], EventHandlerAsync{RegistrationEventArgs}, object)"/> to 
 		/// update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
@@ -670,10 +577,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
-			UpdateEventHandler Callback, object State)
+		public Task UpdateThing(string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<UpdateEventArgs> Callback, object State)
 		{
-			this.UpdateThing(NodeId, SourceId, Partition, string.Empty, MetaDataTags, Callback, State);
+			return this.UpdateThing(NodeId, SourceId, Partition, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
@@ -690,8 +597,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(string NodeId, string SourceId, string Partition, string ThingJid, MetaDataTag[] MetaDataTags,
-			UpdateEventHandler Callback, object State)
+		public Task UpdateThing(string NodeId, string SourceId, string Partition, string ThingJid, MetaDataTag[] MetaDataTags,
+			EventHandlerAsync<UpdateEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -712,35 +619,24 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</update>");
 
-			this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
 			{
-				if (!(Callback is null))
+				XmlElement E = e.FirstElement;
+				bool Disowned = false;
+
+				if (e.Ok && !(E is null) && E.LocalName == "disowned")
 				{
-					XmlElement E = e.FirstElement;
-					bool Disowned = false;
+					Disowned = true;
 
-					if (e.Ok && !(E is null) && E.LocalName == "disowned")
+					if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
+						this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
 					{
-						Disowned = true;
-
-						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
-							this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
-						{
-							ProvisioningClient.OwnerJid = string.Empty;
-						}
-					}
-
-					UpdateEventArgs e2 = new UpdateEventArgs(e, State, Disowned);
-
-					try
-					{
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
+						ProvisioningClient.OwnerJid = string.Empty;
 					}
 				}
+
+				await Callback.Raise(this, new UpdateEventArgs(e, State, Disowned));
+
 			}, State);
 		}
 
@@ -749,9 +645,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(IqResultEventHandlerAsync Callback, object State)
+		public Task Unregister(EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Unregister(string.Empty, string.Empty, string.Empty, Callback, State);
+			return this.Unregister(string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -760,9 +656,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, IqResultEventHandlerAsync Callback, object State)
+		public Task Unregister(string NodeId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Unregister(NodeId, string.Empty, string.Empty, Callback, State);
+			return this.Unregister(NodeId, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -772,9 +668,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, string SourceId, IqResultEventHandlerAsync Callback, object State)
+		public Task Unregister(string NodeId, string SourceId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Unregister(NodeId, SourceId, string.Empty, Callback, State);
+			return this.Unregister(NodeId, SourceId, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -785,9 +681,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task Unregister(string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Unregister(this.thingRegistryAddress, NodeId, SourceId, Partition, Callback, State);
+			return this.Unregister(this.thingRegistryAddress, NodeId, SourceId, Partition, Callback, State);
 		}
 
 		/// <summary>
@@ -799,7 +695,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string RegistryJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task Unregister(string RegistryJid, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -810,20 +706,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(RegistryJid, Request.ToString(), async (sender, e) =>
-			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}, State);
+			return this.client.SendIqSet(RegistryJid, Request.ToString(), (sender, e) => Callback.Raise(this, e), State);
 		}
 
 		/// <summary>
@@ -832,9 +715,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ThingJid">JID of thing to disown.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, IqResultEventHandlerAsync Callback, object State)
+		public Task Disown(string ThingJid, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Disown(ThingJid, string.Empty, string.Empty, string.Empty, Callback, State);
+			return this.Disown(ThingJid, string.Empty, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -844,9 +727,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="NodeId">Optional Node ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, IqResultEventHandlerAsync Callback, object State)
+		public Task Disown(string ThingJid, string NodeId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Disown(ThingJid, NodeId, string.Empty, string.Empty, Callback, State);
+			return this.Disown(ThingJid, NodeId, string.Empty, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -857,9 +740,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SourceId">Optional Source ID of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, string SourceId, IqResultEventHandlerAsync Callback, object State)
+		public Task Disown(string ThingJid, string NodeId, string SourceId, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Disown(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
+			return this.Disown(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -871,9 +754,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task Disown(string ThingJid, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.Disown(this.thingRegistryAddress, ThingJid, NodeId, SourceId, Partition, Callback, State);
+			return this.Disown(this.thingRegistryAddress, ThingJid, NodeId, SourceId, Partition, Callback, State);
 		}
 
 		/// <summary>
@@ -886,7 +769,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string RegistryJid, string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		public Task Disown(string RegistryJid, string ThingJid, string NodeId, string SourceId, string Partition, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -900,20 +783,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(RegistryJid, Request.ToString(), async (sender, e) =>
-			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}, State);
+			return this.client.SendIqSet(RegistryJid, Request.ToString(), (sender, e) => Callback.Raise(this, e), State);
 		}
 
 		private async Task DisownedHandler(object Sender, IqEventArgs e)
@@ -935,26 +805,15 @@ namespace Waher.Networking.XMPP.Provisioning
 				Node = new ThingReference(NodeId, SourceId, Partition);
 
 			NodeEventArgs e2 = new NodeEventArgs(e, Node);
-			NodeEventHandler h = this.Disowned;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.Disowned.Raise(this, e2);
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when a node has been disowned.
 		/// </summary>
-		public event NodeEventHandler Disowned = null;
+		public event EventHandlerAsync<NodeEventArgs> Disowned = null;
 
 		/// <summary>
 		/// Searches for publically available things in the thing registry.
@@ -964,9 +823,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SearchOperators">Search operators to use in search.</param>
 		/// <param name="Callback">Method to call when result has been received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(int Offset, int MaxCount, SearchOperator[] SearchOperators, SearchResultEventHandler Callback, object State)
+		public Task Search(int Offset, int MaxCount, SearchOperator[] SearchOperators, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
-			this.Search(this.thingRegistryAddress, Offset, MaxCount, SearchOperators, Callback, State);
+			return this.Search(this.thingRegistryAddress, Offset, MaxCount, SearchOperators, Callback, State);
 		}
 
 		/// <summary>
@@ -978,7 +837,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SearchOperators">Search operators to use in search.</param>
 		/// <param name="Callback">Method to call when result has been received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Search(string RegistryJid, int Offset, int MaxCount, SearchOperator[] SearchOperators, SearchResultEventHandler Callback, object State)
+		public Task Search(string RegistryJid, int Offset, int MaxCount, SearchOperator[] SearchOperators, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -995,14 +854,14 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</search>");
 
-			this.client.SendIqGet(RegistryJid, Request.ToString(), (sender, e) =>
+			return this.client.SendIqGet(RegistryJid, Request.ToString(), (sender, e) =>
 			{
 				ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 				return Task.CompletedTask;
 			}, State);
 		}
 
-		internal static void ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, SearchResultEventHandler Callback, object State)
+		internal static void ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			List<SearchResultThing> Things = new List<SearchResultThing>();
 			List<MetaDataTag> MetaData = new List<MetaDataTag>();
@@ -1857,7 +1716,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="DeviceBareJid">Device Bare JID</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void FindThingRegistry(string DeviceBareJid, ServiceEventHandler Callback, object State)
+		public void FindThingRegistry(string DeviceBareJid, EventHandlerAsync<ServiceEventArgs> Callback, object State)
 		{
 			this.client.FindComponent(DeviceBareJid, NamespacesDiscovery, Callback, State);
 		}

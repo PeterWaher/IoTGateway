@@ -97,11 +97,11 @@ namespace Waher.Things.Ip
 							this.AddIdentityReadout(Fields, Now);
 						}
 
-						Request.ReportFields(true, Fields);
+						await Request.ReportFields(true, Fields);
 					}
 					else
 					{
-						Request.ReportErrors(true, new ThingError(this, Now,
+						await Request.ReportErrors(true, new ThingError(this, Now,
 							GetErrorMessage(Response)));
 					}
 				}
@@ -109,13 +109,13 @@ namespace Waher.Things.Ip
 			catch (PingException ex)
 			{
 				if (!(ex.InnerException is null))
-					Request.ReportErrors(true, new ThingError(this, ex.InnerException.Message));
+					await Request.ReportErrors(true, new ThingError(this, ex.InnerException.Message));
 				else
-					Request.ReportErrors(true, new ThingError(this, ex.Message));
+					await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 

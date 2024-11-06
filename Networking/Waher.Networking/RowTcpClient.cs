@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -128,7 +127,7 @@ namespace Waher.Networking
 					{
 						if (this.error)
 						{
-							this.Error("Row too long: " + this.len.ToString() + " characters");
+							await this.Error("Row too long: " + this.len.ToString() + " characters");
 							this.error = false;
 						}
 						else if (!await base.TextDataReceived(this.buffer.ToString()))
@@ -169,7 +168,7 @@ namespace Waher.Networking
 		/// <param name="Text">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public override Task<bool> SendAsync(string Text, EventHandler Callback)
+		public override Task<bool> SendAsync(string Text, EventHandlerAsync Callback)
 		{
 			return base.SendAsync(Text + "\r\n", Callback);
 		}

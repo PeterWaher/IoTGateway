@@ -6,19 +6,17 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Data.Functions;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions
+namespace Waher.Script.Data.Functions
 {
 	/// <summary>
 	/// Generates a callback function based on script.
 	/// </summary>
-	public class Callback : FunctionTwoScalarVariables
+	public class Callback : FunctionMultiVariate
 	{
 		/// <summary>
 		/// Generates a callback function based on script.
@@ -29,7 +27,20 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Callback(ScriptNode DelegateType, ScriptNode Lambda, int Start, int Length, Expression Expression)
-			: base(DelegateType, Lambda, Start, Length, Expression)
+			: base(new ScriptNode[] { DelegateType, Lambda }, argumentTypes2Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Generates a callback function based on script.
+		/// </summary>
+		/// <param name="DelegateType">Delegate type.</param>
+		/// <param name="Lambda">Lambda expression that will be used in call-backs.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Callback(ScriptNode DelegateType, ScriptNode ArgumentType, ScriptNode Lambda, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { DelegateType, ArgumentType, Lambda }, argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
 
@@ -46,16 +57,29 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			if (!(Argument1.AssociatedObjectValue is Type Type) || !delegateTypeInfo.IsAssignableFrom(Type.GetTypeInfo()))
-				throw new ScriptRuntimeException("Expected a delegate type in the first argument.", this);
+			int i = 0;
+			int c = Arguments.Length;
 
-			if (!(Argument2.AssociatedObjectValue is ILambdaExpression Lambda))
+			if (!(Arguments[i++].AssociatedObjectValue is Type Type))
+				throw new ScriptRuntimeException("Expected a type in the first argument.", this);
+
+			if (c > 2)
+			{
+				if (!(Arguments[i++].AssociatedObjectValue is Type TArg1))
+					throw new ScriptRuntimeException("Expected a type in the second argument.", this);
+
+				Type = Type.MakeGenericType(TArg1);
+			}
+
+			if (!delegateTypeInfo.IsAssignableFrom(Type.GetTypeInfo()))
+				throw new ScriptRuntimeException("Type must be a delegate type.", this);
+
+			if (!(Arguments[i++].AssociatedObjectValue is ILambdaExpression Lambda))
 				throw new ScriptRuntimeException("Expected a lambda expression in the second argument.", this);
 
 			Type ScriptProxyType;
@@ -82,9 +106,18 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 					bool IsAsync = taskTypeInfo.IsAssignableFrom(ReturnType.GetTypeInfo());
 
-					string TypeName = Type.Name.Replace("`", "_GT_");
+					string ClassTypeName = Type.Name.Replace("`", "_GT_");
+					string ReferenceTypeName = ClassTypeName;
+					Type[] TypeArguments = Type.IsConstructedGenericType ? Type.GenericTypeArguments : null;
+					int j, d = TypeArguments?.Length ?? 0;
+					StringBuilder sb = new StringBuilder();
+					string s;
+
+					for (j = 0; j < d; j++)
+						ClassTypeName = ClassTypeName.Replace("GT_" + (j + 1).ToString(), TypeArguments[j].FullName.Replace(".", "_"));
+
 					StringBuilder CSharp = new StringBuilder();
-					
+
 					CSharp.AppendLine("using System;");
 					CSharp.AppendLine("using Waher.Script;");
 					CSharp.AppendLine("using Waher.Script.Abstraction.Elements;");
@@ -96,20 +129,49 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					CSharp.AppendLine(".ScriptCallbacks");
 					CSharp.AppendLine("{");
 					CSharp.Append("\tpublic class ScriptProxy");
-					CSharp.Append(TypeName);
+					CSharp.Append(ClassTypeName);
 					CSharp.Append(" : ScriptProxy<");
-					CSharp.Append(Type.FullName);
+
+					if (d > 0)
+					{
+						Type GenericType = Type.GetGenericTypeDefinition();
+						s = GenericType.FullName;
+
+						j = s.IndexOf('`');
+						if (j > 0)
+							s = s.Substring(0, j);
+
+						sb.Append(s);
+						sb.Append('<');
+
+						for (j = 0; j < d; j++)
+						{
+							if (j > 0)
+								sb.Append(", ");
+
+							sb.Append(TypeArguments[j].FullName);
+						}
+
+						sb.Append('>');
+
+						ReferenceTypeName = sb.ToString();
+						CSharp.Append(ReferenceTypeName);
+						sb.Clear();
+					}
+					else
+						CSharp.Append(Type.FullName);
+
 					CSharp.AppendLine(">");
 					CSharp.AppendLine("\t{");
 					CSharp.Append("\t\tpublic ScriptProxy");
-					CSharp.Append(TypeName);
+					CSharp.Append(ClassTypeName);
 					CSharp.AppendLine("(ILambdaExpression Lambda, Variables Variables)");
 					CSharp.AppendLine("\t\t\t: base(Lambda, Variables)");
 					CSharp.AppendLine("\t\t{");
 					CSharp.AppendLine("\t\t}");
 					CSharp.AppendLine();
 					CSharp.Append("\t\tpublic override ");
-					CSharp.Append(Type.FullName);
+					CSharp.Append(ReferenceTypeName);
 					CSharp.AppendLine(" GetCallbackFunction()");
 					CSharp.AppendLine("\t\t{");
 					CSharp.AppendLine("\t\t\treturn this.CallLambda;");
@@ -230,7 +292,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					Type Loop = Type;
 					PropertyInfo PI;
 					FieldInfo FI;
-					string s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
+					s = Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "netstandard.dll");
 
 					if (File.Exists(s))
 						Dependencies[s] = true;
@@ -267,8 +329,6 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						if (!string.IsNullOrEmpty(Location))
 							References.Add(Microsoft.CodeAnalysis.MetadataReference.CreateFromFile(Location));
 					}
-
-					StringBuilder sb = new StringBuilder();
 
 					sb.Append("WSDA.");
 					AppendType(Type, sb);
@@ -318,7 +378,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					sb.Clear();
 					sb.Append(Type.Namespace);
 					sb.Append(".ScriptCallbacks.ScriptProxy");
-					sb.Append(TypeName);
+					sb.Append(ClassTypeName);
 
 					ScriptProxyType = A.GetType(sb.ToString());
 					scriptProxyTypes[Type] = ScriptProxyType;
@@ -328,18 +388,6 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			IScriptProxy Proxy = (IScriptProxy)Activator.CreateInstance(ScriptProxyType, Lambda, Variables);
 
 			return new ObjectValue(Proxy.GetCallbackFunctionUntyped());
-		}
-
-		/// <summary>
-		/// Evaluates the function on two scalar arguments.
-		/// </summary>
-		/// <param name="Argument1">Function argument 1.</param>
-		/// <param name="Argument2">Function argument 2.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
-		{
-			return Task.FromResult(this.EvaluateScalar(Argument1, Argument2, Variables));
 		}
 
 		private static readonly TypeInfo delegateTypeInfo = typeof(Delegate).GetTypeInfo();

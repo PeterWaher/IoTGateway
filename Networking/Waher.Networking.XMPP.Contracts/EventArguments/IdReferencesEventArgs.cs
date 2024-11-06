@@ -1,14 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.Contracts
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for ID References callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task IdReferencesEventHandler(object Sender, IdReferencesEventArgs e);
-
 	/// <summary>
 	/// Event arguments for ID References responses
 	/// </summary>

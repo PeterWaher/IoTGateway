@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.Devices.Gpio;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
+using Windows.Devices.Gpio;
 
 namespace Waher.Things.Gpio
 {
@@ -43,15 +43,12 @@ namespace Waher.Things.Gpio
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public GpioController Controller
+		public async Task<GpioController> GetController()
 		{
-			get
-			{
-				if (this.Parent is Controller Controller)
-					return Controller.GpioController;
-				else
-					return null;
-			}
+			if (await this.GetParent() is Controller Controller)
+				return Controller.GpioController;
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -59,7 +56,7 @@ namespace Waher.Things.Gpio
 		/// </summary>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -67,7 +64,7 @@ namespace Waher.Things.Gpio
 		/// </summary>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is Controller);
+			return Task.FromResult(Parent is Controller);
 		}
 
 		/// <summary>

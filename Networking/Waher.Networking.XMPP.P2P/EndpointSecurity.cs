@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
@@ -125,7 +126,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="ServerlessMessaging">Reference to serverless messaging object.</param>
 		/// <param name="SecurityStrength">Desired security strength.</param>
 		/// <param name="LocalEndpoints">Local endpoints to use</param>
-		public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging, int SecurityStrength, 
+		public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging, int SecurityStrength,
 			params IE2eEndpoint[] LocalEndpoints)
 			: base()
 		{
@@ -183,7 +184,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
 		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
 		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength, 
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
 			Type OnlyIfDerivedFrom)
 		{
 			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, OnlyIfDerivedFrom, null);
@@ -198,7 +199,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
 		/// <param name="Thread">Optional profiling thread.</param>
 		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength, 
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength,
 			Type OnlyIfDerivedFrom, ProfilerThread Thread)
 		{
 			Thread = Thread?.CreateSubThread("Endpoints", ProfilerThreadType.Sequential);
@@ -696,7 +697,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Data">Binary data</param>
 		/// <param name="EndpointReference">Endpoint used for encryption.</param>
 		/// <returns>Encrypted data, or null if no E2E information is found for endpoint.</returns>
-		public virtual byte[] Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference)
+		public virtual Task<byte[]> Encrypt(string Id, string Type, string From, string To, byte[] Data, out IE2eEndpoint EndpointReference)
 		{
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
 			if (RemoteEndpoint is null)
@@ -710,7 +711,9 @@ namespace Waher.Networking.XMPP.P2P
 				return null;
 
 			uint Counter = EndpointReference.GetNextCounter();
-			return EndpointReference.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, EndpointReference, RemoteEndpoint);
+			byte[] Encrypted = EndpointReference.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, EndpointReference, RemoteEndpoint);
+
+			return Task.FromResult(Encrypted);
 		}
 
 		/// <summary>
@@ -724,7 +727,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Data">Binary data</param>
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
 		/// <returns>Decrypted data, or null if no E2E information is found for endpoint.</returns>
-		public virtual byte[] Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
+		public virtual Task<byte[]> Decrypt(string EndpointReference, string Id, string Type, string From, string To, byte[] Data,
 			IE2eSymmetricCipher SymmetricCipher)
 		{
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
@@ -739,7 +742,9 @@ namespace Waher.Networking.XMPP.P2P
 			if (!(SymmetricCipher is null) && Cipher.GetType() != SymmetricCipher.GetType())
 				Cipher = SymmetricCipher;
 
-			return Cipher.Decrypt(Id, Type, From, To, Data, RemoteEndpoint, LocalEndpoint);
+			byte[] Decrypted = Cipher.Decrypt(Id, Type, From, To, Data, RemoteEndpoint, LocalEndpoint);
+
+			return Task.FromResult(Decrypted);
 		}
 
 		private IE2eEndpoint FindRemoteEndpoint(string RemoteJid, string EndpointReference)
@@ -846,7 +851,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DataXml">XML data</param>
 		/// <param name="Xml">Output</param>
 		/// <returns>If E2E information was available and encryption was possible.</returns>
-		public virtual bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
+		public virtual async Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
 		{
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
 			if (RemoteEndpoint is null)
@@ -861,7 +866,7 @@ namespace Waher.Networking.XMPP.P2P
 			bool Result = LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Xml, LocalEndpoint, RemoteEndpoint);
 
 			if (Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b)
-				Client.Information(DataXml);
+				await Client.Information(DataXml);
 
 			return Result;
 		}
@@ -926,12 +931,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="To">To attribute</param>
 		/// <param name="E2eElement">Encrypted XML data</param>
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
-		/// <param name="EndpointReference">Endpoint reference</param>
-		/// <returns>Decrypted XML.</returns>
-		public virtual string Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
-			IE2eSymmetricCipher SymmetricCipher, out string EndpointReference)
+		/// <returns>Decrypted XML, together with an endpoint reference, if successful, null otherwise..</returns>
+		public virtual async Task<Tuple<string, string>> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
+			IE2eSymmetricCipher SymmetricCipher)
 		{
-			EndpointReference = XML.Attribute(E2eElement, "r");
+			string EndpointReference = XML.Attribute(E2eElement, "r");
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
 			if (RemoteEndpoint is null)
 				return null;
@@ -947,9 +951,9 @@ namespace Waher.Networking.XMPP.P2P
 			string Xml = Cipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
 
 			if (!(Xml is null) && Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b)
-				Client.Information(Xml);
+				await Client.Information(Xml);
 
-			return Xml;
+			return new Tuple<string, string>(Xml, EndpointReference);
 		}
 
 		private Task AesMessageHandler(object Sender, MessageEventArgs e)
@@ -967,15 +971,18 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eMessageHandler(Sender, e, this.cha);
 		}
 
-		private Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
+		private async Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			string Xml = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher, out string EndpointReference);
-			if (Xml is null)
+			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
+			if (T is null)
 			{
-				Client.Error("Unable to decrypt or verify message.");
-				return Task.CompletedTask;
+				await Client.Error("Unable to decrypt or verify message.");
+				return;
 			}
+
+			string Xml = T.Item1;
+			string EndpointReference = T.Item2;
 
 			XmlDocument Doc = new XmlDocument()
 			{
@@ -993,8 +1000,6 @@ namespace Waher.Networking.XMPP.P2P
 			};
 
 			Client.ProcessMessage(e2);
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -1027,9 +1032,9 @@ namespace Waher.Networking.XMPP.P2P
 			XmppClient Client = Sender as XmppClient;
 			XmlElement E = e.FirstElement;
 			object[] P = (object[])e.State;
-			IqResultEventHandlerAsync Callback = (IqResultEventHandlerAsync)P[0];
+			EventHandlerAsync<IqResultEventArgs> Callback = (EventHandlerAsync<IqResultEventArgs>)P[0];
 			object State = P[1];
-			
+
 			if (!this.TryGetSymmetricCipher(E.LocalName, E.NamespaceURI, out IE2eSymmetricCipher Cipher))
 				Cipher = null;
 
@@ -1037,13 +1042,15 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				if (!(Callback is null))
 				{
-					string Content = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher, out string EndpointReference);
-					if (Content is null)
+					Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
+					if (T is null)
 					{
-						Client.Error("Unable to decrypt or verify response.");
+						await Client.Error("Unable to decrypt or verify response.");
 						return;
 					}
 
+					string Content = T.Item1;
+					string EndpointReference = T.Item2;
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<iq xmlns=\"jabber:client\" id=\"");
@@ -1095,11 +1102,11 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				else
 				{
-					this.SynchronizeE2e(To, async (Sender2, e2) =>
+					await this.SynchronizeE2e(To, async (Sender2, e2) =>
 					{
 						if (e2.Ok)
 						{
-							this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State,
+							await this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State,
 								RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, true);
 						}
 						else
@@ -1174,16 +1181,19 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eIqGetHandler(Sender, e, this.cha);
 		}
 
-		private Task E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
+		private async Task E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher, out string EndpointReference);
-			if (Content is null)
+			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
+			if (T is null)
 			{
-				Client.Error("Unable to decrypt or verify request.");
-				e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
-				return Task.CompletedTask;
+				await Client.Error("Unable to decrypt or verify request.");
+				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
+				return;
 			}
+
+			string Content = T.Item1;
+			string EndpointReference= T.Item2;
 
 			XmlDocument Doc = new XmlDocument()
 			{
@@ -1192,9 +1202,7 @@ namespace Waher.Networking.XMPP.P2P
 			Doc.LoadXml(this.EmbedIq(e, "get", Content));
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
-			Client.ProcessIqGet(e2);
-
-			return Task.CompletedTask;
+			await Client.ProcessIqGet(e2);
 		}
 
 		private Task AesIqSetHandler(object Sender, IqEventArgs e)
@@ -1212,16 +1220,19 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eIqSetHandler(Sender, e, this.cha);
 		}
 
-		private Task E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
+		private async Task E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			string Content = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher, out string EndpointReference);
-			if (Content is null)
+			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
+			if (T is null)
 			{
-				Client.Error("Unable to decrypt or verify request.");
-				e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
-				return Task.CompletedTask;
+				await Client.Error("Unable to decrypt or verify request.");
+				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
+				return;
 			}
+
+			string Content = T.Item1;
+			string EndpointReference = T.Item2;
 
 			XmlDocument Doc = new XmlDocument()
 			{
@@ -1230,9 +1241,7 @@ namespace Waher.Networking.XMPP.P2P
 			Doc.LoadXml(this.EmbedIq(e, "set", Content));
 
 			IqEventArgs e2 = new IqEventArgs(Client, this, EndpointReference, Cipher, Doc.DocumentElement, e.Id, e.To, e.From);
-			Client.ProcessIqSet(e2);
-
-			return Task.CompletedTask;
+			await Client.ProcessIqSet(e2);
 		}
 
 		/// <summary>
@@ -1252,12 +1261,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Method to call when message has been delivered.</param>
 		/// <param name="State">State object to pass on to <paramref name="DeliveryCallback"/>.</param>
-		public void SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
+		public Task SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
 			MessageType Type, string Id, string To, string CustomXml, string Body, string Subject,
-			string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback,
+			string Language, string ThreadId, string ParentThreadId, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback,
 			object State)
 		{
-			this.SendMessage(Client, E2ETransmission, QoS, Type, Id, To, CustomXml, Body, Subject,
+			return this.SendMessage(Client, E2ETransmission, QoS, Type, Id, To, CustomXml, Body, Subject,
 				Language, ThreadId, ParentThreadId, DeliveryCallback, State, false);
 		}
 
@@ -1279,9 +1288,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DeliveryCallback">Method to call when message has been delivered.</param>
 		/// <param name="State">State object to pass on to <paramref name="DeliveryCallback"/>.</param>
 		/// <param name="PkiSynchronized">If E2E parameters have been synchronized</param>
-		private void SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
+		private async Task SendMessage(XmppClient Client, E2ETransmission E2ETransmission, QoSLevel QoS,
 			MessageType Type, string Id, string To, string CustomXml, string Body, string Subject,
-			string Language, string ThreadId, string ParentThreadId, DeliveryEventHandler DeliveryCallback,
+			string Language, string ThreadId, string ParentThreadId, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback,
 			object State, bool PkiSynchronized)
 		{
 			if (this.client is null)
@@ -1357,11 +1366,11 @@ namespace Waher.Networking.XMPP.P2P
 			string MessageXml = Xml.ToString();
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To, MessageXml, Encrypted))
+			if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To, MessageXml, Encrypted))
 			{
 				MessageXml = Encrypted.ToString();
 
-				Client.SendMessage(QoS, MessageType.Normal, Id, To, MessageXml, string.Empty,
+				await Client.SendMessage(QoS, MessageType.Normal, Id, To, MessageXml, string.Empty,
 					string.Empty, string.Empty, string.Empty, string.Empty, DeliveryCallback, State);
 
 				return;
@@ -1377,9 +1386,9 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						Encrypted.Clear();
 
-						if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From, MessageXml, Encrypted))
+						if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From, MessageXml, Encrypted))
 						{
-							Client.SendMessage(QoS, MessageType.Normal, Id, e.From, Encrypted.ToString(), string.Empty,
+							await Client.SendMessage(QoS, MessageType.Normal, Id, e.From, Encrypted.ToString(), string.Empty,
 								string.Empty, string.Empty, string.Empty, string.Empty, DeliveryCallback, State);
 
 							Found = true;
@@ -1396,16 +1405,16 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!PkiSynchronized)
 			{
-				this.SynchronizeE2e(To, async (Sender, e) =>
+				await this.SynchronizeE2e(To, async (Sender, e) =>
 				{
 					if (e.Ok)
 					{
-						this.SendMessage(Client, E2ETransmission, QoS, Type, Id, To, CustomXml, Body, Subject,
+						await this.SendMessage(Client, E2ETransmission, QoS, Type, Id, To, CustomXml, Body, Subject,
 							Language, ThreadId, ParentThreadId, DeliveryCallback, State, true);
 					}
 					else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
 					{
-						Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
+						await Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
 							ThreadId, ParentThreadId, DeliveryCallback, State);
 					}
 					else if (!(DeliveryCallback is null))
@@ -1423,7 +1432,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
 			{
-				Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
+				await Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
 					ThreadId, ParentThreadId, DeliveryCallback, State);
 			}
 			else
@@ -1440,8 +1449,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		/// <returns>ID of IQ stanza.</returns>
-		public uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, Client.DefaultRetryTimeout,
 				Client.DefaultNrRetries, Client.DefaultDropOff, Client.DefaultMaxRetryTimeout, false);
@@ -1459,8 +1468,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza.</returns>
-		public uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries)
+		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, false,
 				RetryTimeout, false);
@@ -1481,8 +1490,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza.</returns>
-		public uint SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
 			int MaxRetryTimeout)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, RetryTimeout,
@@ -1499,8 +1508,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
 		/// <returns>ID of IQ stanza.</returns>
-		public uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "set", Callback, State,
 				Client.DefaultRetryTimeout, Client.DefaultNrRetries, Client.DefaultDropOff,
@@ -1519,8 +1528,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <returns>ID of IQ stanza.</returns>
-		public uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries)
+		public Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "set", Callback, State, RetryTimeout,
 				NrRetries, false, RetryTimeout, false);
@@ -1541,8 +1550,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza.</returns>
-		public uint SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+		public Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
 			int MaxRetryTimeout)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "set", Callback, State, RetryTimeout,
@@ -1557,9 +1566,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Id">Id attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Xml">Payload XML</param>
-		public void SendIqResult(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml)
+		public Task SendIqResult(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml)
 		{
-			this.SendIq(Client, E2ETransmission, Id, To, Xml, "result", null, null, 0, 0, false, 0, false);
+			return this.SendIq(Client, E2ETransmission, Id, To, Xml, "result", null, null, 0, 0, false, 0, false);
 		}
 
 		/// <summary>
@@ -1570,9 +1579,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Id">Id attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="Xml">Payload XML</param>
-		public void SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml)
+		public Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml)
 		{
-			this.SendIq(Client, E2ETransmission, Id, To, Xml, "error", null, null, 0, 0, false, 0, false);
+			return this.SendIq(Client, E2ETransmission, Id, To, Xml, "error", null, null, 0, 0, false, 0, false);
 		}
 
 		/// <summary>
@@ -1583,10 +1592,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Id">Id attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="ex">Exception object</param>
-		public void SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
+		public async Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
 			Exception ex)
 		{
-			this.SendIqError(Client, E2ETransmission, Id, To, Client.ExceptionToXmppXml(ex));
+			await this.SendIqError(Client, E2ETransmission, Id, To, await Client.ExceptionToXmppXml(ex));
 		}
 
 		/// <summary>
@@ -1610,8 +1619,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
 		/// <exception cref="ObjectDisposedException">If endpoint security object has been disposed.</exception>
 		/// <exception cref="InvalidOperationException">If E2E transmission is asserted, but no E2E-encrypted channel could be established.</exception>
-		protected uint SendIq(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml,
-			string Type, IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+		protected async Task<uint> SendIq(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml,
+			string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
 			int MaxRetryTimeout, bool PkiSynchronized)
 		{
 			if (this.client is null)
@@ -1622,11 +1631,11 @@ namespace Waher.Networking.XMPP.P2P
 
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (this.Encrypt(Client, Id, Type, this.client.FullJID, To, Xml, Encrypted))
+			if (await this.Encrypt(Client, Id, Type, this.client.FullJID, To, Xml, Encrypted))
 			{
 				string XmlEnc = Encrypted.ToString();
 
-				return Client.SendIq(Id, To, XmlEnc, Type, this.IqResult,
+				return await Client.SendIq(Id, To, XmlEnc, Type, this.IqResult,
 					new object[] { Callback, State, E2ETransmission, Id, To, Xml, Type, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, PkiSynchronized },
 					RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
 			}
@@ -1647,16 +1656,16 @@ namespace Waher.Networking.XMPP.P2P
 					SeqNr = uint.Parse(Id);
 				}
 
-				this.SynchronizeE2e(To, async (Sender, e) =>
+				await this.SynchronizeE2e(To, async (Sender, e) =>
 				{
 					if (e.Ok)
 					{
-						this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State,
+						await this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State,
 							RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, true);
 					}
 					else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
 					{
-						Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
+						await Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
 							NrRetries, DropOff, MaxRetryTimeout);
 					}
 					else if (!(Callback is null))
@@ -1676,7 +1685,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
 			{
-				return Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout, 
+				return await Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
 					NrRetries, DropOff, MaxRetryTimeout);
 			}
 			else
@@ -1714,11 +1723,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Response XML element.</returns>
 		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
-		public Task<XmlElement> IqGetAsync(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml)
+		public async Task<XmlElement> IqGetAsync(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml)
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			this.SendIqGet(Client, E2ETransmission, To, Xml, (sender, e) =>
+			await this.SendIqGet(Client, E2ETransmission, To, Xml, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1729,7 +1738,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1763,11 +1772,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Response XML element.</returns>
 		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
-		public Task<XmlElement> IqSetAsync(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml)
+		public async Task<XmlElement> IqSetAsync(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml)
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			this.SendIqSet(Client, E2ETransmission, To, Xml, (sender, e) =>
+			await this.SendIqSet(Client, E2ETransmission, To, Xml, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1778,7 +1787,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1802,9 +1811,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="FullJID">Full JID of remote entity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
-		public void SynchronizeE2e(string FullJID, IqResultEventHandlerAsync Callback)
+		public Task SynchronizeE2e(string FullJID, EventHandlerAsync<IqResultEventArgs> Callback)
 		{
-			this.SynchronizeE2e(FullJID, Callback, null);
+			return this.SynchronizeE2e(FullJID, Callback, null);
 		}
 
 		/// <summary>
@@ -1813,9 +1822,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="FullJID">Full JID of remote entity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SynchronizeE2e(string FullJID, IqResultEventHandlerAsync Callback, object State)
+		public Task SynchronizeE2e(string FullJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.client.SendIqSet(FullJID, this.GetE2eXml(), async (Sender, e) =>
+			return this.client.SendIqSet(FullJID, this.GetE2eXml(), async (Sender, e) =>
 			{
 				if (e.Ok && !(e.FirstElement is null))
 					await this.ParseE2e(e.FirstElement, FullJID);
@@ -1878,7 +1887,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			bool HasE2E = this.AddPeerPkiInfo(RemoteFullJID, E2E);
-			bool HasP2P = this.serverlessMessaging?.AddPeerAddressInfo(RemoteFullJID, P2P) ?? false;
+			bool HasP2P = !(this.serverlessMessaging is null) && await this.serverlessMessaging.AddPeerAddressInfo(RemoteFullJID, P2P);
 
 			PeerSynchronizedEventHandler h = this.PeerUpdated;
 			if (!(h is null))
@@ -1899,7 +1908,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			await this.ParseE2e(e.Query, e.From);
-			e.IqResult(this.GetE2eXml());
+			await e.IqResult(this.GetE2eXml());
 		}
 
 		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
@@ -1930,17 +1939,13 @@ namespace Waher.Networking.XMPP.P2P
 					}
 
 					bool HasE2E = this.AddPeerPkiInfo(e.From, E2E);
-					bool HasP2P = this.serverlessMessaging?.AddPeerAddressInfo(e.From, P2P) ?? false;
+					bool HasP2P = !(this.serverlessMessaging is null) && await this.serverlessMessaging.AddPeerAddressInfo(e.From, P2P);
 
-					AvailableEventHandler h = this.PeerAvailable;
-					if (!(h is null))
-						await h(this, new AvailableEventArgs(e, HasE2E, HasP2P));
+					await this.PeerAvailable.Raise(this, new AvailableEventArgs(e, HasE2E, HasP2P));
 					break;
 
 				case PresenceType.Unavailable:
-					PresenceEventHandlerAsync h2 = this.PeerUnavailable;
-					if (!(h2 is null))
-						await h2(this, e);
+					await this.PeerUnavailable.Raise(this, e);
 					break;
 			}
 		}
@@ -1948,12 +1953,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// Event raised whenever a peer has become available.
 		/// </summary>
-		public event AvailableEventHandler PeerAvailable = null;
+		public event EventHandlerAsync<AvailableEventArgs> PeerAvailable = null;
 
 		/// <summary>
 		/// Event raised whenever a peer has become unavailable.
 		/// </summary>
-		public event PresenceEventHandlerAsync PeerUnavailable = null;
+		public event EventHandlerAsync<PresenceEventArgs> PeerUnavailable = null;
 
 		/// <summary>
 		/// Event raised whenever information about a peer has been updated.

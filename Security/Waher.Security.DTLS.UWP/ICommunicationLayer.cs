@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
@@ -9,7 +7,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	/// <param name="Data">Data packet being received.</param>
 	/// <param name="RemoteEndpoint">Remote endpoint, represented as a string.</param>
-	public delegate void DataReceivedEventHandler(byte[] Data, object RemoteEndpoint);
+	public delegate Task DataReceivedEventHandler(byte[] Data, object RemoteEndpoint);
 
 	/// <summary>
 	/// Represents the communication layer which the DTLS layer will use.
@@ -21,7 +19,7 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		void SendPacket(byte[] Packet, object RemoteEndpoint);
+		Task SendPacket(byte[] Packet, object RemoteEndpoint);
 
 		/// <summary>
 		/// Event raised when a packet has been received.

@@ -661,7 +661,7 @@ namespace Waher.IoTGateway.Setup
 				return Msg;
 			}
 
-			await Status.Invoke(this, "Checking current IP Address.");
+			await Status.Raise(this, "Checking current IP Address.");
 
 			Variables Variables = HttpServer.CreateVariables();
 			object Result;
@@ -690,17 +690,17 @@ namespace Waher.IoTGateway.Setup
 				return Msg;
 			}
 
-			await Status.Invoke(this, "Current IP Address: " + CurrentIP);
+			await Status.Raise(this, "Current IP Address: " + CurrentIP);
 
 			string LastIP = await RuntimeSettings.GetAsync("Last.IP." + DomainName, string.Empty);
 
 			if (LastIP == CurrentIP)
-				await Status.Invoke(this, "IP Address has not changed for " + DomainName + ".");
+				await Status.Raise(this, "IP Address has not changed for " + DomainName + ".");
 			else
 			{
 				try
 				{
-					await Status.Invoke(this, "Updating IP address for " + DomainName + " to " + CurrentIP + ".");
+					await Status.Raise(this, "Updating IP address for " + DomainName + " to " + CurrentIP + ".");
 
 					Variables["Account"] = this.dynDnsAccount;
 					Variables["Password"] = this.dynDnsPassword;
@@ -753,7 +753,7 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>null if successful, error message if failed.</returns>
 		public async Task<string> Test(string DomainName, bool EnvironmentSetup, EventHandlerAsync<string> Status)
 		{
-			await Status.Invoke(this, "Testing " + DomainName + "...");
+			await Status.Raise(this, "Testing " + DomainName + "...");
 
 			string Msg = await this.CheckDynamicIp(DomainName, EnvironmentSetup, Status);
 			if (!string.IsNullOrEmpty(Msg))
@@ -804,7 +804,7 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			await Status.Invoke(this, "Domain name valid.");
+			await Status.Raise(this, "Domain name valid.");
 
 			return null;
 		}
@@ -1145,18 +1145,18 @@ namespace Waher.IoTGateway.Setup
 
 				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
 				{
-					await Status.Invoke(this, "Connecting to directory.");
+					await Status.Raise(this, "Connecting to directory.");
 
 					AcmeDirectory AcmeDirectory = await Client.GetDirectory();
 
 					if (AcmeDirectory.ExternalAccountRequired)
-						await Status.Invoke(this, "An external account is required.");
+						await Status.Raise(this, "An external account is required.");
 
 					if (!(AcmeDirectory.TermsOfService is null))
 					{
 						URL = AcmeDirectory.TermsOfService.ToString();
-						await Status.Invoke(this, "Terms of service available on: " + URL);
-						await TermsOfService.Invoke(this, URL);
+						await Status.Raise(this, "Terms of service available on: " + URL);
+						await TermsOfService.Raise(this, URL);
 
 						this.urlToS = URL;
 
@@ -1172,9 +1172,9 @@ namespace Waher.IoTGateway.Setup
 					}
 
 					if (!(AcmeDirectory.Website is null))
-						await Status.Invoke(this, "Web site available on: " + AcmeDirectory.Website.ToString());
+						await Status.Raise(this, "Web site available on: " + AcmeDirectory.Website.ToString());
 
-					await Status.Invoke(this, "Getting account.");
+					await Status.Raise(this, "Getting account.");
 
 					List<string> Names = new List<string>();
 
@@ -1197,43 +1197,43 @@ namespace Waher.IoTGateway.Setup
 					{
 						Account = await Client.GetAccount();
 
-						await Status.Invoke(this, "Account found.");
-						await Status.Invoke(this, "Created: " + Account.CreatedAt.ToString());
-						await Status.Invoke(this, "Initial IP: " + Account.InitialIp);
-						await Status.Invoke(this, "Status: " + Account.Status.ToString());
+						await Status.Raise(this, "Account found.");
+						await Status.Raise(this, "Created: " + Account.CreatedAt.ToString());
+						await Status.Raise(this, "Initial IP: " + Account.InitialIp);
+						await Status.Raise(this, "Status: " + Account.Status.ToString());
 
 						if (string.IsNullOrEmpty(this.contactEMail))
 						{
 							if (!(Account.Contact is null) && Account.Contact.Length != 0)
 							{
-								await Status.Invoke(this, "Updating contact URIs in account.");
+								await Status.Raise(this, "Updating contact URIs in account.");
 								Account = await Account.Update(new string[0]);
-								await Status.Invoke(this, "Account updated.");
+								await Status.Raise(this, "Account updated.");
 							}
 						}
 						else
 						{
 							if (Account.Contact is null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
 							{
-								await Status.Invoke(this, "Updating contact URIs in account.");
+								await Status.Raise(this, "Updating contact URIs in account.");
 								Account = await Account.Update(new string[] { "mailto:" + this.contactEMail });
-								await Status.Invoke(this, "Account updated.");
+								await Status.Raise(this, "Account updated.");
 							}
 						}
 					}
 					catch (AcmeAccountDoesNotExistException)
 					{
-						await Status.Invoke(this, "Account not found.");
-						await Status.Invoke(this, "Creating account.");
+						await Status.Raise(this, "Account not found.");
+						await Status.Raise(this, "Creating account.");
 
 						Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? new string[0] : new string[] { "mailto:" + this.contactEMail },
 							this.acceptToS);
 
-						await Status.Invoke(this, "Account created.");
-						await Status.Invoke(this, "Status: " + Account.Status.ToString());
+						await Status.Raise(this, "Account created.");
+						await Status.Raise(this, "Status: " + Account.Status.ToString());
 					}
 
-					await Status.Invoke(this, "Generating new key.");
+					await Status.Raise(this, "Generating new key.");
 					await Account.NewKey();
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
@@ -1241,9 +1241,9 @@ namespace Waher.IoTGateway.Setup
 						RSA.ImportParameters(Client.ExportAccountKey(true));
 					}
 
-					await Status.Invoke(this, "New key generated.");
+					await Status.Raise(this, "New key generated.");
 
-					await Status.Invoke(this, "Creating order.");
+					await Status.Raise(this, "Creating order.");
 					AcmeOrder Order;
 
 					try
@@ -1253,15 +1253,15 @@ namespace Waher.IoTGateway.Setup
 					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
 					{
 						await Task.Delay(5000);
-						await Status.Invoke(this, "Retrying.");
+						await Status.Raise(this, "Retrying.");
 						Order = await Account.OrderCertificate(DomainNames, null, null);
 					}
 
-					await Status.Invoke(this, "Order created.");
+					await Status.Raise(this, "Order created.");
 
 					AcmeAuthorization[] Authorizations;
 
-					await Status.Invoke(this, "Getting authorizations.");
+					await Status.Raise(this, "Getting authorizations.");
 					try
 					{
 						Authorizations = await Order.GetAuthorizations();
@@ -1269,13 +1269,13 @@ namespace Waher.IoTGateway.Setup
 					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
 					{
 						await Task.Delay(5000);
-						await Status.Invoke(this, "Retrying.");
+						await Status.Raise(this, "Retrying.");
 						Authorizations = await Order.GetAuthorizations();
 					}
 
 					foreach (AcmeAuthorization Authorization in Authorizations)
 					{
-						await Status.Invoke(this, "Processing authorization for " + Authorization.Value);
+						await Status.Raise(this, "Processing authorization for " + Authorization.Value);
 
 						AcmeChallenge Challenge;
 						bool Acknowledged = false;
@@ -1291,13 +1291,13 @@ namespace Waher.IoTGateway.Setup
 								this.challenge = "/" + HttpChallenge.Token;
 								this.token = HttpChallenge.KeyAuthorization;
 
-								await Status.Invoke(this, "Acknowleding challenge.");
+								await Status.Raise(this, "Acknowleding challenge.");
 
 								string Msg = await this.CheckDynamicIp(Authorization.Value, EnvironmentSetup, Status);
 								if (string.IsNullOrEmpty(Msg))
 								{
 									Challenge = await HttpChallenge.AcknowledgeChallenge();
-									await Status.Invoke(this, "Challenge acknowledged: " + Challenge.Status.ToString());
+									await Status.Raise(this, "Challenge acknowledged: " + Challenge.Status.ToString());
 
 									Acknowledged = true;
 								}
@@ -1320,13 +1320,13 @@ namespace Waher.IoTGateway.Setup
 
 						do
 						{
-							await Status.Invoke(this, "Waiting to poll authorization status.");
+							await Status.Raise(this, "Waiting to poll authorization status.");
 							await Task.Delay(5000);
 
-							await Status.Invoke(this, "Polling authorization.");
+							await Status.Raise(this, "Polling authorization.");
 							Authorization2 = await Authorization2.Poll();
 
-							await Status.Invoke(this, "Authorization polled: " + Authorization2.Status.ToString());
+							await Status.Raise(this, "Authorization polled: " + Authorization2.Status.ToString());
 						}
 						while (Authorization2.Status == AcmeAuthorizationStatus.pending);
 
@@ -1354,7 +1354,7 @@ namespace Waher.IoTGateway.Setup
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))   // TODO: Make configurable
 					{
-						await Status.Invoke(this, "Finalizing order.");
+						await Status.Raise(this, "Finalizing order.");
 
 						SignatureAlgorithm SignAlg = new RsaSha256(RSA);
 
@@ -1365,7 +1365,7 @@ namespace Waher.IoTGateway.Setup
 							EMailAddress = this.contactEMail
 						});
 
-						await Status.Invoke(this, "Order finalized: " + Order.Status.ToString());
+						await Status.Raise(this, "Order finalized: " + Order.Status.ToString());
 
 						if (Order.Status != AcmeOrderStatus.valid)
 						{
@@ -1382,19 +1382,19 @@ namespace Waher.IoTGateway.Setup
 						if (Order.Certificate is null)
 							throw new Exception("No certificate URI provided.");
 
-						await Status.Invoke(this, "Downloading certificate.");
+						await Status.Raise(this, "Downloading certificate.");
 
 						X509Certificate2[] Certificates = await Order.DownloadCertificate();
 						X509Certificate2 Certificate = Certificates[0];
 
-						await Status.Invoke(this, "Exporting certificate.");
+						await Status.Raise(this, "Exporting certificate.");
 
 						this.certificate = Certificate.Export(X509ContentType.Cert);
 						this.privateKey = RSA.ExportCspBlob(true);
 						this.pfx = null;
 						this.password = string.Empty;
 
-						await Status.Invoke(this, "Adding private key.");
+						await Status.Raise(this, "Adding private key.");
 
 						try
 						{
@@ -1402,8 +1402,8 @@ namespace Waher.IoTGateway.Setup
 						}
 						catch (PlatformNotSupportedException)
 						{
-							await Status.Invoke(this, "Platform does not support adding of private key.");
-							await Status.Invoke(this, "Searching for OpenSSL on machine.");
+							await Status.Raise(this, "Platform does not support adding of private key.");
+							await Status.Raise(this, "Searching for OpenSSL on machine.");
 
 							string[] Files;
 							string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
@@ -1443,7 +1443,7 @@ namespace Waher.IoTGateway.Setup
 									{
 										if (CertFileName is null)
 										{
-											await Status.Invoke(this, "Generating temporary certificate file.");
+											await Status.Raise(this, "Generating temporary certificate file.");
 
 											StringBuilder PemOutput = new StringBuilder();
 											byte[] Bin = Certificate.Export(X509ContentType.Cert);
@@ -1455,7 +1455,7 @@ namespace Waher.IoTGateway.Setup
 											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
 											await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 
-											await Status.Invoke(this, "Generating temporary key file.");
+											await Status.Raise(this, "Generating temporary key file.");
 
 											DerEncoder KeyOutput = new DerEncoder();
 											SignAlg.ExportPrivateKey(KeyOutput);
@@ -1470,7 +1470,7 @@ namespace Waher.IoTGateway.Setup
 											await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 										}
 
-										await Status.Invoke(this, "Converting to PFX using " + OpenSslFile);
+										await Status.Raise(this, "Converting to PFX using " + OpenSslFile);
 
 										Process P = new Process()
 										{
@@ -1492,22 +1492,22 @@ namespace Waher.IoTGateway.Setup
 										if (!P.WaitForExit(60000) || P.ExitCode != 0)
 										{
 											if (!P.StandardOutput.EndOfStream)
-												await Status.Invoke(this, "Output: " + P.StandardOutput.ReadToEnd());
+												await Status.Raise(this, "Output: " + P.StandardOutput.ReadToEnd());
 
 											if (!P.StandardError.EndOfStream)
-												await Status.Invoke(this, "Error: " + P.StandardError.ReadToEnd());
+												await Status.Raise(this, "Error: " + P.StandardError.ReadToEnd());
 
 											continue;
 										}
 
-										await Status.Invoke(this, "Loading PFX.");
+										await Status.Raise(this, "Loading PFX.");
 
 										CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
 										this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
 										this.password = Password;
 										this.openSslPath = OpenSslFile;
 
-										await Status.Invoke(this, "PFX successfully generated using OpenSSL.");
+										await Status.Raise(this, "PFX successfully generated using OpenSSL.");
 										break;
 									}
 
@@ -1528,19 +1528,19 @@ namespace Waher.IoTGateway.Setup
 							{
 								if (!(CertFileName is null) && File.Exists(CertFileName))
 								{
-									await Status.Invoke(this, "Deleting temporary certificate file.");
+									await Status.Raise(this, "Deleting temporary certificate file.");
 									File.Delete(CertFileName);
 								}
 
 								if (!(KeyFileName is null) && File.Exists(KeyFileName))
 								{
-									await Status.Invoke(this, "Deleting temporary key file.");
+									await Status.Raise(this, "Deleting temporary key file.");
 									File.Delete(KeyFileName);
 								}
 
 								if (!(CertFileName2 is null) && File.Exists(CertFileName2))
 								{
-									await Status.Invoke(this, "Deleting temporary pfx file.");
+									await Status.Raise(this, "Deleting temporary pfx file.");
 									File.Delete(CertFileName2);
 								}
 							}
@@ -1553,7 +1553,7 @@ namespace Waher.IoTGateway.Setup
 						this.Updated = DateTime.Now;
 						await Database.Update(this);
 
-						Gateway.UpdateCertificate(this);
+						await Gateway.UpdateCertificate(this);
 
 						return null;
 					}

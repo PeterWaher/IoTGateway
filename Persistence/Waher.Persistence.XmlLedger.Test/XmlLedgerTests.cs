@@ -9,9 +9,9 @@ namespace Waher.Persistence.XmlLedger.Test
 	[TestClass]
 	public class XmlLedgerTests
 	{
-		private static FilesProvider provider;
-		private static TestContext context;
-		private XmlFileLedger ledger;
+		private static FilesProvider? provider;
+		private static TestContext? context;
+		private XmlFileLedger? ledger;
 
 		[AssemblyInitialize]
 		public static async Task AssemblyInitialize(TestContext _)
@@ -46,7 +46,7 @@ namespace Waher.Persistence.XmlLedger.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			string FileName = Path.Combine("Data", (context.TestName ?? "Test") + ".xml");
+			string FileName = Path.Combine("Data", (context?.TestName ?? "Test") + ".xml");
 
 			if (File.Exists(FileName))
 				File.Delete(FileName);
@@ -59,16 +59,18 @@ namespace Waher.Persistence.XmlLedger.Test
 		public async Task TestCleanup()
 		{
 			await Task.Delay(1000);
-			await this.ledger.Stop();
+
+			if (this.ledger is not null)
+				await this.ledger.Stop();
 		}
 
 		[TestMethod]
 		public async Task Test_01_NewEntry()
 		{
-			await this.CreateNewObject();
+			await CreateNewObject();
 		}
 
-		private async Task<SimpleObject> CreateNewObject()
+		private static async Task<SimpleObject> CreateNewObject()
 		{
 			SimpleObject Result = new()
 			{
@@ -86,7 +88,7 @@ namespace Waher.Persistence.XmlLedger.Test
 		[TestMethod]
 		public async Task Test_02_UpdateEntry()
 		{
-			SimpleObject Obj = await this.CreateNewObject();
+			SimpleObject Obj = await CreateNewObject();
 			int i;
 
 			for (i = 0; i < 10; i++)
@@ -103,14 +105,14 @@ namespace Waher.Persistence.XmlLedger.Test
 		[TestMethod]
 		public async Task Test_03_DeleteEntry()
 		{
-			SimpleObject Obj = await this.CreateNewObject();
+			SimpleObject Obj = await CreateNewObject();
 			await Database.Delete(Obj);
 		}
 
 		[TestMethod]
 		public async Task Test_04_ClearCollection()
 		{
-			await this.CreateNewObject();
+			await CreateNewObject();
 			await Database.Clear("Test");
 		}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -7,7 +8,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void FileNotFoundEventHandler(object Sender, FileNotFoundEventArgs e);
+	public delegate Task FileNotFoundEventHandler(object Sender, FileNotFoundEventArgs e);
 
 	/// <summary>
 	/// Event arguments for file not found events.

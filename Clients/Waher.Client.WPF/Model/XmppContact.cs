@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +13,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.RDP;
-using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Client.WPF.Model
 {
@@ -280,10 +281,10 @@ namespace Waher.Client.WPF.Model
 					To = this.bareJid;
 
 				if (Markdown is null)
-					XmppAccountNode.Client.SendChatMessage(To, Message, string.Empty, string.Empty, ThreadId);
+					await XmppAccountNode.Client.SendChatMessage(To, Message, string.Empty, string.Empty, ThreadId);
 				else
 				{
-					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
+					await XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
 						await MultiFormatMessage(Message, Markdown), string.Empty, string.Empty, string.Empty, ThreadId, string.Empty, null, null);
 				}
 			}

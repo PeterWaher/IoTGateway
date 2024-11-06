@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Persistence
 {
@@ -10,7 +7,7 @@ namespace Waher.Persistence
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CollectionRepairedEventHandler(object Sender, CollectionRepairedEventArgs e);
+	public delegate Task CollectionRepairedEventHandler(object Sender, CollectionRepairedEventArgs e);
 
 	/// <summary>
 	/// Event arguments for collection repaired events.

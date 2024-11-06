@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Net;
 using Waher.Content;
@@ -8,7 +8,6 @@ using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.HTTP
 {
@@ -559,7 +558,7 @@ namespace Waher.Networking.HTTP
 
 				try
 				{
-					h(this, e);
+					await h(this, e);
 				}
 				catch (Exception ex2)
 				{
@@ -574,7 +573,7 @@ namespace Waher.Networking.HTTP
 			Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
 
 			await Response.SendResponse(ex);
-			Response.Dispose();
+			await Response.DisposeAsync();
 		}
 
 		/// <summary>
@@ -1061,7 +1060,7 @@ namespace Waher.Networking.HTTP
 						else
 							await this.Response.Flush();
 
-						this.Response.Dispose();
+						await this.Response.DisposeAsync();
 						this.Response = null;
 
 						await this.Dispose();
@@ -1085,7 +1084,7 @@ namespace Waher.Networking.HTTP
 				if (!(this.Response is null))
 				{
 					await this.Response.SendResponse();
-					this.Response.Dispose();
+					await this.Response.DisposeAsync();
 					this.Response = null;
 				}
 			}
@@ -1256,7 +1255,7 @@ namespace Waher.Networking.HTTP
 			Response.StatusCode = 201;
 			Response.StatusMessage = "Created";
 			await Response.SendResponse();
-			Response.Dispose();
+			await Response.DisposeAsync();
 		}
 
 		/// <summary>
@@ -1332,7 +1331,7 @@ namespace Waher.Networking.HTTP
 			Response.StatusCode = 201;
 			Response.StatusMessage = "Created";
 			await Response.SendResponse();
-			Response.Dispose();
+			await Response.DisposeAsync();
 		}
 
 		/// <summary>
@@ -1353,7 +1352,7 @@ namespace Waher.Networking.HTTP
 				throw new NotFoundException("File not found: " + Request.SubPath);
 
 			await Response.SendResponse();
-			Response.Dispose();
+			await Response.DisposeAsync();
 		}
 
 		/// <summary>
@@ -1399,12 +1398,14 @@ namespace Waher.Networking.HTTP
 			return base.RemoveReference(Server);
 		}
 
-		private void Server_ETagSaltChanged(object sender, EventArgs e)
+		private Task Server_ETagSaltChanged(object sender, EventArgs e)
 		{
 			lock (this.cacheInfo)
 			{
 				this.cacheInfo.Clear();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

@@ -120,7 +120,7 @@ namespace Waher.Things.Semantic.Nodes
 
 					if (Fields.Count > 0)
 					{
-						Request.ReportFields(false, Fields.ToArray());
+						await Request.ReportFields(false, Fields.ToArray());
 						Fields.Clear();
 					}
 
@@ -271,14 +271,14 @@ namespace Waher.Things.Semantic.Nodes
 					foreach (RssWarning Warning in Doc.Warnings)
 						Errors.Add(new ThingError(this, Warning.Message));
 
-					Request.ReportErrors(false, Errors.ToArray());
+					await Request.ReportErrors(false, Errors.ToArray());
 				}
 
-				Request.ReportFields(true, Fields.ToArray());
+				await Request.ReportFields(true, Fields.ToArray());
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 

@@ -16,6 +16,7 @@ using Waher.Things.DisplayableParameters;
 using Waher.Client.WPF.Dialogs;
 using System.Windows.Controls;
 using Waher.Client.WPF.Dialogs.PubSub;
+using Waher.Networking.XMPP.PubSub.Events;
 
 namespace Waher.Client.WPF.Model.PubSub
 {

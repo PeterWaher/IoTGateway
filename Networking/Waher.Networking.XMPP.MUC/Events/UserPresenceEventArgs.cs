@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for User Presence events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task UserPresenceEventHandlerAsync(object Sender, UserPresenceEventArgs e);
-
 	/// <summary>
 	/// Event arguments for user presence events.
 	/// </summary>

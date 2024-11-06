@@ -85,9 +85,10 @@ namespace Waher.Things.Ip.Model
 			return Task.CompletedTask;
 		}
 
-		private void Outgoing_OnDisconnected(object sender, EventArgs e)
+		private Task Outgoing_OnDisconnected(object sender, EventArgs e)
 		{
 			this.port.Remove(this);
+			return Task.CompletedTask;
 		}
 
 		private async Task<bool> Incoming_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
@@ -107,9 +108,10 @@ namespace Waher.Things.Ip.Model
 			return Task.CompletedTask;
 		}
 
-		private void Incoming_OnDisconnected(object sender, EventArgs e)
+		private Task Incoming_OnDisconnected(object sender, EventArgs e)
 		{
 			this.port.Remove(this);
+			return Task.CompletedTask;
 		}
 
 	}

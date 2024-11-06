@@ -160,16 +160,10 @@ namespace Waher.Runtime.Cache
 				}
 
 				if (!(ToRemove1 is null))
-				{
-					foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
-						this.OnRemoved(Item.Key, Item.Value, RemovedReason.NotUsed);
-				}
+					this.OnRemoved(ToRemove1, RemovedReason.NotUsed);
 
 				if (!(ToRemove2 is null))
-				{
-					foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
-						this.OnRemoved(Item.Key, Item.Value, RemovedReason.Old);
-				}
+					this.OnRemoved(ToRemove2, RemovedReason.Old);
 			}
 			catch (Exception ex)
 			{
@@ -406,7 +400,7 @@ namespace Waher.Runtime.Cache
 				this.OnRemoved(Key, Prev.Value, Reason);
 		}
 
-		private void OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
+		private async void OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
 		{
 			CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
 
@@ -414,12 +408,38 @@ namespace Waher.Runtime.Cache
 			{
 				try
 				{
-					h(this, new CacheItemEventArgs<KeyType, ValueType>(Key, Value, Reason));
+					await h(this, new CacheItemEventArgs<KeyType, ValueType>(Key, Value, Reason));
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
+			}
+		}
+
+		private async void OnRemoved(IEnumerable<CacheItem<KeyType, ValueType>> Items, RemovedReason Reason)
+		{
+			CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
+			try
+			{
+				if (!(h is null))
+				{
+					foreach (CacheItem<KeyType, ValueType> Item in Items)
+					{
+						try
+						{
+							await h(this, new CacheItemEventArgs<KeyType, ValueType>(Item.Key, Item.Value, Reason));
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
@@ -477,8 +497,7 @@ namespace Waher.Runtime.Cache
 				this.timer = null;
 			}
 
-			foreach (CacheItem<KeyType, ValueType> Item in Values)
-				this.OnRemoved(Item.Key, Item.Value, RemovedReason.Manual);
+			this.OnRemoved(Values, RemovedReason.Manual);
 		}
 
 		/// <summary>

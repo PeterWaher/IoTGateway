@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Waher.Things;
 
 namespace Waher.Networking.XMPP.Interoperability
 {
-	/// <summary>
-	/// Delegate for interoperability interfaces event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task InteroperabilityServerInterfacesEventHandler(object Sender, InteroperabilityServerEventArgs e);
-
 	/// <summary>
 	/// Event arguments for interoperability interface requests.
 	/// </summary>

@@ -128,7 +128,7 @@ namespace Waher.Networking.Modbus
 			{
 				if (this.protocolId != 0)
 				{
-					e.Server.Error("Invalid protocol ID received.");
+					await e.Server.Error("Invalid protocol ID received.");
 					return false;
 				}
 
@@ -137,7 +137,7 @@ namespace Waher.Networking.Modbus
 					case 0x01:      // Read Coils
 						if (this.data.Length != 4)
 						{
-							e.Server.Error("Expected four bytes of data.");
+							await e.Server.Error("Expected four bytes of data.");
 							return false;
 						}
 
@@ -170,7 +170,7 @@ namespace Waher.Networking.Modbus
 					case 0x02:      // Read Input Discretes
 						if (this.data.Length != 4)
 						{
-							e.Server.Error("Expected four bytes of data.");
+							await e.Server.Error("Expected four bytes of data.");
 							return false;
 						}
 
@@ -203,7 +203,7 @@ namespace Waher.Networking.Modbus
 					case 0x03:      // Read Multiple Registers
 						if (this.data.Length != 4)
 						{
-							e.Server.Error("Expected four bytes of data.");
+							await e.Server.Error("Expected four bytes of data.");
 							return false;
 						}
 
@@ -236,7 +236,7 @@ namespace Waher.Networking.Modbus
 					case 0x04:      // Read Input Registers
 						if (this.data.Length != 4)
 						{
-							e.Server.Error("Expected four bytes of data.");
+							await e.Server.Error("Expected four bytes of data.");
 							return false;
 						}
 
@@ -269,7 +269,7 @@ namespace Waher.Networking.Modbus
 					case 0x05:      // Write Coil
 						if (this.data.Length != 4)
 						{
-							e.Server.Error("Expected four bytes of data.");
+							await e.Server.Error("Expected four bytes of data.");
 							return false;
 						}
 
@@ -293,7 +293,7 @@ namespace Waher.Networking.Modbus
 					case 0x06:      // Write Register
 						if (this.data.Length != 4)
 						{
-							e.Server.Error("Expected four bytes of data.");
+							await e.Server.Error("Expected four bytes of data.");
 							return false;
 						}
 
@@ -322,7 +322,7 @@ namespace Waher.Networking.Modbus
 					case 0x10:      // Write Multiple Registers
 						if (this.data.Length < 5)
 						{
-							e.Server.Error("Expected at least five bytes of data.");
+							await e.Server.Error("Expected at least five bytes of data.");
 							return false;
 						}
 
@@ -338,13 +338,13 @@ namespace Waher.Networking.Modbus
 
 						if (this.data.Length != 5 + ByteCount)
 						{
-							e.Server.Error("Unexpected length.");
+							await e.Server.Error("Unexpected length.");
 							return false;
 						}
 
 						if (ByteCount != NrRegisters << 1)
 						{
-							e.Server.Error("Inconsistency between number of registers and byte count.");
+							await e.Server.Error("Inconsistency between number of registers and byte count.");
 							return false;
 						}
 
@@ -368,7 +368,7 @@ namespace Waher.Networking.Modbus
 						return await this.SendResponse(e, false, Data);
 
 					default:
-						e.Server.Error("Unsupported function code received.");
+						await e.Server.Error("Unsupported function code received.");
 						return await this.SendResponse(e, true, 0x01);
 				}
 			}
@@ -376,7 +376,7 @@ namespace Waher.Networking.Modbus
 			{
 				// TODO: Return error message.
 
-				e.Server.Error(ex.Message);
+				await e.Server.Error(ex.Message);
 				return false;
 			}
 		}

@@ -76,7 +76,7 @@ namespace Waher.Things.Mqtt.Model
 			this.nextCheck = Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckOnline, null);
 		}
 
-		private void Close()
+		private async Task Close()
 		{
 			if (!(this.mqttClient is null))
 			{
@@ -86,7 +86,7 @@ namespace Waher.Things.Mqtt.Model
 				this.mqttClient.OnContentReceived -= this.MqttClient_OnContentReceived;
 				this.mqttClient.OnStateChanged -= this.MqttClient_OnStateChanged;
 
-				this.mqttClient.Dispose();
+				await this.mqttClient.DisposeAsync();
 				this.mqttClient = null;
 			}
 		}
@@ -94,9 +94,25 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public void Dispose()
+		[Obsolete("Use the DisposeAsync() method.")]
+		public async void Dispose()
 		{
-			this.Close();
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		public Task DisposeAsync()
+		{
+			return this.Close();
 		}
 
 		private async void CheckOnline(object _)
@@ -157,11 +173,11 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public void SetWill(string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
+		public async Task SetWill(string WillTopic, string WillData, bool WillRetain, MqttQualityOfService WillQoS)
 		{
 			if (this.willTopic != WillTopic || this.willData != WillData || this.willRetain != WillRetain || this.willQoS != WillQoS)
 			{
-				this.Close();
+				await this.Close();
 
 				this.willTopic = WillTopic;
 				this.willData = WillData;

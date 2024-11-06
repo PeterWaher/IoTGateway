@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Synchronization
 {
@@ -170,7 +171,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				this.client.UnregisterIqGetHandler("sourceReq", NamespaceSynchronizationIeeeV1, this.SourceReq, true);
 
 				#endregion
-				
+
 				this.client = null;
 			}
 		}
@@ -227,9 +228,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			Encode(Now, Xml);
 			Xml.Append("</resp>");
 
-			e.IqResult(Xml.ToString());
-		
-			return Task.CompletedTask;
+			return e.IqResult(Xml.ToString());
 		}
 
 		/// <summary>
@@ -263,11 +262,11 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="ClockSourceJID">JID of clock source.</param>
 		/// <param name="Callback">Callback method</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void MeasureClockDifference(string ClockSourceJID, SynchronizationEventHandler Callback, object State)
+		public Task MeasureClockDifference(string ClockSourceJID, EventHandlerAsync<SynchronizationEventArgs> Callback, object State)
 		{
 			DateTimeHF ClientTime1 = SynchronizationClient.Now;
 
-			this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronizationCurrent + "'/>", (sender, e) =>
+			return this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronizationCurrent + "'/>", async (sender, e) =>
 			{
 				DateTimeHF ClientTime2 = SynchronizationClient.Now;
 				XmlElement E;
@@ -276,7 +275,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				long? LatencyHF;
 				long? ClockDifferenceHF;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "resp" && 
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "resp" &&
 					DateTimeHF.TryParse(E.InnerText, out DateTimeHF ServerTime))
 				{
 					long dt1 = ServerTime - ClientTime1;
@@ -317,15 +316,16 @@ namespace Waher.Networking.XMPP.Synchronization
 
 				try
 				{
-					Callback?.Invoke(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, LatencyHF, ClockDifferenceHF,
-						Stopwatch.Frequency, e));
+					if (!(Callback is null))
+					{
+						await Callback(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, LatencyHF, ClockDifferenceHF,
+							Stopwatch.Frequency, e));
+					}
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
-				
-				return Task.CompletedTask;
 
 			}, State);
 		}
@@ -335,16 +335,17 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		/// <param name="ClockSourceJID">JID of clock source.</param>
 		/// <returns>Result of the clock synchronization request.</returns>
-		public Task<SynchronizationEventArgs> MeasureClockDifferenceAsync(string ClockSourceJID)
+		public async Task<SynchronizationEventArgs> MeasureClockDifferenceAsync(string ClockSourceJID)
 		{
 			TaskCompletionSource<SynchronizationEventArgs> Result = new TaskCompletionSource<SynchronizationEventArgs>();
 
-			this.MeasureClockDifference(ClockSourceJID, (sender, e) =>
+			await this.MeasureClockDifference(ClockSourceJID, (sender, e) =>
 			{
 				Result.SetResult(e);
+				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -459,20 +460,20 @@ namespace Waher.Networking.XMPP.Synchronization
 			this.clockSourceJID = null;
 		}
 
-		private void CheckClock(object P)
+		private async void CheckClock(object P)
 		{
-			XmppState? State = this.client?.State;
-
-			if (State.HasValue)
+			try
 			{
-				try
+				XmppState? State = this.client?.State;
+
+				if (State.HasValue)
 				{
 					switch (State.Value)
 					{
 						case XmppState.Error:
 						case XmppState.Offline:
 							if (this.checkConnection)
-								this.client.Reconnect();
+								await this.client.Reconnect();
 							break;
 
 						case XmppState.Connected:
@@ -487,7 +488,7 @@ namespace Waher.Networking.XMPP.Synchronization
 								Jid = Item.LastPresenceFullJid;
 							}
 
-							this.MeasureClockDifference(Jid, (sender, e) =>
+							await this.MeasureClockDifference(Jid, async (sender, e) =>
 							{
 								if (e.Ok && (DateTime.Now - ((DateTime)e.State)).TotalSeconds < 1.0)
 								{
@@ -641,7 +642,10 @@ namespace Waher.Networking.XMPP.Synchronization
 
 									try
 									{
-										this.OnUpdated?.Invoke(this, EventArgs.Empty);
+										EventHandlerAsync h = this.OnUpdated;
+
+										if (!(h is null))
+											await h(this, EventArgs.Empty);
 									}
 									catch (Exception ex)
 									{
@@ -652,10 +656,10 @@ namespace Waher.Networking.XMPP.Synchronization
 							break;
 					}
 				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
@@ -895,7 +899,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <summary>
 		/// Event raised when the clock difference estimates have been updated.
 		/// </summary>
-		public event EventHandler OnUpdated = null;
+		public event EventHandlerAsync OnUpdated = null;
 
 		private class Rec
 		{
@@ -910,7 +914,7 @@ namespace Waher.Networking.XMPP.Synchronization
 			public int NrDifferenceHf;
 		}
 
-		private Task SourceReq(object Sender, IqEventArgs e)
+		private async Task SourceReq(object Sender, IqEventArgs e)
 		{
 			if (!string.IsNullOrEmpty(this.clockSourceJID))
 			{
@@ -922,12 +926,10 @@ namespace Waher.Networking.XMPP.Synchronization
 				Xml.Append(XML.Encode(XmppClient.GetBareJID(this.clockSourceJID)));
 				Xml.Append("</sourceResp>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 			else
-				e.IqError(new StanzaErrors.ItemNotFoundException("Clock source not used.", e.IQ));
-		
-			return Task.CompletedTask;
+				await e.IqError(new StanzaErrors.ItemNotFoundException("Clock source not used.", e.IQ));
 		}
 
 		/// <summary>
@@ -936,9 +938,9 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="To">Destination JID</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void QueryClockSource(string To, ClockSourceEventHandler Callback, object State)
+		public Task QueryClockSource(string To, EventHandlerAsync<ClockSourceEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronizationCurrent + "'/>", (sender, e) =>
+			return this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronizationCurrent + "'/>", async (sender, e) =>
 			{
 				XmlElement E;
 				string ClockSourceJID = null;
@@ -946,16 +948,7 @@ namespace Waher.Networking.XMPP.Synchronization
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sourceResp")
 					ClockSourceJID = E.InnerText;
 
-				try
-				{
-					Callback?.Invoke(this, new ClockSourceEventArgs(ClockSourceJID, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-
-				return Task.CompletedTask;
+				await Callback.Raise(this, new ClockSourceEventArgs(ClockSourceJID, e));
 
 			}, State);
 		}
@@ -965,20 +958,22 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// </summary>
 		/// <param name="To">Destination JID</param>
 		/// <returns>JID of clock source used by <paramref name="To"/>.</returns>
-		public Task<string> QueryClockSourceAsync(string To)
+		public async Task<string> QueryClockSourceAsync(string To)
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
 
-			this.QueryClockSource(To, (sender, e) =>
+			await this.QueryClockSource(To, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.ClockSourceJID);
 				else
 					Result.SetException(e.StanzaError ?? new Exception("Unable to query clock source."));
 
+				return Task.CompletedTask;
+
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 	}

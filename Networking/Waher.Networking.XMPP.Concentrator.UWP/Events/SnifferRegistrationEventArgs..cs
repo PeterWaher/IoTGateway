@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for sniffer registration callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SnifferRegistrationEventHandler(object Sender, SnifferRegistrationEventArgs e);
-
 	/// <summary>
 	/// Event arguments for sniffer registration responses.
 	/// </summary>

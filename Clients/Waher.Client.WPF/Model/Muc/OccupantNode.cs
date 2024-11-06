@@ -233,10 +233,10 @@ namespace Waher.Client.WPF.Model.Muc
 		public override async Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			if (Markdown is null)
-				this.MucClient.SendPrivateMessage(this.roomId, this.domain, this.nickName, Message, string.Empty, ThreadId);
+				await this.MucClient.SendPrivateMessage(this.roomId, this.domain, this.nickName, Message, string.Empty, ThreadId);
 			else
 			{
-				this.MucClient.SendCustomPrivateMessage(this.roomId, this.domain, this.nickName,
+				await this.MucClient.SendCustomPrivateMessage(this.roomId, this.domain, this.nickName,
 					await XmppContact.MultiFormatMessage(Message, Markdown), string.Empty, ThreadId);
 			}
 		}

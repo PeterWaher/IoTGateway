@@ -1,15 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
+using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.Contracts
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for legal identity petition events.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task LegalIdentityPetitionEventHandler(object Sender, LegalIdentityPetitionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for legal identity petitions
 	/// </summary>

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Security;
 
@@ -40,14 +39,16 @@ namespace Waher.IoTGateway
 			return base.GET(Request, Response);
 		}
 
-		private void ClientEventsWebSocket_Connected(object Sender, WebSocketEventArgs e)
+		private Task ClientEventsWebSocket_Connected(object Sender, WebSocketEventArgs e)
 		{
 			e.Socket.Closed += this.Socket_Closed;
 			e.Socket.Disposed += this.Socket_Disposed;
 			e.Socket.TextReceived += this.Socket_TextReceived;
+		
+			return Task.CompletedTask;
 		}
 
-		private void Socket_TextReceived(object Sender, WebSocketTextEventArgs e)
+		private async Task Socket_TextReceived(object Sender, WebSocketTextEventArgs e)
 		{
 			if (JSON.Parse(e.Payload) is Dictionary<string, object> Obj &&
 				Obj.TryGetValue("cmd", out object Value) && Value is string Command)
@@ -64,24 +65,21 @@ namespace Waher.IoTGateway
 								TabID = TabID
 							};
 
-							Task.Run(async () =>
+							try
 							{
-								try
-								{
-									await ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
-								}
-								catch (Exception ex)
-								{
-									Log.Exception(ex);
-								}
-							});
+								await ClientEvents.RegisterWebSocket(e.Socket, Location, TabID);
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
 
-							ClientEvents.PushEvent(new string[] { TabID }, "CheckServerInstance", serverId, false);
+							await ClientEvents.PushEvent(new string[] { TabID }, "CheckServerInstance", serverId, false);
 						}
 						break;
 
 					case "Unregister":
-						Task _2 = this.Close(e.Socket);
+						await this.Close(e.Socket);
 						break;
 
 					case "Ping":
@@ -98,17 +96,15 @@ namespace Waher.IoTGateway
 			public string TabID;
 		}
 
-		private void Socket_Disposed(object sender, EventArgs e)
+		private async Task Socket_Disposed(object sender, EventArgs e)
 		{
 			if (sender is WebSocket WebSocket)
-			{
-				Task _ = this.Close(WebSocket);
-			}
+				await this.Close(WebSocket);
 		}
 
-		private void Socket_Closed(object Sender, WebSocketClosedEventArgs e)
+		private Task Socket_Closed(object Sender, WebSocketClosedEventArgs e)
 		{
-			Task _ = this.Close(e.Socket);
+			return this.Close(e.Socket);
 		}
 
 		private async Task Close(WebSocket Socket)
@@ -120,7 +116,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private void ClientEventsWebSocket_Accept(object Sender, WebSocketEventArgs e)
+		private Task ClientEventsWebSocket_Accept(object Sender, WebSocketEventArgs e)
 		{
 			// Cross-domain use allowed.
 			//
@@ -131,6 +127,8 @@ namespace Waher.IoTGateway
 			//{
 			//	throw new ForbiddenException("HTTP Session required.");
 			//}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
@@ -67,6 +68,16 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerChannelTeds
 			Fields.Add(new QuantityField(Thing, Timestamp, "Sampling Period", this.Value,
 				Math.Min(CommonTypes.GetNrDecimals(this.Value), (byte)2), "s",
 				FieldType.Status, FieldQoS.AutomaticReadout));
+		}
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public override void AppendDetails(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.Append("SamplingPeriod=");
+			SnifferOutput.AppendLine(this.Value.ToString());
 		}
 	}
 }

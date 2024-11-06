@@ -294,7 +294,7 @@ namespace Waher.Things.Test
 			Assert.AreEqual(TransducerAccessService.SyncReadTransducerSampleDataFromAChannelOfATIM, TransducerAccessMessage.TransducerAccessService);
 			Assert.AreEqual(MessageType.Reply, Message.MessageType);
 
-			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, null, out ushort ErrorCode, out TransducerData Data));
+			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, null, null, out ushort ErrorCode, out TransducerData Data));
 			Assert.AreEqual(0, ErrorCode);
 
 			ChannelAddress Channel = Data.ChannelInfo;
@@ -609,7 +609,7 @@ namespace Waher.Things.Test
 			TransducerAccessMessage TransducerAccessMessage = Message as TransducerAccessMessage;
 			Assert.IsNotNull(TransducerAccessMessage);
 
-			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, Teds, out ErrorCode, out TransducerData Data));
+			Assert.IsTrue(TransducerAccessMessage.TryParseTransducerData(ThingReference.Empty, Teds, null, out ErrorCode, out TransducerData Data));
 			Assert.AreEqual(0, ErrorCode);
 
 			Assert.IsNotNull(Data.Fields);

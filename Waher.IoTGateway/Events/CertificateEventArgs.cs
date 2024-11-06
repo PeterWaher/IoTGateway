@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace Waher.IoTGateway.Events
 {
@@ -9,7 +9,7 @@ namespace Waher.IoTGateway.Events
 	/// </summary>
 	/// <param name="Sender">Sender of event</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void CertificateEventHandler(object Sender, CertificateEventArgs e);
+	public delegate Task CertificateEventHandler(object Sender, CertificateEventArgs e);
 
 	/// <summary>
 	/// Event arguments for X.509 certificate events.

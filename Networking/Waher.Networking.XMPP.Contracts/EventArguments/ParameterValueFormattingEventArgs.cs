@@ -3,14 +3,6 @@
 namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
 	/// <summary>
-	/// Delegate for parameter value formatting event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	/// <returns>Formatted value.</returns>
-	public delegate void ParameterValueFormattingEventHandler(object Sender, ParameterValueFormattingEventArgs e);
-
-	/// <summary>
 	/// Event arguments for parameter value formatting events.
 	/// </summary>
 	public class ParameterValueFormattingEventArgs : EventArgs

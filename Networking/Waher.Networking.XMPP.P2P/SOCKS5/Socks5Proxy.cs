@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.StanzaErrors;
 
@@ -87,34 +88,33 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// Starts the search of SOCKS5 proxies.
 		/// </summary>
 		/// <param name="Callback">Method to call when search is complete. Properties on this object will have been updated.</param>
-		public void StartSearch(EventHandler Callback)
+		public Task StartSearch(EventHandlerAsync Callback)
 		{
 			this.hasProxy = false;
 			this.jid = null;
 			this.host = null;
 			this.port = 0;
 
-			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, this.SearchResponse, Callback);
+			return this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, this.SearchResponse, Callback);
 		}
 
 		private Task SearchResponse(object Sender, ServiceItemsDiscoveryEventArgs e)
 		{
-			EventHandler Callback = (EventHandler)e.State;
+			EventHandlerAsync Callback = (EventHandlerAsync)e.State;
 			SearchState State = new SearchState(this, e.Items, Callback);
-			State.DoQuery();
-			return Task.CompletedTask;
+			return State.DoQuery();
 		}
 
 		private class SearchState
 		{
 			public Socks5Proxy Proxy;
-			public EventHandler Callback;
+			public EventHandlerAsync Callback;
 			public string Component = string.Empty;
 			public Item[] Items;
 			public int Pos = 0;
 			public int NrItems;
 
-			public SearchState(Socks5Proxy Proxy, Item[] Items, EventHandler Callback)
+			public SearchState(Socks5Proxy Proxy, Item[] Items, EventHandlerAsync Callback)
 			{
 				this.Proxy = Proxy;
 				this.Callback = Callback;
@@ -122,38 +122,36 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.NrItems = Items.Length;
 			}
 
-			public void Advance()
+			public Task Advance()
 			{
 				this.Pos++;
-				this.DoQuery();
+				return this.DoQuery();
 			}
 
-			public void DoQuery()
+			public Task DoQuery()
 			{
 				if (this.Pos < this.NrItems)
-					this.Proxy.client.SendServiceDiscoveryRequest(this.Items[this.Pos].JID, this.ItemDiscoveryResponse, null);
+					return this.Proxy.client.SendServiceDiscoveryRequest(this.Items[this.Pos].JID, this.ItemDiscoveryResponse, null);
 				else
-					this.SearchDone();
+					return this.SearchDone();
 			}
 
-			private Task ItemDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e2)
+			private async Task ItemDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e2)
 			{
 				if (e2.Features.ContainsKey(Namespace))
 				{
 					this.Component = this.Items[this.Pos].JID;
-					this.Proxy.client.SendIqGet(this.Component, "<query xmlns=\"" + Namespace + "\"/>", this.SocksQueryResponse, null);
+					await this.Proxy.client.SendIqGet(this.Component, "<query xmlns=\"" + Namespace + "\"/>", this.SocksQueryResponse, null);
 				}
 				else
-					this.Advance();
-
-				return Task.CompletedTask;
+					await this.Advance();
 			}
 
 			private Task SocksQueryResponse(object Sender, IqResultEventArgs e3)
 			{
 				if (e3.Ok)
 				{
-					XmlElement E = (XmlElement)e3.FirstElement;
+					XmlElement E = e3.FirstElement;
 
 					if (E.LocalName == "query" && E.NamespaceURI == Namespace)
 					{
@@ -169,35 +167,23 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 								this.Proxy.port > 0;
 
 							if (this.Proxy.hasProxy)
-								this.SearchDone();
+								return this.SearchDone();
 							else
-								this.Advance();
+								return this.Advance();
 						}
 						else
-							this.Advance();
+							return this.Advance();
 					}
 					else
-						this.Advance();
+						return this.Advance();
 				}
 				else
-					this.Advance();
-
-				return Task.CompletedTask;
+					return this.Advance();
 			}
 
-			private void SearchDone()
+			private Task SearchDone()
 			{
-				if (!(this.Callback is null))
-				{
-					try
-					{
-						this.Callback(this.Proxy, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				return this.Callback.Raise(this.Proxy, EventArgs.Empty);
 			}
 		}
 
@@ -305,9 +291,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			};
 
 			if (!(this.e2e is null))
-				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
+				await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
 			else
-				this.client.SendIqSet(DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
+				await this.client.SendIqSet(DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
 		}
 
 		private class InitiationRec
@@ -341,11 +327,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 						if (!(this.proxy.e2e is null))
 						{
-							this.proxy.e2e.SendIqSet(this.proxy.client, E2ETransmission.NormalIfNotE2E, this.proxy.jid, Xml.ToString(),
+							await this.proxy.e2e.SendIqSet(this.proxy.client, E2ETransmission.NormalIfNotE2E, this.proxy.jid, Xml.ToString(),
 								this.proxy.ActivationResponse, this);
 						}
 						else
-							this.proxy.client.SendIqSet(this.proxy.jid, Xml.ToString(), this.proxy.ActivationResponse, this);
+							await this.proxy.client.SendIqSet(this.proxy.jid, Xml.ToString(), this.proxy.ActivationResponse, this);
 						break;
 
 					case Socks5State.Error:
@@ -475,19 +461,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (string.IsNullOrEmpty(JID) || string.IsNullOrEmpty(Host) || Port <= 0 || Port >= 0x10000)
 				throw new BadRequestException("Invalid parameters.", e.IQ);
 
-			ValidateStreamEventHandler h = this.OnOpen;
 			ValidateStreamEventArgs e2 = new ValidateStreamEventArgs(this.client, e, StreamId);
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnOpen.Raise(this, e2);
 
 			if (e2.DataCallback is null || e2.CloseCallback is null)
 				throw new NotAcceptableException("Stream not expected.", e.IQ);
@@ -547,13 +522,13 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					Xml.Append(Client.Host);
 					Xml.Append("\"/></query>");
 
-					State.eventargs.IqResult(Xml.ToString());
+					await State.eventargs.IqResult(Xml.ToString());
 					break;
 
 				case Socks5State.Error:
 				case Socks5State.Offline:
 					if (Client.State == Socks5State.Error)
-						State.eventargs.IqError(new BadRequestException("Unable to establish a SOCKS5 connection.", State.eventargs.IQ));
+						await State.eventargs.IqError(new BadRequestException("Unable to establish a SOCKS5 connection.", State.eventargs.IQ));
 
 					Client.Dispose();
 
@@ -581,7 +556,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// Event raised when a remote entity tries to open a SOCKS5 bytestream for transmission of data to/from the client.
 		/// A stream has to be accepted before data can be successfully received.
 		/// </summary>
-		public event ValidateStreamEventHandler OnOpen = null;
+		public event EventHandlerAsync<ValidateStreamEventArgs> OnOpen = null;
 
 	}
 }

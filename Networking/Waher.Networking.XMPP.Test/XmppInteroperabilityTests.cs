@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.Interoperability;
 
 namespace Waher.Networking.XMPP.Test
@@ -29,7 +27,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
 			this.interopServer.Dispose();
 			this.interopServer = null;
@@ -37,7 +35,7 @@ namespace Waher.Networking.XMPP.Test
 			this.interopClient.Dispose();
 			this.interopClient = null;
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]

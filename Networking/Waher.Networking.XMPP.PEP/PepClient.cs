@@ -4,7 +4,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.PEP.Events;
 using Waher.Networking.XMPP.PubSub;
+using Waher.Networking.XMPP.PubSub.Events;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.PEP
@@ -19,7 +21,7 @@ namespace Waher.Networking.XMPP.PEP
 
 		private PubSubClient pubSubClient;
 		private readonly string pubSubComponentAddress;
-		private readonly Dictionary<Type, PersonalEventNotificationEventHandler[]> handlers = new Dictionary<Type, PersonalEventNotificationEventHandler[]>();
+		private readonly Dictionary<Type, EventHandlerAsync<PersonalEventNotificationEventArgs>[]> handlers = new Dictionary<Type, EventHandlerAsync<PersonalEventNotificationEventArgs>[]>();
 		private readonly bool hasPubSubComponent;
 
 		/// <summary>
@@ -45,8 +47,8 @@ namespace Waher.Networking.XMPP.PEP
 			this.pubSubClient = new PubSubClient(Client, this.pubSubComponentAddress);
 			this.hasPubSubComponent = !string.IsNullOrEmpty(this.pubSubComponentAddress);
 
-			this.pubSubClient.ItemNotification += PubSubClient_ItemNotification;
-			this.PubSubClient.ItemRetracted += PubSubClient_ItemRetracted;
+			this.pubSubClient.ItemNotification += this.PubSubClient_ItemNotification;
+			this.PubSubClient.ItemRetracted += this.PubSubClient_ItemRetracted;
 		}
 
 		/// <inheritdoc/>
@@ -54,8 +56,8 @@ namespace Waher.Networking.XMPP.PEP
 		{
 			if (!(this.pubSubClient is null))
 			{
-				this.pubSubClient.ItemNotification -= PubSubClient_ItemNotification;
-				this.PubSubClient.ItemRetracted -= PubSubClient_ItemRetracted;
+				this.pubSubClient.ItemNotification -= this.PubSubClient_ItemNotification;
+				this.PubSubClient.ItemRetracted -= this.PubSubClient_ItemRetracted;
 
 				this.pubSubClient.Dispose();
 				this.pubSubClient = null;
@@ -105,9 +107,9 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="Node">Node name.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Publish(string Node, ItemResultEventHandler Callback, object State)
+		public Task Publish(string Node, EventHandlerAsync<ItemResultEventArgs> Callback, object State)
 		{
-			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, Callback, State);
+			return this.pubSubClient.Publish(string.Empty, Node, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -117,9 +119,9 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="PayloadXml">Payload XML.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Publish(string Node, string PayloadXml, ItemResultEventHandler Callback, object State)
+		public Task Publish(string Node, string PayloadXml, EventHandlerAsync<ItemResultEventArgs> Callback, object State)
 		{
-			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, PayloadXml, Callback, State);
+			return this.pubSubClient.Publish(string.Empty, Node, string.Empty, PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -128,14 +130,14 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="PersonalEvent">Personal event.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Publish(IPersonalEvent PersonalEvent, ItemResultEventHandler Callback, object State)
+		public Task Publish(IPersonalEvent PersonalEvent, EventHandlerAsync<ItemResultEventArgs> Callback, object State)
 		{
 			string ItemId = PersonalEvent.ItemId;
 
 			if (ItemId is null)
-				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, Callback, State);
+				return this.pubSubClient.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, Callback, State);
 			else
-				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, Callback, State);
+				return this.pubSubClient.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -147,9 +149,9 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="PayloadXml">Payload XML.</param>
 		/// <param name="Callback">Method to call when operation completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Publish(string Node, string ItemId, string PayloadXml, ItemResultEventHandler Callback, object State)
+		public Task Publish(string Node, string ItemId, string PayloadXml, EventHandlerAsync<ItemResultEventArgs> Callback, object State)
 		{
-			this.pubSubClient?.Publish(string.Empty, Node, ItemId, PayloadXml, Callback, State);
+			return this.pubSubClient.Publish(string.Empty, Node, ItemId, PayloadXml, Callback, State);
 		}
 
 		/// <summary>
@@ -157,11 +159,11 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		/// <param name="Node">Node name.</param>
 		/// <returns>ID of published item.</returns>
-		public Task<string> PublishAsync(string Node)
+		public async Task<string> PublishAsync(string Node)
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, this.AsyncCallback, Result);
-			return Result.Task;
+			await this.pubSubClient.Publish(string.Empty, Node, string.Empty, this.AsyncCallback, Result);
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -170,11 +172,11 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="Node">Node name.</param>
 		/// <param name="PayloadXml">Payload XML.</param>
 		/// <returns>ID of published item.</returns>
-		public Task<string> PublishAsync(string Node, string PayloadXml)
+		public async Task<string> PublishAsync(string Node, string PayloadXml)
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			this.pubSubClient?.Publish(string.Empty, Node, string.Empty, PayloadXml, this.AsyncCallback, Result);
-			return Result.Task;
+			await this.pubSubClient.Publish(string.Empty, Node, string.Empty, PayloadXml, this.AsyncCallback, Result);
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -182,17 +184,17 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		/// <param name="PersonalEvent">Personal event.</param>
 		/// <returns>ID of published item.</returns>
-		public Task<string> PublishAsync(IPersonalEvent PersonalEvent)
+		public async Task<string> PublishAsync(IPersonalEvent PersonalEvent)
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
 			string ItemId = PersonalEvent.ItemId;
 
 			if (ItemId is null)
-				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, this.AsyncCallback, Result);
+				await this.pubSubClient.Publish(string.Empty, PersonalEvent.Node, string.Empty, PersonalEvent.PayloadXml, this.AsyncCallback, Result);
 			else
-				this.pubSubClient?.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, this.AsyncCallback, Result);
+				await this.pubSubClient.Publish(string.Empty, PersonalEvent.Node, ItemId, PersonalEvent.PayloadXml, this.AsyncCallback, Result);
 		
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -203,11 +205,11 @@ namespace Waher.Networking.XMPP.PEP
 		/// is available with that identity, it will be updated with the new content.</param>
 		/// <param name="PayloadXml">Payload XML.</param>
 		/// <returns>ID of published item.</returns>
-		public Task<string> PublishAsync(string Node, string ItemId, string PayloadXml)
+		public async Task<string> PublishAsync(string Node, string ItemId, string PayloadXml)
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			this.pubSubClient?.Publish(string.Empty, Node, ItemId, PayloadXml, this.AsyncCallback, Result);
-			return Result.Task;
+			await this.pubSubClient.Publish(string.Empty, Node, ItemId, PayloadXml, this.AsyncCallback, Result);
+			return await Result.Task;
 		}
 
 		private Task AsyncCallback(object Sender, ItemResultEventArgs e)
@@ -224,14 +226,8 @@ namespace Waher.Networking.XMPP.PEP
 
 		private async Task PubSubClient_ItemNotification(object Sender, ItemNotificationEventArgs e)
 		{
-			ItemNotificationEventHandler h;
-
 			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)
-			{
-				h = this.NonPepItemNotification;
-				if (!(h is null))
-					await h(this, e);
-			}
+				await this.NonPepItemNotification.Raise(this, e);
 			else
 			{
 				if (string.Compare(e.FromBareJID, this.client.BareJID, true) != 0)
@@ -254,7 +250,7 @@ namespace Waher.Networking.XMPP.PEP
 
 				if (!(PersonalEvent is null))
 				{
-					PersonalEventNotificationEventHandler[] Handlers;
+					EventHandlerAsync<PersonalEventNotificationEventArgs>[] Handlers;
 
 					lock (this.handlers)
 					{
@@ -264,17 +260,8 @@ namespace Waher.Networking.XMPP.PEP
 
 					PersonalEventNotificationEventArgs e2 = new PersonalEventNotificationEventArgs(PersonalEvent, this, e);
 
-					foreach (PersonalEventNotificationEventHandler Handler in Handlers)
-					{
-						try
-						{
-							await Handler(this, e2);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					foreach (EventHandlerAsync<PersonalEventNotificationEventArgs> Handler in Handlers)
+						await Handler.Raise(this, e2);
 				}
 			}
 		}
@@ -302,22 +289,18 @@ namespace Waher.Networking.XMPP.PEP
 		private async Task PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
 		{
 			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)
-			{
-				ItemNotificationEventHandler h = this.NonPepItemRetraction;
-				if (!(h is null))
-					await h(this, e);
-			}
+				await this.NonPepItemRetraction.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when an item notification from the publish/subscribe component that is not related to PEP has been received.
 		/// </summary>
-		public event ItemNotificationEventHandler NonPepItemNotification = null;
+		public event EventHandlerAsync<ItemNotificationEventArgs> NonPepItemNotification = null;
 
 		/// <summary>
 		/// Event raised when an item retraction from the publish/subscribe component that is not related to PEP has been received.
 		/// </summary>
-		public event ItemNotificationEventHandler NonPepItemRetraction = null;
+		public event EventHandlerAsync<ItemNotificationEventArgs> NonPepItemRetraction = null;
 
 		private static Dictionary<string, IPersonalEvent> GetPersonalEventTypes()
 		{
@@ -359,7 +342,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		/// <param name="PersonalEventType">Type of personal event.</param>
 		/// <param name="Handler">Event handler.</param>
-		public void RegisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
+		public void RegisterHandler(Type PersonalEventType, EventHandlerAsync<PersonalEventNotificationEventArgs> Handler)
 		{
 			if (!typeof(IPersonalEvent).GetTypeInfo().IsAssignableFrom(PersonalEventType.GetTypeInfo()))
 				throw new ArgumentException("Not a personal event type.", nameof(PersonalEventType));
@@ -368,15 +351,15 @@ namespace Waher.Networking.XMPP.PEP
 
 			lock (this.handlers)
 			{
-				if (!this.handlers.TryGetValue(PersonalEventType, out PersonalEventNotificationEventHandler[] Handlers))
+				if (!this.handlers.TryGetValue(PersonalEventType, out EventHandlerAsync<PersonalEventNotificationEventArgs>[] Handlers))
 					Handlers = null;
 
 				if (Handlers is null)
-					Handlers = new PersonalEventNotificationEventHandler[] { Handler };
+					Handlers = new EventHandlerAsync<PersonalEventNotificationEventArgs>[] { Handler };
 				else
 				{
 					int c = Handlers.Length;
-					PersonalEventNotificationEventHandler[] Handlers2 = new PersonalEventNotificationEventHandler[c + 1];
+					EventHandlerAsync<PersonalEventNotificationEventArgs>[] Handlers2 = new EventHandlerAsync<PersonalEventNotificationEventArgs>[c + 1];
 					Array.Copy(Handlers, 0, Handlers2, 0, c);
 					Handlers2[c] = Handler;
 					Handlers = Handlers2;
@@ -394,14 +377,14 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="PersonalEventType">Type of personal event.</param>
 		/// <param name="Handler">Event handler.</param>
 		/// <returns>If the event handler was found and removed.</returns>
-		public bool UnregisterHandler(Type PersonalEventType, PersonalEventNotificationEventHandler Handler)
+		public bool UnregisterHandler(Type PersonalEventType, EventHandlerAsync<PersonalEventNotificationEventArgs> Handler)
 		{
 			lock (this.handlers)
 			{
-				if (!this.handlers.TryGetValue(PersonalEventType, out PersonalEventNotificationEventHandler[] Handlers))
+				if (!this.handlers.TryGetValue(PersonalEventType, out EventHandlerAsync<PersonalEventNotificationEventArgs>[] Handlers))
 					return false;
 
-				List<PersonalEventNotificationEventHandler> List = new List<PersonalEventNotificationEventHandler>();
+				List<EventHandlerAsync<PersonalEventNotificationEventArgs>> List = new List<EventHandlerAsync<PersonalEventNotificationEventArgs>>();
 				List.AddRange(Handlers);
 
 				if (!List.Remove(Handler))
@@ -429,15 +412,15 @@ namespace Waher.Networking.XMPP.PEP
 		/// Publishes a personal user location.
 		/// </summary>
 		/// <param name="Location">User location</param>
-		public void Publish(UserLocation Location)
+		public Task Publish(UserLocation Location)
 		{
-			this.Publish(Location, null, null);
+			return this.Publish(Location, null, null);
 		}
 
 		/// <summary>
 		/// Event raised when a user location personal event has been received.
 		/// </summary>
-		public event UserLocationEventHandler OnUserLocation
+		public event EventHandlerAsync<UserLocationEventArgs> OnUserLocation
 		{
 			add
 			{
@@ -456,16 +439,12 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
-		private UserLocationEventHandler onUserLocation = null;
+		private EventHandlerAsync<UserLocationEventArgs> onUserLocation = null;
 
 		private async Task UserLocationEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserLocation UserLocation)
-			{
-				UserLocationEventHandler h = onUserLocation;
-				if (!(h is null))
-					await h(this, new UserLocationEventArguments(UserLocation, e));
-			}
+				await this.onUserLocation.Raise(this, new UserLocationEventArgs(UserLocation, e));
 		}
 
 		#endregion
@@ -476,7 +455,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// Publishes a personal user avatar.
 		/// </summary>
 		/// <param name="Images">Images of different types, representing the same avatar.</param>
-		public void Publish(params UserAvatarImage[] Images)
+		public Task Publish(params UserAvatarImage[] Images)
 		{
 			List<UserAvatarReference> References = new List<UserAvatarReference>();
 
@@ -500,13 +479,13 @@ namespace Waher.Networking.XMPP.PEP
 				});
 			}
 
-			this.Publish(new UserAvatarMetaData(References.ToArray()), null, null);
+			return this.Publish(new UserAvatarMetaData(References.ToArray()), null, null);
 		}
 
 		/// <summary>
 		/// Event raised when a user location personal event has been received.
 		/// </summary>
-		public event UserAvatarMetaDataEventHandler OnUserAvatarMetaData
+		public event EventHandlerAsync<UserAvatarMetaDataEventArgs> OnUserAvatarMetaData
 		{
 			add
 			{
@@ -525,17 +504,12 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
-		private UserAvatarMetaDataEventHandler onUserAvatarMetaData = null;
+		private EventHandlerAsync<UserAvatarMetaDataEventArgs> onUserAvatarMetaData = null;
 
 		private async Task UserAvatarMetaDataEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserAvatarMetaData UserAvatarMetaData)
-			{
-				UserAvatarMetaDataEventHandler h = this.onUserAvatarMetaData;
-				
-				if (!(h is null))
-					await h(this, new UserAvatarMetaDataEventArguments(UserAvatarMetaData, e));
-			}
+				await this.onUserAvatarMetaData.Raise(this, new UserAvatarMetaDataEventArgs(UserAvatarMetaData, e));
 		}
 
 		/// <summary>
@@ -545,9 +519,9 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="Reference">Avatar reference, selected from	an <see cref="UserAvatarMetaData"/> event.</param>
 		/// <param name="Callback">Method to call when avatar has been retrieved.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetUserAvatarData(string UserBareJid, UserAvatarReference Reference, UserAvatarImageEventHandler Callback, object State)
+		public Task GetUserAvatarData(string UserBareJid, UserAvatarReference Reference, EventHandlerAsync<UserAvatarImageEventArgs> Callback, object State)
 		{
-			this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, async (sender, e) =>
+			return this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, async (sender, e) =>
 			{
 				UserAvatarImage Image = null;
 
@@ -577,8 +551,7 @@ namespace Waher.Networking.XMPP.PEP
 					}
 				}
 
-				if (!(Callback is null))
-					await Callback(this, new UserAvatarImageEventArguments(Image, e));
+				await Callback.Raise(this, new UserAvatarImageEventArgs(Image, e));
 
 			}, State);
 		}
@@ -592,9 +565,9 @@ namespace Waher.Networking.XMPP.PEP
 		/// </summary>
 		/// <param name="Mood">Mood</param>
 		/// <param name="Text">Custom</param>
-		public void Publish(UserMoods Mood, string Text)
+		public Task Publish(UserMoods Mood, string Text)
 		{
-			this.Publish(new UserMood()
+			return this.Publish(new UserMood()
 			{
 				Mood = Mood,
 				Text = Text
@@ -604,7 +577,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <summary>
 		/// Event raised when a user mood personal event has been received.
 		/// </summary>
-		public event UserMoodEventHandler OnUserMood
+		public event EventHandlerAsync<UserMoodEventArgs> OnUserMood
 		{
 			add
 			{
@@ -623,17 +596,12 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
-		private UserMoodEventHandler onUserMood = null;
+		private EventHandlerAsync<UserMoodEventArgs> onUserMood = null;
 
 		private async Task UserMoodEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserMood UserMood)
-			{
-				UserMoodEventHandler h = this.onUserMood;
-
-				if (!(h is null))
-					await h(this, new UserMoodEventArguments(UserMood, e));
-			}
+				await this.onUserMood.Raise(this, new UserMoodEventArgs(UserMood, e));
 		}
 
 		#endregion
@@ -646,9 +614,9 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="GeneralActivity">General activity</param>
 		/// <param name="SpecificActivity">Specific activity</param>
 		/// <param name="Text">Custom</param>
-		public void Publish(UserGeneralActivities GeneralActivity, UserSpecificActivities SpecificActivity, string Text)
+		public Task Publish(UserGeneralActivities GeneralActivity, UserSpecificActivities SpecificActivity, string Text)
 		{
-			this.Publish(new UserActivity()
+			return this.Publish(new UserActivity()
 			{
 				GeneralActivity = GeneralActivity,
 				SpecificActivity = SpecificActivity,
@@ -659,7 +627,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <summary>
 		/// Event raised when a user activity personal event has been received.
 		/// </summary>
-		public event UserActivityEventHandler OnUserActivity
+		public event EventHandlerAsync<UserActivityEventArgs> OnUserActivity
 		{
 			add
 			{
@@ -678,17 +646,12 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
-		private UserActivityEventHandler onUserActivity = null;
+		private EventHandlerAsync<UserActivityEventArgs> onUserActivity = null;
 
 		private async Task UserActivityEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserActivity UserActivity)
-			{
-				UserActivityEventHandler h = this.onUserActivity;
-
-				if (!(h is null))
-					await this.onUserActivity?.Invoke(this, new UserActivityEventArguments(UserActivity, e));
-			}
+				await this.onUserActivity.Raise(this, new UserActivityEventArgs(UserActivity, e));
 		}
 
 		#endregion
@@ -699,15 +662,15 @@ namespace Waher.Networking.XMPP.PEP
 		/// Publishes a personal user activity.
 		/// </summary>
 		/// <param name="Tune">User tune</param>
-		public void Publish(UserTune Tune)
+		public Task Publish(UserTune Tune)
 		{
-			this.Publish(Tune, null, null);
+			return this.Publish(Tune, null, null);
 		}
 
 		/// <summary>
 		/// Event raised when a user tune personal event has been received.
 		/// </summary>
-		public event UserTuneEventHandler OnUserTune
+		public event EventHandlerAsync<UserTuneEventArgs> OnUserTune
 		{
 			add
 			{
@@ -726,16 +689,12 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
-		private UserTuneEventHandler onUserTune = null;
+		private EventHandlerAsync<UserTuneEventArgs> onUserTune = null;
 
 		private async Task UserTuneEventHandler(object Sender, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is UserTune UserTune)
-			{
-				UserTuneEventHandler h = this.onUserTune;
-				if (!(h is null))
-					await h(this, new UserTuneEventArguments(UserTune, e));
-			}
+				await this.onUserTune.Raise(this, new UserTuneEventArgs(UserTune, e));
 		}
 
 		#endregion

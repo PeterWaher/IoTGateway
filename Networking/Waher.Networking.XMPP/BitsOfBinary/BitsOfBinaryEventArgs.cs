@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.BitsOfBinary
 {
-	/// <summary>
-	/// Delegate for bits-of-binary data request callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task BitsOfBinaryEventHandler(object Sender, BitsOfBinaryEventArgs e);
-
 	/// <summary>
 	/// Event argument for a bits-of-byte data request.
 	/// </summary>

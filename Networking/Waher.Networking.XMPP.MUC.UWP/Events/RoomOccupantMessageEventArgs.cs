@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for MUC Room occupant event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task RoomOccupantMessageEventHandler(object Sender, RoomOccupantMessageEventArgs e);
-
 	/// <summary>
 	/// Message from a MUC room occupant.
 	/// </summary>

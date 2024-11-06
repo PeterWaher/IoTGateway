@@ -111,26 +111,26 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Events\PersonalEventNotificationEventArgs.cs" />
+    <Compile Include="Events\UserActivityEventArgs.cs" />
+    <Compile Include="Events\UserAvatarImageEventArgs.cs" />
+    <Compile Include="Events\UserAvatarMetaDataEventArgs.cs" />
+    <Compile Include="Events\UserLocationEventArgs.cs" />
+    <Compile Include="Events\UserMoodEventArgs.cs" />
+    <Compile Include="Events\UserTuneEventArgs.cs" />
     <Compile Include="IPersonalEvent.cs" />
     <Compile Include="PepClient.cs" />
     <Compile Include="PersonalEvent.cs" />
-    <Compile Include="PersonalEventNotificationEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserActivity.cs" />
-    <Compile Include="UserActivityEventArguments.cs" />
     <Compile Include="UserAvatar.cs" />
     <Compile Include="UserAvatarData.cs" />
     <Compile Include="UserAvatarImage.cs" />
-    <Compile Include="UserAvatarImageEventArguments.cs" />
     <Compile Include="UserAvatarMetaData.cs" />
-    <Compile Include="UserAvatarMetaDataEventArguments.cs" />
     <Compile Include="UserAvatarReference.cs" />
     <Compile Include="UserLocation.cs" />
-    <Compile Include="UserLocationEventArguments.cs" />
     <Compile Include="UserMood.cs" />
-    <Compile Include="UserMoodEventArguments.cs" />
     <Compile Include="UserTune.cs" />
-    <Compile Include="UserTuneEventArguments.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.PEP.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -180,12 +180,15 @@
       <Name>Waher.Networking.XMPP.UWP</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.PEP\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.PEP\Events\*.cs" "$(ProjectDir)Events" /Y
+
 
 </PreBuildEvent>
   </PropertyGroup>

@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using Waher.Events;
 using Waher.Networking.Sniffers;
-using Waher.Networking.UPnP;
-using Waher.Networking.UPnP.Services;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -239,7 +234,8 @@ namespace Waher.Networking.PeerToPeer
 							}
 							catch (Exception)
 							{
-								Connection?.Dispose();
+								if (!(Connection is null))
+									await Connection.DisposeAsync();
 							}
 						}
 					}
@@ -489,7 +485,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote endpoint of destination.</param>
 		/// <param name="Datagram">UDP Datagram to send.</param>
-		public async void SendUdp(IPEndPoint RemoteEndpoint, byte[] Datagram)
+		public async Task SendUdp(IPEndPoint RemoteEndpoint, byte[] Datagram)
 		{
 			lock (this.writeQueue)
 			{

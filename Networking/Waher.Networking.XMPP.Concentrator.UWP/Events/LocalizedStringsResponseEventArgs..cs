@@ -1,31 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for localized string array responses callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task LocalizedStringsResponseEventHandler(object Sender, LocalizedStringsResponseEventArgs e);
-
-	/// <summary>
-	/// Represents a localized string
-	/// </summary>
-	public struct LocalizedString
-	{
-		/// <summary>
-		/// Unlocalized string.
-		/// </summary>
-		public string Unlocalized;
-
-		/// <summary>
-		/// Localized (human readable) string.
-		/// </summary>
-		public string Localized;
-	}
-
 	/// <summary>
 	/// Event arguments for localized string array responses responsess.
 	/// </summary>

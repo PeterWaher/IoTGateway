@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Cache;
 
@@ -34,7 +35,7 @@ namespace Waher.Networking.XMPP.RDP
 			this.e2e = E2e;
 
 			this.sessions = new Cache<string, RemoteDesktopSession>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(15));
-			this.sessions.Removed += Sessions_Removed;
+			this.sessions.Removed += this.Sessions_Removed;
 
 			Client.RegisterMessageHandler("started", RemoteDesktopNamespace, this.StartedMessageHandler, true);
 			Client.RegisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
@@ -114,9 +115,11 @@ namespace Waher.Networking.XMPP.RDP
 			return Result.Task;
 		}
 
-		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, RemoteDesktopSession> e)
+		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, RemoteDesktopSession> e)
 		{
 			e.Value.State = RemoteDesktopSessionState.Stopped;
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

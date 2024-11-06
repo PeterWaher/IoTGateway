@@ -187,7 +187,7 @@ namespace Waher.Networking.SASL
 
 			await Connection.SetUserIdentity(UserName);
 
-			byte[] HPass = H(CONCAT(Account.UserName, ":", Realm, ":", Account.Password));
+			byte[] HPass = this.H(CONCAT(Account.UserName, ":", Realm, ":", Account.Password));
 			byte[] A1;
 			string A2;
 
@@ -201,11 +201,11 @@ namespace Waher.Networking.SASL
 			else
 				A2 = CONCAT("AUTHENTICATE:", DigestUri, ":00000000000000000000000000000000");
 
-			string ResponseString = HEX(KD(HEX(H(A1)), CONCAT(Nonce, ":00000001:", ClientNonce, ":", QualityOfProtection, ":", HEX(H(A2)))));
+			string ResponseString = HEX(this.KD(HEX(this.H(A1)), CONCAT(Nonce, ":00000001:", ClientNonce, ":", QualityOfProtection, ":", HEX(this.H(A2)))));
 
 			if (ResponseString == Response)
 			{
-				Connection.SetAccount(Account);
+				await Connection.SetAccount(Account);
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(null);
 
@@ -241,18 +241,18 @@ namespace Waher.Networking.SASL
 		{
 			string Challenge = await Connection.Initiate(this, null);
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
-			string ChallengeString = System.Text.Encoding.UTF8.GetString(ChallengeBinary);
+			string ChallengeString = Encoding.UTF8.GetString(ChallengeBinary);
 
 			string Realm = Connection.Domain;
 			string Nonce = string.Empty;
 			string Qop = string.Empty;
 			string[] Qops = null;
-			string Stale = string.Empty;
-			string Maxbuf = string.Empty;
-			string Charset = string.Empty;
-			string Algorithm = string.Empty;
-			string Cipher = string.Empty;
-			string Token = string.Empty;
+			//string Stale = string.Empty;
+			//string Maxbuf = string.Empty;
+			//string Charset = string.Empty;
+			//string Algorithm = string.Empty;
+			//string Cipher = string.Empty;
+			//string Token = string.Empty;
 			byte[] A1;
 			string A2;
 
@@ -276,29 +276,29 @@ namespace Waher.Networking.SASL
 						Qops = Qop.Split(',');
 						break;
 
-					case "stale":
-						Stale = Pair.Value;
-						break;
-
-					case "maxbuf":
-						Maxbuf = Pair.Value;
-						break;
-
-					case "charset":
-						Charset = Pair.Value;
-						break;
-
-					case "algorithm":
-						Algorithm = Pair.Value;
-						break;
-
-					case "cipher":
-						Cipher = Pair.Value;
-						break;
-
-					case "token":
-						Token = Pair.Value;
-						break;
+					//	case "stale":
+					//		Stale = Pair.Value;
+					//		break;
+					//	
+					//	case "maxbuf":
+					//		Maxbuf = Pair.Value;
+					//		break;
+					//	
+					//	case "charset":
+					//		Charset = Pair.Value;
+					//		break;
+					//	
+					//	case "algorithm":
+					//		Algorithm = Pair.Value;
+					//		break;
+					//	
+					//	case "cipher":
+					//		Cipher = Pair.Value;
+					//		break;
+					//	
+					//	case "token":
+					//		Token = Pair.Value;
+					//		break;
 				}
 			}
 
@@ -346,7 +346,7 @@ namespace Waher.Networking.SASL
 			sb.Append(DigestUri);
 			sb.Append("\"");
 
-			byte[] HPass = H(CONCAT(UserName, ":", Realm, ":", Password));
+			byte[] HPass = this.H(CONCAT(UserName, ":", Realm, ":", Password));
 			string AuthId = UserName + "@" + Connection.Domain;
 
 			A1 = CONCAT(HPass, ":", Nonce, ":", ClientNonce, ":", AuthId);
@@ -356,7 +356,7 @@ namespace Waher.Networking.SASL
 			else
 				A2 = CONCAT("AUTHENTICATE:", DigestUri, ":00000000000000000000000000000000");
 
-			string ResponseString = HEX(KD(HEX(H(A1)), CONCAT(Nonce, ":00000001:", ClientNonce, ":", Qop, ":", HEX(H(A2)))));
+			string ResponseString = HEX(this.KD(HEX(this.H(A1)), CONCAT(Nonce, ":00000001:", ClientNonce, ":", Qop, ":", HEX(this.H(A2)))));
 
 			sb.Append(",response=");
 			sb.Append(ResponseString);
@@ -367,7 +367,7 @@ namespace Waher.Networking.SASL
 			sb.Append(AuthId);
 			sb.Append("\"");
 
-			await Connection.FinalResponse(this, Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(sb.ToString())));
+			await Connection.FinalResponse(this, Convert.ToBase64String(Encoding.UTF8.GetBytes(sb.ToString())));
 			return true;
 		}
 

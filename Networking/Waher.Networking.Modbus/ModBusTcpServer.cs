@@ -149,6 +149,54 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		public bool HasSniffers => this.server?.HasSniffers ?? false;
 
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(byte[] Data) => this.server?.ReceiveBinary(Data) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(byte[] Data) => this.server?.TransmitBinary(Data) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(string Text) => this.server?.ReceiveText(Text) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(string Text) => this.server?.TransmitText(Text) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(string Comment) => this.server?.Information(Comment) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(string Warning) => this.server?.Warning(Warning) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public Task Error(string Error) => this.server?.Error(Error) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(Exception Exception) => this.server?.Exception(Exception) ?? Task.CompletedTask;
+
 		#endregion
 
 		#region Binary communication

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
@@ -8,6 +9,7 @@ using Waher.Runtime.Language;
 using Waher.Script.Units;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 using Waher.Things.SensorData;
@@ -249,14 +251,23 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task<TransducerAccessMessage> RequestTransducerData(SamplingMode SamplingMode,
 			int TimeoutMilliseconds, int StaleLimitSeconds)
 		{
+			MqttBroker Broker = this.Topic.Broker;
+			MqttBrokerNode BrokerNode = Broker.Node;
+			StringBuilder ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+
 			byte[] Request = TransducerAccessMessage.SerializeRequest(this.ncapId,
-				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3);
+				this.timId, this.channelId, SamplingMode, TimeoutMilliseconds * 1e-3, ToSniffer);
 
 			Task<TransducerAccessMessage> Result = MessageSwitch.WaitForMessage<TransducerAccessMessage>(
 				TimeoutMilliseconds, StaleLimitSeconds, this.ncapId, this.timId, this.channelId);
 
 			if (!Result.IsCompleted)
-				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+			{
+				if (!(ToSniffer is null))
+					await BrokerNode.Information(ToSniffer.ToString());
+
+				await Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+			}
 
 			return await Result;
 		}
@@ -275,14 +286,23 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		public async Task<TedsAccessMessage> RequestTEDS(TedsAccessCode TedsAccessCode,
 			int TimeoutMilliseconds, int StaleLimitSeconds)
 		{
+			MqttBroker Broker = this.Topic.Broker;
+			MqttBrokerNode BrokerNode = Broker.Node;
+			StringBuilder ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+
 			byte[] Request = TedsAccessMessage.SerializeRequest(this.ncapId,
-				this.timId, this.channelId, TedsAccessCode, 0, TimeoutMilliseconds * 1e-3);
+				this.timId, this.channelId, TedsAccessCode, 0, TimeoutMilliseconds * 1e-3, ToSniffer);
 
 			Task<TedsAccessMessage> Result = MessageSwitch.WaitForMessage<TedsAccessMessage>(
 				TimeoutMilliseconds, StaleLimitSeconds, this.ncapId, this.timId, this.channelId);
 
 			if (!Result.IsCompleted)
-				await this.Topic.Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+			{
+				if (!(ToSniffer is null))
+					await BrokerNode.Information(ToSniffer.ToString());
+
+				await Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
+			}
 
 			return await Result;
 		}
@@ -305,7 +325,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (!(Teds is null))
 			{
 				if (ErrorCode != 0)
-					Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
+					await Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
 				else
 				{
 					lock (this.teds)
@@ -317,7 +337,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				}
 			}
 			else
-				Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
+				await Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
 
 			return (null, DateTime.MinValue);
 		}
@@ -366,14 +386,14 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					if (Request.IsIncluded(FieldType.Identity) || Request.IsIncluded(FieldType.Status))
 					{
 						Field[] Fields = Teds.GetFields(ThingReference, TedsTimestamp);
-						Request.ReportFields(false, Fields);
+						await Request.ReportFields(false, Fields);
 
 						(Teds MetaTeds, DateTime MetaTedsTimestamp) = await this.GetTeds(TedsAccessCode.MetaTEDS, ThingReference, Request);
 						Field[] Fields2 = MetaTeds.GetFields(ThingReference, MetaTedsTimestamp);
 						Field[] Fields3 = RemoveDuplicates(Fields2, Fields);
 
 						if (!(Fields3 is null))
-							Request.ReportFields(false, Fields3);
+							await Request.ReportFields(false, Fields3);
 					}
 
 					TransducerAccessMessage TransducerMessage = await this.RequestTransducerData(SamplingMode.Immediate, TimeoutMilliseconds, StaleSeconds);
@@ -381,12 +401,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					if (TransducerMessage.TryParseTransducerData(ThingReference, Teds, PreferredUnit, out ushort ErrorCode, out TransducerData TransducerData))
 					{
 						if (ErrorCode != 0)
-							Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
+							await Request.ReportErrors(false, new ThingError(ThingReference, "Transducer Error code: " + ErrorCode.ToString("X4")));
 
-						Request.ReportFields(true, TransducerData.Fields);
+						await Request.ReportFields(true, TransducerData.Fields);
 					}
 					else
-						Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
+						await Request.ReportErrors(true, new ThingError(ThingReference, "Unable to parse transducer data."));
 				}
 				else if (!MessageSwitch.IsZero(this.timId))   // TIM
 				{
@@ -397,7 +417,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(ThingReference, ex.Message));
+				await Request.ReportErrors(true, new ThingError(ThingReference, ex.Message));
 			}
 		}
 

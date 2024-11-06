@@ -254,10 +254,12 @@ namespace Waher.Events.Socket
 			return Task.FromResult(true);	// Ignore incoming communication.
 		}
 
-		private void Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object sender, EventArgs e)
 		{
 			if (this.client == sender)
 				this.client = null;
+
+			return Task.CompletedTask;
 		}
 
 		private static string[] GetRows(string s)

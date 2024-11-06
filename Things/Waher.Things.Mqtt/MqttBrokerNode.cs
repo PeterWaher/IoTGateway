@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
 using Waher.Networking.MQTT;
+using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -204,7 +205,7 @@ namespace Waher.Things.Mqtt
 		/// Gets the corresponding broker node.
 		/// </summary>
 		/// <returns>MQTT Broker connection object.</returns>
-		public MqttBroker GetBroker()
+		public Task<MqttBroker> GetBroker()
 		{
 			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.TrustServer, this.userName, this.password,
 				this.connectionSubscription, this.willTopic, this.willData, this.willRetain, this.willQoS);
@@ -213,12 +214,12 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public override Task<bool> RemoveAsync(INode Child)
+		public override async Task<bool> RemoveAsync(INode Child)
 		{
 			if (Child is MqttTopicNode Topic)
-				this.GetBroker().Remove(Topic.LocalTopic);
+				(await this.GetBroker()).Remove(Topic.LocalTopic);
 
-			return base.RemoveAsync(Child);
+			return await base.RemoveAsync(Child);
 		}
 
 		#region ISniffable
@@ -228,7 +229,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public void Add(ISniffer Sniffer)
 		{
-			this.GetBroker().Client?.Add(Sniffer);
+			this.GetBroker().Result.Client?.Add(Sniffer);	// TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -236,7 +237,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
-			this.GetBroker().Client?.AddRange(Sniffers);
+			this.GetBroker().Result.Client?.AddRange(Sniffers);	// TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -244,7 +245,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public bool Remove(ISniffer Sniffer)
 		{
-			return this.GetBroker().Client?.Remove(Sniffer) ?? false;
+			return this.GetBroker().Result.Client?.Remove(Sniffer) ?? false;	// TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -252,7 +253,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public ISniffer[] Sniffers
 		{
-			get { return this.GetBroker().Client?.Sniffers ?? new ISniffer[0]; }
+			get { return this.GetBroker().Result.Client?.Sniffers ?? new ISniffer[0]; } // TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -260,7 +261,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public bool HasSniffers
 		{
-			get { return this.GetBroker().Client?.HasSniffers ?? false; }
+			get { return this.GetBroker().Result.Client?.HasSniffers ?? false; }    // TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -273,7 +274,103 @@ namespace Waher.Things.Mqtt
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.GetBroker().Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();
+			return this.GetBroker().Result.Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();  // TODO: Avoid blocking call
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public async Task ReceiveBinary(byte[] Data)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.ReceiveBinary(Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public async Task TransmitBinary(byte[] Data)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.TransmitBinary(Data);
+		}
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public async Task ReceiveText(string Text)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.ReceiveText(Text);
+		}
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public async Task TransmitText(string Text)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.TransmitText(Text);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public async Task Information(string Comment)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Information(Comment);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public async Task Warning(string Warning)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Warning(Warning);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public async Task Error(string Error)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Error(Error);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(Exception Exception)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Exception(Exception);
 		}
 
 		#endregion
@@ -291,7 +388,7 @@ namespace Waher.Things.Mqtt
 			List<ICommand> Result = new List<ICommand>();
 
 			Result.AddRange(await base.Commands);
-			Result.Add(new ReconnectCommand(this.GetBroker().Client));
+			Result.Add(new ReconnectCommand((await this.GetBroker()).Client));
 
 			return Result;
 		}
@@ -305,7 +402,7 @@ namespace Waher.Things.Mqtt
 		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
-			MqttBroker Broker = this.GetBroker();
+			MqttBroker Broker = await this.GetBroker();
 
 			Result.AddLast(new StringParameter("State", await Language.GetStringAsync(typeof(MqttBrokerNode), 30, "State"),
 				Broker.Client.State.ToString() ?? string.Empty));

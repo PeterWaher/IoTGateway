@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -31,9 +33,16 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private static void CacheItem_Removed(object Sender, CacheItemEventArgs<string, ChunkRecord> e)
+		private static async Task CacheItem_Removed(object Sender, CacheItemEventArgs<string, ChunkRecord> e)
 		{
-			e.Value.Dispose();
+			try
+			{
+				await e.Value.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		internal static void UnregisterChunkReceiver(XmppClient Client)
@@ -77,7 +86,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (!await Rec.ChunkReceived(Nr, Last, Data))
 			{
-				Rec.Dispose();
+				await Rec.DisposeAsync();
 				chunkedStreams.Remove(Key);
 			}
 		}

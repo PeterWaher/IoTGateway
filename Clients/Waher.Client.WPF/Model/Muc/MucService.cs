@@ -13,6 +13,7 @@ using Waher.Client.WPF.Dialogs.Muc;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Runtime.Settings;
@@ -98,25 +99,19 @@ namespace Waher.Client.WPF.Model.Muc
 		public override ImageSource ImageResource => XmppAccountNode.chatBubble;
 		public override bool CanRecycle => true;
 
-		public override void Recycle(MainWindow Window)
+		public override async Task Recycle(MainWindow Window)
 		{
 			if (!(this.children is null))
 			{
 				foreach (TreeNode Node in this.children.Values)
 				{
 					if (Node.CanRecycle)
-						Node.Recycle(Window);
+						await Node.Recycle(Window);
 				}
 			}
 		}
 
-		public override string ToolTip
-		{
-			get
-			{
-				return "Multi-User Chat Service";
-			}
-		}
+		public override string ToolTip => "Multi-User Chat Service";
 
 		private bool loadingChildren = false;
 
@@ -217,7 +212,7 @@ namespace Waher.Client.WPF.Model.Muc
 					{
 						if (e.HasStatus(MucStatus.Created))
 						{
-							this.mucClient.GetRoomConfiguration(RoomId, Domain, (sender2, e2) =>
+							await this.mucClient.GetRoomConfiguration(RoomId, Domain, (sender2, e2) =>
 							{
 								if (e2.Ok)
 								{

@@ -377,7 +377,7 @@ namespace Waher.Networking.PeerToPeer
 					if (!LocalPlayerIncluded)
 						break;
 
-					this.mqttConnection.Dispose();
+					await this.mqttConnection.DisposeAsync();
 					this.mqttConnection = null;
 
 					lock (this.remotePlayersByEndpoint)
@@ -465,13 +465,18 @@ namespace Waher.Networking.PeerToPeer
 			ConsoleOut.WriteLine("Receiving connection from " + Endpoint.ToString());
 #endif
 
+			bool Dispose = false;
+
 			lock (this.remotePlayersByEndpoint)
 			{
 				if (!this.remotePlayerIPs.ContainsKey(Endpoint.Address))
-				{
-					Peer.Dispose();
-					return;
-				}
+					Dispose = true;
+			}
+
+			if (Dispose)
+			{
+				await Peer.DisposeAsync();
+				return;
 			}
 
 			Peer.OnClosed += this.Peer_OnClosed;
@@ -507,7 +512,9 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception)
 				{
-					Connection.Dispose();
+					if (!(Connection is null))
+						await Connection.DisposeAsync();
+
 					return true;
 				}
 
@@ -516,27 +523,39 @@ namespace Waher.Networking.PeerToPeer
 				else
 					Packet = Input.GetRemainingData();
 
-				bool AllConnected;
+				bool AllConnected = false;
+				bool DisposeConnection = false;
+				PeerConnection ObsoleteConnection = null;
 
 				lock (this.remotePlayersByEndpoint)
 				{
 					if (!this.playersById.TryGetValue(PlayerId, out Player))
-					{
-						Connection.Dispose();
-						return true;
-					}
-
-					if (Player.Connection is null)
-						this.connectionCount++;
+						DisposeConnection = true;
 					else
-						Player.Connection.Dispose();
+					{
+						if (Player.Connection is null)
+							this.connectionCount++;
+						else
+							ObsoleteConnection = Player.Connection;
 
-					Player.Connection = Connection;
-					Connection.StateObject = Player;
-					Connection.RemoteEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
+						Player.Connection = Connection;
+						Connection.StateObject = Player;
+						Connection.RemoteEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
-					AllConnected = this.connectionCount + 1 == this.playerCount;
+						AllConnected = this.connectionCount + 1 == this.playerCount;
+					}
 				}
+
+				if (DisposeConnection)
+				{
+					if (!(Connection is null))
+						await Connection.DisposeAsync();
+
+					return true;
+				}
+
+                if (!(ObsoleteConnection is null))
+					await ObsoleteConnection.DisposeAsync();
 
 				MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerConnected;
 				if (!(h is null))
@@ -600,7 +619,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public void SendTcpToAll(byte[] Packet)
+		public async Task SendTcpToAll(byte[] Packet)
 		{
 			if (this.state != MultiPlayerState.Ready)
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
@@ -609,7 +628,7 @@ namespace Waher.Networking.PeerToPeer
 			foreach (Player Player in this.remotePlayers)
 			{
 				if (!((Connection = Player.Connection) is null))
-					Connection.SendTcp(Packet);
+					await Connection.SendTcp(Packet);
 			}
 		}
 
@@ -619,13 +638,13 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Player">Player to send the packet to.</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public void SendTcpTo(Player Player, byte[] Packet)
+		public Task SendTcpTo(Player Player, byte[] Packet)
 		{
 			if (this.state != MultiPlayerState.Ready)
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			Connection?.SendTcp(Packet);
+			return Connection?.SendTcp(Packet) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -634,7 +653,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="PlayerId">ID of player to send the packet to.</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public void SendTcpTo(Guid PlayerId, byte[] Packet)
+		public Task SendTcpTo(Guid PlayerId, byte[] Packet)
 		{
 			Player Player;
 
@@ -645,7 +664,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			Connection?.SendTcp(Packet);
+			return Connection?.SendTcp(Packet) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -655,7 +674,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="IncludeNrPreviousPackets">Number of previous packets to include in the datagram. Note that the network limits
 		/// total size of datagram packets.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public void SendUdpToAll(byte[] Packet, int IncludeNrPreviousPackets)
+		public async Task SendUdpToAll(byte[] Packet, int IncludeNrPreviousPackets)
 		{
 			if (this.state != MultiPlayerState.Ready)
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
@@ -664,7 +683,7 @@ namespace Waher.Networking.PeerToPeer
 			foreach (Player Player in this.remotePlayers)
 			{
 				if (!((Connection = Player.Connection) is null))
-					Connection.SendUdp(Packet, IncludeNrPreviousPackets);
+					await Connection.SendUdp(Packet, IncludeNrPreviousPackets);
 			}
 		}
 
@@ -676,13 +695,13 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="IncludeNrPreviousPackets">Number of previous packets to include in the datagram. Note that the network limits
 		/// total size of datagram packets.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public void SendUdpTo(Player Player, byte[] Packet, int IncludeNrPreviousPackets)
+		public Task SendUdpTo(Player Player, byte[] Packet, int IncludeNrPreviousPackets)
 		{
 			if (this.state != MultiPlayerState.Ready)
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			Connection?.SendUdp(Packet, IncludeNrPreviousPackets);
+			return Connection?.SendUdp(Packet, IncludeNrPreviousPackets) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -693,7 +712,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="IncludeNrPreviousPackets">Number of previous packets to include in the datagram. Note that the network limits
 		/// total size of datagram packets.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public void SendUdpTo(Guid PlayerId, byte[] Packet, int IncludeNrPreviousPackets)
+		public Task SendUdpTo(Guid PlayerId, byte[] Packet, int IncludeNrPreviousPackets)
 		{
 			Player Player;
 
@@ -704,10 +723,10 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			Connection?.SendUdp(Packet, IncludeNrPreviousPackets);
+			return Connection?.SendUdp(Packet, IncludeNrPreviousPackets) ?? Task.CompletedTask;
 		}
 
-		private void Peer_OnClosed(object sender, EventArgs e)
+		private async Task Peer_OnClosed(object sender, EventArgs e)
 		{
 			PeerConnection Connection = (PeerConnection)sender;
 			Player Player = (Player)Connection.StateObject;
@@ -730,14 +749,13 @@ namespace Waher.Networking.PeerToPeer
 			{
 				try
 				{
-					h(this, Player);
+					await h(this, Player);
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
 			}
-
 		}
 
 		/// <summary>
@@ -850,21 +868,25 @@ namespace Waher.Networking.PeerToPeer
 			}
 			catch (Exception)
 			{
-				Connection.Dispose();
+				await Connection.DisposeAsync();
 				return true;
 			}
 
 			Player Player = (Player)Connection.StateObject;
+			bool DisposeConnection = false;
 
 			lock (this.remotePlayersByEndpoint)
 			{
 				if (!this.playersById.TryGetValue(PlayerId, out Player Player2) || Player2.PlayerId != Player.PlayerId)
-				{
-					Connection.Dispose();
-					return true;
-				}
+					DisposeConnection = true;
+				else
+					Player.Connection = Connection;
+			}
 
-				Player.Connection = Connection;
+			if (DisposeConnection)
+			{
+				await Connection.DisposeAsync();
+				return true;
 			}
 
 			Connection.RemoteEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
@@ -905,15 +927,20 @@ namespace Waher.Networking.PeerToPeer
 
 			Connection.OnSent -= this.Connection_OnSent;
 
+			bool DisposePlayerConnection = false;
+
 			lock (this.remotePlayersByEndpoint)
 			{
 				if (Player.Connection == Connection)
 					this.connectionCount++;
 				else
-					Player.Connection.Dispose();
+					DisposePlayerConnection = true;
 
 				AllConnected = this.connectionCount + 1 == this.playerCount;
 			}
+
+			if (DisposePlayerConnection)
+				await Player.Connection.DisposeAsync();
 
 			if (AllConnected)
 				await this.SetState(MultiPlayerState.Ready);
@@ -1047,9 +1074,17 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		[Obsolete("Use the DisposeAsync() method.")]
+		public async void Dispose()
 		{
-			Task _ = this.DisposeAsync();
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		/// <summary>
@@ -1072,16 +1107,24 @@ namespace Waher.Networking.PeerToPeer
 
 			if (!(this.remotePlayersByEndpoint is null))
 			{
+				Player[] ToDispose;
+
 				lock (this.remotePlayersByEndpoint)
 				{
 					this.playersById.Clear();
 					this.remotePlayersByIndex.Clear();
 
-					foreach (Player Player in this.remotePlayersByEndpoint.Values)
-						Player.Connection?.Dispose();
+					ToDispose = new Player[this.remotePlayersByEndpoint.Count];
+					this.remotePlayersByEndpoint.Values.CopyTo(ToDispose, 0);
 
 					this.remotePlayersByEndpoint.Clear();
 					this.remotePlayers = null;
+				}
+
+				foreach (Player Player in ToDispose)
+				{
+					if (!(Player.Connection is null))
+						await Player.Connection.DisposeAsync();
 				}
 			}
 		}
@@ -1106,21 +1149,19 @@ namespace Waher.Networking.PeerToPeer
 				}
 				else
 				{
-					this.mqttConnection.Dispose();
+					await this.mqttConnection.DisposeAsync();
 					this.mqttConnection = null;
 				}
 			}
 		}
 
-		private Task MqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
+		private async Task MqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
 		{
 			if (!(this.mqttConnection is null) && PacketIdentifier == this.mqttTerminatedPacketIdentifier)
 			{
-				this.mqttConnection.Dispose();
+				await this.mqttConnection.DisposeAsync();
 				this.mqttConnection = null;
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

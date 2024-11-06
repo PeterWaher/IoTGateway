@@ -459,6 +459,8 @@ namespace Waher.Utility.AnalyzeClock
 
 						if (--Records <= 0)
 							Done2.Set();
+
+						return Task.CompletedTask;
 					};
 
 					SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);

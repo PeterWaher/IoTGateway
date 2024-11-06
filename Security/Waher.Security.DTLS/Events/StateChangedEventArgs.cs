@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
@@ -9,7 +7,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void StateChangedEventHandler(object Sender, StateChangedEventArgs e);
+	public delegate Task StateChangedEventHandler(object Sender, StateChangedEventArgs e);
 
 	/// <summary>
 	/// Event arguments for state change events.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 using Waher.Security;
@@ -273,11 +274,21 @@ namespace Waher.Things.Ieee1451
 		/// <param name="NetworkServiceId">Network service ID</param>
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Payload">Binary payload.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary message</returns>
 		/// <exception cref="ArgumentException"></exception>
 		public static byte[] SerializeMessage(DiscoveryService NetworkServiceId,
-			MessageType MessageType, byte[] Payload)
+			MessageType MessageType, byte[] Payload, StringBuilder SnifferOutput)
 		{
+			if (!(SnifferOutput is null))
+			{
+				SnifferOutput.AppendLine("NetworkServiceType: DiscoveryServices");
+				SnifferOutput.Append("NetworkServiceId: ");
+				SnifferOutput.AppendLine(NetworkServiceId.ToString());
+				SnifferOutput.Append("MessageType: ");
+				SnifferOutput.AppendLine(MessageType.ToString());
+			}
+
 			return SerializeMessage(NetworkServiceType.DiscoveryServices, (byte)NetworkServiceId, MessageType, Payload);
 		}
 
@@ -287,11 +298,21 @@ namespace Waher.Things.Ieee1451
 		/// <param name="NetworkServiceId">Network service ID</param>
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Payload">Binary payload.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary message</returns>
 		/// <exception cref="ArgumentException"></exception>
 		public static byte[] SerializeMessage(TransducerAccessService NetworkServiceId,
-			MessageType MessageType, byte[] Payload)
+			MessageType MessageType, byte[] Payload, StringBuilder SnifferOutput)
 		{
+			if (!(SnifferOutput is null))
+			{
+				SnifferOutput.AppendLine("NetworkServiceType: TransducerAccessServices");
+				SnifferOutput.Append("NetworkServiceId: ");
+				SnifferOutput.AppendLine(NetworkServiceId.ToString());
+				SnifferOutput.Append("MessageType: ");
+				SnifferOutput.AppendLine(MessageType.ToString());
+			}
+
 			return SerializeMessage(NetworkServiceType.TransducerAccessServices,
 				(byte)NetworkServiceId, MessageType, Payload);
 		}
@@ -302,11 +323,21 @@ namespace Waher.Things.Ieee1451
 		/// <param name="NetworkServiceId">Network service ID</param>
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Payload">Binary payload.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary message</returns>
 		/// <exception cref="ArgumentException"></exception>
 		public static byte[] SerializeMessage(TedsAccessService NetworkServiceId,
-			MessageType MessageType, byte[] Payload)
+			MessageType MessageType, byte[] Payload, StringBuilder SnifferOutput)
 		{
+			if (!(SnifferOutput is null))
+			{
+				SnifferOutput.AppendLine("NetworkServiceType: TedsAccessServices");
+				SnifferOutput.Append("NetworkServiceId: ");
+				SnifferOutput.AppendLine(NetworkServiceId.ToString());
+				SnifferOutput.Append("MessageType: ");
+				SnifferOutput.AppendLine(MessageType.ToString());
+			}
+
 			return SerializeMessage(NetworkServiceType.TedsAccessServices,
 				(byte)NetworkServiceId, MessageType, Payload);
 		}
@@ -317,11 +348,21 @@ namespace Waher.Things.Ieee1451
 		/// <param name="NetworkServiceId">Network service ID</param>
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Payload">Binary payload.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <returns>Binary message</returns>
 		/// <exception cref="ArgumentException"></exception>
 		public static byte[] SerializeMessage(EventNotificationService NetworkServiceId,
-			MessageType MessageType, byte[] Payload)
+			MessageType MessageType, byte[] Payload, StringBuilder SnifferOutput)
 		{
+			if (!(SnifferOutput is null))
+			{
+				SnifferOutput.AppendLine("NetworkServiceType: EventNotificationServices");
+				SnifferOutput.Append("NetworkServiceId: ");
+				SnifferOutput.AppendLine(NetworkServiceId.ToString());
+				SnifferOutput.Append("MessageType: ");
+				SnifferOutput.AppendLine(MessageType.ToString());
+			}
+
 			return SerializeMessage(NetworkServiceType.EventNotificationServices,
 				(byte)NetworkServiceId, MessageType, Payload);
 		}

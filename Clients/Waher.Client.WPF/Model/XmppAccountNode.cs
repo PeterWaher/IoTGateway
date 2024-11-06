@@ -19,6 +19,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.XMPP;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -28,11 +29,13 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
+using Waher.Networking.XMPP.PEP.Events;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.RDP;
@@ -66,7 +69,7 @@ namespace Waher.Client.WPF.Model
 		private readonly Dictionary<string, RemoteDesktopView> activeViews = new Dictionary<string, RemoteDesktopView>();
 		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
-		private readonly Dictionary<string, List<RosterItemEventHandlerAsync>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandlerAsync>>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, List<EventHandlerAsync<RosterItem>>> rosterSubscriptions = new Dictionary<string, List<EventHandlerAsync<RosterItem>>>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Connections connections;
 		private EndpointSecurity e2eEncryption;
 		private XmppClient client;
@@ -218,7 +221,7 @@ namespace Waher.Client.WPF.Model
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 			this.synchronizationClient = new SynchronizationClient(this.client);
-			
+
 			this.eventReceptor = new XmppEventReceptor(this.client);
 			this.eventReceptor.OnEvent += this.EventReceptor_OnEvent;
 
@@ -243,7 +246,7 @@ namespace Waher.Client.WPF.Model
 			this.client.Connect();
 		}
 
-		private Task Client_OnErrorMessage(object Sender, MessageEventArgs e)
+		private Task Client_OnErrorMessage(object _, MessageEventArgs e)
 		{
 			string Msg = e.ErrorText;
 			if (!string.IsNullOrEmpty(Msg))
@@ -275,7 +278,7 @@ namespace Waher.Client.WPF.Model
 			this.mucClient = new MultiUserChatClient(this.client, MucComponentAddress);
 		}
 
-		private Task EventReceptor_OnEvent(object Sender, EventEventArgs e)
+		private Task EventReceptor_OnEvent(object _, EventEventArgs e)
 		{
 			MainWindow.UpdateGui(() =>
 			{
@@ -287,10 +290,10 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private async Task ConcentratorClient_OnCustomSnifferMessage(object Sender, CustomSnifferEventArgs e)
+		private async Task ConcentratorClient_OnCustomSnifferMessage(object _, CustomSnifferEventArgs e)
 		{
 			TaskCompletionSource<SnifferView> View = new TaskCompletionSource<SnifferView>();
-			
+
 			MainWindow.UpdateGui(() =>
 			{
 				View.TrySetResult(MainWindow.currentInstance.GetSnifferView(null, e.FromBareJID, true));
@@ -311,7 +314,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private Task Client_OnNormalMessage(object Sender, MessageEventArgs e)
+		private Task Client_OnNormalMessage(object _, MessageEventArgs e)
 		{
 			DateTime Now = DateTime.Now;
 			DateTime Limit = Now.AddMinutes(-1);
@@ -371,7 +374,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private Task Client_OnStateChanged(object _, XmppState NewState)
+		private async Task Client_OnStateChanged(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -403,13 +406,11 @@ namespace Waher.Client.WPF.Model
 					this.connected = false;
 
 					if (ImmediateReconnect && !(this.client is null))
-						this.client.Reconnect();
+						await this.client.Reconnect();
 					break;
 			}
 
 			this.OnUpdated();
-
-			return Task.CompletedTask;
 		}
 
 		public TransportMethod Transport => this.transport;
@@ -475,24 +476,22 @@ namespace Waher.Client.WPF.Model
 
 				XmppClient Client = this.client;
 				this.client = null;
-				Client.Dispose();
+				Client.DisposeAsync().Wait();	// TODO: Asynchronous
 			}
 		}
 
-		private void CheckConnection(object P)
+		private async void CheckConnection(object P)
 		{
-			this.connectionTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckConnection, null);
-
-			if (!(this.client is null) && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
+			try
 			{
-				try
-				{
-					this.client.Reconnect();
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to reconnect.", MessageBoxButton.OK, MessageBoxImage.Error);
-				}
+				this.connectionTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckConnection, null);
+
+				if (!(this.client is null) && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
+					await this.client.Reconnect();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to reconnect.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -756,7 +755,7 @@ namespace Waher.Client.WPF.Model
 			get { return this.connections.Owner.MainView; }
 		}
 
-		private async Task Client_OnRosterItemUpdated(object Sender, RosterItem Item)
+		private async Task Client_OnRosterItemUpdated(object _, RosterItem Item)
 		{
 			if (this.children is null)
 				this.CheckRoster();
@@ -794,11 +793,11 @@ namespace Waher.Client.WPF.Model
 
 		private async Task CheckRosterItemSubscriptions(RosterItem Item)
 		{
-			RosterItemEventHandlerAsync[] h;
+			EventHandlerAsync<RosterItem>[] h;
 
 			lock (this.rosterSubscriptions)
 			{
-				if (this.rosterSubscriptions.TryGetValue(Item.BareJid, out List<RosterItemEventHandlerAsync> List))
+				if (this.rosterSubscriptions.TryGetValue(Item.BareJid, out List<EventHandlerAsync<RosterItem>> List))
 					h = List.ToArray();
 				else
 					h = null;
@@ -806,7 +805,7 @@ namespace Waher.Client.WPF.Model
 
 			if (!(h is null))
 			{
-				foreach (RosterItemEventHandlerAsync h2 in h)
+				foreach (EventHandlerAsync<RosterItem> h2 in h)
 				{
 					try
 					{
@@ -820,13 +819,13 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public void RegisterRosterEventHandler(string BareJid, RosterItemEventHandlerAsync Callback)
+		public void RegisterRosterEventHandler(string BareJid, EventHandlerAsync<RosterItem> Callback)
 		{
 			lock (this.rosterSubscriptions)
 			{
-				if (!this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandlerAsync> h))
+				if (!this.rosterSubscriptions.TryGetValue(BareJid, out List<EventHandlerAsync<RosterItem>> h))
 				{
-					h = new List<RosterItemEventHandlerAsync>();
+					h = new List<EventHandlerAsync<RosterItem>>();
 					this.rosterSubscriptions[BareJid] = h;
 				}
 
@@ -834,16 +833,16 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public void UnregisterRosterEventHandler(string BareJid, RosterItemEventHandlerAsync Callback)
+		public void UnregisterRosterEventHandler(string BareJid, EventHandlerAsync<RosterItem> Callback)
 		{
 			lock (this.rosterSubscriptions)
 			{
-				if (this.rosterSubscriptions.TryGetValue(BareJid, out List<RosterItemEventHandlerAsync> h) && h.Remove(Callback) && h.Count == 0)
+				if (this.rosterSubscriptions.TryGetValue(BareJid, out List<EventHandlerAsync<RosterItem>> h) && h.Remove(Callback) && h.Count == 0)
 					this.rosterSubscriptions.Remove(BareJid);
 			}
 		}
 
-		private Task Client_OnRosterItemRemoved(object Sender, RosterItem Item)
+		private Task Client_OnRosterItemRemoved(object _, RosterItem Item)
 		{
 			if (this.children is null)
 				this.CheckRoster();
@@ -862,7 +861,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresence(object _, PresenceEventArgs e)
 		{
 			if (this.children is null)
 				this.CheckRoster();
@@ -884,9 +883,9 @@ namespace Waher.Client.WPF.Model
 						this.CheckType(Node, e.From);
 				}
 				else if (string.Compare(e.FromBareJID, this.client.BareJID, true) == 0)
-					this.client.Information("Presence from same bare JID. Ignored.");
+					await this.client.Information("Presence from same bare JID. Ignored.");
 				else
-					this.client.Warning("Presence from node not found in roster: " + e.FromBareJID);
+					await this.client.Warning("Presence from node not found in roster: " + e.FromBareJID);
 
 				RosterItem Item = this.client?.GetRosterItem(e.FromBareJID);
 				if (!(Item is null))
@@ -899,7 +898,7 @@ namespace Waher.Client.WPF.Model
 			this.client.SendServiceDiscoveryRequest(FullJid, this.ServiceDiscoveryResponse, Node);
 		}
 
-		private Task ServiceDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e)
+		private Task ServiceDiscoveryResponse(object _, ServiceDiscoveryEventArgs e)
 		{
 			if (e.Ok)
 			{
@@ -1042,19 +1041,17 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		private async Task Client_OnPresenceSubscribe(object _, PresenceEventArgs e)
 		{
 			RosterItem Item = e.Client[e.FromBareJID];
 
 			if (!(Item is null) && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
-				e.Accept();
+				await e.Accept();
 			else
 				MainWindow.UpdateGui(this.PresenceSubscribe, e);
-
-			return Task.CompletedTask;
 		}
 
-		private Task PresenceSubscribe(object P)
+		private async Task PresenceSubscribe(object P)
 		{
 			PresenceEventArgs e = (PresenceEventArgs)P;
 
@@ -1062,17 +1059,17 @@ namespace Waher.Client.WPF.Model
 				this.client.BareJID, MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes))
 			{
 				case MessageBoxResult.Yes:
-					e.Accept();
+					await e.Accept();
 
 					RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
 					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-						this.client.RequestPresenceSubscription(e.FromBareJID);
+						await this.client.RequestPresenceSubscription(e.FromBareJID);
 
-					this.client.SetPresence(Availability.Chat);
+					await this.client.SetPresence(Availability.Chat);
 					break;
 
 				case MessageBoxResult.No:
-					e.Decline();
+					await e.Decline();
 					break;
 
 				case MessageBoxResult.Cancel:
@@ -1080,14 +1077,11 @@ namespace Waher.Client.WPF.Model
 					// Do nothing.
 					break;
 			}
-
-			return Task.CompletedTask;
 		}
 
-		private Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		private Task Client_OnPresenceUnsubscribe(object _, PresenceEventArgs e)
 		{
-			e.Accept();
-			return Task.CompletedTask;
+			return e.Accept();
 		}
 
 		public override bool CanRecycle
@@ -1095,18 +1089,18 @@ namespace Waher.Client.WPF.Model
 			get { return !(this.client is null); }
 		}
 
-		public override void Recycle(MainWindow Window)
+		public override async Task Recycle(MainWindow Window)
 		{
 			if (!(this.children is null))
 			{
 				foreach (TreeNode Node in this.children.Values)
 				{
 					if (Node.CanRecycle)
-						Node.Recycle(Window);
+						await Node.Recycle(Window);
 				}
 			}
 
-			this.client.Reconnect();
+			await this.client.Reconnect();
 		}
 
 		public bool IsOnline
@@ -1168,12 +1162,12 @@ namespace Waher.Client.WPF.Model
 			this.client.Add(Sniffer);
 		}
 
-		public override bool RemoveSniffer(ISniffer Sniffer)
+		public override Task<bool> RemoveSniffer(ISniffer Sniffer)
 		{
 			if (this.client is null)
-				return false;
+				return Task.FromResult(false);
 			else
-				return this.client.Remove(Sniffer);
+				return Task.FromResult(this.client.Remove(Sniffer));
 		}
 
 		public override void Added(MainWindow Window)
@@ -1290,7 +1284,7 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanConfigure => this.IsOnline;
 
-		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		public override void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			DataForm Form = new DataForm(this.client, this.ChangePassword, this.CancelChangePassword, this.BareJID, this.BareJID,
 				new TextPrivateField(null, "Password", "New password:", true, new string[] { string.Empty }, null,
@@ -1379,27 +1373,27 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanReadSensorData => this.IsOnline;
 
-		public override SensorDataClientRequest StartSensorDataFullReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataFullReadout()
 		{
 			return this.DoReadout(FieldType.All);
 		}
 
-		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		public override Task<SensorDataClientRequest> StartSensorDataMomentaryReadout()
 		{
 			return this.DoReadout(FieldType.Momentary);
 		}
 
-		private SensorDataClientRequest DoReadout(FieldType Types)
+		private async Task<SensorDataClientRequest> DoReadout(FieldType Types)
 		{
 			string Id = Guid.NewGuid().ToString();
 
 			CustomSensorDataClientRequest Request = new CustomSensorDataClientRequest(Id, string.Empty, string.Empty, null,
 				Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.Now, string.Empty, string.Empty, string.Empty);
 
-			Request.Accept(false);
-			Request.Started();
+			await Request.Accept(false);
+			await Request.Started();
 
-			this.client.SendServiceDiscoveryRequest(string.Empty, (sender, e) =>
+			await this.client.SendServiceDiscoveryRequest(string.Empty, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -1603,7 +1597,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private Task PepClient_SensorData(object Sender, PersonalEventNotificationEventArgs e)
+		private Task PepClient_SensorData(object _, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is SensorData SensorData &&
 				!(SensorData.Fields is null) &&
@@ -1629,7 +1623,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private Task PepClient_OnUserTune(object Sender, UserTuneEventArguments e)
+		private Task PepClient_OnUserTune(object _, UserTuneEventArgs e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1648,7 +1642,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private Task PepClient_OnUserMood(object Sender, UserMoodEventArguments e)
+		private Task PepClient_OnUserMood(object _, UserMoodEventArgs e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1662,7 +1656,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private Task PepClient_OnUserLocation(object Sender, UserLocationEventArguments e)
+		private Task PepClient_OnUserLocation(object _, UserLocationEventArgs e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1697,7 +1691,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private Task PepClient_OnUserActivity(object Sender, UserActivityEventArguments e)
+		private Task PepClient_OnUserActivity(object _, UserActivityEventArgs e)
 		{
 			if (this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
@@ -1712,20 +1706,20 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private Task PepClient_OnUserAvatarMetaData(object Sender, UserAvatarMetaDataEventArguments e)
+		private Task PepClient_OnUserAvatarMetaData(object _, UserAvatarMetaDataEventArgs e)
 		{
 			// TODO: Avatars
 			return Task.CompletedTask;
 		}
 
-		private void ServerlessMessaging_OnNewXmppClient(object Sender, PeerConnectionEventArgs e)
+		private void ServerlessMessaging_OnNewXmppClient(object _, PeerConnectionEventArgs e)
 		{
 			XmppClient Client = e.Client;
 
 			this.e2eEncryption.RegisterHandlers(Client);
 		}
 
-		private void ServerlessMessaging_OnResynch(object Sender, ResynchEventArgs e)
+		private void ServerlessMessaging_OnResynch(object _, ResynchEventArgs e)
 		{
 			this.e2eEncryption?.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
 			{
@@ -1750,7 +1744,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private Task Proxy_OnOpen(object Sender, ValidateStreamEventArgs e)
+		private Task Proxy_OnOpen(object _, ValidateStreamEventArgs e)
 		{
 			RemoteDesktopView View;
 

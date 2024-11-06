@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Interoperability
 {
-	/// <summary>
-	/// Delegate for interoperability interfaces event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task InteroperabilityInterfacesClientEventHandler(object Sender, InteroperabilityClientEventArgs e);
-
 	/// <summary>
 	/// Event arguments for interoperability interface requests.
 	/// </summary>
@@ -30,6 +22,5 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// Reported Interoperability Interfaces.
 		/// </summary>
 		public string[] Interfaces => this.interfaces;
-
 	}
 }

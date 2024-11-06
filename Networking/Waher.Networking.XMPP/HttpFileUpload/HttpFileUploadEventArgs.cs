@@ -5,16 +5,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.HttpFileUpload
 {
-	/// <summary>
-	/// Delegate for HTTP File Upload callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task HttpFileUploadEventHandler(object Sender, HttpFileUploadEventArgs e);
-
 	/// <summary>
 	/// Event arguments for HTTP File Upload callback methods.
 	/// </summary>
@@ -180,11 +174,11 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 								Content = Body
 							})
 						{
-							this.LogSent(HttpClient, this.PutUrl, Body, "PATCH");
+							await this.LogSent(HttpClient, this.PutUrl, Body, "PATCH");
 
 							HttpResponseMessage Response = await HttpClient.SendAsync(RequestMessage);
 
-							this.LogReceived(Response);
+							await this.LogReceived(Response);
 
 							if (!Response.IsSuccessStatusCode)
 								await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
@@ -216,11 +210,11 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				}
 
 				Content.Headers.Add("Content-Type", ContentType);
-				this.LogSent(HttpClient, this.PutUrl, Content, "PUT");
+				await this.LogSent(HttpClient, this.PutUrl, Content, "PUT");
 
 				HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Content);
 
-				this.LogReceived(Response);
+				await this.LogReceived(Response);
 
 				if (!Response.IsSuccessStatusCode)
 					await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
@@ -230,7 +224,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			}
 		}
 
-		private void LogSent(HttpClient Client, string PutUrl, HttpContent Content, string Method)
+		private async Task LogSent(HttpClient Client, string PutUrl, HttpContent Content, string Method)
 		{
 			if (!this.hasSniffers)
 				return;
@@ -270,10 +264,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			string Msg = sb.ToString();
 
 			foreach (ISniffer Sniffer in this.sniffers)
-				Sniffer.TransmitText(Msg);
+				await Sniffer.TransmitText(Msg);
 		}
 
-		private void LogReceived(HttpResponseMessage Response)
+		private async Task LogReceived(HttpResponseMessage Response)
 		{
 			if (!this.hasSniffers)
 				return;
@@ -302,7 +296,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			string Msg = sb.ToString();
 
 			foreach (ISniffer Sniffer in this.sniffers)
-				Sniffer.ReceiveText(Msg);
+				await Sniffer.ReceiveText(Msg);
 		}
 
 	}

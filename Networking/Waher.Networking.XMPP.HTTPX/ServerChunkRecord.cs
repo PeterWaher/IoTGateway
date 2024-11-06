@@ -116,13 +116,15 @@ namespace Waher.Networking.XMPP.HTTPX
 			return Task.CompletedTask;
 		}
 
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
 			this.request?.Dispose();
 			this.request = null;
 
 			this.chunks?.Clear();
 			this.chunks = null;
+
+			return Task.CompletedTask;
 		}
 	}
 }

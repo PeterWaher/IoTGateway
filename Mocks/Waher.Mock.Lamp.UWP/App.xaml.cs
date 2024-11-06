@@ -49,7 +49,7 @@ namespace Waher.Mock.Lamp.UWP
 				Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
 				Microsoft.ApplicationInsights.WindowsCollectors.Session);
 			this.InitializeComponent();
-			this.Suspending += OnSuspending;
+			this.Suspending += this.OnSuspending;
 		}
 
 		/// <summary>
@@ -74,7 +74,7 @@ namespace Waher.Mock.Lamp.UWP
 				// Create a Frame to act as the navigation context and navigate to the first page
 				rootFrame = new Frame();
 
-				rootFrame.NavigationFailed += OnNavigationFailed;
+				rootFrame.NavigationFailed += this.OnNavigationFailed;
 
 				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
 				{
@@ -130,19 +130,19 @@ namespace Waher.Mock.Lamp.UWP
 
 				Log.Informational("Connecting to XMPP server.");
 
-				xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
+				this.xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
 
 				if (Credentials.Sniffer && !(MainPage.Sniffer is null))
-					xmppClient.Add(MainPage.Sniffer);
+					this.xmppClient.Add(MainPage.Sniffer);
 
 				if (!string.IsNullOrEmpty(Credentials.Events))
-					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, Credentials.Events, false));
+					Log.Register(new XmppEventSink("XMPP Event Sink", this.xmppClient, Credentials.Events, false));
 
 				if (!string.IsNullOrEmpty(Credentials.ThingRegistry))
 				{
-					thingRegistryClient = new ThingRegistryClient(xmppClient, Credentials.ThingRegistry);
+					this.thingRegistryClient = new ThingRegistryClient(this.xmppClient, Credentials.ThingRegistry);
 
-					thingRegistryClient.Claimed += (sender, e) =>
+					this.thingRegistryClient.Claimed += (sender, e) =>
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
@@ -150,7 +150,7 @@ namespace Waher.Mock.Lamp.UWP
 						return Task.CompletedTask;
 					};
 
-					thingRegistryClient.Disowned += (sender, e) =>
+					this.thingRegistryClient.Disowned += (sender, e) =>
 					{
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
@@ -158,7 +158,7 @@ namespace Waher.Mock.Lamp.UWP
 						return Task.CompletedTask;
 					};
 
-					thingRegistryClient.Removed += (sender, e) =>
+					this.thingRegistryClient.Removed += (sender, e) =>
 					{
 						Log.Informational("Thing has been removed from the public registry.", ownerJid);
 						return Task.CompletedTask;
@@ -166,115 +166,110 @@ namespace Waher.Mock.Lamp.UWP
 				}
 
 				if (!string.IsNullOrEmpty(Credentials.Provisioning))
-					provisioningClient = new ProvisioningClient(xmppClient, Credentials.Provisioning);
+					this.provisioningClient = new ProvisioningClient(this.xmppClient, Credentials.Provisioning);
 
-				Timer ConnectionTimer = new Timer((P) =>
+				Timer ConnectionTimer = new Timer(async (P) =>
 				{
-					if (xmppClient.State == XmppState.Offline || xmppClient.State == XmppState.Error || xmppClient.State == XmppState.Authenticating)
+					try
 					{
-						try
+						if (this.xmppClient.State == XmppState.Offline || this.xmppClient.State == XmppState.Error || this.xmppClient.State == XmppState.Authenticating)
 						{
 							Log.Informational("Reconnecting.");
-							xmppClient.Reconnect();
+							await this.xmppClient.Reconnect();
 						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
 					}
 				}, null, 60000, 60000);
 
-				xmppClient.OnStateChanged += (sender, NewState) =>
+				this.xmppClient.OnStateChanged += async (sender, NewState) =>
 				{
 					Log.Informational(NewState.ToString());
 
 					switch (NewState)
 					{
 						case XmppState.Connected:
-							connected = true;
+							this.connected = true;
 
-							if (!registered && !(thingRegistryClient is null))
-								Register();
+							if (!this.registered && !(this.thingRegistryClient is null))
+								this.Register();
 							break;
 
 						case XmppState.Offline:
-							immediateReconnect = connected;
-							connected = false;
+							this.immediateReconnect = this.connected;
+							this.connected = false;
 
-							if (immediateReconnect)
-								xmppClient.Reconnect();
+							if (this.immediateReconnect)
+								await this.xmppClient.Reconnect();
 							break;
 					}
-				
-					return Task.CompletedTask;
 				};
 
-				xmppClient.OnPresenceSubscribe += (sender, e) =>
+				this.xmppClient.OnPresenceSubscribe += async (sender, e) =>
 				{
 					Log.Informational("Subscription request received from " + e.From + ".");
 
-					e.Accept();     // TODO: Provisioning
+					await e.Accept();     // TODO: Provisioning
 
-					RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
+					RosterItem Item = this.xmppClient.GetRosterItem(e.FromBareJID);
 					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-						xmppClient.RequestPresenceSubscription(e.FromBareJID);
+						this.xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
-					xmppClient.SetPresence(Availability.Chat);
-				
-					return Task.CompletedTask;
+					await this.xmppClient.SetPresence(Availability.Chat);
 				};
 
-				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
+				this.xmppClient.OnPresenceUnsubscribe += async (sender, e) =>
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
-					e.Accept();
-					return Task.CompletedTask;
+					await e.Accept();
 				};
 
-				xmppClient.OnRosterItemUpdated += (sender, e) =>
+				this.xmppClient.OnRosterItemUpdated += (sender, e) =>
 				{
 					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
-						xmppClient.RemoveRosterItem(e.BareJid);
-				
+						this.xmppClient.RemoveRosterItem(e.BareJid);
+
 					return Task.CompletedTask;
 				};
 
 				bool SwitchOn = false;
 
-				sensorServer = new SensorServer(xmppClient, provisioningClient, false);
-				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
+				this.sensorServer = new SensorServer(this.xmppClient, this.provisioningClient, false);
+				this.sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					DateTime Now = DateTime.Now;
 
 					Log.Informational("Readout requested", string.Empty, Request.Actor);
 
 					Request.ReportFields(true, new BooleanField(ThingReference.Empty, Now, "Lamp", SwitchOn, FieldType.Momentary, FieldQoS.AutomaticReadout));
-				
+
 					return Task.CompletedTask;
 				};
 
-				controlServer = new ControlServer(xmppClient,
+				this.controlServer = new ControlServer(this.xmppClient,
 					new BooleanControlParameter("Lamp", "Control", "Lamp switch on.", "If checked, lamp is turned on.",
 						(Node) => Task.FromResult<bool?>(SwitchOn),
 						(Node, Value) =>
 						{
 							SwitchOn = Value;
 							Log.Informational("Lamp turned " + (SwitchOn ? "ON" : "OFF"));
-							UpdateMainWindow(SwitchOn);
+							this.UpdateMainWindow(SwitchOn);
 							return Task.CompletedTask;
 						}));
 
 				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-				this.chatServer = new ChatServer(xmppClient, this.bobClient, this.sensorServer, this.controlServer, this.provisioningClient);
+				this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer, this.controlServer, this.provisioningClient);
 
-				interoperabilityServer = new InteroperabilityServer(xmppClient);
-				interoperabilityServer.OnGetInterfaces += (sender, e) =>
+				this.interoperabilityServer = new InteroperabilityServer(this.xmppClient);
+				this.interoperabilityServer.OnGetInterfaces += (sender, e) =>
 				{
 					e.Add("XMPP.IoT.Actuator.Lamp");
 					return Task.CompletedTask;
 				};
 
-				xmppClient.Connect();
+				this.xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{
@@ -366,7 +361,7 @@ namespace Waher.Mock.Lamp.UWP
 
 			if (!(this.xmppClient is null))
 			{
-				this.xmppClient.Dispose();
+				this.xmppClient.DisposeAsync().Wait();  // TODO: Avoid blocking calls.
 				this.xmppClient = null;
 			}
 
@@ -390,9 +385,9 @@ namespace Waher.Mock.Lamp.UWP
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(this.thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
-			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
+			this.thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{

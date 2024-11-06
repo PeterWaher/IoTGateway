@@ -1418,13 +1418,16 @@ namespace Waher.Persistence.MongoDB
 		private async Task Process(object Object, Task Op, ObjectCallback Callback)
 		{
 			await Op;
-			Callback?.Invoke(Object);
+			if (!(Callback is null))
+				Callback(Object);
 		}
 
 		private async Task Process(IEnumerable<object> Objects, Task Op, ObjectsCallback Callback)
 		{
 			await Op;
-			Callback?.Invoke(Objects);
+
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		/// <summary>
@@ -1532,7 +1535,8 @@ namespace Waher.Persistence.MongoDB
 			where T : class
 		{
 			IEnumerable<T> Objects = await this.FindDelete<T>(Offset, MaxCount, SortOrder);
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		/// <summary>
@@ -1549,7 +1553,8 @@ namespace Waher.Persistence.MongoDB
 			where T : class
 		{
 			IEnumerable<T> Objects = await this.FindDelete<T>(Offset, MaxCount, Filter, SortOrder);
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		/// <summary>
@@ -1564,7 +1569,8 @@ namespace Waher.Persistence.MongoDB
 		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback)
 		{
 			IEnumerable<object> Objects = await this.FindDelete(Collection, Offset, MaxCount, SortOrder);
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		/// <summary>
@@ -1580,7 +1586,8 @@ namespace Waher.Persistence.MongoDB
 		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
 		{
 			IEnumerable<object> Objects = await this.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);
-			Callback?.Invoke(Objects);
+			if (!(Callback is null))
+				Callback(Objects);
 		}
 
 		/// <summary>

@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.P2P
 {
-	/// <summary>
-	/// Delegate for availability events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task AvailableEventHandler(object Sender, AvailableEventArgs e);
-
 	/// <summary>
 	/// Event arguments for Availability events.
 	/// </summary>

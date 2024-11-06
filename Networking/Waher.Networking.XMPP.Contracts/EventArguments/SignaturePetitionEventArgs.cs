@@ -1,15 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
+using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.Contracts
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for digital signature petition events.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task SignaturePetitionEventHandler(object Sender, SignaturePetitionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for digital signature petitions
 	/// </summary>

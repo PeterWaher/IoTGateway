@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.WebSockets
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Request">HTTP request.</param>
-	public delegate void HttpRequestEventHandle(object Sender, HttpRequest Request);
+	public delegate Task HttpRequestEventHandle(object Sender, HttpRequest Request);
 
 	/// <summary>
 	/// HTTP resource implementing the WebSocket Protocol as defined in RFC 6455:
@@ -149,8 +149,10 @@ namespace Waher.Networking.HTTP.WebSockets
 				throw new ForbiddenException("Invalid connection.");
 
 			WebSocket Socket = new WebSocket(this, Request, Response);
-			
-			this.Accept?.Invoke(this, new WebSocketEventArgs(Socket));
+
+			WebSocketEventHandler h = this.Accept;
+			if (!(h is null))
+				await h(this, new WebSocketEventArgs(Socket));
 
 			string ChallengeResponse = Convert.ToBase64String(Hashes.ComputeSHA1Hash(
 				Encoding.UTF8.GetBytes(Challenge.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")));
@@ -168,7 +170,9 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			await Response.SendResponse();
 
-			this.Connected?.Invoke(this, new WebSocketEventArgs(Socket));
+			h = this.Connected;
+			if (!(h is null))
+				await h(this, new WebSocketEventArgs(Socket));
 		}
 
 		/// <summary>

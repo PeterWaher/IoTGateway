@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Things.ControlParameters;
 using Waher.Things;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Control.ControlOperations
 {
@@ -46,7 +46,7 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 			bool Result = await this.parameter.Set(this.Node, this.value);
 
 			if (!Result)
-				ControlServer.ParameterValueInvalid(this.parameter.Name, this.Request);
+				await ControlServer.ParameterValueInvalid(this.parameter.Name, this.Request);
 
 			return Result;
 		}

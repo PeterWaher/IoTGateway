@@ -45,7 +45,7 @@ namespace Waher.Mock.Temperature.UWP
 				Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
 				Microsoft.ApplicationInsights.WindowsCollectors.Session);
 			this.InitializeComponent();
-			this.Suspending += OnSuspending;
+			this.Suspending += this.OnSuspending;
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Waher.Mock.Temperature.UWP
 				// Create a Frame to act as the navigation context and navigate to the first page
 				rootFrame = new Frame();
 
-				rootFrame.NavigationFailed += OnNavigationFailed;
+				rootFrame.NavigationFailed += this.OnNavigationFailed;
 
 				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
 				{
@@ -125,19 +125,19 @@ namespace Waher.Mock.Temperature.UWP
 
 				Log.Informational("Connecting to XMPP server.");
 
-				xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
+				this.xmppClient = new XmppClient(Credentials, "en", typeof(App).GetTypeInfo().Assembly);
 
 				if (Credentials.Sniffer && !(MainPage.Sniffer is null))
-					xmppClient.Add(MainPage.Sniffer);
-				
+					this.xmppClient.Add(MainPage.Sniffer);
+
 				if (!string.IsNullOrEmpty(Credentials.Events))
-					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, Credentials.Events, false));
-				
+					Log.Register(new XmppEventSink("XMPP Event Sink", this.xmppClient, Credentials.Events, false));
+
 				if (!string.IsNullOrEmpty(Credentials.ThingRegistry))
 				{
-					thingRegistryClient = new ThingRegistryClient(xmppClient, Credentials.ThingRegistry);
-				
-					thingRegistryClient.Claimed += (sender, e) =>
+					this.thingRegistryClient = new ThingRegistryClient(this.xmppClient, Credentials.ThingRegistry);
+
+					this.thingRegistryClient.Claimed += (sender, e) =>
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
@@ -145,91 +145,86 @@ namespace Waher.Mock.Temperature.UWP
 						return Task.CompletedTask;
 					};
 
-					thingRegistryClient.Disowned += (sender, e) =>
+					this.thingRegistryClient.Disowned += (sender, e) =>
 					{
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
 						this.Register();    // Will call this.OwnershipChanged() after successful registration.
 						return Task.CompletedTask;
 					};
-				
-					thingRegistryClient.Removed += (sender, e) =>
+
+					this.thingRegistryClient.Removed += (sender, e) =>
 					{
 						Log.Informational("Thing has been removed from the public registry.", ownerJid);
 						return Task.CompletedTask;
 					};
 				}
-				
-				if (!string.IsNullOrEmpty(Credentials.Provisioning))
-					provisioningClient = new ProvisioningClient(xmppClient, Credentials.Provisioning);
 
-				Timer ConnectionTimer = new Timer((P) =>
+				if (!string.IsNullOrEmpty(Credentials.Provisioning))
+					this.provisioningClient = new ProvisioningClient(this.xmppClient, Credentials.Provisioning);
+
+				Timer ConnectionTimer = new Timer(async (P) =>
 				{
-					if (xmppClient.State == XmppState.Offline || xmppClient.State == XmppState.Error || xmppClient.State == XmppState.Authenticating)
+					try
 					{
-						try
+						if (this.xmppClient.State == XmppState.Offline || this.xmppClient.State == XmppState.Error || this.xmppClient.State == XmppState.Authenticating)
 						{
 							Log.Informational("Reconnecting.");
-							xmppClient.Reconnect();
+							await this.xmppClient.Reconnect();
 						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
 					}
 				}, null, 60000, 60000);
 
-				xmppClient.OnStateChanged += (sender, NewState) =>
+				this.xmppClient.OnStateChanged += async (sender, NewState) =>
 				{
 					Log.Informational(NewState.ToString());
 
 					switch (NewState)
 					{
 						case XmppState.Connected:
-							connected = true;
+							this.connected = true;
 
-							if (!registered && !(thingRegistryClient is null))
+							if (!this.registered && !(this.thingRegistryClient is null))
 								this.Register();
 							break;
 
 						case XmppState.Offline:
-							immediateReconnect = connected;
-							connected = false;
+							this.immediateReconnect = this.connected;
+							this.connected = false;
 
-							if (immediateReconnect)
-								xmppClient.Reconnect();
+							if (this.immediateReconnect)
+								await this.xmppClient.Reconnect();
 							break;
 					}
-
-					return Task.CompletedTask;
 				};
 
-				xmppClient.OnPresenceSubscribe += (sender, e) =>
+				this.xmppClient.OnPresenceSubscribe += async (sender, e) =>
 				{
 					Log.Informational("Subscription request received from " + e.From + ".");
 
-					e.Accept();     // TODO: Provisioning
+					await e.Accept();     // TODO: Provisioning
 
-					RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
+					RosterItem Item = this.xmppClient.GetRosterItem(e.FromBareJID);
 					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-						xmppClient.RequestPresenceSubscription(e.FromBareJID);
+						this.xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
-					xmppClient.SetPresence(Availability.Chat);
-
-					return Task.CompletedTask;
+					await this.xmppClient.SetPresence(Availability.Chat);
 				};
 
-				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
+				this.xmppClient.OnPresenceUnsubscribe += (sender, e) =>
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
-					e.Accept();
-					return Task.CompletedTask;
+					return e.Accept();
 				};
 
-				xmppClient.OnRosterItemUpdated += (sender, e) =>
+				this.xmppClient.OnRosterItemUpdated += (sender, e) =>
 				{
 					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
-						xmppClient.RemoveRosterItem(e.BareJid);
+						this.xmppClient.RemoveRosterItem(e.BareJid);
 
 					return Task.CompletedTask;
 				};
@@ -248,79 +243,91 @@ namespace Waher.Mock.Temperature.UWP
 				int NrTemp = 1;
 				int NrDayRecords = 0;
 				int NrMinuteRecords = 0;
-				object SampleSynch = new object();
+				SemaphoreSlim SampleSynch = new SemaphoreSlim(1);
 
-				this.sampleTimer = new Timer((P) =>
+				this.sampleTimer = new Timer(async (P) =>
 				{
-					lock (SampleSynch)
+					try
 					{
-						Now = DateTime.Now;
-
-						if (Now.Date != PeriodStart.Date)
+						await SampleSynch.WaitAsync();
+						try
 						{
-							DayHistoryRecord Rec = new DayHistoryRecord(PeriodStart.Date, PeriodStart.Date.AddDays(1).AddMilliseconds(-1),
-								MinTemp, MaxTemp, SumTemp / NrTemp);
+							Now = DateTime.Now;
 
-							DayHistoricalValues.AddFirst(Rec);
+							if (Now.Date != PeriodStart.Date)
+							{
+								DayHistoryRecord Rec = new DayHistoryRecord(PeriodStart.Date, PeriodStart.Date.AddDays(1).AddMilliseconds(-1),
+									MinTemp, MaxTemp, SumTemp / NrTemp);
 
-							if (NrDayRecords < MaxRecordsPerPeriod)
-								NrDayRecords++;
-							else
-								DayHistoricalValues.RemoveLast();
+								DayHistoricalValues.AddFirst(Rec);
 
-							// TODO: Persistence
+								if (NrDayRecords < MaxRecordsPerPeriod)
+									NrDayRecords++;
+								else
+									DayHistoricalValues.RemoveLast();
 
-							PeriodStart = Now.Date;
-							SumTemp = 0;
-							NrTemp = 0;
+								// TODO: Persistence
+
+								PeriodStart = Now.Date;
+								SumTemp = 0;
+								NrTemp = 0;
+							}
+
+							CurrentTemperature = this.ReadTemp();
+
+							if (Now.Minute != SampleTime.Minute)
+							{
+								MinuteHistoryRecord Rec = new MinuteHistoryRecord(Now, CurrentTemperature);
+
+								MinuteHistoricalValues.AddFirst(Rec);
+
+								if (NrMinuteRecords < MaxRecordsPerPeriod)
+									NrMinuteRecords++;
+								else
+									MinuteHistoricalValues.RemoveLast();
+
+								// TODO: Persistence
+							}
+
+							SampleTime = Now;
+
+							if (CurrentTemperature < MinTemp)
+							{
+								MinTemp = CurrentTemperature;
+								MinTime = SampleTime;
+							}
+
+							if (CurrentTemperature > MaxTemp)
+							{
+								MaxTemp = CurrentTemperature;
+								MaxTime = SampleTime;
+							}
+
+							SumTemp += CurrentTemperature;
+							NrTemp++;
+						}
+						finally
+						{
+							SampleSynch.Release();
 						}
 
-						CurrentTemperature = this.ReadTemp();
-
-						if (Now.Minute != SampleTime.Minute)
+						if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
 						{
-							MinuteHistoryRecord Rec = new MinuteHistoryRecord(Now, CurrentTemperature);
-
-							MinuteHistoricalValues.AddFirst(Rec);
-
-							if (NrMinuteRecords < MaxRecordsPerPeriod)
-								NrMinuteRecords++;
-							else
-								MinuteHistoricalValues.RemoveLast();
-
-							// TODO: Persistence
+							this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
+								CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
-						SampleTime = Now;
-
-						if (CurrentTemperature < MinTemp)
-						{
-							MinTemp = CurrentTemperature;
-							MinTime = SampleTime;
-						}
-
-						if (CurrentTemperature > MaxTemp)
-						{
-							MaxTemp = CurrentTemperature;
-							MaxTime = SampleTime;
-						}
-
-						SumTemp += CurrentTemperature;
-						NrTemp++;
+						this.UpdateMainWindow(CurrentTemperature, MinTemp, MaxTemp, SumTemp / NrTemp);
 					}
-
-					if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
+					catch (Exception ex)
 					{
-						this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
-							CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
+						Log.Exception(ex);
 					}
-
-					this.UpdateMainWindow(CurrentTemperature, MinTemp, MaxTemp, SumTemp / NrTemp);
 
 				}, null, 1000 - PeriodStart.Millisecond, 1000);
 
-				this.sensorServer = new SensorServer(xmppClient, provisioningClient, true);
-				this.sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
+				this.sensorServer = new SensorServer(this.xmppClient, this.provisioningClient, true);
+				this.sensorServer.OnExecuteReadoutRequest += async (Sender, Request) =>
 				{
 					Log.Informational("Readout requested by " + Request.From, string.Empty, Request.Actor);
 
@@ -332,7 +339,8 @@ namespace Waher.Mock.Temperature.UWP
 					bool IncludePeak = Request.IsIncluded(FieldType.Peak);
 					bool IncludeComputed = Request.IsIncluded(FieldType.Computed);
 
-					lock (SampleSynch)
+					await SampleSynch.WaitAsync();
+					try
 					{
 						if (IncludeTemp && Request.IsIncluded(FieldType.Momentary))
 						{
@@ -370,7 +378,7 @@ namespace Waher.Mock.Temperature.UWP
 
 								if (Fields.Count >= 100)
 								{
-									Request.ReportFields(false, Fields);
+									await Request.ReportFields(false, Fields);
 									Fields.Clear();
 								}
 
@@ -405,7 +413,7 @@ namespace Waher.Mock.Temperature.UWP
 								{
 									if (Fields.Count >= 100)
 									{
-										Request.ReportFields(false, Fields);
+										await Request.ReportFields(false, Fields);
 										Fields.Clear();
 									}
 
@@ -414,18 +422,19 @@ namespace Waher.Mock.Temperature.UWP
 								}
 							}
 						}
-
+					}
+					finally
+					{
+						SampleSynch.Release();
 					}
 
-					Request.ReportFields(true, Fields);
-
-					return Task.CompletedTask;
+					await Request.ReportFields(true, Fields);
 				};
 
 				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
 				this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer, this.provisioningClient);
 
-				this.interoperabilityServer = new InteroperabilityServer(xmppClient);
+				this.interoperabilityServer = new InteroperabilityServer(this.xmppClient);
 				this.interoperabilityServer.OnGetInterfaces += (sender, e) =>
 				{
 					e.Add("XMPP.IoT.Sensor.Temperature",
@@ -436,11 +445,11 @@ namespace Waher.Mock.Temperature.UWP
 						"XMPP.IoT.Sensor.Temperature.Min.History",
 						"XMPP.IoT.Sensor.Temperature.Max",
 						"XMPP.IoT.Sensor.Temperature.Max.History");
-				
+
 					return Task.CompletedTask;
 				};
 
-				xmppClient.Connect();
+				this.xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{
@@ -543,7 +552,7 @@ namespace Waher.Mock.Temperature.UWP
 
 			if (!(this.xmppClient is null))
 			{
-				this.xmppClient.Dispose();
+				this.xmppClient.DisposeAsync().Wait();  // TODO: Avoid blocking calls.
 				this.xmppClient = null;
 			}
 
@@ -567,9 +576,9 @@ namespace Waher.Mock.Temperature.UWP
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(this.thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
-			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
+			this.thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{

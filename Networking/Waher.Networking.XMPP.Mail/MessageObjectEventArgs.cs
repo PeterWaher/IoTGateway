@@ -1,15 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Mail
 {
-	/// <summary>
-	/// Delegate for message object callback functions.
-	/// </summary>
-	/// <param name="Sender">Caller</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task MessageObjectEventHandler(object Sender, MessageObjectEventArgs e);
-
 	/// <summary>
 	/// Message object event arguments.
 	/// </summary>

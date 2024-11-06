@@ -201,7 +201,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				if (!(this.e2e is null))
 				{
-					byte[] Encrypted = this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block, out _);
+					byte[] Encrypted = await this.e2e.Encrypt(this.id.ToString(), this.sid, this.from, this.to, Block, out _);
 					this.id++;
 
 					if (Encrypted is null)

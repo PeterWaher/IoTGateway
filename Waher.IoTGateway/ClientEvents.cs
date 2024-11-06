@@ -208,7 +208,7 @@ namespace Waher.IoTGateway
 				Json.Append(']');
 				await Response.Write(Json.ToString());
 				await Response.SendResponse();
-				Response.Dispose();
+				await Response.DisposeAsync();
 			}
 			else
 				timeoutByTabID[TabID] = Queue;
@@ -409,7 +409,7 @@ namespace Waher.IoTGateway
 			if (!(ToSend is null))
 			{
 				foreach (string s2 in ToSend)
-					Socket.Send(s2, 4096);
+					await Socket.Send(s2, 4096);
 			}
 		}
 
@@ -504,7 +504,7 @@ namespace Waher.IoTGateway
 			return Result;
 		}
 
-		private static async void TimeoutCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
+		private static async Task TimeoutCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
 		{
 			if (e.Reason == RemovedReason.NotUsed)
 			{
@@ -525,7 +525,7 @@ namespace Waher.IoTGateway
 					}
 					finally
 					{
-						Response.Dispose();
+						await Response.DisposeAsync();
 					}
 				}
 			}
@@ -538,13 +538,15 @@ namespace Waher.IoTGateway
 			return Result;
 		}
 
-		private static void QueueCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
+		private static Task QueueCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
 		{
 			TabQueue Queue = e.Value;
 			string TabID = Queue.TabID;
 
 			Remove(TabID, null);
 			Queue.Dispose();
+
+			return Task.CompletedTask;
 		}
 
 		private static void Remove(string TabID, string Resource)
@@ -606,7 +608,7 @@ namespace Waher.IoTGateway
 			return Result;
 		}
 
-		private static async void ContentCacheItem_Removed(object Sender, CacheItemEventArgs<string, ContentQueue> e)
+		private static async Task ContentCacheItem_Removed(object Sender, CacheItemEventArgs<string, ContentQueue> e)
 		{
 			if (e.Reason != RemovedReason.Manual)
 			{
@@ -1428,14 +1430,14 @@ namespace Waher.IoTGateway
 							try
 							{
 								if (!(Queue.WebSocket is null))
-									Queue.WebSocket.Send(Json.ToString(), 4096);
+									await Queue.WebSocket.Send(Json.ToString(), 4096);
 								else if (!(Queue.Response is null))
 								{
 									try
 									{
 										await Queue.Response.Write("[" + Json.ToString() + "]");
 										await Queue.Response.SendResponse();
-										Queue.Response.Dispose();
+										await Queue.Response.DisposeAsync();
 										Queue.Response = null;
 									}
 									catch (Exception)

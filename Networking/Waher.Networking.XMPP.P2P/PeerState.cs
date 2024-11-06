@@ -6,7 +6,6 @@ using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
 
@@ -141,15 +140,15 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Offset">Start index of first byte read.</param>
 		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		public Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		public async Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			string s = this.encoding.GetString(Buffer, Offset, Count);
 
 			this.lastActivity = DateTime.Now;
 			if (this.xmppClient is null)
-				this.parent.ReceiveText(s);
+				await this.parent.ReceiveText(s);
 
-			return this.ParseIncoming(s);
+			return await this.ParseIncoming(s);
 		}
 
 		private async Task<bool> ParseIncoming(string s)
@@ -166,7 +165,7 @@ namespace Waher.Networking.XMPP.P2P
 							this.fragment.Append(ch);
 							if (++this.fragmentLength > MaxFragmentSize)
 							{
-								this.ToError();
+								await this.ToError();
 								return false;
 							}
 							else
@@ -174,7 +173,7 @@ namespace Waher.Networking.XMPP.P2P
 						}
 						else if (ch > ' ')
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -183,7 +182,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '?')
@@ -192,7 +191,7 @@ namespace Waher.Networking.XMPP.P2P
 						{
 							this.inputState = 5;
 							this.inputDepth = 1;
-							this.ProcessStream(this.fragment.ToString());
+							await this.ProcessStream(this.fragment.ToString());
 							this.fragment.Clear();
 							this.fragmentLength = 0;
 						}
@@ -202,7 +201,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -213,14 +212,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '<')
 							this.inputState++;
 						else if (ch > ' ')
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -229,14 +228,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
 						{
 							this.inputState++;
 							this.inputDepth = 1;
-							this.ProcessStream(this.fragment.ToString());
+							await this.ProcessStream(this.fragment.ToString());
 							this.fragment.Clear();
 							this.fragmentLength = 0;
 						}
@@ -248,7 +247,7 @@ namespace Waher.Networking.XMPP.P2P
 							this.fragment.Append(ch);
 							if (++this.fragmentLength > MaxFragmentSize)
 							{
-								this.ToError();
+								await this.ToError();
 								return false;
 							}
 							else
@@ -259,13 +258,13 @@ namespace Waher.Networking.XMPP.P2P
 							this.fragment.Append(ch);
 							if (++this.fragmentLength > MaxFragmentSize)
 							{
-								this.ToError();
+								await this.ToError();
 								return false;
 							}
 						}
 						else if (ch > ' ')
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -274,7 +273,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '/')
@@ -289,7 +288,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -297,7 +296,7 @@ namespace Waher.Networking.XMPP.P2P
 							this.inputDepth--;
 							if (this.inputDepth < 1)
 							{
-								this.ToError();
+								await this.ToError();
 								return false;
 							}
 							else
@@ -321,7 +320,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -339,7 +338,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -364,7 +363,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -384,7 +383,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '"')
@@ -395,7 +394,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '\'')
@@ -406,7 +405,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '-')
@@ -415,7 +414,7 @@ namespace Waher.Networking.XMPP.P2P
 							this.inputState = 18;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -424,14 +423,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '-')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -440,7 +439,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '-')
@@ -451,7 +450,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '-')
@@ -464,7 +463,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -477,14 +476,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == 'C')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -493,14 +492,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == 'D')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -509,14 +508,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == 'A')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -525,14 +524,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == 'T')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -541,14 +540,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == 'A')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -557,14 +556,14 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '[')
 							this.inputState++;
 						else
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						break;
@@ -573,7 +572,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == ']')
@@ -584,7 +583,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == ']')
@@ -597,7 +596,7 @@ namespace Waher.Networking.XMPP.P2P
 						this.fragment.Append(ch);
 						if (++this.fragmentLength > MaxFragmentSize)
 						{
-							this.ToError();
+							await this.ToError();
 							return false;
 						}
 						else if (ch == '>')
@@ -614,18 +613,21 @@ namespace Waher.Networking.XMPP.P2P
 			return Result;
 		}
 
-		private void ToError()
+		private async Task ToError()
 		{
 			this.inputState = -1;
 			this.state = XmppState.Error;
 
 			this.CallCallbacks();
 
-			this.peer?.Dispose();
-			this.peer = null;
+			if (!(this.peer is null))
+			{
+				await this.peer.DisposeAsync();
+				this.peer = null;
+			}
 		}
 
-		private void ProcessStream(string Xml)
+		private async Task ProcessStream(string Xml)
 		{
 			try
 			{
@@ -673,16 +675,16 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					this.parent.Exception(ex);
+					await this.parent.Exception(ex);
 
 					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 						"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + XML.Encode(ex.Message) +
 						"</text></stream:error></stream:stream>";
 
 					this.headerSent = true;
-					this.SendAsync(Header, (sender, e) =>
+					await this.SendAsync(Header, (sender, e) =>
 					{
-						this.ToError();
+						return this.ToError();
 					});
 
 					return;
@@ -691,7 +693,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (!this.headerSent)
 				{
 					this.headerSent = true;
-					this.SendAsync(Header);
+					await this.SendAsync(Header);
 				}
 
 				this.state = XmppState.Connected;
@@ -701,8 +703,8 @@ namespace Waher.Networking.XMPP.P2P
 					SendFromAddress = true
 				};
 
-				this.parent.PeerAuthenticated(this);
-				this.parent.NewXmppClient(this.xmppClient, this.parentFullJid, this.remoteFullJid);
+				await this.parent.PeerAuthenticated(this);
+				await this.parent.NewXmppClient(this.xmppClient, this.parentFullJid, this.remoteFullJid);
 
 				this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
 
@@ -710,12 +712,12 @@ namespace Waher.Networking.XMPP.P2P
 			}
 			catch (Exception ex)
 			{
-				this.parent.Exception(ex);
-				this.ToError();
+				await this.parent.Exception(ex);
+				await this.ToError();
 			}
 		}
 
-		private Task XmppClient_OnStateChanged(object _, XmppState NewState)
+		private async Task XmppClient_OnStateChanged(object _, XmppState NewState)
 		{
 			this.state = NewState;
 
@@ -727,14 +729,12 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (!(this.xmppClient is null))
 				{
-					this.xmppClient.Dispose();
+					await this.xmppClient.DisposeAsync();
 					this.xmppClient = null;
 				}
 
 				this.CallCallbacks();
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -842,9 +842,9 @@ namespace Waher.Networking.XMPP.P2P
 			return Result;
 		}
 
-		private void Peer_OnClosed(object sender, EventArgs e)
+		private async Task Peer_OnClosed(object sender, EventArgs e)
 		{
-			this.parent.PeerClosed(this);
+			await this.parent.PeerClosed(this);
 			this.parent = null;
 			this.peer = null;
 
@@ -855,13 +855,13 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// CLoses the connection.
 		/// </summary>
-		public void Close()
+		public async Task Close()
 		{
 			if (!(this.peer is null))
 			{
 				try
 				{
-					this.peer.Dispose();
+					await this.peer.DisposeAsync();
 				}
 				catch (Exception)
 				{
@@ -892,7 +892,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				try
 				{
-					this.xmppClient.Dispose();
+					await this.xmppClient.DisposeAsync();
 				}
 				catch (Exception)
 				{
@@ -936,7 +936,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Packet"></param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public Task<bool> SendAsync(string Packet, EventHandler Callback)
+		public Task<bool> SendAsync(string Packet, EventHandlerAsync Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
 
@@ -952,9 +952,25 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		[Obsolete("Use DisposeAsync()")]
+		public async void Dispose()
 		{
-			this.Close();
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public Task DisposeAsync()
+		{
+			return this.Close();
 		}
 
 		/// <summary>

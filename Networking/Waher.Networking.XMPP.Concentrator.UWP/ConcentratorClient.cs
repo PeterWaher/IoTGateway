@@ -1,19 +1,20 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Concentrator.Queries;
+using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 using Waher.Things;
-using Waher.Things.SourceEvents;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.SourceEvents;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -110,9 +111,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetCapabilities(string To, CapabilitiesEventHandler Callback, object State)
+		public Task GetCapabilities(string To, EventHandlerAsync<CapabilitiesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getCapabilities xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(To, "<getCapabilities xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
@@ -149,21 +150,21 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAllDataSources(string To, DataSourcesEventHandler Callback, object State)
+		public Task GetAllDataSources(string To, EventHandlerAsync<DataSourcesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(To, "<getAllDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
 			}, State);
 		}
 
-		private async Task DataSourcesResponse(IqResultEventArgs e, DataSourcesEventHandler Callback, object _)
+		private async Task DataSourcesResponse(IqResultEventArgs e, EventHandlerAsync<DataSourcesEventArgs> Callback, object _)
 		{
 			List<DataSourceReference> DataSources = new List<DataSourceReference>();
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "dataSources" && 
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "dataSources" &&
 				E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 			{
 				foreach (XmlNode N in E)
@@ -194,9 +195,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRootDataSources(string To, DataSourcesEventHandler Callback, object State)
+		public Task GetRootDataSources(string To, EventHandlerAsync<DataSourcesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(To, "<getRootDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
@@ -208,11 +209,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="To">Address of concentrator server.</param>
 		/// <returns>Result</returns>
-		public Task<DataSourceReference[]> GetRootDataSourcesAsync(string To)
+		public async Task<DataSourceReference[]> GetRootDataSourcesAsync(string To)
 		{
 			TaskCompletionSource<DataSourceReference[]> Result = new TaskCompletionSource<DataSourceReference[]>();
 
-			this.GetRootDataSources(To, (_, e) =>
+			await this.GetRootDataSources(To, (_, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.DataSources);
@@ -223,7 +224,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -233,9 +234,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="SourceID">Parent Data Source ID.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetChildDataSources(string To, string SourceID, DataSourcesEventHandler Callback, object State)
+		public Task GetChildDataSources(string To, string SourceID, EventHandlerAsync<DataSourcesEventArgs> Callback, object State)
 		{
-			this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "' src='" + XML.Encode(SourceID) + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(To, "<getChildDataSources xmlns='" + ConcentratorServer.NamespaceConcentratorCurrent + "' src='" + XML.Encode(SourceID) + "'/>", async (sender, e) =>
 			{
 				if (!(Callback is null))
 					await this.DataSourcesResponse(e, Callback, State);
@@ -248,11 +249,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="To">Address of concentrator server.</param>
 		/// <param name="SourceID">Parent Data Source ID.</param>
 		/// <returns>Result</returns>
-		public Task<DataSourceReference[]> GetChildDataSourcesAsync(string To, string SourceID)
+		public async Task<DataSourceReference[]> GetChildDataSourcesAsync(string To, string SourceID)
 		{
 			TaskCompletionSource<DataSourceReference[]> Result = new TaskCompletionSource<DataSourceReference[]>();
 
-			this.GetChildDataSources(To, SourceID, (_, e) =>
+			await this.GetChildDataSources(To, SourceID, (_, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.DataSources);
@@ -263,7 +264,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -276,10 +277,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ContainsNode(string To, IThingReference Node, string ServiceToken, string DeviceToken, string UserToken,
-			BooleanResponseEventHandler Callback, object State)
+		public Task ContainsNode(string To, IThingReference Node, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<BooleanResponseEventArgs> Callback, object State)
 		{
-			this.ContainsNode(To, Node.NodeId, Node.SourceId, Node.Partition, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.ContainsNode(To, Node.NodeId, Node.SourceId, Node.Partition, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -294,8 +295,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ContainsNode(string To, string NodeID, string SourceID, string Partition, string ServiceToken, string DeviceToken, string UserToken,
-			BooleanResponseEventHandler Callback, object State)
+		public Task ContainsNode(string To, string NodeID, string SourceID, string Partition, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<BooleanResponseEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -306,14 +307,14 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.BooleanResponse(e, Callback, State);
 
 			}, State);
 		}
 
-		private async Task BooleanResponse(IqResultEventArgs e, BooleanResponseEventHandler Callback, object _)
+		private async Task BooleanResponse(IqResultEventArgs e, EventHandlerAsync<BooleanResponseEventArgs> Callback, object _)
 		{
 			XmlElement E;
 
@@ -385,8 +386,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ContainsNodes(string To, IThingReference[] Nodes, string ServiceToken, string DeviceToken, string UserToken,
-			BooleansResponseEventHandler Callback, object State)
+		public Task ContainsNodes(string To, IThingReference[] Nodes, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<BooleansResponseEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -400,7 +401,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</containsNodes>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.BooleansResponse(e, Callback, State);
 
@@ -414,12 +415,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("'/>");
 		}
 
-		private async Task BooleansResponse(IqResultEventArgs e, BooleansResponseEventHandler Callback, object _)
+		private async Task BooleansResponse(IqResultEventArgs e, EventHandlerAsync<BooleansResponseEventArgs> Callback, object _)
 		{
 			List<bool> Responses = new List<bool>();
 			XmlElement E;
 
-			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "bools" && 
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "bools" &&
 				E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 			{
 				foreach (XmlNode N in E)
@@ -462,10 +463,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetNode(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeInformationEventHandler Callback, object State)
+		public Task GetNode(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeInformationEventArgs> Callback, object State)
 		{
-			this.GetNode(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.GetNode(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -483,8 +484,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetNode(string To, string NodeID, string SourceID, string Partition, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeInformationEventHandler Callback, object State)
+		public Task GetNode(string To, string NodeID, string SourceID, string Partition, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeInformationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -496,7 +497,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.NodeResponse(e, Parameters, Messages, Callback, State);
 
@@ -524,7 +525,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private async Task NodeResponse(IqResultEventArgs e, bool Parameters, bool Messages, NodeInformationEventHandler Callback, object _)
+		private async Task NodeResponse(IqResultEventArgs e, bool Parameters, bool Messages, EventHandlerAsync<NodeInformationEventArgs> Callback, object _)
 		{
 			XmlElement E;
 			NodeInformation NodeInfo;
@@ -655,7 +656,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						case "message":
 							DateTime Timestamp = XML.Attribute(E2, "timestamp", DateTime.MinValue);
 							string EventId = XML.Attribute(E2, "eventId");
-							Things.DisplayableParameters.MessageType Type = XML.Attribute(E2, "type", 
+							Things.DisplayableParameters.MessageType Type = XML.Attribute(E2, "type",
 								Things.DisplayableParameters.MessageType.Information);
 
 							MessageList?.Add(new Message(Timestamp, Type, EventId, E2.InnerText));
@@ -713,8 +714,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetNodes(string To, IThingReference[] Nodes, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetNodes(string To, IThingReference[] Nodes, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -729,7 +730,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</getNodes>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.NodesResponse(e, Parameters, Messages, Callback, State);
 
@@ -737,7 +738,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		private async Task NodesResponse(IqResultEventArgs e, bool Parameters, bool Messages,
-			NodesInformationEventHandler Callback, object _)
+			EventHandlerAsync<NodesInformationEventArgs> Callback, object _)
 		{
 			XmlElement E;
 			NodeInformation[] NodeInfo;
@@ -786,10 +787,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAllNodes(string To, string SourceID, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetAllNodes(string To, string SourceID, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
-			this.GetAllNodes(To, SourceID, null, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.GetAllNodes(To, SourceID, null, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -806,8 +807,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAllNodes(string To, string SourceID, string[] OnlyIfDerivedFrom, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetAllNodes(string To, string SourceID, string[] OnlyIfDerivedFrom, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -834,7 +835,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.NodesResponse(e, Parameters, Messages, Callback, State);
 
@@ -852,10 +853,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetNodeInheritance(string To, IThingReference Node, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, StringsResponseEventHandler Callback, object State)
+		public Task GetNodeInheritance(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<StringsResponseEventArgs> Callback, object State)
 		{
-			this.GetNodeInheritance(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.GetNodeInheritance(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -871,8 +872,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetNodeInheritance(string To, string NodeID, string SourceID, string Partition, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, StringsResponseEventHandler Callback, object State)
+		public Task GetNodeInheritance(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<StringsResponseEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -890,7 +891,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				List<string> BaseClasses = new List<string>();
 				XmlElement E;
@@ -941,8 +942,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRootNodes(string To, string SourceID, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetRootNodes(string To, string SourceID, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -954,7 +955,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.NodesResponse(e, Parameters, Messages, Callback, State);
 
@@ -973,12 +974,12 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="DeviceToken">Optional Device token.</param>
 		/// <param name="UserToken">Optional User token.</param>
 		/// <returns>Information about the root nodes.</returns>
-		public Task<NodeInformation[]> GetRootNodesAsync(string To, string SourceID, bool Parameters, bool Messages, string Language,
+		public async Task<NodeInformation[]> GetRootNodesAsync(string To, string SourceID, bool Parameters, bool Messages, string Language,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			TaskCompletionSource<NodeInformation[]> Result = new TaskCompletionSource<NodeInformation[]>();
 
-			this.GetRootNodes(To, SourceID, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, (_, e) =>
+			await this.GetRootNodes(To, SourceID, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, (_, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.NodesInformation);
@@ -989,7 +990,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1005,10 +1006,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetChildNodes(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetChildNodes(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
-			this.GetChildNodes(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
+			return this.GetChildNodes(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
 				ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
@@ -1027,8 +1028,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetChildNodes(string To, string NodeID, string SourceID, string Partition, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetChildNodes(string To, string NodeID, string SourceID, string Partition, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1040,7 +1041,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.NodesResponse(e, Parameters, Messages, Callback, State);
 
@@ -1059,7 +1060,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="DeviceToken">Optional Device token.</param>
 		/// <param name="UserToken">Optional User token.</param>
 		/// <returns>Information about the root nodes.</returns>
-		public Task<NodeInformation[]> GetChildNodesAsync(string To, IThingReference Node, bool Parameters, bool Messages, 
+		public Task<NodeInformation[]> GetChildNodesAsync(string To, IThingReference Node, bool Parameters, bool Messages,
 			string Language, string ServiceToken, string DeviceToken, string UserToken)
 		{
 			return this.GetChildNodesAsync(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
@@ -1080,12 +1081,12 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="DeviceToken">Optional Device token.</param>
 		/// <param name="UserToken">Optional User token.</param>
 		/// <returns>Information about the root nodes.</returns>
-		public Task<NodeInformation[]> GetChildNodesAsync(string To, string NodeID, string SourceID, string Partition, 
+		public async Task<NodeInformation[]> GetChildNodesAsync(string To, string NodeID, string SourceID, string Partition,
 			bool Parameters, bool Messages, string Language, string ServiceToken, string DeviceToken, string UserToken)
 		{
 			TaskCompletionSource<NodeInformation[]> Result = new TaskCompletionSource<NodeInformation[]>();
 
-			this.GetChildNodes(To, NodeID, SourceID, Partition, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, (_, e) =>
+			await this.GetChildNodes(To, NodeID, SourceID, Partition, Parameters, Messages, Language, ServiceToken, DeviceToken, UserToken, (_, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.NodesInformation);
@@ -1096,7 +1097,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1112,10 +1113,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAncestors(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetAncestors(string To, IThingReference Node, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
-			this.GetAncestors(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
+			return this.GetAncestors(To, Node.NodeId, Node.SourceId, Node.Partition, Parameters, Messages, Language,
 				ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
@@ -1134,8 +1135,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAncestors(string To, string NodeID, string SourceID, string Partition, bool Parameters, bool Messages, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodesInformationEventHandler Callback, object State)
+		public Task GetAncestors(string To, string NodeID, string SourceID, string Partition, bool Parameters, bool Messages, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodesInformationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1147,7 +1148,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, Parameters, Messages, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), (sender, e) =>
 			{
 				return this.NodesResponse(e, Parameters, Messages, Callback, State);
 
@@ -1165,10 +1166,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAddableNodeTypes(string To, IThingReference Node, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, LocalizedStringsResponseEventHandler Callback, object State)
+		public Task GetAddableNodeTypes(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<LocalizedStringsResponseEventArgs> Callback, object State)
 		{
-			this.GetAddableNodeTypes(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.GetAddableNodeTypes(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -1184,8 +1185,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAddableNodeTypes(string To, string NodeID, string SourceID, string Partition, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, LocalizedStringsResponseEventHandler Callback, object State)
+		public Task GetAddableNodeTypes(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<LocalizedStringsResponseEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1197,12 +1198,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, false, false, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				List<LocalizedString> Types = new List<LocalizedString>();
 				XmlElement E;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeTypes" && 
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "nodeTypes" &&
 					E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 				{
 					foreach (XmlNode N in E)
@@ -1251,56 +1252,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
-			NodeInformationEventHandler NodeCallback, object State)
+		public Task GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback, object State)
 		{
-			this.GetParametersForNewNode(To, Node, NodeType, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
-		}
-
-		/// <summary>
-		/// Gets a set of parameters for the creation of a new node.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="NodeID">Node ID</param>
-		/// <param name="SourceID">Optional Source ID</param>
-		/// <param name="Partition">Optional Partition</param>
-		/// <param name="NodeType">Type of node to create.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
-		{
-			this.GetParametersForNewNode(To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
-		}
-
-		/// <summary>
-		/// Gets a set of parameters for the creation of a new node.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="Node">Node reference.</param>
-		/// <param name="NodeType">Type of node to create.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
-			NodeInformationEventHandler NodeCallback, object State)
-		{
-			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, 
+			return this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language,
 				ServiceToken, DeviceToken, UserToken, FormCallback, NodeCallback, State);
 		}
 
@@ -1319,9 +1275,9 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, 
-			NodeInformationEventHandler NodeCallback, object State)
+		public Task GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1335,7 +1291,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, false, false, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				DataForm Form = null;
 				XmlElement E;
@@ -1377,8 +1333,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ServiceToken = (string)P[6];
 			string DeviceToken = (string)P[7];
 			string UserToken = (string)P[8];
-			DataFormResultEventHandler FormCallback = (DataFormResultEventHandler)P[9];
-			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
+			EventHandlerAsync<DataFormEventArgs> FormCallback = (EventHandlerAsync<DataFormEventArgs>)P[9];
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback = (EventHandlerAsync<NodeInformationEventArgs>)P[10];
 			object State = P[11];
 
 			StringBuilder Xml = new StringBuilder();
@@ -1395,7 +1351,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Form.SerializeSubmit(Xml);
 			Xml.Append("</createNewNode>");
 
-			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
 				if (!e.Ok && !(e.ErrorElement is null) && e.ErrorType == ErrorType.Modify)
 				{
@@ -1428,14 +1384,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				await this.NodeResponse(e, true, true, NodeCallback, State);
 			}, P);
-
-			return Task.CompletedTask;
 		}
 
 		private async Task CancelCreateNewNode(object Sender, DataForm Form)
 		{
 			object[] P = (object[])Form.State;
-			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback = (EventHandlerAsync<NodeInformationEventArgs>)P[10];
 			object State = P[11];
 
 			if (!(NodeCallback is null))
@@ -1462,10 +1416,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DestroyNode(string To, IThingReference Node, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public Task DestroyNode(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.DestroyNode(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.DestroyNode(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -1481,8 +1435,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void DestroyNode(string To, string NodeID, string SourceID, string Partition, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public Task DestroyNode(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1494,7 +1448,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, false, false, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(To, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1509,54 +1463,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetNodeParametersForEdit(string To, IThingReference Node, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
-			NodeInformationEventHandler NodeCallback, object State)
+		public Task GetNodeParametersForEdit(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback, object State)
 		{
-			this.GetNodeParametersForEdit(To, Node, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the set of parameters for the purpose of editing a node.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="NodeID">Node ID</param>
-		/// <param name="SourceID">Optional Source ID</param>
-		/// <param name="Partition">Optional Partition</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
-		{
-			this.GetNodeParametersForEdit(To, NodeID, SourceID, Partition, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the set of parameters for the purpose of editing a node.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="Node">Node reference.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetNodeParametersForEdit(string To, IThingReference Node, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
-			NodeInformationEventHandler NodeCallback, object State)
-		{
-			this.GetNodeParametersForEdit(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken,
+			return this.GetNodeParametersForEdit(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken,
 				FormCallback, NodeCallback, State);
 		}
 
@@ -1574,8 +1485,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
+		public Task GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback, EventHandlerAsync<NodeInformationEventArgs> NodeCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1587,7 +1498,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, false, false, Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				DataForm Form = null;
 				XmlElement E;
@@ -1628,8 +1539,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ServiceToken = (string)P[5];
 			string DeviceToken = (string)P[6];
 			string UserToken = (string)P[7];
-			DataFormResultEventHandler FormCallback = (DataFormResultEventHandler)P[8];
-			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[9];
+			EventHandlerAsync<DataFormEventArgs> FormCallback = (EventHandlerAsync<DataFormEventArgs>)P[8];
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback = (EventHandlerAsync<NodeInformationEventArgs>)P[9];
 			object State = P[10];
 
 			StringBuilder Xml = new StringBuilder();
@@ -1644,7 +1555,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Form.SerializeSubmit(Xml);
 			Xml.Append("</setNodeParametersAfterEdit>");
 
-			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{
 				if (!e.Ok && !(e.ErrorElement is null) && e.ErrorType == ErrorType.Modify)
 				{
@@ -1678,14 +1589,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				return this.NodeResponse(e, true, true, NodeCallback, State);
 
 			}, P);
-
-			return Task.CompletedTask;
 		}
 
 		private async Task CancelEditNode(object Sender, DataForm Form)
 		{
 			object[] P = (object[])Form.State;
-			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[9];
+			EventHandlerAsync<NodeInformationEventArgs> NodeCallback = (EventHandlerAsync<NodeInformationEventArgs>)P[9];
 			object State = P[10];
 
 			if (!(NodeCallback is null))
@@ -1713,10 +1622,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterSniffer(string To, IThingReference Node, DateTime Expires, ISniffer Sniffer,
-			string ServiceToken, string DeviceToken, string UserToken, SnifferRegistrationEventHandler Callback, object State)
+		public Task RegisterSniffer(string To, IThingReference Node, DateTime Expires, ISniffer Sniffer,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<SnifferRegistrationEventArgs> Callback, object State)
 		{
-			this.RegisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, Expires, Sniffer, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.RegisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, Expires, Sniffer, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -1733,8 +1642,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterSniffer(string To, string NodeID, string SourceID, string Partition, DateTime Expires, ISniffer Sniffer,
-			string ServiceToken, string DeviceToken, string UserToken, SnifferRegistrationEventHandler Callback, object State)
+		public Task RegisterSniffer(string To, string NodeID, string SourceID, string Partition, DateTime Expires, ISniffer Sniffer,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<SnifferRegistrationEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1748,12 +1657,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Expires.ToUniversalTime()));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 				string SnifferId = null;
 
-				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sniffer" && 
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "sniffer" &&
 					E.NamespaceURI == ConcentratorServer.NamespaceConcentratorCurrent)
 				{
 					SnifferId = XML.Attribute(E, "snifferId");
@@ -1794,8 +1703,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the sniffer was found locally and removed.</returns>
-		public bool UnregisterSniffer(string To, IThingReference Node, string SnifferId, string ServiceToken, string DeviceToken, string UserToken,
-			IqResultEventHandlerAsync Callback, object State)
+		public Task<bool> UnregisterSniffer(string To, IThingReference Node, string SnifferId, string ServiceToken, string DeviceToken, string UserToken,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.UnregisterSniffer(To, Node.NodeId, Node.SourceId, Node.Partition, SnifferId, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
@@ -1805,7 +1714,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="SnifferId">ID of sniffer to unregister.</param>
 		/// <returns>If the sniffer was found locally and removed.</returns>
-		public bool UnregisterSniffer(string SnifferId)
+		public Task<bool> UnregisterSniffer(string SnifferId)
 		{
 			return this.UnregisterSniffer(string.Empty, null, SnifferId, string.Empty, string.Empty, string.Empty, null, null);
 		}
@@ -1824,8 +1733,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If the sniffer was found locally and removed.</returns>
-		public bool UnregisterSniffer(string To, string NodeID, string SourceID, string Partition, string SnifferId,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public async Task<bool> UnregisterSniffer(string To, string NodeID, string SourceID, string Partition, string SnifferId,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			bool Result;
 
@@ -1848,7 +1757,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(XML.Encode(SnifferId));
 				Xml.Append("'/>");
 
-				this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+				await this.client.SendIqSet(To, Xml.ToString(), Callback, State);
 			}
 
 			return Result;
@@ -1868,7 +1777,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Sniffer is null)
 			{
-				CustomSnifferEventHandler h = this.OnCustomSnifferMessage;
+				EventHandlerAsync<CustomSnifferEventArgs> h = this.OnCustomSnifferMessage;
 				if (!(h is null))
 				{
 					CustomSnifferEventArgs e2 = new CustomSnifferEventArgs(SnifferId, e);
@@ -1958,7 +1867,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Event raised when a sniffer message has been received from a source without a registered sniffer.
 		/// </summary>
-		public event CustomSnifferEventHandler OnCustomSnifferMessage = null;
+		public event EventHandlerAsync<CustomSnifferEventArgs> OnCustomSnifferMessage = null;
 
 		/// <summary>
 		/// Gets available commands for a node.
@@ -1970,10 +1879,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetNodeCommands(string To, IThingReference Node,
-			string ServiceToken, string DeviceToken, string UserToken, CommandsEventHandler Callback, object State)
+		public Task GetNodeCommands(string To, IThingReference Node,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<CommandsEventArgs> Callback, object State)
 		{
-			this.GetNodeCommands(To, Node.NodeId, Node.SourceId, Node.Partition, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.GetNodeCommands(To, Node.NodeId, Node.SourceId, Node.Partition, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -1988,8 +1897,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when process has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetNodeCommands(string To, string NodeID, string SourceID, string Partition,
-			string ServiceToken, string DeviceToken, string UserToken, CommandsEventHandler Callback, object State)
+		public Task GetNodeCommands(string To, string NodeID, string SourceID, string Partition,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<CommandsEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2001,7 +1910,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				XmlElement E;
 				List<NodeCommand> Commands = new List<NodeCommand>();
@@ -2068,56 +1977,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="CommandCallback">Method to call after executing command.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetCommandParameters(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
-			NodeCommandResponseEventHandler CommandCallback, object State)
+		public Task GetCommandParameters(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback, object State)
 		{
-			this.GetCommandParameters(To, Node, Command, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, CommandCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the set of parameters for a parametrized command.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="NodeID">Node ID</param>
-		/// <param name="SourceID">Optional Source ID</param>
-		/// <param name="Partition">Optional Partition</param>
-		/// <param name="Command">Command for which to get parameters.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="CommandCallback">Method to call after executing command.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback, object State)
-		{
-			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, CommandCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the set of parameters for a parametrized command.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="Node">Node reference.</param>
-		/// <param name="Command">Command for which to get parameters.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="CommandCallback">Method to call after executing command.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetCommandParameters(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
-			NodeCommandResponseEventHandler CommandCallback, object State)
-		{
-			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
+			return this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
 				FormCallback, CommandCallback, null, State);
 		}
 
@@ -2136,10 +2000,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="CommandCallback">Method to call after executing command.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback, object State)
+		public Task GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback, object State)
 		{
-			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, null, State);
+			return this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, null, State);
 		}
 
 		/// <summary>
@@ -2155,56 +2020,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetQueryParameters(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
-			NodeQueryResponseEventHandler QueryCallback, object State)
+		public Task GetQueryParameters(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeQueryResponseEventArgs> QueryCallback, object State)
 		{
-			this.GetQueryParameters(To, Node, Command, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, QueryCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the set of parameters for a parametrized query.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="NodeID">Node ID</param>
-		/// <param name="SourceID">Optional Source ID</param>
-		/// <param name="Partition">Optional Partition</param>
-		/// <param name="Command">Command for which to get parameters.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		[Obsolete("Use the DataFormResultEventHandler override instead.")]
-		public void GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeQueryResponseEventHandler QueryCallback, object State)
-		{
-			this.GetQueryParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
-				new FormResultToFormCallback(FormCallback).Callback, QueryCallback, State);
-		}
-
-		/// <summary>
-		/// Gets the set of parameters for a parametrized query.
-		/// </summary>
-		/// <param name="To">Address of concentrator server.</param>
-		/// <param name="Node">Node reference.</param>
-		/// <param name="Command">Command for which to get parameters.</param>
-		/// <param name="Language">Code of desired language.</param>
-		/// <param name="ServiceToken">Optional Service token.</param>
-		/// <param name="DeviceToken">Optional Device token.</param>
-		/// <param name="UserToken">Optional User token.</param>
-		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
-		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
-		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetQueryParameters(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
-			NodeQueryResponseEventHandler QueryCallback, object State)
-		{
-			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
+			return this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
 				FormCallback, null, QueryCallback, State);
 		}
 
@@ -2223,15 +2043,17 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeQueryResponseEventHandler QueryCallback, object State)
+		public Task GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
+			EventHandlerAsync<NodeQueryResponseEventArgs> QueryCallback, object State)
 		{
-			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, null, QueryCallback, State);
+			return this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, null, QueryCallback, State);
 		}
 
-		private void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback,
-			NodeQueryResponseEventHandler QueryCallback, object State)
+		private Task GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback, 
+			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback,
+			EventHandlerAsync<NodeQueryResponseEventArgs> QueryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2245,7 +2067,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Command));
 			Xml.Append("'/>");
 
-			this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
 				DataForm Form = null;
 				XmlElement E;
@@ -2287,23 +2109,21 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ServiceToken = (string)P[6];
 			string DeviceToken = (string)P[7];
 			string UserToken = (string)P[8];
-			DataFormResultEventHandler FormCallback = (DataFormResultEventHandler)P[9];
-			NodeCommandResponseEventHandler CommandCallback = (NodeCommandResponseEventHandler)P[10];
-			NodeQueryResponseEventHandler QueryCallback = (NodeQueryResponseEventHandler)P[11];
+			EventHandlerAsync<DataFormEventArgs> FormCallback = (EventHandlerAsync<DataFormEventArgs>)P[9];
+			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback = (EventHandlerAsync<NodeCommandResponseEventArgs>)P[10];
+			EventHandlerAsync<NodeQueryResponseEventArgs> QueryCallback = (EventHandlerAsync<NodeQueryResponseEventArgs>)P[11];
 			object State = P[12];
 
 			if (!(CommandCallback is null))
-				this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, CommandCallback, State);
+				return this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, CommandCallback, State);
 			else
-				this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, QueryCallback, State);
-
-			return Task.CompletedTask;
+				return this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, QueryCallback, State);
 		}
 
 		private async Task CancelEditCommandParameters(object Sender, DataForm Form)
 		{
 			object[] P = (object[])Form.State;
-			NodeCommandResponseEventHandler CommandCallback = (NodeCommandResponseEventHandler)P[10];
+			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback = (EventHandlerAsync<NodeCommandResponseEventArgs>)P[10];
 			object State = P[11];
 
 			if (!(CommandCallback is null))
@@ -2331,10 +2151,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void ExecuteCommand(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
+		public Task ExecuteCommand(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeCommandResponseEventArgs> Callback, object State)
 		{
-			this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken,
+			return this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken,
 				Callback, null, State);
 		}
 
@@ -2352,10 +2172,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
+		public Task ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeCommandResponseEventArgs> Callback, object State)
 		{
-			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
+			return this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, null, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
 		}
 
 		/// <summary>
@@ -2371,10 +2191,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void ExecuteCommand(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
+		public Task ExecuteCommand(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeCommandResponseEventArgs> Callback, object State)
 		{
-			this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken,
+			return this.ExecuteCommand(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken,
 				Callback, null, State);
 		}
 
@@ -2393,10 +2213,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler Callback, object State)
+		public Task ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeCommandResponseEventArgs> Callback, object State)
 		{
-			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
+			return this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, null, Language, ServiceToken, DeviceToken, UserToken, Callback, null, State);
 		}
 
 
@@ -2413,8 +2233,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		/// <returns>Node query object where results will be made available</returns>
-		public NodeQuery ExecuteQuery(string To, IThingReference Node, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		public Task<NodeQuery> ExecuteQuery(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeQueryResponseEventArgs> Callback, object State)
 		{
 			return this.ExecuteQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, null, Language, ServiceToken, DeviceToken, UserToken,
 				Callback, State);
@@ -2435,8 +2255,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		/// <returns>Node query object where results will be made available</returns>
-		public NodeQuery ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		public Task<NodeQuery> ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeQueryResponseEventArgs> Callback, object State)
 		{
 			return this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, null, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
@@ -2455,8 +2275,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		/// <returns>Node query object where results will be made available</returns>
-		public NodeQuery ExecuteQuery(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		public Task<NodeQuery> ExecuteQuery(string To, IThingReference Node, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeQueryResponseEventArgs> Callback, object State)
 		{
 			return this.ExecuteQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Parameters, Language, ServiceToken, DeviceToken, UserToken,
 				Callback, State);
@@ -2478,8 +2298,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		/// <returns>Node query object where results will be made available</returns>
-		public NodeQuery ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeQueryResponseEventHandler Callback, object State)
+		public async Task<NodeQuery> ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeQueryResponseEventArgs> Callback, object State)
 		{
 			NodeQuery Query;
 
@@ -2494,7 +2314,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				this.queries[Query.QueryId] = Query;
 			}
 
-			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, Query, Language, ServiceToken, DeviceToken, UserToken, null, Callback, State);
+			await this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, Query, Language, ServiceToken, DeviceToken, UserToken, null, Callback, State);
 
 			return Query;
 		}
@@ -2515,8 +2335,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="Query">Node query object where results will be made available</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, NodeQuery Query, NodeQueryResponseEventHandler Callback, object State)
+		public Task ExecuteQuery(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, NodeQuery Query, EventHandlerAsync<NodeQueryResponseEventArgs> Callback, object State)
 		{
 			lock (this.queries)
 			{
@@ -2526,12 +2346,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				this.queries[Query.QueryId] = Query;
 			}
 
-			this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, Query, Language, ServiceToken, DeviceToken, UserToken, null, Callback, State);
+			return this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Parameters, Query, Language, ServiceToken, DeviceToken, UserToken, null, Callback, State);
 		}
 
-		private void ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, NodeQuery Query,
-			string Language, string ServiceToken, string DeviceToken, string UserToken, NodeCommandResponseEventHandler CommandCallback,
-			NodeQueryResponseEventHandler QueryCallback, object State)
+		private Task ExecuteCommand(string To, string NodeID, string SourceID, string Partition, string Command, DataForm Parameters, NodeQuery Query,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback,
+			EventHandlerAsync<NodeQueryResponseEventArgs> QueryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 			string TagName;
@@ -2570,7 +2390,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
 			{
 				if (!e.Ok && !(e.ErrorElement is null) && e.ErrorType == ErrorType.Modify)
 				{
@@ -2614,10 +2434,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void AbortQuery(string To, IThingReference Node, string Command, string QueryId,
-			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public Task AbortQuery(string To, IThingReference Node, string Command, string QueryId,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			this.AbortQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, QueryId, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
+			return this.AbortQuery(To, Node.NodeId, Node.SourceId, Node.Partition, Command, QueryId, Language, ServiceToken, DeviceToken, UserToken, Callback, State);
 		}
 
 		/// <summary>
@@ -2635,8 +2455,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when operation has been executed.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
-		public void AbortQuery(string To, string NodeID, string SourceID, string Partition, string Command, string QueryId,
-			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public Task AbortQuery(string To, string NodeID, string SourceID, string Partition, string Command, string QueryId,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			lock (this.queries)
 			{
@@ -2662,7 +2482,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(QueryId));
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(To, Xml.ToString(), Callback, State);
 		}
 
 		private Task QueryProgressHandler(object Sender, MessageEventArgs e)
@@ -2701,8 +2521,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Subscribe(string To, string SourceID, int TimeoutSeconds, SourceEventType EventTypes, bool Parameters, bool Messages,
-			string Language, string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public Task Subscribe(string To, string SourceID, int TimeoutSeconds, SourceEventType EventTypes, bool Parameters, bool Messages,
+			string Language, string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			if (TimeoutSeconds <= 0)
 				throw new ArgumentException("Timeout must be positive.", nameof(TimeoutSeconds));
@@ -2720,7 +2540,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendEventTypeAttributes(Xml, EventTypes);
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(To, Xml.ToString(), Callback, State);
 		}
 
 		private void AppendEventTypeAttributes(StringBuilder Xml, SourceEventType EventTypes)
@@ -2756,8 +2576,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="UserToken">Optional User token.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Unsubscribe(string To, string SourceID, SourceEventType EventTypes, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, IqResultEventHandlerAsync Callback, object State)
+		public Task Unsubscribe(string To, string SourceID, SourceEventType EventTypes, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -2770,7 +2590,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendEventTypeAttributes(Xml, EventTypes);
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(To, Xml.ToString(), Callback, State);
+			return this.client.SendIqSet(To, Xml.ToString(), Callback, State);
 		}
 
 		private Task NodeAddedMessageHandler(object Sender, MessageEventArgs e)
@@ -2909,26 +2729,14 @@ namespace Waher.Networking.XMPP.Concentrator
 			}, e);
 		}
 
-		private async Task SourceEventReceived(SourceEvent Event, MessageEventArgs e)
+		private Task SourceEventReceived(SourceEvent Event, MessageEventArgs e)
 		{
-			SourceEventMessageEventHandler h = this.OnEvent;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new SourceEventMessageEventArgs(Event, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnEvent.Raise(e, new SourceEventMessageEventArgs(Event, e));
 		}
 
 		/// <summary>
 		/// Event raised when a data source event has been received.
 		/// </summary>
-		public event SourceEventMessageEventHandler OnEvent = null;
-
+		public event EventHandlerAsync<SourceEventMessageEventArgs> OnEvent = null;
 	}
 }

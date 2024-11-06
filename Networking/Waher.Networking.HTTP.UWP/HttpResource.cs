@@ -14,15 +14,7 @@ namespace Waher.Networking.HTTP
 	/// <param name="Request">HTTP Request</param>
 	/// <param name="Response">HTTP Response</param>
 	/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-	public delegate void HttpMethodHandler(HttpRequest Request, HttpResponse Response);
-
-	/// <summary>
-	/// Delegate for HTTP method handlers.
-	/// </summary>
-	/// <param name="Request">HTTP Request</param>
-	/// <param name="Response">HTTP Response</param>
-	/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-	public delegate Task HttpMethodHandlerAsync(HttpRequest Request, HttpResponse Response);
+	public delegate Task HttpMethodHandler(HttpRequest Request, HttpResponse Response);
 
 	/// <summary>
 	/// Base class for all HTTP resources.
@@ -486,7 +478,7 @@ namespace Waher.Networking.HTTP
 			if (this.Synchronous)
 			{
 				await Response.SendResponse();
-				Response.Dispose();
+				await Response.DisposeAsync();
 			}
 		}
 

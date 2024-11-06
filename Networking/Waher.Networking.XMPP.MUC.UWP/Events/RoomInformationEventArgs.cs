@@ -1,16 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP.ServiceDiscovery;
+﻿using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.MUC
 {
-	/// <summary>
-	/// Delegate for room information response event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task RoomInformationEventHandler(Object Sender, RoomInformationEventArgs e);
-
 	/// <summary>
 	/// Room information response event arguments.
 	/// </summary>

@@ -1,7 +1,9 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
+using System;
+using System.Threading.Tasks;
 using Waher.Networking.Cluster.Test.TestObjects;
+using Waher.Networking.Sniffers;
+
 namespace Waher.Networking.Cluster.Test
 {
 	[TestClass]
@@ -17,16 +19,19 @@ namespace Waher.Networking.Cluster.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
-			this.endpoint?.Dispose();
-			this.endpoint = null;
+			if (this.endpoint is not null)
+			{
+				await this.endpoint.DisposeAsync();
+				this.endpoint = null;
+			}
 		}
 
 		[TestMethod]
 		public void Test_01_Strings()
 		{
-			Strings Obj = new Strings()
+			Strings Obj = new()
 			{
 				S1 = "Hello",
 				S2 = "World",
@@ -45,7 +50,7 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_02_Integers()
 		{
-			Integers Obj = new Integers()
+			Integers Obj = new()
 			{
 				Int8 = -0x01,
 				Int16 = -0x0102,
@@ -74,7 +79,7 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_03_FloatingPointNumbers()
 		{
-			FloatingPoints Obj = new FloatingPoints()
+			FloatingPoints Obj = new()
 			{
 				S = 1.2345F,
 				D = 1.2345,
@@ -93,7 +98,7 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_04_MiscTypes()
 		{
-			MiscTypes Obj = new MiscTypes()
+			MiscTypes Obj = new()
 			{
 				B = true,
 				Ch = 'x',
@@ -122,7 +127,7 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_05_Nullable_1()
 		{
-			NullableTypes Obj = new NullableTypes()
+			NullableTypes Obj = new()
 			{
 				Int8 = null,
 				Int16 = -0x0102,
@@ -173,7 +178,7 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_06_Nullable_2()
 		{
-			NullableTypes Obj = new NullableTypes()
+			NullableTypes Obj = new()
 			{
 				Int8 = -0x01,
 				Int16 = null,
@@ -224,13 +229,13 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_07_Arrays()
 		{
-			Arrays Obj = new Arrays()
+			Arrays Obj = new()
 			{
 				Integers = new int[] { 1, 2, 3, 4 },
 				Binary = new byte[] { 5, 6, 7, 8, 9 },
 				Objects = new Parent[]
 				{
-					new Parent()
+					new()
 					{
 						S = "ABC"
 					},
@@ -270,7 +275,7 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public void Test_08_Objects()
 		{
-			Objects Obj = new Objects()
+			Objects Obj = new()
 			{
 				O1 = new Parent()
 				{

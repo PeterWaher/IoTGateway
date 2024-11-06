@@ -29,7 +29,7 @@ namespace Waher.Runtime.Counters
 			counters.Removed += Counters_Removed;
 		}
 
-		private static async void Counters_Removed(object Sender, CacheItemEventArgs<CaseInsensitiveString, CounterRec> e)
+		private static async Task Counters_Removed(object Sender, CacheItemEventArgs<CaseInsensitiveString, CounterRec> e)
 		{
 			try
 			{

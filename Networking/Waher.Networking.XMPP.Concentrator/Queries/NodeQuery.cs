@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Events;
+using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Threading;
 using Waher.Things.Queries;
 
@@ -234,7 +234,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 							case "tableDone":
 								s = XML.Attribute(E, "tableId");
-								this.TableDone(s, e);
+								await this.TableDone(s, e);
 								break;
 
 							case "status":
@@ -281,7 +281,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 									}
 								}
 
-								this.NewTable(new Table(s, s2, Columns.ToArray()), e);
+								await this.NewTable(new Table(s, s2, Columns.ToArray()), e);
 								break;
 
 							case "newRecords":
@@ -397,7 +397,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 									}
 								}
 
-								this.NewRecords(s, Records.ToArray(), e);
+								await this.NewRecords(s, Records.ToArray(), e);
 								break;
 
 							case "newObject":
@@ -407,7 +407,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 									byte[] Bin = Convert.FromBase64String(E.InnerText);
 									object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
 
-									this.NewObject(Decoded, Bin, ContentType, e);
+									await this.NewObject(Decoded, Bin, ContentType, e);
 								}
 								catch (Exception ex)
 								{
@@ -423,7 +423,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 								break;
 
 							case "endSection":
-								this.EndSection(e);
+								await this.EndSection(e);
 								break;
 
 							case "queryDone":
@@ -432,7 +432,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 							case "beginSection":
 								s = XML.Attribute(E, "header");
-								this.BeginSection(s, e);
+								await this.BeginSection(s, e);
 								break;
 
 							case "queryAborted":
@@ -473,19 +473,9 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			}
 		}
 
-		private async Task Invoke(NodeQueryEventHandler h, MessageEventArgs e)
+		private Task Invoke(EventHandlerAsync<NodeQueryEventArgs> h, MessageEventArgs e)
 		{
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new NodeQueryEventArgs(this, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return h.Raise(this, new NodeQueryEventArgs(this, e));
 		}
 
 		internal Task SetTitle(string Title, MessageEventArgs e)
@@ -502,7 +492,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// <summary>
 		/// Raised when the result report gets a new title.
 		/// </summary>
-		public event NodeQueryEventHandler NewTitle = null;
+		public event EventHandlerAsync<NodeQueryEventArgs> NewTitle = null;
 
 		internal Task ReportStarted(MessageEventArgs e)
 		{
@@ -512,7 +502,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// <summary>
 		/// Raised when the result report has started.
 		/// </summary>
-		public event NodeQueryEventHandler Started = null;
+		public event EventHandlerAsync<NodeQueryEventArgs> Started = null;
 
 		internal Task ReportDone(MessageEventArgs e)
 		{
@@ -523,7 +513,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// <summary>
 		/// Raised when the result report is completed.
 		/// </summary>
-		public event NodeQueryEventHandler Done = null;
+		public event EventHandlerAsync<NodeQueryEventArgs> Done = null;
 
 		internal Task ReportAborted(MessageEventArgs e)
 		{
@@ -533,9 +523,9 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// <summary>
 		/// Raised when the result report is aborted.
 		/// </summary>
-		public event NodeQueryEventHandler Aborted = null;
+		public event EventHandlerAsync<NodeQueryEventArgs> Aborted = null;
 
-		internal void NewTable(Table Table, MessageEventArgs e)
+		internal Task NewTable(Table Table, MessageEventArgs e)
 		{
 			QueryTable Table2;
 
@@ -561,79 +551,65 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				this.tables[Table.TableId] = Table2;
 			}
 
-			this.Invoke(this.TableAdded, Table2, e);
+			return this.Invoke(this.TableAdded, Table2, e);
 		}
 
 		/// <summary>
 		/// Event raised when a new table has been added to the report.
 		/// </summary>
-		public event NodeQueryTableEventHandler TableAdded = null;
+		public event EventHandlerAsync<NodeQueryTableEventArgs> TableAdded = null;
 
-		private void Invoke(NodeQueryTableEventHandler Callback, QueryTable Table, MessageEventArgs e)
+		private Task Invoke(EventHandlerAsync<NodeQueryTableEventArgs> Callback, QueryTable Table, MessageEventArgs e)
 		{
-			try
-			{
-				Callback?.Invoke(this, new NodeQueryTableEventArgs(Table, this, e));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return Callback.Raise(this, new NodeQueryTableEventArgs(Table, this, e));
 		}
 
-		internal void NewRecords(string TableId, Record[] Records, MessageEventArgs e)
+		internal Task NewRecords(string TableId, Record[] Records, MessageEventArgs e)
 		{
 			QueryTable Table;
 
 			lock (this.tables)
 			{
 				if (!this.tables.TryGetValue(TableId, out Table))
-					return;
+					return Task.CompletedTask;
 			}
 
 			Table.Add(Records);
 
-			this.Invoke(this.TableUpdated, Table, Records, e);
+			return this.Invoke(this.TableUpdated, Table, Records, e);
 		}
 
-		private void Invoke(NodeQueryTableUpdatedEventHandler h, QueryTable Table, Record[] NewRecords, MessageEventArgs e)
+		private Task Invoke(EventHandlerAsync<NodeQueryTableUpdatedEventArgs> h, QueryTable Table, Record[] NewRecords, MessageEventArgs e)
 		{
-			try
-			{
-				h?.Invoke(this, new NodeQueryTableUpdatedEventArgs(Table, this, NewRecords, e));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return h.Raise(this, new NodeQueryTableUpdatedEventArgs(Table, this, NewRecords, e));
 		}
 
 		/// <summary>
 		/// Event raised when records has been added to a table.
 		/// </summary>
-		public event NodeQueryTableUpdatedEventHandler TableUpdated = null;
+		public event EventHandlerAsync<NodeQueryTableUpdatedEventArgs> TableUpdated = null;
 
-		internal void TableDone(string TableId, MessageEventArgs e)
+		internal Task TableDone(string TableId, MessageEventArgs e)
 		{
 			QueryTable Table;
 
 			lock (this.tables)
 			{
 				if (!this.tables.TryGetValue(TableId, out Table))
-					return;
+					return Task.CompletedTask;
 			}
 
 			Table.Done();
 
-			this.Invoke(this.TableCompleted, Table, e);
+			return this.Invoke(this.TableCompleted, Table, e);
 		}
 
 		/// <summary>
 		/// Event raised when a table has been completed.
 		/// </summary>
-		public event NodeQueryTableEventHandler TableCompleted = null;
+		public event EventHandlerAsync<NodeQueryTableEventArgs> TableCompleted = null;
 
-		internal void NewObject(object Object, byte[] Binary, string ContentType, MessageEventArgs e)
+		internal Task NewObject(object Object, byte[] Binary, string ContentType, MessageEventArgs e)
 		{
 			QueryObject Obj;
 
@@ -654,27 +630,20 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				}
 			}
 
-			this.Invoke(this.ObjectAdded, Obj, e);
+			return this.Invoke(this.ObjectAdded, Obj, e);
 		}
 
 		/// <summary>
 		/// Raised when an object has been added to the report.
 		/// </summary>
-		public event NodeQueryObjectEventHandler ObjectAdded = null;
+		public event EventHandlerAsync<NodeQueryObjectEventArgs> ObjectAdded = null;
 
-		private void Invoke(NodeQueryObjectEventHandler Callback, QueryObject Object, MessageEventArgs e)
+		private Task Invoke(EventHandlerAsync<NodeQueryObjectEventArgs> Callback, QueryObject Object, MessageEventArgs e)
 		{
-			try
-			{
-				Callback?.Invoke(this, new NodeQueryObjectEventArgs(Object, this, e));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return Callback.Raise(this, new NodeQueryObjectEventArgs(Object, this, e));
 		}
 
-		internal void BeginSection(string Header, MessageEventArgs e)
+		internal Task BeginSection(string Header, MessageEventArgs e)
 		{
 			QuerySection Section;
 
@@ -697,88 +666,59 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				this.currentSection = Section;
 			}
 
-			this.Invoke(this.SectionAdded, Section, e);
+			return this.Invoke(this.SectionAdded, Section, e);
 		}
 
-		private void Invoke(NodeQuerySectionEventHandler Callback, QuerySection Section, MessageEventArgs e)
+		private Task Invoke(EventHandlerAsync<NodeQuerySectionEventArgs> Callback, QuerySection Section, MessageEventArgs e)
 		{
-			try
-			{
-				Callback?.Invoke(this, new NodeQuerySectionEventArgs(Section, this, e));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return Callback.Raise(this, new NodeQuerySectionEventArgs(Section, this, e));
 		}
 
 		/// <summary>
 		/// Event raised when a new section has been added to the result set.
 		/// </summary>
-		public event NodeQuerySectionEventHandler SectionAdded = null;
+		public event EventHandlerAsync<NodeQuerySectionEventArgs> SectionAdded = null;
 
-		internal void EndSection(MessageEventArgs e)
+		internal Task EndSection(MessageEventArgs e)
 		{
 			QuerySection Section;
 
 			lock (this.result)
 			{
 				if (this.currentSection is null)
-					return;
+					return Task.CompletedTask;
 
 				Section = this.currentSection;
 				this.currentSection = this.currentSection.Parent as QuerySection;
 			}
 
-			this.Invoke(this.SectionCompleted, Section, e);
+			return this.Invoke(this.SectionCompleted, Section, e);
 		}
 
 		/// <summary>
 		/// Event raised when a section has been compelted in the result set.
 		/// </summary>
-		public event NodeQuerySectionEventHandler SectionCompleted = null;
+		public event EventHandlerAsync<NodeQuerySectionEventArgs> SectionCompleted = null;
 
-		internal async Task StatusMessage(string Message, MessageEventArgs e)
+		internal Task StatusMessage(string Message, MessageEventArgs e)
 		{
-			NodeQueryStatusMessageEventHandler h = this.StatusMessageReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new NodeQueryStatusMessageEventArgs(Message, this, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.StatusMessageReceived.Raise(this, new NodeQueryStatusMessageEventArgs(Message, this, e));
 		}
 
 		/// <summary>
 		/// Raised when a new status message has been received.
 		/// </summary>
-		public event NodeQueryStatusMessageEventHandler StatusMessageReceived = null;
+		public event EventHandlerAsync<NodeQueryStatusMessageEventArgs> StatusMessageReceived = null;
 
-		internal async Task QueryMessage(QueryEventType Type, QueryEventLevel Level, string Message, MessageEventArgs e)
+		internal Task QueryMessage(QueryEventType Type, QueryEventLevel Level, string Message, MessageEventArgs e)
 		{
-			NodeQueryEventMessageEventHandler h = this.EventMessageReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new NodeQueryEventMessageEventArgs(Type, Level, Message, this, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.EventMessageReceived.Raise(this, new NodeQueryEventMessageEventArgs(Type, Level, Message, this, e));
 		}
 
 		/// <summary>
 		/// Raised when a new event message has been received.
 		/// </summary>
-		public event NodeQueryEventMessageEventHandler EventMessageReceived = null;
+		public event EventHandlerAsync<NodeQueryEventMessageEventArgs> EventMessageReceived = null;
 
 		/// <summary>
 		/// Result set

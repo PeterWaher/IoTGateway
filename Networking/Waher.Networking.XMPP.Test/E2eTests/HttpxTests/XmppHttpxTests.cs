@@ -55,7 +55,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 				{
 					i = (int)Math.Min(c, BufSize);
 
-					if (i != await (Request.DataStream.ReadAsync(Buf, 0, BufSize)))
+					if (i != await Request.DataStream.ReadAsync(Buf, 0, BufSize))
 						throw new IOException("Unexpected end of file.");
 
 					await Response.Write(Buf, 0, i);
@@ -94,7 +94,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			};
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
 			this.httpxServer?.Dispose();
 			this.httpxServer = null;
@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			this.httpxClient2?.Dispose();
 			this.httpxClient2 = null;
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]

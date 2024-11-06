@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.XMPP;
 
@@ -27,22 +27,22 @@ namespace Waher.Networking.XMPP.Test
 			Log.Register(this.sink);
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
-			if (!(this.sink is null))
+			if (this.sink is not null)
 			{
 				Log.Unregister(this.sink);
 				this.sink.Dispose();
 				this.sink = null;
 			}
 
-			if (!(this.receptor is null))
+			if (this.receptor is not null)
 			{
 				this.receptor.Dispose();
 				this.receptor = null;
 			}
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]
@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new ManualResetEvent(false);
+				ManualResetEvent Done = new(false);
 				Event Event = null;
 
 				this.receptor.OnEvent += (sender, e) =>

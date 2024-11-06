@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Security.DTLS;
 using Waher.Security.DTLS.Events;
@@ -22,10 +23,10 @@ namespace Waher.Networking.CoAP.Transport
 
 		public override void BeginReceive()
 		{
-			this.Dtls.OnDatagramReceived += Dtls_OnDatagramReceived;
+			this.Dtls.OnDatagramReceived += this.Dtls_OnDatagramReceived;
 		}
 
-		private async void Dtls_OnDatagramReceived(object Sender, UdpDatagramEventArgs e)
+		private async Task Dtls_OnDatagramReceived(object Sender, UdpDatagramEventArgs e)
 		{
 			try
 			{
@@ -43,10 +44,10 @@ namespace Waher.Networking.CoAP.Transport
 				this.HandshakeCompleted, Message);
 		}
 
-		private void HandshakeCompleted(object Sender, UdpTransmissionEventArgs e)
+		private async Task HandshakeCompleted(object Sender, UdpTransmissionEventArgs e)
 		{
 			if (!e.Successful)
-				this.Endpoint.Fail(this, (Message)e.State);
+				await this.Endpoint.Fail(this, (Message)e.State);
 		}
 	}
 }

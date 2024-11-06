@@ -219,8 +219,11 @@ namespace Waher.Networking.XMPP.HTTPX
 				State.Data?.Dispose();
 				State.Data = null;
 
-				State.HttpResponse?.Dispose();
-				State.HttpResponse = null;
+				if (!(State.HttpResponse is null))
+				{
+					await State.HttpResponse.DisposeAsync();
+					State.HttpResponse = null;
+				}
 
 				Timer?.Dispose();
 				Timer = null;

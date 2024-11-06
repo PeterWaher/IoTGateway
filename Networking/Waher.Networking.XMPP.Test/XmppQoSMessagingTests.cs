@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -30,8 +31,8 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 
-			ManualResetEvent Received = new ManualResetEvent(false);
-			ManualResetEvent Delivered = new ManualResetEvent(false);
+			ManualResetEvent Received = new(false);
+			ManualResetEvent Delivered = new(false);
 
 			this.client2.OnNormalMessage += (sender, e) => { Received.Set(); return Task.CompletedTask; };
 
@@ -45,7 +46,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public void QoS_Test_04_Timeout()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Done = new(false);
 			IqResultEventArgs e2 = null;
 
 			this.ConnectClients();

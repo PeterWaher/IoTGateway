@@ -9,6 +9,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.PubSub;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Client.WPF.Dialogs;
+using Waher.Networking.XMPP.PubSub.Events;
 
 namespace Waher.Client.WPF.Model.PubSub
 {

@@ -1,16 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP.DataForms;
+﻿using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Delegate for node command callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task NodeCommandResponseEventHandler(object Sender, NodeCommandResponseEventArgs e);
-
 	/// <summary>
 	/// Event arguments for node command events.
 	/// </summary>

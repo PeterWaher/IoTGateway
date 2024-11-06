@@ -146,7 +146,7 @@ namespace Waher.Things.Xmpp
 				RosterItem Item = Client[this.BareJID];
 
 				if (!(Item is null))
-					Client.RemoveRosterItem(this.BareJID);
+					await Client.RemoveRosterItem(this.BareJID);
 			}
 		}
 	}

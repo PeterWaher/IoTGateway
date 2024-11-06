@@ -151,31 +151,31 @@ namespace Waher.Networking.Modbus
 			}
 		}
 
-		private void TcpClient_OnDisconnected(object sender, EventArgs e)
+		private Task TcpClient_OnDisconnected(object sender, EventArgs e)
 		{
 			this.connected = false;
+			return Task.CompletedTask;
 		}
 
 		private Task TcpClient_OnError(object Sender, Exception Exception)
 		{
-			this.Error(Exception.Message);
-			return Task.CompletedTask;
+			return this.Error(Exception.Message);
 		}
 
-		private void TcpClient_OnWarning(ref string Text)
+		private Task TcpClient_OnWarning(ref string Text)
 		{
-			this.Warning(Text);
+			return this.Warning(Text);
 		}
 
-		private void TcpClient_OnInformation(ref string Text)
+		private Task TcpClient_OnInformation(ref string Text)
 		{
-			this.Information(Text);
+			return this.Information(Text);
 		}
 
-		private Task<bool> TcpClient_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> TcpClient_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
 			int i;
 			byte b;
@@ -244,7 +244,7 @@ namespace Waher.Networking.Modbus
 				}
 			}
 
-			return Task.FromResult(true);
+			return true;
 		}
 
 		private void ProcessIncomingPacket()
@@ -343,7 +343,7 @@ namespace Waher.Networking.Modbus
 				byte[] Bin = Req.Request.ToArray();
 
 				await this.tcpClient.SendAsync(Bin);
-				this.TransmitBinary(Bin);
+				await this.TransmitBinary(Bin);
 
 				Task<ModbusResponse> Result = Req.Handle.Task;
 				Task Timeout = Task.Delay(this.timeoutMs);

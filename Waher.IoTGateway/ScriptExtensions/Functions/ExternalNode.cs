@@ -292,7 +292,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		public Task StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			RosterItem Item = Gateway.XmppClient[this.jid.Value];
 
@@ -300,15 +300,15 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				(Item.State != SubscriptionState.Both &&
 				Item.State != SubscriptionState.To))
 			{
-				Gateway.XmppClient.RequestPresenceSubscription(this.jid.Value);
-				Request.ReportErrors(true, new ThingError(this, "No presence subscription approved by " + this.jid.Value + ". New subscription request sent."));
-				return Task.CompletedTask;
+				await Gateway.XmppClient.RequestPresenceSubscription(this.jid.Value);
+				await Request.ReportErrors(true, new ThingError(this, "No presence subscription approved by " + this.jid.Value + ". New subscription request sent."));
+				return;
 			}
 
 			if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
 			{
-				Request.ReportErrors(true, new ThingError(this, "Sensor host not online: " + this.jid.Value));
-				return Task.CompletedTask;
+				await Request.ReportErrors(true, new ThingError(this, "Sensor host not online: " + this.jid.Value));
+				return;
 			}
 
 			INode[] Nodes;
@@ -318,7 +318,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			else
 				Nodes = new INode[] { this };
 
-			SensorDataClientRequest SensorDataRequest = Gateway.SensorClient.RequestReadout(Item.LastPresenceFullJid,
+			SensorDataClientRequest SensorDataRequest = await Gateway.SensorClient.RequestReadout(Item.LastPresenceFullJid,
 				Nodes, Request.Types, Request.FieldNames, Request.From, Request.To, Request.When, 
 				Request.ServiceToken, Request.DeviceToken, Request.UserToken);
 
@@ -353,8 +353,6 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 				return Task.CompletedTask;
 			};
-
-			return Task.CompletedTask;
 		}
 	}
 }

@@ -19,6 +19,8 @@ using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
 using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Client.WPF.Model.Concentrator;
+using Waher.Networking.XMPP.Provisioning.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Client.WPF.Model.Provisioning
 {

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.Maker.RemoteWiring;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Maker.RemoteWiring;
 using Waher.Content;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -136,11 +136,11 @@ namespace Waher.Things.Arduino
 		/// </summary>
 		public override void Initialize()
 		{
-			RemoteDevice Device = this.Device;
+			RemoteDevice Device = this.GetDevice().Result;	// TODO: Avoid blocking call.
 
 			if (!(Device is null))
 			{
-				switch (Mode)
+				switch (this.Mode)
 				{
 					case AnalogInputPinMode.Input:
 						Device.pinMode(this.PinNrStr, PinMode.ANALOG);
@@ -160,9 +160,8 @@ namespace Waher.Things.Arduino
 		{
 			try
 			{
-				RemoteDevice Device = this.Device;
-				if (Device is null)
-					throw new Exception("Device not ready.");
+				RemoteDevice Device = await this.GetDevice()
+					?? throw new Exception("Device not ready.");
 
 				List<Field> Fields = new List<Field>();
 				DateTime Now = DateTime.Now;
@@ -190,11 +189,11 @@ namespace Waher.Things.Arduino
 					this.AddIdentityReadout(Fields, Now);
 				}
 
-				Request.ReportFields(true, Fields);
+				await Request.ReportFields(true, Fields);
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				await Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
 		}
 

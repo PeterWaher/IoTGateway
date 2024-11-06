@@ -1,21 +1,17 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
-using SkiaSharp;
+using System.Xml;
+using Waher.Content.Binary;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
-using Waher.Things;
-using Waher.Things.ControlParameters;
-using Waher.Things.DisplayableParameters;
-using Waher.Things.Queries;
-using Waher.Things.SourceEvents;
+using Waher.Runtime.Language;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
@@ -25,7 +21,13 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings;
 using Waher.Security;
-using Waher.Content.Binary;
+using Waher.Things;
+using Waher.Things.ControlParameters;
+using Waher.Things.DisplayableParameters;
+using Waher.Things.Queries;
+using Waher.Things.SourceEvents;
+using Waher.Networking.XMPP.Provisioning.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -499,9 +501,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				w.Flush();
 			}
 
-			e.IqResult(Xml.ToString());
-
-			return Task.CompletedTask;
+			return e.IqResult(Xml.ToString());
 		}
 
 		#endregion
@@ -770,7 +770,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</dataSources>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task Export(StringBuilder Xml, IDataSource DataSource, Language Language)
@@ -804,7 +804,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</dataSources>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private static Task<string> GetErrorMessage(Language Language, int StringId, string Message)
@@ -826,7 +826,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
@@ -850,7 +850,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					Xml.Append("'/>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -878,7 +878,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			bool Result = (!(Node is null) && await Node.CanViewAsync(Caller));
 
-			e.IqResult("<bool xmlns='" + e.Query.NamespaceURI + "'>" + CommonTypes.Encode(Result) + "</bool>");
+			await e.IqResult("<bool xmlns='" + e.Query.NamespaceURI + "'>" + CommonTypes.Encode(Result) + "</bool>");
 		}
 
 		private async Task ContainsNodesHandler(object Sender, IqEventArgs e)
@@ -923,7 +923,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</bools>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task ExportAttributes(StringBuilder Xml, INode Node, Language Language)
@@ -1040,10 +1040,10 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					Xml.Append("/>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 			else
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 		}
 
 		private async Task ExportParametersAndMessages(StringBuilder Xml, INode Node, bool Parameters, bool Messages,
@@ -1109,7 +1109,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node is null || !(await Node.CanViewAsync(Caller)))
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 					return;
 				}
 
@@ -1128,7 +1128,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</nodeInfos>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task GetAllNodesHandler(object Sender, IqEventArgs e)
@@ -1147,7 +1147,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
@@ -1162,7 +1162,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Type T = Types.GetType(N.InnerText.Trim());
 						if (T is null)
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
 							return;
 						}
 
@@ -1209,7 +1209,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</nodeInfos>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -1296,10 +1296,10 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</inheritance>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 			else
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 		}
 
 		private async Task GetRootNodesHandler(object Sender, IqEventArgs e)
@@ -1318,7 +1318,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
@@ -1347,7 +1347,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</nodeInfos>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -1373,7 +1373,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
@@ -1405,7 +1405,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</nodeInfos>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -1431,7 +1431,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
@@ -1465,7 +1465,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</nodeInfos>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -1493,14 +1493,14 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else
 			{
 				await Node.MoveUpAsync(Caller);
 
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 			}
 		}
 
@@ -1524,14 +1524,14 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else
 			{
 				await Node.MoveDownAsync(Caller);
 
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 			}
 		}
 
@@ -1568,12 +1568,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 					return;
 				}
 				else if (!await Node.CanEditAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 					return;
 				}
 
@@ -1622,7 +1622,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		private async Task MoveNodesDownHandler(object Sender, IqEventArgs e)
@@ -1659,12 +1659,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 					return;
 				}
 				else if (!await Node.CanEditAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 					return;
 				}
 
@@ -1719,7 +1719,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 			}
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		private async Task GetNodeParametersForEditHandler(object Sender, IqEventArgs e)
@@ -1742,9 +1742,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else
 			{
 				DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
@@ -1752,7 +1752,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Form.SerializeForm(Xml);
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -1776,9 +1776,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else
 			{
 				DataForm Form = null;
@@ -1793,7 +1793,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				if (Form is null)
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+					await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 				else
 				{
 					string OldNodeId = Node.NodeId;
@@ -1847,7 +1847,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
 						Xml.Append("</nodeInfo>");
 
-						e.IqResult(Xml.ToString());
+						await e.IqResult(Xml.ToString());
 
 						Result.AddTag("Full", e.From);
 						Result.AddTag("Source", Node.SourceId);
@@ -1871,7 +1871,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					else
 					{
 						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+						await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					}
 				}
 			}
@@ -1925,19 +1925,19 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Rec is null)
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 					return;
 				}
 
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 					return;
 				}
 				else if (!await Node.CanEditAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 					return;
 				}
 
@@ -1952,7 +1952,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Form is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
 				return;
 			}
 
@@ -1962,7 +1962,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Form.SerializeForm(Xml);
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task SetCommonNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
@@ -1995,12 +1995,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (Node is null || !await Node.CanViewAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 							return;
 						}
 						else if (!await Node.CanEditAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 
@@ -2017,9 +2017,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Nodes is null)
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (Form is null)
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
 			else
 			{
 				foreach (Tuple<IDataSource, INode> P in Nodes)
@@ -2081,7 +2081,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Form.RemoveExcluded();
 
-						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+						await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 						break;
 					}
 
@@ -2105,7 +2105,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 			}
 		}
 
@@ -2134,12 +2134,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				return;
 			}
 			else if (!await Node.CanAddAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				return;
 			}
 
@@ -2177,7 +2177,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</nodeTypes>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task GetParametersForNewNodeHandler(object Sender, IqEventArgs e)
@@ -2201,12 +2201,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				return;
 			}
 			else if (!await Node.CanAddAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				return;
 			}
 
@@ -2214,20 +2214,20 @@ namespace Waher.Networking.XMPP.Concentrator
 			Type Type = Types.GetType(TypeName);
 			if (Type is null)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
 				return;
 			}
 
 			if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
 			ConstructorInfo CI = Types.GetDefaultConstructor(Type);
 			if (CI is null)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
@@ -2239,7 +2239,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			catch (Exception)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
@@ -2251,7 +2251,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Form.SerializeForm(Xml);
 
 			string s = Xml.ToString();
-			e.IqResult(s);
+			await e.IqResult(s);
 		}
 
 		private async Task CreateNewNodeHandler(object Sender, IqEventArgs e)
@@ -2275,12 +2275,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				return;
 			}
 			else if (!await Node.CanAddAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				return;
 			}
 
@@ -2288,20 +2288,20 @@ namespace Waher.Networking.XMPP.Concentrator
 			Type Type = Types.GetType(TypeName);
 			if (Type is null)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
 				return;
 			}
 
 			if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
 			ConstructorInfo CI = Types.GetDefaultConstructor(Type);
 			if (CI is null)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
@@ -2313,13 +2313,13 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			catch (Exception)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
 			if (!await Node.AcceptsChildAsync(PresumptiveChild) || !await PresumptiveChild.AcceptsParentAsync(Node))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 				return;
 			}
 
@@ -2336,7 +2336,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Form is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 12, "Missing form."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 12, "Missing form."), e.IQ));
 				return;
 			}
 
@@ -2362,7 +2362,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await this.ExportParametersAndMessages(Xml, PresumptiveChild, true, true, Language, Caller);
 				Xml.Append("</nodeInfo>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 
 				Result.AddTag("Full", e.From);
 				Result.AddTag("Parent", Node.NodeId);
@@ -2377,7 +2377,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 			{
 				Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild, await PresumptiveChild.GetTypeNameAsync(Language));
-				e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+				await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 			}
 		}
 
@@ -2605,12 +2605,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				return;
 			}
 			else if (!await Node.CanDestroyAsync(Caller))
 			{
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				return;
 			}
 
@@ -2632,7 +2632,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Log.Informational("Node destroyed.", Node.NodeId, e.FromBareJid, "NodeDestroyed", EventLevel.Major, Tags);
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		#endregion
@@ -2659,7 +2659,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				StringBuilder Xml = new StringBuilder();
@@ -2686,7 +2686,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Xml.Append("</commands>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -2778,16 +2778,16 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				string CommandId = XML.Attribute(e.Query, "command");
 				ICommand Command = await FindCommand(CommandId, Node);
 
 				if (Command is null)
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 				else if (!await Command.CanExecuteAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				else
 				{
 					DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
@@ -2795,7 +2795,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Form.SerializeForm(Xml);
 
-					e.IqResult(Xml.ToString());
+					await e.IqResult(Xml.ToString());
 				}
 			}
 		}
@@ -2826,16 +2826,16 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				string CommandId = XML.Attribute(e.Query, "command");
 				ICommand Command = await FindCommand(CommandId, Node);
 
 				if (Command is null)
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 				else if (!await Command.CanExecuteAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				else
 				{
 					DataForm Form = null;
@@ -2853,7 +2853,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						if (Command.Type != CommandType.Simple)
 						{
-							e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+							await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
 							return;
 						}
 					}
@@ -2861,7 +2861,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						if (Command.Type != CommandType.Parametrized)
 						{
-							e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
+							await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
 							return;
 						}
 
@@ -2874,7 +2874,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							DisposeObject(Command);
 
 							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
-							e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+							await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 
 							return;
 						}
@@ -2890,7 +2890,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							DisposeObject(Command);
 					}
 
-					e.IqResult(string.Empty);
+					await e.IqResult(string.Empty);
 				}
 			}
 		}
@@ -2915,7 +2915,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				string CommandId = XML.Attribute(e.Query, "command");
@@ -2923,11 +2923,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				ICommand Command = await FindCommand(CommandId, Node);
 
 				if (Command is null)
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 				else if (!await Command.CanExecuteAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				else if (Command.Type != CommandType.Query)
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+					await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
 				else
 				{
 					DataForm Form = null;
@@ -2943,7 +2943,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Form is null)
 					{
-						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+						await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
 						return;
 					}
 
@@ -2954,7 +2954,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (!(Result.Errors is null))
 					{
 						DisposeObject(Command);
-						e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+						await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 						return;
 					}
 
@@ -2963,11 +2963,11 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (!this.RegisterQuery(Query))
 					{
 						DisposeObject(Command);
-						e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
+						await e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
 						return;
 					}
 
-					e.IqResult(string.Empty);
+					await e.IqResult(string.Empty);
 
 					Query.OnAborted += this.Query_OnAborted;
 					Query.OnBeginSection += this.Query_OnBeginSection;
@@ -3064,7 +3064,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else
 			{
 				string CommandId = XML.Attribute(e.Query, "command");
@@ -3072,11 +3072,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				ICommand Command = await FindCommand(CommandId, Node);
 
 				if (Command is null)
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 				else if (!await Command.CanExecuteAsync(Caller))
-					e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				else if (Command.Type != CommandType.Query)
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+					await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
 				else
 				{
 					Query Query;
@@ -3091,13 +3091,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Query is null)
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
+						await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
 						return;
 					}
 
 					await Query.Abort();
 
-					e.IqResult(string.Empty);
+					await e.IqResult(string.Empty);
 				}
 			}
 		}
@@ -3435,7 +3435,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("</newRecords>");
 			this.EndQueryProgress(Xml);
 
-			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			await Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 
 		private async Task Query_OnNewObject(object Sender, QueryObjectEventArgs e)
@@ -3456,7 +3456,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.EndQueryProgress(Xml);
 
-			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			await Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 
 		private Task Query_OnMessage(object Sender, QueryMessageEventArgs e)
@@ -3615,7 +3615,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 					return;
 				}
 
@@ -3673,7 +3673,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</commands>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task GetCommonCommandParametersHandler(object Sender, IqEventArgs e)
@@ -3711,7 +3711,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node is null || !await Node.CanViewAsync(Caller))
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 					return;
 				}
 
@@ -3721,12 +3721,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Command is null)
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+						await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 						return;
 					}
 					else if (!await Command.CanExecuteAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+						await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 						return;
 					}
 
@@ -3737,12 +3737,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					Command2 = await FindCommand(CommandId, Node);
 					if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+						await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 						return;
 					}
 					else if (!await Command2.CanExecuteAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+						await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 						return;
 					}
 
@@ -3753,7 +3753,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Form is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
 				return;
 			}
 
@@ -3763,7 +3763,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Form.SerializeForm(Xml);
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task ExecuteCommonNodeCommandHandler(object Sender, IqEventArgs e)
@@ -3803,7 +3803,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Node is null || !await Node.CanViewAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
 
@@ -3818,12 +3818,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (Command is null)
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 							return;
 						}
 						else if (!await Command.CanExecuteAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 					}
@@ -3832,12 +3832,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						Command2 = await FindCommand(CommandId, Node);
 						if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 							return;
 						}
 						else if (!await Command2.CanExecuteAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 					}
@@ -3848,7 +3848,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Nodes is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
 				return;
 			}
 
@@ -3856,7 +3856,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				if (Command.Type != CommandType.Simple)
 				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+					await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
 					return;
 				}
 			}
@@ -3864,7 +3864,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				if (Command.Type != CommandType.Parametrized)
 				{
-					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
+					await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
 					return;
 				}
 
@@ -3875,7 +3875,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				if (!(Result.Errors is null))
 				{
 					DisposeObject(Command);
-					e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+					await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					return;
 				}
 			}
@@ -3914,7 +3914,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</partialExecution>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task ExecuteCommonNodeQueryHandler(object Sender, IqEventArgs e)
@@ -3956,7 +3956,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Node is null || !await Node.CanViewAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
 
@@ -3975,12 +3975,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (Command is null)
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 							return;
 						}
 						else if (!await Command.CanExecuteAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 					}
@@ -3989,12 +3989,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						Command2 = await FindCommand(CommandId, Node);
 						if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 							return;
 						}
 						else if (!await Command2.CanExecuteAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 					}
@@ -4005,19 +4005,19 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Nodes is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
 				return;
 			}
 
 			if (Command.Type != CommandType.Query)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
 				return;
 			}
 
 			if (Form is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
 				return;
 			}
 
@@ -4028,7 +4028,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (!(Result.Errors is null))
 			{
 				DisposeObject(Command);
-				e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
+				await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 				return;
 			}
 
@@ -4045,7 +4045,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Query is null)
 			{
 				DisposeObject(Command);
-				e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
+				await e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
 				return;
 			}
 
@@ -4109,7 +4109,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Xml.Append("</partialExecution>");
 
-			e.IqResult(Xml.ToString());
+			await e.IqResult(Xml.ToString());
 		}
 
 		private async Task AbortCommonNodeQueryHandler(object Sender, IqEventArgs e)
@@ -4150,7 +4150,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Node is null || !await Node.CanViewAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
 
@@ -4169,12 +4169,12 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (Command is null)
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 							return;
 						}
 						else if (!await Command.CanExecuteAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 					}
@@ -4183,12 +4183,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						Command2 = await FindCommand(CommandId, Node);
 						if (Command2 is null || !commandComparerInstance.Equals(Command, Command2))
 						{
-							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
 							return;
 						}
 						else if (!await Command2.CanExecuteAsync(Caller))
 						{
-							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 							return;
 						}
 					}
@@ -4197,13 +4197,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Nodes is null)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
 				return;
 			}
 
 			if (Command.Type != CommandType.Query)
 			{
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
 				return;
 			}
 
@@ -4219,13 +4219,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Query is null)
 			{
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
 				return;
 			}
 
 			await Query.Abort();
 
-			e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		#endregion
@@ -4241,7 +4241,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			try
 			{
 				if (Nodes is null || (c = Nodes.Length) == 0)
-					Request.ReportErrors(true, new ThingError(ThingReference.Empty, Now, "Node specification required for concentrators."));
+					await Request.ReportErrors(true, new ThingError(ThingReference.Empty, Now, "Node specification required for concentrators."));
 				else
 				{
 					for (i = 0; i < c; i++)
@@ -4252,21 +4252,21 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							if (!this.TryGetDataSource(NodeRef.SourceId, out IDataSource DataSource))
 							{
-								Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Data source not found."));
+								await Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Data source not found."));
 								continue;
 							}
 
 							Node = await DataSource.GetNodeAsync(NodeRef);
 							if (Node is null)
 							{
-								Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not found."));
+								await Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not found."));
 								continue;
 							}
 						}
 
 						if (!(Node is ISensor Sensor) || !Sensor.IsReadable)
 						{
-							Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not readable."));
+							await Request.ReportErrors(i == c - 1, new ThingError(NodeRef, Now, "Node not readable."));
 							continue;
 						}
 
@@ -4276,7 +4276,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(true, new ThingError(ThingReference.Empty, Now, ex.Message));
+				await Request.ReportErrors(true, new ThingError(ThingReference.Empty, Now, ex.Message));
 			}
 		}
 
@@ -4357,11 +4357,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else if (!(Node is ISniffable Sniffable))
-				e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
+				await e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{
 				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1)).ToUniversalTime();
@@ -4383,7 +4383,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(XML.Encode(Expires.ToUniversalTime()));
 				Xml.Append("'/>");
 
-				e.IqResult(Xml.ToString());
+				await e.IqResult(Xml.ToString());
 			}
 		}
 
@@ -4407,11 +4407,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				Node = await Rec.Source.GetNodeAsync(ThingRef);
 
 			if (Node is null || !await Node.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
-				e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else if (!(Node is ISniffable Sniffable))
-				e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
+				await e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{
 				string Id = XML.Attribute(e.Query, "snifferId");
@@ -4424,13 +4424,13 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							Sniffable.Remove(RemoteSniffer);
 
-							e.IqResult(string.Empty);
+							await e.IqResult(string.Empty);
 							return;
 						}
 					}
 				}
 
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 22, "Sniffer not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 22, "Sniffer not found."), e.IQ));
 			}
 		}
 
@@ -4438,30 +4438,27 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Data Source Events
 
-		private Task DataSource_OnEvent(object _, SourceEvent Event)
+		private async Task DataSource_OnEvent(object _, SourceEvent Event)
 		{
 			DataSourceRec Rec;
 
 			lock (this.synchObject)
 			{
 				if (!this.dataSources.TryGetValue(Event.SourceId, out Rec))
-					return Task.CompletedTask;
+					return;
 			}
 
 			SubscriptionRec[] Subscriptions = Rec.SubscriptionsStatic;
 			if (Subscriptions is null || Subscriptions.Length == 0 || this.client.State != XmppState.Connected)
-				return Task.CompletedTask;
+				return;
 
-			StringBuilder Xml = null;
-			LinkedList<string> ToRemove = null;
+			SendEventMessageRec EventRec = new SendEventMessageRec();
 
 			foreach (SubscriptionRec Subscription in Subscriptions)
-				this.SendEventMessage(Subscription, Event, ref ToRemove, ref Xml);
+				await this.SendEventMessage(Subscription, Event, EventRec);
 
-			if (!(ToRemove is null))
-				this.Remove(Rec, ToRemove);
-
-			return Task.CompletedTask;
+			if (!(EventRec.ToRemove is null))
+				this.Remove(Rec, EventRec.ToRemove);
 		}
 
 		private void Remove(DataSourceRec Rec, LinkedList<string> ToRemove)
@@ -4475,116 +4472,122 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private void SendEventMessage(SubscriptionRec Subscription, SourceEvent Event, ref LinkedList<string> ToRemove, ref StringBuilder Xml)
+		private class SendEventMessageRec
+		{
+			public LinkedList<string> ToRemove;
+			public StringBuilder Xml;
+		}
+
+		private async Task SendEventMessage(SubscriptionRec Subscription, SourceEvent Event, SendEventMessageRec Rec)
 		{
 			SourceEventType EventType = Event.EventType;
 
 			if (Subscription.Expires <= DateTime.Now)
 			{
-				if (ToRemove is null)
-					ToRemove = new LinkedList<string>();
+				if (Rec.ToRemove is null)
+					Rec.ToRemove = new LinkedList<string>();
 
-				ToRemove.AddLast(Subscription.Jid);
+				Rec.ToRemove.AddLast(Subscription.Jid);
 			}
 			else if ((Subscription.EventTypes & EventType) != 0)
 			{
-				if (Xml is null)
-					Xml = new StringBuilder();
+				if (Rec.Xml is null)
+					Rec.Xml = new StringBuilder();
 				else
-					Xml.Clear();
+					Rec.Xml.Clear();
 
 				switch (EventType)
 				{
 					case SourceEventType.NodeAdded:
 						NodeAdded NodeAdded = (NodeAdded)Event;
-						Xml.Append("<nodeAdded xmlns='");
-						Xml.Append(NamespaceConcentratorCurrent);
+						Rec.Xml.Append("<nodeAdded xmlns='");
+						Rec.Xml.Append(NamespaceConcentratorCurrent);
 
 						if (!string.IsNullOrEmpty(NodeAdded.AfterNodeId))
 						{
-							Xml.Append("' aid='");
-							Xml.Append(XML.Encode(NodeAdded.AfterNodeId));
+							Rec.Xml.Append("' aid='");
+							Rec.Xml.Append(XML.Encode(NodeAdded.AfterNodeId));
 						}
 
 						if (!string.IsNullOrEmpty(NodeAdded.AfterPartition))
 						{
-							Xml.Append("' apt='");
-							Xml.Append(XML.Encode(NodeAdded.AfterPartition));
+							Rec.Xml.Append("' apt='");
+							Rec.Xml.Append(XML.Encode(NodeAdded.AfterPartition));
 						}
 
-						Xml.Append("' nodeType='");
-						Xml.Append(XML.Encode(NodeAdded.NodeType));
+						Rec.Xml.Append("' nodeType='");
+						Rec.Xml.Append(XML.Encode(NodeAdded.NodeType));
 
-						Xml.Append("' displayName='");
-						Xml.Append(XML.Encode(NodeAdded.DisplayName));
+						Rec.Xml.Append("' displayName='");
+						Rec.Xml.Append(XML.Encode(NodeAdded.DisplayName));
 
 						if (NodeAdded.Sniffable)
-							Xml.Append("' sniffable='true");
+							Rec.Xml.Append("' sniffable='true");
 
-						this.Append(Xml, NodeAdded, Subscription.Parameters, "nodeAdded");
+						this.Append(Rec.Xml, NodeAdded, Subscription.Parameters, "nodeAdded");
 						break;
 
 					case SourceEventType.NodeUpdated:
 						NodeUpdated NodeUpdated = (NodeUpdated)Event;
 
-						Xml.Append("<nodeUpdated xmlns='");
-						Xml.Append(NamespaceConcentratorCurrent);
+						Rec.Xml.Append("<nodeUpdated xmlns='");
+						Rec.Xml.Append(NamespaceConcentratorCurrent);
 
 						if (!string.IsNullOrEmpty(NodeUpdated.OldId) && NodeUpdated.OldId != NodeUpdated.NodeId)
 						{
-							Xml.Append("' oid='");
-							Xml.Append(XML.Encode(NodeUpdated.OldId));
+							Rec.Xml.Append("' oid='");
+							Rec.Xml.Append(XML.Encode(NodeUpdated.OldId));
 						}
 
-						this.Append(Xml, NodeUpdated, Subscription.Parameters, "nodeUpdated");
+						this.Append(Rec.Xml, NodeUpdated, Subscription.Parameters, "nodeUpdated");
 						break;
 
 					case SourceEventType.NodeStatusChanged:
 						NodeStatusChanged NodeStatusChanged = (NodeStatusChanged)Event;
-						Xml.Append("<nodeStatusChanged xmlns='");
-						Xml.Append(NamespaceConcentratorCurrent);
+						Rec.Xml.Append("<nodeStatusChanged xmlns='");
+						Rec.Xml.Append(NamespaceConcentratorCurrent);
 
-						this.Append(Xml, NodeStatusChanged);
+						this.Append(Rec.Xml, NodeStatusChanged);
 
 						if (Subscription.Messages && !(NodeStatusChanged.Messages is null))
 						{
-							Xml.Append("'>");
+							Rec.Xml.Append("'>");
 
 							foreach (Message Message in NodeStatusChanged.Messages)
-								Message.Export(Xml);
+								Message.Export(Rec.Xml);
 
-							Xml.Append("</nodeStatusChanged>");
+							Rec.Xml.Append("</nodeStatusChanged>");
 						}
 						else
-							Xml.Append("'/>");
+							Rec.Xml.Append("'/>");
 						break;
 
 					case SourceEventType.NodeRemoved:
-						Xml.Append("<nodeRemoved xmlns='");
-						Xml.Append(NamespaceConcentratorCurrent);
-						this.Append(Xml, (NodeRemoved)Event);
-						Xml.Append("'/>");
+						Rec.Xml.Append("<nodeRemoved xmlns='");
+						Rec.Xml.Append(NamespaceConcentratorCurrent);
+						this.Append(Rec.Xml, (NodeRemoved)Event);
+						Rec.Xml.Append("'/>");
 						break;
 
 					case SourceEventType.NodeMovedUp:
-						Xml.Append("<nodeMovedUp xmlns='");
-						Xml.Append(NamespaceConcentratorCurrent);
-						this.Append(Xml, (NodeMovedUp)Event);
-						Xml.Append("'/>");
+						Rec.Xml.Append("<nodeMovedUp xmlns='");
+						Rec.Xml.Append(NamespaceConcentratorCurrent);
+						this.Append(Rec.Xml, (NodeMovedUp)Event);
+						Rec.Xml.Append("'/>");
 						break;
 
 					case SourceEventType.NodeMovedDown:
-						Xml.Append("<nodeMovedDown xmlns='");
-						Xml.Append(NamespaceConcentratorCurrent);
-						this.Append(Xml, (NodeMovedDown)Event);
-						Xml.Append("'/>");
+						Rec.Xml.Append("<nodeMovedDown xmlns='");
+						Rec.Xml.Append(NamespaceConcentratorCurrent);
+						this.Append(Rec.Xml, (NodeMovedDown)Event);
+						Rec.Xml.Append("'/>");
 						break;
 
 					default:
 						return;
 				}
 
-				this.client.SendMessage(MessageType.Normal, Subscription.Jid, Xml.ToString(), string.Empty, string.Empty, Translator.DefaultLanguageCode, string.Empty, string.Empty);
+				await this.client.SendMessage(MessageType.Normal, Subscription.Jid, Rec.Xml.ToString(), string.Empty, string.Empty, Translator.DefaultLanguageCode, string.Empty, string.Empty);
 			}
 		}
 
@@ -4708,9 +4711,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 			else if (TtlSeconds <= 0)
-				e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 23, "Invalid timeout value."), e.IQ));
+				await e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 23, "Invalid timeout value."), e.IQ));
 			else
 			{
 				DateTime GetEventsSince = XML.Attribute(e.Query, "getEventsSince", DateTime.MaxValue);
@@ -4764,20 +4767,19 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 
 				if (GetEventsSince <= DateTime.Now)
 				{
-					StringBuilder Xml = null;
-					LinkedList<string> ToRemove = null;
+					SendEventMessageRec EventRec = new SendEventMessageRec();
 
 					foreach (SourceEvent Event in await Database.Find<SourceEvent>(new FilterAnd(new FilterFieldEqualTo("SourceId", SourceId),
 						new FilterFieldGreaterOrEqualTo("Timestamp", GetEventsSince)), "SourceId", "Timestamp"))
 					{
-						this.SendEventMessage(SubscriptionRec, Event, ref ToRemove, ref Xml);
-						if (!(ToRemove is null))
+						await this.SendEventMessage(SubscriptionRec, Event, EventRec);
+						if (!(EventRec.ToRemove is null))
 						{
-							this.Remove(Rec, ToRemove);
+							this.Remove(Rec, EventRec.ToRemove);
 							break;
 						}
 					}
@@ -4799,7 +4801,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Rec is null || !await Rec.Source.CanViewAsync(Caller))
-				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 			else
 			{
 				SourceEventType Types = SourceEventType.None;
@@ -4836,7 +4838,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				e.IqResult(string.Empty);
+				await e.IqResult(string.Empty);
 			}
 		}
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Net;
 using System.Net.Security;
 using System.Net.WebSockets;
@@ -6,7 +7,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
@@ -95,6 +95,8 @@ namespace Waher.Networking.HTTP.Test
 				{
 					throw new ForbiddenException();
 				}
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -114,12 +116,16 @@ namespace Waher.Networking.HTTP.Test
 				{
 					throw new ForbiddenException();
 				}
+
+				return Task.CompletedTask;
 			};
 
 			this.webSocketListener.Connected += (sender, e) =>
 			{
 				if (e.Socket is null)
 					Assert.Fail("Socket not set.");
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -142,7 +148,11 @@ namespace Waher.Networking.HTTP.Test
 						Result.SetResult(true);
 					else
 						Result.SetResult(false);
+
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -177,7 +187,11 @@ namespace Waher.Networking.HTTP.Test
 					}
 					else
 						Result.SetResult(false);
+
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -206,7 +220,11 @@ namespace Waher.Networking.HTTP.Test
 						Result.SetResult(true);
 					else
 						Result.SetResult(false);
+
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -244,7 +262,11 @@ namespace Waher.Networking.HTTP.Test
 					}
 					else
 						Result.SetResult(false);
+
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -276,7 +298,11 @@ namespace Waher.Networking.HTTP.Test
 						Result.SetResult(true);
 					else
 						Result.SetResult(false);
+
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -303,7 +329,10 @@ namespace Waher.Networking.HTTP.Test
 				e.Socket.BinaryReceived += (sender2, e2) =>
 				{
 					Result.SetResult(false);
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -313,7 +342,7 @@ namespace Waher.Networking.HTTP.Test
 				WebSocketMessageType.Binary, true, CancellationToken.None);
 
 			if (Client.State == WebSocketState.Aborted)
-				throw new WebSocketException();	// Not necessary in previous versions of .NET. This Exception has been swallowed by internal processing in more recent versions.
+				throw new WebSocketException(); // Not necessary in previous versions of .NET. This Exception has been swallowed by internal processing in more recent versions.
 
 			Task _ = Task.Delay(5000).ContinueWith((_) => Result.TrySetException(new TimeoutException()));
 
@@ -326,7 +355,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.webSocketListener.Connected += (sender, e) =>
 			{
-				e.Socket.Send("Hello World");
+				return e.Socket.Send("Hello World");
 			};
 
 			using ClientWebSocket Client = new();
@@ -348,7 +377,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.webSocketListener.Connected += (sender, e) =>
 			{
-				e.Socket.Send(new byte[] { 1, 2, 3, 4 });
+				return e.Socket.Send(new byte[] { 1, 2, 3, 4 });
 			};
 
 			using ClientWebSocket Client = new();
@@ -372,10 +401,10 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_11_SendTextFragmented()
 		{
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += async (sender, e) =>
 			{
-				e.Socket.Send("Hello ", true);
-				e.Socket.Send("World", false);
+				await e.Socket.Send("Hello ", true);
+				await e.Socket.Send("World", false);
 			};
 
 			using ClientWebSocket Client = new();
@@ -404,10 +433,10 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_12_SendBinaryFragmented()
 		{
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += async (sender, e) =>
 			{
-				e.Socket.Send(new byte[] { 1, 2 }, true);
-				e.Socket.Send(new byte[] { 3, 4 }, false);
+				await e.Socket.Send(new byte[] { 1, 2 }, true);
+				await e.Socket.Send(new byte[] { 3, 4 }, false);
 			};
 
 			using ClientWebSocket Client = new();
@@ -444,8 +473,10 @@ namespace Waher.Networking.HTTP.Test
 			{
 				e.Socket.TextReceived += (sender2, e2) =>
 				{
-					e2.Socket.Send(e2.Payload);
+					return e2.Socket.Send(e2.Payload);
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -477,8 +508,10 @@ namespace Waher.Networking.HTTP.Test
 			{
 				e.Socket.TextReceived += (sender2, e2) =>
 				{
-					e2.Socket.Send(e2.Payload);
+					return e2.Socket.Send(e2.Payload);
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();
@@ -516,7 +549,11 @@ namespace Waher.Networking.HTTP.Test
 				{
 					Result.SetResult(e2.Code == (int)WebSockets.WebSocketCloseStatus.Normal &&
 						e2.Reason == "Manual");
+
+					return Task.CompletedTask;
 				};
+
+				return Task.CompletedTask;
 			};
 
 			using ClientWebSocket Client = new();

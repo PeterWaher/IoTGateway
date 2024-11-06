@@ -200,7 +200,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="UInt16"/>.
+		/// Gets the next <see cref="ushort"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
 		public ushort NextUInt16(string Name)
@@ -219,7 +219,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Int16"/>.
+		/// Gets the next <see cref="short"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
 		public short NextInt16(string Name)
@@ -259,7 +259,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="UInt32"/>.
+		/// Gets the next <see cref="uint"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
 		public uint NextUInt32(string Name)
@@ -282,7 +282,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Int32"/>.
+		/// Gets the next <see cref="int"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
 		public int NextInt32(string Name)
@@ -332,7 +332,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Int64"/>.
+		/// Gets the next <see cref="long"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
 		public long NextInt64(string Name)
@@ -363,7 +363,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		}
 
 		/// <summary>
-		/// Gets the next <see cref="Single"/>.
+		/// Gets the next <see cref="float"/>.
 		/// </summary>
 		/// <returns>Next Value</returns>
 		public float NextSingle(string Name)

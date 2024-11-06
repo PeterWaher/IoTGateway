@@ -340,7 +340,7 @@ namespace Waher.Things.Mqtt.Model
 				}
 
 				if (!(this.ex is null))
-					Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
+					await Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
 				else if (this.data is null)
 				{
 					this.data = await this.node.GetDefaultDataObject();
@@ -348,7 +348,7 @@ namespace Waher.Things.Mqtt.Model
 					if (this.data is null)
 					{
 						if (Last)
-							Request.ReportFields(true);
+							await Request.ReportFields(true);
 					}
 					else
 						await this.data.StartReadout(ThingReference, Request, Prefix, Last);
@@ -360,7 +360,7 @@ namespace Waher.Things.Mqtt.Model
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(Last, new ThingError(ThingReference, DateTime.UtcNow, ex.Message));
+				await Request.ReportErrors(Last, new ThingError(ThingReference, DateTime.UtcNow, ex.Message));
 				await this.node.LogErrorAsync("Readout", ex.Message);
 			}
 		}

@@ -117,7 +117,7 @@ namespace Waher.Runtime.ServiceRegistration
 			}
 		}
 
-		private Task<bool> SendRegistration(Registration Registration)
+		private async Task<bool> SendRegistration(Registration Registration)
 		{
 			TaskCompletionSource<bool> T = new TaskCompletionSource<bool>();
 			StringBuilder Xml = new StringBuilder();
@@ -160,13 +160,13 @@ namespace Waher.Runtime.ServiceRegistration
 			w.WriteEndElement();
 			w.Flush();
 
-			this.client.SendIqSet(this.registryJid, Xml.ToString(), (sender, e) =>
+			await this.client.SendIqSet(this.registryJid, Xml.ToString(), (sender, e) =>
 			{
 				T.SetResult(e.Ok);
 				return Task.CompletedTask;
 			}, null);
 
-			return T.Task;
+			return await T.Task;
 		}
 
 		private void SetValues(Registration Registration, string[] Assemblies, Annotation[] Annotations)

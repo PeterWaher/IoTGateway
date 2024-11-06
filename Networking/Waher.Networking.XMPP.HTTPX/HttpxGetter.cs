@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
@@ -331,8 +330,11 @@ namespace Waher.Networking.XMPP.HTTPX
 				State.File?.Dispose();
 				State.File = null;
 
-				State.HttpResponse?.Dispose();
-				State.HttpResponse = null;
+				if (!(State.HttpResponse is null))
+				{
+					await State.HttpResponse.DisposeAsync();
+					State.HttpResponse = null;
+				}
 
 				Timer?.Dispose();
 				Timer = null;

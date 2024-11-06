@@ -106,7 +106,7 @@ namespace Waher.Networking.SASL
 
 			if (Cram == Cram2)
 			{
-				Connection.SetAccount(Account);
+				await Connection.SetAccount(Account);
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(null);
 

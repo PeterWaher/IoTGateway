@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 using Waher.Things.SensorData;
@@ -80,5 +81,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds
 			Fields.Add(new Int32Field(Thing, Timestamp, "#Channels", this.NrChannels,
                 FieldType.Identity, FieldQoS.AutomaticReadout));
         }
-    }
+
+		/// <summary>
+		/// Appends record details to sniffer output.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output.</param>
+		public override void AppendDetails(StringBuilder SnifferOutput)
+		{
+			SnifferOutput.Append("#Channels=");
+			SnifferOutput.AppendLine(this.NrChannels.ToString());
+		}
+	}
 }

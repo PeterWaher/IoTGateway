@@ -21,7 +21,7 @@ namespace Waher.Networking
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		Task<bool> SendAsync(byte[] Packet, EventHandler Callback);
+		Task<bool> SendAsync(byte[] Packet, EventHandlerAsync Callback);
 
 		/// <summary>
 		/// Sends a binary packet.
@@ -40,7 +40,7 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandler Callback);
+		Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback);
 
 		/// <summary>
 		/// Flushes any pending or intermediate data.

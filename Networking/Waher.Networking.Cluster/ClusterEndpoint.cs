@@ -97,7 +97,7 @@ namespace Waher.Networking.Cluster
 			this.localStatus = null;
 			this.remoteStatus = new Dictionary<IPEndPoint, object>();
 			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30), true);
-			this.currentStatus.Removed += CurrentStatus_Removed;
+			this.currentStatus.Removed += this.CurrentStatus_Removed;
 
 			if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
 			{
@@ -267,7 +267,23 @@ namespace Waher.Networking.Cluster
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		[Obsolete("Use DisposeAsync")]
+		public async void Dispose()
+		{
+			try
+			{
+				await this.DisposeAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!this.shuttingDown)
 			{
@@ -293,7 +309,7 @@ namespace Waher.Networking.Cluster
 				{
 					foreach (string Resource in ToRelease)
 					{
-						this.SendMessageAcknowledged(new Release()
+						await this.SendMessageAcknowledged(new Release()
 						{
 							Resource = Resource
 						}, null, null);
@@ -301,7 +317,7 @@ namespace Waher.Networking.Cluster
 				}
 
 				this.shuttingDown = true;
-				this.SendMessageUnacknowledged(new ShuttingDown());
+				await this.SendMessageUnacknowledged(new ShuttingDown());
 
 				this.shutDown?.WaitOne(2000);
 				this.shutDown?.Dispose();
@@ -498,7 +514,7 @@ namespace Waher.Networking.Cluster
 				if (Data.Length == 0)
 					return;
 
-				this.ReceiveBinary(Data);
+				await this.ReceiveBinary(Data);
 
 				using (Deserializer Input = new Deserializer(Data))
 				{
@@ -511,10 +527,13 @@ namespace Waher.Networking.Cluster
 							if (Object is IClusterMessage Message)
 							{
 								await Message.MessageReceived(this, From);
-								this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+
+								ClusterMessageEventHandler h = this.OnMessageReceived;
+								if (!(h is null))
+									await h(this, new ClusterMessageEventArgs(Message));
 							}
 							else
-								this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+								await this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
 							break;
 
 						case 1: // Acknowledged message
@@ -550,11 +569,14 @@ namespace Waher.Networking.Cluster
 									try
 									{
 										Ack = await Message.MessageReceived(this, From);
-										this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+
+										ClusterMessageEventHandler h = this.OnMessageReceived;
+										if (!(h is null))
+											await h(this, new ClusterMessageEventArgs(Message));
 									}
 									catch (Exception ex)
 									{
-										this.Exception(ex);
+										await this.Exception(ex);
 										Log.Exception(ex);
 										Ack = false;
 									}
@@ -563,7 +585,7 @@ namespace Waher.Networking.Cluster
 								}
 								else
 								{
-									this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+									await this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
 									Ack = false;
 								}
 							}
@@ -573,7 +595,7 @@ namespace Waher.Networking.Cluster
 								Output.WriteByte(Ack ? (byte)2 : (byte)3);
 								Output.WriteGuid(Id);
 
-								this.Transmit(Output.ToArray(), From);
+								await this.Transmit(Output.ToArray(), From);
 							}
 							break;
 
@@ -597,9 +619,12 @@ namespace Waher.Networking.Cluster
 									this.currentStatus.Remove(s);
 									this.scheduler.Remove(MessageStatus.Timeout);
 
-									MessageStatus.Callback?.Invoke(this, new ClusterMessageAckEventArgs(
-										MessageStatus.Message, MessageStatus.GetResponses(CurrentStatus),
-										MessageStatus.State));
+									if (!(MessageStatus.Callback is null))
+									{
+										await MessageStatus.Callback(this, new ClusterMessageAckEventArgs(
+											MessageStatus.Message, MessageStatus.GetResponses(CurrentStatus),
+											MessageStatus.State));
+									}
 								}
 							}
 							break;
@@ -665,7 +690,7 @@ namespace Waher.Networking.Cluster
 									rootObject.Serialize(Output, Obj);
 								}
 
-								this.Transmit(Output.ToArray(), From);
+								await this.Transmit(Output.ToArray(), From);
 							}
 							break;
 
@@ -687,7 +712,7 @@ namespace Waher.Networking.Cluster
 									this.currentStatus.Remove(s);
 									this.scheduler.Remove(CommandStatus.Timeout);
 
-									CommandStatus.RaiseResponseEvent(CurrentStatus);
+									await CommandStatus.RaiseResponseEvent(CurrentStatus);
 								}
 							}
 							break;
@@ -725,7 +750,7 @@ namespace Waher.Networking.Cluster
 									this.currentStatus.Remove(s);
 									this.scheduler.Remove(CommandStatus2.Timeout);
 
-									CommandStatus2.RaiseResponseEvent(CurrentStatus);
+									await CommandStatus2.RaiseResponseEvent(CurrentStatus);
 								}
 							}
 							break;
@@ -734,7 +759,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.Exception(ex);
+				await this.Exception(ex);
 				Log.Exception(ex);
 			}
 		}
@@ -755,9 +780,9 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		public event ClusterMessageEventHandler OnMessageReceived = null;
 
-		private void Transmit(byte[] Message, IPEndPoint Destination)
+		private async Task Transmit(byte[] Message, IPEndPoint Destination)
 		{
-			this.TransmitBinary(Message);
+			await this.TransmitBinary(Message);
 
 			foreach (ClusterUdpClient Client in this.outgoing)
 				Client.BeginTransmit(Message, Destination);
@@ -767,7 +792,7 @@ namespace Waher.Networking.Cluster
 		/// Sends an unacknowledged message ("at most once")
 		/// </summary>
 		/// <param name="Message">Message object</param>
-		public void SendMessageUnacknowledged(IClusterMessage Message)
+		public async Task SendMessageUnacknowledged(IClusterMessage Message)
 		{
 			Serializer Output = new Serializer();
 
@@ -775,7 +800,7 @@ namespace Waher.Networking.Cluster
 			{
 				Output.WriteByte(0);    // Unacknowledged message.
 				rootObject.Serialize(Output, Message);
-				this.Transmit(Output.ToArray(), this.destination);
+				await this.Transmit(Output.ToArray(), this.destination);
 			}
 			catch (Exception ex)
 			{
@@ -796,7 +821,7 @@ namespace Waher.Networking.Cluster
 		/// <param name="Message">Message to send using acknowledged service.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendMessageAcknowledged(IClusterMessage Message,
+		public async Task SendMessageAcknowledged(IClusterMessage Message,
 			ClusterMessageAckEventHandler Callback, object State)
 		{
 			Serializer Output = new Serializer();
@@ -828,7 +853,7 @@ namespace Waher.Networking.Cluster
 
 				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
 
-				this.Transmit(Bin, this.destination);
+				await this.Transmit(Bin, this.destination);
 
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
 
@@ -837,8 +862,11 @@ namespace Waher.Networking.Cluster
 					this.currentStatus.Remove(Rec.Id.ToString());
 					this.scheduler.Remove(Rec.Timeout);
 
-					Rec.Callback?.Invoke(this, new ClusterMessageAckEventArgs(
-						Rec.Message, Rec.GetResponses(CurrentStatus), Rec.State));
+					if (!(Rec.Callback is null))
+					{
+						await Rec.Callback(this, new ClusterMessageAckEventArgs(
+							Rec.Message, Rec.GetResponses(CurrentStatus), Rec.State));
+					}
 				}
 			}
 			catch (Exception ex)
@@ -854,7 +882,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		private void ResendAcknowledgedMessage(Object P)
+		private async Task ResendAcknowledgedMessage(object P)
 		{
 			MessageStatus Rec = (MessageStatus)P;
 
@@ -868,8 +896,11 @@ namespace Waher.Networking.Cluster
 					this.currentStatus.Remove(Rec.Id.ToString());
 					this.scheduler.Remove(Rec.Timeout);
 
-					Rec.Callback?.Invoke(this, new ClusterMessageAckEventArgs(
-						Rec.Message, Rec.GetResponses(CurrentStatus), Rec.State));
+					if (!(Rec.Callback is null))
+					{
+						await Rec.Callback(this, new ClusterMessageAckEventArgs(
+							Rec.Message, Rec.GetResponses(CurrentStatus), Rec.State));
+					}
 				}
 				else
 				{
@@ -892,7 +923,7 @@ namespace Waher.Networking.Cluster
 						Output.WriteRaw(Rec.MessageBinary, 18, Rec.MessageBinary.Length - 18);
 
 						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
-						this.Transmit(Output.ToArray(), this.destination);
+						await this.Transmit(Output.ToArray(), this.destination);
 					}
 				}
 			}
@@ -906,16 +937,17 @@ namespace Waher.Networking.Cluster
 		/// Sends a message using acknowledged service.
 		/// </summary>
 		/// <param name="Message">Message to send using acknowledged service.</param>
-		public Task<EndpointAcknowledgement[]> SendMessageAcknowledgedAsync(IClusterMessage Message)
+		public async Task<EndpointAcknowledgement[]> SendMessageAcknowledgedAsync(IClusterMessage Message)
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			this.SendMessageAcknowledged(Message, (sender, e) =>
+			await this.SendMessageAcknowledged(Message, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
+				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -924,23 +956,24 @@ namespace Waher.Networking.Cluster
 		/// <param name="Message">Message to send using acknowledged service.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void SendMessageAssured(IClusterMessage Message,
+		public async Task SendMessageAssured(IClusterMessage Message,
 			ClusterMessageAckEventHandler Callback, object State)
 		{
 			Guid MessageId = Guid.NewGuid();
 
-			this.SendMessageAcknowledged(new Transport()
+			await this.SendMessageAcknowledged(new Transport()
 			{
 				MessageID = MessageId,
 				Message = Message
-			}, (sender, e) =>
+			}, async (sender, e) =>
 			{
-				this.SendMessageAcknowledged(new Deliver()
+				await this.SendMessageAcknowledged(new Deliver()
 				{
 					MessageID = MessageId
-				}, (sender2, e2) =>
+				}, async (sender2, e2) =>
 				{
-					Callback?.Invoke(this, new ClusterMessageAckEventArgs(Message, e2.Responses, State));
+					if (!(Callback is null))
+						await Callback(this, new ClusterMessageAckEventArgs(Message, e2.Responses, State));
 				}, null);
 			}, null);
 		}
@@ -949,28 +982,32 @@ namespace Waher.Networking.Cluster
 		/// Sends a message using assured service. ("exactly once")
 		/// </summary>
 		/// <param name="Message">Message to send using acknowledged service.</param>
-		public Task<EndpointAcknowledgement[]> SendMessageAssuredAsync(IClusterMessage Message)
+		public async Task<EndpointAcknowledgement[]> SendMessageAssuredAsync(IClusterMessage Message)
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			this.SendMessageAssured(Message, (sender, e) =>
+			await this.SendMessageAssured(Message, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
+				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
-		private void SendAlive(object State)
+		private async void SendAlive(object _)
 		{
 			try
 			{
 				ClusterGetStatusEventArgs e = new ClusterGetStatusEventArgs();
+				ClusterGetStatusEventHandler h = this.GetStatus;
 
-				this.GetStatus?.Invoke(this, e);
+				if (!(h is null))
+					await h(this, e);
+
 				this.localStatus = e.Status;
 
-				this.SendMessageUnacknowledged(new Alive()
+				await this.SendMessageUnacknowledged(new Alive()
 				{
 					Status = this.localStatus
 				});
@@ -1136,7 +1173,9 @@ namespace Waher.Networking.Cluster
 					b = await Message.MessageReceived(Endpoint, RemoteEndpoint);
 					this.currentStatus[s] = b;
 
-					this.OnMessageReceived?.Invoke(this, new ClusterMessageEventArgs(Message));
+					ClusterMessageEventHandler h = this.OnMessageReceived;
+					if (!(h is null))
+						await h(this, new ClusterMessageEventArgs(Message));
 
 					return b;
 				}
@@ -1147,7 +1186,7 @@ namespace Waher.Networking.Cluster
 				return false;
 		}
 
-		private void CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)
+		private async Task CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)
 		{
 			if (e.Value is IPEndPoint RemoteEndpoint)
 				this.RemoveRemoteStatus(RemoteEndpoint);
@@ -1157,15 +1196,18 @@ namespace Waher.Networking.Cluster
 				{
 					this.scheduler.Remove(MessageStatus.Timeout);
 
-					try
+					if (!(MessageStatus.Callback is null))
 					{
-						MessageStatus.Callback?.Invoke(this, new ClusterMessageAckEventArgs(
-							MessageStatus.Message, MessageStatus.GetResponses(this.GetRemoteStatuses()),
-							MessageStatus.State));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
+						try
+						{
+							await MessageStatus.Callback(this, new ClusterMessageAckEventArgs(
+								MessageStatus.Message, MessageStatus.GetResponses(this.GetRemoteStatuses()),
+								MessageStatus.State));
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
 					}
 				}
 			}
@@ -1176,9 +1218,9 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Ping(ClusterMessageAckEventHandler Callback, object State)
+		public Task Ping(ClusterMessageAckEventHandler Callback, object State)
 		{
-			this.SendMessageAcknowledged(new Ping(), Callback, State);
+			return this.SendMessageAcknowledged(new Ping(), Callback, State);
 		}
 
 		/// <summary>
@@ -1191,6 +1233,7 @@ namespace Waher.Networking.Cluster
 			this.Ping((sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
+				return Task.CompletedTask;
 			}, null);
 
 			return Result.Task;
@@ -1205,7 +1248,7 @@ namespace Waher.Networking.Cluster
 		/// <param name="Command">Command to send.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void ExecuteCommand<ResponseType>(IClusterCommand Command,
+		public async Task ExecuteCommand<ResponseType>(IClusterCommand Command,
 			ClusterResponseEventHandler<ResponseType> Callback, object State)
 		{
 			Serializer Output = new Serializer();
@@ -1237,7 +1280,7 @@ namespace Waher.Networking.Cluster
 
 				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
 
-				this.Transmit(Bin, this.destination);
+				await this.Transmit(Bin, this.destination);
 
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
 
@@ -1246,8 +1289,11 @@ namespace Waher.Networking.Cluster
 					this.currentStatus.Remove(Rec.Id.ToString());
 					this.scheduler.Remove(Rec.Timeout);
 
-					Rec.Callback?.Invoke(this, new ClusterResponseEventArgs<ResponseType>(
-						Rec.Command, Rec.GetResponses(CurrentStatus), Rec.State));
+					if (!(Rec.Callback is null))
+					{
+						await Rec.Callback(this, new ClusterResponseEventArgs<ResponseType>(
+							Rec.Command, Rec.GetResponses(CurrentStatus), Rec.State));
+					}
 				}
 			}
 			catch (Exception ex)
@@ -1263,7 +1309,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		private void ResendCommand<ResponseType>(Object P)
+		private async Task ResendCommand<ResponseType>(object P)
 		{
 			CommandStatus<ResponseType> Rec = (CommandStatus<ResponseType>)P;
 			DateTime Now = DateTime.Now;
@@ -1277,8 +1323,11 @@ namespace Waher.Networking.Cluster
 					this.currentStatus.Remove(Rec.Id.ToString());
 					this.scheduler.Remove(Rec.Timeout);
 
-					Rec.Callback?.Invoke(this, new ClusterResponseEventArgs<ResponseType>(
-						Rec.Command, Rec.GetResponses(CurrentStatus), Rec.State));
+					if (!(Rec.Callback is null))
+					{
+						await Rec.Callback(this, new ClusterResponseEventArgs<ResponseType>(
+							Rec.Command, Rec.GetResponses(CurrentStatus), Rec.State));
+					}
 				}
 				else
 				{
@@ -1301,7 +1350,7 @@ namespace Waher.Networking.Cluster
 						Output.WriteRaw(Rec.CommandBinary, 18, Rec.CommandBinary.Length - 18);
 
 						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
-						this.Transmit(Output.ToArray(), this.destination);
+						await this.Transmit(Output.ToArray(), this.destination);
 					}
 				}
 			}
@@ -1319,17 +1368,18 @@ namespace Waher.Networking.Cluster
 		/// <typeparam name="ResponseType">Type of response expected.</typeparam>
 		/// <param name="Command">Command to send.</param>
 		/// <returns>Responses returned from available endpoints.</returns>
-		public Task<EndpointResponse<ResponseType>[]> ExecuteCommandAsync<ResponseType>(IClusterCommand Command)
+		public async Task<EndpointResponse<ResponseType>[]> ExecuteCommandAsync<ResponseType>(IClusterCommand Command)
 		{
 			TaskCompletionSource<EndpointResponse<ResponseType>[]> Result =
 				new TaskCompletionSource<EndpointResponse<ResponseType>[]>();
 
-			this.ExecuteCommand<ResponseType>(Command, (sender, e) =>
+			await this.ExecuteCommand<ResponseType>(Command, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
+				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1338,9 +1388,9 @@ namespace Waher.Networking.Cluster
 		/// <param name="Text">Text to echo.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Echo(string Text, ClusterResponseEventHandler<string> Callback, object State)
+		public Task Echo(string Text, ClusterResponseEventHandler<string> Callback, object State)
 		{
-			this.ExecuteCommand<string>(new Echo()
+			return this.ExecuteCommand(new Echo()
 			{
 				Text = Text
 			}, Callback, State);
@@ -1350,16 +1400,17 @@ namespace Waher.Networking.Cluster
 		/// Asks endpoints in the cluster to echo a text string back to the sender.
 		/// </summary>
 		/// <param name="Text">Text to echo.</param>
-		public Task<EndpointResponse<string>[]> EchoAsync(string Text)
+		public async Task<EndpointResponse<string>[]> EchoAsync(string Text)
 		{
 			TaskCompletionSource<EndpointResponse<string>[]> Result = new TaskCompletionSource<EndpointResponse<string>[]>();
 
-			this.Echo(Text, (sender, e) =>
+			await this.Echo(Text, (sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
+				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1367,24 +1418,25 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetAssemblies(ClusterResponseEventHandler<string[]> Callback, object State)
+		public Task GetAssemblies(ClusterResponseEventHandler<string[]> Callback, object State)
 		{
-			this.ExecuteCommand<string[]>(new Assemblies(), Callback, State);
+			return this.ExecuteCommand(new Assemblies(), Callback, State);
 		}
 
 		/// <summary>
 		/// Asks endpoints in the cluster to return assemblies available in their runtime environment.
 		/// </summary>
-		public Task<EndpointResponse<string[]>[]> GetAssembliesAsync()
+		public async Task<EndpointResponse<string[]>[]> GetAssembliesAsync()
 		{
 			TaskCompletionSource<EndpointResponse<string[]>[]> Result = new TaskCompletionSource<EndpointResponse<string[]>[]>();
 
-			this.GetAssemblies((sender, e) =>
+			await this.GetAssemblies((sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
+				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -1394,7 +1446,7 @@ namespace Waher.Networking.Cluster
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
 		/// <param name="Callback">Method to call when operation completes or fails.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Lock(string ResourceName, int TimeoutMilliseconds,
+		public Task Lock(string ResourceName, int TimeoutMilliseconds,
 			ClusterResourceLockEventHandler Callback, object State)
 		{
 			LockInfo Info;
@@ -1423,17 +1475,14 @@ namespace Waher.Networking.Cluster
 			}
 
 			if (Info.Locked)
-			{
-				this.LockResult(false, null, InfoRec);
-				return;
-			}
-
-			this.Lock(Info, InfoRec);
+				return this.LockResult(false, null, InfoRec);
+			else
+				return this.Lock(Info, InfoRec);
 		}
 
-		private void Lock(LockInfo Info, LockInfoRec InfoRec)
+		private Task Lock(LockInfo Info, LockInfoRec InfoRec)
 		{
-			this.SendMessageAcknowledged(new Lock()
+			return this.SendMessageAcknowledged(new Lock()
 			{
 				Resource = Info.Resource
 			}, (sender, e) =>
@@ -1472,26 +1521,26 @@ namespace Waher.Networking.Cluster
 					}
 				}
 
-				this.LockResult(Ok, LockedBy, InfoRec);
+				return this.LockResult(Ok, LockedBy, InfoRec);
 
 			}, null);
 		}
 
-		private void LockResult(bool Ok, IPEndPoint LockedBy, LockInfoRec InfoRec)
+		private async Task LockResult(bool Ok, IPEndPoint LockedBy, LockInfoRec InfoRec)
 		{
 			if (Ok)
-				this.Raise(InfoRec.Info.Resource, true, null, InfoRec);
+				await this.Raise(InfoRec.Info.Resource, true, null, InfoRec);
 			else if (DateTime.Now >= InfoRec.Timeout)
-				this.Raise(InfoRec.Info.Resource, false, LockedBy, InfoRec);
+				await this.Raise(InfoRec.Info.Resource, false, LockedBy, InfoRec);
 			else if (!InfoRec.TimeoutScheduled)
 			{
 				InfoRec.LockedBy = LockedBy;
-				InfoRec.Timeout = scheduler.Add(InfoRec.Timeout, this.LockTimeout, InfoRec);
+				InfoRec.Timeout = this.scheduler.Add(InfoRec.Timeout, this.LockTimeout, InfoRec);
 				InfoRec.TimeoutScheduled = true;
 			}
 		}
 
-		private void LockTimeout(object P)
+		private Task LockTimeout(object P)
 		{
 			LockInfoRec InfoRec = (LockInfoRec)P;
 			LockInfo Info = InfoRec.Info;
@@ -1506,17 +1555,17 @@ namespace Waher.Networking.Cluster
 					this.lockedResources.Remove(Info.Resource);
 			}
 
-			this.Raise(Info.Resource, false, InfoRec.LockedBy, InfoRec);
+			return this.Raise(Info.Resource, false, InfoRec.LockedBy, InfoRec);
 		}
 
-		private void Raise(string ResourceName, bool LockSuccessful, IPEndPoint LockedBy,
+		private async Task Raise(string ResourceName, bool LockSuccessful, IPEndPoint LockedBy,
 			LockInfoRec InfoRec)
 		{
 			try
 			{
 				if (InfoRec.TimeoutScheduled)
 				{
-					scheduler.Remove(InfoRec.Timeout);
+					this.scheduler.Remove(InfoRec.Timeout);
 					InfoRec.TimeoutScheduled = false;
 				}
 
@@ -1530,8 +1579,11 @@ namespace Waher.Networking.Cluster
 						this.lockedResources.Remove(Info.Resource);
 				}
 
-				InfoRec.Callback?.Invoke(this, new ClusterResourceLockEventArgs(ResourceName,
-					LockSuccessful, LockedBy, InfoRec.State));
+				if (!(InfoRec.Callback is null))
+				{
+					await InfoRec.Callback(this, new ClusterResourceLockEventArgs(ResourceName,
+						LockSuccessful, LockedBy, InfoRec.State));
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1551,6 +1603,7 @@ namespace Waher.Networking.Cluster
 			this.Lock(ResourceName, TimeoutMilliseconds, (sender, e) =>
 			{
 				Result.TrySetResult(e);
+				return Task.CompletedTask;
 			}, null);
 
 			return Result.Task;
@@ -1561,7 +1614,7 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		/// <param name="ResourceName">Name of the resource.</param>
 		/// <exception cref="ArgumentException">If the resource is not locked.</exception>
-		public void Release(string ResourceName)
+		public async Task Release(string ResourceName)
 		{
 			LockInfo Info;
 			LockInfoRec InfoRec;
@@ -1582,14 +1635,14 @@ namespace Waher.Networking.Cluster
 					InfoRec = Info.Queue.First.Value;
 			}
 
-			this.SendMessageAcknowledged(new Release()
+			await this.SendMessageAcknowledged(new Release()
 			{
 				Resource = ResourceName
 			}, null, null);
 
 			if (!(InfoRec is null))
 			{
-				scheduler.Add(DateTime.Now.AddMilliseconds(this.rnd.Next(50) + 1), (P) =>
+				this.scheduler.Add(DateTime.Now.AddMilliseconds(this.rnd.Next(50) + 1), (P) =>
 				{
 					this.Lock(Info, InfoRec);
 				}, null);
@@ -1615,7 +1668,7 @@ namespace Waher.Networking.Cluster
 					InfoRec = Info.Queue.First.Value;
 			}
 
-			scheduler.Add(DateTime.Now.AddMilliseconds(this.rnd.Next(50) + 1), (P) =>
+			this.scheduler.Add(DateTime.Now.AddMilliseconds(this.rnd.Next(50) + 1), (P) =>
 			{
 				this.Lock(Info, InfoRec);
 			}, null);

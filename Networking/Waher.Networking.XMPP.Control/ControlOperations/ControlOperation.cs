@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Networking.XMPP.Events;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 

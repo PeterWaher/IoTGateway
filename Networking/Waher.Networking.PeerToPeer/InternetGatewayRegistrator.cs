@@ -212,7 +212,7 @@ namespace Waher.Networking.PeerToPeer
 			this.NetworkChange_NetworkAddressChanged(this, EventArgs.Empty);
 		}
 
-		private async void UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
+		private async Task UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
 		{
 			try
 			{

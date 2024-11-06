@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster
 {
@@ -23,7 +24,7 @@ namespace Waher.Networking.Cluster
 			{
 				foreach (EndpointStatus Status in Statuses)
 				{
-					if (!Responses.ContainsKey(Status.Endpoint))
+					if (!this.Responses.ContainsKey(Status.Endpoint))
 						return false;
 				}
 			}
@@ -44,8 +45,8 @@ namespace Waher.Networking.Cluster
 			{
 				foreach (EndpointStatus Status in Statuses)
 				{
-					if (!Responses.ContainsKey(Status.Endpoint))
-						Responses[Status.Endpoint] = new KeyValuePair<ResponseType, Exception>(default(ResponseType), new TimeoutException("No response returned."));
+					if (!this.Responses.ContainsKey(Status.Endpoint))
+						this.Responses[Status.Endpoint] = new KeyValuePair<ResponseType, Exception>(default, new TimeoutException("No response returned."));
 				}
 
 				Result = new EndpointResponse<ResponseType>[c = this.Responses.Count];
@@ -70,7 +71,7 @@ namespace Waher.Networking.Cluster
 				if (Response is ResponseType Response2)
 					this.Responses[From] = new KeyValuePair<ResponseType, Exception>(Response2, null);
 				else
-					this.Responses[From] = new KeyValuePair<ResponseType, Exception>(default(ResponseType), new Exception("Unexpected response returned."));
+					this.Responses[From] = new KeyValuePair<ResponseType, Exception>(default, new Exception("Unexpected response returned."));
 			}
 		}
 
@@ -83,7 +84,7 @@ namespace Waher.Networking.Cluster
 		{
 			lock (this.Responses)
 			{
-				this.Responses[From] = new KeyValuePair<ResponseType, Exception>(default(ResponseType), Error);
+				this.Responses[From] = new KeyValuePair<ResponseType, Exception>(default, Error);
 			}
 		}
 
@@ -91,10 +92,13 @@ namespace Waher.Networking.Cluster
 		/// Raises the response event.
 		/// </summary>
 		/// <param name="CurrentStatus">Current status of endpoints in cluster.</param>
-		public override void RaiseResponseEvent(EndpointStatus[] CurrentStatus)
+		public override async Task RaiseResponseEvent(EndpointStatus[] CurrentStatus)
 		{
-			this.Callback?.Invoke(this, new ClusterResponseEventArgs<ResponseType>(
-				this.Command, this.GetResponses(CurrentStatus), this.State));
+			if (!(this.Callback is null))
+			{
+				await this.Callback(this, new ClusterResponseEventArgs<ResponseType>(
+					this.Command, this.GetResponses(CurrentStatus), this.State));
+			}
 		}
 
 	}

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -10,9 +9,9 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Events;
-using Waher.Layout.Layout2D.Model.Conditional;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Events;
 using Waher.Persistence;
 using Waher.Runtime.Language;
 using Waher.Script;
@@ -121,9 +120,9 @@ namespace Waher.IoTGateway.Setup
 						RosterItem Item = Gateway.XmppClient.GetRosterItem(Jid);
 						
 						if (Item is null)
-							Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Groups));
+							await Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Groups));
 						else if (NeedsUpdate(Item, Name, Groups))
-							Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Union(Item.Groups, Groups)));
+							await Gateway.XmppClient.AddRosterItem(new RosterItem(Jid, Name, Union(Item.Groups, Groups)));
 						
 						continue;
 					}
@@ -134,7 +133,7 @@ namespace Waher.IoTGateway.Setup
 						RosterItem Item = Gateway.XmppClient.GetRosterItem(Jid);
 
 						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-							Gateway.XmppClient.RequestPresenceSubscription(Jid);
+							await Gateway.XmppClient.RequestPresenceSubscription(Jid);
 						
 						continue;
 					}
@@ -201,7 +200,7 @@ namespace Waher.IoTGateway.Setup
 
 			if (this.AcceptSubscriptionRequest(e.FromBareJID))
 			{
-				e.Accept();
+				await e.Accept();
 				return;
 			}
 
@@ -391,13 +390,13 @@ namespace Waher.IoTGateway.Setup
 				RosterItem Item = Gateway.XmppClient.GetRosterItem(JID);
 				if (Item is null)
 				{
-					Gateway.XmppClient.RequestPresenceSubscription(JID, this.NickName());
+					await Gateway.XmppClient.RequestPresenceSubscription(JID, await this.NickName());
 					Log.Informational("Requesting presence subscription.", JID);
 					await Response.Write("1");
 				}
 				else if (Item.State != SubscriptionState.Both && Item.State != SubscriptionState.To)
 				{
-					Gateway.XmppClient.RequestPresenceSubscription(JID, this.NickName());
+					await Gateway.XmppClient.RequestPresenceSubscription(JID, await this.NickName());
 					Log.Informational("Requesting presence subscription.", JID);
 					await Response.Write("2");
 				}
@@ -406,16 +405,21 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private string NickName()
+		private async Task<string> NickName()
 		{
 			SuggestionEventArgs e = new SuggestionEventArgs(string.Empty);
-			try
+			SuggesstionsEventHandler h = OnGetNickNameSuggestions;
+			
+			if (!(h is null))
 			{
-				OnGetNickNameSuggestions?.Invoke(this, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
+				try
+				{
+					await h(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 
 			string[] Suggestions = e.ToArray();
@@ -443,7 +447,7 @@ namespace Waher.IoTGateway.Setup
 				await Response.Write("0");
 			else
 			{
-				Client.RemoveRosterItem(Contact.BareJid);
+				await Client.RemoveRosterItem(Contact.BareJid);
 				Log.Informational("Contact removed.", Contact.BareJid);
 				await Response.Write("1");
 			}
@@ -468,7 +472,7 @@ namespace Waher.IoTGateway.Setup
 				await Response.Write("0");
 			else
 			{
-				Client.RequestPresenceUnsubscription(Contact.BareJid);
+				await Client.RequestPresenceUnsubscription(Contact.BareJid);
 				Log.Informational("Unsubscribing from presence.", Contact.BareJid);
 				await Response.Write("1");
 			}
@@ -493,7 +497,7 @@ namespace Waher.IoTGateway.Setup
 				await Response.Write("0");
 			else
 			{
-				Client.RequestPresenceSubscription(Contact.BareJid, this.NickName());
+				await Client.RequestPresenceSubscription(Contact.BareJid, await this.NickName());
 				Log.Informational("Requesting presence subscription.", Contact.BareJid);
 				await Response.Write("1");
 			}
@@ -520,7 +524,7 @@ namespace Waher.IoTGateway.Setup
 				await Response.Write("0");
 			else
 			{
-				Client.UpdateRosterItem(Contact.BareJid, NewName, Contact.Groups);
+				await Client.UpdateRosterItem(Contact.BareJid, NewName, Contact.Groups);
 				Log.Informational("Contact renamed.", Contact.BareJid, new KeyValuePair<string, object>("Name", NewName));
 				await Response.Write("1");
 			}
@@ -574,7 +578,7 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			Client.UpdateRosterItem(Contact.BareJid, Contact.Name, GroupsArray);
+			await Client.UpdateRosterItem(Contact.BareJid, Contact.Name, GroupsArray);
 			Log.Informational("Contact groups updated.", Contact.BareJid, new KeyValuePair<string, object>("Groups", sb.ToString()));
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
@@ -600,13 +604,17 @@ namespace Waher.IoTGateway.Setup
 					e.AddSuggestion(Group);
 			}
 
-			try
+			SuggesstionsEventHandler h = OnGetGroupSuggestions;
+			if (!(h is null))
 			{
-				OnGetGroupSuggestions?.Invoke(this, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
+				try
+				{
+					await h(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 
 			StringBuilder sb = new StringBuilder();
@@ -668,12 +676,12 @@ namespace Waher.IoTGateway.Setup
 				await Response.Write("0");
 			else
 			{
-				SubscriptionRequest.Accept();
+				await SubscriptionRequest.Accept();
 				Log.Informational("Accepting presence subscription request.", SubscriptionRequest.FromBareJID);
 
 				if (Gateway.XmppClient.LastSetPresenceAvailability != Availability.Offline)
 				{
-					Gateway.XmppClient.SetPresence(
+					await Gateway.XmppClient.SetPresence(
 						Gateway.XmppClient.LastSetPresenceAvailability,
 						Gateway.XmppClient.LastSetPresenceCustomStatus);
 				}
@@ -702,7 +710,7 @@ namespace Waher.IoTGateway.Setup
 				await Response.Write("0");
 			else
 			{
-				SubscriptionRequest.Decline();
+				await SubscriptionRequest.Decline();
 				Log.Informational("Declining presence subscription request.", SubscriptionRequest.FromBareJID);
 
 				this.RosterItemRemoved(JID);

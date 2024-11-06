@@ -18,7 +18,7 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Exception">Information about error received.</param>
-	public delegate void UPnPExceptionEventHandler(object Sender, Exception Exception);
+	public delegate Task UPnPExceptionEventHandler(object Sender, Exception Exception);
 
 	/// <summary>
 	/// Implements support for the UPnP protocol, as described in:
@@ -161,14 +161,14 @@ namespace Waher.Networking.UPnP
 						return;
 
 					byte[] Packet = Data.Buffer;
-					this.ReceiveBinary(Packet);
+					await this.ReceiveBinary(Packet);
 
 					try
 					{
 						string Header = Encoding.ASCII.GetString(Packet);
 						UPnPHeaders Headers = new UPnPHeaders(Header);
 
-						this.ReceiveText(Header);
+						await this.ReceiveText(Header);
 
 						if (Headers.Direction == HttpDirection.Response &&
 							Headers.HttpVersion >= 1.0 &&
@@ -184,7 +184,7 @@ namespace Waher.Networking.UPnP
 									DeviceLocationEventArgs e = new DeviceLocationEventArgs(DeviceLocation, (IPEndPoint)Client.Client.LocalEndPoint, Data.RemoteEndPoint);
 									try
 									{
-										h(this, e);
+										await h(this, e);
 									}
 									catch (Exception ex)
 									{
@@ -208,7 +208,7 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				this.Exception(ex);
+				await this.Exception(ex);
 			}
 		}
 
@@ -274,7 +274,7 @@ namespace Waher.Networking.UPnP
 						return;
 
 					byte[] Packet = Data.Buffer;
-					this.ReceiveBinary(Packet);
+					await this.ReceiveBinary(Packet);
 
 					if (this.disposed)
 						return;
@@ -284,7 +284,7 @@ namespace Waher.Networking.UPnP
 						string Header = Encoding.ASCII.GetString(Packet);
 						UPnPHeaders Headers = new UPnPHeaders(Header);
 
-						this.ReceiveText(Header);
+						await this.ReceiveText(Header);
 
 						if (!(Data.RemoteEndPoint is null) &&
 							Headers.Direction == HttpDirection.Request &&
@@ -305,16 +305,16 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				this.Exception(ex);
+				await this.Exception(ex);
 			}
 		}
 
 		/// <summary>
 		/// Starts a search for devices on the network.
 		/// </summary>
-		public void StartSearch()
+		public Task StartSearch()
 		{
-			this.StartSearch("upnp:rootdevice", defaultMaximumSearchTimeSeconds);
+			return this.StartSearch("upnp:rootdevice", defaultMaximumSearchTimeSeconds);
 			//this.StartSearch("ssdp:all", defaultMaximumSearchTimeSeconds);
 		}
 
@@ -322,9 +322,9 @@ namespace Waher.Networking.UPnP
 		/// Starts a search for devices on the network.
 		/// </summary>
 		/// <param name="MaximumWaitTimeSeconds">Maximum Wait Time, in seconds. Default=10 seconds.</param>
-		public void StartSearch(int MaximumWaitTimeSeconds)
+		public Task StartSearch(int MaximumWaitTimeSeconds)
 		{
-			this.StartSearch("upnp:rootdevice", MaximumWaitTimeSeconds);
+			return this.StartSearch("upnp:rootdevice", MaximumWaitTimeSeconds);
 			//this.StartSearch("ssdp:all", MaximumWaitTimeSeconds);
 		}
 
@@ -332,9 +332,9 @@ namespace Waher.Networking.UPnP
 		/// Starts a search for devices on the network.
 		/// </summary>
 		/// <param name="SearchTarget">Search target. (Default="upnp:rootdevice", which searches for all types of root devices.)</param>
-		public void StartSearch(string SearchTarget)
+		public Task StartSearch(string SearchTarget)
 		{
-			this.StartSearch(SearchTarget, defaultMaximumSearchTimeSeconds);
+			return this.StartSearch(SearchTarget, defaultMaximumSearchTimeSeconds);
 		}
 
 		/// <summary>
@@ -342,7 +342,7 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		/// <param name="SearchTarget">Search target. (Default="upnp:rootdevice", which searches for all types of root devices.)</param>
 		/// <param name="MaximumWaitTimeSeconds">Maximum Wait Time, in seconds. Default=10 seconds.</param>
-		public void StartSearch(string SearchTarget, int MaximumWaitTimeSeconds)
+		public async Task StartSearch(string SearchTarget, int MaximumWaitTimeSeconds)
 		{
 			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.GetOutgoing())
 			{
@@ -353,7 +353,7 @@ namespace Waher.Networking.UPnP
 					"MX:" + MaximumWaitTimeSeconds.ToString() + "\r\n\r\n";
 				byte[] Packet = Encoding.ASCII.GetBytes(MSearch);
 
-				this.SendPacket(P.Key, P.Value, Packet, MSearch);
+				await this.SendPacket(P.Key, P.Value, Packet, MSearch);
 			}
 		}
 
@@ -393,14 +393,14 @@ namespace Waher.Networking.UPnP
 			}
 		}
 
-		private async void SendPacket(UdpClient Client, IPEndPoint Destination, byte[] Packet, string Text)
+		private async Task SendPacket(UdpClient Client, IPEndPoint Destination, byte[] Packet, string Text)
 		{
 			if (this.disposed)
 				return;
 
 			try
 			{
-				this.TransmitText(Text);
+				await this.TransmitText(Text);
 				await Client.SendAsync(Packet, Packet.Length, Destination);
 			}
 			catch (Exception ex)

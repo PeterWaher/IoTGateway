@@ -1,16 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP;
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Events.XMPP
 {
-	/// <summary>
-	/// Delegate for <see cref="XmppEventReceptor.OnEvent"/> events.
-	/// </summary>
-	/// <param name="Sender"></param>
-	/// <param name="e"></param>
-	public delegate Task EventEventHandlerAsync(object Sender, EventEventArgs e);
-
 	/// <summary>
 	/// Event arguments for <see cref="XmppEventReceptor.OnEvent"/> events.
 	/// </summary>

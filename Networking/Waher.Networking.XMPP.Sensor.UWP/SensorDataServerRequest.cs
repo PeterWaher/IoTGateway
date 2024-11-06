@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -79,9 +80,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Fields that have been read.</param>
-		public void ReportFields(bool Done, params Field[] Fields)
+		public Task ReportFields(bool Done, params Field[] Fields)
 		{
-			this.ReportFields(Done, (IEnumerable<Field>)Fields);
+			return this.ReportFields(Done, (IEnumerable<Field>)Fields);
 		}
 
 		/// <summary>
@@ -89,9 +90,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Errors">Errors that have been detected.</param>
-		public void ReportErrors(bool Done, params ThingError[] Errors)
+		public Task ReportErrors(bool Done, params ThingError[] Errors)
 		{
-			this.ReportErrors(Done, (IEnumerable<ThingError>)Errors);
+			return this.ReportErrors(Done, (IEnumerable<ThingError>)Errors);
 		}
 
 		/// <summary>
@@ -99,7 +100,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Fields that have been read.</param>
-		public virtual void ReportFields(bool Done, IEnumerable<Field> Fields)
+		public virtual async Task ReportFields(bool Done, IEnumerable<Field> Fields)
 		{
 			StringBuilder Output = new StringBuilder();
 			ThingReference Ref;
@@ -149,7 +150,7 @@ namespace Waher.Networking.XMPP.Sensor
 				if (!(this.momentaryFields is null))
 				{
 					foreach (KeyValuePair<ThingReference, List<Field>> Thing in this.momentaryFields)
-						this.sensorServer.NewMomentaryValues(Thing.Key, Thing.Value, this.RemoteJID);
+						await this.sensorServer.NewMomentaryValues(Thing.Key, Thing.Value, this.RemoteJID);
 
 					this.momentaryFields = null;
 				}
@@ -157,7 +158,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (SendMessage)
 			{
-				this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Output.ToString(), string.Empty, string.Empty,
+				await this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Output.ToString(), string.Empty, string.Empty,
 					string.Empty, string.Empty, string.Empty);
 			}
 		}
@@ -536,7 +537,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Errors">Errors that have been detected.</param>
-		public virtual void ReportErrors(bool Done, IEnumerable<ThingError> Errors)
+		public virtual Task ReportErrors(bool Done, IEnumerable<ThingError> Errors)
 		{
 			if (Done && !this.DecNodesLeft())
 				Done = false;
@@ -621,14 +622,14 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("</resp>");
 
-			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
+			return this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
 				string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>
 		/// Report that readout has started. Can optionally be used to report feedback to end-user when readout is slow.
 		/// </summary>
-		public virtual void Start()
+		public virtual Task Start()
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -638,7 +639,7 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.Append(this.Id);
 			Xml.Append("'/>");
 
-			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
+			return this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
 				string.Empty, string.Empty, string.Empty);
 		}
 	}

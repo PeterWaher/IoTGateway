@@ -729,7 +729,7 @@ namespace Waher.Things.Semantic.Sources
 						?? throw new ForbiddenException("Not authorized to read sensor-data from node.");
 
 					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
-					InternalReadoutRequest Request = Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
+					InternalReadoutRequest Request = await Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
 						Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, DateTime.MinValue, DateTime.MaxValue,
 						async (sender, e) =>
 						{

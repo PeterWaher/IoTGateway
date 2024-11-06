@@ -101,17 +101,17 @@ namespace Waher.Things.Modbus
 						Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
 
 						if (!ReadoutCompleted.Task.IsCompleted)
-							Request.ReportErrors(false, new ThingError(this, "Timeout."));
+							await Request.ReportErrors(false, new ThingError(this, "Timeout."));
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Request.ReportErrors(false, new ThingError(this, ex.Message));
+				await Request.ReportErrors(false, new ThingError(this, ex.Message));
 			}
 			finally
 			{
-				Request.ReportFields(true);
+				await Request.ReportFields(true);
 			}
 		}
 

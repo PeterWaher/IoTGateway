@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Contracts
+namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for event handlers referencing a contract.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task ContractReferenceEventHandler(object Sender, ContractReferenceEventArgs e);
-
 	/// <summary>
 	/// Event arguments for events referencing a contract.
 	/// </summary>

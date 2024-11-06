@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
+using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.MetaTeds;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds;
-using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 using Waher.Things.Mqtt;
 using Waher.Things.Mqtt.Model;
 
@@ -72,7 +73,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (BrokerNode is null)
 				return;
 
-			MqttBroker Broker = BrokerNode.GetBroker();
+			MqttBroker Broker = await BrokerNode.GetBroker();
 			if (Broker is null)
 				return;
 
@@ -83,7 +84,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			switch (DiscoveryMessage.DiscoveryService)
 			{
 				case DiscoveryService.NCAPDiscovery:
-					byte[] Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, this.EntityName);
+					StringBuilder ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+					byte[] Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, this.EntityName, ToSniffer);
+
+					if (!(ToSniffer is null))
+						await BrokerNode.Information(ToSniffer.ToString());
+
 					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 					break;
 
@@ -103,7 +109,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					if (TimIds.Count == 0)
 						break;
 
-					Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, TimIds.ToArray(), Names.ToArray());
+					ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+					Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, TimIds.ToArray(), Names.ToArray(), ToSniffer);
+
+					if (!(ToSniffer is null))
+						await BrokerNode.Information(ToSniffer.ToString());
+
 					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 					break;
 			}
@@ -135,7 +146,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (BrokerNode is null)
 				return;
 
-			MqttBroker Broker = BrokerNode.GetBroker();
+			MqttBroker Broker = await BrokerNode.GetBroker();
 			if (Broker is null)
 				return;
 
@@ -144,17 +155,20 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				return;
 
 			byte[] Response;
+			StringBuilder ToSniffer;
 
 			switch (TedsAccessCode)
 			{
 				case TedsAccessCode.MetaTEDS:
-					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary, null, 0,
+					ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary, null, 0, ToSniffer,
 						new TedsId(99, 255, (byte)TedsAccessCode.MetaTEDS, 2, 1),
 						new Uuid(this.NcapIdBinary));
 					break;
 
 				case TedsAccessCode.XdcrName:
-					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary, null, 0,
+					ToSniffer = BrokerNode.HasSniffers ? new StringBuilder() : null;
+					Response = TedsAccessMessage.SerializeResponse(0, this.NcapIdBinary, null, 0, ToSniffer,
 						new TedsId(99, 255, (byte)TedsAccessCode.XdcrName, 2, 1),
 						new Format(true),
 						new Ieee1451_0.TEDS.FieldTypes.TransducerNameTeds.Content(this.EntityName));
@@ -163,6 +177,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				default:
 					return;
 			}
+
+			if (!(ToSniffer is null))
+				await BrokerNode.Information(ToSniffer.ToString());
 
 			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 		}

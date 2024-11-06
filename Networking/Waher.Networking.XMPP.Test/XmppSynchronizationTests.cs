@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Test
 			this.synchronizationClient2 = new SynchronizationClient(this.client2);
 		}
 
-		public override void DisposeClients()
+		public override Task DisposeClients()
 		{
 			if (this.synchronizationClient2 is not null)
 			{
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Test
 				this.synchronizationClient1 = null;
 			}
 
-			base.DisposeClients();
+			return base.DisposeClients();
 		}
 
 		[TestMethod]
@@ -167,6 +167,8 @@ namespace Waher.Networking.XMPP.Test
 					ConsoleOut.WriteLine(Log.CleanStackTrace(ex.StackTrace));
 					Error.Set();
 				}
+
+				return Task.CompletedTask;
 			};
 
 			this.synchronizationClient1.MonitorClockDifference(Source, IntervalMs);
@@ -176,6 +178,8 @@ namespace Waher.Networking.XMPP.Test
 				{
 					if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
 						Error.Set();
+
+					return Task.CompletedTask;
 				}, null);
 
 				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }));

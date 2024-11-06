@@ -1,21 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 
-namespace Waher.Networking.XMPP.PubSub
+namespace Waher.Networking.XMPP.PubSub.Events
 {
-	/// <summary>
-	/// Delegate for subscription request event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task SubscriptionRequestEventHandler(object Sender, SubscriptionRequestEventArgs e);
-
 	/// <summary>
 	/// Event argument for item notification events.
 	/// </summary>
 	public class SubscriptionRequestEventArgs : NodeNotificationEventArgs
-    {
+	{
 		private readonly string jid;
 		private readonly DataForm form;
 
@@ -47,27 +40,33 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Approves the request.
 		/// </summary>
-		public void Approve()
+		public async Task Approve()
 		{
-			this.form["pubsub#allow"]?.SetValue("true");
-			this.form.Submit();
+			Field Field = this.form["pubsub#allow"];
+			if (!(Field is null))
+				await Field.SetValue("true");
+
+			await this.form.Submit();
 		}
 
 		/// <summary>
 		/// Rejects the request.
 		/// </summary>
-		public void Reject()
+		public async Task Reject()
 		{
-			this.form["pubsub#allow"]?.SetValue("false");
-			this.form.Submit();
+			Field Field = this.form["pubsub#allow"];
+			if (!(Field is null))
+				await Field.SetValue("false");
+
+			await this.form.Submit();
 		}
 
 		/// <summary>
 		/// Cancels the request.
 		/// </summary>
-		public void Cancel()
+		public Task Cancel()
 		{
-			this.form.Cancel();
+			return this.form.Cancel();
 		}
 
 	}

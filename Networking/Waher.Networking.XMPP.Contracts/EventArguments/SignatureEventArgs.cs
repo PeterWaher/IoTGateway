@@ -1,15 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace Waher.Networking.XMPP.Contracts
+﻿namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
-	/// <summary>
-	/// Delegate for signature callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate Task SignatureEventHandler(object Sender, SignatureEventArgs e);
-
 	/// <summary>
 	/// Event arguments for signature responses
 	/// </summary>

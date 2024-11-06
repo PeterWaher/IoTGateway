@@ -6,7 +6,6 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
@@ -478,7 +477,7 @@ namespace Waher.Networking.CoAP
 		{
 			if (Packet.Length < 4)
 			{
-				this.Error("Datagram too short.");
+				await this.Error("Datagram too short.");
 				return;
 			}
 
@@ -486,7 +485,7 @@ namespace Waher.Networking.CoAP
 			int TokenLength = b & 15;
 			if (TokenLength > 8)
 			{
-				this.Error("Invalid token length.");
+				await this.Error("Invalid token length.");
 				return;
 			}
 
@@ -495,7 +494,7 @@ namespace Waher.Networking.CoAP
 			b >>= 2;
 			if (b != 1)
 			{
-				this.Error("Unrecognized version.");
+				await this.Error("Unrecognized version.");
 				return;
 			}
 
@@ -513,7 +512,7 @@ namespace Waher.Networking.CoAP
 			{
 				if (Pos >= Len)
 				{
-					this.Error("Unexpected end of packet.");
+					await this.Error("Unexpected end of packet.");
 					return;
 				}
 
@@ -544,7 +543,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos >= Len)
 						{
-							this.Error("Unexpected end of packet.");
+							await this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -554,7 +553,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + 1 >= Len)
 						{
-							this.Error("Unexpected end of packet.");
+							await this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -565,7 +564,7 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Delta == 15)
 					{
-						this.Error("Invalid delta-value.");
+						await this.Error("Invalid delta-value.");
 						return;
 					}
 
@@ -573,7 +572,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos >= Len)
 						{
-							this.Error("Unexpected end of packet.");
+							await this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -583,7 +582,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + 1 >= Len)
 						{
-							this.Error("Unexpected end of packet.");
+							await this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -594,7 +593,7 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Length == 15)
 					{
-						this.Error("Invalid length-value.");
+						await this.Error("Invalid length-value.");
 						return;
 					}
 
@@ -604,7 +603,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + Length > Len)
 						{
-							this.Error("Unexpected end of packet.");
+							await this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -623,7 +622,7 @@ namespace Waher.Networking.CoAP
 						}
 						catch (Exception ex)
 						{
-							this.Exception(ex);
+							await this.Exception(ex);
 
 							if (Option.Critical)
 								return;
@@ -662,7 +661,7 @@ namespace Waher.Networking.CoAP
 						ulong l = ((CoapOptionObserve)Option).Value;
 						if (l < 0 || l > 0xffffff)
 						{
-							this.Error("Invalid observe value.");
+							await this.Error("Invalid observe value.");
 							return;
 						}
 
@@ -673,7 +672,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionUriPort)Option).Value;
 						if (l < 0 || l > ushort.MaxValue)
 						{
-							this.Error("Invalid port number.");
+							await this.Error("Invalid port number.");
 							return;
 						}
 
@@ -698,7 +697,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionContentFormat)Option).Value;
 						if (l < 0 || l > ushort.MaxValue)
 						{
-							this.Error("Invalid content format.");
+							await this.Error("Invalid content format.");
 							return;
 						}
 
@@ -709,7 +708,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionMaxAge)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							this.Error("Invalid max age.");
+							await this.Error("Invalid max age.");
 							return;
 						}
 
@@ -750,7 +749,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionSize2)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							this.Error("Invalid size2.");
+							await this.Error("Invalid size2.");
 							return;
 						}
 
@@ -761,7 +760,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionSize1)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							this.Error("Invalid size1.");
+							await this.Error("Invalid size1.");
 							return;
 						}
 
@@ -813,10 +812,10 @@ namespace Waher.Networking.CoAP
 							Pos = OutgoingMessage.blockNr * OutgoingMessage.blockSize;
 
 							if (Pos >= OutgoingMessage.payload.Length)
-								this.Fail(Client, OutgoingMessage);
+								await this.Fail(Client, OutgoingMessage);
 							else
 							{
-								this.Transmit(Client, OutgoingMessage.destination, Client.IsEncrypted,
+								await this.Transmit(Client, OutgoingMessage.destination, Client.IsEncrypted,
 									null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
 									OutgoingMessage.token, true, OutgoingMessage.payload,
 									OutgoingMessage.blockNr, OutgoingMessage.blockSize,
@@ -855,7 +854,7 @@ namespace Waher.Networking.CoAP
 									OutgoingMessage.ResponseReceived(Client, IncomingMessage);
 								}
 								else
-									this.Fail(Client, OutgoingMessage);
+									await this.Fail(Client, OutgoingMessage);
 							}
 						}
 					}
@@ -867,10 +866,9 @@ namespace Waher.Networking.CoAP
 								this.activeTokens.Remove(Token);
 						}
 
-						if (!(OutgoingMessage.resource is null))
-							OutgoingMessage.resource.UnregisterSubscription(IncomingMessage.From, Token);
+						OutgoingMessage.resource?.UnregisterSubscription(IncomingMessage.From, Token);
 
-						this.Fail(Client, OutgoingMessage);
+						await this.Fail(Client, OutgoingMessage);
 					}
 				}
 			}
@@ -888,7 +886,7 @@ namespace Waher.Networking.CoAP
 
 					if (IncomingMessage.Type == CoapMessageType.CON)
 					{
-						this.Transmit(Client, From, Client.IsEncrypted, IncomingMessage.MessageId,
+						await this.Transmit(Client, From, Client.IsEncrypted, IncomingMessage.MessageId,
 							CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, 0, 64,
 							null, null, null, null, null, null);
 					}
@@ -1021,7 +1019,7 @@ namespace Waher.Networking.CoAP
 						}
 						else
 						{
-							this.Transmit(Client, From, Client.IsEncrypted, MessageId,
+							await this.Transmit(Client, From, Client.IsEncrypted, MessageId,
 								CoapMessageType.RST, CoapCode.NotFound, Token, false,
 								null, 0, 64, null, null, null, null, null);
 						}
@@ -1587,8 +1585,8 @@ namespace Waher.Networking.CoAP
 							Result.Add(Options[j]);
 					}
 				}
-				else if (!(Result is null))
-					Result.Add(Option);
+				else 
+					Result?.Add(Option);
 			}
 
 			if (Result is null)
@@ -1638,7 +1636,7 @@ namespace Waher.Networking.CoAP
 			return (Value >= 0 && Value <= 7 && NrBits == 1);
 		}
 
-		internal void Transmit(ClientBase Client, IPEndPoint Destination, bool Encrypted, ushort? MessageID,
+		internal Task Transmit(ClientBase Client, IPEndPoint Destination, bool Encrypted, ushort? MessageID,
 			CoapMessageType MessageType, CoapCode Code, ulong? Token, bool UpdateTokenTable,
 			byte[] Payload, int BlockNr, int BlockSize, CoapResource Resource, CoapResponseEventHandler Callback, object State,
 			MemoryStream PayloadResponseStream, IDtlsCredentials Credentials, params CoapOption[] Options)
@@ -1775,7 +1773,7 @@ namespace Waher.Networking.CoAP
 			{
 				lock (this.gen)
 				{
-					Message.timeoutMilliseconds = (int)Math.Round(1000 * (ACK_TIMEOUT + (ACK_RANDOM_FACTOR - 1) * gen.NextDouble()));
+					Message.timeoutMilliseconds = (int)Math.Round(1000 * (ACK_TIMEOUT + (ACK_RANDOM_FACTOR - 1) * this.gen.NextDouble()));
 				}
 			}
 			else
@@ -1792,10 +1790,10 @@ namespace Waher.Networking.CoAP
 
 			Message.encoded = this.Encode(Message.messageType, Code, Message.token, MessageID.Value, Payload, Options);
 
-			this.SendMessage(Client, Encrypted, Message);
+			return this.SendMessage(Client, Encrypted, Message);
 		}
 
-		private void SendMessage(ClientBase Client, bool Encrypted, Message Message)
+		private async Task SendMessage(ClientBase Client, bool Encrypted, Message Message)
 		{
 			if (!(Client is null))
 			{
@@ -1831,11 +1829,11 @@ namespace Waher.Networking.CoAP
 				}
 
 				if (!Sent)
-					this.Fail(Client, Message);
+					await this.Fail(Client, Message);
 			}
 		}
 
-		private void CheckRetry(object State)
+		private async Task CheckRetry(object State)
 		{
 			object[] P = (object[])State;
 			ClientBase Client = (ClientBase)P[0];
@@ -1860,12 +1858,12 @@ namespace Waher.Networking.CoAP
 
 			if (Fail)
 			{
-				this.Fail(Client, Message);
+				await this.Fail(Client, Message);
 				return;
 			}
 
 			Message.timeoutMilliseconds *= 2;
-			this.SendMessage(Client, Client.IsEncrypted, Message);
+			await this.SendMessage(Client, Client.IsEncrypted, Message);
 		}
 
 		private void Request(IPEndPoint Destination, bool Encrypted, bool Acknowledged, ulong? Token,
@@ -1963,7 +1961,7 @@ namespace Waher.Networking.CoAP
 
 			if (c == 0)
 			{
-				this.Fail(null, Callback, State, null);
+				await this.Fail(null, Callback, State, null);
 				return null;
 			}
 
@@ -1982,7 +1980,7 @@ namespace Waher.Networking.CoAP
 			return new IPEndPoint(Addr, Port);
 		}
 
-		internal void Fail(ClientBase Client, Message Message)
+		internal Task Fail(ClientBase Client, Message Message)
 		{
 			lock (this.outgoingMessages)
 			{
@@ -1996,20 +1994,20 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 			}
 
-			this.Fail(Client, Message.callback, Message.state, Message.resource);
+			return this.Fail(Client, Message.callback, Message.state, Message.resource);
 		}
 
-		internal void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State, CoapResource Resource)
+		internal async Task Fail(ClientBase Client, CoapResponseEventHandler Callback, object State, CoapResource Resource)
 		{
 			if (!(Callback is null))
 			{
 				try
 				{
-					Callback(this, new CoapResponseEventArgs(Client, this, false, State, null, Resource));
+					await Callback(this, new CoapResponseEventArgs(Client, this, false, State, null, Resource));
 				}
 				catch (Exception ex)
 				{
-					this.Exception(ex);
+					await this.Exception(ex);
 					Log.Exception(ex);
 				}
 			}

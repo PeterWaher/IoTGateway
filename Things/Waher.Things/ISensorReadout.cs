@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Things.SensorData;
 
 namespace Waher.Things
@@ -130,34 +131,34 @@ namespace Waher.Things
 		/// <summary>
 		/// Report that readout has started. Can optionally be used to report feedback to end-user when readout is slow.
 		/// </summary>
-		void Start();
+		Task Start();
 
 		/// <summary>
 		/// Report read fields to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Fields that have been read.</param>
-		void ReportFields(bool Done, params Field[] Fields);
+		Task ReportFields(bool Done, params Field[] Fields);
 
 		/// <summary>
 		/// Report read fields to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Fields that have been read.</param>
-		void ReportFields(bool Done, IEnumerable<Field> Fields);
+		Task ReportFields(bool Done, IEnumerable<Field> Fields);
 
 		/// <summary>
 		/// Report error states to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Errors">Errors that have been detected.</param>
-		void ReportErrors(bool Done, params ThingError[] Errors);
+		Task ReportErrors(bool Done, params ThingError[] Errors);
 
 		/// <summary>
 		/// Report error states to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Errors">Errors that have been detected.</param>
-		void ReportErrors(bool Done, IEnumerable<ThingError> Errors);
+		Task ReportErrors(bool Done, IEnumerable<ThingError> Errors);
 	}
 }

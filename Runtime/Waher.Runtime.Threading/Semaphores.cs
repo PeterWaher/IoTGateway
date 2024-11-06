@@ -22,9 +22,11 @@ namespace Waher.Runtime.Threading
 			semaphores.Removed += Semaphores_Removed;
 		}
 
-		private static void Semaphores_Removed(object Sender, CacheItemEventArgs<string, MultiReadSingleWriteObject> e)
+		private static Task Semaphores_Removed(object Sender, CacheItemEventArgs<string, MultiReadSingleWriteObject> e)
 		{
 			e.Value.Dispose();
+
+			return Task.CompletedTask;
 		}
 
 		private static MultiReadSingleWriteObject GetSemaphore(string Key)

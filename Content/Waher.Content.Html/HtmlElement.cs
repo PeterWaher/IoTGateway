@@ -52,7 +52,7 @@ namespace Waher.Content.Html
 		{
 			if (Attribute.Name == "xmlns")
 			{
-				if (string.IsNullOrEmpty(@namespace))
+				if (string.IsNullOrEmpty(this.@namespace))
 					this.@namespace = Attribute.Value;
 			}
 			else

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
@@ -12,7 +11,7 @@ namespace Waher.Content.Html
 	{
 		private LinkedList<HtmlNode> segments = null;
 		private readonly string name;
-		private string value;
+		private string @value;
 
 		/// <summary>
 		/// HTML attribute
@@ -28,7 +27,7 @@ namespace Waher.Content.Html
 			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.name = Name;
-			this.value = Value;
+			this.@value = Value;
 			this.segments = null;
 		}
 
@@ -45,7 +44,7 @@ namespace Waher.Content.Html
 			: base(Document, Parent, StartPosition, EndPosition)
 		{
 			this.name = Name;
-			this.value = null;
+			this.@value = null;
 			this.segments = null;
 		}
 
@@ -61,7 +60,7 @@ namespace Waher.Content.Html
 			: base(Document, Parent, StartPosition)
 		{
 			this.name = Name;
-			this.value = Value;
+			this.@value = Value;
 			this.segments = null;
 		}
 
@@ -76,7 +75,7 @@ namespace Waher.Content.Html
 			: base(Document, Parent, StartPosition)
 		{
 			this.name = Name;
-			this.value = null;
+			this.@value = null;
 			this.segments = null;
 		}
 
@@ -91,7 +90,7 @@ namespace Waher.Content.Html
 				this.segments = new LinkedList<HtmlNode>();
 
 			this.segments.AddLast(Segment);
-			this.value = null;
+			this.@value = null;
 		}
 
 		internal bool HasSegments
@@ -106,7 +105,7 @@ namespace Waher.Content.Html
 		{
 			get
 			{
-				if (this.value is null)
+				if (this.@value is null)
 				{
 					if (!(this.segments is null))
 					{
@@ -115,18 +114,18 @@ namespace Waher.Content.Html
 						foreach (HtmlNode N in this.segments)
 							sb.Append(N.ToString());
 
-						this.value = sb.ToString();
+						this.@value = sb.ToString();
 					}
 					else
-						this.value = string.Empty;
+						this.@value = string.Empty;
 				}
 
-				return this.value;
+				return this.@value;
 			}
 
 			internal set
 			{
-				this.value = value;
+				this.@value = value;
 				this.segments = null;
 			}
 		}
@@ -145,11 +144,11 @@ namespace Waher.Content.Html
 		{
 			int i = this.name.IndexOf(':');
 			if (i < 0)
-				Output.WriteAttributeString(this.name, this.value);
+				Output.WriteAttributeString(this.name, this.@value);
 			else
 			{
 				Output.WriteAttributeString(this.name.Substring(0, i),
-					this.name.Substring(i + 1), string.Empty, this.value);
+					this.name.Substring(i + 1), string.Empty, this.@value);
 			}
 		}
 
@@ -162,7 +161,7 @@ namespace Waher.Content.Html
             Output.Append(' ');
             Output.Append(this.name);
             Output.Append("=\"");
-            Output.Append(Xml.XML.Encode(this.value));
+            Output.Append(Xml.XML.Encode(this.@value));
             Output.Append('"');
         }
     }

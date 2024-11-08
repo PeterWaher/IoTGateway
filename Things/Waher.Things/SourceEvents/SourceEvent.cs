@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SourceEvents
 {
-	/// <summary>
-	/// Delegate for data source events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Event">Event object.</param>
-	public delegate Task SourceEventEventHandler(object Sender, SourceEvent Event);
-
 	/// <summary>
 	/// Abstract base class for all data source events.
 	/// </summary>

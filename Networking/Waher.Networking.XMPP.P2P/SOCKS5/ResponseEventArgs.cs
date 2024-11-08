@@ -1,39 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
-	/// <summary>
-	/// SOCKS5 command.
-	/// </summary>
-	public enum Command
-	{
-		/// <summary>
-		/// CONNECT command (1)
-		/// </summary>
-		CONNECT = 1,
-
-		/// <summary>
-		/// BIND command (2)
-		/// </summary>
-		BIND = 2,
-
-		/// <summary>
-		/// UDP_ASSOCIATE command (3)
-		/// </summary>
-		UDP_ASSOCIATE = 3
-	}
-
-	/// <summary>
-	/// Delegate for SOCKS5 response events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ResponseEventHandler(object Sender, ResponseEventArgs e);
-
 	/// <summary>
 	/// Event arguments for SOCKS5 responses.
 	/// </summary>

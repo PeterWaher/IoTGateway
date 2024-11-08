@@ -253,9 +253,7 @@ namespace Waher.Things.Metering
 
 					GetQrCodeUrlEventArgs e = new GetQrCodeUrlEventArgs(Uri);
 
-					EventHandlerAsync<GetQrCodeUrlEventArgs> h = QrCodeUrlRequested;
-					if (!(h is null))
-						await h(this, e);
+					await QrCodeUrlRequested.Raise(this, e);
 
 					if (!string.IsNullOrEmpty(e.Url))
 					{

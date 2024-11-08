@@ -5,18 +5,11 @@ using Waher.Events;
 namespace Waher.Networking.XMPP.P2P
 {
 	/// <summary>
-	/// Resynchronization event handler delegate.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ResynchEventHandler(object Sender, ResynchEventArgs e);
-
-	/// <summary>
 	/// Peer connection event arguments.
 	/// </summary>
 	public class ResynchEventArgs : EventArgs
 	{
-		private readonly ResynchEventHandler callback;
+		private readonly EventHandlerAsync<ResynchEventArgs> callback;
 		private readonly string remoteFullJid;
 		private bool ok = false;
 
@@ -25,7 +18,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="RemoteFullJid">Remote Full JID.</param>
 		/// <param name="Callback">Callback method.</param>
-		public ResynchEventArgs(string RemoteFullJid, ResynchEventHandler Callback)
+		public ResynchEventArgs(string RemoteFullJid, EventHandlerAsync<ResynchEventArgs> Callback)
 		{
 			this.remoteFullJid = RemoteFullJid;
 			this.callback = Callback;
@@ -46,21 +39,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// failed (<paramref name="Ok"/>=false).
 		/// </summary>
 		/// <param name="Ok">If the synchronization method succeeded (true) or failed (false).</param>
-		public void Done(bool Ok)
+		public Task Done(bool Ok)
 		{
 			this.ok = Ok;
-
-			if (!(this.callback is null))
-			{
-				try
-				{
-					this.callback(this, this);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.callback.Raise(this, this);
 		}
 	}
 }

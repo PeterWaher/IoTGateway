@@ -11,7 +11,7 @@ namespace Waher.Networking.Cluster
 	internal class CommandStatus<ResponseType> : CommandStatusBase
 	{
 		public Dictionary<IPEndPoint, KeyValuePair<ResponseType, Exception>> Responses = new Dictionary<IPEndPoint, KeyValuePair<ResponseType, Exception>>();
-		public ClusterResponseEventHandler<ResponseType> Callback;
+		public EventHandlerAsync<ClusterResponseEventArgs<ResponseType>> Callback;
 
 		/// <summary>
 		/// If all responses have been returned.
@@ -92,13 +92,10 @@ namespace Waher.Networking.Cluster
 		/// Raises the response event.
 		/// </summary>
 		/// <param name="CurrentStatus">Current status of endpoints in cluster.</param>
-		public override async Task RaiseResponseEvent(EndpointStatus[] CurrentStatus)
+		public override Task RaiseResponseEvent(EndpointStatus[] CurrentStatus)
 		{
-			if (!(this.Callback is null))
-			{
-				await this.Callback(this, new ClusterResponseEventArgs<ResponseType>(
-					this.Command, this.GetResponses(CurrentStatus), this.State));
-			}
+			return this.Callback.Raise(this, new ClusterResponseEventArgs<ResponseType>(
+				this.Command, this.GetResponses(CurrentStatus), this.State));
 		}
 
 	}

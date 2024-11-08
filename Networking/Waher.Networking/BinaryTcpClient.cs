@@ -465,7 +465,7 @@ namespace Waher.Networking
 			}
 		}
 
-		private async void BeginRead()
+		private async void BeginRead()	// Starts parallel task
 		{
 			lock (this.synchObj)
 			{
@@ -544,13 +544,13 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						await this.Error(ex);
+						await this.Exception(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				await this.Error(ex);
+				await this.Exception(ex);
 			}
 			finally
 			{
@@ -574,20 +574,7 @@ namespace Waher.Networking
 			}
 
 			if (!Continue && !this.disposed && !this.disposing)
-			{
-				EventHandlerAsync h = this.OnPaused;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						await this.Error(ex);
-					}
-				}
-			}
+				await this.OnPaused.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -598,18 +585,9 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when the connection has been disconnected.
 		/// </summary>
-		protected virtual async Task Disconnected()
+		protected virtual Task Disconnected()
 		{
-			try
-			{
-				EventHandlerAsync h = this.OnDisconnected;
-                if (!(h is null))
-					await h(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				await this.Error(ex);
-			}
+			return this.OnDisconnected.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -653,20 +631,16 @@ namespace Waher.Networking
 		/// Method called when an exception has been caught.
 		/// </summary>
 		/// <param name="ex">Exception</param>
-		protected virtual async Task Error(Exception ex)
+		public override async Task Exception(Exception ex)
 		{
 			try
 			{
-				if (this.HasSniffers)
-					await this.Exception(ex);
-
-				ExceptionEventHandler h = this.OnError;
-				if (!(h is null))
-					await h(this, ex);
+				await base.Exception(ex);
+				await this.OnError.Raise(this, ex);
 			}
 			catch (Exception ex2)
 			{
-				await this.Error(ex2);
+				Log.Exception(ex2);
 			}
 		}
 
@@ -678,7 +652,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when an error has occurred.
 		/// </summary>
-		public event ExceptionEventHandler OnError;
+		public event EventHandlerAsync<Exception> OnError;
 
 		/// <summary>
 		/// Event raised when the connection has been disconnected.
@@ -726,14 +700,14 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
+		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.BeginSend(Buffer, Offset, Count, Result, Callback, true);
-			return Result.Task;
+			await this.BeginSend(Buffer, Offset, Count, Result, Callback, true);
+			return await Result.Task;
 		}
 
-		private async void BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
+		private async Task BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
 			EventHandlerAsync Callback, bool CheckSending)
 		{
 			if (Buffer is null)
@@ -745,19 +719,7 @@ namespace Waher.Networking
 			if (Count == 0)
 			{
 				Task.TrySetResult(true);
-
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						await this.Error(ex);
-					}
-				}
-
+				await Callback.Raise(this, EventArgs.Empty);
 				return;
 			}
 
@@ -866,22 +828,12 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						await this.Error(ex);
+						await this.Exception(ex);
 					}
 
 					Task.TrySetResult(true);
 
-					if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(this, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							await this.Error(ex);
-						}
-					}
+					await Callback.Raise(this, EventArgs.Empty);
 				}
 
 				if (!this.disposed)
@@ -899,18 +851,7 @@ namespace Waher.Networking
 						return;
 					}
 
-					EventHandler h = this.OnWriteQueueEmpty;
-					if (!(h is null))
-					{
-						try
-						{
-							h(this, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							await this.Error(ex);
-						}
-					}
+					await this.OnWriteQueueEmpty.Raise(this, EventArgs.Empty);
 				}
 			}
 			catch (Exception ex)
@@ -929,7 +870,7 @@ namespace Waher.Networking
 				}
 
 				if (!DoDispose)
-					await this.Error(ex);
+					await this.Exception(ex);
 			}
 		}
 
@@ -958,7 +899,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when the write queue is empty.
 		/// </summary>
-		public event EventHandler OnWriteQueueEmpty = null;
+		public event EventHandlerAsync OnWriteQueueEmpty = null;
 
 		/// <summary>
 		/// Method called when binary data has been sent.
@@ -1249,7 +1190,7 @@ namespace Waher.Networking
 					{
 						try
 						{
-							await this.Error(ex);
+							await this.Exception(ex);
 						}
 						catch (Exception ex2)
 						{

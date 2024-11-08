@@ -1236,7 +1236,7 @@ namespace Waher.IoTGateway
 				if (!(GetDataSources is null))
 					Sources = await GetDataSources(Sources);
 
-				concentratorServer = new ConcentratorServer(xmppClient, thingRegistryClient, provisioningClient, Sources);
+				concentratorServer = await ConcentratorServer.Create(xmppClient, thingRegistryClient, provisioningClient, Sources);
 				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient, pepClient);
 
 				Types.SetModuleParameter("Concentrator", concentratorServer);
@@ -1938,9 +1938,7 @@ namespace Waher.IoTGateway
 				{
 					webServer?.UpdateCertificate(Certificate);
 
-					CertificateEventHandler h = OnNewCertificate;
-					if (!(h is null))
-						await h(typeof(Gateway), new Events.CertificateEventArgs(certificate));
+					await OnNewCertificate.Raise(typeof(Gateway), new Events.CertificateEventArgs(certificate));
 				}
 				catch (Exception ex)
 				{
@@ -2011,7 +2009,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when a new server certificate has been generated.
 		/// </summary>
-		public static event CertificateEventHandler OnNewCertificate = null;
+		public static event EventHandlerAsync<Events.CertificateEventArgs> OnNewCertificate = null;
 
 		private static async void CheckIp(object P)
 		{
@@ -2587,18 +2585,7 @@ namespace Waher.IoTGateway
 
 					await CheckBackup();
 
-					EventHandler h = MinuteTick;
-					if (!(h is null))
-					{
-						try
-						{
-							h(null, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await MinuteTick.Raise(null, EventArgs.Empty);
 				}
 			}
 			catch (Exception ex)
@@ -2610,7 +2597,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised every minute.
 		/// </summary>
-		public static event EventHandler MinuteTick = null;
+		public static event EventHandlerAsync MinuteTick = null;
 
 		private static async Task XmppClient_OnStateChanged(object _, XmppState NewState)
 		{
@@ -3464,18 +3451,9 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static event EventHandlerAsync OnBeforeUninstall = null;
 
-		private static async Task BeforeUninstall(object Sender, EventArgs e)
+		private static Task BeforeUninstall(object Sender, EventArgs e)
 		{
-			try
-			{
-				EventHandlerAsync h = OnBeforeUninstall;
-				if (!(h is null))
-					await h(Sender, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return OnBeforeUninstall.Raise(Sender, e);
 		}
 
 		#endregion
@@ -3745,18 +3723,7 @@ namespace Waher.IoTGateway
 			if (ExportFolder != KeyFolder)
 				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
 
-			EventHandlerAsync h = OnAfterBackup;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(typeof(Gateway), EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await OnAfterBackup.Raise(typeof(Gateway), EventArgs.Empty);
 		}
 
 		private static DateTime? lastBackupTimeCheck = null;

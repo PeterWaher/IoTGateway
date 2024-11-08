@@ -4,14 +4,6 @@ using System.Threading.Tasks;
 namespace Waher.Networking.Cluster
 {
 	/// <summary>
-	/// Event arguments for cluster command response events.
-	/// </summary>
-	/// <typeparam name="ResponseType">Type of expected response.</typeparam>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event handler.</param>
-	public delegate Task ClusterResponseEventHandler<ResponseType>(object Sender, ClusterResponseEventArgs<ResponseType> e);
-
-	/// <summary>
 	/// Event arguments for cluster message acknowledgement events.
 	/// </summary>
 	public class ClusterResponseEventArgs<ResponseType> : EventArgs 

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using System.Windows;
 using Windows.UI.Popups;
+using System.Threading.Tasks;
 
 namespace Waher.Mock
 {
@@ -25,7 +22,7 @@ namespace Waher.Mock
 		/// Raises an event.
 		/// </summary>
 		/// <param name="h">Event handler.</param>
-		protected async void Raise(EventHandler h)
+		protected async Task Raise(EventHandler h)
 		{
 			if (!(h is null))
 			{
@@ -74,17 +71,17 @@ namespace Waher.Mock
 		/// <summary>
 		/// Raises the <see cref="Selected"/> event.
 		/// </summary>
-		protected virtual void OnSelected()
+		protected virtual Task OnSelected()
 		{
-			this.Raise(this.Selected);
+			return this.Raise(this.Selected);
 		}
 
 		/// <summary>
 		/// Raises the <see cref="Deselected"/> event.
 		/// </summary>
-		protected virtual void OnDeselected()
+		protected virtual Task OnDeselected()
 		{
-			this.Raise(this.Deselected);
+			return this.Raise(this.Deselected);
 		}
 
 	}

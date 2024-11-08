@@ -80,23 +80,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// https://neuro-foundation.io
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
-		/// <param name="DataSources">Data sources.</param>
-		public ConcentratorServer(XmppClient Client, params IDataSource[] DataSources)
-			: this(Client, null, null, DataSources)
-		{
-		}
-
-		/// <summary>
-		/// Implements an XMPP concentrator server interface.
-		/// 
-		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
-		/// https://neuro-foundation.io
-		/// </summary>
-		/// <param name="Client">XMPP Client</param>
 		/// <param name="ThingRegistryClient">Thing Registry client.</param>
 		/// <param name="ProvisioningClient">Provisioning client.</param>
 		/// <param name="DataSources">Data sources.</param>
-		public ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
+		private ConcentratorServer(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
 			: base(Client)
 		{
 			this.thingRegistryClient = ThingRegistryClient;
@@ -116,9 +103,6 @@ namespace Waher.Networking.XMPP.Concentrator
 				this.thingRegistryClient.Disowned += this.ThingRegistryClient_Disowned;
 				this.thingRegistryClient.Removed += this.ThingRegistryClient_Removed;
 			}
-
-			foreach (IDataSource DataSource in DataSources)
-				this.Register(DataSource);
 
 			#region Neuro-Foundation V1 handlers
 
@@ -225,6 +209,39 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqSetHandler("unregisterSniffer", NamespaceConcentratorIeeeV1, this.UnregisterSnifferHandler, false);
 
 			#endregion
+		}
+
+		/// <summary>
+		/// Creates an XMPP concentrator server interface.
+		/// 
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="DataSources">Data sources.</param>
+		public static Task<ConcentratorServer> Create(XmppClient Client, params IDataSource[] DataSources)
+		{
+			return Create(Client, null, null, DataSources);
+		}
+
+		/// <summary>
+		/// Creates an XMPP concentrator server interface.
+		/// 
+		/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+		/// https://neuro-foundation.io
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="ThingRegistryClient">Thing Registry client.</param>
+		/// <param name="ProvisioningClient">Provisioning client.</param>
+		/// <param name="DataSources">Data sources.</param>
+		public static async Task<ConcentratorServer> Create(XmppClient Client, ThingRegistryClient ThingRegistryClient, ProvisioningClient ProvisioningClient, params IDataSource[] DataSources)
+		{
+			ConcentratorServer Result = new ConcentratorServer(Client, ThingRegistryClient, ProvisioningClient);
+
+			foreach (IDataSource DataSource in DataSources)
+				await Result.Register(DataSource);
+
+			return Result;
 		}
 
 		private async Task ThingRegistryClient_Claimed(object Sender, ClaimedEventArgs e)
@@ -531,12 +548,12 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="DataSource">Data Source.</param>
 		/// <returns>If the data source was registered (true), or if another data source with the same ID has already been registered (false).</returns>
-		public bool Register(IDataSource DataSource)
+		public Task<bool> Register(IDataSource DataSource)
 		{
 			return this.Register(DataSource, true);
 		}
 
-		private bool Register(IDataSource DataSource, bool Root)
+		private async Task<bool> Register(IDataSource DataSource, bool Root)
 		{
 			lock (this.synchObject)
 			{
@@ -551,24 +568,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			DataSource.OnEvent += this.DataSource_OnEvent;
 
-			EventHandler<DataSourceEventArgs> h = this.SourceRegistered;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, new DataSourceEventArgs(DataSource));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.SourceRegistered.Raise(this, new DataSourceEventArgs(DataSource));
 
 			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
 			if (!(ChildSources is null))
 			{
 				foreach (IDataSource Child in ChildSources)
-					this.Register(Child, false);
+					await this.Register(Child, false);
 			}
 
 			return true;
@@ -577,19 +583,19 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Event raised when a data source has been registered.
 		/// </summary>
-		public event EventHandler<DataSourceEventArgs> SourceRegistered;
+		public event EventHandlerAsync<DataSourceEventArgs> SourceRegistered;
 
 		/// <summary>
 		/// Unregisters a data source from the concentrator.
 		/// </summary>
 		/// <param name="DataSource">Data Source.</param>
 		/// <returns>If the data source was unregistered (true), or if the data source was not found (false).</returns>
-		public bool Unregister(IDataSource DataSource)
+		public Task<bool> Unregister(IDataSource DataSource)
 		{
 			return this.Unregister(DataSource, true);
 		}
 
-		private bool Unregister(IDataSource DataSource, bool Root)
+		private async Task<bool> Unregister(IDataSource DataSource, bool Root)
 		{
 			DataSourceRec ExistingSource;
 
@@ -609,24 +615,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			ExistingSource.Source.OnEvent -= this.DataSource_OnEvent;
 
-			EventHandler<DataSourceEventArgs> h = this.SourceUnregistered;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, new DataSourceEventArgs(DataSource));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.SourceUnregistered.Raise(this, new DataSourceEventArgs(DataSource));
 
 			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
 			if (!(ChildSources is null))
 			{
 				foreach (IDataSource Child in ChildSources)
-					this.Unregister(Child, false);
+					await this.Unregister(Child, false);
 			}
 
 			return true;

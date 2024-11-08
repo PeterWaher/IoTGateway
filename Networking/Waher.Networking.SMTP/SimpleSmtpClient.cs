@@ -112,14 +112,16 @@ namespace Waher.Networking.SMTP
 			await this.AssertOkResult();
 		}
 
-		private Task Client_OnWarning(ref string Text)
+		private async Task<string> Client_OnWarning(string Text)
 		{
-			return this.Warning(Text);
+			await this.Warning(Text);
+			return Text;
 		}
 
-		private Task Client_OnInformation(ref string Text)
+		private async Task<string> Client_OnInformation(string Text)
 		{
-			return this.Information(Text);
+			await this.Information(Text);
+			return Text;
 		}
 
 		private Task Client_OnError(object Sender, Exception Exception)

@@ -516,8 +516,6 @@ namespace Waher.Networking.XMPP.Avatar
 						NewAvatar = null;
 				}
 
-				AvatarEventHandler h;
-
 				if (!(OldAvatar is null))
 				{
 					if (!IsNew)
@@ -532,50 +530,17 @@ namespace Waher.Networking.XMPP.Avatar
 
 					await Database.Delete(OldAvatar);
 
-					h = this.AvatarRemoved;
-					if (!(h is null))
-					{
-						try
-						{
-							await h(this, new AvatarEventArgs(BareJid, OldAvatar));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await this.AvatarRemoved.Raise(this, new AvatarEventArgs(BareJid, OldAvatar));
 				}
 
 				if (!(NewAvatar is null))
 				{
 					await Database.Insert(NewAvatar);
 
-					h = this.AvatarAdded;
-					if (!(h is null))
-					{
-						try
-						{
-							await h(this, new AvatarEventArgs(BareJid, NewAvatar));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await this.AvatarAdded.Raise(this, new AvatarEventArgs(BareJid, NewAvatar));
 				}
 
-				h = this.AvatarUpdated;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, new AvatarEventArgs(BareJid, NewAvatar));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.AvatarUpdated.Raise(this, new AvatarEventArgs(BareJid, NewAvatar));
 			}
 		}
 
@@ -597,17 +562,17 @@ namespace Waher.Networking.XMPP.Avatar
 		/// <summary>
 		/// Event raised when an avatar has been removed.
 		/// </summary>
-		public event AvatarEventHandler AvatarRemoved = null;
+		public event EventHandlerAsync<AvatarEventArgs> AvatarRemoved = null;
 
 		/// <summary>
 		/// Event raised, when an avatar has been added.
 		/// </summary>
-		public event AvatarEventHandler AvatarAdded = null;
+		public event EventHandlerAsync<AvatarEventArgs> AvatarAdded = null;
 
 		/// <summary>
 		/// Event raised, when an avatar has been updated (added or removed).
 		/// </summary>
-		public event AvatarEventHandler AvatarUpdated = null;
+		public event EventHandlerAsync<AvatarEventArgs> AvatarUpdated = null;
 
 		/// <summary>
 		/// Gets an avatar.
@@ -716,9 +681,7 @@ namespace Waher.Networking.XMPP.Avatar
 			{
 				await Database.Insert(Avatar);
 
-				AvatarEventHandler h = this.AvatarAdded;
-				if (!(h is null))
-					await h(this, new AvatarEventArgs(Item.BareJid, Avatar));
+				await this.AvatarAdded.Raise(this, new AvatarEventArgs(Item.BareJid, Avatar));
 			}
 			else
 			{
@@ -780,9 +743,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 								await Database.Insert(Avatar);
 
-								AvatarEventHandler h = this.AvatarAdded;
-								if (!(h is null))
-									await h(this, new AvatarEventArgs(Jid, Avatar));
+								await this.AvatarAdded.Raise(this, new AvatarEventArgs(Jid, Avatar));
 							}
 						}
 					}
@@ -849,7 +810,7 @@ namespace Waher.Networking.XMPP.Avatar
 					{
 						if (e2.Ok && !(e2.AvatarImage is null))
 						{
-							AvatarEventHandler h;
+							EventHandlerAsync<AvatarEventArgs> h;
 
 							if (Avatar is null || Avatar?.ObjectId is null)
 							{
@@ -874,8 +835,7 @@ namespace Waher.Networking.XMPP.Avatar
 								h = this.AvatarUpdated;
 							}
 
-							if (!(h is null))
-								await h(this, new AvatarEventArgs(e.FromBareJID, Avatar));
+							await h.Raise(this, new AvatarEventArgs(e.FromBareJID, Avatar));
 						}
 					}, null);
 				}

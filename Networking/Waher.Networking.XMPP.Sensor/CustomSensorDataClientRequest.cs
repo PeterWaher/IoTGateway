@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Manages a sensor data client request.
 	/// </summary>
-	public class CustomSensorDataClientRequest : SensorDataClientRequest 
+	public class CustomSensorDataClientRequest : SensorDataClientRequest
 	{
 		/// <summary>
 		/// Manages a sensor data client request.
@@ -82,18 +82,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public override async Task Cancel()
 		{
-			try
-			{
-				await this.SetState(SensorDataReadoutState.Cancelled);
-
-				EventHandlerAsync h = this.OnCancel;
-				if (!(h is null))
-					await h(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			await this.SetState(SensorDataReadoutState.Cancelled);
+			await this.OnCancel.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>

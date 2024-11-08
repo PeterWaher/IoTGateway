@@ -382,18 +382,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			else
 				Token = null;
 
-			if (!(Callback is null))
-			{
-				TokenEventArgs e2 = new TokenEventArgs(e, State, Token);
-				try
-				{
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new TokenEventArgs(e, State, Token));
 		}
 
 		/// <summary>
@@ -579,15 +568,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				JID = null;
 			}
 
-			IsFriendResponseEventArgs e2 = new IsFriendResponseEventArgs(e, State, JID, Result);
-			try
-			{
-				await Callback(this, e2);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			await Callback.Raise(this, new IsFriendResponseEventArgs(e, State, JID, Result));
 		}
 
 		private Task UnfriendHandler(object Sender, MessageEventArgs e)
@@ -670,7 +651,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 						Permitted2.AddLast(Ref);
 					}
-					else 
+					else
 						ToCheck2?.AddLast(Ref);
 				}
 
@@ -932,15 +913,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 
 				CanReadResponseEventArgs e2 = new CanReadResponseEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
-
-				try
-				{
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await Callback.Raise(this, e2);
 
 			}, State);
 		}
@@ -1006,7 +979,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public Task CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
-			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
+			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, EventHandlerAsync<CanControlResponseEventArgs> Callback, object State)
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
@@ -1171,14 +1144,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				CanControlResponseEventArgs e2 = new CanControlResponseEventArgs(e, State, Jid, CanControl,
 					Nodes2?.ToArray(), ParameterNames2?.ToArray());
 
-				try
-				{
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await Callback.Raise(this, e2);
 
 			}, State);
 		}
@@ -1313,25 +1279,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		private async Task ClearInternalCache()
 		{
 			await Database.Clear("CachedProvisioningQueries");
-
-			EventHandler h = this.CacheCleared;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.CacheCleared.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when rule cache is cleared.
 		/// </summary>
-		public event EventHandler CacheCleared;
+		public event EventHandlerAsync CacheCleared;
 
 		#endregion
 

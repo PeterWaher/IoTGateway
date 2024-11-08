@@ -10,61 +10,6 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking.PeerToPeer
 {
 	/// <summary>
-	/// State of Peer-to-peer network.
-	/// </summary>
-	public enum PeerToPeerNetworkState
-	{
-		/// <summary>
-		/// Object created
-		/// </summary>
-		Created,
-
-		/// <summary>
-		/// Reinitializing after a network change.
-		/// </summary>
-		Reinitializing,
-
-		/// <summary>
-		/// Searching for Internet gateway.
-		/// </summary>
-		SearchingForGateway,
-
-		/// <summary>
-		/// Registering application in gateway.
-		/// </summary>
-		RegisteringApplicationInGateway,
-
-		/// <summary>
-		/// Ready to receive connections.
-		/// </summary>
-		Ready,
-
-		/// <summary>
-		/// Unable to create a peer-to-peer network that receives connections from the Internet.
-		/// </summary>
-		Error,
-
-		/// <summary>
-		/// Network is closed
-		/// </summary>
-		Closed
-	}
-
-	/// <summary>
-	/// Event handler for peer-to-peer network state change events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewState">New state.</param>
-	public delegate Task PeerToPeerNetworkStateChangeEventHandler(object Sender, PeerToPeerNetworkState NewState);
-
-	/// <summary>
-	/// Event handler whenever a peer has connected.
-	/// </summary>
-	/// <param name="Listener">Sender of event.</param>
-	/// <param name="Peer">Peer connection.</param>
-	public delegate Task PeerConnectedEventHandler(object Listener, PeerConnection Peer);
-
-	/// <summary>
 	/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
 	/// </summary>
 	public class PeerToPeerNetwork : InternetGatewayRegistrator
@@ -139,13 +84,23 @@ namespace Waher.Networking.PeerToPeer
 			this.tcpListener = null;
 			this.udpClient = null;
 
-			this.Start();
+			Task.Run(async () =>
+			{
+				try
+				{
+					await this.Start();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			});
 		}
 
 		/// <summary>
 		/// Starts searching for Internet Gateways. Once found, ports will be registered.
 		/// </summary>
-		public override void Start()
+		public override async Task Start()
 		{
 			if (this.OnPublicNetwork())
 			{
@@ -164,7 +119,7 @@ namespace Waher.Networking.PeerToPeer
 					this.udpClient = new UdpClient(this.localEndpoint.AddressFamily);
 					this.udpClient.Client.Bind(this.localEndpoint);
 
-					this.State = PeerToPeerNetworkState.Ready;
+					await this.SetState(PeerToPeerNetworkState.Ready);
 
 					this.AcceptTcpClients();
 					this.BeginReceiveUdp();
@@ -172,7 +127,7 @@ namespace Waher.Networking.PeerToPeer
 				catch (Exception ex)
 				{
 					this.exception = ex;
-					this.State = PeerToPeerNetworkState.Error;
+					await this.SetState(PeerToPeerNetworkState.Error);
 
 					this.tcpListener?.Stop();
 					this.tcpListener = null;
@@ -182,7 +137,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 			}
 
-			base.Start();
+			await base.Start();
 		}
 
 		private async void AcceptTcpClients()
@@ -203,7 +158,7 @@ namespace Waher.Networking.PeerToPeer
 						}
 						catch (InvalidOperationException)
 						{
-							this.State = PeerToPeerNetworkState.Error;
+							await this.SetState(PeerToPeerNetworkState.Error);
 
 							this.tcpListener?.Stop();
 							this.tcpListener = null;
@@ -226,9 +181,9 @@ namespace Waher.Networking.PeerToPeer
 								Connection = new PeerConnection(Client, this,
 									(IPEndPoint)TcpClient.Client.RemoteEndPoint, this.encapsulatePackets);
 
-								this.State = PeerToPeerNetworkState.Ready;
+								await this.SetState(PeerToPeerNetworkState.Ready);
 
-								this.PeerConnected(Connection);
+								await this.PeerConnected(Connection);
 
 								Connection.Start();
 							}
@@ -318,7 +273,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Registration">Registration to be performed.</param>
 		/// <param name="TcpPortMapped">What TCP Ports are already mapped.</param>
 		/// <param name="UdpPortMapped">What UDP Ports are already mapped.</param>
-		protected override void BeforeRegistration(InternetGatewayRegistration Registration,
+		protected override async Task BeforeRegistration(InternetGatewayRegistration Registration,
 			Dictionary<ushort, bool> TcpPortMapped, Dictionary<ushort, bool> UdpPortMapped)
 		{
 			try
@@ -370,7 +325,7 @@ namespace Waher.Networking.PeerToPeer
 			catch (Exception ex)
 			{
 				this.exception = ex;
-				this.State = PeerToPeerNetworkState.Error;
+				await this.SetState(PeerToPeerNetworkState.Error);
 			}
 		}
 
@@ -378,31 +333,20 @@ namespace Waher.Networking.PeerToPeer
 		/// Called when a new peer has connected.
 		/// </summary>
 		/// <param name="Connection">Peer connection</param>
-		protected virtual void PeerConnected(PeerConnection Connection)
+		protected virtual Task PeerConnected(PeerConnection Connection)
 		{
-			PeerConnectedEventHandler h = this.OnPeerConnected;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, Connection);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnPeerConnected.Raise(this, Connection);
 		}
 
 		/// <summary>
 		/// Event raised when a new peer has connected.
 		/// </summary>
-		public event PeerConnectedEventHandler OnPeerConnected = null;
+		public event EventHandlerAsync<PeerConnection> OnPeerConnected = null;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
 			this.tcpListener?.Stop();
 			this.tcpListener = null;
@@ -410,7 +354,7 @@ namespace Waher.Networking.PeerToPeer
 			this.udpClient?.Dispose();
 			this.udpClient = null;
 
-			base.Dispose();
+			return base.DisposeAsync();
 		}
 
 		/// <summary>
@@ -445,7 +389,7 @@ namespace Waher.Networking.PeerToPeer
 			return Result;
 		}
 
-		private async void BeginReceiveUdp()
+		private async void BeginReceiveUdp()    // Starts parallel task
 		{
 			try
 			{
@@ -453,20 +397,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					UdpReceiveResult Data = await this.udpClient.ReceiveAsync();
 					if (!this.disposed)
-					{
-						UdpDatagramEvent h = this.OnUdpDatagramReceived;
-						if (!(h is null))
-						{
-							try
-							{
-								await h(this, new UdpDatagramEventArgs(Data.RemoteEndPoint, Data.Buffer));
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
-						}
-					}
+						await this.OnUdpDatagramReceived.Raise(this, new UdpDatagramEventArgs(Data.RemoteEndPoint, Data.Buffer));
 				}
 			}
 			catch (Exception ex)
@@ -478,7 +409,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Event raised when an incoming UDP datagram has been received.
 		/// </summary>
-		public event UdpDatagramEvent OnUdpDatagramReceived = null;
+		public event EventHandlerAsync<UdpDatagramEventArgs> OnUdpDatagramReceived = null;
 
 		/// <summary>
 		/// Sends an UDP datagram to a remote destination.
@@ -504,18 +435,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					await this.udpClient.SendAsync(Datagram, Datagram.Length, RemoteEndpoint);
 
-					UdpDatagramEvent h = this.OnUdpDatagramSent;
-					if (!(h is null))
-					{
-						try
-						{
-							await h(this, new UdpDatagramEventArgs(RemoteEndpoint, Datagram));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await this.OnUdpDatagramSent.Raise(this, new UdpDatagramEventArgs(RemoteEndpoint, Datagram));
 
 					lock (this.writeQueue)
 					{
@@ -550,7 +470,6 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Event raised when an outgoing UDP datagram has been sent.
 		/// </summary>
-		public event UdpDatagramEvent OnUdpDatagramSent = null;
-
+		public event EventHandlerAsync<UdpDatagramEventArgs> OnUdpDatagramSent = null;
 	}
 }

@@ -560,18 +560,7 @@ namespace Waher.Networking.HTTP
 				else
 					await this.transferEncoding.ContentSentAsync();
 
-				EventHandler h = this.OnResponseSent;
-				if (!(h is null))
-				{
-					try
-					{
-						h(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnResponseSent.Raise(this, EventArgs.Empty);
 			}
 		}
 
@@ -1083,21 +1072,19 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal Task WriteRawAsync(byte[] Data)
+		internal async Task WriteRawAsync(byte[] Data)
 		{
-			if (this.responseStream is null)
-				return Task.CompletedTask;
-			else
+			if (!(this.responseStream is null))
 			{
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-				this.responseStream.SendAsync(Data, 0, Data.Length, (sender, e) =>
+				await this.responseStream.SendAsync(Data, 0, Data.Length, (sender, e) =>
 				{
 					Result.TrySetResult(true);
 					return Task.CompletedTask;
 				});
 
-				return Result.Task;
+				await Result.Task;
 			}
 		}
 

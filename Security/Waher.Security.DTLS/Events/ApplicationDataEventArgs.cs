@@ -1,14 +1,5 @@
-﻿using System.Threading.Tasks;
-
-namespace Waher.Security.DTLS
+﻿namespace Waher.Security.DTLS
 {
-	/// <summary>
-	/// Delegate for application data events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ApplicationDataEventHandler(object Sender, ApplicationDataEventArgs e);
-
 	/// <summary>
 	/// Event arguments for application data events.
 	/// </summary>

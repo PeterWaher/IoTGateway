@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
-	/// <summary>
-	/// Delegate for stream callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task StreamEventHandler(object Sender, StreamEventArgs e);
-
 	/// <summary>
 	/// Event arguments for stream callbacks.
 	/// </summary>

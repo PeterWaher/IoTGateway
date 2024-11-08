@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Security.DTLS.Events;
@@ -102,7 +102,7 @@ namespace Waher.Security.DTLS
 				DtlsOverUdpState State = new DtlsOverUdpState()
 				{
 					RemoteEndpoint = EP,
-					Queue = new LinkedList<Tuple<byte[], UdpTransmissionEventHandler, object>>(),
+					Queue = new LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>>(),
 					CurrentState = DtlsState.Handshake
 				};
 
@@ -112,38 +112,34 @@ namespace Waher.Security.DTLS
 			return Task.CompletedTask;
 		}
 
-		private Task Dtls_OnSessionFailed(object Sender, FailureEventArgs e)
+		private async Task Dtls_OnSessionFailed(object Sender, FailureEventArgs e)
 		{
 			IPEndPoint EP = (IPEndPoint)e.RemoteEndpoint;
 
 			if (this.dtlsStates.TryGetValue(EP, out DtlsOverUdpState State))
 			{
 				this.dtlsStates.Remove(State.RemoteEndpoint);
-				State.Done(this, false);
+				await State.Done(this, false);
 			}
-
-			return Task.CompletedTask;
 		}
 
-		private Task Dtls_OnHandshakeSuccessful(object sender, RemoteEndpointEventArgs e)
+		private async Task Dtls_OnHandshakeSuccessful(object sender, RemoteEndpointEventArgs e)
 		{
 			IPEndPoint EP = (IPEndPoint)e.RemoteEndpoint;
 
 			if (this.dtlsStates.TryGetValue(EP, out DtlsOverUdpState State))
-				State.Done(this, true);
+				await State.Done(this, true);
 			else
 			{
 				State = new DtlsOverUdpState()
 				{
 					RemoteEndpoint = EP,
-					Queue = new LinkedList<Tuple<byte[], UdpTransmissionEventHandler, object>>(),
+					Queue = new LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>>(),
 					CurrentState = DtlsState.SessionEstablished
 				};
 
 				this.dtlsStates.Add(EP, State);
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private Task Dtls_OnHandshakeFailed(object Sender, FailureEventArgs e)
@@ -151,25 +147,16 @@ namespace Waher.Security.DTLS
 			return this.Dtls_OnSessionFailed(Sender, e);
 		}
 
-		private async Task Dtls_OnApplicationDataReceived(object Sender, ApplicationDataEventArgs e)
+		private Task Dtls_OnApplicationDataReceived(object Sender, ApplicationDataEventArgs e)
 		{
-			try
-			{
-				UdpDatagramEventHandler h = this.OnDatagramReceived;
-				if (!(h is null))
-					await h(this, new UdpDatagramEventArgs(this, (IPEndPoint)e.RemoteEndpoint, e.ApplicationData));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnDatagramReceived.Raise(this, new UdpDatagramEventArgs(this, (IPEndPoint)e.RemoteEndpoint, e.ApplicationData));
 		}
 
 		/// <summary>
 		/// Event raised when decrypted application data has been successfully been received
 		/// over a DTLS session.
 		/// </summary>
-		public event UdpDatagramEventHandler OnDatagramReceived = null;
+		public event EventHandlerAsync<UdpDatagramEventArgs> OnDatagramReceived = null;
 
 		private Task DtlsStates_Removed(object Sender, CacheItemEventArgs<IPEndPoint, DtlsOverUdpState> e)
 		{
@@ -191,7 +178,7 @@ namespace Waher.Security.DTLS
 		/// <param name="Callback">Method to call when operation concludes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public async Task Send(byte[] Packet, IPEndPoint RemoteEndpoint, IDtlsCredentials Credentials,
-			UdpTransmissionEventHandler Callback, object State)
+			EventHandlerAsync<UdpTransmissionEventArgs> Callback, object State)
 		{
 			if (this.dtlsStates.TryGetValue(RemoteEndpoint, out DtlsOverUdpState DtlsState))
 			{
@@ -219,7 +206,7 @@ namespace Waher.Security.DTLS
 				DtlsState = new DtlsOverUdpState()
 				{
 					RemoteEndpoint = RemoteEndpoint,
-					Queue = new LinkedList<Tuple<byte[], UdpTransmissionEventHandler, object>>(),
+					Queue = new LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>>(),
 					CurrentState = Security.DTLS.DtlsState.Handshake
 				};
 

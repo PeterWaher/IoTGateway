@@ -1,16 +1,8 @@
-﻿using System.Threading.Tasks;
-using Waher.Networking.XMPP.Events;
+﻿using Waher.Networking.XMPP.Events;
 using Waher.Things;
 
 namespace Waher.Networking.XMPP.Provisioning.Events
 {
-	/// <summary>
-	/// Delegate for CanControl callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CanControlCallback(object Sender, CanControlResponseEventArgs e);
-
 	/// <summary>
 	/// Event arguments for CanControl callback event arguments.
 	/// </summary>

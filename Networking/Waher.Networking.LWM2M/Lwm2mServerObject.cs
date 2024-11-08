@@ -78,7 +78,7 @@ namespace Waher.Networking.LWM2M
 					Lwm2mServerObjectInstance Instance = new Lwm2mServerObjectInstance(InstanceId);
 					this.Add(Instance);
 					this.Client.Endpoint.Register(Instance);
-					Instance.AfterRegister(this.Client);
+					await Instance.AfterRegister(this.Client);
 
 					Request.Path += Request.SubPath;
 					Request.SubPath = string.Empty;
@@ -86,10 +86,10 @@ namespace Waher.Networking.LWM2M
 					await Instance.PUT(Request, Response);
 				}
 				else
-					Response.RST(CoapCode.BadRequest);
+					await Response.RST(CoapCode.BadRequest);
 			}
 			else
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 		}
 
 		/// <summary>

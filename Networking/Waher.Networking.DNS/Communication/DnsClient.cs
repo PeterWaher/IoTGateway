@@ -46,7 +46,7 @@ namespace Waher.Networking.DNS.Communication
 			public ushort ID;
 			public byte[] Output;
 			public IPEndPoint Destination;
-			public DnsMessageEventHandler Callback;
+			public EventHandlerAsync<DnsMessageEventArgs> Callback;
 			public object State;
 		}
 
@@ -82,7 +82,8 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">method to call when a response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		protected async Task BeginTransmit(ushort ID, byte[] Message, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
+		protected async Task BeginTransmit(ushort ID, byte[] Message, IPEndPoint Destination,
+			EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
 			if (this.disposed)
 				return;
@@ -193,17 +194,7 @@ namespace Waher.Networking.DNS.Communication
 						return;
 				}
 
-				try
-				{
-					if (!(Rec.Callback is null))
-						await Rec.Callback(this, new DnsMessageEventArgs(Message, Rec.State));
-				}
-				catch (Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-					this.thread?.Exception(ex);
-					Log.Exception(ex);
-				}
+				await Rec.Callback.Raise(this, new DnsMessageEventArgs(Message, Rec.State));
 			}
 		}
 
@@ -223,10 +214,8 @@ namespace Waher.Networking.DNS.Communication
 					return;
 			}
 
-			try
+			DnsMessage Message = new DnsMessage(new byte[]
 			{
-				DnsMessage Message = new DnsMessage(new byte[]
-				{
 					(byte)(ID >> 8),
 					(byte)(ID & 255),
 					0x80,	// Response
@@ -234,16 +223,10 @@ namespace Waher.Networking.DNS.Communication
 					0, 0,	// QDCOUNT
 					0, 0,	// ANCOUNT
 					0, 0,	// NSCOUNT
-					0, 0	// ARCOUNT
-				});
+					0, 0    // ARCOUNT
+			});
 
-				if (!(Rec.Callback is null))
-					await Rec.Callback(this, new DnsMessageEventArgs(Message, Rec.State));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			await Rec.Callback.Raise(this, new DnsMessageEventArgs(Message, Rec.State));
 		}
 
 		/// <summary>
@@ -268,7 +251,7 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task SendRequest(OpCode OpCode, bool Recursive, Question[] Questions,
-			IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
+			IPEndPoint Destination, EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
 			using (MemoryStream Request = new MemoryStream())
 			{
@@ -319,13 +302,13 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Questions">Questions</param>
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public Task<DnsMessage> SendRequestAsync(OpCode OpCode, bool Recursive,
+		public async Task<DnsMessage> SendRequestAsync(OpCode OpCode, bool Recursive,
 			Question[] Questions, IPEndPoint Destination, int Timeout)
 		{
 			TaskCompletionSource<DnsMessage> Result = new TaskCompletionSource<DnsMessage>();
 			DateTime TP = DateTime.MinValue;
 
-			this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>
+			await this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>
 			{
 				this.scheduler?.Remove(TP);
 				((TaskCompletionSource<DnsMessage>)e.State).TrySetResult(e.Message);
@@ -339,7 +322,7 @@ namespace Waher.Networking.DNS.Communication
 					new TimeoutException("No DNS response returned within the given time."));
 			}, Result);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -351,7 +334,7 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(string QNAME, QTYPE QTYPE, QCLASS QCLASS, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
+		public void Query(string QNAME, QTYPE QTYPE, QCLASS QCLASS, IPEndPoint Destination, EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
 			this.Query(new Question[] { new Question(QNAME, QTYPE, QCLASS) }, Destination, Callback, State);
 		}
@@ -365,7 +348,7 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
+		public void Query(string QNAME, QTYPE[] QTYPEs, QCLASS QCLASS, IPEndPoint Destination, EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
 			this.Query(ToQuestions(QNAME, QTYPEs, QCLASS), Destination, Callback, State);
 		}
@@ -377,7 +360,7 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void Query(Question[] Questions, IPEndPoint Destination, DnsMessageEventHandler Callback, object State)
+		public void Query(Question[] Questions, IPEndPoint Destination, EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
 			this.SendRequest(OpCode.Query, false, Questions, Destination, Callback, State);
 		}

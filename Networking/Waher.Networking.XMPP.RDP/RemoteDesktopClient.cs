@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.RDP
 		/// <param name="To">Full JID of remote client.</param>
 		/// <param name="SessionGuid">Session ID to use.</param>
 		/// <returns>Remote Desktop Session object.</returns>
-		public Task<RemoteDesktopSession> StartSessionAsync(string To, Guid SessionGuid)
+		public async Task<RemoteDesktopSession> StartSessionAsync(string To, Guid SessionGuid)
 		{
 			StringBuilder sb = new StringBuilder();
 			string SessionId = SessionGuid.ToString();
@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.RDP
 
 			TaskCompletionSource<RemoteDesktopSession> Result = new TaskCompletionSource<RemoteDesktopSession>();
 
-			this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
+			await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -112,14 +112,12 @@ namespace Waher.Networking.XMPP.RDP
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, RemoteDesktopSession> e)
 		{
-			e.Value.State = RemoteDesktopSessionState.Stopped;
-
-			return Task.CompletedTask;
+			return e.Value.SetState(RemoteDesktopSessionState.Stopped);
 		}
 
 		/// <summary>
@@ -128,7 +126,7 @@ namespace Waher.Networking.XMPP.RDP
 		/// <param name="To">Full JID of remote client.</param>
 		/// <param name="SessionId">Session ID</param>
 		/// <returns>Remote Desktop Session object.</returns>
-		public Task StopSessionAsync(string To, string SessionId)
+		public async Task StopSessionAsync(string To, string SessionId)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -139,11 +137,11 @@ namespace Waher.Networking.XMPP.RDP
 			sb.Append("</stop>");
 
 			if (this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session) && Session.State != RemoteDesktopSessionState.Stopped)
-				Session.State = RemoteDesktopSessionState.Stopping;
+				await Session.SetState(RemoteDesktopSessionState.Stopping);
 
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
+			await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -152,17 +150,15 @@ namespace Waher.Networking.XMPP.RDP
 
 				return Task.CompletedTask;
 			}, null);
-
-			return Result.Task;
 		}
 
-		private Task StartedMessageHandler(object State, MessageEventArgs e)
+		private async Task StartedMessageHandler(object State, MessageEventArgs e)
 		{
 			List<ScreenInfo> Screens = new List<ScreenInfo>();
 			string SessionId = XML.Attribute(e.Content, "sessionId");
 
 			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
-				return Task.CompletedTask;
+				return;
 
 			Session.DeviceName = XML.Attribute(e.Content, "deviceName");
 			Session.BitsPerPixel = XML.Attribute(e.Content, "bitsPerPixel", 0);
@@ -189,32 +185,28 @@ namespace Waher.Networking.XMPP.RDP
 			}
 
 			Session.Screens = Screens.ToArray();
-			Session.State = RemoteDesktopSessionState.Started;
+			await Session.SetState(RemoteDesktopSessionState.Started);
 
 			Log.Informational("Remote desktop session started.",
 				new KeyValuePair<string, object>("RemoteJid", Session.RemoteJid),
 				new KeyValuePair<string, object>("SessionId", Session.SessionId));
-
-			return Task.CompletedTask;
 		}
 
-		private Task StoppedMessageHandler(object State, MessageEventArgs e)
+		private async Task StoppedMessageHandler(object State, MessageEventArgs e)
 		{
 			string SessionId = XML.Attribute(e.Content, "sessionId");
 			string Reason = XML.Attribute(e.Content, "reason");
 
 			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
-				return Task.CompletedTask;
+				return;
 
-			Session.State = RemoteDesktopSessionState.Stopped;
+			await Session.SetState(RemoteDesktopSessionState.Stopped);
 			this.sessions.Remove(SessionId);
 
 			Log.Informational("Remote desktop session stopped.",
 				new KeyValuePair<string, object>("RemoteJid", Session.RemoteJid),
 				new KeyValuePair<string, object>("SessionId", Session.SessionId),
 				new KeyValuePair<string, object>("Reason", Reason));
-
-			return Task.CompletedTask;
 		}
 
 		private Task TileMessageHandler(object State, MessageEventArgs e)
@@ -248,16 +240,14 @@ namespace Waher.Networking.XMPP.RDP
 			if (Session is null || TileBase64 is null)
 				return Task.CompletedTask;
 
-			Session.UpdateTile(X, Y, TileBase64);
-
-			return Task.CompletedTask;
+			return Session.UpdateTile(X, Y, TileBase64);
 		}
 
-		private Task TilesMessageHandler(object State, MessageEventArgs e)
+		private async Task TilesMessageHandler(object State, MessageEventArgs e)
 		{
 			string SessionId = XML.Attribute(e.Content, "sessionId");
 			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
-				return Task.CompletedTask;
+				return;
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
@@ -283,11 +273,9 @@ namespace Waher.Networking.XMPP.RDP
 						}
 					}
 
-					Session.UpdateTile(X, Y, TileBase64);
+					await Session.UpdateTile(X, Y, TileBase64);
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private Task ScanCompleteHandler(object State, MessageEventArgs e)
@@ -296,9 +284,7 @@ namespace Waher.Networking.XMPP.RDP
 			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
 				return Task.CompletedTask;
 
-			Session.ScanCompleted();
-
-			return Task.CompletedTask;
+			return Session.ScanCompleted();
 		}
 	}
 }

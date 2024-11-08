@@ -1,17 +1,7 @@
-﻿using System;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 namespace Waher.Networking.PeerToPeer
 {
-	/// <summary>
-	/// Delegate for UDP datagram events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task UdpDatagramEvent(object Sender, UdpDatagramEventArgs e);
-
 	/// <summary>
 	/// Event arguments for UDP Datagram events.
 	/// </summary>

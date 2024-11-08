@@ -649,11 +649,11 @@ namespace Waher.Client.WPF.Model.PubSub
 			}, null);
 		}
 
-		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.Service.PubSubClient.DeleteNode(this.node, (sender, e) =>
+			await this.Service.PubSubClient.DeleteNode(this.node, (sender, e) =>
 			{
 				MainWindow.MouseDefault();
 

@@ -145,19 +145,9 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			await Wait.Task;
 		}
 
-		private async Task RaiseEvent(EventHandlerAsync Callback)
+		private Task RaiseEvent(EventHandlerAsync Callback)
 		{
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return Callback.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -297,24 +287,14 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						HttpFileUploadEventArgs e2;
+				HttpFileUploadEventArgs e2;
 
-						if (this.maxFileSize.HasValue)
-							e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, (int)Math.Min(this.maxFileSize.Value, HttpFileUploadEventArgs.DefaultMaxChunkSize), this.client.Sniffers);
-						else
-							e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, this.client.Sniffers);
+				if (this.maxFileSize.HasValue)
+					e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, (int)Math.Min(this.maxFileSize.Value, HttpFileUploadEventArgs.DefaultMaxChunkSize), this.client.Sniffers);
+				else
+					e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, this.client.Sniffers);
 
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, e2);
 
 			}, State);
 		}

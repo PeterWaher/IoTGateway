@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events.Files;
+using Waher.Networking;
 
 namespace Waher.Events.Pipe
 {
@@ -287,18 +288,10 @@ namespace Waher.Events.Pipe
 					if (this.logIncoming)
 						Log.Event(Event);
 
-					EventEventHandler h = this.EventReceived;
-
-					if (!(h is null))
-						await h(this, new EventEventArgs(Event));
+					await this.EventReceived.Raise(this, new EventEventArgs(Event));
 				}
 				else
-				{
-					CustomFragmentEventHandler h = this.CustomFragmentReceived;
-
-					if (!(h is null))
-						await h(this, new CustomFragmentEventArgs(Doc));
-				}
+					await this.CustomFragmentReceived.Raise(this, new CustomFragmentEventArgs(Doc));
 			}
 			catch (Exception ex)
 			{
@@ -311,11 +304,11 @@ namespace Waher.Events.Pipe
 		/// <summary>
 		/// Event raised when an event has been received.
 		/// </summary>
-		public event EventEventHandler EventReceived;
+		public event EventHandlerAsync<EventEventArgs> EventReceived;
 
 		/// <summary>
 		/// Event raised when a custom XML fragment has been received.
 		/// </summary>
-		public event CustomFragmentEventHandler CustomFragmentReceived;
+		public event EventHandlerAsync<CustomFragmentEventArgs> CustomFragmentReceived;
 	}
 }

@@ -86,7 +86,7 @@ namespace Waher.Networking.LWM2M
 				await this.ValueUpdated();
 			}
 
-			base.Set();
+			await base.Set();
 		}
 
 		/// <summary>

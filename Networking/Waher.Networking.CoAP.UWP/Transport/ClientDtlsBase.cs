@@ -38,10 +38,17 @@ namespace Waher.Networking.CoAP.Transport
 			}
 		}
 
-		public override void BeginTransmit(Message Message)
+		public override async void BeginTransmit(Message Message)
 		{
-			this.Dtls.Send(Message.encoded, Message.destination, Message.credentials,
-				this.HandshakeCompleted, Message);
+			try
+			{
+				await this.Dtls.Send(Message.encoded, Message.destination, Message.credentials,
+					this.HandshakeCompleted, Message);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private async Task HandshakeCompleted(object Sender, UdpTransmissionEventArgs e)

@@ -465,7 +465,7 @@ namespace Waher.Networking
 			}
 		}
 
-		private async void BeginRead()
+		private async void BeginRead()	// Starts parallel task
 		{
 			lock (this.synchObj)
 			{
@@ -603,7 +603,7 @@ namespace Waher.Networking
 			try
 			{
 				EventHandlerAsync h = this.OnDisconnected;
-                if (!(h is null))
+				if (!(h is null))
 					await h(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
@@ -660,9 +660,7 @@ namespace Waher.Networking
 				if (this.HasSniffers)
 					await this.Exception(ex);
 
-				ExceptionEventHandler h = this.OnError;
-				if (!(h is null))
-					await h(this, ex);
+				await this.OnError.Raise(this, ex);
 			}
 			catch (Exception ex2)
 			{
@@ -678,7 +676,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when an error has occurred.
 		/// </summary>
-		public event ExceptionEventHandler OnError;
+		public event EventHandlerAsync<Exception> OnError;
 
 		/// <summary>
 		/// Event raised when the connection has been disconnected.
@@ -726,14 +724,14 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
+		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.BeginSend(Buffer, Offset, Count, Result, Callback, true);
-			return Result.Task;
+			await this.BeginSend(Buffer, Offset, Count, Result, Callback, true);
+			return await Result.Task;
 		}
 
-		private async void BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
+		private async Task BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
 			EventHandlerAsync Callback, bool CheckSending)
 		{
 			if (Buffer is null)
@@ -745,19 +743,7 @@ namespace Waher.Networking
 			if (Count == 0)
 			{
 				Task.TrySetResult(true);
-
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						await this.Error(ex);
-					}
-				}
-
+				await Callback.Raise(this, EventArgs.Empty);
 				return;
 			}
 
@@ -871,17 +857,7 @@ namespace Waher.Networking
 
 					Task.TrySetResult(true);
 
-					if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(this, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							await this.Error(ex);
-						}
-					}
+					await Callback.Raise(this, EventArgs.Empty);
 				}
 
 				if (!this.disposed)

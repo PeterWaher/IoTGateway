@@ -146,18 +146,8 @@ namespace Waher.Networking.XMPP.Software
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						PackageEventArgs e2 = new PackageEventArgs(PackageInfo, e);
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				PackageEventArgs e2 = new PackageEventArgs(PackageInfo, e);
+				await Callback.Raise(this, e2);
 
 			}, State);
 		}
@@ -219,18 +209,8 @@ namespace Waher.Networking.XMPP.Software
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						PackagesEventArgs e2 = new PackagesEventArgs(PackagesInfo, e);
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				PackagesEventArgs e2 = new PackagesEventArgs(PackagesInfo, e);
+				await Callback.Raise(this, e2);
 
 			}, State);
 		}
@@ -381,18 +361,8 @@ namespace Waher.Networking.XMPP.Software
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						SubscriptionsEventArgs e2 = new SubscriptionsEventArgs(FileNames, e);
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				SubscriptionsEventArgs e2 = new SubscriptionsEventArgs(FileNames, e);
+				await Callback.Raise(this, e2);
 			}, State);
 		}
 

@@ -386,38 +386,17 @@ namespace Waher.Networking.PeerToPeer
 
 				if (!(this.resynchCallback is null))
 				{
-					try
-					{
-						this.resynchCallback(this, EventArgs.Empty);
-
-						this.closed = true;
-						await this.DisposeAsync();
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-						await this.RaiseOnClosed();
-					}
+					await this.resynchCallback.Raise(this, EventArgs.Empty);
+					await this.DisposeAsync();
 				}
 				else
 					await this.RaiseOnClosed();
 			}
 		}
 
-		private async Task RaiseOnClosed()
+		private Task RaiseOnClosed()
 		{
-			EventHandlerAsync h = this.OnClosed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnClosed.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>

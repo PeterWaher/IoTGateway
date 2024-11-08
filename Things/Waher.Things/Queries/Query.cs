@@ -1,70 +1,18 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.Language;
 
 namespace Waher.Things.Queries
 {
 	/// <summary>
-	/// Delegate for query event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query event arguments.</param>
-	public delegate Task QueryEventHandler(object Sender, QueryEventArgs e);
-
-	/// <summary>
-	/// Delegate for query table event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query table event arguments.</param>
-	public delegate Task QueryTableEventHandler(object Sender, QueryTableEventArgs e);
-
-	/// <summary>
-	/// Delegate for query new table event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query new table event arguments.</param>
-	public delegate Task QueryNewTableEventHandler(object Sender, QueryNewTableEventArgs e);
-
-	/// <summary>
-	/// Delegate for query new records event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query new records event arguments.</param>
-	public delegate Task QueryNewRecordsEventHandler(object Sender, QueryNewRecordsEventArgs e);
-
-	/// <summary>
-	/// Delegate for query object event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query object arguments.</param>
-	public delegate Task QueryObjectEventHandler(object Sender, QueryObjectEventArgs e);
-
-	/// <summary>
-	/// Delegate for query message event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query message arguments.</param>
-	public delegate Task QueryMessageEventHandler(object Sender, QueryMessageEventArgs e);
-
-	/// <summary>
-	/// Delegate for query title event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query title arguments.</param>
-	public delegate Task QueryTitleEventHandler(object Sender, QueryTitleEventArgs e);
-
-	/// <summary>
-	/// Delegate for query status event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Query status arguments.</param>
-	public delegate Task QueryStatusEventHandler(object Sender, QueryStatusEventArgs e);
-
-	/// <summary>
 	/// Class handling the reception of data from a query.
 	/// </summary>
-	public class Query
+	public class Query : ISniffable
 	{
 		private readonly INode nodeReference;
 		private readonly Language language;
@@ -241,28 +189,18 @@ namespace Waher.Things.Queries
 				return Task.CompletedTask;
 		}
 
-		private async Task Raise(QueryEventHandler Callback, QueryEventArgs e, bool CheckTerminated)
+		private async Task Raise(EventHandlerAsync<QueryEventArgs> Callback, QueryEventArgs e, bool CheckTerminated)
 		{
 			if (CheckTerminated && (this.isAborted || this.isDone))
 				return;
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when the query has been aborted.
 		/// </summary>
-		public event QueryEventHandler OnAborted = null;
+		public event EventHandlerAsync<QueryEventArgs> OnAborted = null;
 
 		/// <summary>
 		/// Starts query execution.
@@ -290,7 +228,7 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Event raised when the query has been aborted.
 		/// </summary>
-		public event QueryEventHandler OnStarted = null;
+		public event EventHandlerAsync<QueryEventArgs> OnStarted = null;
 
 		/// <summary>
 		/// Query execution completed.
@@ -318,7 +256,7 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Event raised when query has been completed.
 		/// </summary>
-		public event QueryEventHandler OnDone = null;
+		public event EventHandlerAsync<QueryEventArgs> OnDone = null;
 
 		/// <summary>
 		/// Defines a new table in the query output.
@@ -338,25 +276,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnNewTable, e);
 		}
 
-		private async Task Raise(QueryNewTableEventHandler Callback, QueryNewTableEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryNewTableEventArgs> Callback, QueryNewTableEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when a new table has been created.
 		/// </summary>
-		public event QueryNewTableEventHandler OnNewTable = null;
+		public event EventHandlerAsync<QueryNewTableEventArgs> OnNewTable = null;
 
 		/// <summary>
 		/// Reports a new set of records in a table.
@@ -375,25 +304,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnNewRecords, e);
 		}
 
-		private async Task Raise(QueryNewRecordsEventHandler Callback, QueryNewRecordsEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryNewRecordsEventArgs> Callback, QueryNewRecordsEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when new records are reported for a table.
 		/// </summary>
-		public event QueryNewRecordsEventHandler OnNewRecords = null;
+		public event EventHandlerAsync<QueryNewRecordsEventArgs> OnNewRecords = null;
 
 		/// <summary>
 		/// Reports a table as being complete.
@@ -411,25 +331,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnTableDone, e);
 		}
 
-		private async Task Raise(QueryTableEventHandler Callback, QueryTableEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryTableEventArgs> Callback, QueryTableEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when a table is completed.
 		/// </summary>
-		public event QueryTableEventHandler OnTableDone = null;
+		public event EventHandlerAsync<QueryTableEventArgs> OnTableDone = null;
 
 		/// <summary>
 		/// Reports a new object.
@@ -447,25 +358,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnNewObject, e);
 		}
 
-		private async Task Raise(QueryObjectEventHandler Callback, QueryObjectEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryObjectEventArgs> Callback, QueryObjectEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when new records are reported for a table.
 		/// </summary>
-		public event QueryObjectEventHandler OnNewObject = null;
+		public event EventHandlerAsync<QueryObjectEventArgs> OnNewObject = null;
 
 		/// <summary>
 		/// Logs an Exception as a query message.
@@ -505,25 +407,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnMessage, e);
 		}
 
-		private async Task Raise(QueryMessageEventHandler Callback, QueryMessageEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryMessageEventArgs> Callback, QueryMessageEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when a new message has been received.
 		/// </summary>
-		public event QueryMessageEventHandler OnMessage = null;
+		public event EventHandlerAsync<QueryMessageEventArgs> OnMessage = null;
 
 		/// <summary>
 		/// Sets the title of the report.
@@ -541,25 +434,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnTitle, e);
 		}
 
-		private async Task Raise(QueryTitleEventHandler Callback, QueryTitleEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryTitleEventArgs> Callback, QueryTitleEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await Callback.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when the report title has been set.
 		/// </summary>
-		public event QueryTitleEventHandler OnTitle = null;
+		public event EventHandlerAsync<QueryTitleEventArgs> OnTitle = null;
 
 		/// <summary>
 		/// Sets the current status of the query execution.
@@ -575,25 +459,16 @@ namespace Waher.Things.Queries
 			return this.Raise(this.OnStatus, e);
 		}
 
-		private async Task Raise(QueryStatusEventHandler h, QueryStatusEventArgs e)
+		private async Task Raise(EventHandlerAsync<QueryStatusEventArgs> h, QueryStatusEventArgs e)
 		{
-			if (!this.isAborted && !this.isDone && !(h is null))
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					await this.LogMessage(ex);
-				}
-			}
+			if (!this.isAborted && !this.isDone)
+				await h.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when the current status changes.
 		/// </summary>
-		public event QueryStatusEventHandler OnStatus = null;
+		public event EventHandlerAsync<QueryStatusEventArgs> OnStatus = null;
 
 		/// <summary>
 		/// Begins a new section. Sections can be nested.
@@ -615,7 +490,7 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Event raised when a new section is created.
 		/// </summary>
-		public event QueryTitleEventHandler OnBeginSection = null;
+		public event EventHandlerAsync<QueryTitleEventArgs> OnBeginSection = null;
 
 		/// <summary>
 		/// Ends a section.
@@ -636,6 +511,103 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Event raised when a section is closed.
 		/// </summary>
-		public event QueryEventHandler OnEndSection = null;
+		public event EventHandlerAsync<QueryEventArgs> OnEndSection = null;
+
+		#region ISniffable
+
+		/// <summary>
+		/// Adds a sniffer to the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer to add.</param>
+		public void Add(ISniffer Sniffer) { }
+
+		/// <summary>
+		/// Adds a range of sniffers to the node.
+		/// </summary>
+		/// <param name="Sniffers">Sniffers to add.</param>
+		public void AddRange(IEnumerable<ISniffer> Sniffers) { }
+
+		/// <summary>
+		/// Removes a sniffer, if registered.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer to remove.</param>
+		/// <returns>If the sniffer was found and removed.</returns>
+		public bool Remove(ISniffer Sniffer) => false;
+
+		/// <summary>
+		/// Registered sniffers.
+		/// </summary>
+		public ISniffer[] Sniffers => Array.Empty<ISniffer>();
+
+		/// <summary>
+		/// If there are sniffers registered on the object.
+		/// </summary>
+		public bool HasSniffers => true;
+
+		/// <summary>
+		/// Gets a typed enumerator.
+		/// </summary>
+		public IEnumerator<ISniffer> GetEnumerator()
+		{
+			return new SnifferEnumerator(this.Sniffers);
+		}
+
+		/// <summary>
+		/// Gets an untyped enumerator.
+		/// </summary>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.Sniffers.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(byte[] Data) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(byte[] Data) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(string Text) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(string Text) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(string Comment) => this.LogMessage(QueryEventType.Information, QueryEventLevel.Minor, Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(string Warning) => this.LogMessage(QueryEventType.Warning, QueryEventLevel.Minor, Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
+		public Task Error(string Error) => this.LogMessage(QueryEventType.Error, QueryEventLevel.Minor, Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
+
+		#endregion
 	}
 }

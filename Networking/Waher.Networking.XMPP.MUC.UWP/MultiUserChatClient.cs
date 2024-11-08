@@ -326,10 +326,7 @@ namespace Waher.Networking.XMPP.MUC
 						};
 					}
 
-					if (Callback is null)
-						return Task.CompletedTask;
-					else
-						return Callback(this, e2);
+					return Callback.Raise(this, e2);
 				}, State);
 		}
 
@@ -393,10 +390,7 @@ namespace Waher.Networking.XMPP.MUC
 						};
 					}
 
-					if (Callback is null)
-						return Task.CompletedTask;
-					else
-						return Callback(this, e2);
+					return Callback.Raise(this, e2);
 				}, State);
 		}
 
@@ -525,10 +519,7 @@ namespace Waher.Networking.XMPP.MUC
 					}
 				}
 
-				if (Callback is null)
-					return Task.CompletedTask;
-				else
-					return Callback(this, new DataFormEventArgs(Form, e));
+				return Callback.Raise(this, new DataFormEventArgs(Form, e));
 			}, State);
 		}
 
@@ -580,11 +571,7 @@ namespace Waher.Networking.XMPP.MUC
 			return this.client.SendIqSet(ConfigurationForm.From, Xml2.ToString(), (sender3, e3) =>
 			{
 				e3.State = State?.State;
-
-				if (State?.SubmissionCallback is null)
-					return Task.CompletedTask;
-				else
-					return State.SubmissionCallback(this, e3);
+				return State?.SubmissionCallback.Raise(this, e3);
 			}, null);
 		}
 
@@ -627,11 +614,7 @@ namespace Waher.Networking.XMPP.MUC
 			{
 				e3.Ok = false;
 				e3.State = State?.State;
-
-				if (State?.SubmissionCallback is null)
-					return Task.CompletedTask;
-				else
-					return State.SubmissionCallback(this, e3);
+				return State?.SubmissionCallback.Raise(this, e3);
 			}, null);
 		}
 
@@ -1377,10 +1360,7 @@ namespace Waher.Networking.XMPP.MUC
 						};
 					}
 
-					if (Callback is null)
-						return Task.CompletedTask;
-					else
-						return Callback(this, e2);
+					return Callback.Raise(this, e2);
 				}, State);
 		}
 
@@ -1602,10 +1582,7 @@ namespace Waher.Networking.XMPP.MUC
 
 											return this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
 											{
-												if (SubmissionCallback is null)
-													return Task.CompletedTask;
-												else
-													return SubmissionCallback(this, e3);
+												return SubmissionCallback.Raise(this, e3);
 											}, null);
 										},
 										(sender2, Form2) =>
@@ -1623,11 +1600,7 @@ namespace Waher.Networking.XMPP.MUC
 											return this.client.SendIqSet(Form2.From, Xml2.ToString(), (sender3, e3) =>
 											{
 												e3.Ok = false;
-
-												if (SubmissionCallback is null)
-													return Task.CompletedTask;
-												else
-													return SubmissionCallback(this, e3);
+												return SubmissionCallback.Raise(this, e3);
 											}, null);
 										},
 										e.From, e.To)
@@ -1643,17 +1616,7 @@ namespace Waher.Networking.XMPP.MUC
 
 				RoomRegistrationEventArgs e2 = new RoomRegistrationEventArgs(e, Form, AlreadyRegistered, UserName);
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, e2);
 			}, State);
 		}
 
@@ -1720,10 +1683,7 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			return this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, (sender, e) =>
 			{
-				if (Callback is null)
-					return Task.CompletedTask;
-				else
-					return Callback(this, new RoomInformationEventArgs(e));
+				return Callback.Raise(this, new RoomInformationEventArgs(e));
 			}, State);
 		}
 
@@ -1757,11 +1717,7 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			return this.client.SendServiceDiscoveryRequest(RoomId + "@" + Domain, "x-roomuser-item", (sender, e) =>
 			{
-
-				if (Callback is null)
-					return Task.CompletedTask;
-				else
-					return Callback(this, e);
+				return Callback.Raise(this, e);
 			}, State);
 		}
 
@@ -2394,10 +2350,7 @@ namespace Waher.Networking.XMPP.MUC
 					}
 				}
 
-				if (Callback is null)
-					return Task.CompletedTask;
-				else
-					return Callback(this, new OccupantListEventArgs(e, Occupants.ToArray()));
+				return Callback.Raise(this, new OccupantListEventArgs(e, Occupants.ToArray()));
 			}, State);
 		}
 

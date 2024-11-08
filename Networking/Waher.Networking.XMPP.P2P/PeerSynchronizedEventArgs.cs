@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.P2P
 {
-	/// <summary>
-	/// Delegate for peer synchronization events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task PeerSynchronizedEventHandler(object Sender, PeerSynchronizedEventArgs e);
-
 	/// <summary>
 	/// Event arguments for peer synchronization events.
 	/// </summary>

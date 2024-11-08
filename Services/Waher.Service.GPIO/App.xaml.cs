@@ -157,9 +157,7 @@ namespace Waher.Service.GPIO
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
-						this.RaiseOwnershipChanged();
-
-						return Task.CompletedTask;
+						return this.RaiseOwnershipChanged();
 					};
 
 					this.thingRegistryClient.Disowned += (sender, e) =>
@@ -229,7 +227,7 @@ namespace Waher.Service.GPIO
 
 					RosterItem Item = this.xmppClient.GetRosterItem(e.FromBareJID);
 					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-						this.xmppClient.RequestPresenceSubscription(e.FromBareJID);
+						await this.xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
 					await this.xmppClient.SetPresence(Availability.Chat);
 				};
@@ -273,7 +271,7 @@ namespace Waher.Service.GPIO
 									DateTime TP = DateTime.Now;
 									string s = "GPIO" + sender.PinNumber.ToString();
 
-									this.sensorServer.NewMomentaryValues(
+									await this.sensorServer.NewMomentaryValues(
 										new EnumField(ThingReference.Empty, TP, s, Value, FieldType.Momentary, FieldQoS.AutomaticReadout));
 								}
 
@@ -373,7 +371,7 @@ namespace Waher.Service.GPIO
 
 							if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
 							{
-								this.sensorServer.NewMomentaryValues(
+								await this.sensorServer.NewMomentaryValues(
 									new Int32Field(ThingReference.Empty, TP, pin + ", Raw",
 										value, FieldType.Momentary, FieldQoS.AutomaticReadout),
 									new QuantityField(ThingReference.Empty, TP, pin,
@@ -397,7 +395,7 @@ namespace Waher.Service.GPIO
 
 							if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
 							{
-								this.sensorServer.NewMomentaryValues(
+								await this.sensorServer.NewMomentaryValues(
 									new EnumField(ThingReference.Empty, TP, s, value, FieldType.Momentary, FieldQoS.AutomaticReadout));
 							}
 
@@ -494,7 +492,7 @@ namespace Waher.Service.GPIO
 				if (this.arduino is null)
 					this.SetupControlServer();
 
-				this.xmppClient.Connect();
+				await this.xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{
@@ -755,7 +753,7 @@ namespace Waher.Service.GPIO
 
 			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(this.thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
-			this.thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
+			this.thingRegistryClient.RegisterThing(metaData, async (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{
@@ -766,27 +764,14 @@ namespace Waher.Service.GPIO
 					else
 						ownerJid = string.Empty;
 
-					this.RaiseOwnershipChanged();
+					await this.RaiseOwnershipChanged();
 				}
-
-				return Task.CompletedTask;
 			}, null);
 		}
 
-		private void RaiseOwnershipChanged()
+		private Task RaiseOwnershipChanged()
 		{
-			EventHandler h = OwnershipChanged;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return OwnershipChanged.Raise(this, EventArgs.Empty);
 		}
 
 		public static event EventHandler OwnershipChanged = null;

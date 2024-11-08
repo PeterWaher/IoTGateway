@@ -1,15 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.UPnP
 {
-	/// <summary>
-	/// UPnP Notification event handler.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task NotificationEventHandler(object Sender, NotificationEventArgs e);
-
 	/// <summary>
 	/// Contains information about the location of a device on the network.
 	/// </summary>
@@ -54,6 +46,5 @@ namespace Waher.Networking.UPnP
 		/// Remote End Point
 		/// </summary>
 		public IPEndPoint RemoteEndPoint => this.remoteEndPoint;
-
 	}
 }

@@ -188,15 +188,15 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public virtual Task GET(CoapMessage Request, CoapResponse Response)
+		public virtual async Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			ILwm2mWriter Writer;
 			bool FromBootstrapServer = this.objInstance.Object.Client.IsFromBootstrapServer(Request);
 
 			if (this.id == 0 && !FromBootstrapServer)
 			{
-				Response.RST(CoapCode.Unauthorized);
-				return Task.CompletedTask;
+				await Response.RST(CoapCode.Unauthorized);
+				return;
 			}
 
 			if (Request.Accept is null)
@@ -211,55 +211,37 @@ namespace Waher.Networking.LWM2M
 				Writer = new OpaqueWriter();
 			else
 			{
-				Response.RST(CoapCode.NotAcceptable);
-				return Task.CompletedTask;
+				await Response.RST(CoapCode.NotAcceptable);
+				return;
 			}
 
 			if (!(this.OnBeforeGet is null))
-			{
-				try
-				{
-					this.OnBeforeGet.Invoke(this, new CoapRequestEventArgs(Request));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+				await this.OnBeforeGet.Raise(this, new CoapRequestEventArgs(Request));
 
 			this.Write(Writer);
 
 			byte[] Payload = Writer.ToArray();
 
-			Response.Respond(CoapCode.Content, Payload, 64,
+			await Response.Respond(CoapCode.Content, Payload, 64,
 				new CoapOptionContentFormat(Writer.ContentFormat));
-	
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Event raised before the response to a GET request is generated.
 		/// </summary>
-		public event CoapRequestEventHandler OnBeforeGet = null;
+		public event EventHandlerAsync<CoapRequestEventArgs> OnBeforeGet = null;
 
 		/// <summary>
 		/// Event raised after the resource has been registered
 		/// </summary>
-		public event EventHandler OnAfterRegister = null;
+		public event EventHandlerAsync OnAfterRegister = null;
 
 		/// <summary>
 		/// Called after the resource has been registered on a CoAP Endpoint.
 		/// </summary>
-		public virtual void AfterRegister()
+		public virtual Task AfterRegister()
 		{
-			try
-			{
-				this.OnAfterRegister?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnAfterRegister.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -295,7 +277,7 @@ namespace Waher.Networking.LWM2M
 
 			if (this.id == 0 && !FromBootstrapServer)
 			{
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 				return;
 			}
 
@@ -303,7 +285,7 @@ namespace Waher.Networking.LWM2M
 			{
 				if (!FromBootstrapServer)
 				{
-					Response.RST(CoapCode.Unauthorized);
+					await Response.RST(CoapCode.Unauthorized);
 					return;
 				}
 
@@ -320,7 +302,7 @@ namespace Waher.Networking.LWM2M
 							break;
 
 						default:
-							Response.RST(CoapCode.BadRequest);
+							await Response.RST(CoapCode.BadRequest);
 							return;
 					}
 				}
@@ -330,7 +312,7 @@ namespace Waher.Networking.LWM2M
 			{
 				if (!this.canWrite && !FromBootstrapServer)
 				{
-					Response.Respond(CoapCode.BadRequest);
+					await Response.Respond(CoapCode.BadRequest);
 					return;
 				}
 
@@ -343,19 +325,19 @@ namespace Waher.Networking.LWM2M
 				}
 				else
 				{
-					Response.Respond(CoapCode.NotAcceptable);
+					await Response.Respond(CoapCode.NotAcceptable);
 					return;
 				}
 
-				this.RemoteUpdate(Request);
+				await this.RemoteUpdate(Request);
 			}
 			else
-				this.Execute(Request);
+				await this.Execute(Request);
 
-			Response.Respond(CoapCode.Changed);
+			await Response.Respond(CoapCode.Changed);
 		}
 
-		internal void RemoteUpdate(CoapMessage Request)
+		internal Task RemoteUpdate(CoapMessage Request)
 		{
 			if (!string.IsNullOrEmpty(this.name))
 			{
@@ -363,63 +345,42 @@ namespace Waher.Networking.LWM2M
 					new KeyValuePair<string, object>("Value", this.Value));
 			}
 
-			try
-			{
-				this.OnRemoteUpdate?.Invoke(this, new CoapRequestEventArgs(Request));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnRemoteUpdate.Raise(this, new CoapRequestEventArgs(Request));
 		}
 
 		/// <summary>
 		/// Even raised when a new value has been written to the resource from a remote source.
 		/// </summary>
-		public event CoapRequestEventHandler OnRemoteUpdate = null;
+		public event EventHandlerAsync<CoapRequestEventArgs> OnRemoteUpdate = null;
 
 		/// <summary>
 		/// Executes an action on the resource.
 		/// </summary>
 		/// <param name="Request">Request message.</param>
-		public virtual void Execute(CoapMessage Request)
+		public virtual Task Execute(CoapMessage Request)
 		{
 			if (!string.IsNullOrEmpty(this.name))
 				Log.Informational("Executing action.", this.name, Request.From.ToString());
 
-			try
-			{
-				this.OnExecute?.Invoke(this, new CoapRequestEventArgs(Request));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnExecute.Raise(this, new CoapRequestEventArgs(Request));
 		}
 
 		/// <summary>
 		/// Event raised when the resource is executed.
 		/// </summary>
-		public event CoapRequestEventHandler OnExecute = null;
+		public event EventHandlerAsync<CoapRequestEventArgs> OnExecute = null;
 
 		/// <summary>
 		/// Event raised when the resource value has been set.
 		/// </summary>
-		public event EventHandler OnSet = null;
+		public event EventHandlerAsync OnSet = null;
 
 		/// <summary>
 		/// Raises the <see cref="OnSet"/> event.
 		/// </summary>
-		protected void Set()
+		protected Task Set()
 		{
-			try
-			{
-				this.OnSet?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnSet.Raise(this, EventArgs.Empty);
 		}
 	}
 }

@@ -72,7 +72,19 @@ namespace Waher.Networking.XMPP.Abuse
             this.client.RegisterIqSetHandler("unblock", NamespaceBlocking, this.UnblockPushHandler, false);
 
             if (Client.State == XmppState.Connected)
-                this.BeginSearchSupport();
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await this.BeginSearchSupport();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Exception(ex);
+                    }
+				});
+            }
 
             this.client.OnStateChanged += this.Client_OnStateChanged;
         }
@@ -82,12 +94,12 @@ namespace Waher.Networking.XMPP.Abuse
 		/// </summary>
 		public override string[] Extensions => new string[] { "XEP-0191", "XEP-0377" };
 
-		private Task Client_OnStateChanged(object _, XmppState NewState)
+		private async Task Client_OnStateChanged(object _, XmppState NewState)
         {
             switch (NewState)
             {
                 case XmppState.Connected:
-                    this.BeginSearchSupport();
+                    await this.BeginSearchSupport();
                     break;
 
                 case XmppState.Offline:
@@ -98,8 +110,6 @@ namespace Waher.Networking.XMPP.Abuse
                     this.supportsAbuseReason = false;
                     break;
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -160,9 +170,9 @@ namespace Waher.Networking.XMPP.Abuse
             return Task.CompletedTask;
         }
 
-        private void BeginSearchSupport()
+        private Task BeginSearchSupport()
         {
-			this.Client.SendServiceDiscoveryRequest(this.Client.Domain, async (sender, e) =>
+			return this.Client.SendServiceDiscoveryRequest(this.Client.Domain, async (sender, e) =>
             {
                 if (e.Ok)
                 {
@@ -348,18 +358,8 @@ namespace Waher.Networking.XMPP.Abuse
 
         private async Task CallCallback(EventHandlerAsync<IqResultEventArgs> Callback, object State, IqResultEventArgs e)
         {
-            if (!(Callback is null))
-            {
-                try
-                {
-                    e.State = State;
-                    await Callback(this, e);
-                }
-                catch (Exception ex)
-                {
-                    Log.Exception(ex);
-                }
-            }
+			e.State = State;
+            await Callback.Raise(this, e);
         }
 
         /// <summary>

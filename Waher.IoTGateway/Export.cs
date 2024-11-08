@@ -166,18 +166,7 @@ namespace Waher.IoTGateway
 				if (!(BackupConfiguration.Instance is null))
 					await BackupConfiguration.Instance.UpdateExportFolder(await GetFullExportFolderAsync());
 
-				EventHandlerAsync h = OnExportFolderUpdated;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(BackupConfiguration.Instance, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await OnExportFolderUpdated.Raise(BackupConfiguration.Instance, EventArgs.Empty);
 			}
 		}
 
@@ -212,18 +201,7 @@ namespace Waher.IoTGateway
 
 				BackupConfiguration.Instance?.UpdateExportKeyFolder(await GetFullKeyExportFolderAsync());
 
-				EventHandlerAsync h = OnExportKeyFolderUpdated;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(BackupConfiguration.Instance, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await OnExportKeyFolderUpdated.Raise(BackupConfiguration.Instance, EventArgs.Empty);
 			}
 		}
 

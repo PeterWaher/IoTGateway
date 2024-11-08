@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Networking;
 using Waher.Networking.MQTT;
 
 namespace Waher.Events.MQTT
@@ -41,7 +42,7 @@ namespace Waher.Events.MQTT
 			this.client.OnContentReceived -= this.Client_OnContentReceived;
 		}
 
-		private Task Client_OnContentReceived(object Sender, MqttContent Content)
+		private async Task Client_OnContentReceived(object Sender, MqttContent Content)
 		{
 			string Xml = CommonTypes.GetString(Content.Data, System.Text.Encoding.UTF8);
 			XmlDocument Doc = new XmlDocument()
@@ -54,12 +55,12 @@ namespace Waher.Events.MQTT
 			}
 			catch (Exception)
 			{
-				return Task.CompletedTask;
+				return;
 			}
 
 			XmlElement E = Doc.DocumentElement;
 			if (E.LocalName != "log" || E.NamespaceURI != MqttEventSink.NamespaceEventLogging)
-				return Task.CompletedTask;
+				return;
 
 			XmlElement E2;
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
@@ -201,30 +202,18 @@ namespace Waher.Events.MQTT
 				Facility = Content.Topic;
 
 			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
-			EventEventHandler h = this.OnEvent;
+			EventHandlerAsync<EventEventArgs> h = this.OnEvent;
 			
 			if (h is null)
 				Log.Event(Event);
 			else
-			{
-				try
-				{
-					h(this, new EventEventArgs(Content, Event, this.client));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
-
-			return Task.CompletedTask;
+				await h.Raise(this, new EventEventArgs(Content, Event, this.client));
 		}
 
 		/// <summary>
 		/// Event raised whenever an event has been received. If no event handler is defined, the default action is to log the event
 		/// to <see cref="Log"/>.
 		/// </summary>
-		public event EventEventHandler OnEvent = null;
-
+		public event EventHandlerAsync<EventEventArgs> OnEvent = null;
 	}
 }

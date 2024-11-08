@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Waher.Networking.CoAP.Options;
@@ -94,9 +93,9 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Code">CoAP message code.</param>
 		/// <param name="Options">Optional options.</param>
-		public void Respond(CoapCode Code, params CoapOption[] Options)
+		public Task Respond(CoapCode Code, params CoapOption[] Options)
 		{
-			this.Respond(Code, null, 64, Options);
+			return this.Respond(Code, null, 64, Options);
 		}
 
 		/// <summary>
@@ -106,10 +105,10 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Optional payload.</param>
 		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
 		/// <param name="Options">Optional options.</param>
-		public void Respond(CoapCode Code, byte[] Payload, int BlockSize, params CoapOption[] Options)
+		public Task Respond(CoapCode Code, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
 			int BlockNr = !(this.request.Block2 is null) ? this.request.Block2.Number : 0;
-			this.Respond(Code, Payload, BlockNr, BlockSize, Options);
+			return this.Respond(Code, Payload, BlockNr, BlockSize, Options);
 		}
 
 		/// <summary>
@@ -120,10 +119,10 @@ namespace Waher.Networking.CoAP
 		/// <param name="Block2Nr">Block index to transmit.</param>
 		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
 		/// <param name="Options">Optional options.</param>
-		internal void Respond(CoapCode Code, byte[] Payload, int Block2Nr, int BlockSize,
+		internal async Task Respond(CoapCode Code, byte[] Payload, int Block2Nr, int BlockSize,
 			params CoapOption[] Options)
 		{
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
+			await this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.request.MessageId,
 				this.ResponseType, Code, this.request.Token, false, Payload, Block2Nr, BlockSize,
 				this.resource, null, null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
@@ -163,19 +162,6 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Optional payload to be encoded.</param>
 		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
 		/// <param name="Options">Optional options.</param>
-		[Obsolete("Use RespondAsync for better asynchronous performance.")]
-		public void Respond(CoapCode Code, object Payload, int BlockSize, params CoapOption[] Options)
-		{
-			this.RespondAsync(Code, Payload, BlockSize, Options).Wait();
-		}
-
-		/// <summary>
-		/// Returns a response to the caller.
-		/// </summary>
-		/// <param name="Code">CoAP message code.</param>
-		/// <param name="Payload">Optional payload to be encoded.</param>
-		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
-		/// <param name="Options">Optional options.</param>
 		public async Task RespondAsync(CoapCode Code, object Payload, int BlockSize, params CoapOption[] Options)
 		{
 			KeyValuePair<byte[], int> P = await CoapEndpoint.EncodeAsync(Payload);
@@ -185,25 +171,25 @@ namespace Waher.Networking.CoAP
 			if (!CoapEndpoint.HasOption(Options, 12))
 				Options = CoapEndpoint.Merge(Options, new CoapOptionContentFormat((ulong)ContentFormat));
 
-			this.Respond(Code, Data, BlockSize, Options);
+			await this.Respond(Code, Data, BlockSize, Options);
 		}
 
 		/// <summary>
 		/// Returns an acknowledgement.
 		/// </summary>
-		public void ACK()
+		public Task ACK()
 		{
-			this.ACK(CoapCode.EmptyMessage);
+			return this.ACK(CoapCode.EmptyMessage);
 		}
 
 		/// <summary>
 		/// Returns an acknowledgement.
 		/// </summary>
 		/// <param name="Code">CoAP message code.</param>
-		public void ACK(CoapCode Code)
+		public Task ACK(CoapCode Code)
 		{
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
+			return this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.request.MessageId, CoapMessageType.ACK, Code,
 				Code == CoapCode.EmptyMessage ? (ulong?)null : this.request.Token, false,
 				null, 0, 64, this.resource, null, null, null, null);
@@ -212,19 +198,19 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Returns a reset message.
 		/// </summary>
-		public void RST()
+		public Task RST()
 		{
-			this.RST(CoapCode.EmptyMessage);
+			return this.RST(CoapCode.EmptyMessage);
 		}
 
 		/// <summary>
 		/// Returns a reset message.
 		/// </summary>
 		/// <param name="Code">CoAP mesasge code.</param>
-		public void RST(CoapCode Code)
+		public Task RST(CoapCode Code)
 		{
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
+			return this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.request.MessageId, CoapMessageType.RST, Code,
 				Code == CoapCode.EmptyMessage ? (ulong?)null : this.request.Token, false, null, 0, 64,
 				this.resource, null, null, null, null);

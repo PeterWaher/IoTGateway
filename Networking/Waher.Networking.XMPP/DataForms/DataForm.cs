@@ -1172,18 +1172,7 @@ namespace Waher.Networking.XMPP.DataForms
 				await NewField.SetValue(OldField.ValueStrings);
 			}
 
-			EventHandlerAsync<DataForm> h = this.OnRemoteUpdate;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this.client, this);
-				}
-				catch (Exception ex)
-				{
-					await this.client.Exception(ex);
-				}
-			}
+			await this.OnRemoteUpdate.Raise(this.client, this);
 		}
 
 		/// <summary>

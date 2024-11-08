@@ -6,7 +6,6 @@ using System.Text;
 using Waher.Events;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.ContentFormats;
-using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.LWM2M.ContentFormats;
 
@@ -30,6 +29,19 @@ namespace Waher.Networking.LWM2M
 		private int lifetimeSeconds = 0;
 		private int registrationEpoch = 0;
 
+		private Lwm2mClient(string ClientName, CoapEndpoint CoapEndpoint)
+			: base("/")
+		{
+			this.coapEndpoint = CoapEndpoint;
+			this.serverReferences = new Lwm2mServerReference[0];
+			this.clientName = ClientName;
+			this.state = Lwm2mState.Bootstrap;
+			this.bsResource = new BootstreapResource(this);
+
+			this.coapEndpoint.Register(this);
+			this.coapEndpoint.Register(this.bsResource);
+		}
+
 		/// <summary>
 		/// Class implementing an LWM2M client, as defined in:
 		/// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
@@ -37,33 +49,26 @@ namespace Waher.Networking.LWM2M
 		/// <param name="ClientName">Client name.</param>
 		/// <param name="CoapEndpoint">CoAP endpoint to use for LWM2M communication.</param>
 		/// <param name="Objects">Objects</param>
-		public Lwm2mClient(string ClientName, CoapEndpoint CoapEndpoint,
-			params Lwm2mObject[] Objects)
-			: base("/")
+		public static async Task<Lwm2mClient> Create(string ClientName, CoapEndpoint CoapEndpoint, params Lwm2mObject[] Objects)
 		{
-			this.coapEndpoint = CoapEndpoint;
-			this.serverReferences = ServerReferences;
-			this.clientName = ClientName;
-			this.state = Lwm2mState.Bootstrap;
-			this.bsResource = new BootstreapResource(this);
-
-			this.coapEndpoint.Register(this);
-			this.coapEndpoint.Register(this.bsResource);
+			Lwm2mClient Result = new Lwm2mClient(ClientName, CoapEndpoint);
 
 			foreach (Lwm2mObject Object in Objects)
 			{
 				if (Object.Id < 0)
 					throw new ArgumentException("Invalid object ID.", nameof(Object));
 
-				if (this.objects.ContainsKey(Object.Id))
+				if (Result.objects.ContainsKey(Object.Id))
 					throw new ArgumentException("An object with ID " + Object.Id + " is already registered.", nameof(Object));
 
-				this.objects[Object.Id] = Object;
-				Object.Client = this;
+				Result.objects[Object.Id] = Object;
+				Object.Client = Result;
 
-				this.coapEndpoint.Register(Object);
-				Object.AfterRegister();
+				Result.coapEndpoint.Register(Object);
+				await Object.AfterRegister();
 			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -79,24 +84,14 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// State of LWM2M client.
 		/// </summary>
-		public Lwm2mState State
-		{
-			get => this.state;
-			internal set
-			{
-				if (this.state != value)
-				{
-					this.state = value;
+		public Lwm2mState State => this.state;
 
-					try
-					{
-						this.OnStateChanged?.Invoke(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+		internal async Task SetState(Lwm2mState NewState)
+		{
+			if (this.state != NewState)
+			{
+				this.state = NewState;
+				await this.OnStateChanged.Raise(this, EventArgs.Empty);
 			}
 		}
 
@@ -168,29 +163,32 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Callback">Callback method when bootstrap request has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If a bootstrap server was found, and request initiated.</returns>
-		public async Task<bool> RequestBootstrap(CoapResponseEventHandler Callback, object State)
+		public async Task<bool> RequestBootstrap(EventHandlerAsync<CoapResponseEventArgs> Callback, object State)
 		{
 			foreach (Lwm2mObject Object in this.objects.Values)
 			{
 				if (Object is Lwm2mSecurityObject SecurityObject)
 				{
-					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
+					foreach (Lwm2mObjectInstance Instance in SecurityObject.Instances)
 					{
-						Lwm2mServerReference Ref = Instance.GetServerReference(true);
-						if (!(Ref is null))
+						if (Instance is Lwm2mSecurityObjectInstance SecurityInstance)
 						{
-							if (Instance.clientHoldOffTimeSeconds.IntegerValue.HasValue &&
-								Instance.clientHoldOffTimeSeconds.IntegerValue.Value > 0)
+							Lwm2mServerReference Ref = SecurityInstance.GetServerReference(true);
+							if (!(Ref is null))
 							{
-								this.coapEndpoint.ScheduleEvent(
-									async (P) => await this.RequestBootstrap((Lwm2mServerReference)P, Callback, State),
-									DateTime.Now.AddSeconds(Instance.clientHoldOffTimeSeconds.IntegerValue.Value),
-									Ref);
-							}
-							else
-								await this.RequestBootstrap(Ref, Callback, State);
+								if (SecurityInstance.clientHoldOffTimeSeconds.IntegerValue.HasValue &&
+									SecurityInstance.clientHoldOffTimeSeconds.IntegerValue.Value > 0)
+								{
+									this.coapEndpoint.ScheduleEvent(
+										async (P) => await this.RequestBootstrap((Lwm2mServerReference)P, Callback, State),
+										DateTime.Now.AddSeconds(SecurityInstance.clientHoldOffTimeSeconds.IntegerValue.Value),
+										Ref);
+								}
+								else
+									await this.RequestBootstrap(Ref, Callback, State);
 
-							return true;
+								return true;
+							}
 						}
 					}
 				}
@@ -219,7 +217,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Callback">Callback method when bootstrap request has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public async Task RequestBootstrap(Lwm2mServerReference BootstrapServer,
-			CoapResponseEventHandler Callback, object State)
+			EventHandlerAsync<CoapResponseEventArgs> Callback, object State)
 		{
 			this.bootstrapSever = BootstrapServer;
 
@@ -265,20 +263,10 @@ namespace Waher.Networking.LWM2M
 		private async Task BootstrapResponse(object Sender, CoapResponseEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			CoapResponseEventHandler Callback = (CoapResponseEventHandler)P[0];
+			EventHandlerAsync<CoapResponseEventArgs> Callback = (EventHandlerAsync<CoapResponseEventArgs>)P[0];
 			object State = P[1];
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback.Invoke(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, e);
 		}
 
 
@@ -298,16 +286,16 @@ namespace Waher.Networking.LWM2M
 			if (this.state != Lwm2mState.Bootstrap)
 			{
 				if (this.IsFromBootstrapServer(Request))
-					this.State = Lwm2mState.Bootstrap;
+					await this.SetState(Lwm2mState.Bootstrap);
 				else
 				{
-					Response.RST(CoapCode.Unauthorized);
+					await Response.RST(CoapCode.Unauthorized);
 					return;
 				}
 			}
 
 			await this.DeleteBootstrapInfo();
-			Response.ACK(CoapCode.Deleted);
+			await Response.ACK(CoapCode.Deleted);
 		}
 
 		/// <summary>
@@ -351,29 +339,13 @@ namespace Waher.Networking.LWM2M
 		internal async Task BootstrapCompleted()
 		{
 			await this.ApplyBootstrapInfo();
-
-			try
-			{
-				this.OnBootstrapCompleted?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-
-			this.Register();
+			await this.OnBootstrapCompleted.Raise(this, EventArgs.Empty);
+			await this.Register();
 		}
 
-		internal void BootstrapFailed()
+		internal Task BootstrapFailed()
 		{
-			try
-			{
-				this.OnBootstrapFailed?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnBootstrapFailed.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -403,10 +375,10 @@ namespace Waher.Networking.LWM2M
 				if (this.client.IsFromBootstrapServer(Request))
 				{
 					await this.client.BootstrapCompleted();
-					Response.Respond(CoapCode.Changed);
+					await Response.Respond(CoapCode.Changed);
 				}
 				else
-					Response.RST(CoapCode.Unauthorized);
+					await Response.RST(CoapCode.Unauthorized);
 			}
 		}
 
@@ -417,7 +389,7 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Registers client with server(s), as defined in bootstrapped information.
 		/// </summary>
-		public bool Register()
+		public async Task<bool> Register()
 		{
 			bool Result = false;
 
@@ -425,10 +397,13 @@ namespace Waher.Networking.LWM2M
 			{
 				if (Object is Lwm2mServerObject ServerObject)
 				{
-					foreach (Lwm2mServerObjectInstance Instance in ServerObject.Instances)
+					foreach (Lwm2mObjectInstance Instance in ServerObject.Instances)
 					{
-						if (Instance.Register(this))
-							Result = true;
+						if (Instance is Lwm2mServerObjectInstance ServerInstance)
+						{
+							if (await ServerInstance.Register(this))
+								Result = true;
+						}
 					}
 				}
 			}
@@ -447,10 +422,13 @@ namespace Waher.Networking.LWM2M
 			{
 				if (Object is Lwm2mSecurityObject SecurityObject)
 				{
-					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
+					foreach (Lwm2mObjectInstance Instance in SecurityObject.Instances)
 					{
-						if (Instance.IsServer(ShortServerId))
-							return Instance;
+						if (Instance is Lwm2mSecurityObjectInstance SecurityInstance)
+						{
+							if (SecurityInstance.IsServer(ShortServerId))
+								return SecurityInstance;
+						}
 					}
 				}
 			}
@@ -463,7 +441,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		/// <param name="LifetimeSeconds">Lifetime, in seconds.</param>
 		/// <param name="Servers">Servers to register with.</param>
-		public void Register(int LifetimeSeconds, params Lwm2mServerReference[] Servers)
+		public async Task Register(int LifetimeSeconds, params Lwm2mServerReference[] Servers)
 		{
 			if (LifetimeSeconds <= 0)
 				throw new ArgumentOutOfRangeException("Expected positive integer.", nameof(LifetimeSeconds));
@@ -471,34 +449,34 @@ namespace Waher.Networking.LWM2M
 			this.serverReferences = Servers;
 			this.lastLinks = this.EncodeObjectLinks(false);
 			this.lifetimeSeconds = LifetimeSeconds;
-			this.State = Lwm2mState.Registration;
+			await this.SetState(Lwm2mState.Registration);
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
-				this.Register(Server, this.lastLinks, false);
+				await this.Register(Server, this.lastLinks, false);
 		}
 
-		private void Register(Lwm2mServerReference Server, string Links, bool Update)
+		private async Task Register(Lwm2mServerReference Server, string Links, bool Update)
 		{
 			if (Update && !string.IsNullOrEmpty(Server.LocationPath) &&
 				Server.LocationPath.StartsWith("/"))
 			{
 				if (Links != this.lastLinks)
 				{
-					this.coapEndpoint.POST(Server.Uri + Server.LocationPath.Substring(1),
+					await this.coapEndpoint.POST(Server.Uri + Server.LocationPath.Substring(1),
 						true, Encoding.UTF8.GetBytes(Links), 64, Server.Credentials,
 						this.RegisterResponse, new object[] { Server, true },
 						new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
 				}
 				else
 				{
-					this.coapEndpoint.POST(Server.Uri + Server.LocationPath.Substring(1),
+					await this.coapEndpoint.POST(Server.Uri + Server.LocationPath.Substring(1),
 						true, null, 64, Server.Credentials, this.RegisterResponse,
 						new object[] { Server, true });
 				}
 			}
 			else
 			{
-				this.coapEndpoint.POST(Server.Uri + "rd?ep=" + this.clientName +
+				await this.coapEndpoint.POST(Server.Uri + "rd?ep=" + this.clientName +
 					"&lt=" + this.lifetimeSeconds.ToString() + "&lwm2m=1.0", true,
 					Encoding.UTF8.GetBytes(Links), 64, Server.Credentials,
 					this.RegisterResponse, new object[] { Server, false },
@@ -520,7 +498,7 @@ namespace Waher.Networking.LWM2M
 		/// Re-registers the client with server. Must be called before the current
 		/// registration times out.
 		/// </summary>
-		public void RegisterUpdate()
+		public async Task RegisterUpdate()
 		{
 			if (this.lifetimeSeconds <= 0)
 				throw new Exception("Client has not been registered.");
@@ -529,15 +507,15 @@ namespace Waher.Networking.LWM2M
 			bool Update = this.state == Lwm2mState.Operation;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
-				this.Register(Server, Links, Update);
+				await this.Register(Server, Links, Update);
 
 			this.lastLinks = Links;
 		}
 
-		internal void RegisterUpdateIfRegistered()
+		internal async Task RegisterUpdateIfRegistered()
 		{
 			if (this.state == Lwm2mState.Operation)
-				this.RegisterUpdate();
+				await this.RegisterUpdate();
 		}
 
 		private async Task RegisterResponse(object Sender, CoapResponseEventArgs e)
@@ -553,9 +531,9 @@ namespace Waher.Networking.LWM2M
 			try
 			{
 				if (e.Ok && this.state == Lwm2mState.Registration)
-					this.State = Lwm2mState.Operation;
+					await this.SetState(Lwm2mState.Operation);
 
-				Lwm2mServerReferenceEventHandler h;
+				EventHandlerAsync<Lwm2mServerReferenceEventArgs> h;
 
 				if (e.Ok)
 				{
@@ -567,8 +545,7 @@ namespace Waher.Networking.LWM2M
 				else
 					h = this.OnRegistrationFailed;
 
-				if (!(h is null))
-					await h(this, new Lwm2mServerReferenceEventArgs(Server));
+				await h.Raise(this, new Lwm2mServerReferenceEventArgs(Server));
 			}
 			catch (Exception ex)
 			{
@@ -576,7 +553,7 @@ namespace Waher.Networking.LWM2M
 			}
 		}
 
-		private void RegisterTimeout(object State)
+		private async Task RegisterTimeout(object State)
 		{
 			object[] P = (object[])State;
 			Lwm2mServerReference Server = (Lwm2mServerReference)P[0];
@@ -587,39 +564,39 @@ namespace Waher.Networking.LWM2M
 				return;
 
 			if (Update)
-				this.Register(Server, this.lastLinks, true);
+				await this.Register(Server, this.lastLinks, true);
 			else
-				this.Register(Server, this.lastLinks, false);
+				await this.Register(Server, this.lastLinks, false);
 		}
 
 		/// <summary>
 		/// Event raised when a server registration has been successful or updated.
 		/// </summary>
-		public event Lwm2mServerReferenceEventHandler OnRegistrationSuccessful = null;
+		public event EventHandlerAsync<Lwm2mServerReferenceEventArgs> OnRegistrationSuccessful = null;
 
 		/// <summary>
 		/// Event raised when a server registration has been failed or unable to update.
 		/// </summary>
-		public event Lwm2mServerReferenceEventHandler OnRegistrationFailed = null;
+		public event EventHandlerAsync<Lwm2mServerReferenceEventArgs> OnRegistrationFailed = null;
 
 		/// <summary>
 		/// Deregisters the client from server(s).
 		/// </summary>
-		public void Deregister()
+		public async Task Deregister()
 		{
 			this.registrationEpoch++;
 
 			if (this.state != Lwm2mState.Operation)
 				return;
 
-			this.State = Lwm2mState.Deregistered;
+			await this.SetState(Lwm2mState.Deregistered);
 			this.lifetimeSeconds = 0;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
 			{
 				if (!string.IsNullOrEmpty(Server.LocationPath) && Server.LocationPath.StartsWith("/"))
 				{
-					this.coapEndpoint.DELETE(Server.Uri + Server.LocationPath.Substring(1),
+					await this.coapEndpoint.DELETE(Server.Uri + Server.LocationPath.Substring(1),
 						true, Server.Credentials, this.DeregisterResponse, Server);
 				}
 			}
@@ -633,9 +610,8 @@ namespace Waher.Networking.LWM2M
 
 			try
 			{
-				Lwm2mServerReferenceEventHandler h = e.Ok ? this.OnDeregistrationSuccessful : this.OnDeregistrationFailed;
-				if (!(h is null))
-					await h(this, new Lwm2mServerReferenceEventArgs(Server));
+				EventHandlerAsync<Lwm2mServerReferenceEventArgs> h = e.Ok ? this.OnDeregistrationSuccessful : this.OnDeregistrationFailed;
+				await h.Raise(this, new Lwm2mServerReferenceEventArgs(Server));
 			}
 			catch (Exception ex)
 			{
@@ -648,12 +624,28 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			try
+			{
+				this.DisposeAsync().Wait();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!(this.coapEndpoint is null))
 			{
 				if (this.state == Lwm2mState.Operation)
-					this.Deregister();
+					await this.Deregister();
 
 				foreach (Lwm2mObject Object in this.objects.Values)
 				{
@@ -679,23 +671,16 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Event raised when a server deregistration has been successful.
 		/// </summary>
-		public event Lwm2mServerReferenceEventHandler OnDeregistrationSuccessful = null;
+		public event EventHandlerAsync<Lwm2mServerReferenceEventArgs> OnDeregistrationSuccessful = null;
 
 		/// <summary>
 		/// Event raised when a server deregistration has been failed.
 		/// </summary>
-		public event Lwm2mServerReferenceEventHandler OnDeregistrationFailed = null;
+		public event EventHandlerAsync<Lwm2mServerReferenceEventArgs> OnDeregistrationFailed = null;
 
-		internal void Reboot()
+		internal Task Reboot()
 		{
-			try
-			{
-				this.OnRebootRequest?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.OnRebootRequest.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>

@@ -225,7 +225,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.flush = false;
 		}
 
-		private async void WriteQueueEmpty(object Sender, EventArgs e)
+		private async Task WriteQueueEmpty(object Sender, EventArgs e)
 		{
 			if (this.tempStream is null || this.aborted)
 				return;
@@ -324,28 +324,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.Dispose();
 		}
 
-		internal void Abort()
+		internal Task Abort()
 		{
 			this.aborted = true;
-
-			EventHandler h = this.OnAbort;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnAbort.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when stream is aborted.
 		/// </summary>
-		public event EventHandler OnAbort = null;
+		public event EventHandlerAsync OnAbort = null;
 
 	}
 }

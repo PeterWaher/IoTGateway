@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
-using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.Options;
@@ -322,22 +321,15 @@ namespace Waher.Networking.LWM2M
 		/// Called after the resource has been registered on a CoAP Endpoint.
 		/// </summary>
 		/// <param name="Client">LWM2M Client</param>
-		public virtual void AfterRegister(Lwm2mClient Client)
+		public virtual async Task AfterRegister(Lwm2mClient Client)
 		{
 			foreach (Lwm2mResource Resource in this.Resources)
 			{
 				Client.CoapEndpoint.Register(Resource);
-				Resource.AfterRegister();
+				await Resource.AfterRegister();
 			}
 
-			try
-			{
-				this.OnAfterRegister?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			await this.OnAfterRegister.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -373,7 +365,7 @@ namespace Waher.Networking.LWM2M
 
 			if (this.id == 0 && !FromBootstrapServer)
 			{
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 				return;
 			}
 
@@ -381,7 +373,7 @@ namespace Waher.Networking.LWM2M
 			{
 				if (!FromBootstrapServer)
 				{
-					Response.RST(CoapCode.Unauthorized);
+					await Response.RST(CoapCode.Unauthorized);
 					return;
 				}
 
@@ -398,7 +390,7 @@ namespace Waher.Networking.LWM2M
 							break;
 
 						default:
-							Response.RST(CoapCode.BadRequest);
+							await Response.RST(CoapCode.BadRequest);
 							return;
 					}
 				}
@@ -430,7 +422,7 @@ namespace Waher.Networking.LWM2M
 
 					if (ToWrite is null)
 					{
-						Response.Respond(CoapCode.BadRequest);
+						await Response.Respond(CoapCode.BadRequest);
 						return;
 					}
 
@@ -443,22 +435,22 @@ namespace Waher.Networking.LWM2M
 					foreach (KeyValuePair<Lwm2mResource, TlvRecord> Rec in ToWrite)
 					{
 						await Rec.Key.Read(Rec.Value);
-						Rec.Key.RemoteUpdate(Request);
+						await Rec.Key.RemoteUpdate(Request);
 					}
 				}
 				else
 				{
-					Response.Respond(CoapCode.NotAcceptable);
+					await Response.Respond(CoapCode.NotAcceptable);
 					return;
 				}
 			}
 			else
 			{
-				Response.Respond(CoapCode.BadRequest);
+				await Response.Respond(CoapCode.BadRequest);
 				return;
 			}
 
-			Response.Respond(CoapCode.Changed);
+			await Response.Respond(CoapCode.Changed);
 		}
 
 	}

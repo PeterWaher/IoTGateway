@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using Waher.Events;
+using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Security.DTLS.Events;
 
 namespace Waher.Security.DTLS
@@ -9,21 +10,21 @@ namespace Waher.Security.DTLS
 	internal class DtlsOverUdpState
 	{
 		public IPEndPoint RemoteEndpoint;
-		public LinkedList<Tuple<byte[], UdpTransmissionEventHandler, object>> Queue;
+		public LinkedList<Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>> Queue;
 		public DTLS.DtlsState CurrentState;
 
-		public void AddToQueue(byte[] Packet, UdpTransmissionEventHandler Callback, object State)
+		public void AddToQueue(byte[] Packet, EventHandlerAsync<UdpTransmissionEventArgs> Callback, object State)
 		{
 			lock (this.Queue)
 			{
-				this.Queue.AddLast(new Tuple<byte[], UdpTransmissionEventHandler, object>(Packet, 
+				this.Queue.AddLast(new Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object>(Packet,
 					Callback, State));
 			}
 		}
 
-		public void Done(DtlsOverUdp DtlsOverUdp, bool Successful)
+		public async Task Done(DtlsOverUdp DtlsOverUdp, bool Successful)
 		{
-			Tuple<byte[], UdpTransmissionEventHandler, object> Rec;
+			Tuple<byte[], EventHandlerAsync<UdpTransmissionEventArgs>, object> Rec;
 
 			do
 			{
@@ -41,20 +42,10 @@ namespace Waher.Security.DTLS
 				if (!(Rec is null))
 				{
 					if (Successful)
-						DtlsOverUdp.DTLS.SendApplicationData(Rec.Item1, this.RemoteEndpoint);
+						await DtlsOverUdp.DTLS.SendApplicationData(Rec.Item1, this.RemoteEndpoint);
 
-					if (!(Rec.Item2 is null))
-					{
-						try
-						{
-							Rec.Item2(this, new UdpTransmissionEventArgs(DtlsOverUdp,
-								this.RemoteEndpoint, Successful, Rec.Item3));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await Rec.Item2.Raise(this, new UdpTransmissionEventArgs(DtlsOverUdp,
+						this.RemoteEndpoint, Successful, Rec.Item3));
 				}
 			}
 			while (!(Rec is null));

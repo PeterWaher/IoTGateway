@@ -6,19 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Waher.Events;
 using Waher.Events.XMPP;
+using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
@@ -141,8 +136,7 @@ namespace Waher.Mock.Temperature.UWP
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
-						this.RaiseOwnershipChanged();
-						return Task.CompletedTask;
+						return this.RaiseOwnershipChanged();
 					};
 
 					this.thingRegistryClient.Disowned += (sender, e) =>
@@ -210,7 +204,7 @@ namespace Waher.Mock.Temperature.UWP
 
 					RosterItem Item = this.xmppClient.GetRosterItem(e.FromBareJID);
 					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-						this.xmppClient.RequestPresenceSubscription(e.FromBareJID);
+						await this.xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
 					await this.xmppClient.SetPresence(Availability.Chat);
 				};
@@ -313,7 +307,7 @@ namespace Waher.Mock.Temperature.UWP
 
 						if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
 						{
-							this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
+							await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
 								CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
@@ -449,7 +443,7 @@ namespace Waher.Mock.Temperature.UWP
 					return Task.CompletedTask;
 				};
 
-				this.xmppClient.Connect();
+				await this.xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{
@@ -578,7 +572,7 @@ namespace Waher.Mock.Temperature.UWP
 
 			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(this.thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
-			this.thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
+			this.thingRegistryClient.RegisterThing(metaData, async (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{
@@ -589,28 +583,15 @@ namespace Waher.Mock.Temperature.UWP
 					else
 						ownerJid = string.Empty;
 
-					this.RaiseOwnershipChanged();
+					await this.RaiseOwnershipChanged();
 				}
-
-				return Task.CompletedTask;
 
 			}, null);
 		}
 
-		private void RaiseOwnershipChanged()
+		private Task RaiseOwnershipChanged()
 		{
-			EventHandler h = OwnershipChanged;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return OwnershipChanged.Raise(this, EventArgs.Empty);
 		}
 
 		public static event EventHandler OwnershipChanged = null;

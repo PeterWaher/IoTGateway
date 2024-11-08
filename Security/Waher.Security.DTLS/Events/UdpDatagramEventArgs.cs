@@ -1,15 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Events
 {
-	/// <summary>
-	/// Delegate for UDP datagram events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task UdpDatagramEventHandler(object Sender, UdpDatagramEventArgs e);
-
 	/// <summary>
 	/// Event arguments for UDP datagram events.
 	/// </summary>
@@ -34,6 +26,5 @@ namespace Waher.Security.DTLS.Events
 		/// Datagram.
 		/// </summary>
 		public byte[] Datagram => this.datagram;
-
 	}
 }

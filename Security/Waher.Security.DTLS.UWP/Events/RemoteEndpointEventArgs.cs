@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS
 {
-	/// <summary>
-	/// Delegate for remote endpoint events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task RemoteEndpointEventHandler(object Sender, RemoteEndpointEventArgs e);
-
 	/// <summary>
 	/// Base class for event arguments with a remote endpoint attribute.
 	/// </summary>

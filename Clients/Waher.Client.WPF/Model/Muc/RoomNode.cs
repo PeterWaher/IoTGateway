@@ -408,7 +408,7 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			DestroyRoomForm Form = new DestroyRoomForm(this.Header)
 			{
@@ -419,7 +419,7 @@ namespace Waher.Client.WPF.Model.Muc
 			if (!Result.HasValue || !Result.Value)
 				return;
 
-			this.MucClient.DestroyRoom(this.roomId, this.domain, Form.Reason.Text, Form.AlternativeRoomJid.Text, (sender, e) =>
+			await this.MucClient.DestroyRoom(this.roomId, this.domain, Form.Reason.Text, Form.AlternativeRoomJid.Text, (sender, e) =>
 			{
 				if (e.Ok)
 					base.Delete(Parent, OnDeleted);
@@ -725,10 +725,17 @@ namespace Waher.Client.WPF.Model.Muc
 			}, null);
 		}
 
-		private void RequestPrivileges_Click(object sender, RoutedEventArgs e)
+		private async void RequestPrivileges_Click(object sender, RoutedEventArgs e)
 		{
-			this.MucClient.RequestVoice(this.roomId, this.domain);
-			MainWindow.SuccessBox("Voice privileges requested.");
+			try
+			{
+				await this.MucClient.RequestVoice(this.roomId, this.domain);
+				MainWindow.SuccessBox("Voice privileges requested.");
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 
 		private void ChangeSubject_Click(object sender, RoutedEventArgs e)

@@ -247,10 +247,7 @@ namespace Waher.Networking.Modbus
 					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
 			}
 
-			EventHandlerAsync<ReadBitsEventArgs> h = this.OnReadCoils;
-
-			if (!(h is null))
-				await h(this, e);
+			await this.OnReadCoils.Raise(this, e);
 		}
 
 		/// <summary>
@@ -266,10 +263,7 @@ namespace Waher.Networking.Modbus
 					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
 			}
 
-			EventHandlerAsync<ReadBitsEventArgs> h = this.OnReadInputDiscretes;
-
-			if (!(h is null))
-				await h(this, e);
+			await this.OnReadInputDiscretes.Raise(this, e);
 		}
 
 		/// <summary>
@@ -285,10 +279,7 @@ namespace Waher.Networking.Modbus
 					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
 			}
 
-			EventHandlerAsync<ReadWordsEventArgs> h = this.OnReadMultipleRegisters;
-
-			if (!(h is null))
-				await h(this, e);
+			await this.OnReadMultipleRegisters.Raise(this, e);
 		}
 
 		/// <summary>
@@ -304,10 +295,7 @@ namespace Waher.Networking.Modbus
 					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
 			}
 
-			EventHandlerAsync<ReadWordsEventArgs> h = this.OnReadInputRegisters;
-
-			if (!(h is null))
-				await h(this, e);
+			await this.OnReadInputRegisters.Raise(this, e);
 		}
 
 		/// <summary>
@@ -323,10 +311,7 @@ namespace Waher.Networking.Modbus
 					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
 			}
 
-			EventHandlerAsync<WriteBitEventArgs> h = this.OnWriteCoil;
-
-			if (!(h is null))
-				await h(this, e);
+			await this.OnWriteCoil.Raise(this, e);
 		}
 
 		/// <summary>
@@ -342,10 +327,7 @@ namespace Waher.Networking.Modbus
 					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
 			}
 
-			EventHandlerAsync<WriteWordEventArgs> h = this.OnWriteRegister;
-
-			if (!(h is null))
-				await h(this, e);
+			await this.OnWriteRegister.Raise(this, e);
 		}
 
 		/// <summary>

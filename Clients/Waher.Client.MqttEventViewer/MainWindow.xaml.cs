@@ -91,9 +91,10 @@ namespace Waher.Client.MqttEventViewer
 			return Task.CompletedTask;
 		}
 
-		private void Receptor_OnEvent(object Sender, EventEventArgs e)
+		private Task Receptor_OnEvent(object Sender, EventEventArgs e)
 		{
 			this.Dispatcher.Invoke(new Action(() => this.EventListView.Items.Add(new EventItem(e.Event))));
+			return Task.CompletedTask;
 		}
 
 		private void CloseButton_Click(object sender, RoutedEventArgs e)

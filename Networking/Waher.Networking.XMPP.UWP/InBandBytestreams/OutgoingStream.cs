@@ -266,28 +266,17 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				return this.client.SendIqSet(this.to, Xml.ToString(), null, null);
 		}
 
-		internal void Abort()
+		internal Task Abort()
 		{
 			this.aborted = true;
 
-			EventHandler h = this.OnAbort;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnAbort.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when stream is aborted.
 		/// </summary>
-		public event EventHandler OnAbort = null;
+		public event EventHandlerAsync OnAbort = null;
 
 	}
 }

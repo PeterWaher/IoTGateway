@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
-using Waher.Events;
 
 namespace Waher.Networking.XMPP.RDP
 {
@@ -76,24 +75,14 @@ namespace Waher.Networking.XMPP.RDP
 		/// <summary>
 		/// Session state changed.
 		/// </summary>
-		public RemoteDesktopSessionState State
-		{
-			get => this.state;
-			internal set
-			{
-				if (this.state != value)
-				{
-					this.state = value;
+		public RemoteDesktopSessionState State => this.state;
 
-					try
-					{
-						this.StateChanged?.Invoke(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+		internal async Task SetState(RemoteDesktopSessionState value)
+		{
+			if (this.state != value)
+			{
+				this.state = value;
+				await this.StateChanged.Raise(this, EventArgs.Empty);
 			}
 		}
 
@@ -174,16 +163,9 @@ namespace Waher.Networking.XMPP.RDP
 			internal set => this.deviceName = value;
 		}
 
-		internal void UpdateTile(int X, int Y, string TileBase64)
+		internal Task UpdateTile(int X, int Y, string TileBase64)
 		{
-			try
-			{
-				this.TileUpdated?.Invoke(this, new TileEventArgs(this, X, Y, TileBase64));
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.TileUpdated.Raise(this, new TileEventArgs(this, X, Y, TileBase64));
 		}
 
 		/// <summary>
@@ -191,16 +173,9 @@ namespace Waher.Networking.XMPP.RDP
 		/// </summary>
 		public event EventHandler<TileEventArgs> TileUpdated;
 
-		internal void ScanCompleted()
+		internal Task ScanCompleted()
 		{
-			try
-			{
-				this.ScanComplete?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return this.ScanComplete.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>

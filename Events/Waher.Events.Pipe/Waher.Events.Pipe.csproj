@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
     <ProjectReference Include="..\Waher.Events.Files\Waher.Events.Files.csproj" />
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>

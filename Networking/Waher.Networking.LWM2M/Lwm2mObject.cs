@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;
@@ -267,22 +266,15 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Called after the resource has been registered on a CoAP Endpoint.
 		/// </summary>
-		public virtual void AfterRegister()
+		public virtual async Task AfterRegister()
 		{
 			foreach (Lwm2mObjectInstance Instance in this.Instances)
 			{
 				this.client.CoapEndpoint.Register(Instance);
-				Instance.AfterRegister(this.client);
+				await Instance.AfterRegister(this.client);
 			}
 
-			try
-			{
-				this.OnAfterRegister?.Invoke(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			await this.OnAfterRegister.Raise(this, EventArgs.Empty);
 		}
 	}
 }

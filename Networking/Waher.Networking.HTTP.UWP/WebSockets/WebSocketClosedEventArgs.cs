@@ -1,14 +1,5 @@
-﻿using System.Threading.Tasks;
-
-namespace Waher.Networking.HTTP.WebSockets
+﻿namespace Waher.Networking.HTTP.WebSockets
 {
-	/// <summary>
-	/// Delegate for websocket closed events.
-	/// </summary>
-	/// <param name="Sender"></param>
-	/// <param name="e"></param>
-	public delegate Task WebSocketClosedEventHandler(object Sender, WebSocketClosedEventArgs e);
-
 	/// <summary>
 	/// Event arguments for websocket closed events.
 	/// </summary>

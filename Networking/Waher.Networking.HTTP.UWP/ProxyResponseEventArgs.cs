@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
-	/// <summary>
-	/// Delegate for proxy response event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ProxyResponseEventHandler(object Sender, ProxyResponseEventArgs e);
-
 	/// <summary>
 	/// Event arguments for proxy response events.
 	/// </summary>

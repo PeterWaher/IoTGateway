@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Runtime.Language;
 using Waher.Things.SourceEvents;
 
@@ -75,6 +76,6 @@ namespace Waher.Things
 		/// <summary>
 		/// Event raised when a data source event has been raised.
 		/// </summary>
-		event SourceEventEventHandler OnEvent;
+		event EventHandlerAsync<SourceEvent> OnEvent;
 	}
 }

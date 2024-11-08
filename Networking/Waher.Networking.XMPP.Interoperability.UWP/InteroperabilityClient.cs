@@ -69,17 +69,7 @@ namespace Waher.Networking.XMPP.Interoperability
 			}
 
 			InteroperabilityClientEventArgs e2 = new InteroperabilityClientEventArgs(Interfaces.ToArray(), e);
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, e2);
 		}
 
 

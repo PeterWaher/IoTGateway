@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Avatar
 {
-	/// <summary>
-	/// Delegate for avatar events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task AvatarEventHandler(object Sender, AvatarEventArgs e);
-
 	/// <summary>
 	/// Event arguments for avatar events.
 	/// </summary>

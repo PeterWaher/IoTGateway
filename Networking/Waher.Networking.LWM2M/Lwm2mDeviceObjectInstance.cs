@@ -58,45 +58,44 @@ namespace Waher.Networking.LWM2M
 			this.hardwareVersion = new Lwm2mResourceString("Hardware Version", 3, 0, 18, false, false, HardwareVersion);
 			this.softwareVersion = new Lwm2mResourceString("Software Version", 3, 0, 19, false, false, SoftwareVersion);
 
-			this.currentTime.OnAfterRegister += CurrentTime_OnAfterRegister;
-			this.currentTime.OnBeforeGet += CurrentTime_OnBeforeGet;
+			this.currentTime.OnAfterRegister += this.CurrentTime_OnAfterRegister;
+			this.currentTime.OnBeforeGet += this.CurrentTime_OnBeforeGet;
 
-			this.reboot.OnExecute += Reboot_OnExecute;
+			this.reboot.OnExecute += this.Reboot_OnExecute;
 
 			this.Add(this.manufacturer);
 			this.Add(this.modelNr);
 			this.Add(this.serialNr);
 			this.Add(this.firmwareVersion);
 			this.Add(this.reboot);
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 5));  // Factory Reset 
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 6));  // Available Power Sources 
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 7));  // Power Source Voltage
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 8));  // Power Source Current  
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 9));  // Battery Level 
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 10));  // Battery Level 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 5));  // Factory Reset 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 6));  // Available Power Sources 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 7));  // Power Source Voltage
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 8));  // Power Source Current  
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 9));  // Battery Level 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 10));  // Battery Level 
 			this.Add(this.errorCodes);
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 12));  // Reset Error Code 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 12));  // Reset Error Code 
 			this.Add(this.currentTime);
 			this.Add(this.timeZone);
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 15));  // Timezone 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 15));  // Timezone 
 			this.Add(this.supportedBindings);
 			this.Add(this.deviceType);
 			this.Add(this.hardwareVersion);
 			this.Add(this.softwareVersion);
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 20));  // Battery Status 
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 21));  // Memory Total 
-			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 22));  // ExtDevInfo 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 20));  // Battery Status 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 21));  // Memory Total 
+			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 22));  // ExtDevInfo 
 		}
 
 		private Task Reboot_OnExecute(object sender, EventArgs e)
 		{
-			this.Object.Client.Reboot();
-			return Task.CompletedTask;
+			return this.Object.Client.Reboot();
 		}
 
-		private void CurrentTime_OnAfterRegister(object sender, EventArgs e)
+		private Task CurrentTime_OnAfterRegister(object sender, EventArgs e)
 		{
-			this.currentTime.TriggerAll(new TimeSpan(0, 0, 1));
+			return this.currentTime.TriggerAll(new TimeSpan(0, 0, 1));
 		}
 
 		private Task CurrentTime_OnBeforeGet(object sender, CoapRequestEventArgs e)
@@ -109,10 +108,10 @@ namespace Waher.Networking.LWM2M
 		/// Called after the resource has been registered on a CoAP Endpoint.
 		/// </summary>
 		/// <param name="Client">LWM2M Client</param>
-		public override void AfterRegister(Lwm2mClient Client)
+		public override async Task AfterRegister(Lwm2mClient Client)
 		{
-			base.AfterRegister(Client);
-			this.TriggerAll(new TimeSpan(0, 0, 1));
+			await base.AfterRegister(Client);
+			await this.TriggerAll(new TimeSpan(0, 0, 1));
 		}
 
 	}

@@ -98,14 +98,14 @@ namespace Waher.Networking.LWM2M
 			this.shortServerId = new Lwm2mResourceInteger("ShortServerId", 0, InstanceId, 10, false, false, null, false);
 			this.clientHoldOffTimeSeconds = new Lwm2mResourceInteger("ClientHoldOffTimeSeconds", 0, InstanceId, 11, false, false, null, false);
 
-			this.serverUri.OnBeforeGet += CheckFromBootstrapServer;
-			this.bootstrapServer.OnBeforeGet += CheckFromBootstrapServer;
-			this.securityMode.OnBeforeGet += CheckFromBootstrapServer;
-			this.publicKeyOrIdentity.OnBeforeGet += CheckFromBootstrapServer;
-			this.serverPublicKey.OnBeforeGet += CheckFromBootstrapServer;
-			this.secretKey.OnBeforeGet += CheckFromBootstrapServer;
-			this.shortServerId.OnBeforeGet += CheckFromBootstrapServer;
-			this.clientHoldOffTimeSeconds.OnBeforeGet += CheckFromBootstrapServer;
+			this.serverUri.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.bootstrapServer.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.securityMode.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.publicKeyOrIdentity.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.serverPublicKey.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.secretKey.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.shortServerId.OnBeforeGet += this.CheckFromBootstrapServer;
+			this.clientHoldOffTimeSeconds.OnBeforeGet += this.CheckFromBootstrapServer;
 
 			this.Add(this.serverUri);
 			this.Add(this.bootstrapServer);
@@ -159,7 +159,7 @@ namespace Waher.Networking.LWM2M
 		public SecurityMode? SecurityMode
 		{
 			get { return (SecurityMode?)this.securityMode.IntegerValue; }
-			set { this.securityMode.IntegerValue = (int?)SecurityMode; }
+			set { this.securityMode.IntegerValue = (int?)value; }
 		}
 
 		/// <summary>
@@ -244,10 +244,10 @@ namespace Waher.Networking.LWM2M
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				await this.DeleteBootstrapInfo();
-				Response.ACK(CoapCode.Deleted);
+				await Response.ACK(CoapCode.Deleted);
 			}
 			else
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 		}
 
 		/// <summary>

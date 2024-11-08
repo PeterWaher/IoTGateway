@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
-	/// <summary>
-	/// Delegate for stream closed callback methods.
-	/// </summary>
-	/// <param name="Sender">Caller.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task StreamClosedEventHandler(object Sender, StreamClosedEventArgs e);
-
 	/// <summary>
 	/// Event arguments for stream close callbacks.
 	/// </summary>

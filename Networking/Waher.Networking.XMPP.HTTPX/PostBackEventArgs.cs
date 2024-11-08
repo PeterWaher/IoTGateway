@@ -1,16 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
-	/// <summary>
-	/// Delegate for post-back events or callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event, or caller of callback method.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task PostBackEventHandler(object Sender, PostBackEventArgs e);
-
 	/// <summary>
 	/// Event arguments for post-back events or callbacks.
 	/// </summary>

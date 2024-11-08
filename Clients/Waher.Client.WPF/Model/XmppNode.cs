@@ -57,7 +57,7 @@ namespace Waher.Client.WPF.Model
 			Item.Click += this.SendXmppIqSet_Click;
 		}
 
-		private void SendXmppMessage_Click(object sender, RoutedEventArgs e)
+		private async void SendXmppMessage_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -72,7 +72,7 @@ namespace Waher.Client.WPF.Model
 
 				if (Result.HasValue && Result.Value)
 				{
-					this.Account.Client.SendMessage((MessageType)Enum.Parse(typeof(MessageType), Form.Type.Text),
+					await this.Account.Client.SendMessage((MessageType)Enum.Parse(typeof(MessageType), Form.Type.Text),
 						Form.To.Text.Trim(), Form.CustomXml.Text, Form.Body.Text, Form.Subject.Text, Form.MessageLanguage.Text,
 						Form.ThreadId.Text, Form.ParentThreadId.Text);
 				}
@@ -83,7 +83,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void SendXmppIqGet_Click(object sender, RoutedEventArgs e)
+		private async void SendXmppIqGet_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -99,7 +99,7 @@ namespace Waher.Client.WPF.Model
 
 				if (Result.HasValue && Result.Value)
 				{
-					this.Account.Client.SendIqGet(Form.To.Text.Trim(), Form.CustomXml.Text, (sender2, e2) =>
+					await this.Account.Client.SendIqGet(Form.To.Text.Trim(), Form.CustomXml.Text, (sender2, e2) =>
 					{
 						if (e2.Ok)
 						{
@@ -131,7 +131,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void SendXmppIqSet_Click(object sender, RoutedEventArgs e)
+		private async void SendXmppIqSet_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -147,7 +147,7 @@ namespace Waher.Client.WPF.Model
 
 				if (Result.HasValue && Result.Value)
 				{
-					this.Account.Client.SendIqSet(Form.To.Text.Trim(), Form.CustomXml.Text, (sender2, e2) =>
+					await this.Account.Client.SendIqSet(Form.To.Text.Trim(), Form.CustomXml.Text, (sender2, e2) =>
 					{
 						if (e2.Ok)
 						{

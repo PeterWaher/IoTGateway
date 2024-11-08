@@ -4,19 +4,13 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.WHOIS;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 
 namespace Waher.Security.LoginMonitor
 {
-	/// <summary>
-	/// Delegate for endpoint annotation event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task AnnotateEndpointEventHandler(object Sender, AnnotateEndpointEventArgs e);
-
 	/// <summary>
 	/// Class that monitors login events, and help applications determine malicious intent. 
 	/// Register instance of class with <see cref="Log.Register(IEventSink)"/> to activate it.
@@ -408,18 +402,7 @@ namespace Waher.Security.LoginMonitor
 			foreach (KeyValuePair<string, object> Tag in Tags)
 				e.AddTag(Tag.Key, Tag.Value);
 
-			AnnotateEndpointEventHandler h = AnnotateEndpoint;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(null, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await AnnotateEndpoint.Raise(null, e);
 
 			return e.GetTags();
 		}
@@ -427,7 +410,7 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Event raised when an endpoint is to be annotated. Can be used to add additional information about an endpoint.
 		/// </summary>
-		public static event AnnotateEndpointEventHandler AnnotateEndpoint = null;
+		public static event EventHandlerAsync<AnnotateEndpointEventArgs> AnnotateEndpoint = null;
 
 		/// <summary>
 		/// Unblocks a remote endpoint and resets counters for it.
@@ -526,7 +509,7 @@ namespace Waher.Security.LoginMonitor
 				tlsHackEndpoints[RemoteEndpoint] = DateTime.Now;
 			}
 
-			LoginAuditor.Fail(Message, string.Empty, RemoteEndpoint, "SMTP", await Annotate(RemoteEndpoint));
+			Fail(Message, string.Empty, RemoteEndpoint, Protocol, await Annotate(RemoteEndpoint));
 		}
 
 		private static readonly Dictionary<string, DateTime> tlsHackEndpoints = new Dictionary<string, DateTime>();

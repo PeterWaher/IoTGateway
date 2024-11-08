@@ -360,7 +360,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		#endregion
@@ -540,7 +540,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XmppClient.NamespaceData);
 			Xml.Append("' type='cancel'/></configure></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		/// <summary>
@@ -653,7 +653,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</delete></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		#endregion
@@ -1126,7 +1126,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Options.SerializeSubmit(Xml);
 			Xml.Append("</options></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback(this, new SubscriptionOptionsEventArgs(
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new SubscriptionOptionsEventArgs(
 				NodeName, Jid, new SubscriptionOptions(Options), new DataFormEventArgs(Options, e))), State);
 		}
 
@@ -1869,7 +1869,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(Name));
 			Xml.Append("'/></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		/// <summary>

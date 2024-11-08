@@ -27,9 +27,9 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		{
 			this.sb = new StringBuilder();
 
-			sb.Append("{\"bn\":\"");
-			sb.Append(Content.JSON.Encode(BaseName));
-			sb.Append("\",\"e\":[");
+			this.sb.Append("{\"bn\":\"");
+			this.sb.Append(Content.JSON.Encode(BaseName));
+			this.sb.Append("\",\"e\":[");
 		}
 
 		private void WriteName(ushort Identifier)
@@ -40,11 +40,11 @@ namespace Waher.Networking.LWM2M.ContentFormats
 			if (this.first)
 				this.first = false;
 			else
-				sb.Append(',');
+				this.sb.Append(',');
 
-			sb.Append("{\"n\":\"");
-			sb.Append(Identifier.ToString());
-			sb.Append("\"");
+			this.sb.Append("{\"n\":\"");
+			this.sb.Append(Identifier.ToString());
+			this.sb.Append("\"");
 		}
 
 		/// <summary>
@@ -101,9 +101,9 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		{
 			this.WriteName(Identifier);
 
-			sb.Append(",\"sv\":\"");
-			sb.Append(Value);
-			sb.Append("\"}");
+			this.sb.Append(",\"sv\":\"");
+			this.sb.Append(Value);
+			this.sb.Append("\"}");
 		}
 
 		/// <summary>
@@ -149,9 +149,9 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		{
 			this.WriteName(Identifier);
 
-			sb.Append(",\"v\":");
-			sb.Append(Value.ToString());
-			sb.Append('}');
+			this.sb.Append(",\"v\":");
+			this.sb.Append(Value.ToString());
+			this.sb.Append('}');
 		}
 
 		/// <summary>
@@ -175,9 +175,9 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		{
 			this.WriteName(Identifier);
 
-			sb.Append(",\"v\":");
-			sb.Append(Value.ToString("F"));
-			sb.Append('}');
+			this.sb.Append(",\"v\":");
+			this.sb.Append(Value.ToString("F"));
+			this.sb.Append('}');
 		}
 
 		/// <summary>
@@ -190,9 +190,9 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		{
 			this.WriteName(Identifier);
 
-			sb.Append(",\"bv\":");
-			sb.Append(Value ? "true" : "false");
-			sb.Append('}');
+			this.sb.Append(",\"bv\":");
+			this.sb.Append(Value ? "true" : "false");
+			this.sb.Append('}');
 		}
 
 		/// <summary>
@@ -219,11 +219,11 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		{
 			this.WriteName(Identifier);
 
-			sb.Append(",\"ov\":\"");
-			sb.Append(ObjectId.ToString());
-			sb.Append(':');
-			sb.Append(ObjectInstanceId.ToString());
-			sb.Append("\"}");
+			this.sb.Append(",\"ov\":\"");
+			this.sb.Append(ObjectId.ToString());
+			this.sb.Append(':');
+			this.sb.Append(ObjectInstanceId.ToString());
+			this.sb.Append("\"}");
 		}
 
 		/// <summary>
@@ -234,7 +234,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		public void Write(IdentifierType IdentifierType, ushort Identifier)
 		{
 			this.WriteName(Identifier);
-			sb.Append('}');
+			this.sb.Append('}');
 		}
 
 	}

@@ -195,18 +195,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				this.connection = null;
 			}
 
-			EventHandlerAsync h = this.Disposed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.Disposed.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -470,7 +459,7 @@ namespace Waher.Networking.HTTP.WebSockets
 								{
 									case WebSocketOpcode.Text:
 										if (i > this.listener.MaximumTextPayloadSize)
-											this.RaiseBinaryReceived(this.payload);
+											await this.RaiseBinaryReceived(this.payload);
 										else
 										{
 											byte[] Bin = new byte[i];
@@ -481,7 +470,7 @@ namespace Waher.Networking.HTTP.WebSockets
 										break;
 
 									case WebSocketOpcode.Binary:
-										this.RaiseBinaryReceived(this.payload);
+										await this.RaiseBinaryReceived(this.payload);
 										break;
 								}
 							}
@@ -523,64 +512,31 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <summary>
 		/// Event raised when a remote party closed a connection.
 		/// </summary>
-		public event WebSocketClosedEventHandler Closed = null;
+		public event EventHandlerAsync<WebSocketClosedEventArgs> Closed = null;
 
-		private async Task RaiseClosed(ushort? Code, string Reason)
+		private Task RaiseClosed(ushort? Code, string Reason)
 		{
-			WebSocketClosedEventHandler h = this.Closed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new WebSocketClosedEventArgs(this, Code, Reason));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.Closed.Raise(this, new WebSocketClosedEventArgs(this, Code, Reason));
 		}
 
 		/// <summary>
 		/// Event raised when binary payload has been received.
 		/// </summary>
-		public event WebSocketBinaryEventHandler BinaryReceived = null;
+		public event EventHandlerAsync<WebSocketBinaryEventArgs> BinaryReceived = null;
 
-		private async void RaiseBinaryReceived(Stream Payload)
+		private Task RaiseBinaryReceived(Stream Payload)
 		{
-			WebSocketBinaryEventHandler h = BinaryReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new WebSocketBinaryEventArgs(this, Payload));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.BinaryReceived.Raise(this, new WebSocketBinaryEventArgs(this, Payload));
 		}
 
 		/// <summary>
 		/// Event raised when text payload has been received.
 		/// </summary>
-		public event WebSocketTextEventHandler TextReceived = null;
+		public event EventHandlerAsync<WebSocketTextEventArgs> TextReceived = null;
 
-		internal async Task RaiseTextReceived(string Payload)
+		internal Task RaiseTextReceived(string Payload)
 		{
-			WebSocketTextEventHandler h = this.TextReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new WebSocketTextEventArgs(this, Payload));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.TextReceived.Raise(this, new WebSocketTextEventArgs(this, Payload));
 		}
 
 		private async Task BeginWriteRaw(byte[] Frame, EventHandlerAsync Callback)
@@ -604,18 +560,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				while (!(Frame is null))
 				{
 					await this.httpResponse.WriteRawAsync(Frame);
-
-					if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(this, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await Callback.Raise(this, EventArgs.Empty);
 
 					lock (this.queue)
 					{
@@ -1056,22 +1001,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <summary>
 		/// Event raised when a client heart-beat has been received.
 		/// </summary>
-		public event WebSocketEventHandler Heartbeat = null;
+		public event EventHandlerAsync<WebSocketEventArgs> Heartbeat = null;
 
-		internal async Task RaiseHeartbeat()
+		internal Task RaiseHeartbeat()
 		{
-			WebSocketEventHandler h = this.Heartbeat;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new WebSocketEventArgs(this));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.Heartbeat.Raise(this, new WebSocketEventArgs(this));
 		}
 
 	}

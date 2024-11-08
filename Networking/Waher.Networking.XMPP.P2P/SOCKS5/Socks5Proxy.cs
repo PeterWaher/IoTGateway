@@ -208,7 +208,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationJid">JID of destination.</param>
 		/// <param name="Callback">Method to call when initiation attempt completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task InitiateSession(string DestinationJid, StreamEventHandler Callback, object State)
+		public Task InitiateSession(string DestinationJid, EventHandlerAsync<StreamEventArgs> Callback, object State)
 		{
 			return this.InitiateSession(DestinationJid, null, true, Callback, State);
 		}
@@ -220,7 +220,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="StreamId">Stream ID to use.</param>
 		/// <param name="Callback">Method to call when initiation attempt completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task InitiateSession(string DestinationJid, string StreamId, StreamEventHandler Callback, object State)
+		public Task InitiateSession(string DestinationJid, string StreamId, EventHandlerAsync<StreamEventArgs> Callback, object State)
 		{
 			return this.InitiateSession(DestinationJid, StreamId, true, Callback, State);
 		}
@@ -235,7 +235,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="Callback">Method to call when initiation attempt completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public async Task InitiateSession(string DestinationJid, string StreamId, bool InstantiateSocks5Client,
-			StreamEventHandler Callback, object State)
+			EventHandlerAsync<StreamEventArgs> Callback, object State)
 		{
 			if (!this.hasProxy)
 			{
@@ -302,7 +302,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			public string streamId;
 			public object state;
 			public bool instantiateSocks5Client;
-			public StreamEventHandler callback;
+			public EventHandlerAsync<StreamEventArgs> callback;
 			public Socks5Client stream = null;
 			public Socks5Proxy proxy;
 
@@ -311,7 +311,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				switch (this.stream.State)
 				{
 					case Socks5State.Authenticated:
-						this.stream.CONNECT(this.streamId, this.proxy.client.FullJID, this.destinationJid);
+						await this.stream.CONNECT(this.streamId, this.proxy.client.FullJID, this.destinationJid);
 						break;
 
 					case Socks5State.Connected:
@@ -407,7 +407,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			Rec.callback = null;
 		}
 
-		private async Task Callback(StreamEventHandler Callback, object State, bool Ok, Socks5Client Stream, string StreamId)
+		private async Task Callback(EventHandlerAsync<StreamEventArgs> Callback, object State, bool Ok, Socks5Client Stream, string StreamId)
 		{
 			if (!Ok && !string.IsNullOrEmpty(StreamId))
 			{
@@ -417,17 +417,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 			}
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new StreamEventArgs(Ok, Stream, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new StreamEventArgs(Ok, Stream, State));
 		}
 
 		private async Task QueryHandler(object Sender, IqEventArgs e)
@@ -508,7 +498,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			switch (Client.State)
 			{
 				case Socks5State.Authenticated:
-					Client.CONNECT(State.streamId, State.eventargs.From, this.client.FullJID);
+					await Client.CONNECT(State.streamId, State.eventargs.From, this.client.FullJID);
 					break;
 
 				case Socks5State.Connected:
@@ -537,17 +527,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						this.streams.Remove(State.streamId);
 					}
 
-					if (!(State.eventargs2.CloseCallback is null))
-					{
-						try
-						{
-							await State.eventargs2.CloseCallback(this, new StreamEventArgs(false, Client, State.eventargs2.State));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await State.eventargs2.CloseCallback.Raise(this, new StreamEventArgs(false, Client, State.eventargs2.State));
 					break;
 			}
 		}

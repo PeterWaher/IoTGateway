@@ -241,12 +241,14 @@ namespace Waher.Events.Socket
 			}
 		}
 
-		private void Client_OnWriteQueueEmpty(object sender, EventArgs e)
+		private Task Client_OnWriteQueueEmpty(object sender, EventArgs e)
 		{
 			BinaryTcpClient Client = this.client;
 			this.client = null;
 
 			Client.DisposeWhenDone();
+
+			return Task.CompletedTask;
 		}
 
 		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)

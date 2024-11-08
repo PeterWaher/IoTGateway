@@ -35,7 +35,7 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public UdpClient Client => this.client;
 
-		private async void BeginReceive()
+		private async void BeginReceive()   // Starts parallel task
 		{
 			try
 			{

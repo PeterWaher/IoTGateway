@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.LWM2M.ContentFormats;
 using Waher.Runtime.Settings;
@@ -121,7 +120,7 @@ namespace Waher.Networking.LWM2M
 				await this.ValueUpdated();
 			}
 
-			base.Set();
+			await base.Set();
 		}
 
 		/// <summary>

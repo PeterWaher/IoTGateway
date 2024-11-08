@@ -20,7 +20,7 @@ namespace Waher.Networking.CoAP.Test
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
-			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
+			this.lwm2mClient = await Lwm2mClient.Create("Lwm2mTestClient", this.coapClient,
 				new Lwm2mSecurityObject(),
 				new Lwm2mServerObject(),
 				new Lwm2mAccessControlObject(),
@@ -32,10 +32,13 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
-			this.lwm2mClient?.Dispose();
-			this.lwm2mClient = null;
+			if (this.lwm2mClient is not null)
+			{
+				await this.lwm2mClient.DisposeAsync();
+				this.lwm2mClient = null;
+			}
 
 			if (this.coapClient is not null)
 			{

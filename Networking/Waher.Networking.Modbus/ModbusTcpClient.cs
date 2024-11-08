@@ -162,14 +162,16 @@ namespace Waher.Networking.Modbus
 			return this.Error(Exception.Message);
 		}
 
-		private Task TcpClient_OnWarning(ref string Text)
+		private async Task<string> TcpClient_OnWarning(string Text)
 		{
-			return this.Warning(Text);
+			await this.Warning(Text);
+			return Text;
 		}
 
-		private Task TcpClient_OnInformation(ref string Text)
+		private async Task<string> TcpClient_OnInformation(string Text)
 		{
-			return this.Information(Text);
+			await this.Information(Text);
+			return Text;
 		}
 
 		private async Task<bool> TcpClient_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)

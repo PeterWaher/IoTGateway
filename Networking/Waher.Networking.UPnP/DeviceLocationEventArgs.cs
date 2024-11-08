@@ -1,15 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.UPnP
 {
-	/// <summary>
-	/// UPnP Device Location event handler.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task UPnPDeviceLocationEventHandler(object Sender, DeviceLocationEventArgs e);
-
 	/// <summary>
 	/// Event arguments for completion events when downloading device description documents.
 	/// </summary>

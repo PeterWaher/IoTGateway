@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
-	/// <summary>
-	/// Delegate for custom error content event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CustomErrorEventHandler(object Sender, CustomErrorEventArgs e);
-
 	/// <summary>
 	/// Event arguments for custom error content events.
 	/// </summary>

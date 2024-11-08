@@ -21,7 +21,7 @@ namespace Waher.Networking.CoAP.Test
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
-			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
+			this.lwm2mClient = await Lwm2mClient.Create("Lwm2mTestClient", this.coapClient,
 				new Lwm2mSecurityObject(),
 				new Lwm2mServerObject(),
 				new Lwm2mAccessControlObject(),
@@ -33,10 +33,13 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
-				this.lwm2mClient?.Dispose();
+			if (this.lwm2mClient is not null)
+			{
+				await this.lwm2mClient.DisposeAsync();
 				this.lwm2mClient = null;
+			}
 
 			if (this.coapClient is not null)
 			{
@@ -50,7 +53,7 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestMethod]
-		public void LWM2M_Registration_Test_01_Register()
+		public async Task LWM2M_Registration_Test_01_Register()
 		{
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
@@ -67,16 +70,16 @@ namespace Waher.Networking.CoAP.Test
 			};
 
 			//this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org"));
-			this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org",
+			await this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org",
 				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })));
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 		[TestMethod]
-		public void LWM2M_Registration_Test_02_RegisterUpdate()
+		public async Task LWM2M_Registration_Test_02_RegisterUpdate()
 		{
-			this.LWM2M_Registration_Test_01_Register();
+			await this.LWM2M_Registration_Test_01_Register();
 
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
@@ -96,9 +99,9 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestMethod]
-		public void LWM2M_Registration_Test_03_Deregister()
+		public async Task LWM2M_Registration_Test_03_Deregister()
 		{
-			this.LWM2M_Registration_Test_02_RegisterUpdate();
+			await this.LWM2M_Registration_Test_02_RegisterUpdate();
 
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
@@ -113,7 +116,7 @@ namespace Waher.Networking.CoAP.Test
 				Error.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.Deregister();
+			await this.lwm2mClient.Deregister();
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000));
 		}

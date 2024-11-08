@@ -1,16 +1,7 @@
-﻿using System.Threading.Tasks;
-using Waher.Networking.XMPP.Events;
-
+﻿using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.SoftwareVersion
 {
-	/// <summary>
-	/// Delegate for software version events or callback methods.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task SoftwareVersionEventHandler(object Sender, SoftwareVersionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for software version responses.
 	/// </summary>

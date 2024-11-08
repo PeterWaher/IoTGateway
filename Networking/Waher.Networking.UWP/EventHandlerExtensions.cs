@@ -16,13 +16,6 @@ namespace Waher.Networking
 	public delegate Task EventHandlerAsync<T>(object Sender, T e);
 
 	/// <summary>
-	/// Connection error event handler delegate.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Exception">Information about error received.</param>
-	public delegate Task ExceptionEventHandler(object Sender, Exception Exception);
-
-	/// <summary>
 	/// Callback function with one argument.
 	/// </summary>
 	/// <typeparam name="ArgT">Argument type.</typeparam>

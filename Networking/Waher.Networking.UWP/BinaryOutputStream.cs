@@ -82,19 +82,7 @@ namespace Waher.Networking
 		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
 		{
 			await this.output.WriteAsync(Buffer, Offset, Count);
-
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
-
+			await Callback.Raise(this, EventArgs.Empty);
 			return true;
 		}
 	}

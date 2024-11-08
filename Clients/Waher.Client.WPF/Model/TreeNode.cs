@@ -367,10 +367,10 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
-		public virtual void Delete(TreeNode Parent, EventHandler OnDeleted)
+		public virtual Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			Parent?.RemoveChild(this);
-			OnDeleted?.Invoke(this, EventArgs.Empty);
+			return OnDeleted.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -601,7 +601,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
+		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			throw new NotSupportedException();
 		}

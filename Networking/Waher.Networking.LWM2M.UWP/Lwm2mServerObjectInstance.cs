@@ -73,7 +73,7 @@ namespace Waher.Networking.LWM2M
 			this.binding = new Lwm2mResourceString("Binding", 1, InstanceId, 7, true, false, null);
 			this.registrationUpdateTrigger = new Lwm2mResourceCommand("RegistrationUpdateTrigger", 1, InstanceId, 8);
 
-			this.registrationUpdateTrigger.OnExecute += RegistrationUpdateTrigger_OnExecute;
+			this.registrationUpdateTrigger.OnExecute += this.RegistrationUpdateTrigger_OnExecute;
 
 			this.Add(this.shortServerId);
 			this.Add(this.lifetimeSeconds);
@@ -88,8 +88,7 @@ namespace Waher.Networking.LWM2M
 
 		private Task RegistrationUpdateTrigger_OnExecute(object sender, EventArgs e)
 		{
-			this.Object.Client.RegisterUpdate();
-			return Task.CompletedTask;
+			return this.Object.Client.RegisterUpdate();
 		}
 
 		/// <summary>
@@ -161,10 +160,10 @@ namespace Waher.Networking.LWM2M
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				await this.DeleteBootstrapInfo();
-				Response.ACK(CoapCode.Deleted);
+				await Response.ACK(CoapCode.Deleted);
 			}
 			else
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 		}
 
 		/// <summary>
@@ -207,7 +206,7 @@ namespace Waher.Networking.LWM2M
 			}
 		}
 
-		internal bool Register(Lwm2mClient Client)
+		internal async Task<bool> Register(Lwm2mClient Client)
 		{
 			if (!this.shortServerId.IntegerValue.HasValue)
 				return false;
@@ -222,7 +221,7 @@ namespace Waher.Networking.LWM2M
 			if (Ref is null)
 				return false;
 
-			Client.Register(this.lifetimeSeconds.IntegerValue.HasValue ? 
+			await Client.Register(this.lifetimeSeconds.IntegerValue.HasValue ? 
 				(int)this.lifetimeSeconds.IntegerValue.Value : 86400, Ref);
 
 			return true;

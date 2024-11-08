@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -345,24 +346,12 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Event raised when a data source event has been raised.
 		/// </summary>
-		public event SourceEventEventHandler OnEvent = null;
+		public event EventHandlerAsync<SourceEvent> OnEvent = null;
 
 		internal static async Task NewEvent(SourceEvent Event)
 		{
 			await Database.InsertLazy(Event);
-
-			SourceEventEventHandler h = instance?.OnEvent;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(instance, Event);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await instance?.OnEvent?.Raise(instance, Event);
 		}
 
 		/// <summary>

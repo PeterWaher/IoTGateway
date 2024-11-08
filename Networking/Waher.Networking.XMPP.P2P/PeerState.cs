@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.P2P
 		private PeerConnection peer;
 		private XmppServerlessMessaging parent;
 		private XmppClient xmppClient;
-		private LinkedList<KeyValuePair<PeerConnectionEventHandler, object>> callbacks = null;
+		private LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>> callbacks = null;
 		private DateTime lastActivity = DateTime.Now;
 		private int inputState = 0;
 		private int inputDepth = 0;
@@ -74,7 +74,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Callback">Callback method</param>
 		/// <param name="State">State object</param>
 		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteFullJID, string StreamHeader, string StreamFooter,
-			string StreamId, double Version, PeerConnectionEventHandler Callback, object State)
+			string StreamId, double Version, EventHandlerAsync<PeerConnectionEventArgs> Callback, object State)
 		{
 			this.parent = Parent;
 			this.peer = Peer;
@@ -85,18 +85,18 @@ namespace Waher.Networking.XMPP.P2P
 			this.version = Version;
 			this.parentFullJid = Parent.FullJid;
 
-			this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
-			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
+			this.callbacks = new LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>>();
+			this.callbacks.AddLast(new KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>(Callback, State));
 
 			this.AddPeerHandlers();
 		}
 
-		internal void AddCallback(PeerConnectionEventHandler Callback, object State)
+		internal void AddCallback(EventHandlerAsync<PeerConnectionEventArgs> Callback, object State)
 		{
 			if (this.callbacks is null)
-				this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
+				this.callbacks = new LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>>();
 
-			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
+			this.callbacks.AddLast(new KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>(Callback, State));
 		}
 
 		private void AddPeerHandlers()
@@ -800,7 +800,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (!(this.callbacks is null))
 			{
-				foreach (KeyValuePair<PeerConnectionEventHandler, object> P in this.callbacks)
+				foreach (KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object> P in this.callbacks)
 				{
 					try
 					{
@@ -903,7 +903,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		private Task Peer_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task Peer_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			TextEventHandler h = this.OnSent;
 			if (!(h is null))
@@ -911,15 +911,13 @@ namespace Waher.Networking.XMPP.P2P
 				try
 				{
 					string s = this.encoding.GetString(Buffer, Offset, Count);
-					h(this, s);
+					await h(this, s);
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
 			}
-
-			return Task.FromResult(true);
 		}
 
 		/// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.Transport;
@@ -120,7 +121,7 @@ namespace Waher.Networking.CoAP
 				if (!(value is null))
 				{
 					if (!(this.endpoint is null))
-						throw new ArgumentException("Resource already registered.", nameof(Endpoint));
+						throw new ArgumentException("Resource already registered.", nameof(this.Endpoint));
 
 					this.endpoint = value;
 				}
@@ -244,15 +245,15 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Sends data to all registered observers.
 		/// </summary>
-		public void TriggerAll()
+		public Task TriggerAll()
 		{
-			this.Trigger(this.GetRegistrations());
+			return this.Trigger(this.GetRegistrations());
 		}
 
 		/// <summary>
 		/// Recurrently triggers resource using a given time interval.
 		/// </summary>
-		public void TriggerAll(TimeSpan Interval)
+		public async Task TriggerAll(TimeSpan Interval)
 		{
 			if (Interval <= TimeSpan.Zero)
 				throw new ArgumentOutOfRangeException("Interval must be positive.", nameof(Interval));
@@ -266,12 +267,12 @@ namespace Waher.Networking.CoAP
 			DateTime TP = DateTime.Now + Interval;
 			object[] P = new object[] { TP, Interval, null };
 
-			this.TriggerAll();
+			await this.TriggerAll();
 			this.nextTrigger = this.endpoint.ScheduleEvent(this.Retrigger, TP, P);
 			P[2] = this.nextTrigger;
 		}
 
-		private void Retrigger(object State)
+		private async Task Retrigger(object State)
 		{
 			try
 			{
@@ -286,7 +287,7 @@ namespace Waher.Networking.CoAP
 				TP += Interval;
 				P[0] = TP;
 
-				this.TriggerAll();
+				await this.TriggerAll();
 				this.nextTrigger = this.endpoint.ScheduleEvent(this.Retrigger, TP, P);
 				P[2] = this.nextTrigger;
 			}
@@ -300,7 +301,7 @@ namespace Waher.Networking.CoAP
 		/// Sends data to a selected set of registered observers.
 		/// </summary>
 		/// <param name="Registrations">Registrations to trigger.</param>
-		public void Trigger(params ObservationRegistration[] Registrations)
+		public async Task Trigger(params ObservationRegistration[] Registrations)
 		{
 			if (Registrations is null || Registrations.Length == 0)
 				return;
@@ -312,7 +313,7 @@ namespace Waher.Networking.CoAP
 
 				Registration.Endpoint.RemoveBlockedResponse(Key);
 				Registration.Request.Block2 = null;
-				Registration.Endpoint.ProcessRequest(this, Registration.Client,
+				await Registration.Endpoint.ProcessRequest(this, Registration.Client,
 					Registration.Request, true, new CoapOptionObserve(Registration.SequenceNumber));
 
 				Registration.IncSeqNr();

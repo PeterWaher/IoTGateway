@@ -94,7 +94,7 @@ namespace Waher.Networking.DNS.Communication
 			throw new NotSupportedException("No route to DNS server found.");
 		}
 
-		private async void BeginReceive()
+		private async void BeginReceive()   // Starts parallel task
 		{
 			try
 			{

@@ -9,6 +9,7 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Events;
@@ -408,19 +409,7 @@ namespace Waher.IoTGateway.Setup
 		private async Task<string> NickName()
 		{
 			SuggestionEventArgs e = new SuggestionEventArgs(string.Empty);
-			SuggesstionsEventHandler h = OnGetNickNameSuggestions;
-			
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await OnGetNickNameSuggestions.Raise(this, e);
 
 			string[] Suggestions = e.ToArray();
 			string NickName = Suggestions.Length > 0 ? Suggestions[0] : (string)Gateway.Domain;
@@ -604,18 +593,7 @@ namespace Waher.IoTGateway.Setup
 					e.AddSuggestion(Group);
 			}
 
-			SuggesstionsEventHandler h = OnGetGroupSuggestions;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await OnGetGroupSuggestions.Raise(this, e);
 
 			StringBuilder sb = new StringBuilder();
 			string[] Groups = e.ToArray();
@@ -649,12 +627,12 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Event raised when list of group suggestions is populated.
 		/// </summary>
-		public static event SuggesstionsEventHandler OnGetGroupSuggestions = null;
+		public static event EventHandlerAsync<SuggestionEventArgs> OnGetGroupSuggestions = null;
 
 		/// <summary>
 		/// Event raised when list of nickname suggestions is populated.
 		/// </summary>
-		public static event SuggesstionsEventHandler OnGetNickNameSuggestions = null;
+		public static event EventHandlerAsync<SuggestionEventArgs> OnGetNickNameSuggestions = null;
 
 		private async Task AcceptRequest(HttpRequest Request, HttpResponse Response)
 		{

@@ -1,15 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.Cluster
 {
-	/// <summary>
-	/// Event arguments for cluster endpoint status events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event handler.</param>
-	public delegate Task ClusterEndpointStatusEventHandler(object Sender, ClusterEndpointStatusEventArgs e);
-
 	/// <summary>
 	/// Event arguments for cluster endpoint status events.
 	/// </summary>

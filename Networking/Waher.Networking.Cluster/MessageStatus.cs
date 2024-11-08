@@ -15,7 +15,7 @@ namespace Waher.Networking.Cluster
 		public byte[] MessageBinary;
 		public DateTime Timeout;
 		public DateTime TimeLimit;
-		public ClusterMessageAckEventHandler Callback;
+		public EventHandlerAsync<ClusterMessageAckEventArgs> Callback;
 		public object State;
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace Waher.Networking.Cluster
 			{
 				foreach (EndpointStatus Status in Statuses)
 				{
-					if (!Acknowledged.ContainsKey(Status.Endpoint))
+					if (!this.Acknowledged.ContainsKey(Status.Endpoint))
 						return false;
 				}
 			}
@@ -50,8 +50,8 @@ namespace Waher.Networking.Cluster
 			{
 				foreach (EndpointStatus Status in Statuses)
 				{
-					if (!Acknowledged.ContainsKey(Status.Endpoint))
-						Acknowledged[Status.Endpoint] = null;
+					if (!this.Acknowledged.ContainsKey(Status.Endpoint))
+						this.Acknowledged[Status.Endpoint] = null;
 				}
 
 				Result = new EndpointAcknowledgement[c = this.Acknowledged.Count];

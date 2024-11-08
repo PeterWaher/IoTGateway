@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -320,30 +321,20 @@ namespace Waher.Content.Markdown.Consolidation
 			return Result;
 		}
 
-		private async Task Raise(SourceEventHandler Handler, string Source)
+		private Task Raise(EventHandlerAsync<SourceEventArgs> Handler, string Source)
 		{
-			if (!(Handler is null))
-			{
-				try
-				{
-					await Handler(this, new SourceEventArgs(Source));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return Handler.Raise(this, new SourceEventArgs(Source));
 		}
 
 		/// <summary>
 		/// Event raised when content from a source has been added.
 		/// </summary>
-		public event SourceEventHandler Added = null;
+		public event EventHandlerAsync<SourceEventArgs> Added = null;
 
 		/// <summary>
 		/// Event raised when content from a source has been updated.
 		/// </summary>
-		public event SourceEventHandler Updated = null;
+		public event EventHandlerAsync<SourceEventArgs> Updated = null;
 
 		/// <summary>
 		/// Generates consolidated markdown from all sources.
@@ -717,25 +708,30 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
-			EventHandler h = this.Disposed;
-			if (!(h is null))
+			try
 			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				this.DisposeAsync().Wait();
 			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public Task DisposeAsync()
+		{
+			return this.Disposed.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when consolidator has been disposed.
 		/// </summary>
-		public event EventHandler Disposed = null;
+		public event EventHandlerAsync Disposed = null;
 	}
 }

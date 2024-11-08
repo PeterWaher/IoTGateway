@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.WebSockets
 {
-	/// <summary>
-	/// Delegate for websocket events.
-	/// </summary>
-	/// <param name="Sender"></param>
-	/// <param name="e"></param>
-	public delegate Task WebSocketEventHandler(object Sender, WebSocketEventArgs e);
-
 	/// <summary>
 	/// Event arguments for websocket events.
 	/// </summary>

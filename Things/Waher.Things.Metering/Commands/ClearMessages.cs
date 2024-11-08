@@ -85,7 +85,7 @@ namespace Waher.Things.Metering.Commands
 			{
 				this.node.State = NodeState.None;
 				await Database.Update(this.node);
-				this.node.RaiseUpdate();
+				await this.node.RaiseUpdate();
 			}
 
 			await this.node.NodeStateChanged();

@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
-	/// <summary>
-	/// Delegate for data reception callback methods.
-	/// </summary>
-	/// <param name="Sender">Caller.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task DataReceivedEventHandler(object Sender, DataReceivedEventArgs e);
-
 	/// <summary>
 	/// Event arguments containing received binary data.
 	/// </summary>

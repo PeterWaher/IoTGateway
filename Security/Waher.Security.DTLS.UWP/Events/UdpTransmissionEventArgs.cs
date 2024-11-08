@@ -1,15 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 
 namespace Waher.Security.DTLS.Events
 {
-	/// <summary>
-	/// Delegate for UDP transmission events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task UdpTransmissionEventHandler(object Sender, UdpTransmissionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for UDP transmission events.
 	/// </summary>
@@ -42,6 +34,5 @@ namespace Waher.Security.DTLS.Events
 		/// State object passed in original call.
 		/// </summary>
 		public object State => this.state;
-
 	}
 }

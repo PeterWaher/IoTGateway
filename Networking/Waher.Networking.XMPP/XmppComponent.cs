@@ -178,19 +178,7 @@ namespace Waher.Networking.XMPP
 
 		private async Task ConnectionError(Exception ex)
 		{
-			ExceptionEventHandler h = this.OnConnectionError;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					await this.Exception(ex2);
-				}
-			}
-
+			await this.OnConnectionError.Raise(this, ex);
 			await this.Error(this, ex);
 
 			this.inputState = -1;
@@ -221,19 +209,7 @@ namespace Waher.Networking.XMPP
 			this.State = XmppState.Error;
 
 			await this.Exception(ex);
-
-			ExceptionEventHandler h = this.OnError;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					await this.Exception(ex2);
-				}
-			}
+			await this.OnError.Raise(this, ex);
 		}
 
 		private async Task<bool> OnSent(object _, string Text)
@@ -260,12 +236,12 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when a connection to a broker could not be made.
 		/// </summary>
-		public event ExceptionEventHandler OnConnectionError = null;
+		public event EventHandlerAsync<Exception> OnConnectionError = null;
 
 		/// <summary>
 		/// Event raised when an error was encountered.
 		/// </summary>
-		public event ExceptionEventHandler OnError = null;
+		public event EventHandlerAsync<Exception> OnError = null;
 
 		/// <summary>
 		/// Host or IP address of XMPP server.
@@ -406,19 +382,7 @@ namespace Waher.Networking.XMPP
 		private async Task BeginWrite(string Xml, EventHandlerAsync Callback)
 		{
 			if (string.IsNullOrEmpty(Xml))
-			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}
+				await Callback.Raise(this, EventArgs.Empty);
 			else
 			{
 				await this.client.SendAsync(Xml, Callback);
@@ -1024,17 +988,7 @@ namespace Waher.Networking.XMPP
 											}
 										}
 
-										if (!(Callback is null))
-										{
-											try
-											{
-												await Callback(this, new IqResultEventArgs(E, Id, To, From, Ok, State));
-											}
-											catch (Exception ex)
-											{
-												await this.Exception(ex);
-											}
-										}
+										await Callback.Raise(this, new IqResultEventArgs(E, Id, To, From, Ok, State));
 									}
 									break;
 							}
@@ -1142,17 +1096,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, e);
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
+				await h.Raise(this, e);
 			}
 			catch (Exception ex)
 			{
@@ -1250,17 +1194,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e);
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, e);
 			}
 			catch (Exception ex)
 			{
@@ -2078,8 +2012,7 @@ namespace Waher.Networking.XMPP
 
 				PresenceEventArgs e2 = new PresenceEventArgs(this, Doc.DocumentElement);
 
-				if (!(PendingRequest.PresenceCallback is null))
-					await PendingRequest.PresenceCallback(this, e2);
+				await PendingRequest.PresenceCallback.Raise(this, e2);
 			}
 			catch (Exception ex)
 			{
@@ -2449,19 +2382,9 @@ namespace Waher.Networking.XMPP
 			await this.DeliveryCallback(DeliveryCallback, State, false);
 		}
 
-		private async Task DeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
+		private Task DeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
 		{
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new DeliveryEventArgs(State, Ok));
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-				}
-			}
+			return Callback.Raise(this, new DeliveryEventArgs(State, Ok));
 		}
 
 		/// <summary>
@@ -2826,7 +2749,7 @@ namespace Waher.Networking.XMPP
 								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 									Request.State);
 
-								await Request.IqCallback(this, e);
+								await Request.IqCallback.Raise(this, e);
 							}
 						}
 						catch (Exception ex)

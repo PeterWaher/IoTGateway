@@ -29,9 +29,10 @@ namespace Waher.Networking.XMPP
 			this.client.OnDisposed += this.Client_OnDisposed;
 		}
 
-		private void Client_OnDisposed(object sender, EventArgs e)
+		private Task Client_OnDisposed(object sender, EventArgs e)
 		{
 			this.clientDisposed = true;
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

@@ -15,7 +15,7 @@ namespace Waher.Networking.Cluster
 	{
 		public LockInfo Info;
 		public DateTime Timeout;
-		public ClusterResourceLockEventHandler Callback;
+		public EventHandlerAsync<ClusterResourceLockEventArgs> Callback;
 		public IPEndPoint LockedBy;
 		public object State;
 		public bool TimeoutScheduled = false;

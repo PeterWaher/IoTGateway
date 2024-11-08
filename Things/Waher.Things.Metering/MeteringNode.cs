@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -286,7 +287,7 @@ namespace Waher.Things.Metering
 					{
 						this.state = NodeState.ErrorUnsigned;
 						await Database.Update(this);
-						this.RaiseUpdate();
+						await this.RaiseUpdate();
 					}
 					break;
 
@@ -295,7 +296,7 @@ namespace Waher.Things.Metering
 					{
 						this.state = NodeState.WarningUnsigned;
 						await Database.Update(this);
-						this.RaiseUpdate();
+						await this.RaiseUpdate();
 					}
 					break;
 
@@ -304,7 +305,7 @@ namespace Waher.Things.Metering
 					{
 						this.state = NodeState.Information;
 						await Database.Update(this);
-						this.RaiseUpdate();
+						await this.RaiseUpdate();
 					}
 					break;
 			}
@@ -487,7 +488,7 @@ namespace Waher.Things.Metering
 						{
 							this.state = NewStateSigned;
 							await Database.Update(this);
-							this.RaiseUpdate();
+							await this.RaiseUpdate();
 						}
 						break;
 
@@ -496,7 +497,7 @@ namespace Waher.Things.Metering
 						{
 							this.state = NewStateUnsigned;
 							await Database.Update(this);
-							this.RaiseUpdate();
+							await this.RaiseUpdate();
 						}
 						break;
 				}
@@ -512,20 +513,9 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public event EventHandler OnUpdate = null;
 
-		internal void RaiseUpdate()
+		internal Task RaiseUpdate()
 		{
-			EventHandler h = this.OnUpdate;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnUpdate.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -1107,7 +1097,7 @@ namespace Waher.Things.Metering
 			else
 				await Node.NodeUpdated();
 
-			this.RaiseUpdate();
+			await this.RaiseUpdate();
 		}
 
 		/// <summary>
@@ -1154,7 +1144,7 @@ namespace Waher.Things.Metering
 			if (this.objectId != Guid.Empty)
 				await this.NodeUpdated();
 
-			this.RaiseUpdate();
+			await this.RaiseUpdate();
 		}
 
 		/// <summary>
@@ -1194,7 +1184,7 @@ namespace Waher.Things.Metering
 			if (Node.objectId != Guid.Empty)
 			{
 				await Database.Update(Child);
-				this.RaiseUpdate();
+				await this.RaiseUpdate();
 
 				await MeteringTopology.NewEvent(new NodeRemoved()
 				{

@@ -1889,9 +1889,7 @@ namespace Waher.Networking.XMPP.P2P
 			bool HasE2E = this.AddPeerPkiInfo(RemoteFullJID, E2E);
 			bool HasP2P = !(this.serverlessMessaging is null) && await this.serverlessMessaging.AddPeerAddressInfo(RemoteFullJID, P2P);
 
-			PeerSynchronizedEventHandler h = this.PeerUpdated;
-			if (!(h is null))
-				await h(this, new PeerSynchronizedEventArgs(RemoteFullJID, HasE2E, HasP2P));
+			await this.PeerUpdated.Raise(this, new PeerSynchronizedEventArgs(RemoteFullJID, HasE2E, HasP2P));
 		}
 
 		private async Task SynchE2eHandler(object Sender, IqEventArgs e)
@@ -1963,7 +1961,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// Event raised whenever information about a peer has been updated.
 		/// </summary>
-		public event PeerSynchronizedEventHandler PeerUpdated = null;
+		public event EventHandlerAsync<PeerSynchronizedEventArgs> PeerUpdated = null;
 
 		/// <summary>
 		/// Gets the local key of a given type.

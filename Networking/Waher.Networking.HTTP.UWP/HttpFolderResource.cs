@@ -435,7 +435,7 @@ namespace Waher.Networking.HTTP
 					return s2;
 
 				i = s2.LastIndexOf('.');
-				if (i > 0 && 
+				if (i > 0 &&
 					File.Exists(s3 = s2.Substring(0, i)) &&
 					InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
 					(Header?.Accept?.IsAcceptable(ContentType) ?? true))
@@ -540,7 +540,7 @@ namespace Waher.Networking.HTTP
 				if (Response.ResponseSent)
 					return;
 
-				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, 
+				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified,
 					Response, Request, this.defaultResponseHeaders);
 			}
 			else
@@ -550,25 +550,12 @@ namespace Waher.Networking.HTTP
 		private async Task RaiseFileNotFound(string FullPath, HttpRequest Request, HttpResponse Response)
 		{
 			NotFoundException ex = new NotFoundException("File not found: " + Request.SubPath);
-			FileNotFoundEventHandler h = this.FileNotFound;
+			FileNotFoundEventArgs e = new FileNotFoundEventArgs(ex, FullPath, Request, Response);
+			await this.FileNotFound.Raise(this, e);
 
-			if (!(h is null))
-			{
-				FileNotFoundEventArgs e = new FileNotFoundEventArgs(ex, FullPath, Request, Response);
-
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex2)
-				{
-					Log.Exception(ex2);
-				}
-
-				ex = e.Exception;
-				if (ex is null)
-					return;     // Sent asynchronously from event handler.
-			}
+			ex = e.Exception;
+			if (ex is null)
+				return;     // Sent asynchronously from event handler.
 
 			Log.Warning("File not found.", FullPath, Request.RemoteEndPoint, "FileNotFound");
 
@@ -579,7 +566,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when a file was requested that could not be found. 
 		/// </summary>
-		public event FileNotFoundEventHandler FileNotFound = null;
+		public event EventHandlerAsync<FileNotFoundEventArgs> FileNotFound = null;
 
 		/// <summary>
 		/// Sends a file-based response back to the client.

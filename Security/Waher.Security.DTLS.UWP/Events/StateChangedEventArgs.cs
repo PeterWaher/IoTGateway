@@ -3,13 +3,6 @@
 namespace Waher.Security.DTLS
 {
 	/// <summary>
-	/// Delegate for state change events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task StateChangedEventHandler(object Sender, StateChangedEventArgs e);
-
-	/// <summary>
 	/// Event arguments for state change events.
 	/// </summary>
 	public class StateChangedEventArgs : RemoteEndpointEventArgs

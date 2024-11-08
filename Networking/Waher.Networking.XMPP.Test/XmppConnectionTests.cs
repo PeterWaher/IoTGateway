@@ -265,7 +265,11 @@ namespace Waher.Networking.XMPP.Test
 
 			this.WaitConnected(10000);
 
-			this.client.OnPasswordChanged += (sender, e) => Changed.Set();
+			this.client.OnPasswordChanged += (sender, e) =>
+			{
+				Changed.Set();
+				return Task.CompletedTask;
+			};
 
 			this.client.ChangePassword("newtestpassword");
 			Assert.IsTrue(Changed.WaitOne(10000), "Unable to change password.");

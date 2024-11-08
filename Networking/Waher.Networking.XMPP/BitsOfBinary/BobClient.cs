@@ -174,17 +174,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 
 			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
 			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new BitsOfBinaryEventArgs(e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new BitsOfBinaryEventArgs(e));
 			}, State);
 		}
 	}

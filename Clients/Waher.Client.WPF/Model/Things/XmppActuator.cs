@@ -93,13 +93,13 @@ namespace Waher.Client.WPF.Model.Things
 
 		protected override bool UseActuatorControl => true;
 
-		public override void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
+		public override async Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			ControlClient ControlClient;
 
 			if (!(XmppAccountNode is null) && !((ControlClient = XmppAccountNode.ControlClient) is null))
-				ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);
+				await ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);
 			else
 				throw new NotSupportedException();
 		}

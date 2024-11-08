@@ -147,7 +147,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public Task GET(string To, string Resource, EventHandlerAsync<HttpxResponseEventArgs> Callback,
-			HttpxResponseDataEventHandler DataCallback, object State, params HttpField[] Headers)
+			EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback, object State, params HttpField[] Headers)
 		{
 			return this.Request(To, "GET", Resource, Callback, DataCallback, State, Headers);
 		}
@@ -163,7 +163,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public async Task POST(string To, string Resource, object Data,
-			EventHandlerAsync<HttpxResponseEventArgs> Callback, HttpxResponseDataEventHandler DataCallback,
+			EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback,
 			object State, params HttpField[] Headers)
 		{
 			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Data, Encoding.UTF8);
@@ -182,7 +182,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public Task POST(string To, string Resource, byte[] Data, string ContentType,
-			EventHandlerAsync<HttpxResponseEventArgs> Callback, HttpxResponseDataEventHandler DataCallback,
+			EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback,
 			object State, params HttpField[] Headers)
 		{
 			using (MemoryStream DataStream = new MemoryStream(Data))
@@ -203,7 +203,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public Task POST(string To, string Resource, Stream DataStream, string ContentType,
-			EventHandlerAsync<HttpxResponseEventArgs> Callback, HttpxResponseDataEventHandler DataCallback,
+			EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback,
 			object State, params HttpField[] Headers)
 		{
 			List<HttpField> Headers2 = new List<HttpField>()
@@ -234,7 +234,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public Task Request(string To, string Method, string LocalResource, EventHandlerAsync<HttpxResponseEventArgs> Callback,
-			HttpxResponseDataEventHandler DataCallback, object State, params HttpField[] Headers)
+			EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback, object State, params HttpField[] Headers)
 		{
 			return this.Request(To, Method, LocalResource, 1.1, Headers, null, Callback, DataCallback, State);
 		}
@@ -252,7 +252,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="DataCallback">Local resource.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public async Task Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
-			Stream DataStream, EventHandlerAsync<HttpxResponseEventArgs> Callback, HttpxResponseDataEventHandler DataCallback, object State)
+			Stream DataStream, EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback, object State)
 		{
 			// TODO: Local IP & port for quick P2P response (TLS).
 
@@ -277,7 +277,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (!(this.postResource is null))
 			{
-				string Resource = this.postResource.GetUrl(this.ResponsePostbackHandler, ResponseState);
+				string Resource = await this.postResource.GetUrl(this.ResponsePostbackHandler, ResponseState);
 
 				Xml.Append("' post='");
 				Xml.Append(XML.Encode(Resource));
@@ -393,7 +393,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private class ResponseState : IDisposable
 		{
 			public EventHandlerAsync<HttpxResponseEventArgs> Callback;
-			public HttpxResponseDataEventHandler DataCallback;
+			public EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback;
 			public HttpxResponseEventArgs HttpxResponse = null;
 			public object State;
 
@@ -771,11 +771,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			try
 			{
-				await ResponseState.Callback(this, e2);
-			}
-			catch (Exception)
-			{
-				// Ignore.
+				await ResponseState.Callback.Raise(this, e2);
 			}
 			finally
 			{
@@ -1056,17 +1052,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new TokenResponseEventArgs(e, Token));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new TokenResponseEventArgs(e, Token));
 			}, State);
 		}
 

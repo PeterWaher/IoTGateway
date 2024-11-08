@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Waher.Networking.CoAP;
 
 namespace Waher.Networking.LWM2M.Events
 {
-	/// <summary>
-	/// Delegate for CoAP request event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CoapRequestEventHandler(object Sender, CoapRequestEventArgs e);
-
 	/// <summary>
 	/// Event arguments for CoAP request events.
 	/// </summary>

@@ -149,7 +149,7 @@ namespace Waher.Networking.XMPP.Mail
 								{
 									if (N2 is XmlElement E2 && E2.LocalName == "body")
 									{
-										Html = E2.OuterXml;		// InnerXml introduces xmlns attributes on all child elements.
+										Html = E2.OuterXml;     // InnerXml introduces xmlns attributes on all child elements.
 
 										int i = Html.IndexOf('>');
 										Html = Html.Substring(i + 1);
@@ -231,17 +231,7 @@ namespace Waher.Networking.XMPP.Mail
 					else
 						e.Ok = false;
 
-					if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(this, new MessageObjectEventArgs(e, ResponseContentType, Data));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await Callback.Raise(this, new MessageObjectEventArgs(e, ResponseContentType, Data));
 				}, State);
 		}
 
@@ -262,7 +252,7 @@ namespace Waher.Networking.XMPP.Mail
 		public async Task<MessageObject> GetAsync(string ObjectId, string ContentType)
 		{
 			TaskCompletionSource<MessageObject> Result = new TaskCompletionSource<MessageObject>();
-			
+
 			await this.Get(ObjectId, ContentType, (sender, e) =>
 			{
 				if (e.Ok)
@@ -357,7 +347,7 @@ namespace Waher.Networking.XMPP.Mail
 			}
 
 			Xml.Append("'>");
-			Xml.Append(Convert.ToBase64String(ContentData));		// TODO: Chunked transfer
+			Xml.Append(Convert.ToBase64String(ContentData));        // TODO: Chunked transfer
 			Xml.Append("</content>");
 
 			return Task.CompletedTask;

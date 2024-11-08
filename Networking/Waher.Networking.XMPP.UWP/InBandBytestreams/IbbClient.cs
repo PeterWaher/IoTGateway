@@ -132,7 +132,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					}
 				}
 				else
-					Result.Abort();
+					await Result.Abort();
 
 			}, null);
 
@@ -178,7 +178,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			await e.IqResult(string.Empty);
 		}
 
-		private Task CloseHandler(object Sender, IqEventArgs e)
+		private async Task CloseHandler(object Sender, IqEventArgs e)
 		{
 			string StreamId = XML.Attribute(e.Query, "sid");
 			string Key = e.From + " " + StreamId;
@@ -205,20 +205,20 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					this.output.Remove(StreamId);
 				}
 
-				Output.Abort();
+				await Output.Abort();
 				Output.Dispose();
 			}
 			else
 			{
 				if (Input.BlocksMissing)
-					Input.Closed(CloseReason.Aborted);
+					await Input.Closed(CloseReason.Aborted);
 				else
-					Input.Closed(CloseReason.Done);
+					await Input.Closed(CloseReason.Done);
 
 				Input.Dispose();
 			}
 
-			return e.IqResult(string.Empty);
+			await e.IqResult(string.Empty);
 		}
 
 		private void AssertCacheCreated()

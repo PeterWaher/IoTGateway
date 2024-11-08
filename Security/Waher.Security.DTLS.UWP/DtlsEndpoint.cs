@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
@@ -743,17 +744,7 @@ namespace Waher.Security.DTLS
 									this.rnd.GetBytes(State.serverRandom);
 								}
 
-								try
-								{
-									RemoteEndpointEventHandler h2 = this.OnIncomingHandshakeStarted;
-
-									if (!(h2 is null))
-										await h2(this, new RemoteEndpointEventArgs(State.remoteEndpoint));
-								}
-								catch (Exception ex)
-								{
-									Log.Exception(ex);
-								}
+								await this.OnIncomingHandshakeStarted.Raise(this, new RemoteEndpointEventArgs(State.remoteEndpoint));
 
 								this.SetUnixTime(State.serverRandom, 0);
 
@@ -915,18 +906,7 @@ namespace Waher.Security.DTLS
 						if (State.State != DtlsState.SessionEstablished)
 							break;
 
-						ApplicationDataEventHandler h = this.OnApplicationDataReceived;
-						if (!(h is null))
-						{
-							try
-							{
-								await h(this, new ApplicationDataEventArgs(State.remoteEndpoint, Record.fragment));
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
-						}
+						await this.OnApplicationDataReceived.Raise(this, new ApplicationDataEventArgs(State.remoteEndpoint, Record.fragment));
 						break;
 
 					default:
@@ -946,7 +926,7 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Event raised when application data has been received.
 		/// </summary>
-		public event ApplicationDataEventHandler OnApplicationDataReceived = null;
+		public event EventHandlerAsync<ApplicationDataEventArgs> OnApplicationDataReceived = null;
 
 		internal Task SendAlert(AlertLevel Level, AlertDescription Description, EndpointState State)
 		{
@@ -978,46 +958,24 @@ namespace Waher.Security.DTLS
 		{
 			await State.SetState(DtlsState.SessionEstablished);
 
-			RemoteEndpointEventHandler h = this.OnHandshakeSuccessful;
-			if (h is null)
-			{
-				try
-				{
-					await h(this, new RemoteEndpointEventArgs(State.remoteEndpoint));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnHandshakeSuccessful.Raise(this, new RemoteEndpointEventArgs(State.remoteEndpoint));
 		}
 
 		/// <summary>
 		/// Event raised when handshake has been successful.
 		/// </summary>
-		public event RemoteEndpointEventHandler OnHandshakeSuccessful = null;
+		public event EventHandlerAsync<RemoteEndpointEventArgs> OnHandshakeSuccessful = null;
 
 		/// <summary>
 		/// Event raised when an incoming handshake has begun.
 		/// </summary>
-		public event RemoteEndpointEventHandler OnIncomingHandshakeStarted = null;
+		public event EventHandlerAsync<RemoteEndpointEventArgs> OnIncomingHandshakeStarted = null;
 
 		private async Task HandshakeFailure(EndpointState State, string Reason, AlertDescription Descripton)
 		{
 			await State.SetState(DtlsState.Failed);
 
-			FailureEventHandler h = this.OnHandshakeFailed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new FailureEventArgs(State.remoteEndpoint, Reason, Descripton));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnHandshakeFailed.Raise(this, new FailureEventArgs(State.remoteEndpoint, Reason, Descripton));
 
 			this.states?.Remove(State.remoteEndpoint);
 		}
@@ -1025,24 +983,13 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Event raised when handshake fails.
 		/// </summary>
-		public event FailureEventHandler OnHandshakeFailed = null;
+		public event EventHandlerAsync<FailureEventArgs> OnHandshakeFailed = null;
 
 		private async Task SessionFailure(EndpointState State, string Reason, AlertDescription Descripton)
 		{
 			await State.SetState(DtlsState.Failed);
 
-			FailureEventHandler h = this.OnSessionFailed;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new FailureEventArgs(State.remoteEndpoint, Reason, Descripton));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnSessionFailed.Raise(this, new FailureEventArgs(State.remoteEndpoint, Reason, Descripton));
 
 			this.states?.Remove(State.remoteEndpoint);
 		}
@@ -1050,27 +997,16 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Event raised when session fails.
 		/// </summary>
-		public event FailureEventHandler OnSessionFailed = null;
+		public event EventHandlerAsync<FailureEventArgs> OnSessionFailed = null;
 
 		/// <summary>
 		/// Event raised, when DTLS state is changed.
 		/// </summary>
-		public event StateChangedEventHandler OnStateChanged = null;
+		public event EventHandlerAsync<StateChangedEventArgs> OnStateChanged = null;
 
-		internal async Task StateChanged(object RemoteEndpoint, DtlsState State)
+		internal Task StateChanged(object RemoteEndpoint, DtlsState State)
 		{
-			StateChangedEventHandler h = this.OnStateChanged;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new StateChangedEventArgs(RemoteEndpoint, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex, RemoteEndpoint.ToString());
-				}
-			}
+			return this.OnStateChanged.Raise(this, new StateChangedEventArgs(RemoteEndpoint, State));
 		}
 
 		private static ushort GetUInt16(byte[] Data, int Pos)

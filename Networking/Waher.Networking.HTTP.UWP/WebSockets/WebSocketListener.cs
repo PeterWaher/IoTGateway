@@ -6,13 +6,6 @@ using Waher.Security;
 namespace Waher.Networking.HTTP.WebSockets
 {
 	/// <summary>
-	/// Delegate for HTTP Request events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Request">HTTP request.</param>
-	public delegate Task HttpRequestEventHandle(object Sender, HttpRequest Request);
-
-	/// <summary>
 	/// HTTP resource implementing the WebSocket Protocol as defined in RFC 6455:
 	/// https://tools.ietf.org/html/rfc6455
 	/// </summary>
@@ -150,9 +143,9 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			WebSocket Socket = new WebSocket(this, Request, Response);
 
-			WebSocketEventHandler h = this.Accept;
-			if (!(h is null))
-				await h(this, new WebSocketEventArgs(Socket));
+			EventHandlerAsync<WebSocketEventArgs> Accept = this.Accept;
+			if (!(Accept is null))
+				await Accept.Invoke(this, new WebSocketEventArgs(Socket));	// Allow event handler to throw exception
 
 			string ChallengeResponse = Convert.ToBase64String(Hashes.ComputeSHA1Hash(
 				Encoding.UTF8.GetBytes(Challenge.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")));
@@ -170,9 +163,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			await Response.SendResponse();
 
-			h = this.Connected;
-			if (!(h is null))
-				await h(this, new WebSocketEventArgs(Socket));
+			await this.Connected.Raise(this, new WebSocketEventArgs(Socket));
 		}
 
 		/// <summary>
@@ -180,11 +171,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// It can be used to check the origin of the request. If the connection should
 		/// be rejected, throw an <see cref="HttpException"/> within the event handler.
 		/// </summary>
-		public event WebSocketEventHandler Accept = null;
+		public event EventHandlerAsync<WebSocketEventArgs> Accept = null;
 
 		/// <summary>
 		/// Event raised after connection has been updated to a websocket connection.
 		/// </summary>
-		public event WebSocketEventHandler Connected = null;
+		public event EventHandlerAsync<WebSocketEventArgs> Connected = null;
 	}
 }

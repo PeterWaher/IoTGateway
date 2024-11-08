@@ -651,7 +651,7 @@ namespace Waher.Networking.XMPP
 				if (this.disposed)
 					throw new ObjectDisposedException("XMPP Client has been disposed.");
 
-				this.DisposeClient(false);
+				await this.DisposeClient(false);
 
 				this.domain = Domain;
 				this.bareJid = this.fullJid = this.userName + "@" + Domain;
@@ -824,23 +824,11 @@ namespace Waher.Networking.XMPP
 		{
 			await this.SetState(XmppState.Error);
 
-			ExceptionEventHandler h = this.OnConnectionError;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					await this.Exception(ex2);
-				}
-			}
-
+			await this.OnConnectionError.Raise(this, ex);
 			await this.Error(this, ex);
 
 			this.inputState = -1;
-			this.DisposeClient(false);
+			await this.DisposeClient(false);
 		}
 
 		private async Task Error(object _, Exception Exception)
@@ -857,31 +845,19 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				await this.Exception(Exception);
-
-				ExceptionEventHandler h = this.OnError;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, Exception);
-					}
-					catch (Exception ex2)
-					{
-						await this.Exception(ex2);
-					}
-				}
+				await this.OnError.Raise(this, Exception);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when a connection to a broker could not be made.
 		/// </summary>
-		public event ExceptionEventHandler OnConnectionError = null;
+		public event EventHandlerAsync<Exception> OnConnectionError = null;
 
 		/// <summary>
 		/// Event raised when an error was encountered.
 		/// </summary>
-		public event ExceptionEventHandler OnError = null;
+		public event EventHandlerAsync<Exception> OnError = null;
 
 		/// <summary>
 		/// Host or IP address of XMPP server.
@@ -1204,7 +1180,7 @@ namespace Waher.Networking.XMPP
 			this.secondTimer?.Dispose();
 			this.secondTimer = null;
 
-			this.DisposeClient(RaiseEvent);
+			await this.DisposeClient(RaiseEvent);
 
 			this.responses.Dispose();
 
@@ -1217,7 +1193,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void DisposeClient(bool RaiseEvent)
+		private async Task DisposeClient(bool RaiseEvent)
 		{
 			this.client?.DisposeWhenDone();
 			this.client = null;
@@ -1227,27 +1203,15 @@ namespace Waher.Networking.XMPP
 
 			if (RaiseEvent)
 			{
-				EventHandler h = this.OnDisposed;
-				if (!(h is null))
-				{
-					this.OnDisposed = null;
-
-					try
-					{
-						h(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnDisposed.Raise(this, EventArgs.Empty);
+				this.OnDisposed = null;
 			}
 		}
 
 		/// <summary>
 		/// Event raised when object is disposed.
 		/// </summary>
-		public event EventHandler OnDisposed = null;
+		public event EventHandlerAsync OnDisposed = null;
 
 		/// <summary>
 		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
@@ -1316,19 +1280,7 @@ namespace Waher.Networking.XMPP
 		private async Task BeginWrite(string Xml, EventHandlerAsync Callback)
 		{
 			if (string.IsNullOrEmpty(Xml))
-			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}
+				await Callback.Raise(this, EventArgs.Empty);
 			else
 			{
 				if (this.textTransportLayer is null)
@@ -2627,20 +2579,10 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				if (!(Callback is null))
-				{
-					e.Content = null;
-					e.State = State;
+				e.Content = null;
+				e.State = State;
 
-					try
-					{
-						await Callback(this, e);
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, e);
 			}
 			catch (Exception ex)
 			{
@@ -2717,26 +2659,9 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private async Task ProcessResult(EventHandlerAsync<IqResultEventArgs> Callback, IqResultEventArgs e)
+		private Task ProcessResult(EventHandlerAsync<IqResultEventArgs> Callback, IqResultEventArgs e)
 		{
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					try
-					{
-						await this.Exception(ex);
-					}
-					catch (Exception)
-					{
-						// Ignore
-					}
-				}
-			}
+			return Callback.Raise(this, e);
 		}
 
 		/// <summary>
@@ -4008,16 +3933,7 @@ namespace Waher.Networking.XMPP
 							await this.Information("OnRegistrationForm()");
 							EventHandlerAsync<DataForm> h = this.OnRegistrationForm;
 							if (!(h is null))
-							{
-								try
-								{
-									await h(this, Form);
-								}
-								catch (Exception ex)
-								{
-									await this.Exception(ex);
-								}
-							}
+								await h.Raise(this, Form);
 							else
 								await Form.Submit();
 						}
@@ -4185,18 +4101,7 @@ namespace Waher.Networking.XMPP
 				// TODO: Also update hash and hash method
 
 				await this.Information("OnPasswordChanged()");
-				EventHandler h = this.OnPasswordChanged;
-				if (!(h is null))
-				{
-					try
-					{
-						h(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
+				await this.OnPasswordChanged.Raise(this, EventArgs.Empty);
 			}
 			else
 			{
@@ -4249,18 +4154,8 @@ namespace Waher.Networking.XMPP
 				await this.Error(this, e.StanzaError);
 			}
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					e.State = State;
-					await Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			e.State = State;
+			await Callback.Raise(this, e);
 		}
 
 		private async Task SubmitChangePasswordForm(object _, DataForm RegistrationForm)
@@ -4298,7 +4193,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when password has been changed.
 		/// </summary>
-		public event EventHandler OnPasswordChanged = null;
+		public event EventHandlerAsync OnPasswordChanged = null;
 
 		/// <summary>
 		/// If the roster should be automatically fetched on startup or not.
@@ -5210,27 +5105,7 @@ namespace Waher.Networking.XMPP
 
 			await T;
 
-			if (!(h is null))
-				this.ProcessRosterHandler(h, Item);
-		}
-
-		private async void ProcessRosterHandler(EventHandlerAsync<RosterItem> h, RosterItem Item)
-		{
-			try
-			{
-				await h(this, Item);
-			}
-			catch (Exception ex)
-			{
-				try
-				{
-					await this.Exception(ex);
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			await h.Raise(this, Item);
 		}
 
 		/// <summary>
@@ -5522,19 +5397,9 @@ namespace Waher.Networking.XMPP
 			await this.CallDeliveryCallback(DeliveryCallback, State, false);
 		}
 
-		private async Task CallDeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
+		private Task CallDeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
 		{
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new DeliveryEventArgs(State, Ok));
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-				}
-			}
+			return Callback.Raise(this, new DeliveryEventArgs(State, Ok));
 		}
 
 		private async Task DynamicFormUpdatedHandler(object Sender, MessageEventArgs e)
@@ -5553,20 +5418,7 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (!(Form is null))
-			{
-				EventHandlerAsync<DynamicDataFormEventArgs> h = this.OnDynamicFormUpdated;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, new DynamicDataFormEventArgs(Form, SessionVariable, Language, e));
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
-			}
+				await this.OnDynamicFormUpdated.Raise(this, new DynamicDataFormEventArgs(Form, SessionVariable, Language, e));
 		}
 
 		/// <summary>
@@ -5814,17 +5666,7 @@ namespace Waher.Networking.XMPP
 						State = State
 					};
 
-					if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(this, e2);
-						}
-						catch (Exception ex)
-						{
-							await this.Exception(ex);
-						}
-					}
+					await Callback.Raise(this, e2);
 
 					return;
 				}
@@ -5898,17 +5740,7 @@ namespace Waher.Networking.XMPP
 				if (e.Ok && CacheResponse)
 					this.serverFeatures = e2;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, e2);
 			}
 		}
 
@@ -6090,17 +5922,7 @@ namespace Waher.Networking.XMPP
 						State = State
 					};
 
-					if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(this, e2);
-						}
-						catch (Exception ex)
-						{
-							await this.Exception(ex);
-						}
-					}
+					await Callback.Raise(this, e2);
 
 					return;
 				}
@@ -6158,17 +5980,7 @@ namespace Waher.Networking.XMPP
 				if (CacheResponse && e.Ok)
 					this.serverComponents = e2;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, e2);
-					}
-					catch (Exception ex)
-					{
-						await this.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, e2);
 			}
 		}
 
@@ -6312,7 +6124,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="To">Destination address.</param>
 		/// <param name="Callback">Method to call when response or error is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task SendSoftwareVersionRequest(string To, SoftwareVersionEventHandler Callback, object State)
+		public Task SendSoftwareVersionRequest(string To, EventHandlerAsync<SoftwareVersionEventArgs> Callback, object State)
 		{
 			return this.SendSoftwareVersionRequest(null, To, Callback, State);
 		}
@@ -6325,7 +6137,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="To">Destination address.</param>
 		/// <param name="Callback">Method to call when response or error is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task SendSoftwareVersionRequest(IEndToEndEncryption E2eEncryption, string To, SoftwareVersionEventHandler Callback, object State)
+		public Task SendSoftwareVersionRequest(IEndToEndEncryption E2eEncryption, string To, EventHandlerAsync<SoftwareVersionEventArgs> Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -6345,7 +6157,7 @@ namespace Waher.Networking.XMPP
 		private async Task SoftwareVersionResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
-			SoftwareVersionEventHandler Callback = (SoftwareVersionEventHandler)P[0];
+			EventHandlerAsync<SoftwareVersionEventArgs> Callback = (EventHandlerAsync<SoftwareVersionEventArgs>)P[0];
 			object State = P[1];
 			List<Item> Items = new List<Item>();
 
@@ -6389,14 +6201,7 @@ namespace Waher.Networking.XMPP
 					State = State
 				};
 
-				try
-				{
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-				}
+				await Callback.Raise(this, e2);
 			}
 		}
 
@@ -6470,7 +6275,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="FormCallback">Method to call when search form response or error is returned.</param>
 		/// <param name="ResultCallback">Method to call when search result is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task SendSearchFormRequest(string To, EventHandlerAsync<SearchFormEventArgs> FormCallback, 
+		public Task SendSearchFormRequest(string To, EventHandlerAsync<SearchFormEventArgs> FormCallback,
 			EventHandlerAsync<SearchResultEventArgs> ResultCallback, object State)
 		{
 			return this.SendSearchFormRequest(null, To, FormCallback, ResultCallback, State);
@@ -6486,7 +6291,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ResultCallback">Method to call when search result is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task SendSearchFormRequest(IEndToEndEncryption E2eEncryption, string To,
-			EventHandlerAsync<SearchFormEventArgs> FormCallback, EventHandlerAsync<SearchResultEventArgs> ResultCallback, 
+			EventHandlerAsync<SearchFormEventArgs> FormCallback, EventHandlerAsync<SearchResultEventArgs> ResultCallback,
 			object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -6605,14 +6410,7 @@ namespace Waher.Networking.XMPP
 				if (!(SearchForm is null))
 					SearchForm.State = new object[] { ResultCallback, State, e2 };
 
-				try
-				{
-					await FormCallback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-				}
+				await FormCallback.Raise(this, e2);
 			}
 		}
 
@@ -7134,7 +6932,7 @@ namespace Waher.Networking.XMPP
 								IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 									Request.State);
 
-								await Request.IqCallback(this, e);
+								await Request.IqCallback.Raise(this, e);
 							}
 						}
 						catch (Exception ex)
@@ -7489,17 +7287,7 @@ namespace Waher.Networking.XMPP
 				if (Result is null)
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new PrivateXmlEventArgs(Result, e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new PrivateXmlEventArgs(Result, e));
 
 			}, State);
 		}
@@ -7575,17 +7363,7 @@ namespace Waher.Networking.XMPP
 
 			return this.SendIqSet(string.Empty, Xml.ToString(), async (sender, e) =>
 			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new PrivateXmlEventArgs(Element, e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new PrivateXmlEventArgs(Element, e));
 
 			}, State);
 		}
@@ -7631,17 +7409,7 @@ namespace Waher.Networking.XMPP
 				Feature = null;
 			}
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new ServiceEventArgs(Service, Feature, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new ServiceEventArgs(Service, Feature, State));
 		}
 
 		/// <summary>

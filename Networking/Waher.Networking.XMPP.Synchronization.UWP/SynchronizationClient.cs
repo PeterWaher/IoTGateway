@@ -314,18 +314,8 @@ namespace Waher.Networking.XMPP.Synchronization
 					ClockDifferenceHF = null;
 				}
 
-				try
-				{
-					if (!(Callback is null))
-					{
-						await Callback(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, LatencyHF, ClockDifferenceHF,
-							Stopwatch.Frequency, e));
-					}
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await Callback.Raise(this, new SynchronizationEventArgs(Latency100Ns, ClockDifference100Ns, LatencyHF, ClockDifferenceHF,
+					Stopwatch.Frequency, e));
 
 			}, State);
 		}
@@ -640,17 +630,7 @@ namespace Waher.Networking.XMPP.Synchronization
 										}
 									}
 
-									try
-									{
-										EventHandlerAsync h = this.OnUpdated;
-
-										if (!(h is null))
-											await h(this, EventArgs.Empty);
-									}
-									catch (Exception ex)
-									{
-										Log.Exception(ex);
-									}
+									await this.OnUpdated.Raise(this, EventArgs.Empty);
 								}
 							}, DateTime.Now);
 							break;

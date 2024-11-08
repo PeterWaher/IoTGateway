@@ -645,17 +645,7 @@ namespace Waher.Networking.XMPP.Control
 			else
 				e2 = new SetResultEventArgs(e, false, null, null, State);
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, e2);
 		}
 
 		private StringBuilder SetHeader(string ServiceToken, string DeviceToken, string UserToken, params ThingReference[] Nodes)
@@ -802,15 +792,8 @@ namespace Waher.Networking.XMPP.Control
 			if (!(Callback is null))
 			{
 				DataFormEventArgs e2 = new DataFormEventArgs(Form, e);
-				try
-				{
-					e2.State = State;
-					await Callback(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				e2.State = State;
+				await Callback.Raise(this, e2);
 			}
 		}
 

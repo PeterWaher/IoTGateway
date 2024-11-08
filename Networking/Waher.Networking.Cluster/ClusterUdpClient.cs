@@ -58,7 +58,7 @@ namespace Waher.Networking.Cluster
 			this.hmac = null;
 		}
 
-		internal async void BeginReceive()
+		internal async void BeginReceive()  // Starts parallel task
 		{
 			try
 			{
@@ -172,7 +172,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		internal async void BeginTransmit(byte[] Message, IPEndPoint Destination)
+		internal async void BeginTransmit(byte[] Message, IPEndPoint Destination)   // Starts parallel task
 		{
 			try
 			{

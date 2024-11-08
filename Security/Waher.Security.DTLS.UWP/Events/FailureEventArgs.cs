@@ -1,14 +1,5 @@
-﻿using System.Threading.Tasks;
-
-namespace Waher.Security.DTLS
+﻿namespace Waher.Security.DTLS
 {
-	/// <summary>
-	/// Delegate for handshake failure events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task FailureEventHandler(object Sender, FailureEventArgs e);
-
 	/// <summary>
 	/// Event arguments for handshake failure events.
 	/// </summary>

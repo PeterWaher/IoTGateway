@@ -314,9 +314,7 @@ namespace Waher.Networking.HTTP
 				this.AddHttpPorts(HttpPorts, Listeners);
 				this.AddHttpsPorts(HttpsPorts, Listeners);
 #endif
-				EventHandlerAsync h = this.OnNetworkChanged;
-				if (!(h is null))
-					await h(this, EventArgs.Empty);
+				await this.OnNetworkChanged.Raise(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -756,16 +754,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.eTagSalt = NewSalt;
 
-				try
-				{
-					EventHandlerAsync h = this.ETagSaltChanged;
-					if (!(h is null))
-						await h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await this.ETagSaltChanged.Raise(this, EventArgs.Empty);
 			}
 		}
 
@@ -1647,25 +1636,13 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised before sending an error back to a client. Allows the server to prepare custom error pages.
 		/// </summary>
-		public event CustomErrorEventHandler CustomError = null;
+		public event EventHandlerAsync<CustomErrorEventArgs> CustomError = null;
 
 		internal bool HasCustomErrors => !(this.CustomError is null);
 
-		internal async Task CustomizeError(CustomErrorEventArgs e)
+		internal Task CustomizeError(CustomErrorEventArgs e)
 		{
-			CustomErrorEventHandler h = this.CustomError;
-
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.CustomError.Raise(this, e);
 		}
 
 		#endregion

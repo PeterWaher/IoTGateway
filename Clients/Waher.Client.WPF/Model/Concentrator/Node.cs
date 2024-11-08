@@ -366,7 +366,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public override void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
+		public override async Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			XmppConcentrator Concentrator = this.Concentrator;
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
@@ -374,7 +374,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (!(XmppAccountNode is null) && !((ControlClient = XmppAccountNode.ControlClient) is null))
 			{
-				ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
+				await ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
 					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition));
 			}
 			else
@@ -544,7 +544,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
-		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
@@ -553,7 +553,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				ConcentratorClient.DestroyNode(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				await ConcentratorClient.DestroyNode(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 				{
 					MainWindow.MouseDefault();
 

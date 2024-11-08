@@ -41,31 +41,38 @@ namespace Waher.Networking.PeerToPeer
 			this.ports = Ports;
 			this.sniffers = Sniffers;
 
-			NetworkChange.NetworkAddressChanged += NetworkChange_NetworkAddressChanged;
+			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 		}
 
-		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+		private async void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
 		{
-			if (!this.disposed && State != PeerToPeerNetworkState.SearchingForGateway)    // Multiple events might get fired one after the other. Just start one search.
+			try
 			{
-				this.State = PeerToPeerNetworkState.Reinitializing;
+				if (!this.disposed && this.State != PeerToPeerNetworkState.SearchingForGateway)    // Multiple events might get fired one after the other. Just start one search.
+				{
+					await this.SetState(PeerToPeerNetworkState.Reinitializing);
 
-				this.ready?.Reset();
-				this.error?.Reset();
+					this.ready?.Reset();
+					this.error?.Reset();
 
-				this.Start();
+					await this.Start();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
 		/// <summary>
 		/// Starts the registration.
 		/// </summary>
-		public virtual void Start()
+		public virtual async Task Start()
 		{
 			if (this.OnPublicNetwork())
 				this.localAddress = this.externalAddress;
 			else
-				this.SearchGateways();
+				await this.SearchGateways();
 		}
 
 		/// <summary>
@@ -133,10 +140,10 @@ namespace Waher.Networking.PeerToPeer
 							case 0:
 								switch (Addr[2])
 								{
-									case 0:				// 192.0.0.0/24 reserved for IANA IPv4 Special Purpose Address Registry
+									case 0:             // 192.0.0.0/24 reserved for IANA IPv4 Special Purpose Address Registry
 										return false;
 
-									case 2:				// 192.0.2.X/24  reserved for TEST-NET-1
+									case 2:             // 192.0.2.X/24  reserved for TEST-NET-1
 										return false;
 
 									default:
@@ -161,7 +168,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Searches for Internet Gateways in the network.
 		/// </summary>
-		public void SearchGateways()
+		public async Task SearchGateways()
 		{
 			if (this.disposed || this.ipAddressesFound is null)
 				return;
@@ -182,26 +189,33 @@ namespace Waher.Networking.PeerToPeer
 					this.ipAddressesFound.Clear();
 				}
 
-				this.State = PeerToPeerNetworkState.SearchingForGateway;
+				await this.SetState(PeerToPeerNetworkState.SearchingForGateway);
 
-				this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:1", 1);
-				this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:2", 1);
+				await this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:1", 1);
+				await this.upnpClient.StartSearch("urn:schemas-upnp-org:service:WANIPConnection:2", 1);
 
 				this.searchTimer = new Timer(this.SearchTimeout, null, 10000, Timeout.Infinite);
 			}
 			catch (Exception ex)
 			{
 				this.exception = ex;
-				this.State = PeerToPeerNetworkState.Error;
+				await this.SetState(PeerToPeerNetworkState.Error);
 			}
 		}
 
-		private void SearchTimeout(object State)
+		private async void SearchTimeout(object State)
 		{
-			this.searchTimer?.Dispose();
-			this.searchTimer = null;
+			try
+			{
+				this.searchTimer?.Dispose();
+				this.searchTimer = null;
 
-			this.State = PeerToPeerNetworkState.Error;
+				await this.SetState(PeerToPeerNetworkState.Error);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
 		private void Reinitialize(object State)
@@ -236,17 +250,17 @@ namespace Waher.Networking.PeerToPeer
 					}
 
 					ServiceDescriptionDocument Scpd = await Service.GetServiceAsync();
-					this.ServiceRetrieved(Scpd, e.LocalEndPoint);
+					await this.ServiceRetrieved(Scpd, e.LocalEndPoint);
 				}
 			}
 			catch (Exception ex)
 			{
 				this.exception = ex;
-				this.State = PeerToPeerNetworkState.Error;
+				await this.SetState(PeerToPeerNetworkState.Error);
 			}
 		}
 
-		private void ServiceRetrieved(ServiceDescriptionDocument Scpd, IPEndPoint LocalEndPoint)
+		private async Task ServiceRetrieved(ServiceDescriptionDocument Scpd, IPEndPoint LocalEndPoint)
 		{
 			try
 			{
@@ -255,7 +269,7 @@ namespace Waher.Networking.PeerToPeer
 				ushort PortMappingIndex;
 
 				this.serviceWANIPConnectionV1 = new WANIPConnectionV1(Scpd);
-				this.State = PeerToPeerNetworkState.RegisteringApplicationInGateway;
+				await this.SetState(PeerToPeerNetworkState.RegisteringApplicationInGateway);
 
 				this.serviceWANIPConnectionV1.GetExternalIPAddress(out string NewExternalIPAddress);
 				this.externalAddress = IPAddress.Parse(NewExternalIPAddress);
@@ -354,7 +368,7 @@ namespace Waher.Networking.PeerToPeer
 
 				foreach (InternetGatewayRegistration Registration in this.ports)
 				{
-					this.BeforeRegistration(Registration, TcpPortMapped, UdpPortMapped);
+					await this.BeforeRegistration(Registration, TcpPortMapped, UdpPortMapped);
 
 					if ((Registration.TcpRegistered || !Registration.Tcp) &&
 						(Registration.UdpRegistered || !Registration.Udp))
@@ -369,13 +383,13 @@ namespace Waher.Networking.PeerToPeer
 							new KeyValuePair<string, object>("External Port", Registration.ExternalPort),
 							new KeyValuePair<string, object>("Protocol", "TCP"),
 							new KeyValuePair<string, object>("Local Port", Registration.LocalPort),
-							new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
+							new KeyValuePair<string, object>("Local Address", this.LocalAddress.ToString()),
 							new KeyValuePair<string, object>("Application", Registration.ApplicationName));
 
 						try
 						{
 							this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, Registration.ExternalPort,
-								"TCP", Registration.LocalPort, LocalAddress.ToString(), true, Registration.ApplicationName, 0);
+								"TCP", Registration.LocalPort, this.LocalAddress.ToString(), true, Registration.ApplicationName, 0);
 
 							Registration.TcpRegistered = true;
 						}
@@ -385,7 +399,7 @@ namespace Waher.Networking.PeerToPeer
 								new KeyValuePair<string, object>("External Port", Registration.ExternalPort),
 								new KeyValuePair<string, object>("Protocol", "TCP"),
 								new KeyValuePair<string, object>("Local Port", Registration.LocalPort),
-								new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
+								new KeyValuePair<string, object>("Local Address", this.LocalAddress.ToString()),
 								new KeyValuePair<string, object>("Application", Registration.ApplicationName));
 						}
 					}
@@ -397,13 +411,13 @@ namespace Waher.Networking.PeerToPeer
 							new KeyValuePair<string, object>("External Port", Registration.ExternalPort),
 							new KeyValuePair<string, object>("Protocol", "UDP"),
 							new KeyValuePair<string, object>("Local Port", Registration.LocalPort),
-							new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
+							new KeyValuePair<string, object>("Local Address", this.LocalAddress.ToString()),
 							new KeyValuePair<string, object>("Application", Registration.ApplicationName));
 
 						try
 						{
 							this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, Registration.ExternalPort,
-								"UDP", Registration.LocalPort, LocalAddress.ToString(), true, Registration.ApplicationName, 0);
+								"UDP", Registration.LocalPort, this.LocalAddress.ToString(), true, Registration.ApplicationName, 0);
 
 							Registration.UdpRegistered = true;
 						}
@@ -413,20 +427,20 @@ namespace Waher.Networking.PeerToPeer
 								new KeyValuePair<string, object>("External Port", Registration.ExternalPort),
 								new KeyValuePair<string, object>("Protocol", "UDP"),
 								new KeyValuePair<string, object>("Local Port", Registration.LocalPort),
-								new KeyValuePair<string, object>("Local Address", LocalAddress.ToString()),
+								new KeyValuePair<string, object>("Local Address", this.LocalAddress.ToString()),
 								new KeyValuePair<string, object>("Application", Registration.ApplicationName));
 						}
 					}
 				}
 
-				this.State = PeerToPeerNetworkState.Ready;
+				await this.SetState(PeerToPeerNetworkState.Ready);
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
 
 				this.exception = ex;
-				this.State = PeerToPeerNetworkState.Error;
+				await this.SetState(PeerToPeerNetworkState.Error);
 			}
 		}
 
@@ -436,64 +450,48 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Registration">Registration to be performed.</param>
 		/// <param name="TcpPortMapped">What TCP ports have already been mapped.</param>
 		/// <param name="UdpPortMapped">What UDP ports have already been mapped.</param>
-		protected virtual void BeforeRegistration(InternetGatewayRegistration Registration,
+		protected virtual Task BeforeRegistration(InternetGatewayRegistration Registration,
 			Dictionary<ushort, bool> TcpPortMapped, Dictionary<ushort, bool> UdpPortMapped)
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;	// Do nothing by default.
 		}
 
 		/// <summary>
 		/// Current state of the peer-to-peer network object.
 		/// </summary>
-		public PeerToPeerNetworkState State
+		public PeerToPeerNetworkState State => this.state;
+
+		internal async Task SetState(PeerToPeerNetworkState NewState)
 		{
-			get => this.state;
-			internal set
+			if (this.state != NewState)
 			{
-				if (this.state != value)
+				this.state = NewState;
+
+				switch (NewState)
 				{
-					this.state = value;
+					case PeerToPeerNetworkState.Ready:
+						this.searchTimer?.Dispose();
+						this.searchTimer = null;
+						this.ready?.Set();
+						break;
 
-					switch (value)
-					{
-						case PeerToPeerNetworkState.Ready:
-							this.searchTimer?.Dispose();
-							this.searchTimer = null;
-							this.ready?.Set();
-							break;
+					case PeerToPeerNetworkState.Error:
+						this.searchTimer?.Dispose();
+						this.searchTimer = null;
+						this.error?.Set();
 
-						case PeerToPeerNetworkState.Error:
-							this.searchTimer?.Dispose();
-							this.searchTimer = null;
-							this.error?.Set();
-
-							this.searchTimer = new Timer(this.Reinitialize, null, 60000, Timeout.Infinite);
-							break;
-					}
-
-					PeerToPeerNetworkStateChangeEventHandler h = this.OnStateChange;
-					if (!(h is null))
-					{
-						Task.Run(async () =>
-						{
-							try
-							{
-								await h(this, value);
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
-						});
-					}
+						this.searchTimer = new Timer(this.Reinitialize, null, 60000, Timeout.Infinite);
+						break;
 				}
+
+				await this.OnStateChange.Raise(this, NewState);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when the state of the peer-to-peer network changes.
 		/// </summary>
-		public event PeerToPeerNetworkStateChangeEventHandler OnStateChange = null;
+		public event EventHandlerAsync<PeerToPeerNetworkState> OnStateChange = null;
 
 		/// <summary>
 		/// External IP Address.
@@ -540,12 +538,28 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public virtual void Dispose()
+		[Obsolete("Use DisposeAsync() instead.")]
+		public void Dispose()
+		{
+			try
+			{
+				this.DisposeAsync().Wait();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public virtual async Task DisposeAsync()
 		{
 			this.disposed = true;
-			this.State = PeerToPeerNetworkState.Closed;
+			await this.SetState(PeerToPeerNetworkState.Closed);
 
-			NetworkChange.NetworkAddressChanged -= NetworkChange_NetworkAddressChanged;
+			NetworkChange.NetworkAddressChanged -= this.NetworkChange_NetworkAddressChanged;
 
 			this.searchTimer?.Dispose();
 			this.searchTimer = null;

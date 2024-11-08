@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
 	internal class PostBack : HttpSynchronousResource, IPostResource, IHttpPostMethod
 	{
-		private Cache<string, KeyValuePair<PostBackEventHandler, object>> queries = null;
+		private Cache<string, KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>> queries = null;
 		private readonly object synchObj = new();
 		private readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 
@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		public override bool UserSessions => false;
 		public bool AllowsPOST => true;
 
-		public string GetUrl(PostBackEventHandler Callback, object State)
+		public Task<string> GetUrl(EventHandlerAsync<PostBackEventArgs> Callback, object State)
 		{
 			byte[] Bin = new byte[32];
 			string Key;
@@ -36,18 +36,18 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 				if (this.queries is null)
 				{
-					this.queries = new Cache<string, KeyValuePair<PostBackEventHandler, object>>(int.MaxValue, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+					this.queries = new Cache<string, KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>>(int.MaxValue, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
 					this.queries.Removed += this.Queries_Removed;
 				}
 
-				this.queries[Key] = new KeyValuePair<PostBackEventHandler, object>(Callback, State);
-				this.queries[string.Empty] = new KeyValuePair<PostBackEventHandler, object>(null, null);    // Keep cache active to avoid multiple recreation when a series of requests occur in sequence.
+				this.queries[Key] = new KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>(Callback, State);
+				this.queries[string.Empty] = new KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>(null, null);    // Keep cache active to avoid multiple recreation when a series of requests occur in sequence.
 			}
 
-			return "http://localhost:8081" + this.ResourceName + "/" + Key;
+			return Task.FromResult("http://localhost:8081" + this.ResourceName + "/" + Key);
 		}
 
-		private Task Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<PostBackEventHandler, object>> e)
+		private Task Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>> e)
 		{
 			lock (this.synchObj)
 			{
@@ -100,7 +100,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 			Key = Key[1..];
 
-			KeyValuePair<PostBackEventHandler, object> Rec;
+			KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object> Rec;
 
 			lock (this.synchObj)
 			{
@@ -110,7 +110,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 			Request.DataStream.Position = 0;
 
-			return Rec.Key.Invoke(this, new PostBackEventArgs(Request.DataStream, Rec.Value, From, To, EndpointReference, SymmetricCipherReference));
+			return Rec.Key.Raise(this, new PostBackEventArgs(Request.DataStream, Rec.Value, From, To, EndpointReference, SymmetricCipherReference));
 		}
 	}
 }

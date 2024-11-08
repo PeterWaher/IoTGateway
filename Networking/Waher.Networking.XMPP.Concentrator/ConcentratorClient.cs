@@ -132,14 +132,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					else
 						e.Ok = false;
 
-					try
-					{
-						await Callback(this, new CapabilitiesEventArgs(Capabilities.ToArray(), e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					await Callback.Raise(this, new CapabilitiesEventArgs(Capabilities.ToArray(), e));
 				}
 			}, State);
 		}
@@ -176,17 +169,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				e.Ok = false;
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new DataSourcesEventArgs(DataSources.ToArray(), e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new DataSourcesEventArgs(DataSources.ToArray(), e));
 		}
 
 		/// <summary>
@@ -324,17 +307,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Response = false;
 			}
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new BooleanResponseEventArgs(Response, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new BooleanResponseEventArgs(Response, e));
 		}
 
 		private void AppendNodeAttributes(StringBuilder Xml, string NodeID, string SourceID, string Partition)
@@ -437,17 +410,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				e.Ok = false;
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new BooleansResponseEventArgs(Responses.ToArray(), e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new BooleansResponseEventArgs(Responses.ToArray(), e));
 		}
 
 		/// <summary>
@@ -538,17 +501,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				NodeInfo = null;
 			}
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new NodeInformationEventArgs(NodeInfo, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new NodeInformationEventArgs(NodeInfo, e));
 		}
 
 		private NodeInformation GetNodeInformation(XmlElement E, bool Parameters, bool Messages)
@@ -761,17 +714,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				NodeInfo = null;
 			}
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new NodesInformationEventArgs(NodeInfo, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new NodesInformationEventArgs(NodeInfo, e));
 		}
 
 		/// <summary>
@@ -914,17 +857,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new StringsResponseEventArgs(BaseClasses?.ToArray(), e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new StringsResponseEventArgs(BaseClasses?.ToArray(), e));
 
 			}, State);
 		}
@@ -1224,17 +1157,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new LocalizedStringsResponseEventArgs(Types.ToArray(), e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new LocalizedStringsResponseEventArgs(Types.ToArray(), e));
 
 			}, State);
 		}
@@ -1306,17 +1229,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(FormCallback is null))
-				{
-					try
-					{
-						await FormCallback(this, new DataFormEventArgs(Form, e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await FormCallback.Raise(this, new DataFormEventArgs(Form, e));
 
 			}, new object[] { To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken, FormCallback, NodeCallback, State });
 		}
@@ -1366,20 +1279,10 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					if (!(FormCallback is null))
-					{
-						try
-						{
-							e.Ok = true;
-							await FormCallback(this, new DataFormEventArgs(Form, e));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
+					e.Ok = true;
+					await FormCallback.Raise(this, new DataFormEventArgs(Form, e));
 
-						return;
-					}
+					return;
 				}
 
 				await this.NodeResponse(e, true, true, NodeCallback, State);
@@ -1392,17 +1295,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			EventHandlerAsync<NodeInformationEventArgs> NodeCallback = (EventHandlerAsync<NodeInformationEventArgs>)P[10];
 			object State = P[11];
 
-			if (!(NodeCallback is null))
-			{
-				try
-				{
-					await NodeCallback(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await NodeCallback.Raise(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
 		}
 
 		/// <summary>
@@ -1513,17 +1406,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(FormCallback is null))
-				{
-					try
-					{
-						await FormCallback(this, new DataFormEventArgs(Form, e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await FormCallback.Raise(this, new DataFormEventArgs(Form, e));
 
 			}, new object[] { To, NodeID, SourceID, Partition, Language, ServiceToken, DeviceToken, UserToken, FormCallback, NodeCallback, State });
 		}
@@ -1570,23 +1453,11 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
-					if (!(FormCallback is null))
-					{
-						try
-						{
-							e.Ok = true;
-							FormCallback(this, new DataFormEventArgs(Form, e));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-
-						return Task.CompletedTask;
-					}
+					e.Ok = true;
+					return FormCallback.Raise(this, new DataFormEventArgs(Form, e));
 				}
-
-				return this.NodeResponse(e, true, true, NodeCallback, State);
+				else
+					return this.NodeResponse(e, true, true, NodeCallback, State);
 
 			}, P);
 		}
@@ -1597,17 +1468,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			EventHandlerAsync<NodeInformationEventArgs> NodeCallback = (EventHandlerAsync<NodeInformationEventArgs>)P[9];
 			object State = P[10];
 
-			if (!(NodeCallback is null))
-			{
-				try
-				{
-					await NodeCallback(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await NodeCallback.Raise(this, new NodeInformationEventArgs(null, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
 		}
 
 		/// <summary>
@@ -1676,17 +1537,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new SnifferRegistrationEventArgs(SnifferId, Expires, e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new SnifferRegistrationEventArgs(SnifferId, Expires, e));
 
 			}, State);
 		}
@@ -1777,20 +1628,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Sniffer is null)
 			{
-				EventHandlerAsync<CustomSnifferEventArgs> h = this.OnCustomSnifferMessage;
-				if (!(h is null))
+				CustomSnifferEventArgs e2 = new CustomSnifferEventArgs(SnifferId, e);
+
+				await this.OnCustomSnifferMessage.Raise(this, e2);
+
+				Sniffer = e2.Sniffer;
+				if (Sniffer is null)
+					return;
+
+				lock (this.sniffers)
 				{
-					CustomSnifferEventArgs e2 = new CustomSnifferEventArgs(SnifferId, e);
-					await h(this, e2);
-					Sniffer = e2.Sniffer;
-
-					if (Sniffer is null)
-						return;
-
-					lock (this.sniffers)
-					{
-						this.sniffers[SnifferId] = Sniffer;
-					}
+					this.sniffers[SnifferId] = Sniffer;
 				}
 			}
 
@@ -1940,17 +1788,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new CommandsEventArgs(Commands.ToArray(), e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new CommandsEventArgs(Commands.ToArray(), e));
 
 			}, State);
 		}
@@ -2051,7 +1889,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		private Task GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback, 
+			string ServiceToken, string DeviceToken, string UserToken, EventHandlerAsync<DataFormEventArgs> FormCallback,
 			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback,
 			EventHandlerAsync<NodeQueryResponseEventArgs> QueryCallback, object State)
 		{
@@ -2082,17 +1920,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (!(FormCallback is null))
-				{
-					try
-					{
-						await FormCallback(this, new DataFormEventArgs(Form, e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await FormCallback.Raise(this, new DataFormEventArgs(Form, e));
 
 			}, new object[] { To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, QueryCallback, State });
 		}
@@ -2126,17 +1954,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			EventHandlerAsync<NodeCommandResponseEventArgs> CommandCallback = (EventHandlerAsync<NodeCommandResponseEventArgs>)P[10];
 			object State = P[11];
 
-			if (!(CommandCallback is null))
-			{
-				try
-				{
-					await CommandCallback(this, new NodeCommandResponseEventArgs(Form, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await CommandCallback.Raise(this, new NodeCommandResponseEventArgs(Form, new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, false, State)));
 		}
 
 		/// <summary>
@@ -2406,17 +2224,10 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 				}
 
-				try
-				{
-					if (!(CommandCallback is null))
-						await CommandCallback(this, new NodeCommandResponseEventArgs(Parameters, e));
-					else
-						await QueryCallback(this, new NodeQueryResponseEventArgs(Query, Parameters, e));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				if (!(CommandCallback is null))
+					await CommandCallback.Raise(this, new NodeCommandResponseEventArgs(Parameters, e));
+				else
+					await QueryCallback.Raise(this, new NodeQueryResponseEventArgs(Query, Parameters, e));
 
 			}, State);
 		}

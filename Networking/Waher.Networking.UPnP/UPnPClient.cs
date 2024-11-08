@@ -14,13 +14,6 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking.UPnP
 {
 	/// <summary>
-	/// UPnP error event handler.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Exception">Information about error received.</param>
-	public delegate Task UPnPExceptionEventHandler(object Sender, Exception Exception);
-
-	/// <summary>
 	/// Implements support for the UPnP protocol, as described in:
 	/// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
 	/// </summary>
@@ -150,7 +143,7 @@ namespace Waher.Networking.UPnP
 			}
 		}
 
-		private async void BeginReceiveOutgoing(UdpClient Client)
+		private async void BeginReceiveOutgoing(UdpClient Client)   // Starts parallel task
 		{
 			try
 			{
@@ -176,29 +169,19 @@ namespace Waher.Networking.UPnP
 						{
 							if (!string.IsNullOrEmpty(Headers.Location))
 							{
-								UPnPDeviceLocationEventHandler h = this.OnDeviceFound;
-								if (!(h is null))
-								{
-									DeviceLocation DeviceLocation = new DeviceLocation(this, Headers.SearchTarget, Headers.Server, Headers.Location,
-										Headers.UniqueServiceName, Headers);
-									DeviceLocationEventArgs e = new DeviceLocationEventArgs(DeviceLocation, (IPEndPoint)Client.Client.LocalEndPoint, Data.RemoteEndPoint);
-									try
-									{
-										await h(this, e);
-									}
-									catch (Exception ex)
-									{
-										this.RaiseOnError(ex);
-									}
-								}
+								DeviceLocation DeviceLocation = new DeviceLocation(this, Headers.SearchTarget, Headers.Server, Headers.Location,
+									Headers.UniqueServiceName, Headers);
+								DeviceLocationEventArgs e = new DeviceLocationEventArgs(DeviceLocation, (IPEndPoint)Client.Client.LocalEndPoint, Data.RemoteEndPoint);
+
+								await this.OnDeviceFound.Raise(this, e);
 							}
 						}
 						else if (Headers.Direction == HttpDirection.Request && Headers.HttpVersion >= 1.0)
-							this.HandleIncoming(Client, Data.RemoteEndPoint, Headers);
+							await this.HandleIncoming(Client, Data.RemoteEndPoint, Headers);
 					}
 					catch (Exception ex)
 					{
-						this.RaiseOnError(ex);
+						await this.RaiseOnError(ex);
 					}
 				}
 			}
@@ -215,40 +198,18 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Event raised when a device has been found as a result of a search made by the client.
 		/// </summary>
-		public event UPnPDeviceLocationEventHandler OnDeviceFound = null;
+		public event EventHandlerAsync<DeviceLocationEventArgs> OnDeviceFound = null;
 
-		private void HandleIncoming(UdpClient UdpClient, IPEndPoint RemoteIP, UPnPHeaders Headers)
+		private async Task HandleIncoming(UdpClient UdpClient, IPEndPoint RemoteIP, UPnPHeaders Headers)
 		{
 			switch (Headers.Verb)
 			{
 				case "M-SEARCH":
-					NotificationEventHandler h = this.OnSearch;
-					if (!(h is null))
-					{
-						try
-						{
-							h(this, new NotificationEventArgs(this, Headers, (IPEndPoint)UdpClient.Client.LocalEndPoint, RemoteIP));
-						}
-						catch (Exception ex)
-						{
-							this.RaiseOnError(ex);
-						}
-					}
+					await this.OnSearch.Raise(this, new NotificationEventArgs(this, Headers, (IPEndPoint)UdpClient.Client.LocalEndPoint, RemoteIP));
 					break;
 
 				case "NOTIFY":
-					h = this.OnNotification;
-					if (!(h is null))
-					{
-						try
-						{
-							h(this, new NotificationEventArgs(this, Headers, (IPEndPoint)UdpClient.Client.LocalEndPoint, RemoteIP));
-						}
-						catch (Exception ex)
-						{
-							this.RaiseOnError(ex);
-						}
-					}
+					await this.OnNotification.Raise(this, new NotificationEventArgs(this, Headers, (IPEndPoint)UdpClient.Client.LocalEndPoint, RemoteIP));
 					break;
 			}
 		}
@@ -256,14 +217,14 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Event raised when the client is notified of a device or service in the network.
 		/// </summary>
-		public event NotificationEventHandler OnNotification = null;
+		public event EventHandlerAsync<NotificationEventArgs> OnNotification = null;
 
 		/// <summary>
 		/// Event raised when the client receives a request searching for devices or services in the network.
 		/// </summary>
-		public event NotificationEventHandler OnSearch = null;
+		public event EventHandlerAsync<NotificationEventArgs> OnSearch = null;
 
-		private async void BeginReceiveIncoming(UdpClient Client)
+		private async void BeginReceiveIncoming(UdpClient Client)   // Starts parallel task
 		{
 			try
 			{
@@ -290,12 +251,12 @@ namespace Waher.Networking.UPnP
 							Headers.Direction == HttpDirection.Request &&
 							Headers.HttpVersion >= 1.0)
 						{
-							this.HandleIncoming(Client, Data.RemoteEndPoint, Headers);
+							await this.HandleIncoming(Client, Data.RemoteEndPoint, Headers);
 						}
 					}
 					catch (Exception ex)
 					{
-						this.RaiseOnError(ex);
+						await this.RaiseOnError(ex);
 					}
 				}
 			}
@@ -367,10 +328,10 @@ namespace Waher.Networking.UPnP
 			lock (this.ssdpOutgoing)
 			{
 				KeyValuePair<UdpClient, IPEndPoint>[] Result = this.ssdpOutgoing.ToArray();
-				
+
 				if (Clear)
 					this.ssdpOutgoing.Clear();
-				
+
 				return Result;
 			}
 		}
@@ -405,30 +366,19 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				this.RaiseOnError(ex);
+				await this.RaiseOnError(ex);
 			}
 		}
 
-		private void RaiseOnError(Exception ex)
+		private Task RaiseOnError(Exception ex)
 		{
-			UPnPExceptionEventHandler h = this.OnError;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					Events.Log.Exception(ex2);
-				}
-			}
+			return this.OnError.Raise(this, ex);
 		}
 
 		/// <summary>
 		/// Event raised when an error occurs.
 		/// </summary>
-		public event UPnPExceptionEventHandler OnError = null;
+		public event EventHandlerAsync<Exception> OnError = null;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -540,7 +490,7 @@ namespace Waher.Networking.UPnP
 				}
 				catch (Exception ex)
 				{
-					this.RaiseOnError(ex);
+					await this.RaiseOnError(ex);
 					return null;
 				}
 			}
@@ -608,7 +558,7 @@ namespace Waher.Networking.UPnP
 				}
 				catch (Exception ex)
 				{
-					this.RaiseOnError(ex);
+					await this.RaiseOnError(ex);
 					return null;
 				}
 			}

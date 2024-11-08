@@ -33,8 +33,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	public class IncomingStream : IDisposable
 	{
-		private DataReceivedEventHandler dataCallback;
-		private StreamClosedEventHandler closeCallback;
+		private EventHandlerAsync<DataReceivedEventArgs> dataCallback;
+		private EventHandlerAsync<StreamClosedEventArgs> closeCallback;
 		private TemporaryStream tempStream = null;
 		private MultiReadSingleWriteObject syncObject = new MultiReadSingleWriteObject();
 		private readonly object state;
@@ -50,7 +50,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="CloseCallback">Method called when stream has been closed.</param>
 		/// <param name="State">State object</param>
 		/// <param name="BlockSize">Block size.</param>
-		public IncomingStream(DataReceivedEventHandler DataCallback, StreamClosedEventHandler CloseCallback, object State, int BlockSize)
+		public IncomingStream(EventHandlerAsync<DataReceivedEventArgs> DataCallback,
+			EventHandlerAsync<StreamClosedEventArgs> CloseCallback, object State, int BlockSize)
 		{
 			this.dataCallback = DataCallback;
 			this.closeCallback = CloseCallback;
@@ -158,7 +159,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 						await File.ReadAllAsync(Buf, 0, c);
 						NrBytes -= c;
 
-						this.DataReceived(Buf);
+						await this.DataReceived(Buf);
 					}
 				}
 				finally
@@ -167,45 +168,28 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				}
 			}
 
-			this.DataReceived(Data);
+			await this.DataReceived(Data);
 
 			return true;
 		}
 
-		private void DataReceived(byte[] Bin)
+		private Task DataReceived(byte[] Bin)
 		{
-			if (!(this.dataCallback is null))
-			{
-				try
-				{
-					this.dataCallback(this, new DataReceivedEventArgs(Bin, this.state));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.dataCallback.Raise(this, new DataReceivedEventArgs(Bin, this.state));
 		}
 
-		internal void Closed(CloseReason Reason)
+		internal Task Closed(CloseReason Reason)
 		{
-			if (!(this.closeCallback is null))
+			try
 			{
-				try
-				{
-					this.closeCallback(this, new StreamClosedEventArgs(Reason, this.state));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-				finally
-				{
-					this.closeCallback = null;
-					this.dataCallback = null;
-				}
+				return this.closeCallback.Raise(this, new StreamClosedEventArgs(Reason, this.state));
+			}
+			finally
+			{
+				this.closeCallback = null;
+				this.dataCallback = null;
 			}
 		}
-
 	}
+
 }

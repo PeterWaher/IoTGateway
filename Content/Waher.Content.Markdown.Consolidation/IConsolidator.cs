@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Networking;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -82,16 +83,16 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// Event raised when content from a source has been added.
 		/// </summary>
-		event SourceEventHandler Added;
+		event EventHandlerAsync<SourceEventArgs> Added;
 
 		/// <summary>
 		/// Event raised when content from a source has been updated.
 		/// </summary>
-		event SourceEventHandler Updated;
+		event EventHandlerAsync<SourceEventArgs> Updated;
 
 		/// <summary>
 		/// Event raised when consolidator has been disposed.
 		/// </summary>
-		event EventHandler Disposed;
+		event EventHandlerAsync Disposed;
 	}
 }

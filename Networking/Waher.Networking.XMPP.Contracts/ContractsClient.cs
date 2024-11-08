@@ -36,13 +36,13 @@ using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.Contracts
 {
-    /// <summary>
-    /// Adds support for legal identities, smart contracts and signatures to an XMPP client.
-    /// 
-    /// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
-    /// https://neuro-foundation.io
-    /// </summary>
-    public class ContractsClient : XmppExtension
+	/// <summary>
+	/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
+	/// 
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
+	/// </summary>
+	public class ContractsClient : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:leg:id:1.0
@@ -958,20 +958,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!(e0 is null))
 			{
-				try
+				e0 = new KeyEventArgs(e0, e0.Key)
 				{
-					e0 = new KeyEventArgs(e0, e0.Key)
-					{
-						State = State
-					};
+					State = State
+				};
 
-					if (!(Callback is null))
-						await Callback(this, e0);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await Callback.Raise(this, e0);
 			}
 			else
 			{
@@ -1007,8 +999,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 					}
 
-					if (!(Callback is null))
-						await Callback(this, e0);
+					await Callback.Raise(this, e0);
 				}, State);
 			}
 		}
@@ -1105,20 +1096,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!(e0 is null))
 			{
-				try
+				e0 = new KeyEventArgs(e0, e0.Key)
 				{
-					e0 = new KeyEventArgs(e0, e0.Key)
-					{
-						State = State
-					};
+					State = State
+				};
 
-					if (!(Callback is null))
-						await Callback(this, e0);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await Callback.Raise(this, e0);
 			}
 			else
 			{
@@ -1143,8 +1126,7 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 					}
 
-					if (!(Callback is null))
-						await Callback(this, e0);
+					await Callback.Raise(this, e0);
 
 				}, State);
 			}
@@ -1193,19 +1175,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public Task GetIdApplicationAttributes(EventHandlerAsync<IdApplicationAttributesEventArgs> Callback, object State)
 		{
-			return this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", (sender, e) =>
 			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new IdApplicationAttributesEventArgs(e));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				return Callback.Raise(this, new IdApplicationAttributesEventArgs(e));
 
 			}, State);
 		}
@@ -1310,12 +1282,11 @@ namespace Waher.Networking.XMPP.Contracts
 						else
 							e2.Ok = false;
 
-						if (!(Callback is null))
-							await Callback(this, new LegalIdentityEventArgs(e2, Identity2));
+						await Callback.Raise(this, new LegalIdentityEventArgs(e2, Identity2));
 					}, e.State);
 				}
-				else if (!(Callback is null))
-					await Callback(this, new LegalIdentityEventArgs(e, null));
+				else
+					await Callback.Raise(this, new LegalIdentityEventArgs(e, null));
 			}, State);
 		}
 
@@ -1692,17 +1663,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task ReturnStatus(IdentityStatus Status, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new IdentityValidationEventArgs(Status, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(this, new IdentityValidationEventArgs(Status, State));
 		}
 
 		/// <summary>
@@ -1998,8 +1959,7 @@ namespace Waher.Networking.XMPP.Contracts
 				e.Ok = false;
 
 			e.State = P[1];
-			if (!(Callback is null))
-				await Callback(this, new LegalIdentitiesEventArgs(e, Identities));
+			await Callback.Raise(this, new LegalIdentitiesEventArgs(e, Identities));
 		}
 
 		/// <summary>
@@ -2083,8 +2043,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new LegalIdentityEventArgs(e, Identity));
+				await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 			}, State);
 		}
 
@@ -2162,8 +2121,7 @@ namespace Waher.Networking.XMPP.Contracts
 					else
 						e.Ok = false;
 
-					if (!(Callback is null))
-						await Callback(this, new LegalIdentityEventArgs(e, Identity));
+					await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 				}, State);
 		}
 
@@ -2241,8 +2199,7 @@ namespace Waher.Networking.XMPP.Contracts
 					else
 						e.Ok = false;
 
-					if (!(Callback is null))
-						await Callback(this, new LegalIdentityEventArgs(e, Identity));
+					await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 				}, State);
 		}
 
@@ -2334,8 +2291,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (e.Ok)
 						Signature = e.Key.Sign(Data);
 
-					if (!(Callback is null))
-						await Callback(this, new SignatureEventArgs(e, Signature));
+					await Callback.Raise(this, new SignatureEventArgs(e, Signature));
 
 				}, State);
 			}
@@ -2343,8 +2299,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Signature = Key.Sign(Data);
 
-				if (!(Callback is null))
-					await Callback(this, new SignatureEventArgs(Key, Signature, State));
+				await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
 			}
 		}
 
@@ -2418,8 +2373,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (e.Ok)
 						Signature = e.Key.Sign(Data);
 
-					if (!(Callback is null))
-						await Callback(this, new SignatureEventArgs(e, Signature));
+					await Callback.Raise(this, new SignatureEventArgs(e, Signature));
 
 				}, State);
 			}
@@ -2427,8 +2381,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				Signature = Key.Sign(Data);
 
-				if (!(Callback is null))
-					await Callback(this, new SignatureEventArgs(Key, Signature, State));
+				await Callback.Raise(this, new SignatureEventArgs(Key, Signature, State));
 			}
 		}
 
@@ -2524,8 +2477,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new LegalIdentityEventArgs(e, Identity));
+				await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 			}, State);
 		}
 
@@ -2771,8 +2723,7 @@ namespace Waher.Networking.XMPP.Contracts
 				e.Ok = false;
 
 			e.State = P[1];
-			if (!(Callback is null))
-				await Callback(this, new SmartContractEventArgs(e, Contract));
+			await Callback.Raise(this, new SmartContractEventArgs(e, Contract));
 		}
 
 		/// <summary>
@@ -3221,8 +3172,7 @@ namespace Waher.Networking.XMPP.Contracts
 				e.Ok = false;
 
 			e.State = P[1];
-			if (!(Callback is null))
-				await Callback(this, new IdReferencesEventArgs(e, IDs.ToArray()));
+			await Callback.Raise(this, new IdReferencesEventArgs(e, IDs.ToArray()));
 		}
 
 		/// <summary>
@@ -3390,8 +3340,7 @@ namespace Waher.Networking.XMPP.Contracts
 				e.Ok = false;
 
 			e.State = P[1];
-			if (!(Callback is null))
-				await Callback(this, new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray()));
+			await Callback.Raise(this, new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray()));
 		}
 
 		/// <summary>
@@ -3515,8 +3464,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 					await this.client.SendIqSet(Address, Xml.ToString(), this.ContractResponse, new object[] { Callback, State });
 				}
-				else if (!(Callback is null))
-					await Callback(this, new SmartContractEventArgs(e, null));
+				else
+					await Callback.Raise(this, new SmartContractEventArgs(e, null));
 			}, State);
 		}
 
@@ -4736,19 +4685,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
 
-		private async Task ReturnStatus(ContractStatus Status, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
+		private Task ReturnStatus(ContractStatus Status, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this, new ContractValidationEventArgs(Status, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return Callback.Raise(this, new ContractValidationEventArgs(Status, State));
 		}
 
 		private static async Task<bool> IsHumanReadableWellDefined(HumanReadableText[] Texts)
@@ -5293,8 +5232,7 @@ namespace Waher.Networking.XMPP.Contracts
 					else
 						e.Ok = false;
 
-					if (!(Callback is null))
-						await Callback(this, new SchemaEventArgs(e, Schema));
+					await Callback.Raise(this, new SchemaEventArgs(e, Schema));
 
 				}, State);
 		}
@@ -5538,8 +5476,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new NetworkIdentitiesEventArgs(e, Identities));
+				await Callback.Raise(this, new NetworkIdentitiesEventArgs(e, Identities));
 			}, State);
 		}
 
@@ -5706,8 +5643,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new SearchResultEventArgs(e, Offset, MaxCount, More, IDs?.ToArray()));
+				await Callback.Raise(this, new SearchResultEventArgs(e, Offset, MaxCount, More, IDs?.ToArray()));
 			}, State);
 		}
 
@@ -6805,8 +6741,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new LegalIdentityEventArgs(e, Identity));
+				await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 			}, State);
 		}
 
@@ -6875,8 +6810,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new SmartContractEventArgs(e, Contract));
+				await Callback.Raise(this, new SmartContractEventArgs(e, Contract));
 			}, State);
 		}
 
@@ -7056,8 +6990,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new LegalIdentityEventArgs(e, Identity));
+				await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 			}, State);
 		}
 
@@ -7115,8 +7048,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-					await Callback(this, new SmartContractEventArgs(e, Contract));
+				await Callback.Raise(this, new SmartContractEventArgs(e, Contract));
 			}, State);
 		}
 
@@ -7505,17 +7437,7 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					e.Ok = false;
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new ServiceProvidersEventArgs<ServiceProviderWithLegalId>(e, Providers?.ToArray()));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(this, new ServiceProvidersEventArgs<ServiceProviderWithLegalId>(e, Providers?.ToArray()));
 
 			}, State);
 		}

@@ -9,8 +9,9 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Delegate for text sniffer events.
 	/// </summary>
-	/// <param name="Text"></param>
-	public delegate Task TextSnifferEvent(ref string Text);
+	/// <param name="Text">Text</param>
+	/// <return>Text, possibly modified.</return>
+	public delegate Task<string> TextSnifferEvent(string Text);
 
 	/// <summary>
 	/// Simple abstract base class for sniffable nodes.
@@ -140,7 +141,7 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				this.Transform(this.OnReceiveText, ref Text);
+				Text = await this.Transform(this.OnReceiveText, Text);
 
 				if (!string.IsNullOrEmpty(Text))
 				{
@@ -150,19 +151,21 @@ namespace Waher.Networking.Sniffers
 			}
 		}
 
-		private void Transform(TextSnifferEvent Callback, ref string s)
+		private async Task<string> Transform(TextSnifferEvent Callback, string s)
 		{
 			if (!(Callback is null))
 			{
 				try
 				{
-					Callback(ref s);
+					return await Callback(s);
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
 			}
+
+			return s;
 		}
 
 		/// <summary>
@@ -178,7 +181,7 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				this.Transform(this.OnTransmitText, ref Text);
+				Text = await this.Transform(this.OnTransmitText, Text);
 
 				if (!string.IsNullOrEmpty(Text))
 				{
@@ -209,7 +212,7 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				this.Transform(this.OnInformation, ref Comment);
+				Comment = await this.Transform(this.OnInformation, Comment);
 
 				if (!string.IsNullOrEmpty(Comment))
 				{
@@ -232,7 +235,7 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				this.Transform(this.OnWarning, ref Warning);
+				Warning = await this.Transform(this.OnWarning, Warning);
 
 				if (!string.IsNullOrEmpty(Warning))
 				{

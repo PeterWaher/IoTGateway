@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.XMPP.HTTPX
+﻿using System.Threading.Tasks;
+
+namespace Waher.Networking.XMPP.HTTPX
 {
 	/// <summary>
 	/// Interface for HTTP(S) Post-back resources. These can be used to allow HTTPX servers to HTTP POST back responses
@@ -12,6 +14,6 @@
 		/// <param name="Callback">Method to call when item has been posted to URL.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>URL the HTTPX server can use to post back responses to.</returns>
-		string GetUrl(PostBackEventHandler Callback, object State);
+		Task<string> GetUrl(EventHandlerAsync<PostBackEventArgs> Callback, object State);
 	}
 }

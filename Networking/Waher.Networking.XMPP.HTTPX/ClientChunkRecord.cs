@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal HttpxResponseEventArgs e;
 		internal SortedDictionary<int, Chunk> chunks = null;
 		internal HttpResponse response;
-		internal HttpxResponseDataEventHandler dataCallback;
+		internal EventHandlerAsync<HttpxResponseDataEventArgs> dataCallback;
 		internal IE2eSymmetricCipher symmetricCipher;
 		internal object state;
 		internal string streamId;
@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal bool e2e;
 
 		internal ClientChunkRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response,
-			HttpxResponseDataEventHandler DataCallback, object State, string StreamId, string From, string To, bool E2e,
+			EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback, object State, string StreamId, string From, string To, bool E2e,
 			string EndpointReference, IE2eSymmetricCipher SymmetricCipher)
 			: base()
 		{

@@ -128,7 +128,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
-		private void Client_OnWriteQueueEmpty(object sender, EventArgs e)
+		private async Task Client_OnWriteQueueEmpty(object sender, EventArgs e)
 		{
 			bool DoDispose;
 
@@ -141,20 +141,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (DoDispose)
 				this.Dispose();
 			else
-			{
-				EventHandler h = this.OnWriteQueueEmpty;
-				if (!(h is null))
-				{
-					try
-					{
-						h(this, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}
+				await this.OnWriteQueueEmpty.Raise(this, e);
 		}
 
 		private Task Client_OnDisconnected(object sender, EventArgs e)
@@ -204,18 +191,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.state = NewState;
 				await this.Information("State changed to " + this.state.ToString());
 
-				EventHandlerAsync h = this.OnStateChange;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnStateChange.Raise(this, EventArgs.Empty);
 			}
 		}
 
@@ -295,7 +271,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Event raised when the write queue is empty.
 		/// </summary>
-		public event EventHandler OnWriteQueueEmpty = null;
+		public event EventHandlerAsync OnWriteQueueEmpty = null;
 
 		/// <summary>
 		/// Closes the stream when all bytes have been sent.
@@ -317,20 +293,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private async Task ParseIncoming(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.state == Socks5State.Connected)
-			{
-				DataReceivedEventHandler h = this.OnDataReceived;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-			}
+				await this.OnDataReceived.Raise(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState));
 			else if (this.state == Socks5State.Initializing)
 			{
 				if (Count < 2 || Buffer[Offset++] < 5)
@@ -481,30 +444,19 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				Port <<= 8;
 				Port |= Buffer[Offset++];
 
-				ResponseEventHandler h = this.OnResponse;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, new ResponseEventArgs(REP, Addr, DomainName, Port));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnResponse.Raise(this, new ResponseEventArgs(REP, Addr, DomainName, Port));
 			}
 		}
 
 		/// <summary>
 		/// Event raised when a response has been returned.
 		/// </summary>
-		public event ResponseEventHandler OnResponse = null;
+		public event EventHandlerAsync<ResponseEventArgs> OnResponse = null;
 
 		/// <summary>
 		/// Event raised when binary data has been received over an established connection.
 		/// </summary>
-		public event DataReceivedEventHandler OnDataReceived = null;
+		public event EventHandlerAsync<DataReceivedEventArgs> OnDataReceived = null;
 
 		private async Task ToError()
 		{
@@ -512,7 +464,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.client.Dispose();
 		}
 
-		private void Request(Command Command, IPAddress DestinationAddress, int Port)
+		private Task Request(Command Command, IPAddress DestinationAddress, int Port)
 		{
 			using (MemoryStream Req = new MemoryStream())
 			{
@@ -532,11 +484,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				Req.WriteByte((byte)(Port >> 8));
 				Req.WriteByte((byte)Port);
 
-				this.SendPacket(Req.ToArray());
+				return this.SendPacket(Req.ToArray());
 			}
 		}
 
-		private void Request(Command Command, string DestinationDomainName, int Port)
+		private Task Request(Command Command, string DestinationDomainName, int Port)
 		{
 			using (MemoryStream Req = new MemoryStream())
 			{
@@ -555,7 +507,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				Req.WriteByte((byte)(Port >> 8));
 				Req.WriteByte((byte)Port);
 
-				this.SendPacket(Req.ToArray());
+				return this.SendPacket(Req.ToArray());
 			}
 		}
 
@@ -565,9 +517,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationAddress">Destination Address. Must be a IPv4 or IPv6 address.</param>
 		/// <param name="Port">Port number.</param>
 		/// <exception cref="IOException">If client not connected (yet).</exception>
-		public void CONNECT(IPAddress DestinationAddress, int Port)
+		public Task CONNECT(IPAddress DestinationAddress, int Port)
 		{
-			this.Request(Command.CONNECT, DestinationAddress, Port);
+			return this.Request(Command.CONNECT, DestinationAddress, Port);
 		}
 
 		/// <summary>
@@ -576,9 +528,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationDomainName">Destination Domain Name.</param>
 		/// <param name="Port">Port number.</param>
 		/// <exception cref="IOException">If client not connected (yet).</exception>
-		public void CONNECT(string DestinationDomainName, int Port)
+		public Task CONNECT(string DestinationDomainName, int Port)
 		{
-			this.Request(Command.CONNECT, DestinationDomainName, Port);
+			return this.Request(Command.CONNECT, DestinationDomainName, Port);
 		}
 
 		/// <summary>
@@ -588,7 +540,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="StreamID">Stream ID</param>
 		/// <param name="RequesterJID">Requester JID</param>
 		/// <param name="TargetJID">Target JID</param>
-		public void CONNECT(string StreamID, string RequesterJID, string TargetJID)
+		public Task CONNECT(string StreamID, string RequesterJID, string TargetJID)
 		{
 			string s = StreamID + RequesterJID + TargetJID;
 			byte[] Hash = Hashes.ComputeSHA1Hash(Encoding.UTF8.GetBytes(s));
@@ -597,7 +549,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			foreach (byte b in Hash)
 				sb.Append(b.ToString("x2"));
 
-			this.CONNECT(sb.ToString(), 0);
+			return this.CONNECT(sb.ToString(), 0);
 		}
 
 		/// <summary>
@@ -606,9 +558,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationAddress">Destination Address. Must be a IPv4 or IPv6 address.</param>
 		/// <param name="Port">Port number.</param>
 		/// <exception cref="IOException">If client not connected (yet).</exception>
-		public void BIND(IPAddress DestinationAddress, int Port)
+		public Task BIND(IPAddress DestinationAddress, int Port)
 		{
-			this.Request(Command.BIND, DestinationAddress, Port);
+			return this.Request(Command.BIND, DestinationAddress, Port);
 		}
 
 		/// <summary>
@@ -617,9 +569,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationDomainName">Destination Domain Name.</param>
 		/// <param name="Port">Port number.</param>
 		/// <exception cref="IOException">If client not connected (yet).</exception>
-		public void BIND(string DestinationDomainName, int Port)
+		public Task BIND(string DestinationDomainName, int Port)
 		{
-			this.Request(Command.BIND, DestinationDomainName, Port);
+			return this.Request(Command.BIND, DestinationDomainName, Port);
 		}
 
 		/// <summary>
@@ -628,9 +580,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationAddress">Destination Address. Must be a IPv4 or IPv6 address.</param>
 		/// <param name="Port">Port number.</param>
 		/// <exception cref="IOException">If client not connected (yet).</exception>
-		public void UDP_ASSOCIATE(IPAddress DestinationAddress, int Port)
+		public Task UDP_ASSOCIATE(IPAddress DestinationAddress, int Port)
 		{
-			this.Request(Command.UDP_ASSOCIATE, DestinationAddress, Port);
+			return this.Request(Command.UDP_ASSOCIATE, DestinationAddress, Port);
 		}
 
 		/// <summary>
@@ -639,9 +591,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="DestinationDomainName">Destination Domain Name.</param>
 		/// <param name="Port">Port number.</param>
 		/// <exception cref="IOException">If client not connected (yet).</exception>
-		public void UDP_ASSOCIATE(string DestinationDomainName, int Port)
+		public Task UDP_ASSOCIATE(string DestinationDomainName, int Port)
 		{
-			this.Request(Command.UDP_ASSOCIATE, DestinationDomainName, Port);
+			return this.Request(Command.UDP_ASSOCIATE, DestinationDomainName, Port);
 		}
 
 	}

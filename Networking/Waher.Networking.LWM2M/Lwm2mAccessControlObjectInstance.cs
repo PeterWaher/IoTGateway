@@ -194,10 +194,10 @@ namespace Waher.Networking.LWM2M
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				await this.DeleteBootstrapInfo();
-				Response.ACK(CoapCode.Deleted);
+				await Response.ACK(CoapCode.Deleted);
 			}
 			else
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 		}
 
 		/// <summary>

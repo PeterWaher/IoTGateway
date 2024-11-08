@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.DNS.Communication
 {
-	/// <summary>
-	/// Delegate for DNS Message event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task DnsMessageEventHandler(object Sender, DnsMessageEventArgs e);
-
 	/// <summary>
 	/// DNS Messge event arguments.
 	/// </summary>

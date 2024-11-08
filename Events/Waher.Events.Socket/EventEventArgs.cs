@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Events.Socket
 {
-	/// <summary>
-	/// Delegate for Event event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task EventEventHandler(object Sender, EventEventArgs e);
-
 	/// <summary>
 	/// Event arguments for Event events.
 	/// </summary>

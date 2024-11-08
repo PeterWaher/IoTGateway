@@ -65,27 +65,6 @@ namespace Waher.Networking.PeerToPeer
 	}
 
 	/// <summary>
-	/// Event handler for multi-player environment state change events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewState">New state.</param>
-	public delegate Task MultiPlayerEnvironmentStateChangeEventHandler(object Sender, MultiPlayerState NewState);
-
-	/// <summary>
-	/// Event handler for player information events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="PlayerInformation">Player information.</param>
-	public delegate Task MultiPlayerEnvironmentPlayerInformationEventHandler(object Sender, Player PlayerInformation);
-
-	/// <summary>
-	/// Event handler for game data events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task GameDataEventHandler(object Sender, GameDataEventArgs e);
-
-	/// <summary>
 	/// Manages a multi-player environment.
 	/// </summary>
 	public class MultiPlayerEnvironment : IDisposable
@@ -315,18 +294,7 @@ namespace Waher.Networking.PeerToPeer
 						this.UpdateRemotePlayersLocked();
 					}
 
-					MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerAvailable;
-					if (!(h is null))
-					{
-						try
-						{
-							await h(this, Player);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await this.OnPlayerAvailable.Raise(this, Player);
 					break;
 
 				case 1:     // Interconnect
@@ -557,18 +525,7 @@ namespace Waher.Networking.PeerToPeer
                 if (!(ObsoleteConnection is null))
 					await ObsoleteConnection.DisposeAsync();
 
-				MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerConnected;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, Player);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnPlayerConnected.Raise(this, Player);
 
 				if (AllConnected)
 					await this.SetState(MultiPlayerState.Ready);
@@ -582,7 +539,7 @@ namespace Waher.Networking.PeerToPeer
 				Packet = BinaryTcpClient.ToArray(Buffer, Offset, Count);
 			}
 
-			this.GameDataReceived(Player, Connection, Packet);
+			await this.GameDataReceived(Player, Connection, Packet);
 
 			return true;
 		}
@@ -593,26 +550,15 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="FromPlayer">Data came from this player.</param>
 		/// <param name="Connection">Data came over this connection.</param>
 		/// <param name="Packet">Data received.</param>
-		protected virtual void GameDataReceived(Player FromPlayer, PeerConnection Connection, byte[] Packet)
+		protected virtual Task GameDataReceived(Player FromPlayer, PeerConnection Connection, byte[] Packet)
 		{
-			GameDataEventHandler h = this.OnGameDataReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, new GameDataEventArgs(FromPlayer, Connection, Packet));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnGameDataReceived.Raise(this, new GameDataEventArgs(FromPlayer, Connection, Packet));
 		}
 
 		/// <summary>
 		/// Event raised when game data has been received from a player.
 		/// </summary>
-		public event GameDataEventHandler OnGameDataReceived = null;
+		public event EventHandlerAsync<GameDataEventArgs> OnGameDataReceived = null;
 
 		/// <summary>
 		/// Sends a packet to all remote players using TCP. Can only be done if <see cref="State"/>=<see cref="MultiPlayerState.Ready"/>.
@@ -744,34 +690,23 @@ namespace Waher.Networking.PeerToPeer
 				Connection.StateObject = null;
 			}
 
-			MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerDisconnected;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, Player);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnPlayerDisconnected.Raise(this, Player);
 		}
 
 		/// <summary>
 		/// Event raised when a new player is available.
 		/// </summary>
-		public event MultiPlayerEnvironmentPlayerInformationEventHandler OnPlayerAvailable = null;
+		public event EventHandlerAsync<Player> OnPlayerAvailable = null;
 
 		/// <summary>
 		/// Event raised when a player has been connected to the local macine.
 		/// </summary>
-		public event MultiPlayerEnvironmentPlayerInformationEventHandler OnPlayerConnected = null;
+		public event EventHandlerAsync<Player> OnPlayerConnected = null;
 
 		/// <summary>
 		/// Event raised when a player has been disconnected from the local macine.
 		/// </summary>
-		public event MultiPlayerEnvironmentPlayerInformationEventHandler OnPlayerDisconnected = null;
+		public event EventHandlerAsync<Player> OnPlayerDisconnected = null;
 
 		/// <summary>
 		/// Creates inter-player peer-to-peer connections between known players.
@@ -903,18 +838,7 @@ namespace Waher.Networking.PeerToPeer
 
 			await Connection.SendTcp(Output.GetPacket());
 
-			MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerConnected;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, Player);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnPlayerConnected.Raise(this, Player);
 
 			return true;
 		}
@@ -982,25 +906,14 @@ namespace Waher.Networking.PeerToPeer
 						break;
 				}
 
-				MultiPlayerEnvironmentStateChangeEventHandler h = this.OnStateChange;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, NewState);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await this.OnStateChange.Raise(this, NewState);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when the state of the peer-to-peer network changes.
 		/// </summary>
-		public event MultiPlayerEnvironmentStateChangeEventHandler OnStateChange = null;
+		public event EventHandlerAsync<MultiPlayerState> OnStateChange = null;
 
 		/// <summary>
 		/// Application Name
@@ -1096,8 +1009,11 @@ namespace Waher.Networking.PeerToPeer
 
 			await this.SetState(MultiPlayerState.Closed);
 
-			this.p2pNetwork?.Dispose();
-			this.p2pNetwork = null;
+			if (!(this.p2pNetwork is null))
+			{
+				await this.p2pNetwork.DisposeAsync();
+				this.p2pNetwork = null;
+			}
 
 			this.ready?.Dispose();
 			this.ready = null;

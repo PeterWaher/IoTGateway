@@ -1,16 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Networking.CoAP.Transport;
+﻿using Waher.Networking.CoAP.Transport;
 
 namespace Waher.Networking.CoAP
 {
-	/// <summary>
-	/// Delegate for CoAP response callbacks
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CoapResponseEventHandler(object Sender, CoapResponseEventArgs e);
-
 	/// <summary>
 	/// Event arguments for CoAP response callbacks.
 	/// </summary>

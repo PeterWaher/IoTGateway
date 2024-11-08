@@ -67,7 +67,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void PUT(CoapMessage Request, CoapResponse Response)
+		public async Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Client.State == Lwm2mState.Bootstrap)
 			{
@@ -77,15 +77,15 @@ namespace Waher.Networking.LWM2M
 					Lwm2mAccessControlObjectInstance Instance = new Lwm2mAccessControlObjectInstance(InstanceId);
 					this.Add(Instance);
 					this.Client.Endpoint.Register(Instance);
-					Instance.AfterRegister(this.Client);
+					await Instance.AfterRegister(this.Client);
 
-					Instance.PUT(Request, Response);
+					await Instance.PUT(Request, Response);
 				}
 				else
-					Response.RST(CoapCode.BadRequest);
+					await Response.RST(CoapCode.BadRequest);
 			}
 			else
-				Response.RST(CoapCode.Unauthorized);
+				await Response.RST(CoapCode.Unauthorized);
 		}
 	}
 }

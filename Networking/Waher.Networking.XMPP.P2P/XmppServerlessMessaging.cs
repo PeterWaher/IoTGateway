@@ -11,13 +11,6 @@ using Waher.Networking.PeerToPeer;
 namespace Waher.Networking.XMPP.P2P
 {
 	/// <summary>
-	/// Event handler for peer connection callbacks.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task PeerConnectionEventHandler(object Sender, PeerConnectionEventArgs e);
-
-	/// <summary>
 	/// Class managing peer-to-peer serveless XMPP communication.
 	/// </summary>
 	public class XmppServerlessMessaging : Sniffable, IDisposable
@@ -139,24 +132,13 @@ namespace Waher.Networking.XMPP.P2P
 
 			await this.Information("Removing JID from set of recognized JIDs: " + FullJID);
 
-			PeerAddressEventHandler h = this.PeerAddressRemoved;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new PeerAddressEventArgs(FullJID, string.Empty, 0, string.Empty, 0));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.PeerAddressRemoved.Raise(this, new PeerAddressEventArgs(FullJID, string.Empty, 0, string.Empty, 0));
 		}
 
 		/// <summary>
 		/// Event raised when address information about a peer has been removed.
 		/// </summary>
-		public event PeerAddressEventHandler PeerAddressRemoved = null;
+		public event EventHandlerAsync<PeerAddressEventArgs> PeerAddressRemoved = null;
 
 		/// <summary>
 		/// Reports recognized peer addresses.
@@ -231,24 +213,13 @@ namespace Waher.Networking.XMPP.P2P
 			await this.Information("P2P information available for " + FullJID + ". External: " + ExternalIp + ":" + ExternalPort.ToString() +
 				", Local: " + LocalIp + ":" + LocalPort.ToString());
 
-			PeerAddressEventHandler h = this.PeerAddressReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new PeerAddressEventArgs(FullJID, ExternalIp, ExternalPort, LocalIp, LocalPort));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.PeerAddressReceived.Raise(this, new PeerAddressEventArgs(FullJID, ExternalIp, ExternalPort, LocalIp, LocalPort));
 		}
 
 		/// <summary>
 		/// Event raised when address information about a peer has been received.
 		/// </summary>
-		public event PeerAddressEventHandler PeerAddressReceived = null;
+		public event EventHandlerAsync<PeerAddressEventArgs> PeerAddressReceived = null;
 
 		internal void AuthenticatePeer(PeerConnection Peer, string FullJID)
 		{
@@ -297,24 +268,13 @@ namespace Waher.Networking.XMPP.P2P
 			/*foreach (ISniffer Sniffer in this.Sniffers)
 				Client.Add(Sniffer);*/
 
-			PeerConnectionEventHandler h = this.OnNewXmppClient;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new PeerConnectionEventArgs(Client, null, LocalJid, RemoteJid));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnNewXmppClient.Raise(this, new PeerConnectionEventArgs(Client, null, LocalJid, RemoteJid));
 		}
 
 		/// <summary>
 		/// Event raised when a new XMPP client has been created.
 		/// </summary>
-		public event PeerConnectionEventHandler OnNewXmppClient = null;
+		public event EventHandlerAsync<PeerConnectionEventArgs> OnNewXmppClient = null;
 
 		internal async Task PeerClosed(PeerState State)
 		{
@@ -336,7 +296,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="FullJID">Full JID of peer to connect to.</param>
 		/// <param name="Callback">Method to call when connection is established.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task GetPeerConnection(string FullJID, PeerConnectionEventHandler Callback, object State)
+		public Task GetPeerConnection(string FullJID, EventHandlerAsync<PeerConnectionEventArgs> Callback, object State)
 		{
 			return this.GetPeerConnection(FullJID, Callback, State, this.OnResynch);
 		}
@@ -346,23 +306,23 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="FullJID">Full JID of peer to connect to.</param>
 		/// <returns>Peer Connection event arguments containing peer-to-peer client, and corresponding JIDs, if they exist.</returns>
-		public Task<PeerConnectionEventArgs> GetPeerConnectionAsync(string FullJID)
+		public async Task<PeerConnectionEventArgs> GetPeerConnectionAsync(string FullJID)
 		{
 			TaskCompletionSource<PeerConnectionEventArgs> Result = new TaskCompletionSource<PeerConnectionEventArgs>();
 
-			this.GetPeerConnection(FullJID, (Sender, e) =>
+			await this.GetPeerConnection(FullJID, (Sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		/// <summary>
 		/// Event raised when the peer-to-peer connection parameters need to be updated for a given remote JID.
 		/// </summary>
-		public event ResynchEventHandler OnResynch = null;
+		public event EventHandlerAsync<ResynchEventArgs> OnResynch = null;
 
 		/// <summary>
 		/// If it is possible to connect directly to a given peer, given it's bare JID.
@@ -396,7 +356,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		private async Task GetPeerConnection(string FullJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
+		private async Task GetPeerConnection(string FullJID, EventHandlerAsync<PeerConnectionEventArgs> Callback, object State, EventHandlerAsync<ResynchEventArgs> ResynchMethod)
 		{
 			PeerState Result;
 			PeerState Old = null;
@@ -406,18 +366,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (this.p2pNetwork is null || this.p2pNetwork.State != PeerToPeerNetworkState.Ready)
 			{
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(this, new PeerConnectionEventArgs(null, State, this.fullJid, FullJID));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
-
+				await Callback.Raise(this, new PeerConnectionEventArgs(null, State, this.fullJid, FullJID));
 				return;
 			}
 
@@ -428,7 +377,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!b)
 			{
-				await Callback(this, new PeerConnectionEventArgs(null, State, this.fullJid, FullJID));
+				await Callback.Raise(this, new PeerConnectionEventArgs(null, State, this.fullJid, FullJID));
 				return;
 			}
 
@@ -464,15 +413,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (b)
 			{
-				try
-				{
-					await Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.fullJid, FullJID));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-
+				await Callback.Raise(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.fullJid, FullJID));
 				return;
 			}
 			else if (!(Old is null))
@@ -638,11 +579,14 @@ namespace Waher.Networking.XMPP.P2P
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public async Task DisposeAsync()
-		{ 
+		{
 			if (!this.disposed)
 			{
-				this.p2pNetwork?.Dispose();
-				this.p2pNetwork = null;
+				if (!(this.p2pNetwork is null))
+				{
+					await this.p2pNetwork.DisposeAsync();
+					this.p2pNetwork = null;
+				}
 
 				if (!(this.peersByFullJid is null))
 				{
@@ -675,7 +619,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Xml">XML Output.</param>
 		public void AppendP2pInfo(StringBuilder Xml)
 		{
-			if (!(this.p2pNetwork is null) && 
+			if (!(this.p2pNetwork is null) &&
 				this.p2pNetwork.State == PeerToPeerNetworkState.Ready &&
 				!(this.p2pNetwork.ExternalEndpoint is null))
 			{

@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
-	/// <summary>
-	/// Event handler for HTTPX response data events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task HttpxResponseDataEventHandler(object Sender, HttpxResponseDataEventArgs e);
-
 	/// <summary>
 	/// Event arguments for HTTPX data responses.
 	/// </summary>

@@ -806,16 +806,7 @@ namespace Waher.Client.WPF.Model
 			if (!(h is null))
 			{
 				foreach (EventHandlerAsync<RosterItem> h2 in h)
-				{
-					try
-					{
-						await h2(this, Item);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+					await h2.Raise(this, Item);
 			}
 		}
 
@@ -1284,7 +1275,7 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanConfigure => this.IsOnline;
 
-		public override void GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
+		public override async Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
 			DataForm Form = new DataForm(this.client, this.ChangePassword, this.CancelChangePassword, this.BareJID, this.BareJID,
 				new TextPrivateField(null, "Password", "New password:", true, new string[] { string.Empty }, null,
@@ -1296,7 +1287,7 @@ namespace Waher.Client.WPF.Model
 				Instructions = new string[] { "Enter the new password you wish to use." }
 			};
 
-			Callback(this, new DataFormEventArgs(Form, new IqResultEventArgs(null, string.Empty, this.BareJID, this.BareJID, true, State)));
+			await Callback.Raise(this, new DataFormEventArgs(Form, new IqResultEventArgs(null, string.Empty, this.BareJID, this.BareJID, true, State)));
 		}
 
 		private class PasswordValidation : BasicValidation
@@ -1723,8 +1714,7 @@ namespace Waher.Client.WPF.Model
 		{
 			this.e2eEncryption?.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
 			{
-				e.Done(e2.Ok);
-				return Task.CompletedTask;
+				return e.Done(e2.Ok);
 			});
 		}
 

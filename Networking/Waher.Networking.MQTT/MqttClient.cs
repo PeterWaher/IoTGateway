@@ -18,36 +18,6 @@ using System.Security.Cryptography.X509Certificates;
 namespace Waher.Networking.MQTT
 {
 	/// <summary>
-	/// Connection error event handler.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Exception">Information about error received.</param>
-	public delegate Task MqttExceptionEventHandler(object Sender, Exception Exception);
-
-	/// <summary>
-	/// Event handler for state change events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewState">New state reported.</param>
-	public delegate Task StateChangedEventHandler(object Sender, MqttState NewState);
-
-	/// <summary>
-	/// Event handler used for events raised when data has been successfully acknowledged.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="PacketIdentifier">Packet identifier of data successfully published.</param>
-	//#pragma warning disable
-	public delegate Task PacketAcknowledgedEventHandler(object Sender, ushort PacketIdentifier);
-	//#pragma warning restore
-
-	/// <summary>
-	/// Event handler for events raised when content has been received.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Content">Content received.</param>
-	public delegate Task ContentReceivedEventHandler(object Sender, MqttContent Content);
-
-	/// <summary>
 	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 	/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
 	/// </summary>
@@ -264,20 +234,7 @@ namespace Waher.Networking.MQTT
 
 		private async Task ConnectionError(object Sender, Exception ex)
 		{
-			MqttExceptionEventHandler h = this.OnConnectionError;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					await this.Exception(ex2);
-					Log.Exception(ex2);
-				}
-			}
-
+			await this.OnConnectionError.Raise(this, ex);
 			await this.Error(ex);
 
 			this.State = MqttState.Error;
@@ -632,19 +589,7 @@ namespace Waher.Networking.MQTT
 						if (this.HasSniffers)
 							await this.Information("Rx.PINGRESP");
 
-						EventHandlerAsync h = this.OnPingResponse;
-						if (!(h is null))
-						{
-							try
-							{
-								await h(this, EventArgs.Empty);
-							}
-							catch (Exception ex)
-							{
-								await this.Exception(ex);
-								Log.Exception(ex);
-							}
-						}
+						await this.OnPingResponse.Raise(this, EventArgs.Empty);
 						break;
 
 					case MqttControlPacketType.PUBLISH:
@@ -688,18 +633,7 @@ namespace Waher.Networking.MQTT
 							await this.Information("Rx.PUBACK");
 
 						this.PacketDelivered(Header.PacketIdentifier);
-						PacketAcknowledgedEventHandler h2 = this.OnPublished;
-						if (!(h2 is null))
-						{
-							try
-							{
-								await h2(this, Header.PacketIdentifier);
-							}
-							catch (Exception ex)
-							{
-								await this.Exception(ex);
-							}
-						}
+						await this.OnPublished.Raise(this, Header.PacketIdentifier);
 						break;
 
 					case MqttControlPacketType.PUBREC:
@@ -732,18 +666,7 @@ namespace Waher.Networking.MQTT
 							await this.Information("Rx.PUBCOMP");
 
 						this.PacketDelivered(Header.PacketIdentifier);
-						h2 = this.OnPublished;
-						if (!(h2 is null))
-						{
-							try
-							{
-								await h2(this, Header.PacketIdentifier);
-							}
-							catch (Exception ex)
-							{
-								await this.Exception(ex);
-							}
-						}
+						await this.OnPublished.Raise(this, Header.PacketIdentifier);
 						break;
 
 					case MqttControlPacketType.SUBACK:
@@ -751,18 +674,7 @@ namespace Waher.Networking.MQTT
 							await this.Information("Rx.SUBACK");
 
 						this.PacketDelivered(Header.PacketIdentifier);
-						h2 = this.OnSubscribed;
-						if (!(h2 is null))
-						{
-							try
-							{
-								await h2(this, Header.PacketIdentifier);
-							}
-							catch (Exception ex)
-							{
-								await this.Exception(ex);
-							}
-						}
+						await this.OnSubscribed.Raise(this, Header.PacketIdentifier);
 						break;
 
 					case MqttControlPacketType.UNSUBACK:
@@ -770,18 +682,7 @@ namespace Waher.Networking.MQTT
 							await this.Information("Rx.UNSUBACK");
 
 						this.PacketDelivered(Header.PacketIdentifier);
-						h2 = this.OnUnsubscribed;
-						if (!(h2 is null))
-						{
-							try
-							{
-								await h2(this, Header.PacketIdentifier);
-							}
-							catch (Exception ex)
-							{
-								await this.Exception(ex);
-							}
-						}
+						await this.OnUnsubscribed.Raise(this, Header.PacketIdentifier);
 						break;
 				}
 			}
@@ -793,21 +694,9 @@ namespace Waher.Networking.MQTT
 			return true;
 		}
 
-		private async Task Error(Exception ex)
+		private Task Error(Exception ex)
 		{
-			MqttExceptionEventHandler h = this.OnError;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					await this.Exception(ex2);
-					Log.Exception(ex2);
-				}
-			}
+			return this.OnError.Raise(this, ex);
 		}
 
 		private int inputState = 0;
@@ -833,19 +722,7 @@ namespace Waher.Networking.MQTT
 
 			await this.Write(PacketData, 0, null);
 
-			EventHandlerAsync h = this.OnPing;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-					Log.Exception(ex);
-				}
-			}
+			await this.OnPing.Raise(this, EventArgs.Empty);
 		}
 
 		private async Task PINGRESP()
@@ -865,12 +742,12 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Event raised when a connection to a broker could not be made.
 		/// </summary>
-		public event MqttExceptionEventHandler OnConnectionError = null;
+		public event EventHandlerAsync<Exception> OnConnectionError = null;
 
 		/// <summary>
 		/// Event raised when an error was encountered.
 		/// </summary>
-		public event MqttExceptionEventHandler OnError = null;
+		public event EventHandlerAsync<Exception> OnError = null;
 
 		/// <summary>
 		/// Event raised whenever a ping message is sent, i.e. when connection is idle.
@@ -959,26 +836,15 @@ namespace Waher.Networking.MQTT
 			}
 		}
 
-		private async Task RaiseOnStateChanged(MqttState State)
+		private Task RaiseOnStateChanged(MqttState State)
 		{
-			StateChangedEventHandler h = this.OnStateChanged;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, State);
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-				}
-			}
+			return this.OnStateChanged.Raise(this, State);
 		}
 
 		/// <summary>
 		/// Event raised whenever the internal state of the connection changes.
 		/// </summary>
-		public event StateChangedEventHandler OnStateChanged = null;
+		public event EventHandlerAsync<MqttState> OnStateChanged = null;
 
 		private ushort packetIdentifier = 0;
 
@@ -1057,12 +923,12 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Event raised when data has been successfully published.
 		/// </summary>
-		public event PacketAcknowledgedEventHandler OnPublished = null;
+		public event EventHandlerAsync<ushort> OnPublished = null;
 
 		/// <summary>
 		/// Event raised when subscription has been successfully received.
 		/// </summary>
-		public event PacketAcknowledgedEventHandler OnSubscribed = null;
+		public event EventHandlerAsync<ushort> OnSubscribed = null;
 
 		private Task PUBACK(ushort PacketIdentifier)
 		{
@@ -1222,27 +1088,15 @@ namespace Waher.Networking.MQTT
 			return PacketIdentifier;
 		}
 
-		private async Task ContentReceived(MqttContent Content)
+		private Task ContentReceived(MqttContent Content)
 		{
-			ContentReceivedEventHandler h = this.OnContentReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, Content);
-				}
-				catch (Exception ex)
-				{
-					await this.Exception(ex);
-					Log.Exception(ex);
-				}
-			}
+			return this.OnContentReceived.Raise(this, Content);
 		}
 
 		/// <summary>
 		/// Event raised when new content has been received.
 		/// </summary>
-		public event ContentReceivedEventHandler OnContentReceived = null;
+		public event EventHandlerAsync<MqttContent> OnContentReceived = null;
 
 		/// <summary>
 		/// Unsubscribes from information earlier subscribed to. Topics can include wildcards.
@@ -1304,7 +1158,7 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Event raised when unsubscription has been successfully received.
 		/// </summary>
-		public event PacketAcknowledgedEventHandler OnUnsubscribed = null;
+		public event EventHandlerAsync<ushort> OnUnsubscribed = null;
 
 		/// <summary>
 		/// Closes the connection and disposes of all resources.

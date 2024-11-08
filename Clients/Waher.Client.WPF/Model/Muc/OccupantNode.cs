@@ -179,10 +179,12 @@ namespace Waher.Client.WPF.Model.Muc
 		public override bool CanEdit => true;
 		public override bool CanChat => true;
 
-		public override void Delete(TreeNode Parent, EventHandler OnDeleted)
+		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
-			this.MucClient?.Kick(this.RoomId, this.domain, this.nickName, null, null);
-			base.Delete(Parent, OnDeleted);
+			if (!(this.MucClient is null))
+				await this.MucClient.Kick(this.RoomId, this.domain, this.nickName, null, null);
+
+			await base.Delete(Parent, OnDeleted);
 		}
 
 		public override void Edit()
@@ -369,14 +371,12 @@ namespace Waher.Client.WPF.Model.Muc
 
 			if (b.HasValue && b.Value)
 			{
-				this.MucClient.Ban(this.roomId, this.domain, this.jid, Form.Reason.Text, (sender2, e2) =>
+				this.MucClient.Ban(this.roomId, this.domain, this.jid, Form.Reason.Text, async (sender2, e2) =>
 				{
 					if (e2.Ok)
-						this.Delete(this.Parent, null);
+						await this.Delete(this.Parent, null);
 					else
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to ban the occupant." : e2.ErrorText);
-
-					return Task.CompletedTask;
 				}, null);
 			}
 		}

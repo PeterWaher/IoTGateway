@@ -96,7 +96,7 @@ namespace Waher.IoTGateway.Console
 				Log.RegisterExceptionToUnnest(typeof(ExternalException));
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
-				AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+				AppDomain.CurrentDomain.UnhandledException += (Sender, e) =>
 				{
 					if (e.IsTerminating)
 					{
@@ -160,7 +160,7 @@ namespace Waher.IoTGateway.Console
 					}
 				};
 
-				TaskScheduler.UnobservedTaskException += (sender, e) =>
+				TaskScheduler.UnobservedTaskException += (Sender, e) =>
 				{
 					Exception ex = Log.UnnestException(e.Exception);
 					string StackTrace = Log.CleanStackTrace(ex.StackTrace);
@@ -181,8 +181,8 @@ namespace Waher.IoTGateway.Console
 				}
 
 				ManualResetEvent Done = new(false);
-				Gateway.OnTerminate += (sender, e) => Done.Set();
-				System.Console.CancelKeyPress += (sender, e) =>
+				Gateway.OnTerminate += (Sender, e) => Done.Set();
+				System.Console.CancelKeyPress += (Sender, e) =>
 				{
 					e.Cancel = true;
 					Gateway.Terminate();

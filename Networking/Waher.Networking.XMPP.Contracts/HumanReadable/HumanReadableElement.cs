@@ -82,9 +82,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public void GenerateMarkdown(MarkdownOutput Markdown, MarkdownSettings Settings)
+		public Task GenerateMarkdown(MarkdownOutput Markdown, MarkdownSettings Settings)
 		{
-			this.GenerateMarkdown(Markdown, 1, 0, Settings);
+			return this.GenerateMarkdown(Markdown, 1, 0, Settings);
 		}
 
 		/// <summary>
@@ -94,7 +94,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public abstract void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings);
+		public abstract Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings);
 
 		/// <summary>
 		/// Encodes text to Markdown.

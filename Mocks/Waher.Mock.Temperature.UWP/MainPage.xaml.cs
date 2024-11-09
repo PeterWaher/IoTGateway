@@ -45,7 +45,7 @@ namespace Waher.Mock.Temperature.UWP
 			App.OwnershipChanged += App_OwnershipChanged;
 		}
 
-		private void App_OwnershipChanged(object sender, EventArgs e)
+		private void App_OwnershipChanged(object Sender, EventArgs e)
 		{
 			if (string.IsNullOrEmpty(App.OwnerJid))
 			{
@@ -65,7 +65,7 @@ namespace Waher.Mock.Temperature.UWP
 			}
 		}
 
-		private void Page_Unloaded(object sender, RoutedEventArgs e)
+		private void Page_Unloaded(object Sender, RoutedEventArgs e)
 		{
 			if (!(sniffer is null) && sniffer.ListView == this.SnifferListView)
 				sniffer = null;

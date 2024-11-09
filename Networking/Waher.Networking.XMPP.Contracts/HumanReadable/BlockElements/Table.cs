@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		public override async Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			LinkedList<KeyValuePair<string, string[]>> Notes = null;
 			List<bool> IsRowHeader = new List<bool>();
@@ -188,7 +188,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 					Markdown.Append("| ");
 
 					MarkdownOutput CellMarkdown = new MarkdownOutput();
-					Cell.GenerateMarkdown(CellMarkdown, 1, 0, Settings);
+					await Cell.GenerateMarkdown(CellMarkdown, 1, 0, Settings);
 
 					string[] Rows = CellMarkdown.ToString().Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 

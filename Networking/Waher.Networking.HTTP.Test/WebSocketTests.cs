@@ -88,7 +88,7 @@ namespace Waher.Networking.HTTP.Test
 		[ExpectedException(typeof(WebSocketException))]
 		public async Task Test_01_Connect_Reject()
 		{
-			this.webSocketListener.Accept += (sender, e) =>
+			this.webSocketListener.Accept += (Sender, e) =>
 			{
 				if (!e.Socket.HttpRequest.Header.TryGetHeaderField("Origin", out HttpField Origin) ||
 					Origin.Value != "UnitTest")
@@ -106,7 +106,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_02_Connect_Accept()
 		{
-			this.webSocketListener.Accept += (sender, e) =>
+			this.webSocketListener.Accept += (Sender, e) =>
 			{
 				if (e.Socket is null)
 					Assert.Fail("Socket not set.");
@@ -120,7 +120,7 @@ namespace Waher.Networking.HTTP.Test
 				return Task.CompletedTask;
 			};
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				if (e.Socket is null)
 					Assert.Fail("Socket not set.");
@@ -140,7 +140,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.TextReceived += (sender2, e2) =>
 				{
@@ -173,7 +173,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.BinaryReceived += (sender2, e2) =>
 				{
@@ -212,7 +212,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.TextReceived += (sender2, e2) =>
 				{
@@ -248,7 +248,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.BinaryReceived += (sender2, e2) =>
 				{
@@ -290,7 +290,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.BinaryReceived += (sender2, e2) =>
 				{
@@ -324,7 +324,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.BinaryReceived += (sender2, e2) =>
 				{
@@ -353,7 +353,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_09_SendText()
 		{
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				return e.Socket.Send("Hello World");
 			};
@@ -375,7 +375,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_10_SendBinary()
 		{
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				return e.Socket.Send(new byte[] { 1, 2, 3, 4 });
 			};
@@ -401,7 +401,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_11_SendTextFragmented()
 		{
-			this.webSocketListener.Connected += async (sender, e) =>
+			this.webSocketListener.Connected += async (Sender, e) =>
 			{
 				await e.Socket.Send("Hello ", true);
 				await e.Socket.Send("World", false);
@@ -433,7 +433,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_12_SendBinaryFragmented()
 		{
-			this.webSocketListener.Connected += async (sender, e) =>
+			this.webSocketListener.Connected += async (Sender, e) =>
 			{
 				await e.Socket.Send(new byte[] { 1, 2 }, true);
 				await e.Socket.Send(new byte[] { 3, 4 }, false);
@@ -469,7 +469,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_13_Work()
 		{
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.TextReceived += (sender2, e2) =>
 				{
@@ -504,7 +504,7 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_14_Pong()
 		{
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.TextReceived += (sender2, e2) =>
 				{
@@ -543,7 +543,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			TaskCompletionSource<bool> Result = new();
 
-			this.webSocketListener.Connected += (sender, e) =>
+			this.webSocketListener.Connected += (Sender, e) =>
 			{
 				e.Socket.Closed += (sender2, e2) =>
 				{

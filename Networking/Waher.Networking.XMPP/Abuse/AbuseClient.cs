@@ -172,7 +172,7 @@ namespace Waher.Networking.XMPP.Abuse
 
         private Task BeginSearchSupport()
         {
-			return this.Client.SendServiceDiscoveryRequest(this.Client.Domain, async (sender, e) =>
+			return this.Client.SendServiceDiscoveryRequest(this.Client.Domain, async (Sender, e) =>
             {
                 if (e.Ok)
                 {
@@ -247,7 +247,7 @@ namespace Waher.Networking.XMPP.Abuse
         /// <param name="State">State object to pass on to callback method.</param>
         public Task StartGetBlockList(EventHandlerAsync<BlockListEventArgs> Callback, object State)
         {
-			return this.client.SendIqGet(string.Empty, "<blocklist xmlns='" + NamespaceBlocking + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(string.Empty, "<blocklist xmlns='" + NamespaceBlocking + "'/>", async (Sender, e) =>
             {
                 List<string> JIDs = new List<string>();
                 XmlElement E, E2;
@@ -338,7 +338,7 @@ namespace Waher.Networking.XMPP.Abuse
                 else
                     Xml.Append("'/></block>");
 
-                await this.client.SendIqSet(this.client.Domain, Xml.ToString(), async (sender, e) =>
+                await this.client.SendIqSet(this.client.Domain, Xml.ToString(), async (Sender, e) =>
                 {
                     if (e.Ok)
                     {
@@ -383,7 +383,7 @@ namespace Waher.Networking.XMPP.Abuse
             else if (this.supportsBlocking)
             {
 				await this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'><item jid='" + JID + "'/></unblock>", 
-                    async (sender, e) =>
+                    async (Sender, e) =>
                     {
                         if (e.Ok)
                         {
@@ -410,7 +410,7 @@ namespace Waher.Networking.XMPP.Abuse
         {
             if (this.supportsBlocking)
             {
-				await this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'/>", async (sender, e) =>
+				await this.client.SendIqSet(this.client.Domain, "<unblock xmlns='" + NamespaceBlocking + "'/>", async (Sender, e) =>
                 {
                     if (e.Ok)
                     {

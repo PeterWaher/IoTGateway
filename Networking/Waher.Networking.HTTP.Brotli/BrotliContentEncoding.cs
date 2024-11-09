@@ -111,7 +111,7 @@ namespace Waher.Networking.HTTP.Brotli
 					{
 						scheduler = new Scheduler();
 
-						Log.Terminating += (sender, e) =>
+						Log.Terminating += (Sender, e) =>
 						{
 							scheduler?.Dispose();
 							scheduler = null;

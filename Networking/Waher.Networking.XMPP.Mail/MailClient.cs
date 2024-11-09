@@ -210,7 +210,7 @@ namespace Waher.Networking.XMPP.Mail
 
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(this.client.Domain, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(this.client.Domain, Xml.ToString(), async (Sender, e) =>
 				{
 					XmlElement E;
 					string ResponseContentType = null;
@@ -253,7 +253,7 @@ namespace Waher.Networking.XMPP.Mail
 		{
 			TaskCompletionSource<MessageObject> Result = new TaskCompletionSource<MessageObject>();
 
-			await this.Get(ObjectId, ContentType, (sender, e) =>
+			await this.Get(ObjectId, ContentType, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(new MessageObject(e.Data, e.ContentType));
@@ -287,7 +287,7 @@ namespace Waher.Networking.XMPP.Mail
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.Delete(ObjectId, (sender, e) =>
+			await this.Delete(ObjectId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);

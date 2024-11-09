@@ -135,7 +135,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Error = new(false);
 
 			this.httpUpload = new HttpFileUploadClient(this.client1);
-			this.httpUpload.Discover((sender, e) =>
+			this.httpUpload.Discover((Sender, e) =>
 			{
 				if (this.httpUpload.HasSupport)
 					Done.Set();

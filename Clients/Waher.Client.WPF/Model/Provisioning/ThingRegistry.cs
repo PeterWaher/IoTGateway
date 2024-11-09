@@ -303,7 +303,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					}
 				}
 
-				this.registryClient.Search(0, 100, Operators.ToArray(), (sender, e) =>
+				this.registryClient.Search(0, 100, Operators.ToArray(), (Sender, e) =>
 				{
 					this.ShowResult(e);
 					return Task.CompletedTask;
@@ -436,7 +436,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			if (Result.HasValue && Result.Value)
 			{
-				this.registryClient.Mine(Form.MakePublic, Form.Tags, (sender, e) =>
+				this.registryClient.Mine(Form.MakePublic, Form.Tags, (Sender, e) =>
 				{
 					if (e.Ok)
 					{
@@ -522,7 +522,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}
 		}
 
-		private void MyDevices_Click(object sender, RoutedEventArgs e)
+		private void MyDevices_Click(object Sender, RoutedEventArgs e)
 		{
 			this.provisioningClient.GetDevices(0, 100, (sender2, e2) =>
 			{
@@ -531,7 +531,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}, null);
 		}
 
-		private void RecycleDeviceRuleCaches_Click(object sender, RoutedEventArgs e)
+		private void RecycleDeviceRuleCaches_Click(object Sender, RoutedEventArgs e)
 		{
 			this.provisioningClient.ClearDeviceCaches((sender2, e2) =>
 			{
@@ -650,9 +650,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}
 		}
 
-		private void ClearRuleCache_Click(object sender, RoutedEventArgs e)
+		private void ClearRuleCache_Click(object Sender, RoutedEventArgs e)
 		{
-			MenuItem Item = (MenuItem)sender;
+			MenuItem Item = (MenuItem)Sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
 			this.provisioningClient.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
@@ -678,9 +678,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}, null);
 		}
 
-		private void ReconfigureDevice_Click(object sender, RoutedEventArgs e)
+		private void ReconfigureDevice_Click(object Sender, RoutedEventArgs e)
 		{
-			MenuItem Item = (MenuItem)sender;
+			MenuItem Item = (MenuItem)Sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
 			this.provisioningClient.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
@@ -706,9 +706,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}, null);
 		}
 
-		private void ReconfigureDeviceNode_Click(object sender, RoutedEventArgs e)
+		private void ReconfigureDeviceNode_Click(object Sender, RoutedEventArgs e)
 		{
-			MenuItem Item = (MenuItem)sender;
+			MenuItem Item = (MenuItem)Sender;
 			Node Node = (Node)Item.Tag;
 
 			this.provisioningClient.FindProvisioningService(Node.Concentrator.BareJID, (sender2, e2) =>
@@ -734,9 +734,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}, null);
 		}
 
-		private void DisownDevice_Click(object sender, RoutedEventArgs e)
+		private void DisownDevice_Click(object Sender, RoutedEventArgs e)
 		{
-			MenuItem Item = (MenuItem)sender;
+			MenuItem Item = (MenuItem)Sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
 			this.registryClient.FindThingRegistry(Contact.BareJID, (sender2, e2) =>
@@ -761,9 +761,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}, null);
 		}
 
-		private void DisownDeviceNode_Click(object sender, RoutedEventArgs e)
+		private void DisownDeviceNode_Click(object Sender, RoutedEventArgs e)
 		{
-			MenuItem Item = (MenuItem)sender;
+			MenuItem Item = (MenuItem)Sender;
 			Node Node = (Node)Item.Tag;
 
 			this.registryClient.FindThingRegistry(Node.Concentrator.BareJID, (sender2, e2) =>

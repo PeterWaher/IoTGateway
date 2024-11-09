@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Test
 			using ManualResetEvent Added = new(false);
 
 			this.client1.AddRosterItem(new RosterItem(this.client2.BareJID, "Test Client 2", "Test Clients"),
-				(sender, e) => { Added.Set(); return Task.CompletedTask; }, null);
+				(Sender, e) => { Added.Set(); return Task.CompletedTask; }, null);
 
 			Assert.IsTrue(Added.WaitOne(10000), "Roster item not properly added.");
 		}
@@ -40,7 +40,7 @@ namespace Waher.Networking.XMPP.Test
 			using ManualResetEvent Updated = new(false);
 			
 			this.client1.UpdateRosterItem(this.client2.BareJID, "Test Client II", new string[] { "Test Clients" },
-				(sender, e) => { Updated.Set(); return Task.CompletedTask; }, null);
+				(Sender, e) => { Updated.Set(); return Task.CompletedTask; }, null);
 
 			Assert.IsTrue(Updated.WaitOne(10000), "Roster item not properly updated.");
 		}
@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			using ManualResetEvent Removed = new(false);
 			
-			this.client1.RemoveRosterItem(this.client2.BareJID, (sender, e) => { Removed.Set(); return Task.CompletedTask; }, null);
+			this.client1.RemoveRosterItem(this.client2.BareJID, (Sender, e) => { Removed.Set(); return Task.CompletedTask; }, null);
 
 			Assert.IsTrue(Removed.WaitOne(10000), "Roster item not properly removed.");
 		}
@@ -63,14 +63,14 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Received = new(false);
 			ManualResetEvent Done = new(false);
 
-			this.client2.OnPresenceSubscribe += (sender, e) =>
+			this.client2.OnPresenceSubscribe += (Sender, e) =>
 			{
 				Received.Set();
 				e.Accept();
 				return Task.CompletedTask;
 			};
 
-			this.client1.OnPresenceSubscribed += (sender, e) => { Done.Set(); return Task.CompletedTask; };
+			this.client1.OnPresenceSubscribed += (Sender, e) => { Done.Set(); return Task.CompletedTask; };
 
 			this.client1.RequestPresenceSubscription(this.client2.BareJID);
 
@@ -84,11 +84,11 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
 
-			this.client2.OnPresenceUnsubscribe += (sender, e) => { e.Accept(); return Task.CompletedTask; };
-			this.client1.OnPresenceUnsubscribed += (sender, e) => { Done.Set(); return Task.CompletedTask; };
+			this.client2.OnPresenceUnsubscribe += (Sender, e) => { e.Accept(); return Task.CompletedTask; };
+			this.client1.OnPresenceUnsubscribed += (Sender, e) => { Done.Set(); return Task.CompletedTask; };
 
-			this.client1.OnPresenceSubscribe += (sender, e) => { e.Decline(); return Task.CompletedTask; };
-			this.client2.OnPresenceSubscribe += (sender, e) => { e.Decline(); return Task.CompletedTask; };
+			this.client1.OnPresenceSubscribe += (Sender, e) => { e.Decline(); return Task.CompletedTask; };
+			this.client2.OnPresenceSubscribe += (Sender, e) => { e.Decline(); return Task.CompletedTask; };
 
 			this.client1.RequestPresenceUnsubscription(this.client2.BareJID);
 
@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
 
-			this.client1.OnPresenceSubscribed += (sender, e) => { Done.Set(); return Task.CompletedTask; };
+			this.client1.OnPresenceSubscribed += (Sender, e) => { Done.Set(); return Task.CompletedTask; };
 			this.client1.RequestPresenceSubscription("wpfclient@cybercity.online");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");

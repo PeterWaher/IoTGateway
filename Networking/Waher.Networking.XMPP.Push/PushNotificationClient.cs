@@ -75,7 +75,7 @@ namespace Waher.Networking.XMPP.Push
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.NewToken(Token, Service, ClientType, (sender, e) =>
+			await this.NewToken(Token, Service, ClientType, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -115,7 +115,7 @@ namespace Waher.Networking.XMPP.Push
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.RemoveToken((sender, e) =>
+			await this.RemoveToken((Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -155,7 +155,7 @@ namespace Waher.Networking.XMPP.Push
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.ClearRules((sender, e) =>
+			await this.ClearRules((Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -258,7 +258,7 @@ namespace Waher.Networking.XMPP.Push
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.AddRule(MessageType, LocalName, Namespace, Channel, MessageVariable, PatternMatchingScript, ContentScript, (sender, e) =>
+			await this.AddRule(MessageType, LocalName, Namespace, Channel, MessageVariable, PatternMatchingScript, ContentScript, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -313,7 +313,7 @@ namespace Waher.Networking.XMPP.Push
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.RemoveRule(MessageType, LocalName, Namespace, (sender, e) =>
+			await this.RemoveRule(MessageType, LocalName, Namespace, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);

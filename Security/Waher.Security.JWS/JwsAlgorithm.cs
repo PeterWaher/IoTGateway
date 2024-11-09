@@ -156,7 +156,7 @@ namespace Waher.Security.JWS
 			}
 		}
 
-		private static void Types_OnInvalidated(object sender, EventArgs e)
+		private static void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			lock (algorithms)
 			{

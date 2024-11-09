@@ -14,17 +14,17 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			InitializeComponent();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void SendButton_Click(object sender, RoutedEventArgs e)
+		private void SendButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void BareJid_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		private void BareJid_TextChanged(object Sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
 			this.SendButton.IsEnabled = !string.IsNullOrEmpty(this.BareJid.Text) &&
 				XmppClient.BareJidRegEx.IsMatch(this.BareJid.Text);

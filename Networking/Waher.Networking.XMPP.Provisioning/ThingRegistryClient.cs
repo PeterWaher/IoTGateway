@@ -248,28 +248,25 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</register>");
 
-			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (Sender, e) =>
 			{
-				if (!(Callback is null))
+				XmlElement E = e.FirstElement;
+				string OwnerJid = string.Empty;
+				bool IsPublic = false;
+
+				if (e.Ok && !(E is null) && E.LocalName == "claimed")
 				{
-					XmlElement E = e.FirstElement;
-					string OwnerJid = string.Empty;
-					bool IsPublic = false;
+					OwnerJid = XML.Attribute(E, "jid");
+					IsPublic = XML.Attribute(E, "public", false);
 
-					if (e.Ok && !(E is null) && E.LocalName == "claimed")
+					if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
+						this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
 					{
-						OwnerJid = XML.Attribute(E, "jid");
-						IsPublic = XML.Attribute(E, "public", false);
-
-						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
-							this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
-						{
-							ProvisioningClient.OwnerJid = OwnerJid;
-						}
+						ProvisioningClient.OwnerJid = OwnerJid;
 					}
-
-					await Callback.Raise(this, new RegistrationEventArgs(e, State, OwnerJid, IsPublic));
 				}
+
+				await Callback.Raise(this, new RegistrationEventArgs(e, State, OwnerJid, IsPublic));
 			}, State);
 		}
 
@@ -356,27 +353,24 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</mine>");
 
-			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (Sender, e) =>
 			{
-				if (!(Callback is null))
+				XmlElement E = e.FirstElement;
+				string NodeJid = string.Empty;
+				ThingReference Node = ThingReference.Empty;
+
+				if (e.Ok && !(E is null) && E.LocalName == "claimed")
 				{
-					XmlElement E = e.FirstElement;
-					string NodeJid = string.Empty;
-					ThingReference Node = ThingReference.Empty;
+					string NodeId = XML.Attribute(E, "id");
+					string SourceId = XML.Attribute(E, "src");
+					string Partition = XML.Attribute(E, "pt");
+					NodeJid = XML.Attribute(E, "jid");
 
-					if (e.Ok && !(E is null) && E.LocalName == "claimed")
-					{
-						string NodeId = XML.Attribute(E, "id");
-						string SourceId = XML.Attribute(E, "src");
-						string Partition = XML.Attribute(E, "pt");
-						NodeJid = XML.Attribute(E, "jid");
-
-						if (!string.IsNullOrEmpty(NodeId) || !string.IsNullOrEmpty(SourceId) || !string.IsNullOrEmpty(Partition))
-							Node = new ThingReference(NodeId, SourceId, Partition);
-					}
-
-					await Callback.Raise(this, new NodeResultEventArgs(e, State, NodeJid, Node));
+					if (!string.IsNullOrEmpty(NodeId) || !string.IsNullOrEmpty(SourceId) || !string.IsNullOrEmpty(Partition))
+						Node = new ThingReference(NodeId, SourceId, Partition);
 				}
+
+				await Callback.Raise(this, new NodeResultEventArgs(e, State, NodeJid, Node));
 			}, State);
 		}
 
@@ -485,7 +479,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			return this.client.SendIqSet(RegistryJid, Request.ToString(), (sender, e) => Callback.Raise(this, e), State);
+			return this.client.SendIqSet(RegistryJid, Request.ToString(), (Sender, e) => Callback.Raise(this, e), State);
 		}
 
 		private async Task RemovedHandler(object Sender, IqEventArgs e)
@@ -619,7 +613,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</update>");
 
-			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(RegistryAddress, Request.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				bool Disowned = false;
@@ -706,7 +700,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			return this.client.SendIqSet(RegistryJid, Request.ToString(), (sender, e) => Callback.Raise(this, e), State);
+			return this.client.SendIqSet(RegistryJid, Request.ToString(), (Sender, e) => Callback.Raise(this, e), State);
 		}
 
 		/// <summary>
@@ -783,7 +777,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			return this.client.SendIqSet(RegistryJid, Request.ToString(), (sender, e) => Callback.Raise(this, e), State);
+			return this.client.SendIqSet(RegistryJid, Request.ToString(), (Sender, e) => Callback.Raise(this, e), State);
 		}
 
 		private async Task DisownedHandler(object Sender, IqEventArgs e)
@@ -854,14 +848,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</search>");
 
-			return this.client.SendIqGet(RegistryJid, Request.ToString(), (sender, e) =>
+			return this.client.SendIqGet(RegistryJid, Request.ToString(), (Sender, e) =>
 			{
-				ParseResultSet(Offset, MaxCount, this, e, Callback, State);
-				return Task.CompletedTask;
+				return ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 			}, State);
 		}
 
-		internal static void ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
+		internal static async Task ParseResultSet(int Offset, int MaxCount, object Sender, IqResultEventArgs e, EventHandlerAsync<SearchResultEventArgs> Callback, object State)
 		{
 			List<SearchResultThing> Things = new List<SearchResultThing>();
 			List<MetaDataTag> MetaData = new List<MetaDataTag>();
@@ -920,19 +913,9 @@ namespace Waher.Networking.XMPP.Provisioning
 				}
 			}
 
-			if (!(Callback is null))
-			{
-				SearchResultEventArgs e2 = new SearchResultEventArgs(e, State, Offset, MaxCount, More, Things.ToArray());
+			SearchResultEventArgs e2 = new SearchResultEventArgs(e, State, Offset, MaxCount, More, Things.ToArray());
 
-				try
-				{
-					Callback(Sender, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await Callback.Raise(Sender, e2);
 		}
 
 		/// <summary>

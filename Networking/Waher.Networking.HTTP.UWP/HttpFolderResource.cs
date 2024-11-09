@@ -1385,7 +1385,7 @@ namespace Waher.Networking.HTTP
 			return base.RemoveReference(Server);
 		}
 
-		private Task Server_ETagSaltChanged(object sender, EventArgs e)
+		private Task Server_ETagSaltChanged(object Sender, EventArgs e)
 		{
 			lock (this.cacheInfo)
 			{

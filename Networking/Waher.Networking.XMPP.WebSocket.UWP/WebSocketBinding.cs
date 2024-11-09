@@ -365,7 +365,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					{
 						this.closeSent = true;
 
-						Task _ = this.SendAsync("<close xmlns=\"urn:ietf:params:xml:ns:xmpp-framing\"/>", async (sender, e) =>
+						Task _ = this.SendAsync("<close xmlns=\"urn:ietf:params:xml:ns:xmpp-framing\"/>", async (Sender, e) =>
 						{
 							this.terminated = true;
 

@@ -101,7 +101,7 @@ namespace Waher.Things.Script
 						v[Tag.Name] = Tag.Value;
 				}
 
-				v.OnPreview += (sender, e) =>
+				v.OnPreview += (Sender, e) =>
 				{
 					ReportFields(Request, e.Preview.AssociatedObjectValue, false);
 					return Task.CompletedTask;

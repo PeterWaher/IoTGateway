@@ -20,7 +20,7 @@ namespace Waher.Runtime.Console.Worker
 			Task.Run(() => PerformWork());
 		}
 
-		private static void Log_Terminating(object sender, System.EventArgs e)
+		private static void Log_Terminating(object Sender, System.EventArgs e)
 		{
 			Terminate();
 			Log.Terminating -= Log_Terminating;

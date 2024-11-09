@@ -474,7 +474,7 @@ namespace Waher.Networking.Cluster
 			}
 
 			if (propertyTypes is null)
-				Types.OnInvalidated += (sender, e) => Init();
+				Types.OnInvalidated += (Sender, e) => Init();
 
 			propertyTypes = PropertyTypes;
 		}
@@ -928,7 +928,7 @@ namespace Waher.Networking.Cluster
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			await this.SendMessageAcknowledged(Message, (sender, e) =>
+			await this.SendMessageAcknowledged(Message, (Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -952,7 +952,7 @@ namespace Waher.Networking.Cluster
 			{
 				MessageID = MessageId,
 				Message = Message
-			}, async (sender, e) =>
+			}, async (Sender, e) =>
 			{
 				await this.SendMessageAcknowledged(new Deliver()
 				{
@@ -972,7 +972,7 @@ namespace Waher.Networking.Cluster
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			await this.SendMessageAssured(Message, (sender, e) =>
+			await this.SendMessageAssured(Message, (Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -1062,9 +1062,8 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		/// <param name="Endpoint">Cluster endpoint.</param>
 		/// <returns>If the corresponding endpoint status object was found and removed.</returns>
-		public bool RemoveRemoteStatus(IPEndPoint Endpoint)
+		public async Task<bool> RemoveRemoteStatus(IPEndPoint Endpoint)
 		{
-			EventHandlerAsync<ClusterEndpointEventArgs> h;
 			bool Removed;
 
 			lock (this.remoteStatus)
@@ -1072,17 +1071,8 @@ namespace Waher.Networking.Cluster
 				Removed = this.remoteStatus.Remove(Endpoint);
 			}
 
-			if (Removed && !((h = this.EndpointOffline) is null))
-			{
-				try
-				{
-					h(this, new ClusterEndpointEventArgs(Endpoint));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			if (Removed)
+				await this.EndpointOffline.Raise(this, new ClusterEndpointEventArgs(Endpoint));
 
 			return Removed;
 		}
@@ -1112,9 +1102,9 @@ namespace Waher.Networking.Cluster
 				this.currentStatus[s] = RemoteEndpoint;
 		}
 
-		internal void EndpointShutDown(IPEndPoint RemoteEndpoint)
+		internal Task EndpointShutDown(IPEndPoint RemoteEndpoint)
 		{
-			this.RemoveRemoteStatus(RemoteEndpoint);
+			return this.RemoveRemoteStatus(RemoteEndpoint);
 		}
 
 		internal void AssuredTransport(Guid MessageId, IClusterMessage Message)
@@ -1150,7 +1140,7 @@ namespace Waher.Networking.Cluster
 		private async Task CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)
 		{
 			if (e.Value is IPEndPoint RemoteEndpoint)
-				this.RemoveRemoteStatus(RemoteEndpoint);
+				await this.RemoveRemoteStatus(RemoteEndpoint);
 			else if (e.Value is MessageStatus MessageStatus)
 			{
 				if (e.Reason != RemovedReason.Manual)
@@ -1181,7 +1171,7 @@ namespace Waher.Networking.Cluster
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			await this.Ping((sender, e) =>
+			await this.Ping((Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -1318,7 +1308,7 @@ namespace Waher.Networking.Cluster
 			TaskCompletionSource<EndpointResponse<ResponseType>[]> Result =
 				new TaskCompletionSource<EndpointResponse<ResponseType>[]>();
 
-			await this.ExecuteCommand<ResponseType>(Command, (sender, e) =>
+			await this.ExecuteCommand<ResponseType>(Command, (Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -1349,7 +1339,7 @@ namespace Waher.Networking.Cluster
 		{
 			TaskCompletionSource<EndpointResponse<string>[]> Result = new TaskCompletionSource<EndpointResponse<string>[]>();
 
-			await this.Echo(Text, (sender, e) =>
+			await this.Echo(Text, (Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -1375,7 +1365,7 @@ namespace Waher.Networking.Cluster
 		{
 			TaskCompletionSource<EndpointResponse<string[]>[]> Result = new TaskCompletionSource<EndpointResponse<string[]>[]>();
 
-			await this.GetAssemblies((sender, e) =>
+			await this.GetAssemblies((Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -1430,7 +1420,7 @@ namespace Waher.Networking.Cluster
 			return this.SendMessageAcknowledged(new Lock()
 			{
 				Resource = Info.Resource
-			}, (sender, e) =>
+			}, (Sender, e) =>
 			{
 				IPEndPoint LockedBy = null;
 
@@ -1542,7 +1532,7 @@ namespace Waher.Networking.Cluster
 		{
 			TaskCompletionSource<ClusterResourceLockEventArgs> Result = new TaskCompletionSource<ClusterResourceLockEventArgs>();
 
-			await this.Lock(ResourceName, TimeoutMilliseconds, (sender, e) =>
+			await this.Lock(ResourceName, TimeoutMilliseconds, (Sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;

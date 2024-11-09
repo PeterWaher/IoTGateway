@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Done = new(false);
 				Event Event = null;
 
-				this.receptor.OnEvent += (sender, e) =>
+				this.receptor.OnEvent += (Sender, e) =>
 				{
 					Event = e.Event;
 					Done.Set();

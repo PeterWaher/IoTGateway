@@ -59,12 +59,12 @@ namespace Waher.Security.DTLS.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.client.OnHandshakeSuccessful += (sender, e) =>
+			this.client.OnHandshakeSuccessful += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
 			};
-			this.client.OnHandshakeFailed += (sender, e) => 
+			this.client.OnHandshakeFailed += (Sender, e) => 
 			{ 
 				Error.Set(); 
 				return Task.CompletedTask;
@@ -82,7 +82,7 @@ namespace Waher.Security.DTLS.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.server.OnApplicationDataReceived += (sender, e) =>
+			this.server.OnApplicationDataReceived += (Sender, e) =>
 			{
 				try
 				{
@@ -114,7 +114,7 @@ namespace Waher.Security.DTLS.Test
 
 			this.Test_02_ApplicationData();
 
-			this.client.OnStateChanged += (sender, e) =>
+			this.client.OnStateChanged += (Sender, e) =>
 			{
 				if (e.State == DtlsState.Closed)
 					Done1.Set();
@@ -124,7 +124,7 @@ namespace Waher.Security.DTLS.Test
 				return Task.CompletedTask;
 			};
 
-			this.server.OnStateChanged += (sender, e) =>
+			this.server.OnStateChanged += (Sender, e) =>
 			{
 				if (e.State == DtlsState.Closed)
 					Done2.Set();

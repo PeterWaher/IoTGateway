@@ -72,7 +72,7 @@ namespace Waher.Networking.MQTT.Test
 
 			this.Test_01_Connect();
 
-			this.client.OnContentReceived += (sender, e) =>
+			this.client.OnContentReceived += (Sender, e) =>
 			{
 				ConsoleOut.WriteLine(e.Topic + ": " + System.Text.Encoding.UTF8.GetString(e.Data));
 
@@ -118,7 +118,7 @@ namespace Waher.Networking.MQTT.Test
 
 			this.Test_01_Connect();
 
-			this.client.OnContentReceived += (sender, e) =>
+			this.client.OnContentReceived += (Sender, e) =>
 			{
 				string s = System.Text.Encoding.UTF8.GetString(e.Data);
 
@@ -152,8 +152,8 @@ namespace Waher.Networking.MQTT.Test
 
 			this.Test_01_Connect();
 
-			this.client.OnPing += (sender, e) => { Ping.Set(); return Task.CompletedTask; };
-			this.client.OnPingResponse += (sender, e) => { PingResp.Set(); return Task.CompletedTask; };
+			this.client.OnPing += (Sender, e) => { Ping.Set(); return Task.CompletedTask; };
+			this.client.OnPingResponse += (Sender, e) => { PingResp.Set(); return Task.CompletedTask; };
 
 			Assert.IsTrue(Ping.WaitOne(60000), "Ping not sent properly.");
 			Assert.IsTrue(PingResp.WaitOne(60000), "Ping response not received properly.");

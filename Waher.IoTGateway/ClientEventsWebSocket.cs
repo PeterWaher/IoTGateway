@@ -96,9 +96,9 @@ namespace Waher.IoTGateway
 			public string TabID;
 		}
 
-		private async Task Socket_Disposed(object sender, EventArgs e)
+		private async Task Socket_Disposed(object Sender, EventArgs e)
 		{
-			if (sender is WebSocket WebSocket)
+			if (Sender is WebSocket WebSocket)
 				await this.Close(WebSocket);
 		}
 

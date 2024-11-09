@@ -360,7 +360,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		#endregion
@@ -396,7 +396,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append("'/>");
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -507,7 +507,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</configure></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		/// <summary>
@@ -540,7 +540,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XmppClient.NamespaceData);
 			Xml.Append("' type='cancel'/></configure></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		/// <summary>
@@ -568,7 +568,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append("'><default/>");
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -653,7 +653,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</delete></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		#endregion
@@ -780,7 +780,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				SubscriptionOptions Options2 = null;
 				OptionsAvailability Availability = OptionsAvailability.Unknown;
@@ -967,7 +967,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/></pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -1126,7 +1126,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Options.SerializeSubmit(Xml);
 			Xml.Append("</options></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new SubscriptionOptionsEventArgs(
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) => Callback.Raise(this, new SubscriptionOptionsEventArgs(
 				NodeName, Jid, new SubscriptionOptions(Options), new DataFormEventArgs(Options, e))), State);
 		}
 
@@ -1175,7 +1175,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("/></pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				XmlElement E;
 				DataForm Form = null;
@@ -1282,7 +1282,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("'/></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				NodeSubscriptionStatus Status = NodeSubscriptionStatus.none;
 				DateTime Expires = DateTime.MaxValue;
@@ -1421,7 +1421,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				string NodeName = string.Empty;
 				XmlElement E;
@@ -1773,7 +1773,7 @@ namespace Waher.Networking.XMPP.PubSub
 
 			Xml.Append("</pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				List<PubSubItem> Items = new List<PubSubItem>();
 				ResultPage ResultPage = null;
@@ -1869,7 +1869,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(Name));
 			Xml.Append("'/></pubsub>");
 
-			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
+			return this.client.SendIqSet(ServiceAddress, Xml.ToString(), (Sender, e) => Callback.Raise(this, new NodeEventArgs(Name, e)), State);
 		}
 
 		/// <summary>
@@ -1937,7 +1937,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'/></pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
@@ -2044,7 +2044,7 @@ namespace Waher.Networking.XMPP.PubSub
 			Xml.Append(XML.Encode(NodeName));
 			Xml.Append("'/></pubsub>");
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				List<Affiliation> Affiliations = null;
 				XmlElement E;
@@ -2180,7 +2180,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("'/></pubsub>");
 			}
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				List<Subscription> Subscriptions = new List<Subscription>();
 				XmlElement E;
@@ -2259,7 +2259,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("'/></pubsub>");
 			}
 
-			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceAddress, Xml.ToString(), (Sender, e) =>
 			{
 				List<Affiliation> Affiliations = new List<Affiliation>();
 				XmlElement E;

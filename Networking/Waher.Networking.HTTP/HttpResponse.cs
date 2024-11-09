@@ -1078,7 +1078,7 @@ namespace Waher.Networking.HTTP
 			{
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-				await this.responseStream.SendAsync(Data, 0, Data.Length, (sender, e) =>
+				await this.responseStream.SendAsync(Data, 0, Data.Length, (Sender, e) =>
 				{
 					Result.TrySetResult(true);
 					return Task.CompletedTask;

@@ -483,30 +483,27 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 
 			return this.client.SendIqGet(Address, "<getCertificate xmlns='" + NamespaceProvisioningTokenCurrent + "'>" +
-				XML.Encode(Token) + "</getCertificate>", async (sender, e) =>
+				XML.Encode(Token) + "</getCertificate>", async (Sender, e) =>
 				{
-					if (!(Callback is null))
+					try
 					{
-						try
-						{
-							byte[] Certificate;
-							XmlElement E;
+						byte[] Certificate;
+						XmlElement E;
 
-							if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "certificate")
-								Certificate = Convert.FromBase64String(e.FirstElement.InnerText);
-							else
-							{
-								e.Ok = false;
-								Certificate = null;
-							}
-
-							CertificateEventArgs e2 = new CertificateEventArgs(e, State, Certificate);
-							await Callback(sender, e2);
-						}
-						catch (Exception ex)
+						if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "certificate")
+							Certificate = Convert.FromBase64String(e.FirstElement.InnerText);
+						else
 						{
-							Log.Exception(ex);
+							e.Ok = false;
+							Certificate = null;
 						}
+
+						CertificateEventArgs e2 = new CertificateEventArgs(e, State, Certificate);
+						await Callback.Raise(Sender, e2);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
 					}
 				}, State);
 		}
@@ -526,19 +523,16 @@ namespace Waher.Networking.XMPP.Provisioning
 			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(JID, this.ownerJid, true) == 0) ||
 				string.Compare(JID, this.provisioningServerAddress, true) == 0)
 			{
-				if (!(Callback is null))
+				try
 				{
-					try
-					{
-						IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
-						IsFriendResponseEventArgs e = new IsFriendResponseEventArgs(e0, State, JID, true);
+					IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+					IsFriendResponseEventArgs e = new IsFriendResponseEventArgs(e0, State, JID, true);
 
-						await Callback(this.client, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					await Callback.Raise(this.client, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 
 				return;
@@ -684,43 +678,38 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="UserTokens">Any user tokens provided.</param>
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<IThingReference> Nodes, IEnumerable<string> FieldNames,
+		public async Task CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<IThingReference> Nodes, IEnumerable<string> FieldNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, EventHandlerAsync<CanReadResponseEventArgs> Callback, object State)
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
-				if (!(Callback is null))
+				try
 				{
-					try
+					IThingReference[] Nodes2 = Permitted as IThingReference[];
+					if (Nodes2 is null && !(Permitted is null))
 					{
-						IThingReference[] Nodes2 = Permitted as IThingReference[];
-						if (Nodes2 is null && !(Permitted is null))
-						{
-							List<IThingReference> List = new List<IThingReference>();
-							List.AddRange(Permitted);
-							Nodes2 = List.ToArray();
-						}
-
-						string[] FieldNames2 = FieldNames as string[];
-						if (FieldNames2 is null && !(FieldNames is null))
-						{
-							List<string> List = new List<string>();
-							List.AddRange(FieldNames);
-							FieldNames2 = List.ToArray();
-						}
-
-						IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
-						CanReadResponseEventArgs e = new CanReadResponseEventArgs(e0, State, RequestFromBareJid, true, FieldTypes, Nodes2, FieldNames2);
-
-						Callback(this.client, e);
+						List<IThingReference> List = new List<IThingReference>();
+						List.AddRange(Permitted);
+						Nodes2 = List.ToArray();
 					}
-					catch (Exception ex)
+
+					string[] FieldNames2 = FieldNames as string[];
+					if (FieldNames2 is null && !(FieldNames is null))
 					{
-						Log.Exception(ex);
+						List<string> List = new List<string>();
+						List.AddRange(FieldNames);
+						FieldNames2 = List.ToArray();
 					}
+
+					IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+					CanReadResponseEventArgs e = new CanReadResponseEventArgs(e0, State, RequestFromBareJid, true, FieldTypes, Nodes2, FieldNames2);
+
+					await Callback.Raise(this.client, e);
 				}
-
-				return Task.CompletedTask;
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -782,7 +771,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("</canRead>");
 			}
 
-			return this.CachedIqGet(Xml.ToString(), async (sender, e) =>
+			await this.CachedIqGet(Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<IThingReference> Nodes2 = null;
@@ -978,43 +967,38 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="UserTokens">Any user tokens provided.</param>
 		/// <param name="Callback">Method to call when result is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
+		public async Task CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, EventHandlerAsync<CanControlResponseEventArgs> Callback, object State)
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
-				if (!(Callback is null))
+				try
 				{
-					try
+					IThingReference[] Nodes2 = Nodes as IThingReference[];
+					if (Nodes2 is null && !(Nodes is null))
 					{
-						IThingReference[] Nodes2 = Nodes as IThingReference[];
-						if (Nodes2 is null && !(Nodes is null))
-						{
-							List<IThingReference> List = new List<IThingReference>();
-							List.AddRange(Nodes);
-							Nodes2 = List.ToArray();
-						}
-
-						string[] ParameterNames2 = ParameterNames as string[];
-						if (ParameterNames2 is null && !(ParameterNames is null))
-						{
-							List<string> List = new List<string>();
-							List.AddRange(ParameterNames);
-							ParameterNames2 = List.ToArray();
-						}
-
-						IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
-						CanControlResponseEventArgs e = new CanControlResponseEventArgs(e0, State, RequestFromBareJid, true, Nodes2, ParameterNames2);
-
-						Callback(this.client, e);
+						List<IThingReference> List = new List<IThingReference>();
+						List.AddRange(Nodes);
+						Nodes2 = List.ToArray();
 					}
-					catch (Exception ex)
+
+					string[] ParameterNames2 = ParameterNames as string[];
+					if (ParameterNames2 is null && !(ParameterNames is null))
 					{
-						Log.Exception(ex);
+						List<string> List = new List<string>();
+						List.AddRange(ParameterNames);
+						ParameterNames2 = List.ToArray();
 					}
+
+					IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+					CanControlResponseEventArgs e = new CanControlResponseEventArgs(e0, State, RequestFromBareJid, true, Nodes2, ParameterNames2);
+
+					await Callback.Raise(this.client, e);
 				}
-
-				return Task.CompletedTask;
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -1053,7 +1037,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Xml.Append("</canControl>");
 			}
 
-			return this.CachedIqGet(Xml.ToString(), async (sender, e) =>
+			await this.CachedIqGet(Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<IThingReference> Nodes2 = null;
@@ -1168,33 +1152,30 @@ namespace Waher.Networking.XMPP.Provisioning
 				Query.LastUsed = DateTime.Now;
 				await Database.Update(Query);
 
-				if (!(Callback is null))
+				try
 				{
-					try
+					XmlDocument Doc = new XmlDocument()
 					{
-						XmlDocument Doc = new XmlDocument()
-						{
-							PreserveWhitespace = true
-						};
-						Doc.LoadXml(Query.Response);
+						PreserveWhitespace = true
+					};
+					Doc.LoadXml(Query.Response);
 
-						XmlElement E = Doc.DocumentElement;
-						string Type = XML.Attribute(E, "type");
-						string Id = XML.Attribute(E, "id");
-						string To = XML.Attribute(E, "to");
-						string From = XML.Attribute(E, "from");
-						bool Ok = (Type == "result");
+					XmlElement E = Doc.DocumentElement;
+					string Type = XML.Attribute(E, "type");
+					string Id = XML.Attribute(E, "id");
+					string To = XML.Attribute(E, "to");
+					string From = XML.Attribute(E, "from");
+					bool Ok = (Type == "result");
 
-						IqResultEventArgs e = new IqResultEventArgs(E, Id, To, From, Ok, State);
+					IqResultEventArgs e = new IqResultEventArgs(E, Id, To, From, Ok, State);
 
-						await Callback(this.client, e);
+					await Callback.Raise(this.client, e);
 
-						return true;
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 
 				return false;
@@ -1227,11 +1208,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			await Database.Insert(Query);
 
-			if (!(Callback is null))
-			{
-				e.State = State;
-				await Callback(Sender, e);
-			}
+			e.State = State;
+			await Callback.Raise(Sender, e);
 
 			await this.DeleteOld();
 		}
@@ -2103,10 +2081,9 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append(MaxCount.ToString());
 			Request.Append("'/>");
 
-			return this.client.SendIqGet(ServiceJID, Request.ToString(), (sender, e) =>
+			return this.client.SendIqGet(ServiceJID, Request.ToString(), (Sender, e) =>
 			{
-				ThingRegistryClient.ParseResultSet(Offset, MaxCount, this, e, Callback, State);
-				return Task.CompletedTask;
+				return ThingRegistryClient.ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 			}, State);
 		}
 

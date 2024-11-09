@@ -14,7 +14,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
-			this.client2.OnChatMessage += (sender, e) =>
+			this.client2.OnChatMessage += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
-			this.client2.OnChatMessage += (sender, e) =>
+			this.client2.OnChatMessage += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
@@ -46,7 +46,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
-			this.client2.OnChatMessage += (sender, e) =>
+			this.client2.OnChatMessage += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
@@ -62,7 +62,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ConnectClients();
 			ManualResetEvent Done = new(false);
-			this.client1.OnPresence += (sender, e) =>
+			this.client1.OnPresence += (Sender, e) =>
 			{
 				if (e.From == this.client2.FullJID && e.Availability == Availability.Chat)
 					Done.Set();
@@ -78,7 +78,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Done2 = new(false);
 				ManualResetEvent Error2 = new(false);
 
-				this.client2.OnPresenceSubscribe += async (sender, e) =>
+				this.client2.OnPresenceSubscribe += async (Sender, e) =>
 				{
 					if (e.FromBareJID == this.client1.BareJID)
 					{
@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Stanza_Test_05_IQ_Get()
 		{
 			this.ConnectClients();
-			this.client1.RegisterIqGetHandler("query", "test", (sender, e) =>
+			this.client1.RegisterIqGetHandler("query", "test", (Sender, e) =>
 			{
 				return e.IqResult("<response xmlns='test'/>");
 			}, true);
@@ -134,7 +134,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Stanza_Test_06_IQ_Set()
 		{
 			this.ConnectClients();
-			this.client1.RegisterIqSetHandler("query", "test", (sender, e) =>
+			this.client1.RegisterIqSetHandler("query", "test", (Sender, e) =>
 			{
 				return e.IqResult("<response xmlns='test'/>");
 			}, true);

@@ -83,7 +83,7 @@ namespace Waher.Client.WPF.Model
 
 		public override void Search()
 		{
-			this.Account?.Client?.SendSearchFormRequest(null, this.jid, (sender, e) =>
+			this.Account?.Client?.SendSearchFormRequest(null, this.jid, (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -98,7 +98,7 @@ namespace Waher.Client.WPF.Model
 
 				return Task.CompletedTask;
 
-			}, (sender, e) =>
+			}, (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -201,7 +201,7 @@ namespace Waher.Client.WPF.Model
 			await Request.Accept(false);
 			await Request.Started();
 
-			await this.Account.Client.SendServiceDiscoveryRequest(this.jid, (sender, e) =>
+			await this.Account.Client.SendServiceDiscoveryRequest(this.jid, (Sender, e) =>
 			{
 				if (e.Ok)
 				{

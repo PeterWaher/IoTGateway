@@ -25,13 +25,13 @@ namespace Waher.Layout.Layout2D.Test
 			EmptyFolder(Path.Combine("Output", "Dimensions", FileName));
 			EmptyFolder(Path.Combine("Output", "Positions", FileName));
 
-			Doc.OnMeasuringDimensions += (sender, e) =>
+			Doc.OnMeasuringDimensions += (Sender, e) =>
 			{
 				string Xml = Doc.ExportState();
 				NewXml(Path.Combine("Output", "Dimensions", FileName, DimIndex++.ToString() + ".xml"), Xml, ref PrevDimXml);
 			};
 
-			Doc.OnMeasuringPositions += (sender, e) =>
+			Doc.OnMeasuringPositions += (Sender, e) =>
 			{
 				string Xml = Doc.ExportState();
 				NewXml(Path.Combine("Output", "Positions", FileName, PosIndex++.ToString() + ".xml"), Xml, ref PrevPosXml);

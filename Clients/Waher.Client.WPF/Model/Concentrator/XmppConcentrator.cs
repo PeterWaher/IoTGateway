@@ -42,7 +42,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				if (!string.IsNullOrEmpty(FullJid))
 				{
-					this.XmppAccountNode.ConcentratorClient.GetCapabilities(FullJid, (sender, e) =>
+					this.XmppAccountNode.ConcentratorClient.GetCapabilities(FullJid, (Sender, e) =>
 					{
 						if (e.Ok)
 						{
@@ -98,7 +98,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					ConcentratorClient ConcentratorClient = this.XmppAccountNode.ConcentratorClient;
 
 					this.loadingChildren = true;
-					ConcentratorClient.GetRootDataSources(FullJid, (sender, e) =>
+					ConcentratorClient.GetRootDataSources(FullJid, (Sender, e) =>
 					{
 						this.loadingChildren = false;
 						MainWindow.MouseDefault();

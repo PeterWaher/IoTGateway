@@ -13,12 +13,12 @@ namespace Waher.Client.WPF.Dialogs.Legal
 			InitializeComponent();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void RegisterButton_Click(object sender, RoutedEventArgs e)
+		private void RegisterButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}

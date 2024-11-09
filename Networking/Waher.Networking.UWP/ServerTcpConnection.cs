@@ -55,7 +55,7 @@ namespace Waher.Networking
 			return Task.CompletedTask;
 		}
 
-		private Task Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			this.Dispose();
 			return Task.CompletedTask;

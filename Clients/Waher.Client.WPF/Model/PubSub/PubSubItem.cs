@@ -161,7 +161,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, (sender, e) =>
+			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, (Sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -262,7 +262,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			await this.Service.PubSubClient.Retract(this.node, this.itemId, (sender, e) =>
+			await this.Service.PubSubClient.Retract(this.node, this.itemId, (Sender, e) =>
 			{
 				MainWindow.MouseDefault();
 

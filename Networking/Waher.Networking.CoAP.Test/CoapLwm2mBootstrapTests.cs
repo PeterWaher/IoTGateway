@@ -60,15 +60,15 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done3 = new(false);
 			ManualResetEvent Error3 = new(false);
 
-			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
-			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
+			this.lwm2mClient.OnBootstrapCompleted += (Sender, e) => Done2.Set();
+			this.lwm2mClient.OnBootstrapFailed += (Sender, e) => Error2.Set();
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			this.lwm2mClient.OnRegistrationSuccessful += (Sender, e) =>
 			{
 				Done3.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			this.lwm2mClient.OnRegistrationFailed += (Sender, e) =>
 			{
 				Error3.Set();
 				return Task.CompletedTask;
@@ -76,7 +76,7 @@ namespace Waher.Networking.CoAP.Test
 
 			await this.lwm2mClient.RequestBootstrap(
 				new Lwm2mServerReference("leshan.eclipse.org", 5783),
-				(sender, e) =>
+				(Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -102,21 +102,21 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done3 = new(false);
 			ManualResetEvent Error3 = new(false);
 
-			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
-			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
+			this.lwm2mClient.OnBootstrapCompleted += (Sender, e) => Done2.Set();
+			this.lwm2mClient.OnBootstrapFailed += (Sender, e) => Error2.Set();
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			this.lwm2mClient.OnRegistrationSuccessful += (Sender, e) =>
 			{
 				Done3.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			this.lwm2mClient.OnRegistrationFailed += (Sender, e) =>
 			{
 				Error3.Set();
 				return Task.CompletedTask;
 			};
 
-			Assert.IsTrue(await this.lwm2mClient.RequestBootstrap((sender, e) =>
+			Assert.IsTrue(await this.lwm2mClient.RequestBootstrap((Sender, e) =>
 			{
 				if (e.Ok)
 					Done.Set();

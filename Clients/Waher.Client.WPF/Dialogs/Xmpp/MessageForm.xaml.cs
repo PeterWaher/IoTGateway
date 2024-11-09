@@ -19,7 +19,7 @@ namespace Waher.Client.WPF.Dialogs.Xmpp
 			InitializeComponent();
 		}
 
-		private void CustomXml_TextInput(object sender, TextCompositionEventArgs e)
+		private void CustomXml_TextInput(object Sender, TextCompositionEventArgs e)
 		{
 			try
 			{
@@ -45,7 +45,7 @@ namespace Waher.Client.WPF.Dialogs.Xmpp
 			}
 		}
 
-		private void To_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		private void To_TextChanged(object Sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
 			string s = this.To.Text.Trim();
 
@@ -55,13 +55,13 @@ namespace Waher.Client.WPF.Dialogs.Xmpp
 			this.SendButton.IsEnabled = this.xmlOk && this.toOk;
 		}
 
-		private void SendButton_Click(object sender, RoutedEventArgs e)
+		private void SendButton_Click(object Sender, RoutedEventArgs e)
 		{
 			if (this.xmlOk && this.toOk)
 				this.DialogResult = true;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}

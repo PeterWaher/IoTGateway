@@ -157,18 +157,18 @@ namespace Waher.IoTGateway.Installers
 				{
 					bool Error = false;
 
-					P.ErrorDataReceived += (sender, e) =>
+					P.ErrorDataReceived += (Sender, e) =>
 					{
 						Error = true;
 						Session.Log("ERROR: " + e.Data);
 					};
 
-					P.Exited += (sender, e) =>
+					P.Exited += (Sender, e) =>
 					{
 						Session.Log("Process exited.");
 					};
 
-					P.OutputDataReceived += (sender, e) =>
+					P.OutputDataReceived += (Sender, e) =>
 					{
 						Session.Log(e.Data);
 					};
@@ -231,18 +231,18 @@ namespace Waher.IoTGateway.Installers
 				{
 					bool Error = false;
 
-					P.ErrorDataReceived += (sender, e) =>
+					P.ErrorDataReceived += (Sender, e) =>
 					{
 						Error = true;
 						Session.Log("ERROR: " + e.Data);
 					};
 
-					P.Exited += (sender, e) =>
+					P.Exited += (Sender, e) =>
 					{
 						Session.Log("Process exited.");
 					};
 
-					P.OutputDataReceived += (sender, e) =>
+					P.OutputDataReceived += (Sender, e) =>
 					{
 						Session.Log(e.Data);
 					};
@@ -306,18 +306,18 @@ namespace Waher.IoTGateway.Installers
 				{
 					bool Error = false;
 
-					P.ErrorDataReceived += (sender, e) =>
+					P.ErrorDataReceived += (Sender, e) =>
 					{
 						Error = true;
 						Session.Log("ERROR: " + e.Data);
 					};
 
-					P.Exited += (sender, e) =>
+					P.Exited += (Sender, e) =>
 					{
 						Session.Log("Process exited.");
 					};
 
-					P.OutputDataReceived += (sender, e) =>
+					P.OutputDataReceived += (Sender, e) =>
 					{
 						Session.Log(e.Data);
 					};
@@ -375,18 +375,18 @@ namespace Waher.IoTGateway.Installers
 				{
 					bool Error = false;
 
-					P.ErrorDataReceived += (sender, e) =>
+					P.ErrorDataReceived += (Sender, e) =>
 					{
 						Error = true;
 						Session.Log("ERROR: " + e.Data);
 					};
 
-					P.Exited += (sender, e) =>
+					P.Exited += (Sender, e) =>
 					{
 						Session.Log("Process exited.");
 					};
 
-					P.OutputDataReceived += (sender, e) =>
+					P.OutputDataReceived += (Sender, e) =>
 					{
 						Session.Log(e.Data);
 					};
@@ -445,18 +445,18 @@ namespace Waher.IoTGateway.Installers
 				{
 					bool Error = false;
 
-					P.ErrorDataReceived += (sender, e) =>
+					P.ErrorDataReceived += (Sender, e) =>
 					{
 						Error = true;
 						Session.Log("ERROR: " + e.Data);
 					};
 
-					P.Exited += (sender, e) =>
+					P.Exited += (Sender, e) =>
 					{
 						Session.Log("Process exited.");
 					};
 
-					P.OutputDataReceived += (sender, e) =>
+					P.OutputDataReceived += (Sender, e) =>
 					{
 						Session.Log(e.Data);
 					};
@@ -529,18 +529,18 @@ namespace Waher.IoTGateway.Installers
 				Process P = new Process();
 				bool Error = false;
 
-				P.ErrorDataReceived += (sender, e) =>
+				P.ErrorDataReceived += (Sender, e) =>
 				{
 					Error = true;
 					Session.Log("ERROR: " + e.Data);
 				};
 
-				P.Exited += (sender, e) =>
+				P.Exited += (Sender, e) =>
 				{
 					Session.Log("Process exited.");
 				};
 
-				P.OutputDataReceived += (sender, e) =>
+				P.OutputDataReceived += (Sender, e) =>
 				{
 					Session.Log(e.Data);
 				};
@@ -578,18 +578,18 @@ namespace Waher.IoTGateway.Installers
 				P = new Process();
 				Error = false;
 
-				P.ErrorDataReceived += (sender, e) =>
+				P.ErrorDataReceived += (Sender, e) =>
 				{
 					Error = true;
 					Session.Log("ERROR: " + e.Data);
 				};
 
-				P.Exited += (sender, e) =>
+				P.Exited += (Sender, e) =>
 				{
 					Session.Log("Process exited.");
 				};
 
-				P.OutputDataReceived += (sender, e) =>
+				P.OutputDataReceived += (Sender, e) =>
 				{
 					Session.Log(e.Data);
 				};

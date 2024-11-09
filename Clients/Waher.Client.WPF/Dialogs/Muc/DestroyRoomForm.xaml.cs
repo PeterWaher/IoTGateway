@@ -16,17 +16,17 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			this.RoomName.Text = RoomName;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void YesButton_Click(object sender, RoutedEventArgs e)
+		private void YesButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void AlternativeRoomJid_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		private void AlternativeRoomJid_TextChanged(object Sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
 			this.YesButton.IsEnabled = string.IsNullOrEmpty(this.AlternativeRoomJid.Text) ||
 				XmppClient.BareJidRegEx.IsMatch(this.AlternativeRoomJid.Text);

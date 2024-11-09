@@ -34,12 +34,12 @@ namespace Waher.Client.WPF.Dialogs
 			set => this.passwordHashMethod = value;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void ChangeButton_Click(object sender, RoutedEventArgs e)
+		private void ChangeButton_Click(object Sender, RoutedEventArgs e)
 		{
 			if (this.Password.Password != this.RetypePassword.Password)
 			{

@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Layout2D
 				{
 					scheduler = new Scheduler();
 
-					Log.Terminating += (sender, e) =>
+					Log.Terminating += (Sender, e) =>
 					{
 						scheduler?.Dispose();
 						scheduler = null;

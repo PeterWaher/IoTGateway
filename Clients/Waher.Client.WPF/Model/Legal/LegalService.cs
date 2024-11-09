@@ -105,7 +105,7 @@ namespace Waher.Client.WPF.Model.Legal
 			Item.Click += this.CompromizedLegalIdentities_Click;
 		}
 
-		private async void RegisterLegalIdentity_Click(object sender, RoutedEventArgs e)
+		private async void RegisterLegalIdentity_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -222,7 +222,7 @@ namespace Waher.Client.WPF.Model.Legal
 			}
 		}
 
-		private void MyLegalIdentities_Click(object sender, RoutedEventArgs e)
+		private void MyLegalIdentities_Click(object Sender, RoutedEventArgs e)
 		{
 			this.contractsClient.GetLegalIdentities((sender2, e2) =>
 			{
@@ -254,7 +254,7 @@ namespace Waher.Client.WPF.Model.Legal
 			}, null);
 		}
 
-		private void ObsoleteLegalIdentities_Click(object sender, RoutedEventArgs e)
+		private void ObsoleteLegalIdentities_Click(object Sender, RoutedEventArgs e)
 		{
 			if (MessageBox.Show(MainWindow.currentInstance, "Are you sure you want to obsolete registered legal identities?",
 				"Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes) != MessageBoxResult.Yes)
@@ -293,7 +293,7 @@ namespace Waher.Client.WPF.Model.Legal
 			}, null);
 		}
 
-		private void CompromizedLegalIdentities_Click(object sender, RoutedEventArgs e)
+		private void CompromizedLegalIdentities_Click(object Sender, RoutedEventArgs e)
 		{
 			if (MessageBox.Show(MainWindow.currentInstance, "Are you sure you want to report your registered legal identities as compromized?",
 				"Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes) != MessageBoxResult.Yes)

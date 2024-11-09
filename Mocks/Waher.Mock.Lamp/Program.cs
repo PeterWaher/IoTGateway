@@ -70,14 +70,14 @@ namespace Waher.Mock.Lamp
 					{
 						thingRegistryClient = new ThingRegistryClient(Client, credentials.ThingRegistry);
 
-						thingRegistryClient.Claimed += (sender, e) =>
+						thingRegistryClient.Claimed += (Sender, e) =>
 						{
 							ownerJid = e.JID;
 							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 							return Task.CompletedTask;
 						};
 
-						thingRegistryClient.Disowned += (sender, e) =>
+						thingRegistryClient.Disowned += (Sender, e) =>
 						{
 							Log.Informational("Thing has been disowned.", ownerJid);
 							ownerJid = string.Empty;
@@ -85,7 +85,7 @@ namespace Waher.Mock.Lamp
 							return Task.CompletedTask;
 						};
 
-						thingRegistryClient.Removed += (sender, e) =>
+						thingRegistryClient.Removed += (Sender, e) =>
 						{
 							Log.Informational("Thing has been removed from the public registry.", ownerJid);
 							return Task.CompletedTask;
@@ -137,7 +137,7 @@ namespace Waher.Mock.Lamp
 						return Task.CompletedTask;
 					};
 
-					Client.OnPresenceSubscribe += (sender, e) =>
+					Client.OnPresenceSubscribe += (Sender, e) =>
 					{
 						e.Accept();     // TODO: Provisioning
 
@@ -150,13 +150,13 @@ namespace Waher.Mock.Lamp
 						return Task.CompletedTask;
 					};
 
-					Client.OnPresenceUnsubscribe += (sender, e) =>
+					Client.OnPresenceUnsubscribe += (Sender, e) =>
 					{
 						e.Accept();
 						return Task.CompletedTask;
 					};
 
-					Client.OnRosterItemUpdated += (sender, e) =>
+					Client.OnRosterItemUpdated += (Sender, e) =>
 					{
 						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 							Client.RemoveRosterItem(e.BareJid);
@@ -192,7 +192,7 @@ namespace Waher.Mock.Lamp
 					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ControlServer, ProvisioningClient);
 
 					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
-					InteroperabilityServer.OnGetInterfaces += (sender, e) =>
+					InteroperabilityServer.OnGetInterfaces += (Sender, e) =>
 					{
 						e.Add("XMPP.IoT.Actuator.Lamp");
 						return Task.CompletedTask;

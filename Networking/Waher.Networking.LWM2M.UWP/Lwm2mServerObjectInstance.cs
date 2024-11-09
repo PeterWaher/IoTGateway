@@ -86,7 +86,7 @@ namespace Waher.Networking.LWM2M
 			this.Add(this.registrationUpdateTrigger);
 		}
 
-		private Task RegistrationUpdateTrigger_OnExecute(object sender, EventArgs e)
+		private Task RegistrationUpdateTrigger_OnExecute(object Sender, EventArgs e)
 		{
 			return this.Object.Client.RegisterUpdate();
 		}

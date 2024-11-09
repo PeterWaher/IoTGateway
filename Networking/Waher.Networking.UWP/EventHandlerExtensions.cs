@@ -59,7 +59,10 @@ namespace Waher.Networking
 			if (EventHandler is null)
 			{
 				if (Sender is ISniffable Sniffable)
-					await Sniffable.Warning("No event handler registered.");
+				{
+					await Sniffable.Warning("No event handler registered (" +
+						(Sender?.GetType().FullName ?? e.GetType().FullName) + ")");
+				}
 			}
 			else
 			{

@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.b = false;
 
-				this.controlClient.Set(this.client2.FullJID, "Bool", true, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Bool", true, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -139,7 +139,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.cl = new ColorReference(0, 0, 0);
 
-				this.controlClient.Set(this.client2.FullJID, "Color", new ColorReference(1, 2, 3), (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Color", new ColorReference(1, 2, 3), (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -171,7 +171,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.d = DateTime.MinValue;
 
-				this.controlClient.Set(this.client2.FullJID, "Date", DateTime.Today, true, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Date", DateTime.Today, true, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -204,7 +204,7 @@ namespace Waher.Networking.XMPP.Test
 
 				Now = new DateTime(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, Now.Second, Now.Millisecond);
 
-				this.controlClient.Set(this.client2.FullJID, "DateTime", Now, false, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "DateTime", Now, false, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -234,7 +234,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.db = 0;
 
-				this.controlClient.Set(this.client2.FullJID, "Double", 3.1415927, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Double", 3.1415927, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -264,7 +264,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.dr = Duration.Zero;
 
-				this.controlClient.Set(this.client2.FullJID, "Duration", new Duration(true, 1, 2, 3, 4, 5, 6), (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Duration", new Duration(true, 1, 2, 3, 4, 5, 6), (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -294,7 +294,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.e = TypeCode.Boolean;
 
-				this.controlClient.Set(this.client2.FullJID, "Enum", TypeCode.Int16, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Enum", TypeCode.Int16, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -324,7 +324,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.i = 0;
 
-				this.controlClient.Set(this.client2.FullJID, "Int32", int.MinValue, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Int32", int.MinValue, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -354,7 +354,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.l = 0;
 
-				this.controlClient.Set(this.client2.FullJID, "Int64", long.MinValue, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Int64", long.MinValue, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -384,7 +384,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.s = string.Empty;
 
-				this.controlClient.Set(this.client2.FullJID, "String", "ABC", (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "String", "ABC", (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -415,7 +415,7 @@ namespace Waher.Networking.XMPP.Test
 				TimeSpan Time = DateTime.Now.TimeOfDay;
 				this.t = TimeSpan.Zero;
 
-				this.controlClient.Set(this.client2.FullJID, "Time", Time, (sender, e) =>
+				this.controlClient.Set(this.client2.FullJID, "Time", Time, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();

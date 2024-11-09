@@ -30,10 +30,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		public override Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			Markdown.Append("  ");
 			Markdown.AppendLine();
+			return Task.CompletedTask;
 		}
 	}
 }

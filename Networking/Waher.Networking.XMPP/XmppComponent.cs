@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP
 			this.State = XmppState.Error;
 		}
 
-		private async Task Client_OnDisconnected(object sender, EventArgs e)
+		private async Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			if (this.HasSniffers)
 			{
@@ -1754,7 +1754,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.SendIqGet(From, To, Xml, (sender, e) =>
+			await this.SendIqGet(From, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1800,7 +1800,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.SendIqSet(From, To, Xml, (sender, e) =>
+			await this.SendIqSet(From, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -2315,7 +2315,7 @@ namespace Waher.Networking.XMPP
 			switch (QoS)
 			{
 				case QoSLevel.Unacknowledged:
-					await this.BeginWrite(MessageXml, async (sender, e) => await this.DeliveryCallback(DeliveryCallback, State, true));
+					await this.BeginWrite(MessageXml, async (Sender, e) => await this.DeliveryCallback(DeliveryCallback, State, true));
 					break;
 
 				case QoSLevel.Acknowledged:
@@ -2326,7 +2326,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
 
-					await this.SendIqSet(From, To, Xml.ToString(), (sender, e) => this.DeliveryCallback(DeliveryCallback, State, e.Ok), null,
+					await this.SendIqSet(From, To, Xml.ToString(), (Sender, e) => this.DeliveryCallback(DeliveryCallback, State, e.Ok), null,
 						5000, int.MaxValue, true, 3600000);
 					break;
 

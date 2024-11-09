@@ -83,7 +83,7 @@ namespace Waher.Content.Markdown.PlantUml
 					{
 						scheduler = new Scheduler();
 
-						Log.Terminating += (sender, e) =>
+						Log.Terminating += (Sender, e) =>
 						{
 							scheduler?.Dispose();
 							scheduler = null;
@@ -380,17 +380,17 @@ namespace Waher.Content.Markdown.PlantUml
 			StringBuilder StandardOutput = new StringBuilder();
 			StringBuilder ErrorOutput = new StringBuilder();
 
-			P.ErrorDataReceived += (sender, e) =>
+			P.ErrorDataReceived += (Sender, e) =>
 			{
 				ErrorOutput.AppendLine(e.Data);
 			};
 
-			P.OutputDataReceived += (sender, e) =>
+			P.OutputDataReceived += (Sender, e) =>
 			{
 				StandardOutput.AppendLine(e.Data);
 			};
 
-			P.Exited += (sender, e) =>
+			P.Exited += (Sender, e) =>
 			{
 				ExitSource.TrySetResult(P.ExitCode);
 			};

@@ -226,7 +226,7 @@ namespace Waher.Things.Mqtt.Model
 				{
 					InternalReadoutRequest Request = new InternalReadoutRequest(string.Empty,
 						new IThingReference[] { this.node }, FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
-						(sender, e) =>
+						(Sender, e) =>
 						{
 							this.node.NewMomentaryValues(e.Fields);
 
@@ -251,7 +251,7 @@ namespace Waher.Things.Mqtt.Model
 
 							return Task.CompletedTask;
 						},
-						(sender, e) =>
+						(Sender, e) =>
 						{
 							return Task.CompletedTask;
 						}, null);

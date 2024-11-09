@@ -15,17 +15,17 @@ namespace Waher.Client.WPF.Dialogs
 			InitializeComponent();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void AddButton_Click(object sender, RoutedEventArgs e)
+		private void AddButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void ContactJID_TextChanged(object sender, TextChangedEventArgs e)
+		private void ContactJID_TextChanged(object Sender, TextChangedEventArgs e)
 		{
 			this.AddButton.IsEnabled = XmppClient.BareJidRegEx.IsMatch(this.ContactJID.Text);
 		}

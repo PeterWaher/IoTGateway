@@ -85,7 +85,7 @@ namespace Waher.Things.Ip.Model
 			return Task.CompletedTask;
 		}
 
-		private Task Outgoing_OnDisconnected(object sender, EventArgs e)
+		private Task Outgoing_OnDisconnected(object Sender, EventArgs e)
 		{
 			this.port.Remove(this);
 			return Task.CompletedTask;
@@ -108,7 +108,7 @@ namespace Waher.Things.Ip.Model
 			return Task.CompletedTask;
 		}
 
-		private Task Incoming_OnDisconnected(object sender, EventArgs e)
+		private Task Incoming_OnDisconnected(object Sender, EventArgs e)
 		{
 			this.port.Remove(this);
 			return Task.CompletedTask;

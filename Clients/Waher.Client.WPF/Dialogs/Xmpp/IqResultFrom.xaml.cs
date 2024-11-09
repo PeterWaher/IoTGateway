@@ -13,7 +13,7 @@ namespace Waher.Client.WPF.Dialogs.Xmpp
 			InitializeComponent();
 		}
 
-		private void OkButton_Click(object sender, RoutedEventArgs e)
+		private void OkButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}

@@ -1043,7 +1043,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(Seconds.ToString());
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
 			{
 				string Token = null;
 
@@ -1080,7 +1080,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
 
-			await this.GetJwtToken(Address, Seconds, (sender, e) =>
+			await this.GetJwtToken(Address, Seconds, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Token);

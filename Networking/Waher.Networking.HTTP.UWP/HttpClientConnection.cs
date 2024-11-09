@@ -89,7 +89,7 @@ namespace Waher.Networking.HTTP
 			return this.DisposeAsync();
 		}
 
-		private Task Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			return this.DisposeAsync();
 		}

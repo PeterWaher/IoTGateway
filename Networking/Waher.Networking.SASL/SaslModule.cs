@@ -38,7 +38,7 @@ namespace Waher.Networking.SASL
 		/// </summary>
 		public static IAuthenticationMechanism[] Mechanisms => mechanisms;
 
-		private static async void Types_OnInvalidated(object sender, EventArgs e)
+		private static async void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			try
 			{

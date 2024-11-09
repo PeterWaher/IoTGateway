@@ -85,7 +85,7 @@ namespace Waher.Content.Markdown.GraphViz
 					{
 						scheduler = new Scheduler();
 
-						Log.Terminating += (sender, e) =>
+						Log.Terminating += (Sender, e) =>
 						{
 							scheduler?.Dispose();
 							scheduler = null;
@@ -631,12 +631,12 @@ namespace Waher.Content.Markdown.GraphViz
 			Process P = new Process();
 			TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
 
-			P.ErrorDataReceived += (sender, e) =>
+			P.ErrorDataReceived += (Sender, e) =>
 			{
 				ResultSource.TrySetException(new Exception("Unable to generate graph:\r\n\r\n" + e.Data));
 			};
 
-			P.Exited += async (sender, e) =>
+			P.Exited += async (Sender, e) =>
 			{
 				try
 				{

@@ -117,7 +117,7 @@ namespace Waher.Networking.XMPP.BOSH
 			return Result;
 		}
 
-		private bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		private bool RemoteCertificateValidationCallback(object Sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
 		{
 			if (sslPolicyErrors != SslPolicyErrors.None)
 				return this.xmppClient.TrustServer;

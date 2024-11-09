@@ -340,7 +340,7 @@ namespace Waher.Networking.MQTT
 			this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 		}
 
-		private Task Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			if (this.state != MqttState.Error)
 				this.State = MqttState.Offline;
@@ -1216,7 +1216,7 @@ namespace Waher.Networking.MQTT
 			if (this.HasSniffers)
 				await this.Information("Tx.DISCONNECT");
 
-			await this.Write(PacketData, 0, (sender, e) =>
+			await this.Write(PacketData, 0, (Sender, e) =>
 			{
 				this.State = MqttState.Offline;
 				Done.TrySetResult(true);

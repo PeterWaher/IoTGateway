@@ -731,7 +731,7 @@ namespace Waher.Things.Semantic.Sources
 					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 					InternalReadoutRequest Request = await Gateway.ConcentratorServer.SensorServer.DoInternalReadout(Caller.From,
 						Approval.Nodes, Approval.FieldTypes, Approval.FieldNames, DateTime.MinValue, DateTime.MaxValue,
-						async (sender, e) =>
+						async (Sender, e) =>
 						{
 							foreach (Field F in e.Fields)
 							{
@@ -964,7 +964,7 @@ namespace Waher.Things.Semantic.Sources
 							if (e.Done)
 								ReadoutCompleted.TrySetResult(true);
 						},
-						(sender, e) =>
+						(Sender, e) =>
 						{
 							foreach (ThingError Error in e.Errors)
 							{

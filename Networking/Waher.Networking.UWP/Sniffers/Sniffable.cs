@@ -267,7 +267,7 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(Exception Exception)
+		public virtual async Task Exception(Exception Exception)
 		{
 			Exception = Log.UnnestException(Exception);
 

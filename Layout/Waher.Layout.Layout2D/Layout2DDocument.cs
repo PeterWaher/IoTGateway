@@ -284,7 +284,7 @@ namespace Waher.Layout.Layout2D
 					elementTypes = TypesPerKey;
 					initialized = true;
 
-					Types.OnInvalidated += (sender, e) => initialized = false;
+					Types.OnInvalidated += (Sender, e) => initialized = false;
 				}
 			}
 

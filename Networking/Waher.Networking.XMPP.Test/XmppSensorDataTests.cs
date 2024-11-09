@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Test
 
 			this.temp = 12.3;
 
-			this.sensorServer.OnExecuteReadoutRequest += (sender, e) =>
+			this.sensorServer.OnExecuteReadoutRequest += (Sender, e) =>
 			{
 				DateTime Now = DateTime.Now;
 

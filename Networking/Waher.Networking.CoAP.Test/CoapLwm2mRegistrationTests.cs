@@ -58,12 +58,12 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			this.lwm2mClient.OnRegistrationSuccessful += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			this.lwm2mClient.OnRegistrationFailed += (Sender, e) =>
 			{
 				Error.Set();
 				return Task.CompletedTask;
@@ -84,12 +84,12 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			this.lwm2mClient.OnRegistrationSuccessful += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			this.lwm2mClient.OnRegistrationFailed += (Sender, e) =>
 			{
 				Error.Set();
 				return Task.CompletedTask;
@@ -106,12 +106,12 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.lwm2mClient.OnDeregistrationSuccessful += (sender, e) =>
+			this.lwm2mClient.OnDeregistrationSuccessful += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
 			};
-			this.lwm2mClient.OnDeregistrationFailed += (sender, e) =>
+			this.lwm2mClient.OnDeregistrationFailed += (Sender, e) =>
 			{
 				Error.Set();
 				return Task.CompletedTask;

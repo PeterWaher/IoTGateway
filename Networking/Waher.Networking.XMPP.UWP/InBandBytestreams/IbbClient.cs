@@ -120,7 +120,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append(StreamId);
 			Xml.Append("' stanza='iq'/>");
 
-			await this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>
+			await this.client.SendIqSet(To, Xml.ToString(), async (Sender, e) =>
 			{
 				if (e.Ok)
 				{

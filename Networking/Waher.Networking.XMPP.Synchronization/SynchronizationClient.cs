@@ -266,7 +266,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		{
 			DateTimeHF ClientTime1 = SynchronizationClient.Now;
 
-			return this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronizationCurrent + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(ClockSourceJID, "<req xmlns='" + NamespaceSynchronizationCurrent + "'/>", async (Sender, e) =>
 			{
 				DateTimeHF ClientTime2 = SynchronizationClient.Now;
 				XmlElement E;
@@ -329,7 +329,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		{
 			TaskCompletionSource<SynchronizationEventArgs> Result = new TaskCompletionSource<SynchronizationEventArgs>();
 
-			await this.MeasureClockDifference(ClockSourceJID, (sender, e) =>
+			await this.MeasureClockDifference(ClockSourceJID, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -478,7 +478,7 @@ namespace Waher.Networking.XMPP.Synchronization
 								Jid = Item.LastPresenceFullJid;
 							}
 
-							await this.MeasureClockDifference(Jid, async (sender, e) =>
+							await this.MeasureClockDifference(Jid, async (Sender, e) =>
 							{
 								if (e.Ok && (DateTime.Now - ((DateTime)e.State)).TotalSeconds < 1.0)
 								{
@@ -920,7 +920,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task QueryClockSource(string To, EventHandlerAsync<ClockSourceEventArgs> Callback, object State)
 		{
-			return this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronizationCurrent + "'/>", async (sender, e) =>
+			return this.client.SendIqGet(To, "<sourceReq xmlns='" + NamespaceSynchronizationCurrent + "'/>", async (Sender, e) =>
 			{
 				XmlElement E;
 				string ClockSourceJID = null;
@@ -942,7 +942,7 @@ namespace Waher.Networking.XMPP.Synchronization
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
 
-			await this.QueryClockSource(To, (sender, e) =>
+			await this.QueryClockSource(To, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.ClockSourceJID);

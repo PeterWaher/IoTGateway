@@ -172,7 +172,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			Xml.Append(ContentId);
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(To, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(To, Xml.ToString(), async (Sender, e) =>
 			{
 				await Callback.Raise(this, new BitsOfBinaryEventArgs(e));
 			}, State);

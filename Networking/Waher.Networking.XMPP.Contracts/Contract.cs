@@ -1939,7 +1939,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <returns>Markdown</returns>
-		public string ToMarkdown(string Language)
+		public Task<string> ToMarkdown(string Language)
 		{
 			return this.ToMarkdown(Language, MarkdownType.ForRendering);
 		}
@@ -1950,7 +1950,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Language">Desired language</param>
 		/// <param name="Type">Type of Markdown being generated.</param>
 		/// <returns>Markdown</returns>
-		public string ToMarkdown(string Language, MarkdownType Type)
+		public Task<string> ToMarkdown(string Language, MarkdownType Type)
 		{
 			return this.ToMarkdown(this.forHumans, Language, Type);
 		}
@@ -1982,9 +1982,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Language">Language</param>
 		/// <param name="Type">Type of markdown to generate.</param>
 		/// <returns>Markdown document.</returns>
-		public string ToMarkdown(HumanReadableText[] Text, string Language, MarkdownType Type)
+		public async Task<string> ToMarkdown(HumanReadableText[] Text, string Language, MarkdownType Type)
 		{
-			return this.Select(Text, Language)?.GenerateMarkdown(this, Type);
+			HumanReadableText SelectedText = this.Select(Text, Language);
+            if (SelectedText is null)
+				return string.Empty;
+			else
+				return await SelectedText.GenerateMarkdown(this, Type);
 		}
 
 		/// <summary>
@@ -2160,24 +2164,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public event EventHandlerAsync<ParameterValueFormattingEventArgs> FormatParameterDisplay;
 
-		internal object FormatParameterValue(string Name, object Value)
+		internal async Task<object> FormatParameterValue(string Name, object Value)
 		{
-			EventHandlerAsync<ParameterValueFormattingEventArgs> h = this.FormatParameterDisplay;
-
-			if (h is null)
-				return Value;
-
 			ParameterValueFormattingEventArgs e = new ParameterValueFormattingEventArgs(Name, Value);
-
-			try
-			{
-				h(this, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-
+			await this.FormatParameterDisplay.Raise(this, e);
 			return e.Value;
 		}
 

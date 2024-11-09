@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                 ManualResetEvent Done2 = new(false);
                 ManualResetEvent Error2 = new(false);
 
-                To.OnPresenceSubscribe += (sender, e) =>
+                To.OnPresenceSubscribe += (Sender, e) =>
                 {
                     if (e.FromBareJID == From.BareJID)
                     {

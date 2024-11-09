@@ -86,7 +86,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		static CodeBlock()
 		{
 			Init();
-			Types.OnInvalidated += (sender, e) => Init();
+			Types.OnInvalidated += (Sender, e) => Init();
 		}
 
 		private static void Init()

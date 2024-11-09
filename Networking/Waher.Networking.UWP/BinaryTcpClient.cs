@@ -544,13 +544,13 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						await this.Error(ex);
+						await this.Exception(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				await this.Error(ex);
+				await this.Exception(ex);
 			}
 			finally
 			{
@@ -574,20 +574,7 @@ namespace Waher.Networking
 			}
 
 			if (!Continue && !this.disposed && !this.disposing)
-			{
-				EventHandlerAsync h = this.OnPaused;
-				if (!(h is null))
-				{
-					try
-					{
-						await h(this, EventArgs.Empty);
-					}
-					catch (Exception ex)
-					{
-						await this.Error(ex);
-					}
-				}
-			}
+				await this.OnPaused.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -598,18 +585,9 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when the connection has been disconnected.
 		/// </summary>
-		protected virtual async Task Disconnected()
+		protected virtual Task Disconnected()
 		{
-			try
-			{
-				EventHandlerAsync h = this.OnDisconnected;
-				if (!(h is null))
-					await h(this, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				await this.Error(ex);
-			}
+			return this.OnDisconnected.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -653,18 +631,16 @@ namespace Waher.Networking
 		/// Method called when an exception has been caught.
 		/// </summary>
 		/// <param name="ex">Exception</param>
-		protected virtual async Task Error(Exception ex)
+		public override async Task Exception(Exception ex)
 		{
 			try
 			{
-				if (this.HasSniffers)
-					await this.Exception(ex);
-
+				await base.Exception(ex);
 				await this.OnError.Raise(this, ex);
 			}
 			catch (Exception ex2)
 			{
-				await this.Error(ex2);
+				Log.Exception(ex2);
 			}
 		}
 
@@ -852,7 +828,7 @@ namespace Waher.Networking
 					}
 					catch (Exception ex)
 					{
-						await this.Error(ex);
+						await this.Exception(ex);
 					}
 
 					Task.TrySetResult(true);
@@ -875,18 +851,7 @@ namespace Waher.Networking
 						return;
 					}
 
-					EventHandler h = this.OnWriteQueueEmpty;
-					if (!(h is null))
-					{
-						try
-						{
-							h(this, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							await this.Error(ex);
-						}
-					}
+					await this.OnWriteQueueEmpty.Raise(this, EventArgs.Empty);
 				}
 			}
 			catch (Exception ex)
@@ -905,7 +870,7 @@ namespace Waher.Networking
 				}
 
 				if (!DoDispose)
-					await this.Error(ex);
+					await this.Exception(ex);
 			}
 		}
 
@@ -934,7 +899,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Event raised when the write queue is empty.
 		/// </summary>
-		public event EventHandler OnWriteQueueEmpty = null;
+		public event EventHandlerAsync OnWriteQueueEmpty = null;
 
 		/// <summary>
 		/// Method called when binary data has been sent.
@@ -1225,7 +1190,7 @@ namespace Waher.Networking
 					{
 						try
 						{
-							await this.Error(ex);
+							await this.Exception(ex);
 						}
 						catch (Exception ex2)
 						{

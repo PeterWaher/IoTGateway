@@ -198,7 +198,7 @@ namespace Waher.Client.WPF
 
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
-		private async void Window_Loaded(object sender, RoutedEventArgs e)
+		private async void Window_Loaded(object Sender, RoutedEventArgs e)
 		{
 			object Value;
 
@@ -253,7 +253,7 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		private void Window_Closing(object Sender, System.ComponentModel.CancelEventArgs e)
 		{
 			if (!this.MainView.CheckSaved())
 			{
@@ -280,9 +280,9 @@ namespace Waher.Client.WPF
 			databaseProvider = null;
 		}
 
-		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void ConnectTo_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			this.MainView.ConnectTo_Executed(sender, e);
+			this.MainView.ConnectTo_Executed(Sender, e);
 		}
 
 		public ITabView CurrentTab
@@ -296,24 +296,24 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Save_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			this.CurrentTab?.SaveButton_Click(sender, e);
+			this.CurrentTab?.SaveButton_Click(Sender, e);
 		}
 
-		private void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void SaveAs_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			this.CurrentTab?.SaveAsButton_Click(sender, e);
+			this.CurrentTab?.SaveAsButton_Click(Sender, e);
 		}
 
-		private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Open_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			this.CurrentTab?.OpenButton_Click(sender, e);
+			this.CurrentTab?.OpenButton_Click(Sender, e);
 		}
 
-		private void New_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void New_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			this.CurrentTab?.NewButton_Click(sender, e);
+			this.CurrentTab?.NewButton_Click(Sender, e);
 		}
 
 		internal void SelectionChanged()
@@ -386,13 +386,13 @@ namespace Waher.Client.WPF
 			return MainWindow;
 		}
 
-		private void Add_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Add_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanAddChildren);
 		}
 
-		private void Add_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Add_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanAddChildren)
@@ -401,13 +401,13 @@ namespace Waher.Client.WPF
 			Node.Add();
 		}
 
-		private void Refresh_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Refresh_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanRecycle);
 		}
 
-		private void Refresh_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Refresh_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanRecycle)
@@ -416,13 +416,13 @@ namespace Waher.Client.WPF
 			Node.Recycle(this);
 		}
 
-		private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Delete_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanDelete);
 		}
 
-		private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Delete_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanDelete)
@@ -443,13 +443,13 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void Edit_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Edit_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanEdit);
 		}
 
-		private void Edit_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Edit_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanEdit)
@@ -458,13 +458,13 @@ namespace Waher.Client.WPF
 			Node.Edit();
 		}
 
-		private void Copy_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Copy_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanCopy);
 		}
 
-		private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Copy_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanCopy)
@@ -475,13 +475,13 @@ namespace Waher.Client.WPF
 			CommandManager.InvalidateRequerySuggested();
 		}
 
-		private void Paste_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Paste_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanPaste);
 		}
 
-		private void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Paste_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanPaste)
@@ -490,13 +490,13 @@ namespace Waher.Client.WPF
 			Node.Paste();
 		}
 
-		private void Sniff_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Sniff_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.IsSniffable);
 		}
 
-		private void Sniff_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Sniff_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.IsSniffable)
@@ -564,12 +564,12 @@ namespace Waher.Client.WPF
 			return View;
 		}
 
-		private void EventLog_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void EventLog_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = true;
 		}
 
-		private void EventLog_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void EventLog_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			LogView View;
 
@@ -592,12 +592,12 @@ namespace Waher.Client.WPF
 			this.Tabs.SelectedItem = TabItem;
 		}
 
-		private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void CloseTab_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = this.Tabs.SelectedIndex > 0;
 		}
 
-		internal void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
+		internal void CloseTab_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			int i = this.Tabs.SelectedIndex;
 			if (i > 0)
@@ -613,13 +613,13 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void Chat_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Chat_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanChat);
 		}
 
-		private void Chat_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Chat_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanChat)
@@ -1004,7 +1004,7 @@ namespace Waher.Client.WPF
 			TabItem2.Content = ChatView2;
 		}
 
-		private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void Tabs_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
 			if (this.Tabs.SelectedItem is TabItem Item)
 			{
@@ -1016,13 +1016,13 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void ReadMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void ReadMomentary_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
 		}
 
-		private async void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void ReadMomentary_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			try
 			{
@@ -1048,13 +1048,13 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void ReadDetailed_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void ReadDetailed_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
 		}
 
-		private async void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void ReadDetailed_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			try
 			{
@@ -1080,13 +1080,13 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void SubscribeToMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void SubscribeToMomentary_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanSubscribeToSensorData);
 		}
 
-		private async void SubscribeToMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void SubscribeToMomentary_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			try
 			{
@@ -1118,13 +1118,13 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void Configure_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Configure_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanConfigure);
 		}
 
-		private void Configure_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Configure_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanConfigure)
@@ -1170,13 +1170,13 @@ namespace Waher.Client.WPF
 			return Task.CompletedTask;
 		}
 
-		private void Search_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Search_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			e.CanExecute = (!(Node is null) && Node.CanSearch);
 		}
 
-		private void Search_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Search_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
 			if (Node is null || !Node.CanSearch)
@@ -1192,12 +1192,12 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void Script_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void Script_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = true;
 		}
 
-		private void Script_Executed(object sender, ExecutedRoutedEventArgs e)
+		private void Script_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			TabItem TabItem = NewTab("Script");
 			this.Tabs.Items.Add(TabItem);
@@ -1347,21 +1347,21 @@ namespace Waher.Client.WPF
 			Tab.Header = Header;
 		}
 
-		private static void CloseImage_MouseLeave(object sender, MouseEventArgs e)
+		private static void CloseImage_MouseLeave(object Sender, MouseEventArgs e)
 		{
-			if (sender is Image Image)
+			if (Sender is Image Image)
 				Image.Source = new BitmapImage(new Uri("../Graphics/symbol-delete-icon-gray.png", UriKind.Relative));
 		}
 
-		private static void CloseImage_MouseEnter(object sender, MouseEventArgs e)
+		private static void CloseImage_MouseEnter(object Sender, MouseEventArgs e)
 		{
-			if (sender is Image Image)
+			if (Sender is Image Image)
 				Image.Source = new BitmapImage(new Uri("../Graphics/symbol-delete-icon.png", UriKind.Relative));
 		}
 
-		private static void CloseImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private static void CloseImage_MouseLeftButtonDown(object Sender, MouseButtonEventArgs e)
 		{
-			if ((sender as Image)?.Tag is TabItem Item)
+			if ((Sender as Image)?.Tag is TabItem Item)
 			{
 				currentInstance?.Tabs?.Items.Remove(Item);
 				if (!(Item.Content is null) && Item.Content is IDisposable Disposable)

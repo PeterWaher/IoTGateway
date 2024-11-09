@@ -35,7 +35,7 @@ namespace Waher.Security.DTLS
 		static DtlsEndpoint()
 		{
 			InitCiphers();
-			Types.OnInvalidated += (sender, e) => InitCiphers();
+			Types.OnInvalidated += (Sender, e) => InitCiphers();
 		}
 
 		private static void InitCiphers()

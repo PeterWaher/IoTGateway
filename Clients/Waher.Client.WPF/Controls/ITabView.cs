@@ -8,9 +8,9 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public interface ITabView : IDisposable
 	{
-		void NewButton_Click(object sender, RoutedEventArgs e);
-		void SaveButton_Click(object sender, RoutedEventArgs e);
-		void SaveAsButton_Click(object sender, RoutedEventArgs e);
-		void OpenButton_Click(object sender, RoutedEventArgs e);
+		void NewButton_Click(object Sender, RoutedEventArgs e);
+		void SaveButton_Click(object Sender, RoutedEventArgs e);
+		void SaveAsButton_Click(object Sender, RoutedEventArgs e);
+		void OpenButton_Click(object Sender, RoutedEventArgs e);
 	}
 }

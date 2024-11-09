@@ -85,7 +85,7 @@ namespace Waher.Script
 			Types.OnInvalidated += Types_OnInvalidated;
 		}
 
-		private static void Types_OnInvalidated(object sender, EventArgs e)
+		private static void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			functions = null;
 			constants = null;
@@ -5342,7 +5342,7 @@ namespace Waher.Script
 				if (converters is null)
 				{
 					converters = Converters;
-					Types.OnInvalidated += (sender, e) => converters = GetTypeConverters();
+					Types.OnInvalidated += (Sender, e) => converters = GetTypeConverters();
 				}
 			}
 

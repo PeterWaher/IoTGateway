@@ -107,7 +107,7 @@ namespace Waher.Things.Script
 
 				this.PopulateVariables(v);
 
-				v.OnPreview += (sender, e) =>
+				v.OnPreview += (Sender, e) =>
 				{
 					ScriptNode.ReportFields(Request, e.Preview.AssociatedObjectValue, false);
 					return Task.CompletedTask;

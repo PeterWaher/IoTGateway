@@ -45,13 +45,13 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 				ConsoleOut.WriteLine("Pressing a letter or a digit will lock/release a corresponding resource.");
 				ConsoleOut.WriteLine("Press ESC to quit the application.");
 
-				Endpoint.GetStatus += (sender, e) =>
+				Endpoint.GetStatus += (Sender, e) =>
 				{
 					e.Status = Name;
 					return Task.CompletedTask;
 				};
 
-				Endpoint.EndpointOnline += (sender, e) =>
+				Endpoint.EndpointOnline += (Sender, e) =>
 				{
 					lock (Names)
 					{
@@ -63,7 +63,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 					return Task.CompletedTask;
 				};
 
-				Endpoint.EndpointOffline += (sender, e) =>
+				Endpoint.EndpointOffline += (Sender, e) =>
 				{
 					string RemoteName;
 
@@ -78,7 +78,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 					return Task.CompletedTask;
 				};
 
-				Endpoint.EndpointStatus += (sender, e) =>
+				Endpoint.EndpointStatus += (Sender, e) =>
 				{
 					if (e.Status is string RemoteName)
 					{
@@ -118,7 +118,7 @@ namespace Waher.Networking.Cluster.ConsoleSandbox
 						{
 							ConsoleOut.WriteLine("Locking " + s + ".");
 
-							Endpoint.Lock(s, 10000, (sender, e) =>
+							Endpoint.Lock(s, 10000, (Sender, e) =>
 							{
 								if (e.LockSuccessful)
 								{

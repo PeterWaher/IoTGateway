@@ -153,14 +153,14 @@ namespace Waher.Service.GPIO
 				{
 					this.thingRegistryClient = new ThingRegistryClient(this.xmppClient, Credentials.ThingRegistry);
 
-					this.thingRegistryClient.Claimed += (sender, e) =>
+					this.thingRegistryClient.Claimed += (Sender, e) =>
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 						return this.RaiseOwnershipChanged();
 					};
 
-					this.thingRegistryClient.Disowned += (sender, e) =>
+					this.thingRegistryClient.Disowned += (Sender, e) =>
 					{
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
@@ -169,7 +169,7 @@ namespace Waher.Service.GPIO
 						return Task.CompletedTask;
 					};
 
-					this.thingRegistryClient.Removed += (sender, e) =>
+					this.thingRegistryClient.Removed += (Sender, e) =>
 					{
 						Log.Informational("Thing has been removed from the public registry.", ownerJid);
 						return Task.CompletedTask;
@@ -219,7 +219,7 @@ namespace Waher.Service.GPIO
 					}
 				};
 
-				this.xmppClient.OnPresenceSubscribe += async (sender, e) =>
+				this.xmppClient.OnPresenceSubscribe += async (Sender, e) =>
 				{
 					Log.Informational("Subscription request received from " + e.From + ".");
 
@@ -232,13 +232,13 @@ namespace Waher.Service.GPIO
 					await this.xmppClient.SetPresence(Availability.Chat);
 				};
 
-				this.xmppClient.OnPresenceUnsubscribe += (sender, e) =>
+				this.xmppClient.OnPresenceUnsubscribe += (Sender, e) =>
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
 					return e.Accept();
 				};
 
-				this.xmppClient.OnRosterItemUpdated += (sender, e) =>
+				this.xmppClient.OnRosterItemUpdated += (Sender, e) =>
 				{
 					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 						this.xmppClient.RemoveRosterItem(e.BareJid);
@@ -259,7 +259,7 @@ namespace Waher.Service.GPIO
 							this.gpioPins[i] = new KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>(Pin,
 								MainPage.Instance.AddPin("GPIO" + i.ToString(), Pin.GetDriveMode(), Pin.Read().ToString()));
 
-							Pin.ValueChanged += async (sender, e) =>
+							Pin.ValueChanged += async (Sender, e) =>
 							{
 								if (!this.gpioPins.TryGetValue(sender.PinNumber, out KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> P))
 									return;
@@ -643,7 +643,7 @@ namespace Waher.Service.GPIO
 		/// </summary>
 		/// <param name="sender">The Frame which failed navigation</param>
 		/// <param name="e">Details about the navigation failure</param>
-		void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+		void OnNavigationFailed(object Sender, NavigationFailedEventArgs e)
 		{
 			throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
 		}
@@ -655,7 +655,7 @@ namespace Waher.Service.GPIO
 		/// </summary>
 		/// <param name="sender">The source of the suspend request.</param>
 		/// <param name="e">Details about the suspend request.</param>
-		private void OnSuspending(object sender, SuspendingEventArgs e)
+		private void OnSuspending(object Sender, SuspendingEventArgs e)
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
 

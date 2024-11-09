@@ -47,9 +47,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		public override Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
-			this.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings, false);
+			return this.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings, false);
 		}
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
 		/// <param name="EspaceFirstSpace">If escaping of the first character should be done, if it is a space character.</param>
-		public void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings,
+		public async Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings,
 			bool EspaceFirstSpace)
 		{
 			if (!(this.elements is null))
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 					MarkdownOutput Markdown2 = new MarkdownOutput();
 
 					foreach (InlineElement E in this.elements)
-						E.GenerateMarkdown(Markdown2, SectionLevel, Indentation, Settings);
+						await E.GenerateMarkdown(Markdown2, SectionLevel, Indentation, Settings);
 
 					string Segment = Markdown2.ToString();
 
@@ -88,7 +88,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 				else
 				{
 					foreach (InlineElement E in this.elements)
-						E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+						await E.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
 				}
 			}
 		}

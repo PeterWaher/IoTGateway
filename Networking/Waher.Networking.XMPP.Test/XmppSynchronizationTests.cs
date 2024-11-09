@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.Test
 
 			w.WriteLine("Date\tTime\tRaw Latency (ms)\tRaw Difference (ms)\tLatency Spike\tDifference Spike\tFiltered Latency (ms)\tFiltered Difference (ms)\tAvg Latency (ms)\tAvg Difference (ms)\tRaw HF Latency (ms)\tRaw HF Difference (ms)\tHF Latency Spike\tHF Difference Spike\tFiltered HF Latency (ms)\tFiltered HF Difference (ms)\tAvg HF Latency (ms)\tAvg HF Difference (ms)");
 
-			this.synchronizationClient1.OnUpdated += (sender, e) =>
+			this.synchronizationClient1.OnUpdated += (Sender, e) =>
 			{
 				try
 				{
@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.Test
 			this.synchronizationClient1.MonitorClockDifference(Source, IntervalMs);
 			try
 			{
-				this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (sender, e) =>
+				this.synchronizationClient2.QueryClockSource(this.client1.FullJID, (Sender, e) =>
 				{
 					if (!e.Ok || e.ClockSourceJID != XmppClient.GetBareJID(Source))
 						Error.Set();

@@ -2385,7 +2385,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			KeyValuePair<string, object>[] MetaData = await Node.GetMetaData();
 
 			this.thingRegistryClient?.RegisterThing(false, Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, true),
-				async (sender, e) =>
+				async (Sender, e) =>
 				{
 					try
 					{
@@ -2438,7 +2438,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			KeyValuePair<string, object>[] MetaData = await Node.GetMetaData();
 
 			this.thingRegistryClient?.UpdateThing(Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, false),
-				async (sender, e) =>
+				async (Sender, e) =>
 				{
 					try
 					{
@@ -2484,7 +2484,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string SourceId = Node.SourceId;
 			string Partition = Node.Partition;
 
-			this.thingRegistryClient?.Unregister(NodeId, SourceId, Partition, (sender, e) =>
+			this.thingRegistryClient?.Unregister(NodeId, SourceId, Partition, (Sender, e) =>
 			{
 				try
 				{

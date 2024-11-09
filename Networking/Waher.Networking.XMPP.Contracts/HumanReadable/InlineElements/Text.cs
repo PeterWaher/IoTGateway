@@ -9,15 +9,15 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 	/// </summary>
 	public class Text : InlineElement
 	{
-		private string value;
+		private string @value;
 
 		/// <summary>
 		/// Text
 		/// </summary>
 		public string Value
 		{
-			get => this.value;
-			set => this.value = value;
+			get => this.@value;
+			set => this.@value = value;
 		}
 
 		/// <summary>
@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <returns>Returns first failing element, if found.</returns>
 		public override Task<HumanReadableElement> IsWellDefined()
 		{
-			return Task.FromResult<HumanReadableElement>(string.IsNullOrEmpty(this.value) ? this : null);
+			return Task.FromResult<HumanReadableElement>(string.IsNullOrEmpty(this.@value) ? this : null);
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		public override void Serialize(StringBuilder Xml)
 		{
 			Xml.Append("<text>");
-			Xml.Append(XML.Encode(this.value));
+			Xml.Append(XML.Encode(this.@value));
 			Xml.Append("</text>");
 		}
 
@@ -47,9 +47,10 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		public override Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
-			Markdown.Append(MarkdownEncode(this.value, Settings.SimpleEscape));
+			Markdown.Append(MarkdownEncode(this.@value, Settings.SimpleEscape));
+			return Task.CompletedTask;
 		}
 	}
 }

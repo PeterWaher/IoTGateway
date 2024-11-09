@@ -29,7 +29,7 @@ namespace Waher.Networking.Cluster.Test
 		{
 			this.endpoint1 = new ClusterEndpoint(clusterAddress, 12345, "UnitTest",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
-			this.endpoint1.GetStatus += (sender, e) => 
+			this.endpoint1.GetStatus += (Sender, e) => 
 			{ 
 				e.Status = 1;
 				return Task.CompletedTask;
@@ -38,7 +38,7 @@ namespace Waher.Networking.Cluster.Test
 			foreach (IPEndPoint Endpoint in this.endpoint1.Endpoints)
 			{
 				this.endpoint2 = new ClusterEndpoint(Endpoint.Address, Endpoint.Port, "UnitTest");
-				this.endpoint2.GetStatus += (sender, e) =>
+				this.endpoint2.GetStatus += (Sender, e) =>
 				{
 					e.Status = 2;
 					return Task.CompletedTask;
@@ -80,7 +80,7 @@ namespace Waher.Networking.Cluster.Test
 				Timestamp = DateTime.Now
 			};
 
-			this.endpoint1.OnMessageReceived += (sender, e) =>
+			this.endpoint1.OnMessageReceived += (Sender, e) =>
 			{
 				if (e.Message is Message Msg2)
 				{
@@ -118,7 +118,7 @@ namespace Waher.Networking.Cluster.Test
 		{
 			ManualResetEvent AliveReceived = new(false);
 
-			this.endpoint1.OnMessageReceived += (sender, e) =>
+			this.endpoint1.OnMessageReceived += (Sender, e) =>
 			{
 				if (e.Message is Alive)
 					AliveReceived.Set();
@@ -154,7 +154,7 @@ namespace Waher.Networking.Cluster.Test
 				Timestamp = DateTime.Now
 			};
 
-			this.endpoint1.OnMessageReceived += (sender, e) =>
+			this.endpoint1.OnMessageReceived += (Sender, e) =>
 			{
 				if (e.Message is Message Msg2)
 				{
@@ -170,7 +170,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			};
 
-			await this.endpoint2.SendMessageAcknowledged(Msg, (sender, e) =>
+			await this.endpoint2.SendMessageAcknowledged(Msg, (Sender, e) =>
 			{
 				if (e.Message == Msg &&
 					e.Responses.Length == 1 &&
@@ -223,7 +223,7 @@ namespace Waher.Networking.Cluster.Test
 				B = 4
 			};
 
-			await this.endpoint2.ExecuteCommand<int>(Add, (sender, e) =>
+			await this.endpoint2.ExecuteCommand<int>(Add, (Sender, e) =>
 			{
 				if (e.Ok &&
 					e.Responses.Length == 1 &&
@@ -253,7 +253,7 @@ namespace Waher.Networking.Cluster.Test
 				B = 4
 			};
 
-			await this.endpoint2.ExecuteCommand<int>(ErrorCommand, (sender, e) =>
+			await this.endpoint2.ExecuteCommand<int>(ErrorCommand, (Sender, e) =>
 			{
 				if (!e.Ok &&
 					e.Responses.Length == 1 &&
@@ -292,7 +292,7 @@ namespace Waher.Networking.Cluster.Test
 				Timestamp = DateTime.Now
 			};
 
-			this.endpoint1.OnMessageReceived += (sender, e) =>
+			this.endpoint1.OnMessageReceived += (Sender, e) =>
 			{
 				if (e.Message is Message Msg2)
 				{
@@ -308,7 +308,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			};
 
-			await this.endpoint2.SendMessageAssured(Msg, (sender, e) =>
+			await this.endpoint2.SendMessageAssured(Msg, (Sender, e) =>
 			{
 				if (e.Message == Msg &&
 					e.Responses.Length == 1 &&
@@ -365,7 +365,7 @@ namespace Waher.Networking.Cluster.Test
 			ManualResetEvent Done1 = new(false);
 			ManualResetEvent Error1 = new(false);
 
-			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
 				if (e.LockSuccessful &&
 					e.Resource == "Resource" &&
@@ -391,7 +391,7 @@ namespace Waher.Networking.Cluster.Test
 			ManualResetEvent Done2 = new(false);
 			ManualResetEvent Error2 = new(false);
 
-			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
 				if (e.LockSuccessful &&
 					e.Resource == "Resource" &&
@@ -408,7 +408,7 @@ namespace Waher.Networking.Cluster.Test
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
 
-			this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
 				if (!e.LockSuccessful &&
 					e.Resource == "Resource" &&
@@ -434,7 +434,7 @@ namespace Waher.Networking.Cluster.Test
 			ManualResetEvent Done2 = new(false);
 			ManualResetEvent Error2 = new(false);
 
-			await this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			await this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
 				if (e.LockSuccessful &&
 					e.Resource == "Resource" &&
@@ -451,7 +451,7 @@ namespace Waher.Networking.Cluster.Test
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
 
-			await this.endpoint2.Lock("Resource", 2000, (sender, e) =>
+			await this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
 				if (e.LockSuccessful &&
 					e.Resource == "Resource" &&

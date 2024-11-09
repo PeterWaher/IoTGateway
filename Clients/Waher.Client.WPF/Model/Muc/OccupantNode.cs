@@ -364,7 +364,7 @@ namespace Waher.Client.WPF.Model.Muc
 			Item.Click += this.Ban_Click;
 		}
 
-		private void Ban_Click(object sender, RoutedEventArgs e)
+		private void Ban_Click(object Sender, RoutedEventArgs e)
 		{
 			BanOccupantForm Form = new BanOccupantForm(this.nickName);
 			bool? b = Form.ShowDialog();
@@ -381,34 +381,34 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		private void SetAffiliationOwner_Click(object sender, RoutedEventArgs e)
+		private void SetAffiliationOwner_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Owner);
 		}
 
-		private void SetAffiliationAdministrator_Click(object sender, RoutedEventArgs e)
+		private void SetAffiliationAdministrator_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Admin);
 		}
 
-		private void SetAffiliationMember_Click(object sender, RoutedEventArgs e)
+		private void SetAffiliationMember_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Member);
 		}
 
-		private void SetAffiliationNone_Click(object sender, RoutedEventArgs e)
+		private void SetAffiliationNone_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.None);
 		}
 
-		private void SetAffiliationOutcast_Click(object sender, RoutedEventArgs e)
+		private void SetAffiliationOutcast_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetAffiliation(Networking.XMPP.MUC.Affiliation.Outcast);
 		}
 
 		private void SetAffiliation(Affiliation Affiliation)
 		{
-			this.MucClient.ConfigureOccupant(this.roomId, this.domain, XmppClient.GetBareJID(this.jid), Affiliation, string.Empty, (sender, e) =>
+			this.MucClient.ConfigureOccupant(this.roomId, this.domain, XmppClient.GetBareJID(this.jid), Affiliation, string.Empty, (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -422,29 +422,29 @@ namespace Waher.Client.WPF.Model.Muc
 			}, null);
 		}
 
-		private void SetRoleModerator_Click(object sender, RoutedEventArgs e)
+		private void SetRoleModerator_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetRole(Networking.XMPP.MUC.Role.Moderator);
 		}
 
-		private void SetRoleParticipant_Click(object sender, RoutedEventArgs e)
+		private void SetRoleParticipant_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetRole(Networking.XMPP.MUC.Role.Participant);
 		}
 
-		private void SetRoleVisitor_Click(object sender, RoutedEventArgs e)
+		private void SetRoleVisitor_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetRole(Networking.XMPP.MUC.Role.Visitor);
 		}
 
-		private void SetRoleNone_Click(object sender, RoutedEventArgs e)
+		private void SetRoleNone_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SetRole(Networking.XMPP.MUC.Role.None);
 		}
 
 		private void SetRole(Role Role)
 		{
-			this.MucClient.ConfigureOccupant(this.roomId, this.domain, this.nickName, Role, string.Empty, (sender, e) =>
+			this.MucClient.ConfigureOccupant(this.roomId, this.domain, this.nickName, Role, string.Empty, (Sender, e) =>
 			{
 				if (e.Ok)
 				{

@@ -151,7 +151,7 @@ namespace Waher.Networking.Modbus
 			}
 		}
 
-		private Task TcpClient_OnDisconnected(object sender, EventArgs e)
+		private Task TcpClient_OnDisconnected(object Sender, EventArgs e)
 		{
 			this.connected = false;
 			return Task.CompletedTask;

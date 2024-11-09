@@ -32,17 +32,17 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			this.NickName.Focus();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void AddButton_Click(object sender, RoutedEventArgs e)
+		private void AddButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void FormChanged(object sender, TextChangedEventArgs e)
+		private void FormChanged(object Sender, TextChangedEventArgs e)
 		{
 			this.AddButton.IsEnabled = 
 				!string.IsNullOrEmpty(this.RoomID.Text.Trim()) &&

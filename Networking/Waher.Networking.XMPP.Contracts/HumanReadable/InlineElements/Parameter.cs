@@ -49,7 +49,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="SectionLevel">Current section level.</param>
 		/// <param name="Indentation">Current indentation.</param>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
-		public override void GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
+		public override async Task GenerateMarkdown(MarkdownOutput Markdown, int SectionLevel, int Indentation, MarkdownSettings Settings)
 		{
 			switch (Settings.Type)
 			{
@@ -80,7 +80,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 									Markdown.Append('[');
 
 								foreach (Label Label in ContractReferenceParameter.Labels)
-									Label.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+									await Label.GenerateMarkdown(Markdown, SectionLevel, Indentation, Settings);
+
 								if (HasReference)
 								{
 									Markdown.Append("](iotsc:");
@@ -109,7 +110,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 							Value = null;
 
 						if (!(Value is null))
-							Value = Settings.Contract.FormatParameterValue(this.name, Value);
+							Value = await Settings.Contract.FormatParameterValue(this.name, Value);
 					}
 
 					if (Value is null)

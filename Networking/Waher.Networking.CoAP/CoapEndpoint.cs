@@ -468,7 +468,7 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private static void Types_OnInvalidated(object sender, EventArgs e)
+		private static void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			Init();
 		}

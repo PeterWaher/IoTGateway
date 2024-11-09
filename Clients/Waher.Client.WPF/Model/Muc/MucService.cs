@@ -122,7 +122,7 @@ namespace Waher.Client.WPF.Model.Muc
 				Mouse.OverrideCursor = Cursors.Wait;
 
 				this.loadingChildren = true;
-				this.Account.Client.SendServiceItemsDiscoveryRequest(this.mucClient.ComponentAddress, async (sender, e) =>
+				this.Account.Client.SendServiceItemsDiscoveryRequest(this.mucClient.ComponentAddress, async (Sender, e) =>
 				{
 					this.loadingChildren = false;
 					MainWindow.MouseDefault();
@@ -206,7 +206,7 @@ namespace Waher.Client.WPF.Model.Muc
 				string Prefix = this.mucClient.Client.BareJID + "." + RoomId + "@" + Domain;
 				DataForm Form = null;
 
-				this.mucClient.EnterRoom(RoomId, Domain, NickName, Password, async (sender, e) =>
+				this.mucClient.EnterRoom(RoomId, Domain, NickName, Password, async (Sender, e) =>
 				{
 					if (e.Ok)
 					{

@@ -484,7 +484,7 @@ namespace Waher.Networking.XMPP.P2P
 				else
 				{
 					Result.Peer = Connection;
-					Connection.Start((sender, e) =>
+					Connection.Start((Sender, e) =>
 					{
 						if (!(ResynchMethod is null))
 						{

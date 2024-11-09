@@ -18,10 +18,10 @@ namespace Waher.Networking.Cluster.Messages
 		/// <param name="RemoteEndpoint">Endpoint sending the message.</param>
 		/// <returns>If the message was accepted/processed or not.
 		/// In Acknowledged service, this corresponds to ACK/NACK.</returns>
-		public Task<bool> MessageReceived(ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
+		public async Task<bool> MessageReceived(ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
 		{
-			Endpoint.EndpointShutDown(RemoteEndpoint);
-			return Task.FromResult(true);
+			await Endpoint.EndpointShutDown(RemoteEndpoint);
+			return true;
 		}
 	}
 }

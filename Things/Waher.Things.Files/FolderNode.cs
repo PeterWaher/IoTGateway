@@ -199,7 +199,7 @@ namespace Waher.Things.Files
 			return FilesModule.CheckSynchronization(this);
 		}
 
-		internal async void Watcher_Error(object sender, ErrorEventArgs e)
+		internal async void Watcher_Error(object Sender, ErrorEventArgs e)
 		{
 			try
 			{
@@ -211,7 +211,7 @@ namespace Waher.Things.Files
 			}
 		}
 
-		internal async void Watcher_Renamed(object sender, RenamedEventArgs e)
+		internal async void Watcher_Renamed(object Sender, RenamedEventArgs e)
 		{
 			try
 			{
@@ -223,7 +223,7 @@ namespace Waher.Things.Files
 			}
 		}
 
-		internal async void Watcher_Deleted(object sender, FileSystemEventArgs e)
+		internal async void Watcher_Deleted(object Sender, FileSystemEventArgs e)
 		{
 			try
 			{
@@ -235,7 +235,7 @@ namespace Waher.Things.Files
 			}
 		}
 
-		internal async void Watcher_Created(object sender, FileSystemEventArgs e)
+		internal async void Watcher_Created(object Sender, FileSystemEventArgs e)
 		{
 			try
 			{
@@ -247,7 +247,7 @@ namespace Waher.Things.Files
 			}
 		}
 
-		internal async void Watcher_Changed(object sender, FileSystemEventArgs e)
+		internal async void Watcher_Changed(object Sender, FileSystemEventArgs e)
 		{
 			try
 			{
@@ -569,12 +569,12 @@ namespace Waher.Things.Files
 			{
 				InternalReadoutRequest InternalReadout = new InternalReadoutRequest(Node.LogId, null,
 					SensorData.FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
-					(sender, e) =>
+					(Sender, e) =>
 					{
 						ScriptReferenceNode.NewMomentaryValues(e.Fields);
 						return Task.CompletedTask;
 					},
-					async (sender, e) =>
+					async (Sender, e) =>
 					{
 						foreach (ThingError Error in e.Errors)
 							await ScriptReferenceNode.LogErrorAsync(Error.ErrorMessage);

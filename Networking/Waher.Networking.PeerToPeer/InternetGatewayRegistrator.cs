@@ -44,7 +44,7 @@ namespace Waher.Networking.PeerToPeer
 			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 		}
 
-		private async void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+		private async void NetworkChange_NetworkAddressChanged(object Sender, EventArgs e)
 		{
 			try
 			{

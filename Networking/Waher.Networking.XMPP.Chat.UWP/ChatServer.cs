@@ -1535,7 +1535,7 @@ namespace Waher.Networking.XMPP.Chat
 				string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + "." + ImageCodec.FileExtensionPng;
 				string ContentType = ImageCodec.ContentTypePng;
 
-				await this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (sender, e) =>
+				await this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (Sender, e) =>
 				{
 					try
 					{

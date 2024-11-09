@@ -19,12 +19,12 @@ namespace Waher.Client.WPF.Dialogs.PubSub
 			this.InitializeComponent();
 		}
 
-		private void AffilationView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void AffilationView_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
 			this.RemoveButton.IsEnabled = this.AffiliationView.SelectedIndex >= 0;
 		}
 
-		public void AddButton_Click(object sender, RoutedEventArgs e)
+		public void AddButton_Click(object Sender, RoutedEventArgs e)
 		{
 			AddAffiliateForm Form = new AddAffiliateForm()
 			{
@@ -44,17 +44,17 @@ namespace Waher.Client.WPF.Dialogs.PubSub
 			}
 		}
 
-		public void RemoveButton_Click(object sender, RoutedEventArgs e)
+		public void RemoveButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.AffiliationView.Items.RemoveAt(this.AffiliationView.SelectedIndex);
 		}
 
-		public void ApplyButton_Click(object sender, RoutedEventArgs e)
+		public void ApplyButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		public void CancelButton_Click(object sender, RoutedEventArgs e)
+		public void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}

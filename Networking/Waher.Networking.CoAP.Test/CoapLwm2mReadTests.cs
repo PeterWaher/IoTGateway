@@ -57,7 +57,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Timeout = new(false);
 
-			this.lwm2mClient.OnRebootRequest += (sender, e) => Done.Set();
+			this.lwm2mClient.OnRebootRequest += (Sender, e) => Done.Set();
 			this.lwm2mClient.RequestBootstrap(new Lwm2mServerReference("leshan.eclipse.org", 5783));
 
 			Task.Delay(10000).ContinueWith((_) => Timeout.Set());

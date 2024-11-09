@@ -40,12 +40,12 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			return b ? "✓" : string.Empty;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void NickName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		private void NickName_TextChanged(object Sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
 			this.AcceptButton.IsEnabled = !string.IsNullOrEmpty(this.NickName.Text) && AllLetters(this.NickName.Text);
 		}
@@ -61,12 +61,12 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			return true;
 		}
 
-		private void AcceptButton_Click(object sender, RoutedEventArgs e)
+		private void AcceptButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void DeclineButton_Click(object sender, RoutedEventArgs e)
+		private void DeclineButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}

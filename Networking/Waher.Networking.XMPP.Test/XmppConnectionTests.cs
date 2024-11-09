@@ -265,7 +265,7 @@ namespace Waher.Networking.XMPP.Test
 
 			this.WaitConnected(10000);
 
-			this.client.OnPasswordChanged += (sender, e) =>
+			this.client.OnPasswordChanged += (Sender, e) =>
 			{
 				Changed.Set();
 				return Task.CompletedTask;

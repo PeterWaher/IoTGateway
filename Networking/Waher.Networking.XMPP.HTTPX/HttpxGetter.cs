@@ -259,7 +259,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				HttpxClient?.Request(FullJid, "GET", LocalUrl, async (sender, e) =>
+				HttpxClient?.Request(FullJid, "GET", LocalUrl, async (Sender, e) =>
 				{
 					if (e.Ok)
 					{
@@ -283,7 +283,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					else
 						State.Done.TrySetException(e.StanzaError ?? new Exception("Unable to get resource."));
 
-				}, async (sender, e) =>
+				}, async (Sender, e) =>
 				{
 					await (State.File?.WriteAsync(e.Data, 0, e.Data.Length) ?? Task.CompletedTask);
 					if (e.Last)

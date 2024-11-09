@@ -201,7 +201,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			}
 		}
 
-		private void Hyperlink_Click(object sender, RoutedEventArgs e)
+		private void Hyperlink_Click(object Sender, RoutedEventArgs e)
 		{
 			if (!(e.Source is Hyperlink Link))
 				return;

@@ -157,7 +157,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				Mouse.OverrideCursor = Cursors.Wait;
 
 				this.loadingChildren = true;
-				this.Account.Client.SendServiceItemsDiscoveryRequest(this.pubSubClient.ComponentAddress, (sender, e) =>
+				this.Account.Client.SendServiceItemsDiscoveryRequest(this.pubSubClient.ComponentAddress, (Sender, e) =>
 				{
 					this.loadingChildren = false;
 					MainWindow.MouseDefault();
@@ -225,7 +225,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.pubSubClient.GetDefaultNodeConfiguration((sender, e) =>
+			this.pubSubClient.GetDefaultNodeConfiguration((Sender, e) =>
 			{
 				MainWindow.MouseDefault();
 

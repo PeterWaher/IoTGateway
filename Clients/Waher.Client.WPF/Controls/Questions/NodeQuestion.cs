@@ -121,7 +121,7 @@ namespace Waher.Client.WPF.Controls.Questions
 						this.AddToken(Details, Token, Certificate, OnYes, OnNo, Range);
 					else
 					{
-						Client.GetCertificate(Token, (sender, e) =>
+						Client.GetCertificate(Token, (Sender, e) =>
 						{
 							if (e.Ok)
 							{

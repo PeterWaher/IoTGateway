@@ -87,19 +87,19 @@ namespace Waher.Script.Lab
 			}
 		}
 
-		private void Input_PreviewKeyDown(object sender, KeyEventArgs e)
+		private void Input_PreviewKeyDown(object Sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
 			{
 				if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
 				{
 					e.Handled = true;
-					this.ExecuteButton_Click(sender, e);
+					this.ExecuteButton_Click(Sender, e);
 				}
 			}
 		}
 
-		private void ExecuteButton_Click(object sender, RoutedEventArgs e)
+		private void ExecuteButton_Click(object Sender, RoutedEventArgs e)
 		{
 			Expression Exp;
 			TextBlock ScriptBlock;
@@ -330,10 +330,10 @@ namespace Waher.Script.Lab
 			return ResultBlock;
 		}
 
-		private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		private void TextBlock_PreviewMouseDown(object Sender, MouseButtonEventArgs e)
 		{
 			e.Handled = true;
-			this.Input.Text = ((TextBlock)sender).Text;
+			this.Input.Text = ((TextBlock)Sender).Text;
 			this.Input.SelectAll();
 			this.Input.Focus();
 		}
@@ -391,9 +391,9 @@ namespace Waher.Script.Lab
 			return Result.Task;
 		}
 
-		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		private void ImageBlock_PreviewMouseDown(object Sender, MouseButtonEventArgs e)
 		{
-			Image ImageBlock = (Image)sender;
+			Image ImageBlock = (Image)Sender;
 
 			e.Handled = true;
 
@@ -485,7 +485,7 @@ namespace Waher.Script.Lab
 			this.Dispatcher.Invoke(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, null));
 		}
 
-		private void Window_Loaded(object sender, RoutedEventArgs e)
+		private void Window_Loaded(object Sender, RoutedEventArgs e)
 		{
 			object Value;
 
@@ -518,7 +518,7 @@ namespace Waher.Script.Lab
 			}
 		}
 
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		private void Window_Closing(object Sender, System.ComponentModel.CancelEventArgs e)
 		{
 			Registry.SetValue(registryKey, "WindowLeft", (int)this.Left, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowTop", (int)this.Top, RegistryValueKind.DWord);

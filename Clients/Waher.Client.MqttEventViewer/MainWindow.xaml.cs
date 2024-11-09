@@ -24,7 +24,7 @@ namespace Waher.Client.MqttEventViewer
 			this.InitializeComponent();
 		}
 
-		private void ConnectButton_Click(object sender, RoutedEventArgs e)
+		private void ConnectButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -97,7 +97,7 @@ namespace Waher.Client.MqttEventViewer
 			return Task.CompletedTask;
 		}
 
-		private void CloseButton_Click(object sender, RoutedEventArgs e)
+		private void CloseButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -133,7 +133,7 @@ namespace Waher.Client.MqttEventViewer
 
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.MqttEventViewer";
 
-		private void Window_Closed(object sender, EventArgs e)
+		private void Window_Closed(object Sender, EventArgs e)
 		{
 			int i;
 
@@ -162,7 +162,7 @@ namespace Waher.Client.MqttEventViewer
 				Registry.SetValue(MainWindow.registryKey, "Trust", this.Trust.IsChecked.Value ? 1 : 0, RegistryValueKind.DWord);
 		}
 
-		private void Window_Loaded(object sender, RoutedEventArgs e)
+		private void Window_Loaded(object Sender, RoutedEventArgs e)
 		{
 			object Value;
 

@@ -92,7 +92,7 @@ namespace Waher.Client.WPF.Controls
 
 		public TreeNode Node => this.node;
 
-		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void UserControl_SizeChanged(object Sender, SizeChangedEventArgs e)
 		{
 			if (this.SensorDataListView.View is GridView GridView)
 			{
@@ -259,17 +259,17 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SensorDataListView.Items.Clear();
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.SaveAsButton_Click(sender, e);
+			this.SaveAsButton_Click(Sender, e);
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog()
 			{
@@ -345,7 +345,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -435,7 +435,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		private void UserControl_Loaded(object Sender, RoutedEventArgs e)
 		{
 			if (this.SensorDataListView.View is GridView GridView)
 			{

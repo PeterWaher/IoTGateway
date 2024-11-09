@@ -161,7 +161,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				await HttpxClient.Request(FullJid, "DELETE", LocalUrl, 1.1, Headers2, null, async (sender, e) =>
+				await HttpxClient.Request(FullJid, "DELETE", LocalUrl, 1.1, Headers2, null, async (Sender, e) =>
 					{
 						if (e.Ok)
 						{
@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						else
 							State.Done.TrySetException(e.StanzaError ?? new Exception("Unable to get resource."));
 
-					}, async (sender, e) =>
+					}, async (Sender, e) =>
 					{
 						if (State.Data is null)
 							State.Data = new MemoryStream();

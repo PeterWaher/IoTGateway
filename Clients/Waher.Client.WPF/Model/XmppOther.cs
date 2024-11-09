@@ -61,7 +61,7 @@ namespace Waher.Client.WPF.Model
 			await Request.Accept(false);
 			await Request.Started();
 
-			await Client.SendServiceDiscoveryRequest(Jid, (sender, e) =>
+			await Client.SendServiceDiscoveryRequest(Jid, (Sender, e) =>
 			{
 				if (e.Ok)
 				{

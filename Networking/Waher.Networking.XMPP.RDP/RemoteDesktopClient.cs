@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.RDP
 
 			TaskCompletionSource<RemoteDesktopSession> Result = new TaskCompletionSource<RemoteDesktopSession>();
 
-			await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
+			await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.RDP
 
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
+			await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);

@@ -103,7 +103,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					if (this.hasChildSources)
 					{
 						this.loadingChildren = true;
-						this.Concentrator.XmppAccountNode.ConcentratorClient.GetChildDataSources(FullJid, this.key, (sender, e) =>
+						this.Concentrator.XmppAccountNode.ConcentratorClient.GetChildDataSources(FullJid, this.key, (Sender, e) =>
 						{
 							this.loadingChildren = false;
 							MainWindow.MouseDefault();
@@ -133,7 +133,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					{
 						this.loadingChildren = true;
 						this.Concentrator.XmppAccountNode.ConcentratorClient.GetRootNodes(FullJid, this.key, true, true,
-							"en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+							"en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 						{
 							this.loadingChildren = false;
 							MainWindow.MouseDefault();
@@ -223,7 +223,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 
 			ConcentratorClient.Subscribe(FullJid, this.key, 600, SourceEventType.All, true, true, "en",
-				string.Empty, string.Empty, string.Empty, (sender, e) =>
+				string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
 					if (e.Ok)
 						this.timer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(5), this.SubscribeToEvents, false);

@@ -62,7 +62,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void ConnectionTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void ConnectionTree_SelectedItemChanged(object Sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			this.ConnectionListView.Items.Clear();
 
@@ -305,7 +305,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			if (!this.CheckSaved())
 				return;
@@ -315,17 +315,17 @@ namespace Waher.Client.WPF.Controls
 			this.FileName = string.Empty;
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SaveFile();
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.SaveNewFile();
 		}
 
-		public async void OpenButton_Click(object sender, RoutedEventArgs e)
+		public async void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -356,7 +356,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
+		public void ConnectTo_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			ConnectToForm Dialog = new ConnectToForm()
 			{
@@ -412,7 +412,7 @@ namespace Waher.Client.WPF.Controls
 			this.Node_Updated(this, EventArgs.Empty);
 		}
 
-		private void Node_Updated(object sender, EventArgs e)
+		private void Node_Updated(object Sender, EventArgs e)
 		{
 			if (this.refreshTimer > DateTime.MinValue)
 			{
@@ -473,19 +473,19 @@ namespace Waher.Client.WPF.Controls
 			});
 		}
 
-		private void ConnectionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void ConnectionListView_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
-			this.ConnectionListView_GotFocus(sender, e);
+			this.ConnectionListView_GotFocus(Sender, e);
 		}
 
 		public TreeNode SelectedNode => this.selectedNode;
 
-		private void TreeContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		private void TreeContextMenu_ContextMenuOpening(object Sender, ContextMenuEventArgs e)
 		{
 			this.PopulateConextMenu(this.TreeContextMenu);
 		}
 
-		private void ListViewContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+		private void ListViewContextMenu_ContextMenuOpening(object Sender, ContextMenuEventArgs e)
 		{
 			this.PopulateConextMenu(this.ListViewContextMenu);
 		}
@@ -499,7 +499,7 @@ namespace Waher.Client.WPF.Controls
 			this.selectedNode?.AddContexMenuItems(ref Group, Menu);
 		}
 
-		private void ConnectionListView_GotFocus(object sender, RoutedEventArgs e)
+		private void ConnectionListView_GotFocus(object Sender, RoutedEventArgs e)
 		{
 			this.selectedNode = this.ConnectionListView.SelectedItem as TreeNode;
 
@@ -507,7 +507,7 @@ namespace Waher.Client.WPF.Controls
 			MainWindow?.SelectionChanged();
 		}
 
-		private void ConnectionTree_GotFocus(object sender, RoutedEventArgs e)
+		private void ConnectionTree_GotFocus(object Sender, RoutedEventArgs e)
 		{
 			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
 

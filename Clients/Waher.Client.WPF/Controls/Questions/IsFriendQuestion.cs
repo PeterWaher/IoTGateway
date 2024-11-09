@@ -154,32 +154,32 @@ namespace Waher.Client.WPF.Controls.Questions
 			}
 		}
 
-		private void NoAllButton_Click(object sender, RoutedEventArgs e)
+		private void NoAllButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.Process(false, RuleRange.All);
 		}
 
-		private void YesAllButton_Click(object sender, RoutedEventArgs e)
+		private void YesAllButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.Process(true, RuleRange.All);
 		}
 
-		private void NoDomainButton_Click(object sender, RoutedEventArgs e)
+		private void NoDomainButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.Process(false, RuleRange.Domain);
 		}
 
-		private void YesDomainButton_Click(object sender, RoutedEventArgs e)
+		private void YesDomainButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.Process(true, RuleRange.Domain);
 		}
 
-		private void NoButton_Click(object sender, RoutedEventArgs e)
+		private void NoButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.Process(false, RuleRange.Caller);
 		}
 
-		private void YesButton_Click(object sender, RoutedEventArgs e)
+		private void YesButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.Process(true, RuleRange.Caller);
 		}

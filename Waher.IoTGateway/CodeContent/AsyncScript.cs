@@ -149,7 +149,7 @@ namespace Waher.IoTGateway.CodeContent
 
 		private async Task Evaluate(Expression Script, Variables Variables, StringBuilder ImplicitPrint, string Id)
 		{
-			async Task Preview(object sender, PreviewEventArgs e)
+			async Task Preview(object Sender, PreviewEventArgs e)
 			{
 				try
 				{

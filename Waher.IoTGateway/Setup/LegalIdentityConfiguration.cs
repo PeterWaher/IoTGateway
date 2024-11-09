@@ -503,7 +503,7 @@ namespace Waher.IoTGateway.Setup
 
 		private void GetLegalIdentities()
 		{
-			Gateway.ContractsClient?.GetLegalIdentities((sender, e) =>
+			Gateway.ContractsClient?.GetLegalIdentities((Sender, e) =>
 			{
 				if (e.Ok)
 				{

@@ -13,6 +13,7 @@ using System.Xml;
 using Waher.Client.WPF.Dialogs.AvalonExtensions;
 using Waher.Content;
 using Waher.Content.Text;
+using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
@@ -292,26 +293,33 @@ namespace Waher.Client.WPF.Dialogs
 			return CheckBox;
 		}
 
-		private void CheckBox_Click(object sender, RoutedEventArgs e)
+		private async void CheckBox_Click(object Sender, RoutedEventArgs e)
 		{
-			if (!(sender is CheckBox CheckBox))
-				return;
-
-			string Var = NameToVar(CheckBox.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			if (CheckBox.IsChecked.HasValue)
+			try
 			{
-				CheckBox.Background = null;
-				Field.SetValue(CommonTypes.Encode(CheckBox.IsChecked.Value));
-				this.CheckOkButtonEnabled();
+				if (!(Sender is CheckBox CheckBox))
+					return;
+
+				string Var = NameToVar(CheckBox.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
+
+				if (CheckBox.IsChecked.HasValue)
+				{
+					CheckBox.Background = null;
+					await Field.SetValue(CommonTypes.Encode(CheckBox.IsChecked.Value));
+					this.CheckOkButtonEnabled();
+				}
+				else
+				{
+					CheckBox.Background = new SolidColorBrush(Colors.LightGray);
+					await Field.SetValue(string.Empty);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				CheckBox.Background = new SolidColorBrush(Colors.LightGray);
-				Field.SetValue(string.Empty);
+				Log.Exception(ex);
 			}
 		}
 
@@ -421,66 +429,73 @@ namespace Waher.Client.WPF.Dialogs
 			return GroupBox;
 		}
 
-		private void MultiListCheckBox_Click(object sender, RoutedEventArgs e)
+		private async void MultiListCheckBox_Click(object Sender, RoutedEventArgs e)
 		{
-			if (!(sender is CheckBox CheckBox))
-				return;
-
-			if (!(CheckBox.Parent is StackPanel StackPanel))
-				return;
-
-			if (!(StackPanel.Parent is GroupBox GroupBox))
-				return;
-
-			string Var = NameToVar(GroupBox.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			List<string> Values = new List<string>();
-
-			foreach (UIElement Element in StackPanel.Children)
+			try
 			{
-				CheckBox = Element as CheckBox;
-				if (CheckBox is null)
-					continue;
+				if (!(Sender is CheckBox CheckBox))
+					return;
 
-				if (CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value)
-					Values.Add((string)CheckBox.Tag);
-			}
+				if (!(CheckBox.Parent is StackPanel StackPanel))
+					return;
 
-			Field.SetValue(Values.ToArray());
+				if (!(StackPanel.Parent is GroupBox GroupBox))
+					return;
 
-			TextBlock ErrorLabel = (TextBlock)GroupBox.Tag;
-			Brush Background;
+				string Var = NameToVar(GroupBox.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
 
-			if (Field.HasError)
-			{
-				Background = new SolidColorBrush(Colors.PeachPuff);
-				this.OkButton.IsEnabled = false;
+				List<string> Values = new List<string>();
 
-				if (!(ErrorLabel is null))
+				foreach (UIElement Element in StackPanel.Children)
 				{
-					ErrorLabel.Text = Field.Error;
-					ErrorLabel.Visibility = Visibility.Visible;
+					CheckBox = Element as CheckBox;
+					if (CheckBox is null)
+						continue;
+
+					if (CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value)
+						Values.Add((string)CheckBox.Tag);
+				}
+
+				await Field.SetValue(Values.ToArray());
+
+				TextBlock ErrorLabel = (TextBlock)GroupBox.Tag;
+				Brush Background;
+
+				if (Field.HasError)
+				{
+					Background = new SolidColorBrush(Colors.PeachPuff);
+					this.OkButton.IsEnabled = false;
+
+					if (!(ErrorLabel is null))
+					{
+						ErrorLabel.Text = Field.Error;
+						ErrorLabel.Visibility = Visibility.Visible;
+					}
+				}
+				else
+				{
+					Background = null;
+					this.CheckOkButtonEnabled();
+
+					if (!(ErrorLabel is null))
+						ErrorLabel.Visibility = Visibility.Collapsed;
+				}
+
+				foreach (UIElement Element in StackPanel.Children)
+				{
+					CheckBox = Element as CheckBox;
+					if (CheckBox is null)
+						continue;
+
+					CheckBox.Background = Background;
 				}
 			}
-			else
+			catch (Exception ex)
 			{
-				Background = null;
-				this.CheckOkButtonEnabled();
-
-				if (!(ErrorLabel is null))
-					ErrorLabel.Visibility = Visibility.Collapsed;
-			}
-
-			foreach (UIElement Element in StackPanel.Children)
-			{
-				CheckBox = Element as CheckBox;
-				if (CheckBox is null)
-					continue;
-
-				CheckBox.Background = Background;
+				Log.Exception(ex);
 			}
 		}
 
@@ -541,86 +556,100 @@ namespace Waher.Client.WPF.Dialogs
 			return ComboBox;
 		}
 
-		private void ComboBox_TextChanged(object sender, TextChangedEventArgs e)
+		private async void ComboBox_TextChanged(object Sender, TextChangedEventArgs e)
 		{
-			if (!(sender is ComboBox ComboBox))
-				return;
-
-			string Var = NameToVar(ComboBox.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
-			string s = ComboBox.Text;
-
-			if (ComboBox.SelectedItem is ComboBoxItem ComboBoxItem && ((string)ComboBoxItem.Content) == s)
-				s = (string)ComboBoxItem.Tag;
-
-			Field.SetValue(s);
-
-			if (Field.HasError)
+			try
 			{
-				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
-				this.OkButton.IsEnabled = false;
+				if (!(Sender is ComboBox ComboBox))
+					return;
 
-				if (!(ErrorLabel is null))
+				string Var = NameToVar(ComboBox.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
+
+				TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
+				string s = ComboBox.Text;
+
+				if (ComboBox.SelectedItem is ComboBoxItem ComboBoxItem && ((string)ComboBoxItem.Content) == s)
+					s = (string)ComboBoxItem.Tag;
+
+				await Field.SetValue(s);
+
+				if (Field.HasError)
 				{
-					ErrorLabel.Text = Field.Error;
-					ErrorLabel.Visibility = Visibility.Visible;
+					ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
+					this.OkButton.IsEnabled = false;
+
+					if (!(ErrorLabel is null))
+					{
+						ErrorLabel.Text = Field.Error;
+						ErrorLabel.Visibility = Visibility.Visible;
+					}
+				}
+				else
+				{
+					ComboBox.Background = null;
+
+					if (!(ErrorLabel is null))
+						ErrorLabel.Visibility = Visibility.Collapsed;
+
+					this.CheckOkButtonEnabled();
 				}
 			}
-			else
+			catch (Exception ex)
 			{
-				ComboBox.Background = null;
-
-				if (!(ErrorLabel is null))
-					ErrorLabel.Visibility = Visibility.Collapsed;
-
-				this.CheckOkButtonEnabled();
+				Log.Exception(ex);
 			}
 		}
 
-		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private async void ComboBox_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
-			if (!(sender is ComboBox ComboBox))
-				return;
-
-			string Var = NameToVar(ComboBox.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
-			string Value;
-
-			if (!(ComboBox.SelectedItem is ComboBoxItem Item))
-				Value = string.Empty;
-			else
-				Value = (string)Item.Tag;
-
-			Field.SetValue(Value);
-
-			if (Field.HasError)
+			try
 			{
-				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
-				this.OkButton.IsEnabled = false;
+				if (!(Sender is ComboBox ComboBox))
+					return;
 
-				if (!(ErrorLabel is null))
+				string Var = NameToVar(ComboBox.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
+
+				TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
+				string Value;
+
+				if (!(ComboBox.SelectedItem is ComboBoxItem Item))
+					Value = string.Empty;
+				else
+					Value = (string)Item.Tag;
+
+				await Field.SetValue(Value);
+
+				if (Field.HasError)
 				{
-					ErrorLabel.Text = Field.Error;
-					ErrorLabel.Visibility = Visibility.Visible;
+					ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
+					this.OkButton.IsEnabled = false;
+
+					if (!(ErrorLabel is null))
+					{
+						ErrorLabel.Text = Field.Error;
+						ErrorLabel.Visibility = Visibility.Visible;
+					}
+					return;
 				}
-				return;
+				else
+				{
+					ComboBox.Background = null;
+
+					if (!(ErrorLabel is null))
+						ErrorLabel.Visibility = Visibility.Collapsed;
+
+					this.CheckOkButtonEnabled();
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				ComboBox.Background = null;
-
-				if (!(ErrorLabel is null))
-					ErrorLabel.Visibility = Visibility.Collapsed;
-
-				this.CheckOkButtonEnabled();
+				Log.Exception(ex);
 			}
 		}
 
@@ -849,9 +878,9 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Rewind_Click(object sender, RoutedEventArgs e)
+		private void Rewind_Click(object Sender, RoutedEventArgs e)
 		{
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 
 			if (!(MediaElement is null))
@@ -863,9 +892,9 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Play_Click(object sender, RoutedEventArgs e)
+		private void Play_Click(object Sender, RoutedEventArgs e)
 		{
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 
 			if (!(MediaElement is null))
@@ -880,23 +909,23 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Pause_Click(object sender, RoutedEventArgs e)
+		private void Pause_Click(object Sender, RoutedEventArgs e)
 		{
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 			MediaElement?.Pause();
 		}
 
-		private void Stop_Click(object sender, RoutedEventArgs e)
+		private void Stop_Click(object Sender, RoutedEventArgs e)
 		{
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 			MediaElement?.Stop();
 		}
 
-		private void Forward_Click(object sender, RoutedEventArgs e)
+		private void Forward_Click(object Sender, RoutedEventArgs e)
 		{
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			MediaElement MediaElement = (MediaElement)Button.Tag;
 
 			if (!(MediaElement is null))
@@ -1031,7 +1060,7 @@ namespace Waher.Client.WPF.Dialogs
 						SyntaxHighlightingResource = "JSON.xshd";
 					else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+xml"))
 						SyntaxHighlightingResource = "XML.xshd";
-					
+
 					break;
 			}
 
@@ -1086,39 +1115,46 @@ namespace Waher.Client.WPF.Dialogs
 			return PasswordBox;
 		}
 
-		private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+		private async void PasswordBox_PasswordChanged(object Sender, RoutedEventArgs e)
 		{
-			if (!(sender is PasswordBox PasswordBox))
-				return;
-
-			string Var = NameToVar(PasswordBox.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			Field.SetValue(PasswordBox.Password);
-
-			TextBlock ErrorLabel = (TextBlock)PasswordBox.Tag;
-
-			if (Field.HasError)
+			try
 			{
-				PasswordBox.Background = new SolidColorBrush(Colors.PeachPuff);
-				this.OkButton.IsEnabled = false;
+				if (!(Sender is PasswordBox PasswordBox))
+					return;
 
-				if (!(ErrorLabel is null))
+				string Var = NameToVar(PasswordBox.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
+
+				await Field.SetValue(PasswordBox.Password);
+
+				TextBlock ErrorLabel = (TextBlock)PasswordBox.Tag;
+
+				if (Field.HasError)
 				{
-					ErrorLabel.Text = Field.Error;
-					ErrorLabel.Visibility = Visibility.Visible;
+					PasswordBox.Background = new SolidColorBrush(Colors.PeachPuff);
+					this.OkButton.IsEnabled = false;
+
+					if (!(ErrorLabel is null))
+					{
+						ErrorLabel.Text = Field.Error;
+						ErrorLabel.Visibility = Visibility.Visible;
+					}
+				}
+				else
+				{
+					PasswordBox.Background = null;
+
+					if (!(ErrorLabel is null))
+						ErrorLabel.Visibility = Visibility.Collapsed;
+
+					this.CheckOkButtonEnabled();
 				}
 			}
-			else
+			catch (Exception ex)
 			{
-				PasswordBox.Background = null;
-
-				if (!(ErrorLabel is null))
-					ErrorLabel.Visibility = Visibility.Collapsed;
-
-				this.CheckOkButtonEnabled();
+				Log.Exception(ex);
 			}
 		}
 
@@ -1197,73 +1233,87 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+		private async void TextBox_TextChanged(object Sender, TextChangedEventArgs e)
 		{
-			if (!(sender is TextBox TextBox))
-				return;
-
-			string Var = NameToVar(TextBox.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			TextBlock ErrorLabel = (TextBlock)TextBox.Tag;
-
-			Field.SetValue(TextBox.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
-
-			if (Field.HasError)
+			try
 			{
-				TextBox.Background = new SolidColorBrush(Colors.PeachPuff);
-				this.OkButton.IsEnabled = false;
-				if (!(ErrorLabel is null))
+				if (!(Sender is TextBox TextBox))
+					return;
+
+				string Var = NameToVar(TextBox.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
+
+				TextBlock ErrorLabel = (TextBlock)TextBox.Tag;
+
+				await Field.SetValue(TextBox.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
+
+				if (Field.HasError)
 				{
-					ErrorLabel.Text = Field.Error;
-					ErrorLabel.Visibility = Visibility.Visible;
+					TextBox.Background = new SolidColorBrush(Colors.PeachPuff);
+					this.OkButton.IsEnabled = false;
+					if (!(ErrorLabel is null))
+					{
+						ErrorLabel.Text = Field.Error;
+						ErrorLabel.Visibility = Visibility.Visible;
+					}
+				}
+				else
+				{
+					TextBox.Background = null;
+
+					if (!(ErrorLabel is null))
+						ErrorLabel.Visibility = Visibility.Collapsed;
+
+					this.CheckOkButtonEnabled();
 				}
 			}
-			else
+			catch (Exception ex)
 			{
-				TextBox.Background = null;
-
-				if (!(ErrorLabel is null))
-					ErrorLabel.Visibility = Visibility.Collapsed;
-
-				this.CheckOkButtonEnabled();
+				Log.Exception(ex);
 			}
 		}
 
-		private void Editor_TextChanged(object sender, EventArgs e)
+		private async void Editor_TextChanged(object Sender, EventArgs e)
 		{
-			if (!(sender is NonScrollingTextEditor Editor))
-				return;
-
-			string Var = NameToVar(Editor.Name);
-			Field Field = this.form[Var];
-			if (Field is null)
-				return;
-
-			TextBlock ErrorLabel = (TextBlock)Editor.Tag;
-
-			Field.SetValue(Editor.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
-
-			if (Field.HasError)
+			try
 			{
-				Editor.Background = new SolidColorBrush(Colors.PeachPuff);
-				this.OkButton.IsEnabled = false;
-				if (!(ErrorLabel is null))
+				if (!(Sender is NonScrollingTextEditor Editor))
+					return;
+
+				string Var = NameToVar(Editor.Name);
+				Field Field = this.form[Var];
+				if (Field is null)
+					return;
+
+				TextBlock ErrorLabel = (TextBlock)Editor.Tag;
+
+				await Field.SetValue(Editor.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
+
+				if (Field.HasError)
 				{
-					ErrorLabel.Text = Field.Error;
-					ErrorLabel.Visibility = Visibility.Visible;
+					Editor.Background = new SolidColorBrush(Colors.PeachPuff);
+					this.OkButton.IsEnabled = false;
+					if (!(ErrorLabel is null))
+					{
+						ErrorLabel.Text = Field.Error;
+						ErrorLabel.Visibility = Visibility.Visible;
+					}
+				}
+				else
+				{
+					Editor.Background = null;
+
+					if (!(ErrorLabel is null))
+						ErrorLabel.Visibility = Visibility.Collapsed;
+
+					this.CheckOkButtonEnabled();
 				}
 			}
-			else
+			catch (Exception ex)
 			{
-				Editor.Background = null;
-
-				if (!(ErrorLabel is null))
-					ErrorLabel.Visibility = Visibility.Collapsed;
-
-				this.CheckOkButtonEnabled();
+				Log.Exception(ex);
 			}
 		}
 
@@ -1377,21 +1427,35 @@ namespace Waher.Client.WPF.Dialogs
 			return true;
 		}
 
-		private void OkButton_Click(object sender, RoutedEventArgs e)
+		private async void OkButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.form.Submit();
+			try
+			{
+				await this.form.Submit();
 
-			this.DialogResult = true;
+				this.DialogResult = true;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private async void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.form.Cancel();
+			try
+			{
+				await this.form.Cancel();
 
-			this.DialogResult = false;
+				this.DialogResult = false;
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
-		private void Window_Activated(object sender, EventArgs e)
+		private void Window_Activated(object Sender, EventArgs e)
 		{
 			if (!(this.makeVisible is null))
 			{

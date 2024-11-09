@@ -670,7 +670,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		public async Task SendAsync(string Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.Send(Payload, More, (sender, e) =>
+			await this.Send(Payload, More, (Sender, e) =>
 			{
 				Result.SetResult(true);
 				return Task.CompletedTask;
@@ -754,7 +754,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		public async Task SendAsync(byte[] Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.Send(Payload, More, (sender, e) =>
+			await this.Send(Payload, More, (Sender, e) =>
 			{
 				Result.SetResult(true);
 				return Task.CompletedTask;
@@ -919,7 +919,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		public async Task CloseAsync()
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.Close((sender, e) =>
+			await this.Close((Sender, e) =>
 			{
 				Result.SetResult(true);
 				return Task.CompletedTask;
@@ -945,7 +945,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		public async Task CloseAsync(ushort Code, string Reason)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.Close(Code, Reason, (sender, e) =>
+			await this.Close(Code, Reason, (Sender, e) =>
 			{
 				Result.SetResult(true);
 				return Task.CompletedTask;

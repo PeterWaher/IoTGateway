@@ -672,9 +672,9 @@ namespace Waher.Networking.PeerToPeer
 			return Connection?.SendUdp(Packet, IncludeNrPreviousPackets) ?? Task.CompletedTask;
 		}
 
-		private async Task Peer_OnClosed(object sender, EventArgs e)
+		private async Task Peer_OnClosed(object Sender, EventArgs e)
 		{
-			PeerConnection Connection = (PeerConnection)sender;
+			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player = (Player)Connection.StateObject;
 			if (Player is null)
 				return;

@@ -260,7 +260,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public async Task NetworkChanged()
 #else
-		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
+		private void NetworkChange_NetworkAddressChanged(object Sender, EventArgs e)
 		{
 			this.NetworkChanged();
 		}
@@ -924,13 +924,13 @@ namespace Waher.Networking.HTTP
 		#region Connections
 
 #if WINDOWS_UWP
-		private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+		private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
 		{
 			try
 			{
 				StreamSocket Client = args.Socket;
 
-				this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+				await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
 				BinaryTcpClient.Bind(true);

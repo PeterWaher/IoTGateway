@@ -88,17 +88,17 @@ namespace Waher.Networking.LWM2M
 			this.Add(new Lwm2mResourceNotSupported(3, this.InstanceId, 22));  // ExtDevInfo 
 		}
 
-		private Task Reboot_OnExecute(object sender, EventArgs e)
+		private Task Reboot_OnExecute(object Sender, EventArgs e)
 		{
 			return this.Object.Client.Reboot();
 		}
 
-		private Task CurrentTime_OnAfterRegister(object sender, EventArgs e)
+		private Task CurrentTime_OnAfterRegister(object Sender, EventArgs e)
 		{
 			return this.currentTime.TriggerAll(new TimeSpan(0, 0, 1));
 		}
 
-		private Task CurrentTime_OnBeforeGet(object sender, CoapRequestEventArgs e)
+		private Task CurrentTime_OnBeforeGet(object Sender, CoapRequestEventArgs e)
 		{
 			this.currentTime.TimeValue = DateTime.Now;
 			return Task.CompletedTask;

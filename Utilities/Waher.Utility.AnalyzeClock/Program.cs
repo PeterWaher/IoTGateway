@@ -298,7 +298,7 @@ namespace Waher.Utility.AnalyzeClock
 					{
 						Done.Reset();
 
-						Client.OnPresenceSubscribed += (sender, e) =>
+						Client.OnPresenceSubscribed += (Sender, e) =>
 						{
 							if (string.Compare(e.FromBareJID, Jid, true) == 0)
 								Done.Set();
@@ -306,7 +306,7 @@ namespace Waher.Utility.AnalyzeClock
 							return Task.CompletedTask;
 						};
 
-						Client.OnPresenceUnsubscribed += (sender, e) =>
+						Client.OnPresenceUnsubscribed += (Sender, e) =>
 						{
 							if (string.Compare(e.FromBareJID, Jid, true) == 0)
 								Error.Set();
@@ -381,7 +381,7 @@ namespace Waher.Utility.AnalyzeClock
 
 				using (SynchronizationClient SynchClient = new(Client))
 				{
-					SynchClient.OnUpdated += (sender, e) =>
+					SynchClient.OnUpdated += (Sender, e) =>
 					{
 						DateTime TP = DateTime.Now;
 						double? StdDev;

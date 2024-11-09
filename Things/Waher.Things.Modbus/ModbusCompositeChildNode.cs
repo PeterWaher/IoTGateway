@@ -67,7 +67,7 @@ namespace Waher.Things.Modbus
 
 						InternalReadoutRequest InternalReadout = new InternalReadoutRequest(this.LogId, null, Request.Types, Request.FieldNames,
 							Request.From, Request.To,
-							(sender, e) =>
+							(Sender, e) =>
 							{
 								foreach (Field F in e.Fields)
 									F.Thing = this;
@@ -79,7 +79,7 @@ namespace Waher.Things.Modbus
 
 								return Task.CompletedTask;
 							},
-							(sender, e) =>
+							(Sender, e) =>
 							{
 								List<ThingError> Errors2 = new List<ThingError>();
 

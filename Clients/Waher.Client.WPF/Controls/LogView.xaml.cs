@@ -74,17 +74,17 @@ namespace Waher.Client.WPF.Controls
 			return Task.CompletedTask;
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.LogListView.Items.Clear();
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.SaveAsButton_Click(sender, e);
+			this.SaveAsButton_Click(Sender, e);
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog()
 			{
@@ -233,7 +233,7 @@ namespace Waher.Client.WPF.Controls
 			return sb.ToString();
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -348,7 +348,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void UserControl_SizeChanged(object Sender, SizeChangedEventArgs e)
 		{
 			if (this.LogListView.View is GridView GridView)
 			{

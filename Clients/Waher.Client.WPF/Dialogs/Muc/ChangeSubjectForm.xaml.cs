@@ -13,17 +13,17 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			InitializeComponent();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void ApplyButton_Click(object sender, RoutedEventArgs e)
+		private void ApplyButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void Subject_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		private void Subject_TextChanged(object Sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
 			this.ApplyButton.IsEnabled = !string.IsNullOrEmpty(this.Subject.Text.Trim());
 		}

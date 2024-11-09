@@ -123,7 +123,7 @@ namespace Waher.Security.DTLS
 			}
 		}
 
-		private async Task Dtls_OnHandshakeSuccessful(object sender, RemoteEndpointEventArgs e)
+		private async Task Dtls_OnHandshakeSuccessful(object Sender, RemoteEndpointEventArgs e)
 		{
 			IPEndPoint EP = (IPEndPoint)e.RemoteEndpoint;
 

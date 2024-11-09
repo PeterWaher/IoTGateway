@@ -187,7 +187,7 @@ namespace Waher.Client.WPF.Model.Muc
 						return;
 					}
 
-					this.MucClient?.GetOccupants(this.roomId, this.domain, null, null, (sender, e) =>
+					this.MucClient?.GetOccupants(this.roomId, this.domain, null, null, (Sender, e) =>
 					{
 						this.loadingChildren = false;
 						MainWindow.MouseDefault();
@@ -392,7 +392,7 @@ namespace Waher.Client.WPF.Model.Muc
 				if (!await this.AssertEntered(true))
 					return;
 
-				DataForm ConfigurationForm = await this.MucClient.GetRoomConfigurationAsync(this.roomId, this.domain, (sender, e) =>
+				DataForm ConfigurationForm = await this.MucClient.GetRoomConfigurationAsync(this.roomId, this.domain, (Sender, e) =>
 				{
 					if (e.Ok)
 						this.OnUpdated();
@@ -419,7 +419,7 @@ namespace Waher.Client.WPF.Model.Muc
 			if (!Result.HasValue || !Result.Value)
 				return;
 
-			await this.MucClient.DestroyRoom(this.roomId, this.domain, Form.Reason.Text, Form.AlternativeRoomJid.Text, (sender, e) =>
+			await this.MucClient.DestroyRoom(this.roomId, this.domain, Form.Reason.Text, Form.AlternativeRoomJid.Text, (Sender, e) =>
 			{
 				if (e.Ok)
 					base.Delete(Parent, OnDeleted);
@@ -684,7 +684,7 @@ namespace Waher.Client.WPF.Model.Muc
 			Item2.Click += this.GetOutcastsList_Click;
 		}
 
-		private void RegisterWithRoom_Click(object sender, RoutedEventArgs e)
+		private void RegisterWithRoom_Click(object Sender, RoutedEventArgs e)
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
@@ -725,7 +725,7 @@ namespace Waher.Client.WPF.Model.Muc
 			}, null);
 		}
 
-		private async void RequestPrivileges_Click(object sender, RoutedEventArgs e)
+		private async void RequestPrivileges_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -738,7 +738,7 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		private void ChangeSubject_Click(object sender, RoutedEventArgs e)
+		private void ChangeSubject_Click(object Sender, RoutedEventArgs e)
 		{
 			ChangeSubjectForm Form = new ChangeSubjectForm()
 			{
@@ -757,37 +757,37 @@ namespace Waher.Client.WPF.Model.Muc
 			this.entered = false;
 		}
 
-		private void GetAdministratorsList_Click(object sender, RoutedEventArgs e)
+		private void GetAdministratorsList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetAdminList(this.roomId, this.domain, this.OccupantListCallback, "Administrators");
 		}
 
-		private void GetOwnersList_Click(object sender, RoutedEventArgs e)
+		private void GetOwnersList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetOwnerList(this.roomId, this.domain, this.OccupantListCallback, "Owners");
 		}
 
-		private void GetModeratorsList_Click(object sender, RoutedEventArgs e)
+		private void GetModeratorsList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetModeratorList(this.roomId, this.domain, this.OccupantListCallback, "Moderators");
 		}
 
-		private void GetMembersList_Click(object sender, RoutedEventArgs e)
+		private void GetMembersList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetMemberList(this.roomId, this.domain, this.OccupantListCallback, "Members");
 		}
 
-		private void GetParticipantsList_Click(object sender, RoutedEventArgs e)
+		private void GetParticipantsList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetVoiceList(this.roomId, this.domain, this.OccupantListCallback, "Participants");
 		}
 
-		private void GetVisitorsList_Click(object sender, RoutedEventArgs e)
+		private void GetVisitorsList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetOccupants(this.roomId, this.domain, null, Role.Visitor, this.OccupantListCallback, "Visitors");
 		}
 
-		private void GetOutcastsList_Click(object sender, RoutedEventArgs e)
+		private void GetOutcastsList_Click(object Sender, RoutedEventArgs e)
 		{
 			this.MucClient.GetBannedOccupants(this.roomId, this.domain, this.OccupantListCallback, "Outcasts");
 		}

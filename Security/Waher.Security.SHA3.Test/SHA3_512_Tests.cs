@@ -12,7 +12,7 @@ namespace Waher.Security.SHA3.Test
             SHA3_512 H = new SHA3_512();
             int i = 0;
 
-            H.NewState += (sender, e) =>
+            H.NewState += (Sender, e) =>
             {
                 string Expected = States0Bits[i++].Replace(" ", string.Empty);
                 string Actual = Hashes.BinaryToString(H.GetState()).ToUpper();
@@ -31,7 +31,7 @@ namespace Waher.Security.SHA3.Test
             SHA3_512 H = new SHA3_512();
             int i = 0;
 
-            H.NewState += (sender, e) =>
+            H.NewState += (Sender, e) =>
             {
                 string Expected = States1600Bits[i++].Replace(" ", string.Empty);
                 string Actual = Hashes.BinaryToString(H.GetState()).ToUpper();

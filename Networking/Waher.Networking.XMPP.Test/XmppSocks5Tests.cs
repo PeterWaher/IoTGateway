@@ -18,7 +18,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new(false);
 			Socks5Proxy Proxy = new(this.client1);
 			
-			Proxy.StartSearch((sender, e) =>
+			Proxy.StartSearch((Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
@@ -41,7 +41,7 @@ namespace Waher.Networking.XMPP.Test
 			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
 				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
-			Client.OnStateChange += (sender, e) =>
+			Client.OnStateChange += (Sender, e) =>
 			{
 				switch (Client.State)
 				{
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Test
 			Socks5Client Client = new("waher.se", 1080, "socks5.waher.se",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
-			Client.OnStateChange += (sender, e) =>
+			Client.OnStateChange += (Sender, e) =>
 			{
 				switch (Client.State)
 				{
@@ -103,7 +103,7 @@ namespace Waher.Networking.XMPP.Test
 			Socks5Client Client1 = new("waher.se", 1080, "socks5.waher.se",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
-			Client1.OnStateChange += (sender, e) =>
+			Client1.OnStateChange += (Sender, e) =>
 			{
 				switch (Client1.State)
 				{
@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP.Test
 			Socks5Client Client2 = new("waher.se", 1080, "socks5.waher.se",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 
-			Client2.OnStateChange += (sender, e) =>
+			Client2.OnStateChange += (Sender, e) =>
 			{
 				switch (Client2.State)
 				{
@@ -162,7 +162,7 @@ namespace Waher.Networking.XMPP.Test
 			Done2.Reset();
 			Error2.Reset();
 
-			Client1.OnDataReceived += (sender, e) =>
+			Client1.OnDataReceived += (Sender, e) =>
 			{
 				if (Encoding.UTF8.GetString(e.Buffer, e.Offset, e.Count) == "Hello2")
 					Done1.Set();
@@ -172,7 +172,7 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			Client2.OnDataReceived += (sender, e) =>
+			Client2.OnDataReceived += (Sender, e) =>
 			{
 				if (Encoding.UTF8.GetString(e.Buffer, e.Offset, e.Count) == "Hello1")
 					Done2.Set();
@@ -183,7 +183,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 
 			this.client1.SendIqSet("socks5.waher.se", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
-				"<activate>" + this.client2.FullJID + "</activate></query>", (sender, e) =>
+				"<activate>" + this.client2.FullJID + "</activate></query>", (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -216,7 +216,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done1 = new(false);
 			Socks5Proxy Proxy1 = new(this.client1);
 
-			Proxy1.StartSearch((sender, e) =>
+			Proxy1.StartSearch((Sender, e) =>
 			{
 				Done1.Set();
 				return Task.CompletedTask;
@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done2 = new(false);
 			Socks5Proxy Proxy2 = new(this.client2);
 
-			Proxy2.StartSearch((sender, e) =>
+			Proxy2.StartSearch((Sender, e) =>
 			{
 				Done2.Set();
 				return Task.CompletedTask;
@@ -251,7 +251,7 @@ namespace Waher.Networking.XMPP.Test
 			ConsoleOut.WriteLine("Start of session initiation.");
 			ConsoleOut.WriteLine();
 
-			Proxy2.OnOpen += (sender, e) =>
+			Proxy2.OnOpen += (Sender, e) =>
 			{
 				e.AcceptStream((sender2, e2) =>
 				{
@@ -275,7 +275,7 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			Proxy1.InitiateSession(this.client2.FullJID, (sender, e) =>
+			Proxy1.InitiateSession(this.client2.FullJID, (Sender, e) =>
 			{
 				if (e.Ok)
 				{

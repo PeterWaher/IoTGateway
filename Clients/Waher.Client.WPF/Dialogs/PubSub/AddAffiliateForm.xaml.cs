@@ -14,12 +14,12 @@ namespace Waher.Client.WPF.Dialogs.PubSub
 			this.InitializeComponent();
 		}
 
-		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void ComboBox_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
 			this.FormChanged();
 		}
 
-		private void Jid_TextChanged(object sender, TextChangedEventArgs e)
+		private void Jid_TextChanged(object Sender, TextChangedEventArgs e)
 		{
 			this.FormChanged();
 		}
@@ -29,12 +29,12 @@ namespace Waher.Client.WPF.Dialogs.PubSub
 			this.AddButton.IsEnabled = XmppClient.BareJidRegEx.IsMatch(this.Jid.Text) && this.Affiliation.SelectedIndex >= 0;
 		}
 
-		public void AddButton_Click(object sender, RoutedEventArgs e)
+		public void AddButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		public void CancelButton_Click(object sender, RoutedEventArgs e)
+		public void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}

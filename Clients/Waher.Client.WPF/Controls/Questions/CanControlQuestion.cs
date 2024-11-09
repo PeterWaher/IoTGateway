@@ -207,11 +207,11 @@ namespace Waher.Client.WPF.Controls.Questions
 			this.AddTokens(Details, this.client, this.YesTokenButton_Click, this.NoTokenButton_Click);
 		}
 
-		private void GetListButton_Click(object sender, RoutedEventArgs e)
+		private void GetListButton_Click(object Sender, RoutedEventArgs e)
 		{
 			XmppClient Client = this.client.Client;
 
-			((Button)sender).IsEnabled = false;
+			((Button)Sender).IsEnabled = false;
 
 			RosterItem Item = Client[this.JID];
 			if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
@@ -364,50 +364,50 @@ namespace Waher.Client.WPF.Controls.Questions
 			}
 		}
 
-		private void NoAllButton_Click(object sender, RoutedEventArgs e)
+		private void NoAllButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
 			this.client.CanControlResponseAll(this.Sender, this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
-		private void YesAllButton_Click(object sender, RoutedEventArgs e)
+		private void YesAllButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
 			this.client.CanControlResponseAll(this.Sender, this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
-		private void NoDomainButton_Click(object sender, RoutedEventArgs e)
+		private void NoDomainButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
 			this.client.CanControlResponseDomain(this.Sender, this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
-		private void YesDomainButton_Click(object sender, RoutedEventArgs e)
+		private void YesDomainButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
 			this.client.CanControlResponseDomain(this.Sender, this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
-		private void NoButton_Click(object sender, RoutedEventArgs e)
+		private void NoButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
 			this.client.CanControlResponseCaller(this.Sender, this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
-		private void YesButton_Click(object sender, RoutedEventArgs e)
+		private void YesButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
 			this.client.CanControlResponseCaller(this.Sender, this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
-		private void NoTokenButton_Click(object sender, RoutedEventArgs e)
+		private void NoTokenButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.TokenButtonClick(sender, e, false);
+			this.TokenButtonClick(Sender, e, false);
 		}
 
-		private void TokenButtonClick(object sender, RoutedEventArgs _, bool Result)
+		private void TokenButtonClick(object Sender, RoutedEventArgs _, bool Result)
 		{
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			object[] P = (object[])Button.Tag;
 			this.parameter = (string)P[0];
 			this.range = (OperationRange)P[1];
@@ -428,9 +428,9 @@ namespace Waher.Client.WPF.Controls.Questions
 			}
 		}
 
-		private void YesTokenButton_Click(object sender, RoutedEventArgs e)
+		private void YesTokenButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.TokenButtonClick(sender, e, true);
+			this.TokenButtonClick(Sender, e, true);
 		}
 
 		public override bool IsResolvedBy(Question Question)

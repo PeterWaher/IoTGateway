@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP.Software
 			Xml.Append(XML.Encode(FileName));
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				Package PackageInfo = null;
@@ -162,7 +162,7 @@ namespace Waher.Networking.XMPP.Software
 		{
 			TaskCompletionSource<Package> Result = new TaskCompletionSource<Package>();
 
-			await this.GetPackageInformation(FileName, (sender, e) =>
+			await this.GetPackageInformation(FileName, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Package);
@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.Software
 			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				Package[] PackagesInfo = null;
@@ -224,7 +224,7 @@ namespace Waher.Networking.XMPP.Software
 		{
 			TaskCompletionSource<Package[]> Result = new TaskCompletionSource<Package[]>();
 
-			await this.GetPackagesInformation((sender, e) =>
+			await this.GetPackagesInformation((Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Packages);
@@ -268,7 +268,7 @@ namespace Waher.Networking.XMPP.Software
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.Subscribe(FileName, (sender, e) =>
+			await this.Subscribe(FileName, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -312,7 +312,7 @@ namespace Waher.Networking.XMPP.Software
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.Unsubscribe(FileName, (sender, e) =>
+			await this.Unsubscribe(FileName, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -341,7 +341,7 @@ namespace Waher.Networking.XMPP.Software
 			Xml.Append(NamespaceSoftwareUpdatesCurrent);
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				string[] FileNames = null;
@@ -375,7 +375,7 @@ namespace Waher.Networking.XMPP.Software
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
 
-			await this.GetSubscriptions((sender, e) =>
+			await this.GetSubscriptions((Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.FileNames);

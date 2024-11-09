@@ -41,12 +41,12 @@ namespace Waher.Client.WPF.Dialogs
 			set => this.passwordHashMethod = value;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private async void ConnectButton_Click(object sender, RoutedEventArgs e)
+		private async void ConnectButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -322,14 +322,14 @@ namespace Waher.Client.WPF.Dialogs
 
 		public XmppClient Client => this.client;
 
-		private void CreateAccount_Click(object sender, RoutedEventArgs e)
+		private void CreateAccount_Click(object Sender, RoutedEventArgs e)
 		{
 			bool Create = this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value;
 			this.CreateParameters.Visibility = Create ? Visibility.Visible : Visibility.Collapsed;
 			this.RetypePassword.IsEnabled = Create;
 		}
 
-		private void ConnectionMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void ConnectionMethod_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
 			if (this.PortLabel is null)
 				return;

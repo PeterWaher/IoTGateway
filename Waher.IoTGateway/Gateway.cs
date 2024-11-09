@@ -488,7 +488,7 @@ namespace Waher.IoTGateway
 										exceptionFile.Write("Start of export: ");
 										exceptionFile.WriteLine(DateTime.Now.ToString());
 
-										AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+										AppDomain.CurrentDomain.FirstChanceException += (Sender, e) =>
 										{
 											if (!(exceptionFile is null))
 											{
@@ -1008,7 +1008,7 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("X509", certificate);
 
 				await WriteWebServerOpenPorts();
-				webServer.OnNetworkChanged += async (sender, e) =>
+				webServer.OnNetworkChanged += async (Sender, e) =>
 				{
 					try
 					{
@@ -1419,7 +1419,7 @@ namespace Waher.IoTGateway
 			return true;
 		}
 
-		private static Task ProvisionedMeteringNode_QrCodeUrlRequested(object sender, GetQrCodeUrlEventArgs e)
+		private static Task ProvisionedMeteringNode_QrCodeUrlRequested(object Sender, GetQrCodeUrlEventArgs e)
 		{
 			StringBuilder Link = new StringBuilder();
 			Link.Append("https://");
@@ -2292,7 +2292,7 @@ namespace Waher.IoTGateway
 				{
 					using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
 					{
-						await xmppClient.SetPresence(Availability.Offline, (sender, e) =>
+						await xmppClient.SetPresence(Availability.Offline, (Sender, e) =>
 						{
 							OfflineSent.Set();
 							return Task.CompletedTask;

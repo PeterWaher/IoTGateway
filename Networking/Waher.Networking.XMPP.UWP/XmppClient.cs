@@ -521,7 +521,7 @@ namespace Waher.Networking.XMPP
 				this.AllowRegistration(Credentials.FormSignatureKey, Credentials.FormSignatureSecret);
 		}
 
-		private void Types_OnInvalidated(object sender, EventArgs e)
+		private void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			alternativeBindingMechanisms = Types.GetTypesImplementingInterface(typeof(IAlternativeTransport));
 		}
@@ -725,7 +725,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private async Task Client_OnDisconnected(object sender, EventArgs e)
+		private async Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			await this.Information("Disconnected.");
 			if (this.state != XmppState.Error)
@@ -1916,8 +1916,7 @@ namespace Waher.Networking.XMPP
 											}
 										}
 
-										if (!(Callback is null))
-											await this.ProcessResult(Callback, new IqResultEventArgs(E, Id, To, From, Ok, State));
+										await Callback.Raise(this, new IqResultEventArgs(E, Id, To, From, Ok, State));
 									}
 									break;
 							}
@@ -2659,11 +2658,6 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private Task ProcessResult(EventHandlerAsync<IqResultEventArgs> Callback, IqResultEventArgs e)
-		{
-			return Callback.Raise(this, e);
-		}
-
 		/// <summary>
 		/// Registers an IQ-Get handler.
 		/// </summary>
@@ -3345,7 +3339,7 @@ namespace Waher.Networking.XMPP
 			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, StanzaElement);
 		}
 
-		private async Task Client_OnPaused(object sender, EventArgs e)
+		private async Task Client_OnPaused(object Sender, EventArgs e)
 		{
 			if (this.upgradeToTls)
 			{
@@ -3829,7 +3823,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.SendIqGet(To, Xml, (sender, e) =>
+			await this.SendIqGet(To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -3874,7 +3868,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.SendIqSet(To, Xml, (sender, e) =>
+			await this.SendIqSet(To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -4694,7 +4688,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.SetPresence(Availability, (sender, e) =>
+			await this.SetPresence(Availability, (Sender, e) =>
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;
@@ -5032,7 +5026,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<PresenceEventArgs> Query = new TaskCompletionSource<PresenceEventArgs>();
 
-			await this.SendDirectedPresence(Type, To, CustomXml, (sender, e) =>
+			await this.SendDirectedPresence(Type, To, CustomXml, (Sender, e) =>
 			{
 				Query.SetResult(e);
 				return Task.CompletedTask;
@@ -5329,7 +5323,7 @@ namespace Waher.Networking.XMPP
 			switch (QoS)
 			{
 				case QoSLevel.Unacknowledged:
-					await this.BeginWrite(MessageXml, async (sender, e) => await this.CallDeliveryCallback(DeliveryCallback, State, true));
+					await this.BeginWrite(MessageXml, async (Sender, e) => await this.CallDeliveryCallback(DeliveryCallback, State, true));
 					break;
 
 				case QoSLevel.Acknowledged:
@@ -5340,7 +5334,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
 
-					await this.SendIqSet(To, Xml.ToString(), async (sender, e) => await this.CallDeliveryCallback(DeliveryCallback, State, e.Ok), null,
+					await this.SendIqSet(To, Xml.ToString(), async (Sender, e) => await this.CallDeliveryCallback(DeliveryCallback, State, e.Ok), null,
 						5000, int.MaxValue, true, 3600000);
 					break;
 
@@ -5698,50 +5692,47 @@ namespace Waher.Networking.XMPP
 			Dictionary<string, DataForm> ExtendedInformation = new Dictionary<string, DataForm>();
 			List<Identity> Identities = new List<Identity>();
 
-			if (!(Callback is null) || CacheResponse)
+			if (e.Ok)
 			{
-				if (e.Ok)
+				foreach (XmlNode N in e.Response.ChildNodes)
 				{
-					foreach (XmlNode N in e.Response.ChildNodes)
+					if (N.LocalName == "query")
 					{
-						if (N.LocalName == "query")
+						foreach (XmlNode N2 in N.ChildNodes)
 						{
-							foreach (XmlNode N2 in N.ChildNodes)
+							switch (N2.LocalName)
 							{
-								switch (N2.LocalName)
-								{
-									case "identity":
-										Identities.Add(new Identity((XmlElement)N2));
+								case "identity":
+									Identities.Add(new Identity((XmlElement)N2));
+									break;
+
+								case "feature":
+									Features[XML.Attribute((XmlElement)N2, "var")] = true;
+									break;
+
+								case "x":
+									DataForm Form = new DataForms.DataForm(this, (XmlElement)N2, null, null, e.From, e.To);
+									Field FormType = Form["FORM_TYPE"];
+									if (FormType is null)
 										break;
 
-									case "feature":
-										Features[XML.Attribute((XmlElement)N2, "var")] = true;
-										break;
-
-									case "x":
-										DataForm Form = new DataForms.DataForm(this, (XmlElement)N2, null, null, e.From, e.To);
-										Field FormType = Form["FORM_TYPE"];
-										if (FormType is null)
-											break;
-
-										ExtendedInformation[FormType.ValueString] = Form;
-										break;
-								}
+									ExtendedInformation[FormType.ValueString] = Form;
+									break;
 							}
 						}
 					}
 				}
-
-				ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(e, Identities.ToArray(), Features, ExtendedInformation)
-				{
-					State = State2
-				};
-
-				if (e.Ok && CacheResponse)
-					this.serverFeatures = e2;
-
-				await Callback.Raise(this, e2);
 			}
+
+			ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(e, Identities.ToArray(), Features, ExtendedInformation)
+			{
+				State = State2
+			};
+
+			if (e.Ok && CacheResponse)
+				this.serverFeatures = e2;
+
+			await Callback.Raise(this, e2);
 		}
 
 		/// <summary>
@@ -5850,7 +5841,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<ServiceDiscoveryEventArgs> Result = new TaskCompletionSource<ServiceDiscoveryEventArgs>();
 
-			await this.SendServiceDiscoveryRequest(E2eEncryption, To, Node, (sender, e) =>
+			await this.SendServiceDiscoveryRequest(E2eEncryption, To, Node, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -5955,33 +5946,30 @@ namespace Waher.Networking.XMPP
 			bool CacheResponse = (bool)P[2];
 			List<Item> Items = new List<Item>();
 
-			if (!(Callback is null) || CacheResponse)
+			if (e.Ok)
 			{
-				if (e.Ok)
+				foreach (XmlNode N in e.Response.ChildNodes)
 				{
-					foreach (XmlNode N in e.Response.ChildNodes)
+					if (N.LocalName == "query")
 					{
-						if (N.LocalName == "query")
+						foreach (XmlNode N2 in N.ChildNodes)
 						{
-							foreach (XmlNode N2 in N.ChildNodes)
-							{
-								if (N2.LocalName == "item")
-									Items.Add(new Item((XmlElement)N2));
-							}
+							if (N2.LocalName == "item")
+								Items.Add(new Item((XmlElement)N2));
 						}
 					}
 				}
-
-				ServiceItemsDiscoveryEventArgs e2 = new ServiceItemsDiscoveryEventArgs(e, Items.ToArray())
-				{
-					State = State
-				};
-
-				if (CacheResponse && e.Ok)
-					this.serverComponents = e2;
-
-				await Callback.Raise(this, e2);
 			}
+
+			ServiceItemsDiscoveryEventArgs e2 = new ServiceItemsDiscoveryEventArgs(e, Items.ToArray())
+			{
+				State = State
+			};
+
+			if (CacheResponse && e.Ok)
+				this.serverComponents = e2;
+
+			await Callback.Raise(this, e2);
 		}
 
 		/// <summary>
@@ -6092,7 +6080,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<ServiceItemsDiscoveryEventArgs> Result = new TaskCompletionSource<ServiceItemsDiscoveryEventArgs>();
 
-			await this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, Node, (sender, e) =>
+			await this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, Node, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -6161,48 +6149,45 @@ namespace Waher.Networking.XMPP
 			object State = P[1];
 			List<Item> Items = new List<Item>();
 
-			if (!(Callback is null))
+			string Name = string.Empty;
+			string Version = string.Empty;
+			string OS = string.Empty;
+
+			if (e.Ok)
 			{
-				string Name = string.Empty;
-				string Version = string.Empty;
-				string OS = string.Empty;
-
-				if (e.Ok)
+				foreach (XmlNode N in e.Response.ChildNodes)
 				{
-					foreach (XmlNode N in e.Response.ChildNodes)
+					if (N.LocalName == "query")
 					{
-						if (N.LocalName == "query")
+						foreach (XmlNode N2 in N.ChildNodes)
 						{
-							foreach (XmlNode N2 in N.ChildNodes)
+							switch (N2.LocalName)
 							{
-								switch (N2.LocalName)
-								{
-									case "name":
-										Name = N2.InnerText;
-										break;
+								case "name":
+									Name = N2.InnerText;
+									break;
 
-									case "version":
-										Version = N2.InnerText;
-										break;
+								case "version":
+									Version = N2.InnerText;
+									break;
 
-									case "os":
-										OS = N2.InnerText;
-										break;
-								}
+								case "os":
+									OS = N2.InnerText;
+									break;
 							}
-
-							break;
 						}
+
+						break;
 					}
 				}
-
-				SoftwareVersionEventArgs e2 = new SoftwareVersionEventArgs(e, Name, Version, OS)
-				{
-					State = State
-				};
-
-				await Callback.Raise(this, e2);
 			}
+
+			SoftwareVersionEventArgs e2 = new SoftwareVersionEventArgs(e, Name, Version, OS)
+			{
+				State = State
+			};
+
+			await Callback.Raise(this, e2);
 		}
 
 		/// <summary>
@@ -6259,7 +6244,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<SoftwareVersionEventArgs> Result = new TaskCompletionSource<SoftwareVersionEventArgs>();
 
-			await this.SendSoftwareVersionRequest(E2eEncryption, To, (sender, e) =>
+			await this.SendSoftwareVersionRequest(E2eEncryption, To, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -6483,7 +6468,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<SearchFormEventArgs> Result = new TaskCompletionSource<SearchFormEventArgs>();
 
-			await this.SendSearchFormRequest(E2eEncryption, To, (sender, e) =>
+			await this.SendSearchFormRequest(E2eEncryption, To, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -7232,7 +7217,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.GetPrivateXmlElement(LocalName, Namespace, (sender, e) =>
+			await this.GetPrivateXmlElement(LocalName, Namespace, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Element);
@@ -7267,7 +7252,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(Namespace));
 			Xml.Append("'/></query>");
 
-			return this.SendIqGet(string.Empty, Xml.ToString(), async (sender, e) =>
+			return this.SendIqGet(string.Empty, Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement Result = null;
 				XmlElement E;
@@ -7315,7 +7300,7 @@ namespace Waher.Networking.XMPP
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.SetPrivateXmlElement(Element, (sender, e) =>
+			await this.SetPrivateXmlElement(Element, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -7361,7 +7346,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(Element.OuterXml);
 			Xml.Append("</query>");
 
-			return this.SendIqSet(string.Empty, Xml.ToString(), async (sender, e) =>
+			return this.SendIqSet(string.Empty, Xml.ToString(), async (Sender, e) =>
 			{
 				await Callback.Raise(this, new PrivateXmlEventArgs(Element, e));
 

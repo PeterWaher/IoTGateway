@@ -1040,44 +1040,41 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(Cipher is null))
 			{
-				if (!(Callback is null))
+				Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
+				if (T is null)
 				{
-					Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
-					if (T is null)
-					{
-						await Client.Error("Unable to decrypt or verify response.");
-						return;
-					}
-
-					string Content = T.Item1;
-					string EndpointReference = T.Item2;
-					StringBuilder Xml = new StringBuilder();
-
-					Xml.Append("<iq xmlns=\"jabber:client\" id=\"");
-					Xml.Append(e.Id);
-					Xml.Append("\" from=\"");
-					Xml.Append(XML.Encode(e.From));
-					Xml.Append("\" to=\"");
-					Xml.Append(XML.Encode(e.To));
-
-					if (e.Ok)
-						Xml.Append("\" type=\"result\">");
-					else
-						Xml.Append("\" type=\"error\">");
-
-					Xml.Append(Content);
-					Xml.Append("</iq>");
-
-					XmlDocument Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.LoadXml(Xml.ToString());
-
-					IqResultEventArgs e2 = new IqResultEventArgs(this, EndpointReference, Cipher,
-						Doc.DocumentElement, e.Id, e.To, e.From, e.Ok, State);
-					await Callback(Sender, e2);
+					await Client.Error("Unable to decrypt or verify response.");
+					return;
 				}
+
+				string Content = T.Item1;
+				string EndpointReference = T.Item2;
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<iq xmlns=\"jabber:client\" id=\"");
+				Xml.Append(e.Id);
+				Xml.Append("\" from=\"");
+				Xml.Append(XML.Encode(e.From));
+				Xml.Append("\" to=\"");
+				Xml.Append(XML.Encode(e.To));
+
+				if (e.Ok)
+					Xml.Append("\" type=\"result\">");
+				else
+					Xml.Append("\" type=\"error\">");
+
+				Xml.Append(Content);
+				Xml.Append("</iq>");
+
+				XmlDocument Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
+				Doc.LoadXml(Xml.ToString());
+
+				IqResultEventArgs e2 = new IqResultEventArgs(this, EndpointReference, Cipher,
+					Doc.DocumentElement, e.Id, e.To, e.From, e.Ok, State);
+				await Callback.Raise(Sender, e2);
 			}
 			else if (!e.Ok && this.IsForbidden(e.ErrorElement))
 			{
@@ -1094,11 +1091,8 @@ namespace Waher.Networking.XMPP.P2P
 
 				if (PkiSynchronized)
 				{
-					if (!(Callback is null))
-					{
-						e.State = State;
-						await Callback(Sender, e);
-					}
+					e.State = State;
+					await Callback.Raise(Sender, e);
 				}
 				else
 				{
@@ -1119,11 +1113,8 @@ namespace Waher.Networking.XMPP.P2P
 			}
 			else
 			{
-				if (!(Callback is null))
-				{
-					e.State = State;
-					await Callback(Sender, e);
-				}
+				e.State = State;
+				await Callback.Raise(Sender, e);
 			}
 		}
 
@@ -1193,7 +1184,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 
 			string Content = T.Item1;
-			string EndpointReference= T.Item2;
+			string EndpointReference = T.Item2;
 
 			XmlDocument Doc = new XmlDocument()
 			{
@@ -1668,17 +1659,8 @@ namespace Waher.Networking.XMPP.P2P
 						await Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
 							NrRetries, DropOff, MaxRetryTimeout);
 					}
-					else if (!(Callback is null))
-					{
-						try
-						{
-							await Callback(Sender, e);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					else
+						await Callback.Raise(Sender, e);
 				}, State);
 
 				return SeqNr;
@@ -1727,7 +1709,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.SendIqGet(Client, E2ETransmission, To, Xml, (sender, e) =>
+			await this.SendIqGet(Client, E2ETransmission, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1776,7 +1758,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
 
-			await this.SendIqSet(Client, E2ETransmission, To, Xml, (sender, e) =>
+			await this.SendIqSet(Client, E2ETransmission, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Response);
@@ -1829,17 +1811,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (e.Ok && !(e.FirstElement is null))
 					await this.ParseE2e(e.FirstElement, FullJID);
 
-				if (!(Callback is null))
-				{
-					try
-					{
-						await Callback(Sender, e);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+				await Callback.Raise(Sender, e);
 			}, State);
 		}
 

@@ -97,17 +97,17 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.table.Clear();
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.SaveAsButton_Click(sender, e);
+			this.SaveAsButton_Click(Sender, e);
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog()
 			{
@@ -196,7 +196,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{

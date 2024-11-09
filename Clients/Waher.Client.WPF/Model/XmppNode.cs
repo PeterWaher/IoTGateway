@@ -57,7 +57,7 @@ namespace Waher.Client.WPF.Model
 			Item.Click += this.SendXmppIqSet_Click;
 		}
 
-		private async void SendXmppMessage_Click(object sender, RoutedEventArgs e)
+		private async void SendXmppMessage_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -83,7 +83,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private async void SendXmppIqGet_Click(object sender, RoutedEventArgs e)
+		private async void SendXmppIqGet_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -131,7 +131,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private async void SendXmppIqSet_Click(object sender, RoutedEventArgs e)
+		private async void SendXmppIqSet_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{

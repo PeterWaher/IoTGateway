@@ -1076,7 +1076,7 @@ namespace Waher.IoTGateway.Setup
 			return false;
 		}
 
-		private bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		private bool RemoteCertificateValidationCallback(object Sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
 		{
 			bool Valid;
 

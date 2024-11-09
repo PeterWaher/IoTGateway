@@ -55,7 +55,7 @@ namespace Waher.Networking.XMPP.Test
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
 				string ContentId = await this.bobClient2.StoreData(Bin, PlainTextCodec.DefaultContentType);
 
-				await this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
+				await this.bobClient1.GetData(this.client2.FullJID, ContentId, (Sender, e) =>
 				{
 					if (e.Ok && e.ContentId == ContentId && e.ContentType == PlainTextCodec.DefaultContentType && Encoding.UTF8.GetString(e.Data) == s)
 						Done.Set();
@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.Test
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
 				string ContentId = await this.bobClient2.StoreData(Bin, PlainTextCodec.DefaultContentType, DateTime.Now.AddMinutes(1));
 
-				await this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
+				await this.bobClient1.GetData(this.client2.FullJID, ContentId, (Sender, e) =>
 				{
 					double d;
 

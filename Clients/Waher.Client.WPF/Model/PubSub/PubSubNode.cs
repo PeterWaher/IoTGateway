@@ -136,7 +136,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 				if (this.nodeType == NodeType.leaf && this.Service.SupportsLastPublished)
 				{
-					this.Service.PubSubClient.GetLatestItems(this.node, 50, (sender, e) =>
+					this.Service.PubSubClient.GetLatestItems(this.node, 50, (Sender, e) =>
 					{
 						this.loadingChildren = false;
 						MainWindow.MouseDefault();
@@ -168,7 +168,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				}
 				else
 				{
-					this.Service.Account.Client.SendServiceItemsDiscoveryRequest(this.PubSubClient.ComponentAddress, this.node, (sender, e) =>
+					this.Service.Account.Client.SendServiceItemsDiscoveryRequest(this.PubSubClient.ComponentAddress, this.node, (Sender, e) =>
 					{
 						this.loadingChildren = false;
 						MainWindow.MouseDefault();
@@ -488,7 +488,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			MenuItem.Click += this.Purge_Click;
 		}
 
-		private void Purge_Click(object sender, RoutedEventArgs e)
+		private void Purge_Click(object Sender, RoutedEventArgs e)
 		{
 			if (MessageBox.Show(MainWindow.currentInstance, "Are you sure you want to purge all items in " + this.node + "?", "Are you sure?", MessageBoxButton.YesNo,
 				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
@@ -511,7 +511,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			}
 		}
 
-		private void Affiliations_Click(object sender, RoutedEventArgs e)
+		private void Affiliations_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -594,7 +594,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.PubSubClient.GetNodeConfiguration(this.node, (sender, e) =>
+			this.PubSubClient.GetNodeConfiguration(this.node, (Sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -653,7 +653,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			await this.Service.PubSubClient.DeleteNode(this.node, (sender, e) =>
+			await this.Service.PubSubClient.DeleteNode(this.node, (Sender, e) =>
 			{
 				MainWindow.MouseDefault();
 

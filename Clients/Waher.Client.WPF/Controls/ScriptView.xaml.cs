@@ -48,19 +48,19 @@ namespace Waher.Client.WPF.Controls
 			this.Input.Focus();
 		}
 
-		private void Input_PreviewKeyDown(object sender, KeyEventArgs e)
+		private void Input_PreviewKeyDown(object Sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
 			{
 				if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
 				{
-					this.ExecuteButton_Click(sender, e);
+					this.ExecuteButton_Click(Sender, e);
 					e.Handled = true;
 				}
 			}
 		}
 
-		private void ExecuteButton_Click(object sender, RoutedEventArgs e)
+		private void ExecuteButton_Click(object Sender, RoutedEventArgs e)
 		{
 			Waher.Script.Expression Exp;
 			TextBlock ScriptBlock;
@@ -270,9 +270,9 @@ namespace Waher.Client.WPF.Controls
 			return ResultBlock;
 		}
 
-		private void TextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		private void TextBlock_PreviewMouseDown(object Sender, MouseButtonEventArgs e)
 		{
-			this.Input.Text = ((TextBlock)sender).Text;
+			this.Input.Text = ((TextBlock)Sender).Text;
 			this.Input.SelectAll();
 			this.Input.Focus();
 			e.Handled = true;
@@ -317,9 +317,9 @@ namespace Waher.Client.WPF.Controls
 			return ImageBlock;
 		}
 
-		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+		private void ImageBlock_PreviewMouseDown(object Sender, MouseButtonEventArgs e)
 		{
-			Image ImageBlock = (Image)sender;
+			Image ImageBlock = (Image)Sender;
 
 			if (e.ChangedButton == MouseButton.Left)
 			{
@@ -415,17 +415,17 @@ namespace Waher.Client.WPF.Controls
 			});
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.HistoryPanel.Children.Clear();
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.SaveAsButton_Click(sender, e);
+			this.SaveAsButton_Click(Sender, e);
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog()
 			{
@@ -537,7 +537,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -663,9 +663,9 @@ namespace Waher.Client.WPF.Controls
 			this.HistoryPanel.Children.Clear();
 		}
 
-		private void Hyperlink_Click(object sender, RoutedEventArgs e)
+		private void Hyperlink_Click(object Sender, RoutedEventArgs e)
 		{
-			string Uri = ((Hyperlink)sender).NavigateUri.ToString();
+			string Uri = ((Hyperlink)Sender).NavigateUri.ToString();
 			System.Diagnostics.Process.Start(Uri);
 		}
 	}

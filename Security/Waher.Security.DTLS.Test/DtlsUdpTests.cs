@@ -57,12 +57,12 @@ namespace Waher.Security.DTLS.Test
 			ManualResetEvent Done = new(false);
 			ManualResetEvent Error = new(false);
 
-			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (sender, e) =>
+			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (Sender, e) =>
 			{
 				Done.Set();
 				return Task.CompletedTask;
 			};
-			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (sender, e) =>
+			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (Sender, e) =>
 			{
 				Error.Set();
 				return Task.CompletedTask;

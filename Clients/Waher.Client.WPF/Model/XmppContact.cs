@@ -375,12 +375,12 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void Subscribe_Click(object sender, RoutedEventArgs e)
+		private void Subscribe_Click(object Sender, RoutedEventArgs e)
 		{
 			this.XmppAccountNode?.Client?.RequestPresenceSubscription(this.bareJid);
 		}
 
-		private void Unsubscribe_Click(object sender, RoutedEventArgs e)
+		private void Unsubscribe_Click(object Sender, RoutedEventArgs e)
 		{
 			this.XmppAccountNode?.Client?.RequestPresenceUnsubscription(this.bareJid);
 		}

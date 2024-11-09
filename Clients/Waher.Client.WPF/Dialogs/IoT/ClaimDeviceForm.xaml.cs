@@ -17,17 +17,17 @@ namespace Waher.Client.WPF.Dialogs.IoT
 			InitializeComponent();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void ClaimButton_Click(object sender, RoutedEventArgs e)
+		private void ClaimButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void ClaimUri_TextChanged(object sender, TextChangedEventArgs e)
+		private void ClaimUri_TextChanged(object Sender, TextChangedEventArgs e)
 		{
 			try
 			{

@@ -44,12 +44,12 @@ namespace Waher.Client.WPF.Dialogs.IoT
 			public string Unlocalized => this.s.Unlocalized;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void OkButton_Click(object sender, RoutedEventArgs e)
+		private void OkButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
@@ -65,12 +65,12 @@ namespace Waher.Client.WPF.Dialogs.IoT
 			}
 		}
 
-		private void ItemsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void ItemsView_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
 			this.OkButton.IsEnabled = !(this.ItemsView.SelectedItem is null);
 		}
 
-		private void ItemsView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void ItemsView_MouseDoubleClick(object Sender, MouseButtonEventArgs e)
 		{
 			if (!(this.ItemsView.SelectedItem is null))
 				this.DialogResult = true;

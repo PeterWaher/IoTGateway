@@ -40,22 +40,22 @@ namespace Waher.Client.WPF.Dialogs.IoT
 		/// </summary>
 		public SearchForThingsDialog()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 
 			this.Field1.Focus();
 		}
 
-		private void OkButton_Click(object sender, RoutedEventArgs e)
+		private void OkButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void AddButton_Click(object sender, RoutedEventArgs e)
+		private void AddButton_Click(object Sender, RoutedEventArgs e)
 		{
 			string Suffix = (++this.ruleNr).ToString();
 
@@ -215,7 +215,7 @@ namespace Waher.Client.WPF.Dialogs.IoT
 			this.nrRules++;
 		}
 
-		private void Delete_Click(object sender, RoutedEventArgs e)
+		private void Delete_Click(object Sender, RoutedEventArgs e)
 		{
 			if (this.nrRules <= 1)
 			{
@@ -223,7 +223,7 @@ namespace Waher.Client.WPF.Dialogs.IoT
 				return;
 			}
 
-			Button Button = (Button)sender;
+			Button Button = (Button)Sender;
 			StackPanel Rule = (StackPanel)(((StackPanel)Button.Parent).Parent);
 			((StackPanel)Rule.Parent).Children.Remove(Rule);
 
@@ -270,9 +270,9 @@ namespace Waher.Client.WPF.Dialogs.IoT
 			return Result.ToArray();
 		}
 
-		private void Operator_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void Operator_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
-			ComboBox Op = (ComboBox)sender;
+			ComboBox Op = (ComboBox)Sender;
 			Operator Op2 = (Operator)Op.SelectedIndex;
 			StackPanel Panel = (StackPanel)(Op.Parent);
 			StackPanel Rule = (StackPanel)(Panel.Parent);

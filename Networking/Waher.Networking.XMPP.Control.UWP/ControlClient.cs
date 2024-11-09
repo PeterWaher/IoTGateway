@@ -789,12 +789,12 @@ namespace Waher.Networking.XMPP.Control
 					Form.State = Nodes;
 			}
 
-			if (!(Callback is null))
+			DataFormEventArgs e2 = new DataFormEventArgs(Form, e)
 			{
-				DataFormEventArgs e2 = new DataFormEventArgs(Form, e);
-				e2.State = State;
-				await Callback.Raise(this, e2);
-			}
+				State = State
+			};
+
+			await Callback.Raise(this, e2);
 		}
 
 		private Task SubmitForm(object _, DataForm Form)

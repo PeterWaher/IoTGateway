@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.Test
 			this.interopClient = new InteroperabilityClient(this.client1);
 			this.interopServer = new InteroperabilityServer(this.client2);
 
-			this.interopServer.OnGetInterfaces += (sender, e) =>
+			this.interopServer.OnGetInterfaces += (Sender, e) =>
 			{
 				e.Add("Interface A", "Interface B", "Interface C", "Interface D");
 				return Task.CompletedTask;

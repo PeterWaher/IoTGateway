@@ -148,9 +148,7 @@ namespace Waher.Networking
 				foreach (TcpListener L in Listeners)
 					L.Stop();
 #endif
-				EventHandlerAsync h = this.OnNetworkChanged;
-				if (!(h is null))
-					await h(this, EventArgs.Empty);
+				await this.OnNetworkChanged.Raise(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -440,20 +438,9 @@ namespace Waher.Networking
 		private async Task<bool> AcceptConnection(ServerTcpConnection Connection)
 		{
 			ServerConnectionAcceptEventArgs e = new ServerConnectionAcceptEventArgs(Connection);
-			EventHandlerAsync<ServerConnectionAcceptEventArgs> h = this.OnAccept;
 
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-					e.Accept = false;
-				}
-			}
+			if (!await this.OnAccept.Raise(this, e))
+				e.Accept = false;
 
 			return e.Accept;
 		}
@@ -695,20 +682,9 @@ namespace Waher.Networking
 
 		private async Task LoginFailure(Exception ex, ServerTcpConnection Connection)
 		{
-			EventHandlerAsync<ServerTlsErrorEventArgs> h = this.OnTlsUpgradeError;
+			Exception ex2 = Log.UnnestException(ex);
 
-			if (!(h is null))
-			{
-				Exception ex2 = Log.UnnestException(ex);
-				try
-				{
-					await h(this, new ServerTlsErrorEventArgs(Connection, ex2));
-				}
-				catch (Exception ex3)
-				{
-					Log.Exception(ex3);
-				}
-			}
+			await this.OnTlsUpgradeError.Raise(this, new ServerTlsErrorEventArgs(Connection, ex2));
 
 			Connection.Client.Dispose();
 		}
@@ -718,25 +694,14 @@ namespace Waher.Networking
 		/// </summary>
 		public event EventHandlerAsync<ServerTlsErrorEventArgs> OnTlsUpgradeError;
 #endif
-		private async Task Added(ServerTcpConnection Connection)
+		private Task Added(ServerTcpConnection Connection)
 		{
 			lock (this.connections)
 			{
 				this.connections[Connection.Id] = Connection;
 			}
 
-			EventHandlerAsync<ServerConnectionEventArgs> h = this.OnClientConnected;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new ServerConnectionEventArgs(Connection));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.OnClientConnected.Raise(this, new ServerConnectionEventArgs(Connection));
 		}
 
 		/// <summary>
@@ -750,9 +715,7 @@ namespace Waher.Networking
 			{
 				e.Value.Client?.Dispose();
 
-				EventHandlerAsync<ServerConnectionEventArgs> h = this.OnClientDisconnected;
-				if (!(h is null))
-					await h(this, new ServerConnectionEventArgs(e.Value));
+				await this.OnClientDisconnected.Raise(this, new ServerConnectionEventArgs(e.Value));
 			}
 			catch (Exception ex)
 			{
@@ -783,18 +746,7 @@ namespace Waher.Networking
 			if (this.HasSniffers)
 				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
-			EventHandlerAsync<ServerConnectionDataEventArgs> h = this.OnDataReceived;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, new ServerConnectionDataEventArgs(Connection, Buffer, Offset, Count));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			await this.OnDataReceived.Raise(this, new ServerConnectionDataEventArgs(Connection, Buffer, Offset, Count));
 		}
 
 		/// <summary>

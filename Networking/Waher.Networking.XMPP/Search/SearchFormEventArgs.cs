@@ -302,7 +302,7 @@ namespace Waher.Networking.XMPP.Search
 			return this.CallResponseMethod(Callback, State, Records, Headers.ToArray(), e);
 		}
 
-		private async Task CallResponseMethod(EventHandlerAsync<SearchResultEventArgs> Callback, object State, List<Dictionary<string, string>> Records,
+		private Task CallResponseMethod(EventHandlerAsync<SearchResultEventArgs> Callback, object State, List<Dictionary<string, string>> Records,
 			Field[] Headers, IqResultEventArgs e)
 		{
 			SearchResultEventArgs e2 = new SearchResultEventArgs(Records.ToArray(), Headers, e)
@@ -310,17 +310,7 @@ namespace Waher.Networking.XMPP.Search
 				State = State
 			};
 
-			if (!(Callback is null))
-			{
-				try
-				{
-					await Callback(this.client, e2);
-				}
-				catch (Exception ex)
-				{
-					await this.client.Exception(ex);
-				}
-			}
+			return Callback.Raise(this.client, e2);
 		}
 
 		private Task FormSearchResult(object Sender, IqResultEventArgs e)
@@ -411,7 +401,7 @@ namespace Waher.Networking.XMPP.Search
 		{
 			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
 
-			await this.SendSearchRequest((sender, e) =>
+			await this.SendSearchRequest((Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e);

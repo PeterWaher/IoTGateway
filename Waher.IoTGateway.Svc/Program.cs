@@ -52,7 +52,7 @@ namespace Waher.IoTGateway.Svc
 
 		public static int Main(string[] args)
 		{
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+			AppDomain.CurrentDomain.UnhandledException += (Sender, e) =>
 			{
 				if (e.IsTerminating)
 				{
@@ -115,18 +115,18 @@ namespace Waher.IoTGateway.Svc
 				}
 			};
 
-			AppDomain.CurrentDomain.DomainUnload += (sender, e) =>
+			AppDomain.CurrentDomain.DomainUnload += (Sender, e) =>
 			{
 				Log.Informational("Unloading domain.");
 			};
 
-			AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+			AppDomain.CurrentDomain.ProcessExit += (Sender, e) =>
 			{
 				Log.Informational("Exiting process.");
 				Log.Terminate();
 			};
 
-			TaskScheduler.UnobservedTaskException += (sender, e) =>
+			TaskScheduler.UnobservedTaskException += (Sender, e) =>
 			{
 				Exception ex = Log.UnnestException(e.Exception);
 				string StackTrace = Log.CleanStackTrace(ex.StackTrace);
@@ -447,8 +447,8 @@ namespace Waher.IoTGateway.Svc
 				}
 
 				ManualResetEvent Done = new(false);
-				Gateway.OnTerminate += (sender, e) => Done.Set();
-				Console.CancelKeyPress += (sender, e) =>
+				Gateway.OnTerminate += (Sender, e) => Done.Set();
+				Console.CancelKeyPress += (Sender, e) =>
 				{
 					e.Cancel = true;
 					Gateway.Terminate();

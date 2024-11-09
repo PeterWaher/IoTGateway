@@ -85,7 +85,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Session_StateChanged(object sender, EventArgs e)
+		private void Session_StateChanged(object Sender, EventArgs e)
 		{
 			if (this.session.State == RemoteDesktopSessionState.Started && this.desktop is null)
 			{
@@ -106,7 +106,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Session_TileUpdated(object sender, TileEventArgs e)
+		private void Session_TileUpdated(object Sender, TileEventArgs e)
 		{
 			lock (this.synchObj)
 			{
@@ -120,7 +120,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Session_ScanComplete(object sender, EventArgs e)
+		private void Session_ScanComplete(object Sender, EventArgs e)
 		{
 			this.UpdateScreen(null);
 		}
@@ -424,7 +424,7 @@ namespace Waher.Client.WPF.Controls
 		public XmppClient Client => this.client;
 		public RemoteDesktopClient RdpClient => this.rdpClient;
 
-		private void UserControl_MouseMove(object sender, MouseEventArgs e)
+		private void UserControl_MouseMove(object Sender, MouseEventArgs e)
 		{
 			if (!(this.session is null))
 			{
@@ -442,7 +442,7 @@ namespace Waher.Client.WPF.Controls
 			Y = (int)(this.session.Height * P.Y / this.DesktopImage.ActualHeight + 0.5);
 		}
 
-		private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
+		private void UserControl_MouseDown(object Sender, MouseButtonEventArgs e)
 		{
 			if (!(this.session is null))
 			{
@@ -472,7 +472,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
+		private void UserControl_MouseUp(object Sender, MouseButtonEventArgs e)
 		{
 			if (!(this.session is null))
 			{
@@ -502,7 +502,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_MouseWheel(object sender, MouseWheelEventArgs e)
+		private void UserControl_MouseWheel(object Sender, MouseWheelEventArgs e)
 		{
 			if (!(this.session is null))
 			{
@@ -512,7 +512,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_KeyDown(object sender, KeyEventArgs e)
+		private void UserControl_KeyDown(object Sender, KeyEventArgs e)
 		{
 			if (!(this.session is null))
 			{
@@ -522,7 +522,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_KeyUp(object sender, KeyEventArgs e)
+		private void UserControl_KeyUp(object Sender, KeyEventArgs e)
 		{
 			if (!(this.session is null))
 			{
@@ -532,28 +532,28 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+		private void UserControl_IsVisibleChanged(object Sender, DependencyPropertyChangedEventArgs e)
 		{
 			if (this.IsVisible)
 				Keyboard.Focus(this);
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO: screen capture?
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO: screen capture?
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO: Refresh screen?
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO: ?
 		}

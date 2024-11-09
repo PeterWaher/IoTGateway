@@ -104,7 +104,7 @@ namespace Waher.Client.WPF.Controls
 
 		public TreeNode Node => this.node;
 
-		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void UserControl_SizeChanged(object Sender, SizeChangedEventArgs e)
 		{
 			if (this.ChatListView.View is GridView GridView)
 			{
@@ -138,7 +138,7 @@ namespace Waher.Client.WPF.Controls
 			};
 		}
 
-		private async void Send_Click(object sender, RoutedEventArgs e)
+		private async void Send_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -389,22 +389,22 @@ namespace Waher.Client.WPF.Controls
 			});
 		}
 
-		private void UserControl_GotFocus(object sender, RoutedEventArgs e)
+		private void UserControl_GotFocus(object Sender, RoutedEventArgs e)
 		{
 			this.Input.Focus();
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.ChatListView.Items.Clear();
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
-			this.SaveAsButton_Click(sender, e);
+			this.SaveAsButton_Click(Sender, e);
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog()
 			{
@@ -484,7 +484,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		public async void OpenButton_Click(object sender, RoutedEventArgs e)
+		public async void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -599,19 +599,19 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Input_PreviewKeyDown(object sender, KeyEventArgs e)
+		private void Input_PreviewKeyDown(object Sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
 			{
 				if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
 				{
-					this.Send_Click(sender, e);
+					this.Send_Click(Sender, e);
 					e.Handled = true;
 				}
 			}
 		}
 
-		private void ChatListView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		private void ChatListView_PreviewMouseLeftButtonUp(object Sender, MouseButtonEventArgs e)
 		{
 			if (this.ChatListView.SelectedItem is ListViewItem ListViewItem &&
 				ListViewItem.Content is ChatItem Item)
@@ -631,9 +631,9 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Hyperlink_Click(object sender, RoutedEventArgs e)
+		private void Hyperlink_Click(object Sender, RoutedEventArgs e)
 		{
-			string Uri = ((Hyperlink)sender).NavigateUri.ToString();
+			string Uri = ((Hyperlink)Sender).NavigateUri.ToString();
 			System.Diagnostics.Process.Start(Uri);
 		}
 
@@ -660,7 +660,7 @@ namespace Waher.Client.WPF.Controls
 
 			if (this.node is RoomNode RoomNode)
 			{
-				RoomNode.MucClient.SelfPing(RoomNode.RoomId, RoomNode.Domain, RoomNode.NickName, (sender, e) =>
+				RoomNode.MucClient.SelfPing(RoomNode.RoomId, RoomNode.Domain, RoomNode.NickName, (Sender, e) =>
 				{
 					if (!e.Ok)
 					{

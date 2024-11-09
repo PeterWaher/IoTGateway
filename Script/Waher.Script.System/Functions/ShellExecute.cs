@@ -86,12 +86,12 @@ namespace Waher.Script.System.Functions
 			Process P = new Process();
 			TaskCompletionSource<IElement> ResultSource = new TaskCompletionSource<IElement>();
 
-			P.ErrorDataReceived += (sender, e) =>
+			P.ErrorDataReceived += (Sender, e) =>
 			{
 				ResultSource.TrySetException(new ScriptRuntimeException(e.Data, this));
 			};
 
-			P.Exited += async (sender, e) =>
+			P.Exited += async (Sender, e) =>
 			{
 				try
 				{

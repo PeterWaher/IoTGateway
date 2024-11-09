@@ -308,7 +308,7 @@ namespace Waher.Networking.DNS.Communication
 			TaskCompletionSource<DnsMessage> Result = new TaskCompletionSource<DnsMessage>();
 			DateTime TP = DateTime.MinValue;
 
-			await this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>
+			await this.SendRequest(OpCode, Recursive, Questions, Destination, (Sender, e) =>
 			{
 				this.scheduler?.Remove(TP);
 				((TaskCompletionSource<DnsMessage>)e.State).TrySetResult(e.Message);

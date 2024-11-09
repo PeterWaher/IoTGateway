@@ -41,27 +41,27 @@ namespace Waher.Client.WPF.Controls
 			this.QuestionListView.Items.Add(Question);
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO
 		}
 
-		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
+		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO
 		}
 
-		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object Sender, RoutedEventArgs e)
 		{
 			// TODO
 		}
 
-		private void QuestionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void QuestionListView_SelectionChanged(object Sender, SelectionChangedEventArgs e)
 		{
 			this.Details.Children.Clear();
 

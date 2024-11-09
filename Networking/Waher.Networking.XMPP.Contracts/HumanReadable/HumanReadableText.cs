@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
 		/// <returns>Markdown</returns>
-		public string GenerateMarkdown(Contract Contract)
+		public Task<string> GenerateMarkdown(Contract Contract)
 		{
 			return this.GenerateMarkdown(Contract, MarkdownType.ForRendering);
 		}
@@ -133,7 +133,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
 		/// <param name="Type">Type of Markdown to generate</param>
 		/// <returns>Markdown</returns>
-		public string GenerateMarkdown(Contract Contract, MarkdownType Type)
+		public Task<string> GenerateMarkdown(Contract Contract, MarkdownType Type)
 		{
 			return this.GenerateMarkdown(new MarkdownSettings(Contract, Type));
 		}
@@ -143,10 +143,10 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
 		/// <returns>Markdown</returns>
-		public string GenerateMarkdown(MarkdownSettings Settings)
+		public async Task<string> GenerateMarkdown(MarkdownSettings Settings)
 		{
 			MarkdownOutput Markdown = new MarkdownOutput();
-			this.GenerateMarkdown(Markdown, 1, 0, Settings);
+			await this.GenerateMarkdown(Markdown, 1, 0, Settings);
 			return Markdown.ToString();
 		}
 
@@ -157,7 +157,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <returns>Parsed Markdown</returns>
 		public async Task<MarkdownDocument> GenerateMarkdownDocument(Contract Contract)
 		{
-			string Markdown = this.GenerateMarkdown(Contract);
+			string Markdown = await this.GenerateMarkdown(Contract);
 			return await MarkdownDocument.CreateAsync(Markdown);
 		}
 

@@ -165,7 +165,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				await this.OnAbort(null, EventArgs.Empty);
 		}
 
-		private Task OnAbort(object sender, EventArgs e)
+		private Task OnAbort(object Sender, EventArgs e)
 		{
 			this.Cancel();
 			return Task.CompletedTask;

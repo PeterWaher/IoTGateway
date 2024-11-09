@@ -144,7 +144,7 @@ namespace Waher.Networking.PeerToPeer
 			return this.Closed();
 		}
 
-		private Task TcpConnection_OnDisconnected(object sender, EventArgs e)
+		private Task TcpConnection_OnDisconnected(object Sender, EventArgs e)
 		{
 			return this.Closed();
 		}

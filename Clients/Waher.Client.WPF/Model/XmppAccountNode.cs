@@ -1175,7 +1175,7 @@ namespace Waher.Client.WPF.Model
 
 		public void SearchComponents()
 		{
-			this.client.SendServiceDiscoveryRequest(this.client.Domain, (sender, e) =>
+			this.client.SendServiceDiscoveryRequest(this.client.Domain, (Sender, e) =>
 			{
 				this.supportsSearch = e.HasFeature(XmppClient.NamespaceSearch);
 
@@ -1195,7 +1195,7 @@ namespace Waher.Client.WPF.Model
 
 			}, null);
 
-			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (sender, e) =>
+			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (Sender, e) =>
 			{
 				foreach (Item Item in e.Items)
 				{
@@ -1336,7 +1336,7 @@ namespace Waher.Client.WPF.Model
 		{
 			string NewPassword = Form["Password"].ValueString;
 
-			this.client.ChangePassword(NewPassword, (sender, e) =>
+			this.client.ChangePassword(NewPassword, (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -1384,7 +1384,7 @@ namespace Waher.Client.WPF.Model
 			await Request.Accept(false);
 			await Request.Started();
 
-			await this.client.SendServiceDiscoveryRequest(string.Empty, (sender, e) =>
+			await this.client.SendServiceDiscoveryRequest(string.Empty, (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -1521,7 +1521,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void ChangePassword_Click(object sender, RoutedEventArgs e)
+		private void ChangePassword_Click(object Sender, RoutedEventArgs e)
 		{
 			ChangePasswordForm Dialog = new ChangePasswordForm();
 			bool? Result = Dialog.ShowDialog();

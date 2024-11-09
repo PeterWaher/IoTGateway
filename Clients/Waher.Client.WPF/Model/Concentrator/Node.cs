@@ -228,7 +228,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Mouse.OverrideCursor = Cursors.Wait;
 
 						this.loadingChildren = true;
-						ConcentratorClient.GetChildNodes(FullJid, this.nodeInfo, true, true, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+						ConcentratorClient.GetChildNodes(FullJid, this.nodeInfo, true, true, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 						{
 							this.loadingChildren = false;
 							MainWindow.MouseDefault();
@@ -428,7 +428,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				ConcentratorClient.GetAddableNodeTypes(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				ConcentratorClient.GetAddableNodeTypes(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
 					MainWindow.MouseDefault();
 
@@ -489,7 +489,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				ConcentratorClient.GetParametersForNewNode(FullJid, this.nodeInfo, Type, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				ConcentratorClient.GetParametersForNewNode(FullJid, this.nodeInfo, Type, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
 					MainWindow.MouseDefault();
 
@@ -506,7 +506,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 					return Task.CompletedTask;
 
-				}, (sender, e) =>
+				}, (Sender, e) =>
 				{
 					if (e.Ok)
 						this.Add(new Node(this, e.NodeInformation));
@@ -553,7 +553,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				await ConcentratorClient.DestroyNode(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				await ConcentratorClient.DestroyNode(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
 					MainWindow.MouseDefault();
 
@@ -590,7 +590,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				ConcentratorClient.GetNodeParametersForEdit(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				ConcentratorClient.GetNodeParametersForEdit(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
 					MainWindow.MouseDefault();
 
@@ -607,7 +607,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 					return Task.CompletedTask;
 
-				}, (sender, e) =>
+				}, (Sender, e) =>
 				{
 					if (e.Ok)
 					{
@@ -648,7 +648,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				Mouse.OverrideCursor = Cursors.Wait;
 
 				this.ConcentratorClient.RegisterSniffer(FullJid, this.nodeInfo, DateTime.Now.AddHours(1), Sniffer,
-					string.Empty, string.Empty, string.Empty, (sender, e) =>
+					string.Empty, string.Empty, string.Empty, (Sender, e) =>
 					{
 						MainWindow.MouseDefault();
 
@@ -684,7 +684,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				Mouse.OverrideCursor = Cursors.Wait;
 
 				return await this.ConcentratorClient.UnregisterSniffer(FullJid, this.nodeInfo, TabSniffer.SnifferId,
-					string.Empty, string.Empty, string.Empty, (sender, e) =>
+					string.Empty, string.Empty, string.Empty, (Sender, e) =>
 					{
 						MainWindow.MouseDefault();
 						return Task.CompletedTask;
@@ -710,7 +710,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					this.commands = new NodeCommand[0];
 
-					this.ConcentratorClient.GetNodeCommands(FullJid, this.nodeInfo, string.Empty, string.Empty, string.Empty, (sender, e) =>
+					this.ConcentratorClient.GetNodeCommands(FullJid, this.nodeInfo, string.Empty, string.Empty, string.Empty, (Sender, e) =>
 					{
 						if (e.Ok)
 							this.commands = e.Result;
@@ -754,14 +754,14 @@ namespace Waher.Client.WPF.Model.Concentrator
 			}
 		}
 
-		private void NodeCommandClick(object sender, System.Windows.RoutedEventArgs e)
+		private void NodeCommandClick(object Sender, System.Windows.RoutedEventArgs e)
 		{
 			string FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
 			{
-				MenuItem Item = (MenuItem)sender;
+				MenuItem Item = (MenuItem)Sender;
 				NodeCommand Command = (NodeCommand)Item.Tag;
 
 				if (!string.IsNullOrEmpty(Command.ConfirmationString))
@@ -1029,7 +1029,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TaskCompletionSource<NodeInformation[]> NodesInformation = new TaskCompletionSource<NodeInformation[]>();
 
-				await ConcentratorClient.GetChildNodes(FullJid, Node, true, false, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
+				await ConcentratorClient.GetChildNodes(FullJid, Node, true, false, "en", string.Empty, string.Empty, string.Empty, (Sender, e) =>
 				{
 					if (e.Ok)
 						NodesInformation.TrySetResult(e.NodesInformation);

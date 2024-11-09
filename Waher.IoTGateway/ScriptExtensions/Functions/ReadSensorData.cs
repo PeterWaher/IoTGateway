@@ -235,7 +235,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			string Actor = Origin is IUser User ? User.UserName : nameof(ReadSensorData);
 
 			InternalReadoutRequest Request = await Gateway.ConcentratorServer.SensorServer.DoInternalReadout(
-				Actor, Nodes, FieldTypes, FieldNames, From, To, (sender, e) =>
+				Actor, Nodes, FieldTypes, FieldNames, From, To, (Sender, e) =>
 				{
 					foreach (Field F in e.Fields)
 					{
@@ -250,7 +250,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 					return Task.CompletedTask;
 				},
-				(sender, e) =>
+				(Sender, e) =>
 				{
 					Errors.AddRange(e.Errors);
 					Error = true;

@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
-				this.client2.OnNormalMessage += (sender, e) =>
+				this.client2.OnNormalMessage += (Sender, e) =>
 				{
 					if (e.UsesE2eEncryption && e.Body == "Test message" && e.Subject == "Subject" && e.Id == "1")
 						Done.Set();
@@ -111,7 +111,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
-				this.client2.RegisterIqGetHandler("test", "testns", async (sender, e) =>
+				this.client2.RegisterIqGetHandler("test", "testns", async (Sender, e) =>
 				{
 					if (e.UsesE2eEncryption &&
 						e.E2eEncryption is not null &&
@@ -126,7 +126,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				}, true);
 
 				await this.endpointSecurity1.SendIqGet(this.client1, E2ETransmission.AssertE2E,
-					this.client2.FullJID, "<test xmlns='testns'>" + Send + "</test>", (sender, e) =>
+					this.client2.FullJID, "<test xmlns='testns'>" + Send + "</test>", (Sender, e) =>
 					{
 						if (e.UsesE2eEncryption &&
 							e.E2eEncryption is not null &&
@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				ManualResetEvent Done = new(false);
 				ManualResetEvent Error = new(false);
 
-				this.client2.RegisterIqSetHandler("test", "testns", async (sender, e) =>
+				this.client2.RegisterIqSetHandler("test", "testns", async (Sender, e) =>
 				{
 					if (e.UsesE2eEncryption &&
 						e.E2eEncryption is not null &&
@@ -207,7 +207,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 				}, true);
 
 				await this.endpointSecurity1.SendIqSet(this.client1, E2ETransmission.AssertE2E,
-					this.client2.FullJID, "<test xmlns='testns'>Hello</test>", (sender, e) =>
+					this.client2.FullJID, "<test xmlns='testns'>Hello</test>", (Sender, e) =>
 					{
 						if (e.E2eEncryption is not null &&
 							!string.IsNullOrEmpty(e.E2eReference) &&

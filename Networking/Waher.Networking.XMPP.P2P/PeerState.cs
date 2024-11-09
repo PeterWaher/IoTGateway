@@ -682,7 +682,7 @@ namespace Waher.Networking.XMPP.P2P
 						"</text></stream:error></stream:stream>";
 
 					this.headerSent = true;
-					await this.SendAsync(Header, (sender, e) =>
+					await this.SendAsync(Header, (Sender, e) =>
 					{
 						return this.ToError();
 					});
@@ -816,23 +816,23 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		private Task<bool> ProcessFragment(string Xml)
+		private async Task<bool> ProcessFragment(string Xml)
 		{
-			Task<bool> Result;
+			bool Result;
 			TextEventHandler h = this.OnReceived;
 
 			if (h is null)
-				Result = Task.FromResult(false);
+				Result = false;
 			else
 			{
 				try
 				{
-					Result = h(this, Xml);
+					Result = await h(this, Xml);
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-					Result = Task.FromResult(false);
+					Result = false;
 				}
 
 				//if (Result && !(this.callbacks is null))
@@ -842,7 +842,7 @@ namespace Waher.Networking.XMPP.P2P
 			return Result;
 		}
 
-		private async Task Peer_OnClosed(object sender, EventArgs e)
+		private async Task Peer_OnClosed(object Sender, EventArgs e)
 		{
 			await this.parent.PeerClosed(this);
 			this.parent = null;

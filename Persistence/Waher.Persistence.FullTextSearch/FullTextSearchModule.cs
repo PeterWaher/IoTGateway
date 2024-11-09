@@ -1485,7 +1485,7 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static readonly Dictionary<Type, ITokenizer> tokenizers = new Dictionary<Type, ITokenizer>();
 
-		private void Types_OnInvalidated(object sender, EventArgs e)
+		private void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			lock (tokenizers)
 			{

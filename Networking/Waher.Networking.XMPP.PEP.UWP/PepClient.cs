@@ -332,7 +332,7 @@ namespace Waher.Networking.XMPP.PEP
 			return Result;
 		}
 
-		private static void Types_OnInvalidated(object sender, EventArgs e)
+		private static void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			personalEventTypes = GetPersonalEventTypes2();
 		}
@@ -521,7 +521,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task GetUserAvatarData(string UserBareJid, UserAvatarReference Reference, EventHandlerAsync<UserAvatarImageEventArgs> Callback, object State)
 		{
-			return this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, async (sender, e) =>
+			return this.pubSubClient.GetItems(UserBareJid, UserAvatarData.AvatarDataNamespace, new string[] { Reference.Id }, async (Sender, e) =>
 			{
 				UserAvatarImage Image = null;
 

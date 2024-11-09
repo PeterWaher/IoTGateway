@@ -124,7 +124,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			string ContentType = null;
 
 			this.httpxClient1.GET(this.client2.FullJID, "/Hello",
-				(sender, e) =>
+				(Sender, e) =>
 				{
 					if (e.Ok && e.HasData && e.State.Equals(Nr))
 					{
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					return Task.CompletedTask;
 				},
-				async (sender, e) =>
+				async (Sender, e) =>
 				{
 					ms?.Write(e.Data, 0, e.Data.Length);
 
@@ -196,7 +196,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			Message = Convert.ToBase64String(Bin);
 
 			await this.httpxClient1.POST(this.client2.FullJID, "/Echo", Message,
-				(sender, e) =>
+				(Sender, e) =>
 				{
 					if (e.Ok && e.HasData && e.State.Equals(Nr))
 					{
@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					return Task.CompletedTask;
 				},
-				async (sender, e) =>
+				async (Sender, e) =>
 				{
 					ms?.Write(e.Data, 0, e.Data.Length);
 

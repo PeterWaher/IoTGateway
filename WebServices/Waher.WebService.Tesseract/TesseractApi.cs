@@ -444,13 +444,13 @@ namespace Waher.WebService.Tesseract
 					Process P = new Process();
 					TaskCompletionSource<string> ResultSource = new TaskCompletionSource<string>();
 
-					P.ErrorDataReceived += (sender, e) =>
+					P.ErrorDataReceived += (Sender, e) =>
 					{
 						Log.Error("Unable to perform OCR: " + e.Data);
 						ResultSource.TrySetResult(null);
 					};
 
-					P.Exited += async (sender, e) =>
+					P.Exited += async (Sender, e) =>
 					{
 						try
 						{

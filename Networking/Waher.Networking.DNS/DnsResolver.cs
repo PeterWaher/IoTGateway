@@ -48,7 +48,7 @@ namespace Waher.Networking.DNS
 		{
 			try
 			{
-				NetworkChange.NetworkAddressChanged += (sender, e) => networkChanged = true;
+				NetworkChange.NetworkAddressChanged += (Sender, e) => networkChanged = true;
 			}
 			catch (Exception ex)
 			{

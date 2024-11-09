@@ -103,12 +103,12 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			return Result.ToArray();
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void ApplyButton_Click(object sender, RoutedEventArgs e)
+		private void ApplyButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}

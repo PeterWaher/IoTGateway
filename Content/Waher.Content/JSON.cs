@@ -25,7 +25,7 @@ namespace Waher.Content
 			Types.OnInvalidated += Types_OnInvalidated;
 		}
 
-		private static void Types_OnInvalidated(object sender, EventArgs e)
+		private static void Types_OnInvalidated(object Sender, EventArgs e)
 		{
 			lock (encoders)
 			{

@@ -406,7 +406,7 @@ namespace Waher.Things.Mqtt.Model
 					{
 						scheduler = new Scheduler();
 
-						Log.Terminating += (sender, e) =>
+						Log.Terminating += (Sender, e) =>
 						{
 							scheduler?.Dispose();
 							scheduler = null;

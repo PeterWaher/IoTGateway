@@ -128,7 +128,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
-		private async Task Client_OnWriteQueueEmpty(object sender, EventArgs e)
+		private async Task Client_OnWriteQueueEmpty(object Sender, EventArgs e)
 		{
 			bool DoDispose;
 
@@ -144,7 +144,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				await this.OnWriteQueueEmpty.Raise(this, e);
 		}
 
-		private Task Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			return this.SetState(Socks5State.Offline);
 		}

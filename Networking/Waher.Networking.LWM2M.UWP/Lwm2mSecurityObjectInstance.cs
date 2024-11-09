@@ -122,7 +122,7 @@ namespace Waher.Networking.LWM2M
 			this.Add(new Lwm2mResourceNotSupported(0, InstanceId, 12)); //  BootstrapServer Account Timeout
 		}
 
-		private Task CheckFromBootstrapServer(object sender, CoapRequestEventArgs e)
+		private Task CheckFromBootstrapServer(object Sender, CoapRequestEventArgs e)
 		{
 			if (!this.Object.Client.IsFromBootstrapServer(e.Request))
 				throw new CoapException(CoapCode.Unauthorized);

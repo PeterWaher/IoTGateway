@@ -15,12 +15,12 @@ namespace Waher.Client.WPF.Dialogs.Muc
 			this.NickName.Text = NickName;
 		}
 
-		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		private void CancelButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
 		}
 
-		private void YesButton_Click(object sender, RoutedEventArgs e)
+		private void YesButton_Click(object Sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
 		}

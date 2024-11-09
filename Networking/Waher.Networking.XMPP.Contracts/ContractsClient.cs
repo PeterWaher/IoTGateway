@@ -967,7 +967,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				await this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
+				await this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
 				{
 					IE2eEndpoint ServerKey = null;
 					XmlElement E;
@@ -1022,7 +1022,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<IE2eEndpoint> Result = new TaskCompletionSource<IE2eEndpoint>();
 
-			await this.GetServerPublicKey(Address, (sender, e) =>
+			await this.GetServerPublicKey(Address, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Key);
@@ -1105,7 +1105,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
-				await this.GetServerPublicKey(Address, async (sender, e) =>
+				await this.GetServerPublicKey(Address, async (Sender, e) =>
 				{
 					IE2eEndpoint LocalKey = null;
 
@@ -1150,7 +1150,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<IE2eEndpoint> Result = new TaskCompletionSource<IE2eEndpoint>();
 
-			await this.GetMatchingLocalKey(Address, (sender, e) =>
+			await this.GetMatchingLocalKey(Address, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Key);
@@ -1175,7 +1175,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public Task GetIdApplicationAttributes(EventHandlerAsync<IdApplicationAttributesEventArgs> Callback, object State)
 		{
-			return this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", (sender, e) =>
+			return this.client.SendIqGet(this.componentAddress, "<applicationAttributes xmlns='" + NamespaceLegalIdentitiesCurrent + "'/>", (Sender, e) =>
 			{
 				return Callback.Raise(this, new IdApplicationAttributesEventArgs(e));
 
@@ -1190,7 +1190,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<IdApplicationAttributesEventArgs> Result = new TaskCompletionSource<IdApplicationAttributesEventArgs>();
 
-			await this.GetIdApplicationAttributes((sender, e) =>
+			await this.GetIdApplicationAttributes((Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e);
@@ -1229,7 +1229,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			this.AssertAllowed();
 
-			await this.GetMatchingLocalKey(Address, async (sender, e) =>
+			await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -1310,7 +1310,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.Apply(Address, Properties, (sender, e) =>
+			await this.Apply(Address, Properties, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -1387,7 +1387,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.ReadyForApproval(Address, LegalIdentityId, (sender, e) =>
+			await this.ReadyForApproval(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -1555,7 +1555,7 @@ namespace Waher.Networking.XMPP.Contracts
 				HasOldPublicKey = this.publicKeys.ContainsKey(Identity.Provider);
 			}
 
-			await this.GetServerPublicKey(Identity.Provider, async (sender, e) =>
+			await this.GetServerPublicKey(Identity.Provider, async (Sender, e) =>
 			{
 				if (e.Ok && !(e.Key is null))
 				{
@@ -1686,7 +1686,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<IdentityStatus> Result = new TaskCompletionSource<IdentityStatus>();
 
-			await this.Validate(Identity, ValidateState, (sender, e) =>
+			await this.Validate(Identity, ValidateState, (Sender, e) =>
 			{
 				Result.SetResult(e.Status);
 				return Task.CompletedTask;
@@ -1980,7 +1980,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity[]> Result = new TaskCompletionSource<LegalIdentity[]>();
 
-			await this.GetLegalIdentities(Address, (sender, e) =>
+			await this.GetLegalIdentities(Address, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identities);
@@ -2033,7 +2033,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public Task GetLegalIdentity(string Address, string LegalIdentityId, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
 			return this.client.SendIqGet(Address, "<getLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
-				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
+				NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -2067,7 +2067,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.GetLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			await this.GetLegalIdentity(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2108,7 +2108,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			return this.client.SendIqSet(Address, "<obsoleteLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
-				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
+				NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
 				{
 					LegalIdentity Identity = null;
 					XmlElement E;
@@ -2145,7 +2145,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.ObsoleteLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			await this.ObsoleteLegalIdentity(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2186,7 +2186,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			return this.client.SendIqSet(Address, "<compromisedLegalIdentity id=\"" + XML.Encode(LegalIdentityId) + "\" xmlns=\"" +
-				NamespaceLegalIdentitiesCurrent + "\"/>", async (sender, e) =>
+				NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
 				{
 					LegalIdentity Identity = null;
 					XmlElement E;
@@ -2223,7 +2223,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.CompromisedLegalIdentity(Address, LegalIdentityId, (sender, e) =>
+			await this.CompromisedLegalIdentity(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2286,7 +2286,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Key is null)
 			{
-				await this.GetMatchingLocalKey(Address, async (sender, e) =>
+				await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 				{
 					if (e.Ok)
 						Signature = e.Key.Sign(Data);
@@ -2325,7 +2325,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
-			await this.Sign(Address, Data, SignWith, (sender, e) =>
+			await this.Sign(Address, Data, SignWith, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Signature);
@@ -2368,7 +2368,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Key is null)
 			{
-				await this.GetMatchingLocalKey(Address, async (sender, e) =>
+				await this.GetMatchingLocalKey(Address, async (Sender, e) =>
 				{
 					if (e.Ok)
 						Signature = e.Key.Sign(Data);
@@ -2407,7 +2407,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
-			await this.Sign(Address, Data, SignWith, (sender, e) =>
+			await this.Sign(Address, Data, SignWith, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Signature);
@@ -2467,7 +2467,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("\"/>");
 
-			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -2505,7 +2505,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.ValidateSignature(Address, LegalId, Data, Signature, (sender, e) =>
+			await this.ValidateSignature(Address, LegalId, Data, Signature, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identity);
@@ -2778,7 +2778,7 @@ namespace Waher.Networking.XMPP.Contracts
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
 			await this.CreateContract(Address, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode, Duration,
-				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -3061,7 +3061,7 @@ namespace Waher.Networking.XMPP.Contracts
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
 			await this.CreateContract(Address, TemplateId, Parts, Parameters, Visibility, PartsMode, Duration,
-				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (sender, e) =>
+				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (Sender, e) =>
 				{
 					if (e.Ok)
 						Result.SetResult(e.Contract);
@@ -3216,7 +3216,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
 
-			await this.GetCreatedContractReferences(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetCreatedContractReferences(Address, Offset, MaxCount, (Sender, e) =>
 				{
 					if (e.Ok)
 						Result.SetResult(e.References);
@@ -3384,7 +3384,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			await this.GetCreatedContracts(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetCreatedContracts(Address, Offset, MaxCount, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -3443,7 +3443,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			await this.Sign(Address, Data, SignWith.LatestApprovedId, async (sender, e) =>
+			await this.Sign(Address, Data, SignWith.LatestApprovedId, async (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -3497,7 +3497,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.SignContract(Address, Contract, Role, Transferable, (sender, e) =>
+			await this.SignContract(Address, Contract, Role, Transferable, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -3605,7 +3605,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
 
-			await this.GetSignedContractReferences(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetSignedContractReferences(Address, Offset, MaxCount, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.References);
@@ -3725,7 +3725,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			await this.GetSignedContracts(Address, Offset, MaxCount, (sender, e) =>
+			await this.GetSignedContracts(Address, Offset, MaxCount, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -3808,7 +3808,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.GetContract(Address, ContractId, (sender, e) =>
+			await this.GetContract(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -3863,7 +3863,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (KeyValuePair<string, List<string>> P in ByTrustProvider)
 			{
-				await this.GetContracts(P.Key, P.Value.ToArray(), async (sender, e) =>
+				await this.GetContracts(P.Key, P.Value.ToArray(), async (Sender, e) =>
 				{
 					lock (Contracts)
 					{
@@ -3927,7 +3927,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			await this.GetContracts(ContractIds, (sender, e) =>
+			await this.GetContracts(ContractIds, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -3947,7 +3947,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
-			await this.GetContracts(Address, ContractIds, (sender, e) =>
+			await this.GetContracts(Address, ContractIds, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -4013,7 +4013,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.ObsoleteContract(Address, ContractId, (sender, e) =>
+			await this.ObsoleteContract(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -4083,7 +4083,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.DeleteContract(Address, ContractId, (sender, e) =>
+			await this.DeleteContract(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -4226,7 +4226,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.UpdateContract(Address, Contract, (sender, e) =>
+			await this.UpdateContract(Address, Contract, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -4634,7 +4634,7 @@ namespace Waher.Networking.XMPP.Contracts
 				HasOldPublicKey = this.publicKeys.ContainsKey(Contract.Provider);
 			}
 
-			await this.GetServerPublicKey(Contract.Provider, async (sender, e) =>
+			await this.GetServerPublicKey(Contract.Provider, async (Sender, e) =>
 			{
 				if (e.Ok && !(e.Key is null))
 				{
@@ -4750,7 +4750,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<ContractStatus> Result = new TaskCompletionSource<ContractStatus>();
 
-			await this.Validate(Contract, ValidateState, (sender, e) =>
+			await this.Validate(Contract, ValidateState, (Sender, e) =>
 			{
 				Result.SetResult(e.Status);
 				return Task.CompletedTask;
@@ -5083,7 +5083,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public Task GetSchemas(string Address, EventHandlerAsync<SchemaReferencesEventArgs> Callback, object State)
 		{
 			return this.client.SendIqGet(Address, "<getSchemas xmlns='" + NamespaceSmartContractsCurrent + "'/>",
-				async (sender, e) =>
+				async (Sender, e) =>
 				{
 					XmlElement E = e.FirstElement;
 					List<SchemaReference> Schemas = new List<SchemaReference>();
@@ -5140,7 +5140,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<SchemaReference[]> Result = new TaskCompletionSource<SchemaReference[]>();
 
-			await this.GetSchemas(Address, (sender, e) =>
+			await this.GetSchemas(Address, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.References);
@@ -5222,7 +5222,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			return this.client.SendIqGet(Address, Xml.ToString(),
-				async (sender, e) =>
+				async (Sender, e) =>
 				{
 					XmlElement E = e.FirstElement;
 					byte[] Schema = null;
@@ -5280,7 +5280,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
-			await this.GetSchema(Address, Namespace, Digest, (sender, e) =>
+			await this.GetSchema(Address, Namespace, Digest, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Schema);
@@ -5405,7 +5405,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity[]> Result = new TaskCompletionSource<LegalIdentity[]>();
 
-			await this.GetContractLegalIdentities(Address, ContractId, Current, Historic, (sender, e) =>
+			await this.GetContractLegalIdentities(Address, ContractId, Current, Historic, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identities);
@@ -5451,7 +5451,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(ContractId));
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
 			{
 				NetworkIdentity[] Identities = null;
 				XmlElement E;
@@ -5500,7 +5500,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<NetworkIdentity[]> Result = new TaskCompletionSource<NetworkIdentity[]>();
 
-			await this.GetContractNetworkIdentities(Address, ContractId, (sender, e) =>
+			await this.GetContractNetworkIdentities(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Identities);
@@ -5620,7 +5620,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</searchPublicContracts>");
 
-			return this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E = e.FirstElement;
 				List<string> IDs = null;
@@ -5689,7 +5689,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<SearchResultEventArgs> Result = new TaskCompletionSource<SearchResultEventArgs>();
 
-			await this.Search(Address, Offset, MaxCount, Filter, (sender, e) =>
+			await this.Search(Address, Offset, MaxCount, Filter, (Sender, e) =>
 			{
 				Result.SetResult(e);
 				return Task.CompletedTask;
@@ -6731,7 +6731,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Convert.ToBase64String(Signature));
 			Xml.Append("'/>");
 
-			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -6757,7 +6757,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.AddLegalIdAttachment(LegalId, GetUrl, Signature, (sender, e) =>
+			await this.AddLegalIdAttachment(LegalId, GetUrl, Signature, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
@@ -6794,7 +6794,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(Convert.ToBase64String(Signature));
 			Xml.Append("'/>");
 
-			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				Contract Contract = null;
 				XmlElement E;
@@ -6825,7 +6825,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.AddContractAttachment(ContractId, GetUrl, Signature, (sender, e) =>
+			await this.AddContractAttachment(ContractId, GetUrl, Signature, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Contract);
@@ -6980,7 +6980,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(AttachmentId));
 			Xml.Append("'/>");
 
-			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -7002,7 +7002,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<LegalIdentity> Result = new TaskCompletionSource<LegalIdentity>();
 
-			await this.RemoveLegalIdAttachment(AttachmentId, (sender, e) =>
+			await this.RemoveLegalIdAttachment(AttachmentId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
@@ -7032,7 +7032,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(XML.Encode(AttachmentId));
 			Xml.Append("'/>");
 
-			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqSet(this.componentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				Contract Contract = null;
 				XmlElement E;
@@ -7060,7 +7060,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			await this.RemoveContractAttachment(AttachmentId, (sender, e) =>
+			await this.RemoveContractAttachment(AttachmentId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(e.Contract);
@@ -7290,7 +7290,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.AuthorizeAccessToId(Address, LegalId, RemoteId, Authorized, (sender, e) =>
+			await this.AuthorizeAccessToId(Address, LegalId, RemoteId, Authorized, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -7369,7 +7369,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			await this.AuthorizeAccessToContract(Address, ContractId, RemoteId, Authorized, (sender, e) =>
+			await this.AuthorizeAccessToContract(Address, ContractId, RemoteId, Authorized, (Sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(true);
@@ -7412,7 +7412,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("'/>");
 
-			return this.client.SendIqGet(ComponentAddress, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(ComponentAddress, Xml.ToString(), async (Sender, e) =>
 			{
 				List<ServiceProviderWithLegalId> Providers = null;
 				XmlElement E;
@@ -7526,7 +7526,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<ServiceProviderWithLegalId[]> Providers = new TaskCompletionSource<ServiceProviderWithLegalId[]>();
 
-			await this.GetPeerReviewIdServiceProviders(ComponentAddress, (sender, e) =>
+			await this.GetPeerReviewIdServiceProviders(ComponentAddress, (Sender, e) =>
 			{
 				if (e.Ok)
 					Providers.TrySetResult(e.ServiceProviders);
@@ -7608,7 +7608,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			TaskCompletionSource<bool> Providers = new TaskCompletionSource<bool>();
 
-			await this.SelectPeerReviewService(ComponentAddress, Provider, ServiceId, (sender, e) =>
+			await this.SelectPeerReviewService(ComponentAddress, Provider, ServiceId, (Sender, e) =>
 			{
 				if (e.Ok)
 					Providers.TrySetResult(true);

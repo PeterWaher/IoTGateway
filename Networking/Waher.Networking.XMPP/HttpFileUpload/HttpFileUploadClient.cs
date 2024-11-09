@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		{
 			Dictionary<string, bool> Jids = new Dictionary<string, bool>();
 
-			return this.client.SendServiceItemsDiscoveryRequest(Domain, async (sender, e) =>
+			return this.client.SendServiceItemsDiscoveryRequest(Domain, async (Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -241,7 +241,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			string PutUrl = null;
 			string GetUrl = null;
 
-			return this.client.SendIqGet(this.fileUploadJid, Xml.ToString(), async (sender, e) =>
+			return this.client.SendIqGet(this.fileUploadJid, Xml.ToString(), async (Sender, e) =>
 			{
 				XmlElement E;
 
@@ -332,7 +332,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		{
 			TaskCompletionSource<HttpFileUploadEventArgs> Result = new TaskCompletionSource<HttpFileUploadEventArgs>();
 
-			await this.RequestUploadSlot(FileName, ContentType, ContentSize, CheckFileSize, (sender, e) =>
+			await this.RequestUploadSlot(FileName, ContentType, ContentSize, CheckFileSize, (Sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;

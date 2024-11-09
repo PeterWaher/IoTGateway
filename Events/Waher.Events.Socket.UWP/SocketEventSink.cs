@@ -241,7 +241,7 @@ namespace Waher.Events.Socket
 			}
 		}
 
-		private Task Client_OnWriteQueueEmpty(object sender, EventArgs e)
+		private Task Client_OnWriteQueueEmpty(object Sender, EventArgs e)
 		{
 			BinaryTcpClient Client = this.client;
 			this.client = null;
@@ -256,9 +256,9 @@ namespace Waher.Events.Socket
 			return Task.FromResult(true);	// Ignore incoming communication.
 		}
 
-		private Task Client_OnDisconnected(object sender, EventArgs e)
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
-			if (this.client == sender)
+			if (this.client == Sender)
 				this.client = null;
 
 			return Task.CompletedTask;

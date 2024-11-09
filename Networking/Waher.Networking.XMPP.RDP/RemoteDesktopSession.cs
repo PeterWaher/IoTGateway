@@ -89,7 +89,7 @@ namespace Waher.Networking.XMPP.RDP
 		/// <summary>
 		/// Event raised when state has been changed.
 		/// </summary>
-		public event EventHandler StateChanged;
+		public event EventHandlerAsync StateChanged;
 
 		/// <summary>
 		/// Available remote screens.
@@ -181,7 +181,7 @@ namespace Waher.Networking.XMPP.RDP
 		/// <summary>
 		/// Event raised when the screen has been successfully scanned and transferred.
 		/// </summary>
-		public event EventHandler ScanComplete;
+		public event EventHandlerAsync ScanComplete;
 
 		/// <summary>
 		/// Reports the mouse having moved to a given position.

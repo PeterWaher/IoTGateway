@@ -2466,24 +2466,17 @@ namespace Waher.IoTGateway
 		/// needs to close.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If no <see cref="OnTerminate"/> event handler has been set.</exception>
-		public static void Terminate()
+		public static Task Terminate()
 		{
-			EventHandler h = OnTerminate ?? throw new InvalidOperationException("No OnTerminate event handler set.");
-			try
-			{
-				h(instance, EventArgs.Empty);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			EventHandlerAsync h = OnTerminate ?? throw new InvalidOperationException("No OnTerminate event handler set.");
+			return h.Raise(instance, EventArgs.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when the <see cref="Terminate"/> method has been called, letting the container exceutable know
 		/// the application needs to close.
 		/// </summary>
-		public static event EventHandler OnTerminate = null;
+		public static event EventHandlerAsync OnTerminate = null;
 
 		/// <summary>
 		/// Tries to get the default page of a host.

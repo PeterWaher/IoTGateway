@@ -85,7 +85,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Session_StateChanged(object Sender, EventArgs e)
+		private Task Session_StateChanged(object Sender, EventArgs e)
 		{
 			if (this.session.State == RemoteDesktopSessionState.Started && this.desktop is null)
 			{
@@ -104,6 +104,8 @@ namespace Waher.Client.WPF.Controls
 					this.queue.Clear();
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void Session_TileUpdated(object Sender, TileEventArgs e)
@@ -120,9 +122,10 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void Session_ScanComplete(object Sender, EventArgs e)
+		private Task Session_ScanComplete(object Sender, EventArgs e)
 		{
 			this.UpdateScreen(null);
+			return Task.CompletedTask;
 		}
 
 		private byte[] buffer;

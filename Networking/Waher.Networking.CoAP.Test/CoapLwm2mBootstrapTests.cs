@@ -60,8 +60,16 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done3 = new(false);
 			ManualResetEvent Error3 = new(false);
 
-			this.lwm2mClient.OnBootstrapCompleted += (Sender, e) => Done2.Set();
-			this.lwm2mClient.OnBootstrapFailed += (Sender, e) => Error2.Set();
+			this.lwm2mClient.OnBootstrapCompleted += (Sender, e) =>
+			{
+				Done2.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnBootstrapFailed += (Sender, e) =>
+			{
+				Error2.Set();
+				return Task.CompletedTask;
+			};
 
 			this.lwm2mClient.OnRegistrationSuccessful += (Sender, e) =>
 			{
@@ -102,8 +110,16 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done3 = new(false);
 			ManualResetEvent Error3 = new(false);
 
-			this.lwm2mClient.OnBootstrapCompleted += (Sender, e) => Done2.Set();
-			this.lwm2mClient.OnBootstrapFailed += (Sender, e) => Error2.Set();
+			this.lwm2mClient.OnBootstrapCompleted += (Sender, e) =>
+			{
+				Done2.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnBootstrapFailed += (Sender, e) =>
+			{
+				Error2.Set();
+				return Task.CompletedTask;
+			};
 
 			this.lwm2mClient.OnRegistrationSuccessful += (Sender, e) =>
 			{

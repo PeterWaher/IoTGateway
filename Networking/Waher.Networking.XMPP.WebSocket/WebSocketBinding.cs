@@ -509,17 +509,7 @@ namespace Waher.Networking.XMPP.WebSocket
 
 					await this.RaiseOnSent(Packet);
 
-					if (!(DeliveryCallback is null))
-					{
-						try
-						{
-							await DeliveryCallback(this.xmppClient, EventArgs.Empty);
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					await DeliveryCallback.Raise(this.xmppClient, EventArgs.Empty);
 
 					lock (this.queue)
 					{

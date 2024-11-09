@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <PackageId>Waher.Theme.Base</PackageId>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
@@ -44,11 +44,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec
-      Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y"
-      Condition="'$(OS)'=='Windows_NT'" />
-    <Exec
-      Command="ditto &quot;$(OutDir)Root&quot; &quot;/usr/local/share/IoT Gateway Dev/Root&quot;"
-      Condition="'$(OS)'=='Unix'" />
+    <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="ditto &quot;$(OutDir)Root&quot; &quot;/usr/local/share/IoT Gateway Dev/Root&quot;" Condition="'$(OS)'=='Unix'" />
   </Target>
 </Project>

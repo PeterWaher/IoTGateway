@@ -1494,16 +1494,7 @@ namespace Waher.IoTGateway.Setup
 					this.identityPetitionCallbackMethods.Remove(PetitionId);
 			}
 
-			try
-			{
-				Callback(Sender, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-
-			return Task.CompletedTask;
+			return Callback.Raise(Sender, e);
 		}
 
 		private Task ContractsClient_PetitionedContractResponseReceived(object Sender, ContractPetitionResponseEventArgs e)
@@ -1519,16 +1510,7 @@ namespace Waher.IoTGateway.Setup
 					this.contractPetitionCallbackMethods.Remove(PetitionId);
 			}
 
-			try
-			{
-				Callback(Sender, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-
-			return Task.CompletedTask;
+			return Callback.Raise(Sender, e);
 		}
 
 		/// <summary>

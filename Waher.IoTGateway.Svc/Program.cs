@@ -447,11 +447,22 @@ namespace Waher.IoTGateway.Svc
 				}
 
 				ManualResetEvent Done = new(false);
-				Gateway.OnTerminate += (Sender, e) => Done.Set();
-				Console.CancelKeyPress += (Sender, e) =>
+				Gateway.OnTerminate += (Sender, e) =>
 				{
-					e.Cancel = true;
-					Gateway.Terminate();
+					Done.Set();
+					return Task.CompletedTask;
+				};
+				Console.CancelKeyPress += async (Sender, e) =>
+				{
+					try
+					{
+						e.Cancel = true;
+						await Gateway.Terminate();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
 				};
 
 				switch (Environment.OSVersion.Platform)
@@ -470,7 +481,17 @@ namespace Waher.IoTGateway.Svc
 									case CtrlTypes.CTRL_CLOSE_EVENT:
 									case CtrlTypes.CTRL_C_EVENT:
 									case CtrlTypes.CTRL_SHUTDOWN_EVENT:
-										Gateway.Terminate();
+										Task.Run(async () =>
+										{
+											try
+											{
+												await Gateway.Terminate();
+											}
+											catch (Exception ex)
+											{
+												Log.Exception(ex);
+											}
+										});
 										break;
 
 									case CtrlTypes.CTRL_LOGOFF_EVENT:

@@ -401,7 +401,7 @@ namespace Waher.Mock.Lamp.UWP
 			return OwnershipChanged.Raise(this, EventArgs.Empty);
 		}
 
-		public static event EventHandler OwnershipChanged = null;
+		public static event EventHandlerAsync OwnershipChanged = null;
 
 		public static string OwnerJid
 		{

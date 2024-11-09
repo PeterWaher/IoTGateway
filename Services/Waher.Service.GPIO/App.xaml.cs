@@ -261,7 +261,7 @@ namespace Waher.Service.GPIO
 
 							Pin.ValueChanged += async (Sender, e) =>
 							{
-								if (!this.gpioPins.TryGetValue(sender.PinNumber, out KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> P))
+								if (!this.gpioPins.TryGetValue(Sender.PinNumber, out KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> P))
 									return;
 
 								PinState Value = e.Edge == GpioPinEdge.FallingEdge ? PinState.LOW : PinState.HIGH;
@@ -269,7 +269,7 @@ namespace Waher.Service.GPIO
 								if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
 								{
 									DateTime TP = DateTime.Now;
-									string s = "GPIO" + sender.PinNumber.ToString();
+									string s = "GPIO" + Sender.PinNumber.ToString();
 
 									await this.sensorServer.NewMomentaryValues(
 										new EnumField(ThingReference.Empty, TP, s, Value, FieldType.Momentary, FieldQoS.AutomaticReadout));
@@ -774,7 +774,7 @@ namespace Waher.Service.GPIO
 			return OwnershipChanged.Raise(this, EventArgs.Empty);
 		}
 
-		public static event EventHandler OwnershipChanged = null;
+		public static event EventHandlerAsync OwnershipChanged = null;
 
 		public static string OwnerJid
 		{

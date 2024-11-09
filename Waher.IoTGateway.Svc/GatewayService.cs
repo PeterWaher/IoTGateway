@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Events;
@@ -88,10 +89,11 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private void TerminateService(object Sender, EventArgs e)
+		private Task TerminateService(object Sender, EventArgs e)
 		{
 			this.ExitCode = 1;
 			ThreadPool.QueueUserWorkItem(_ => this.Stop());
+			return Task.CompletedTask;
 		}
 
 		private class PendingTimer : IDisposable

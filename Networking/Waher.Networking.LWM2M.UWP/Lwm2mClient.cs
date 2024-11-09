@@ -98,7 +98,7 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Event raised when the LWM2M state changes.
 		/// </summary>
-		public event EventHandler OnStateChanged = null;
+		public event EventHandlerAsync OnStateChanged = null;
 
 		/// <summary>
 		/// Registered objects.
@@ -351,12 +351,12 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Event raised when a bootstrap sequence completed.
 		/// </summary>
-		public event EventHandler OnBootstrapCompleted = null;
+		public event EventHandlerAsync OnBootstrapCompleted = null;
 
 		/// <summary>
 		/// Event raised when a bootstrap sequence failed.
 		/// </summary>
-		public event EventHandler OnBootstrapFailed = null;
+		public event EventHandlerAsync OnBootstrapFailed = null;
 
 		internal class BootstreapResource : CoapResource, ICoapPostMethod
 		{
@@ -686,7 +686,7 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Event raised when a reboot request has been received.
 		/// </summary>
-		public event EventHandler OnRebootRequest = null;
+		public event EventHandlerAsync OnRebootRequest = null;
 
 	}
 }

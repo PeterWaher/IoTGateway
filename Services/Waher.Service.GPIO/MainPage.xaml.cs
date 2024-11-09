@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Waher.Events;
 using Waher.Mock;
+using System.Threading.Tasks;
 
 namespace Waher.Service.GPIO
 {
@@ -44,10 +45,10 @@ namespace Waher.Service.GPIO
 			if (instance is null)
 				instance = this;
 
-			App.OwnershipChanged += App_OwnershipChanged;
+			App.OwnershipChanged += this.App_OwnershipChanged;
 		}
 
-		private void App_OwnershipChanged(object Sender, EventArgs e)
+		private Task App_OwnershipChanged(object Sender, EventArgs e)
 		{
 			if (string.IsNullOrEmpty(App.OwnerJid))
 			{
@@ -65,9 +66,11 @@ namespace Waher.Service.GPIO
 				this.QrCodeLabel.Visibility = Visibility.Collapsed;
 				this.QrCode.Visibility = Visibility.Collapsed;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void Page_Unloaded(object Sender, RoutedEventArgs e)
+		private void Page_Unloaded(object _, RoutedEventArgs __)
 		{
 			if (!(sniffer is null) && sniffer.ListView == this.SnifferListView)
 				sniffer = null;
@@ -97,38 +100,35 @@ namespace Waher.Service.GPIO
 
 		public KeyValuePair<TextBlock, TextBlock> AddPin(string PinName, Enum Drive, string Value)
 		{
-			TextBlock Cell1 = new TextBlock()
+			TextBlock Cell1 = new TextBlock
 			{
 				TextWrapping = TextWrapping.Wrap,
-				Margin = new Thickness(0, 0, 0, 5)
+				Margin = new Thickness(0, 0, 0, 5),
+				Text = PinName
 			};
-
-			Cell1.Text = PinName;
 			Grid.SetColumn(Cell1, 0);
 			Grid.SetRow(Cell1, ++this.currentRow);
 
 			this.GpioGrid.RowDefinitions.Add(new RowDefinition());
 			this.GpioGrid.Children.Add(Cell1);
 
-			TextBlock Cell2 = new TextBlock()
+			TextBlock Cell2 = new TextBlock
 			{
 				TextWrapping = TextWrapping.Wrap,
-				Margin = new Thickness(0, 0, 0, 5)
+				Margin = new Thickness(0, 0, 0, 5),
+				Text = Drive.ToString()
 			};
-
-			Cell2.Text = Drive.ToString();
 			Grid.SetColumn(Cell2, 1);
 			Grid.SetRow(Cell2, this.currentRow);
 
 			this.GpioGrid.Children.Add(Cell2);
 
-			TextBlock Cell3 = new TextBlock()
+			TextBlock Cell3 = new TextBlock
 			{
 				TextWrapping = TextWrapping.Wrap,
-				Margin = new Thickness(0, 0, 0, 5)
+				Margin = new Thickness(0, 0, 0, 5),
+				Text = Value
 			};
-
-			Cell3.Text = Value;
 			Grid.SetColumn(Cell3, 2);
 			Grid.SetRow(Cell3, this.currentRow);
 

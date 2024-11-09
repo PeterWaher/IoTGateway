@@ -315,7 +315,7 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Event raised after the resource has been registered
 		/// </summary>
-		public event EventHandler OnAfterRegister = null;
+		public event EventHandlerAsync OnAfterRegister = null;
 
 		/// <summary>
 		/// Called after the resource has been registered on a CoAP Endpoint.

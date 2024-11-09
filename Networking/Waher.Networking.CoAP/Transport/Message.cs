@@ -32,24 +32,13 @@ namespace Waher.Networking.CoAP.Transport
 		public bool acknowledged;
 		public bool responseReceived = false;
 
-		internal async Task ResponseReceived(ClientBase Client, CoapMessage Response)
+		internal Task ResponseReceived(ClientBase Client, CoapMessage Response)
 		{
 			this.responseReceived = true;
 
-			if (!(this.callback is null))
-			{
-				try
-				{
-					await this.callback(this.endpoint, new CoapResponseEventArgs(Client, this.endpoint,
-						Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
-						this.state, Response, null));
-				}
-				catch (Exception ex)
-				{
-					await this.endpoint.Exception(ex);
-					Log.Exception(ex);
-				}
-			}
+			return this.callback.Raise(this.endpoint, new CoapResponseEventArgs(Client, this.endpoint,
+				Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
+				this.state, Response, null));
 		}
 
 		internal async Task<byte[]> BlockReceived(ClientBase Client, CoapMessage IncomingMessage)

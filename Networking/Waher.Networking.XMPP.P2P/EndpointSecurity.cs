@@ -1106,7 +1106,7 @@ namespace Waher.Networking.XMPP.P2P
 						else
 						{
 							e.State = State;
-							await Callback(Sender, e);
+							await Callback.Raise(Sender, e);
 						}
 					});
 				};
@@ -1408,17 +1408,8 @@ namespace Waher.Networking.XMPP.P2P
 						await Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
 							ThreadId, ParentThreadId, DeliveryCallback, State);
 					}
-					else if (!(DeliveryCallback is null))
-					{
-						try
-						{
-							await DeliveryCallback(Sender, new DeliveryEventArgs(State, false));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+					else 
+						await DeliveryCallback.Raise(Sender, new DeliveryEventArgs(State, false));
 				}, State);
 			}
 			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)

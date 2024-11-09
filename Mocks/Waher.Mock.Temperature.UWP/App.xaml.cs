@@ -594,7 +594,7 @@ namespace Waher.Mock.Temperature.UWP
 			return OwnershipChanged.Raise(this, EventArgs.Empty);
 		}
 
-		public static event EventHandler OwnershipChanged = null;
+		public static event EventHandlerAsync OwnershipChanged = null;
 
 		public static string OwnerJid
 		{

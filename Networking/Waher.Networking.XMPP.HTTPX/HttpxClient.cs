@@ -573,17 +573,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							Count -= BufSize;
 
-							if (!(this.DataCallback is null))
-							{
-								try
-								{
-									await this.DataCallback(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
-								}
-								catch (Exception ex)
-								{
-									Log.Exception(ex);
-								}
-							}
+							await this.DataCallback.Raise(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
 						}
 					}
 					else

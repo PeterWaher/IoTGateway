@@ -511,7 +511,7 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// Event raised when node has been updated.
 		/// </summary>
-		public event EventHandler OnUpdate = null;
+		public event EventHandlerAsync OnUpdate = null;
 
 		internal Task RaiseUpdate()
 		{

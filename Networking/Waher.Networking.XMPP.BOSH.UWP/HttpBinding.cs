@@ -622,17 +622,7 @@ namespace Waher.Networking.XMPP.BOSH
 						await this.RaiseOnSent(Packet);
 						Xml.Append(Packet);
 
-						if (!(DeliveryCallback is null))
-						{
-							try
-							{
-								await DeliveryCallback(this.xmppClient, EventArgs.Empty);
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
-						}
+						await DeliveryCallback.Raise(this.xmppClient, EventArgs.Empty);
 
 						Packet = null;
 						DeliveryCallback = null;

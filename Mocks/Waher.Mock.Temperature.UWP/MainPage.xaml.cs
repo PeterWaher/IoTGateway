@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Waher.Events;
 using Waher.Mock;
+using System.Threading.Tasks;
 
 namespace Waher.Mock.Temperature.UWP
 {
@@ -42,10 +43,10 @@ namespace Waher.Mock.Temperature.UWP
 			if (instance is null)
 				instance = this;
 
-			App.OwnershipChanged += App_OwnershipChanged;
+			App.OwnershipChanged += this.App_OwnershipChanged;
 		}
 
-		private void App_OwnershipChanged(object Sender, EventArgs e)
+		private Task App_OwnershipChanged(object Sender, EventArgs e)
 		{
 			if (string.IsNullOrEmpty(App.OwnerJid))
 			{
@@ -63,9 +64,11 @@ namespace Waher.Mock.Temperature.UWP
 				this.QrCodeLabel.Visibility = Visibility.Collapsed;
 				this.QrCode.Visibility = Visibility.Collapsed;
 			}
+
+			return Task.CompletedTask;
 		}
 
-		private void Page_Unloaded(object Sender, RoutedEventArgs e)
+		private void Page_Unloaded(object _, RoutedEventArgs __)
 		{
 			if (!(sniffer is null) && sniffer.ListView == this.SnifferListView)
 				sniffer = null;

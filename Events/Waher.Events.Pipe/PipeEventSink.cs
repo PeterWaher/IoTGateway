@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Events.Files;
+using Waher.Networking;
 
 namespace Waher.Events.Pipe
 {
@@ -125,9 +126,9 @@ namespace Waher.Events.Pipe
 				if (this.pipe is null)
 				{
 					this.pipe = this.pipeStreamFactory(this.pipeName);
-					this.Raise(this.BeforeConnect);
+					await this.BeforeConnect.Raise(this, EventArgs.Empty);
 					await this.pipe.ConnectAsync(5000);
-					this.Raise(this.AfterConnect);
+					await this.AfterConnect.Raise(this, EventArgs.Empty);
 				}
 
 				while (!(Bin is null))
@@ -164,21 +165,6 @@ namespace Waher.Events.Pipe
 			}
 		}
 
-		private void Raise(EventHandler Event)
-		{
-			if (!(Event is null))
-			{
-				try
-				{
-					Event(this, EventArgs.Empty);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
-		}
-
 		private void EmptyPipeQueue()
 		{
 			lock (this.pipeQueue)
@@ -191,11 +177,11 @@ namespace Waher.Events.Pipe
 		/// <summary>
 		/// Raised before connecting to the pipe stream.
 		/// </summary>
-		public event EventHandler BeforeConnect;
-
+		public event EventHandlerAsync BeforeConnect;
+		
 		/// <summary>
 		/// Raised after connecting to the pipe stream
 		/// </summary>
-		public event EventHandler AfterConnect;
+		public event EventHandlerAsync AfterConnect;
 	}
 }

@@ -68,10 +68,29 @@ namespace Waher.Script.Data.Functions
 			if (!(Arguments[i++].AssociatedObjectValue is Type Type))
 				throw new ScriptRuntimeException("Expected a type in the first argument.", this);
 
+			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+			{
+				{ GetLocation(typeof(object)), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
+				{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
+				{ GetLocation(typeof(Types)), true },
+				{ GetLocation(typeof(Expression)), true },
+				{ GetLocation(typeof(Callback)), true }
+			};
+
+			Dependencies[GetLocation(Type)] = true;
+
 			if (c > 2)
 			{
 				if (!(Arguments[i++].AssociatedObjectValue is Type TArg1))
 					throw new ScriptRuntimeException("Expected a type in the second argument.", this);
+
+
+				Dependencies[GetLocation(TArg1)] = true;
 
 				Type = Type.MakeGenericType(TArg1);
 			}
@@ -271,22 +290,6 @@ namespace Waher.Script.Data.Functions
 					CSharp.AppendLine("}");
 
 					string CSharpCode = CSharp.ToString();
-
-					Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
-					{
-						{ GetLocation(typeof(object)), true },
-						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(object))), "System.Runtime.dll"), true },
-						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Encoding))), "System.Text.Encoding.dll"), true },
-						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.IO.dll"), true },
-						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(MemoryStream))), "System.Runtime.Extensions.dll"), true },
-						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Task))), "System.Threading.Tasks.dll"), true },
-						{ Path.Combine(Path.GetDirectoryName(GetLocation(typeof(Dictionary<string, object>))), "System.Collections.dll"), true },
-						{ GetLocation(typeof(Types)), true },
-						{ GetLocation(typeof(Expression)), true },
-						{ GetLocation(typeof(Callback)), true }
-					};
-
-					Dependencies[GetLocation(Type)] = true;
 
 					TypeInfo LoopInfo;
 					Type Loop = Type;

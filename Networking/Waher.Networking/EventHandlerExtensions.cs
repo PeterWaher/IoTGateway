@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -59,10 +60,7 @@ namespace Waher.Networking
 			if (EventHandler is null)
 			{
 				if (Sender is ISniffable Sniffable)
-				{
-					await Sniffable.Warning("No event handler registered (" +
-						(Sender?.GetType().FullName ?? e.GetType().FullName) + ")");
-				}
+					await Sniffable.NoEventHandlerWarning(Sender, e);
 			}
 			else
 			{
@@ -81,6 +79,30 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Shows a warning in sniffers that an event handler is not registered.
+		/// </summary>
+		/// <param name="Sniffable">Sniffable object.</param>
+		/// <param name="Sender">Sender of event.</param>
+		/// <param name="e">Event arguments.</param>
+		public static Task NoEventHandlerWarning(this ISniffable Sniffable, object Sender, object e)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("No event handler registered (");
+
+			if (Sender is null)
+				sb.Append("null sender");
+            else
+				sb.Append(Sender.GetType().FullName);
+
+			sb.Append(", ");
+			sb.Append(e.GetType().FullName);
+			sb.Append(")");
+
+			return Sniffable.Warning(sb.ToString());
+		}
+
+		/// <summary>
 		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
 		/// </summary>
 		/// <param name="EventHandler">Event handler, or null if not defined.</param>
@@ -92,7 +114,7 @@ namespace Waher.Networking
 			if (EventHandler is null)
 			{
 				if (Sender is ISniffable Sniffable)
-					await Sniffable.Warning("No event handler registered.");
+					await Sniffable.NoEventHandlerWarning(Sender, e);
 			}
 			else
 			{
@@ -141,7 +163,7 @@ namespace Waher.Networking
 			if (EventHandler is null)
 			{
 				if (Sender is ISniffable Sniffable)
-					await Sniffable.Warning("No event handler registered.");
+					await Sniffable.NoEventHandlerWarning(Sender, e);
 			}
 			else
 			{
@@ -175,7 +197,7 @@ namespace Waher.Networking
 			if (EventHandler is null)
 			{
 				if (Sender is ISniffable Sniffable)
-					await Sniffable.Warning("No event handler registered.");
+					await Sniffable.NoEventHandlerWarning(Sender, e);
 			}
 			else
 			{

@@ -160,8 +160,8 @@
 		<Content fileName="MarkdownEditor.cssx"/>
 		<Content fileName="MarkdownEditor.js"/>
 		<Content fileName="MarkdownEditor.md"/>
-		<Content fileName="Master.md"/>
 		<Content fileName="Master.js"/>
+		<Content fileName="Master.md"/>
 		<Content fileName="Prompt.js"/>
 		<Content fileName="Prompt.md"/>
 		<Content fileName="robots.txt"/>

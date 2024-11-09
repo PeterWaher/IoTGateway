@@ -1054,7 +1054,7 @@ namespace Waher.Networking.Cluster
 			if (New)
 				await this.EndpointOnline.Raise(this, new ClusterEndpointEventArgs(Endpoint));
 
-			await this.EndpointStatus(this, new ClusterEndpointStatusEventArgs(Endpoint, Status));
+			await this.EndpointStatus.Raise(this, new ClusterEndpointStatusEventArgs(Endpoint, Status));
 		}
 
 		/// <summary>

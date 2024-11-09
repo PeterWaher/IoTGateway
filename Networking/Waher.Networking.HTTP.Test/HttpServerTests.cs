@@ -23,6 +23,7 @@ namespace Waher.Networking.HTTP.Test
 	{
 		private static HttpServer server;
 		private static ConsoleEventSink sink = null;
+		private static XmlFileSniffer xmlSniffer = null;
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
@@ -40,8 +41,18 @@ namespace Waher.Networking.HTTP.Test
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
 
+			if (xmlSniffer is null)
+			{
+				File.Delete("HTTP.xml");
+				xmlSniffer = xmlSniffer = new XmlFileSniffer("HTTP.xml",
+						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+						int.MaxValue, BinaryPresentationMethod.Base64);
+			}
+
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
-			server = new HttpServer(8081, 8088, Certificate, new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
+			server = new HttpServer(8081, 8088, Certificate,
+				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
+				xmlSniffer);
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{
@@ -54,6 +65,9 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server?.Dispose();
 			server = null;
+
+			xmlSniffer?.Dispose();
+			xmlSniffer = null;
 
 			if (sink is not null)
 			{
@@ -615,9 +629,9 @@ namespace Waher.Networking.HTTP.Test
 			}, true, false, true);
 			server.Register("/Remote/test31.txt", async (req, resp) =>
 			{
-				string A = req.Session["A"].ToString();
-				string B = req.Session["B"].ToString();
-				string C = req.Session["C"].ToString();
+				string A = req.Session["A"]?.ToString();
+				string B = req.Session["B"]?.ToString();
+				string C = req.Session["C"]?.ToString();
 
 				await resp.Return(A + " " + B + " " + C);
 			}, true, false, true);

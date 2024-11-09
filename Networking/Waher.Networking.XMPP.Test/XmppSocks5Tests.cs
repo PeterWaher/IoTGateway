@@ -11,6 +11,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppSocks5Tests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		[TestMethod]
 		public void Socks5_Test_01_FindProxy()
 		{

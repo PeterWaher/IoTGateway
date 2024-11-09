@@ -266,24 +266,30 @@ namespace Waher.Networking.Sniffers
 			this.output.WriteStartElement("SnifferOutput", "http://waher.se/Schema/SnifferOutput.xsd");
 			this.output.Flush();
 
-			string FolderName = Path.GetDirectoryName(s);
-			string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-			foreach (string FileName in Files)
+			if (this.deleteAfterDays < int.MaxValue)
 			{
-				if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+				string FolderName = Path.GetDirectoryName(s);
+				if (string.IsNullOrEmpty(FolderName))
+					FolderName = ".";
+
+				string[] Files = Directory.GetFiles(FolderName, "*.*");
+
+				foreach (string FileName in Files)
 				{
-					try
+					if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
 					{
-						File.Delete(FileName);
-					}
-					catch (IOException ex)
-					{
-						Log.Error("Unable to delete file: " + ex.Message, FileName);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex, FileName);
+						try
+						{
+							File.Delete(FileName);
+						}
+						catch (IOException ex)
+						{
+							Log.Error("Unable to delete file: " + ex.Message, FileName);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex, FileName);
+						}
 					}
 				}
 			}

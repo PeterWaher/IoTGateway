@@ -185,7 +185,7 @@ namespace Waher.Networking.HTTP
 				if (First)
 				{
 					Name = P.Key;
-					Value = P.Value;
+					Value = WebUtility.UrlDecode(P.Value);
 					First = false;
 				}
 				else

@@ -14,6 +14,18 @@ namespace Waher.Networking.XMPP.Test
 		private BobClient bobClient1;
 		private BobClient bobClient2;
 
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		public override void ConnectClients()
 		{
 			base.ConnectClients();

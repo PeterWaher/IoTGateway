@@ -172,14 +172,14 @@ namespace Waher.Networking.MQTT
 
 				this.DisposeClient();
 
-				this.State = MqttState.Connecting;
+				await this.SetState(MqttState.Connecting);
 
 				this.client = new BinaryTcpClient();
 				await this.client.ConnectAsync(this.Host, this.Port, this.tls);
 
 				if (this.tls)
 				{
-					this.State = MqttState.StartingEncryption;
+					await this.SetState(MqttState.StartingEncryption);
 #if WINDOWS_UWP
 					await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
@@ -237,12 +237,12 @@ namespace Waher.Networking.MQTT
 			await this.OnConnectionError.Raise(this, ex);
 			await this.Error(ex);
 
-			this.State = MqttState.Error;
+			await this.SetState(MqttState.Error);
 		}
 
 		private async Task CONNECT(int KeepAliveSeconds)
 		{
-			this.State = MqttState.Authenticating;
+			await this.SetState(MqttState.Authenticating);
 			this.keepAliveSeconds = KeepAliveSeconds;
 			this.nextPing = DateTime.Now.AddMilliseconds(KeepAliveSeconds * 500);
 			this.secondTimer = new Timer(this.SecondTimer_Elapsed, null, 1000, 1000);
@@ -340,12 +340,10 @@ namespace Waher.Networking.MQTT
 			this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 		}
 
-		private Task Client_OnDisconnected(object Sender, EventArgs e)
+		private async Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
 			if (this.state != MqttState.Error)
-				this.State = MqttState.Offline;
-
-			return Task.CompletedTask;
+				await this.SetState(MqttState.Offline);
 		}
 
 		private async Task<bool> Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
@@ -547,7 +545,7 @@ namespace Waher.Networking.MQTT
 							switch (ReturnCode)
 							{
 								case 0:
-									this.State = MqttState.Connected;
+									await this.SetState(MqttState.Connected);
 									this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 									break;
 
@@ -808,37 +806,28 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Current state of connection.
 		/// </summary>
-		public MqttState State
-		{
-			get => this.state;
-			internal set
-			{
-				if (this.state != value)
-				{
-					this.state = value;
+		public MqttState State => this.state;
 
-					if (this.HasSniffers || !(this.OnStateChanged is null))
+		internal async Task SetState(MqttState NewState)
+		{
+			if (this.state != NewState)
+			{
+				this.state = NewState;
+
+				if (this.HasSniffers)
+				{
+					try
 					{
-						Task.Run(async () =>
-						{
-							try
-							{
-								await this.Information("Switching state to " + value.ToString());
-								await this.RaiseOnStateChanged(value);
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
-						});
+						await this.Information("Switching state to " + NewState.ToString());
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
 					}
 				}
-			}
-		}
 
-		private Task RaiseOnStateChanged(MqttState State)
-		{
-			return this.OnStateChanged.Raise(this, State);
+				await this.OnStateChanged.Raise(this, NewState);
+			}
 		}
 
 		/// <summary>
@@ -1216,11 +1205,10 @@ namespace Waher.Networking.MQTT
 			if (this.HasSniffers)
 				await this.Information("Tx.DISCONNECT");
 
-			await this.Write(PacketData, 0, (Sender, e) =>
+			await this.Write(PacketData, 0, async (Sender, e) =>
 			{
-				this.State = MqttState.Offline;
+				await this.SetState(MqttState.Offline);
 				Done.TrySetResult(true);
-				return Task.CompletedTask;
 			});
 
 			await Task.WhenAny(Done.Task, Task.Delay(1000));

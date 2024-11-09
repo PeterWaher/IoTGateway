@@ -8,6 +8,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppServiceDiscoveryTests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		[TestMethod]
 		public async Task ServiceDiscovery_Test_01_Server()
 		{

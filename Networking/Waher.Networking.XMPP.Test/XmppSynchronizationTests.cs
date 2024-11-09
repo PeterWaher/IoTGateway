@@ -15,6 +15,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppSynchronizationTests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		private SynchronizationClient synchronizationClient1;
 		private SynchronizationClient synchronizationClient2;
 

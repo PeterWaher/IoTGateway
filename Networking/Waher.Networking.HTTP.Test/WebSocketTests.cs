@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.WebSockets;
@@ -23,6 +24,7 @@ namespace Waher.Networking.HTTP.Test
 		private const int MaxBinarySize = 1024 * 1024;
 		private static HttpServer server;
 		private static ConsoleEventSink sink = null;
+		private static XmlFileSniffer xmlSniffer = null;
 
 		private WebSocketListener webSocketListener;
 
@@ -32,11 +34,18 @@ namespace Waher.Networking.HTTP.Test
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
 
-			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
-			server = new HttpServer(8081, 8088, Certificate, new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine))
+			if (xmlSniffer is null)
 			{
-				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine)
-			};
+				File.Delete("WebSocket.xml");
+				xmlSniffer = xmlSniffer = new XmlFileSniffer("WebSocket.xml",
+						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+						int.MaxValue, BinaryPresentationMethod.Hexadecimal);
+			}
+
+			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
+			server = new HttpServer(8081, 8088, Certificate,
+				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
+				xmlSniffer);
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{
@@ -49,6 +58,9 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server?.Dispose();
 			server = null;
+
+			xmlSniffer?.Dispose();
+			xmlSniffer = null;
 
 			if (sink is not null)
 			{
@@ -341,10 +353,13 @@ namespace Waher.Networking.HTTP.Test
 			await Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
 				WebSocketMessageType.Binary, true, CancellationToken.None);
 
-			if (Client.State == WebSocketState.Aborted)
-				throw new WebSocketException(); // Not necessary in previous versions of .NET. This Exception has been swallowed by internal processing in more recent versions.
-
-			Task _ = Task.Delay(5000).ContinueWith((_) => Result.TrySetException(new TimeoutException()));
+			Task _ = Task.Delay(5000).ContinueWith((_) =>
+			{
+				if (Client.State == WebSocketState.Aborted)
+					Result.TrySetException(new WebSocketException());
+				else
+					Result.TrySetException(new TimeoutException());
+			});
 
 			await Result.Task;
 			Assert.Fail("Binary data received, contrary to expectation.");

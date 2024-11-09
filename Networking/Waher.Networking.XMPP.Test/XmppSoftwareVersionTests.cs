@@ -7,6 +7,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppSoftwareVersionTests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		[TestMethod]
 		public void SoftwareVersion_Test_01_Server()
 		{

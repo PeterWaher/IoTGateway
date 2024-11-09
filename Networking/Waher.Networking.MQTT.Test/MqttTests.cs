@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
@@ -9,13 +11,49 @@ namespace Waher.Networking.MQTT.Test
 	[TestClass]
 	public abstract class MqttTests
 	{
+		private static XmlFileSniffer xmlSniffer = null;
 		private MqttClient client;
+		private Exception ex;
+
+		public static void SetupSniffer()
+		{
+			if (xmlSniffer is null)
+			{
+				File.Delete("MQTT.xml");
+				xmlSniffer = xmlSniffer = new XmlFileSniffer("MQTT.xml",
+					@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+					int.MaxValue, BinaryPresentationMethod.Hexadecimal);
+			}
+		}
+
+		public static void CloseSniffer()
+		{
+			xmlSniffer?.Dispose();
+			xmlSniffer = null;
+		}
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.client = new MqttClient("mqtt.eclipse.org", this.Port, this.Encypted, "UnitTest", string.Empty,
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
+			this.ex = null;
+			this.client = new MqttClient("test.mosquitto.org", this.Port, this.Encypted, string.Empty, string.Empty,
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine),
+				xmlSniffer)
+			{
+				TrustServer = true
+			};
+
+			this.client.OnError += (Sender, e) =>
+			{
+				this.ex = e;
+				return Task.CompletedTask;
+			};
+
+			this.client.OnConnectionError += (Sender, e) =>
+			{
+				this.ex = e;
+				return Task.CompletedTask;
+			};
 		}
 
 		public abstract bool Encypted
@@ -31,6 +69,9 @@ namespace Waher.Networking.MQTT.Test
 		[TestCleanup]
 		public async Task TestCleanup()
 		{
+			if (this.ex is not null)
+				Assert.Fail(this.ex.Message);
+
 			if (this.client is not null)
 			{
 				await this.client.DisposeAsync();
@@ -100,13 +141,13 @@ namespace Waher.Networking.MQTT.Test
 		}
 
 		[TestMethod]
-		public async void Test_04_Publish_AtLeastOnce()
+		public async Task Test_04_Publish_AtLeastOnce()
 		{
 			await this.Publish(MqttQualityOfService.AtLeastOnce);
 		}
 
 		[TestMethod]
-		public async void Test_05_Publish_ExactlyOne()
+		public async Task Test_05_Publish_ExactlyOne()
 		{
 			await this.Publish(MqttQualityOfService.ExactlyOnce);
 		}

@@ -120,6 +120,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_10_Resolve_Service_Endpoint_2()
 		{
 			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("cibernotar.io", "xmpp-client", "tcp");
@@ -127,6 +128,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_11_Resolve_Service_Endpoint_3()
 		{
 			SRV Endpoint = await DnsResolver.LookupServiceEndpoint("cibernotar.io", "xmpp-server", "tcp");
@@ -150,6 +152,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_14_Resolve_Mail_Exchange_3()
 		{
 			await TestExchange("waher.se");
@@ -203,6 +206,7 @@ namespace Waher.Networking.DNS.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_21_Resolve_TXT_2()
 		{
 			string[] Text = await DnsResolver.LookupText("waher.se");

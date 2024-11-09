@@ -1,19 +1,23 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Networking.MQTT.Test
 {
 	[TestClass]
 	public class MqttUnencryptedTests : MqttTests
 	{
-		public override bool Encypted
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
 		{
-			get { return false; }
+			SetupSniffer();
 		}
 
-		public override int Port
+		[ClassCleanup]
+		public static void ClassCleanup()
 		{
-			get { return 1883; }
+			CloseSniffer();
 		}
+
+		public override bool Encypted => false;
+		public override int Port => 1883;
 	}
 }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
@@ -14,6 +15,7 @@ namespace Waher.Networking.XMPP.Test
 	public abstract class CommunicationTests
 	{
 		private static ConsoleEventSink sink = null;
+		private static XmlFileSniffer xmlSniffer = null;
 		protected ManualResetEvent connected1 = new(false);
 		protected ManualResetEvent error1 = new(false);
 		protected ManualResetEvent offline1 = new(false);
@@ -29,16 +31,25 @@ namespace Waher.Networking.XMPP.Test
 		{
 		}
 
-		[ClassInitialize]
-		public static void ClassInitialize(TestContext _)
+		public static void SetupSnifferAndLog()
 		{
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
+
+			if (xmlSniffer is null)
+			{
+				File.Delete("XMPP.xml");
+				xmlSniffer = xmlSniffer = new XmlFileSniffer("XMPP.xml",
+						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+						int.MaxValue, BinaryPresentationMethod.Base64);
+			}
 		}
 
-		[ClassCleanup]
-		public static void ClassCleanup()
+		public static void DisposeSnifferAndLog()
 		{
+			xmlSniffer?.Dispose();
+			xmlSniffer = null;
+
 			if (sink is not null)
 			{
 				Log.Unregister(sink);
@@ -69,6 +80,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 
             this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
+			this.client1.Add(xmlSniffer);
             this.client1.OnConnectionError += this.Client_OnConnectionError1;
 			this.client1.OnError += this.Client_OnError1;
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;

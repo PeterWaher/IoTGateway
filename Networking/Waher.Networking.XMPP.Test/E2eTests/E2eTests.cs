@@ -12,7 +12,19 @@ namespace Waher.Networking.XMPP.Test.E2eTests
         protected EndpointSecurity endpointSecurity1;
         protected EndpointSecurity endpointSecurity2;
 
-        public override void PrepareClient1(XmppClient Client)
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+            SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+            DisposeSnifferAndLog();
+		}
+
+		public override void PrepareClient1(XmppClient Client)
         {
             base.PrepareClient1(Client);
             this.endpointSecurity1 = new EndpointSecurity(this.client1, 128, this.endpoints1);

@@ -37,6 +37,18 @@ namespace Waher.Networking.XMPP.Test
 				typeof(P2P.EndpointSecurity).Assembly);
 		}
 
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		public override void ConnectClients()
 		{
 			base.ConnectClients();

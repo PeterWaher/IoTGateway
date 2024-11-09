@@ -112,8 +112,6 @@ namespace Waher.Networking.XMPP.BOSH
 				rid = BitConverter.ToUInt32(XmppClient.GetRandomBytes(4), 0) + 1
 			};
 
-			Result.httpClients = new HttpClient[1];
-
 			return Result;
 		}
 
@@ -155,7 +153,7 @@ namespace Waher.Networking.XMPP.BOSH
 				foreach (HttpClient Client in this.httpClients)
 					Client?.Dispose();
 
-				this.httpClients = null;
+				this.httpClients = Array.Empty<HttpClient>();
 			}
 		}
 

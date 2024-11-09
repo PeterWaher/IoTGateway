@@ -10,6 +10,18 @@ namespace Waher.Networking.XMPP.Test
 		private InteroperabilityClient interopClient;
 		private InteroperabilityServer interopServer;
 
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		public override void ConnectClients()
 		{
 			base.ConnectClients();

@@ -58,6 +58,11 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public SensorDataReadoutState State => this.state;
 
+		/// <summary>
+		/// If the request object should be maintained across multiple readouts.
+		/// </summary>
+		public virtual bool MaintainSubscription => false;
+
 		internal async Task SetState(SensorDataReadoutState NewState)
 		{
 			if (this.state != NewState)
@@ -91,7 +96,7 @@ namespace Waher.Networking.XMPP.Sensor
 			await this.SetState(SensorDataReadoutState.Failure);
 		}
 
-		internal virtual Task LogErrors(IEnumerable<ThingError> Errors)
+		internal Task LogErrors(IEnumerable<ThingError> Errors)
 		{
 			lock (this.synchObject)
 			{
@@ -104,7 +109,7 @@ namespace Waher.Networking.XMPP.Sensor
 			return this.OnErrorsReceived.Raise(this, Errors);
 		}
 
-		internal virtual Task LogFields(IEnumerable<Field> Fields)
+		internal Task LogFields(IEnumerable<Field> Fields)
 		{
 			lock (this.synchObject)
 			{

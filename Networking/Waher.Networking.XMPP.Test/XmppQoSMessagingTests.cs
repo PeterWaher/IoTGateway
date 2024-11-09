@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.Events;
@@ -9,6 +8,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppQoSMessagingTests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		[TestMethod]
 		public void QoS_Test_01_Unacknowledged_Service()
 		{

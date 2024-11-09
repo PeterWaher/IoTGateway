@@ -18,6 +18,18 @@ namespace Waher.Networking.XMPP.Test
 		private SensorServer sensorServer;
 		private double temp;
 
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		public override void ConnectClients()
 		{
 			base.ConnectClients();
@@ -112,8 +124,7 @@ namespace Waher.Networking.XMPP.Test
 			this.ConnectClients();
 			try
 			{
-				ManualResetEvent Done = new(false);
-				ManualResetEvent Error = new(false);
+				TaskCompletionSource<bool> Result = new();
 				IEnumerable<Field> Fields = null;
 
 				SensorDataSubscriptionRequest Request = await this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
@@ -125,20 +136,22 @@ namespace Waher.Networking.XMPP.Test
 				};
 				Request.OnErrorsReceived += (sender, Errors) =>
 				{
-					Error.Set();
+					Result.TrySetResult(false);
 					return Task.CompletedTask;
 				};
 				Request.OnFieldsReceived += (sender, NewFields) =>
 				{
 					Fields = NewFields;
-					Done.Set();
+					Result.TrySetResult(true);
 					return Task.CompletedTask;
 				};
 
 				await this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
 					FieldType.Momentary, FieldQoS.AutomaticReadout));
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
+				Task _ = Task.Delay(10000).ContinueWith((_) => Result.TrySetException(new TimeoutException()));
+
+				Assert.IsTrue(await Result.Task, "Subscription not performed correctly");
 
 				foreach (Field Field in Fields)
 					ConsoleOut.WriteLine(Field.ToString());

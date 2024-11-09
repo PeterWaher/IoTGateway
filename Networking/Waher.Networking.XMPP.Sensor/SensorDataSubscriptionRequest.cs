@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.XMPP.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Manages a sensor data client request.
 	/// </summary>
-	public class SensorDataSubscriptionRequest : SensorDataClientRequest 
+	public class SensorDataSubscriptionRequest : SensorDataClientRequest, IDisposable
 	{
 		private readonly FieldSubscriptionRule[] fieldRules;
 		private readonly Duration? minInterval;
@@ -47,6 +47,11 @@ namespace Waher.Networking.XMPP.Sensor
 			this.maxAge = MaxAge;
 			this.fieldRules = FieldRules;
 		}
+
+		/// <summary>
+		/// If the request object should be maintained across multiple readouts.
+		/// </summary>
+		public override bool MaintainSubscription => true;
 
 		private static string[] ExtractFieldNames(FieldSubscriptionRule[] FieldRules)
 		{
@@ -114,21 +119,28 @@ namespace Waher.Networking.XMPP.Sensor
 				return Task.CompletedTask;
 		}
 
-		internal override Task LogFields(IEnumerable<Field> Fields)
+		/// <summary>
+		/// Disposes of the subscription.
+		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
+		public void Dispose()
 		{
-			if (!this.unsubscribed)
-				return this.Unsubscribe();
-			else
-				return base.LogFields(Fields);
+			try
+			{
+				this.DisposeAsync().Wait();
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 
-		internal override Task LogErrors(IEnumerable<ThingError> Errors)
+		/// <summary>
+		/// Disposes of the subscription.
+		/// </summary>
+		public async Task DisposeAsync()
 		{
-			if (!this.unsubscribed)
-				return this.Unsubscribe();
-			else
-				return base.LogErrors(Errors);
+			await this.Unsubscribe();
 		}
-
 	}
 }

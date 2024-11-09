@@ -296,12 +296,7 @@ namespace Waher.Networking.XMPP.Sensor
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			StringBuilder Xml = new StringBuilder();
-			string Id = Guid.NewGuid().ToString().Replace("-", string.Empty);
-
-			lock (this.synchObj)
-			{
-				this.requests[Id] = null;
-			}
+			string Id = this.GetNewId();
 
 			Xml.Append("<req xmlns='");
 			Xml.Append(NamespaceSensorDataCurrent);
@@ -417,6 +412,24 @@ namespace Waher.Networking.XMPP.Sensor
 			return Request;
 		}
 
+		private string GetNewId()
+		{
+			string Id;
+
+			lock (this.synchObj)
+			{
+				do
+				{
+					Id = Guid.NewGuid().ToString().Replace("-", string.Empty);
+				}
+				while (this.requests.ContainsKey(Id));
+
+				this.requests[Id] = null;
+			}
+
+			return Id;
+		}
+
 		private async Task RequestResponse(object Sender, IqResultEventArgs e)
 		{
 			SensorDataClientRequest Request = (SensorDataClientRequest)e.State;
@@ -495,9 +508,15 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				if (!this.requests.TryGetValue(Id, out Request))
 					return;
+
+				if (!Request.MaintainSubscription)
+					this.requests.Remove(Id);
 			}
 
 			await Request.Done();
+
+			if (Request.MaintainSubscription)
+				Request.Clear();
 		}
 
 		private async Task AssertReceiving(SensorDataClientRequest Request)
@@ -554,7 +573,19 @@ namespace Waher.Networking.XMPP.Sensor
 				await Request.LogErrors(Response.Item2);
 
 			if (Done)
+			{
 				await Request.Done();
+
+				if (Request.MaintainSubscription)
+					Request.Clear();
+				else
+				{
+					lock (this.requests)
+					{
+						this.requests.Remove(Request.Id);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -1154,12 +1185,7 @@ namespace Waher.Networking.XMPP.Sensor
 			bool ImmediateReadout)
 		{
 			StringBuilder Xml = new StringBuilder();
-			string Id = Guid.NewGuid().ToString().Replace("-", string.Empty);
-
-			lock (this.synchObj)
-			{
-				this.requests[Id] = null;
-			}
+			string Id = this.GetNewId();
 
 			Xml.Append("<subscribe xmlns='");
 			Xml.Append(NamespaceSensorEventsCurrent);

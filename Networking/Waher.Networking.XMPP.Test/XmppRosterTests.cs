@@ -1,11 +1,5 @@
-﻿using System;
-using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Test
@@ -13,6 +7,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppRosterTests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		[TestMethod]
 		public void Roster_Test_01_GetRoster()
 		{

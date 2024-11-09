@@ -10,6 +10,18 @@ namespace Waher.Networking.XMPP.Test
 	[TestClass]
 	public class XmppSearchTests : CommunicationTests
 	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
 		[TestMethod]
 		public void Search_Test_01_FindSearchForms()
 		{

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
 

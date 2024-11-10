@@ -301,7 +301,7 @@ namespace Waher.WebService.Tesseract
 
 			string Result = SearchForInstallationFolder(Folder);
 
-			if (string.IsNullOrEmpty(Result))
+			if (string.IsNullOrEmpty(Result) && !string.IsNullOrEmpty(Gateway.RuntimeFolder))
 				Result = SearchForInstallationFolder(Path.Combine(Gateway.RuntimeFolder, SpecialFolder.ToString()));
 
 			return Result;
@@ -334,13 +334,20 @@ namespace Waher.WebService.Tesseract
 
 			foreach (string SubFolder in SubFolders)
 			{
-				FolderName = Path.GetFileName(SubFolder);
-				if (!FolderName.StartsWith(FolderPrefix, StringComparison.CurrentCultureIgnoreCase))
-					continue;
+				try
+				{
+					FolderName = Path.GetFileName(SubFolder);
+					if (!FolderName.StartsWith(FolderPrefix, StringComparison.CurrentCultureIgnoreCase))
+						continue;
 
-				string ExePath = Path.Combine(SubFolder, ExecutableName);
-				if (File.Exists(ExePath))
-					return ExePath;
+					string ExePath = Path.Combine(SubFolder, ExecutableName);
+					if (File.Exists(ExePath))
+						return ExePath;
+				}
+				catch (Exception)
+				{
+					continue;	// Ignore. Some folders might be protected.
+				}
 			}
 
 			return null;

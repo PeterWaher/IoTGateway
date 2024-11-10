@@ -117,9 +117,10 @@ namespace Waher.WebService.Sparql
 			return Task.CompletedTask;
 		}
 
-		private void ConcentratorServer_SourceUnregistered(object Sender, DataSourceEventArgs e)
+		private Task ConcentratorServer_SourceUnregistered(object Sender, DataSourceEventArgs e)
 		{
 			GraphStore.InvalidateDefaultGraph();
+			return Task.CompletedTask;
 		}
 	}
 }

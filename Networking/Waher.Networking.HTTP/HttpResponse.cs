@@ -1221,7 +1221,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when the response has been sent.
 		/// </summary>
-		public EventHandler OnResponseSent = null;
+		public EventHandlerAsync OnResponseSent = null;
 
 		#region TextWriter analogies
 

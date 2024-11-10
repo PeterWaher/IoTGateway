@@ -630,7 +630,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Event raised when a data source has been unregistered.
 		/// </summary>
-		public event EventHandler<DataSourceEventArgs> SourceUnregistered;
+		public event EventHandlerAsync<DataSourceEventArgs> SourceUnregistered;
 
 		private class DataSourceRec
 		{

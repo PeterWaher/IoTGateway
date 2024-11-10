@@ -370,7 +370,8 @@ namespace Waher.Client.WPF.Model
 		public virtual Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			Parent?.RemoveChild(this);
-			return OnDeleted.Raise(this, EventArgs.Empty);
+			OnDeleted.Raise(this, EventArgs.Empty);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

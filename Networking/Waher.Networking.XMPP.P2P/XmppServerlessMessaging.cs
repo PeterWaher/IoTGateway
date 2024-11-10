@@ -484,38 +484,33 @@ namespace Waher.Networking.XMPP.P2P
 				else
 				{
 					Result.Peer = Connection;
-					Connection.Start((Sender, e) =>
+					Connection.Start(async (Sender, e) =>
 					{
 						if (!(ResynchMethod is null))
 						{
-							try
+							if (!await ResynchMethod.Raise(this, new ResynchEventArgs(FullJID, async (sender2, e2) =>
 							{
-								ResynchMethod(this, new ResynchEventArgs(FullJID, async (sender2, e2) =>
+								try
 								{
-									try
+									if (e2.Ok)
 									{
-										if (e2.Ok)
-										{
-											Result.Peer = null;
-											Connection = await this.ConnectToAsync(FullJID, Info);
-											Result.Peer = Connection;
-											Connection.Start();
-											Result.HeaderSent = true;
-											await Result.SendAsync(Header);
-											await this.TransmitText(Header);
-										}
-										else
-											Result.CallCallbacks();
+										Result.Peer = null;
+										Connection = await this.ConnectToAsync(FullJID, Info);
+										Result.Peer = Connection;
+										Connection.Start();
+										Result.HeaderSent = true;
+										await Result.SendAsync(Header);
+										await this.TransmitText(Header);
 									}
-									catch (Exception ex)
-									{
-										await this.Exception(ex);
-									}
-								}));
-							}
-							catch (Exception ex)
+									else
+										Result.CallCallbacks();
+								}
+								catch (Exception ex)
+								{
+									await this.Exception(ex);
+								}
+							})))
 							{
-								Log.Exception(ex);
 								Result.CallCallbacks();
 							}
 						}

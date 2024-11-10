@@ -240,14 +240,16 @@ namespace Waher.Networking.XMPP.RDP
 			if (Session is null || TileBase64 is null)
 				return Task.CompletedTask;
 
-			return Session.UpdateTile(X, Y, TileBase64);
+			Session.UpdateTile(X, Y, TileBase64);
+
+			return Task.CompletedTask;
 		}
 
-		private async Task TilesMessageHandler(object State, MessageEventArgs e)
+		private Task TilesMessageHandler(object State, MessageEventArgs e)
 		{
 			string SessionId = XML.Attribute(e.Content, "sessionId");
 			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
-				return;
+				return Task.CompletedTask;
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
@@ -273,9 +275,11 @@ namespace Waher.Networking.XMPP.RDP
 						}
 					}
 
-					await Session.UpdateTile(X, Y, TileBase64);
+					Session.UpdateTile(X, Y, TileBase64);
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private Task ScanCompleteHandler(object State, MessageEventArgs e)

@@ -163,9 +163,9 @@ namespace Waher.Networking.XMPP.RDP
 			internal set => this.deviceName = value;
 		}
 
-		internal Task UpdateTile(int X, int Y, string TileBase64)
+		internal void UpdateTile(int X, int Y, string TileBase64)
 		{
-			return this.TileUpdated.Raise(this, new TileEventArgs(this, X, Y, TileBase64));
+			this.TileUpdated.Raise(this, new TileEventArgs(this, X, Y, TileBase64));
 		}
 
 		/// <summary>

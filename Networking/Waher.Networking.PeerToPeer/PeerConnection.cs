@@ -16,7 +16,7 @@ namespace Waher.Networking.PeerToPeer
 		private readonly PeerToPeerNetwork network;
 		private IPEndPoint remoteEndpoint;
 		private BinaryTcpClient tcpConnection;
-		private EventHandler resynchCallback;
+		private EventHandlerAsync resynchCallback;
 		private object stateObject = null;
 		private int readState = 0;
 		private int packetSize = 0;
@@ -162,7 +162,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		///	<param name="ResynchCallback">Resynchronization callback to call, if connection is discarded. Can be null if no 
 		///	resynchronization method is used.</param>
-		public void Start(EventHandler ResynchCallback)
+		public void Start(EventHandlerAsync ResynchCallback)
 		{
 			this.readState = 0;
 			this.packetSize = 0;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.MQTT;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
@@ -10,10 +10,10 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Mqtt.Model.Encapsulations
 {
-	/// <summary>
-	/// Represents an MQTT topic with binary data.
-	/// </summary>
-	public class BinaryData : MqttData
+    /// <summary>
+    /// Represents an MQTT topic with binary data.
+    /// </summary>
+    public class BinaryData : MqttData
 	{
 		private byte[] value;
 		private bool firstReport = true;
@@ -122,7 +122,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		public override void SnifferOutput(ISniffable Output)
+		public override void SnifferOutput(ICommunicationLayer Output)
 		{
 			if (this.value is null)
 				this.Information(Output, "NULL");

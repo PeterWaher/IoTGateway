@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
-	/// <summary>
-	/// Interface for sniffers. Sniffers can be added to <see cref="ISniffable"/> classes to eavesdrop on communication performed on that
-	/// particular node.
-	/// </summary>
-	public interface ISniffer
+    /// <summary>
+    /// Interface for sniffers. Sniffers can be added to <see cref="ICommunicationLayer"/> classes to eavesdrop on communication performed on that
+    /// particular node.
+    /// </summary>
+    public interface ISniffer
 	{
 		/// <summary>
 		/// Called when binary data has been received.

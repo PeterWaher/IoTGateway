@@ -108,8 +108,10 @@
     <Compile Include="BinaryOutputStream.cs" />
     <Compile Include="BinaryTcpServer.cs" />
     <Compile Include="ClientCertificates.cs" />
+    <Compile Include="CommunicationLayer.cs" />
     <Compile Include="EventHandlerExtensions.cs" />
     <Compile Include="IBinaryTransmission.cs" />
+    <Compile Include="ICommunicationLayer.cs" />
     <Compile Include="RowTcpClient.cs" />
     <Compile Include="ServerConnectionAcceptEventArgs.cs" />
     <Compile Include="ServerConnectionDataEventArgs.cs" />
@@ -117,7 +119,6 @@
     <Compile Include="ServerTcpConnection.cs" />
     <Compile Include="ServerTlsErrorEventArgs.cs" />
     <Compile Include="Sniffers\DebugSniffer.cs" />
-    <Compile Include="Sniffers\Extensions.cs" />
     <Compile Include="Sniffers\SnifferBase.cs" />
     <Compile Include="Sniffers\SnifferProxy.cs" />
     <Compile Include="Sniffers\TextSnifferBase.cs" />
@@ -129,7 +130,6 @@
     <Compile Include="Sniffers\ConsoleErrorSniffer.cs" />
     <Compile Include="Sniffers\ConsoleOutSniffer.cs" />
     <Compile Include="Sniffers\InMemorySniffer.cs" />
-    <Compile Include="Sniffers\ISniffable.cs" />
     <Compile Include="Sniffers\ISniffer.cs" />
     <Compile Include="Sniffers\Model\SnifferBinaryEvent.cs" />
     <Compile Include="Sniffers\Model\SnifferError.cs" />
@@ -142,7 +142,6 @@
     <Compile Include="Sniffers\Model\SnifferTxBinary.cs" />
     <Compile Include="Sniffers\Model\SnifferTxText.cs" />
     <Compile Include="Sniffers\Model\SnifferWarning.cs" />
-    <Compile Include="Sniffers\Sniffable.cs" />
     <Compile Include="Sniffers\SnifferEnumerator.cs" />
     <Compile Include="Sniffers\TextFileSniffer.cs" />
     <Compile Include="Sniffers\TextWriterSniffer.cs" />

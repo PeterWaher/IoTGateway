@@ -10,10 +10,10 @@ using Waher.Networking.PeerToPeer;
 
 namespace Waher.Networking.XMPP.P2P
 {
-	/// <summary>
-	/// Class managing peer-to-peer serveless XMPP communication.
-	/// </summary>
-	public class XmppServerlessMessaging : Sniffable, IDisposable
+    /// <summary>
+    /// Class managing peer-to-peer serveless XMPP communication.
+    /// </summary>
+    public class XmppServerlessMessaging : CommunicationLayer, IDisposable
 	{
 		private Dictionary<string, PeerState> peersByFullJid = new Dictionary<string, PeerState>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Dictionary<string, AddressInfo> addressesByFullJid = new Dictionary<string, AddressInfo>(StringComparer.CurrentCultureIgnoreCase);

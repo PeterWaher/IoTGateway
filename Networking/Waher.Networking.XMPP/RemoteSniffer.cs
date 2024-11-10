@@ -6,16 +6,16 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP
 {
-	/// <summary>
-	/// Class redirecting sniffer output to a remote client.
-	/// </summary>
-	public class RemoteSniffer : SnifferBase
+    /// <summary>
+    /// Class redirecting sniffer output to a remote client.
+    /// </summary>
+    public class RemoteSniffer : SnifferBase
 	{
 		private readonly string id;
 		private readonly string fullJID;
 		private readonly string @namespace;
 		private readonly DateTime expires;
-		private readonly ISniffable node;
+		private readonly ICommunicationLayer node;
 		private readonly XmppClient client;
 
 		/// <summary>
@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Node">Node being sniffed.</param>
 		/// <param name="Client">XMPP Client transmitting messages.</param>
 		/// <param name="Namespace">Namespace used when creating sniffer.</param>
-		public RemoteSniffer(string FullJID, DateTime Expires, ISniffable Node, XmppClient Client, string Namespace)
+		public RemoteSniffer(string FullJID, DateTime Expires, ICommunicationLayer Node, XmppClient Client, string Namespace)
 		{
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.fullJID = FullJID;
@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Node being sniffed.
 		/// </summary>
-		public ISniffable Node => this.node;
+		public ICommunicationLayer Node => this.node;
 
 		/// <summary>
 		/// XMPP Client transmitting messages.

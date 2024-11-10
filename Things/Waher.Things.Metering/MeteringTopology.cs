@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking;
-using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
@@ -14,12 +13,12 @@ using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
 {
-	/// <summary>
-	/// Delegate for new momentary values event handlers.
-	/// </summary>
-	/// <param name="Reference">Thing reporting new momentary values.</param>
-	/// <param name="Values">New momentary values.</param>
-	public delegate Task NewMomentaryValuesHandler(IThingReference Reference, IEnumerable<Field> Values);
+    /// <summary>
+    /// Delegate for new momentary values event handlers.
+    /// </summary>
+    /// <param name="Reference">Thing reporting new momentary values.</param>
+    /// <param name="Values">New momentary values.</param>
+    public delegate Task NewMomentaryValuesHandler(IThingReference Reference, IEnumerable<Field> Values);
 
 	/// <summary>
 	/// Defines the Metering Topology data source. This data source contains a tree structure of persistent 
@@ -271,7 +270,7 @@ namespace Waher.Things.Metering
 				{
 					Parameters = await Result.GetDisplayableParameterAraryAsync(Language, RequestOrigin.Empty),
 					NodeType = Result.GetType().FullName,
-					Sniffable = Result is ISniffable,
+					Sniffable = Result is ICommunicationLayer,
 					DisplayName = await Result.GetTypeNameAsync(Language),
 					HasChildren = Result.HasChildren,
 					ChildrenOrdered = Result.ChildrenOrdered,

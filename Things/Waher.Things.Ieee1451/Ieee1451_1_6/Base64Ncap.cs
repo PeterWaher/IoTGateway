@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.MQTT;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Language;
 using Waher.Things.Mqtt.Model;
 using Waher.Things.Mqtt.Model.Encapsulations;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
-	/// <summary>
-	/// Base64-encoded IEEE 1451.1.6 NCAP.
-	/// </summary>
-	public class Base64Ncap : Ncap
+    /// <summary>
+    /// Base64-encoded IEEE 1451.1.6 NCAP.
+    /// </summary>
+    public class Base64Ncap : Ncap
 	{
 		private bool firstMessage = true;
 
@@ -68,7 +68,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		public override void SnifferOutput(ISniffable Output)
+		public override void SnifferOutput(ICommunicationLayer Output)
 		{
 		}
 

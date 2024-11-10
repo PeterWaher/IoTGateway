@@ -17,10 +17,10 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.SMTP
 {
-	/// <summary>
-	/// Simple SMTP Client
-	/// </summary>
-	public class SimpleSmtpClient : Sniffable, ISaslClientSide, IDisposable
+    /// <summary>
+    /// Simple SMTP Client
+    /// </summary>
+    public class SimpleSmtpClient : CommunicationLayer, ISaslClientSide, IDisposable
 	{
 		/// <summary>
 		/// 25

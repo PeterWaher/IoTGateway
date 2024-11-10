@@ -11,10 +11,10 @@ using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
-	/// <summary>
-	/// SOCKS5 connection state.
-	/// </summary>
-	public enum Socks5State
+    /// <summary>
+    /// SOCKS5 connection state.
+    /// </summary>
+    public enum Socks5State
 	{
 		/// <summary>
 		/// Offline
@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// 
 	/// SOCKS5 is defined in RFC 1928.
 	/// </summary>
-	public class Socks5Client : Sniffable, IDisposable, IHostReference
+	public class Socks5Client : CommunicationLayer, IDisposable, IHostReference
 	{
 		private BinaryTcpClient client;
 		private Socks5State state = Socks5State.Offline;

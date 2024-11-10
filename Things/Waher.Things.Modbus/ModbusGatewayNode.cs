@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.Modbus;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
@@ -13,12 +14,12 @@ using Waher.Things.Ip;
 
 namespace Waher.Things.Modbus
 {
-	/// <summary>
-	/// Node representing a TCP/IP connection to a Modbus Gateway
-	/// </summary>
-	public class ModbusGatewayNode : IpHostPort, ISniffable
+    /// <summary>
+    /// Node representing a TCP/IP connection to a Modbus Gateway
+    /// </summary>
+    public class ModbusGatewayNode : IpHostPort, ICommunicationLayer
 	{
-		private readonly Sniffable sniffers = new Sniffable();
+		private readonly CommunicationLayer sniffers = new CommunicationLayer();
 
 		/// <summary>
 		/// Node representing a TCP/IP connection to a Modbus Gateway
@@ -50,7 +51,7 @@ namespace Waher.Things.Modbus
 			return Task.FromResult(Child is ModbusUnitNode);
 		}
 
-		#region ISniffable
+		#region ICommunicationLayer
 
 		/// <summary>
 		/// Registered sniffers
@@ -140,6 +141,75 @@ namespace Waher.Things.Modbus
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(Exception Exception) => this.sniffers.Exception(Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(string Exception) => this.sniffers.Exception(Exception);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.sniffers.ReceiveBinary(Timestamp, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.sniffers.TransmitBinary(Timestamp, Data);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(DateTime Timestamp, string Text) => this.sniffers.ReceiveText(Timestamp, Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(DateTime Timestamp, string Text) => this.sniffers.TransmitText(Timestamp, Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(DateTime Timestamp, string Comment) => this.sniffers.Information(Timestamp, Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(DateTime Timestamp, string Warning) => this.sniffers.Warning(Timestamp, Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public Task Error(DateTime Timestamp, string Error) => this.sniffers.Error(Timestamp, Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, string Exception) => this.sniffers.Exception(Timestamp, Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, Exception Exception) => this.sniffers.Exception(Timestamp, Exception);
 
 		#endregion
 

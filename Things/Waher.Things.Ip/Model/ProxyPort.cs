@@ -11,17 +11,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
 
 namespace Waher.Things.Ip.Model
 {
-	/// <summary>
-	/// Node acting as a TCP/IP proxy opening a port for incoming communication and proxying it to another port on a remote machine .
-	/// </summary>
-	public class ProxyPort : Sniffable, IDisposable
+    /// <summary>
+    /// Node acting as a TCP/IP proxy opening a port for incoming communication and proxying it to another port on a remote machine .
+    /// </summary>
+    public class ProxyPort : CommunicationLayer, IDisposable
 	{
 		private readonly LinkedList<TcpListener> tcpListeners = new LinkedList<TcpListener>();
 		private readonly Dictionary<Guid, ProxyClientConncetion> connections = new Dictionary<Guid, ProxyClientConncetion>();

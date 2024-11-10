@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Persistence;
@@ -15,10 +16,10 @@ using Waher.Things.Xmpp.Model;
 
 namespace Waher.Things.Xmpp
 {
-	/// <summary>
-	/// Node representing an XMPP broker.
-	/// </summary>
-	public class XmppBrokerNode : IpHostPort, ISniffable
+    /// <summary>
+    /// Node representing an XMPP broker.
+    /// </summary>
+    public class XmppBrokerNode : IpHostPort, ICommunicationLayer
 	{
 		private readonly Dictionary<CaseInsensitiveString, RosterItemNode> roster = new Dictionary<CaseInsensitiveString, RosterItemNode>();
 		private string userName = string.Empty;
@@ -178,10 +179,10 @@ namespace Waher.Things.Xmpp
 				this.passwordMechanism, this.trustServer, this.allowInsecureMechanisms);
 		}
 
-		#region ISniffable
+		#region ICommunicationLayer
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ICommunicationLayer.Add"/>
 		/// </summary>
 		public void Add(ISniffer Sniffer)
 		{
@@ -189,7 +190,7 @@ namespace Waher.Things.Xmpp
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.AddRange"/>
+		/// <see cref="ICommunicationLayer.AddRange"/>
 		/// </summary>
 		public void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
@@ -197,7 +198,7 @@ namespace Waher.Things.Xmpp
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Remove"/>
+		/// <see cref="ICommunicationLayer.Remove"/>
 		/// </summary>
 		public bool Remove(ISniffer Sniffer)
 		{
@@ -237,49 +238,118 @@ namespace Waher.Things.Xmpp
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(byte[] Data) => (await this.GetBroker()).Client?.ReceiveBinary(Data);
+		public async Task ReceiveBinary(byte[] Data) => await ((await this.GetBroker()).Client?.ReceiveBinary(Data) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(byte[] Data) => (await this.GetBroker()).Client?.TransmitBinary(Data);
+		public async Task TransmitBinary(byte[] Data) => await ((await this.GetBroker()).Client?.TransmitBinary(Data) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(string Text) => (await this.GetBroker()).Client?.ReceiveText(Text);
+		public async Task ReceiveText(string Text) => await ((await this.GetBroker()).Client?.ReceiveText(Text) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(string Text) => (await this.GetBroker()).Client?.TransmitText(Text);
+		public async Task TransmitText(string Text) => await ((await this.GetBroker()).Client?.TransmitText(Text) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(string Comment) => (await this.GetBroker()).Client?.Information(Comment);
+		public async Task Information(string Comment) => await ((await this.GetBroker()).Client?.Information(Comment) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(string Warning) => (await this.GetBroker()).Client?.Warning(Warning);
+		public async Task Warning(string Warning) => await ((await this.GetBroker()).Client?.Warning(Warning) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public async Task Error(string Error) => (await this.GetBroker()).Client?.Error(Error);
+		public async Task Error(string Error) => await ((await this.GetBroker()).Client?.Error(Error) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
 		public async Task Exception(Exception Exception) => (await this.GetBroker()).Client?.Exception(Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(string Exception) => await ((await this.GetBroker()).Client?.Exception(Exception) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data) => await ((await this.GetBroker()).Client?.ReceiveBinary(Timestamp, Data) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public async Task TransmitBinary(DateTime Timestamp, byte[] Data) => await ((await this.GetBroker()).Client?.TransmitBinary(Timestamp, Data) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public async Task ReceiveText(DateTime Timestamp, string Text) => await ((await this.GetBroker()).Client?.ReceiveText(Timestamp, Text) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public async Task TransmitText(DateTime Timestamp, string Text) => await ((await this.GetBroker()).Client?.TransmitText(Timestamp, Text) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public async Task Information(DateTime Timestamp, string Comment) => await ((await this.GetBroker()).Client?.Information(Timestamp, Comment) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public async Task Warning(DateTime Timestamp, string Warning) => await ((await this.GetBroker()).Client?.Warning(Timestamp, Warning) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public async Task Error(DateTime Timestamp, string Error) => await ((await this.GetBroker()).Client?.Error(Timestamp, Error) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(DateTime Timestamp, string Exception) => await ((await this.GetBroker()).Client?.Exception(Timestamp, Exception) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(DateTime Timestamp, Exception Exception) => await ((await this.GetBroker()).Client?.Exception(Timestamp, Exception) ?? Task.CompletedTask);
 
 		#endregion
 

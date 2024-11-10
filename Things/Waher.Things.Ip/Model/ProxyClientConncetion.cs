@@ -5,10 +5,10 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Things.Ip.Model
 {
-	/// <summary>
-	/// Maintains one proxy connection
-	/// </summary>
-	public class ProxyClientConncetion : Sniffable, IDisposable
+    /// <summary>
+    /// Maintains one proxy connection
+    /// </summary>
+    public class ProxyClientConncetion : CommunicationLayer, IDisposable
 	{
 		private readonly Guid id = Guid.NewGuid();
 		private readonly BinaryTcpClient incoming;

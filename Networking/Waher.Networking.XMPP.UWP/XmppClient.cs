@@ -35,27 +35,27 @@ using Waher.Security;
 
 namespace Waher.Networking.XMPP
 {
-	/// <summary>
-	/// Manages an XMPP client connection. Implements XMPP, as defined in
-	/// https://tools.ietf.org/html/rfc6120
-	/// https://tools.ietf.org/html/rfc6121
-	/// https://tools.ietf.org/html/rfc6122
-	/// 
-	/// Extensions supported directly by client object:
-	/// 
-	/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-	/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-	/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-	/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-	/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-	/// XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH): https://xmpp.org/extensions/xep-0124.html
-	/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-	/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-	/// XEP-0206: XMPP Over BOSH: https://xmpp.org/extensions/xep-0206.html
-	/// 
-	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
-	/// </summary>
-	public class XmppClient : Sniffable, IDisposable, IHostReference
+    /// <summary>
+    /// Manages an XMPP client connection. Implements XMPP, as defined in
+    /// https://tools.ietf.org/html/rfc6120
+    /// https://tools.ietf.org/html/rfc6121
+    /// https://tools.ietf.org/html/rfc6122
+    /// 
+    /// Extensions supported directly by client object:
+    /// 
+    /// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+    /// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+    /// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+    /// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+    /// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+    /// XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH): https://xmpp.org/extensions/xep-0124.html
+    /// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
+    /// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
+    /// XEP-0206: XMPP Over BOSH: https://xmpp.org/extensions/xep-0206.html
+    /// 
+    /// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+    /// </summary>
+    public class XmppClient : CommunicationLayer, IDisposable, IHostReference
 	{
 		/// <summary>
 		/// http://etherx.jabber.org/streams

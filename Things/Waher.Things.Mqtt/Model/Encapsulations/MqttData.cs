@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
@@ -10,10 +11,10 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Mqtt.Model.Encapsulations
 {
-	/// <summary>
-	/// Abstract base class for MQTT data encapsulations.
-	/// </summary>
-	public abstract class MqttData : IMqttData
+    /// <summary>
+    /// Abstract base class for MQTT data encapsulations.
+    /// </summary>
+    public abstract class MqttData : IMqttData
 	{
 		/// <summary>
 		/// Abstract base class for MQTT data encapsulations.
@@ -82,12 +83,12 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		public abstract void SnifferOutput(ISniffable Output);
+		public abstract void SnifferOutput(ICommunicationLayer Output);
 
 		/// <summary>
 		/// Outputs information to sniffer.
 		/// </summary>
-		public void Information(ISniffable Output, string Info)
+		public void Information(ICommunicationLayer Output, string Info)
 		{
 			foreach (ISniffer Sniffer in Output.Sniffers)
 				Sniffer.Information(this.Topic.FullTopic + ": " + Info);

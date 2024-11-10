@@ -13,11 +13,11 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.UPnP
 {
-	/// <summary>
-	/// Implements support for the UPnP protocol, as described in:
-	/// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
-	/// </summary>
-	public class UPnPClient : Sniffable, IDisposable
+    /// <summary>
+    /// Implements support for the UPnP protocol, as described in:
+    /// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
+    /// </summary>
+    public class UPnPClient : CommunicationLayer, IDisposable
 	{
 		private const int ssdpPort = 1900;
 		private const int defaultMaximumSearchTimeSeconds = 10;

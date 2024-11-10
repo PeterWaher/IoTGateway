@@ -23,7 +23,7 @@ using Windows.Networking.Sockets;
 
 namespace Waher.Networking.HTTP
 {
-	internal enum ConnectionMode
+    internal enum ConnectionMode
 	{
 		Http,
 		WebSocket
@@ -32,7 +32,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Class managing a remote client connection to a local <see cref="HttpServer"/>.
 	/// </summary>
-	internal class HttpClientConnection : Sniffable, IDisposable
+	internal class HttpClientConnection : CommunicationLayer, IDisposable
 	{
 		internal const byte CR = 13;
 		internal const byte LF = 10;

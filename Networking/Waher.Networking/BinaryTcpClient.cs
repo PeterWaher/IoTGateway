@@ -23,12 +23,12 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking
 {
-	/// <summary>
-	/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-	/// permitted pace.
-	/// </summary>
-	public class BinaryTcpClient : Sniffable, IDisposable, IBinaryTransportLayer
+    /// <summary>
+    /// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+    /// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
+    /// permitted pace.
+    /// </summary>
+    public class BinaryTcpClient : CommunicationLayer, IDisposable, IBinaryTransportLayer
 	{
 		private const int BufferSize = 65536;
 
@@ -630,12 +630,13 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when an exception has been caught.
 		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="ex">Exception</param>
-		public override async Task Exception(Exception ex)
+		public override async Task Exception(DateTime Timestamp, Exception ex)
 		{
 			try
 			{
-				await base.Exception(ex);
+				await base.Exception(Timestamp, ex);
 				await this.OnError.Raise(this, ex);
 			}
 			catch (Exception ex2)

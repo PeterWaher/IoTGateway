@@ -2,17 +2,17 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
+using Waher.Networking;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0;
 using Waher.Things.Ieee1451.Ieee1451_0.Messages;
 
 namespace Waher.Things.Ieee1451
 {
-	/// <summary>
-	/// Static class for IEEE 1451-related parsing tasks.
-	/// </summary>
-	public static class Ieee1451Parser
+    /// <summary>
+    /// Static class for IEEE 1451-related parsing tasks.
+    /// </summary>
+    public static class Ieee1451Parser
 	{
 		/// <summary>
 		/// Tries to parse an IEEE 1451.0-encoded data.
@@ -30,7 +30,7 @@ namespace Waher.Things.Ieee1451
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		/// <returns>Message object, if able to parse the message, null otherwise.</returns>
-		public static async Task<Message> TryParseMessage(byte[] Data, ISniffable Sniffable)
+		public static async Task<Message> TryParseMessage(byte[] Data, ICommunicationLayer Sniffable)
 		{
 			NetworkServiceType NetworkServiceType = 0;
 			MessageType MessageType = 0;

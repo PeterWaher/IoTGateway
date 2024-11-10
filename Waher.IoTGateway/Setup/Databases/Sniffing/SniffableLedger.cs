@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
 
 namespace Waher.IoTGateway.Setup.Databases.Sniffing
 {
-	/// <summary>
-	/// Class that can be used to sniff on ledger activity.
-	/// </summary>
-	public class SniffableLedger : Sniffable
+    /// <summary>
+    /// Class that can be used to sniff on ledger activity.
+    /// </summary>
+    public class SniffableLedger : CommunicationLayer
 	{
 		private bool prevHasSniffers = false;
 
@@ -22,7 +23,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ICommunicationLayer.Add"/>
 		/// </summary>
 		public override void Add(ISniffer Sniffer)
 		{
@@ -31,7 +32,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.AddRange"/>
+		/// <see cref="ICommunicationLayer.AddRange"/>
 		/// </summary>
 		public override void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
@@ -40,7 +41,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Remove"/>
+		/// <see cref="ICommunicationLayer.Remove"/>
 		/// </summary>
 		public override bool Remove(ISniffer Sniffer)
 		{

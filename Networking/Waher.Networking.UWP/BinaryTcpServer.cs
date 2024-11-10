@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
+
 #if WINDOWS_UWP
 using Windows.Networking;
 using Windows.Networking.Connectivity;
@@ -21,12 +22,12 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Waher.Networking
 {
-	/// <summary>
-	/// Implements a binary TCP Server. The server adapts to network changes,
-	/// maintains a list of current connection, and removes unused connections
-	/// automatically.
-	/// </summary>
-	public class BinaryTcpServer : Sniffable, IDisposable
+    /// <summary>
+    /// Implements a binary TCP Server. The server adapts to network changes,
+    /// maintains a list of current connection, and removes unused connections
+    /// automatically.
+    /// </summary>
+    public class BinaryTcpServer : CommunicationLayer, IDisposable
 	{
 		/// <summary>
 		/// Default Connection backlog (10).

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Security.PKCS.Test
@@ -25,7 +24,7 @@ namespace Waher.Security.PKCS.Test
 			this.pfxOutput.EndSafeContent();
 			byte[] Pfx = this.pfxOutput.End();
 
-			X509Certificate2 _ = new X509Certificate2(Pfx, "Test");
+			X509Certificate2 _ = new(Pfx, "Test");
 		}
 
 	}

@@ -1,14 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking.Sniffers;
 
-namespace Waher.Networking.Sniffers
+namespace Waher.Networking
 {
-    /// <summary>
-    /// Interface for sniffers. Sniffers can be added to <see cref="ICommunicationLayer"/> classes to eavesdrop on communication performed on that
-    /// particular node.
-    /// </summary>
-    public interface ISniffer
+	/// <summary>
+	/// Interface for sniffable classes. Sniffable classes can receive <see cref="ISniffer"/> objects that eavesdrop on communication being performed
+	/// at the node.
+	/// </summary>
+	public interface ICommunicationLayer : IEnumerable<ISniffer>
 	{
+		/// <summary>
+		/// Adds a sniffer to the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer to add.</param>
+		void Add(ISniffer Sniffer);
+
+		/// <summary>
+		/// Adds a range of sniffers to the node.
+		/// </summary>
+		/// <param name="Sniffers">Sniffers to add.</param>
+		void AddRange(IEnumerable<ISniffer> Sniffers);
+
+		/// <summary>
+		/// Removes a sniffer, if registered.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer to remove.</param>
+		/// <returns>If the sniffer was found and removed.</returns>
+		bool Remove(ISniffer Sniffer);
+
+		/// <summary>
+		/// Registered sniffers.
+		/// </summary>
+		ISniffer[] Sniffers
+		{
+			get;
+		}
+
+		/// <summary>
+		/// If there are sniffers registered on the object.
+		/// </summary>
+		bool HasSniffers
+		{
+			get;
+		}
+
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>

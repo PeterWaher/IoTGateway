@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking;
 using Waher.Networking.MQTT;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
@@ -13,10 +13,10 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Mqtt.Model.Encapsulations
 {
-	/// <summary>
-	/// Represents an MQTT topic with JSON-encoded data.
-	/// </summary>
-	public class JsonData : MqttData
+    /// <summary>
+    /// Represents an MQTT topic with JSON-encoded data.
+    /// </summary>
+    public class JsonData : MqttData
 	{
 		private string json;
 		private object value;
@@ -209,7 +209,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		public override void SnifferOutput(ISniffable Output)
+		public override void SnifferOutput(ICommunicationLayer Output)
 		{
 			this.Information(Output, this.json);
 		}

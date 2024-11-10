@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
@@ -12,15 +13,15 @@ using Waher.Security;
 
 namespace Waher.IoTGateway.WebResources
 {
-	/// <summary>
-	/// Sending sniffer events to the corresponding web page(s).
-	/// </summary>
-	public class WebSniffer : SnifferBase, IDisposable
+    /// <summary>
+    /// Sending sniffer events to the corresponding web page(s).
+    /// </summary>
+    public class WebSniffer : SnifferBase, IDisposable
 	{
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private readonly DateTime created = DateTime.Now;
 		private readonly DateTime expires;
-		private readonly ISniffable sniffable;
+		private readonly ICommunicationLayer sniffable;
 		private readonly string[] privileges;
 		private readonly string userVariable;
 		private readonly string resource;
@@ -41,7 +42,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
-		public WebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife, BinaryPresentationMethod BinaryPresentationMethod, ISniffable Sniffable,
+		public WebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife, BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer Sniffable,
 			string UserVariable, params string[] Privileges)
 			: base()
 		{

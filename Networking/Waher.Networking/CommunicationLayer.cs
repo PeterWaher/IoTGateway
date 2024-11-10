@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 
-namespace Waher.Networking.Sniffers
+namespace Waher.Networking
 {
 	/// <summary>
 	/// Delegate for text sniffer events.
@@ -16,7 +17,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Simple abstract base class for sniffable nodes.
 	/// </summary>
-	public class Sniffable : ISniffable
+	public class CommunicationLayer : ICommunicationLayer
 	{
 		private readonly List<ISniffer> sniffers;
 		private ISniffer[] staticList;
@@ -26,7 +27,7 @@ namespace Waher.Networking.Sniffers
 		/// Simple abstract base class for sniffable nodes.
 		/// </summary>
 		/// <param name="Sniffers">Sniffers.</param>
-		public Sniffable(params ISniffer[] Sniffers)
+		public CommunicationLayer(params ISniffer[] Sniffers)
 		{
 			this.sniffers = new List<ISniffer>();
 			this.sniffers.AddRange(Sniffers);
@@ -35,7 +36,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ICommunicationLayer.Add"/>
 		/// </summary>
 		public virtual void Add(ISniffer Sniffer)
 		{
@@ -48,7 +49,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.AddRange"/>
+		/// <see cref="ICommunicationLayer.AddRange"/>
 		/// </summary>
 		public virtual void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
@@ -61,7 +62,7 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Remove"/>
+		/// <see cref="ICommunicationLayer.Remove"/>
 		/// </summary>
 		public virtual bool Remove(ISniffer Sniffer)
 		{
@@ -111,12 +112,22 @@ namespace Waher.Networking.Sniffers
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(byte[] Data)
+		public Task ReceiveBinary(byte[] Data)
+		{
+			return this.ReceiveBinary(DateTime.Now, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.ReceiveBinary(Data);
+					await Sniffer.ReceiveBinary(Timestamp, Data);
 			}
 		}
 
@@ -124,12 +135,22 @@ namespace Waher.Networking.Sniffers
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(byte[] Data)
+		public Task TransmitBinary(byte[] Data)
+		{
+			return this.TransmitBinary(DateTime.Now, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public async Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.TransmitBinary(Data);
+					await Sniffer.TransmitBinary(Timestamp, Data);
 			}
 		}
 
@@ -137,7 +158,17 @@ namespace Waher.Networking.Sniffers
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(string Text)
+		public Task ReceiveText(string Text)
+		{
+			return this.ReceiveText(DateTime.Now, Text);
+		}
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public async Task ReceiveText(DateTime Timestamp, string Text)
 		{
 			if (this.hasSniffers)
 			{
@@ -146,7 +177,7 @@ namespace Waher.Networking.Sniffers
 				if (!string.IsNullOrEmpty(Text))
 				{
 					foreach (ISniffer Sniffer in this.staticList)
-						await Sniffer.ReceiveText(Text);
+						await Sniffer.ReceiveText(Timestamp, Text);
 				}
 			}
 		}
@@ -177,7 +208,17 @@ namespace Waher.Networking.Sniffers
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(string Text)
+		public Task TransmitText(string Text)
+		{
+			return this.TransmitText(DateTime.Now, Text);
+		}
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public async Task TransmitText(DateTime Timestamp, string Text)
 		{
 			if (this.hasSniffers)
 			{
@@ -188,12 +229,12 @@ namespace Waher.Networking.Sniffers
 					if (Text == " ")
 					{
 						foreach (ISniffer Sniffer in this.staticList)
-							await Sniffer.Information("Heart beat");
+							await Sniffer.Information(Timestamp, "Heart beat");
 					}
 					else
 					{
 						foreach (ISniffer Sniffer in this.staticList)
-							await Sniffer.TransmitText(Text);
+							await Sniffer.TransmitText(Timestamp, Text);
 					}
 				}
 			}
@@ -208,7 +249,17 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(string Comment)
+		public Task Information(string Comment)
+		{
+			return this.Information(DateTime.Now, Comment);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public async Task Information(DateTime Timestamp, string Comment)
 		{
 			if (this.hasSniffers)
 			{
@@ -217,7 +268,7 @@ namespace Waher.Networking.Sniffers
 				if (!string.IsNullOrEmpty(Comment))
 				{
 					foreach (ISniffer Sniffer in this.staticList)
-						await Sniffer.Information(Comment);
+						await Sniffer.Information(Timestamp, Comment);
 				}
 			}
 		}
@@ -231,7 +282,17 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(string Warning)
+		public Task Warning(string Warning)
+		{
+			return this.Warning(DateTime.Now, Warning);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public async Task Warning(DateTime Timestamp, string Warning)
 		{
 			if (this.hasSniffers)
 			{
@@ -240,7 +301,7 @@ namespace Waher.Networking.Sniffers
 				if (!string.IsNullOrEmpty(Warning))
 				{
 					foreach (ISniffer Sniffer in this.staticList)
-						await Sniffer.Warning(Warning);
+						await Sniffer.Warning(Timestamp, Warning);
 				}
 			}
 		}
@@ -254,12 +315,22 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public async Task Error(string Error)
+		public Task Error(string Error)
+		{
+			return this.Error(DateTime.Now, Error);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public async Task Error(DateTime Timestamp, string Error)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.Error(Error);
+					await Sniffer.Error(Timestamp, Error);
 			}
 		}
 
@@ -267,31 +338,46 @@ namespace Waher.Networking.Sniffers
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public virtual async Task Exception(Exception Exception)
+		public Task Exception(Exception Exception)
 		{
-			Exception = Log.UnnestException(Exception);
+			return this.Exception(DateTime.Now, Exception);
+		}
 
-			do
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public virtual async Task Exception(DateTime Timestamp, Exception Exception)
+		{
+			if (this.hasSniffers)
 			{
-				if (Exception is AggregateException ex)
-				{
-					foreach (Exception ex2 in ex.InnerExceptions)
-						await this.Exception(ex2);
-				}
-				else
-				{
-					string Msg = Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace);
-
-					if (this.hasSniffers)
-					{
-						foreach (ISniffer Sniffer in this.staticList)
-							await Sniffer.Exception(Msg);
-					}
-				}
-
-				Exception = Exception.InnerException;
+				foreach (ISniffer Sniffer in this.staticList)
+					await Sniffer.Exception(Timestamp, Exception);
 			}
-			while (!(Exception is null));
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(string Exception)
+		{
+			return this.Exception(DateTime.Now, Exception);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public virtual async Task Exception(DateTime Timestamp, string Exception)
+		{
+			if (this.hasSniffers)
+			{
+				foreach (ISniffer Sniffer in this.staticList)
+					await Sniffer.Exception(Timestamp, Exception);
+			}
 		}
 
 	}

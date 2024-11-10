@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Waher.Content;
-using Waher.Networking.Sniffers;
+using Waher.Networking;
 using Waher.Script.Units;
 using Waher.Security;
 using Waher.Things.Metering;
@@ -11,10 +11,10 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
-	/// <summary>
-	/// IEEE 1451.0 Transducer Access Message
-	/// </summary>
-	public class TransducerAccessMessage : Message
+    /// <summary>
+    /// IEEE 1451.0 Transducer Access Message
+    /// </summary>
+    public class TransducerAccessMessage : Message
 	{
 		private TransducerData data;
 		private ushort errorCode;
@@ -29,7 +29,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Tail">Bytes that are received after the body.</param>
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public TransducerAccessMessage(NetworkServiceType NetworkServiceType, TransducerAccessService TransducerAccessService,
-			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer Sniffable)
 			: base(NetworkServiceType, (byte)TransducerAccessService, MessageType, Body, Tail, Sniffable)
 		{
 			this.TransducerAccessService = TransducerAccessService;

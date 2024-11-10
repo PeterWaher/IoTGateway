@@ -5,13 +5,14 @@ using System.Net;
 using System.Net.Sockets;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Networking;
 
 namespace Waher.Security.DTLS
 {
-	/// <summary>
-	/// Class acting as an interface for DTLS to communicate UDP.
-	/// </summary>
-	public class UdpCommunicationLayer : Sniffable, IDisposable, ICommunicationLayer
+    /// <summary>
+    /// Class acting as an interface for DTLS to communicate UDP.
+    /// </summary>
+    public class UdpCommunicationLayer : CommunicationLayer, IDisposable, ICommunicationLayer
 	{
 		private readonly LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
 		private UdpClient client;

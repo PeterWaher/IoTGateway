@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking;
-using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
@@ -17,10 +16,10 @@ using Waher.Things.SourceEvents;
 
 namespace Waher.Things.Metering
 {
-	/// <summary>
-	/// Base class for all metering nodes.
-	/// </summary>
-	[CollectionName("MeteringTopology")]
+    /// <summary>
+    /// Base class for all metering nodes.
+    /// </summary>
+    [CollectionName("MeteringTopology")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[ArchivingTime]
 	[Index("NodeId")]
@@ -1067,7 +1066,7 @@ namespace Waher.Things.Metering
 				{
 					Parameters = await Node.GetDisplayableParameterAraryAsync(Language, RequestOrigin.Empty),
 					NodeType = Node.GetType().FullName,
-					Sniffable = Node is ISniffable,
+					Sniffable = Node is ICommunicationLayer,
 					DisplayName = await Node.GetTypeNameAsync(Language),
 					HasChildren = Node.HasChildren,
 					ChildrenOrdered = Node.ChildrenOrdered,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
+using Waher.Networking;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Units;
@@ -13,10 +13,10 @@ using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
-	/// <summary>
-	/// IEEE 1451.0 Binary object
-	/// </summary>
-	public class Binary
+    /// <summary>
+    /// IEEE 1451.0 Binary object
+    /// </summary>
+    public class Binary
 	{
 		private static readonly Dictionary<ClassTypePair, IFieldType> fieldTypes = new Dictionary<ClassTypePair, IFieldType>();
 
@@ -34,7 +34,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		/// <param name="MultiRow">If sniffer output should be on multiple rows (true) or a single row (false).</param>
-		public Binary(byte[] Body, ISniffable Sniffable, bool MultiRow)
+		public Binary(byte[] Body, ICommunicationLayer Sniffable, bool MultiRow)
 		{
 			this.Body = Body;
 			this.len = this.Body.Length;
@@ -72,7 +72,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Sniffable interface on which the message was received.
 		/// </summary>
-		public ISniffable Sniffable { get; }
+		public ICommunicationLayer Sniffable { get; }
 
 		/// <summary>
 		/// If sniffers are available.

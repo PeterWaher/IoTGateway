@@ -7,10 +7,10 @@ using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
 {
-	/// <summary>
-	/// Sniffer that stores events in memory.
-	/// </summary>
-	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
+    /// <summary>
+    /// Sniffer that stores events in memory.
+    /// </summary>
+    public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
 	{
 		private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
 		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
@@ -157,7 +157,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Sniffable">Receiver of sniffer events.</param>
 		[Obsolete("Use ReplayAsync instead, for better asynchronous performance.")]
-		public void Replay(Sniffable Sniffable)
+		public void Replay(CommunicationLayer Sniffable)
 		{
 			this.ReplayAsync(Sniffable).Wait();
 		}
@@ -176,7 +176,7 @@ namespace Waher.Networking.Sniffers
 		/// Replays sniffer events.
 		/// </summary>
 		/// <param name="Sniffable">Receiver of sniffer events.</param>
-		public async Task ReplayAsync(Sniffable Sniffable)
+		public async Task ReplayAsync(CommunicationLayer Sniffable)
 		{
 			if (Sniffable.HasSniffers)
 				await this.ReplayAsync(Sniffable.Sniffers);

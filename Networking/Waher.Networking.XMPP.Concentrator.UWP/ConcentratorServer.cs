@@ -31,13 +31,13 @@ using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	/// <summary>
-	/// Implements an XMPP concentrator server interface.
-	/// 
-	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
-	/// https://neuro-foundation.io
-	/// </summary>
-	public class ConcentratorServer : XmppExtension
+    /// <summary>
+    /// Implements an XMPP concentrator server interface.
+    /// 
+    /// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+    /// https://neuro-foundation.io
+    /// </summary>
+    public class ConcentratorServer : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0
@@ -974,7 +974,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Node.HasCommands)
 				Xml.Append("' hasCommands='true");
 
-			if (Node is ISniffable)
+			if (Node is ICommunicationLayer)
 				Xml.Append("' sniffable='true");
 
 			INode Parent = Node.Parent;
@@ -4355,7 +4355,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
 				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-			else if (!(Node is ISniffable Sniffable))
+			else if (!(Node is ICommunicationLayer Sniffable))
 				await e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{
@@ -4405,7 +4405,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
 				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-			else if (!(Node is ISniffable Sniffable))
+			else if (!(Node is ICommunicationLayer Sniffable))
 				await e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{

@@ -25,11 +25,11 @@ using Windows.Networking.Connectivity;
 
 namespace Waher.Networking.CoAP
 {
-	/// <summary>
-	/// CoAP client. CoAP is defined in RFC7252:
-	/// https://tools.ietf.org/html/rfc7252
-	/// </summary>
-	public class CoapEndpoint : Sniffable, IDisposable
+    /// <summary>
+    /// CoAP client. CoAP is defined in RFC7252:
+    /// https://tools.ietf.org/html/rfc7252
+    /// </summary>
+    public class CoapEndpoint : CommunicationLayer, IDisposable
 	{
 		/// <summary>
 		/// Default CoAP port = 5683

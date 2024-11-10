@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.StreamErrors;
 using Waher.Runtime.Cache;
@@ -17,18 +16,18 @@ using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP
 {
-	/// <summary>
-	/// Delegate for event raised to get roster items for the component.
-	/// </summary>
-	/// <param name="BareJid">Bare JID</param>
-	/// <returns>Corresponding roster item, if found, or null, if not found.</returns>
-	public delegate RosterItem GetRosterItemEventHandler(string BareJid);
+    /// <summary>
+    /// Delegate for event raised to get roster items for the component.
+    /// </summary>
+    /// <param name="BareJid">Bare JID</param>
+    /// <returns>Corresponding roster item, if found, or null, if not found.</returns>
+    public delegate RosterItem GetRosterItemEventHandler(string BareJid);
 
 	/// <summary>
 	/// Manages an XMPP component connection, as defined in XEP-0114:
 	/// http://xmpp.org/extensions/xep-0114.html
 	/// </summary>
-	public class XmppComponent : Sniffable, IDisposable, IHostReference
+	public class XmppComponent : CommunicationLayer, IDisposable, IHostReference
 	{
 		private const int KeepAliveTimeSeconds = 30;
 		private const int MaxFragmentSize = 40000000;

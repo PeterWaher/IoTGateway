@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Waher.Networking.Sniffers;
+using Waher.Networking;
 using Waher.Security;
 using Waher.Things.Metering;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
-	/// <summary>
-	/// IEEE 1451.0 Discovery Message
-	/// </summary>
-	public class DiscoveryMessage : Message
+    /// <summary>
+    /// IEEE 1451.0 Discovery Message
+    /// </summary>
+    public class DiscoveryMessage : Message
 	{
 		/// <summary>
 		/// IEEE 1451.0 Discovery Message
@@ -22,7 +22,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Tail">Bytes that are received after the body.</param>
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public DiscoveryMessage(NetworkServiceType NetworkServiceType, DiscoveryService DiscoveryService,
-			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer Sniffable)
 			: base(NetworkServiceType, (byte)DiscoveryService, MessageType, Body, Tail, Sniffable)
 		{
 			this.DiscoveryService = DiscoveryService;

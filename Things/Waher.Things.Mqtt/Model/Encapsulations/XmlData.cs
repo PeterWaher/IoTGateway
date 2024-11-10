@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.MQTT;
-using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 using Waher.Runtime.Inventory;
+using Waher.Networking;
 
 namespace Waher.Things.Mqtt.Model.Encapsulations
 {
-	/// <summary>
-	/// Represents an MQTT topic with XML data.
-	/// </summary>
-	public class XmlData : MqttData
+    /// <summary>
+    /// Represents an MQTT topic with XML data.
+    /// </summary>
+    public class XmlData : MqttData
 	{
 		private string xml;
 		private XmlDocument value;
@@ -241,7 +241,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		public override void SnifferOutput(ISniffable Output)
+		public override void SnifferOutput(ICommunicationLayer Output)
 		{
 			this.Information(Output, this.xml);
 		}

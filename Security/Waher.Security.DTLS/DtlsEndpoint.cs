@@ -14,11 +14,11 @@ using Waher.Runtime.Timing;
 
 namespace Waher.Security.DTLS
 {
-	/// <summary>
-	/// DTLS endpoint class. Manages a client or server DTLS endpoint connection, as defined
-	/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
-	/// </summary>
-	public class DtlsEndpoint : Sniffable, IDisposable
+    /// <summary>
+    /// DTLS endpoint class. Manages a client or server DTLS endpoint connection, as defined
+    /// in RFC 6347: https://tools.ietf.org/html/rfc6347.
+    /// </summary>
+    public class DtlsEndpoint : CommunicationLayer, IDisposable
 	{
 		private static ICipher[] ciphers = null;
 		private static Dictionary<ushort, ICipher> ciphersPerCode = null;

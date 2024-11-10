@@ -9,10 +9,10 @@ using Waher.Runtime.Language;
 
 namespace Waher.Things.Queries
 {
-	/// <summary>
-	/// Class handling the reception of data from a query.
-	/// </summary>
-	public class Query : ISniffable
+    /// <summary>
+    /// Class handling the reception of data from a query.
+    /// </summary>
+    public class Query : ICommunicationLayer
 	{
 		private readonly INode nodeReference;
 		private readonly Language language;
@@ -513,7 +513,7 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public event EventHandlerAsync<QueryEventArgs> OnEndSection = null;
 
-		#region ISniffable
+		#region ICommunicationLayer
 
 		/// <summary>
 		/// Adds a sniffer to the node.
@@ -607,6 +607,75 @@ namespace Waher.Things.Queries
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(DateTime Timestamp, string Text) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(DateTime Timestamp, string Text) => Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(DateTime Timestamp, string Comment) => this.LogMessage(QueryEventType.Information, QueryEventLevel.Minor, Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(DateTime Timestamp, string Warning) => this.LogMessage(QueryEventType.Warning, QueryEventLevel.Minor, Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public Task Error(DateTime Timestamp, string Error) => this.LogMessage(QueryEventType.Error, QueryEventLevel.Minor, Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
 
 		#endregion
 	}

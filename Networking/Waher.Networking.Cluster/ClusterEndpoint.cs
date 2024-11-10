@@ -25,10 +25,10 @@ using Windows.Networking.Connectivity;
 
 namespace Waher.Networking.Cluster
 {
-	/// <summary>
-	/// Represents one endpoint (or participant) in the network cluster.
-	/// </summary>
-	public class ClusterEndpoint : Sniffable, IDisposable
+    /// <summary>
+    /// Represents one endpoint (or participant) in the network cluster.
+    /// </summary>
+    public class ClusterEndpoint : CommunicationLayer, IDisposable
 	{
 		private static readonly Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 		private static Dictionary<Type, IProperty> propertyTypes = null;

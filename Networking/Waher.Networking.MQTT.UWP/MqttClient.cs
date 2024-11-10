@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
 using Windows.Security.Cryptography.Certificates;
@@ -17,11 +18,11 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Waher.Networking.MQTT
 {
-	/// <summary>
-	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
-	/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
-	/// </summary>
-	public class MqttClient : Sniffable, IDisposable, IHostReference
+    /// <summary>
+    /// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
+    /// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
+    /// </summary>
+    public class MqttClient : CommunicationLayer, IDisposable, IHostReference
 	{
 		private const int KeepAliveTimeSeconds = 30;
 

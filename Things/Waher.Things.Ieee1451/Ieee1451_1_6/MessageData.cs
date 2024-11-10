@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.MQTT;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Script.Units;
@@ -16,10 +16,10 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Ieee1451.Ieee1451_1_6
 {
-	/// <summary>
-	/// Data mode of topic
-	/// </summary>
-	public enum DataMode
+    /// <summary>
+    /// Data mode of topic
+    /// </summary>
+    public enum DataMode
 	{
 		/// <summary>
 		/// Binary
@@ -232,7 +232,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		public override void SnifferOutput(ISniffable Output)
+		public override void SnifferOutput(ICommunicationLayer Output)
 		{
 			this.Information(Output, "Transducer data");
 		}

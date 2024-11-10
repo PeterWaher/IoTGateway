@@ -3,18 +3,18 @@ using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
-	/// <summary>
-	/// A sniffer that redirects incoming events to another sniffable object.
-	/// </summary>
-	public class SnifferProxy : ISniffer
+    /// <summary>
+    /// A sniffer that redirects incoming events to another sniffable object.
+    /// </summary>
+    public class SnifferProxy : ISniffer
 	{
-		private readonly ISniffable sniffable;
+		private readonly ICommunicationLayer sniffable;
 
 		/// <summary>
 		/// A sniffer that redirects incoming events to another sniffable object.
 		/// </summary>
 		/// <param name="Sniffable">Sniffable object to receive incoming sniffer events.</param>
-		public SnifferProxy(ISniffable Sniffable)
+		public SnifferProxy(ICommunicationLayer Sniffable)
 		{
 			if (Sniffable is null)
 				throw new ArgumentNullException(nameof(Sniffable));
@@ -25,7 +25,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Object receiving incoming sniffer events.
 		/// </summary>
-		public ISniffable Sniffable => this.sniffable;
+		public ICommunicationLayer Sniffable => this.sniffable;
 
 		/// <summary>
 		/// Called when binary data has been received.

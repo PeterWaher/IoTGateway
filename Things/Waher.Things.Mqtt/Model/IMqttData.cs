@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 using Waher.Runtime.Inventory;
+using Waher.Networking;
 
 namespace Waher.Things.Mqtt.Model
 {
-	/// <summary>
-	/// Results from processing an incoming message.
-	/// </summary>
-	public enum DataProcessingResult
+    /// <summary>
+    /// Results from processing an incoming message.
+    /// </summary>
+    public enum DataProcessingResult
 	{
 		/// <summary>
 		/// Data was incompatible with selected processing algorithm.
@@ -86,12 +86,12 @@ namespace Waher.Things.Mqtt.Model
 		/// <summary>
 		/// Outputs the parsed data to the sniffer.
 		/// </summary>
-		void SnifferOutput(ISniffable Output);
+		void SnifferOutput(ICommunicationLayer Output);
 
 		/// <summary>
 		/// Outputs information to sniffer.
 		/// </summary>
-		void Information(ISniffable Output, string Info);
+		void Information(ICommunicationLayer Output, string Info);
 
 		/// <summary>
 		/// Reports fields during an active readout.

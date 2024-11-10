@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Timing;
 
 namespace Waher.Networking.DNS.Communication
 {
-	/// <summary>
-	/// Abstract base class for DNS clients.
-	/// </summary>
-	public abstract class DnsClient : Sniffable, IDisposable
+    /// <summary>
+    /// Abstract base class for DNS clients.
+    /// </summary>
+    public abstract class DnsClient : CommunicationLayer, IDisposable
 	{
 		/// <summary>
 		/// Default Timeout, in milliseconds (30000 ms)

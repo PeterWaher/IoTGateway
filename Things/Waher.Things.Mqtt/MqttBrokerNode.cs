@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Networking;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
@@ -13,10 +14,10 @@ using Waher.Things.Mqtt.Model;
 
 namespace Waher.Things.Mqtt
 {
-	/// <summary>
-	/// Node representing a connection to an MQTT broker.
-	/// </summary>
-	public class MqttBrokerNode : IpHostPort, ISniffable
+    /// <summary>
+    /// Node representing a connection to an MQTT broker.
+    /// </summary>
+    public class MqttBrokerNode : IpHostPort, ICommunicationLayer
 	{
 		private MqttQualityOfService willQoS = MqttQualityOfService.AtLeastOnce;
 		private string userName = string.Empty;
@@ -222,10 +223,10 @@ namespace Waher.Things.Mqtt
 			return await base.RemoveAsync(Child);
 		}
 
-		#region ISniffable
+		#region ICommunicationLayer
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ICommunicationLayer.Add"/>
 		/// </summary>
 		public void Add(ISniffer Sniffer)
 		{
@@ -233,7 +234,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.AddRange"/>
+		/// <see cref="ICommunicationLayer.AddRange"/>
 		/// </summary>
 		public void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
@@ -241,7 +242,7 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Remove"/>
+		/// <see cref="ICommunicationLayer.Remove"/>
 		/// </summary>
 		public bool Remove(ISniffer Sniffer)
 		{
@@ -371,6 +372,135 @@ namespace Waher.Things.Mqtt
 			MqttClient Client = Broker.Client;
 			if (!(Client is null))
 				await Client.Exception(Exception);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(string Exception)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Exception(Exception);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.ReceiveBinary(Timestamp, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public async Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.TransmitBinary(Timestamp, Data);
+		}
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public async Task ReceiveText(DateTime Timestamp, string Text)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.ReceiveText(Timestamp, Text);
+		}
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public async Task TransmitText(DateTime Timestamp, string Text)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.TransmitText(Timestamp, Text);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public async Task Information(DateTime Timestamp, string Comment)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Information(Timestamp, Comment);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public async Task Warning(DateTime Timestamp, string Warning)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Warning(Timestamp, Warning);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public async Task Error(DateTime Timestamp, string Error)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Error(Timestamp, Error);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(DateTime Timestamp, string Exception)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Exception(Timestamp, Exception);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public async Task Exception(DateTime Timestamp, Exception Exception)
+		{
+			MqttBroker Broker = await this.GetBroker();
+			MqttClient Client = Broker.Client;
+			if (!(Client is null))
+				await Client.Exception(Timestamp, Exception);
 		}
 
 		#endregion

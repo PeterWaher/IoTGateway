@@ -6,10 +6,10 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP
 {
-	/// <summary>
-	/// Base class for XMPP Extensions.
-	/// </summary>
-	public abstract class XmppExtension : IXmppExtension, ISniffable
+    /// <summary>
+    /// Base class for XMPP Extensions.
+    /// </summary>
+    public abstract class XmppExtension : IXmppExtension, ICommunicationLayer
 	{
 		/// <summary>
 		/// XMPP Client used by the extension.
@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP
 			this.client.UnregisterExtension(this);
 		}
 
-		#region ISniffable
+		#region ICommunicationLayer
 
 		/// <summary>
 		/// Adds a sniffer to the node.
@@ -149,6 +149,75 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(Exception Exception) => this.Client.Exception(Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(string Exception) => this.Client.Exception(Exception);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.Client.ReceiveBinary(Timestamp, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.Client.TransmitBinary(Timestamp, Data);
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(DateTime Timestamp, string Text) => this.Client.ReceiveText(Timestamp, Text);
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(DateTime Timestamp, string Text) => this.Client.TransmitText(Timestamp, Text);
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(DateTime Timestamp, string Comment) => this.Client.Information(Timestamp, Comment);
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(DateTime Timestamp, string Warning) => this.Client.Warning(Timestamp, Warning);
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public Task Error(DateTime Timestamp, string Error) => this.Client.Error(Timestamp, Error);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, string Exception) => this.Client.Exception(Timestamp, Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, Exception Exception) => this.Client.Exception(Timestamp, Exception);
 
 		#endregion
 	}

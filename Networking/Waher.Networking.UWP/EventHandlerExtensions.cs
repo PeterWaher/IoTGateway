@@ -2,16 +2,15 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking.Sniffers;
 
 namespace Waher.Networking
 {
-	#region Delegates
+    #region Delegates
 
-	/// <summary>
-	/// Asynchronous version of <see cref="EventArgs"/>.
-	/// </summary>
-	public delegate Task EventHandlerAsync(object Sender, EventArgs e);
+    /// <summary>
+    /// Asynchronous version of <see cref="EventArgs"/>.
+    /// </summary>
+    public delegate Task EventHandlerAsync(object Sender, EventArgs e);
 
 	/// <summary>
 	/// Asynchronous version of <see cref="EventArgs"/> with a typed event arguments.
@@ -39,7 +38,7 @@ namespace Waher.Networking
 	/// </summary>
 	public static class EventHandlerExtensions
 	{
-		#region Synchronous event handlers, non-sniffable
+		#region Synchronous event handlers, non-communication-layers
 
 		/// <summary>
 		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
@@ -104,7 +103,7 @@ namespace Waher.Networking
 
 		#endregion
 
-		#region Synchronous event handlers, sniffable
+		#region Synchronous event handlers, communication layers
 
 		/// <summary>
 		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
@@ -112,7 +111,7 @@ namespace Waher.Networking
 		/// <param name="EventHandler">Event handler, or null if not defined.</param>
 		/// <param name="Sender">Sender of events.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, ISniffable Sender)
+		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty);
 		}
@@ -124,7 +123,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandler EventHandler, ISniffable Sender, EventArgs e)
+		public static async Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
@@ -151,7 +150,7 @@ namespace Waher.Networking
 		/// <param name="Sniffable">Sniffable object.</param>
 		/// <param name="Sender">Sender of event.</param>
 		/// <param name="e">Event arguments.</param>
-		private static Task NoEventHandlerWarning(this ISniffable Sniffable, object Sender, object e)
+		private static Task NoEventHandlerWarning(this ICommunicationLayer Sniffable, object Sender, object e)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -176,7 +175,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, ISniffable Sender, T e)
+		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
@@ -199,7 +198,7 @@ namespace Waher.Networking
 
 		#endregion
 
-		#region Asynchronous event handlers, non-sniffable
+		#region Asynchronous event handlers, non-communication-layers
 
 		/// <summary>
 		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
@@ -264,7 +263,7 @@ namespace Waher.Networking
 
 		#endregion
 
-		#region Asynchronous event handlers, sniffable
+		#region Asynchronous event handlers, communication layers
 
 		/// <summary>
 		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
@@ -272,7 +271,7 @@ namespace Waher.Networking
 		/// <param name="EventHandler">Event handler, or null if not defined.</param>
 		/// <param name="Sender">Sender of events.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ISniffable Sender)
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty);
 		}
@@ -284,7 +283,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, ISniffable Sender, EventArgs e)
+		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
@@ -312,7 +311,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ISniffable Sender, T e)
+		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
@@ -382,6 +381,5 @@ namespace Waher.Networking
 		}
 
 		#endregion
-
 	}
 }

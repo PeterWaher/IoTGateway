@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.Sniffers;
+using Waher.Networking;
 using Waher.Security;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS;
 using Waher.Things.Ieee1451.Ieee1451_0.TEDS.FieldTypes;
@@ -10,10 +10,10 @@ using Waher.Things.Metering;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
-	/// <summary>
-	/// IEEE 1451.0 TEDS Access Message
-	/// </summary>
-	public class TedsAccessMessage : Message
+    /// <summary>
+    /// IEEE 1451.0 TEDS Access Message
+    /// </summary>
+    public class TedsAccessMessage : Message
 	{
 		private Teds data;
 		private ushort errorCode;
@@ -28,7 +28,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="Tail">Bytes that are received after the body.</param>
 		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
 		public TedsAccessMessage(NetworkServiceType NetworkServiceType, TedsAccessService TedsAccessService,
-			MessageType MessageType, byte[] Body, byte[] Tail, ISniffable Sniffable)
+			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer Sniffable)
 			: base(NetworkServiceType, (byte)TedsAccessService, MessageType, Body, Tail, Sniffable)
 		{
 			this.TedsAccessService = TedsAccessService;

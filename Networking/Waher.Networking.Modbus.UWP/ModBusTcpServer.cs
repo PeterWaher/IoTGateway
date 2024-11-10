@@ -7,14 +7,14 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.Modbus
 {
-	/// <summary>
-	/// Modbus over TCP server
-	/// 
-	/// References:
-	/// https://waher.se/Downloads/modbus_tcp_specification.pdf
-	/// https://modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf
-	/// </summary>
-	public class ModBusTcpServer : IDisposable, ISniffable
+    /// <summary>
+    /// Modbus over TCP server
+    /// 
+    /// References:
+    /// https://waher.se/Downloads/modbus_tcp_specification.pdf
+    /// https://modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf
+    /// </summary>
+    public class ModBusTcpServer : IDisposable, ICommunicationLayer
 	{
 		private readonly Dictionary<Guid, ModBusParser> parsers = new Dictionary<Guid, ModBusParser>();
 		private BinaryTcpServer server;
@@ -196,6 +196,75 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(Exception Exception) => this.server?.Exception(Exception) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(string Exception) => this.server?.Exception(Exception) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.server?.ReceiveBinary(Timestamp, Data) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.server?.TransmitBinary(Timestamp, Data) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task ReceiveText(DateTime Timestamp, string Text) => this.server?.ReceiveText(Timestamp, Text) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Text">Text</param>
+		public Task TransmitText(DateTime Timestamp, string Text) => this.server?.TransmitText(Timestamp, Text) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Comment">Comment.</param>
+		public Task Information(DateTime Timestamp, string Comment) => this.server?.Information(Timestamp, Comment) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Warning">Warning.</param>
+		public Task Warning(DateTime Timestamp, string Warning) => this.server?.Warning(Timestamp, Warning) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Error">Error.</param>
+		public Task Error(DateTime Timestamp, string Error) => this.server?.Error(Timestamp, Error) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, string Exception) => this.server?.Exception(Timestamp, Exception) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public Task Exception(DateTime Timestamp, Exception Exception) => this.server?.Exception(Timestamp, Exception) ?? Task.CompletedTask;
 
 		#endregion
 

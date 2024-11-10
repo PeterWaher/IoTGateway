@@ -29,10 +29,10 @@ using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {
-	/// <summary>
-	/// Implements an HTTP server.
-	/// </summary>
-	public class HttpServer : Sniffable, IDisposable, IResourceMap
+    /// <summary>
+    /// Implements an HTTP server.
+    /// </summary>
+    public class HttpServer : CommunicationLayer, IDisposable, IResourceMap
 	{
 		/// <summary>
 		/// Default HTTP Port (80).
@@ -1181,7 +1181,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Add"/>
+		/// <see cref="ICommunicationLayer.Add"/>
 		/// </summary>
 		public override void Add(ISniffer Sniffer)
 		{
@@ -1195,7 +1195,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.AddRange"/>
+		/// <see cref="ICommunicationLayer.AddRange"/>
 		/// </summary>
 		public override void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
@@ -1209,7 +1209,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// <see cref="ISniffable.Remove"/>
+		/// <see cref="ICommunicationLayer.Remove"/>
 		/// </summary>
 		public override bool Remove(ISniffer Sniffer)
 		{

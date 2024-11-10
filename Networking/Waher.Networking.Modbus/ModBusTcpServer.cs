@@ -26,7 +26,7 @@ namespace Waher.Networking.Modbus
 		/// <param name="Sniffers">Optional set of sniffers.</param>
 		private ModBusTcpServer(int Port, params ISniffer[] Sniffers)
 		{
-			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), Sniffers);
+			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), false, Sniffers);
 		}
 
 #if !WINDOWS_UWP
@@ -38,7 +38,7 @@ namespace Waher.Networking.Modbus
 		/// <param name="Sniffers">Optional set of sniffers.</param>
 		private ModBusTcpServer(int Port, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
 		{
-			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), ServerCertificate, Sniffers);
+			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), ServerCertificate, false, Sniffers);
 		}
 #endif
 		/// <summary>
@@ -92,6 +92,12 @@ namespace Waher.Networking.Modbus
 		#endregion
 
 		#region ICommunicationLayer
+
+		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => this.server?.DecoupledEvents ?? false;
 
 		/// <summary>
 		/// Adds a sniffer to the node.

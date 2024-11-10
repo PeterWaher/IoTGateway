@@ -2469,7 +2469,7 @@ namespace Waher.IoTGateway
 		public static Task Terminate()
 		{
 			EventHandlerAsync h = OnTerminate ?? throw new InvalidOperationException("No OnTerminate event handler set.");
-			return h.Raise(instance, EventArgs.Empty);
+			return h.Raise(instance, EventArgs.Empty, false);
 		}
 
 		/// <summary>
@@ -3446,7 +3446,7 @@ namespace Waher.IoTGateway
 
 		private static Task BeforeUninstall(object Sender, EventArgs e)
 		{
-			return OnBeforeUninstall.Raise(Sender, e);
+			return OnBeforeUninstall.Raise(Sender, e, false);
 		}
 
 		#endregion

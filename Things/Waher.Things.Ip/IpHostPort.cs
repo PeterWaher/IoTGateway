@@ -72,11 +72,14 @@ namespace Waher.Things.Ip
 		/// <summary>
 		/// Connect to the remote host and port using a binary protocol over TCP.
 		/// </summary>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
 		/// <returns>Binary TCP transport.</returns>
-		public async Task<BinaryTcpClient> ConnectTcp(params ISniffer[] Sniffers)
+		public async Task<BinaryTcpClient> ConnectTcp(bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
-			BinaryTcpClient Client = new BinaryTcpClient(Sniffers);
+			BinaryTcpClient Client = new BinaryTcpClient(DecoupledEvents, Sniffers);
 			await Client.ConnectAsync(this.Host, this.port);
 
 			if (this.tls)
@@ -89,11 +92,14 @@ namespace Waher.Things.Ip
 		/// Connect to the remote host and port using a text-based protocol over TCP.
 		/// </summary>
 		/// <param name="Encoding">Encoding to use.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
 		/// <returns>Text-based TCP transport.</returns>
-		public async Task<TextTcpClient> ConnectTcp(Encoding Encoding, params ISniffer[] Sniffers)
+		public async Task<TextTcpClient> ConnectTcp(Encoding Encoding, bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
-			TextTcpClient Client = new TextTcpClient(Encoding, Sniffers);
+			TextTcpClient Client = new TextTcpClient(Encoding, DecoupledEvents, Sniffers);
 			await Client.ConnectAsync(this.Host, this.port);
 
 			if (this.tls)
@@ -128,7 +134,7 @@ namespace Waher.Things.Ip
 				DateTime Now = DateTime.Now;
 				string Module = typeof(IpHost).Namespace;
 
-				using (BinaryTcpClient Client = await this.ConnectTcp())
+				using (BinaryTcpClient Client = await this.ConnectTcp(false))
 				{
 					List<Field> Fields = new List<Field>()
 					{

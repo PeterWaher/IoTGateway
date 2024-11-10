@@ -20,20 +20,31 @@ namespace Waher.Networking
 	public class CommunicationLayer : ICommunicationLayer
 	{
 		private readonly List<ISniffer> sniffers;
+		private readonly bool decoupledEvents;
 		private ISniffer[] staticList;
 		private bool hasSniffers;
 
 		/// <summary>
 		/// Simple abstract base class for sniffable nodes.
 		/// </summary>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public CommunicationLayer(params ISniffer[] Sniffers)
+		public CommunicationLayer(bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
+			this.decoupledEvents = DecoupledEvents;
 			this.sniffers = new List<ISniffer>();
 			this.sniffers.AddRange(Sniffers);
 			this.staticList = this.sniffers.ToArray();
 			this.hasSniffers = this.sniffers.Count > 0;
 		}
+
+		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => this.decoupledEvents;
 
 		/// <summary>
 		/// <see cref="ICommunicationLayer.Add"/>

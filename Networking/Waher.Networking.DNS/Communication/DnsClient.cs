@@ -53,6 +53,7 @@ namespace Waher.Networking.DNS.Communication
 		/// Abstract base class for DNS clients.
 		/// </summary>
 		public DnsClient()
+			: base(false)
 		{
 		}
 

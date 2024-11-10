@@ -21,7 +21,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		/// Class that can be used to sniff on database updates.
 		/// </summary>
 		public SniffableDatabase()
-			: base()
+			: base(false)
 		{
 		}
 

@@ -523,23 +523,16 @@ namespace Waher.Networking.XMPP.Provisioning
 			if ((!string.IsNullOrEmpty(this.ownerJid) && string.Compare(JID, this.ownerJid, true) == 0) ||
 				string.Compare(JID, this.provisioningServerAddress, true) == 0)
 			{
-				try
-				{
-					IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
-					IsFriendResponseEventArgs e = new IsFriendResponseEventArgs(e0, State, JID, true);
+				IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+				IsFriendResponseEventArgs e = new IsFriendResponseEventArgs(e0, State, JID, true);
 
-					await Callback.Raise(this.client, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-
-				return;
+				await Callback.Raise(this.client, e);
 			}
-
-			await this.CachedIqGet("<isFriend xmlns='" + NamespaceProvisioningDeviceCurrent + "' jid='" +
-				XML.Encode(JID) + "'/>", this.IsFriendCallback, new object[] { Callback, State });
+			else
+			{
+				await this.CachedIqGet("<isFriend xmlns='" + NamespaceProvisioningDeviceCurrent + "' jid='" +
+					XML.Encode(JID) + "'/>", this.IsFriendCallback, new object[] { Callback, State });
+			}
 		}
 
 		private async Task IsFriendCallback(object Sender, IqResultEventArgs e)
@@ -683,228 +676,223 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
-				try
+				IThingReference[] Nodes2 = Permitted as IThingReference[];
+				if (Nodes2 is null && !(Permitted is null))
 				{
-					IThingReference[] Nodes2 = Permitted as IThingReference[];
-					if (Nodes2 is null && !(Permitted is null))
-					{
-						List<IThingReference> List = new List<IThingReference>();
-						List.AddRange(Permitted);
-						Nodes2 = List.ToArray();
-					}
-
-					string[] FieldNames2 = FieldNames as string[];
-					if (FieldNames2 is null && !(FieldNames is null))
-					{
-						List<string> List = new List<string>();
-						List.AddRange(FieldNames);
-						FieldNames2 = List.ToArray();
-					}
-
-					IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
-					CanReadResponseEventArgs e = new CanReadResponseEventArgs(e0, State, RequestFromBareJid, true, FieldTypes, Nodes2, FieldNames2);
-
-					await Callback.Raise(this.client, e);
+					List<IThingReference> List = new List<IThingReference>();
+					List.AddRange(Permitted);
+					Nodes2 = List.ToArray();
 				}
-				catch (Exception ex)
+
+				string[] FieldNames2 = FieldNames as string[];
+				if (FieldNames2 is null && !(FieldNames is null))
 				{
-					Log.Exception(ex);
+					List<string> List = new List<string>();
+					List.AddRange(FieldNames);
+					FieldNames2 = List.ToArray();
 				}
+
+				IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+				CanReadResponseEventArgs e = new CanReadResponseEventArgs(e0, State, RequestFromBareJid, true, FieldTypes, Nodes2, FieldNames2);
+
+				await Callback.Raise(this.client, e);
 			}
-
-			StringBuilder Xml = new StringBuilder();
-
-			Xml.Append("<canRead xmlns='");
-			Xml.Append(NamespaceProvisioningDeviceCurrent);
-			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(RequestFromBareJid));
-
-			this.AppendTokens(Xml, "st", ServiceTokens);
-			this.AppendTokens(Xml, "dt", DeviceTokens);
-			this.AppendTokens(Xml, "ut", UserTokens);
-
-			if ((FieldTypes & FieldType.All) == FieldType.All)
-				Xml.Append("' all='true");
 			else
 			{
-				if (FieldTypes.HasFlag(FieldType.Momentary))
-					Xml.Append("' m='true");
+				StringBuilder Xml = new StringBuilder();
 
-				if (FieldTypes.HasFlag(FieldType.Peak))
-					Xml.Append("' p='true");
+				Xml.Append("<canRead xmlns='");
+				Xml.Append(NamespaceProvisioningDeviceCurrent);
+				Xml.Append("' jid='");
+				Xml.Append(XML.Encode(RequestFromBareJid));
 
-				if (FieldTypes.HasFlag(FieldType.Status))
-					Xml.Append("' s='true");
+				this.AppendTokens(Xml, "st", ServiceTokens);
+				this.AppendTokens(Xml, "dt", DeviceTokens);
+				this.AppendTokens(Xml, "ut", UserTokens);
 
-				if (FieldTypes.HasFlag(FieldType.Computed))
-					Xml.Append("' c='true");
-
-				if (FieldTypes.HasFlag(FieldType.Identity))
-					Xml.Append("' i='true");
-
-				if (FieldTypes.HasFlag(FieldType.Historical))
-					Xml.Append("' h='true");
-			}
-
-			if (ToCheck is null && FieldNames is null)
-				Xml.Append("'/>");
-			else
-			{
-				Xml.Append("'>");
-
-				if (!(ToCheck is null))
+				if ((FieldTypes & FieldType.All) == FieldType.All)
+					Xml.Append("' all='true");
+				else
 				{
-					foreach (IThingReference Node in ToCheck)
-						this.AppendNode(Xml, Node);
+					if (FieldTypes.HasFlag(FieldType.Momentary))
+						Xml.Append("' m='true");
+
+					if (FieldTypes.HasFlag(FieldType.Peak))
+						Xml.Append("' p='true");
+
+					if (FieldTypes.HasFlag(FieldType.Status))
+						Xml.Append("' s='true");
+
+					if (FieldTypes.HasFlag(FieldType.Computed))
+						Xml.Append("' c='true");
+
+					if (FieldTypes.HasFlag(FieldType.Identity))
+						Xml.Append("' i='true");
+
+					if (FieldTypes.HasFlag(FieldType.Historical))
+						Xml.Append("' h='true");
 				}
 
-				if (!(FieldNames is null))
+				if (ToCheck is null && FieldNames is null)
+					Xml.Append("'/>");
+				else
 				{
-					foreach (string FieldName in FieldNames)
+					Xml.Append("'>");
+
+					if (!(ToCheck is null))
 					{
-						Xml.Append("<f n='");
-						Xml.Append(XML.Encode(FieldName));
-						Xml.Append("'/>");
+						foreach (IThingReference Node in ToCheck)
+							this.AppendNode(Xml, Node);
 					}
-				}
 
-				Xml.Append("</canRead>");
-			}
-
-			await this.CachedIqGet(Xml.ToString(), async (Sender, e) =>
-			{
-				XmlElement E = e.FirstElement;
-				List<IThingReference> Nodes2 = null;
-				List<string> Fields2 = null;
-				FieldType FieldTypes2 = (FieldType)0;
-				string Jid = string.Empty;
-				string NodeId;
-				string SourceId;
-				string Partition;
-				bool b;
-				bool CanRead;
-
-				try
-				{
-					if (e.Ok && !(E is null) && E.LocalName == "canReadResponse")
+					if (!(FieldNames is null))
 					{
-						CanRead = XML.Attribute(E, "result", false);
-
-						foreach (XmlAttribute Attr in E.Attributes)
+						foreach (string FieldName in FieldNames)
 						{
-							switch (Attr.Name)
-							{
-								case "jid":
-									Jid = Attr.Value;
-									break;
-
-								case "all":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.All;
-									break;
-
-								case "h":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.Historical;
-									break;
-
-								case "m":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.Momentary;
-									break;
-
-								case "p":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.Peak;
-									break;
-
-								case "s":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.Status;
-									break;
-
-								case "c":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.Computed;
-									break;
-
-								case "i":
-									if (CommonTypes.TryParse(Attr.Value, out b) && b)
-										FieldTypes2 |= FieldType.Identity;
-									break;
-							}
+							Xml.Append("<f n='");
+							Xml.Append(XML.Encode(FieldName));
+							Xml.Append("'/>");
 						}
+					}
 
-						if (CanRead)
+					Xml.Append("</canRead>");
+				}
+
+				await this.CachedIqGet(Xml.ToString(), async (Sender, e) =>
+				{
+					XmlElement E = e.FirstElement;
+					List<IThingReference> Nodes2 = null;
+					List<string> Fields2 = null;
+					FieldType FieldTypes2 = (FieldType)0;
+					string Jid = string.Empty;
+					string NodeId;
+					string SourceId;
+					string Partition;
+					bool b;
+					bool CanRead;
+
+					try
+					{
+						if (e.Ok && !(E is null) && E.LocalName == "canReadResponse")
 						{
-							if (!(Permitted is null))
-								Nodes2 = new List<IThingReference>(Permitted);
+							CanRead = XML.Attribute(E, "result", false);
 
-							foreach (XmlNode N in E.ChildNodes)
+							foreach (XmlAttribute Attr in E.Attributes)
 							{
-								switch (N.LocalName)
+								switch (Attr.Name)
 								{
-									case "nd":
-										if (Nodes2 is null)
-											Nodes2 = new List<IThingReference>();
-
-										E = (XmlElement)N;
-										NodeId = XML.Attribute(E, "id");
-										SourceId = XML.Attribute(E, "src");
-										Partition = XML.Attribute(E, "pt");
-
-										bool Found = false;
-
-										if (!(Nodes is null))
-										{
-											foreach (IThingReference Ref in Nodes)
-											{
-												if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
-												{
-													Nodes2.Add(Ref);
-													Found = true;
-													break;
-												}
-											}
-										}
-
-										if (!Found)
-											Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+									case "jid":
+										Jid = Attr.Value;
 										break;
 
-									case "f":
-										if (Fields2 is null)
-											Fields2 = new List<string>();
+									case "all":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.All;
+										break;
 
-										Fields2.Add(XML.Attribute((XmlElement)N, "n"));
+									case "h":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.Historical;
+										break;
+
+									case "m":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.Momentary;
+										break;
+
+									case "p":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.Peak;
+										break;
+
+									case "s":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.Status;
+										break;
+
+									case "c":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.Computed;
+										break;
+
+									case "i":
+										if (CommonTypes.TryParse(Attr.Value, out b) && b)
+											FieldTypes2 |= FieldType.Identity;
 										break;
 								}
 							}
-						}
-						else if (!(Permitted is null))
-						{
-							CanRead = true;
-							Jid = RequestFromBareJid;
-							FieldTypes2 = FieldTypes;
-							Nodes2 = new List<IThingReference>(Permitted);
 
-							if (!(FieldNames is null))
-								Fields2 = new List<string>(FieldNames);
+							if (CanRead)
+							{
+								if (!(Permitted is null))
+									Nodes2 = new List<IThingReference>(Permitted);
+
+								foreach (XmlNode N in E.ChildNodes)
+								{
+									switch (N.LocalName)
+									{
+										case "nd":
+											if (Nodes2 is null)
+												Nodes2 = new List<IThingReference>();
+
+											E = (XmlElement)N;
+											NodeId = XML.Attribute(E, "id");
+											SourceId = XML.Attribute(E, "src");
+											Partition = XML.Attribute(E, "pt");
+
+											bool Found = false;
+
+											if (!(Nodes is null))
+											{
+												foreach (IThingReference Ref in Nodes)
+												{
+													if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+													{
+														Nodes2.Add(Ref);
+														Found = true;
+														break;
+													}
+												}
+											}
+
+											if (!Found)
+												Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+											break;
+
+										case "f":
+											if (Fields2 is null)
+												Fields2 = new List<string>();
+
+											Fields2.Add(XML.Attribute((XmlElement)N, "n"));
+											break;
+									}
+								}
+							}
+							else if (!(Permitted is null))
+							{
+								CanRead = true;
+								Jid = RequestFromBareJid;
+								FieldTypes2 = FieldTypes;
+								Nodes2 = new List<IThingReference>(Permitted);
+
+								if (!(FieldNames is null))
+									Fields2 = new List<string>(FieldNames);
+							}
 						}
+						else
+							CanRead = false;
 					}
-					else
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
 						CanRead = false;
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-					CanRead = false;
-				}
+					}
 
-				CanReadResponseEventArgs e2 = new CanReadResponseEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
-				await Callback.Raise(this, e2);
+					CanReadResponseEventArgs e2 = new CanReadResponseEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
+					await Callback.Raise(this, e2);
 
-			}, State);
+				}, State);
+			}
 		}
 
 		private void AppendNode(StringBuilder Xml, IThingReference Node)
@@ -972,165 +960,160 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
-				try
+				IThingReference[] Nodes2 = Nodes as IThingReference[];
+				if (Nodes2 is null && !(Nodes is null))
 				{
-					IThingReference[] Nodes2 = Nodes as IThingReference[];
-					if (Nodes2 is null && !(Nodes is null))
-					{
-						List<IThingReference> List = new List<IThingReference>();
-						List.AddRange(Nodes);
-						Nodes2 = List.ToArray();
-					}
-
-					string[] ParameterNames2 = ParameterNames as string[];
-					if (ParameterNames2 is null && !(ParameterNames is null))
-					{
-						List<string> List = new List<string>();
-						List.AddRange(ParameterNames);
-						ParameterNames2 = List.ToArray();
-					}
-
-					IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
-					CanControlResponseEventArgs e = new CanControlResponseEventArgs(e0, State, RequestFromBareJid, true, Nodes2, ParameterNames2);
-
-					await Callback.Raise(this.client, e);
+					List<IThingReference> List = new List<IThingReference>();
+					List.AddRange(Nodes);
+					Nodes2 = List.ToArray();
 				}
-				catch (Exception ex)
+
+				string[] ParameterNames2 = ParameterNames as string[];
+				if (ParameterNames2 is null && !(ParameterNames is null))
 				{
-					Log.Exception(ex);
+					List<string> List = new List<string>();
+					List.AddRange(ParameterNames);
+					ParameterNames2 = List.ToArray();
 				}
+
+				IqResultEventArgs e0 = new IqResultEventArgs(null, string.Empty, this.client.FullJID, this.provisioningServerAddress, true, State);
+				CanControlResponseEventArgs e = new CanControlResponseEventArgs(e0, State, RequestFromBareJid, true, Nodes2, ParameterNames2);
+
+				await Callback.Raise(this.client, e);
 			}
-
-			StringBuilder Xml = new StringBuilder();
-
-			Xml.Append("<canControl xmlns='");
-			Xml.Append(NamespaceProvisioningDeviceCurrent);
-			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(RequestFromBareJid));
-
-			this.AppendTokens(Xml, "st", ServiceTokens);
-			this.AppendTokens(Xml, "dt", DeviceTokens);
-			this.AppendTokens(Xml, "ut", UserTokens);
-
-			if (ToCheck is null && ParameterNames is null)
-				Xml.Append("'/>");
 			else
 			{
-				Xml.Append("'>");
+				StringBuilder Xml = new StringBuilder();
 
-				if (!(ToCheck is null))
-				{
-					foreach (IThingReference Node in ToCheck)
-						this.AppendNode(Xml, Node);
-				}
+				Xml.Append("<canControl xmlns='");
+				Xml.Append(NamespaceProvisioningDeviceCurrent);
+				Xml.Append("' jid='");
+				Xml.Append(XML.Encode(RequestFromBareJid));
 
-				if (!(ParameterNames is null))
+				this.AppendTokens(Xml, "st", ServiceTokens);
+				this.AppendTokens(Xml, "dt", DeviceTokens);
+				this.AppendTokens(Xml, "ut", UserTokens);
+
+				if (ToCheck is null && ParameterNames is null)
+					Xml.Append("'/>");
+				else
 				{
-					foreach (string ParameterName in ParameterNames)
+					Xml.Append("'>");
+
+					if (!(ToCheck is null))
 					{
-						Xml.Append("<parameter name='");
-						Xml.Append(XML.Encode(ParameterName));
-						Xml.Append("'/>");
+						foreach (IThingReference Node in ToCheck)
+							this.AppendNode(Xml, Node);
 					}
+
+					if (!(ParameterNames is null))
+					{
+						foreach (string ParameterName in ParameterNames)
+						{
+							Xml.Append("<parameter name='");
+							Xml.Append(XML.Encode(ParameterName));
+							Xml.Append("'/>");
+						}
+					}
+
+					Xml.Append("</canControl>");
 				}
 
-				Xml.Append("</canControl>");
-			}
-
-			await this.CachedIqGet(Xml.ToString(), async (Sender, e) =>
-			{
-				XmlElement E = e.FirstElement;
-				List<IThingReference> Nodes2 = null;
-				List<string> ParameterNames2 = null;
-				string Jid = string.Empty;
-				string NodeId;
-				string SourceId;
-				string Partition;
-				bool CanControl;
-
-				try
+				await this.CachedIqGet(Xml.ToString(), async (Sender, e) =>
 				{
-					if (e.Ok && !(E is null) && E.LocalName == "canControlResponse")
+					XmlElement E = e.FirstElement;
+					List<IThingReference> Nodes2 = null;
+					List<string> ParameterNames2 = null;
+					string Jid = string.Empty;
+					string NodeId;
+					string SourceId;
+					string Partition;
+					bool CanControl;
+
+					try
 					{
-						CanControl = XML.Attribute(E, "result", false);
-
-						foreach (XmlAttribute Attr in E.Attributes)
+						if (e.Ok && !(E is null) && E.LocalName == "canControlResponse")
 						{
-							if (Attr.Name == "jid")
-								Jid = Attr.Value;
-						}
+							CanControl = XML.Attribute(E, "result", false);
 
-						if (CanControl)
-						{
-							if (!(Permitted is null))
-								Nodes2 = new List<IThingReference>(Permitted);
-
-							foreach (XmlNode N in E.ChildNodes)
+							foreach (XmlAttribute Attr in E.Attributes)
 							{
-								switch (N.LocalName)
+								if (Attr.Name == "jid")
+									Jid = Attr.Value;
+							}
+
+							if (CanControl)
+							{
+								if (!(Permitted is null))
+									Nodes2 = new List<IThingReference>(Permitted);
+
+								foreach (XmlNode N in E.ChildNodes)
 								{
-									case "nd":
-										if (Nodes2 is null)
-											Nodes2 = new List<IThingReference>();
+									switch (N.LocalName)
+									{
+										case "nd":
+											if (Nodes2 is null)
+												Nodes2 = new List<IThingReference>();
 
-										E = (XmlElement)N;
-										NodeId = XML.Attribute(E, "id");
-										SourceId = XML.Attribute(E, "src");
-										Partition = XML.Attribute(E, "pt");
+											E = (XmlElement)N;
+											NodeId = XML.Attribute(E, "id");
+											SourceId = XML.Attribute(E, "src");
+											Partition = XML.Attribute(E, "pt");
 
-										bool Found = false;
+											bool Found = false;
 
-										if (!(Nodes is null))
-										{
-											foreach (IThingReference Ref in Nodes)
+											if (!(Nodes is null))
 											{
-												if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+												foreach (IThingReference Ref in Nodes)
 												{
-													Nodes2.Add(Ref);
-													Found = true;
-													break;
+													if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+													{
+														Nodes2.Add(Ref);
+														Found = true;
+														break;
+													}
 												}
 											}
-										}
 
-										if (!Found)
-											Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
-										break;
+											if (!Found)
+												Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+											break;
 
-									case "parameter":
-										if (ParameterNames2 is null)
-											ParameterNames2 = new List<string>();
+										case "parameter":
+											if (ParameterNames2 is null)
+												ParameterNames2 = new List<string>();
 
-										ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
-										break;
+											ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
+											break;
+									}
 								}
 							}
-						}
-						else if (!(Permitted is null))
-						{
-							CanControl = true;
-							Jid = RequestFromBareJid;
-							Nodes2 = new List<IThingReference>(Permitted);
+							else if (!(Permitted is null))
+							{
+								CanControl = true;
+								Jid = RequestFromBareJid;
+								Nodes2 = new List<IThingReference>(Permitted);
 
-							if (!(ParameterNames is null))
-								ParameterNames2 = new List<string>(ParameterNames);
+								if (!(ParameterNames is null))
+									ParameterNames2 = new List<string>(ParameterNames);
+							}
 						}
+						else
+							CanControl = false;
 					}
-					else
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
 						CanControl = false;
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-					CanControl = false;
-				}
+					}
 
-				CanControlResponseEventArgs e2 = new CanControlResponseEventArgs(e, State, Jid, CanControl,
-					Nodes2?.ToArray(), ParameterNames2?.ToArray());
+					CanControlResponseEventArgs e2 = new CanControlResponseEventArgs(e, State, Jid, CanControl,
+						Nodes2?.ToArray(), ParameterNames2?.ToArray());
 
-				await Callback.Raise(this, e2);
+					await Callback.Raise(this, e2);
 
-			}, State);
+				}, State);
+			}
 		}
 
 		#endregion

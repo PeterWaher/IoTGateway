@@ -452,7 +452,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				throw new BadRequestException("Invalid parameters.", e.IQ);
 
 			ValidateStreamEventArgs e2 = new ValidateStreamEventArgs(this.client, e, StreamId);
-			await this.OnOpen.Raise(this, e2);
+			await this.OnOpen.Raise(this, e2, false);
 
 			if (e2.DataCallback is null || e2.CloseCallback is null)
 				throw new NotAcceptableException("Stream not expected.", e.IQ);

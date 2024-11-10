@@ -5,12 +5,12 @@ using Waher.Events;
 
 namespace Waher.Networking
 {
-    #region Delegates
+	#region Delegates
 
-    /// <summary>
-    /// Asynchronous version of <see cref="EventArgs"/>.
-    /// </summary>
-    public delegate Task EventHandlerAsync(object Sender, EventArgs e);
+	/// <summary>
+	/// Asynchronous version of <see cref="EventArgs"/>.
+	/// </summary>
+	public delegate Task EventHandlerAsync(object Sender, EventArgs e);
 
 	/// <summary>
 	/// Asynchronous version of <see cref="EventArgs"/> with a typed event arguments.
@@ -48,7 +48,20 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static bool Raise(this EventHandler EventHandler, object Sender)
 		{
-			return Raise(EventHandler, Sender, EventArgs.Empty);
+			return Raise(EventHandler, Sender, EventArgs.Empty, false);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static bool Raise(this EventHandler EventHandler, object Sender, bool Decoupled)
+		{
+			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
 
 		/// <summary>
@@ -60,16 +73,47 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static bool Raise(this EventHandler EventHandler, object Sender, EventArgs e)
 		{
+			return EventHandler.Raise(Sender, e, false);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static bool Raise(this EventHandler EventHandler, object Sender, EventArgs e, bool Decoupled)
+		{
 			if (!(EventHandler is null))
 			{
-				try
+				if (Decoupled)
 				{
-					EventHandler(Sender, e);
+					Task.Run(() =>
+					{
+						try
+						{
+							EventHandler(Sender, e);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					});
 				}
-				catch (Exception ex)
+				else
 				{
-					Log.Exception(ex);
-					return false;
+					try
+					{
+						EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+						return false;
+					}
 				}
 			}
 
@@ -85,16 +129,47 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static bool Raise<T>(this EventHandler<T> EventHandler, object Sender, T e)
 		{
+			return EventHandler.Raise(Sender, e, false);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static bool Raise<T>(this EventHandler<T> EventHandler, object Sender, T e, bool Decoupled)
+		{
 			if (!(EventHandler is null))
 			{
-				try
+				if (Decoupled)
 				{
-					EventHandler(Sender, e);
+					Task.Run(() =>
+					{
+						try
+						{
+							EventHandler(Sender, e);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					});
 				}
-				catch (Exception ex)
+				else
 				{
-					Log.Exception(ex);
-					return false;
+					try
+					{
+						EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+						return false;
+					}
 				}
 			}
 
@@ -113,7 +188,20 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender)
 		{
-			return Raise(EventHandler, Sender, EventArgs.Empty);
+			return Raise(EventHandler, Sender, EventArgs.Empty, Sender.DecoupledEvents);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, bool Decoupled)
+		{
+			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
 
 		/// <summary>
@@ -123,10 +211,49 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e)
+		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e)
+		{
+			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static async Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
+			else if (Decoupled)
+			{
+				Task _ = Task.Run(async () =>
+				{
+					try
+					{
+						EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+
+						try
+						{
+							await Sender.Exception(ex);
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					}
+				});
+
+				return true;
+			}
 			else
 			{
 				try
@@ -175,10 +302,49 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e)
+		public static Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e)
+		{
+			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
+			else if (Decoupled)
+			{
+				Task _ = Task.Run(async () =>
+				{
+					try
+					{
+						EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+
+						try
+						{
+							await Sender.Exception(ex);
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					}
+				});
+
+				return true;
+			}
 			else
 			{
 				try
@@ -208,7 +374,20 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandlerAsync EventHandler, object Sender)
 		{
-			return Raise(EventHandler, Sender, EventArgs.Empty);
+			return Raise(EventHandler, Sender, EventArgs.Empty, false);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, object Sender, bool Decoupled)
+		{
+			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
 
 		/// <summary>
@@ -218,18 +397,49 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, object Sender, EventArgs e)
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, object Sender, EventArgs e)
+		{
+			return EventHandler.Raise(Sender, e, false);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, object Sender, EventArgs e, bool Decoupled)
 		{
 			if (!(EventHandler is null))
 			{
-				try
+				if (Decoupled)
 				{
-					await EventHandler(Sender, e);
+					Task _ = Task.Run(async () =>
+					{
+						try
+						{
+							await EventHandler(Sender, e);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					});
 				}
-				catch (Exception ex)
+				else
 				{
-					Log.Exception(ex);
-					return false;
+					try
+					{
+						await EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+						return false;
+					}
 				}
 			}
 
@@ -243,18 +453,49 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, object Sender, T e)
+		public static Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, object Sender, T e)
+		{
+			return EventHandler.Raise(Sender, e, false);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, object Sender, T e, bool Decoupled)
 		{
 			if (!(EventHandler is null))
 			{
-				try
+				if (Decoupled)
 				{
-					await EventHandler(Sender, e);
+					Task _ = Task.Run(async () =>
+					{
+						try
+						{
+							await EventHandler(Sender, e);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+					});
 				}
-				catch (Exception ex)
+				else
 				{
-					Log.Exception(ex);
-					return false;
+					try
+					{
+						await EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+						return false;
+					}
 				}
 			}
 
@@ -273,7 +514,20 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender)
 		{
-			return Raise(EventHandler, Sender, EventArgs.Empty);
+			return Raise(EventHandler, Sender, EventArgs.Empty, Sender.DecoupledEvents);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, bool Decoupled)
+		{
+			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
 
 		/// <summary>
@@ -283,10 +537,49 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e)
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e)
+		{
+			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
+			else if (Decoupled)
+			{
+				Task _ = Task.Run(async () =>
+				{
+					try
+					{
+						await EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+
+						try
+						{
+							await Sender.Exception(ex);
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					}
+				});
+
+				return true;
+			}
 			else
 			{
 				try
@@ -311,10 +604,49 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e)
+		public static Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e)
+		{
+			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+		}
+
+		/// <summary>
+		/// Raises an event, if handler is defined. Any exceptions are trapped and logged.
+		/// </summary>
+		/// <param name="EventHandler">Event handler, or null if not defined.</param>
+		/// <param name="Sender">Sender of events.</param>
+		/// <param name="e">Event arguments.</param>
+		/// <param name="Decoupled">If the event is decoupled, i.e. executed
+		/// in parallel with the source that raised it.</param>
+		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
+		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(Sender, e);
+			else if (Decoupled)
+			{
+				Task _ = Task.Run(async () =>
+				{
+					try
+					{
+						await EventHandler(Sender, e);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+
+						try
+						{
+							await Sender.Exception(ex);
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
+					}
+				});
+
+				return true;
+			}
 			else
 			{
 				try

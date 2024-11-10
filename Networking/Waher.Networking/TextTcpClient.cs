@@ -23,9 +23,12 @@ namespace Waher.Networking
 		/// Implements a text-based TCP Client, by using the thread-safe full-duplex <see cref="BinaryTcpClient"/>.
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public TextTcpClient(Encoding Encoding, params ISniffer[] Sniffers)
-			: this(Encoding, true, Sniffers)
+		public TextTcpClient(Encoding Encoding, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(Encoding, true, DecoupledEvents, Sniffers)
 		{
 		}
 
@@ -34,9 +37,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public TextTcpClient(Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
-			: base(false, Sniffers)
+		public TextTcpClient(Encoding Encoding, bool SniffText, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(false, DecoupledEvents, Sniffers)
 		{
 			this.encoding = Encoding;
 			this.sniffText = SniffText;
@@ -48,9 +54,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public TextTcpClient(StreamSocket Client, Encoding Encoding, params ISniffer[] Sniffers)
-			: this(Client, Encoding, true, Sniffers)
+		public TextTcpClient(StreamSocket Client, Encoding Encoding, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(Client, Encoding, true, DecoupledEvents, Sniffers)
 		{
 		}
 
@@ -60,9 +69,12 @@ namespace Waher.Networking
 		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public TextTcpClient(StreamSocket Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
-			: base(Client, false, Sniffers)
+		public TextTcpClient(StreamSocket Client, Encoding Encoding, bool SniffText, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Client, false, DecoupledEvents, Sniffers)
 		{
 			this.encoding = Encoding;
 			this.sniffText = SniffText;
@@ -73,9 +85,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public TextTcpClient(TcpClient Client, Encoding Encoding, params ISniffer[] Sniffers)
-			: this(Client, Encoding, true, Sniffers)
+		public TextTcpClient(TcpClient Client, Encoding Encoding, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(Client, Encoding, true, DecoupledEvents, Sniffers)
 		{
 		}
 
@@ -85,9 +100,12 @@ namespace Waher.Networking
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public TextTcpClient(TcpClient Client, Encoding Encoding, bool SniffText, params ISniffer[] Sniffers)
-			: base(Client, false, Sniffers)
+		public TextTcpClient(TcpClient Client, Encoding Encoding, bool SniffText, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Client, false, DecoupledEvents, Sniffers)
 		{
 			this.encoding = Encoding;
 			this.sniffText = SniffText;

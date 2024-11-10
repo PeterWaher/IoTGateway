@@ -386,7 +386,7 @@ namespace Waher.Networking.PeerToPeer
 
 				if (!(this.resynchCallback is null))
 				{
-					await this.resynchCallback.Raise(this, EventArgs.Empty);
+					await this.resynchCallback.Raise(this, EventArgs.Empty, false);
 					await this.DisposeAsync();
 				}
 				else

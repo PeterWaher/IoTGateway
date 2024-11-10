@@ -40,9 +40,9 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		/// <param name="Sniffers">Sniffers</param>
 		private ModbusTcpClient(params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
-			this.tcpClient = new BinaryTcpClient();
+			this.tcpClient = new BinaryTcpClient(false);
 		}
 
 		/// <summary>

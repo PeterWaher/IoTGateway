@@ -73,9 +73,12 @@ namespace Waher.Networking
 		/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also maked the use of <see cref="TcpClient"/>
 		/// safe, making sure it can be disposed, even during an active connection attempt.
 		/// </summary>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public BinaryTcpClient(params ISniffer[] Sniffers)
-			: this(true, Sniffers)
+		public BinaryTcpClient(bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(true, DecoupledEvents, Sniffers)
 		{
 		}
 
@@ -84,9 +87,12 @@ namespace Waher.Networking
 		/// safe, making sure it can be disposed, even during an active connection attempt.
 		/// </summary>
 		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public BinaryTcpClient(bool SniffBinary, params ISniffer[] Sniffers)
-			: base(Sniffers)
+		public BinaryTcpClient(bool SniffBinary, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(DecoupledEvents, Sniffers)
 		{
 			this.sniffBinary = SniffBinary;
 #if WINDOWS_UWP
@@ -104,9 +110,12 @@ namespace Waher.Networking
 		/// safe, making sure it can be disposed, even during an active connection attempt.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public BinaryTcpClient(StreamSocket Client, params ISniffer[] Sniffers)
-			: this(Client, true, Sniffers)
+		public BinaryTcpClient(StreamSocket Client, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(Client, true, DecoupledEvents, Sniffers)
 		{
 		}
 
@@ -116,9 +125,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public BinaryTcpClient(StreamSocket Client, bool SniffBinary, params ISniffer[] Sniffers)
-			: base(Sniffers)
+		public BinaryTcpClient(StreamSocket Client, bool SniffBinary, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(DecoupledEvents, Sniffers)
 		{
 			this.sniffBinary = SniffBinary;
 			this.buffer = Windows.Storage.Streams.Buffer.CreateCopyFromMemoryBuffer(this.memoryBuffer);
@@ -130,9 +142,12 @@ namespace Waher.Networking
 		/// safe, making sure it can be disposed, even during an active connection attempt.
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public BinaryTcpClient(TcpClient Client, params ISniffer[] Sniffers)
-			: this(Client, true, Sniffers)
+		public BinaryTcpClient(TcpClient Client, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: this(Client, true, DecoupledEvents, Sniffers)
 		{
 		}
 
@@ -142,9 +157,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="SniffBinary">If binary communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public BinaryTcpClient(TcpClient Client, bool SniffBinary, params ISniffer[] Sniffers)
-			: base(Sniffers)
+		public BinaryTcpClient(TcpClient Client, bool SniffBinary, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(DecoupledEvents, Sniffers)
 		{
 			this.sniffBinary = SniffBinary;
 			this.tcpClient = Client;
@@ -574,7 +592,7 @@ namespace Waher.Networking
 			}
 
 			if (!Continue && !this.disposed && !this.disposing)
-				await this.OnPaused.Raise(this, EventArgs.Empty);
+				await this.OnPaused.Raise(this, EventArgs.Empty, false);
 		}
 
 		/// <summary>

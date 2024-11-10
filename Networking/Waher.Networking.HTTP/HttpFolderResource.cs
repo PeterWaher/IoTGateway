@@ -551,7 +551,7 @@ namespace Waher.Networking.HTTP
 		{
 			NotFoundException ex = new NotFoundException("File not found: " + Request.SubPath);
 			FileNotFoundEventArgs e = new FileNotFoundEventArgs(ex, FullPath, Request, Response);
-			await this.FileNotFound.Raise(this, e);
+			await this.FileNotFound.Raise(this, e, false);
 
 			ex = e.Exception;
 			if (ex is null)

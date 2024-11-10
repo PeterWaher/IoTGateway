@@ -23,7 +23,7 @@ namespace Waher.Things.Ip.Model
 		/// <param name="Outgoing">Outgoing client connection</param>
 		/// <param name="Sniffers">Sniffers</param>
 		public ProxyClientConncetion(ProxyPort Port, BinaryTcpClient Incoming, BinaryTcpClient Outgoing, ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			this.port = Port;
 			this.incoming = Incoming;

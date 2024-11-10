@@ -573,7 +573,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							Count -= BufSize;
 
-							await this.DataCallback.Raise(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State));
+							await this.DataCallback.Raise(Sender, new HttpxResponseDataEventArgs(this.HttpxResponse, Buf, string.Empty, Count <= 0, this.State), false);
 						}
 					}
 					else
@@ -761,7 +761,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			try
 			{
-				await ResponseState.Callback.Raise(this, e2);
+				await ResponseState.Callback.Raise(this, e2, false);
 			}
 			finally
 			{

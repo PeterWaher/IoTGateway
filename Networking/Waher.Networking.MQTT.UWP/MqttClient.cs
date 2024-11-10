@@ -97,7 +97,7 @@ namespace Waher.Networking.MQTT
 		/// <param name="Sniffers">Sniffers to use.</param>
 		public MqttClient(string Host, int Port, X509Certificate ClientCertificate, string WillTopic,
 			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = Host;
 			this.port = Port;
@@ -135,7 +135,7 @@ namespace Waher.Networking.MQTT
 		/// <param name="Sniffers">Sniffers to use.</param>
 		public MqttClient(string Host, int Port, bool Tls, string UserName, string Password, string WillTopic,
 			MqttQualityOfService WillQoS, bool WillRetain, byte[] WillData, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = Host;
 			this.port = Port;
@@ -175,7 +175,7 @@ namespace Waher.Networking.MQTT
 
 				await this.SetState(MqttState.Connecting);
 
-				this.client = new BinaryTcpClient();
+				this.client = new BinaryTcpClient(this.DecoupledEvents);
 				await this.client.ConnectAsync(this.Host, this.Port, this.tls);
 
 				if (this.tls)

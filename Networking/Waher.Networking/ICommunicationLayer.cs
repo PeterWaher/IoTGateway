@@ -12,6 +12,12 @@ namespace Waher.Networking
 	public interface ICommunicationLayer : IEnumerable<ISniffer>
 	{
 		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		bool DecoupledEvents { get; }
+
+		/// <summary>
 		/// Adds a sniffer to the node.
 		/// </summary>
 		/// <param name="Sniffer">Sniffer to add.</param>

@@ -400,7 +400,7 @@ namespace Waher.Networking.XMPP.Software
 			Package PackageInfo = Package.Parse(e.Content);
 			PackageUpdatedEventArgs e2 = new PackageUpdatedEventArgs(PackageInfo, e);
 
-			await this.OnSoftwareUpdated.Raise(this, e2);
+			await this.OnSoftwareUpdated.Raise(this, e2, false);
 
 			if (e2.Download)
 			{
@@ -415,7 +415,7 @@ namespace Waher.Networking.XMPP.Software
 				string FileName = await this.DownloadPackageAsync(PackageInfo);
 				PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
 
-				if (!await this.OnSoftwareValidation.Raise(this, e3))
+				if (!await this.OnSoftwareValidation.Raise(this, e3, false))
 				{
 					File.Delete(FileName);
 					Log.Warning("Package with invalid signature downloaded and deleted.", FileName);
@@ -524,7 +524,7 @@ namespace Waher.Networking.XMPP.Software
 
 			Package PackageInfo = Package.Parse(e.Content);
 			PackageDeletedEventArgs e2 = new PackageDeletedEventArgs(PackageInfo, e);
-			await this.OnSoftwareDeleted.Raise(this, e2);
+			await this.OnSoftwareDeleted.Raise(this, e2, false);
 
 			if (e2.Delete)
 			{

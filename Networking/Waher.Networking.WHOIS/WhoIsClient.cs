@@ -40,7 +40,7 @@ namespace Waher.Networking.WHOIS
 		/// <param name="Encoding">Text encoding to use. (Default=<see cref="Encoding.ASCII"/>)</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public WhoIsClient(Encoding Encoding, params ISniffer[] Sniffers)
-			: base(Encoding, Sniffers)
+			: base(Encoding, false, Sniffers)
 		{
 		}
 

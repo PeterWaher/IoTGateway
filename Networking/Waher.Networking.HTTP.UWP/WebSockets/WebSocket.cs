@@ -195,7 +195,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				this.connection = null;
 			}
 
-			await this.Disposed.Raise(this, EventArgs.Empty);
+			await this.Disposed.Raise(this, EventArgs.Empty, false);
 		}
 
 		/// <summary>
@@ -516,7 +516,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 		private Task RaiseClosed(ushort? Code, string Reason)
 		{
-			return this.Closed.Raise(this, new WebSocketClosedEventArgs(this, Code, Reason));
+			return this.Closed.Raise(this, new WebSocketClosedEventArgs(this, Code, Reason), false);
 		}
 
 		/// <summary>

@@ -79,7 +79,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="JID">JID of SOCKS5 stream host.</param>
 		/// <param name="Sniffers">Optional set of sniffers.</param>
 		public Socks5Client(string Host, int Port, string JID, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			this.host = Host;
 			this.port = Port;
@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 			});
 
-			this.client = new BinaryTcpClient();
+			this.client = new BinaryTcpClient(false);
 			this.Connect();
 		}
 
@@ -293,7 +293,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private async Task ParseIncoming(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.state == Socks5State.Connected)
-				await this.OnDataReceived.Raise(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState));
+				await this.OnDataReceived.Raise(this, new DataReceivedEventArgs(Buffer, Offset, Count, this, this.callbackState), false);
 			else if (this.state == Socks5State.Initializing)
 			{
 				if (Count < 2 || Buffer[Offset++] < 5)
@@ -444,7 +444,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				Port <<= 8;
 				Port |= Buffer[Offset++];
 
-				await this.OnResponse.Raise(this, new ResponseEventArgs(REP, Addr, DomainName, Port));
+				await this.OnResponse.Raise(this, new ResponseEventArgs(REP, Addr, DomainName, Port), false);
 			}
 		}
 

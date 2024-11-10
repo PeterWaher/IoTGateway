@@ -309,7 +309,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string Password, string Language, Assembly AppAssembly,
 			params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = this.domain = Host;
 			this.port = Port;
@@ -336,7 +336,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language,
 			Assembly AppAssembly, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = this.domain = Host;
 			this.port = Port;
@@ -358,7 +358,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 #else
 		/// <summary>
 		/// Manages an XMPP client connection over a traditional binary socket connection. 
@@ -389,7 +389,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string Password, string Language, Assembly AppAssembly,
 			X509Certificate ClientCertificate, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = this.domain = Host;
 			this.port = Port;
@@ -435,7 +435,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language, Assembly AppAssembly,
 			X509Certificate ClientCertificate, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.host = this.domain = Host;
 			this.port = Port;
@@ -458,7 +458,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public XmppClient(XmppCredentials Credentials, string Language, Assembly AppAssembly, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 #endif
 		{
 			this.host = this.domain = Credentials.Host;
@@ -584,7 +584,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="StreamFooter">Stream footer end tag.</param>
 		/// <param name="BareJid">Bare JID of connection.</param>
 		/// <param name="AppAssembly">Application assembly.</param>
-		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter, string BareJid, Assembly AppAssembly)
+		/// <param name="Sniffers">Sniffers</param>
+		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter, string BareJid, 
+			Assembly AppAssembly, params ISniffer[] Sniffers)
+			: base(true, Sniffers)
 		{
 			this.textTransportLayer = TextTransporLayer;
 			this.Init(AppAssembly);
@@ -678,7 +681,7 @@ namespace Waher.Networking.XMPP
 
 				if (this.textTransportLayer is null)
 				{
-					this.client = new TextTcpClient(this.encoding);
+					this.client = new TextTcpClient(this.encoding, true);
 					this.client.OnReceived += this.OnReceived;
 					this.client.OnSent += this.OnSent;
 					this.client.OnError += this.Error;
@@ -1203,7 +1206,7 @@ namespace Waher.Networking.XMPP
 
 			if (RaiseEvent)
 			{
-				await this.OnDisposed.Raise(this, EventArgs.Empty);
+				await this.OnDisposed.Raise(this, EventArgs.Empty, false);
 				this.OnDisposed = null;
 			}
 		}
@@ -2173,7 +2176,7 @@ namespace Waher.Networking.XMPP
 				return true;
 
 			ValidateSenderEventArgs e = new ValidateSenderEventArgs(this, Stanza, From, FromBareJid, IqStanza, MessageStanza);
-			await h.Raise(this, e);
+			await h.Raise(this, e, false);
 
 			if (e.Rejected && !e.Accepted)
 			{
@@ -4533,7 +4536,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML of stanza being built.</param>
 		public async Task AddCustomPresenceXml(Availability Availability, StringBuilder Xml)
 		{
-			await this.CustomPresenceXml.Raise(this, new CustomPresenceEventArgs(Availability, Xml));
+			await this.CustomPresenceXml.Raise(this, new CustomPresenceEventArgs(Availability, Xml), false);
 
 			lock (this.synchObject)
 			{

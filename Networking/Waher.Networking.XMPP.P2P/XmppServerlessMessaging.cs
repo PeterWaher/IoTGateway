@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Sniffers">Sniffers</param>
 		public XmppServerlessMessaging(string ApplicationName, string FullJid, ushort LocalPort, ushort ExternalPort, int Backlog,
 			params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			this.fullJid = FullJid;
 			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers)
@@ -509,7 +509,7 @@ namespace Waher.Networking.XMPP.P2P
 								{
 									await this.Exception(ex);
 								}
-							})))
+							}), false))
 							{
 								Result.CallCallbacks();
 							}

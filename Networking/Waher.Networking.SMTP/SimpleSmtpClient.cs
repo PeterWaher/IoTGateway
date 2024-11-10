@@ -73,7 +73,7 @@ namespace Waher.Networking.SMTP
 		/// <param name="UserName">User name</param>
 		/// <param name="Password">Password</param>
 		public SimpleSmtpClient(string Domain, string Host, int Port, string UserName, string Password, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			this.domain = Domain;
 			this.host = Host;
@@ -95,7 +95,7 @@ namespace Waher.Networking.SMTP
 				this.response.Clear();
 			}
 
-			this.client = new RowTcpClient(Encoding.UTF8, 10000);
+			this.client = new RowTcpClient(Encoding.UTF8, 10000, false);
 			this.client.Client.ReceiveTimeout = 10000;
 			this.client.Client.SendTimeout = 10000;
 

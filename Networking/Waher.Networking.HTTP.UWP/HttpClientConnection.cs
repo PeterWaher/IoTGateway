@@ -58,7 +58,7 @@ namespace Waher.Networking.HTTP
 		private bool rxText = false;
 
 		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, bool Encrypted, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			this.server = Server;
 			this.client = Client;

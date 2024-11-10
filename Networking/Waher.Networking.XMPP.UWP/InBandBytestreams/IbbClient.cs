@@ -159,7 +159,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			ValidateStreamEventArgs e2 = new ValidateStreamEventArgs(this.client, e, StreamId, BlockSize);
 			
-			await this.OnOpen.Raise(this, e2);
+			await this.OnOpen.Raise(this, e2, false);
 
 			if (e2.DataCallback is null || e2.CloseCallback is null)
 				throw new NotAcceptableException("Stream not expected.", e.IQ);

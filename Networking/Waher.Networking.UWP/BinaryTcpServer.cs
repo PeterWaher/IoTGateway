@@ -62,9 +62,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Port">Port number.</param>
 		/// <param name="ActivityTimeout">Time before closing unused client connections.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public BinaryTcpServer(int Port, TimeSpan ActivityTimeout, ISniffer[] Sniffers)
-			: base(Sniffers)
+		public BinaryTcpServer(int Port, TimeSpan ActivityTimeout, bool DecoupledEvents, ISniffer[] Sniffers)
+			: base(DecoupledEvents, Sniffers)
 		{
 #if !WINDOWS_UWP
 			this.tls = false;
@@ -80,10 +83,12 @@ namespace Waher.Networking
 		/// <param name="Port">Port number.</param>
 		/// <param name="ActivityTimeout">Time before closing unused client connections.</param>
 		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public BinaryTcpServer(int Port, TimeSpan ActivityTimeout,
-			X509Certificate ServerCertificate, ISniffer[] Sniffers)
-			: base(Sniffers)
+		public BinaryTcpServer(int Port, TimeSpan ActivityTimeout, X509Certificate ServerCertificate, bool DecoupledEvents, ISniffer[] Sniffers)
+			: base(DecoupledEvents, Sniffers)
 		{
 			this.serverCertificate = ServerCertificate;
 			this.tls = !(this.serverCertificate is null);
@@ -440,7 +445,7 @@ namespace Waher.Networking
 		{
 			ServerConnectionAcceptEventArgs e = new ServerConnectionAcceptEventArgs(Connection);
 
-			if (!await this.OnAccept.Raise(this, e))
+			if (!await this.OnAccept.Raise(this, e, false))
 				e.Accept = false;
 
 			return e.Accept;
@@ -460,7 +465,7 @@ namespace Waher.Networking
 			{
 				StreamSocket Client = args.Socket;
 
-				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, this.DecoupledEvents);
 				BinaryTcpClient.Bind(true);
 				ServerTcpConnection Connection = new ServerTcpConnection(this, BinaryTcpClient);
 
@@ -547,7 +552,7 @@ namespace Waher.Networking
 
 						if (!(Client is null))
 						{
-							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, this.DecoupledEvents);
 							BinaryTcpClient.Bind(true);
 
 							ServerTcpConnection Connection = new ServerTcpConnection(this, BinaryTcpClient);
@@ -685,7 +690,7 @@ namespace Waher.Networking
 		{
 			Exception ex2 = Log.UnnestException(ex);
 
-			await this.OnTlsUpgradeError.Raise(this, new ServerTlsErrorEventArgs(Connection, ex2));
+			await this.OnTlsUpgradeError.Raise(this, new ServerTlsErrorEventArgs(Connection, ex2), false);
 
 			Connection.Client.Dispose();
 		}

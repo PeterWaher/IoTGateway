@@ -19,7 +19,7 @@ namespace Waher.Things.Modbus
     /// </summary>
     public class ModbusGatewayNode : IpHostPort, ICommunicationLayer
 	{
-		private readonly CommunicationLayer sniffers = new CommunicationLayer();
+		private readonly CommunicationLayer sniffers = new CommunicationLayer(false);
 
 		/// <summary>
 		/// Node representing a TCP/IP connection to a Modbus Gateway
@@ -52,6 +52,12 @@ namespace Waher.Things.Modbus
 		}
 
 		#region ICommunicationLayer
+
+		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => this.sniffers.DecoupledEvents;
 
 		/// <summary>
 		/// Registered sniffers

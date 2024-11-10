@@ -501,7 +501,7 @@ namespace Waher.Networking.XMPP.Sensor
 			InternalReadoutRequest Request = new InternalReadoutRequest(Actor, Nodes, Types, Fields, From, To, OnFieldsReported, OnErrorsReported, State);
 			EventHandlerAsync<SensorDataServerRequest> h = this.OnExecuteReadoutRequest;
 
-			await h.Raise(this, Request);
+			await h.Raise(this, Request, false);
 			
 			return Request;
 		}

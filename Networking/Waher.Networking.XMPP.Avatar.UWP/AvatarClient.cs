@@ -215,7 +215,8 @@ namespace Waher.Networking.XMPP.Avatar
 
 		private async Task QueryAvatarHandler(object Sender, IqEventArgs e)
 		{
-			await this.ValidateAccess.Raise(this, e);
+			if (!await this.ValidateAccess.Raise(this, e, false))
+				return;
 
 			Avatar Avatar = this.localAvatar ?? this.defaultAvatar;
 

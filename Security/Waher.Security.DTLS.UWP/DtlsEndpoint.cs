@@ -104,7 +104,7 @@ namespace Waher.Security.DTLS
 		/// <param name="Sniffers">Sniffers.</param>
 		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, IUserSource Users,
 			string RequiredPrivilege, params ISniffer[] Sniffers)
-		: base(Sniffers)
+		: base(false, Sniffers)
 		{
 			this.mode = Mode;
 			this.users = Users;
@@ -744,7 +744,7 @@ namespace Waher.Security.DTLS
 									this.rnd.GetBytes(State.serverRandom);
 								}
 
-								await this.OnIncomingHandshakeStarted.Raise(this, new RemoteEndpointEventArgs(State.remoteEndpoint));
+								await this.OnIncomingHandshakeStarted.Raise(this, new RemoteEndpointEventArgs(State.remoteEndpoint), false);
 
 								this.SetUnixTime(State.serverRandom, 0);
 

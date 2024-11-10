@@ -472,7 +472,7 @@ namespace Waher.Networking.HTTP
 						else
 							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
 
-						await this.BeforeForwardRequest.Raise(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response));
+						await this.BeforeForwardRequest.Raise(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response), false);
 
 						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
 
@@ -543,12 +543,12 @@ namespace Waher.Networking.HTTP
 
 							Response.ContentLength = Bin.Length;
 
-							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
+							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
 
 							await Response.Write(Bin);
 						}
 						else
-							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response));
+							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
 
 						await Response.SendResponse();
 					}

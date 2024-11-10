@@ -2167,7 +2167,7 @@ namespace Waher.Networking.XMPP.Contracts
 		internal async Task<object> FormatParameterValue(string Name, object Value)
 		{
 			ParameterValueFormattingEventArgs e = new ParameterValueFormattingEventArgs(Name, Value);
-			await this.FormatParameterDisplay.Raise(this, e);
+			await this.FormatParameterDisplay.Raise(this, e, false);
 			return e.Value;
 		}
 

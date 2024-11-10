@@ -216,7 +216,7 @@ namespace Waher.Networking.HTTP
 			Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificSettings, bool LockSettings,
 			params ISniffer[] Sniffers)
 #endif
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 #if !WINDOWS_UWP
 			this.serverCertificate = ServerCertificate;
@@ -994,7 +994,7 @@ namespace Waher.Networking.HTTP
 						{
 							await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
-							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 							BinaryTcpClient.Bind(true);
 
 							if (Tls)
@@ -1642,7 +1642,7 @@ namespace Waher.Networking.HTTP
 
 		internal Task CustomizeError(CustomErrorEventArgs e)
 		{
-			return this.CustomError.Raise(this, e);
+			return this.CustomError.Raise(this, e, false);
 		}
 
 		#endregion

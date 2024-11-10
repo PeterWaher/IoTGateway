@@ -25,7 +25,7 @@ namespace Waher.Security.DTLS
 		/// <param name="UdpClient">UDP client.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public UdpCommunicationLayer(UdpClient UdpClient, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			this.client = UdpClient;
 			this.BeginReceive();

@@ -18,7 +18,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		/// Class that can be used to sniff on ledger activity.
 		/// </summary>
 		public SniffableLedger()
-			: base()
+			: base(false)
 		{
 		}
 

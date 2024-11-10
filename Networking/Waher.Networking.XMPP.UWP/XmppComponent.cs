@@ -13,6 +13,7 @@ using Waher.Networking.XMPP.StreamErrors;
 using Waher.Runtime.Cache;
 using Waher.Security;
 using Waher.Networking.XMPP.Events;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP
 {
@@ -88,8 +89,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="IdentityCategory">Identity category, as defined in XEP-0030.</param>
 		/// <param name="IdentityType">Identity type, as defined in XEP-0030.</param>
 		/// <param name="IdentityName">Identity name, as defined in XEP-0030.</param>
+		/// <param name="Sniffers">Sniffers</param>
 		public XmppComponent(string Host, int Port, string ComponentSubDomain, string SharedSecret,
-			string IdentityCategory, string IdentityType, string IdentityName)
+			string IdentityCategory, string IdentityType, string IdentityName, params ISniffer[] Sniffers)
+			: base(true, Sniffers)
 		{
 			this.identityCategory = IdentityCategory;
 			this.identityType = IdentityType;
@@ -115,7 +118,7 @@ namespace Waher.Networking.XMPP
 
 			try
 			{
-				this.client = new TextTcpClient(this.encoding);
+				this.client = new TextTcpClient(this.encoding, true);
 				this.client.OnReceived += this.OnReceived;
 				this.client.OnSent += this.OnSent;
 				this.client.OnError += this.Error;
@@ -177,7 +180,7 @@ namespace Waher.Networking.XMPP
 
 		private async Task ConnectionError(Exception ex)
 		{
-			await this.OnConnectionError.Raise(this, ex);
+			await this.OnConnectionError.Raise(this, ex, false);
 			await this.Error(this, ex);
 
 			this.inputState = -1;

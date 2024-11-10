@@ -726,7 +726,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// </summary>
 		public Task DisposeAsync()
 		{
-			return this.Disposed.Raise(this, EventArgs.Empty);
+			return this.Disposed.Raise(this, EventArgs.Empty, false);
 		}
 
 		/// <summary>

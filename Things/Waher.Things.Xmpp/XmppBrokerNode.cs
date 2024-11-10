@@ -182,6 +182,12 @@ namespace Waher.Things.Xmpp
 		#region ICommunicationLayer
 
 		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => true;
+
+		/// <summary>
 		/// <see cref="ICommunicationLayer.Add"/>
 		/// </summary>
 		public void Add(ISniffer Sniffer)

@@ -175,7 +175,7 @@ namespace Waher.Networking.PeerToPeer
 
 							try
 							{
-								BinaryTcpClient Client = new BinaryTcpClient(TcpClient);
+								BinaryTcpClient Client = new BinaryTcpClient(TcpClient, false);
 								Client.Bind(true);
 
 								Connection = new PeerConnection(Client, this,
@@ -368,7 +368,7 @@ namespace Waher.Networking.PeerToPeer
 			if (this.State != PeerToPeerNetworkState.Ready)
 				throw new IOException("Peer-to-peer network not ready.");
 
-			BinaryTcpClient Client = new BinaryTcpClient();
+			BinaryTcpClient Client = new BinaryTcpClient(false);
 			IPEndPoint RemoteEndPoint2 = RemoteEndPoint;
 
 			try

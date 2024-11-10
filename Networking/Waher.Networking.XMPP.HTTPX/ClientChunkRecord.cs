@@ -46,7 +46,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (Data.Length > 0 || Last)
 				{
-					if (!await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state)))
+					if (!await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state), false))
 					{
 						await this.client.CancelTransfer(this.e.From, this.streamId);
 						return false;
@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								if (Chunk.Nr == this.nextChunk)
 								{
-									if (!await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last, this.state)))
+									if (!await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last, this.state), false))
 										return false;
 
 									this.nextChunk++;
@@ -121,7 +121,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (this.response is null)
 				return;
 
-			await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, new byte[0], this.streamId, true, this.state));
+			await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, new byte[0], this.streamId, true, this.state), false);
 
 			if (!this.response.HeaderSent)
 				await this.response.SendResponse(new InternalServerErrorException(Message));

@@ -1624,7 +1624,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				CustomSnifferEventArgs e2 = new CustomSnifferEventArgs(SnifferId, e);
 
-				await this.OnCustomSnifferMessage.Raise(this, e2);
+				await this.OnCustomSnifferMessage.Raise(this, e2, false);
 
 				Sniffer = e2.Sniffer;
 				if (Sniffer is null)

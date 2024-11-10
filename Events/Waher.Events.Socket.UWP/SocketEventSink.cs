@@ -182,7 +182,7 @@ namespace Waher.Events.Socket
 						this.client?.Dispose();
 						this.client = null;
 
-						this.client = new BinaryTcpClient(this.sniffers);
+						this.client = new BinaryTcpClient(false, this.sniffers);
 
 						this.client.OnDisconnected += this.Client_OnDisconnected;
 						this.client.OnReceived += this.Client_OnReceived;

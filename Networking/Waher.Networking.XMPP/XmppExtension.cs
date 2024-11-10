@@ -64,6 +64,12 @@ namespace Waher.Networking.XMPP
 		#region ICommunicationLayer
 
 		/// <summary>
+		/// If events raised from the communication layer are decoupled, i.e. executed
+		/// in parallel with the source that raised them.
+		/// </summary>
+		public bool DecoupledEvents => this.Client.DecoupledEvents;
+
+		/// <summary>
 		/// Adds a sniffer to the node.
 		/// </summary>
 		/// <param name="Sniffer">Sniffer to add.</param>

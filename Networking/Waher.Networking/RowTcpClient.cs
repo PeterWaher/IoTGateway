@@ -27,9 +27,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public RowTcpClient(Encoding Encoding, int MaxLength, params ISniffer[] Sniffers)
-			: base(Encoding, Sniffers)
+		public RowTcpClient(Encoding Encoding, int MaxLength, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Encoding, DecoupledEvents, Sniffers)
 		{
 			this.maxLen = MaxLength;
 		}
@@ -41,9 +44,12 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public RowTcpClient(Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
-			: base(Encoding, SniffText, Sniffers)
+		public RowTcpClient(Encoding Encoding, int MaxLength, bool SniffText, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Encoding, SniffText, DecoupledEvents, Sniffers)
 		{
 			this.maxLen = MaxLength;
 		}
@@ -56,9 +62,12 @@ namespace Waher.Networking
 		/// <param name="Client">Encapsulate this <see cref="StreamSocket"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public RowTcpClient(StreamSocket Client, Encoding Encoding, int MaxLength, params ISniffer[] Sniffers)
-			: base(Client, Encoding, Sniffers)
+		public RowTcpClient(StreamSocket Client, Encoding Encoding, int MaxLength, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Client, Encoding, DecoupledEvents, Sniffers)
 		{
 			this.maxLen = MaxLength;
 		}
@@ -71,9 +80,12 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public RowTcpClient(StreamSocket Client, Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
-			: base(Client, Encoding, SniffText, Sniffers)
+		public RowTcpClient(StreamSocket Client, Encoding Encoding, int MaxLength, bool SniffText, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Client, Encoding, SniffText, DecoupledEvents, Sniffers)
 		{
 			this.maxLen = MaxLength;
 		}
@@ -85,9 +97,12 @@ namespace Waher.Networking
 		/// <param name="Client">Encapsulate this <see cref="TcpClient"/> connection.</param>
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public RowTcpClient(TcpClient Client, Encoding Encoding, int MaxLength, params ISniffer[] Sniffers)
-			: base(Client, Encoding, Sniffers)
+		public RowTcpClient(TcpClient Client, Encoding Encoding, int MaxLength, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Client, Encoding, DecoupledEvents, Sniffers)
 		{
 			this.maxLen = MaxLength;
 		}
@@ -100,9 +115,12 @@ namespace Waher.Networking
 		/// <param name="Encoding">Text encoding to use.</param>
 		/// <param name="MaxLength">Maximum number of characters in a row</param>
 		/// <param name="SniffText">If text communication is to be forwarded to registered sniffers.</param>
+		/// <param name="DecoupledEvents">If events raised from the communication 
+		/// layer are decoupled, i.e. executed in parallel with the source that raised 
+		/// them.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public RowTcpClient(TcpClient Client, Encoding Encoding, int MaxLength, bool SniffText, params ISniffer[] Sniffers)
-			: base(Client, Encoding, SniffText, Sniffers)
+		public RowTcpClient(TcpClient Client, Encoding Encoding, int MaxLength, bool SniffText, bool DecoupledEvents, params ISniffer[] Sniffers)
+			: base(Client, Encoding, SniffText, DecoupledEvents, Sniffers)
 		{
 			this.maxLen = MaxLength;
 		}

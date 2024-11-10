@@ -32,7 +32,7 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		/// <param name="Sniffers">Sniffers.</param>
 		public UPnPClient(params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			Dictionary<AddressFamily, bool> GenIncoming = new Dictionary<AddressFamily, bool>();
 			UdpClient Outgoing;

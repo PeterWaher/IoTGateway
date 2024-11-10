@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
@@ -37,7 +38,8 @@ namespace Waher.Things.Ip.Model
 		private bool closed = false;
 
 		private ProxyPort(IpHostPortProxy Node, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort, bool AuthorizedAccess,
-			IpCidr[] RemoteIps)
+			IpCidr[] RemoteIps, params ISniffer[] Sniffers)
+			: base(false, Sniffers)
 		{
 			this.node = Node;
 			this.host = Host;
@@ -177,7 +179,7 @@ namespace Waher.Things.Ip.Model
 
 							await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
-							BinaryTcpClient Incoming = new BinaryTcpClient(Client);
+							BinaryTcpClient Incoming = new BinaryTcpClient(Client, false);
 							BinaryTcpClient Outgoing = null;
 
 							Incoming.Bind(true);
@@ -187,7 +189,7 @@ namespace Waher.Things.Ip.Model
 
 							try
 							{
-								Outgoing = new BinaryTcpClient();
+								Outgoing = new BinaryTcpClient(false);
 								if (!await Outgoing.ConnectAsync(this.host, this.port, true))
 								{
 									await this.node.LogErrorAsync("UnableToConnect", "Unable to connect to remote endpoint.");

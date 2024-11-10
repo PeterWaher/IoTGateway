@@ -402,7 +402,7 @@ namespace Waher.Security.LoginMonitor
 			foreach (KeyValuePair<string, object> Tag in Tags)
 				e.AddTag(Tag.Key, Tag.Value);
 
-			await AnnotateEndpoint.Raise(null, e);
+			await AnnotateEndpoint.Raise(null, e, false);
 
 			return e.GetTags();
 		}

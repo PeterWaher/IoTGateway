@@ -198,7 +198,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public CoapEndpoint(int[] CoapPorts, int[] CoapsPorts, IUserSource Users, string RequiredPrivilege,
 			bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(false, Sniffers)
 		{
 			LinkedList<KeyValuePair<int, bool>> Ports = new LinkedList<KeyValuePair<int, bool>>();
 			UdpClient Outgoing;

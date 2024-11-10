@@ -71,7 +71,7 @@ namespace Waher.Networking.Cluster
 		/// <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public ClusterEndpoint(IPAddress MulticastAddress, int Port, byte[] SharedSecret, params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: base(true, Sniffers)
 		{
 			ClusterUdpClient ClusterUdpClient;
 			UdpClient Client;

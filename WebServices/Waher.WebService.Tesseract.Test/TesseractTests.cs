@@ -20,7 +20,7 @@ namespace Waher.WebService.Tesseract.Test
 	public class TesseractTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(TesseractTests).Assembly,
 				typeof(InternetContent).Assembly,
@@ -29,6 +29,14 @@ namespace Waher.WebService.Tesseract.Test
 				typeof(JwsAlgorithm).Assembly);
 
 			Log.Register(new ConsoleEventSink());
+
+			await Types.StartAllModules(10000);
+		}
+
+		[AssemblyCleanup]
+		public static async Task AssemblyCleanup()
+		{
+			await Types.StopAllModules();
 		}
 
 		[TestMethod]

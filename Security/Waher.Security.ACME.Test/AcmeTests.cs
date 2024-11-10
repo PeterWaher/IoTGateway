@@ -2,6 +2,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 using Waher.Security.PKCS;
@@ -19,7 +20,8 @@ namespace Waher.Security.ACME.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
 		{
-			Types.Initialize();
+			Types.Initialize(
+				typeof(JSON).Assembly);
 		}
 
 		[TestInitialize]

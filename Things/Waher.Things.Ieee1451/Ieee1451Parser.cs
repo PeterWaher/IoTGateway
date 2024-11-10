@@ -202,6 +202,7 @@ namespace Waher.Things.Ieee1451
 					return new DiscoveryMessage(NetworkServiceType, (DiscoveryService)NetworkServiceId, MessageType, Body, Tail, Sniffable);
 
 				case NetworkServiceType.TransducerAccessServices:
+					if (Sniffable?.HasSniffers ?? false)
 					{
 						await Sniffable.Information(nameof(TransducerAccessMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((TransducerAccessService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +
@@ -211,6 +212,7 @@ namespace Waher.Things.Ieee1451
 					return new TransducerAccessMessage(NetworkServiceType, (TransducerAccessService)NetworkServiceId, MessageType, Body, Tail, Sniffable);
 
 				case NetworkServiceType.TedsAccessServices:
+					if (Sniffable?.HasSniffers ?? false)
 					{
 						await Sniffable.Information(nameof(TedsAccessMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((TedsAccessService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +
@@ -220,6 +222,7 @@ namespace Waher.Things.Ieee1451
 					return new TedsAccessMessage(NetworkServiceType, (TedsAccessService)NetworkServiceId, MessageType, Body, Tail, Sniffable);
 
 				case NetworkServiceType.EventNotificationServices:
+					if (Sniffable?.HasSniffers ?? false)
 					{
 						await Sniffable.Information(nameof(EventNotificationMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((EventNotificationService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +

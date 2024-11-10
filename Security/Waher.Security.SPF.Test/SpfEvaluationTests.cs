@@ -46,8 +46,8 @@ namespace Waher.Security.SPF.Test
 		public async Task Test_01_SPF_Evaluation_1()
 		{
 			KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(
-				IPAddress.Parse("194.9.95.112"), "littlesister.se",
-				"testaccount@littlesister.se", "smtp.outgoing.loopia.se", "cybercity.online");
+				IPAddress.Parse("20.105.198.113"), "cybercity.online",
+				"testaccount@cybercity.online", "smtp.outgoing.loopia.se", "cybercity.online");
 			Assert.AreEqual(SpfResult.Pass, Result.Key, Result.Value);
 		}
 

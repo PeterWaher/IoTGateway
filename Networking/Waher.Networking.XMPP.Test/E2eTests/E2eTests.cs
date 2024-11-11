@@ -12,18 +12,6 @@ namespace Waher.Networking.XMPP.Test.E2eTests
         protected EndpointSecurity endpointSecurity1;
         protected EndpointSecurity endpointSecurity2;
 
-		[ClassInitialize]
-		public static void ClassInitialize(TestContext _)
-		{
-            SetupSnifferAndLog();
-		}
-
-		[ClassCleanup]
-		public static void ClassCleanup()
-		{
-            DisposeSnifferAndLog();
-		}
-
 		public override void PrepareClient1(XmppClient Client)
         {
             base.PrepareClient1(Client);
@@ -36,9 +24,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests
             this.endpointSecurity2 = new EndpointSecurity(this.client2, 128, this.endpoints2);
         }
 
-        public override void ConnectClients()
+        public override async Task ConnectClients()
         {
-            base.ConnectClients();
+            await base.ConnectClients();
 
 			SubscribedTo(this.client1, this.client2);
 			SubscribedTo(this.client2, this.client1);
@@ -55,20 +43,18 @@ namespace Waher.Networking.XMPP.Test.E2eTests
                 ManualResetEvent Done2 = new(false);
                 ManualResetEvent Error2 = new(false);
 
-                To.OnPresenceSubscribe += (Sender, e) =>
+                To.OnPresenceSubscribe += async (Sender, e) =>
                 {
                     if (e.FromBareJID == From.BareJID)
                     {
-                        e.Accept();
+                        await e.Accept();
                         Done2.Set();
                     }
                     else
                     {
-                        e.Decline();
+                        await e.Decline();
                         Error2.Set();
                     }
-
-                    return Task.CompletedTask;
                 };
 
                 From.RequestPresenceSubscription(To.BareJID);

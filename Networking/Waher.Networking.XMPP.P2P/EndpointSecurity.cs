@@ -853,19 +853,30 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If E2E information was available and encryption was possible.</returns>
 		public virtual async Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
 		{
+			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
 			if (RemoteEndpoint is null)
+			{
+				if (SniffE2eInfo)
+					await Client.Warning("Remote E2E endpoint not found. Unable to encrypt message.");
+
 				return false;
+			}
 
 			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
 			if (LocalEndpoint is null)
+			{
+				if (SniffE2eInfo)
+					await Client.Warning("Local E2E endpoint matching remote endpoint not found. Unable to encrypt message.");
+
 				return false;
+			}
 
 			byte[] Data = this.encoding.GetBytes(DataXml);
 			uint Counter = LocalEndpoint.GetNextCounter();
 			bool Result = LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Xml, LocalEndpoint, RemoteEndpoint);
 
-			if (Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b)
+			if (SniffE2eInfo)
 				await Client.Information(DataXml);
 
 			return Result;
@@ -935,22 +946,40 @@ namespace Waher.Networking.XMPP.P2P
 		public virtual async Task<Tuple<string, string>> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
 			IE2eSymmetricCipher SymmetricCipher)
 		{
+			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
 			string EndpointReference = XML.Attribute(E2eElement, "r");
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(From, EndpointReference);
 			if (RemoteEndpoint is null)
+			{
+				if (SniffE2eInfo)
+					await Client.Error("Remote E2E endpoint not found. Unable to decrypt message.");
+
 				return null;
+			}
 
 			IE2eEndpoint LocalEndpoint = this.FindLocalEndpoint(RemoteEndpoint);
 			if (LocalEndpoint is null)
+			{
+				if (SniffE2eInfo)
+					await Client.Error("Local E2E endpoint matching remote endpoint not found. Unable to decrypt message.");
+				
 				return null;
+			}
 
 			IE2eSymmetricCipher Cipher = LocalEndpoint.DefaultSymmetricCipher;
 			if (!(SymmetricCipher is null) && Cipher.GetType() != SymmetricCipher.GetType())
 				Cipher = SymmetricCipher;
 
 			string Xml = Cipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
+			if (Xml is null)
+			{
+				if (SniffE2eInfo)
+					await Client.Error("Unable to decrypt message.");
+				
+				return null;
+			}
 
-			if (!(Xml is null) && Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b)
+			if (SniffE2eInfo)
 				await Client.Information(Xml);
 
 			return new Tuple<string, string>(Xml, EndpointReference);
@@ -1408,8 +1437,9 @@ namespace Waher.Networking.XMPP.P2P
 						await Client.SendMessage(QoS, Type, Id, To, CustomXml, Body, Subject, Language,
 							ThreadId, ParentThreadId, DeliveryCallback, State);
 					}
-					else 
+					else if (!(DeliveryCallback is null))   // null Callbacks are common, and should not result in a warning in sniffers.
 						await DeliveryCallback.Raise(Sender, new DeliveryEventArgs(State, false));
+
 				}, State);
 			}
 			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
@@ -1795,15 +1825,57 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="FullJID">Full JID of remote entity.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task SynchronizeE2e(string FullJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
+		public async Task SynchronizeE2e(string FullJID, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
-			return this.client.SendIqSet(FullJID, this.GetE2eXml(), async (Sender, e) =>
+			LinkedList<SynchRec> CallbackList;
+
+			lock (this.synchronizationTasks)
 			{
+				SynchRec Rec = new SynchRec()
+				{
+					Callback = Callback,
+					State = State
+				};
+
+				if (this.synchronizationTasks.TryGetValue(FullJID, out CallbackList))
+				{
+					CallbackList.AddLast(Rec);
+					return;
+				}
+
+				CallbackList = new LinkedList<SynchRec>();
+				CallbackList.AddLast(Rec);
+
+				this.synchronizationTasks[FullJID] = CallbackList;
+			}
+
+			await this.client.SendIqSet(FullJID, this.GetE2eXml(), async (Sender, e) =>
+			{
+				lock (this.synchronizationTasks)
+				{
+					if (!this.synchronizationTasks.TryGetValue(FullJID, out CallbackList))
+						return;
+
+					this.synchronizationTasks.Remove(FullJID);
+				}
+
 				if (e.Ok && !(e.FirstElement is null))
 					await this.ParseE2e(e.FirstElement, FullJID);
 
-				await Callback.Raise(Sender, e);
+				foreach (SynchRec Rec in CallbackList)
+				{
+					e.State = Rec.State;
+					await Rec.Callback.Raise(Sender, e);
+				}
 			}, State);
+		}
+
+		private readonly Dictionary<string, LinkedList<SynchRec>> synchronizationTasks = new Dictionary<string, LinkedList<SynchRec>>();
+
+		private class SynchRec
+		{
+			public EventHandlerAsync<IqResultEventArgs> Callback;
+			public object State;
 		}
 
 		private string GetE2eXml()

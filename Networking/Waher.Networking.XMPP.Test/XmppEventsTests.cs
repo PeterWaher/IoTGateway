@@ -26,9 +26,9 @@ namespace Waher.Networking.XMPP.Test
 			DisposeSnifferAndLog();
 		}
 
-		public override void ConnectClients()
+		public override async Task ConnectClients()
 		{
-			base.ConnectClients();
+			await base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -58,9 +58,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Events_Test_01_LogEvent()
+		public async Task Events_Test_01_LogEvent()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -161,7 +161,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 	}

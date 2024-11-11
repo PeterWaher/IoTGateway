@@ -71,6 +71,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 			//this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
+			this.client.SetTag("ShowE2E", true);
 			this.client.OnConnectionError += this.Client_OnConnectionError;
 			this.client.OnError += this.Client_OnError;
 			this.client.OnStateChanged += this.Client_OnStateChanged;

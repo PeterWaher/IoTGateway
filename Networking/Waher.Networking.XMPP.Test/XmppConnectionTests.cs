@@ -60,6 +60,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
+			this.client.SetTag("ShowE2E", true);
 			this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
 			this.client.OnConnectionError += this.Client_OnConnectionError;
@@ -229,6 +230,7 @@ namespace Waher.Networking.XMPP.Test
 			await this.Connection_Test_03_Disconnect();
 
 			this.client = new XmppClient("waher.se", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
+			this.client.SetTag("ShowE2E", true);
 			this.client.OnConnectionError += this.Client_OnConnectionError;
 			this.client.OnError += this.Client_OnError;
 			this.client.OnStateChanged += this.Client_OnStateChanged;

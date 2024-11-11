@@ -22,9 +22,9 @@ namespace Waher.Networking.XMPP.Test
 			DisposeSnifferAndLog();
 		}
 
-		public override void ConnectClients()
+		public override async Task ConnectClients()
 		{
-			base.ConnectClients();
+			await base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -51,9 +51,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Interoperability_Test_01_GetInterfaces()
+		public async Task Interoperability_Test_01_GetInterfaces()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				string[] Interfaces = this.interopClient.GetInterfaces(this.client2.FullJID, 10000);
@@ -66,7 +66,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 	}

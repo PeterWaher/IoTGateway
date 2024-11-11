@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		private HttpxServer httpxServer;
 
 		[TestInitialize]
-		public void TestInitialize()
+		public async Task TestInitialize()
 		{
 			this.webServer = new HttpServer(8081);
 
@@ -65,14 +65,16 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 				await Response.SendResponse();
 			});
 
-			this.ConnectClients();
+			await this.ConnectClients();
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			this.webServer?.Dispose();
 			this.webServer = null;
+
+			await this.DisposeClients();
 		}
 
 		public override void PrepareClient1(XmppClient Client)

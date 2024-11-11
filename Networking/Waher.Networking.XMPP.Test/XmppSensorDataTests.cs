@@ -30,9 +30,9 @@ namespace Waher.Networking.XMPP.Test
 			DisposeSnifferAndLog();
 		}
 
-		public override void ConnectClients()
+		public override async Task ConnectClients()
 		{
-			base.ConnectClients();
+			await base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -42,11 +42,11 @@ namespace Waher.Networking.XMPP.Test
 
 			this.temp = 12.3;
 
-			this.sensorServer.OnExecuteReadoutRequest += (Sender, e) =>
+			this.sensorServer.OnExecuteReadoutRequest += async (Sender, e) =>
 			{
 				DateTime Now = DateTime.Now;
 
-				e.ReportFields(true,
+				await e.ReportFields(true,
 					new QuantityField(ThingReference.Empty, Now, "Temperature", this.temp, 1, "C", FieldType.Momentary, FieldQoS.AutomaticReadout),
 					new BooleanField(ThingReference.Empty, Now, "Bool", true, FieldType.Momentary, FieldQoS.AutomaticReadout),
 					new DateField(ThingReference.Empty, Now, "Date", DateTime.Today, FieldType.Momentary, FieldQoS.AutomaticReadout),
@@ -57,8 +57,6 @@ namespace Waher.Networking.XMPP.Test
 					new Int64Field(ThingReference.Empty, Now, "Int64", long.MinValue, FieldType.Momentary, FieldQoS.AutomaticReadout),
 					new StringField(ThingReference.Empty, Now, "String", "Hello world.", FieldType.Momentary, FieldQoS.AutomaticReadout),
 					new TimeField(ThingReference.Empty, Now, "Time", Now.TimeOfDay, FieldType.Momentary, FieldQoS.AutomaticReadout));
-
-				return Task.CompletedTask;
 			};
 		}
 
@@ -82,7 +80,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_01_ReadAll()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -121,7 +119,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_02_Subscribe_MaxInterval()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				TaskCompletionSource<bool> Result = new();
@@ -165,7 +163,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_03_Subscribe_ChangeBy()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -230,7 +228,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_04_Subscribe_ChangeUp()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -284,7 +282,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_05_Subscribe_ChangeDown()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -338,7 +336,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_06_Subscribe_MinInterval()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -406,7 +404,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task SensorData_Test_07_Unsubscribe()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);

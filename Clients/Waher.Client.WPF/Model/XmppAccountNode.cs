@@ -1712,10 +1712,15 @@ namespace Waher.Client.WPF.Model
 
 		private void ServerlessMessaging_OnResynch(object _, ResynchEventArgs e)
 		{
-			this.e2eEncryption?.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
+			if (this.e2eEncryption is null)
+				e.Done(false);
+			else
 			{
-				return e.Done(e2.Ok);
-			});
+				this.e2eEncryption.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
+				{
+					return e.Done(e2.Ok);
+				});
+			}
 		}
 
 		internal void ReregisterView(string SessionId, RemoteDesktopView View)

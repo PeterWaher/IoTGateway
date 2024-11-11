@@ -30,9 +30,9 @@ namespace Waher.Networking.XMPP.Test
 		private SynchronizationClient synchronizationClient1;
 		private SynchronizationClient synchronizationClient2;
 
-		public override void ConnectClients()
+		public override async Task ConnectClients()
 		{
-			base.ConnectClients();
+			await base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_01_Measure()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			await this.Measure(this.client2.FullJID);
 		}
 
@@ -80,24 +80,24 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Control_Test_02_Monitor_30()
+		public async Task Control_Test_02_Monitor_30()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor(this.client2.FullJID, 30, 1000, "Monitor30.tsv");
 		}
 
 		[TestMethod]
-		public void Control_Test_03_Monitor_200()
+		public async Task Control_Test_03_Monitor_200()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor(this.client2.FullJID, 200, 1000, "Monitor200.tsv");
 		}
 
 		[TestMethod]
 		[Ignore]
-		public void Control_Test_04_Monitor_1000()
+		public async Task Control_Test_04_Monitor_1000()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor(this.client2.FullJID, 1000, 1000, "Monitor1000.tsv");
 		}
 
@@ -242,58 +242,58 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Control_Test_06_Measure_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			await this.Measure("waher.se");
 		}
 
 		[TestMethod]
-		public void Control_Test_07_Monitor_30_Server()
+		public async Task Control_Test_07_Monitor_30_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor("waher.se", 30, 1000, "Monitor30Server.tsv");
 		}
 
 		[TestMethod]
-		public void Control_Test_08_Monitor_200_Server()
+		public async Task Control_Test_08_Monitor_200_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor("waher.se", 200, 1000, "Monitor200Server.tsv");
 		}
 
 		[TestMethod]
 		[Ignore]
-		public void Control_Test_09_Monitor_1000_Server()
+		public async Task Control_Test_09_Monitor_1000_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor("waher.se", 1000, 1000, "Monitor1000Server.tsv");
 		}
 
 		[TestMethod]
 		public async Task Control_Test_10_Measure_Federated_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			await this.Measure("cybercity.online");
 		}
 
 		[TestMethod]
-		public void Control_Test_11_Monitor_30_Federated_Server()
+		public async Task Control_Test_11_Monitor_30_Federated_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor("cybercity.online", 30, 1000, "Monitor30FederatedServer.tsv");
 		}
 
 		[TestMethod]
-		public void Control_Test_12_Monitor_200_Federated_Server()
+		public async Task Control_Test_12_Monitor_200_Federated_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor("cybercity.online", 200, 1000, "Monitor200FederatedServer.tsv");
 		}
 
 		[TestMethod]
 		[Ignore]
-		public void Control_Test_13_Monitor_1000_Federated_Server()
+		public async Task Control_Test_13_Monitor_1000_Federated_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.Monitor("cybercity.online", 1000, 1000, "Monitor1000FederatedServer.tsv");
 		}
 

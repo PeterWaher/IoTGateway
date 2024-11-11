@@ -49,9 +49,9 @@ namespace Waher.Networking.XMPP.Test
 			DisposeSnifferAndLog();
 		}
 
-		public override void ConnectClients()
+		public override async Task ConnectClients()
 		{
-			base.ConnectClients();
+			await base.ConnectClients();
 
 			Assert.AreEqual(XmppState.Connected, this.client1.State);
 			Assert.AreEqual(XmppState.Connected, this.client2.State);
@@ -111,9 +111,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Control_Test_01_Bool()
+		public async Task Control_Test_01_Bool()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -121,7 +121,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.b = false;
 
-				this.controlClient.Set(this.client2.FullJID, "Bool", true, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Bool", true, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -136,14 +136,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_02_Color()
+		public async Task Control_Test_02_Color()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -151,7 +151,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.cl = new ColorReference(0, 0, 0);
 
-				this.controlClient.Set(this.client2.FullJID, "Color", new ColorReference(1, 2, 3), (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Color", new ColorReference(1, 2, 3), (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -168,14 +168,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_03_Date()
+		public async Task Control_Test_03_Date()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -183,7 +183,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.d = DateTime.MinValue;
 
-				this.controlClient.Set(this.client2.FullJID, "Date", DateTime.Today, true, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Date", DateTime.Today, true, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -198,14 +198,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_04_DateTime()
+		public async Task Control_Test_04_DateTime()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -216,7 +216,7 @@ namespace Waher.Networking.XMPP.Test
 
 				Now = new DateTime(Now.Year, Now.Month, Now.Day, Now.Hour, Now.Minute, Now.Second, Now.Millisecond);
 
-				this.controlClient.Set(this.client2.FullJID, "DateTime", Now, false, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "DateTime", Now, false, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -231,14 +231,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_05_Double()
+		public async Task Control_Test_05_Double()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.db = 0;
 
-				this.controlClient.Set(this.client2.FullJID, "Double", 3.1415927, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Double", 3.1415927, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -261,14 +261,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_06_Duration()
+		public async Task Control_Test_06_Duration()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -276,7 +276,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.dr = Duration.Zero;
 
-				this.controlClient.Set(this.client2.FullJID, "Duration", new Duration(true, 1, 2, 3, 4, 5, 6), (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Duration", new Duration(true, 1, 2, 3, 4, 5, 6), (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -291,14 +291,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_07_Enum()
+		public async Task Control_Test_07_Enum()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -306,7 +306,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.e = TypeCode.Boolean;
 
-				this.controlClient.Set(this.client2.FullJID, "Enum", TypeCode.Int16, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Enum", TypeCode.Int16, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -321,14 +321,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_08_Int32()
+		public async Task Control_Test_08_Int32()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -336,7 +336,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.i = 0;
 
-				this.controlClient.Set(this.client2.FullJID, "Int32", int.MinValue, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Int32", int.MinValue, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -351,14 +351,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_09_Int64()
+		public async Task Control_Test_09_Int64()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -366,7 +366,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.l = 0;
 
-				this.controlClient.Set(this.client2.FullJID, "Int64", long.MinValue, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Int64", long.MinValue, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -381,14 +381,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_10_String()
+		public async Task Control_Test_10_String()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -396,7 +396,7 @@ namespace Waher.Networking.XMPP.Test
 
 				this.s = string.Empty;
 
-				this.controlClient.Set(this.client2.FullJID, "String", "ABC", (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "String", "ABC", (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -411,14 +411,14 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 
 		[TestMethod]
-		public void Control_Test_11_Time()
+		public async Task Control_Test_11_Time()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -427,7 +427,7 @@ namespace Waher.Networking.XMPP.Test
 				TimeSpan Time = DateTime.Now.TimeOfDay;
 				this.t = TimeSpan.Zero;
 
-				this.controlClient.Set(this.client2.FullJID, "Time", Time, (Sender, e) =>
+				await this.controlClient.Set(this.client2.FullJID, "Time", Time, (Sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
@@ -442,7 +442,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 			finally
 			{
-				this.DisposeClients();
+				await this.DisposeClients();
 			}
 		}
 

@@ -2386,7 +2386,10 @@ namespace Waher.Networking.XMPP
 
 		private Task DeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
 		{
-			return Callback.Raise(this, new DeliveryEventArgs(State, Ok));
+			if (Callback is null)
+				return Task.CompletedTask;  // Do not call Raise. null Callbacks are common, and should not result in a warning in sniffers.
+			else
+				return Callback.Raise(this, new DeliveryEventArgs(State, Ok));
 		}
 
 		/// <summary>

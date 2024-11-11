@@ -6,8 +6,20 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 {
     [TestClass]
     public class Rsa1024Tests : XmppE2eTests
-    {
-        public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
+	{
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
+		}
+
+		public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
         {
             RSA RSA = RSACryptoServiceProvider.Create();
             RSA.KeySize = 1024;

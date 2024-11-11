@@ -58,7 +58,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		public virtual void ConnectClients()
+		public virtual async Task ConnectClients()
 		{
 			this.connected1.Reset();
 			this.error1.Reset();
@@ -79,16 +79,18 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-            this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
+			this.client1.SetTag("ShowE2E", true);
+			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 			this.client1.Add(xmlSniffer);
             this.client1.OnConnectionError += this.Client_OnConnectionError1;
 			this.client1.OnError += this.Client_OnError1;
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;
+			await this.client1.Information("Starting test, client 1...");
 
 			this.PrepareClient1(this.client1);
 
-			this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
-			this.client1.Connect();
+			await this.client1.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Live and well"));
+			await this.client1.Connect();
 
 			this.WaitConnected1(5000);
 
@@ -100,14 +102,16 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-            this.client2.OnConnectionError += this.Client_OnConnectionError2;
+			this.client2.SetTag("ShowE2E", true);
+			this.client2.OnConnectionError += this.Client_OnConnectionError2;
 			this.client2.OnError += this.Client_OnError2;
 			this.client2.OnStateChanged += this.Client_OnStateChanged2;
+			await this.client2.Information("Starting test, client 2...");
+
+			this.PrepareClient2(this.client2);
 			
-            this.PrepareClient2(this.client2);
-			
-			this.client2.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Ready to chat."));
-			this.client2.Connect();
+			await this.client2.SetPresence(Availability.Chat, new KeyValuePair<string, string>("en", "Ready to chat."));
+			await this.client2.Connect();
 
 			this.WaitConnected2(5000);
         }
@@ -260,12 +264,14 @@ namespace Waher.Networking.XMPP.Test
 		{
 			if (this.client1 is not null)
 			{
+				await this.client1.Information("Stopping test, client 1...");
 				await this.client1.DisposeAsync();
 				this.client1 = null;
 			}
 
 			if (this.client2 is not null)
 			{
+				await this.client2.Information("Stopping test, client 2...");
 				await this.client2.DisposeAsync();
 				this.client2 = null;
 			}

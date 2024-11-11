@@ -4355,18 +4355,18 @@ namespace Waher.Networking.XMPP.Concentrator
 				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
 				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-			else if (!(Node is ICommunicationLayer Sniffable))
+			else if (!(Node is ICommunicationLayer ComLayer))
 				await e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{
 				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1)).ToUniversalTime();
-				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this.client, e.Query.NamespaceURI);
+				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, ComLayer, this.client, e.Query.NamespaceURI);
 				DateTime MaxExpires = DateTime.UtcNow.AddDays(1);
 
 				if (Expires > MaxExpires)
 					Expires = MaxExpires;
 
-				Sniffable.Add(Sniffer);
+				ComLayer.Add(Sniffer);
 
 				StringBuilder Xml = new StringBuilder();
 
@@ -4405,19 +4405,19 @@ namespace Waher.Networking.XMPP.Concentrator
 				await e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			else if (!await Node.CanEditAsync(Caller))
 				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
-			else if (!(Node is ICommunicationLayer Sniffable))
+			else if (!(Node is ICommunicationLayer ComLayer))
 				await e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{
 				string Id = XML.Attribute(e.Query, "snifferId");
 
-				if (Sniffable.HasSniffers)
+				if (ComLayer.HasSniffers)
 				{
-					foreach (ISniffer Sniffer in Sniffable.Sniffers)
+					foreach (ISniffer Sniffer in ComLayer.Sniffers)
 					{
 						if (Sniffer is RemoteSniffer RemoteSniffer && RemoteSniffer.Id == Id)
 						{
-							Sniffable.Remove(RemoteSniffer);
+							ComLayer.Remove(RemoteSniffer);
 
 							await e.IqResult(string.Empty);
 							return;

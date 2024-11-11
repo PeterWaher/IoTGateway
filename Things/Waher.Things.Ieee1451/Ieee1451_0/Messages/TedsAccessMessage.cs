@@ -26,10 +26,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
-		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
+		/// <param name="ComLayer">Sniffable interface on which the message was received.</param>
 		public TedsAccessMessage(NetworkServiceType NetworkServiceType, TedsAccessService TedsAccessService,
-			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer Sniffable)
-			: base(NetworkServiceType, (byte)TedsAccessService, MessageType, Body, Tail, Sniffable)
+			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer ComLayer)
+			: base(NetworkServiceType, (byte)TedsAccessService, MessageType, Body, Tail, ComLayer)
 		{
 			this.TedsAccessService = TedsAccessService;
 		}
@@ -96,7 +96,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				if (CheckChecksum && CheckSum != CheckSum2)
 					return (ErrorCode, null);
 
-				Binary TedsBlock = new Binary(Data, this.Sniffable, true);
+				Binary TedsBlock = new Binary(Data, this.ComLayer, true);
 				ParsingState State = new ParsingState();
 
 				this.data = Teds = new Teds(ChannelInfo, TedsBlock.ParseTedsRecords(State));
@@ -110,7 +110,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			catch (Exception ex)
 			{
 				if (this.HasSniffers)
-					await this.Sniffable.Exception(ex);
+					await this.ComLayer.Exception(ex);
 
 				return (0xffff, null);
 			}

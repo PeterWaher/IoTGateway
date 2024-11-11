@@ -214,7 +214,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					break;
 			}
 
-			Message Message = await Ieee1451Parser.TryParseMessage(Data, Content.Sniffable);
+			Message Message = await Ieee1451Parser.TryParseMessage(Data, Content.CommunicationLayer);
 			if (Message is null)
 				return DataProcessingResult.Processed;
 

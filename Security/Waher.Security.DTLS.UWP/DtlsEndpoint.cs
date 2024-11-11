@@ -27,7 +27,7 @@ namespace Waher.Security.DTLS
 		private Scheduler timeouts;
 		private readonly DtlsMode mode;
 		private RandomNumberGenerator rnd;
-		private ICommunicationLayer communicationLayer;
+		private ICommunicationLayer comLayer;
 		private readonly IUserSource users;
 		private readonly string requiredPrivilege;
 		private double probabilityPacketLoss = 0;
@@ -71,10 +71,10 @@ namespace Waher.Security.DTLS
 		/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
 		/// </summary>
 		/// <param name="Mode">DTLS Mode of operation.</param>
-		/// <param name="CommunicationLayer">Communication layer.</param>
+		/// <param name="ComLayer">Communication layer.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, params ISniffer[] Sniffers)
-			: this(Mode, CommunicationLayer, null, null, Sniffers)
+		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer ComLayer, params ISniffer[] Sniffers)
+			: this(Mode, ComLayer, null, null, Sniffers)
 		{
 		}
 
@@ -83,12 +83,12 @@ namespace Waher.Security.DTLS
 		/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
 		/// </summary>
 		/// <param name="Mode">DTLS Mode of operation.</param>
-		/// <param name="CommunicationLayer">Communication layer.</param>
+		/// <param name="ComLayer">Communication layer.</param>
 		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, IUserSource Users,
+		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer ComLayer, IUserSource Users,
 			params ISniffer[] Sniffers)
-			: this(Mode, CommunicationLayer, Users, null, Sniffers)
+			: this(Mode, ComLayer, Users, null, Sniffers)
 		{
 		}
 
@@ -97,12 +97,12 @@ namespace Waher.Security.DTLS
 		/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
 		/// </summary>
 		/// <param name="Mode">DTLS Mode of operation.</param>
-		/// <param name="CommunicationLayer">Communication layer.</param>
+		/// <param name="ComLayer">Communication layer.</param>
 		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
 		/// <param name="RequiredPrivilege">Required privilege, for the user to be acceptable
 		/// in PSK handshakes.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, IUserSource Users,
+		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer ComLayer, IUserSource Users,
 			string RequiredPrivilege, params ISniffer[] Sniffers)
 		: base(false, Sniffers)
 		{
@@ -115,8 +115,8 @@ namespace Waher.Security.DTLS
 
 			this.states.Removed += this.States_Removed;
 
-			this.communicationLayer = CommunicationLayer;
-			this.communicationLayer.PacketReceived += this.DataReceived;
+			this.comLayer = ComLayer;
+			this.comLayer.PacketReceived += this.DataReceived;
 		}
 
 		private async Task States_Removed(object Sender, CacheItemEventArgs<object, EndpointState> e)
@@ -178,10 +178,10 @@ namespace Waher.Security.DTLS
 				this.states = null;
 			}
 
-			if (!(this.communicationLayer is null))
+			if (!(this.comLayer is null))
 			{
-				this.communicationLayer.PacketReceived -= this.DataReceived;
-				this.communicationLayer = null;
+				this.comLayer.PacketReceived -= this.DataReceived;
+				this.comLayer = null;
 			}
 
 			if (!(this.rnd is null))
@@ -1147,7 +1147,7 @@ namespace Waher.Security.DTLS
 				await this.TransmitBinary(Record);
 
 				if (this.probabilityPacketLoss == 0 || !this.PacketLost())
-					await this.communicationLayer.SendPacket(Record, State.remoteEndpoint);
+					await this.comLayer.SendPacket(Record, State.remoteEndpoint);
 				else if (this.HasSniffers)
 					await this.Warning(DateTime.Now.ToString("T") + " Transmitted packet lost.");
 

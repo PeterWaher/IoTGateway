@@ -15,10 +15,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
-		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
+		/// <param name="ComLayer">Sniffable interface on which the message was received.</param>
 		public EventNotificationMessage(NetworkServiceType NetworkServiceType, EventNotificationService EventNotificationService, 
-			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer Sniffable)
-			: base(NetworkServiceType, (byte)EventNotificationService, MessageType, Body, Tail, Sniffable)
+			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer ComLayer)
+			: base(NetworkServiceType, (byte)EventNotificationService, MessageType, Body, Tail, ComLayer)
 		{
 			this.EventNotificationService = EventNotificationService;
 		}

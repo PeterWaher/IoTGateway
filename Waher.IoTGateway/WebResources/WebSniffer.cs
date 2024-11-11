@@ -21,7 +21,7 @@ namespace Waher.IoTGateway.WebResources
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private readonly DateTime created = DateTime.Now;
 		private readonly DateTime expires;
-		private readonly ICommunicationLayer sniffable;
+		private readonly ICommunicationLayer comLayer;
 		private readonly string[] privileges;
 		private readonly string userVariable;
 		private readonly string resource;
@@ -38,23 +38,23 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="PageResource">Resource of page displaying the sniffer.</param>
 		/// <param name="MaxLife">Maximum life of sniffer.</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="ComLayer">Object being sniffed</param>
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
-		public WebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife, BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer Sniffable,
+		public WebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife, BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer ComLayer,
 			string UserVariable, params string[] Privileges)
 			: base()
 		{
 			this.expires = DateTime.Now.Add(MaxLife);
-			this.sniffable = Sniffable;
+			this.comLayer = ComLayer;
 			this.snifferId = SnifferId;
 			this.resource = PageResource;
 			this.binaryPresentationMethod = BinaryPresentationMethod;
 			this.tabIds = null;
 			this.userVariable = UserVariable;
 			this.privileges = Privileges;
-			this.feedbackCheck = Sniffable is HttpServer;
+			this.feedbackCheck = ComLayer is HttpServer;
 
 			if (this.feedbackCheck)
 				this.outgoing = new Cache<string, bool>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), true);
@@ -144,7 +144,7 @@ namespace Waher.IoTGateway.WebResources
 		private async Task Close()
 		{
 			await this.Push(DateTime.Now, "Sniffer closed.", "Information", false);
-			this.sniffable.Remove(this);
+			this.comLayer.Remove(this);
 			this.Dispose();
 		}
 

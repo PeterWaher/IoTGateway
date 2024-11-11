@@ -404,12 +404,12 @@ namespace Waher.Content.Markdown
 					{
 						UsesImplicitPrint = true;
 
+						if (!FromScript)
+							await Variables.LockAsync();
+
 						ValuePrinter PrinterBak = Variables.Printer;
 						TextWriter Bak = Variables.ConsoleOut;
 						StringBuilder sb = new StringBuilder();
-
-						if (!FromScript)
-							await Variables.LockAsync();
 
 						Variables.ConsoleOut = new StringWriter(sb);
 						Variables.Printer = PrintMarkdown;
@@ -419,7 +419,7 @@ namespace Waher.Content.Markdown
 						}
 						finally
 						{
-							Variables.ConsoleOut.Flush();
+							Variables.ConsoleOut?.Flush();
 							Variables.ConsoleOut = Bak;
 							Variables.Printer = PrinterBak;
 

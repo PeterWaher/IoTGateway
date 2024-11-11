@@ -188,7 +188,7 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender)
 		{
-			return Raise(EventHandler, Sender, EventArgs.Empty, Sender.DecoupledEvents);
+			return Raise(EventHandler, Sender, EventArgs.Empty, Sender?.DecoupledEvents ?? false);
 		}
 
 		/// <summary>
@@ -213,7 +213,7 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e)
 		{
-			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
 
 		/// <summary>
@@ -228,7 +228,7 @@ namespace Waher.Networking
 		public static async Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(Sender, e);
+				await Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
 				Task _ = Task.Run(async () =>
@@ -241,13 +241,16 @@ namespace Waher.Networking
 					{
 						Log.Exception(ex);
 
-						try
+						if (!(Sender is null))
 						{
-							await Sender.Exception(ex);
-						}
-						catch (Exception ex2)
-						{
-							Log.Exception(ex2);
+							try
+							{
+								await Sender.Exception(ex);
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
 						}
 					}
 				});
@@ -263,7 +266,10 @@ namespace Waher.Networking
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-					await Sender.Exception(ex);
+
+					if (!(Sender is null))
+						await Sender.Exception(ex);
+
 					return false;
 				}
 			}
@@ -274,11 +280,13 @@ namespace Waher.Networking
 		/// <summary>
 		/// Shows a warning in sniffers that an event handler is not registered.
 		/// </summary>
-		/// <param name="Sniffable">Sniffable object.</param>
 		/// <param name="Sender">Sender of event.</param>
 		/// <param name="e">Event arguments.</param>
-		private static Task NoEventHandlerWarning(this ICommunicationLayer Sniffable, object Sender, object e)
+		private static Task NoEventHandlerWarning(this ICommunicationLayer Sender, object e)
 		{
+			if (Sender is null)
+				return Task.CompletedTask;
+
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("No event handler registered (");
@@ -292,7 +300,7 @@ namespace Waher.Networking
 			sb.Append(e.GetType().FullName);
 			sb.Append(")");
 
-			return Sniffable.Warning(sb.ToString());
+			return Sender.Warning(sb.ToString());
 		}
 
 		/// <summary>
@@ -304,7 +312,7 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e)
 		{
-			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
 
 		/// <summary>
@@ -319,7 +327,7 @@ namespace Waher.Networking
 		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(Sender, e);
+				await Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
 				Task _ = Task.Run(async () =>
@@ -332,13 +340,16 @@ namespace Waher.Networking
 					{
 						Log.Exception(ex);
 
-						try
+						if (!(Sender is null))
 						{
-							await Sender.Exception(ex);
-						}
-						catch (Exception ex2)
-						{
-							Log.Exception(ex2);
+							try
+							{
+								await Sender.Exception(ex);
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
 						}
 					}
 				});
@@ -354,7 +365,10 @@ namespace Waher.Networking
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-					await Sender.Exception(ex);
+
+					if (!(Sender is null))
+						await Sender.Exception(ex);
+
 					return false;
 				}
 			}
@@ -514,7 +528,7 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender)
 		{
-			return Raise(EventHandler, Sender, EventArgs.Empty, Sender.DecoupledEvents);
+			return Raise(EventHandler, Sender, EventArgs.Empty, Sender?.DecoupledEvents ?? false);
 		}
 
 		/// <summary>
@@ -539,7 +553,7 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e)
 		{
-			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
 
 		/// <summary>
@@ -554,7 +568,7 @@ namespace Waher.Networking
 		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(Sender, e);
+				await Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
 				Task _ = Task.Run(async () =>
@@ -567,13 +581,16 @@ namespace Waher.Networking
 					{
 						Log.Exception(ex);
 
-						try
+						if (!(Sender is null))
 						{
-							await Sender.Exception(ex);
-						}
-						catch (Exception ex2)
-						{
-							Log.Exception(ex2);
+							try
+							{
+								await Sender.Exception(ex);
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
 						}
 					}
 				});
@@ -589,7 +606,10 @@ namespace Waher.Networking
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-					await Sender.Exception(ex);
+
+					if (!(Sender is null))
+						await Sender.Exception(ex);
+
 					return false;
 				}
 			}
@@ -606,7 +626,7 @@ namespace Waher.Networking
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
 		public static Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e)
 		{
-			return EventHandler.Raise(Sender, e, Sender.DecoupledEvents);
+			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
 
 		/// <summary>
@@ -621,7 +641,7 @@ namespace Waher.Networking
 		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(Sender, e);
+				await Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
 				Task _ = Task.Run(async () =>
@@ -634,13 +654,16 @@ namespace Waher.Networking
 					{
 						Log.Exception(ex);
 
-						try
+						if (!(Sender is null))
 						{
-							await Sender.Exception(ex);
-						}
-						catch (Exception ex2)
-						{
-							Log.Exception(ex2);
+							try
+							{
+								await Sender.Exception(ex);
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
 						}
 					}
 				});
@@ -656,7 +679,10 @@ namespace Waher.Networking
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-					await Sender.Exception(ex);
+
+					if (!(Sender is null))
+						await Sender.Exception(ex);
+
 					return false;
 				}
 			}

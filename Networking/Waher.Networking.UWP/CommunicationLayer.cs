@@ -15,7 +15,7 @@ namespace Waher.Networking
 	public delegate Task<string> TextSnifferEvent(string Text);
 
 	/// <summary>
-	/// Simple abstract base class for sniffable nodes.
+	/// Simple base class for classes implementing communication protocols.
 	/// </summary>
 	public class CommunicationLayer : ICommunicationLayer
 	{
@@ -25,7 +25,7 @@ namespace Waher.Networking
 		private bool hasSniffers;
 
 		/// <summary>
-		/// Simple abstract base class for sniffable nodes.
+		/// Simple base class for classes implementing communication protocols.
 		/// </summary>
 		/// <param name="DecoupledEvents">If events raised from the communication 
 		/// layer are decoupled, i.e. executed in parallel with the source that raised 

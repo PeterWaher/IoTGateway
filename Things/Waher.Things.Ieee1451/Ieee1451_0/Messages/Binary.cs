@@ -32,15 +32,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// IEEE 1451.0 Message
 		/// </summary>
 		/// <param name="Body">Binary Body</param>
-		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
+		/// <param name="ComLayer">Sniffable interface on which the message was received.</param>
 		/// <param name="MultiRow">If sniffer output should be on multiple rows (true) or a single row (false).</param>
-		public Binary(byte[] Body, ICommunicationLayer Sniffable, bool MultiRow)
+		public Binary(byte[] Body, ICommunicationLayer ComLayer, bool MultiRow)
 		{
 			this.Body = Body;
 			this.len = this.Body.Length;
 
-			this.Sniffable = Sniffable;
-			this.hasSniffer = Sniffable?.HasSniffers ?? false;
+			this.ComLayer = ComLayer;
+			this.hasSniffer = ComLayer?.HasSniffers ?? false;
 			this.snifferOutput = this.hasSniffer ? new StringBuilder() : null;
 			this.multiRow = MultiRow;
 			this.containerPacket = null;
@@ -56,7 +56,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			this.Body = Body;
 			this.len = this.Body.Length;
 
-			this.Sniffable = ContainerPacket.Sniffable;
+			this.ComLayer = ContainerPacket.ComLayer;
 			this.hasSniffer = ContainerPacket.hasSniffer;
 			this.snifferOutput = ContainerPacket.snifferOutput;
 			this.multiRow = ContainerPacket.multiRow;
@@ -72,12 +72,12 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Sniffable interface on which the message was received.
 		/// </summary>
-		public ICommunicationLayer Sniffable { get; }
+		public ICommunicationLayer ComLayer { get; }
 
 		/// <summary>
 		/// If sniffers are available.
 		/// </summary>
-		public bool HasSniffers => this.Sniffable?.HasSniffers ?? false;
+		public bool HasSniffers => this.ComLayer?.HasSniffers ?? false;
 
 		/// <summary>
 		/// Current position.
@@ -112,7 +112,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					this.snifferOutput.Clear();
 					this.firstOutput = true;
 				
-					return this.Sniffable.Information(s);
+					return this.ComLayer.Information(s);
 				}
 			}
 
@@ -982,7 +982,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					}
 				}
 
-				Binary RecordData = new Binary(RawValue, this.Sniffable, false);
+				Binary RecordData = new Binary(RawValue, this.ComLayer, false);
 				TedsRecord Record = FieldType.Parse(RecordTypeId, RecordData, State);
 				if (Record is TedsId TedsId)
 				{

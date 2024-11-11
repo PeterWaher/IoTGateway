@@ -4878,14 +4878,14 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="SnifferId">Sniffer ID</param>
 		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
-		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="ComLayer">Object being sniffed</param>
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
 		/// <returns>Web Sniffer Markdown.</returns>
-		public static string AddWebSniffer(string SnifferId, HttpRequest Request, ICommunicationLayer Sniffable, string UserVariable, params string[] Privileges)
+		public static string AddWebSniffer(string SnifferId, HttpRequest Request, ICommunicationLayer ComLayer, string UserVariable, params string[] Privileges)
 		{
-			return AddWebSniffer(SnifferId, Request, BinaryPresentationMethod.ByteCount, Sniffable, UserVariable, Privileges);
+			return AddWebSniffer(SnifferId, Request, BinaryPresentationMethod.ByteCount, ComLayer, UserVariable, Privileges);
 		}
 
 		/// <summary>
@@ -4894,15 +4894,15 @@ namespace Waher.IoTGateway
 		/// <param name="SnifferId">Sniffer ID</param>
 		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="ComLayer">Object being sniffed</param>
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
 		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, HttpRequest Request, BinaryPresentationMethod BinaryPresentationMethod,
-			ICommunicationLayer Sniffable, string UserVariable, params string[] Privileges)
+			ICommunicationLayer ComLayer, string UserVariable, params string[] Privileges)
 		{
-			return AddWebSniffer(SnifferId, Request, TimeSpan.FromHours(1), BinaryPresentationMethod, Sniffable, UserVariable, Privileges);
+			return AddWebSniffer(SnifferId, Request, TimeSpan.FromHours(1), BinaryPresentationMethod, ComLayer, UserVariable, Privileges);
 		}
 
 		/// <summary>
@@ -4912,20 +4912,20 @@ namespace Waher.IoTGateway
 		/// <param name="Request">Current HTTP request fetching a page displaying the sniffer.</param>
 		/// <param name="MaxLife">Maximum life of sniffer.</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="ComLayer">Object being sniffed</param>
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
 		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, HttpRequest Request, TimeSpan MaxLife,
-			BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer Sniffable, string UserVariable, params string[] Privileges)
+			BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer ComLayer, string UserVariable, params string[] Privileges)
 		{
 			string Resource = Request.Header.ResourcePart;
 			int i = Resource.IndexOfAny(new char[] { '?', '#' });
 			if (i > 0)
 				Resource = Resource.Substring(0, i);
 
-			return AddWebSniffer(SnifferId, Resource, MaxLife, BinaryPresentationMethod, Sniffable, UserVariable, Privileges);
+			return AddWebSniffer(SnifferId, Resource, MaxLife, BinaryPresentationMethod, ComLayer, UserVariable, Privileges);
 		}
 
 		/// <summary>
@@ -4935,17 +4935,17 @@ namespace Waher.IoTGateway
 		/// <param name="PageResource">Resource of page displaying the sniffer.</param>
 		/// <param name="MaxLife">Maximum life of sniffer.</param>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		/// <param name="Sniffable">Object being sniffed</param>
+		/// <param name="ComLayer">Object being sniffed</param>
 		/// <param name="UserVariable">Event is only pushed to clients with a session contining a variable 
 		/// named <paramref name="UserVariable"/> having a value derived from <see cref="IUser"/>.</param>
 		/// <param name="Privileges">Event is only pushed to clients with a user variable having the following set of privileges.</param>
 		/// <returns>Web Sniffer Markdown.</returns>
 		public static string AddWebSniffer(string SnifferId, string PageResource, TimeSpan MaxLife,
-			BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer Sniffable, string UserVariable, params string[] Privileges)
+			BinaryPresentationMethod BinaryPresentationMethod, ICommunicationLayer ComLayer, string UserVariable, params string[] Privileges)
 		{
 			bool Found = false;
 
-			foreach (ISniffer Sniffer in Sniffable)
+			foreach (ISniffer Sniffer in ComLayer)
 			{
 				if (Sniffer is WebSniffer WebSniffer && WebSniffer.SnifferId == SnifferId)
 				{
@@ -4956,8 +4956,8 @@ namespace Waher.IoTGateway
 
 			if (!Found)
 			{
-				WebSniffer Sniffer = new WebSniffer(SnifferId, PageResource, MaxLife, BinaryPresentationMethod, Sniffable, UserVariable, Privileges);
-				Sniffable.Add(Sniffer);
+				WebSniffer Sniffer = new WebSniffer(SnifferId, PageResource, MaxLife, BinaryPresentationMethod, ComLayer, UserVariable, Privileges);
+				ComLayer.Add(Sniffer);
 			}
 
 			return "\r\n\r\n![Sniffer](/Sniffers/Sniffer.md)\r\n\r\n";

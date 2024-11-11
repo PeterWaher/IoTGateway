@@ -6,8 +6,7 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking
 {
 	/// <summary>
-	/// Interface for sniffable classes. Sniffable classes can receive <see cref="ISniffer"/> objects that eavesdrop on communication being performed
-	/// at the node.
+	/// Interface for classes implementing communication protocols. 
 	/// </summary>
 	public interface ICommunicationLayer : IEnumerable<ISniffer>
 	{

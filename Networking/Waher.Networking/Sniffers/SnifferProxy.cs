@@ -8,24 +8,24 @@ namespace Waher.Networking.Sniffers
     /// </summary>
     public class SnifferProxy : ISniffer
 	{
-		private readonly ICommunicationLayer sniffable;
+		private readonly ICommunicationLayer comLayer;
 
 		/// <summary>
 		/// A sniffer that redirects incoming events to another sniffable object.
 		/// </summary>
-		/// <param name="Sniffable">Sniffable object to receive incoming sniffer events.</param>
-		public SnifferProxy(ICommunicationLayer Sniffable)
+		/// <param name="ComLayer">Sniffable object to receive incoming sniffer events.</param>
+		public SnifferProxy(ICommunicationLayer ComLayer)
 		{
-			if (Sniffable is null)
-				throw new ArgumentNullException(nameof(Sniffable));
+			if (ComLayer is null)
+				throw new ArgumentNullException(nameof(ComLayer));
 
-			this.sniffable = Sniffable;
+			this.comLayer = ComLayer;
 		}
 
 		/// <summary>
 		/// Object receiving incoming sniffer events.
 		/// </summary>
-		public ICommunicationLayer Sniffable => this.sniffable;
+		public ICommunicationLayer CommunicationLayer => this.comLayer;
 
 		/// <summary>
 		/// Called when binary data has been received.
@@ -33,7 +33,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Data">Binary Data.</param>
 		public Task ReceiveBinary(byte[] Data)
 		{
-			return this.sniffable.ReceiveBinary(Data);
+			return this.comLayer.ReceiveBinary(Data);
 		}
 
 		/// <summary>
@@ -43,7 +43,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Data">Binary Data.</param>
 		public Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			return this.sniffable.ReceiveBinary(Timestamp, Data);
+			return this.comLayer.ReceiveBinary(Timestamp, Data);
 		}
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Data">Binary Data.</param>
 		public Task TransmitBinary(byte[] Data)
 		{
-			return this.sniffable.TransmitBinary(Data);
+			return this.comLayer.TransmitBinary(Data);
 		}
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Data">Binary Data.</param>
 		public Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			return this.sniffable.TransmitBinary(Timestamp, Data);
+			return this.comLayer.TransmitBinary(Timestamp, Data);
 		}
 
 		/// <summary>
@@ -71,7 +71,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public Task ReceiveText(string Text)
 		{
-			return this.sniffable.ReceiveText(Text);
+			return this.comLayer.ReceiveText(Text);
 		}
 
 		/// <summary>
@@ -81,7 +81,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			return this.sniffable.ReceiveText(Timestamp, Text);
+			return this.comLayer.ReceiveText(Timestamp, Text);
 		}
 
 		/// <summary>
@@ -90,7 +90,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public Task TransmitText(string Text)
 		{
-			return this.sniffable.TransmitText(Text);
+			return this.comLayer.TransmitText(Text);
 		}
 
 		/// <summary>
@@ -100,7 +100,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Text">Text</param>
 		public Task TransmitText(DateTime Timestamp, string Text)
 		{
-			return this.sniffable.TransmitText(Timestamp, Text);
+			return this.comLayer.TransmitText(Timestamp, Text);
 		}
 
 		/// <summary>
@@ -109,7 +109,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Comment">Comment.</param>
 		public Task Information(string Comment)
 		{
-			return this.sniffable.Information(Comment);
+			return this.comLayer.Information(Comment);
 		}
 
 		/// <summary>
@@ -119,7 +119,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Comment">Comment.</param>
 		public Task Information(DateTime Timestamp, string Comment)
 		{
-			return this.sniffable.Information(Timestamp, Comment);
+			return this.comLayer.Information(Timestamp, Comment);
 		}
 
 		/// <summary>
@@ -128,7 +128,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Warning">Warning.</param>
 		public Task Warning(string Warning)
 		{
-			return this.sniffable.Warning(Warning);
+			return this.comLayer.Warning(Warning);
 		}
 
 		/// <summary>
@@ -138,7 +138,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Warning">Warning.</param>
 		public Task Warning(DateTime Timestamp, string Warning)
 		{
-			return this.sniffable.Warning(Timestamp, Warning);
+			return this.comLayer.Warning(Timestamp, Warning);
 		}
 
 		/// <summary>
@@ -147,7 +147,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Error">Error.</param>
 		public Task Error(string Error)
 		{
-			return this.sniffable.Error(Error);
+			return this.comLayer.Error(Error);
 		}
 
 		/// <summary>
@@ -157,7 +157,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Error">Error.</param>
 		public Task Error(DateTime Timestamp, string Error)
 		{
-			return this.sniffable.Error(Timestamp, Error);
+			return this.comLayer.Error(Timestamp, Error);
 		}
 
 		/// <summary>
@@ -166,7 +166,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(string Exception)
 		{
-			return this.sniffable.Exception(Exception);
+			return this.comLayer.Exception(Exception);
 		}
 
 		/// <summary>
@@ -176,7 +176,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(DateTime Timestamp, string Exception)
 		{
-			return this.sniffable.Exception(Timestamp, Exception);
+			return this.comLayer.Exception(Timestamp, Exception);
 		}
 
 		/// <summary>
@@ -185,7 +185,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(Exception Exception)
 		{
-			return this.sniffable.Exception(Exception);
+			return this.comLayer.Exception(Exception);
 		}
 
 		/// <summary>
@@ -195,7 +195,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(DateTime Timestamp, Exception Exception)
 		{
-			return this.sniffable.Exception(Timestamp, Exception);
+			return this.comLayer.Exception(Timestamp, Exception);
 		}
 	}
 }

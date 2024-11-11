@@ -27,10 +27,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <param name="MessageType">Message Type</param>
 		/// <param name="Body">Binary Body</param>
 		/// <param name="Tail">Bytes that are received after the body.</param>
-		/// <param name="Sniffable">Sniffable interface on which the message was received.</param>
+		/// <param name="ComLayer">Sniffable interface on which the message was received.</param>
 		public TransducerAccessMessage(NetworkServiceType NetworkServiceType, TransducerAccessService TransducerAccessService,
-			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer Sniffable)
-			: base(NetworkServiceType, (byte)TransducerAccessService, MessageType, Body, Tail, Sniffable)
+			MessageType MessageType, byte[] Body, byte[] Tail, ICommunicationLayer ComLayer)
+			: base(NetworkServiceType, (byte)TransducerAccessService, MessageType, Body, Tail, ComLayer)
 		{
 			this.TransducerAccessService = TransducerAccessService;
 		}

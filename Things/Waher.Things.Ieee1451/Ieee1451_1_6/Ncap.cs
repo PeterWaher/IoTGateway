@@ -51,7 +51,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Data processing result</returns>
 		public async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
 		{
-			Message Message = await Ieee1451Parser.TryParseMessage(Data, Topic is null ? null : Content.Sniffable);
+			Message Message = await Ieee1451Parser.TryParseMessage(Data, Topic is null ? null : Content.CommunicationLayer);
 			if (Message is null)
 				return this.firstMessage ? DataProcessingResult.Incompatible : DataProcessingResult.Processed;
 

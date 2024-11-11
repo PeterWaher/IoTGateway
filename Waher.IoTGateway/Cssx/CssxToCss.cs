@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using SkiaSharp;
@@ -71,6 +72,9 @@ namespace Waher.IoTGateway.Cssx
 		public static async Task<string> Convert(string Cssx, Variables Session, string FileName)
 		{
 			bool Pushed = false;
+
+			if (Session is null)
+				throw new ArgumentNullException("No session defined.", nameof(Session));
 
 			await Session.LockAsync();
 			try

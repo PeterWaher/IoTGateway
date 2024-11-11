@@ -155,11 +155,11 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Replays sniffer events.
 		/// </summary>
-		/// <param name="Sniffable">Receiver of sniffer events.</param>
+		/// <param name="ComLayer">Receiver of sniffer events.</param>
 		[Obsolete("Use ReplayAsync instead, for better asynchronous performance.")]
-		public void Replay(CommunicationLayer Sniffable)
+		public void Replay(CommunicationLayer ComLayer)
 		{
-			this.ReplayAsync(Sniffable).Wait();
+			this.ReplayAsync(ComLayer).Wait();
 		}
 
 		/// <summary>
@@ -175,11 +175,11 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Replays sniffer events.
 		/// </summary>
-		/// <param name="Sniffable">Receiver of sniffer events.</param>
-		public async Task ReplayAsync(CommunicationLayer Sniffable)
+		/// <param name="ComLayer">Receiver of sniffer events.</param>
+		public async Task ReplayAsync(CommunicationLayer ComLayer)
 		{
-			if (Sniffable.HasSniffers)
-				await this.ReplayAsync(Sniffable.Sniffers);
+			if (ComLayer.HasSniffers)
+				await this.ReplayAsync(ComLayer.Sniffers);
 		}
 
 		/// <summary>

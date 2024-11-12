@@ -8,6 +8,7 @@ using Waher.Networking;
 using Waher.Networking.WHOIS;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security.LoginMonitor
 {
@@ -23,6 +24,8 @@ namespace Waher.Security.LoginMonitor
 	/// </summary>
 	public class LoginAuditor : EventSink, ILoginAuditor
 	{
+		private static LoginAuditor instance = null;
+
 		private readonly Dictionary<string, RemoteEndpoint> states = new Dictionary<string, RemoteEndpoint>();
 		private readonly LoginInterval[] intervals;
 		private readonly int nrIntervals;
@@ -91,7 +94,7 @@ namespace Waher.Security.LoginMonitor
 			return string.Empty;
 		}
 
-		private string RemovePort(string s)
+		private static string RemovePort(string s)
 		{
 			int i = s.LastIndexOf(':');
 			if (i < 0)
@@ -123,7 +126,7 @@ namespace Waher.Security.LoginMonitor
 		/// <returns>Annotated state object, if available. Null otherwise.</returns>
 		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint, bool CreateNew)
 		{
-			string s = this.RemovePort(RemoteEndpoint);
+			string s = RemovePort(RemoteEndpoint);
 			RemoteEndpoint EP = await this.GetStateObject(s, string.Empty, CreateNew);
 			if (EP is null)
 				return null;
@@ -144,7 +147,7 @@ namespace Waher.Security.LoginMonitor
 		{
 			RemoteEndpoint EP;
 
-			RemoteEndpoint = this.RemovePort(RemoteEndpoint);
+			RemoteEndpoint = RemovePort(RemoteEndpoint);
 
 			lock (this.states)
 			{
@@ -493,6 +496,54 @@ namespace Waher.Security.LoginMonitor
 			{
 				Log.Exception(ex);
 			}
+		}
+
+		/// <summary>
+		/// Login Auditor instance used by runtime environment. If none is defined
+		/// as a module parameter, null is returned.
+		/// </summary>
+		public static LoginAuditor Instance
+		{
+			get
+			{
+				if (instance is null)
+				{
+					if (Types.TryGetModuleParameter("LoginAuditor", out object Obj) &&
+						Obj is LoginAuditor Instance)
+					{
+						instance = Instance;
+					}
+				}
+
+				return instance;
+			}
+		}
+
+		/// <summary>
+		/// Handles a successful login attempt silently. This means an entry is logged
+		/// only if it is necessary to clear any previous failed login attempts.
+		/// </summary>
+		/// <param name="Message">Log message</param>
+		/// <param name="UserName">Attempted user name.</param>
+		/// <param name="RemoteEndpoint">String representation of remote endpoint</param>
+		/// <param name="Protocol">Protocol</param>
+		/// <param name="Tags">Any informative tags.</param>
+		public static async Task SilentSuccess(string Message, string UserName, string RemoteEndpoint, string Protocol,
+			params KeyValuePair<string, object>[] Tags)
+		{
+			LoginAuditor Auditor = Instance;
+			if (Auditor is null)
+				return;
+
+			string s = RemovePort(RemoteEndpoint);
+			RemoteEndpoint EP = await Auditor.GetStateObject(s, Protocol, false);
+			if (EP is null)
+				return;
+
+			if (!EP.LastFailed)
+				return;
+
+			Success(Message, UserName, RemoteEndpoint, Protocol, Tags);
 		}
 
 		/// <summary>

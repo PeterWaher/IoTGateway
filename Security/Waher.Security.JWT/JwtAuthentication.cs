@@ -163,7 +163,7 @@ namespace Waher.Security.JWT
 					if (User is null)
 						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
 					else
-						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+						await LoginAuditor.SilentSuccess("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
 			
 					return User;
 				}

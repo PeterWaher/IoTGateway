@@ -1006,6 +1006,7 @@ namespace Waher.IoTGateway
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
+				Types.SetModuleParameter("LoginAuditor", webServer.LoginAuditor);
 
 				await WriteWebServerOpenPorts();
 				webServer.OnNetworkChanged += async (Sender, e) =>
@@ -3020,10 +3021,7 @@ namespace Waher.IoTGateway
 		/// Current Login Auditor. Should be used by modules accepting user logins, to protect the system from
 		/// unauthorized access by malicious users.
 		/// </summary>
-		public static LoginAuditor LoginAuditor
-		{
-			get { return loginAuditor; }
-		}
+		public static LoginAuditor LoginAuditor => loginAuditor;
 
 		/// <summary>
 		/// Makes sure a request is being made from a session with a successful user login.

@@ -121,7 +121,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			if (this.client1 is not null)
 			{
-				await this.client1.DisposeAsync();
+				await this.client1.OfflineAndDisposeAsync(false);
 				this.client1 = null;
 			}
 

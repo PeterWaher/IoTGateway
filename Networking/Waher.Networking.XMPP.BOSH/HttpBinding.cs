@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// </summary>
 		public const string BoshNamespace = "urn:xmpp:xbosh";
 
-		private LinkedList<KeyValuePair<string, EventHandlerAsync>> outputQueue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
+		private LinkedList<OutputRec> outputQueue = new LinkedList<OutputRec>();
 		private readonly LinkedList<string> keys = new LinkedList<string>();
 		private HttpClient[] httpClients;
 		private XmppBindingInterface bindingInterface;
@@ -62,6 +62,13 @@ namespace Waher.Networking.XMPP.BOSH
 		private bool disposed = false;
 		private bool terminated = false;
 		private bool restartLogic = false;
+
+		private class OutputRec
+		{
+			public string Packet;
+			public EventHandlerAsync<DeliveryEventArgs> DeliveryCallback;
+			public object State;
+		}
 
 		/// <summary>
 		/// Implements a HTTP Binding mechanism based on BOSH.
@@ -484,7 +491,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// <param name="Packet">Text packet.</param>
 		public override Task<bool> SendAsync(string Packet)
 		{
-			return this.SendAsync(Packet, null);
+			return this.SendAsync(Packet, null, null);
 		}
 
 		/// <summary>
@@ -492,14 +499,15 @@ namespace Waher.Networking.XMPP.BOSH
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync DeliveryCallback)
+		/// <param name="State">State object to pass on to callback method.</param>
+		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			if (this.terminated)
 				return false;
 
 			try
 			{
-				LinkedList<KeyValuePair<string, EventHandlerAsync>> Queued = null;
+				LinkedList<OutputRec> Queued = null;
 				StringBuilder Xml;
 				long Rid;
 				int ClientIndex = -1;
@@ -531,12 +539,17 @@ namespace Waher.Networking.XMPP.BOSH
 								if (!string.IsNullOrEmpty(Packet))
 								{
 									this.xmppClient?.Information("Outbound stanza queued.");
-									this.outputQueue.AddLast(new KeyValuePair<string, EventHandlerAsync>(Packet, DeliveryCallback));
+									this.outputQueue.AddLast(new OutputRec()
+									{
+										Packet = Packet,
+										DeliveryCallback = DeliveryCallback,
+										State = State
+									});
 								}
 
 								if (!(Queued is null))
 								{
-									LinkedListNode<KeyValuePair<string, EventHandlerAsync>> Loop = Queued.Last;
+									LinkedListNode<OutputRec> Loop = Queued.Last;
 
 									while (!(Loop is null))
 									{
@@ -553,7 +566,7 @@ namespace Waher.Networking.XMPP.BOSH
 							if (!(this.outputQueue.First is null))
 							{
 								Queued = this.outputQueue;
-								this.outputQueue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
+								this.outputQueue = new LinkedList<OutputRec>();
 							}
 						}
 
@@ -596,22 +609,13 @@ namespace Waher.Networking.XMPP.BOSH
 
 					if (!(Queued is null))
 					{
-						foreach (KeyValuePair<string, EventHandlerAsync> P in Queued)
+						foreach (OutputRec Rec in Queued)
 						{
-							await this.RaiseOnSent(P.Key);
-							Xml.Append(P.Key);
+							await this.RaiseOnSent(Rec.Packet);
+							Xml.Append(Rec.Packet);
 
-							if (!(P.Value is null))
-							{
-								try
-								{
-									await P.Value(this, EventArgs.Empty);
-								}
-								catch (Exception ex)
-								{
-									Log.Exception(ex);
-								}
-							}
+							if (!(Rec.DeliveryCallback is null))
+								await Rec.DeliveryCallback.Raise(this, new DeliveryEventArgs(Rec.State, true));
 						}
 					}
 
@@ -620,7 +624,8 @@ namespace Waher.Networking.XMPP.BOSH
 						await this.RaiseOnSent(Packet);
 						Xml.Append(Packet);
 
-						await DeliveryCallback.Raise(this.xmppClient, EventArgs.Empty);
+						if (!(DeliveryCallback is null))
+							await DeliveryCallback.Raise(this.xmppClient, new DeliveryEventArgs(State, true));
 
 						Packet = null;
 						DeliveryCallback = null;
@@ -650,7 +655,7 @@ namespace Waher.Networking.XMPP.BOSH
 						if (!(this.outputQueue.First is null))
 						{
 							Queued = this.outputQueue;
-							this.outputQueue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
+							this.outputQueue = new LinkedList<OutputRec>();
 						}
 						else
 						{

@@ -3,12 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Inventory;
@@ -181,13 +182,28 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="DataCallback">Callback method to call when data is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
-		public Task POST(string To, string Resource, byte[] Data, string ContentType,
+		public async Task POST(string To, string Resource, byte[] Data, string ContentType,
 			EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback,
 			object State, params HttpField[] Headers)
 		{
-			using (MemoryStream DataStream = new MemoryStream(Data))
+			MemoryStream DataStream = new MemoryStream(Data);
+
+			try
 			{
-				return this.POST(To, Resource, DataStream, ContentType, Callback, DataCallback, State, Headers);
+				Task ResponseReceived(object Sender, HttpxResponseEventArgs e)
+				{
+					DataStream?.Dispose();
+					DataStream = null;
+
+					return Callback.Raise(Sender, e);
+				};
+
+				await this.POST(To, Resource, DataStream, ContentType, ResponseReceived, DataCallback, State, Headers);
+			}
+			catch (Exception ex)
+			{
+				DataStream?.Dispose();
+				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}
 
@@ -333,10 +349,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			Xml.Append("</req>");
 
-			if (!(this.e2e is null))
-				await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), this.ResponseHandler, ResponseState, 60000, 0);
-			else
-				await this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, ResponseState, 60000, 0);
+			await this.SendIqSet(To, Xml.ToString(), ResponseState);
 
 			if (!string.IsNullOrEmpty(StreamId))
 			{
@@ -375,19 +388,62 @@ namespace Waher.Networking.XMPP.HTTPX
 					Xml.Append("</chunk>");
 					Nr++;
 
-					if (!(this.e2e is null))
-					{
-						await this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
-							MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty,
-							string.Empty, string.Empty, string.Empty, null, null);
-					}
-					else
-					{
-						await this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
-							string.Empty, string.Empty);
-					}
+					await this.SendChunk(To, Xml.ToString(), ResponseState);
 				}
 			}
+		}
+
+		private async Task SendIqSet(string To, string Xml, object ResponseState)
+		{
+			TaskCompletionSource<bool> StanzaSent = new TaskCompletionSource<bool>();
+			Task FlagStanzaAsSent(object Sender, EventArgs e)
+			{
+				StanzaSent.TrySetResult(true);
+				return Task.CompletedTask;
+			};
+
+			if (!(this.e2e is null))
+			{
+				await this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml,
+					this.ResponseHandler, ResponseState, 60000, 0, FlagStanzaAsSent);
+			}
+			else
+			{
+				await this.client.SendIqSet(To, Xml, this.ResponseHandler, ResponseState, 
+					60000, 0, FlagStanzaAsSent);
+			}
+
+			Task _ = Task.Delay(10000).ContinueWith((_2) =>
+				StanzaSent.TrySetException(new TimeoutException("Unable to send HTTPX request.")));
+
+			await StanzaSent.Task;  // By waiting for request to have been sent, E2E synchronization has already been performed, if necessary.
+		}
+
+		private async Task SendChunk(string To, string Xml, object ResponseState)
+		{
+			TaskCompletionSource<bool> StanzaSent = new TaskCompletionSource<bool>();
+			Task FlagStanzaAsSent(object Sender, EventArgs e)
+			{
+				StanzaSent.TrySetResult(true);
+				return Task.CompletedTask;
+			};
+
+			if (!(this.e2e is null))
+			{
+				await this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
+					MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty,
+					string.Empty, string.Empty, string.Empty, FlagStanzaAsSent, ResponseState);
+			}
+			else
+			{
+				await this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, string.Empty, To, Xml.ToString(),
+					string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, FlagStanzaAsSent, ResponseState);
+			}
+
+			Task _ = Task.Delay(10000).ContinueWith((_2) =>
+				StanzaSent.TrySetException(new TimeoutException("Unable to send HTTPX data chunk.")));
+
+			await StanzaSent.Task;  // By waiting for chunk to have been sent, transmission is throttled to the network bandwidth.
 		}
 
 		private class ResponseState : IDisposable

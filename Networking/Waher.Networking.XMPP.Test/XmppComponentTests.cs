@@ -210,7 +210,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			if (this.client is not null)
 			{
-				await this.client.DisposeAsync();
+				await this.client.OfflineAndDisposeAsync(false);
 				this.client = null;
 			}
 

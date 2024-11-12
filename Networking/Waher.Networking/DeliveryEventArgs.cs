@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Waher.Networking.XMPP.Events
+namespace Waher.Networking
 {
 	/// <summary>
 	/// Event arguments for delivery events.

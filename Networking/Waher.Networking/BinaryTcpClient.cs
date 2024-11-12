@@ -20,6 +20,7 @@ using System.Security.Cryptography.X509Certificates;
 #endif
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using System.Runtime.CompilerServices;
 
 namespace Waher.Networking
 {
@@ -65,7 +66,8 @@ namespace Waher.Networking
 		private class Rec
 		{
 			public byte[] Data;
-			public EventHandlerAsync Callback;
+			public EventHandlerAsync<DeliveryEventArgs> Callback;
+			public object State;
 			public TaskCompletionSource<bool> Task;
 		}
 
@@ -685,7 +687,7 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public Task<bool> SendAsync(byte[] Packet)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, null);
+			return this.SendAsync(Packet, 0, Packet.Length, null, null);
 		}
 
 		/// <summary>
@@ -693,10 +695,11 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync Callback)
+		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, Callback);
+			return this.SendAsync(Packet, 0, Packet.Length, Callback, State);
 		}
 
 		/// <summary>
@@ -708,7 +711,7 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count)
 		{
-			return this.SendAsync(Buffer, Offset, Count, null);
+			return this.SendAsync(Buffer, Offset, Count, null, null);
 		}
 
 		/// <summary>
@@ -718,16 +721,17 @@ namespace Waher.Networking
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync Callback)
+		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.BeginSend(Buffer, Offset, Count, Result, Callback, true);
+			await this.BeginSend(Buffer, Offset, Count, Result, Callback, State, true);
 			return await Result.Task;
 		}
 
 		private async Task BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
-			EventHandlerAsync Callback, bool CheckSending)
+			EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool CheckSending)
 		{
 			if (Buffer is null)
 				throw new ArgumentException("Cannot be null.", nameof(Buffer));
@@ -738,7 +742,10 @@ namespace Waher.Networking
 			if (Count == 0)
 			{
 				Task.TrySetResult(true);
-				await Callback.Raise(this, EventArgs.Empty);
+
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, true));
+
 				return;
 			}
 
@@ -781,6 +788,7 @@ namespace Waher.Networking
 								{
 									Data = Packet,
 									Callback = Callback,
+									State = State,
 									Task = Task
 								});
 								return;
@@ -810,6 +818,7 @@ namespace Waher.Networking
 								Offset = 0;
 								Count = Buffer.Length;
 								Callback = Rec.Callback;
+								State = Rec.State;
 								Task = Rec.Task;
 							}
 						}
@@ -852,7 +861,8 @@ namespace Waher.Networking
 
 					Task.TrySetResult(true);
 
-					await Callback.Raise(this, EventArgs.Empty);
+					if (!(Callback is null))
+						await Callback.Raise(this, new DeliveryEventArgs(State, true));
 				}
 
 				if (!this.disposed)

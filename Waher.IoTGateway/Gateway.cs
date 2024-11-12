@@ -91,12 +91,12 @@ using Waher.Things.SensorData;
 
 namespace Waher.IoTGateway
 {
-    /// <summary>
-    /// Delegate for callback methods used for the creation of database providers.
-    /// </summary>
-    /// <param name="Definition">XML definition of provider.</param>
-    /// <returns>Database provider.</returns>
-    public delegate Task<IDatabaseProvider> GetDatabaseProviderEventHandler(XmlElement Definition);
+	/// <summary>
+	/// Delegate for callback methods used for the creation of database providers.
+	/// </summary>
+	/// <param name="Definition">XML definition of provider.</param>
+	/// <returns>Database provider.</returns>
+	public delegate Task<IDatabaseProvider> GetDatabaseProviderEventHandler(XmlElement Definition);
 
 	/// <summary>
 	/// Delegate for registration callback methods.
@@ -2290,25 +2290,7 @@ namespace Waher.IoTGateway
 
 				if (!(xmppClient is null))
 				{
-					using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
-					{
-						await xmppClient.SetPresence(Availability.Offline, (Sender, e) =>
-						{
-							OfflineSent.Set();
-							return Task.CompletedTask;
-						});
-						OfflineSent.WaitOne(1000);
-					}
-
-					foreach (ISniffer Sniffer in xmppClient.Sniffers)
-					{
-						XmppClient.Remove(Sniffer);
-
-						if (Sniffer is IDisposable Disposable)
-							Disposable.Dispose();
-					}
-
-					await xmppClient.DisposeAsync();
+					await xmppClient.OfflineAndDisposeAsync();
 					xmppClient = null;
 				}
 

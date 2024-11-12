@@ -109,6 +109,7 @@
     <Compile Include="BinaryTcpServer.cs" />
     <Compile Include="ClientCertificates.cs" />
     <Compile Include="CommunicationLayer.cs" />
+    <Compile Include="DeliveryEventArgs.cs" />
     <Compile Include="EventHandlerExtensions.cs" />
     <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="ICommunicationLayer.cs" />

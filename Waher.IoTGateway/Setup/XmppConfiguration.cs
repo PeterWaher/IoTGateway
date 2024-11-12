@@ -540,7 +540,7 @@ namespace Waher.IoTGateway.Setup
 
 			if (!(this.client is null))
 			{
-				await this.client.DisposeAsync();
+				await this.client.OfflineAndDisposeAsync();
 				this.client = null;
 			}
 
@@ -659,7 +659,7 @@ namespace Waher.IoTGateway.Setup
 
 								if (!(this.client is null))
 								{
-									await this.client.DisposeAsync();
+									await this.client.OfflineAndDisposeAsync();
 									this.client = null;
 								}
 
@@ -827,7 +827,7 @@ namespace Waher.IoTGateway.Setup
 
 						if (!(this.client is null))
 						{
-							await this.client.DisposeAsync();
+							await this.client.OfflineAndDisposeAsync();
 							this.client = null;
 						}
 
@@ -976,7 +976,7 @@ namespace Waher.IoTGateway.Setup
 
 							if (!(this.client is null))
 							{
-								await this.client.DisposeAsync();
+								await this.client.OfflineAndDisposeAsync();
 								this.client = null;
 							}
 

@@ -168,7 +168,7 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public virtual Task<bool> SendAsync(string Text)
 		{
-			return this.SendAsync(Text, null);
+			return this.SendAsync(Text, null, null);
 		}
 
 		/// <summary>
@@ -176,12 +176,13 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Text">Text packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async virtual Task<bool> SendAsync(string Text, EventHandlerAsync Callback)
+		public async virtual Task<bool> SendAsync(string Text, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			byte[] Data = this.encoding.GetBytes(Text);
 			this.lastTransmittedBytes = Data.Length;
-			bool Result = await base.SendAsync(Data, Callback);
+			bool Result = await base.SendAsync(Data, Callback, State);
 			await this.TextDataSent(Text);
 			return Result;
 		}

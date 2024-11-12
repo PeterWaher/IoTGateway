@@ -404,9 +404,9 @@ namespace Waher.Networking.XMPP.Search
 			await this.SendSearchRequest((Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e);
+					Result.TrySetResult(e);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform search operation."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform search operation."));
 
 				return Task.CompletedTask;
 			}, null);

@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			this.endpoints1 = Endpoints1;
 			this.endpoints2 = Endpoints2;
 
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			this.endpoints1 = Endpoints1;
 			this.endpoints2 = Endpoints2;
 
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);
@@ -186,7 +186,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			this.endpoints1 = Endpoints1;
 			this.endpoints2 = Endpoints2;
 
-			this.ConnectClients();
+			await this.ConnectClients();
 			try
 			{
 				ManualResetEvent Done = new(false);

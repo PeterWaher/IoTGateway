@@ -1082,7 +1082,7 @@ namespace Waher.Networking.HTTP
 				{
 					Result.TrySetResult(true);
 					return Task.CompletedTask;
-				});
+				}, null);
 
 				await Result.Task;
 			}

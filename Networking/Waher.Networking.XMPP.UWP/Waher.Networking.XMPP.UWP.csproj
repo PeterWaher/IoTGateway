@@ -191,7 +191,6 @@
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="ErrorType.cs" />
     <Compile Include="Events\CustomPresenceEventArgs.cs" />
-    <Compile Include="Events\DeliveryEventArgs.cs" />
     <Compile Include="Events\IqEventArgs.cs" />
     <Compile Include="Events\IqResultEventArgs.cs" />
     <Compile Include="Events\MessageEventArgs.cs" />

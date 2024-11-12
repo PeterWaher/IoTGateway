@@ -476,7 +476,7 @@ namespace Waher.Client.WPF.Model
 
 				XmppClient Client = this.client;
 				this.client = null;
-				Client.DisposeAsync().Wait();	// TODO: Asynchronous
+				Client.OfflineAndDisposeAsync().Wait();	// TODO: Asynchronous
 			}
 		}
 

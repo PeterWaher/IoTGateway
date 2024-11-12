@@ -229,7 +229,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Packet">Packet to send.</param>
 		public Task SendTcp(byte[] Packet)
 		{
-			return this.SendTcp(Packet, null);
+			return this.SendTcp(Packet, null, null);
 		}
 
 		/// <summary>
@@ -238,13 +238,14 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public Task SendTcp(byte[] Packet, EventHandlerAsync Callback)
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task SendTcp(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (this.disposed)
 				return Task.CompletedTask;
 
 			byte[] EncodedPacket = this.EncodePacket(Packet, false);
-			return this.tcpConnection.SendAsync(EncodedPacket, Callback);
+			return this.tcpConnection.SendAsync(EncodedPacket, Callback, State);
 		}
 
 		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber)

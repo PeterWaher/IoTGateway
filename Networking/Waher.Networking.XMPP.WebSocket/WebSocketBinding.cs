@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// </summary>
 		public const string FramingNamespace = "urn:ietf:params:xml:ns:xmpp-framing";
 
-		private readonly LinkedList<KeyValuePair<string, EventHandlerAsync>> queue = new LinkedList<KeyValuePair<string, EventHandlerAsync>>();
+		private readonly LinkedList<KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>> queue = new LinkedList<KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>>();
 		private XmppClient xmppClient;
 		private XmppBindingInterface bindingInterface;
 		private ClientWebSocket webSocketClient;
@@ -381,7 +381,7 @@ namespace Waher.Networking.XMPP.WebSocket
 							{
 								this.webSocketClient = null;
 							}
-						});
+						}, null);
 					}
 					else
 					{
@@ -452,7 +452,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// <param name="Packet">Text packet.</param>
 		public override Task<bool> SendAsync(string Packet)
 		{
-			return this.SendAsync(Packet, null);
+			return this.SendAsync(Packet, null, null);
 		}
 
 		/// <summary>
@@ -460,7 +460,8 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync DeliveryCallback)
+		/// <param name="State">State object to pass on to callback method.</param>
+		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			if (this.terminated)
 				return false;
@@ -486,7 +487,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				if (this.writing)
 				{
 					this.xmppClient?.Information("Outbound stanza queued.");
-					this.queue.AddLast(new KeyValuePair<string, EventHandlerAsync>(Packet, DeliveryCallback));
+					this.queue.AddLast(new KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>(Packet, DeliveryCallback));
 					return true;
 				}
 				else
@@ -509,13 +510,13 @@ namespace Waher.Networking.XMPP.WebSocket
 
 					await this.RaiseOnSent(Packet);
 
-					await DeliveryCallback.Raise(this.xmppClient, EventArgs.Empty);
+					await DeliveryCallback.Raise(this.xmppClient, new DeliveryEventArgs(State, true));
 
 					lock (this.queue)
 					{
 						if (!(this.queue.First is null))
 						{
-							LinkedListNode<KeyValuePair<string, EventHandlerAsync>> Node = this.queue.First;
+							LinkedListNode<KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>> Node = this.queue.First;
 							Packet = Node.Value.Key;
 							DeliveryCallback = Node.Value.Value;
 							this.queue.RemoveFirst();

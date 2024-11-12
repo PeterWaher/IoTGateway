@@ -17,12 +17,12 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP
 {
-    /// <summary>
-    /// Delegate for event raised to get roster items for the component.
-    /// </summary>
-    /// <param name="BareJid">Bare JID</param>
-    /// <returns>Corresponding roster item, if found, or null, if not found.</returns>
-    public delegate RosterItem GetRosterItemEventHandler(string BareJid);
+	/// <summary>
+	/// Delegate for event raised to get roster items for the component.
+	/// </summary>
+	/// <param name="BareJid">Bare JID</param>
+	/// <returns>Corresponding roster item, if found, or null, if not found.</returns>
+	public delegate RosterItem GetRosterItemEventHandler(string BareJid);
 
 	/// <summary>
 	/// Manages an XMPP component connection, as defined in XEP-0114:
@@ -129,7 +129,7 @@ namespace Waher.Networking.XMPP
 					this.State = XmppState.StreamNegotiation;
 
 					await this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
-						"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null);
+						"' xmlns='jabber:component:accept' xmlns:stream='" + XmppClient.NamespaceStream + "'>", null, null);
 
 					this.ResetState();
 				}
@@ -315,7 +315,7 @@ namespace Waher.Networking.XMPP
 		public async Task DisposeAsync()
 		{
 			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
-				await this.BeginWrite(this.streamFooter, this.CleanUp);
+				await this.BeginWrite(this.streamFooter, this.CleanUp, null);
 			else
 				await this.CleanUp(this, EventArgs.Empty);
 		}
@@ -381,13 +381,16 @@ namespace Waher.Networking.XMPP
 			this.Connect();
 		}
 
-		private async Task BeginWrite(string Xml, EventHandlerAsync Callback)
+		private async Task BeginWrite(string Xml, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (string.IsNullOrEmpty(Xml))
-				await Callback.Raise(this, EventArgs.Empty);
+			{
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, true));
+			}
 			else
 			{
-				await this.client.SendAsync(Xml, Callback);
+				await this.client.SendAsync(Xml, Callback, State);
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
 		}
@@ -901,7 +904,7 @@ namespace Waher.Networking.XMPP
 					string s = this.streamId + this.sharedSecret;
 					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
 
-					await this.BeginWrite("<handshake>" + Hashes.ComputeSHA1HashString(Data) + "</handshake>", null);
+					await this.BeginWrite("<handshake>" + Hashes.ComputeSHA1HashString(Data) + "</handshake>", null, null);
 				}
 			}
 			catch (Exception ex)
@@ -1718,7 +1721,7 @@ namespace Waher.Networking.XMPP
 			if (!(PendingRequest is null))
 				PendingRequest.Xml = IqXml;
 
-			await this.BeginWrite(IqXml, null);
+			await this.BeginWrite(IqXml, null, null);
 
 			return SeqNr;
 		}
@@ -1759,9 +1762,9 @@ namespace Waher.Networking.XMPP
 			await this.SendIqGet(From, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Response);
+					Result.TrySetResult(e.Response);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
 
 				return Task.CompletedTask;
 			}, null);
@@ -1805,9 +1808,9 @@ namespace Waher.Networking.XMPP
 			await this.SendIqSet(From, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Response);
+					Result.TrySetResult(e.Response);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
 
 				return Task.CompletedTask;
 			}, null);
@@ -1918,7 +1921,7 @@ namespace Waher.Networking.XMPP
 
 				Xml.Append("</presence>");
 
-				await this.BeginWrite(Xml.ToString(), null);
+				await this.BeginWrite(Xml.ToString(), null, null);
 			}
 		}
 
@@ -1976,7 +1979,7 @@ namespace Waher.Networking.XMPP
 			if (!(PendingRequest is null))
 				PendingRequest.Xml = PresenceXml;
 
-			await this.BeginWrite(PresenceXml, null);
+			await this.BeginWrite(PresenceXml, null, null);
 		}
 
 		private async Task PendingPresenceRequest_Removed(object Sender, CacheItemEventArgs<string, uint> e)
@@ -2051,7 +2054,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='subscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceSubscriptionDeclined(string Id, string From, string BareJid)
@@ -2071,7 +2074,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='unsubscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceUnsubscriptionAccepted(string Id, string From, string BareJid)
@@ -2091,7 +2094,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='unsubscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceUnsubscriptionDeclined(string Id, string From, string BareJid)
@@ -2111,7 +2114,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='subscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		/// <summary>
@@ -2317,7 +2320,7 @@ namespace Waher.Networking.XMPP
 			switch (QoS)
 			{
 				case QoSLevel.Unacknowledged:
-					await this.BeginWrite(MessageXml, async (Sender, e) => await this.DeliveryCallback(DeliveryCallback, State, true));
+					await this.BeginWrite(MessageXml, async (Sender, e) => await this.DeliveryCallback(DeliveryCallback, State, true), State);
 					break;
 
 				case QoSLevel.Acknowledged:
@@ -2675,7 +2678,7 @@ namespace Waher.Networking.XMPP
 							}
 						}
 						else
-							await this.BeginWrite(" ", null);
+							await this.BeginWrite(" ", null, null);
 					}
 					catch (Exception ex)
 					{
@@ -2733,7 +2736,7 @@ namespace Waher.Networking.XMPP
 						try
 						{
 							if (Retry)
-								await this.BeginWrite(Request.Xml, null);
+								await this.BeginWrite(Request.Xml, null, null);
 							else if (!(Request.IqCallback is null))
 							{
 								StringBuilder Xml = new StringBuilder();

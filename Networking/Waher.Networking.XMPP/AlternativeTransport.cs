@@ -36,7 +36,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
-		public abstract Task<bool> SendAsync(string Packet, EventHandlerAsync DeliveryCallback);
+		/// <param name="State">State object to pass on to callback method.</param>
+		public abstract Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State);
 
 		/// <summary>
 		/// If the reading is paused.

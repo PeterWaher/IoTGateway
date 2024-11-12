@@ -206,7 +206,7 @@ namespace Waher.IoTGateway.Setup
 					await Database.Update(this);
 			}
 
-			this.completionSource?.SetResult(ReloadConfiguration);
+			this.completionSource?.TrySetResult(ReloadConfiguration);
 		}
 
 		/// <summary>

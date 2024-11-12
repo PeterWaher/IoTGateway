@@ -177,7 +177,7 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public override Task<bool> SendAsync(string Packet)
 		{
-			return this.SendAsync(Packet, null);
+			return this.SendAsync(Packet, null, null);
 		}
 
 		/// <summary>
@@ -185,10 +185,11 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Text">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public override Task<bool> SendAsync(string Text, EventHandlerAsync Callback)
+		public override Task<bool> SendAsync(string Text, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return base.SendAsync(Text + "\r\n", Callback);
+			return base.SendAsync(Text + "\r\n", Callback, State);
 		}
 
 		/// <summary>

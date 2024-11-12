@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.PeerToPeer;
-using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -685,7 +684,7 @@ namespace Waher.Networking.XMPP.P2P
 					await this.SendAsync(Header, (Sender, e) =>
 					{
 						return this.ToError();
-					});
+					}, null);
 
 					return;
 				}
@@ -873,26 +872,9 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(this.xmppClient is null))
 			{
-				foreach (ISniffer Sniffer in this.xmppClient.Sniffers)
-				{
-					this.xmppClient.Remove(Sniffer);
-
-					if (Sniffer is IDisposable Disposable)
-					{
-						try
-						{
-							Disposable.Dispose();
-						}
-						catch (Exception)
-						{
-							// Ignore
-						}
-					}
-				}
-
 				try
 				{
-					await this.xmppClient.DisposeAsync();
+					await this.xmppClient.OfflineAndDisposeAsync(true);
 				}
 				catch (Exception)
 				{
@@ -926,7 +908,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Packet"></param>
 		public Task<bool> SendAsync(string Packet)
 		{
-			return this.SendAsync(Packet, null);
+			return this.SendAsync(Packet, null, null);
 		}
 
 		/// <summary>
@@ -934,13 +916,14 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Packet"></param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		public Task<bool> SendAsync(string Packet, EventHandlerAsync Callback)
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
 
 			if (!(this.peer is null))
 			{
-				this.peer.SendTcp(Data, Callback);
+				this.peer.SendTcp(Data, Callback, State);
 				this.lastActivity = DateTime.Now;
 			}
 

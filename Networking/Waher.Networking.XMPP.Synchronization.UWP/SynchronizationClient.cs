@@ -331,7 +331,7 @@ namespace Waher.Networking.XMPP.Synchronization
 
 			await this.MeasureClockDifference(ClockSourceJID, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -945,9 +945,9 @@ namespace Waher.Networking.XMPP.Synchronization
 			await this.QueryClockSource(To, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.ClockSourceJID);
+					Result.TrySetResult(e.ClockSourceJID);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to query clock source."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to query clock source."));
 
 				return Task.CompletedTask;
 

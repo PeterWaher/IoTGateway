@@ -139,7 +139,7 @@ namespace Waher.Things.Xmpp.Model
 				this.xmppClient.OnRosterItemRemoved -= this.XmppClient_OnRosterItemRemoved;
 				this.xmppClient.OnRosterItemUpdated -= this.XmppClient_OnRosterItemUpdated;
 
-				await this.xmppClient.DisposeAsync();
+				await this.xmppClient.OfflineAndDisposeAsync();
 				this.xmppClient = null;
 			}
 		}

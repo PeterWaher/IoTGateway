@@ -246,6 +246,114 @@ namespace Waher.Networking.XMPP
 			int MaxRetryTimeout);
 
 		/// <summary>
+		/// Sends an IQ Get request.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="E2ETransmission">How transmission is to be handled if no end-to-end encryption
+		/// can be performed.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback);
+
+		/// <summary>
+		/// Sends an IQ Get request.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="E2ETransmission">How transmission is to be handled if no end-to-end encryption
+		/// can be performed.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, 
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback);
+
+		/// <summary>
+		/// Sends an IQ Get request.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="E2ETransmission">How transmission is to be handled if no end-to-end encryption
+		/// can be performed.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+			int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback);
+
+		/// <summary>
+		/// Sends an IQ Set request.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="E2ETransmission">How transmission is to be handled if no end-to-end encryption
+		/// can be performed.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback);
+
+		/// <summary>
+		/// Sends an IQ Set request.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="E2ETransmission">How transmission is to be handled if no end-to-end encryption
+		/// can be performed.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, 
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback);
+
+		/// <summary>
+		/// Sends an IQ Set request.
+		/// </summary>
+		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>
+		/// <param name="E2ETransmission">How transmission is to be handled if no end-to-end encryption
+		/// can be performed.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+			int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback);
+
+		/// <summary>
 		/// Returns a response to an IQ Get/Set request.
 		/// </summary>
 		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>

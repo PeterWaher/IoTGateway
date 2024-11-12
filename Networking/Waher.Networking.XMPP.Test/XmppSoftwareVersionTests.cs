@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.SoftwareVersion;
 using Waher.Runtime.Console;
 
@@ -20,9 +21,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void SoftwareVersion_Test_01_Server()
+		public async Task SoftwareVersion_Test_01_Server()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.Domain, 10000);
 			Print(e);
 		}
@@ -36,9 +37,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void SoftwareVersion_Test_02_Client()
+		public async Task SoftwareVersion_Test_02_Client()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.FullJID, 10000);
 			Print(e);
 		}

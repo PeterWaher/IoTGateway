@@ -672,7 +672,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			await this.Send(Payload, More, (Sender, e) =>
 			{
-				Result.SetResult(true);
+				Result.TrySetResult(true);
 				return Task.CompletedTask;
 			});
 			await Result.Task;
@@ -756,7 +756,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			await this.Send(Payload, More, (Sender, e) =>
 			{
-				Result.SetResult(true);
+				Result.TrySetResult(true);
 				return Task.CompletedTask;
 			});
 			await Result.Task;
@@ -921,7 +921,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			await this.Close((Sender, e) =>
 			{
-				Result.SetResult(true);
+				Result.TrySetResult(true);
 				return Task.CompletedTask;
 			});
 			await Result.Task;
@@ -947,7 +947,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 			await this.Close(Code, Reason, (Sender, e) =>
 			{
-				Result.SetResult(true);
+				Result.TrySetResult(true);
 				return Task.CompletedTask;
 			});
 			await Result.Task;

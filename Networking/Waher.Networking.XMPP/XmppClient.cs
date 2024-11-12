@@ -706,7 +706,7 @@ namespace Waher.Networking.XMPP
 
 						await this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 							XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
-							NamespaceStream + "'>", null);
+							NamespaceStream + "'>", null, null);
 					}
 					else
 					{
@@ -1099,7 +1099,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Closes the connection and disposes of all resources.
 		/// </summary>
-		[Obsolete("Use the DisposeAsync() method.")]
+		[Obsolete("Use the DisposeAsync() or OfflineAndDisposeAsync() method.")]
 		public async void Dispose()
 		{
 			try
@@ -1110,6 +1110,52 @@ namespace Waher.Networking.XMPP
 			{
 				Log.Exception(ex);
 			}
+		}
+
+		/// <summary>
+		/// Sends an offline presence, and then disposes the object by calling
+		/// <see cref="DisposeAsync"/>.
+		/// </summary>
+		public Task OfflineAndDisposeAsync()
+		{
+			return this.OfflineAndDisposeAsync(true);
+		}
+
+		/// <summary>
+		/// Sends an offline presence (if online), and then disposes the object by calling
+		/// <see cref="DisposeAsync"/>.
+		/// </summary>
+		/// <param name="DisposeSniffers">If attached sniffers should be disposed.</param>
+		public async Task OfflineAndDisposeAsync(bool DisposeSniffers)
+		{
+			if (this.state == XmppState.Connected)
+			{
+				TaskCompletionSource<bool> OfflineSent = new TaskCompletionSource<bool>();
+
+				await this.SetPresence(Availability.Offline, (Sender, e) =>
+				{
+					OfflineSent.TrySetResult(true);
+					return Task.CompletedTask;
+				}, null);
+
+				Task _ = Task.Delay(1000).ContinueWith((_2) =>
+				{
+					OfflineSent.TrySetResult(false);
+					return Task.CompletedTask;
+				});
+
+				await OfflineSent.Task;
+			}
+
+			foreach (ISniffer Sniffer in this.Sniffers)
+			{
+				this.Remove(Sniffer);
+
+				if (DisposeSniffers && Sniffer is IDisposable Disposable)
+					Disposable.Dispose();
+			}
+
+			await this.DisposeAsync();
 		}
 
 		/// <summary>
@@ -1128,7 +1174,7 @@ namespace Waher.Networking.XMPP
 				{
 					try
 					{
-						await this.BeginWrite(this.streamFooter, this.CleanUp);
+						await this.BeginWrite(this.streamFooter, this.CleanUp, null);
 					}
 					catch (Exception)
 					{
@@ -1280,16 +1326,16 @@ namespace Waher.Networking.XMPP
 			return this.Connect(this.domain);
 		}
 
-		private async Task BeginWrite(string Xml, EventHandlerAsync Callback)
+		private async Task BeginWrite(string Xml, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (string.IsNullOrEmpty(Xml))
-				await Callback.Raise(this, EventArgs.Empty);
+				await Callback.Raise(this, new DeliveryEventArgs(State, true));
 			else
 			{
 				if (this.textTransportLayer is null)
-					this.client?.SendAsync(Xml, Callback);
+					this.client?.SendAsync(Xml, Callback, State);
 				else
-					await this.textTransportLayer.SendAsync(Xml, Callback);
+					await this.textTransportLayer.SendAsync(Xml, Callback, State);
 
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
@@ -2022,7 +2068,7 @@ namespace Waher.Networking.XMPP
 								}
 								else if (StartTls && this.allowEncryption)
 								{
-									await this.BeginWrite("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>", null);
+									await this.BeginWrite("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>", null, null);
 									return true;
 								}
 								else if (Auth)
@@ -2102,7 +2148,7 @@ namespace Waher.Networking.XMPP
 									await this.SetState(XmppState.Authenticating);
 
 								string Response = this.authenticationMethod.Challenge(E.InnerText, this);
-								await this.BeginWrite("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + Response + "</response>", null);
+								await this.BeginWrite("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + Response + "</response>", null, null);
 							}
 							break;
 
@@ -2147,7 +2193,7 @@ namespace Waher.Networking.XMPP
 
 										await this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) +
 											"' version='1.0' xml:lang='" + XML.Encode(this.language) +
-											"' xmlns='" + NamespaceClient + "' xmlns:stream='" + NamespaceStream + "'>", null);
+											"' xmlns='" + NamespaceClient + "' xmlns:stream='" + NamespaceStream + "'>", null, null);
 									}
 								}
 								else
@@ -3161,7 +3207,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("'/>");
 
 			await this.SetState(XmppState.StartingEncryption);
-			await this.BeginWrite(Xml.ToString(), null);
+			await this.BeginWrite(Xml.ToString(), null, null);
 
 			return true;
 		}
@@ -3180,7 +3226,7 @@ namespace Waher.Networking.XMPP
 					await this.SetState(XmppState.Authenticating);
 					this.authenticationMethod = new ScramSha256(Nonce);
 					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-256'>" +
-						Convert.ToBase64String(Data) + "</auth>", null);
+						Convert.ToBase64String(Data) + "</auth>", null, null);
 				}
 				else if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
@@ -3192,21 +3238,21 @@ namespace Waher.Networking.XMPP
 					await this.SetState(XmppState.Authenticating);
 					this.authenticationMethod = new ScramSha1(Nonce);
 					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>" +
-						Convert.ToBase64String(Data) + "</auth>", null);
+						Convert.ToBase64String(Data) + "</auth>", null, null);
 				}
 				else if (this.allowDigestMD5 && this.authenticationMechanisms.ContainsKey("DIGEST-MD5") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "DIGEST-MD5"))
 				{
 					await this.SetState(XmppState.Authenticating);
 					this.authenticationMethod = new DigestMd5();
-					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>", null);
+					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>", null, null);
 				}
 				else if (this.allowCramMD5 && this.authenticationMechanisms.ContainsKey("CRAM-MD5") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "CRAM-MD5"))
 				{
 					await this.SetState(XmppState.Authenticating);
 					this.authenticationMethod = new CramMd5();
-					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='CRAM-MD5'/>", null);
+					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='CRAM-MD5'/>", null, null);
 				}
 				else if (this.allowPlain && this.authenticationMechanisms.ContainsKey("PLAIN") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "PLAIN"))
@@ -3226,7 +3272,8 @@ namespace Waher.Networking.XMPP
 						Pwd = this.passwordHash;
 
 					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>" +
-						Convert.ToBase64String(this.encoding.GetBytes("\x00" + this.userName + "\x00" + Pwd)) + "</auth>", null);
+						Convert.ToBase64String(this.encoding.GetBytes("\x00" + this.userName + "\x00" + Pwd)) + 
+						"</auth>", null, null);
 				}
 				//else if (this.authenticationMechanisms.ContainsKey("ANONYMOUS"))
 				//	throw new XmppException("ANONYMOUS authentication method not allowed.");
@@ -3365,7 +3412,7 @@ namespace Waher.Networking.XMPP
 					{
 						await this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
 							"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
-							NamespaceStream + "'>", null);
+							NamespaceStream + "'>", null, null);
 					}
 				}
 				catch (Exception ex)
@@ -3598,6 +3645,113 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Sends an IQ Get request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public Task<uint> SendIqGet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(null, To, Xml, "get", Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
+				this.defaultMaxRetryTimeout, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Get request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public Task<uint> SendIqGet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries,
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(null, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, false, RetryTimeout, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Get request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public Task<uint> SendIqGet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(null, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Set request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public Task<uint> SendIqSet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(null, To, Xml, "set", Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
+				this.defaultMaxRetryTimeout, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Set request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public Task<uint> SendIqSet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries,
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(null, To, Xml, "set", Callback, State, RetryTimeout, NrRetries, false, RetryTimeout, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Set request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public Task<uint> SendIqSet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(null, To, Xml, "set", Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, 
+				DeliveryCallback);
+		}
+
+		/// <summary>
 		/// Returns a response to an IQ Get/Set request.
 		/// </summary>
 		/// <param name="Id">ID attribute of original IQ request.</param>
@@ -3701,7 +3855,25 @@ namespace Waher.Networking.XMPP
 		public Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State)
 		{
 			return this.SendIq(Id, To, Xml, Type, Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
-				this.defaultMaxRetryTimeout);
+				this.defaultMaxRetryTimeout, null);
+		}
+
+		/// <summary>
+		/// Sends an IQ stanza.
+		/// </summary>
+		/// <param name="Id">Optional ID attribute of IQ stanza.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Type">Type of IQ stanza to send.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+		public Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State, 
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Id, To, Xml, Type, Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
+				this.defaultMaxRetryTimeout, DeliveryCallback);
 		}
 
 		/// <summary>
@@ -3719,8 +3891,30 @@ namespace Waher.Networking.XMPP
 		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
 		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
-		public async Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State,
+		public Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
+		{
+			return this.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, null);
+		}
+
+		/// <summary>
+		/// Sends an IQ stanza.
+		/// </summary>
+		/// <param name="Id">Optional ID attribute of IQ stanza.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Type">Type of IQ stanza to send.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+		public async Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State,
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
 		{
 			PendingRequest PendingRequest = null;
 			DateTime TP;
@@ -3790,7 +3984,7 @@ namespace Waher.Networking.XMPP
 			if (!(PendingRequest is null))
 				PendingRequest.Xml = IqXml;
 
-			await this.BeginWrite(IqXml, null);
+			await this.BeginWrite(IqXml, DeliveryCallback, State);
 
 			return SeqNr;
 		}
@@ -3829,9 +4023,9 @@ namespace Waher.Networking.XMPP
 			await this.SendIqGet(To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Response);
+					Result.TrySetResult(e.Response);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
 
 				return Task.CompletedTask;
 
@@ -3874,9 +4068,9 @@ namespace Waher.Networking.XMPP
 			await this.SendIqSet(To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Response);
+					Result.TrySetResult(e.Response);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
 
 				return Task.CompletedTask;
 			}, null);
@@ -4611,8 +4805,9 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Availability">Client availability.</param>
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public async Task SetPresence(Availability Availability, EventHandlerAsync Callback, params KeyValuePair<string, string>[] Status)
+		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback, object State, params KeyValuePair<string, string>[] Status)
 		{
 			this.currentAvailability = Availability;
 			this.customPresenceStatus = Status;
@@ -4669,14 +4864,15 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				await this.AddCustomPresenceXml(Availability, Xml);
+				if (Availability != Availability.Offline)
+					await this.AddCustomPresenceXml(Availability, Xml);
 
 				Xml.Append("</presence>");
 
 				if (Callback is null)
 					Callback = this.PresenceSent;
 
-				await this.BeginWrite(Xml.ToString(), Callback);
+				await this.BeginWrite(Xml.ToString(), Callback, State);
 			}
 		}
 
@@ -4774,7 +4970,7 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</presence>");
 			}
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		/// <summary>
@@ -4801,7 +4997,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='unsubscribe'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		/// <summary>
@@ -4824,7 +5020,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='unsubscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceSubscriptionAccepted(string Id, string BareJid)
@@ -4862,7 +5058,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='subscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceSubscriptionDeclined(string Id, string BareJid)
@@ -4885,7 +5081,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='unsubscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceUnsubscriptionAccepted(string Id, string BareJid)
@@ -4903,7 +5099,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='unsubscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		internal Task PresenceUnsubscriptionDeclined(string Id, string BareJid)
@@ -4921,7 +5117,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("' type='subscribed'/>");
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		/// <summary>
@@ -5016,7 +5212,7 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</presence>");
 			}
 
-			return this.BeginWrite(Xml.ToString(), null);
+			return this.BeginWrite(Xml.ToString(), null, null);
 		}
 
 		/// <summary>
@@ -5031,7 +5227,7 @@ namespace Waher.Networking.XMPP
 
 			await this.SendDirectedPresence(Type, To, CustomXml, (Sender, e) =>
 			{
-				Query.SetResult(e);
+				Query.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -5326,7 +5522,7 @@ namespace Waher.Networking.XMPP
 			switch (QoS)
 			{
 				case QoSLevel.Unacknowledged:
-					await this.BeginWrite(MessageXml, async (Sender, e) => await this.CallDeliveryCallback(DeliveryCallback, State, true));
+					await this.BeginWrite(MessageXml, async (Sender, e) => await this.CallDeliveryCallback(DeliveryCallback, State, true), State);
 					break;
 
 				case QoSLevel.Acknowledged:
@@ -5849,7 +6045,7 @@ namespace Waher.Networking.XMPP
 
 			await this.SendServiceDiscoveryRequest(E2eEncryption, To, Node, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -6088,7 +6284,7 @@ namespace Waher.Networking.XMPP
 
 			await this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, Node, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -6252,7 +6448,7 @@ namespace Waher.Networking.XMPP
 
 			await this.SendSoftwareVersionRequest(E2eEncryption, To, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -6476,7 +6672,7 @@ namespace Waher.Networking.XMPP
 
 			await this.SendSearchFormRequest(E2eEncryption, To, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null, null);
 
@@ -6828,7 +7024,7 @@ namespace Waher.Networking.XMPP
 									}
 								}
 								else
-									await this.BeginWrite(" ", null);
+									await this.BeginWrite(" ", null, null);
 							}
 							catch (Exception ex)
 							{
@@ -6902,7 +7098,7 @@ namespace Waher.Networking.XMPP
 						try
 						{
 							if (Retry)
-								await this.BeginWrite(Request.Xml, null);
+								await this.BeginWrite(Request.Xml, null, null);
 							else if (!(Request.IqCallback is null))
 							{
 								StringBuilder Xml = new StringBuilder();
@@ -7226,9 +7422,9 @@ namespace Waher.Networking.XMPP
 			await this.GetPrivateXmlElement(LocalName, Namespace, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Element);
+					Result.TrySetResult(e.Element);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to get private XML element."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to get private XML element."));
 
 				return Task.CompletedTask;
 			}, null);
@@ -7309,9 +7505,9 @@ namespace Waher.Networking.XMPP
 			await this.SetPrivateXmlElement(Element, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(true);
+					Result.TrySetResult(true);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to set private XML element."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to set private XML element."));
 
 				return Task.CompletedTask;
 			}, null);

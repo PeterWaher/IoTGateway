@@ -15,7 +15,8 @@ namespace Waher.Networking.XMPP.Test
 	public abstract class CommunicationTests
 	{
 		private static ConsoleEventSink sink = null;
-		private static XmlFileSniffer xmlSniffer = null;
+		private static XmlFileSniffer xmlSniffer1 = null;
+		private static XmlFileSniffer xmlSniffer2 = null;
 		protected ManualResetEvent connected1 = new(false);
 		protected ManualResetEvent error1 = new(false);
 		protected ManualResetEvent offline1 = new(false);
@@ -36,10 +37,18 @@ namespace Waher.Networking.XMPP.Test
 			sink = new ConsoleEventSink();
 			Log.Register(sink);
 
-			if (xmlSniffer is null)
+			if (xmlSniffer1 is null)
 			{
-				File.Delete("XMPP.xml");
-				xmlSniffer = xmlSniffer = new XmlFileSniffer("XMPP.xml",
+				File.Delete("XMPP1.xml");
+				xmlSniffer1 = xmlSniffer1 = new XmlFileSniffer("XMPP1.xml",
+						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+						int.MaxValue, BinaryPresentationMethod.Base64);
+			}
+
+			if (xmlSniffer2 is null)
+			{
+				File.Delete("XMPP2.xml");
+				xmlSniffer2 = xmlSniffer2 = new XmlFileSniffer("XMPP2.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 						int.MaxValue, BinaryPresentationMethod.Base64);
 			}
@@ -47,8 +56,11 @@ namespace Waher.Networking.XMPP.Test
 
 		public static void DisposeSnifferAndLog()
 		{
-			xmlSniffer?.Dispose();
-			xmlSniffer = null;
+			xmlSniffer1?.Dispose();
+			xmlSniffer1 = null;
+
+			xmlSniffer2?.Dispose();
+			xmlSniffer2 = null;
 
 			if (sink is not null)
 			{
@@ -81,7 +93,7 @@ namespace Waher.Networking.XMPP.Test
 
 			this.client1.SetTag("ShowE2E", true);
 			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
-			this.client1.Add(xmlSniffer);
+			this.client1.Add(xmlSniffer1);
             this.client1.OnConnectionError += this.Client_OnConnectionError1;
 			this.client1.OnError += this.Client_OnError1;
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;
@@ -103,6 +115,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 
 			this.client2.SetTag("ShowE2E", true);
+			this.client2.Add(xmlSniffer2);
 			this.client2.OnConnectionError += this.Client_OnConnectionError2;
 			this.client2.OnError += this.Client_OnError2;
 			this.client2.OnStateChanged += this.Client_OnStateChanged2;
@@ -265,14 +278,14 @@ namespace Waher.Networking.XMPP.Test
 			if (this.client1 is not null)
 			{
 				await this.client1.Information("Stopping test, client 1...");
-				await this.client1.DisposeAsync();
+				await this.client1.OfflineAndDisposeAsync(false);
 				this.client1 = null;
 			}
 
 			if (this.client2 is not null)
 			{
 				await this.client2.Information("Stopping test, client 2...");
-				await this.client2.DisposeAsync();
+				await this.client2.OfflineAndDisposeAsync(false);
 				this.client2 = null;
 			}
 

@@ -1025,9 +1025,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetServerPublicKey(Address, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Key);
+					Result.TrySetResult(e.Key);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get public key."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get public key."));
 
 				return Task.CompletedTask;
 
@@ -1153,9 +1153,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetMatchingLocalKey(Address, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Key);
+					Result.TrySetResult(e.Key);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get matching local key."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get matching local key."));
 
 				return Task.CompletedTask;
 
@@ -1313,9 +1313,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.Apply(Address, Properties, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identity);
+					Result.TrySetResult(e.Identity);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to apply for a legal identity to be registered."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to apply for a legal identity to be registered."));
 
 				return Task.CompletedTask;
 
@@ -1390,9 +1390,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.ReadyForApproval(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(true);
+					Result.TrySetResult(true);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to flag identity as ready for approval."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to flag identity as ready for approval."));
 
 				return Task.CompletedTask;
 
@@ -1688,7 +1688,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.Validate(Identity, ValidateState, (Sender, e) =>
 			{
-				Result.SetResult(e.Status);
+				Result.TrySetResult(e.Status);
 				return Task.CompletedTask;
 			}, null);
 
@@ -1983,9 +1983,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetLegalIdentities(Address, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identities);
+					Result.TrySetResult(e.Identities);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get legal identities."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get legal identities."));
 
 				return Task.CompletedTask;
 
@@ -2070,9 +2070,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetLegalIdentity(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identity);
+					Result.TrySetResult(e.Identity);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get legal identity."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get legal identity."));
 
 				return Task.CompletedTask;
 
@@ -2148,9 +2148,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.ObsoleteLegalIdentity(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identity);
+					Result.TrySetResult(e.Identity);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to obsolete legal identity."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to obsolete legal identity."));
 
 				return Task.CompletedTask;
 
@@ -2226,9 +2226,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.CompromisedLegalIdentity(Address, LegalIdentityId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identity);
+					Result.TrySetResult(e.Identity);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to compromise legal identity."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to compromise legal identity."));
 
 				return Task.CompletedTask;
 
@@ -2328,9 +2328,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.Sign(Address, Data, SignWith, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Signature);
+					Result.TrySetResult(e.Signature);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to sign data."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to sign data."));
 
 				return Task.CompletedTask;
 
@@ -2410,9 +2410,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.Sign(Address, Data, SignWith, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Signature);
+					Result.TrySetResult(e.Signature);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to sign data."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to sign data."));
 
 				return Task.CompletedTask;
 
@@ -2508,9 +2508,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.ValidateSignature(Address, LegalId, Data, Signature, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identity);
+					Result.TrySetResult(e.Identity);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to sign data."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to sign data."));
 
 				return Task.CompletedTask;
 
@@ -2781,9 +2781,9 @@ namespace Waher.Networking.XMPP.Contracts
 				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Contract);
+					Result.TrySetResult(e.Contract);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to create the contract."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to create the contract."));
 
 				return Task.CompletedTask;
 
@@ -3064,9 +3064,9 @@ namespace Waher.Networking.XMPP.Contracts
 				ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate, (Sender, e) =>
 				{
 					if (e.Ok)
-						Result.SetResult(e.Contract);
+						Result.TrySetResult(e.Contract);
 					else
-						Result.SetException(e.StanzaError ?? new Exception("Unable to create the contract."));
+						Result.TrySetException(e.StanzaError ?? new Exception("Unable to create the contract."));
 
 					return Task.CompletedTask;
 
@@ -3219,9 +3219,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetCreatedContractReferences(Address, Offset, MaxCount, (Sender, e) =>
 				{
 					if (e.Ok)
-						Result.SetResult(e.References);
+						Result.TrySetResult(e.References);
 					else
-						Result.SetException(e.StanzaError ?? new Exception("Unable to get created contract references."));
+						Result.TrySetException(e.StanzaError ?? new Exception("Unable to get created contract references."));
 
 					return Task.CompletedTask;
 
@@ -3386,7 +3386,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.GetCreatedContracts(Address, Offset, MaxCount, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
@@ -3500,9 +3500,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.SignContract(Address, Contract, Role, Transferable, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Contract);
+					Result.TrySetResult(e.Contract);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to sign the contract."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to sign the contract."));
 
 				return Task.CompletedTask;
 
@@ -3608,9 +3608,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetSignedContractReferences(Address, Offset, MaxCount, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.References);
+					Result.TrySetResult(e.References);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get signed contract references."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get signed contract references."));
 
 				return Task.CompletedTask;
 
@@ -3727,7 +3727,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.GetSignedContracts(Address, Offset, MaxCount, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
@@ -3811,9 +3811,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetContract(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Contract);
+					Result.TrySetResult(e.Contract);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get the contract."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get the contract."));
 
 				return Task.CompletedTask;
 
@@ -3929,7 +3929,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.GetContracts(ContractIds, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
@@ -3949,7 +3949,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.GetContracts(Address, ContractIds, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
@@ -4016,9 +4016,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.ObsoleteContract(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Contract);
+					Result.TrySetResult(e.Contract);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to obsolete the contract."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to obsolete the contract."));
 
 				return Task.CompletedTask;
 
@@ -4086,9 +4086,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.DeleteContract(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Contract);
+					Result.TrySetResult(e.Contract);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to delete the contract."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to delete the contract."));
 
 				return Task.CompletedTask;
 
@@ -4229,9 +4229,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.UpdateContract(Address, Contract, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Contract);
+					Result.TrySetResult(e.Contract);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to update the contract."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to update the contract."));
 
 				return Task.CompletedTask;
 
@@ -4752,7 +4752,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.Validate(Contract, ValidateState, (Sender, e) =>
 			{
-				Result.SetResult(e.Status);
+				Result.TrySetResult(e.Status);
 				return Task.CompletedTask;
 			}, null);
 
@@ -5143,9 +5143,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetSchemas(Address, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.References);
+					Result.TrySetResult(e.References);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get schemas."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get schemas."));
 
 				return Task.CompletedTask;
 
@@ -5283,9 +5283,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetSchema(Address, Namespace, Digest, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Schema);
+					Result.TrySetResult(e.Schema);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get schema."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get schema."));
 
 				return Task.CompletedTask;
 
@@ -5408,9 +5408,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetContractLegalIdentities(Address, ContractId, Current, Historic, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identities);
+					Result.TrySetResult(e.Identities);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get legal identities."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get legal identities."));
 
 				return Task.CompletedTask;
 
@@ -5503,9 +5503,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.GetContractNetworkIdentities(Address, ContractId, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Identities);
+					Result.TrySetResult(e.Identities);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get network identities."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get network identities."));
 
 				return Task.CompletedTask;
 
@@ -5691,7 +5691,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.Search(Address, Offset, MaxCount, Filter, (Sender, e) =>
 			{
-				Result.SetResult(e);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -7293,9 +7293,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.AuthorizeAccessToId(Address, LegalId, RemoteId, Authorized, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(true);
+					Result.TrySetResult(true);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to authorize access to legal identity."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to authorize access to legal identity."));
 
 				return Task.CompletedTask;
 
@@ -7372,9 +7372,9 @@ namespace Waher.Networking.XMPP.Contracts
 			await this.AuthorizeAccessToContract(Address, ContractId, RemoteId, Authorized, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(true);
+					Result.TrySetResult(true);
 				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to authorize access to legal identity."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to authorize access to legal identity."));
 
 				return Task.CompletedTask;
 

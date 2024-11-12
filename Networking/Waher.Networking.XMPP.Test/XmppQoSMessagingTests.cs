@@ -21,33 +21,33 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void QoS_Test_01_Unacknowledged_Service()
+		public async Task QoS_Test_01_Unacknowledged_Service()
 		{
-			this.QoSTest(QoSLevel.Unacknowledged);
+			await this.QoSTest(QoSLevel.Unacknowledged);
 		}
 
 		[TestMethod]
-		public void QoS_Test_02_Acknowledged_Service()
+		public async Task QoS_Test_02_Acknowledged_Service()
 		{
-			this.QoSTest(QoSLevel.Acknowledged);
+			await this.QoSTest(QoSLevel.Acknowledged);
 		}
 
 		[TestMethod]
-		public void QoS_Test_03_Assured_Service()
+		public async Task QoS_Test_03_Assured_Service()
 		{
-			this.QoSTest(QoSLevel.Assured);
+			await this.QoSTest(QoSLevel.Assured);
 		}
 
-		private void QoSTest(QoSLevel Level)
+		private async Task QoSTest(QoSLevel Level)
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 
 			ManualResetEvent Received = new(false);
 			ManualResetEvent Delivered = new(false);
 
 			this.client2.OnNormalMessage += (Sender, e) => { Received.Set(); return Task.CompletedTask; };
 
-			this.client1.SendMessage(Level, MessageType.Normal, this.client2.FullJID, string.Empty, "Hello", string.Empty, "en",
+			await this.client1.SendMessage(Level, MessageType.Normal, this.client2.FullJID, string.Empty, "Hello", string.Empty, "en",
 				string.Empty, string.Empty, (Sender, e) => { Delivered.Set(); return Task.CompletedTask; }, null);
 
 			Assert.IsTrue(Delivered.WaitOne(10000), "Message not delivered properly.");
@@ -55,12 +55,12 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void QoS_Test_04_Timeout()
+		public async Task QoS_Test_04_Timeout()
 		{
 			ManualResetEvent Done = new(false);
 			IqResultEventArgs e2 = null;
 
-			this.ConnectClients();
+			await this.ConnectClients();
 
 			this.client2.RegisterIqGetHandler("test", "test", (Sender, e) =>
 			{
@@ -68,7 +68,7 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			}, false);
 
-			this.client1.SendIqGet(this.client2.FullJID, "<test:test xmlns:test='test'/>", (Sender, e) =>
+			await this.client1.SendIqGet(this.client2.FullJID, "<test:test xmlns:test='test'/>", (Sender, e) =>
 			{
 				e2 = e;
 				Done.Set();

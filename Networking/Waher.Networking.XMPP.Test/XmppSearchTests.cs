@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Search;
 using Waher.Networking.XMPP.ServiceDiscovery;
@@ -23,17 +24,17 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Search_Test_01_FindSearchForms()
+		public async Task Search_Test_01_FindSearchForms()
 		{
-			string[] JIDs = this.SearchJIDs();
+			string[] JIDs = await this.SearchJIDs();
 
 			foreach (string JID in JIDs)
 				ConsoleOut.WriteLine(JID);
 		}
 
-		private string[] SearchJIDs()
+		private async Task<string[]> SearchJIDs()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			List<string> SupportsSearch = new();
 
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
@@ -52,9 +53,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Search_Test_02_GetSearchForms()
+		public async Task Search_Test_02_GetSearchForms()
 		{
-			string[] JIDs = this.SearchJIDs();
+			string[] JIDs = await this.SearchJIDs();
 
 			foreach (string JID in JIDs)
 			{
@@ -79,9 +80,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Search_Test_03_DoSearch()
+		public async Task Search_Test_03_DoSearch()
 		{
-			string[] JIDs = this.SearchJIDs();
+			string[] JIDs = await this.SearchJIDs();
 
 			foreach (string JID in JIDs)
 			{

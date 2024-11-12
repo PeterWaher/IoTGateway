@@ -162,7 +162,7 @@ namespace Waher.Runtime.ServiceRegistration
 
 			await this.client.SendIqSet(this.registryJid, Xml.ToString(), (Sender, e) =>
 			{
-				T.SetResult(e.Ok);
+				T.TrySetResult(e.Ok);
 				return Task.CompletedTask;
 			}, null);
 

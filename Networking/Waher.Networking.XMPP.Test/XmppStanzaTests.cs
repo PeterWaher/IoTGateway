@@ -21,9 +21,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Stanza_Test_01_ChatMessage()
+		public async Task Stanza_Test_01_ChatMessage()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			ManualResetEvent Done = new(false);
 			this.client2.OnChatMessage += (Sender, e) =>
 			{
@@ -31,15 +31,15 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			this.client1.SendChatMessage(this.client2.FullJID, "Hello");
+			await this.client1.SendChatMessage(this.client2.FullJID, "Hello");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Message not delivered properly.");
 		}
 
 		[TestMethod]
-		public void Stanza_Test_02_ChatMessageWithSubject()
+		public async Task Stanza_Test_02_ChatMessageWithSubject()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			ManualResetEvent Done = new(false);
 			this.client2.OnChatMessage += (Sender, e) =>
 			{
@@ -47,15 +47,15 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			this.client1.SendChatMessage(this.client2.FullJID, "Hello", "Greeting");
+			await this.client1.SendChatMessage(this.client2.FullJID, "Hello", "Greeting");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Message not delivered properly.");
 		}
 
 		[TestMethod]
-		public void Stanza_Test_03_ChatMessageWithSubjectAndLanguage()
+		public async Task Stanza_Test_03_ChatMessageWithSubjectAndLanguage()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			ManualResetEvent Done = new(false);
 			this.client2.OnChatMessage += (Sender, e) =>
 			{
@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.Test
 				return Task.CompletedTask;
 			};
 
-			this.client1.SendChatMessage(this.client2.FullJID, "Hello", "Greeting", "en");
+			await this.client1.SendChatMessage(this.client2.FullJID, "Hello", "Greeting", "en");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Message not delivered properly.");
 		}
@@ -71,7 +71,7 @@ namespace Waher.Networking.XMPP.Test
 		[TestMethod]
 		public async Task Stanza_Test_04_Presence()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			ManualResetEvent Done = new(false);
 			this.client1.OnPresence += (Sender, e) =>
 			{
@@ -130,9 +130,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Stanza_Test_05_IQ_Get()
+		public async Task Stanza_Test_05_IQ_Get()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.client1.RegisterIqGetHandler("query", "test", (Sender, e) =>
 			{
 				return e.IqResult("<response xmlns='test'/>");
@@ -142,9 +142,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Stanza_Test_06_IQ_Set()
+		public async Task Stanza_Test_06_IQ_Set()
 		{
-			this.ConnectClients();
+			await this.ConnectClients();
 			this.client1.RegisterIqSetHandler("query", "test", (Sender, e) =>
 			{
 				return e.IqResult("<response xmlns='test'/>");

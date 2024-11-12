@@ -1571,6 +1571,133 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Sends an IQ Get stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza.</returns>
+		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, Client.DefaultRetryTimeout,
+				Client.DefaultNrRetries, Client.DefaultDropOff, Client.DefaultMaxRetryTimeout, false, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Get stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza.</returns>
+		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, 
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, false,
+				RetryTimeout, false, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Get stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza.</returns>
+		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+			int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, RetryTimeout,
+				NrRetries, DropOff, MaxRetryTimeout, false, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Set stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza.</returns>
+		public Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Client, E2ETransmission, null, To, Xml, "set", Callback, State,
+				Client.DefaultRetryTimeout, Client.DefaultNrRetries, Client.DefaultDropOff,
+				Client.DefaultMaxRetryTimeout, false, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Set stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza.</returns>
+		public Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries,
+			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Client, E2ETransmission, null, To, Xml, "set", Callback, State, RetryTimeout,
+				NrRetries, false, RetryTimeout, false, DeliveryCallback);
+		}
+
+		/// <summary>
+		/// Sends an IQ Set stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza.</returns>
+		public Task<uint> SendIqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+			int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
+		{
+			return this.SendIq(Client, E2ETransmission, null, To, Xml, "set", Callback, State, RetryTimeout,
+				NrRetries, DropOff, MaxRetryTimeout, false, DeliveryCallback);
+		}
+
+		/// <summary>
 		/// Sends an IQ Result stanza
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
@@ -1631,9 +1758,39 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
 		/// <exception cref="ObjectDisposedException">If endpoint security object has been disposed.</exception>
 		/// <exception cref="InvalidOperationException">If E2E transmission is asserted, but no E2E-encrypted channel could be established.</exception>
-		protected async Task<uint> SendIq(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml,
+		protected Task<uint> SendIq(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml,
 			string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
 			int MaxRetryTimeout, bool PkiSynchronized)
+		{
+			return this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State, RetryTimeout, NrRetries, DropOff, 
+				MaxRetryTimeout, PkiSynchronized, null);
+		}
+
+		/// <summary>
+		/// Sends an IQ stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="Id">Id attribute</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Type">Type attribute</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
+		/// <param name="PkiSynchronized">If E2E information has been synchronized. If not, and a forbidden response is returned,
+		/// E2E information is first synchronized, and the operation retried, before conceding failure.</param>
+		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
+		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+		/// <exception cref="ObjectDisposedException">If endpoint security object has been disposed.</exception>
+		/// <exception cref="InvalidOperationException">If E2E transmission is asserted, but no E2E-encrypted channel could be established.</exception>
+		protected async Task<uint> SendIq(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml,
+			string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
+			int MaxRetryTimeout, bool PkiSynchronized, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
 		{
 			if (this.client is null)
 				throw new ObjectDisposedException("Endpoint security object disposed.");
@@ -1649,7 +1806,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				return await Client.SendIq(Id, To, XmlEnc, Type, this.IqResult,
 					new object[] { Callback, State, E2ETransmission, Id, To, Xml, Type, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, PkiSynchronized },
-					RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
+					RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, DeliveryCallback);
 			}
 
 			if (E2ETransmission == E2ETransmission.IgnoreIfNotE2E)
@@ -1673,15 +1830,20 @@ namespace Waher.Networking.XMPP.P2P
 					if (e.Ok)
 					{
 						await this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State,
-							RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, true);
+							RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, true, DeliveryCallback);
 					}
 					else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
 					{
 						await Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
-							NrRetries, DropOff, MaxRetryTimeout);
+							NrRetries, DropOff, MaxRetryTimeout, DeliveryCallback);
 					}
 					else
+					{
+						if (!(DeliveryCallback is null))
+							await DeliveryCallback.Raise(Sender, new DeliveryEventArgs(Sender, true));
+
 						await Callback.Raise(Sender, e);
+					}
 				}, State);
 
 				return SeqNr;
@@ -1689,7 +1851,7 @@ namespace Waher.Networking.XMPP.P2P
 			else if (E2ETransmission == E2ETransmission.NormalIfNotE2E)
 			{
 				return await Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout,
-					NrRetries, DropOff, MaxRetryTimeout);
+					NrRetries, DropOff, MaxRetryTimeout, DeliveryCallback);
 			}
 			else
 				throw new InvalidOperationException("End-to-End Encryption not available between " + Client.FullJID + " and " + To + ".");
@@ -1733,9 +1895,9 @@ namespace Waher.Networking.XMPP.P2P
 			await this.SendIqGet(Client, E2ETransmission, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Response);
+					Result.TrySetResult(e.Response);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
 
 				return Task.CompletedTask;
 
@@ -1782,9 +1944,9 @@ namespace Waher.Networking.XMPP.P2P
 			await this.SendIqSet(Client, E2ETransmission, To, Xml, (Sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.Response);
+					Result.TrySetResult(e.Response);
 				else
-					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
+					Result.TrySetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
 
 				return Task.CompletedTask;
 

@@ -55,7 +55,7 @@ namespace Waher.Networking.XMPP.Interoperability
 			string UserToken = XML.Attribute(E, "ut");
 
 			InteroperabilityServerEventArgs e2 = new InteroperabilityServerEventArgs(NodeId, SourceId, Partition, ServiceToken, DeviceToken, UserToken);
-			await this.OnGetInterfaces.Raise(this, e2);
+			await this.OnGetInterfaces.Raise(this, e2, false);
 
 			StringBuilder Xml = new StringBuilder();
 

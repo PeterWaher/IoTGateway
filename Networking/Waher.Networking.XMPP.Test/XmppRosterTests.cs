@@ -106,7 +106,12 @@ namespace Waher.Networking.XMPP.Test
 			await this.ConnectClients();
 			ManualResetEvent Done = new(false);
 
-			this.client1.OnPresenceSubscribed += (Sender, e) => { Done.Set(); return Task.CompletedTask; };
+			this.client1.OnPresenceSubscribed += (Sender, e) =>
+			{ 
+				Done.Set(); 
+				return Task.CompletedTask; 
+			};
+
 			await this.client1.RequestPresenceSubscription("wpfclient@cybercity.online");
 
 			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");

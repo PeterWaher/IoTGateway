@@ -26,16 +26,90 @@ namespace Waher.Content.Xml
 		/// <returns>XML-encoded string.</returns>
 		public static string Encode(string s)
 		{
-			if (s is null || s.IndexOfAny(specialCharacters) < 0)
-				return s;
-
-			return s.
-				Replace("&", "&amp;").
-				Replace("<", "&lt;").
-				Replace(">", "&gt;").
-				Replace("\"", "&quot;").
-				Replace("'", "&apos;");
+			return CommonTypes.Escape(s, specialCharacters, specialCharacterEncodings);
 		}
+
+		private static readonly char[] specialCharacters = new char[] 
+		{ 
+			'<', 
+			'>', 
+			'&', 
+			'"', 
+			'\'',
+			'\x00',
+			'\x01',
+			'\x02',
+			'\x03',
+			'\x04',
+			'\x05',
+			'\x06',
+			'\x07',
+			'\x08',
+			//'\x09',
+			//'\x0a',
+			'\x0b',
+			'\x0c',
+			//'\x0d',
+			'\x0e',
+			'\x0f',
+			'\x10',
+			'\x11',
+			'\x12',
+			'\x13',
+			'\x14',
+			'\x15',
+			'\x16',
+			'\x17',
+			'\x18',
+			'\x19',
+			'\x1a',
+			'\x1b',
+			'\x1c',
+			'\x1d',
+			'\x1e',
+			'\x1f'
+		};
+
+		private static readonly string[] specialCharacterEncodings = new string[] 
+		{
+			"&amp;", 
+			"&lt;", 
+			"&gt;", 
+			"&quot;",
+			"&apos;",
+			"&#00;",
+			"&#01;",
+			"&#02;",
+			"&#03;",
+			"&#04;",
+			"&#05;",
+			"&#06;",
+			"&#07;",
+			"&#08;",
+			//"&#09;",
+			//"&#10;",
+			"&#11;",
+			"&#12;",
+			//"&#13;",
+			"&#14;",
+			"&#15;",
+			"&#16;",
+			"&#17;",
+			"&#18;",
+			"&#19;",
+			"&#20;",
+			"&#21;",
+			"&#22;",
+			"&#23;",
+			"&#24;",
+			"&#25;",
+			"&#26;",
+			"&#27;",
+			"&#28;",
+			"&#29;",
+			"&#30;",
+			"&#31;"
+		};
 
 		/// <summary>
 		/// Differs from <see cref="Encode(String)"/>, in that it does not encode the aposotrophe.
@@ -44,18 +118,88 @@ namespace Waher.Content.Xml
 		/// <returns>Encoded string</returns>
 		public static string HtmlAttributeEncode(string s)
 		{
-			if (s is null || s.IndexOfAny(specialAttributeCharacters) < 0)
-				return s;
-
-			return s.
-				Replace("&", "&amp;").
-				Replace("<", "&lt;").
-				Replace(">", "&gt;").
-				Replace("\"", "&quot;").
-				Replace("\t", "&#09;").
-				Replace("\n", "&#10;").
-				Replace("\r", "&#13;");
+			return CommonTypes.Escape(s, specialAttributeCharacters, specialAttributeEncodings);
 		}
+
+		private static readonly char[] specialAttributeCharacters = new char[] 
+		{
+			'<', 
+			'>', 
+			'&', 
+			'"', 
+			'\x00',
+			'\x01',
+			'\x02',
+			'\x03',
+			'\x04',
+			'\x05',
+			'\x06',
+			'\x07',
+			'\x08',
+			'\x09',
+			'\x0a',
+			'\x0b',
+			'\x0c',
+			'\x0d',
+			'\x0e',
+			'\x0f',
+			'\x10',
+			'\x11',
+			'\x12',
+			'\x13',
+			'\x14',
+			'\x15',
+			'\x16',
+			'\x17',
+			'\x18',
+			'\x19',
+			'\x1a',
+			'\x1b',
+			'\x1c',
+			'\x1d',
+			'\x1e',
+			'\x1f'
+		};
+
+		private static readonly string[] specialAttributeEncodings = new string[]
+		{
+			"&amp;",
+			"&lt;",
+			"&gt;",
+			"&quot;",
+			"&#00;",
+			"&#01;",
+			"&#02;",
+			"&#03;",
+			"&#04;",
+			"&#05;",
+			"&#06;",
+			"&#07;",
+			"&#08;",
+			"&#09;",
+			"&#10;",
+			"&#11;",
+			"&#12;",
+			"&#13;",
+			"&#14;",
+			"&#15;",
+			"&#16;",
+			"&#17;",
+			"&#18;",
+			"&#19;",
+			"&#20;",
+			"&#21;",
+			"&#22;",
+			"&#23;",
+			"&#24;",
+			"&#25;",
+			"&#26;",
+			"&#27;",
+			"&#28;",
+			"&#29;",
+			"&#30;",
+			"&#31;"
+		};
 
 		/// <summary>
 		/// Differs from <see cref="Encode(String)"/>, in that it does not encode the aposotrophe or the quote.
@@ -64,18 +208,22 @@ namespace Waher.Content.Xml
 		/// <returns>Encoded string</returns>
 		public static string HtmlValueEncode(string s)
 		{
-			if (s is null || s.IndexOfAny(specialValueCharacters) < 0)
-				return s;
-
-			return s.
-				Replace("&", "&amp;").
-				Replace("<", "&lt;").
-				Replace(">", "&gt;");
+			return CommonTypes.Escape(s, specialValueCharacters, specialValueEncodings);
 		}
 
-		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"', '\t', '\r', '\n' };
-		private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
-		private static readonly char[] specialCharacters = new char[] { '<', '>', '&', '"', '\'' };
+		private static readonly char[] specialValueCharacters = new char[] 
+		{ 
+			'<', 
+			'>', 
+			'&' 
+		};
+
+		private static readonly string[] specialValueEncodings = new string[]
+		{
+			"&amp;",
+			"&lt;",
+			"&gt;"
+		};
 
 		/// <summary>
 		/// Encodes a <see cref="DateTime"/> for use in XML.

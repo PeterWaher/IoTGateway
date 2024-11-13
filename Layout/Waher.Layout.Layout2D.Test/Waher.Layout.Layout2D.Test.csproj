@@ -62,7 +62,7 @@
     <None Remove="Xml\Test_54_Paragraph_BLC.xml" />
     <None Remove="Xml\Test_55_Paragraph_BLR.xml" />
     <None Remove="Xml\Test_56_ImageScript.xml" />
-    <None Remove="Xml\Test_57_EmptyCells.xml" />
+    <None Remove="Xml\Test_57_HeightUndefined.xml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Images\Icon_64x64_Resource.png" />
@@ -81,7 +81,7 @@
     <Content Include="Xml\Test_56_ImageScript.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Xml\Test_57_EmptyCells.xml">
+    <Content Include="Xml\Test_57_HeightUndefined.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_53_Paragraph_BLL.xml">

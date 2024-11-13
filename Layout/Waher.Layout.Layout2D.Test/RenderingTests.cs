@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -95,6 +96,12 @@ namespace Waher.Layout.Layout2D.Test
 			}
 			else
 				Directory.CreateDirectory(Path);
+		}
+
+		[ExpectedException(typeof(InvalidOperationException))]
+		public override Task Test_57_HeightUndefined()
+		{
+			return base.Test_57_HeightUndefined();
 		}
 
 	}

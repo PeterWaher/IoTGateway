@@ -376,10 +376,9 @@ namespace Waher.Layout.Layout2D.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
-		public async Task Test_57_EmptyCells()
+		public virtual async Task Test_57_HeightUndefined()
 		{
-			await this.Test("Test_57_EmptyCells");
+			await this.Test("Test_57_HeightUndefined");
 		}
 	}
 }

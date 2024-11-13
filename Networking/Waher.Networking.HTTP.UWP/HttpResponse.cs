@@ -767,6 +767,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+					bool TxText = ContentEncoding is null && this.txText;
 
 					if (this.contentLength.HasValue && ContentEncoding is null)
 					{
@@ -774,7 +775,7 @@ namespace Waher.Networking.HTTP
 						Output.Append(this.contentLength.Value.ToString());
 
 						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
-							this.contentLength.Value, this.clientConnection, this.txText, this.encoding);
+							this.contentLength.Value, this.clientConnection, TxText, this.encoding);
 					}
 					else if (ExpectContent)
 					{
@@ -793,11 +794,13 @@ namespace Waher.Networking.HTTP
 
 							if (PrecompressedFile?.Exists ?? false)
 							{
+								TxText = false;
+
 								Output.Append("\r\nContent-Length: ");
 								Output.Append(PrecompressedFile.Length.ToString());
 
 								this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
-									PrecompressedFile.Length, this.clientConnection, this.txText, this.encoding);
+									PrecompressedFile.Length, this.clientConnection, TxText, this.encoding);
 
 								this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
 							}
@@ -806,7 +809,7 @@ namespace Waher.Networking.HTTP
 								Output.Append("\r\nTransfer-Encoding: chunked");
 
 								this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
-									DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
+									DefaultChunkSize, this.clientConnection, TxText, this.encoding);
 
 								this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
 									this.contentLength.HasValue ? this.eTag : null);
@@ -817,7 +820,7 @@ namespace Waher.Networking.HTTP
 							Output.Append("\r\nTransfer-Encoding: chunked");
 
 							this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
-								DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
+								DefaultChunkSize, this.clientConnection, TxText, this.encoding);
 						}
 					}
 					else
@@ -826,7 +829,7 @@ namespace Waher.Networking.HTTP
 							Output.Append("\r\nContent-Length: 0");
 
 						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0,
-							this.clientConnection, this.txText, this.encoding);
+							this.clientConnection, TxText, this.encoding);
 					}
 
 					if (!(this.challenges is null))

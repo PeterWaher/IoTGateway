@@ -51,11 +51,14 @@ namespace Waher.Networking
 		/// </summary>
 		public virtual void Add(ISniffer Sniffer)
 		{
-			lock (this.sniffers)
+			if (!(Sniffer is null))
 			{
-				this.sniffers.Add(Sniffer);
-				this.staticList = this.sniffers.ToArray();
-				this.hasSniffers = this.staticList.Length > 0;
+				lock (this.sniffers)
+				{
+					this.sniffers.Add(Sniffer);
+					this.staticList = this.sniffers.ToArray();
+					this.hasSniffers = this.staticList.Length > 0;
+				}
 			}
 		}
 
@@ -64,11 +67,19 @@ namespace Waher.Networking
 		/// </summary>
 		public virtual void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
-			lock (this.sniffers)
+			if (!(Sniffers is null))
 			{
-				this.sniffers.AddRange(Sniffers);
-				this.staticList = this.sniffers.ToArray();
-				this.hasSniffers = this.staticList.Length > 0;
+				lock (this.sniffers)
+				{
+					foreach (ISniffer Sniffer in Sniffers)
+					{
+						if (!(Sniffer is null))
+							this.sniffers.Add(Sniffer);
+					}
+
+					this.staticList = this.sniffers.ToArray();
+					this.hasSniffers = this.staticList.Length > 0;
+				}
 			}
 		}
 

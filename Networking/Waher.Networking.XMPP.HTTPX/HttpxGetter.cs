@@ -259,7 +259,10 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				HttpxClient?.Request(FullJid, "GET", LocalUrl, async (Sender, e) =>
+				if (HttpxClient is null)
+					throw new Exception("No HTTPX client available.");
+
+				await HttpxClient.Request(FullJid, "GET", LocalUrl, async (Sender, e) =>
 				{
 					if (e.Ok)
 					{

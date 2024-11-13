@@ -459,15 +459,13 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Is called during startup to configure the system.
 		/// </summary>
-		public override Task ConfigureSystem()
+		public override async Task ConfigureSystem()
 		{
 			if (this.useLegalIdentity && !(Gateway.ContractsClient is null))
-				this.AddHandlers();
-
-			return Task.CompletedTask;
+				await this.AddHandlers();
 		}
 
-		private void AddHandlers()
+		private async Task AddHandlers()
 		{
 			if (!this.handlersAdded || Gateway.ContractsClient != this.prevClient)
 			{
@@ -486,24 +484,25 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
-					this.GetLegalIdentities();
+					await this.GetLegalIdentities();
 			}
 		}
 
 		private bool handlersAdded = false;
 		private ContractsClient prevClient = null;
 
-		private Task XmppClient_OnStateChanged(object Sender, XmppState NewState)
+		private async Task XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{
 			if (NewState == XmppState.Connected)
-				this.GetLegalIdentities();
-
-			return Task.CompletedTask;
+				await this.GetLegalIdentities();
 		}
 
-		private void GetLegalIdentities()
+		private Task GetLegalIdentities()
 		{
-			Gateway.ContractsClient?.GetLegalIdentities((Sender, e) =>
+			if (Gateway.ContractsClient is null)
+				return Task.CompletedTask;
+
+			return Gateway.ContractsClient.GetLegalIdentities((Sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -846,14 +845,18 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
 		/// <returns>If all system configuration objects must be reloaded from the database.</returns>
-		public override Task<bool> SetupConfiguration(HttpServer WebServer)
+		public override async Task<bool> SetupConfiguration(HttpServer WebServer)
 		{
-			if (!this.Complete && Gateway.XmppClient.State == XmppState.Offline)
-				Gateway.XmppClient?.Connect();
+			if (!this.Complete &&
+				Gateway.XmppClient.State == XmppState.Offline &&
+				!(Gateway.XmppClient is null))
+			{
+				await Gateway.XmppClient.Connect();
+			}
 
-			this.AddHandlers();
+			await this.AddHandlers();
 
-			return base.SetupConfiguration(WebServer);
+			return await base.SetupConfiguration(WebServer);
 		}
 
 		/// <summary>

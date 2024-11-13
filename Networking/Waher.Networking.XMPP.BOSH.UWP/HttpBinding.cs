@@ -538,7 +538,14 @@ namespace Waher.Networking.XMPP.BOSH
 							{
 								if (!string.IsNullOrEmpty(Packet))
 								{
-									this.xmppClient?.Information("Outbound stanza queued.");
+									if (this.xmppClient?.HasSniffers ?? false)
+									{
+										Task.Run(() =>
+										{
+											return this.xmppClient.Information("Outbound stanza queued.");
+										});
+									}
+
 									this.outputQueue.AddLast(new OutputRec()
 									{
 										Packet = Packet,
@@ -638,8 +645,8 @@ namespace Waher.Networking.XMPP.BOSH
 					if (this.disposed)
 						break;
 
-					if (HasSniffers)
-						this.xmppClient?.TransmitText(s);
+					if (HasSniffers && !(this.xmppClient is null))
+						await this.xmppClient.TransmitText(s);
 
 					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, XmlCodec.DefaultContentType);
 

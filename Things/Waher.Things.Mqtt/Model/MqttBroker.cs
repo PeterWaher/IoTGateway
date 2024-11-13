@@ -213,12 +213,12 @@ namespace Waher.Things.Mqtt.Model
 
 					case MqttState.Error:
 						await this.node.LogErrorAsync("Error", "Connection to broker failed.");
-						this.Reconnect();
+						await this.Reconnect();
 						break;
 
 					case MqttState.Offline:
 						await this.node.LogErrorAsync("Offline", "Connection is closed.");
-						this.Reconnect();
+						await this.Reconnect();
 						break;
 				}
 			}
@@ -283,16 +283,17 @@ namespace Waher.Things.Mqtt.Model
 
 		private Task MqttClient_OnConnectionError(object Sender, Exception Exception)
 		{
-			this.Reconnect();
-			return Task.CompletedTask;
+			return this.Reconnect();
 		}
 
-		private void Reconnect()
+		private async Task Reconnect()
 		{
 			if (this.connectionOk)
 			{
 				this.connectionOk = false;
-				this.mqttClient?.Reconnect();
+
+				if (!(this.mqttClient is null))
+					await this.mqttClient.Reconnect();
 			}
 		}
 

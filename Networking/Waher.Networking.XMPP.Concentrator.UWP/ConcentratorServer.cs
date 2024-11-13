@@ -1860,7 +1860,7 @@ namespace Waher.Networking.XMPP.Concentrator
 									await this.UpdateNodeRegistration(LifeCycleManagement);
 							}
 							else if (PreProvisioned)
-								this.UnregisterNode(LifeCycleManagement);
+								await this.UnregisterNode(LifeCycleManagement);
 						}
 					}
 					else
@@ -2096,7 +2096,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								await this.UpdateNodeRegistration(LifeCycleManagement);
 						}
 						else if (PreProvisioned)
-							this.UnregisterNode(LifeCycleManagement);
+							await this.UnregisterNode(LifeCycleManagement);
 					}
 				}
 
@@ -2384,7 +2384,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			KeyValuePair<string, object>[] MetaData = await Node.GetMetaData();
 
-			this.thingRegistryClient?.RegisterThing(false, Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, true),
+			if (this.thingRegistryClient is null)
+				throw new Exception("No thing registry client available.");
+
+			await this.thingRegistryClient.RegisterThing(false, Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, true),
 				async (Sender, e) =>
 				{
 					try
@@ -2437,7 +2440,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			KeyValuePair<string, object>[] MetaData = await Node.GetMetaData();
 
-			this.thingRegistryClient?.UpdateThing(Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, false),
+			if (this.thingRegistryClient is null)
+				throw new Exception("No thing registry client available.");
+
+			await this.thingRegistryClient.UpdateThing(Node.NodeId, Node.SourceId, Node.Partition, await this.GetTags(Node, MetaData, false),
 				async (Sender, e) =>
 				{
 					try
@@ -2478,13 +2484,16 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// Unregisters a node from the thing registry.
 		/// </summary>
 		/// <param name="Node">Node to unregister.</param>
-		public void UnregisterNode(ILifeCycleManagement Node)
+		public Task UnregisterNode(ILifeCycleManagement Node)
 		{
 			string NodeId = Node.NodeId;
 			string SourceId = Node.SourceId;
 			string Partition = Node.Partition;
 
-			this.thingRegistryClient?.Unregister(NodeId, SourceId, Partition, (Sender, e) =>
+			if (this.thingRegistryClient is null)
+				throw new Exception("No thing registry client available.");
+
+			return this.thingRegistryClient.Unregister(NodeId, SourceId, Partition, (Sender, e) =>
 			{
 				try
 				{
@@ -2618,7 +2627,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			};
 
 			if (Node is ILifeCycleManagement LifeCycleManagement)
-				this.UnregisterNode(LifeCycleManagement);
+				await this.UnregisterNode(LifeCycleManagement);
 
 			if (!(Parent is null))
 				await Parent.RemoveAsync(Node);

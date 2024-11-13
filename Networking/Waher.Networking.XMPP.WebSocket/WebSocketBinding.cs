@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			{
 				try
 				{
-					Result= await h(this, Payload);
+					Result = await h(this, Payload);
 				}
 				catch (Exception ex)
 				{
@@ -400,7 +400,10 @@ namespace Waher.Networking.XMPP.WebSocket
 
 		private async Task<string> ReadText()
 		{
-			WebSocketReceiveResult Response = await this.webSocketClient?.ReceiveAsync(this.inputBuffer, CancellationToken.None);
+			if (this.webSocketClient is null)
+				throw new Exception("No web socket client available.");
+
+			WebSocketReceiveResult Response = await this.webSocketClient.ReceiveAsync(this.inputBuffer, CancellationToken.None);
 			if (Response is null)
 				return string.Empty;
 
@@ -486,7 +489,14 @@ namespace Waher.Networking.XMPP.WebSocket
 			{
 				if (this.writing)
 				{
-					this.xmppClient?.Information("Outbound stanza queued.");
+					if (this.xmppClient?.HasSniffers ?? false)
+					{
+						Task.Run(() =>
+						{
+							return this.xmppClient.Information("Outbound stanza queued.");
+						});
+					}
+
 					this.queue.AddLast(new KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>(Packet, DeliveryCallback));
 					return true;
 				}
@@ -500,11 +510,15 @@ namespace Waher.Networking.XMPP.WebSocket
 
 				while (!(Packet is null) && !this.disposed)
 				{
-					if (HasSniffers)
-						this.xmppClient?.TransmitText(Packet);
+					if (HasSniffers && !(this.xmppClient is null))
+						await this.xmppClient.TransmitText(Packet);
 
 					ArraySegment<byte> Buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(Packet));
-					await this.webSocketClient?.SendAsync(Buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+
+					if (this.webSocketClient is null)
+						throw new Exception("No web socket client available.");
+
+					await this.webSocketClient.SendAsync(Buffer, WebSocketMessageType.Text, true, CancellationToken.None);
 
 					this.bindingInterface.NextPing = DateTime.Now.AddMinutes(1);
 

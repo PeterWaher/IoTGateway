@@ -357,14 +357,18 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="WebServer">Current Web Server object.</param>
 		/// <returns>If all system configuration objects must be reloaded from the database.</returns>
-		public override Task<bool> SetupConfiguration(HttpServer WebServer)
+		public override async Task<bool> SetupConfiguration(HttpServer WebServer)
 		{
-			if (!this.Complete && Gateway.XmppClient.State == XmppState.Offline)
-				Gateway.XmppClient?.Connect();
+			if (!this.Complete &&
+				Gateway.XmppClient.State == XmppState.Offline &&
+				!(Gateway.XmppClient is null))
+			{
+				await Gateway.XmppClient.Connect();
+			}
 
 			this.AddHandlers();
 
-			return base.SetupConfiguration(WebServer);
+			return await base.SetupConfiguration(WebServer);
 		}
 
 		private async Task ConnectToJID(HttpRequest Request, HttpResponse Response)

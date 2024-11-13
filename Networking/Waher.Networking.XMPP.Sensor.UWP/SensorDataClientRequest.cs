@@ -202,7 +202,10 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.Append(XML.Encode(this.Id));
 			Xml.Append("'/>");
 
-			return this.sensorClient?.Client?.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
+			XmppClient Client = this.sensorClient?.Client
+				?? throw new Exception("No XMPP client available.");
+
+			return Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
 		}
 
 		private Task CancelResponse(object _, IqResultEventArgs e)

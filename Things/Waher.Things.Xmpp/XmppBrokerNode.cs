@@ -286,7 +286,7 @@ namespace Waher.Things.Xmpp
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(Exception Exception) => (await this.GetBroker()).Client?.Exception(Exception);
+		public async Task Exception(Exception Exception) => await ((await this.GetBroker()).Client?.Exception(Exception) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.

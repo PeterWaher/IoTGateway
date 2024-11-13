@@ -2547,11 +2547,13 @@ namespace Waher.IoTGateway
 					scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
 					XmppState? State2 = xmppClient?.State;
-					if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
+					if (State2.HasValue && 
+						(State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating) &&
+						!(xmppClient is null))
 					{
 						try
 						{
-							xmppClient?.Reconnect();
+							await xmppClient.Reconnect();
 						}
 						catch (Exception ex)
 						{
@@ -3591,9 +3593,12 @@ namespace Waher.IoTGateway
 		/// Publishes a personal event on the XMPP network.
 		/// </summary>
 		/// <param name="PersonalEvent">Personal event to publish.</param>
-		public static void PublishPersonalEvent(IPersonalEvent PersonalEvent)
+		public static Task PublishPersonalEvent(IPersonalEvent PersonalEvent)
 		{
-			pepClient?.Publish(PersonalEvent, null, null);
+			if (pepClient is null)
+				throw new Exception("No PEP client available.");
+
+			return pepClient.Publish(PersonalEvent, null, null);
 		}
 
 		/// <summary>

@@ -1,13 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Events;
-using Waher.Events.Console;
-using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -16,6 +7,18 @@ namespace Waher.Networking.XMPP.Test
 	{
 		public BoshStanzaTests()
 		{
+		}
+
+		[ClassInitialize]
+		public new static void ClassInitialize(TestContext _)
+		{
+			SetupSnifferAndLog();
+		}
+
+		[ClassCleanup]
+		public new static void ClassCleanup()
+		{
+			DisposeSnifferAndLog();
 		}
 
 		public override XmppCredentials GetCredentials1()

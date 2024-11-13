@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Json;
-using Waher.Events;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Xml.Text

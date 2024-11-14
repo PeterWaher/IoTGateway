@@ -4,7 +4,6 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<Version>3.1.3</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -18,8 +17,9 @@ https://waher.se/Markdown.md</Description>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown LaTeX</PackageTags>
-    <AssemblyVersion>3.1.3</AssemblyVersion>
-    <FileVersion>3.1.3</FileVersion>
+    <AssemblyVersion>3.1.4</AssemblyVersion>
+    <FileVersion>3.1.4</FileVersion>
+		<Version>3.1.4</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 	<PropertyGroup>

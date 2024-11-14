@@ -5,7 +5,6 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>2.0.4</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -22,9 +21,10 @@ https://waher.se/Script.md#externalMySQLDatabaseRelatedFunctionsWaherScriptDataM
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing external MySQL database</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.0.4</AssemblyVersion>
-    <FileVersion>2.0.4</FileVersion>
-  </PropertyGroup>
+    <AssemblyVersion>2.0.5</AssemblyVersion>
+    <FileVersion>2.0.5</FileVersion>
+		<Version>2.0.5</Version>
+	</PropertyGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

@@ -18,7 +18,7 @@
     <FileVersion>1.0.0</FileVersion>
     <StartupObject>Waher.IoTGateway.Svc.Program</StartupObject>
     <ApplicationIcon>eye.ico</ApplicationIcon>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm;osx-x64;osx-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64;osx-x64;osx-arm64</RuntimeIdentifiers>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway.Svc\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

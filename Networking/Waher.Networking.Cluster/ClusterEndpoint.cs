@@ -1161,7 +1161,7 @@ namespace Waher.Networking.Cluster
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task Ping(EventHandlerAsync<ClusterMessageAckEventArgs> Callback, object State)
 		{
-			return this.SendMessageAcknowledged(new Ping(), Callback, State);
+			return this.SendMessageAcknowledged(new Messages.Ping(), Callback, State);
 		}
 
 		/// <summary>

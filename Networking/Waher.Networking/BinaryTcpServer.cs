@@ -667,13 +667,13 @@ namespace Waher.Networking
 			{
 				await this.LoginFailure(ex, Connection);
 			}
-			catch (Win32Exception ex)
-			{
-				await this.LoginFailure(ex, Connection);
-			}
 			catch (SocketException)
 			{
 				Connection.Client.Dispose();
+			}
+			catch (Win32Exception ex)
+			{
+				await this.LoginFailure(ex, Connection);
 			}
 			catch (IOException)
 			{

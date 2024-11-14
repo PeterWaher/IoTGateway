@@ -1741,7 +1741,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 				case "TIMEZONE":
 					Node = this.ParseArgument(Parser);
-					return new TimeZone(Node, Start, Parser.Position - Start, Parser.Expression);
+					return new Waher.Content.Semantic.Functions.TimeZone(Node, Start, Parser.Position - Start, Parser.Expression);
 
 				case "TZ":
 					Node = this.ParseArgument(Parser);

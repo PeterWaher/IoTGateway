@@ -29337,6 +29337,7 @@
       "packagesPath": "C:\\Users\\peter\\.nuget\\packages\\",
       "outputPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.MQTT.UWP\\obj\\",
       "projectStyle": "ProjectJson",
+      "UsingMicrosoftNETSdk": false,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"

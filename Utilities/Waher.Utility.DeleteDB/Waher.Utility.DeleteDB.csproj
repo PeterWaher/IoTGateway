@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <StartupObject>Waher.Utility.DeleteDB.Program</StartupObject>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
@@ -48,10 +48,10 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
-    <Exec Command="mkdir -p &quot;$(ProjectDir)obj/$(ConfigurationName)/net6.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
-    <Exec Command="cp &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj/$(ConfigurationName)/net6.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="mkdir -p &quot;$(ProjectDir)obj/$(ConfigurationName)/net8.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="cp &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj/$(ConfigurationName)/net8.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
   </Target>
 
 </Project>

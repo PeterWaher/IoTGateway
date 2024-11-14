@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
@@ -52,9 +52,9 @@
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
-    <Exec Command="mkdir -p &quot;$(ProjectDir)obj/$(ConfigurationName)/net6.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
-    <Exec Command="cp &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj/$(ConfigurationName)/net6.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="mkdir -p &quot;$(ProjectDir)obj/$(ConfigurationName)/net8.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
+    <Exec Command="cp &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj/$(ConfigurationName)/net8.0/osx-arm64&quot;" Condition="'$(OS)'=='Unix'" />
   </Target>
 </Project>

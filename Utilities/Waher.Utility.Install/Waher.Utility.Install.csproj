@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm;osx-x64;osx-arm64</RuntimeIdentifiers>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
@@ -62,7 +62,7 @@
     <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net6.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="if not exist &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot; md &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)obj\$(ConfigurationName)\net8.0\win-x86&quot;" Condition="'$(OS)'=='Windows_NT'" />
   </Target>
 </Project>

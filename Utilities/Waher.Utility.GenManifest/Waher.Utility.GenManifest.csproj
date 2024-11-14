@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Description>Command-line tool that can generate manifest files from files existing in folders.</Description>

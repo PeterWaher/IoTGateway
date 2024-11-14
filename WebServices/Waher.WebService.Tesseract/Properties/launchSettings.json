@@ -4,7 +4,7 @@
       "commandName": "Executable",
       "executablePath": "C:\\Program Files\\dotnet\\dotnet.exe",
       "commandLineArgs": "Waher.IoTGateway.Console.dll -instance Dev",
-      "workingDirectory": "C:\\My Projects\\IoTGateway\\Waher.IoTGateway.Console\\bin\\$(ConfigurationName)\\net6.0\\"
+      "workingDirectory": "C:\\My Projects\\IoTGateway\\Waher.IoTGateway.Console\\bin\\$(ConfigurationName)\\net8.0\\"
     }
   }
 }

@@ -30,7 +30,7 @@ namespace Waher.Events.Socket
 		/// </summary>
 		private SocketEventRecipient(int Port, bool LogIncomingEvents, params ISniffer[] Sniffers)
 		{
-			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(10), Sniffers);
+			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(10), false, Sniffers);
 			this.logIncoming = LogIncomingEvents;
 		}
 

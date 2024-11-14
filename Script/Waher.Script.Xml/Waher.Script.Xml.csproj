@@ -20,12 +20,12 @@ https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution xml</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.2.2</AssemblyVersion>
-    <FileVersion>2.2.2</FileVersion>
-    <PackageIcon>Icon_64x64.png</PackageIcon>
-    <PackageIconUrl />
-    <Version>2.2.2</Version>
-  </PropertyGroup>
+    <AssemblyVersion>2.2.3</AssemblyVersion>
+    <FileVersion>2.2.3</FileVersion>
+		<Version>2.2.3</Version>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+		<PackageIconUrl />
+	</PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <Version>2.0.4</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -16,9 +15,10 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptTh
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing threading parallel semaphore</PackageTags>
-    <AssemblyVersion>2.0.4</AssemblyVersion>
-    <FileVersion>2.0.4</FileVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>2.1.0</AssemblyVersion>
+    <FileVersion>2.1.0</FileVersion>
+		<Version>2.1.0</Version>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

@@ -708,7 +708,7 @@ namespace Waher.Utility.Acme
 
                             SignatureAlgorithm SignAlg = new RsaSha256(RSA);
 
-                            Order = await Order.FinalizeOrder(new CertificateRequest(SignAlg)
+                            Order = await Order.FinalizeOrder(new Security.PKCS.CertificateRequest(SignAlg)
                             {
                                 CommonName = domainNames[0],
                                 SubjectAlternativeNames = DomainNames,

@@ -932,7 +932,7 @@ namespace Waher.Networking.HTTP
 
 				await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 
-				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client);
+				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 				BinaryTcpClient.Bind(true);
 				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
 				BinaryTcpClient.Continue();
@@ -1128,13 +1128,13 @@ namespace Waher.Networking.HTTP
 				{
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
-				catch (Win32Exception ex)
-				{
-					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
-				}
 				catch (SocketException)
 				{
 					Client.Dispose();
+				}
+				catch (Win32Exception ex)
+				{
+					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
 				catch (IOException)
 				{

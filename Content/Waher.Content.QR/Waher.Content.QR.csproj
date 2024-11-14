@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Description>The library contains a light-weight managed encoder of QR codes. It can generate both text-based output (using block characters) for display on text devices, as well as images and color-coded codes. Contains methods for customization of QR-codes, including controlling color and shape of dots, overlaying of images, and procedural coloring.</Description>
     <Authors>Peter Waher</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

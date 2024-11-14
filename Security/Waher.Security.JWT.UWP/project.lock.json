@@ -2622,15 +2622,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -5498,15 +5490,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -8410,15 +8394,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -11295,15 +11271,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -14216,15 +14184,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -17101,15 +17061,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -20022,15 +19974,7 @@
       },
       "Waher.Content/2.6.14": {
         "type": "project",
-        "framework": ".NETStandard,Version=v1.3",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
-        }
+        "framework": "Unsupported,Version=v0.0"
       },
       "Waher.Content.Xml/2.3.3": {
         "type": "project",
@@ -30327,5 +30271,70 @@
         "#import": []
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586). Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586"
+      ]
+    },
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586) / win10-arm. Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586/win10-arm"
+      ]
+    },
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586) / win10-arm-aot. Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586/win10-arm-aot"
+      ]
+    },
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586) / win10-x64. Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586/win10-x64"
+      ]
+    },
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586) / win10-x64-aot. Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586/win10-x64-aot"
+      ]
+    },
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586) / win10-x86. Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586/win10-x86"
+      ]
+    },
+    {
+      "code": "NU1201",
+      "level": "Error",
+      "message": "Project Waher.Content is not compatible with uap10.0.10586 (UAP,Version=v10.0.10586) / win10-x86-aot. Project Waher.Content supports: netstandard2.0 (.NETStandard,Version=v2.0)",
+      "libraryId": "Waher.Content",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10586/win10-x86-aot"
+      ]
+    }
+  ]
 }

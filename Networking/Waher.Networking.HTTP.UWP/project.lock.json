@@ -127,7 +127,7 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package"
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -1576,6 +1576,16 @@
           }
         }
       },
+      "System.Private.Uri/4.3.2": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3"
+        },
+        "compile": {
+          "ref/netstandard/_._": {}
+        }
+      },
       "System.Reflection/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -2659,8 +2669,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -2673,6 +2685,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -2794,6 +2807,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -2943,7 +2957,7 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package"
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -4498,11 +4512,11 @@
           "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll": {}
         }
       },
-      "System.Private.Uri/4.3.0": {
+      "System.Private.Uri/4.3.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.win7.System.Private.Uri": "4.3.0"
         },
         "compile": {
@@ -5496,8 +5510,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -5510,6 +5526,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -5631,6 +5648,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -5780,7 +5798,7 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package"
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -7371,11 +7389,11 @@
           "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll": {}
         }
       },
-      "System.Private.Uri/4.3.0": {
+      "System.Private.Uri/4.3.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.win7.System.Private.Uri": "4.3.0"
         },
         "compile": {
@@ -8369,8 +8387,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -8383,6 +8403,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -8504,6 +8525,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -8653,10 +8675,10 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package",
         "dependencies": {
-          "runtime.win7-x64.Microsoft.NETCore.Jit": "1.0.3"
+          "runtime.win-x64.Microsoft.NETCore.Jit": "2.0.8"
         }
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -9091,6 +9113,12 @@
       "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
       },
+      "runtime.win-x64.Microsoft.NETCore.Jit/2.0.8": {
+        "type": "package",
+        "native": {
+          "runtimes/win-x64/native/clrjit.dll": {}
+        }
+      },
       "runtime.win.Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -9224,12 +9252,6 @@
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
-        }
-      },
-      "runtime.win7-x64.Microsoft.NETCore.Jit/1.0.3": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x64/native/clrjit.dll": {}
         }
       },
       "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
@@ -10217,11 +10239,11 @@
           "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll": {}
         }
       },
-      "System.Private.Uri/4.3.0": {
+      "System.Private.Uri/4.3.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.win7.System.Private.Uri": "4.3.0"
         },
         "compile": {
@@ -11215,8 +11237,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -11229,6 +11253,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -11350,6 +11375,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -11499,10 +11525,10 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package",
         "dependencies": {
-          "runtime.win7-x64.Microsoft.NETCore.Jit": "1.0.3"
+          "runtime.win-x64.Microsoft.NETCore.Jit": "2.0.8"
         }
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -11983,6 +12009,12 @@
       "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
       },
+      "runtime.win-x64.Microsoft.NETCore.Jit/2.0.8": {
+        "type": "package",
+        "native": {
+          "runtimes/win-x64/native/clrjit.dll": {}
+        }
+      },
       "runtime.win.Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -12122,12 +12154,6 @@
         "type": "package",
         "runtime": {
           "runtimes/win10-x64-aot/lib/netcore50/clrcompression.dll": {}
-        }
-      },
-      "runtime.win7-x64.Microsoft.NETCore.Jit/1.0.3": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x64-aot/native/_._": {}
         }
       },
       "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
@@ -13099,11 +13125,11 @@
           "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll": {}
         }
       },
-      "System.Private.Uri/4.3.0": {
+      "System.Private.Uri/4.3.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.win7.System.Private.Uri": "4.3.0"
         },
         "compile": {
@@ -14097,8 +14123,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -14111,6 +14139,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -14232,6 +14261,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -14381,10 +14411,10 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package",
         "dependencies": {
-          "runtime.win7-x86.Microsoft.NETCore.Jit": "1.0.3"
+          "runtime.win-x86.Microsoft.NETCore.Jit": "2.0.8"
         }
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -14819,6 +14849,12 @@
       "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
       },
+      "runtime.win-x86.Microsoft.NETCore.Jit/2.0.8": {
+        "type": "package",
+        "native": {
+          "runtimes/win-x86/native/clrjit.dll": {}
+        }
+      },
       "runtime.win.Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -14952,12 +14988,6 @@
         "type": "package",
         "compile": {
           "ref/netstandard/_._": {}
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.3": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x86/native/clrjit.dll": {}
         }
       },
       "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
@@ -15945,11 +15975,11 @@
           "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll": {}
         }
       },
-      "System.Private.Uri/4.3.0": {
+      "System.Private.Uri/4.3.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.win7.System.Private.Uri": "4.3.0"
         },
         "compile": {
@@ -16943,8 +16973,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -16957,6 +16989,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -17078,6 +17111,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -17227,10 +17261,10 @@
           "System.Xml.XDocument": "4.0.11"
         }
       },
-      "Microsoft.NETCore.Jit/1.0.3": {
+      "Microsoft.NETCore.Jit/2.0.8": {
         "type": "package",
         "dependencies": {
-          "runtime.win7-x86.Microsoft.NETCore.Jit": "1.0.3"
+          "runtime.win-x86.Microsoft.NETCore.Jit": "2.0.8"
         }
       },
       "Microsoft.NETCore.Platforms/1.1.1": {
@@ -17711,6 +17745,12 @@
       "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
       },
+      "runtime.win-x86.Microsoft.NETCore.Jit/2.0.8": {
+        "type": "package",
+        "native": {
+          "runtimes/win-x86/native/clrjit.dll": {}
+        }
+      },
       "runtime.win.Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -17850,12 +17890,6 @@
         "type": "package",
         "runtime": {
           "runtimes/win10-x86-aot/lib/netcore50/clrcompression.dll": {}
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.3": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x86-aot/native/_._": {}
         }
       },
       "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
@@ -18827,11 +18861,11 @@
           "runtimes/win7/lib/netcore50/System.Private.ServiceModel.dll": {}
         }
       },
-      "System.Private.Uri/4.3.0": {
+      "System.Private.Uri/4.3.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.win7.System.Private.Uri": "4.3.0"
         },
         "compile": {
@@ -19825,8 +19859,10 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
+          "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
@@ -19839,6 +19875,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -19960,6 +19997,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
+          "Microsoft.NETCore.Jit": "2.0.8",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
@@ -22189,16 +22227,19 @@
         "microsoft.netcore.nuspec"
       ]
     },
-    "Microsoft.NETCore.Jit/1.0.3": {
-      "sha512": "/l8xYwtoJrFSx9zMWRClaKrgR+BTstCD1E5P90ADgiwH0GwlEqVhLoFIrsXpYj0j9vCB/fzOq7D/ZzuCbtmrTQ==",
+    "Microsoft.NETCore.Jit/2.0.8": {
+      "sha512": "webbzOhpGlR6qnCeb4m2OWHixBK0IgoyISVIhPVlLH8bY9yZtjnK4XQKkEkh/a9l5K26ddus7l+QpNh3EtnyYQ==",
       "type": "package",
-      "path": "microsoft.netcore.jit/1.0.3",
+      "path": "microsoft.netcore.jit/2.0.8",
       "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "microsoft.netcore.jit.1.0.3.nupkg.sha512",
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "microsoft.netcore.jit.2.0.8.nupkg.sha512",
         "microsoft.netcore.jit.nuspec",
-        "runtime.json"
+        "runtime.json",
+        "version.txt"
       ]
     },
     "Microsoft.NETCore.Platforms/1.1.1": {
@@ -23509,6 +23550,38 @@
         "runtimes/ubuntu.16.10-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
       ]
     },
+    "runtime.win-x64.Microsoft.NETCore.Jit/2.0.8": {
+      "sha512": "2J7f7s1VAHxom2biex5Jw21jj7extMRPDpdIZ259PnI4AZ6GnRt+F2HaIdh7DXpS50arJ77FSsBwA9t3wixw0w==",
+      "type": "package",
+      "path": "runtime.win-x64.microsoft.netcore.jit/2.0.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "runtime.win-x64.microsoft.netcore.jit.2.0.8.nupkg.sha512",
+        "runtime.win-x64.microsoft.netcore.jit.nuspec",
+        "runtimes/win-x64-aot/native/_._",
+        "runtimes/win-x64/native/clrjit.dll",
+        "version.txt"
+      ]
+    },
+    "runtime.win-x86.Microsoft.NETCore.Jit/2.0.8": {
+      "sha512": "6duwbrkf4bIP418Yvx/hNLZMz9U7EdylX2nhLHdkQTOCxKqrLJviOEFeEgKv/1w6HkPUUdizwj1iFcS/b/MGfQ==",
+      "type": "package",
+      "path": "runtime.win-x86.microsoft.netcore.jit/2.0.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "runtime.win-x86.microsoft.netcore.jit.2.0.8.nupkg.sha512",
+        "runtime.win-x86.microsoft.netcore.jit.nuspec",
+        "runtimes/win-x86-aot/native/_._",
+        "runtimes/win-x86/native/clrjit.dll",
+        "version.txt"
+      ]
+    },
     "runtime.win.Microsoft.Win32.Primitives/4.3.0": {
       "sha512": "NU51SEt/ZaD2MF48sJ17BIqx7rjeNNLXUevfMOjqQIetdndXwYjZfZsT6jD+rSWp/FYxjesdK4xUSl4OTEI0jw==",
       "type": "package",
@@ -24754,19 +24827,6 @@
         "runtimes/win10-x86/nativeassets/uap10.0.15138/clrcompression.dll"
       ]
     },
-    "runtime.win7-x64.Microsoft.NETCore.Jit/1.0.3": {
-      "sha512": "pXLZyhN1gFNVjmmZloXzGxbdZyUjkiHKpojzxUxCZ2U+T0jD6ooK3rYhwqFzlSjVKUAdQ9QNDoixxnEr3/5VWw==",
-      "type": "package",
-      "path": "runtime.win7-x64.microsoft.netcore.jit/1.0.3",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.win7-x64.microsoft.netcore.jit.1.0.3.nupkg.sha512",
-        "runtime.win7-x64.microsoft.netcore.jit.nuspec",
-        "runtimes/win7-x64-aot/native/_._",
-        "runtimes/win7-x64/native/clrjit.dll"
-      ]
-    },
     "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
       "sha512": "YaXA5RVLCYIcV1N31A7MJhWJnNkNfGnyRBNH1yYilUrBDvzMxNsbXX2pD7owWsC/go/4LRwbHbdWWXwHowKNvw==",
       "type": "package",
@@ -24807,19 +24867,6 @@
         "runtime.win7-x64.runtime.native.system.io.compression.nuspec",
         "runtimes/win7-x64/native/clrcompression.dll",
         "runtimes/win7-x64/nativeassets/netcore50/clrcompression.dll"
-      ]
-    },
-    "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.3": {
-      "sha512": "bU1EUneMeB6JltMNDCekL7nP1dluxOlnUgmAFx8EGsD6a+lgaYoDLk7V7F3H5Zpw/LeCxl5XmZqgPObGAlW7Dg==",
-      "type": "package",
-      "path": "runtime.win7-x86.microsoft.netcore.jit/1.0.3",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.win7-x86.microsoft.netcore.jit.1.0.3.nupkg.sha512",
-        "runtime.win7-x86.microsoft.netcore.jit.nuspec",
-        "runtimes/win7-x86-aot/native/_._",
-        "runtimes/win7-x86/native/clrjit.dll"
       ]
     },
     "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
@@ -27323,15 +27370,17 @@
         "system.private.servicemodel.nuspec"
       ]
     },
-    "System.Private.Uri/4.3.0": {
-      "sha512": "I4SwANiUGho1esj4V4oSlPllXjzCZDE+5XXso2P03LW2vOda2Enzh8DWOxwN6hnrJyp314c7KuVu31QYhRzOGg==",
+    "System.Private.Uri/4.3.2": {
+      "sha512": "o1+7RJnu3Ik3PazR7Z7tJhjPdE000Eq2KGLLWhqJJKXj04wrS8lwb1OFtDF9jzXXADhUuZNJZlPc98uwwqmpFA==",
       "type": "package",
-      "path": "system.private.uri/4.3.0",
+      "path": "system.private.uri/4.3.2",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "ref/netstandard/_._",
-        "system.private.uri.4.3.0.nupkg.sha512",
+        "system.private.uri.4.3.2.nupkg.sha512",
         "system.private.uri.nuspec"
       ]
     },

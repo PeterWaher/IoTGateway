@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -20,9 +20,9 @@ https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution xml</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.2.3</AssemblyVersion>
-    <FileVersion>2.2.3</FileVersion>
-		<Version>2.2.3</Version>
+    <AssemblyVersion>2.3.0</AssemblyVersion>
+    <FileVersion>2.3.0</FileVersion>
+		<Version>2.3.0</Version>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 		<PackageIconUrl />
 	</PropertyGroup>
@@ -39,9 +39,10 @@ https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

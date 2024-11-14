@@ -32,6 +32,10 @@ https://waher.se/Markdown.md</Description>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
   </ItemGroup>
 </Project>

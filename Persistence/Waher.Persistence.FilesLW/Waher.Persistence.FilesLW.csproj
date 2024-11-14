@@ -56,6 +56,10 @@
       <PackagePath />
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="xcopy &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files\*.cs&quot; &quot;C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW&quot; /Y /S" Condition="'$(OS)'=='Windows_NT'" />
     <Exec Command="rsync -avm --include='*.cs' --exclude='*' /My\ Projects/IoTGateway/Persistence/Waher.Persistence.Files/ /My\ Projects/IoTGateway/Persistence/Waher.Persistence.FilesLW/" Condition="'$(OS)'=='Unix'" />

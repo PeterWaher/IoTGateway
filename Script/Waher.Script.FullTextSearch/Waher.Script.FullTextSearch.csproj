@@ -37,6 +37,9 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptFu
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />

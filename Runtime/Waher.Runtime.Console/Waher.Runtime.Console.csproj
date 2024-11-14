@@ -34,6 +34,10 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="System.Net.Http" Version="4.3.4" />
+	  <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />

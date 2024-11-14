@@ -29,7 +29,8 @@ https://waher.se/Script.md#externalPostgreSQLDatabaseRelatedFunctionsWaherScript
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

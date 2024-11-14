@@ -46,6 +46,9 @@
     <EmbeddedResource Include="Schema\SimpleXmppConfiguration.xsd" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.QR\Waher.Content.QR.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />

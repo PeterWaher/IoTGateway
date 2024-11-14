@@ -130,7 +130,7 @@
       "Microsoft.NETCore.Jit/1.0.3": {
         "type": "package"
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -235,7 +235,7 @@
           "Microsoft.NETCore.Windows.ApiSets": "1.0.1"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -1166,10 +1166,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -1189,9 +1189,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "lib/win8/_._": {}
@@ -1789,11 +1787,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0"
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3"
         },
         "compile": {
           "ref/netcore50/System.Runtime.dll": {
@@ -1804,12 +1802,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0"
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1"
         },
         "compile": {
           "ref/netcore50/System.Runtime.Extensions.dll": {
@@ -2354,14 +2352,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -2617,6 +2615,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -2627,6 +2627,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -2638,7 +2640,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -2646,6 +2650,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -2676,6 +2682,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -2684,6 +2692,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -2693,6 +2703,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -2701,6 +2713,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -2709,6 +2723,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -2716,7 +2732,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -2724,6 +2742,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -2733,6 +2753,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -2741,7 +2763,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     },
@@ -2874,7 +2898,7 @@
       "Microsoft.NETCore.Jit/1.0.3": {
         "type": "package"
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -2926,7 +2950,7 @@
           "runtime.win8-arm.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -3255,7 +3279,7 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
           "Microsoft.NETCore.Targets": "1.1.0",
-          "runtime.win8-arm.runtime.native.System.IO.Compression": "4.3.0"
+          "runtime.win8-arm.runtime.native.System.IO.Compression": "4.3.2"
         },
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -3319,7 +3343,7 @@
           "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
-      "runtime.win.System.Console/4.3.0": {
+      "runtime.win.System.Console/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.IO": "4.3.0",
@@ -3472,10 +3496,10 @@
           "runtimes/win8-arm/native/sos.dll": {}
         }
       },
-      "runtime.win8-arm.runtime.native.System.IO.Compression/4.3.0": {
+      "runtime.win8-arm.runtime.native.System.IO.Compression/4.3.2": {
         "type": "package",
         "native": {
-          "runtimes/win8-arm/native/clrcompression.dll": {}
+          "runtimes/win8-arm/nativeassets/netcore50/clrcompression.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -3658,7 +3682,7 @@
           "System.IO": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Text.Encoding": "4.3.0",
-          "runtime.win.System.Console": "4.3.0"
+          "runtime.win.System.Console": "4.3.1"
         },
         "compile": {
           "ref/netstandard1.3/System.Console.dll": {
@@ -4077,10 +4101,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -4100,9 +4124,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Net.Http.dll": {}
@@ -4630,11 +4652,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.any.System.Runtime": "4.3.0"
         },
         "compile": {
@@ -4646,12 +4668,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1",
           "runtime.win.System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
@@ -5136,14 +5158,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -5382,6 +5404,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -5392,6 +5416,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -5403,7 +5429,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -5411,6 +5439,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -5441,6 +5471,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -5449,6 +5481,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -5458,6 +5492,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -5466,6 +5502,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -5474,6 +5512,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -5481,7 +5521,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -5489,6 +5531,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -5498,6 +5542,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -5506,7 +5552,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     },
@@ -5639,7 +5687,7 @@
       "Microsoft.NETCore.Jit/1.0.3": {
         "type": "package"
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -5692,7 +5740,7 @@
           "runtime.win8-arm.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -6130,7 +6178,7 @@
           "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
-      "runtime.win.System.Console/4.3.0": {
+      "runtime.win.System.Console/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.IO": "4.3.0",
@@ -6459,7 +6507,7 @@
           "System.IO": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Text.Encoding": "4.3.0",
-          "runtime.win.System.Console": "4.3.0"
+          "runtime.win.System.Console": "4.3.1"
         },
         "compile": {
           "ref/netstandard1.3/System.Console.dll": {
@@ -6878,10 +6926,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -6901,9 +6949,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Net.Http.dll": {}
@@ -7431,11 +7477,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.aot.System.Runtime": "4.3.0"
         },
         "compile": {
@@ -7447,12 +7493,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1",
           "runtime.win.System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
@@ -7937,14 +7983,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -8183,6 +8229,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -8193,6 +8241,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -8204,7 +8254,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -8212,6 +8264,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -8242,6 +8296,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -8250,6 +8306,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -8259,6 +8317,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -8267,6 +8327,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -8275,6 +8337,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -8282,7 +8346,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -8290,6 +8356,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -8299,6 +8367,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -8307,7 +8377,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     },
@@ -8443,7 +8515,7 @@
           "runtime.win7-x64.Microsoft.NETCore.Jit": "1.0.3"
         }
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -8495,7 +8567,7 @@
           "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -8824,7 +8896,7 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
           "Microsoft.NETCore.Targets": "1.1.0",
-          "runtime.win7-x64.runtime.native.System.IO.Compression": "4.3.0"
+          "runtime.win7-x64.runtime.native.System.IO.Compression": "4.3.2"
         },
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -8888,7 +8960,7 @@
           "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
-      "runtime.win.System.Console/4.3.0": {
+      "runtime.win.System.Console/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.IO": "4.3.0",
@@ -9038,10 +9110,10 @@
           "runtimes/win7-x64/native/sos.dll": {}
         }
       },
-      "runtime.win7-x64.runtime.native.System.IO.Compression/4.3.0": {
+      "runtime.win7-x64.runtime.native.System.IO.Compression/4.3.2": {
         "type": "package",
         "native": {
-          "runtimes/win7-x64/native/clrcompression.dll": {}
+          "runtimes/win7-x64/nativeassets/netcore50/clrcompression.dll": {}
         }
       },
       "runtime.win7.System.Private.Uri/4.3.0": {
@@ -9233,7 +9305,7 @@
           "System.IO": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Text.Encoding": "4.3.0",
-          "runtime.win.System.Console": "4.3.0"
+          "runtime.win.System.Console": "4.3.1"
         },
         "compile": {
           "ref/netstandard1.3/System.Console.dll": {
@@ -9652,10 +9724,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -9675,9 +9747,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Net.Http.dll": {}
@@ -10205,11 +10275,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.any.System.Runtime": "4.3.0"
         },
         "compile": {
@@ -10221,12 +10291,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1",
           "runtime.win.System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
@@ -10711,14 +10781,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -10957,6 +11027,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -10967,6 +11039,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -10978,7 +11052,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -10986,6 +11062,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -11016,6 +11094,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -11024,6 +11104,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -11033,6 +11115,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -11041,6 +11125,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -11049,6 +11135,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -11056,7 +11144,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -11064,6 +11154,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -11073,6 +11165,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -11081,7 +11175,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     },
@@ -11217,7 +11313,7 @@
           "runtime.win7-x64.Microsoft.NETCore.Jit": "1.0.3"
         }
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -11270,7 +11366,7 @@
           "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -11708,7 +11804,7 @@
           "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
-      "runtime.win.System.Console/4.3.0": {
+      "runtime.win.System.Console/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.IO": "4.3.0",
@@ -12043,7 +12139,7 @@
           "System.IO": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Text.Encoding": "4.3.0",
-          "runtime.win.System.Console": "4.3.0"
+          "runtime.win.System.Console": "4.3.1"
         },
         "compile": {
           "ref/netstandard1.3/System.Console.dll": {
@@ -12462,10 +12558,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -12485,9 +12581,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Net.Http.dll": {}
@@ -13015,11 +13109,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.aot.System.Runtime": "4.3.0"
         },
         "compile": {
@@ -13031,12 +13125,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1",
           "runtime.win.System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
@@ -13521,14 +13615,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -13767,6 +13861,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -13777,6 +13873,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -13788,7 +13886,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -13796,6 +13896,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -13826,6 +13928,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -13834,6 +13938,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -13843,6 +13949,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -13851,6 +13959,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -13859,6 +13969,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -13866,7 +13978,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -13874,6 +13988,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -13883,6 +13999,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -13891,7 +14009,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     },
@@ -14027,7 +14147,7 @@
           "runtime.win7-x86.Microsoft.NETCore.Jit": "1.0.3"
         }
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -14079,7 +14199,7 @@
           "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -14408,7 +14528,7 @@
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
           "Microsoft.NETCore.Targets": "1.1.0",
-          "runtime.win7-x86.runtime.native.System.IO.Compression": "4.3.0"
+          "runtime.win7-x86.runtime.native.System.IO.Compression": "4.3.2"
         },
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -14472,7 +14592,7 @@
           "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
-      "runtime.win.System.Console/4.3.0": {
+      "runtime.win.System.Console/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.IO": "4.3.0",
@@ -14622,10 +14742,10 @@
           "runtimes/win7-x86/native/sos.dll": {}
         }
       },
-      "runtime.win7-x86.runtime.native.System.IO.Compression/4.3.0": {
+      "runtime.win7-x86.runtime.native.System.IO.Compression/4.3.2": {
         "type": "package",
         "native": {
-          "runtimes/win7-x86/native/clrcompression.dll": {}
+          "runtimes/win7-x86/nativeassets/netcore50/clrcompression.dll": {}
         }
       },
       "runtime.win7.System.Private.Uri/4.3.0": {
@@ -14817,7 +14937,7 @@
           "System.IO": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Text.Encoding": "4.3.0",
-          "runtime.win.System.Console": "4.3.0"
+          "runtime.win.System.Console": "4.3.1"
         },
         "compile": {
           "ref/netstandard1.3/System.Console.dll": {
@@ -15236,10 +15356,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -15259,9 +15379,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Net.Http.dll": {}
@@ -15789,11 +15907,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.any.System.Runtime": "4.3.0"
         },
         "compile": {
@@ -15805,12 +15923,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1",
           "runtime.win.System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
@@ -16295,14 +16413,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -16541,6 +16659,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -16551,6 +16671,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -16562,7 +16684,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -16570,6 +16694,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -16600,6 +16726,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -16608,6 +16736,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -16617,6 +16747,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -16625,6 +16757,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -16633,6 +16767,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -16640,7 +16776,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -16648,6 +16786,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -16657,6 +16797,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -16665,7 +16807,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     },
@@ -16801,7 +16945,7 @@
           "runtime.win7-x86.Microsoft.NETCore.Jit": "1.0.3"
         }
       },
-      "Microsoft.NETCore.Platforms/1.1.0": {
+      "Microsoft.NETCore.Platforms/1.1.1": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -16854,7 +16998,7 @@
           "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
-      "Microsoft.NETCore.Targets/1.1.0": {
+      "Microsoft.NETCore.Targets/1.1.3": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -17292,7 +17436,7 @@
           "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
-      "runtime.win.System.Console/4.3.0": {
+      "runtime.win.System.Console/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.IO": "4.3.0",
@@ -17627,7 +17771,7 @@
           "System.IO": "4.3.0",
           "System.Runtime": "4.3.0",
           "System.Text.Encoding": "4.3.0",
-          "runtime.win.System.Console": "4.3.0"
+          "runtime.win.System.Console": "4.3.1"
         },
         "compile": {
           "ref/netstandard1.3/System.Console.dll": {
@@ -18046,10 +18190,10 @@
           "lib/netcore50/System.Linq.Queryable.dll": {}
         }
       },
-      "System.Net.Http/4.3.0": {
+      "System.Net.Http/4.3.4": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Diagnostics.DiagnosticSource": "4.3.0",
@@ -18069,9 +18213,7 @@
           "System.Threading.Tasks": "4.3.0"
         },
         "compile": {
-          "ref/netcore50/System.Net.Http.dll": {
-            "related": ".xml"
-          }
+          "ref/netcore50/System.Net.Http.dll": {}
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Net.Http.dll": {}
@@ -18599,11 +18741,11 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime/4.3.0": {
+      "System.Runtime/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
           "runtime.aot.System.Runtime": "4.3.0"
         },
         "compile": {
@@ -18615,12 +18757,12 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Runtime.Extensions/4.3.0": {
+      "System.Runtime.Extensions/4.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "1.1.0",
-          "Microsoft.NETCore.Targets": "1.1.0",
-          "System.Runtime": "4.3.0",
+          "Microsoft.NETCore.Platforms": "1.1.1",
+          "Microsoft.NETCore.Targets": "1.1.3",
+          "System.Runtime": "4.3.1",
           "runtime.win.System.Runtime.Extensions": "4.3.0"
         },
         "compile": {
@@ -19105,14 +19247,14 @@
           "lib/win8/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.3.0": {
+      "System.Text.RegularExpressions/4.3.1": {
         "type": "package",
         "dependencies": {
           "System.Collections": "4.3.0",
           "System.Globalization": "4.3.0",
           "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
+          "System.Runtime": "4.3.1",
+          "System.Runtime.Extensions": "4.3.1",
           "System.Threading": "4.3.0"
         },
         "compile": {
@@ -19351,6 +19493,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.1.7",
           "Waher.Runtime.Temporary": "1.0.1",
           "Waher.Script": "2.9.0"
@@ -19361,6 +19505,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.6.14",
           "Waher.Runtime.Inventory": "1.1.7",
@@ -19372,7 +19518,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -19380,6 +19528,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0",
           "Waher.Runtime.Console": "1.0.1",
@@ -19410,6 +19560,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -19418,6 +19570,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Queue": "2.0.0"
         }
@@ -19427,6 +19581,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -19435,6 +19591,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -19443,6 +19601,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2"
         }
       },
@@ -19450,7 +19610,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       },
       "Waher.Runtime.Threading/2.0.0": {
@@ -19458,6 +19620,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Cache": "2.0.0"
         }
@@ -19467,6 +19631,8 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.2.2",
           "Waher.Runtime.Inventory": "1.1.7"
         }
@@ -19475,7 +19641,9 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "NETStandard.Library": "1.6.1"
+          "NETStandard.Library": "1.6.1",
+          "System.Net.Http": "4.3.4",
+          "System.Text.RegularExpressions": "4.3.1"
         }
       }
     }
@@ -21697,15 +21865,17 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.Platforms/1.1.0": {
-      "sha512": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A==",
+    "Microsoft.NETCore.Platforms/1.1.1": {
+      "sha512": "TMBuzAHpTenGbGgk0SMTwyEkyijY/Eae4ZGsFNYJvAr/LDn1ku3Etp3FPxChmDp5HHF3kzJuoaa08N0xjqAJfQ==",
       "type": "package",
-      "path": "microsoft.netcore.platforms/1.1.0",
+      "path": "microsoft.netcore.platforms/1.1.1",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+        "microsoft.netcore.platforms.1.1.1.nupkg.sha512",
         "microsoft.netcore.platforms.nuspec",
         "runtime.json"
       ]
@@ -21804,15 +21974,17 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.Targets/1.1.0": {
-      "sha512": "aOZA3BWfz9RXjpzt0sRJJMjAscAUm3Hoa4UWAfceV9UTYxgwZ1lZt5nO2myFf+/jetYQo4uTP7zS8sJY67BBxg==",
+    "Microsoft.NETCore.Targets/1.1.3": {
+      "sha512": "3Wrmi0kJDzClwAC+iBdUBpEKmEle8FQNsCs77fkiOIw/9oYA07bL1EZNX0kQ2OMN3xpwvl0vAtOCYY3ndDNlhQ==",
       "type": "package",
-      "path": "microsoft.netcore.targets/1.1.0",
+      "path": "microsoft.netcore.targets/1.1.3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.targets.1.1.0.nupkg.sha512",
+        "microsoft.netcore.targets.1.1.3.nupkg.sha512",
         "microsoft.netcore.targets.nuspec",
         "runtime.json"
       ]
@@ -23015,15 +23187,17 @@
         "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Primitives.dll"
       ]
     },
-    "runtime.win.System.Console/4.3.0": {
-      "sha512": "RRACWygml5dnmfgC1SW6tLGsFgwsUAKFtvhdyHnIEz4EhWyrd7pacDdY95CacQJy7BMXRDRCejC9aCRC0Y1sQA==",
+    "runtime.win.System.Console/4.3.1": {
+      "sha512": "vHPXC3B18dxhyipVce8xQT1MQv1o5srYZqBlCNu9p9MNjhgGOntdQh/Xh2X4o7M2F839YUcQiGwu8Q498FyDjg==",
       "type": "package",
-      "path": "runtime.win.system.console/4.3.0",
+      "path": "runtime.win.system.console/4.3.1",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "ref/netstandard/_._",
-        "runtime.win.system.console.4.3.0.nupkg.sha512",
+        "runtime.win.system.console.4.3.1.nupkg.sha512",
         "runtime.win.system.console.nuspec",
         "runtimes/win/lib/net/_._",
         "runtimes/win/lib/netcore50/System.Console.dll",
@@ -24284,16 +24458,19 @@
         "tools/crossgen.exe"
       ]
     },
-    "runtime.win7-x64.runtime.native.System.IO.Compression/4.3.0": {
-      "sha512": "UamDlgSO/nIzc96M+g3wbvAGbAuXjvRYR5Ttm/FVJgt2iva8ouOqSJ0j6eGI7pZDLvD/ZISl9XRZOajE/Xvizg==",
+    "runtime.win7-x64.runtime.native.System.IO.Compression/4.3.2": {
+      "sha512": "QZj+xNVPDGJV1hs/bW5HIhiN/LOpKvmPlJiWr9H2kqucFKD0ZzZJYzJbE1W267QEe/Rl+WXODdmfrZuv8b9tVw==",
       "type": "package",
-      "path": "runtime.win7-x64.runtime.native.system.io.compression/4.3.0",
+      "path": "runtime.win7-x64.runtime.native.system.io.compression/4.3.2",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
-        "runtime.win7-x64.runtime.native.system.io.compression.4.3.0.nupkg.sha512",
+        "runtime.win7-x64.runtime.native.system.io.compression.4.3.2.nupkg.sha512",
         "runtime.win7-x64.runtime.native.system.io.compression.nuspec",
-        "runtimes/win7-x64/native/clrcompression.dll"
+        "runtimes/win7-x64/native/clrcompression.dll",
+        "runtimes/win7-x64/nativeassets/netcore50/clrcompression.dll"
       ]
     },
     "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.3": {
@@ -24336,16 +24513,19 @@
         "tools/crossgen.exe"
       ]
     },
-    "runtime.win7-x86.runtime.native.System.IO.Compression/4.3.0": {
-      "sha512": "99pM1ZhX7dPNnr/dOxuAxnVl/2XNWRh1WAUfesV3ZKwbR6mnEzpfbz2GX69zrpGvKbEytsjMKCD+auvvH6f7kA==",
+    "runtime.win7-x86.runtime.native.System.IO.Compression/4.3.2": {
+      "sha512": "E18Sg1VFmHKaBk6i0hOxOtgTlMbpimkIFWC7yLwV7OYmQk9pra/Yz5B0J+RvjfvdUxaBJyfRcM6H/R2r3E7kig==",
       "type": "package",
-      "path": "runtime.win7-x86.runtime.native.system.io.compression/4.3.0",
+      "path": "runtime.win7-x86.runtime.native.system.io.compression/4.3.2",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
-        "runtime.win7-x86.runtime.native.system.io.compression.4.3.0.nupkg.sha512",
+        "runtime.win7-x86.runtime.native.system.io.compression.4.3.2.nupkg.sha512",
         "runtime.win7-x86.runtime.native.system.io.compression.nuspec",
-        "runtimes/win7-x86/native/clrcompression.dll"
+        "runtimes/win7-x86/native/clrcompression.dll",
+        "runtimes/win7-x86/nativeassets/netcore50/clrcompression.dll"
       ]
     },
     "runtime.win7.System.Private.Uri/4.0.4": {
@@ -24407,16 +24587,19 @@
         "tools/sos.dll"
       ]
     },
-    "runtime.win8-arm.runtime.native.System.IO.Compression/4.3.0": {
-      "sha512": "Vq1+MgltEQZEIvEhkw+gdEkm2+6QHvJCbX+/fdTmed37Rx18+GMLzGwNd81qb2VfpK6ywFQuB3rC28QkuOJGVg==",
+    "runtime.win8-arm.runtime.native.System.IO.Compression/4.3.2": {
+      "sha512": "YrI7ioXywMkNSQ1kuO+aO87lUFktLF8ZtRIuxD6HC6h/w8eLjI1KdoicX2941ThRmO7nuOXSQBx7uAEEwxJw/g==",
       "type": "package",
-      "path": "runtime.win8-arm.runtime.native.system.io.compression/4.3.0",
+      "path": "runtime.win8-arm.runtime.native.system.io.compression/4.3.2",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
-        "runtime.win8-arm.runtime.native.system.io.compression.4.3.0.nupkg.sha512",
+        "runtime.win8-arm.runtime.native.system.io.compression.4.3.2.nupkg.sha512",
         "runtime.win8-arm.runtime.native.system.io.compression.nuspec",
-        "runtimes/win8-arm/native/clrcompression.dll"
+        "runtimes/win8-arm/native/clrcompression.dll",
+        "runtimes/win8-arm/nativeassets/netcore50/clrcompression.dll"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -26121,11 +26304,13 @@
         "system.linq.queryable.nuspec"
       ]
     },
-    "System.Net.Http/4.3.0": {
-      "sha512": "sYg+FtILtRQuYWSIAuNOELwVuVsxVyJGWQyOnlAzhV4xvhyFnON1bAzYYC+jjRW8JREM45R0R5Dgi8MTC5sEwA==",
+    "System.Net.Http/4.3.4": {
+      "sha512": "aOa2d51SEbmM+H+Csw7yJOuNZoHkrP2XnAurye5HWYgGVVU54YZDvsLUYRv6h18X3sPnjNCANmN7ZhIPiqMcjA==",
       "type": "package",
-      "path": "system.net.http/4.3.0",
+      "path": "system.net.http/4.3.4",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/Xamarinmac20/_._",
@@ -26144,49 +26329,9 @@
         "ref/monotouch10/_._",
         "ref/net45/_._",
         "ref/net46/System.Net.Http.dll",
-        "ref/net46/System.Net.Http.xml",
-        "ref/net46/de/System.Net.Http.xml",
-        "ref/net46/es/System.Net.Http.xml",
-        "ref/net46/fr/System.Net.Http.xml",
-        "ref/net46/it/System.Net.Http.xml",
-        "ref/net46/ja/System.Net.Http.xml",
-        "ref/net46/ko/System.Net.Http.xml",
-        "ref/net46/ru/System.Net.Http.xml",
-        "ref/net46/zh-hans/System.Net.Http.xml",
-        "ref/net46/zh-hant/System.Net.Http.xml",
         "ref/netcore50/System.Net.Http.dll",
-        "ref/netcore50/System.Net.Http.xml",
-        "ref/netcore50/de/System.Net.Http.xml",
-        "ref/netcore50/es/System.Net.Http.xml",
-        "ref/netcore50/fr/System.Net.Http.xml",
-        "ref/netcore50/it/System.Net.Http.xml",
-        "ref/netcore50/ja/System.Net.Http.xml",
-        "ref/netcore50/ko/System.Net.Http.xml",
-        "ref/netcore50/ru/System.Net.Http.xml",
-        "ref/netcore50/zh-hans/System.Net.Http.xml",
-        "ref/netcore50/zh-hant/System.Net.Http.xml",
         "ref/netstandard1.1/System.Net.Http.dll",
-        "ref/netstandard1.1/System.Net.Http.xml",
-        "ref/netstandard1.1/de/System.Net.Http.xml",
-        "ref/netstandard1.1/es/System.Net.Http.xml",
-        "ref/netstandard1.1/fr/System.Net.Http.xml",
-        "ref/netstandard1.1/it/System.Net.Http.xml",
-        "ref/netstandard1.1/ja/System.Net.Http.xml",
-        "ref/netstandard1.1/ko/System.Net.Http.xml",
-        "ref/netstandard1.1/ru/System.Net.Http.xml",
-        "ref/netstandard1.1/zh-hans/System.Net.Http.xml",
-        "ref/netstandard1.1/zh-hant/System.Net.Http.xml",
         "ref/netstandard1.3/System.Net.Http.dll",
-        "ref/netstandard1.3/System.Net.Http.xml",
-        "ref/netstandard1.3/de/System.Net.Http.xml",
-        "ref/netstandard1.3/es/System.Net.Http.xml",
-        "ref/netstandard1.3/fr/System.Net.Http.xml",
-        "ref/netstandard1.3/it/System.Net.Http.xml",
-        "ref/netstandard1.3/ja/System.Net.Http.xml",
-        "ref/netstandard1.3/ko/System.Net.Http.xml",
-        "ref/netstandard1.3/ru/System.Net.Http.xml",
-        "ref/netstandard1.3/zh-hans/System.Net.Http.xml",
-        "ref/netstandard1.3/zh-hant/System.Net.Http.xml",
         "ref/portable-net45+win8+wpa81/_._",
         "ref/win8/_._",
         "ref/wpa81/_._",
@@ -26197,7 +26342,7 @@
         "runtimes/win/lib/net46/System.Net.Http.dll",
         "runtimes/win/lib/netcore50/System.Net.Http.dll",
         "runtimes/win/lib/netstandard1.3/System.Net.Http.dll",
-        "system.net.http.4.3.0.nupkg.sha512",
+        "system.net.http.4.3.4.nupkg.sha512",
         "system.net.http.nuspec"
       ]
     },
@@ -27358,11 +27503,13 @@
         "system.resources.resourcemanager.nuspec"
       ]
     },
-    "System.Runtime/4.3.0": {
-      "sha512": "JufQi0vPQ0xGnAczR13AUFglDyVYt4Kqnz1AZaiKZ5+GICq0/1MH/mO/eAJHt/mHW1zjKBJd7kV26SrxddAhiw==",
+    "System.Runtime/4.3.1": {
+      "sha512": "abhfv1dTK6NXOmu4bgHIONxHyEqFjW8HwXPmpY9gmll+ix9UNo4XDcmzJn6oLooftxNssVHdJC1pGT9jkSynQg==",
       "type": "package",
-      "path": "system.runtime/4.3.0",
+      "path": "system.runtime/4.3.1",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -27444,15 +27591,17 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.runtime.4.3.0.nupkg.sha512",
+        "system.runtime.4.3.1.nupkg.sha512",
         "system.runtime.nuspec"
       ]
     },
-    "System.Runtime.Extensions/4.3.0": {
-      "sha512": "guW0uK0fn5fcJJ1tJVXYd7/1h5F+pea1r7FLSOz/f8vPEqbR2ZAknuRDvTQ8PzAilDveOxNjSfr0CHfIQfFk8g==",
+    "System.Runtime.Extensions/4.3.1": {
+      "sha512": "qAtKMcHOAq9/zKkl0dwvF0T0pmgCQxX1rC49rJXoU8jq+lw6MC3uXy7nLFmjEI20T3Aq069eWz4LcYR64vEmJw==",
       "type": "package",
-      "path": "system.runtime.extensions/4.3.0",
+      "path": "system.runtime.extensions/4.3.1",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -27523,7 +27672,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.runtime.extensions.4.3.0.nupkg.sha512",
+        "system.runtime.extensions.4.3.1.nupkg.sha512",
         "system.runtime.extensions.nuspec"
       ]
     },
@@ -28686,11 +28835,13 @@
         "system.text.encoding.extensions.nuspec"
       ]
     },
-    "System.Text.RegularExpressions/4.3.0": {
-      "sha512": "RpT2DA+L660cBt1FssIE9CAGpLFdFPuheB7pLpKpn6ZXNby7jDERe8Ua/Ne2xGiwLVG2JOqziiaVCGDon5sKFA==",
+    "System.Text.RegularExpressions/4.3.1": {
+      "sha512": "N0kNRrWe4+nXOWlpLT4LAY5brb8caNFlUuIRpraCVMDLYutKkol1aV079rQjLuSxKMJT2SpBQsYX9xbcTMmzwg==",
       "type": "package",
-      "path": "system.text.regularexpressions/4.3.0",
+      "path": "system.text.regularexpressions/4.3.1",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -28764,7 +28915,7 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.text.regularexpressions.4.3.0.nupkg.sha512",
+        "system.text.regularexpressions.4.3.1.nupkg.sha512",
         "system.text.regularexpressions.nuspec"
       ]
     },

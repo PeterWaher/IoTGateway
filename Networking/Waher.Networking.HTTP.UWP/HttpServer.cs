@@ -1128,13 +1128,13 @@ namespace Waher.Networking.HTTP
 				{
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
-				catch (Win32Exception ex)
-				{
-					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
-				}
 				catch (SocketException)
 				{
 					Client.Dispose();
+				}
+				catch (Win32Exception ex)
+				{
+					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
 				catch (IOException)
 				{

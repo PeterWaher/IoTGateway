@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-#if NETSTANDARD2_0
+#if COMPILED
 using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -197,7 +197,7 @@ namespace Waher.Persistence.Serialization
 		private string collectionName;
 		private string[][] indices;
 		private TypeNameSerialization typeNameSerialization;
-#if NETSTANDARD2_0
+#if COMPILED
 		private FieldInfo objectIdFieldInfo = null;
 		private PropertyInfo objectIdPropertyInfo = null;
 		private MemberInfo objectIdMemberInfo = null;
@@ -232,7 +232,7 @@ namespace Waher.Persistence.Serialization
 			this.typeInfo = Type.GetTypeInfo();
 			this.context = Context;
 			this.normalized = Context.NormalizedNames;
-#if NETSTANDARD2_0
+#if COMPILED
 			this.compiled = false;
 #endif
 			this.isNullable = true;
@@ -250,7 +250,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public ISerializerContext Context => this.context;
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// Initializes a serializer that serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
@@ -277,7 +277,7 @@ namespace Waher.Persistence.Serialization
 		}
 #endif
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// Prepares a serializer that serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
@@ -301,7 +301,7 @@ namespace Waher.Persistence.Serialization
 			this.context = Context;
 			this.normalized = Context.NormalizedNames;
 
-#if NETSTANDARD2_0
+#if COMPILED
 			this.compiled = Compiled;
 #endif
 
@@ -429,7 +429,7 @@ namespace Waher.Persistence.Serialization
 
 			this.indices = Indices.ToArray();
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 			{
 				StringBuilder CSharp = new StringBuilder();
@@ -3545,7 +3545,7 @@ namespace Waher.Persistence.Serialization
 					if (!string.IsNullOrEmpty(ShortName))
 						this.membersByName[ShortName] = Member;
 				}
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 			this.prepared = true;
@@ -3570,7 +3570,7 @@ namespace Waher.Persistence.Serialization
 			protected set => this.prepared = value;
 		}
 
-#if NETSTANDARD2_0
+#if COMPILED
 		private static string GetLocation(Type T)
 		{
 			System.Reflection.TypeInfo TI = T.GetTypeInfo();
@@ -3703,7 +3703,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool NormalizedNames => this.normalized;
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// Initializes the serializer before first-time use.
 		/// </summary>
@@ -3731,7 +3731,7 @@ namespace Waher.Persistence.Serialization
 		/// <returns>A deserialized value.</returns>
 		public virtual async Task<object> Deserialize(IDeserializer Reader, uint? DataType, bool Embedded)
 		{
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 				return await this.customSerializer.Deserialize(Reader, DataType, Embedded);
 			else
@@ -4440,7 +4440,7 @@ namespace Waher.Persistence.Serialization
 				}
 
 				return Result;
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 		}
@@ -4455,7 +4455,7 @@ namespace Waher.Persistence.Serialization
 		/// <param name="State">State object, passed on in recursive calls.</param>
 		public virtual async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 				await this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value, State);
 			else
@@ -4838,7 +4838,7 @@ namespace Waher.Persistence.Serialization
 					WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
 					WriterBak.WriteRaw(Bin);
 				}
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 		}
@@ -4850,7 +4850,7 @@ namespace Waher.Persistence.Serialization
 		{
 			get
 			{
-#if NETSTANDARD2_0
+#if COMPILED
 				if (this.compiled)
 				{
 					if (!(this.objectIdMemberInfo is null))
@@ -4865,7 +4865,7 @@ namespace Waher.Persistence.Serialization
 						return this.objectIdMember.Name;
 					else
 						return null;
-#if NETSTANDARD2_0
+#if COMPILED
 				}
 #endif
 			}
@@ -4878,7 +4878,7 @@ namespace Waher.Persistence.Serialization
 		{
 			get
 			{
-#if NETSTANDARD2_0
+#if COMPILED
 				if (this.compiled)
 					return !(this.objectIdMemberInfo is null);
 				else
@@ -4895,7 +4895,7 @@ namespace Waher.Persistence.Serialization
 		{
 			object ObjectId;
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 			{
 				if (!(this.objectIdFieldInfo is null))
@@ -4912,7 +4912,7 @@ namespace Waher.Persistence.Serialization
 					ObjectId = this.objectIdMember.Get(Value);
 				else
 					return Task.FromResult(false);
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 
@@ -4936,7 +4936,7 @@ namespace Waher.Persistence.Serialization
 			Type MemberType;
 			object Obj;
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 			{
 				if (!(this.objectIdFieldInfo is null))
@@ -4953,7 +4953,7 @@ namespace Waher.Persistence.Serialization
 					MemberType = this.objectIdMember.MemberType;
 				else
 					return Task.FromResult(false);
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 
@@ -4966,7 +4966,7 @@ namespace Waher.Persistence.Serialization
 			else
 				return Task.FromResult(false);
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 			{
 				if (!(this.objectIdFieldInfo is null))
@@ -4994,7 +4994,7 @@ namespace Waher.Persistence.Serialization
 		{
 			object Obj;
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 			{
 				if (!(this.objectIdFieldInfo is null))
@@ -5027,7 +5027,7 @@ namespace Waher.Persistence.Serialization
 
 					throw new NotSupportedException(sb.ToString());
 				}
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 
@@ -5039,7 +5039,7 @@ namespace Waher.Persistence.Serialization
 				Guid ObjectId = await this.context.SaveNewObject(Value, State);
 				Type T;
 
-#if NETSTANDARD2_0
+#if COMPILED
 				if (this.compiled)
 				{
 					if (!(this.objectIdFieldInfo is null))
@@ -5067,7 +5067,7 @@ namespace Waher.Persistence.Serialization
 					throw new NotSupportedException(sb.ToString());
 				}
 
-#if NETSTANDARD2_0
+#if COMPILED
 				if (this.compiled)
 				{
 					if (!(this.objectIdFieldInfo is null))
@@ -5108,7 +5108,7 @@ namespace Waher.Persistence.Serialization
 		{
 			object Default;
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 			{
 				if (!this.defaultValues.TryGetValue(FieldName, out Default))
@@ -5121,7 +5121,7 @@ namespace Waher.Persistence.Serialization
 					return false;
 
 				Default = Member.DefaultValue;
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 			if ((Value is null) ^ (Default is null))
@@ -5141,7 +5141,7 @@ namespace Waher.Persistence.Serialization
 		/// <returns>Corresponding field or property value, if found, or null otherwise.</returns>
 		public virtual Task<object> TryGetFieldValue(string FieldName, object Object)
 		{
-#if NETSTANDARD2_0
+#if COMPILED
 			if (this.compiled)
 				return this.customSerializer.TryGetFieldValue(FieldName, Object);
 			else
@@ -5151,7 +5151,7 @@ namespace Waher.Persistence.Serialization
 					return Task.FromResult<object>(Member.Get(Object));
 				else
 					return Task.FromResult<object>(null);
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 #endif
 		}
@@ -5170,7 +5170,7 @@ namespace Waher.Persistence.Serialization
 			{
 				foreach (MemberInfo MI in T.DeclaredMembers)
 				{
-#if NETSTANDARD2_0
+#if COMPILED
 					if (MI.MemberType != MemberTypes.Property && MI.MemberType != MemberTypes.Field)
 						continue;
 #endif

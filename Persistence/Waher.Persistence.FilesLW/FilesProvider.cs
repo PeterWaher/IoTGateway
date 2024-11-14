@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_0
+﻿#if COMPILED
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 #endif
 using System;
@@ -64,7 +64,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public const string FILES_DB_SALT = nameof(FILES_DB_SALT);
 
-#if NETSTANDARD2_0
+#if COMPILED
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 #endif
 		private static bool asyncFileIo = true;
@@ -93,7 +93,7 @@ namespace Waher.Persistence.Files
 		private string salt = null;
 		private readonly bool encrypted;
 		private readonly CustomKeyHandler customKeyMethod;
-#if NETSTANDARD2_0
+#if COMPILED
 		private bool rsaFailure = false;
 		private readonly bool compiled;
 		private bool deleteObsoleteKeys = true;
@@ -143,7 +143,7 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.encrypted = Encrypted;
 			this.customKeyMethod = CustomKeyMethod;
-#if NETSTANDARD2_0
+#if COMPILED
 			this.compiled = Compiled;
 			this.serializers = new SerializerCollection(this, this.compiled);
 #else
@@ -156,7 +156,7 @@ namespace Waher.Persistence.Files
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
 		}
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -228,7 +228,7 @@ namespace Waher.Persistence.Files
 				false, false, null, null);
 		}
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -353,7 +353,7 @@ namespace Waher.Persistence.Files
 				false, false, null, Thread);
 		}
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -519,7 +519,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public bool Encrypted => this.encrypted;
 
-#if NETSTANDARD2_0
+#if COMPILED
 		/// <summary>
 		/// If object serializers should be compiled or not.
 		/// </summary>
@@ -828,7 +828,7 @@ namespace Waher.Persistence.Files
 		{
 			byte[] Key, IV;
 
-#if NETSTANDARD2_0
+#if COMPILED
 			if (!(this.customKeyMethod is null))
 			{
 #endif
@@ -839,7 +839,7 @@ namespace Waher.Persistence.Files
 					Key = Sha256.ComputeHash(P.Key);
 					IV = Sha256.ComputeHash(P.Value);
 				}
-#if NETSTANDARD2_0
+#if COMPILED
 			}
 			else if (this.rsaFailure)
 				return this.GetKeysUsingSalt(FileName);
@@ -1444,7 +1444,7 @@ namespace Waher.Persistence.Files
 		{
 			StringBuilder sb = new StringBuilder();
 
-#if NETSTANDARD2_0
+#if COMPILED
 			string s;
 			bool Exists;
 			byte[] Hash;
@@ -3620,7 +3620,7 @@ namespace Waher.Persistence.Files
 							}
 						}
 
-#if NETSTANDARD2_0
+#if COMPILED
 						if (File.Encrypted && this.customKeyMethod is null)
 						{
 							try

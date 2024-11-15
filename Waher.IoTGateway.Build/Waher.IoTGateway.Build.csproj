@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Configuration>Release</Configuration>
-    <RuntimeFrameworkVersion>netcoreapp3.1</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>8.0</RuntimeFrameworkVersion>
     <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>

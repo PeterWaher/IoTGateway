@@ -22,7 +22,7 @@
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway.Svc\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <RuntimeFrameworkVersion>6.0</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>8.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>

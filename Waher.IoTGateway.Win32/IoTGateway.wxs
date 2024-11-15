@@ -1745,7 +1745,7 @@
 								<RemoveFile Id='RemoveWaher.Utility.Acme.runtimeconfig.json' Name='Waher.Utility.Acme.runtimeconfig.json' On='uninstall'/>
 							</Component>
 							<Component Id='UtilityAcmeDebugFiles' Guid='9AF24263-A6A4-40B6-9CC1-EE03E0B69E88'>
-								<File Id='Waher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\Waher.Utility.Acme.pdb' Vital='yes' KeyPath='yes'/>
+								<File Id='Waher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Acme.pdb' Vital='yes' KeyPath='yes'/>
 								<RemoveFile Id='RemoveWaher.Utility.Acme.pdb' Name='Waher.Utility.Acme.pdb' On='uninstall'/>
 							</Component>
 						</Directory>

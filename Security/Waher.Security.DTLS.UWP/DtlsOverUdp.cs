@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Waher.Networking;
+using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Security.DTLS.Events;

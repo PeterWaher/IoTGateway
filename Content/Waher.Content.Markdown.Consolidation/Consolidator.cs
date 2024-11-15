@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Graphs;

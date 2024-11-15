@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Waher.Networking;
+using Waher.Events;
 
 namespace Waher.Content.Markdown.Consolidation
 {

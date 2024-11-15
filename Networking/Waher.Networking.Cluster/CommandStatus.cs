@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Networking.Cluster
 {

@@ -1,4 +1,6 @@
-﻿namespace Waher.Networking.XMPP.PEP.Events
+﻿using Waher.Events;
+
+namespace Waher.Networking.XMPP.PEP.Events
 {
 	/// <summary>
 	/// Event arguments for user avatar metadata events.

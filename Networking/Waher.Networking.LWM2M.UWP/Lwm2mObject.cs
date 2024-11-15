@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;

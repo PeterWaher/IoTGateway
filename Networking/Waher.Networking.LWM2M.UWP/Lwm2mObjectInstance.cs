@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
-using Waher.Persistence.Attributes;
+using Waher.Events;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.LWM2M.ContentFormats;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.LWM2M
 {

@@ -1072,7 +1072,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Reads a tag array.
 		/// </summary>
-		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
@@ -1096,7 +1096,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Reads a tag array.
 		/// </summary>
-		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
@@ -1121,6 +1121,7 @@ namespace Waher.Persistence.Serialization
 		/// Reads a typed array.
 		/// </summary>
 		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Context">Serialization context.</param>
 		/// <param name="Reader">Deserializer.</param>
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>

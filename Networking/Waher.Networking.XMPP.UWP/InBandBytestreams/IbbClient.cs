@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Cache;

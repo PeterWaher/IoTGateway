@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Images;
-using Waher.Networking;
+using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;

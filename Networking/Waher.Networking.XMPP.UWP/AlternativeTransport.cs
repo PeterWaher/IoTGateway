@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP

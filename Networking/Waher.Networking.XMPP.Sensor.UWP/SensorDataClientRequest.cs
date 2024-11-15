@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.Events;
 using Waher.Things;
 using Waher.Things.SensorData;

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 
-namespace Waher.Networking
+namespace Waher.Events
 {
 	#region Delegates
 
@@ -186,7 +185,7 @@ namespace Waher.Networking
 		/// <param name="EventHandler">Event handler, or null if not defined.</param>
 		/// <param name="Sender">Sender of events.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender)
+		public static Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty, Sender?.DecoupledEvents ?? false);
 		}
@@ -199,7 +198,7 @@ namespace Waher.Networking
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, bool Decoupled)
+		public static Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender, bool Decoupled)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
@@ -211,7 +210,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e)
+		public static Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender, EventArgs e)
 		{
 			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
@@ -225,7 +224,7 @@ namespace Waher.Networking
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandler EventHandler, ICommunicationLayer Sender, EventArgs e, bool Decoupled)
+		public static async Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(e);
@@ -282,7 +281,7 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Sender">Sender of event.</param>
 		/// <param name="e">Event arguments.</param>
-		private static Task NoEventHandlerWarning(this ICommunicationLayer Sender, object e)
+		private static Task NoEventHandlerWarning(this IObservableLayer Sender, object e)
 		{
 			if (Sender is null)
 				return Task.CompletedTask;
@@ -310,7 +309,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e)
+		public static Task<bool> Raise<T>(this EventHandler<T> EventHandler, IObservableLayer Sender, T e)
 		{
 			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
@@ -324,7 +323,7 @@ namespace Waher.Networking
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, ICommunicationLayer Sender, T e, bool Decoupled)
+		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, IObservableLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(e);
@@ -526,7 +525,7 @@ namespace Waher.Networking
 		/// <param name="EventHandler">Event handler, or null if not defined.</param>
 		/// <param name="Sender">Sender of events.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender)
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, IObservableLayer Sender)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty, Sender?.DecoupledEvents ?? false);
 		}
@@ -539,7 +538,7 @@ namespace Waher.Networking
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, bool Decoupled)
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, IObservableLayer Sender, bool Decoupled)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
@@ -551,7 +550,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e)
+		public static Task<bool> Raise(this EventHandlerAsync EventHandler, IObservableLayer Sender, EventArgs e)
 		{
 			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
@@ -565,7 +564,7 @@ namespace Waher.Networking
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, ICommunicationLayer Sender, EventArgs e, bool Decoupled)
+		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, IObservableLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(e);
@@ -624,7 +623,7 @@ namespace Waher.Networking
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e)
+		public static Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, IObservableLayer Sender, T e)
 		{
 			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
@@ -638,7 +637,7 @@ namespace Waher.Networking
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, ICommunicationLayer Sender, T e, bool Decoupled)
+		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, IObservableLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
 				await Sender.NoEventHandlerWarning(e);

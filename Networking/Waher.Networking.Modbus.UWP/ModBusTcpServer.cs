@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.Modbus

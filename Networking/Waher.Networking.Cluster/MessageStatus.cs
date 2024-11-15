@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using Waher.Events;
 
 namespace Waher.Networking.Cluster
 {

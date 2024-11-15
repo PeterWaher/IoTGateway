@@ -156,6 +156,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
       <Project>{6c7adaeb-7809-4d79-ad1b-e981b4a18b1f}</Project>
       <Name>Waher.Networking.UWP</Name>

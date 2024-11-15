@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP.WebSockets

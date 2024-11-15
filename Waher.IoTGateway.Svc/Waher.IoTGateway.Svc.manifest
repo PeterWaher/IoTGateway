@@ -604,6 +604,9 @@
 	<Assembly fileName="Waher.Security.Users.pdb" />
 	<Assembly fileName="Waher.Security.Users.xml" />
 	<Assembly fileName="Waher.Security.xml" />
+	<Assembly fileName="Waher.Theme.Base.dll" />
+	<Assembly fileName="Waher.Theme.Base.manifest" />
+	<Assembly fileName="Waher.Theme.Base.pdb" />
 	<Assembly fileName="Waher.Theme.CactusRose.dll" />
 	<Assembly fileName="Waher.Theme.CactusRose.manifest" />
 	<Assembly fileName="Waher.Theme.CactusRose.pdb" />

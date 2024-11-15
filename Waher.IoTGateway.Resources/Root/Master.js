@@ -16,9 +16,10 @@ function NativeHeader() {
             // if on computer, make sure dropdowns expand beyond the screen
 
             const rect = subMenu.getBoundingClientRect();
-            const rightX = rect.left + rect.width
+            const rightX = rect.right
+            const bottomY = rect.bottom
 
-            // content is overflowing
+            // content is overflowing to the right of the screen
             if (rightX > window.innerWidth) {
                 // go to top submenu
                 let element = subMenu
@@ -39,6 +40,12 @@ function NativeHeader() {
                     element.style.transform = ""
                   };
                 topLevelLi.addEventListener("mouseenter", handler);
+            }
+
+            // overflowing the bottom of the screen
+            if (bottomY > window.innerHeight) {
+                console.log(rect.height - bottomY + window.innerHeight)
+                subMenu.style.maxHeight = rect.height - bottomY + window.innerHeight + "px";
             }
         })
     })

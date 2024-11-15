@@ -310,6 +310,8 @@ html body fieldset
 
     #native-header li > ul 
     {
+        overflow-y: scroll;
+        direction:rtl; 
         overflow-x: visible;
     }
 

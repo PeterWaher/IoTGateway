@@ -387,15 +387,14 @@
 							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' On='uninstall' />
 						</Component>
 						<Component Id='MicrosoftLibraries' Guid='A9BAC7EA-59F6-4362-B44C-63B82A034C88'>
-							<File Id='AWSSDK.Core.dll' Name='AWSSDK.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\AWSSDK.Core.dll' Vital='yes' KeyPath='yes' />
-							<File Id='AWSSDK.SecurityToken.dll' Name='AWSSDK.SecurityToken.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\AWSSDK.SecurityToken.dll' Vital='yes' />
-							<File Id='clretwrc.dll' Name='clretwrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clretwrc.dll' Vital='yes' />
+							<File Id='clretwrc.dll' Name='clretwrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clretwrc.dll' Vital='yes' KeyPath='yes' />
+							<File Id='clrgc.dll' Name='clrgc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clrgc.dll' Vital='yes' />
 							<File Id='clrjit.dll' Name='clrjit.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clrjit.dll' Vital='yes' />
 							<File Id='coreclr.dll' Name='coreclr.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\coreclr.dll' Vital='yes' />
 							<File Id='createdump.exe' Name='createdump.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\createdump.exe' Vital='yes' />
-							<File Id='dbgshim.dll' Name='dbgshim.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\dbgshim.dll' Vital='yes' />
 							<File Id='hostfxr.dll' Name='hostfxr.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\hostfxr.dll' Vital='yes' />
 							<File Id='hostpolicy.dll' Name='hostpolicy.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\hostpolicy.dll' Vital='yes' />
+							<File Id='Microsoft.Bcl.Cryptography.dll' Name='Microsoft.Bcl.Cryptography.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Bcl.Cryptography.dll' Vital='yes' />
 							<File Id='Microsoft.CodeAnalysis.CSharp.dll' Name='Microsoft.CodeAnalysis.CSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CodeAnalysis.CSharp.dll' Vital='yes' />
 							<File Id='Microsoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CodeAnalysis.dll' Vital='yes' />
 							<File Id='Microsoft.CSharp.dll' Name='Microsoft.CSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CSharp.dll' Vital='yes' />
@@ -403,27 +402,24 @@
 							<File Id='Microsoft.Extensions.DependencyInjection.Abstractions.dll' Name='Microsoft.Extensions.DependencyInjection.Abstractions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Extensions.DependencyInjection.Abstractions.dll' Vital='yes' />
 							<File Id='Microsoft.Extensions.Logging.Abstractions.dll' Name='Microsoft.Extensions.Logging.Abstractions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Extensions.Logging.Abstractions.dll' Vital='yes' />
 							<File Id='Microsoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.Core.dll' Vital='yes' />
+							<File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.dll' Vital='yes' />
 							<File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Primitives.dll' Vital='yes' />
 							<File Id='Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Registry.dll' Vital='yes' />
-							<File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.dll' Vital='yes' />
-							<File Id='mscordaccore.dll' Name='mscordaccore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore.dll' Vital='yes' />
-							<File Id='mscordaccore_x86_x86_6.0.21.52210.dll' Name='mscordaccore_x86_x86_6.0.21.52210.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_6.0.21.52210.dll' Vital='yes' />
+							<File Id='mscordaccore_x86_x86_8.0.23.53103.dll' Name='mscordaccore_x86_x86_8.0.23.53103.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_8.0.23.53103.dll' Vital='yes' />
 							<File Id='mscordbi.dll' Name='mscordbi.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordbi.dll' Vital='yes' />
 							<File Id='mscorlib.dll' Name='mscorlib.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorlib.dll' Vital='yes' />
 							<File Id='mscorrc.dll' Name='mscorrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.dll' Vital='yes' />
 							<File Id='msquic.dll' Name='msquic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\msquic.dll' Vital='yes' />
 							<File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\netstandard.dll' Vital='yes' />
-							<File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
 							<File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\WindowsBase.dll' Vital='yes' />
-							<RemoveFile Id='RemoveAWSSDK.Core.dll' Name='AWSSDK.Core.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAWSSDK.SecurityToken.dll' Name='AWSSDK.SecurityToken.dll' On='uninstall'/>
 							<RemoveFile Id='Removeclretwrc.dll' Name='clretwrc.dll' On='uninstall'/>
+							<RemoveFile Id='Removeclrgc.dll' Name='clrgc.dll' On='uninstall'/>
 							<RemoveFile Id='Removeclrjit.dll' Name='clrjit.dll' On='uninstall'/>
 							<RemoveFile Id='Removecoreclr.dll' Name='coreclr.dll' On='uninstall'/>
 							<RemoveFile Id='Removecreatedump.exe' Name='createdump.exe' On='uninstall'/>
-							<RemoveFile Id='Removedbgshim.dll' Name='dbgshim.dll' On='uninstall'/>
-							<RemoveFile Id='Removehostpolicy.dll' Name='hostpolicy.dll' On='uninstall'/>
 							<RemoveFile Id='Removehostfxr.dll' Name='hostfxr.dll' On='uninstall'/>
+							<RemoveFile Id='Removehostpolicy.dll' Name='hostpolicy.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.Bcl.Cryptography.dll' Name='Microsoft.Bcl.Cryptography.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.CodeAnalysis.CSharp.dll' Name='Microsoft.CodeAnalysis.CSharp.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.CSharp.dll' Name='Microsoft.CSharp.dll' On='uninstall'/>
@@ -435,13 +431,12 @@
 							<RemoveFile Id='RemoveMicrosoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscordaccore.dll' Name='mscordaccore.dll' On='uninstall'/>
-							<RemoveFile Id='Removemscordaccore_x86_x86_6.0.21.52210.dll' Name='mscordaccore_x86_x86_6.0.21.52210.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordaccore_x86_x86_8.0.23.53103.dll' Name='mscordaccore_x86_x86_8.0.23.53103.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscordbi.dll' Name='mscordbi.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscorlib.dll' Name='mscorlib.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscorrc.dll' Name='mscorrc.dll' On='uninstall'/>
 							<RemoveFile Id='Removemsquic.dll' Name='msquic.dll' On='uninstall'/>
 							<RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
-							<RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
 						</Component>
 						<Component Id='ExternalLibraries' Guid='6545F5ED-1503-454E-9EB4-E211BF6E74B3'>
@@ -449,29 +444,23 @@
 							<File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\libSkiaSharp.dll' Vital='yes'/>
 							<File Id='MongoDB.Bson.dll' Name='MongoDB.Bson.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Bson.dll' Vital='yes'/>
 							<File Id='MongoDB.Driver.dll' Name='MongoDB.Driver.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.dll' Vital='yes'/>
-							<File Id='MongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.Core.dll' Vital='yes'/>
-							<File Id='MongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Libmongocrypt.dll' Vital='yes'/>
-							<File Id='mongocrypt.dll' Name='mongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mongocrypt.dll' Vital='yes'/>
 							<File Id='MySqlConnector.dll' Name='MySqlConnector.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MySqlConnector.dll' Vital='yes'/>
 							<File Id='Npgsql.dll' Name='Npgsql.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Npgsql.dll' Vital='yes'/>
-							<File Id='sni.dll' Name='sni.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sni.dll' Vital='yes'/>
 							<File Id='SharpCompress.dll' Name='SharpCompress.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SharpCompress.dll' Vital='yes'/>
 							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SkiaSharp.dll' Vital='yes'/>
 							<File Id='Snappier.dll' Name='Snappier.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Snappier.dll' Vital='yes'/>
+							<File Id='sni.dll' Name='sni.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sni.dll' Vital='yes'/>
 							<File Id='ZstdSharp.dll' Name='ZstdSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ZstdSharp.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveDnsClient.dll' Name='DnsClient.dll' On='uninstall'/>
 							<RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Bson.dll' Name='MongoDB.Bson.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Driver.dll' Name='MongoDB.Driver.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveMongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveMongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' On='uninstall'/>
-							<RemoveFile Id='mongocrypt.dll' Name='mongocrypt.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMySqlConnector.dll' Name='MySqlConnector.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveNpgsql.dll' Name='Npgsql.dll' On='uninstall'/>
-							<RemoveFile Id='Removesni.dll' Name='sni.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSharpCompress.dll' Name='SharpCompress.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSnappier.dll' Name='Snappier.dll' On='uninstall'/>
+							<RemoveFile Id='Removesni.dll' Name='sni.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveZstdSharp.dll' Name='ZstdSharp.dll' On='uninstall'/>
 						</Component>
 						<Component Id='MainExecutable' Guid='4A7EDBB4-9F37-4115-93B6-1BCBECD06486'>
@@ -512,13 +501,16 @@
 							<File Id='Waher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.dll' Vital='yes'/>
 							<File Id='Waher.Events.XMPP.dll' Name='Waher.Events.XMPP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.XMPP.dll' Vital='yes'/>
 							<File Id='Waher.IoTGateway.dll' Name='Waher.IoTGateway.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.dll' Vital='yes'/>
+							<File Id='Waher.IoTGateway.manifest' Name='Waher.IoTGateway.manifest' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.manifest' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Resources.dll' Vital='yes'/>
+							<File Id='Waher.IoTGateway.Resources.manifest' Name='Waher.IoTGateway.Resources.manifest' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Resources.manifest' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.exe' Vital='yes'>
 								<Shortcut Id="StartMenuIoTGatewayConsole" Directory="ProgramMenuDir" Name="IoT Gateway 1.0"
 										 WorkingDirectory='INSTALLDIR' Icon="eye.ico" Arguments="-console" IconIndex="0" Advertise="yes" />
 							</File>
 							<File Id='Waher.IoTGateway.Svc.dll' Name='Waher.IoTGateway.Svc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.dll' Vital='yes' />
 							<File Id='Waher.IoTGateway.Svc.deps.json' Name='Waher.IoTGateway.Svc.deps.json' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.deps.json' Vital='yes' />
+							<File Id='Waher.IoTGateway.Svc.manifest' Name='Waher.IoTGateway.Svc.manifest' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.manifest' Vital='yes' />
 							<File Id='Waher.IoTGateway.Svc.runtimeconfig.json' Name='Waher.IoTGateway.Svc.runtimeconfig.json' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.runtimeconfig.json' Vital='yes' />
 							<fire:FirewallException Id="FirewallServiceRule" Name="IoT Gateway Service" File="Waher.IoTGateway.Svc.exe" Scope="any"/>
 							<File Id='Waher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Layout.Layout2D.dll' Vital='yes'/>
@@ -656,10 +648,13 @@
 							<RemoveFile Id='RemoveWaher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.XMPP.dll' Name='Waher.Events.XMPP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.dll' Name='Waher.IoTGateway.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.manifest' Name='Waher.IoTGateway.manifest' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.Resources.manifest' Name='Waher.IoTGateway.Resources.manifest' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.dll' Name='Waher.IoTGateway.Svc.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.deps.json' Name='Waher.IoTGateway.Svc.deps.json' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.manifest' Name='Waher.IoTGateway.Svc.manifest' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.runtimeconfig.json' Name='Waher.IoTGateway.Svc.runtimeconfig.json' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
@@ -1303,6 +1298,10 @@
 							<File Id='Waher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Script.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' On='uninstall'/>
 						</Component>
+						<Component Id='ScriptWebServiceCodeDoc' Guid='F72D5541-4D65-4961-A346-5D8FC0EA2425'>
+							<File Id='Waher.WebService.Script.xml' Name='Waher.WebService.Script.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Script.xml' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.WebService.Script.xml' Name='Waher.WebService.Script.xml' On='uninstall'/>
+						</Component>
 						<Component Id='SparqlWebService' Guid='849EE82F-B03F-43CD-8BBF-9952426E77E5'>
 							<File Id='Waher.WebService.Sparql.dll' Name='Waher.WebService.Sparql.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Sparql.dll' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.WebService.Sparql.dll' Name='Waher.WebService.Sparql.dll' On='uninstall'/>
@@ -1310,6 +1309,10 @@
 						<Component Id='SparqlWebServiceDebugFiles' Guid='86B1D04C-9355-4A49-9D9F-BEC64739CB60'>
 							<File Id='Waher.WebService.Sparql.pdb' Name='Waher.WebService.Sparql.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Sparql.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.WebService.Sparql.pdb' Name='Waher.WebService.Sparql.pdb' On='uninstall'/>
+						</Component>
+						<Component Id='SparqlWebServiceCodeDoc' Guid='F1F6E165-5AB0-4294-BAB5-186740B70863'>
+							<File Id='Waher.WebService.Sparql.xml' Name='Waher.WebService.Sparql.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Sparql.xml' Vital='yes' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.WebService.Sparql.xml' Name='Waher.WebService.Sparql.xml' On='uninstall'/>
 						</Component>
 						<Component Id='UtilityInstall' Guid='AA0A1804-6484-4684-AE06-A39A627665B3'>
 							<File Id='Waher.Utility.Install.exe' Name='Waher.Utility.Install.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe' Vital='yes' KeyPath='yes'/>
@@ -2589,7 +2592,9 @@
 				<ComponentRef Id='MainDebugFiles'/>
 				<ComponentRef Id='MainCodeDocFiles'/>
 				<ComponentRef Id='ScriptWebServiceDebugFiles'/>
+				<ComponentRef Id='ScriptWebServiceCodeDoc'/>
 				<ComponentRef Id='SparqlWebServiceDebugFiles'/>
+				<ComponentRef Id='SparqlWebServiceCodeDoc'/>
 				<ComponentRef Id='UtilityAcmeDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeClockDebugFiles' />
 				<ComponentRef Id='UtilityAnalyzeDBDebugFiles' />

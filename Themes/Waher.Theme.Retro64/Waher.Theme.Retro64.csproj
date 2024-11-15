@@ -23,8 +23,11 @@
     <FileVersion>2.0.0</FileVersion>
     <Version>2.0.0</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Remove="Root\Themes\Retro64\Retro64.cssx" />
     <None Remove="Root\Themes\Retro64\Retro64.png" />
     <None Remove="Root\Themes\Retro64\Retro64.xml" />

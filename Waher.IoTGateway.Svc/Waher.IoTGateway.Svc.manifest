@@ -1,59 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
-	<Assembly fileName='api-ms-win-core-console-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-console-l1-2-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-datetime-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-debug-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-errorhandling-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-file-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-file-l1-2-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-file-l2-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-handle-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-heap-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-interlocked-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-libraryloader-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-localization-l1-2-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-memory-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-namedpipe-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-processenvironment-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-processthreads-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-processthreads-l1-1-1.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-profile-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-rtlsupport-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-string-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-synch-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-synch-l1-2-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-sysinfo-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-timezone-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-core-util-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='API-MS-Win-core-xstate-l2-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-conio-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-convert-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-environment-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-filesystem-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-heap-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-locale-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-math-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-multibyte-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-private-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-process-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-runtime-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-stdio-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-string-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-time-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='api-ms-win-crt-utility-l1-1-0.dll' category="NetCoreWin"/>
-	<Assembly fileName='AWSSDK.Core.dll'/>
-	<Assembly fileName='AWSSDK.SecurityToken.dll'/>
 	<Assembly fileName='clretwrc.dll'/>
+	<Assembly fileName='clrgc.dll'/>
 	<Assembly fileName='clrjit.dll'/>
 	<Assembly fileName='coreclr.dll'/>
 	<Assembly fileName='createdump.exe'/>
-	<Assembly fileName='dbgshim.dll'/>
-	<Assembly fileName='DnsClient.dll'/>
-	<Assembly fileName='Gateway.config'/>
 	<Assembly fileName='hostfxr.dll'/>
 	<Assembly fileName='hostpolicy.dll'/>
-	<Assembly fileName='libSkiaSharp.dll'/>
+	<Assembly fileName='Microsoft.Bcl.Cryptography.dll'/>
 	<Assembly fileName='Microsoft.CodeAnalysis.CSharp.dll'/>
 	<Assembly fileName='Microsoft.CodeAnalysis.dll'/>
 	<Assembly fileName='Microsoft.CSharp.dll'/>
@@ -64,24 +18,26 @@
 	<Assembly fileName='Microsoft.VisualBasic.dll'/>
 	<Assembly fileName='Microsoft.Win32.Primitives.dll'/>
 	<Assembly fileName='Microsoft.Win32.Registry.dll'/>
-	<Assembly fileName='mongocrypt.dll'/>
-	<Assembly fileName='MongoDB.Bson.dll'/>
-	<Assembly fileName='MongoDB.Driver.Core.dll'/>
-	<Assembly fileName='MongoDB.Driver.dll'/>
-	<Assembly fileName='MongoDB.Libmongocrypt.dll'/>
-	<Assembly fileName='mscordaccore.dll'/>
-	<Assembly fileName='mscordaccore_x86_x86_6.0.21.52210.dll'/>
+	<Assembly fileName='mscordaccore_x86_x86_8.0.23.53103.dll'/>
 	<Assembly fileName='mscordbi.dll'/>
 	<Assembly fileName='mscorlib.dll'/>
 	<Assembly fileName='mscorrc.dll'/>
 	<Assembly fileName='msquic.dll'/>
-	<Assembly fileName='MySqlConnector.dll'/>
 	<Assembly fileName='netstandard.dll'/>
-	<Assembly fileName='Npgsql.dll'/>
-	<Assembly fileName='SharpCompress.dll'/>
+	<Assembly fileName='WindowsBase.dll'/>
+
+	<Assembly fileName='DnsClient.dll'/>
+	<Assembly fileName='libSkiaSharp.dll'/>
+	<Assembly fileName='MongoDB.Bson.dll'/>
+	<Assembly fileName='MongoDB.Driver.dll'/>
+	<Assembly fileName='MySqlConnector.dll'/> 
+	<Assembly fileName='Npgsql.dll'/> 
+	<Assembly fileName='SharpCompress.dll'/> 
 	<Assembly fileName='SkiaSharp.dll'/>
 	<Assembly fileName='Snappier.dll'/>
 	<Assembly fileName='sni.dll'/>
+	<Assembly fileName='ZstdSharp.dll'/>
+
 	<Assembly fileName='System.AppContext.dll'/>
 	<Assembly fileName='System.Buffers.dll'/>
 	<Assembly fileName='System.Collections.Concurrent.dll'/>
@@ -113,7 +69,6 @@
 	<Assembly fileName='System.Diagnostics.FileVersionInfo.dll'/>
 	<Assembly fileName='System.Diagnostics.PerformanceCounter.dll'/>
 	<Assembly fileName='System.Diagnostics.Process.dll'/>
-	<Assembly fileName='System.Diagnostics.PerformanceCounter.dll'/>
 	<Assembly fileName='System.Diagnostics.StackTrace.dll'/>
 	<Assembly fileName='System.Diagnostics.TextWriterTraceListener.dll'/>
 	<Assembly fileName='System.Diagnostics.Tools.dll'/>
@@ -124,6 +79,7 @@
 	<Assembly fileName='System.Drawing.Primitives.dll'/>
 	<Assembly fileName='System.Dynamic.Runtime.dll'/>
 	<Assembly fileName='System.Formats.Asn1.dll'/>
+	<Assembly fileName='System.Formats.Tar.dll'/>
 	<Assembly fileName='System.Globalization.Calendars.dll'/>
 	<Assembly fileName='System.Globalization.dll'/>
 	<Assembly fileName='System.Globalization.Extensions.dll'/>
@@ -193,6 +149,7 @@
 	<Assembly fileName='System.Runtime.Extensions.dll'/>
 	<Assembly fileName='System.Runtime.Handles.dll'/>
 	<Assembly fileName='System.Runtime.InteropServices.dll'/>
+	<Assembly fileName='System.Runtime.InteropServices.JavaScript.dll'/>
 	<Assembly fileName='System.Runtime.InteropServices.RuntimeInformation.dll'/>
 	<Assembly fileName='System.Runtime.Intrinsics.dll'/>
 	<Assembly fileName='System.Runtime.Loader.dll'/>
@@ -204,6 +161,7 @@
 	<Assembly fileName='System.Runtime.Serialization.Xml.dll'/>
 	<Assembly fileName='System.Security.AccessControl.dll'/>
 	<Assembly fileName='System.Security.Claims.dll'/>
+	<Assembly fileName='System.Security.Cryptography.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Algorithms.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Cng.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Csp.dll'/>
@@ -253,20 +211,22 @@
 	<Assembly fileName='System.Xml.XPath.dll'/>
 	<Assembly fileName='System.Xml.XPath.XDocument.dll'/>
 	<Assembly fileName='System.Xml.XPath.XmlDocument.dll'/>
-	<Assembly fileName='ucrtbase.dll'/>
+	
+	<Assembly fileName="Waher.Content.dll" />
+	<Assembly fileName="Waher.Content.pdb" />
+	<Assembly fileName="Waher.Content.xml" />
 	<Assembly fileName="Waher.Content.Asn1.dll" />
 	<Assembly fileName="Waher.Content.Asn1.pdb" />
 	<Assembly fileName="Waher.Content.Asn1.xml" />
-	<Assembly fileName="Waher.Content.dll" />
 	<Assembly fileName="Waher.Content.Dsn.dll" />
 	<Assembly fileName="Waher.Content.Dsn.pdb" />
 	<Assembly fileName="Waher.Content.Dsn.xml" />
 	<Assembly fileName="Waher.Content.Emoji.dll" />
+	<Assembly fileName="Waher.Content.Emoji.pdb" />
+	<Assembly fileName="Waher.Content.Emoji.xml" />
 	<Assembly fileName="Waher.Content.Emoji.Emoji1.dll" />
 	<Assembly fileName="Waher.Content.Emoji.Emoji1.pdb" />
 	<Assembly fileName="Waher.Content.Emoji.Emoji1.xml" />
-	<Assembly fileName="Waher.Content.Emoji.pdb" />
-	<Assembly fileName="Waher.Content.Emoji.xml" />
 	<Assembly fileName="Waher.Content.Html.dll" />
 	<Assembly fileName="Waher.Content.Html.pdb" />
 	<Assembly fileName="Waher.Content.Html.xml" />
@@ -280,18 +240,20 @@
 	<Assembly fileName="Waher.Content.Markdown.Contracts.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.Contracts.xml" />
 	<Assembly fileName="Waher.Content.Markdown.dll" />
+	<Assembly fileName="Waher.Content.Markdown.pdb" />
+	<Assembly fileName="Waher.Content.Markdown.xml" />
 	<Assembly fileName="Waher.Content.Markdown.GraphViz.dll" />
 	<Assembly fileName="Waher.Content.Markdown.GraphViz.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.GraphViz.xml" />
 	<Assembly fileName="Waher.Content.Markdown.JavaScript.dll" />
 	<Assembly fileName="Waher.Content.Markdown.JavaScript.pdb" />
+	<Assembly fileName="Waher.Content.Markdown.JavaScript.xml" />
 	<Assembly fileName="Waher.Content.Markdown.Latex.dll" />
 	<Assembly fileName="Waher.Content.Markdown.Latex.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.Latex.xml" />
 	<Assembly fileName="Waher.Content.Markdown.Layout2D.dll" />
 	<Assembly fileName="Waher.Content.Markdown.Layout2D.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.Layout2D.xml" />
-	<Assembly fileName="Waher.Content.Markdown.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.PlantUml.dll" />
 	<Assembly fileName="Waher.Content.Markdown.PlantUml.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.PlantUml.xml" />
@@ -304,11 +266,9 @@
 	<Assembly fileName="Waher.Content.Markdown.Xamarin.dll" />
 	<Assembly fileName="Waher.Content.Markdown.Xamarin.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.Xamarin.xml" />
-	<Assembly fileName="Waher.Content.Markdown.xml" />
 	<Assembly fileName="Waher.Content.Markdown.Xml.dll" />
 	<Assembly fileName="Waher.Content.Markdown.Xml.pdb" />
 	<Assembly fileName="Waher.Content.Markdown.Xml.xml" />
-	<Assembly fileName="Waher.Content.pdb" />
 	<Assembly fileName="Waher.Content.QR.dll" />
 	<Assembly fileName="Waher.Content.QR.pdb" />
 	<Assembly fileName="Waher.Content.QR.xml" />
@@ -321,24 +281,24 @@
 	<Assembly fileName="Waher.Content.SystemFiles.dll" />
 	<Assembly fileName="Waher.Content.SystemFiles.pdb" />
 	<Assembly fileName="Waher.Content.SystemFiles.xml" />
-	<Assembly fileName="Waher.Content.xml" />
 	<Assembly fileName="Waher.Content.Xml.dll" />
 	<Assembly fileName="Waher.Content.Xml.pdb" />
 	<Assembly fileName="Waher.Content.Xml.xml" />
 	<Assembly fileName="Waher.Content.Xsl.dll" />
 	<Assembly fileName="Waher.Content.Xsl.pdb" />
 	<Assembly fileName="Waher.Content.Xsl.xml" />
+	<Assembly fileName="Waher.Events.dll" />
+	<Assembly fileName="Waher.Events.pdb" />
+	<Assembly fileName="Waher.Events.xml" />
 	<Assembly fileName="Waher.Events.Console.dll" />
 	<Assembly fileName="Waher.Events.Console.pdb" />
 	<Assembly fileName="Waher.Events.Console.xml" />
-	<Assembly fileName="Waher.Events.dll" />
 	<Assembly fileName="Waher.Events.Files.dll" />
 	<Assembly fileName="Waher.Events.Files.pdb" />
 	<Assembly fileName="Waher.Events.Files.xml" />
 	<Assembly fileName="Waher.Events.Filter.dll" />
 	<Assembly fileName="Waher.Events.Filter.pdb" />
 	<Assembly fileName="Waher.Events.Filter.xml" />
-	<Assembly fileName="Waher.Events.pdb" />
 	<Assembly fileName="Waher.Events.Persistence.dll" />
 	<Assembly fileName="Waher.Events.Persistence.pdb" />
 	<Assembly fileName="Waher.Events.Persistence.xml" />
@@ -348,22 +308,24 @@
 	<Assembly fileName="Waher.Events.WindowsEventLog.dll" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.pdb" />
 	<Assembly fileName="Waher.Events.WindowsEventLog.xml" />
-	<Assembly fileName="Waher.Events.xml" />
 	<Assembly fileName="Waher.Events.XMPP.dll" />
 	<Assembly fileName="Waher.Events.XMPP.pdb" />
 	<Assembly fileName="Waher.Events.XMPP.xml" />
 	<Assembly fileName="Waher.IoTGateway.dll" />
 	<Assembly fileName="Waher.IoTGateway.manifest" />
 	<Assembly fileName="Waher.IoTGateway.pdb" />
+	<Assembly fileName="Waher.IoTGateway.xml" />
 	<Assembly fileName="Waher.IoTGateway.Resources.dll" />
 	<Assembly fileName="Waher.IoTGateway.Resources.manifest" />
 	<Assembly fileName="Waher.IoTGateway.Resources.pdb" />
+	<Assembly fileName="Waher.IoTGateway.Resources.xml" />
 	<Assembly fileName="Waher.IoTGateway.Svc.deps.json" />
 	<Assembly fileName="Waher.IoTGateway.Svc.dll" />
 	<Assembly fileName="Waher.IoTGateway.Svc.exe" />
 	<Assembly fileName="Waher.IoTGateway.Svc.manifest" />
 	<Assembly fileName="Waher.IoTGateway.Svc.pdb" />
 	<Assembly fileName="Waher.IoTGateway.Svc.runtimeconfig.json" />
+	<Assembly fileName="Waher.IoTGateway.Svc.xml" />
 	<Assembly fileName="Waher.IoTGateway.xml" />
 	<Assembly fileName="Waher.Layout.Layout2D.dll" />
 	<Assembly fileName="Waher.Layout.Layout2D.pdb" />
@@ -375,20 +337,23 @@
 	<Assembly fileName="Waher.Networking.CoAP.pdb" />
 	<Assembly fileName="Waher.Networking.CoAP.xml" />
 	<Assembly fileName="Waher.Networking.dll" />
+	<Assembly fileName="Waher.Networking.pdb" />
+	<Assembly fileName="Waher.Networking.xml" />
 	<Assembly fileName="Waher.Networking.DNS.dll" />
 	<Assembly fileName="Waher.Networking.DNS.pdb" />
 	<Assembly fileName="Waher.Networking.DNS.xml" />
 	<Assembly fileName="Waher.Networking.HTTP.Brotli.dll" />
 	<Assembly fileName="Waher.Networking.HTTP.Brotli.pdb" />
+	<Assembly fileName="Waher.Networking.HTTP.Brotli.xml" />
 	<Assembly fileName="Waher.Networking.HTTP.dll" />
 	<Assembly fileName="Waher.Networking.HTTP.pdb" />
 	<Assembly fileName="Waher.Networking.HTTP.xml" />
 	<Assembly fileName="Waher.Networking.Modbus.dll" />
 	<Assembly fileName="Waher.Networking.Modbus.pdb" />
+	<Assembly fileName="Waher.Networking.Modbus.xml" />
 	<Assembly fileName="Waher.Networking.MQTT.dll" />
 	<Assembly fileName="Waher.Networking.MQTT.pdb" />
 	<Assembly fileName="Waher.Networking.MQTT.xml" />
-	<Assembly fileName="Waher.Networking.pdb" />
 	<Assembly fileName="Waher.Networking.PeerToPeer.dll" />
 	<Assembly fileName="Waher.Networking.PeerToPeer.pdb" />
 	<Assembly fileName="Waher.Networking.PeerToPeer.xml" />
@@ -403,7 +368,7 @@
 	<Assembly fileName="Waher.Networking.UPnP.xml" />
 	<Assembly fileName="Waher.Networking.WHOIS.dll" />
 	<Assembly fileName="Waher.Networking.WHOIS.pdb" />
-	<Assembly fileName="Waher.Networking.xml" />
+	<Assembly fileName="Waher.Networking.WHOIS.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.Avatar.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.Avatar.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.Avatar.xml" />
@@ -420,6 +385,8 @@
 	<Assembly fileName="Waher.Networking.XMPP.Control.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.Control.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.dll" />
+	<Assembly fileName="Waher.Networking.XMPP.pdb" />
+	<Assembly fileName="Waher.Networking.XMPP.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.HTTPX.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.HTTPX.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.HTTPX.xml" />
@@ -432,7 +399,6 @@
 	<Assembly fileName="Waher.Networking.XMPP.P2P.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.P2P.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.P2P.xml" />
-	<Assembly fileName="Waher.Networking.XMPP.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.PEP.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.PEP.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.PEP.xml" />
@@ -447,13 +413,13 @@
 	<Assembly fileName="Waher.Networking.XMPP.Sensor.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.Software.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.Software.pdb" />
+	<Assembly fileName="Waher.Networking.XMPP.Software.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.Synchronization.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.Synchronization.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.Synchronization.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.WebSocket.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.WebSocket.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.WebSocket.xml" />
-	<Assembly fileName="Waher.Networking.XMPP.xml" />
 	<Assembly fileName="Waher.Persistence.dll" />
 	<Assembly fileName="Waher.Persistence.pdb" />
 	<Assembly fileName="Waher.Persistence.xml" />
@@ -468,6 +434,7 @@
 	<Assembly fileName="Waher.Persistence.MongoDB.xml" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.dll" />
 	<Assembly fileName="Waher.Persistence.Serialization.Compiled.pdb" />
+	<Assembly fileName="Waher.Persistence.Serialization.Compiled.xml" />
 	<Assembly fileName="Waher.Persistence.XmlLedger.dll" />
 	<Assembly fileName="Waher.Persistence.XmlLedger.pdb" />
 	<Assembly fileName="Waher.Persistence.XmlLedger.xml" />
@@ -481,11 +448,11 @@
 	<Assembly fileName="Waher.Runtime.Counters.pdb" />
 	<Assembly fileName="Waher.Runtime.Counters.xml" />
 	<Assembly fileName="Waher.Runtime.Inventory.dll" />
+	<Assembly fileName="Waher.Runtime.Inventory.pdb" />
+	<Assembly fileName="Waher.Runtime.Inventory.xml" />
 	<Assembly fileName="Waher.Runtime.Inventory.Loader.dll" />
 	<Assembly fileName="Waher.Runtime.Inventory.Loader.pdb" />
 	<Assembly fileName="Waher.Runtime.Inventory.Loader.xml" />
-	<Assembly fileName="Waher.Runtime.Inventory.pdb" />
-	<Assembly fileName="Waher.Runtime.Inventory.xml" />
 	<Assembly fileName="Waher.Runtime.Language.dll" />
 	<Assembly fileName="Waher.Runtime.Language.pdb" />
 	<Assembly fileName="Waher.Runtime.Language.xml" />
@@ -509,10 +476,10 @@
 	<Assembly fileName="Waher.Runtime.Text.xml" />
 	<Assembly fileName="Waher.Runtime.Threading.dll" />
 	<Assembly fileName="Waher.Runtime.Threading.pdb" />
+	<Assembly fileName="Waher.Runtime.Threading.xml" />
 	<Assembly fileName="Waher.Runtime.Threading.Sync.dll" />
 	<Assembly fileName="Waher.Runtime.Threading.Sync.pdb" />
 	<Assembly fileName="Waher.Runtime.Threading.Sync.xml" />
-	<Assembly fileName="Waher.Runtime.Threading.xml" />
 	<Assembly fileName="Waher.Runtime.Timing.dll" />
 	<Assembly fileName="Waher.Runtime.Timing.pdb" />
 	<Assembly fileName="Waher.Runtime.Timing.xml" />
@@ -526,14 +493,17 @@
 	<Assembly fileName="Waher.Script.Cryptography.pdb" />
 	<Assembly fileName="Waher.Script.Cryptography.xml" />
 	<Assembly fileName="Waher.Script.Data.dll" />
+	<Assembly fileName="Waher.Script.Data.pdb" />
+	<Assembly fileName="Waher.Script.Data.xml" />
 	<Assembly fileName="Waher.Script.Data.MySQL.dll" />
 	<Assembly fileName="Waher.Script.Data.MySQL.pdb" />
 	<Assembly fileName="Waher.Script.Data.MySQL.xml" />
-	<Assembly fileName="Waher.Script.Data.pdb" />
 	<Assembly fileName="Waher.Script.Data.PostgreSQL.dll" />
 	<Assembly fileName="Waher.Script.Data.PostgreSQL.pdb" />
 	<Assembly fileName="Waher.Script.Data.PostgreSQL.xml" />
 	<Assembly fileName="Waher.Script.dll" />
+	<Assembly fileName="Waher.Script.pdb" />
+	<Assembly fileName="Waher.Script.xml" />
 	<Assembly fileName="Waher.Script.Fractals.dll" />
 	<Assembly fileName="Waher.Script.Fractals.pdb" />
 	<Assembly fileName="Waher.Script.Fractals.xml" />
@@ -549,7 +519,6 @@
 	<Assembly fileName="Waher.Script.Networking.dll" />
 	<Assembly fileName="Waher.Script.Networking.pdb" />
 	<Assembly fileName="Waher.Script.Networking.xml" />
-	<Assembly fileName="Waher.Script.pdb" />
 	<Assembly fileName="Waher.Script.Persistence.dll" />
 	<Assembly fileName="Waher.Script.Persistence.pdb" />
 	<Assembly fileName="Waher.Script.Persistence.xml" />
@@ -558,12 +527,13 @@
 	<Assembly fileName="Waher.Script.Statistics.xml" />
 	<Assembly fileName="Waher.Script.System.dll" />
 	<Assembly fileName="Waher.Script.System.pdb" />
+	<Assembly fileName="Waher.Script.System.xml" />
 	<Assembly fileName="Waher.Script.Threading.dll" />
 	<Assembly fileName="Waher.Script.Threading.pdb" />
 	<Assembly fileName="Waher.Script.Threading.xml" />
-	<Assembly fileName="Waher.Script.xml" />
 	<Assembly fileName="Waher.Script.Xml.dll" />
 	<Assembly fileName="Waher.Script.Xml.pdb" />
+	<Assembly fileName="Waher.Script.Xml.xml" />
 	<Assembly fileName="Waher.Script.XmlDSig.dll" />
 	<Assembly fileName="Waher.Script.XmlDSig.pdb" />
 	<Assembly fileName="Waher.Script.XmlDSig.xml" />
@@ -575,7 +545,10 @@
 	<Assembly fileName="Waher.Security.CallStack.xml" />
 	<Assembly fileName="Waher.Security.ChaChaPoly.dll" />
 	<Assembly fileName="Waher.Security.ChaChaPoly.pdb" />
+	<Assembly fileName="Waher.Security.ChaChaPoly.xml" />
 	<Assembly fileName="Waher.Security.dll" />
+	<Assembly fileName="Waher.Security.pdb" />
+	<Assembly fileName="Waher.Security.xml" />
 	<Assembly fileName="Waher.Security.DTLS.dll" />
 	<Assembly fileName="Waher.Security.DTLS.pdb" />
 	<Assembly fileName="Waher.Security.DTLS.xml" />
@@ -591,46 +564,51 @@
 	<Assembly fileName="Waher.Security.LoginMonitor.dll" />
 	<Assembly fileName="Waher.Security.LoginMonitor.pdb" />
 	<Assembly fileName="Waher.Security.LoginMonitor.xml" />
-	<Assembly fileName="Waher.Security.pdb" />
 	<Assembly fileName="Waher.Security.PKCS.dll" />
 	<Assembly fileName="Waher.Security.PKCS.pdb" />
 	<Assembly fileName="Waher.Security.PKCS.xml" />
 	<Assembly fileName="Waher.Security.SHA3.dll" />
 	<Assembly fileName="Waher.Security.SHA3.pdb" />
+	<Assembly fileName="Waher.Security.SHA3.xml" />
 	<Assembly fileName="Waher.Security.SPF.dll" />
 	<Assembly fileName="Waher.Security.SPF.pdb" />
 	<Assembly fileName="Waher.Security.SPF.xml" />
 	<Assembly fileName="Waher.Security.Users.dll" />
 	<Assembly fileName="Waher.Security.Users.pdb" />
 	<Assembly fileName="Waher.Security.Users.xml" />
-	<Assembly fileName="Waher.Security.xml" />
 	<Assembly fileName="Waher.Theme.Base.dll" />
 	<Assembly fileName="Waher.Theme.Base.manifest" />
 	<Assembly fileName="Waher.Theme.Base.pdb" />
+	<Assembly fileName="Waher.Theme.Base.xml" />
 	<Assembly fileName="Waher.Theme.CactusRose.dll" />
 	<Assembly fileName="Waher.Theme.CactusRose.manifest" />
 	<Assembly fileName="Waher.Theme.CactusRose.pdb" />
+	<Assembly fileName="Waher.Theme.CactusRose.xml" />
 	<Assembly fileName="Waher.Theme.GothicPeacock.dll" />
 	<Assembly fileName="Waher.Theme.GothicPeacock.manifest" />
 	<Assembly fileName="Waher.Theme.GothicPeacock.pdb" />
+	<Assembly fileName="Waher.Theme.GothicPeacock.xml" />
 	<Assembly fileName="Waher.Theme.Retro64.dll" />
 	<Assembly fileName="Waher.Theme.Retro64.manifest" />
 	<Assembly fileName="Waher.Theme.Retro64.pdb" />
+	<Assembly fileName="Waher.Theme.Retro64.xml" />
 	<Assembly fileName="Waher.Theme.SpaceGravel.dll" />
 	<Assembly fileName="Waher.Theme.SpaceGravel.manifest" />
 	<Assembly fileName="Waher.Theme.SpaceGravel.pdb" />
+	<Assembly fileName="Waher.Theme.SpaceGravel.xml" />
 	<Assembly fileName="Waher.Theme.WinterDawn.dll" />
 	<Assembly fileName="Waher.Theme.WinterDawn.manifest" />
 	<Assembly fileName="Waher.Theme.WinterDawn.pdb" />
+	<Assembly fileName="Waher.Theme.WinterDawn.xml" />
 	<Assembly fileName="Waher.Things.dll" />
 	<Assembly fileName="Waher.Things.pdb" />
 	<Assembly fileName="Waher.Things.xml" />
-	<Assembly fileName="Waher.Things.Ieee1451.dll" />
-	<Assembly fileName="Waher.Things.Ieee1451.pdb" />
-	<Assembly fileName="Waher.Things.Ieee1451.xml" />
 	<Assembly fileName="Waher.Things.Files.dll" />
 	<Assembly fileName="Waher.Things.Files.pdb" />
 	<Assembly fileName="Waher.Things.Files.xml" />
+	<Assembly fileName="Waher.Things.Ieee1451.dll" />
+	<Assembly fileName="Waher.Things.Ieee1451.pdb" />
+	<Assembly fileName="Waher.Things.Ieee1451.xml" />
 	<Assembly fileName="Waher.Things.Ip.dll" />
 	<Assembly fileName="Waher.Things.Ip.pdb" />
 	<Assembly fileName="Waher.Things.Ip.xml" />

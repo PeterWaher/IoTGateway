@@ -1624,7 +1624,7 @@ namespace Waher.Networking.XMPP.Chat
 			return Variables;
 		}
 
-		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		private Task Sessions_Removed(object _, CacheItemEventArgs<string, Variables> e)
 		{
 			if (!(this.bobClient is null) &&
 				e.Value.TryGetVariable(" ContentIDs ", out Variable v) &&

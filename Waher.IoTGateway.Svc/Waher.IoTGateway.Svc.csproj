@@ -26,9 +26,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>
-    <SelfContained>true</SelfContained>
+		<SelfContained>true</SelfContained>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>

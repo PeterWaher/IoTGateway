@@ -25,7 +25,10 @@
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Waher.IoTGateway.Console\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-  <ItemGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
     <None Remove="Gateway.config" />
   </ItemGroup>
   <ItemGroup>

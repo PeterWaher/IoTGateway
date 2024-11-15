@@ -26,8 +26,11 @@ https://waher.se/Script.md#externalDatabaseRelatedFunctionsWaherScriptData</Desc
     <FileVersion>2.1.0</FileVersion>
     <Version>2.1.0</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

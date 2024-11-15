@@ -20,8 +20,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication http compression brotli</PackageTags>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

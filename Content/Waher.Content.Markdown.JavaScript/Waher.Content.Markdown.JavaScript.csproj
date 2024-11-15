@@ -22,8 +22,11 @@ https://waher.se/Markdown.md</Description>
     <FileVersion>3.1.4</FileVersion>
 		<Version>3.1.4</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

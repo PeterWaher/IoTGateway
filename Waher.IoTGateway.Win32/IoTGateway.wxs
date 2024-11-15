@@ -38,92 +38,6 @@
 								<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 							</CreateFolder>
 						</Component>
-						<Component Id='NetCore' Guid='F8A15022-C2F1-4F00-8649-D23FDD89DA1D'>
-							<File Id='api_ms_win_core_console_l1_1_0.dll' Name='api-ms-win-core-console-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-console-l1-1-0.dll' Vital='yes' KeyPath='yes'/>
-							<File Id='api_ms_win_core_console_l1_2_0.dll' Name='api-ms-win-core-console-l1-2-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-console-l1-2-0.dll' Vital='yes' />
-							<File Id='api_ms_win_core_datetime_l1_1_0.dll' Name='api-ms-win-core-datetime-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-datetime-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_debug_l1_1_0.dll' Name='api-ms-win-core-debug-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-debug-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_errorhandling_l1_1_0.dll' Name='api-ms-win-core-errorhandling-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-errorhandling-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_file_l1_1_0.dll' Name='api-ms-win-core-file-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-file-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_file_l1_2_0.dll' Name='api-ms-win-core-file-l1-2-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-file-l1-2-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_file_l2_1_0.dll' Name='api-ms-win-core-file-l2-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-file-l2-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_handle_l1_1_0.dll' Name='api-ms-win-core-handle-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-handle-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_heap_l1_1_0.dll' Name='api-ms-win-core-heap-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-heap-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_interlocked_l1_1_0.dll' Name='api-ms-win-core-interlocked-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-interlocked-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_libraryloader_l1_1_0.dll' Name='api-ms-win-core-libraryloader-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-libraryloader-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_localization_l1_2_0.dll' Name='api-ms-win-core-localization-l1-2-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-localization-l1-2-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_memory_l1_1_0.dll' Name='api-ms-win-core-memory-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-memory-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_namedpipe_l1_1_0.dll' Name='api-ms-win-core-namedpipe-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-namedpipe-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_processenvironment_l1_1_0.dll' Name='api-ms-win-core-processenvironment-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-processenvironment-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_processthreads_l1_1_0.dll' Name='api-ms-win-core-processthreads-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-processthreads-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_processthreads_l1_1_1.dll' Name='api-ms-win-core-processthreads-l1-1-1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-processthreads-l1-1-1.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_profile_l1_1_0.dll' Name='api-ms-win-core-profile-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-profile-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_rtlsupport_l1_1_0.dll' Name='api-ms-win-core-rtlsupport-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-rtlsupport-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_string_l1_1_0.dll' Name='api-ms-win-core-string-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-string-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_synch_l1_1_0.dll' Name='api-ms-win-core-synch-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-synch-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_synch_l1_2_0.dll' Name='api-ms-win-core-synch-l1-2-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-synch-l1-2-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_sysinfo_l1_1_0.dll' Name='api-ms-win-core-sysinfo-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-sysinfo-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_timezone_l1_1_0.dll' Name='api-ms-win-core-timezone-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-timezone-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_core_util_l1_1_0.dll' Name='api-ms-win-core-util-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-core-util-l1-1-0.dll' Vital='yes'/>
-							<File Id='API_MS_Win_core_xstate_l2_1_0.dll' Name='API-MS-Win-core-xstate-l2-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\API-MS-Win-core-xstate-l2-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_conio_l1_1_0.dll' Name='api-ms-win-crt-conio-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-conio-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_convert_l1_1_0.dll' Name='api-ms-win-crt-convert-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-convert-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_environment_l1_1_0.dll' Name='api-ms-win-crt-environment-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-environment-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_filesystem_l1_1_0.dll' Name='api-ms-win-crt-filesystem-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-filesystem-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_heap_l1_1_0.dll' Name='api-ms-win-crt-heap-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-heap-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_locale_l1_1_0.dll' Name='api-ms-win-crt-locale-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-locale-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_math_l1_1_0.dll' Name='api-ms-win-crt-math-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-math-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_multibyte_l1_1_0.dll' Name='api-ms-win-crt-multibyte-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-multibyte-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_private_l1_1_0.dll' Name='api-ms-win-crt-private-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-private-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_process_l1_1_0.dll' Name='api-ms-win-crt-process-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-process-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_runtime_l1_1_0.dll' Name='api-ms-win-crt-runtime-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-runtime-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_stdio_l1_1_0.dll' Name='api-ms-win-crt-stdio-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-stdio-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_string_l1_1_0.dll' Name='api-ms-win-crt-string-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-string-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_time_l1_1_0.dll' Name='api-ms-win-crt-time-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-time-l1-1-0.dll' Vital='yes'/>
-							<File Id='api_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\api-ms-win-crt-utility-l1-1-0.dll' Vital='yes'/>
-							<RemoveFile Id='Removeapi_ms_win_core_console_l1_1_0.dll' Name='api-ms-win-core-console-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_console_l1_2_0.dll' Name='api-ms-win-core-console-l1-2-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_datetime_l1_1_0.dll' Name='api-ms-win-core-datetime-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_debug_l1_1_0.dll' Name='api-ms-win-core-debug-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_errorhandling_l1_1_0.dll' Name='api-ms-win-core-errorhandling-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_file_l1_1_0.dll' Name='api-ms-win-core-file-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_file_l1_2_0.dll' Name='api-ms-win-core-file-l1-2-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_file_l2_1_0.dll' Name='api-ms-win-core-file-l2-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_handle_l1_1_0.dll' Name='api-ms-win-core-handle-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_heap_l1_1_0.dll' Name='api-ms-win-core-heap-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_interlocked_l1_1_0.dll' Name='api-ms-win-core-interlocked-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_libraryloader_l1_1_0.dll' Name='api-ms-win-core-libraryloader-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_localization_l1_2_0.dll' Name='api-ms-win-core-localization-l1-2-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_memory_l1_1_0.dll' Name='api-ms-win-core-memory-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_namedpipe_l1_1_0.dll' Name='api-ms-win-core-namedpipe-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_processenvironment_l1_1_0.dll' Name='api-ms-win-core-processenvironment-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_processthreads_l1_1_0.dll' Name='api-ms-win-core-processthreads-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_processthreads_l1_1_1.dll' Name='api-ms-win-core-processthreads-l1-1-1.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_profile_l1_1_0.dll' Name='api-ms-win-core-profile-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_rtlsupport_l1_1_0.dll' Name='api-ms-win-core-rtlsupport-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_string_l1_1_0.dll' Name='api-ms-win-core-string-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_synch_l1_1_0.dll' Name='api-ms-win-core-synch-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_synch_l1_2_0.dll' Name='api-ms-win-core-synch-l1-2-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_sysinfo_l1_1_0.dll' Name='api-ms-win-core-sysinfo-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_timezone_l1_1_0.dll' Name='api-ms-win-core-timezone-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_core_util_l1_1_0.dll' Name='api-ms-win-core-util-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveAPI_MS_Win_core_xstate_l2_1_0.dll' Name='API-MS-Win-core-xstate-l2-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_conio_l1_1_0.dll' Name='api-ms-win-crt-conio-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_convert_l1_1_0.dll' Name='api-ms-win-crt-convert-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_environment_l1_1_0.dll' Name='api-ms-win-crt-environment-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_filesystem_l1_1_0.dll' Name='api-ms-win-crt-filesystem-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_heap_l1_1_0.dll' Name='api-ms-win-crt-heap-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_locale_l1_1_0.dll' Name='api-ms-win-crt-locale-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_math_l1_1_0.dll' Name='api-ms-win-crt-math-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_multibyte_l1_1_0.dll' Name='api-ms-win-crt-multibyte-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_private_l1_1_0.dll' Name='api-ms-win-crt-private-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_process_l1_1_0.dll' Name='api-ms-win-crt-process-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_runtime_l1_1_0.dll' Name='api-ms-win-crt-runtime-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_stdio_l1_1_0.dll' Name='api-ms-win-crt-stdio-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_string_l1_1_0.dll' Name='api-ms-win-crt-string-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_time_l1_1_0.dll' Name='api-ms-win-crt-time-l1-1-0.dll' On='uninstall'/>
-							<RemoveFile Id='Removeapi_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' On='uninstall'/>
-						</Component>
 						<Component Id='SystemLibraries' Guid='E4B153DB-DAB9-4D36-BF64-636475E07922'>
 							<File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.AppContext.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='System.Buffers.dll' Name='System.Buffers.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Buffers.dll' Vital='yes'/>
@@ -154,8 +68,8 @@
 							<File Id='System.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.EventLog.Messages.dll' Name='System.Diagnostics.EventLog.Messages.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.Messages.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.FileVersionInfo.dll' Vital='yes'/>
-							<File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Process.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.PerformanceCounter.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Process.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.StackTrace.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.TextWriterTraceListener.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Tools.dll' Vital='yes'/>
@@ -166,6 +80,7 @@
 							<File Id='System.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.Primitives.dll' Vital='yes'/>
 							<File Id='System.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Dynamic.Runtime.dll' Vital='yes'/>
 							<File Id='System.Formats.Asn1.dll' Name='System.Formats.Asn1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Formats.Asn1.dll' Vital='yes'/>
+							<File Id='System.Formats.Tar.dll' Name='System.Formats.Tar.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Formats.Tar.dll' Vital='yes'/>
 							<File Id='System.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.Calendars.dll' Vital='yes'/>
 							<File Id='System.Globalization.dll' Name='System.Globalization.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.dll' Vital='yes'/>
 							<File Id='System.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.Extensions.dll' Vital='yes'/>
@@ -235,9 +150,10 @@
 							<File Id='System.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Extensions.dll' Vital='yes'/>
 							<File Id='System.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Handles.dll' Vital='yes'/>
 							<File Id='System.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.InteropServices.dll' Vital='yes'/>
+							<File Id='System.Runtime.InteropServices.JavaScript.dll' Name='System.Runtime.InteropServices.JavaScript.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.InteropServices.JavaScript.dll' Vital='yes'/>
 							<File Id='System.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.InteropServices.RuntimeInformation.dll' Vital='yes'/>
-							<File Id='System.Runtime.Loader.dll' Name='System.Runtime.Loader.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Loader.dll' Vital='yes'/>
 							<File Id='System.Runtime.Intrinsics.dll' Name='System.Runtime.Intrinsics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Intrinsics.dll' Vital='yes'/>
+							<File Id='System.Runtime.Loader.dll' Name='System.Runtime.Loader.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Loader.dll' Vital='yes'/>
 							<File Id='System.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Numerics.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.dll' Name='System.Runtime.Serialization.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.Formatters.dll' Vital='yes'/>
@@ -249,6 +165,7 @@
 							<File Id='System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Algorithms.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Cng.dll' Name='System.Security.Cryptography.Cng.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Cng.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Csp.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.dll' Name='System.Security.Cryptography.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.OpenSsl.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Pkcs.dll' Name='System.Security.Cryptography.Pkcs.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Pkcs.dll' Vital='yes'/>
@@ -336,6 +253,7 @@
 							<RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Formats.Asn1.dll' Name='System.Formats.Asn1.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Formats.Tar.dll' Name='System.Formats.Tar.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' On='uninstall' />
@@ -405,6 +323,7 @@
 							<RemoveFile Id='RemoveSystem.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.JavaScript.dll' Name='System.Runtime.InteropServices.JavaScript.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Loader.dll' Name='System.Runtime.Loader.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Intrinsics.dll' Name='System.Runtime.Intrinsics.dll' On='uninstall' />
@@ -419,6 +338,7 @@
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Cng.dll' Name='System.Security.Cryptography.Cng.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.dll' Name='System.Security.Cryptography.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Pkcs.dll' Name='System.Security.Cryptography.Pkcs.dll' On='uninstall' />
@@ -648,8 +568,8 @@
 							<File Id='Waher.Runtime.Queue.dll' Name='Waher.Runtime.Queue.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.ServiceRegistration.dll' Name='Waher.Runtime.ServiceRegistration.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.ServiceRegistration.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Settings.dll' Vital='yes'/>
-							<File Id='Waher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Text.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Temporary.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Text.dll' Name='Waher.Runtime.Text.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Text.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.Sync.dll' Name='Waher.Runtime.Threading.Sync.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.Sync.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Timing.dll' Vital='yes'/>
@@ -691,8 +611,8 @@
 							<File Id='Waher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.SpaceGravel.dll'/>
 							<File Id='Waher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.WinterDawn.dll'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
-							<File Id='Waher.Things.Ieee1451.dll' Name='Waher.Things.Ieee1451.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.dll' Vital='yes'/>
 							<File Id='Waher.Things.Files.dll' Name='Waher.Things.Files.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.dll' Vital='yes'/>
+							<File Id='Waher.Things.Ieee1451.dll' Name='Waher.Things.Ieee1451.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.dll' Vital='yes'/>
 							<File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
 							<File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.dll' Vital='yes'/>
 							<File Id='Waher.Things.Modbus.dll' Name='Waher.Things.Modbus.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Modbus.dll' Vital='yes'/>
@@ -847,10 +767,10 @@
 							<File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.pdb' Vital='yes' KeyPath='yes'/>
 							<File Id='Waher.Content.Asn1.pdb' Name='Waher.Content.Asn1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Dsn.pdb' Name='Waher.Content.Dsn.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Dsn.pdb' Vital='yes'/>
-							<File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Html.pdb' Vital='yes'/>
-							<File Id='Waher.Content.Images.pdb' Name='Waher.Content.Images.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Images.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Html.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Images.pdb' Name='Waher.Content.Images.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Images.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Consolidation.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Contracts.pdb' Name='Waher.Content.Markdown.Contracts.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Contracts.pdb' Vital='yes'/>
@@ -869,15 +789,18 @@
 							<File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.SystemFiles.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xsl.pdb' Vital='yes'/>
-							<File Id='Waher.Events.Console.pdb' Name='Waher.Events.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Console.pdb' Vital='yes'/>
 							<File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.pdb' Vital='yes'/>
+							<File Id='Waher.Events.Console.pdb' Name='Waher.Events.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Console.pdb' Vital='yes'/>
 							<File Id='Waher.Events.Files.pdb' Name='Waher.Events.Files.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Files.pdb' Vital='yes'/>
+							<File Id='Waher.Events.Filter.pdb' Name='Waher.Events.Filter.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Filter.pdb' Vital='yes'/>
 							<File Id='Waher.Events.Persistence.pdb' Name='Waher.Events.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Persistence.pdb' Vital='yes'/>
 							<File Id='Waher.Events.Statistics.pdb' Name='Waher.Events.Statistics.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Statistics.pdb' Vital='yes'/>
+							<File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
 							<File Id='Waher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.XMPP.pdb' Vital='yes'/>
 							<File Id='Waher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.pdb' Vital='yes'/>
+							<File Id='Waher.IoTGateway.Resources.pdb' Name='Waher.IoTGateway.Resources.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Resources.pdb' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.pdb' Vital='yes'/>
-							<File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
+							<File Id='Waher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Layout.Layout2D.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.Cluster.pdb' Name='Waher.Networking.Cluster.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.Cluster.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.CoAP.pdb' Name='Waher.Networking.CoAP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.CoAP.pdb' Vital='yes'/>
@@ -905,6 +828,7 @@
 							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PubSub.pdb' Name='Waher.Networking.XMPP.PubSub.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.PubSub.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Sensor.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Software.pdb' Name='Waher.Networking.XMPP.Software.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Software.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Synchronization.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.WebSocket.pdb' Name='Waher.Networking.XMPP.WebSocket.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.WebSocket.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.pdb' Vital='yes'/>
@@ -919,8 +843,12 @@
 							<File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Inventory.Loader.pdb' Name='Waher.Runtime.Inventory.Loader.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Profiling.pdb' Name='Waher.Runtime.Profiling.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Profiling.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Queue.pdb' Name='Waher.Runtime.Queue.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.ServiceRegistration.pdb' Name='Waher.Runtime.ServiceRegistration.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.ServiceRegistration.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Settings.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Temporary.pdb' Name='Waher.Runtime.Temporary.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Temporary.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Text.pdb' Name='Waher.Runtime.Text.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Text.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.Sync.pdb' Name='Waher.Runtime.Threading.Sync.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.Sync.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Timing.pdb' Vital='yes'/>
@@ -937,6 +865,11 @@
 							<File Id='Waher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs3D.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Networking.pdb' Name='Waher.Script.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Networking.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Persistence.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Statistics.pdb' Vital='yes'/>
+							<File Id='Waher.Script.System.pdb' Name='Waher.Script.System.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.System.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Threading.pdb' Name='Waher.Script.Threading.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Threading.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Xml.pdb' Vital='yes'/>
+							<File Id='Waher.Script.XmlDSig.pdb' Name='Waher.Script.XmlDSig.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.XmlDSig.pdb' Vital='yes'/>
 							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.pdb' Vital='yes'/>
 							<File Id='Waher.Security.CallStack.pdb' Name='Waher.Security.CallStack.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.CallStack.pdb' Vital='yes'/>
@@ -945,12 +878,14 @@
 							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.pdb' Vital='yes'/>
+							<File Id='Waher.Security.LoginMonitor.pdb' Name='Waher.Security.LoginMonitor.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.LoginMonitor.pdb' Vital='yes'/>
 							<File Id='Waher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.pdb' Vital='yes'/>
 							<File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.pdb' Vital='yes'/>
 							<File Id='Waher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.pdb' Vital='yes'/>
+							<File Id='Waher.Security.Users.pdb' Name='Waher.Security.Users.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.pdb' Vital='yes'/>
-							<File Id='Waher.Things.Ieee1451.pdb' Name='Waher.Things.Ieee1451.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Files.pdb' Name='Waher.Things.Files.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.pdb' Vital='yes'/>
+							<File Id='Waher.Things.Ieee1451.pdb' Name='Waher.Things.Ieee1451.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.pdb' Vital='yes'/>
 							<File Id='Waher.Things.IP.pdb' Name='Waher.Things.IP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.pdb' Vital='yes'/>
 							<File Id='Waher.Things.Modbus.pdb' Name='Waher.Things.Modbus.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Modbus.pdb' Vital='yes'/>
@@ -988,12 +923,15 @@
 							<RemoveFile Id='RemoveWaher.Events.Console.pdb' Name='Waher.Events.Console.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Files.pdb' Name='Waher.Events.Files.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Filter.pdb' Name='Waher.Events.Filter.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Persistence.pdb' Name='Waher.Events.Persistence.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Statistics.pdb' Name='Waher.Events.Statistics.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.Resources.pdb' Name='Waher.IoTGateway.Resources.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.Cluster.pdb' Name='Waher.Networking.Cluster.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.CoAP.pdb' Name='Waher.Networking.CoAP.pdb' On='uninstall'/>
@@ -1021,6 +959,7 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.pdb' Name='Waher.Networking.XMPP.PubSub.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Software.pdb' Name='Waher.Networking.XMPP.Software.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.pdb' Name='Waher.Networking.XMPP.WebSocket.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
@@ -1035,8 +974,12 @@
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.Loader.pdb' Name='Waher.Runtime.Inventory.Loader.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Profiling.pdb' Name='Waher.Runtime.Profiling.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Queue.pdb' Name='Waher.Runtime.Queue.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.ServiceRegistration.pdb' Name='Waher.Runtime.ServiceRegistration.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Temporary.pdb' Name='Waher.Runtime.Temporary.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Text.pdb' Name='Waher.Runtime.Text.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.Sync.pdb' Name='Waher.Runtime.Threading.Sync.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' On='uninstall'/>
@@ -1053,6 +996,11 @@
 							<RemoveFile Id='RemoveWaher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Networking.pdb' Name='Waher.Script.Networking.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.System.pdb' Name='Waher.Script.System.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Threading.pdb' Name='Waher.Script.Threading.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.XmlDSig.pdb' Name='Waher.Script.XmlDSig.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.ACME.pdb' Name='Waher.Security.ACME.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.CallStack.pdb' Name='Waher.Security.CallStack.pdb' On='uninstall'/>
@@ -1061,9 +1009,11 @@
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWS.pdb' Name='Waher.Security.JWS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.JWT.pdb' Name='Waher.Security.JWT.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.LoginMonitor.pdb' Name='Waher.Security.LoginMonitor.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.PKCS.pdb' Name='Waher.Security.PKCS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SPF.pdb' Name='Waher.Security.SPF.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.Users.pdb' Name='Waher.Security.Users.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Ieee1451.pdb' Name='Waher.Things.Ieee1451.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Files.pdb' Name='Waher.Things.Files.pdb' On='uninstall'/>
@@ -1076,6 +1026,270 @@
 							<RemoveFile Id='RemoveWaher.Things.Snmp.pdb' Name='Waher.Things.Snmp.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Virtual.pdb' Name='Waher.Things.Virtual.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Xmpp.pdb' Name='Waher.Things.Xmpp.pdb' On='uninstall'/>
+						</Component>
+						<Component Id='MainCodeDocFiles' Guid='3A09F298-39F6-4DE5-BB99-00F91A0038E1'>
+							<File Id='Waher.Content.xml' Name='Waher.Content.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.xml' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Content.Asn1.xml' Name='Waher.Content.Asn1.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.xml' Vital='yes'/>
+							<File Id='Waher.Content.Dsn.xml' Name='Waher.Content.Dsn.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Dsn.xml' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.xml' Name='Waher.Content.Emoji.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.xml' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.Emoji1.xml' Name='Waher.Content.Emoji.Emoji1.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Emoji.Emoji1.xml' Vital='yes'/>
+							<File Id='Waher.Content.Html.xml' Name='Waher.Content.Html.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Html.xml' Vital='yes'/>
+							<File Id='Waher.Content.Images.xml' Name='Waher.Content.Images.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Images.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.xml' Name='Waher.Content.Markdown.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Consolidation.xml' Name='Waher.Content.Markdown.Consolidation.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Consolidation.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Contracts.xml' Name='Waher.Content.Markdown.Contracts.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Contracts.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.GraphViz.xml' Name='Waher.Content.Markdown.GraphViz.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.GraphViz.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.JavaScript.xml' Name='Waher.Content.Markdown.JavaScript.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.JavaScript.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Latex.xml' Name='Waher.Content.Markdown.Latex.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Latex.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Layout2D.xml' Name='Waher.Content.Markdown.Layout2D.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Layout2D.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.PlantUml.xml' Name='Waher.Content.Markdown.PlantUml.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.PlantUml.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Web.xml' Name='Waher.Content.Markdown.Web.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Web.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Wpf.xml' Name='Waher.Content.Markdown.Wpf.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Wpf.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Xamarin.xml' Name='Waher.Content.Markdown.Xamarin.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Xamarin.xml' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Xml.xml' Name='Waher.Content.Markdown.Xml.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Markdown.Xml.xml' Vital='yes'/>
+							<File Id='Waher.Content.QR.xml' Name='Waher.Content.QR.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.QR.xml' Vital='yes'/>
+							<File Id='Waher.Content.Rss.xml' Name='Waher.Content.Rss.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Rss.xml' Vital='yes'/>
+							<File Id='Waher.Content.Semantic.xml' Name='Waher.Content.Semantic.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Semantic.xml' Vital='yes'/>
+							<File Id='Waher.Content.SystemFiles.xml' Name='Waher.Content.SystemFiles.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.SystemFiles.xml' Vital='yes'/>
+							<File Id='Waher.Content.Xml.xml' Name='Waher.Content.Xml.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xml.xml' Vital='yes'/>
+							<File Id='Waher.Content.Xsl.xml' Name='Waher.Content.Xsl.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Xsl.xml' Vital='yes'/>
+							<File Id='Waher.Events.xml' Name='Waher.Events.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.xml' Vital='yes'/>
+							<File Id='Waher.Events.Console.xml' Name='Waher.Events.Console.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Console.xml' Vital='yes'/>
+							<File Id='Waher.Events.Files.xml' Name='Waher.Events.Files.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Files.xml' Vital='yes'/>
+							<File Id='Waher.Events.Filter.xml' Name='Waher.Events.Filter.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Filter.xml' Vital='yes'/>
+							<File Id='Waher.Events.Persistence.xml' Name='Waher.Events.Persistence.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Persistence.xml' Vital='yes'/>
+							<File Id='Waher.Events.Statistics.xml' Name='Waher.Events.Statistics.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.Statistics.xml' Vital='yes'/>
+							<File Id='Waher.Events.WindowsEventLog.xml' Name='Waher.Events.WindowsEventLog.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.WindowsEventLog.xml' Vital='yes'/>
+							<File Id='Waher.Events.XMPP.xml' Name='Waher.Events.XMPP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Events.XMPP.xml' Vital='yes'/>
+							<File Id='Waher.IoTGateway.xml' Name='Waher.IoTGateway.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.xml' Vital='yes'/>
+							<File Id='Waher.IoTGateway.Resources.xml' Name='Waher.IoTGateway.Resources.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Resources.xml' Vital='yes'/>
+							<File Id='Waher.IoTGateway.Svc.xml' Name='Waher.IoTGateway.Svc.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.xml' Vital='yes'/>
+							<File Id='Waher.Layout.Layout2D.xml' Name='Waher.Layout.Layout2D.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Layout.Layout2D.xml' Vital='yes'/>
+							<File Id='Waher.Networking.xml' Name='Waher.Networking.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.xml' Vital='yes'/>
+							<File Id='Waher.Networking.Cluster.xml' Name='Waher.Networking.Cluster.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.Cluster.xml' Vital='yes'/>
+							<File Id='Waher.Networking.CoAP.xml' Name='Waher.Networking.CoAP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.CoAP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.DNS.xml' Name='Waher.Networking.DNS.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.DNS.xml' Vital='yes'/>
+							<File Id='Waher.Networking.HTTP.xml' Name='Waher.Networking.HTTP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.HTTP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.HTTP.Brotli.xml' Name='Waher.Networking.HTTP.Brotli.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.HTTP.Brotli.xml' Vital='yes'/>
+							<File Id='Waher.Networking.Modbus.xml' Name='Waher.Networking.Modbus.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.Modbus.xml' Vital='yes'/>
+							<File Id='Waher.Networking.MQTT.xml' Name='Waher.Networking.MQTT.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.MQTT.xml' Vital='yes'/>
+							<File Id='Waher.Networking.PeerToPeer.xml' Name='Waher.Networking.PeerToPeer.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.PeerToPeer.xml' Vital='yes'/>
+							<File Id='Waher.Networking.SASL.xml' Name='Waher.Networking.SASL.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.SASL.xml' Vital='yes'/>
+							<File Id='Waher.Networking.SMTP.xml' Name='Waher.Networking.SMTP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.SMTP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.UPnP.xml' Name='Waher.Networking.UPnP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.UPnP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.WHOIS.xml' Name='Waher.Networking.WHOIS.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.WHOIS.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Avatar.xml' Name='Waher.Networking.XMPP.Avatar.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Avatar.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.BOSH.xml' Name='Waher.Networking.XMPP.BOSH.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.BOSH.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Concentrator.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Contracts.xml' Name='Waher.Networking.XMPP.Contracts.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Contracts.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Control.xml' Name='Waher.Networking.XMPP.Control.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Control.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.HTTPX.xml' Name='Waher.Networking.XMPP.HTTPX.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.HTTPX.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Mail.xml' Name='Waher.Networking.XMPP.Mail.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Mail.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.MUC.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.P2P.xml' Name='Waher.Networking.XMPP.P2P.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.P2P.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.PEP.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Provisioning.xml' Name='Waher.Networking.XMPP.Provisioning.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Provisioning.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.PubSub.xml' Name='Waher.Networking.XMPP.PubSub.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.PubSub.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Sensor.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Software.xml' Name='Waher.Networking.XMPP.Software.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Software.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Synchronization.xml' Name='Waher.Networking.XMPP.Synchronization.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.Synchronization.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Networking.XMPP.WebSocket.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.xml' Name='Waher.Persistence.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.Files.xml' Name='Waher.Persistence.Files.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Files.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.FullTextSearch.xml' Name='Waher.Persistence.FullTextSearch.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.FullTextSearch.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.MongoDB.xml' Name='Waher.Persistence.MongoDB.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.Serialization.Compiled.xml' Name='Waher.Persistence.Serialization.Compiled.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.xml' Vital='yes'/>
+							<File Id='Waher.Persistence.XmlLedger.xml' Name='Waher.Persistence.XmlLedger.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.XmlLedger.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Cache.xml' Name='Waher.Runtime.Cache.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Console.xml' Name='Waher.Runtime.Console.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Console.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Counters.xml' Name='Waher.Runtime.Counters.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Inventory.xml' Name='Waher.Runtime.Inventory.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Inventory.Loader.xml' Name='Waher.Runtime.Inventory.Loader.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Language.xml' Name='Waher.Runtime.Language.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Profiling.xml' Name='Waher.Runtime.Profiling.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Profiling.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Queue.xml' Name='Waher.Runtime.Queue.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.ServiceRegistration.xml' Name='Waher.Runtime.ServiceRegistration.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.ServiceRegistration.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Settings.xml' Name='Waher.Runtime.Settings.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Settings.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Temporary.xml' Name='Waher.Runtime.Temporary.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Temporary.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Text.xml' Name='Waher.Runtime.Text.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Text.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Threading.xml' Name='Waher.Runtime.Threading.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Threading.Sync.xml' Name='Waher.Runtime.Threading.Sync.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Threading.Sync.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Timing.xml' Name='Waher.Runtime.Timing.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Timing.xml' Vital='yes'/>
+							<File Id='Waher.Runtime.Transactions.xml' Name='Waher.Runtime.Transactions.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Transactions.xml' Vital='yes'/>
+							<File Id='Waher.Script.xml' Name='Waher.Script.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.xml' Vital='yes'/>
+							<File Id='Waher.Script.Content.xml' Name='Waher.Script.Content.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Content.xml' Vital='yes'/>
+							<File Id='Waher.Script.Cryptography.xml' Name='Waher.Script.Cryptography.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Cryptography.xml' Vital='yes'/>
+							<File Id='Waher.Script.Data.xml' Name='Waher.Script.Data.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.xml' Vital='yes'/>
+							<File Id='Waher.Script.Data.MySQL.xml' Name='Waher.Script.Data.MySQL.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.MySQL.xml' Vital='yes'/>
+							<File Id='Waher.Script.Data.PostgreSQL.xml' Name='Waher.Script.Data.PostgreSQL.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.PostgreSQL.xml' Vital='yes'/>
+							<File Id='Waher.Script.Fractals.xml' Name='Waher.Script.Fractals.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Fractals.xml' Vital='yes'/>
+							<File Id='Waher.Script.FullTextSearch.xml' Name='Waher.Script.FullTextSearch.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.FullTextSearch.xml' Vital='yes'/>
+							<File Id='Waher.Script.Graphs.xml' Name='Waher.Script.Graphs.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs.xml' Vital='yes'/>
+							<File Id='Waher.Script.Graphs3D.xml' Name='Waher.Script.Graphs3D.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs3D.xml' Vital='yes'/>
+							<File Id='Waher.Script.Networking.xml' Name='Waher.Script.Networking.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Networking.xml' Vital='yes'/>
+							<File Id='Waher.Script.Persistence.xml' Name='Waher.Script.Persistence.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Persistence.xml' Vital='yes'/>
+							<File Id='Waher.Script.Statistics.xml' Name='Waher.Script.Statistics.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Statistics.xml' Vital='yes'/>
+							<File Id='Waher.Script.System.xml' Name='Waher.Script.System.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.System.xml' Vital='yes'/>
+							<File Id='Waher.Script.Threading.xml' Name='Waher.Script.Threading.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Threading.xml' Vital='yes'/>
+							<File Id='Waher.Script.Xml.xml' Name='Waher.Script.Xml.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Xml.xml' Vital='yes'/>
+							<File Id='Waher.Script.XmlDSig.xml' Name='Waher.Script.XmlDSig.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.XmlDSig.xml' Vital='yes'/>
+							<File Id='Waher.Security.xml' Name='Waher.Security.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.xml' Vital='yes'/>
+							<File Id='Waher.Security.ACME.xml' Name='Waher.Security.ACME.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.xml' Vital='yes'/>
+							<File Id='Waher.Security.CallStack.xml' Name='Waher.Security.CallStack.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.CallStack.xml' Vital='yes'/>
+							<File Id='Waher.Security.ChaChaPoly.xml' Name='Waher.Security.ChaChaPoly.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ChaChaPoly.xml' Vital='yes'/>
+							<File Id='Waher.Security.DTLS.xml' Name='Waher.Security.DTLS.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.DTLS.xml' Vital='yes'/>
+							<File Id='Waher.Security.EllipticCurves.xml' Name='Waher.Security.EllipticCurves.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.EllipticCurves.xml' Vital='yes'/>
+							<File Id='Waher.Security.JWS.xml' Name='Waher.Security.JWS.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWS.xml' Vital='yes'/>
+							<File Id='Waher.Security.JWT.xml' Name='Waher.Security.JWT.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.JWT.xml' Vital='yes'/>
+							<File Id='Waher.Security.LoginMonitor.xml' Name='Waher.Security.LoginMonitor.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.LoginMonitor.xml' Vital='yes'/>
+							<File Id='Waher.Security.PKCS.xml' Name='Waher.Security.PKCS.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.PKCS.xml' Vital='yes'/>
+							<File Id='Waher.Security.SHA3.xml' Name='Waher.Security.SHA3.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SHA3.xml' Vital='yes'/>
+							<File Id='Waher.Security.SPF.xml' Name='Waher.Security.SPF.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.SPF.xml' Vital='yes'/>
+							<File Id='Waher.Security.Users.xml' Name='Waher.Security.Users.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.xml' Vital='yes'/>
+							<File Id='Waher.Things.xml' Name='Waher.Things.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.xml' Vital='yes'/>
+							<File Id='Waher.Things.Files.xml' Name='Waher.Things.Files.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Files.xml' Vital='yes'/>
+							<File Id='Waher.Things.Ieee1451.xml' Name='Waher.Things.Ieee1451.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Ieee1451.xml' Vital='yes'/>
+							<File Id='Waher.Things.IP.xml' Name='Waher.Things.IP.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.xml' Vital='yes'/>
+							<File Id='Waher.Things.Metering.xml' Name='Waher.Things.Metering.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Metering.xml' Vital='yes'/>
+							<File Id='Waher.Things.Modbus.xml' Name='Waher.Things.Modbus.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Modbus.xml' Vital='yes'/>
+							<File Id='Waher.Things.Mqtt.xml' Name='Waher.Things.Mqtt.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Mqtt.xml' Vital='yes'/>
+							<File Id='Waher.Things.Script.xml' Name='Waher.Things.Script.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Script.xml' Vital='yes'/>
+							<File Id='Waher.Things.Semantic.xml' Name='Waher.Things.Semantic.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Semantic.xml' Vital='yes'/>
+							<File Id='Waher.Things.Snmp.xml' Name='Waher.Things.Snmp.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Snmp.xml' Vital='yes'/>
+							<File Id='Waher.Things.Virtual.xml' Name='Waher.Things.Virtual.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Virtual.xml' Vital='yes'/>
+							<File Id='Waher.Things.Xmpp.xml' Name='Waher.Things.Xmpp.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.Xmpp.xml' Vital='yes'/>
+							<RemoveFile Id='RemoveWaher.Content.xml' Name='Waher.Content.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Asn1.xml' Name='Waher.Content.Asn1.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Dsn.xml' Name='Waher.Content.Dsn.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Html.xml' Name='Waher.Content.Html.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Images.xml' Name='Waher.Content.Images.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Emoji.xml' Name='Waher.Content.Emoji.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.xml' Name='Waher.Content.Emoji.Emoji1.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.xml' Name='Waher.Content.Markdown.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.xml' Name='Waher.Content.Markdown.Consolidation.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Contracts.xml' Name='Waher.Content.Markdown.Contracts.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.xml' Name='Waher.Content.Markdown.GraphViz.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.JavaScript.xml' Name='Waher.Content.Markdown.JavaScript.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Latex.xml' Name='Waher.Content.Markdown.Latex.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.xml' Name='Waher.Content.Markdown.Layout2D.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.xml' Name='Waher.Content.Markdown.PlantUml.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Web.xml' Name='Waher.Content.Markdown.Web.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Wpf.xml' Name='Waher.Content.Markdown.Wpf.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Xamarin.xml' Name='Waher.Content.Markdown.Xamarin.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Xml.xml' Name='Waher.Content.Markdown.Xml.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.QR.xml' Name='Waher.Content.QR.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Rss.xml' Name='Waher.Content.Rss.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Semantic.xml' Name='Waher.Content.Semantic.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.SystemFiles.xml' Name='Waher.Content.SystemFiles.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Xml.xml' Name='Waher.Content.Xml.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Xsl.xml' Name='Waher.Content.Xsl.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Console.xml' Name='Waher.Events.Console.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.xml' Name='Waher.Events.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Files.xml' Name='Waher.Events.Files.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Filter.xml' Name='Waher.Events.Filter.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Persistence.xml' Name='Waher.Events.Persistence.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Statistics.xml' Name='Waher.Events.Statistics.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.XMPP.xml' Name='Waher.Events.XMPP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.xml' Name='Waher.IoTGateway.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.Resources.xml' Name='Waher.IoTGateway.Resources.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.xml' Name='Waher.IoTGateway.Svc.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.WindowsEventLog.xml' Name='Waher.Events.WindowsEventLog.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Layout.Layout2D.xml' Name='Waher.Layout.Layout2D.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.xml' Name='Waher.Networking.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.Cluster.xml' Name='Waher.Networking.Cluster.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.CoAP.xml' Name='Waher.Networking.CoAP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.DNS.xml' Name='Waher.Networking.DNS.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.HTTP.xml' Name='Waher.Networking.HTTP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.HTTP.Brotli.xml' Name='Waher.Networking.HTTP.Brotli.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.Modbus.xml' Name='Waher.Networking.Modbus.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.MQTT.xml' Name='Waher.Networking.MQTT.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.xml' Name='Waher.Networking.PeerToPeer.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.SASL.xml' Name='Waher.Networking.SASL.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.SMTP.xml' Name='Waher.Networking.SMTP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.UPnP.xml' Name='Waher.Networking.UPnP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.WHOIS.xml' Name='Waher.Networking.WHOIS.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Avatar.xml' Name='Waher.Networking.XMPP.Avatar.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.xml' Name='Waher.Networking.XMPP.BOSH.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Contracts.xml' Name='Waher.Networking.XMPP.Contracts.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.xml' Name='Waher.Networking.XMPP.Control.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.HTTPX.xml' Name='Waher.Networking.XMPP.HTTPX.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Mail.xml' Name='Waher.Networking.XMPP.Mail.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.xml' Name='Waher.Networking.XMPP.P2P.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.xml' Name='Waher.Networking.XMPP.Provisioning.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.xml' Name='Waher.Networking.XMPP.PubSub.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Software.xml' Name='Waher.Networking.XMPP.Software.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.xml' Name='Waher.Networking.XMPP.Synchronization.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.xml' Name='Waher.Persistence.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.Files.xml' Name='Waher.Persistence.Files.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.FullTextSearch.xml' Name='Waher.Persistence.FullTextSearch.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.xml' Name='Waher.Persistence.MongoDB.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.xml' Name='Waher.Persistence.Serialization.Compiled.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.XmlLedger.xml' Name='Waher.Persistence.XmlLedger.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Cache.xml' Name='Waher.Runtime.Cache.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Console.xml' Name='Waher.Runtime.Console.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Counters.xml' Name='Waher.Runtime.Counters.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Inventory.xml' Name='Waher.Runtime.Inventory.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Inventory.Loader.xml' Name='Waher.Runtime.Inventory.Loader.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Language.xml' Name='Waher.Runtime.Language.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Profiling.xml' Name='Waher.Runtime.Profiling.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Queue.xml' Name='Waher.Runtime.Queue.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.ServiceRegistration.xml' Name='Waher.Runtime.ServiceRegistration.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Settings.xml' Name='Waher.Runtime.Settings.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Temporary.xml' Name='Waher.Runtime.Temporary.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Text.xml' Name='Waher.Runtime.Text.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Threading.xml' Name='Waher.Runtime.Threading.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Threading.Sync.xml' Name='Waher.Runtime.Threading.Sync.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Timing.xml' Name='Waher.Runtime.Timing.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Transactions.xml' Name='Waher.Runtime.Transactions.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.xml' Name='Waher.Script.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Content.xml' Name='Waher.Script.Content.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Cryptography.xml' Name='Waher.Script.Cryptography.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.xml' Name='Waher.Script.Data.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.MySQL.xml' Name='Waher.Script.Data.MySQL.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.PostgreSQL.xml' Name='Waher.Script.Data.PostgreSQL.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Fractals.xml' Name='Waher.Script.Fractals.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.FullTextSearch.xml' Name='Waher.Script.FullTextSearch.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Graphs.xml' Name='Waher.Script.Graphs.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Graphs3D.xml' Name='Waher.Script.Graphs3D.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Networking.xml' Name='Waher.Script.Networking.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Persistence.xml' Name='Waher.Script.Persistence.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Statistics.xml' Name='Waher.Script.Statistics.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.System.xml' Name='Waher.Script.System.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Threading.xml' Name='Waher.Script.Threading.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Xml.xml' Name='Waher.Script.Xml.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.XmlDSig.xml' Name='Waher.Script.XmlDSig.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.xml' Name='Waher.Security.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.ACME.xml' Name='Waher.Security.ACME.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.CallStack.xml' Name='Waher.Security.CallStack.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.ChaChaPoly.xml' Name='Waher.Security.ChaChaPoly.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.DTLS.xml' Name='Waher.Security.DTLS.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.xml' Name='Waher.Security.EllipticCurves.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.JWS.xml' Name='Waher.Security.JWS.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.JWT.xml' Name='Waher.Security.JWT.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.LoginMonitor.xml' Name='Waher.Security.LoginMonitor.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.PKCS.xml' Name='Waher.Security.PKCS.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.SHA3.xml' Name='Waher.Security.SHA3.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.SPF.xml' Name='Waher.Security.SPF.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.Users.xml' Name='Waher.Security.Users.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.xml' Name='Waher.Things.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Ieee1451.xml' Name='Waher.Things.Ieee1451.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Files.xml' Name='Waher.Things.Files.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.IP.xml' Name='Waher.Things.IP.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Metering.xml' Name='Waher.Things.Metering.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Modbus.xml' Name='Waher.Things.Modbus.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Mqtt.xml' Name='Waher.Things.Mqtt.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Script.xml' Name='Waher.Things.Script.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Semantic.xml' Name='Waher.Things.Semantic.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Snmp.xml' Name='Waher.Things.Snmp.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Virtual.xml' Name='Waher.Things.Virtual.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Xmpp.xml' Name='Waher.Things.Xmpp.xml' On='uninstall'/>
 						</Component>
 						<Component Id='ServerConfiguration' Guid='61FE76A1-088C-41F5-AF6A-EAB2DE5B13CE'>
 							<File Id='Gateway.config' Name='Gateway.config' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Gateway.config' Vital='yes' KeyPath='yes'/>
@@ -2305,7 +2519,6 @@
 							 Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
 			<Feature Id='IoTGateway' Title='IoT Gateway' Description='Contains the required software to run the IoT Gateway.' Level='1'>
 				<ComponentRef Id='InstallFolder'/>
-				<ComponentRef Id='NetCore' />
 				<ComponentRef Id='SystemLibraries'/>
 				<ComponentRef Id='MicrosoftLibraries'/>
 				<ComponentRef Id='MainExecutable' />
@@ -2374,6 +2587,7 @@
       </Feature>
 			<Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
 				<ComponentRef Id='MainDebugFiles'/>
+				<ComponentRef Id='MainCodeDocFiles'/>
 				<ComponentRef Id='ScriptWebServiceDebugFiles'/>
 				<ComponentRef Id='SparqlWebServiceDebugFiles'/>
 				<ComponentRef Id='UtilityAcmeDebugFiles' />

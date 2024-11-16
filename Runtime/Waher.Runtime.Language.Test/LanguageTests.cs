@@ -38,7 +38,7 @@ namespace Waher.Runtime.Language.Test
 			filesProvider?.Dispose();
 			filesProvider = null;
 
-			if (!(consoleEventSink is null))
+			if (consoleEventSink is not null)
 			{
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;
@@ -49,9 +49,11 @@ namespace Waher.Runtime.Language.Test
 		public async Task Language_Test_01_GetLanguage()
 		{
 			Language Language = await Translator.GetLanguageAsync("en");
-			if (Language is null)
-				Language = await Translator.CreateLanguageAsync("en", "English", null, 0, 0);
+			Language ??= await Translator.CreateLanguageAsync("en", "English", null, 0, 0);
 			Assert.IsNotNull(Language);
+
+			Assert.AreEqual("en", Language.Code);
+			Assert.AreEqual("English", Language.Name);
 		}
 
 		[TestMethod]
@@ -74,8 +76,9 @@ namespace Waher.Runtime.Language.Test
 		{
 			Language Language = await Translator.GetLanguageAsync("en");
 			Namespace Namespace = await Language.GetNamespaceAsync("Test");
-			if (Namespace is null)
-				await Language.CreateNamespaceAsync("Test");
+			Namespace ??= await Language.CreateNamespaceAsync("Test");
+
+			Assert.AreEqual("Test", Namespace.Name);
 		}
 
 		[TestMethod]
@@ -85,6 +88,9 @@ namespace Waher.Runtime.Language.Test
 			Namespace[] Namespaces = await Language.GetNamespacesAsync();
 			Assert.IsNotNull(Namespaces);
 			Assert.IsTrue(Namespaces.Length > 0);
+
+			foreach (Namespace Namespace in Namespaces)
+				Assert.AreEqual(Language.ObjectId, Namespace.LanguageId);
 		}
 
 		[TestMethod]
@@ -104,6 +110,9 @@ namespace Waher.Runtime.Language.Test
 			LanguageString[] Strings = await Namespace.GetStringsAsync();
 			Assert.IsNotNull(Strings);
 			Assert.IsTrue(Strings.Length > 0);
+
+			foreach (LanguageString s in Strings)
+				Assert.AreEqual(Namespace.ObjectId, s.NamespaceId);
 		}
 
 		[TestMethod]

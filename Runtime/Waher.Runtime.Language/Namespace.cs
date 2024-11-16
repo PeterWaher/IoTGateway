@@ -80,18 +80,21 @@ namespace Waher.Runtime.Language
 					return Result;
 			}
 
-			foreach (LanguageString LanguageString in await Database.Find<LanguageString>(new FilterAnd(
-				new FilterFieldEqualTo("NamespaceId", this.objectId), new FilterFieldEqualTo("Id", Id))))
+			LanguageString LanguageString = await Database.FindFirstIgnoreRest<LanguageString>(new FilterAnd(
+				new FilterFieldEqualTo("NamespaceId", this.objectId), new FilterFieldEqualTo("Id", Id)));
+
+			if (!(LanguageString is null))
 			{
 				lock (this.synchObject)
 				{
-					this.stringsById[LanguageString.Id] = LanguageString;
+					if (this.stringsById.TryGetValue(Id, out LanguageString Result))
+						return Result;
+					else
+						this.stringsById[LanguageString.Id] = LanguageString;
 				}
-
-				return LanguageString;
 			}
 
-			return null;
+			return LanguageString;
 		}
 
 		/// <summary>
@@ -130,9 +133,12 @@ namespace Waher.Runtime.Language
 		{
 			if (!this.stringsLoaded)
 			{
-				foreach (LanguageString LanguageString in await Database.Find<LanguageString>(new FilterFieldEqualTo("NamespaceId", this.objectId)))
+				IEnumerable<LanguageString> Strings = await Database.Find<LanguageString>(
+					new FilterFieldEqualTo("NamespaceId", this.objectId));
+
+				lock (this.synchObject)
 				{
-					lock (this.synchObject)
+					foreach (LanguageString LanguageString in Strings)
 					{
 						if (!this.stringsById.ContainsKey(LanguageString.Id))
 							this.stringsById[LanguageString.Id] = LanguageString;
@@ -174,20 +180,37 @@ namespace Waher.Runtime.Language
 			}
 			else
 			{
-				Result = new LanguageString()
-				{
-					NamespaceId = this.objectId,
-					Id = Id,
-					Value = Value,
-					Level = Level
-				};
+				bool Insert = false;
 
 				lock (this.synchObject)
 				{
-					this.stringsById[Id] = Result;
+					if (this.stringsById.TryGetValue(Id, out Result))
+					{
+						if (Result.Value == Value || Result.Level > Level)
+							return Result;
+
+						Result.Value = Value;
+						Result.Level = Level;
+					}
+					else
+					{
+						Result = new LanguageString()
+						{
+							NamespaceId = this.objectId,
+							Id = Id,
+							Value = Value,
+							Level = Level
+						};
+
+						this.stringsById[Id] = Result;
+						Insert = true;
+					}
 				}
 
-				await Database.Insert(Result);
+				if (Insert)
+					await Database.Insert(Result);
+				else
+					await Database.Update(Result);
 
 				return Result;
 			}

@@ -47,18 +47,22 @@ namespace Waher.Runtime.Language
 					return Result;
 			}
 
-			foreach (Language Language in await Database.Find<Language>(new FilterFieldEqualTo("Code", Code)))
+			Language Language = await Database.FindFirstIgnoreRest<Language>(
+				new FilterFieldEqualTo("Code", Code));
+
+			if (!(Language is null))
 			{
 				lock (synchObject)
 				{
+					if (languagesByCode.TryGetValue(Code, out Language Result))
+						return Result;
+
 					languagesByCode[Language.Code] = Language;
 					languagesByName[Language.Name] = Language;
 				}
-
-				return Language;
 			}
 
-			return null;
+			return Language;
 		}
 
 		/// <summary>
@@ -69,9 +73,11 @@ namespace Waher.Runtime.Language
 		{
 			if (!langaugesLoaded)
 			{
-				foreach (Language Language in await Database.Find<Language>())
+				IEnumerable<Language> Languages = await Database.Find<Language>();
+
+				lock (synchObject)
 				{
-					lock (synchObject)
+					foreach (Language Language in Languages)
 					{
 						if (!languagesByCode.ContainsKey(Language.Code))
 						{
@@ -136,22 +142,51 @@ namespace Waher.Runtime.Language
 			}
 			else
 			{
-				Result = new Language()
-				{
-					Code = Code,
-					Name = Name,
-					Flag = Flag,
-					FlagWidth = FlagWidth,
-					FlagHeight = FlagHeight
-				};
+				bool Insert = false;
+				bool Update = false;
 
 				lock (synchObject)
 				{
-					languagesByCode[Code] = Result;
-					languagesByName[Name] = Result;
+					if (languagesByCode.TryGetValue(Code, out Result))
+					{
+						if (Result.Name != Name && !string.IsNullOrEmpty(Name))
+						{
+							languagesByName.Remove(Result.Name);
+							Result.Name = Name;
+							languagesByName[Name] = Result;
+							Update = true;
+						}
+
+						if (!(Flag is null))
+						{
+							Result.Flag = Flag;
+							Result.FlagWidth = FlagWidth;
+							Result.FlagHeight = FlagHeight;
+							Update = true;
+						}
+					}
+					else
+					{
+						Result = new Language()
+						{
+							Code = Code,
+							Name = Name,
+							Flag = Flag,
+							FlagWidth = FlagWidth,
+							FlagHeight = FlagHeight
+						};
+
+						languagesByCode[Code] = Result;
+						languagesByName[Name] = Result;
+
+						Insert = true;
+					}
 				}
 
-				await Database.Insert(Result);
+				if (Insert)
+					await Database.Insert(Result);
+				else if (Update)
+					await Database.Update(Result);
 
 				return Result;
 			}

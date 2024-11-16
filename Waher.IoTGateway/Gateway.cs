@@ -1508,6 +1508,8 @@ namespace Waher.IoTGateway
 					return 1;
 				else if (x is Runtime.Transactions.TransactionModule)
 					return 2;
+				else if (x is NetworkingModule)
+					return int.MaxValue;
 				else
 					return 3;
 			}

@@ -47,7 +47,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Default Connection backlog (10).
 		/// </summary>
-		public const int DefaultConnectionBacklog = 10;
+		public const int DefaultConnectionBacklog = BinaryTcpServer.DefaultC2SConnectionBacklog;
 
 		/// <summary>
 		/// Default buffer size (16384).
@@ -930,6 +930,12 @@ namespace Waher.Networking.HTTP
 			{
 				StreamSocket Client = args.Socket;
 
+				if (NetworkingModule.Stopping)
+				{
+					Client?.Dispose();
+					return;
+				}
+
 				await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
@@ -960,7 +966,7 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
-				while (!this.closed)
+				while (!this.closed && NetworkingModule.Running)
 				{
 					try
 					{
@@ -969,8 +975,11 @@ namespace Waher.Networking.HTTP
 						try
 						{
 							Client = await Listener.AcceptTcpClientAsync();
-							if (this.closed)
+							if (this.closed || NetworkingModule.Stopping)
+							{
+								Client?.Dispose();
 								return;
+							}
 						}
 						catch (InvalidOperationException)
 						{

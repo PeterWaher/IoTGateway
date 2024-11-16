@@ -349,6 +349,21 @@ namespace Waher.Runtime.Inventory
 
 					foreach (IModule Module in Modules)
 					{
+						if (Module is IGracefulModule GracefulModule)
+						{
+							try
+							{
+								await GracefulModule.PrepareStop();
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
+						}
+					}
+
+					foreach (IModule Module in Modules)
+					{
 						try
 						{
 							await Module.Stop();

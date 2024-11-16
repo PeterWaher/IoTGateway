@@ -27,7 +27,7 @@ namespace Waher.Networking.Modbus
 		/// <param name="Sniffers">Optional set of sniffers.</param>
 		private ModBusTcpServer(int Port, params ISniffer[] Sniffers)
 		{
-			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), false, Sniffers);
+			this.server = new BinaryTcpServer(false, Port, TimeSpan.FromSeconds(30), false, Sniffers);
 		}
 
 #if !WINDOWS_UWP
@@ -39,7 +39,7 @@ namespace Waher.Networking.Modbus
 		/// <param name="Sniffers">Optional set of sniffers.</param>
 		private ModBusTcpServer(int Port, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
 		{
-			this.server = new BinaryTcpServer(Port, TimeSpan.FromSeconds(30), ServerCertificate, false, Sniffers);
+			this.server = new BinaryTcpServer(false, Port, TimeSpan.FromSeconds(30), ServerCertificate, false, Sniffers);
 		}
 #endif
 		/// <summary>

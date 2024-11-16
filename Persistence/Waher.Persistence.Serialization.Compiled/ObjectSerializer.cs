@@ -304,7 +304,7 @@ namespace Waher.Persistence.Serialization
 #if COMPILED
 			this.compiled = Compiled;
 #endif
-			if (Types.GetDefaultConstructor(Type) is null)
+			if (Types.GetDefaultConstructor(Type) is null && !Type.IsAbstract && Type.IsClass)
 				throw new SerializationException("Objects of type " + Type.FullName + " cannot be serialized: The class must have a default constructor.", Type);
 
 			if (this.type == typeof(bool) ||

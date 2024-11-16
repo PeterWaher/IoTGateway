@@ -1813,7 +1813,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1919,7 +1919,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -3987,7 +3987,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -4093,7 +4093,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -6266,7 +6266,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6372,7 +6372,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -8440,7 +8440,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8546,7 +8546,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -10719,7 +10719,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10825,7 +10825,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -12893,7 +12893,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12999,7 +12999,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -15172,7 +15172,7 @@
           "Waher.Events": "1.3.0"
         }
       },
-      "Waher.Runtime.Language/1.1.5": {
+      "Waher.Runtime.Language/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15278,7 +15278,7 @@
           "Waher.Events": "1.3.0",
           "Waher.Networking": "3.0.0",
           "Waher.Runtime.Inventory": "1.1.8",
-          "Waher.Runtime.Language": "1.1.5",
+          "Waher.Runtime.Language": "1.2.0",
           "Waher.Script": "2.9.0"
         }
       }
@@ -23140,7 +23140,7 @@
       "path": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Inventory/Waher.Runtime.Inventory.csproj"
     },
-    "Waher.Runtime.Language/1.1.5": {
+    "Waher.Runtime.Language/1.2.0": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"

@@ -18,17 +18,17 @@ namespace Waher.Persistence.Exceptions
         public SerializationException(string Message, Type Type)
             : base(Message)
         {
-            type = Type;
+            this.type = Type;
         }
 
         /// <summary>
         /// Type of object being serialized or deserialized.
         /// </summary>
-        public Type Type => type;
+        public Type Type => this.type;
 
         /// <summary>
         /// Object identifier related to the object.
         /// </summary>
-        public string Object => type.FullName;
+        public string Object => this.type.FullName;
     }
 }

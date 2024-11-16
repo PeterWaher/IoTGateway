@@ -35,6 +35,7 @@ namespace Waher.Script.Data.Functions
 		/// Generates a callback function based on script.
 		/// </summary>
 		/// <param name="DelegateType">Delegate type.</param>
+		/// <param name="ArgumentType">Argument type, when the delegate type is generic.</param>
 		/// <param name="Lambda">Lambda expression that will be used in call-backs.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>

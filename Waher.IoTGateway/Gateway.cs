@@ -4822,7 +4822,7 @@ namespace Waher.IoTGateway
 
 					if (!(Doc.Tag is MultiReadSingleWriteObject DocSynchObj))
 					{
-						DocSynchObj = new MultiReadSingleWriteObject();
+						DocSynchObj = new MultiReadSingleWriteObject(Doc);
 						Doc.Tag = DocSynchObj;
 					}
 

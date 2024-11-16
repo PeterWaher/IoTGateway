@@ -543,7 +543,7 @@ namespace Waher.Networking
 		{
 			try
 			{
-				while (!this.closed && NetworkingModule.Running)
+				while (!this.closed && !NetworkingModule.Stopping)
 				{
 					try
 					{

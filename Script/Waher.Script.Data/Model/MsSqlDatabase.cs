@@ -15,7 +15,7 @@ namespace Waher.Script.Data.Model
 	public class MsSqlDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, MsSqlStoredProcedure> procedures = new Dictionary<string, MsSqlStoredProcedure>();
-		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObject;
 		private SqlConnection connection;
 
 		/// <summary>
@@ -24,6 +24,7 @@ namespace Waher.Script.Data.Model
 		/// <param name="Connection">Connection</param>
 		public MsSqlDatabase(SqlConnection Connection)
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 			this.connection = Connection;
 		}
 
@@ -82,7 +83,7 @@ namespace Waher.Script.Data.Model
 				SqlCommand Command = this.connection.CreateCommand();
 				Command.CommandType = CommandType.StoredProcedure;
 				Command.CommandText = this.connection.Database + "." + Name;
-				
+
 				SqlCommandBuilder.DeriveParameters(Command);
 
 				Result = new MsSqlStoredProcedure(Command);

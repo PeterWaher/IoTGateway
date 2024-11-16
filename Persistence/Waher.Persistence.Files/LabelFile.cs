@@ -14,12 +14,13 @@ namespace Waher.Persistence.Files
 	{
 		private readonly Dictionary<string, uint> codesByLabel = new Dictionary<string, uint>();
 		private readonly Dictionary<uint, string> labelsByCode = new Dictionary<uint, string>();
-		private readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObj;
 		private readonly int timeoutMilliseconds;
 
 		private LabelFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted)
 			: base(FileName, CollectionName, Encrypted)
 		{
+			this.synchObj = new MultiReadSingleWriteObject(this);
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 

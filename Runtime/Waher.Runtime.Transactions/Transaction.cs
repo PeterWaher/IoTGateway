@@ -17,7 +17,7 @@ namespace Waher.Runtime.Transactions
 	{
 		private readonly Guid id = Guid.NewGuid();
 		private TransactionState state = TransactionState.Created;
-		private MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private MultiReadSingleWriteObject synchObject;
 		private object tag;
 
 		/// <summary>
@@ -25,6 +25,7 @@ namespace Waher.Runtime.Transactions
 		/// </summary>
 		public Transaction()
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 		}
 
 		/// <summary>
@@ -32,6 +33,7 @@ namespace Waher.Runtime.Transactions
 		/// </summary>
 		/// <param name="Id">ID of transaction.</param>
 		public Transaction(Guid Id)
+			: this()
 		{
 			this.id = Id;
 		}

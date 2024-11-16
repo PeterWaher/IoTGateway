@@ -16,7 +16,7 @@ namespace Waher.Script.Data.Model
 	public class OleDbDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, OleDbStoredProcedure> procedures = new Dictionary<string, OleDbStoredProcedure>();
-		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObject;
 		private OleDbConnection connection;
 
 		/// <summary>
@@ -25,6 +25,7 @@ namespace Waher.Script.Data.Model
 		/// <param name="Connection">Connection</param>
 		public OleDbDatabase(OleDbConnection Connection)
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 			this.connection = Connection;
 		}
 

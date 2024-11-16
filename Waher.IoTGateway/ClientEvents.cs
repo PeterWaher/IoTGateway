@@ -1274,7 +1274,7 @@ namespace Waher.IoTGateway
 			public string TabID;
 			public string SessionID;
 			public Variables Session;
-			public MultiReadSingleWriteObject SyncObj = new MultiReadSingleWriteObject();
+			public MultiReadSingleWriteObject SyncObj;
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
 			public WebSocket WebSocket = null;
@@ -1284,6 +1284,7 @@ namespace Waher.IoTGateway
 
 			public TabQueue(string ID, string SessionID, Variables Session)
 			{
+				this.SyncObj = new MultiReadSingleWriteObject(this);
 				this.TabID = ID;
 				this.SessionID = SessionID;
 				this.Session = Session;

@@ -7,13 +7,13 @@ using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
 {
-    /// <summary>
-    /// Sniffer that stores events in memory.
-    /// </summary>
-    public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
+	/// <summary>
+	/// Sniffer that stores events in memory.
+	/// </summary>
+	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
 	{
 		private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
-		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject semaphore;
 		private readonly int maxCount;
 		private int count = 0;
 		private bool disposed = false;
@@ -32,6 +32,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="MaxCount">Maximum number of records in memory.</param>
 		public InMemorySniffer(int MaxCount)
 		{
+			this.semaphore = new MultiReadSingleWriteObject(this);
 			this.maxCount = MaxCount;
 		}
 

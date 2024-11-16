@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class NodeQuery : IDisposable
 	{
-		private readonly MultiReadSingleWriteObject syncObj = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject syncObj;
 		private readonly string queryId;
 		private readonly string to;
 		private readonly string nodeID;
@@ -55,6 +55,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		public NodeQuery(ConcentratorClient Client, string To, string NodeID, string SourceID, string Partition, string Command,
 			string Language, string ServiceToken, string DeviceToken, string UserToken)
 		{
+			this.syncObj = new MultiReadSingleWriteObject(this);
 			this.queryId = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.client = Client;
 			this.to = To;

@@ -27,7 +27,7 @@ namespace Waher.Persistence.FullTextSearch
 	[ModuleDependency(typeof(DatabaseModule))]
 	public class FullTextSearchModule : IModule
 	{
-		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject(typeof(FullTextSearchModule));
 		private static Cache<string, QueryRecord> queryCache;
 		private static Dictionary<string, bool> stopWords = new Dictionary<string, bool>();
 		private static IPersistentDictionary collectionInformation;

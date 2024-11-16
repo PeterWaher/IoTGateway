@@ -36,7 +36,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		private EventHandlerAsync<DataReceivedEventArgs> dataCallback;
 		private EventHandlerAsync<StreamClosedEventArgs> closeCallback;
 		private TemporaryStream tempStream = null;
-		private MultiReadSingleWriteObject syncObject = new MultiReadSingleWriteObject();
+		private MultiReadSingleWriteObject syncObject;
 		private readonly object state;
 		private int expectedSeq = 0;
 		private int baseSeq = 0;
@@ -53,6 +53,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		public IncomingStream(EventHandlerAsync<DataReceivedEventArgs> DataCallback,
 			EventHandlerAsync<StreamClosedEventArgs> CloseCallback, object State, int BlockSize)
 		{
+			this.syncObject = new MultiReadSingleWriteObject(this);
 			this.dataCallback = DataCallback;
 			this.closeCallback = CloseCallback;
 			this.state = State;

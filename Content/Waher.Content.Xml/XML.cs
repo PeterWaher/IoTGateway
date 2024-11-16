@@ -72,9 +72,9 @@ namespace Waher.Content.Xml
 
 		private static readonly string[] specialCharacterEncodings = new string[] 
 		{
-			"&amp;", 
 			"&lt;", 
 			"&gt;", 
+			"&amp;", 
 			"&quot;",
 			"&apos;",
 			"&#00;",
@@ -163,9 +163,9 @@ namespace Waher.Content.Xml
 
 		private static readonly string[] specialAttributeEncodings = new string[]
 		{
-			"&amp;",
 			"&lt;",
 			"&gt;",
+			"&amp;",
 			"&quot;",
 			"&#00;",
 			"&#01;",
@@ -220,9 +220,9 @@ namespace Waher.Content.Xml
 
 		private static readonly string[] specialValueEncodings = new string[]
 		{
-			"&amp;",
 			"&lt;",
-			"&gt;"
+			"&gt;",
+			"&amp;"
 		};
 
 		/// <summary>

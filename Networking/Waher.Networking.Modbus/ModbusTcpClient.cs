@@ -28,7 +28,7 @@ namespace Waher.Networking.Modbus
 
 		private readonly Dictionary<ushort, Transaction> transactions = new Dictionary<ushort, Transaction>();
 		private readonly BinaryTcpClient tcpClient;
-		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObject;
 		private ushort transactionId = 0;
 		private int timeoutMs = 10000;
 		private bool connected = false;
@@ -42,6 +42,7 @@ namespace Waher.Networking.Modbus
 		private ModbusTcpClient(params ISniffer[] Sniffers)
 			: base(false, Sniffers)
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 			this.tcpClient = new BinaryTcpClient(false);
 		}
 

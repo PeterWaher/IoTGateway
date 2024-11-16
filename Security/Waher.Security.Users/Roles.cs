@@ -13,7 +13,7 @@ namespace Waher.Security.Users
 	public static class Roles
 	{
 		private static readonly Dictionary<string, Role> roles = new Dictionary<string, Role>();
-		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject(typeof(Roles));
 
 		/// <summary>
 		/// Gets the <see cref="Role"/> object corresponding to a Role ID.

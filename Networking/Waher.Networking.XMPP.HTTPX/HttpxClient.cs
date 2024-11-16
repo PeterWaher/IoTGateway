@@ -469,7 +469,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			public void PreparePostBackCall(IEndToEndEncryption EndpointSecurity, string Id, XmppClient Client)
 			{
-				this.synchObj = new MultiReadSingleWriteObject();
+				this.synchObj = new MultiReadSingleWriteObject(this);
 				this.endpointSecurity = EndpointSecurity;
 				this.id = Id;
 				this.client = Client;

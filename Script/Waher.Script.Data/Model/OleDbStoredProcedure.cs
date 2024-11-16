@@ -14,7 +14,7 @@ namespace Waher.Script.Data.Model
 	/// </summary>
 	public class OleDbStoredProcedure : ILambdaExpression, IDisposable
 	{
-		private readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObj;
 		private readonly OleDbCommand command;
 		private readonly int nrParameters;
 		private readonly string[] parameterNames;
@@ -22,6 +22,7 @@ namespace Waher.Script.Data.Model
 
 		internal OleDbStoredProcedure(OleDbCommand Command)
 		{
+			this.synchObj = new MultiReadSingleWriteObject(this);
 			this.command = Command;
 			this.nrParameters = this.command.Parameters.Count;
 			this.parameterNames = new string[this.nrParameters];

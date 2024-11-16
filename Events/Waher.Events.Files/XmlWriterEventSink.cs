@@ -17,7 +17,7 @@ namespace Waher.Events.Files
 		/// </summary>
 		protected XmlWriter output;
 
-		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject semaphore;
 		private bool disposed = false;
 
 		/// <summary>
@@ -28,6 +28,7 @@ namespace Waher.Events.Files
 		public XmlWriterEventSink(string ObjectID, XmlWriter Output)
 			: base(ObjectID)
 		{
+			this.semaphore = new MultiReadSingleWriteObject(this);
 			this.output = Output;
 		}
 

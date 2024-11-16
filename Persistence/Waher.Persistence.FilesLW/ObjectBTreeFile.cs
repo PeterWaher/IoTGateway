@@ -129,7 +129,7 @@ namespace Waher.Persistence.Files
 			this.genericSerializer = new GenericObjectSerializer(Provider);
 			this.encrypted = Encrypted;
 			this.mainSynch = FileAccess is null;
-			this.fileAccess = FileAccess ?? new MultiReadSingleWriteObject();
+			this.fileAccess = FileAccess ?? new MultiReadSingleWriteObject(this);
 
 			if (RecordHandler is null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);

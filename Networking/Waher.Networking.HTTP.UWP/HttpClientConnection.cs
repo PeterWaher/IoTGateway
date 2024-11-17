@@ -511,7 +511,13 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
+				if (NetworkingModule.Stopping)
+				{
+					await this.SendResponse(Request, null, new ServiceUnavailableException("Service is shutting down. Please try again later."), true,
+						new KeyValuePair<string, string>("Retry-After", "300"));    // Try again in 5 minutes.
+					Result = false;
+				}
+				else if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
 				{
 					Request.Resource = Resource;
 					Request.SubPath = SubPath;

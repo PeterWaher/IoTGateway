@@ -1849,7 +1849,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1872,7 +1872,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -4028,7 +4028,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -4051,7 +4051,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -6312,7 +6312,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6335,7 +6335,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -8491,7 +8491,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8514,7 +8514,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -10775,7 +10775,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10798,7 +10798,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -12954,7 +12954,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12977,7 +12977,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -15238,7 +15238,7 @@
           "Waher.Script": "2.9.0"
         }
       },
-      "Waher.Security/1.0.10": {
+      "Waher.Security/1.0.11": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15261,7 +15261,7 @@
           "Waher.Networking.WHOIS.UWP": "1.0.0",
           "Waher.Persistence": "1.13.0",
           "Waher.Runtime.Inventory": "1.2.0",
-          "Waher.Security": "1.0.10"
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Security.SHA3/1.1.0": {
@@ -23038,7 +23038,7 @@
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
     },
-    "Waher.Security/1.0.10": {
+    "Waher.Security/1.0.11": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"

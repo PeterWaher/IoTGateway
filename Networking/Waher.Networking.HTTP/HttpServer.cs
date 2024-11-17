@@ -1879,7 +1879,9 @@ namespace Waher.Networking.HTTP
 			if (i >= 0)
 				ResourceName = ResourceName.Substring(0, i);
 
-			if (this.TryGetResource(ResourceName, true, out HttpResource Resource, out string SubPath) &&
+			if (NetworkingModule.Stopping)
+				return new Tuple<int, string, byte[]>(ServiceUnavailableException.Code, ServiceUnavailableException.StatusMessage, null);
+			else if (this.TryGetResource(ResourceName, true, out HttpResource Resource, out string SubPath) &&
 				Resource is IHttpGetMethod GetMethod)
 			{
 				using (MemoryStream ms = new MemoryStream())

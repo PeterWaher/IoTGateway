@@ -1,4 +1,4 @@
-﻿¤LoadFile(System.IO.Path.Combine(Waher.IoTGateway.Gateway.RootFolder),"Themes","Base","Base.cssx"))¤
+﻿¤LoadFile(System.IO.Path.Combine(Waher.IoTGateway.Gateway.RootFolder),"Themes","Base","Base.cssx")¤
 
 /* region Header*/
 

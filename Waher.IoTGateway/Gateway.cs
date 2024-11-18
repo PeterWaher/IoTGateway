@@ -2090,6 +2090,7 @@ namespace Waher.IoTGateway
 				{
 					case "clrcompression.dll":
 					case "clretwrc.dll":
+					case "clrgc.dll":
 					case "clrjit.dll":
 					case "coreclr.dll":
 					case "dbgshim.dll":

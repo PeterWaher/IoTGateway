@@ -2545,7 +2545,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				if (!stopped)
+				if (!stopped && !NetworkingModule.Stopping)
 				{
 					scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
@@ -2612,8 +2612,12 @@ namespace Waher.IoTGateway
 					immediateReconnect = connected;
 					connected = false;
 
-					if (immediateReconnect && !(xmppClient is null))
+					if (immediateReconnect &&
+						!(xmppClient is null) &&
+						!NetworkingModule.Stopping)
+					{
 						await xmppClient.Reconnect();
+					}
 					break;
 			}
 		}

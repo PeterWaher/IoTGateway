@@ -462,7 +462,7 @@ namespace Waher.Networking.XMPP.Synchronization
 					{
 						case XmppState.Error:
 						case XmppState.Offline:
-							if (this.checkConnection)
+							if (this.checkConnection && !NetworkingModule.Stopping)
 								await this.client.Reconnect();
 							break;
 

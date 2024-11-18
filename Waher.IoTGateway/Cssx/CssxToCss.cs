@@ -69,18 +69,36 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="Session">Current session</param>
 		/// <param name="FileName">Source file name.</param>
 		/// <returns>CSS</returns>
-		public static async Task<string> Convert(string Cssx, Variables Session, string FileName)
+		public static Task<string> Convert(string Cssx, Variables Session, string FileName)
+		{
+			return Convert(Cssx, Session, FileName, true);
+		}
+
+		/// <summary>
+		/// Converts CSSX to CSS, using the current theme
+		/// </summary>
+		/// <param name="Cssx">CSSX</param>
+		/// <param name="Session">Current session</param>
+		/// <param name="FileName">Source file name.</param>
+		/// <param name="LockSession">If the session should be locked (true),
+		/// or if the caller has already locked the session (false).</param>
+		/// <returns>CSS</returns>
+		internal static async Task<string> Convert(string Cssx, Variables Session, string FileName, bool LockSession)
 		{
 			bool Pushed = false;
 
 			if (Session is null)
 				throw new ArgumentNullException("No session defined.", nameof(Session));
 
-			await Session.LockAsync();
+			if (LockSession)
+				await Session.LockAsync();
 			try
 			{
-				Session.Push();
-				Pushed = true;
+				if (LockSession)
+				{
+					Session.Push();
+					Pushed = true;
+				}
 
 				ThemeDefinition Def = Theme.GetCurrentTheme(Session);
 				Def?.Prepare(Session);
@@ -147,10 +165,13 @@ namespace Waher.IoTGateway.Cssx
 			}
 			finally
 			{
-				if (Pushed)
-					Session.Pop();
+				if (LockSession)
+				{
+					if (Pushed)
+						Session.Pop();
 
-				Session.Release();
+					Session.Release();
+				}
 			}
 		}
 

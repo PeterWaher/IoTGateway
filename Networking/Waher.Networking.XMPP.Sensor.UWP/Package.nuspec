@@ -24,7 +24,7 @@
 			<dependency id="Waher.Networking.XMPP.Provisioning.UWP" version="4.0.0"/>
 			<dependency id="Waher.Networking.XMPP.PubSub.UWP" version="3.0.0"/>
 			<dependency id="Waher.Runtime.Timing" version="2.0.0"/>
-			<dependency id="Waher.Things" version="3.0.0"/>
+			<dependency id="Waher.Things" version="3.0.1"/>
 		</dependencies>
 	</metadata>
 	<files>

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Waher.IoTGateway.Cssx;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -53,7 +54,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
 		{
-			Argument = await Expression.TransformAsync(Argument, "¤", "¤", Variables);
+			Argument = await CssxToCss.Convert(Argument, Variables, string.Empty);
 			return new StringValue(Argument);
         }
 

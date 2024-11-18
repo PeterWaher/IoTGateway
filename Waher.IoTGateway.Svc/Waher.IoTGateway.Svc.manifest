@@ -1029,6 +1029,9 @@
 			<Content fileName='Repeat.md'/>
 		</Folder>
 		<Folder name='Themes'>
+			<Folder name='Base'>
+				<Content fileName='Base.cssx'/>
+			</Folder>
 			<Folder name='CactusRose'>
 				<Content fileName='CactusRose.cssx'/>
 				<Content fileName='CactusRose.png'/>

@@ -526,13 +526,22 @@ namespace Waher.Utility.Install
 					{
 						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
 
+						if (FileName.EndsWith(".dll"))
+							Log.Informational("Assembly file: " + FileName, string.Empty, string.Empty, "FileCopy");
+						else
+							Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
+
 						if (CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, true))
 						{
 							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{
 								string PdbFileName = FileName[0..^4] + ".pdb";
 								if (File.Exists(PdbFileName))
+								{
+									Log.Informational("Symbol file: " + PdbFileName, string.Empty, string.Empty, "FileCopy");
+
 									CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, true);
+								}
 							}
 						}
 
@@ -909,6 +918,11 @@ namespace Waher.Utility.Install
 					{
 						(string FileName, string AppFileName) = GetFileName(E, AppFolder);
 
+						if (FileName.EndsWith(".dll"))
+							Log.Informational("Assembly file: " + FileName, string.Empty, string.Empty, "FileCopy");
+						else
+							Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
+
 						if (AppFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
 							AppFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
@@ -958,6 +972,7 @@ namespace Waher.Utility.Install
 							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{
 								string PdbFileName = FileName[0..^4] + ".pdb";
+								Log.Informational("Symbol file: " + PdbFileName, string.Empty, string.Empty, "FileCopy");
 								RemoveFile(PdbFileName);
 							}
 						}
@@ -1071,6 +1086,11 @@ namespace Waher.Utility.Install
 						if (E.LocalName == "Assembly")
 						{
 							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
+
+							if (FileName.EndsWith(".dll"))
+								Log.Informational("Assembly file: " + FileName, string.Empty, string.Empty, "FileCopy");
+							else
+								Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
 							if (SourceFileName.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase) ||
 								SourceFileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
@@ -1984,6 +2004,11 @@ namespace Waher.Utility.Install
 					if (!ContentOnly)
 					{
 						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder, false);
+
+						if (FileName.EndsWith(".dll"))
+							Log.Informational("Assembly file: " + FileName, string.Empty, string.Empty, "FileCopy");
+						else
+							Log.Informational("Application file: " + FileName, string.Empty, string.Empty, "FileCopy");
 
 						CopyFile(SourceFileName, Path.Combine(AppFolder, FileName), DockerOutput);
 						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))

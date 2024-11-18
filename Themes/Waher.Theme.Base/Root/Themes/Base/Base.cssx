@@ -272,6 +272,7 @@ html body fieldset
     #native-header li > ul > li
     {
         display: flex;
+        flex-direction: row-reverse;
         position: relative;
         overflow: visible;
         border-bottom: none;
@@ -303,7 +304,7 @@ html body fieldset
         margin-inline-start: 0;
     }
     
-    #native-header li > ul > li:hover > ul
+    #native-header li > ul > li > ul[expanded]
     {
         display: block;
     }
@@ -319,9 +320,6 @@ html body fieldset
     {
         padding: 0px;
         display: none;
-        height: 0;
-        position: absolute;
-        left: 100%;
     }
 
     /*#endregion Dropdown*/

@@ -12,9 +12,27 @@ function NativeHeader() {
             }
         })
 
+        // close submenu
+        subMenu.parentElement.addEventListener("mouseleave", () => {
+            subMenu.removeAttribute("expanded")
+        })
+        
+        
+        // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
-            // if on computer, make sure dropdowns expand beyond the screen
+            // make every dropdowns item the same with
+            let maxWidth = 0
+            const listItems = Array.from(subMenu.children) 
+            listItems.forEach(listItem => {
+                const anchorElement = listItem.children[0]
+                maxWidth = Math.max(maxWidth, anchorElement.clientWidth)
+            })
+            listItems.forEach(listItem => {
+                listItem.children[0].style.width = maxWidth + "px"
+            })
 
+          
+            // if on computer, make sure dropdowns does not expand beyond the screen
             const rect = subMenu.getBoundingClientRect();
             const rightX = rect.right
             const bottomY = rect.bottom
@@ -44,9 +62,12 @@ function NativeHeader() {
 
             // overflowing the bottom of the screen
             if (bottomY > window.innerHeight) {
-                console.log(rect.height - bottomY + window.innerHeight)
                 subMenu.style.maxHeight = rect.height - bottomY + window.innerHeight + "px";
             }
+
+
+            subMenu.setAttribute("expanded", "")
+
         })
     })
 

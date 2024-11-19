@@ -276,6 +276,8 @@ html body fieldset
         position: relative;
         overflow: visible;
         border-bottom: none;
+        width: fit-content;
+        margin-right: auto;
     }
 
 
@@ -311,9 +313,8 @@ html body fieldset
 
     #native-header li > ul 
     {
-        overflow-y: scroll;
+        overflow-y: auto;
         direction:rtl; 
-        overflow-x: visible;
     }
 
     #native-header li > ul > li > ul

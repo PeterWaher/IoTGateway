@@ -15,11 +15,22 @@ function NativeHeader() {
         // close submenu
         subMenu.parentElement.addEventListener("mouseleave", () => {
             subMenu.removeAttribute("expanded")
+
+            // remove sibling translation
+            let sibling = subMenu.parentElement.nextElementSibling
+            while(sibling != undefined)
+            {
+                sibling.style.transform = ""
+                sibling = sibling.nextElementSibling
+            }
         })
         
         
         // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
+            subMenu.setAttribute("expanded", "") // expand menu
+
+
             // make every dropdowns item the same with
             let maxWidth = 0
             const listItems = Array.from(subMenu.children) 
@@ -30,6 +41,9 @@ function NativeHeader() {
             listItems.forEach(listItem => {
                 listItem.children[0].style.width = maxWidth + "px"
             })
+
+
+
 
           
             // if on computer, make sure dropdowns does not expand beyond the screen
@@ -46,10 +60,9 @@ function NativeHeader() {
                     element = element.parentElement.parentElement
                 }
 
-                let oldOffset = 0
-                if (element.style.transform)
-                    oldOffset += Number(element.style.transform.split("(")[1].split("px")[0])
-                element.style.transform = `translateX(${oldOffset + window.innerWidth - rightX}px)`
+                let oldOffset = element.offset || 0
+                element.offset = oldOffset + window.innerWidth - rightX
+                element.style.transform += ` translateX(${element.offset}px)`
 
                 const topLevelLi = element.parentElement
 
@@ -66,8 +79,17 @@ function NativeHeader() {
             }
 
 
-            subMenu.setAttribute("expanded", "")
 
+
+            // translate siblings
+            const offset = subMenu.parentElement.getBoundingClientRect().height - subMenu.parentElement.children[0].getBoundingClientRect().height
+
+            let sibling = subMenu.parentElement.nextElementSibling
+            while(sibling != undefined)
+            {
+                sibling.style.transform += ` translateY(${-offset}px)`
+                sibling = sibling.nextElementSibling
+            }
         })
     })
 

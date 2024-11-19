@@ -5,6 +5,7 @@ using Windows.Networking.Sockets;
 #else
 using System.Net.Sockets;
 #endif
+using Waher.Events;
 using Waher.Networking.Sniffers;
 
 namespace Waher.Networking

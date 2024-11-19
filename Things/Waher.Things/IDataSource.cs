@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Networking;
+using Waher.Events;
 using Waher.Runtime.Language;
 using Waher.Things.SourceEvents;
 

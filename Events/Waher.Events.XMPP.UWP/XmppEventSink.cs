@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
+using Waher.Networking;
 
 namespace Waher.Events.XMPP
 {
@@ -56,7 +57,9 @@ namespace Waher.Events.XMPP
 		private void CheckConnection(object State)
 		{
 			XmppState? State2 = this.client?.State;
-			if (State2.HasValue && (State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating))
+			if (State2.HasValue && 
+				(State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating) &&
+				!NetworkingModule.Stopping)
 			{
 				try
 				{
@@ -69,7 +72,7 @@ namespace Waher.Events.XMPP
 			}
 		}
 
-		private Task Client_OnStateChanged(object _, XmppState NewState)
+		private async Task Client_OnStateChanged(object _, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -99,12 +102,10 @@ namespace Waher.Events.XMPP
 						this.connected = false;
 					}
 
-					if (ImmediateReconnect && !(this.timer is null))
-						this.client.Reconnect();
+					if (ImmediateReconnect && !(this.timer is null) && !NetworkingModule.Stopping)
+						await this.client.Reconnect();
 					break;
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

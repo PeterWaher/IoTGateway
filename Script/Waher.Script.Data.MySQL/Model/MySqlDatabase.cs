@@ -16,7 +16,7 @@ namespace Waher.Script.Data.MySQL.Model
 	public class MySqlDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, StoredProcedure> procedures = new Dictionary<string, StoredProcedure>();
-		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObject;
 		private MySqlConnection connection;
 
 		/// <summary>
@@ -25,6 +25,7 @@ namespace Waher.Script.Data.MySQL.Model
 		/// <param name="Connection">Connection</param>
 		public MySqlDatabase(MySqlConnection Connection)
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 			this.connection = Connection;
 		}
 

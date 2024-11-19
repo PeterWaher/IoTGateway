@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Runtime.Cache;

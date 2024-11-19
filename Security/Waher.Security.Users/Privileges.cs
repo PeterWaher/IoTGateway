@@ -13,7 +13,7 @@ namespace Waher.Security.Users
 	public class Privileges
 	{
 		private static readonly Dictionary<string, Privilege> privileges = new Dictionary<string, Privilege>();
-		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject(typeof(Privileges));
 
 		/// <summary>
 		/// Gets the <see cref="Privilege"/> object corresponding to a full Privilege ID.

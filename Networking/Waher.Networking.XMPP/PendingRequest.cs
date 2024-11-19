@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Events;
 using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP

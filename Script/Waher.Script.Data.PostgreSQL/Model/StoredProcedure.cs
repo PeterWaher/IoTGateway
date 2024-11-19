@@ -15,7 +15,7 @@ namespace Waher.Script.Data.PostgreSQL.Model
 	/// </summary>
 	public class StoredProcedure : ILambdaExpression, IDisposable
 	{
-		private readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObj;
 		private readonly NpgsqlCommand command;
 		private readonly int nrParameters;
 		private readonly string[] parameterNames;
@@ -23,6 +23,7 @@ namespace Waher.Script.Data.PostgreSQL.Model
 
 		internal StoredProcedure(NpgsqlCommand Command)
 		{
+			this.synchObj = new MultiReadSingleWriteObject(this);
 			this.command = Command;
 			this.nrParameters = this.command.Parameters.Count;
 			this.parameterNames = new string[this.nrParameters];

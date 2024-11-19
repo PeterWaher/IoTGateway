@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Inventory;
@@ -469,7 +469,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			public void PreparePostBackCall(IEndToEndEncryption EndpointSecurity, string Id, XmppClient Client)
 			{
-				this.synchObj = new MultiReadSingleWriteObject();
+				this.synchObj = new MultiReadSingleWriteObject(this);
 				this.endpointSecurity = EndpointSecurity;
 				this.id = Id;
 				this.client = Client;

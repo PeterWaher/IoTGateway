@@ -40,7 +40,7 @@ namespace Waher.Script.Xml.Model
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
 		/// </summary>
 		public override bool IsAsynchronous => this.isAsync;
 

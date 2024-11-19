@@ -16,7 +16,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected XmlWriter output;
 
-		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject semaphore;
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private bool disposed = false;
 
@@ -27,6 +27,7 @@ namespace Waher.Networking.Sniffers
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
 		public XmlWriterSniffer(XmlWriter Output, BinaryPresentationMethod BinaryPresentationMethod)
 		{
+			this.semaphore = new MultiReadSingleWriteObject(this);
 			this.output = Output;
 			this.binaryPresentationMethod = BinaryPresentationMethod;
 		}

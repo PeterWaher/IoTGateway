@@ -16,7 +16,7 @@ namespace Waher.Script.Data.Model
 	public class OdbcDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, OdbcStoredProcedure> procedures = new Dictionary<string, OdbcStoredProcedure>();
-		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObject;
 		private OdbcConnection connection;
 
 		/// <summary>
@@ -25,6 +25,7 @@ namespace Waher.Script.Data.Model
 		/// <param name="Connection">Connection</param>
 		public OdbcDatabase(OdbcConnection Connection)
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 			this.connection = Connection;
 		}
 

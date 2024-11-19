@@ -15,7 +15,7 @@ namespace Waher.Persistence.Files
 	{
 		private const int MinBlockSize = 64;
 
-		private readonly MultiReadSingleWriteObject fileAccess = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject fileAccess;
 		private readonly FileStream file;
 		private readonly string fileName;
 		private readonly bool encrypted;
@@ -40,6 +40,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If file is encrypted.</param>
 		protected SerialFile(string FileName, string CollectionName, bool Encrypted)
 		{
+			this.fileAccess = new MultiReadSingleWriteObject(this);
 			this.fileName = FileName;
 			this.collectionName = CollectionName;
 			this.encrypted = Encrypted;

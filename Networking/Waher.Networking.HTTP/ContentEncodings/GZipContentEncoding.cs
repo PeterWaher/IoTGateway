@@ -8,7 +8,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 	/// </summary>
 	public class GZipContentEncoding : IContentEncoding
 	{
-		private static bool compressDynamic = true;
+		private static bool compressDynamic = false;
 		private static bool compressStatic = true;
 
 		/// <summary>

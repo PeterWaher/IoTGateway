@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Language;
 
 namespace Waher.Things.Queries
@@ -12,7 +8,7 @@ namespace Waher.Things.Queries
     /// <summary>
     /// Class handling the reception of data from a query.
     /// </summary>
-    public class Query : ICommunicationLayer
+    public class Query : IObservableLayer
 	{
 		private readonly INode nodeReference;
 		private readonly Language language;
@@ -522,75 +518,6 @@ namespace Waher.Things.Queries
 		public bool DecoupledEvents => false;
 
 		/// <summary>
-		/// Adds a sniffer to the node.
-		/// </summary>
-		/// <param name="Sniffer">Sniffer to add.</param>
-		public void Add(ISniffer Sniffer) { }
-
-		/// <summary>
-		/// Adds a range of sniffers to the node.
-		/// </summary>
-		/// <param name="Sniffers">Sniffers to add.</param>
-		public void AddRange(IEnumerable<ISniffer> Sniffers) { }
-
-		/// <summary>
-		/// Removes a sniffer, if registered.
-		/// </summary>
-		/// <param name="Sniffer">Sniffer to remove.</param>
-		/// <returns>If the sniffer was found and removed.</returns>
-		public bool Remove(ISniffer Sniffer) => false;
-
-		/// <summary>
-		/// Registered sniffers.
-		/// </summary>
-		public ISniffer[] Sniffers => Array.Empty<ISniffer>();
-
-		/// <summary>
-		/// If there are sniffers registered on the object.
-		/// </summary>
-		public bool HasSniffers => true;
-
-		/// <summary>
-		/// Gets a typed enumerator.
-		/// </summary>
-		public IEnumerator<ISniffer> GetEnumerator()
-		{
-			return new SnifferEnumerator(this.Sniffers);
-		}
-
-		/// <summary>
-		/// Gets an untyped enumerator.
-		/// </summary>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.Sniffers.GetEnumerator();
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data) => Task.CompletedTask;
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data) => Task.CompletedTask;
-
-		/// <summary>
-		/// Called when text has been received.
-		/// </summary>
-		/// <param name="Text">Text</param>
-		public Task ReceiveText(string Text) => Task.CompletedTask;
-
-		/// <summary>
-		/// Called when text has been transmitted.
-		/// </summary>
-		/// <param name="Text">Text</param>
-		public Task TransmitText(string Text) => Task.CompletedTask;
-
-		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
@@ -619,34 +546,6 @@ namespace Waher.Things.Queries
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
 		public Task Exception(string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => Task.CompletedTask;
-
-		/// <summary>
-		/// Called when binary data has been transmitted.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => Task.CompletedTask;
-
-		/// <summary>
-		/// Called when text has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public Task ReceiveText(DateTime Timestamp, string Text) => Task.CompletedTask;
-
-		/// <summary>
-		/// Called when text has been transmitted.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public Task TransmitText(DateTime Timestamp, string Text) => Task.CompletedTask;
 
 		/// <summary>
 		/// Called to inform the viewer of something.

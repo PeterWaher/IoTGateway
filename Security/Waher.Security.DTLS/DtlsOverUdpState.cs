@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Waher.Networking;
+using Waher.Events;
 using Waher.Security.DTLS.Events;
 
 namespace Waher.Security.DTLS

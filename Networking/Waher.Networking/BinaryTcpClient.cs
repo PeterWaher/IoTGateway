@@ -24,12 +24,12 @@ using System.Runtime.CompilerServices;
 
 namespace Waher.Networking
 {
-    /// <summary>
-    /// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
-    /// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
-    /// permitted pace.
-    /// </summary>
-    public class BinaryTcpClient : CommunicationLayer, IDisposable, IBinaryTransportLayer
+	/// <summary>
+	/// Implements a binary TCP Client, by encapsulating a <see cref="TcpClient"/>. It also makes the use of <see cref="TcpClient"/>
+	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
+	/// permitted pace.
+	/// </summary>
+	public class BinaryTcpClient : CommunicationLayer, IDisposable, IBinaryTransportLayer
 	{
 		private const int BufferSize = 65536;
 
@@ -44,6 +44,7 @@ namespace Waher.Networking
 #else
 		private readonly byte[] buffer = new byte[BufferSize];
 		private readonly TcpClient tcpClient;
+		private readonly Guid id = Guid.NewGuid();
 		private Stream stream = null;
 		private CancellationTokenSource cancelReading;
 #endif
@@ -103,6 +104,7 @@ namespace Waher.Networking
 #else
 			this.tcpClient = new TcpClient();
 			this.cancelReading = new CancellationTokenSource();
+			NetworkingModule.RegisterToken(this.id, this.cancelReading);
 #endif
 		}
 
@@ -169,6 +171,7 @@ namespace Waher.Networking
 			this.sniffBinary = SniffBinary;
 			this.tcpClient = Client;
 			this.cancelReading = new CancellationTokenSource();
+			NetworkingModule.RegisterToken(this.id, this.cancelReading);
 		}
 #endif
 
@@ -403,6 +406,7 @@ namespace Waher.Networking
 				{
 					this.disposing = true;
 					this.cancelReading.Cancel();
+					NetworkingModule.UnregisterToken(this.id);
 					Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
 					return;
 				}
@@ -485,7 +489,7 @@ namespace Waher.Networking
 			}
 		}
 
-		private async void BeginRead()	// Starts parallel task
+		private async void BeginRead()  // Starts parallel task
 		{
 			lock (this.synchObj)
 			{
@@ -512,7 +516,7 @@ namespace Waher.Networking
 				{
 					lock (this.synchObj)
 					{
-						if (this.disposing || this.disposed || this.cancelRead)
+						if (this.disposing || this.disposed || this.cancelRead || NetworkingModule.Stopping)
 							break;
 
 #if WINDOWS_UWP
@@ -539,7 +543,7 @@ namespace Waher.Networking
 #else
 					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.cancelReading.Token);
 #endif
-					if (this.disposing || this.disposed)
+					if (this.disposing || this.disposed || NetworkingModule.Stopping)
 						break;
 
 					if (NrRead <= 0)
@@ -583,7 +587,10 @@ namespace Waher.Networking
 						this.cancelRead = false;
 #if !WINDOWS_UWP
 						this.cancelReading.Dispose();
+						NetworkingModule.UnregisterToken(this.id);
+
 						this.cancelReading = new CancellationTokenSource();
+						NetworkingModule.RegisterToken(this.id, this.cancelReading);
 #endif
 						this.EmptyCancelQueueLocked();
 					}
@@ -1494,6 +1501,7 @@ namespace Waher.Networking
 					IAsyncAction _ = this.client.CancelIOAsync();
 #else
 					this.cancelReading.Cancel();
+					NetworkingModule.UnregisterToken(this.id);
 #endif
 				}
 				else

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.MQTT;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
@@ -119,7 +120,7 @@ namespace Waher.Things.Mqtt.Model
 		{
 			try
 			{
-				if (!(this.mqttClient is null))
+				if (!(this.mqttClient is null) && !NetworkingModule.Stopping)
 				{
 					MqttState State = this.mqttClient.State;
 					if (State == MqttState.Offline || State == MqttState.Error || State == MqttState.Authenticating)
@@ -213,12 +214,16 @@ namespace Waher.Things.Mqtt.Model
 
 					case MqttState.Error:
 						await this.node.LogErrorAsync("Error", "Connection to broker failed.");
-						await this.Reconnect();
+
+						if (!NetworkingModule.Stopping)
+							await this.Reconnect();
 						break;
 
 					case MqttState.Offline:
 						await this.node.LogErrorAsync("Offline", "Connection is closed.");
-						await this.Reconnect();
+
+						if (!!NetworkingModule.Stopping)
+							await this.Reconnect();
 						break;
 				}
 			}
@@ -281,9 +286,10 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private Task MqttClient_OnConnectionError(object Sender, Exception Exception)
+		private async Task MqttClient_OnConnectionError(object Sender, Exception Exception)
 		{
-			return this.Reconnect();
+			if (!NetworkingModule.Stopping)
+				await this.Reconnect();
 		}
 
 		private async Task Reconnect()
@@ -292,7 +298,7 @@ namespace Waher.Things.Mqtt.Model
 			{
 				this.connectionOk = false;
 
-				if (!(this.mqttClient is null))
+				if (!(this.mqttClient is null) && !NetworkingModule.Stopping)
 					await this.mqttClient.Reconnect();
 			}
 		}

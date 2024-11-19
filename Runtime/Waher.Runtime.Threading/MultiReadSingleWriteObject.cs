@@ -11,12 +11,50 @@ namespace Waher.Runtime.Threading
 	/// </summary>
 	public class MultiReadSingleWriteObject : IMultiReadSingleWriteObject, IDisposable
 	{
+#if DEBUG
+		private readonly string creatorStacktrace;
+#endif
+		private readonly object owner;
 		private LinkedList<TaskCompletionSource<bool>> noWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private readonly object synchObj = new object();
 		private long token = 0;
 		private int nrReaders = 0;
 		private bool isWriting = false;
+
+		/// <summary>
+		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
+		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
+		/// </summary>
+		/// <param name="Owner">Owner of object.</param>
+		public MultiReadSingleWriteObject(object Owner)
+			: this()
+		{
+			this.owner = Owner;
+		}
+
+		/// <summary>
+		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
+		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
+		/// </summary>
+		public MultiReadSingleWriteObject()
+		{
+#if DEBUG
+			this.creatorStacktrace = Environment.StackTrace;
+#endif
+		}
+
+		/// <summary>
+		/// Owner of object.
+		/// </summary>
+		public object Owner => this.owner;
+
+#if DEBUG
+		/// <summary>
+		/// Stack trace from creation of object.
+		/// </summary>
+		public string CreatorStacktrace => this.creatorStacktrace;
+#endif
 
 		/// <summary>
 		/// Number of concurrent readers.

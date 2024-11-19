@@ -235,7 +235,15 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			try
 			{
-				if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
+				if (NetworkingModule.Stopping)
+				{
+					this.server.RequestReceived(Request, From, null, null);
+					await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To,
+						ServiceUnavailableException.Code, ServiceUnavailableException.StatusMessage,
+						false, MaxChunkSize, new KeyValuePair<string, string>("Retry-After", "300"));
+					Result = false;
+				}
+				else if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
 				{
 					Request.Resource = Resource;
 

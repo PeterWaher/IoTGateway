@@ -13,6 +13,9 @@ using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Xml
 {
+	/// <summary>
+	/// Script extensions helping with convertsion of script results to XML.
+	/// </summary>
 	public static class Extensions
 	{
 		/// <summary>

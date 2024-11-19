@@ -35,27 +35,27 @@ using Waher.Security;
 
 namespace Waher.Networking.XMPP
 {
-    /// <summary>
-    /// Manages an XMPP client connection. Implements XMPP, as defined in
-    /// https://tools.ietf.org/html/rfc6120
-    /// https://tools.ietf.org/html/rfc6121
-    /// https://tools.ietf.org/html/rfc6122
-    /// 
-    /// Extensions supported directly by client object:
-    /// 
-    /// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
-    /// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
-    /// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
-    /// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
-    /// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
-    /// XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH): https://xmpp.org/extensions/xep-0124.html
-    /// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
-    /// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
-    /// XEP-0206: XMPP Over BOSH: https://xmpp.org/extensions/xep-0206.html
-    /// 
-    /// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
-    /// </summary>
-    public class XmppClient : CommunicationLayer, IDisposable, IHostReference
+	/// <summary>
+	/// Manages an XMPP client connection. Implements XMPP, as defined in
+	/// https://tools.ietf.org/html/rfc6120
+	/// https://tools.ietf.org/html/rfc6121
+	/// https://tools.ietf.org/html/rfc6122
+	/// 
+	/// Extensions supported directly by client object:
+	/// 
+	/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+	/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+	/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+	/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+	/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+	/// XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH): https://xmpp.org/extensions/xep-0124.html
+	/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
+	/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
+	/// XEP-0206: XMPP Over BOSH: https://xmpp.org/extensions/xep-0206.html
+	/// 
+	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+	/// </summary>
+	public class XmppClient : CommunicationLayer, IDisposable, IHostReference
 	{
 		/// <summary>
 		/// http://etherx.jabber.org/streams
@@ -585,7 +585,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="BareJid">Bare JID of connection.</param>
 		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter, string BareJid, 
+		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter, string BareJid,
 			Assembly AppAssembly, params ISniffer[] Sniffers)
 			: base(true, Sniffers)
 		{
@@ -3272,7 +3272,7 @@ namespace Waher.Networking.XMPP
 						Pwd = this.passwordHash;
 
 					await this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>" +
-						Convert.ToBase64String(this.encoding.GetBytes("\x00" + this.userName + "\x00" + Pwd)) + 
+						Convert.ToBase64String(this.encoding.GetBytes("\x00" + this.userName + "\x00" + Pwd)) +
 						"</auth>", null, null);
 				}
 				//else if (this.authenticationMechanisms.ContainsKey("ANONYMOUS"))
@@ -3747,7 +3747,7 @@ namespace Waher.Networking.XMPP
 		public Task<uint> SendIqSet(string To, string Xml, EventHandlerAsync<IqResultEventArgs> Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
 		{
-			return this.SendIq(null, To, Xml, "set", Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, 
+			return this.SendIq(null, To, Xml, "set", Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout,
 				DeliveryCallback);
 		}
 
@@ -3869,7 +3869,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
-		public Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State, 
+		public Task<uint> SendIq(string Id, string To, string Xml, string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State,
 			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
 		{
 			return this.SendIq(Id, To, Xml, Type, Callback, State, this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff,
@@ -5593,7 +5593,7 @@ namespace Waher.Networking.XMPP
 		private Task CallDeliveryCallback(EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool Ok)
 		{
 			if (Callback is null)
-				return Task.CompletedTask;	// Do not call Raise. null Callbacks are common, and should not result in a warning in sniffers.
+				return Task.CompletedTask;  // Do not call Raise. null Callbacks are common, and should not result in a warning in sniffers.
 			else
 				return Callback.Raise(this, new DeliveryEventArgs(State, Ok));
 		}
@@ -6990,8 +6990,13 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
-				if (!this.checkConnection.HasValue || !this.checkConnection.Value || this.disposed)
+				if (!this.checkConnection.HasValue ||
+					!this.checkConnection.Value ||
+					this.disposed ||
+					NetworkingModule.Stopping)
+				{
 					return;
+				}
 
 				if (DateTime.Now >= this.nextPing)
 				{
@@ -7029,7 +7034,9 @@ namespace Waher.Networking.XMPP
 							catch (Exception ex)
 							{
 								await this.Exception(ex);
-								await this.Reconnect();
+
+								if (!NetworkingModule.Stopping)
+									await this.Reconnect();
 							}
 						}
 					}
@@ -7039,7 +7046,9 @@ namespace Waher.Networking.XMPP
 						{
 							this.nextPing = DateTime.Now.AddSeconds(this.keepAliveSeconds);
 							await this.Warning("Reconnecting.");
-							await this.Reconnect();
+
+							if (!NetworkingModule.Stopping)
+								await this.Reconnect();
 						}
 						catch (Exception ex)
 						{
@@ -7139,7 +7148,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.pingResponse = true;
 
-			if (!e.Ok && !this.disposed)
+			if (!e.Ok && !this.disposed && !NetworkingModule.Stopping)
 			{
 				if (e.StanzaError is RecipientUnavailableException)
 				{

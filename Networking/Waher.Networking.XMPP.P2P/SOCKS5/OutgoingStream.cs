@@ -48,7 +48,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.isWriting = false;
 			this.done = false;
 			this.tempStream = new TemporaryStream();
-			this.syncObject = new MultiReadSingleWriteObject();
+			this.syncObject = new MultiReadSingleWriteObject(this);
 		}
 
 		/// <summary>

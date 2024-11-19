@@ -23,8 +23,11 @@
     <FileVersion>2.0.0</FileVersion>
     <Version>2.0.0</Version>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel.cssx" />
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel.png" />
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel.xml" />
@@ -67,6 +70,10 @@
 
   <ItemGroup>
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Theme.Base\Waher.Theme.Base.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

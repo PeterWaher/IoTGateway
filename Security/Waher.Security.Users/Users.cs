@@ -23,7 +23,7 @@ namespace Waher.Security.Users
 	public class Users : IUserSource
 	{
 		private static readonly Dictionary<string, User> users = new Dictionary<string, User>();
-		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
+		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject(typeof(Users));
 		private static readonly IUserSource source = new Users();
 		private static LoginAuditor loginAuditor = null;
 		private static HashComputationMethod hashMethod = null;

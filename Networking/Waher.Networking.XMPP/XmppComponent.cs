@@ -2662,7 +2662,7 @@ namespace Waher.Networking.XMPP
 								this.pingResponse = false;
 								await this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
 							}
-							else
+							else if (!NetworkingModule.Stopping)
 							{
 								try
 								{
@@ -2685,7 +2685,8 @@ namespace Waher.Networking.XMPP
 						if (this.HasSniffers)
 							await this.Exception(ex);
 
-						this.Reconnect();
+						if (!NetworkingModule.Stopping)
+							this.Reconnect();
 					}
 				}
 
@@ -2781,13 +2782,16 @@ namespace Waher.Networking.XMPP
 			{
 				if (e.StanzaError is RecipientUnavailableException)
 				{
-					try
+					if (!NetworkingModule.Stopping)
 					{
-						this.Reconnect();
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
+						try
+						{
+							this.Reconnect();
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
 					}
 				}
 				else

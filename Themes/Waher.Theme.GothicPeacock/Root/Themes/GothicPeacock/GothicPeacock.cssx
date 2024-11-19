@@ -1,6 +1,4 @@
-﻿@import url("../Base/Base.cssx");
-
-
+﻿¤PreprocessCssx(LoadFile(System.IO.Path.Combine(Waher.IoTGateway.Gateway.RootFolder,"Themes","Base","Base.cssx")))¤
 
 /* region Header*/
 

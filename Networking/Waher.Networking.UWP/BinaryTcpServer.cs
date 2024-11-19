@@ -30,9 +30,14 @@ namespace Waher.Networking
     public class BinaryTcpServer : CommunicationLayer, IDisposable
 	{
 		/// <summary>
-		/// Default Connection backlog (10).
+		/// Default Client-to-Client Connection backlog (10).
 		/// </summary>
-		public const int DefaultConnectionBacklog = 10;
+		public const int DefaultC2CConnectionBacklog = 10;
+
+		/// <summary>
+		/// Default Client-to-Server Connection backlog (100).
+		/// </summary>
+		public const int DefaultC2SConnectionBacklog = 100;
 
 		/// <summary>
 		/// Default buffer size (16384).
@@ -52,6 +57,7 @@ namespace Waher.Networking
 #endif
 		private Cache<Guid, ServerTcpConnection> connections;
 		private readonly object synchObj = new object();
+		private readonly bool c2s;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
 		private int port;
@@ -60,15 +66,18 @@ namespace Waher.Networking
 		/// Creates a TCP server, waiting for incoming connections. Encryption is not
 		/// initiated.
 		/// </summary>
+		/// <param name="C2S">If the listener is for a client-to-server protocol (true),
+		/// or a client-to-client protocol (false)</param>
 		/// <param name="Port">Port number.</param>
 		/// <param name="ActivityTimeout">Time before closing unused client connections.</param>
 		/// <param name="DecoupledEvents">If events raised from the communication 
 		/// layer are decoupled, i.e. executed in parallel with the source that raised 
 		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public BinaryTcpServer(int Port, TimeSpan ActivityTimeout, bool DecoupledEvents, ISniffer[] Sniffers)
+		public BinaryTcpServer(bool C2S, int Port, TimeSpan ActivityTimeout, bool DecoupledEvents, ISniffer[] Sniffers)
 			: base(DecoupledEvents, Sniffers)
 		{
+			this.c2s = C2S;
 #if !WINDOWS_UWP
 			this.tls = false;
 #endif
@@ -80,6 +89,8 @@ namespace Waher.Networking
 		/// Creates a TCP server, waiting for incoming connections. Encryption is
 		/// initiated for each connection request.
 		/// </summary>
+		/// <param name="C2S">If the listener is for a client-to-server protocol (true),
+		/// or a client-to-client protocol (false)</param>
 		/// <param name="Port">Port number.</param>
 		/// <param name="ActivityTimeout">Time before closing unused client connections.</param>
 		/// <param name="ServerCertificate">Server certificate.</param>
@@ -87,10 +98,11 @@ namespace Waher.Networking
 		/// layer are decoupled, i.e. executed in parallel with the source that raised 
 		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public BinaryTcpServer(int Port, TimeSpan ActivityTimeout, X509Certificate ServerCertificate, bool DecoupledEvents, ISniffer[] Sniffers)
+		public BinaryTcpServer(bool C2S, int Port, TimeSpan ActivityTimeout, X509Certificate ServerCertificate, bool DecoupledEvents, ISniffer[] Sniffers)
 			: base(DecoupledEvents, Sniffers)
 		{
 			this.serverCertificate = ServerCertificate;
+			this.c2s = C2S;
 			this.tls = !(this.serverCertificate is null);
 
 			this.Init(Port, ActivityTimeout);
@@ -113,6 +125,12 @@ namespace Waher.Networking
 			NetworkChange.NetworkAddressChanged += this.NetworkChange_NetworkAddressChanged;
 #endif
 		}
+
+		/// <summary>
+		/// If the listener is for a client-to-server protocol (true),
+		/// or a client-to-client protocol (false)
+		/// </summary>
+		public bool C2S => this.c2s;
 
 		private async void NetworkChange_NetworkAddressChanged(object sender
 #if !WINDOWS_UWP
@@ -317,7 +335,7 @@ namespace Waher.Networking
 								try
 								{
 									Listener = new TcpListener(UnicastAddress.Address, this.port);
-									Listener.Start(DefaultConnectionBacklog);
+									Listener.Start(this.c2s ? DefaultC2SConnectionBacklog : DefaultC2CConnectionBacklog);
 									Task T = this.ListenForIncomingConnections(Listener);
 
 									NrOpened++;
@@ -370,7 +388,6 @@ namespace Waher.Networking
 				this.connections.Clear();
 		}
 #endif
-
 		/// <summary>
 		/// Opens the server for incoming connection requests.
 		/// </summary>
@@ -465,6 +482,12 @@ namespace Waher.Networking
 			{
 				StreamSocket Client = args.Socket;
 
+				if (NetworkingModule.Stopping)
+				{
+					Client?.Dispose();
+					return;
+				}
+
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, this.DecoupledEvents);
 				BinaryTcpClient.Bind(true);
 				ServerTcpConnection Connection = new ServerTcpConnection(this, BinaryTcpClient);
@@ -520,7 +543,7 @@ namespace Waher.Networking
 		{
 			try
 			{
-				while (!this.closed)
+				while (!this.closed && !NetworkingModule.Stopping)
 				{
 					try
 					{
@@ -529,8 +552,11 @@ namespace Waher.Networking
 						try
 						{
 							Client = await Listener.AcceptTcpClientAsync();
-							if (this.closed)
+							if (this.closed || NetworkingModule.Stopping)
+							{
+								Client?.Dispose();
 								return;
+							}
 						}
 						catch (InvalidOperationException)
 						{

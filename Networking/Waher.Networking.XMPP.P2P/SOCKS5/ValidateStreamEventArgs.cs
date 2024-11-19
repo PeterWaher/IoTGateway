@@ -1,4 +1,5 @@
-﻿using Waher.Networking.XMPP.Events;
+﻿using Waher.Events;
+using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {

@@ -449,7 +449,8 @@ namespace Waher.Networking.HTTP
 			}
 
 			s2 = this.folderPath + s;
-			if (Found = !MustExist || File.Exists(s2))
+			Found = File.Exists(s2);
+			if (Found || !MustExist)
 				return s2;
 
 			i = s2.LastIndexOf('.');

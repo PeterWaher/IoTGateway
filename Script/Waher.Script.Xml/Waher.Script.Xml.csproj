@@ -26,8 +26,11 @@ https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 		<PackageIconUrl />
 	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

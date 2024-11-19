@@ -110,9 +110,9 @@
     <Compile Include="ClientCertificates.cs" />
     <Compile Include="CommunicationLayer.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
-    <Compile Include="EventHandlerExtensions.cs" />
     <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="ICommunicationLayer.cs" />
+    <Compile Include="NetworkingModule.cs" />
     <Compile Include="RowTcpClient.cs" />
     <Compile Include="ServerConnectionAcceptEventArgs.cs" />
     <Compile Include="ServerConnectionDataEventArgs.cs" />
@@ -170,6 +170,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
       <Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
       <Name>Waher.Runtime.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj">
       <Project>{1adfb1fd-e9fc-41e0-a3d4-d0db91adcd59}</Project>

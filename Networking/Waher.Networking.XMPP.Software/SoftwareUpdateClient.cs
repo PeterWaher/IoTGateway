@@ -61,6 +61,7 @@ namespace Waher.Networking.XMPP.Software
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ComponentAddress">Component XMPP Address.</param>
+		/// <param name="PackageFolder">Folder with package files.</param>
 		public SoftwareUpdateClient(XmppClient Client, string ComponentAddress, string PackageFolder)
 			: base(Client)
 		{

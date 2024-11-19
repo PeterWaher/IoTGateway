@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Networking.XMPP.HTTPX
 {

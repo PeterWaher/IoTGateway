@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -19,7 +18,7 @@ namespace Waher.Content.Markdown.Consolidation
 	{
 		private readonly string threadId;
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
-		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
+		private readonly MultiReadSingleWriteObject synchObject;
 		private readonly int maxPaletteSize;
 		private Dictionary<string, KeyValuePair<SKColor, int>> legend = null;
 		private DocumentType type = DocumentType.Empty;
@@ -36,6 +35,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="MaxPaletteSize">Maximum PaletteSize</param>
 		public Consolidator(string ThreadId, int MaxPaletteSize)
 		{
+			this.synchObject = new MultiReadSingleWriteObject(this);
 			this.threadId = ThreadId;
 			this.maxPaletteSize = MaxPaletteSize;
 		}

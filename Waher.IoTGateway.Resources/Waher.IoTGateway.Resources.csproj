@@ -24,7 +24,10 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
-  <ItemGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
     <None Remove="Default\400.md" />
     <None Remove="Default\401.md" />
     <None Remove="Default\402.md" />

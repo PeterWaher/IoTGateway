@@ -22,7 +22,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Default connection backlog (10).
 		/// </summary>
-		public const int DefaultBacklog = 10;
+		public const int DefaultBacklog = BinaryTcpServer.DefaultC2CConnectionBacklog;
 
 		private readonly LinkedList<KeyValuePair<IPEndPoint, byte[]>> writeQueue = new LinkedList<KeyValuePair<IPEndPoint, byte[]>>();
 		private TcpListener tcpListener;

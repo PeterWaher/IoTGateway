@@ -1508,6 +1508,8 @@ namespace Waher.IoTGateway
 					return 1;
 				else if (x is Runtime.Transactions.TransactionModule)
 					return 2;
+				else if (x is NetworkingModule)
+					return int.MaxValue;
 				else
 					return 3;
 			}
@@ -2088,6 +2090,7 @@ namespace Waher.IoTGateway
 				{
 					case "clrcompression.dll":
 					case "clretwrc.dll":
+					case "clrgc.dll":
 					case "clrjit.dll":
 					case "coreclr.dll":
 					case "dbgshim.dll":
@@ -2542,7 +2545,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				if (!stopped)
+				if (!stopped && !NetworkingModule.Stopping)
 				{
 					scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
@@ -2609,8 +2612,12 @@ namespace Waher.IoTGateway
 					immediateReconnect = connected;
 					connected = false;
 
-					if (immediateReconnect && !(xmppClient is null))
+					if (immediateReconnect &&
+						!(xmppClient is null) &&
+						!NetworkingModule.Stopping)
+					{
 						await xmppClient.Reconnect();
+					}
 					break;
 			}
 		}
@@ -4820,7 +4827,7 @@ namespace Waher.IoTGateway
 
 					if (!(Doc.Tag is MultiReadSingleWriteObject DocSynchObj))
 					{
-						DocSynchObj = new MultiReadSingleWriteObject();
+						DocSynchObj = new MultiReadSingleWriteObject(Doc);
 						Doc.Tag = DocSynchObj;
 					}
 

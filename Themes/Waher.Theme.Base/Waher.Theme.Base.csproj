@@ -5,11 +5,11 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Authors>Peter Waher</Authors>
+    <Authors>Peter Waher, Viggo Skjönsberg</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Contains theme files for the IoTGateway base theme.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
+    <Description>Contains base theme files used by other themes hosted on the IoTGateway.</Description>
+    <Copyright>Copyright © Waher Data AB 2024. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.Base</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
@@ -18,15 +18,20 @@
     <PackageTags>IoT Gateway Theme</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <FileVersion>2.0.0</FileVersion>
     <Version>2.0.0</Version>
     <PackageId>Waher.Theme.Base</PackageId>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+    <None Remove="Waher.Theme.Base.manifest" />
+  </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Waher.Theme.Base.manifest" />
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -39,6 +44,9 @@
 
   <ItemGroup>
     <Content Include="Root\Themes\Base\Base.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Waher.Theme.Base.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

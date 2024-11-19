@@ -130,6 +130,10 @@
     <EmbeddedResource Include="Properties\Waher.Content.Markdown.Web.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP.UWP\Waher.Networking.HTTP.UWP.csproj">
       <Project>{5d9d4910-b0d3-4510-a914-d49a548011c7}</Project>
       <Name>Waher.Networking.HTTP.UWP</Name>

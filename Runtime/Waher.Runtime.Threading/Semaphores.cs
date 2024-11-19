@@ -36,7 +36,7 @@ namespace Waher.Runtime.Threading
 				if (semaphores.TryGetValue(Key, out MultiReadSingleWriteObject Result))
 					return Result;
 
-				Result = new MultiReadSingleWriteObject();
+				Result = new MultiReadSingleWriteObject(Key);
 				semaphores[Key] = Result;
 
 				return Result;

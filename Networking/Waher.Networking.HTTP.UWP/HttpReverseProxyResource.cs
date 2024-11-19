@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
-using Waher.Networking.HTTP.HeaderFields;
+using Waher.Events;
 using Waher.Script;
 using Waher.Security;
 

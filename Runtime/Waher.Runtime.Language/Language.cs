@@ -104,18 +104,21 @@ namespace Waher.Runtime.Language
 					return Result;
 			}
 
-			foreach (Namespace Namespace in await Database.Find<Namespace>(new FilterAnd(
-				new FilterFieldEqualTo("LanguageId", this.objectId), new FilterFieldEqualTo("Name", Name))))
+			Namespace Namespace = await Database.FindFirstIgnoreRest<Namespace>(new FilterAnd(
+				new FilterFieldEqualTo("LanguageId", this.objectId), new FilterFieldEqualTo("Name", Name)));
+
+			if (!(Namespace is null))
 			{
 				lock (this.synchObject)
 				{
-					this.namespacesByName[Namespace.Name] = Namespace;
+					if (this.namespacesByName.TryGetValue(Name, out Namespace Result))
+						return Result;
+					else
+						this.namespacesByName[Namespace.Name] = Namespace;
 				}
-
-				return Namespace;
 			}
 
-			return null;
+			return Namespace;
 		}
 
 		/// <summary>
@@ -141,9 +144,12 @@ namespace Waher.Runtime.Language
 		{
 			if (!this.namespacesLoaded)
 			{
-				foreach (Namespace Namespace in await Database.Find<Namespace>(new FilterFieldEqualTo("Code", this.code)))
+				IEnumerable<Namespace> Namespaces = await Database.Find<Namespace>(
+					new FilterFieldEqualTo("LanguageId", this.objectId));
+
+				lock (this.synchObject)
 				{
-					lock (this.synchObject)
+					foreach (Namespace Namespace in Namespaces)
 					{
 						if (!this.namespacesByName.ContainsKey(Namespace.Name))
 							this.namespacesByName[Namespace.Name] = Namespace;
@@ -173,15 +179,18 @@ namespace Waher.Runtime.Language
 				return Result;
 			else
 			{
-				Result = new Namespace()
-				{
-					LanguageId = this.objectId,
-					Name = Name
-				};
-
 				lock (this.synchObject)
 				{
-					this.namespacesByName[this.code] = Result;
+					if (this.namespacesByName.TryGetValue(Name, out Result))
+						return Result;
+
+					Result = new Namespace()
+					{
+						LanguageId = this.objectId,
+						Name = Name
+					};
+
+					this.namespacesByName[Name] = Result;
 				}
 
 				await Database.Insert(Result);

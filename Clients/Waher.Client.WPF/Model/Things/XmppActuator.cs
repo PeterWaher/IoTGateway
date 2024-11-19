@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Control;

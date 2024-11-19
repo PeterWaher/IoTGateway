@@ -222,7 +222,7 @@ namespace Waher.Things.Modbus
 		#region TCP/IP connections
 
 		private readonly static Cache<string, ModbusTcpClient> clients = GetCache();
-		private readonly static MultiReadSingleWriteObject clientsSynchObject = new MultiReadSingleWriteObject();
+		private readonly static MultiReadSingleWriteObject clientsSynchObject = new MultiReadSingleWriteObject(typeof(ModbusGatewayNode));
 
 		private static Cache<string, ModbusTcpClient> GetCache()
 		{

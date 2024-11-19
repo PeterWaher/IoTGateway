@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
+using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;

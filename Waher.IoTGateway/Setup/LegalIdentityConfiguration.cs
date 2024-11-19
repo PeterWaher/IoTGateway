@@ -1005,14 +1005,24 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 
-			await this.ApplyId(Password, TabID, ProtectWithPassword, null);
+			await this.ApplyId(Password, TabID, ProtectWithPassword, false, null);
 		}
 
-		private async Task ApplyId(string Password, string TabID, bool ProtectWithPassword, TaskCompletionSource<bool> Response)
+		/// <summary>
+		/// Resends an identity application with the same properties as last time.
+		/// </summary>
+		/// <param name="Response">Task completion source where response will be returned.</param>
+		public Task Reapply(TaskCompletionSource<bool> Response)
+		{
+			return this.ApplyId(null, null, false, true, Response);
+		}
+
+		internal async Task ApplyId(string Password, string TabID, bool ProtectWithPassword, 
+			bool Reapplication, TaskCompletionSource<bool> Response)
 		{
 			await Gateway.ContractsClient.GenerateNewKeys();
 			await Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse,
-				new object[] { Password, TabID, ProtectWithPassword, Response });
+				new object[] { Password, TabID, ProtectWithPassword, Reapplication, Response });
 		}
 
 		private async Task ApplyResponse(object Sender, LegalIdentityEventArgs e)
@@ -1021,35 +1031,39 @@ namespace Waher.IoTGateway.Setup
 			string Password = (string)P[0];
 			string TabID = (string)P[1];
 			bool ProtectWithPassword = (bool)P[2];
-			TaskCompletionSource<bool> Response = (TaskCompletionSource<bool>)P[3];
+			bool Reapplication = (bool)P[3];
+			TaskCompletionSource<bool> Response = (TaskCompletionSource<bool>)P[4];
 
 			if (e.Ok)
 			{
-				this.protectWithPassword = ProtectWithPassword;
-
-				if (ProtectWithPassword)
+				if (!Reapplication)
 				{
-					Dictionary<string, AlternativeField> ById = new Dictionary<string, AlternativeField>();
+					this.protectWithPassword = ProtectWithPassword;
 
-					if (!(this.passwordHashes is null))
+					if (ProtectWithPassword)
 					{
-						foreach (AlternativeField H in this.passwordHashes)
-							ById[H.Key] = H;
+						Dictionary<string, AlternativeField> ById = new Dictionary<string, AlternativeField>();
+
+						if (!(this.passwordHashes is null))
+						{
+							foreach (AlternativeField H in this.passwordHashes)
+								ById[H.Key] = H;
+						}
+
+						ById[e.Identity.Id] = new AlternativeField(e.Identity.Id, this.CalcPasswordHash(e.Identity, Password));
+
+						AlternativeField[] Hashes = new AlternativeField[ById.Count];
+						ById.Values.CopyTo(Hashes, 0);
+
+						this.passwordHashes = Hashes;
 					}
 
-					ById[e.Identity.Id] = new AlternativeField(e.Identity.Id, this.CalcPasswordHash(e.Identity, Password));
+					this.Step = 1;
+					await Database.Update(this);
 
-					AlternativeField[] Hashes = new AlternativeField[ById.Count];
-					ById.Values.CopyTo(Hashes, 0);
-
-					this.passwordHashes = Hashes;
+					if (!string.IsNullOrEmpty(TabID))
+						await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
 				}
-
-				this.Step = 1;
-				await Database.Update(this);
-
-				if (!string.IsNullOrEmpty(TabID))
-					await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
 
 				await this.UpdateClients(e.Identity);
 
@@ -1737,7 +1751,7 @@ namespace Waher.IoTGateway.Setup
 			{
 				Task _ = Task.Delay(30000).ContinueWith(Prev => Result?.TrySetException(new TimeoutException()));
 
-				await this.ApplyId(Value, null, !string.IsNullOrEmpty(Value), Result);
+				await this.ApplyId(Value, null, !string.IsNullOrEmpty(Value), false, Result);
 
 				if (await Result.Task)
 					return true;

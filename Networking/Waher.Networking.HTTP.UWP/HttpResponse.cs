@@ -950,10 +950,7 @@ namespace Waher.Networking.HTTP
 				while (Pos < Len)
 				{
 					c = (int)Math.Min(BufSize, Len - Pos);
-
-					if (await f.ReadAsync(Buf, 0, c) != c)
-						throw new IOException("Unexpected end of file.");
-
+					await f.ReadAllAsync(Buf, 0, c);
 					await this.Write(Buf, 0, c);
 					Pos += c;
 				}

@@ -1736,7 +1736,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {
@@ -3785,7 +3786,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {
@@ -5939,7 +5941,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {
@@ -7988,7 +7991,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {
@@ -10142,7 +10146,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {
@@ -12191,7 +12196,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {
@@ -14345,7 +14351,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Inventory": "1.2.0"
         }
       },
       "Waher.Things/3.0.1": {

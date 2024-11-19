@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Content.Markdown.Latex.Multimedia
@@ -58,7 +59,7 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 						byte[] Bin = new byte[c];
 
 						f.Position = 0;
-						await f.ReadAsync(Bin, 0, c);
+						await f.ReadAllAsync(Bin, 0, c);
 
 						string FileName = await GetTemporaryFile(Bin);
 

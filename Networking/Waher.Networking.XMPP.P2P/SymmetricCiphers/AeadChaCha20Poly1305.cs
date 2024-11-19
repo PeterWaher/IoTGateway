@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Script.Functions.Scalar;
 using Waher.Security;
@@ -123,7 +124,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             
                 byte[] Mac = new byte[16];
             
-                await Data.ReadAsync(Mac, 0, 16);
+                await Data.ReadAllAsync(Mac, 0, 16);
 
                 Temp.Position = 0;
                 return await Acp.Decrypt(Temp, AssociatedData, Mac);

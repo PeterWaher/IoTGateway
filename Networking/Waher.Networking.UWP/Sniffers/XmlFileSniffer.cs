@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.Sniffers
 {
@@ -311,7 +312,7 @@ namespace Waher.Networking.Sniffers
 				int Len = (int)l;
 				byte[] Bin = new byte[Len];
 
-				await fs.ReadAsync(Bin, 0, Len);
+				await fs.ReadAllAsync(Bin, 0, Len);
 
 				return Bin;
 			}

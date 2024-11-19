@@ -624,8 +624,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								BufSize = (int)Count;
 							}
 
-							if (BufSize != await Data.ReadAsync(Buf, 0, BufSize))
-								throw new IOException("Unexpected end of file.");
+							await Data.ReadAllAsync(Buf, 0, BufSize);
 
 							Count -= BufSize;
 

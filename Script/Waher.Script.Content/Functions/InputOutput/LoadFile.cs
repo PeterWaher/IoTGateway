@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -123,16 +124,9 @@ namespace Waher.Script.Content.Functions.InputOutput
 
 			int Len = (int)l;
 			byte[] Bin = new byte[Len];
-			int Pos = 0;
-
-			while (Pos < Len)
-			{
-				int i = await fs.ReadAsync(Bin, Pos, Len - Pos);
-				if (i < 0)
-					throw new ScriptRuntimeException("Unexpected end of file.", this);
-
-				Pos += i;
-			}
+			
+			if (await fs.TryReadAllAsync(Bin, 0, Len) != Len)
+				throw new ScriptRuntimeException("Unexpected end of file.", this);
 
 			return Bin;
 		}

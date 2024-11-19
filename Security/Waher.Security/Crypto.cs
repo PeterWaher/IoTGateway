@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security
 {
@@ -44,8 +45,7 @@ namespace Waher.Security
 			while (l > 0)
 			{
 				j = (int)Math.Min(BufferSize, l);
-				if (await Source.ReadAsync(Input, 0, j) != j)
-					throw new IOException("Unexpected end of file.");
+				await Source.ReadAllAsync(Input, 0, j);
 
 				l -= j;
 				if (l <= 0)
@@ -80,7 +80,7 @@ namespace Waher.Security
 					if (DataLen < BufSize)
 						BufSize = (int)DataLen;
 
-					if (await From.ReadAsync(Buffer, 0, BufSize) != BufSize)
+					if (await From.TryReadAllAsync(Buffer, 0, BufSize) != BufSize)
 						return false;
 
 					await To.WriteAsync(Buffer, 0, BufSize);

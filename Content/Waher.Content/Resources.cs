@@ -191,7 +191,7 @@ namespace Waher.Content
 				int Len = (int)l;
 				byte[] Bin = new byte[Len];
 
-				await fs.ReadAsync(Bin, 0, Len);
+				await fs.ReadAllAsync(Bin, 0, Len);
 
 				return Bin;
 			}

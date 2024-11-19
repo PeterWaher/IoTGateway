@@ -109,8 +109,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				int Len = (int)File.Length;
 				byte[] Bin = new byte[Len];
-				if (await File.ReadAsync(Bin, 0, Len) != Len)
-					throw new IOException("Unable to read from file.");
+				await File.ReadAllAsync(Bin, 0, Len);
 
 				return await InternetContent.DecodeAsync(ContentType, Bin, Uri);
 			}
@@ -321,7 +320,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						ContentType = State.HttpResponse.ContentType;
 						State.File.Position = 0;
 						Data = new byte[Len];
-						await State.File.ReadAsync(Data, 0, Len);
+						await State.File.ReadAllAsync(Data, 0, Len);
 					}
 
 					throw GetExceptionObject(State.StatusCode, State.StatusMessage,

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 
@@ -680,12 +681,12 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			byte[] EncryptedKey = KeyLen > 0 ? new byte[KeyLen] : null;
 			byte[] Key;
 
-			if (await Data.ReadAsync(Signature, 0, SignatureLen) != SignatureLen)
+			if (await Data.TryReadAllAsync(Signature, 0, SignatureLen) != SignatureLen)
 				return null;
 
 			if (KeyLen > 0)
 			{
-				if (await Data.ReadAsync(EncryptedKey, 0, KeyLen) != KeyLen)
+				if (await Data.TryReadAllAsync(EncryptedKey, 0, KeyLen) != KeyLen)
 					return null;
 			}
 

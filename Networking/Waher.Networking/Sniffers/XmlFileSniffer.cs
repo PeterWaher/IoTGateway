@@ -305,16 +305,7 @@ namespace Waher.Networking.Sniffers
 		{
 			using (FileStream fs = File.OpenRead(FileName))
 			{
-				long l = fs.Length;
-				if (l > int.MaxValue)
-					throw new NotSupportedException("File too large.");
-
-				int Len = (int)l;
-				byte[] Bin = new byte[Len];
-
-				await fs.ReadAllAsync(Bin, 0, Len);
-
-				return Bin;
+				return await fs.ReadAllAsync();
 			}
 		}
 

@@ -3,51 +3,52 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Content.Functions.InputOutput
+namespace Waher.IoTGateway.ScriptExtensions.Functions
 {
 	/// <summary>
-	/// LoadFile(FileName)
+	/// LoadResourceFile(LocalResource)
 	/// </summary>
-	public class LoadFile : FunctionMultiVariate
+	public class LoadResourceFile : FunctionMultiVariate
 	{
 		/// <summary>
-		/// LoadFile(FileName)
+		/// LoadResourceFile(LocalResource)
 		/// </summary>
-		/// <param name="FileName">File name.</param>
+		/// <param name="LocalResource">File name.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public LoadFile(ScriptNode FileName, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { FileName }, argumentTypes1Scalar, Start, Length, Expression)
+		public LoadResourceFile(ScriptNode LocalResource, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { LocalResource }, argumentTypes1Scalar, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// LoadFile(FileName, ContentType)
+		/// LoadResourceFile(LocalResource, ContentType)
 		/// </summary>
-		/// <param name="FileName">File name.</param>
+		/// <param name="LocalResource">File name.</param>
 		/// <param name="ContentType">Content Type</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public LoadFile(ScriptNode FileName, ScriptNode ContentType, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { FileName, ContentType }, argumentTypes2Scalar, Start, Length, Expression)
+		public LoadResourceFile(ScriptNode LocalResource, ScriptNode ContentType, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { LocalResource, ContentType }, argumentTypes2Scalar, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(LoadFile);
+		public override string FunctionName => nameof(LoadResourceFile);
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "FileName", "ContentType" };
+		public override string[] DefaultArgumentNames => new string[] { "LocalResource", "ContentType" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -74,10 +75,11 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string FileName = Arguments[0].AssociatedObjectValue?.ToString();
+			string LocalResource = Arguments[0].AssociatedObjectValue?.ToString();
 			string ContentType;
 
-			FileName = Path.Combine(Directory.GetCurrentDirectory(), FileName);
+			if (!Gateway.HttpServer.TryGetFileName(LocalResource, true, out string FileName))
+				throw new ScriptRuntimeException("Unable to convert local resource to file name.", this);
 
 			if (Arguments.Length > 1)
 				ContentType = Arguments[1].AssociatedObjectValue?.ToString();
@@ -111,7 +113,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 				}
 			}
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
+			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(Gateway.GetUrl(LocalResource)));
 
 			return Expression.Encapsulate(Decoded);
 		}

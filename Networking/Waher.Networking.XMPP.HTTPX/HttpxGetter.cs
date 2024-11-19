@@ -107,9 +107,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (File.Length > int.MaxValue)
 					throw new OutOfMemoryException("Resource too large.");
 
-				int Len = (int)File.Length;
-				byte[] Bin = new byte[Len];
-				await File.ReadAllAsync(Bin, 0, Len);
+				byte[] Bin = await File.ReadAllAsync();
 
 				return await InternetContent.DecodeAsync(ContentType, Bin, Uri);
 			}
@@ -315,12 +313,9 @@ namespace Waher.Networking.XMPP.HTTPX
 						Data = null;
 					else
 					{
-						int Len = (int)State.File.Length;
-
 						ContentType = State.HttpResponse.ContentType;
 						State.File.Position = 0;
-						Data = new byte[Len];
-						await State.File.ReadAllAsync(Data, 0, Len);
+						Data = await State.File.ReadAllAsync();
 					}
 
 					throw GetExceptionObject(State.StatusCode, State.StatusMessage,

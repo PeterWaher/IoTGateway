@@ -323,11 +323,8 @@ namespace Waher.Networking.HTTP
 
 				if (Request.HasData)
 				{
-					int c = (int)Request.DataStream.Length;
 					Request.DataStream.Position = 0;
-
-					Data = new byte[c];
-					await Request.DataStream.ReadAllAsync(Data, 0, c);
+					Data = await Request.DataStream.ReadAllAsync();
 				}
 				else
 					Data = null;

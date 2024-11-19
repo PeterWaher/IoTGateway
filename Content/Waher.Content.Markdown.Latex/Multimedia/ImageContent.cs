@@ -55,12 +55,7 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 
 					using (TemporaryStream f = P.Value)
 					{
-						int c = (int)Math.Min(int.MaxValue, f.Length);
-						byte[] Bin = new byte[c];
-
-						f.Position = 0;
-						await f.ReadAllAsync(Bin, 0, c);
-
+						byte[] Bin = await f.ReadAllAsync();
 						string FileName = await GetTemporaryFile(Bin);
 
 						if (AloneInParagraph)

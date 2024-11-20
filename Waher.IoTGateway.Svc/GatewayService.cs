@@ -13,6 +13,7 @@ using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.Persistence;
 using Waher.Runtime.Console;
+using Waher.Runtime.Inventory;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -68,6 +69,7 @@ namespace Waher.IoTGateway.Svc
 					try
 					{
 						Started = Gateway.Start(false, true, Program.InstanceName).Result;
+						Types.SetModuleParameter("SERVICE_NAME", this.ServiceName);
 					}
 					finally
 					{

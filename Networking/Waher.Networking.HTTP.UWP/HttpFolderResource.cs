@@ -8,6 +8,7 @@ using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
+using System.Linq.Expressions;
 
 namespace Waher.Networking.HTTP
 {
@@ -449,8 +450,8 @@ namespace Waher.Networking.HTTP
 			}
 
 			s2 = this.folderPath + s;
-			Found = File.Exists(s2);
-			if (Found || !MustExist)
+			Found = !MustExist || File.Exists(s2);
+			if (Found)
 				return s2;
 
 			i = s2.LastIndexOf('.');

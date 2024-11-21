@@ -14,7 +14,7 @@
 				<ExePackagePayload Name="dotnet-runtime-8.0.11-win-x64.exe" SourceFile="..\..\dotnet-runtime-8.0.11-win-x64.exe" />
 			</ExePackage>
 			<!--<MsiPackage SourceFile="C:\Downloads\graphviz-2.38.msi" DisplayName="GraphViz 2.38" Description="Renders diagrams." DisplayInternalUI="yes"/>-->
-			<MsiPackage SourceFile="..\Waher.IoTGateway.Win32\bin\x86\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
+			<MsiPackage SourceFile="..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
 									bal:DisplayInternalUICondition="1">
 				<MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service" />
 				<MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway." />

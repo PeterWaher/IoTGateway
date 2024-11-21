@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 
@@ -36,7 +37,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 			return mgr;
 		}
 
-		public ServiceHandle CreateService(string serviceName, string displayName, string binaryPath, ServiceType serviceType, ServiceStartType startupType, ErrorSeverity errorSeverity, Win32ServiceCredentials credentials)
+		public ServiceHandle CreateService(string serviceName, string displayName, string binaryPath, 
+			ServiceType serviceType, ServiceStartType startupType, ErrorSeverity errorSeverity, Win32ServiceCredentials credentials)
 		{
 			ServiceHandle service = Win32.CreateServiceW(this, serviceName, displayName, ServiceControlAccessRights.All, serviceType, startupType, errorSeverity,
 				binaryPath, null, IntPtr.Zero, null, credentials.UserName, credentials.Password);

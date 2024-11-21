@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.ServiceProcess;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 
@@ -14,7 +15,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		protected override bool ReleaseHandle()
 		{
-			return Win32.CloseServiceHandle(handle);
+			return Win32.CloseServiceHandle(this.handle);
 		}
 
 		public override bool IsInvalid
@@ -22,7 +23,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 			[System.Security.SecurityCritical]
 			get
 			{
-				return handle == IntPtr.Zero;
+				return this.handle == IntPtr.Zero;
 			}
 		}
 
@@ -45,7 +46,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void SetDescription(string description)
 		{
-			ServiceDescriptionInfo descriptionInfo = new ServiceDescriptionInfo(description ?? string.Empty);
+			ServiceDescriptionInfo descriptionInfo = new(description ?? string.Empty);
 			IntPtr lpDescriptionInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceDescriptionInfo>());
 			try
 			{
@@ -91,7 +92,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void SetFailureActionFlag(bool enabled)
 		{
-			ServiceFailureActionsFlag failureActionsFlag = new ServiceFailureActionsFlag(enabled);
+			ServiceFailureActionsFlag failureActionsFlag = new(enabled);
 			IntPtr lpFailureActionsFlag = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceFailureActionsFlag>());
 			try
 			{

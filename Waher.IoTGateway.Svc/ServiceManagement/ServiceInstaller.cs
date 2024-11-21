@@ -1,9 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.ServiceProcess;
+using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement.Classes;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.IoTGateway.Svc.ServiceManagement.Structures;
+using static Waher.IoTGateway.Svc.ServiceManagement.Win32;
+
+#pragma warning disable CA1416 // Validate platform compatibility
 
 namespace Waher.IoTGateway.Svc.ServiceManagement
 {
@@ -102,6 +110,83 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						else
 							svc.SetFailureActionFlag(false);
 
+						try
+						{
+							// Attempt to give the local service account access rights to start
+							// the service. This will be used by the update procedure to trigger
+							// a start of the service after installation has completed.
+
+							using ServiceController Service = new(this.serviceName);
+
+							bool HandleRetrieved = false;
+							Service.ServiceHandle.DangerousAddRef(ref HandleRetrieved);
+
+							try
+							{
+								IntPtr ServiceHandle = Service.ServiceHandle.DangerousGetHandle();
+
+								QueryServiceObjectSecurity(ServiceHandle, SecurityInfos.DiscretionaryAcl, null, 0, out uint Size);
+
+								if (Size <= 0 || Size > int.MaxValue)
+									throw new Exception("Unable to get Service Security Object");
+
+								byte[] Buffer = new byte[Size];
+								if (!QueryServiceObjectSecurity(ServiceHandle, SecurityInfos.DiscretionaryAcl, Buffer, Size, out Size))
+									throw new Win32Exception(Marshal.GetLastWin32Error());
+
+								RawSecurityDescriptor Descriptor = new(Buffer, 0);
+
+								if (Descriptor.DiscretionaryAcl is not null)
+								{
+									int i = 0;
+									bool Found = false;
+
+									foreach (object Item in Descriptor.DiscretionaryAcl)
+									{
+										if (Item is CommonAce Ace)
+										{
+											if (Ace.SecurityIdentifier.IsWellKnown(WellKnownSidType.LocalServiceSid))
+											{
+												if (Ace.AceQualifier != AceQualifier.AccessAllowed || (Ace.AccessMask & (int)ServiceAccessRights.Start) == 0)
+													Descriptor.DiscretionaryAcl.RemoveAce(i);
+												else
+												{
+													Found = true;
+													break;
+												}
+											}
+										}
+
+										i++;
+									}
+
+									if (!Found)
+									{
+										SecurityIdentifier LocalServiceSid = new(WellKnownSidType.LocalServiceSid, null);
+										CommonAce LocalServiceAce = new(AceFlags.None, AceQualifier.AccessAllowed, (int)ServiceAccessRights.Start, LocalServiceSid, false, null);
+										Descriptor.DiscretionaryAcl.InsertAce(Descriptor.DiscretionaryAcl.Count, LocalServiceAce);
+
+										int Len = Descriptor.BinaryLength;
+										byte[] Bin = new byte[Len];
+
+										Descriptor.GetBinaryForm(Bin, 0);
+
+										if (!SetServiceObjectSecurity(ServiceHandle, SecurityInfos.DiscretionaryAcl, Bin))
+											throw new Win32Exception(Marshal.GetLastWin32Error());
+									}
+								}
+							}
+							finally
+							{
+								if (HandleRetrieved)
+									Service.ServiceHandle.DangerousRelease();
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
+
 						if (StartImmediately)
 						{
 							svc.Start();
@@ -156,3 +241,5 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 	}
 }
+
+#pragma warning restore CA1416 // Validate platform compatibility

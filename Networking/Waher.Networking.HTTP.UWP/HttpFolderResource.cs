@@ -8,7 +8,6 @@ using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
-using System.Linq.Expressions;
 
 namespace Waher.Networking.HTTP
 {

@@ -20,7 +20,6 @@ using System.Security.Cryptography.X509Certificates;
 #endif
 using Waher.Events;
 using Waher.Networking.Sniffers;
-using System.Runtime.CompilerServices;
 
 namespace Waher.Networking
 {

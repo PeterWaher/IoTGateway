@@ -1086,7 +1086,7 @@ namespace Waher.Networking.HTTP
 							", Trust Certificates: " + TrustCertificates.ToString() + ")");
 					}
 
-					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
+					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls, 
 						ClientCertificates, null, TrustCertificates);
 
 					if (this.HasSniffers)

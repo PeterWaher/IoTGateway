@@ -20,7 +20,7 @@ using System.Security.Cryptography.X509Certificates;
 #endif
 using Waher.Events;
 using Waher.Networking.Sniffers;
-using System.Runtime.CompilerServices;
+using Waher.Security;
 
 namespace Waher.Networking
 {
@@ -1347,7 +1347,7 @@ namespace Waher.Networking
 		/// <param name="ServerCertificate">Server certificate.</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate)
 		{
-			return this.UpgradeToTlsAsServer(ServerCertificate, SslProtocols.Tls12, ClientCertificates.Optional, null, false);
+			return this.UpgradeToTlsAsServer(ServerCertificate, Crypto.SecureTls, ClientCertificates.Optional, null, false);
 		}
 
 		/// <summary>

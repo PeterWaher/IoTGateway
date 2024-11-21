@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
+using Waher.Security;
+
 
 #if WINDOWS_UWP
 using Windows.Networking;
@@ -654,7 +656,7 @@ namespace Waher.Networking
 			{
 				await this.Information("Switching to TLS.");
 
-				await Connection.Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
+				await Connection.Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
 					this.clientCertificates, null, this.trustClientCertificates);
 
 				if (this.HasSniffers)

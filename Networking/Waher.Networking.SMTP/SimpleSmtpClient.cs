@@ -14,6 +14,7 @@ using Waher.Content.Text;
 using Waher.Networking.SASL;
 using Waher.Networking.SMTP.Exceptions;
 using Waher.Networking.Sniffers;
+using Waher.Security;
 
 namespace Waher.Networking.SMTP
 {
@@ -382,7 +383,7 @@ namespace Waher.Networking.SMTP
 				await this.client.PauseReading();
 
 				await this.Information("Starting TLS handshake.");
-				await this.client.UpgradeToTlsAsClient(null, SslProtocols.Tls12, this.trustCertificate);
+				await this.client.UpgradeToTlsAsClient(null, Crypto.SecureTls, this.trustCertificate);
 				await this.Information("TLS handshake complete.");
 				this.client.Continue();
 

@@ -1557,7 +1557,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -1641,7 +1642,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -3787,7 +3789,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -3871,7 +3874,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -6122,7 +6126,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -6206,7 +6211,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -8352,7 +8358,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -8436,7 +8443,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -10687,7 +10695,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -10771,7 +10780,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -12917,7 +12927,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -13001,7 +13012,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -15252,7 +15264,8 @@
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Temporary": "1.0.2",
-          "Waher.Script": "2.9.0"
+          "Waher.Script": "2.9.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Content.Emoji/2.0.2": {
@@ -15336,7 +15349,8 @@
           "Waher.Runtime.Console": "1.0.1",
           "Waher.Runtime.Inventory": "1.2.0",
           "Waher.Runtime.Queue": "2.0.0",
-          "Waher.Runtime.Threading": "2.0.0"
+          "Waher.Runtime.Threading": "2.0.0",
+          "Waher.Security": "1.0.11"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {

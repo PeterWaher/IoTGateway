@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
@@ -11,6 +12,16 @@ namespace Waher.Security
 	/// </summary>
 	public static class Crypto
 	{
+		/// <summary>
+		/// TLS 1.2 &amp; 1.3
+		/// </summary>
+		public const SslProtocols SecureTls = (SslProtocols)((int)SslProtocols.Tls12 | 12288 /* TLS 1.3 */);
+
+		/// <summary>
+		/// TLS 1.0, 1.1, 1.2 &amp; 1.3
+		/// </summary>
+		public const SslProtocols TlsOnly = (SslProtocols)((int)SslProtocols.Tls | (int)SslProtocols.Tls11 | (int)SslProtocols.Tls12 | 12288 /* TLS 1.3 */);
+
 		/// <summary>
 		/// Transforms a stream of data.
 		/// </summary>

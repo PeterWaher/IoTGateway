@@ -8,6 +8,7 @@ using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
+using Waher.Security;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
@@ -83,7 +84,7 @@ namespace Waher.Things.Ip
 			await Client.ConnectAsync(this.Host, this.port);
 
 			if (this.tls)
-				await Client.UpgradeToTlsAsClient(System.Security.Authentication.SslProtocols.Tls12);
+				await Client.UpgradeToTlsAsClient(Crypto.SecureTls);
 
 			return Client;
 		}
@@ -103,7 +104,7 @@ namespace Waher.Things.Ip
 			await Client.ConnectAsync(this.Host, this.port);
 
 			if (this.tls)
-				await Client.UpgradeToTlsAsClient(System.Security.Authentication.SslProtocols.Tls12);
+				await Client.UpgradeToTlsAsClient(Crypto.SecureTls);
 
 			return Client;
 		}

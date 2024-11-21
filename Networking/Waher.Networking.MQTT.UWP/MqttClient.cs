@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Security;
+
 
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -185,7 +187,7 @@ namespace Waher.Networking.MQTT
 #if WINDOWS_UWP
 					await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
-					await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
+					await this.client.UpgradeToTlsAsClient(this.clientCertificate, Crypto.SecureTls, this.trustServer);
 #endif
 					this.client.Continue();
 				}

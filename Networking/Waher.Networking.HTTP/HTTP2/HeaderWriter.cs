@@ -6,27 +6,6 @@ using System.Text;
 namespace Waher.Networking.HTTP.HTTP2
 {
 	/// <summary>
-	/// How labels are serialized with regards to indexing.
-	/// </summary>
-	public enum IndexMode : byte
-	{
-		/// <summary>
-		/// Indexed (§6.2.1 in RFC 7541)
-		/// </summary>
-		Indexed,
-
-		/// <summary>
-		/// Not indexed (§6.2.2 in RFC 7541)
-		/// </summary>
-		NotIndexed,
-
-		/// <summary>
-		/// Never indexed (§6.2.3 in RFC 7541)
-		/// </summary>
-		NeverIndexed
-	}
-
-	/// <summary>
 	/// Generates HTTP/2 headers.
 	/// </summary>
 	public class HeaderWriter
@@ -115,7 +94,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{ "via", new StaticRecord[] { new StaticRecord(60) } },
 			{ "www-authenticate", new StaticRecord[] { new StaticRecord(61) } }
 		};
-		private const int firstDynamicHeaderIndex = 62;
+		private const int lastStaticHeaderIndex = 61;
 
 		private class StaticRecord
 		{
@@ -420,40 +399,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		private uint maxDynamicHeaderSize;
 		private uint dynamicHeaderSize = 0;
 		private uint nrDynamicRecords = 0;
-		private ulong nrHeadersEvicted = 0;
-		private ulong nrHeadersCreated = firstDynamicHeaderIndex;
+		private ulong nrHeadersCreated = 0;
 		private uint pos = 0;
 		private byte bitsLeft = 8;
 		private byte current = 0;
-
-		private class DynamicHeader
-		{
-			public readonly string Header;
-			public readonly ulong Ordinal;
-			public readonly Dictionary<string, DynamicRecord> Values = new Dictionary<string, DynamicRecord>();
-
-			public DynamicHeader(string Header, ulong Ordinal)
-			{
-				this.Header = Header;
-				this.Ordinal = Ordinal;
-			}
-		}
-
-		private class DynamicRecord
-		{
-			public readonly DynamicHeader Header;
-			public readonly string Value;
-			public readonly ulong Ordinal;
-			public uint Length;
-
-			public DynamicRecord(DynamicHeader Header, string Value, uint Length, ulong Ordinal)
-			{
-				this.Header = Header;
-				this.Value = Value;
-				this.Length = Length;
-				this.Ordinal = Ordinal;
-			}
-		}
 
 		/// <summary>
 		/// Generates HTTP/2 headers.
@@ -498,6 +447,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		public uint MaxDynamicHeaderSize => this.maxDynamicHeaderSize;
 
 		/// <summary>
+		/// Gets a copy of available dynamic records
+		/// </summary>
+		public DynamicRecord[] GetDynamicRecords()
+		{
+			DynamicRecord[] Records = new DynamicRecord[this.nrDynamicRecords];
+			this.dynamicRecords.CopyTo(Records, 0);
+			return Records;
+		}
+
+		/// <summary>
 		/// Flushes any remaining bits.
 		/// </summary>
 		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
@@ -527,8 +486,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.Reset();
 			this.dynamicHeaders.Clear();
 			this.dynamicRecords.Clear();
-			this.nrHeadersEvicted = 0;
-			this.nrHeadersCreated = firstDynamicHeaderIndex;
+			this.nrHeadersCreated = 0;
 			this.dynamicHeaderSize = 0;
 		}
 
@@ -711,7 +669,6 @@ namespace Waher.Networking.HTTP.HTTP2
 					return;
 
 				this.dynamicRecords.RemoveLast();
-				this.nrHeadersEvicted++;
 				this.nrDynamicRecords--;
 
 				if (DynamicRecord.Header.Values.Remove(DynamicRecord.Value) &&
@@ -724,6 +681,18 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
+		private DynamicRecord AddToDynamicIndex(DynamicHeader Header, string Value)
+		{
+			ulong Index = this.nrHeadersCreated++;
+
+			DynamicRecord DynamicRecord = new DynamicRecord(Header, Value, 32, Index);
+			this.dynamicRecords.AddFirst(DynamicRecord);
+			this.nrDynamicRecords++;
+			Header.Values[Value] = DynamicRecord;
+
+			return DynamicRecord;
+		}
+
 		private DynamicRecord AddToDynamicIndex(string Header, string Value)
 		{
 			ulong Index = this.nrHeadersCreated++;
@@ -734,6 +703,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			DynamicRecord DynamicRecord = new DynamicRecord(DynamicHeader, Value, 32, Index);
 			this.dynamicRecords.AddFirst(DynamicRecord);
 			this.nrDynamicRecords++;
+			DynamicHeader.Values[Value] = DynamicRecord;
 
 			return DynamicRecord;
 		}
@@ -748,11 +718,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
 		public bool WriteHeader(string Header, string Value, IndexMode Mode, bool Huffman)
 		{
+			DynamicHeader DynamicHeader;
 			DynamicRecord DynamicRecord;
 			ulong Index;
 			uint c;
 
-			 if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
+			if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
 				this.TrimDynamicHeaders();
 
 			Header = Header.ToLower();
@@ -778,12 +749,26 @@ namespace Waher.Networking.HTTP.HTTP2
 				Rec = Records[0];
 				Index = Rec.Index;
 
+				if (this.dynamicHeaders.TryGetValue(Header, out DynamicHeader) &&
+					DynamicHeader.Values.TryGetValue(Value, out DynamicRecord))
+				{
+					if (!this.WriteBit(true))
+						return false;
+
+					Index = lastStaticHeaderIndex + this.nrHeadersCreated - DynamicRecord.Ordinal;
+					return this.WriteBits(Index, 7);
+				}
+
 				if (Mode == IndexMode.Indexed)
 				{
 					if (Rec.Length == 0)
 						Rec.Length = (uint)Encoding.UTF8.GetBytes(Header).Length;
 
-					DynamicRecord = this.AddToDynamicIndex(Header, Value);
+					if (DynamicHeader is null)
+						DynamicRecord = this.AddToDynamicIndex(Header, Value);
+					else
+						DynamicRecord = this.AddToDynamicIndex(DynamicHeader, Value);
+
 					DynamicRecord.Length += Rec.Length;
 				}
 				else
@@ -791,20 +776,24 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 			else
 			{
-				if (this.dynamicHeaders.TryGetValue(Header, out DynamicHeader DynamicHeader))
+				if (this.dynamicHeaders.TryGetValue(Header, out DynamicHeader))
 				{
 					if (DynamicHeader.Values.TryGetValue(Value, out DynamicRecord))
 					{
 						if (!this.WriteBit(true))
 							return false;
 
-						Index = DynamicRecord.Ordinal - this.nrHeadersEvicted;
+						Index = lastStaticHeaderIndex + this.nrHeadersCreated - DynamicRecord.Ordinal;
 						return this.WriteBits(Index, 7);
 					}
 					else
 					{
-						Index = DynamicHeader.Ordinal - this.nrHeadersEvicted;
-						DynamicRecord = null;
+						Index = lastStaticHeaderIndex + this.nrHeadersCreated - DynamicHeader.Ordinal;
+
+						if (Mode == IndexMode.Indexed)
+							DynamicRecord = this.AddToDynamicIndex(DynamicHeader, Value);
+						else
+							DynamicRecord = null;
 					}
 				}
 				else

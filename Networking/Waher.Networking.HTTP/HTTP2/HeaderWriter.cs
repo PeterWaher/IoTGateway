@@ -6,7 +6,8 @@ using System.Text;
 namespace Waher.Networking.HTTP.HTTP2
 {
 	/// <summary>
-	/// Generates HTTP/2 headers.
+	/// Generates HTTP/2 headers using HPACK, defined in RFC 7541.
+	/// https://datatracker.ietf.org/doc/html/rfc7541
 	/// </summary>
 	public class HeaderWriter
 	{
@@ -391,6 +392,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly LinkedList<DynamicRecord> dynamicRecords = new LinkedList<DynamicRecord>();
 		private readonly uint bufferSize;
 		private readonly byte[] buffer;
+		private readonly uint maxDynamicHeaderSizeLimit;
 		private uint maxDynamicHeaderSize;
 		private uint dynamicHeaderSize = 0;
 		private uint nrDynamicRecords = 0;
@@ -400,15 +402,29 @@ namespace Waher.Networking.HTTP.HTTP2
 		private byte current = 0;
 
 		/// <summary>
-		/// Generates HTTP/2 headers.
+		/// Generates HTTP/2 headers using HPACK, defined in RFC 7541.
+		/// https://datatracker.ietf.org/doc/html/rfc7541
 		/// </summary>
 		/// <param name="BufferSize">Size of binary buffer.</param>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
 		public HeaderWriter(uint BufferSize, uint MaxDynamicHeaderSize)
+			: this(BufferSize, MaxDynamicHeaderSize, MaxDynamicHeaderSize)
+		{
+		}
+
+		/// <summary>
+		/// Generates HTTP/2 headers using HPACK, defined in RFC 7541.
+		/// https://datatracker.ietf.org/doc/html/rfc7541
+		/// </summary>
+		/// <param name="BufferSize">Size of binary buffer.</param>
+		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
+		/// <param name="MaxDynamicHeaderSizeLimit">Upper limit of the maximum dynamic header size.</param>
+		public HeaderWriter(uint BufferSize, uint MaxDynamicHeaderSize, uint MaxDynamicHeaderSizeLimit)
 		{
 			this.bufferSize = BufferSize;
 			this.buffer = new byte[this.bufferSize];
 			this.maxDynamicHeaderSize = MaxDynamicHeaderSize;
+			this.maxDynamicHeaderSizeLimit = MaxDynamicHeaderSizeLimit;
 		}
 
 		/// <summary>
@@ -440,6 +456,28 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Maximum size of dynamic header.
 		/// </summary>
 		public uint MaxDynamicHeaderSize => this.maxDynamicHeaderSize;
+
+		/// <summary>
+		/// Upper limit of the Maximum size of dynamic header (SETTINGS_HEADER_TABLE_SIZE).
+		/// </summary>
+		public uint MaxDynamicHeaderSizeLimit => this.maxDynamicHeaderSizeLimit;
+
+		/// <summary>
+		/// Updates the maximum dynamic header size, and trims the dynamic header table.
+		/// </summary>
+		/// <param name="MaxDynamicHeaderSize">New Maximum size of the dynamic header.</param>
+		/// <returns>If change was applied (true), or if the request was rejected because
+		/// it surpassed the upper limit (false).</returns>
+		public bool UpdateMaxDynamicHeaderSize(uint MaxDynamicHeaderSize)
+		{
+			if (MaxDynamicHeaderSize > this.maxDynamicHeaderSizeLimit)
+				return false;
+
+			this.maxDynamicHeaderSize = MaxDynamicHeaderSize;
+			this.TrimDynamicHeaders();
+
+			return true;
+		}
 
 		/// <summary>
 		/// Gets a copy of available dynamic records

@@ -98,16 +98,16 @@ namespace Waher.Networking.HTTP.HTTP2
 
 		private class StaticRecord
 		{
-			public readonly uint Index;
+			public readonly byte Index;
 			public readonly string Value;
 			public uint Length = 0;
 
-			public StaticRecord(uint Index)
+			public StaticRecord(byte Index)
 				: this(Index, null)
 			{
 			}
 
-			public StaticRecord(uint Index, string Value)
+			public StaticRecord(byte Index, string Value)
 			{
 				this.Index = Index;
 				this.Value = Value;
@@ -375,11 +375,6 @@ namespace Waher.Networking.HTTP.HTTP2
 			new HuffmanRecord(0x3fffffff, 30)
 		};
 
-		/// <summary>
-		/// End of string code.
-		/// </summary>
-		private const int EOS = 256;
-
 		private class HuffmanRecord
 		{
 			public readonly uint Value;
@@ -462,8 +457,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
 		public bool Flush()
 		{
+			if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
+				this.TrimDynamicHeaders();
+
 			if (this.bitsLeft < 8)
-				return this.WriteBits(0, this.bitsLeft);
+				return this.WriteByteBits(0, this.bitsLeft);
 			else
 				return true;
 		}
@@ -521,25 +519,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Bits">Bits to write.</param>
 		/// <param name="NrBits">Number of bits to write.</param>
 		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
-		public bool WriteBits(ulong Bits, byte NrBits)
+		public bool WriteByteBits(byte Bits, byte NrBits)
 		{
 			if (NrBits <= 0)
 				throw new ArgumentException("Must be positive.", nameof(NrBits));
 
-			byte n;
+			Bits &= bitMasks[NrBits];
 
-			while (NrBits > 0)
+			if (NrBits <= this.bitsLeft)
 			{
-				if (NrBits > this.bitsLeft)
-					n = this.bitsLeft;
-				else
-					n = NrBits;
+				this.current <<= NrBits;
+				this.current |= Bits;
 
-				this.current <<= n;
-				this.current |= (byte)(Bits & bitMasks[n]);
-				Bits >>= n;
-				NrBits -= n;
-				this.bitsLeft -= n;
+				this.bitsLeft -= NrBits;
 				if (this.bitsLeft <= 0)
 				{
 					if (this.pos >= this.bufferSize)
@@ -550,8 +542,98 @@ namespace Waher.Networking.HTTP.HTTP2
 					this.current = 0;
 				}
 			}
+			else
+			{
+				byte n = (byte)(Bits >> (NrBits - this.bitsLeft));
+				NrBits -= this.bitsLeft;
+				Bits &= bitMasks[NrBits];
+
+				this.current <<= this.bitsLeft;
+				this.current |= n;
+
+				if (this.pos >= this.bufferSize)
+					return false;
+
+				this.buffer[this.pos++] = this.current;
+				this.bitsLeft = (byte)(8 - NrBits);
+				this.current = Bits;
+			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Writes a set of bits.
+		/// </summary>
+		/// <param name="Bits">Bits to write.</param>
+		/// <param name="NrBits">Number of bits to write.</param>
+		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
+		public bool WriteUIntBits(uint Bits, byte NrBits)
+		{
+			if (NrBits <= 0)
+				throw new ArgumentException("Must be positive.", nameof(NrBits));
+
+			if (NrBits <= 8)
+				return this.WriteByteBits((byte)Bits, NrBits);
+
+			byte b1 = (byte)Bits;
+
+			if (NrBits > 8)
+			{
+				Bits >>= 8;
+				byte b2 = (byte)Bits;
+
+				if (NrBits > 16)
+				{
+					Bits >>= 8;
+					byte b3 = (byte)Bits;
+
+					if (NrBits > 24)
+					{
+						Bits >>= 8;
+						byte b4 = (byte)Bits;
+
+						NrBits &= 7;
+						if (NrBits == 0)
+							NrBits = 8;
+
+						if (!this.WriteByteBits(b4, NrBits))
+							return false;
+
+						NrBits = 8;
+					}
+					else
+					{
+						NrBits &= 7;
+						if (NrBits == 0)
+							NrBits = 8;
+					}
+
+					if (!this.WriteByteBits(b3, NrBits))
+						return false;
+
+					NrBits = 8;
+				}
+				else
+				{
+					NrBits &= 7;
+					if (NrBits == 0)
+						NrBits = 8;
+				}
+
+				if (!this.WriteByteBits(b2, NrBits))
+					return false;
+
+				NrBits = 8;
+			}
+			else
+			{
+				NrBits &= 7;
+				if (NrBits == 0)
+					NrBits = 8;
+			}
+
+			return this.WriteByteBits(b1, NrBits);
 		}
 
 		private static readonly byte[] bitMasks = new[]
@@ -593,9 +675,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			byte i = bitMasks[this.bitsLeft];
 			if (Value < i)
-				return this.WriteBits(Value, this.bitsLeft);
+				return this.WriteByteBits((byte)Value, this.bitsLeft);
 
-			if (!this.WriteBits(i, this.bitsLeft))
+			if (!this.WriteByteBits(i, this.bitsLeft))
 				return false;
 
 			Value -= i;
@@ -603,9 +685,9 @@ namespace Waher.Networking.HTTP.HTTP2
 			while (true)
 			{
 				if (Value < 128)
-					return this.WriteBits(Value, 8);
+					return this.WriteByteBits((byte)Value, 8);
 
-				if (!this.WriteBits((Value & 127) | 128, 8))
+				if (!this.WriteByteBits((byte)((Value & 127) | 128), 8))
 					return false;
 
 				Value >>= 7;
@@ -632,25 +714,38 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			Length = (uint)Bin.Length;
 
-			if (!this.WriteInteger(Length))
-				return false;
-
 			if (Huffman)
 			{
 				HuffmanRecord Rec;
+				uint HuffmanLen = 0;
+
+				for (i = 0; i < Length; i++)
+					HuffmanLen += huffmanTable[Bin[i]].NrBits;
+
+				HuffmanLen += 7;
+				HuffmanLen >>= 3;
+
+				if (!this.WriteInteger(HuffmanLen))
+					return false;
 
 				for (i = 0; i < Length; i++)
 				{
 					Rec = huffmanTable[Bin[i]];
-					if (!this.WriteBits(Rec.Value, Rec.NrBits))
+					if (!this.WriteUIntBits(Rec.Value, Rec.NrBits))
 						return false;
 				}
+
+				if (this.bitsLeft < 8 && !this.WriteByteBits(0xff, this.bitsLeft))	// EOS
+					return false;
 			}
 			else
 			{
+				if (!this.WriteInteger(Length))
+					return false;
+
 				for (i = 0; i < Length; i++)
 				{
-					if (!this.WriteBits(Bin[i], 8))
+					if (!this.WriteByteBits(Bin[i], 8))
 						return false;
 				}
 			}
@@ -742,7 +837,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						if (!this.WriteBit(true))
 							return false;
 
-						return this.WriteBits(Rec.Index, 7);
+						return this.WriteByteBits(Rec.Index, 7);
 					}
 				}
 
@@ -756,7 +851,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						return false;
 
 					Index = lastStaticHeaderIndex + this.nrHeadersCreated - DynamicRecord.Ordinal;
-					return this.WriteBits(Index, 7);
+					return this.WriteInteger(Index);
 				}
 
 				if (Mode == IndexMode.Indexed)
@@ -784,7 +879,7 @@ namespace Waher.Networking.HTTP.HTTP2
 							return false;
 
 						Index = lastStaticHeaderIndex + this.nrHeadersCreated - DynamicRecord.Ordinal;
-						return this.WriteBits(Index, 7);
+						return this.WriteInteger(Index);
 					}
 					else
 					{
@@ -810,17 +905,17 @@ namespace Waher.Networking.HTTP.HTTP2
 			switch (Mode)
 			{
 				case IndexMode.Indexed:
-					if (!this.WriteBits(1, 2) || !this.WriteInteger(Index))
+					if (!this.WriteByteBits(1, 2) || !this.WriteInteger(Index))
 						return false;
 					break;
 
 				case IndexMode.NotIndexed:
-					if (!this.WriteBits(0, 4) || !this.WriteInteger(Index))
+					if (!this.WriteByteBits(0, 4) || !this.WriteInteger(Index))
 						return false;
 					break;
 
 				case IndexMode.NeverIndexed:
-					if (!this.WriteBits(1, 4) || !this.WriteInteger(Index))
+					if (!this.WriteByteBits(1, 4) || !this.WriteInteger(Index))
 						return false;
 					break;
 

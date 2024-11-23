@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -21,6 +22,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		public ulong Ordinal { get; }
 
 		/// <summary>
+		/// Length of header string.
+		/// </summary>
+		public uint HeaderLength { get; }
+
+		/// <summary>
 		/// Contains information about a header containing dynamic records generated 
 		/// when serializing HTTP/2 headers.
 		/// </summary>
@@ -30,6 +36,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.Header = Header;
 			this.Ordinal = Ordinal;
+			this.HeaderLength = (uint)Encoding.UTF8.GetBytes(Header).Length;
 		}
 	}
 }

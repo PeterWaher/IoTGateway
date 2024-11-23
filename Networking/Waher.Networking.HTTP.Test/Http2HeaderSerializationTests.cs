@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Security;
 
@@ -65,16 +66,27 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("40 0a 63 75 73 74 6f 6d 2d 6b 65 79 0d 63 75 73 74 6f 6d 2d 68 65 61 64 65 72",
 				Hashes.BinaryToString(Output, true));
 
-			Assert.AreEqual(1U, w.NrDynamicHeaderRecords);
-			Assert.AreEqual(55U, w.DynamicHeaderSize);
+			HeaderReader r = new(Output, 256);
+			Assert.IsTrue(r.ReadFields(out IEnumerable<HttpField> Fields));
+			List<HttpField> Fields2 = [.. Fields];
 
-			DynamicRecord[] Records = w.GetDynamicRecords();
-			Assert.AreEqual(1, Records.Length);
+			Assert.AreEqual(1, Fields2.Count);
+			Assert.AreEqual("custom-key", Fields2[0].Key);
+			Assert.AreEqual("custom-header", Fields2[0].Value);
 
-			DynamicRecord Rec = Records[0];
-			Assert.AreEqual(55U, Rec.Length);
-			Assert.AreEqual("custom-key", Rec.Header.Header);
-			Assert.AreEqual("custom-header", Rec.Value);
+			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
+			{
+				Assert.AreEqual(1U, d.NrDynamicHeaderRecords);
+				Assert.AreEqual(55U, d.DynamicHeaderSize);
+
+				DynamicRecord[] Records = d.GetDynamicRecords();
+				Assert.AreEqual(1, Records.Length);
+
+				DynamicRecord Rec = Records[0];
+				Assert.AreEqual(55U, Rec.Length);
+				Assert.AreEqual("custom-key", Rec.Header.Header);
+				Assert.AreEqual("custom-header", Rec.Value);
+			}
 		}
 
 		/// <summary>

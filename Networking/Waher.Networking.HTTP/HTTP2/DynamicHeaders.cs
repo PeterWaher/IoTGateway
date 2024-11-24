@@ -557,23 +557,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Resets the table for a new header, without clearing the dynamic header table.
-		/// </summary>
-		public abstract void Reset();
-
-		/// <summary>
-		/// Clears the table for a new header, clearing the dynamic header table.
-		/// </summary>
-		public void Clear()
-		{
-			this.Reset();
-			this.dynamicHeaders.Clear();
-			this.dynamicRecords.Clear();
-			this.nrHeadersCreated = 0;
-			this.dynamicHeaderSize = 0;
-		}
-
-		/// <summary>
 		/// Trims the dynamic headers table, to assue it is not larger than the
 		/// maximum table size.
 		/// </summary>

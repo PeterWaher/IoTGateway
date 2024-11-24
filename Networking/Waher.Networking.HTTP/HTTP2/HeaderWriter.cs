@@ -74,11 +74,23 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Resets the writer for a new header, without clearing the dynamic header table.
 		/// </summary>
-		public override void Reset()
+		public void Reset()
 		{
 			this.pos = 0;
 			this.bitsLeft = 8;
 			this.current = 0;
+		}
+
+		/// <summary>
+		/// Clears the table for a new header, clearing the dynamic header table.
+		/// </summary>
+		public void Clear()
+		{
+			this.Reset();
+			this.dynamicHeaders.Clear();
+			this.dynamicRecords.Clear();
+			this.nrHeadersCreated = 0;
+			this.dynamicHeaderSize = 0;
 		}
 
 		/// <summary>
@@ -315,7 +327,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						return false;
 				}
 
-				if (this.bitsLeft < 8 && !this.WriteByteBits(0xff, this.bitsLeft))	// EOS
+				if (this.bitsLeft < 8 && !this.WriteByteBits(0xff, this.bitsLeft))  // EOS
 					return false;
 			}
 			else
@@ -323,11 +335,11 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!this.WriteInteger(Length))
 					return false;
 
-				for (i = 0; i < Length; i++)
-				{
-					if (!this.WriteByteBits(Bin[i], 8))
-						return false;
-				}
+				if (this.pos + Length >= this.bufferSize)
+					return false;
+
+				Array.Copy(Bin, 0, this.buffer, this.pos, Length);
+				this.pos += Length;
 			}
 
 			return true;

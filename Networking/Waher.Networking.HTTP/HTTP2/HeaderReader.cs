@@ -10,8 +10,8 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class HeaderReader : DynamicHeaders
 	{
-		private readonly uint bufferSize;
-		private readonly byte[] buffer;
+		private uint bufferSize;
+		private byte[] buffer;
 		private byte[] stringBuffer = new byte[128];
 		private int stringBufferLen = 128;
 		private uint pos;
@@ -62,13 +62,51 @@ namespace Waher.Networking.HTTP.HTTP2
 		public byte[] Buffer => this.buffer;
 
 		/// <summary>
-		/// Resets the reader for a new header, without clearing the dynamic header table.
+		/// Resets the writer for a new header, without clearing the dynamic header table.
 		/// </summary>
-		public override void Reset()
+		/// <param name="Buffer">Input buffer.</param>
+		public void Reset(byte[] Buffer)
 		{
-			this.pos = 0;
-			this.bitsLeft = 8;
+			this.Reset(Buffer, 0, (uint)Buffer.Length);
+		}
+
+		/// <summary>
+		/// Resets the writer for a new header, without clearing the dynamic header table.
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		/// <param name="Offset">Start reading at this position.</param>
+		/// <param name="Count">Number of bytes to read.</param>
+		public void Reset(byte[] Buffer, uint Offset, uint Count)
+		{
+			this.bufferSize = Offset + Count;
+			this.buffer = Buffer;
+			this.pos = Offset;
+			this.bitsLeft = 0;
 			this.current = 0;
+		}
+
+		/// <summary>
+		/// Clears the table for a new header, clearing the dynamic header table.
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		public void Clear(byte[] Buffer)
+		{
+			this.Clear(Buffer, 0, (uint)Buffer.Length);
+		}
+
+		/// <summary>
+		/// Clears the table for a new header, clearing the dynamic header table.
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		/// <param name="Offset">Start reading at this position.</param>
+		/// <param name="Count">Number of bytes to read.</param>
+		public void Clear(byte[] Buffer, uint Offset, uint Count)
+		{
+			this.Reset(Buffer, Offset, Count);
+			this.dynamicHeaders.Clear();
+			this.dynamicRecords.Clear();
+			this.nrHeadersCreated = 0;
+			this.dynamicHeaderSize = 0;
 		}
 
 		/// <summary>
@@ -133,8 +171,8 @@ namespace Waher.Networking.HTTP.HTTP2
 				byte n = (byte)(NrBits - this.bitsLeft);
 
 				Bits = this.current;
-				Bits >>= 8 - n;
-				NrBits -= n;
+				Bits >>= n;
+				NrBits -= this.bitsLeft;
 
 				if (this.pos >= this.bufferSize)
 					return false;
@@ -171,11 +209,14 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 
 			byte Mask = bitMasks[this.bitsLeft];
-			Value = (byte)(this.current & Mask);
+			Value = (byte)(this.current >> (8 - this.bitsLeft));
 			this.bitsLeft = 0;
 
 			if (Value < Mask)
 				return true;
+
+			ulong v = 0;
+			int Offset = 0;
 
 			do
 			{
@@ -184,10 +225,12 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				Mask = this.buffer[this.pos++];
 
-				Value <<= 7;
-				Value |= (byte)(Mask & 127);
+				v |= ((ulong)(Mask & 127)) << Offset;
+				Offset += 7;
 			}
 			while ((Mask & 128) != 0);
+
+			Value += v;
 
 			return true;
 		}
@@ -200,6 +243,13 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If read was successful (true), or if buffer size did not permit read operation (false).</returns>
 		public bool ReadString(out string Value, out uint Length)
 		{
+			if (!this.ReadBit(out bool Huffman))
+			{
+				Value = null;
+				Length = 0;
+				return false;
+			}
+
 			if (this.ReadInteger(out ulong l) && l <= uint.MaxValue)
 				Length = (uint)l;
 			else
@@ -209,41 +259,45 @@ namespace Waher.Networking.HTTP.HTTP2
 				return false;
 			}
 
-			if (!this.ReadBit(out bool Huffman))
-			{
-				Value = null;
-				return false;
-			}
-
 			if (Huffman)
 			{
 				uint EndPos = this.pos + Length;
 				HuffmanDecoding Loop = huffmanDecodingRoot;
 				int StringPos = 0;
+				int i;
 
-				while (this.pos < EndPos || this.bitsLeft > 0)
+				while (this.pos < EndPos)
 				{
-					if (!this.ReadBit(out bool Bit))
+					if (this.pos >= this.bufferSize)
 					{
 						Value = null;
 						return false;
 					}
 
-					if (Bit)
-						Loop = Loop.One;
-					else
-						Loop = Loop.Zero;
+					this.current = this.buffer[this.pos++];
 
-					if (Loop.LeafNode)
+					for (i = 0; i < 8; i++)
 					{
-						if (StringPos >= this.stringBufferLen)
+						Loop = (this.current & 0x80) == 0 ? Loop.Zero : Loop.One;
+						this.current <<= 1;
+
+						if (Loop is null)
 						{
-							Array.Resize(ref this.stringBuffer, this.stringBufferLen + 128);
-							this.stringBufferLen += 128;
+							Value = null;
+							return false;
 						}
 
-						this.stringBuffer[StringPos++] = Loop.Value.Value;
-						Loop = huffmanDecodingRoot;
+						if (Loop.LeafNode)
+						{
+							if (StringPos >= this.stringBufferLen)
+							{
+								Array.Resize(ref this.stringBuffer, this.stringBufferLen + 128);
+								this.stringBufferLen += 128;
+							}
+
+							this.stringBuffer[StringPos++] = Loop.Value.Value;
+							Loop = huffmanDecodingRoot;
+						}
 					}
 				}
 
@@ -254,22 +308,18 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				Value = Encoding.UTF8.GetString(this.stringBuffer, 0, StringPos);
+				Length = (uint)StringPos;
 			}
 			else
 			{
-				byte[] Bin = new byte[Length];
-				int i;
-
-				for (i = 0; i < Length; i++)
+				if (this.pos + Length > this.bufferSize)
 				{
-					if (!this.ReadByteBits(out Bin[i], 8))
-					{
-						Value = null;
-						return false;
-					}
+					Value = null;
+					return false;
 				}
 
-				Value = Encoding.UTF8.GetString(Bin);
+				Value = Encoding.UTF8.GetString(this.buffer, (int)this.pos, (int)Length);
+				this.pos += Length;
 			}
 
 			return true;
@@ -288,9 +338,6 @@ namespace Waher.Networking.HTTP.HTTP2
 			DynamicRecord DynamicRecord;
 			ulong Index;
 			uint HeaderLen;
-
-			if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
-				this.TrimDynamicHeaders();
 
 			if (!this.ReadBit(out bool Bit))
 			{
@@ -381,7 +428,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 				else if (Index <= lastStaticHeaderIndex)
 				{
-					StaticRecord Rec = staticTable[(int)Index];
+					StaticRecord Rec = staticTable[(int)Index - 1];
 					Header = Rec.Header;
 					HeaderLen = Rec.HeaderLength;
 				}
@@ -412,6 +459,9 @@ namespace Waher.Networking.HTTP.HTTP2
 
 					DynamicRecord.Length += ValueLen + HeaderLen;
 					this.dynamicHeaderSize += DynamicRecord.Length;
+
+					if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
+						this.TrimDynamicHeaders();
 				}
 			}
 

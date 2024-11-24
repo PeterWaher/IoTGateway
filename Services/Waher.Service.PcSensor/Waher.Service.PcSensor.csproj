@@ -1,135 +1,92 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BD323209-10EE-44AA-A654-59AB29D32175}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Service.PcSensor</RootNamespace>
-    <AssemblyName>Waher.Service.PcSensor</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Waher.Service.PcSensor</Title>
+    <Description>Application that turns the PC into an XMPP IoT compatible sensor.</Description>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
+    <None Remove="Schema\PerformanceCounterCategories.xsd" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Schema\PerformanceCounterCategories.xsd" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Schema\PerformanceCounterCategories.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
-      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
-      <Name>Waher.Content.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj">
-      <Project>{9525e41e-9c40-4f55-bada-ee8a6bab1062}</Project>
-      <Name>Waher.Content.Xsl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
-      <Project>{549bb008-3bb9-4882-b5dc-782b58d2d7b4}</Project>
-      <Name>Waher.Events.Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
-      <Project>{f3789e37-22a3-4103-9281-0e0ce193690e}</Project>
-      <Name>Waher.Events.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Mocks\Waher.Mock\Waher.Mock.csproj">
-      <Project>{3e5ef375-1080-44f9-9084-c32a0e9cbcf0}</Project>
-      <Name>Waher.Mock</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj">
-      <Project>{570e55d2-8182-4bd3-bc12-b346a210611a}</Project>
-      <Name>Waher.Networking.XMPP.Chat</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
-      <Project>{adf456c6-dc01-460f-9270-dfa4385b92e0}</Project>
-      <Name>Waher.Networking.XMPP.Concentrator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
-      <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
-      <Name>Waher.Networking.XMPP.Control</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
-      <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
-      <Name>Waher.Networking.XMPP.Provisioning</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
-      <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
-      <Name>Waher.Networking.XMPP.Sensor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
-      <Name>Waher.Networking.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
-      <Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
-      <Name>Waher.Runtime.Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
-      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
-      <Name>Waher.Things</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+	<ItemGroup>
+		<ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
+			<Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
+			<Name>Waher.Content.Xml</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj">
+			<Project>{9525e41e-9c40-4f55-bada-ee8a6bab1062}</Project>
+			<Name>Waher.Content.Xsl</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+			<Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
+			<Name>Waher.Content</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
+			<Project>{549bb008-3bb9-4882-b5dc-782b58d2d7b4}</Project>
+			<Name>Waher.Events.Console</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
+			<Project>{f3789e37-22a3-4103-9281-0e0ce193690e}</Project>
+			<Name>Waher.Events.XMPP</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+			<Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
+			<Name>Waher.Events</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Mocks\Waher.Mock\Waher.Mock.csproj">
+			<Project>{3e5ef375-1080-44f9-9084-c32a0e9cbcf0}</Project>
+			<Name>Waher.Mock</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj">
+			<Project>{570e55d2-8182-4bd3-bc12-b346a210611a}</Project>
+			<Name>Waher.Networking.XMPP.Chat</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
+			<Project>{adf456c6-dc01-460f-9270-dfa4385b92e0}</Project>
+			<Name>Waher.Networking.XMPP.Concentrator</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
+			<Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
+			<Name>Waher.Networking.XMPP.Control</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
+			<Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
+			<Name>Waher.Networking.XMPP.Provisioning</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
+			<Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
+			<Name>Waher.Networking.XMPP.Sensor</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
+			<Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
+			<Name>Waher.Networking.XMPP</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj">
+			<Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
+			<Name>Waher.Networking</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
+			<Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
+			<Name>Waher.Runtime.Console</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
+			<Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
+			<Name>Waher.Things</Name>
+		</ProjectReference>
+	</ItemGroup>
 </Project>

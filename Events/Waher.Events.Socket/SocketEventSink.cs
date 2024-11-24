@@ -12,6 +12,7 @@ using Waher.Content.Xml;
 using Waher.Events.Files;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
+using Waher.Security;
 
 namespace Waher.Events.Socket
 {
@@ -205,7 +206,7 @@ namespace Waher.Events.Socket
 #if WINDOWS_UWP
 							await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12);
 #else
-							await this.client.UpgradeToTlsAsClient(SslProtocols.Tls12);
+							await this.client.UpgradeToTlsAsClient(Crypto.SecureTls);
 #endif
 							this.client.Continue();
 						}

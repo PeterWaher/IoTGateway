@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using Waher.Content.Json.ReferenceTypes;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Security;
 

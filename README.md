@@ -143,7 +143,7 @@ can be run by users to perform different types of interaction with things or the
 | Project                          | Type       | Project description |
 |----------------------------------|------------|---------------------|
 | **Waher.Client.WPF**             | .NET 4.8   | The [Waher.Client.WPF](Clients/Waher.Client.WPF) project is a simple IoT client that allows you to interact with things and users. If you connect to the network, you can chat with users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and rich content based on markdown. |
-| **Waher.Client.MqttEventViewer** | .NET 4.8   | The [Waher.Client.MqttEventViewer](Clients/Client.MqttEventViewer) project defines a simple WPF client application that subscribes to an MQTT topic and displays any events it receivs. Events are parsed as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
+| **Waher.Client.MqttEventViewer** | .NET 8.0   | The [Waher.Client.MqttEventViewer](Clients/Client.MqttEventViewer) project defines a simple WPF client application that subscribes to an MQTT topic and displays any events it receivs. Events are parsed as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 
 Content
 ----------------------

@@ -1087,7 +1087,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls, 
-						ClientCertificates, null, TrustCertificates);
+						ClientCertificates, null, TrustCertificates, "http/1.1");
 
 					if (this.HasSniffers)
 					{

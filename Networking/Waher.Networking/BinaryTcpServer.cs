@@ -49,6 +49,7 @@ namespace Waher.Networking
 #if WINDOWS_UWP
 		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
 #else
+		private readonly string[] alpnProtocols;
 		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
 		private X509Certificate serverCertificate;
 		private ClientCertificates clientCertificates = ClientCertificates.NotUsed;
@@ -100,12 +101,16 @@ namespace Waher.Networking
 		/// layer are decoupled, i.e. executed in parallel with the source that raised 
 		/// them.</param>
 		/// <param name="Sniffers">Sniffers</param>
-		public BinaryTcpServer(bool C2S, int Port, TimeSpan ActivityTimeout, X509Certificate ServerCertificate, bool DecoupledEvents, ISniffer[] Sniffers)
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public BinaryTcpServer(bool C2S, int Port, TimeSpan ActivityTimeout, X509Certificate ServerCertificate, bool DecoupledEvents, ISniffer[] Sniffers,
+			params string[] AlpnProtocols)
 			: base(DecoupledEvents, Sniffers)
 		{
 			this.serverCertificate = ServerCertificate;
 			this.c2s = C2S;
 			this.tls = !(this.serverCertificate is null);
+			this.alpnProtocols = AlpnProtocols;
 
 			this.Init(Port, ActivityTimeout);
 		}
@@ -657,7 +662,7 @@ namespace Waher.Networking
 				await this.Information("Switching to TLS.");
 
 				await Connection.Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
-					this.clientCertificates, null, this.trustClientCertificates);
+					this.clientCertificates, null, this.trustClientCertificates, this.alpnProtocols);
 
 				if (this.HasSniffers)
 				{

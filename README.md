@@ -221,10 +221,10 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 
 The folder also contains the following unit test projects:
 
-| Project                      | Type   | Project description |
-|------------------------------|--------|---------------------|
-| **Waher.Events.Pipe.Test**   | .NET 6 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
-| **Waher.Events.Socket.Test** | .NET 6 | The [Waher.Events.Socket.Test](Events/Waher.Events.Socket.Test) project contains unit tests for the **Waher.Events.Socket** project. |
+| Project                      | Type     | Project description |
+|------------------------------|----------|---------------------|
+| **Waher.Events.Pipe.Test**   | .NET 8.0 | The [Waher.Events.Pipe.Test](Events/Waher.Events.Pipe.Test) project contains unit tests for the **Waher.Events.Pipe** project. |
+| **Waher.Events.Socket.Test** | .NET 8.0 | The [Waher.Events.Socket.Test](Events/Waher.Events.Socket.Test) project contains unit tests for the **Waher.Events.Socket** project. |
 
 Layout
 ----------------------

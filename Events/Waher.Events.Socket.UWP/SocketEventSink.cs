@@ -12,6 +12,7 @@ using Waher.Content.Xml;
 using Waher.Events.Files;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
+using Waher.Security;
 
 namespace Waher.Events.Socket
 {

@@ -1130,6 +1130,20 @@ namespace Waher.Runtime.Inventory
 		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
 		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
 		/// <param name="Object">Object with features to process.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			return FindSupport<InterfaceType, ObjectType>(Object, Grade.Barely);
+		}
+
+		/// <summary>
+		/// Finds the best interface for a certain task.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
 		/// <param name="MinSupport">Minimum support required.</param>
 		/// <returns>Best interface, if found, null otherwise.</returns>
 		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport)

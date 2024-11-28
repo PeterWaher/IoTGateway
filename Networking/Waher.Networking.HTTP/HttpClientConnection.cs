@@ -11,6 +11,7 @@ using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
@@ -23,9 +24,11 @@ using Windows.Networking.Sockets;
 
 namespace Waher.Networking.HTTP
 {
-    internal enum ConnectionMode
+	internal enum ConnectionMode
 	{
 		Http,
+		Http2Init,
+		Http2Live,
 		WebSocket
 	}
 
@@ -48,6 +51,7 @@ namespace Waher.Networking.HTTP
 		private BinaryTcpClient client;
 		private HttpRequestHeader header = null;
 		private ConnectionMode mode = ConnectionMode.Http;
+		private ConnectionSettings settings = null;
 		private WebSocket webSocket = null;
 		private Encoding rxEncoding = null;
 		private byte b1 = 0;
@@ -73,15 +77,26 @@ namespace Waher.Networking.HTTP
 		{
 			this.server.DataReceived(Count);
 
-			if (this.mode == ConnectionMode.Http)
+			switch (this.mode)
 			{
-				if (this.header is null)
-					return this.BinaryHeaderReceived(Buffer, Offset, Count);
-				else
-					return this.BinaryDataReceived(Buffer, Offset, Count);
+				case ConnectionMode.Http:
+					if (this.header is null)
+						return this.BinaryHeaderReceived(Buffer, Offset, Count);
+					else
+						return this.BinaryDataReceived(Buffer, Offset, Count);
+
+				case ConnectionMode.Http2Init:
+					return this.BinaryHttp2InitDataReceived(Buffer, Offset, Count);
+
+				case ConnectionMode.Http2Live:
+					return this.BinaryHttp2LiveDataReceived(Buffer, Offset, Count);
+
+				case ConnectionMode.WebSocket:
+					return this.webSocket?.WebSocketDataReceived(Buffer, Offset, Count) ?? Task.FromResult(false);
+
+				default:
+					return Task.FromResult(false);
 			}
-			else
-				return this.webSocket?.WebSocketDataReceived(Buffer, Offset, Count) ?? Task.FromResult(false);
 		}
 
 		private Task Client_OnError(object Sender, Exception Exception)
@@ -224,7 +239,7 @@ namespace Waher.Networking.HTTP
 
 				if (this.header.HttpVersion < 1)
 				{
-					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported", 
+					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported",
 						"At least HTTP Version 1.0 is required."), true);
 					return false;
 				}
@@ -250,18 +265,69 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				if (i + 1 < NrRead)
-					return await this.BinaryDataReceived(Data, i + 1, NrRead - i - 1);
+				if (this.header.Method == "PRI")
+				{
+					this.mode = ConnectionMode.Http2Init;
+					this.settings = new ConnectionSettings();
 
-				if (!this.header.HasMessageBody)
-					return await this.RequestReceived();
+					if (i + 1 < NrRead)
+						return await this.BinaryHttp2InitDataReceived(Data, i + 1, NrRead - i - 1);
+					else
+						return true;
+				}
+				else
+				{
+					if (!(this.header.Upgrade is null) &&
+						this.header.Upgrade.Value == "h2c" &&
+						!(this.header.Connection is null) &&
+						this.header.Connection.Value.StartsWith("Upgrade") &&
+						this.header.TryGetHeaderField("HTTP2-Settings", out HttpField Http2Settings))
+					{
+						try
+						{
+							byte[] Bin = Convert.FromBase64String(Http2Settings.Value);
+							if (ConnectionSettings.TryParse(Bin, out ConnectionSettings Settings))
+							{
+								this.settings = Settings;
+								this.mode = ConnectionMode.Http2Live;
 
-				return true;
+								using HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
+								{
+									StatusCode = 101,
+									StatusMessage = "Switching Protocols",
+									ContentLength = null,
+									ContentType = null,
+									ContentLanguage = null
+								};
+
+								Response.SetHeader("Upgrade", "h2c");
+								Response.SetHeader("Connection", "Upgrade");
+
+								await Response.SendResponse();
+
+								if (i + 1 < NrRead)
+									return await this.BinaryHttp2LiveDataReceived(Data, i + 1, NrRead - i - 1);
+								else
+									return true;
+							}
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
+					}
+
+					if (i + 1 < NrRead)
+						return await this.BinaryDataReceived(Data, i + 1, NrRead - i - 1);
+
+					if (!this.header.HasMessageBody)
+						return await this.RequestReceived();
+
+					return true;
+				}
 			}
 
-			if (this.headerStream is null)
-				this.headerStream = new MemoryStream();
-
+			this.headerStream ??= new MemoryStream();
 			this.headerStream.Write(Data, Offset, NrRead);
 
 			if (this.headerStream.Position < MaxHeaderSize)
@@ -283,6 +349,50 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		private static readonly char[] http2Preface = new char[] { 'S', 'M', '\r', '\n', '\r', '\n' };
+
+		private async Task<bool> BinaryHttp2InitDataReceived(byte[] Data, int Offset, int NrRead)
+		{
+			int i, c;
+			byte b;
+
+			c = Offset + NrRead;
+
+			for (i = Offset; i < c; i++)
+			{
+				b = Data[i];
+
+				if (b != http2Preface[this.settings.InitStep++])
+				{
+					if (this.HasSniffers && i > Offset)
+						await this.ReceiveText(InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset));
+
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid HTTP/2 connection preface."), true);
+					return false;
+				}
+
+				if (this.settings.InitStep == 6)
+				{
+					this.mode = ConnectionMode.Http2Live;
+
+					if (this.HasSniffers)
+						await this.ReceiveText("\r\n\r\nSM\r\n\r\n");
+
+					if (i + 1 < NrRead)
+						return await this.BinaryHttp2LiveDataReceived(Data, i + 1, NrRead - i - 1);
+					else
+						return true;
+				}
+			}
+
+			return true;
+		}
+
+		private async Task<bool> BinaryHttp2LiveDataReceived(byte[] Data, int Offset, int NrRead)
+		{
+			return true;	// TODO
+		}
+
 		internal static bool IsSniffableTextType(string ContentType)
 		{
 			ContentType = ContentType.ToLower();
@@ -290,7 +400,7 @@ namespace Waher.Networking.HTTP
 			if (j < 0)
 				return false;
 
-			string s = ContentType.Substring(0, j);
+			string s = ContentType[..j];
 
 			// TODO: Customizable.
 
@@ -327,7 +437,7 @@ namespace Waher.Networking.HTTP
 						case "application/jose+json":
 						case "application/jwt":
 							return true;
-						
+
 						case "application/javascript":
 						case "application/xhtml+xml":
 						case "application/xslt+xml":
@@ -336,14 +446,11 @@ namespace Waher.Networking.HTTP
 					}
 
 				case "multipart":
-					switch (ContentType)
+					return ContentType switch
 					{
-						case "multipart/form-data":
-							return true;
-
-						default:
-							return false;
-					}
+						"multipart/form-data" => true,
+						_ => false,
+					};
 
 				default:
 					return false;
@@ -354,7 +461,7 @@ namespace Waher.Networking.HTTP
 		{
 			if (this.dataStream is null)
 			{
-				if (!(this.header.ContentEncoding is null))		// TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
+				if (!(this.header.ContentEncoding is null))     // TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
 				{
 					await this.SendResponse(null, null, new HttpException(UnsupportedMediaTypeException.Code,
 						UnsupportedMediaTypeException.StatusMessage, "Content-Encoding not supported."), false);
@@ -371,7 +478,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						await this.SendResponse(null, null, new HttpException(NotImplementedException.Code, 
+						await this.SendResponse(null, null, new HttpException(NotImplementedException.Code,
 							NotImplementedException.StatusMessage, "Transfer encoding not implemented."), false);
 						return true;
 					}
@@ -384,7 +491,7 @@ namespace Waher.Networking.HTTP
 						long l = ContentLength.ContentLength;
 						if (l < 0)
 						{
-							await this.SendResponse(null, null, new HttpException(BadRequestException.Code, 
+							await this.SendResponse(null, null, new HttpException(BadRequestException.Code,
 								BadRequestException.StatusMessage, "Negative content lengths invalid."), false);
 							return true;
 						}
@@ -398,7 +505,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						await this.SendResponse(null, null, new HttpException(411, "Length Required", 
+						await this.SendResponse(null, null, new HttpException(411, "Length Required",
 							"Content Length required."), true);
 						return false;
 					}
@@ -441,7 +548,7 @@ namespace Waher.Networking.HTTP
 				}
 				else if (this.transferEncoding.TransferError)
 				{
-					await this.SendResponse(null, null, new HttpException(InternalServerErrorException.Code, 
+					await this.SendResponse(null, null, new HttpException(InternalServerErrorException.Code,
 						InternalServerErrorException.StatusMessage, "Unable to transfer content to resource."), false);
 					return true;
 				}
@@ -481,7 +588,7 @@ namespace Waher.Networking.HTTP
 				UnderlyingSocket.Information.LocalAddress.ToString() + ":" + UnderlyingSocket.Information.LocalPort);
 #else
 			Socket UnderlyingSocket = this.client.Client.Client;
-			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream, 
+			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream,
 				UnderlyingSocket.RemoteEndPoint.ToString(),
 				UnderlyingSocket.LocalEndPoint.ToString());
 #endif
@@ -770,7 +877,7 @@ namespace Waher.Networking.HTTP
 					s = Header.Host.Value;
 					i = s.IndexOf(':');
 					if (i > 0)
-						s = s.Substring(0, i);
+						s = s[..i];
 
 					Location.Append(s);
 

@@ -32,6 +32,8 @@ namespace Waher.Networking.HTTP
 		private HttpFieldRange range = null;
 		private HttpFieldUserAgent userAgent = null;
 		private HttpFieldUpgradeInsecureRequests upgradeInsequreRequests = null;
+		private HttpField connection = null;
+		private HttpField upgrade = null;
 		private string method = string.Empty;
 		private string resource = string.Empty;
 		private string resourcePart = string.Empty;
@@ -248,6 +250,8 @@ namespace Waher.Networking.HTTP
 				case "range": return this.range = new HttpFieldRange(Key, Value);
 				case "user-agent": return this.userAgent = new HttpFieldUserAgent(Key, Value);
 				case "upgrade-insecure-requests": return this.upgradeInsequreRequests = new HttpFieldUpgradeInsecureRequests(Key, Value);
+				case "connection": return this.connection = new HttpField(Key, Value);
+				case "upgrade": return this.upgrade = new HttpField(Key, Value);
 				default: return base.ParseField(KeyLower, Key, Value);
 			}
 		}
@@ -340,6 +344,16 @@ namespace Waher.Networking.HTTP
 		/// UserAgent HTTP Field header. (RFC 2616, §14.43)
 		/// </summary>
 		public HttpFieldUserAgent UserAgent => this.userAgent;
+
+		/// <summary>
+		/// Connection HTTP Field header. (RFC 2616, §14.10)
+		/// </summary>
+		public HttpField Connection => this.connection;
+
+		/// <summary>
+		/// Upgrade HTTP Field header. (RFC 2616, §14.42)
+		/// </summary>
+		public HttpField Upgrade => this.upgrade;
 
 		/// <summary>
 		/// Upgrade-Insecure-Requests HTTP Field header.

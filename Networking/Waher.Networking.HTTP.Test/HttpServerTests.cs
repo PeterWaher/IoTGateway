@@ -195,7 +195,7 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			string s1 = new('Ω', 100000);
 			Client.UploadData("http://localhost:8081/Test09/string.txt", "PUT", Utf8.GetBytes(s1));
 
@@ -212,7 +212,7 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			byte[] Data = Client.UploadData("http://localhost:8081/Test10/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 		}
 
@@ -222,10 +222,10 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test11", "Data", true, true, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			Client.UploadData("http://localhost:8081/Test11/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 
-			Client.UploadData("http://localhost:8081/Test11/string.txt", "DELETE", Array.Empty<byte>());
+			Client.UploadData("http://localhost:8081/Test11/string.txt", "DELETE", []);
 		}
 
 		[TestMethod]
@@ -235,10 +235,10 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			Client.UploadData("http://localhost:8081/Test12/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 
-			Client.UploadData("http://localhost:8081/Test12/string.txt", "DELETE", Array.Empty<byte>());
+			Client.UploadData("http://localhost:8081/Test12/string.txt", "DELETE", []);
 		}
 
 		[TestMethod]
@@ -247,7 +247,7 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test13", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			string s1 = new('Ω', 100000);
 			Client.UploadData("http://localhost:8081/Test13/Folder/string.txt", "PUT", Utf8.GetBytes(s1));
 
@@ -263,10 +263,10 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test14", "Data", true, true, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			Client.UploadData("http://localhost:8081/Test14/Folder/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 
-			Client.UploadData("http://localhost:8081/Test14/Folder", "DELETE", Array.Empty<byte>());
+			Client.UploadData("http://localhost:8081/Test14/Folder", "DELETE", []);
 		}
 
 		[TestMethod]
@@ -525,7 +525,7 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test25", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			string s1 = new('Ω', 100000);
 			Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
 			Client.UploadData("http://localhost:8081/Test25/Temp.txt", "PUT", Utf8.GetBytes(s1));
@@ -539,7 +539,7 @@ namespace Waher.Networking.HTTP.Test
 			server.Register(new HttpFolderResource("/Test26", "Data", true, false, true, false));
 
 			using CookieWebClient Client = new();
-			Encoding Utf8 = new UTF8Encoding(true);
+			UTF8Encoding Utf8 = new(true);
 			string s1 = new('Ω', 100000);
 			Client.IfUnmodifiedSince = LastModified.AddMinutes(1);
 			Client.UploadData("http://localhost:8081/Test26/Temp.txt", "PUT", Utf8.GetBytes(s1));

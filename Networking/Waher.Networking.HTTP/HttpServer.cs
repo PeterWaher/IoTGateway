@@ -1087,7 +1087,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls, 
-						ClientCertificates, null, TrustCertificates, "http/1.1", "h2", "h2c");
+						ClientCertificates, null, TrustCertificates, "http/1.1", "h2");
 
 					if (this.HasSniffers)
 					{
@@ -1499,8 +1499,8 @@ namespace Waher.Networking.HTTP
 					if (i < 0)
 						break;
 
-					SubPath = ResourceName.Substring(i) + SubPath;
-					ResourceName = ResourceName.Substring(0, i);
+					SubPath = ResourceName[i..] + SubPath;
+					ResourceName = ResourceName[..i];
 				}
 			}
 
@@ -1719,7 +1719,7 @@ namespace Waher.Networking.HTTP
 					string s = Request.RemoteEndPoint;
 					int i = s.LastIndexOf(':');
 					if (i > 0)
-						s = s.Substring(0, i);
+						s = s[..i];
 
 					this.IncLocked(s, this.callsPerFrom);
 				}
@@ -1877,33 +1877,31 @@ namespace Waher.Networking.HTTP
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');
 			if (i >= 0)
-				ResourceName = ResourceName.Substring(0, i);
+				ResourceName = ResourceName[..i];
 
 			if (NetworkingModule.Stopping)
 				return new Tuple<int, string, byte[]>(ServiceUnavailableException.Code, ServiceUnavailableException.StatusMessage, null);
 			else if (this.TryGetResource(ResourceName, true, out HttpResource Resource, out string SubPath) &&
 				Resource is IHttpGetMethod GetMethod)
 			{
-				using (MemoryStream ms = new MemoryStream())
+				using MemoryStream ms = new MemoryStream();
+				HttpRequest Request = new HttpRequest(this,
+					new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "unknown", "unknown")
 				{
-					HttpRequest Request = new HttpRequest(this,
-						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "unknown", "unknown")
-					{
-						Session = Session,
-						SubPath = SubPath,
-						Resource = Resource
-					};
+					Session = Session,
+					SubPath = SubPath,
+					Resource = Resource
+				};
 
-					InternalTransfer InternalTransfer = new InternalTransfer(ms);
-					HttpResponse Response = new HttpResponse(InternalTransfer, this, Request);
+				InternalTransfer InternalTransfer = new InternalTransfer(ms);
+				HttpResponse Response = new HttpResponse(InternalTransfer, this, Request);
 
-					this.RequestReceived(Request, string.Empty, Resource, SubPath);
-					await GetMethod.GET(Request, Response);
+				this.RequestReceived(Request, string.Empty, Resource, SubPath);
+				await GetMethod.GET(Request, Response);
 
-					await InternalTransfer.WaitUntilSent(10000);
+				await InternalTransfer.WaitUntilSent(10000);
 
-					return new Tuple<int, string, byte[]>(Response.StatusCode, Response.ContentType, ms.ToArray());
-				}
+				return new Tuple<int, string, byte[]>(Response.StatusCode, Response.ContentType, ms.ToArray());
 			}
 			else
 				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.StatusMessage, null);
@@ -1932,7 +1930,7 @@ namespace Waher.Networking.HTTP
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');
 			if (i >= 0)
-				ResourceName = ResourceName.Substring(0, i);
+				ResourceName = ResourceName[..i];
 
 			if (this.TryGetResource(ResourceName, false, out HttpResource Resource, out string SubPath) &&
 				Resource is HttpFolderResource Folder)

@@ -1,0 +1,126 @@
+﻿using System.IO;
+
+namespace Waher.Networking.HTTP.HTTP2
+{
+	/// <summary>
+	/// Deserializes binary data
+	/// </summary>
+	public class BinaryReader
+	{
+		private uint bufferSize;
+		private byte[] buffer;
+		private uint pos;
+
+		/// <summary>
+		/// Deserializes binary data
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		public BinaryReader(byte[] Buffer)
+			: this(Buffer, 0, (uint)Buffer.Length)
+		{
+		}
+
+		/// <summary>
+		/// Deserializes binary data
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		/// <param name="Offset">Start reading at this position.</param>
+		/// <param name="Count">Number of bytes to read.</param>
+		public BinaryReader(byte[] Buffer, uint Offset, uint Count)
+		{
+			this.bufferSize = Offset + Count;
+			this.buffer = Buffer;
+			this.pos = Offset;
+		}
+
+		/// <summary>
+		/// Current byte-position.
+		/// </summary>
+		public uint Position => this.pos;
+
+		/// <summary>
+		/// Current buffer.
+		/// </summary>
+		public byte[] Buffer => this.buffer;
+
+		/// <summary>
+		/// Resets the writer for a new header, without clearing the dynamic header table.
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		public void Reset(byte[] Buffer)
+		{
+			this.Reset(Buffer, 0, (uint)Buffer.Length);
+		}
+
+		/// <summary>
+		/// Resets the writer for a new header, without clearing the dynamic header table.
+		/// </summary>
+		/// <param name="Buffer">Input buffer.</param>
+		/// <param name="Offset">Start reading at this position.</param>
+		/// <param name="Count">Number of bytes to read.</param>
+		public void Reset(byte[] Buffer, uint Offset, uint Count)
+		{
+			this.bufferSize = Offset + Count;
+			this.buffer = Buffer;
+			this.pos = Offset;
+		}
+
+		/// <summary>
+		/// Returns the next <see cref="byte"/>.
+		/// </summary>
+		/// <returns>Byte</returns>
+		public byte NextByte()
+		{
+			if (this.pos >= this.bufferSize)
+				throw new IOException("Unexpected end of data.");
+
+			return this.buffer[this.pos++];
+		}
+
+		/// <summary>
+		/// Returns the next <see cref="ushort"/>.
+		/// </summary>
+		/// <returns>Next 16-bit unsigned integer.</returns>
+		public ushort NextUInt16()
+		{
+			if (this.pos + 1 >= this.bufferSize)
+				throw new IOException("Unexpected end of data.");
+
+			ushort Result = this.buffer[this.pos++];
+			Result <<= 8;
+			Result |= this.buffer[this.pos++];
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Returns the next <see cref="uint"/>.
+		/// </summary>
+		/// <returns>Next 32-bit unsigned integer.</returns>
+		public uint NextUInt32()
+		{
+			if (this.pos + 3 >= this.bufferSize)
+				throw new IOException("Unexpected end of data.");
+
+			ushort Result = this.buffer[this.pos++];
+			Result <<= 8;
+			Result |= this.buffer[this.pos++];
+			Result <<= 8;
+			Result |= this.buffer[this.pos++];
+			Result <<= 8;
+			Result |= this.buffer[this.pos++];
+
+			return Result;
+		}
+
+		/// <summary>
+		/// If there's more data to read.
+		/// </summary>
+		public bool HasMore => this.pos < this.bufferSize;
+
+		/// <summary>
+		/// Number of bytes left to read.
+		/// </summary>
+		public int BytesLeft => (int)(this.bufferSize - this.pos);
+	}
+}

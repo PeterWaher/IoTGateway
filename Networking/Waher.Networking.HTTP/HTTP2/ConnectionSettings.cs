@@ -27,7 +27,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// header block(see[COMPRESSION]).  The initial value is 4,096
 		/// octets.
 		/// </summary>
-		public uint HeaderTableSize = 4096;
+		public int HeaderTableSize = 4096;
 
 		/// <summary>
 		/// SETTINGS_ENABLE_PUSH (0x2):  This setting can be used to disable
@@ -59,7 +59,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// set a zero value for short durations; if a server does not wish to
 		/// accept requests, closing the connection is more appropriate.
 		/// </summary>
-		public uint MaxConcurrentStreams = 100;
+		public int MaxConcurrentStreams = 100;
 
 		/// <summary>
 		/// SETTINGS_INITIAL_WINDOW_SIZE (0x4):  Indicates the sender's initial
@@ -73,7 +73,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// be treated as a connection error(Section 5.4.1) of type
 		/// FLOW_CONTROL_ERROR.
 		/// </summary>
-		public uint InitialWindowSize = 65535;
+		public int InitialWindowSize = 65535;
 
 		/// <summary>
 		/// SETTINGS_MAX_FRAME_SIZE (0x5):  Indicates the size of the largest
@@ -84,7 +84,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Values outside this range MUST be treated as a connection error
 		/// (Section 5.4.1) of type PROTOCOL_ERROR.
 		/// </summary>
-		public uint MaxFrameSize = 16384;
+		public int MaxFrameSize = 16384;
 
 		/// <summary>
 		///  SETTINGS_MAX_HEADER_LIST_SIZE (0x6):  This advisory setting informs a
@@ -97,7 +97,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		///  For any given request, a lower limit than what is advertised MAY
 		///  be enforced.The initial value of this setting is unlimited.
 		/// </summary>
-		public uint MaxHeaderListSize = HttpClientConnection.MaxHeaderSize;
+		public int MaxHeaderListSize = HttpClientConnection.MaxHeaderSize;
 
 		/// <summary>
 		/// Initialization step.
@@ -146,7 +146,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				switch (Key)
 				{
 					case 1:
-						Settings.HeaderTableSize = Value;
+						if (Value > int.MaxValue)
+							return false;
+
+						Settings.HeaderTableSize = (int)Value;
 						break;
 
 					case 2:
@@ -157,25 +160,31 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 3:
-						Settings.MaxConcurrentStreams = Value;
+						if (Value > int.MaxValue)
+							return false;
+						
+						Settings.MaxConcurrentStreams = (int)Value;
 						break;
 
 					case 4:
 						if (Value > 0x7fffffff)
 							return false;
 
-						Settings.InitialWindowSize = Value;
+						Settings.InitialWindowSize = (int)Value;
 						break;
 
 					case 5:
 						if (Value > 0x00ffffff)
 							return false;
 
-						Settings.MaxFrameSize = Value;
+						Settings.MaxFrameSize = (int)Value;
 						break;
 
 					case 6:
-						Settings.MaxHeaderListSize = Value;
+						if (Value > int.MaxValue)
+							return false;
+						
+						Settings.MaxHeaderListSize = (int)Value;
 						break;
 
 					default:
@@ -194,12 +203,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			BinaryWriter w = new BinaryWriter();
 
-			w.WriteKeyValue(1, this.HeaderTableSize);
+			w.WriteKeyValue(1, (uint)this.HeaderTableSize);
 			w.WriteKeyValue(2, this.EnablePush ? 1U : 0U);
-			w.WriteKeyValue(3, this.MaxConcurrentStreams);
-			w.WriteKeyValue(4, this.InitialWindowSize);
-			w.WriteKeyValue(5, this.MaxFrameSize);
-			w.WriteKeyValue(6, this.MaxHeaderListSize);
+			w.WriteKeyValue(3, (uint)this.MaxConcurrentStreams);
+			w.WriteKeyValue(4, (uint)this.InitialWindowSize);
+			w.WriteKeyValue(5, (uint)this.MaxFrameSize);
+			w.WriteKeyValue(6, (uint)this.MaxHeaderListSize);
 
 			return w.ToArray();
 		}
@@ -208,8 +217,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Sets the window size increment for stream, modified using the WINDOW_UPDATE
 		/// frame.
 		/// </summary>
-		public bool SetWindowSizeIncrement(uint Increment)
+		public bool SetWindowSizeIncrement(int Increment)
 		{
+			if (Increment < 0)
+				return false;
+
 			long Size = this.InitialWindowSize + Increment;
 
 			if (Size > int.MaxValue - 1)

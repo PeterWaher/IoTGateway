@@ -99,5 +99,20 @@ namespace Waher.Networking.HTTP.Test
 			string s = Encoding.UTF8.GetString(Data);
 			Assert.AreEqual("hej på dej", s);
 		}
+
+		/* To Test
+		 * 
+		 * Long headers (multiple HEADERS & CONTINUATION frames)
+		 * data requests (POST)
+		 * long data requests (multiple DATA & CONTINUATION frames)
+		 * data-less responses
+		 * data responses (one DATA frame)
+		 * long data responses (multiple DATA & CONTINUATION frames)
+		 * long headers in data responses (multiple HEADER & CONTINUATION frames)
+		 * push
+		 * stream priorities
+		 * stream errors
+		 * connection errors
+		 */
 	}
 }

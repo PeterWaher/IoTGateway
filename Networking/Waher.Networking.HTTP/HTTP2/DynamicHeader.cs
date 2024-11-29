@@ -24,7 +24,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Length of header string.
 		/// </summary>
-		public uint HeaderLength { get; }
+		public int HeaderLength { get; }
 
 		/// <summary>
 		/// Contains information about a header containing dynamic records generated 
@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.Header = Header;
 			this.Ordinal = Ordinal;
-			this.HeaderLength = (uint)Encoding.UTF8.GetBytes(Header).Length;
+			this.HeaderLength = Encoding.UTF8.GetBytes(Header).Length;
 		}
 	}
 }

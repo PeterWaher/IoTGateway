@@ -506,6 +506,8 @@ namespace Waher.Networking.HTTP
 		private int http2FramePos = 0;
 		private FrameType http2FrameType = 0;
 		private Dictionary<int, Http2Stream> http2Streams = null;
+		private HeaderReader http2HeaderReader = null;
+		private HeaderReader http2HeaderWriter = null;
 		private byte http2FrameFlags = 0;
 		private byte[] http2Frame = null;
 
@@ -569,7 +571,81 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case FrameType.Headers:
-					// TODO
+					if (this.http2StreamId == 0)
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+					bool EndStream = (this.http2FrameFlags & 1) != 0;
+					bool EndHeaders = (this.http2FrameFlags & 4) != 0;
+					bool Padded = (this.http2FrameFlags & 8) != 0;
+					bool Priority = (this.http2FrameFlags & 32) != 0;
+
+					byte PaddingLen = Padded ? this.reader.NextByte() : (byte)0;
+					uint StreamIdDependency;
+					bool Exclusive;
+					byte Weight;
+
+					if (Priority)
+					{
+						StreamIdDependency = this.reader.NextUInt32();
+						Exclusive = (StreamIdDependency & 0x80000000) != 0;
+						StreamIdDependency &= 0x7fffffff;
+						Weight = this.reader.NextByte();
+					}
+					else
+					{
+						StreamIdDependency = 0;
+						Exclusive = false;
+						Weight = 0;
+					}
+
+					int HeaderSize = this.reader.BytesLeft - PaddingLen;
+					if (HeaderSize < 0)
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+					if (EndHeaders)
+					{
+						byte[] Buf;
+						int Start;
+						int Count;
+
+						if (Stream.IsBuildingHeaders)
+						{
+							Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize);
+							Buf = Stream.FinishBuildingHeaders();
+							Start = 0;
+							Count = Buf.Length;
+						}
+						else
+						{
+							Buf = this.reader.Buffer;
+							Start = this.reader.Position;
+							Count = HeaderSize;
+						}
+
+						if (this.http2HeaderReader is null)
+						{
+							this.http2HeaderReader = new HeaderReader(Buf, Start, Count,
+								this.settings.HeaderTableSize, this.settings.MaxHeaderListSize);
+						}
+						else
+							this.http2HeaderReader.Reset(Buf, Start, Count);
+
+						while (this.http2HeaderReader.HasMore)
+						{
+							if (!this.http2HeaderReader.ReadHeader(out string HeaderName, out string HeaderValue, out _))
+								return false;
+
+							if (this.HasSniffers)
+								await this.Information("RX: " + HeaderName + ": " + HeaderValue);
+
+							Stream.AddParsedHeader(HeaderName, HeaderValue);
+						}
+
+						// TODO: Execute request.
+					}
+					else
+						Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize);
+
 					break;
 
 				case FrameType.Priority:
@@ -594,7 +670,7 @@ namespace Waher.Networking.HTTP
 					else
 					{
 						int StartPos = this.reader.Position;
-						
+
 						while (this.reader.HasMore)
 						{
 							if (this.reader.BytesLeft < 6)
@@ -609,7 +685,7 @@ namespace Waher.Networking.HTTP
 									if (this.HasSniffers)
 										await this.Information("RX: SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
 
-									this.settings.HeaderTableSize = Value;
+									this.settings.HeaderTableSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 									break;
 
 								case 2:
@@ -626,7 +702,7 @@ namespace Waher.Networking.HTTP
 									if (this.HasSniffers)
 										await this.Information("RX: SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
 
-									this.settings.MaxConcurrentStreams = Value;
+									this.settings.MaxConcurrentStreams = Value > int.MaxValue ? int.MaxValue : (int)Value;
 									break;
 
 								case 4:
@@ -636,7 +712,7 @@ namespace Waher.Networking.HTTP
 									if (Value > 0x7fffffff)
 										return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
 
-									this.settings.InitialWindowSize = Value;
+									this.settings.InitialWindowSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 									break;
 
 								case 5:
@@ -646,14 +722,14 @@ namespace Waher.Networking.HTTP
 									if (Value > 0x00ffffff)
 										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
 
-									this.settings.MaxFrameSize = Value;
+									this.settings.MaxFrameSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 									break;
 
 								case 6:
 									if (this.HasSniffers)
 										await this.Information("RX: SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
 
-									this.settings.MaxHeaderListSize = Value;
+									this.settings.MaxHeaderListSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 									break;
 
 								default:
@@ -700,7 +776,7 @@ namespace Waher.Networking.HTTP
 
 					if (Stream is null)
 					{
-						if (!this.settings.SetWindowSizeIncrement(Value))
+						if (!this.settings.SetWindowSizeIncrement((int)Value))
 							return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
 					}
 					else

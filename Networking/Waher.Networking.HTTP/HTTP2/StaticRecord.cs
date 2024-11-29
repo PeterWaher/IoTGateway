@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Length of header.
 		/// </summary>
-		public uint HeaderLength { get; }
+		public int HeaderLength { get; }
 
 		/// <summary>
 		/// Static record.
@@ -47,7 +47,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.Index = Index;
 			this.Header = Header;
-			this.HeaderLength = (uint)Encoding.UTF8.GetBytes(Header).Length;
+			this.HeaderLength = Encoding.UTF8.GetBytes(Header).Length;
 			this.Value = Value;
 		}
 	}

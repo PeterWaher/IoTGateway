@@ -19,7 +19,7 @@
 		/// <summary>
 		/// Length of record in dynamic header table.
 		/// </summary>
-		public uint Length { get; internal set; }
+		public int Length { get; internal set; }
 
 		/// <summary>
 		/// Creation ordinal number.
@@ -34,7 +34,7 @@
 		/// <param name="Value">HTTP Header Value</param>
 		/// <param name="Length">Length of record in dynamic header table.</param>
 		/// <param name="Ordinal">Creation ordinal number.</param>
-		public DynamicRecord(DynamicHeader Header, string Value, uint Length, ulong Ordinal)
+		public DynamicRecord(DynamicHeader Header, string Value, int Length, ulong Ordinal)
 		{
 			this.Header = Header;
 			this.Value = Value;

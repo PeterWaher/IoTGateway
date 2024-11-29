@@ -39,8 +39,18 @@ namespace Waher.Networking.HTTP
 		private string resourcePart = string.Empty;
 		private string queryString = string.Empty;
 		private string fragment = string.Empty;
-		private readonly string uriScheme = string.Empty;
+		private string uriScheme = string.Empty;
 		private double httpVersion = -1;
+
+		/// <summary>
+		/// Contains information about all fields in an HTTP request header.
+		/// </summary>
+		/// <param name="Version">HTTP Version</param>
+		public HttpRequestHeader(double Version)
+			: base()
+		{
+			this.httpVersion = Version;
+		}
 
 		/// <summary>
 		/// Contains information about all fields in an HTTP request header.
@@ -85,60 +95,68 @@ namespace Waher.Networking.HTTP
 				int j = Row.LastIndexOf(' ');
 				if (j > 0 && j < Row.Length - 5 && Row.Substring(j + 1, 5) == "HTTP/")
 				{
-					this.resourcePart = Row.Substring(i + 1, j - i - 1).Trim();
-					VanityResources?.CheckVanityResource(ref this.resourcePart);
-					this.resource = this.resourcePart;
+					this.SetResource(Row.Substring(i + 1, j - i - 1).Trim(), VanityResources);
+					
+					if (!CommonTypes.TryParse(Row[(j + 6)..], out this.httpVersion))
+						this.httpVersion = -1;
+				}
+			}
+		}
 
-					if (CommonTypes.TryParse(Row[(j + 6)..], out this.httpVersion))
+		/// <summary>
+		/// Sets the resource part of the request.
+		/// </summary>
+		/// <param name="Resource">Resource part</param>
+		/// <param name="VanityResources">Vanity resources.</param>
+		public void SetResource(string Resource, VanityResources VanityResources)
+		{
+			this.resourcePart = Resource;
+			VanityResources?.CheckVanityResource(ref this.resourcePart);
+			this.resource = this.resourcePart;
+
+			int i = this.resource.IndexOf('?');
+			if (i >= 0)
+			{
+				this.queryString = this.resource[(i + 1)..];
+				this.resource = this.resource[..i];
+
+				i = this.queryString.IndexOf('#');
+				if (i >= 0)
+				{
+					this.fragment = this.queryString[(i + 1)..];
+					this.queryString = this.queryString[..i];
+				}
+
+				this.query = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+				List<KeyValuePair<string, string>> Parameters = new List<KeyValuePair<string, string>>();
+				string Key, Name;
+
+				foreach (string Part in this.queryString.Split('&'))
+				{
+					i = Part.IndexOf('=');
+					if (i < 0)
 					{
-						i = this.resource.IndexOf('?');
-						if (i >= 0)
-						{
-							this.queryString = this.resource[(i + 1)..];
-							this.resource = this.resource[..i];
-
-							i = this.queryString.IndexOf('#');
-							if (i >= 0)
-							{
-								this.fragment = this.queryString[(i + 1)..];
-								this.queryString = this.queryString[..i];
-							}
-
-							this.query = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
-							List<KeyValuePair<string, string>> Parameters = new List<KeyValuePair<string, string>>();
-							string Key, Name;
-
-							foreach (string Part in this.queryString.Split('&'))
-							{
-								i = Part.IndexOf('=');
-								if (i < 0)
-								{
-									this.query[Part] = string.Empty;
-									Parameters.Add(new KeyValuePair<string, string>(Part, string.Empty));
-								}
-								else
-								{
-									Key = Part[..i];
-									Name = Part[(i + 1)..];
-									this.query[Key] = Name;
-									Parameters.Add(new KeyValuePair<string, string>(Key, Name));
-								}
-							}
-
-							this.queryParameters = Parameters.ToArray();
-						}
-						else
-						{
-							i = this.resource.IndexOf('#');
-							if (i >= 0)
-							{
-								this.fragment = this.resource[(i + 1)..];
-								this.resource = this.resource[..i];
-							}
-						}
+						this.query[Part] = string.Empty;
+						Parameters.Add(new KeyValuePair<string, string>(Part, string.Empty));
 					}
 					else
-						this.httpVersion = -1;
+					{
+						Key = Part[..i];
+						Name = Part[(i + 1)..];
+						this.query[Key] = Name;
+						Parameters.Add(new KeyValuePair<string, string>(Key, Name));
+					}
+				}
+
+				this.queryParameters = Parameters.ToArray();
+			}
+			else
+			{
+				i = this.resource.IndexOf('#');
+				if (i >= 0)
+				{
+					this.fragment = this.resource[(i + 1)..];
+					this.resource = this.resource[..i];
 				}
 			}
 		}
@@ -146,7 +164,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// HTTP Method
 		/// </summary>
-		public string Method => this.method;
+		public string Method
+		{
+			get => this.method;
+			internal set => this.method = value;
+		}
 
 		/// <summary>
 		/// Resource
@@ -176,7 +198,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// URI scheme.
 		/// </summary>
-		public string UriScheme => this.uriScheme;
+		public string UriScheme
+		{
+			get => this.uriScheme;
+			internal set => this.uriScheme = value;
+		}
 
 		/// <summary>
 		/// Tries to get the value of an individual query parameter, if available.
@@ -216,7 +242,7 @@ namespace Waher.Networking.HTTP
 						this.accept = new HttpFieldAccept(Key, Value);
 					else
 						this.accept.AppendRecords(Value);
-					
+
 					return this.accept;
 
 				case "accept-encoding":

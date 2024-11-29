@@ -302,16 +302,12 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if ((Code & 0x80000000) == 0)
 					{
-						if (Loop.Zero is null)
-							Loop.Zero = new HuffmanDecoding();
-
+						Loop.Zero ??= new HuffmanDecoding();
 						Loop = Loop.Zero;
 					}
 					else
 					{
-						if (Loop.One is null)
-							Loop.One = new HuffmanDecoding();
-
+						Loop.One ??= new HuffmanDecoding();
 						Loop = Loop.One;
 					}
 
@@ -321,15 +317,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				if ((Code & 0x80000000) == 0)
-				{
-					if (Loop.Zero is null)
-						Loop.Zero = new HuffmanDecoding((byte)i, PartOfEoS);
-				}
+					Loop.Zero ??= new HuffmanDecoding((byte)i, PartOfEoS);
 				else
-				{
-					if (Loop.One is null)
-						Loop.One = new HuffmanDecoding((byte)i, PartOfEoS);
-				}
+					Loop.One ??= new HuffmanDecoding((byte)i, PartOfEoS);
 			}
 
 			return Root;
@@ -465,17 +455,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Upper limit of maximum dynamic header table size.
 		/// </summary>
-		protected readonly uint maxDynamicHeaderSizeLimit;
+		protected readonly int maxDynamicHeaderSizeLimit;
 
 		/// <summary>
 		/// Maximum size of the table of dynamic headers.
 		/// </summary>
-		protected uint maxDynamicHeaderSize;
+		protected int maxDynamicHeaderSize;
 
 		/// <summary>
 		/// Size of the dynamic headers table.
 		/// </summary>
-		protected uint dynamicHeaderSize = 0;
+		protected int dynamicHeaderSize = 0;
 
 		/// <summary>
 		/// Number of records in the dynamic headers table.
@@ -492,7 +482,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// https://datatracker.ietf.org/doc/html/rfc7541
 		/// </summary>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
-		public DynamicHeaders(uint MaxDynamicHeaderSize)
+		public DynamicHeaders(int MaxDynamicHeaderSize)
 			: this(MaxDynamicHeaderSize, MaxDynamicHeaderSize)
 		{
 		}
@@ -503,7 +493,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
 		/// <param name="MaxDynamicHeaderSizeLimit">Upper limit of the maximum dynamic header size.</param>
-		public DynamicHeaders(uint MaxDynamicHeaderSize, uint MaxDynamicHeaderSizeLimit)
+		public DynamicHeaders(int MaxDynamicHeaderSize, int MaxDynamicHeaderSizeLimit)
 		{
 			this.maxDynamicHeaderSize = MaxDynamicHeaderSize;
 			this.maxDynamicHeaderSizeLimit = MaxDynamicHeaderSizeLimit;
@@ -517,17 +507,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Size of dynamic header.
 		/// </summary>
-		public uint DynamicHeaderSize => this.dynamicHeaderSize;
+		public int DynamicHeaderSize => this.dynamicHeaderSize;
 
 		/// <summary>
 		/// Maximum size of dynamic header.
 		/// </summary>
-		public uint MaxDynamicHeaderSize => this.maxDynamicHeaderSize;
+		public int MaxDynamicHeaderSize => this.maxDynamicHeaderSize;
 
 		/// <summary>
 		/// Upper limit of the Maximum size of dynamic header (SETTINGS_HEADER_TABLE_SIZE).
 		/// </summary>
-		public uint MaxDynamicHeaderSizeLimit => this.maxDynamicHeaderSizeLimit;
+		public int MaxDynamicHeaderSizeLimit => this.maxDynamicHeaderSizeLimit;
 
 		/// <summary>
 		/// Updates the maximum dynamic header size, and trims the dynamic header table.
@@ -535,7 +525,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="MaxDynamicHeaderSize">New Maximum size of the dynamic header.</param>
 		/// <returns>If change was applied (true), or if the request was rejected because
 		/// it surpassed the upper limit (false).</returns>
-		public bool UpdateMaxDynamicHeaderSize(uint MaxDynamicHeaderSize)
+		public bool UpdateMaxDynamicHeaderSize(int MaxDynamicHeaderSize)
 		{
 			if (MaxDynamicHeaderSize > this.maxDynamicHeaderSizeLimit)
 				return false;

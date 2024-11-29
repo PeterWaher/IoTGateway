@@ -10,11 +10,11 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class HeaderReader : DynamicHeaders
 	{
-		private uint bufferSize;
+		private int bufferSize;
 		private byte[] buffer;
 		private byte[] stringBuffer = new byte[128];
 		private int stringBufferLen = 128;
-		private uint pos;
+		private int pos;
 		private byte bitsLeft = 0;
 		private byte current = 0;
 
@@ -24,8 +24,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
-		public HeaderReader(byte[] Buffer, uint MaxDynamicHeaderSize)
-			: this(Buffer, 0, (uint)Buffer.Length, MaxDynamicHeaderSize, MaxDynamicHeaderSize)
+		public HeaderReader(byte[] Buffer, int MaxDynamicHeaderSize)
+			: this(Buffer, 0, Buffer.Length, MaxDynamicHeaderSize, MaxDynamicHeaderSize)
 		{
 		}
 
@@ -38,7 +38,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Count">Number of bytes to read.</param>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
 		/// <param name="MaxDynamicHeaderSizeLimit">Upper limit of the maximum dynamic header size.</param>
-		public HeaderReader(byte[] Buffer, uint Offset, uint Count, uint MaxDynamicHeaderSize, uint MaxDynamicHeaderSizeLimit)
+		public HeaderReader(byte[] Buffer, int Offset, int Count, int MaxDynamicHeaderSize, int MaxDynamicHeaderSizeLimit)
 			: base(MaxDynamicHeaderSize, MaxDynamicHeaderSizeLimit)
 		{
 			this.bufferSize = Offset + Count;
@@ -49,7 +49,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Current byte-position.
 		/// </summary>
-		public uint Position => this.pos;
+		public int Position => this.pos;
 
 		/// <summary>
 		/// Bits left of current byte.
@@ -67,7 +67,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		public void Reset(byte[] Buffer)
 		{
-			this.Reset(Buffer, 0, (uint)Buffer.Length);
+			this.Reset(Buffer, 0, Buffer.Length);
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="Offset">Start reading at this position.</param>
 		/// <param name="Count">Number of bytes to read.</param>
-		public void Reset(byte[] Buffer, uint Offset, uint Count)
+		public void Reset(byte[] Buffer, int Offset, int Count)
 		{
 			this.bufferSize = Offset + Count;
 			this.buffer = Buffer;
@@ -91,7 +91,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		public void Clear(byte[] Buffer)
 		{
-			this.Clear(Buffer, 0, (uint)Buffer.Length);
+			this.Clear(Buffer, 0, Buffer.Length);
 		}
 
 		/// <summary>
@@ -100,7 +100,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="Offset">Start reading at this position.</param>
 		/// <param name="Count">Number of bytes to read.</param>
-		public void Clear(byte[] Buffer, uint Offset, uint Count)
+		public void Clear(byte[] Buffer, int Offset, int Count)
 		{
 			this.Reset(Buffer, Offset, Count);
 			this.dynamicHeaders.Clear();
@@ -241,7 +241,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Value">String value.</param>
 		/// <param name="Length">Length of string, for use with calculation of dynamic header record size.</param>
 		/// <returns>If read was successful (true), or if buffer size did not permit read operation (false).</returns>
-		public bool ReadString(out string Value, out uint Length)
+		public bool ReadString(out string Value, out int Length)
 		{
 			if (!this.ReadBit(out bool Huffman))
 			{
@@ -250,8 +250,8 @@ namespace Waher.Networking.HTTP.HTTP2
 				return false;
 			}
 
-			if (this.ReadInteger(out ulong l) && l <= uint.MaxValue)
-				Length = (uint)l;
+			if (this.ReadInteger(out ulong l) && l <= int.MaxValue)
+				Length = (int)l;
 			else
 			{
 				Value = null;
@@ -261,7 +261,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Huffman)
 			{
-				uint EndPos = this.pos + Length;
+				int EndPos = this.pos + Length;
 				HuffmanDecoding Loop = huffmanDecodingRoot;
 				int StringPos = 0;
 				int i;
@@ -308,7 +308,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				Value = Encoding.UTF8.GetString(this.stringBuffer, 0, StringPos);
-				Length = (uint)StringPos;
+				Length = StringPos;
 			}
 			else
 			{
@@ -337,7 +337,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			DynamicHeader DynamicHeader = null;
 			DynamicRecord DynamicRecord;
 			ulong Index;
-			uint HeaderLen;
+			int HeaderLen;
 
 			if (!this.ReadBit(out bool Bit))
 			{
@@ -447,7 +447,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					HeaderLen = DynamicHeader.HeaderLength;
 				}
 
-				if (!this.ReadString(out Value, out uint ValueLen))
+				if (!this.ReadString(out Value, out int ValueLen))
 					return false;
 
 				if (Mode == IndexMode.Indexed)

@@ -10,9 +10,9 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class HeaderWriter : DynamicHeaders
 	{
-		private readonly uint bufferSize;
+		private readonly int bufferSize;
 		private readonly byte[] buffer;
-		private uint pos = 0;
+		private int pos = 0;
 		private byte bitsLeft = 8;
 		private byte current = 0;
 
@@ -22,7 +22,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="BufferSize">Size of binary buffer.</param>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
-		public HeaderWriter(uint BufferSize, uint MaxDynamicHeaderSize)
+		public HeaderWriter(int BufferSize, int MaxDynamicHeaderSize)
 			: this(BufferSize, MaxDynamicHeaderSize, MaxDynamicHeaderSize)
 		{
 		}
@@ -34,7 +34,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="BufferSize">Size of binary buffer.</param>
 		/// <param name="MaxDynamicHeaderSize">Maximum dynamic header size.</param>
 		/// <param name="MaxDynamicHeaderSizeLimit">Upper limit of the maximum dynamic header size.</param>
-		public HeaderWriter(uint BufferSize, uint MaxDynamicHeaderSize, uint MaxDynamicHeaderSizeLimit)
+		public HeaderWriter(int BufferSize, int MaxDynamicHeaderSize, int MaxDynamicHeaderSizeLimit)
 			: base(MaxDynamicHeaderSize, MaxDynamicHeaderSizeLimit)
 		{
 			this.bufferSize = BufferSize;
@@ -44,7 +44,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Current byte-position.
 		/// </summary>
-		public uint Position => this.pos;
+		public int Position => this.pos;
 
 		/// <summary>
 		/// Bits left of current byte.
@@ -293,7 +293,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Huffman">If the value should be Huffman encoded.</param>
 		/// <param name="Length">Length of string, for use with calculation of dynamic header record size.</param>
 		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
-		public bool WriteString(string Value, bool Huffman, out uint Length)
+		public bool WriteString(string Value, bool Huffman, out int Length)
 		{
 			if (!this.WriteBit(Huffman))
 			{
@@ -304,7 +304,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			byte[] Bin = Encoding.UTF8.GetBytes(Value);
 			int i;
 
-			Length = (uint)Bin.Length;
+			Length = Bin.Length;
 
 			if (Huffman)
 			{
@@ -332,7 +332,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 			else
 			{
-				if (!this.WriteInteger(Length))
+				if (!this.WriteInteger((uint)Length))
 					return false;
 
 				if (this.pos + Length >= this.bufferSize)
@@ -358,7 +358,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			DynamicHeader DynamicHeader;
 			DynamicRecord DynamicRecord;
 			ulong Index;
-			uint c;
+			int c;
 
 			if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
 				this.TrimDynamicHeaders();

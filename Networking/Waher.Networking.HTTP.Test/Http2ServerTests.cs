@@ -82,7 +82,8 @@ namespace Waher.Networking.HTTP.Test
 				AllowAutoRedirect = false,
 				UseCookies = true,
 				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-				InitialHttp2StreamWindowSize = 65535
+				InitialHttp2StreamWindowSize = 65535,
+				ConnectTimeout = TimeSpan.FromSeconds(10)
 			};
 
 			Handler.SslOptions.EnabledSslProtocols = System.Security.Authentication.SslProtocols.None; // For HTTP/2 cleartext

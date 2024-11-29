@@ -1,10 +1,15 @@
-﻿namespace Waher.Networking.HTTP.HTTP2
+﻿using System;
+
+namespace Waher.Networking.HTTP.HTTP2
 {
 	/// <summary>
 	/// HTTP/2 connection settings (SETTINGS).
 	/// </summary>
 	public class ConnectionSettings
 	{
+		private int bufferSize = 65535;
+		private byte[] outputBuffer;
+
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
@@ -174,11 +179,53 @@
 						break;
 
 					default:
-						break;	// Ignore
+						break;  // Ignore
 				}
 			}
 
 			return true;
 		}
+
+		/// <summary>
+		/// Serializes current settings.
+		/// </summary>
+		/// <returns></returns>
+		public byte[] ToArray()
+		{
+			BinaryWriter w = new BinaryWriter();
+
+			w.WriteKeyValue(1, this.HeaderTableSize);
+			w.WriteKeyValue(2, this.EnablePush ? 1U : 0U);
+			w.WriteKeyValue(3, this.MaxConcurrentStreams);
+			w.WriteKeyValue(4, this.InitialWindowSize);
+			w.WriteKeyValue(5, this.MaxFrameSize);
+			w.WriteKeyValue(6, this.MaxHeaderListSize);
+
+			return w.ToArray();
+		}
+
+		/// <summary>
+		/// Sets the window size increment for stream, modified using the WINDOW_UPDATE
+		/// frame.
+		/// </summary>
+		public bool SetWindowSizeIncrement(uint Increment)
+		{
+			long Size = this.InitialWindowSize + Increment;
+
+			if (Size > int.MaxValue - 1)
+				return false;
+
+			this.bufferSize = (int)Size;
+
+			if (!(this.outputBuffer is null) && this.outputBuffer.Length < this.bufferSize)
+				Array.Resize(ref this.outputBuffer, this.bufferSize);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Buffer size
+		/// </summary>
+		public int BufferSize => this.bufferSize;
 	}
 }

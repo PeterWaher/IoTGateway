@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -31,7 +32,8 @@ namespace Waher.Networking.HTTP
 		Http,
 		Http2Init,
 		Http2Live,
-		WebSocket
+		WebSocket,
+		Closed
 	}
 
 	/// <summary>
@@ -97,6 +99,7 @@ namespace Waher.Networking.HTTP
 				case ConnectionMode.WebSocket:
 					return this.webSocket?.WebSocketDataReceived(Buffer, Offset, Count) ?? Task.FromResult(false);
 
+				case ConnectionMode.Closed:
 				default:
 					return Task.FromResult(false);
 			}
@@ -272,6 +275,7 @@ namespace Waher.Networking.HTTP
 				{
 					this.mode = ConnectionMode.Http2Init;
 					this.settings = new ConnectionSettings();
+					this.http2Streams = new Dictionary<int, Http2Stream>();
 
 					if (i + 1 < NrRead)
 						return await this.BinaryHttp2InitDataReceived(Data, i + 1, NrRead - i - 1);
@@ -293,6 +297,7 @@ namespace Waher.Networking.HTTP
 							{
 								this.settings = Settings;
 								this.mode = ConnectionMode.Http2Live;
+								this.http2Streams ??= new Dictionary<int, Http2Stream>();
 
 								using HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
@@ -377,6 +382,7 @@ namespace Waher.Networking.HTTP
 				if (this.settings.InitStep == 6)
 				{
 					this.mode = ConnectionMode.Http2Live;
+					this.http2Streams ??= new Dictionary<int, Http2Stream>();
 
 					if (this.HasSniffers)
 						await this.ReceiveText("\r\nSM\r\n");
@@ -496,10 +502,14 @@ namespace Waher.Networking.HTTP
 		private int http2State = 0;
 		private int http2FrameLength = 0;
 		private int http2StreamId = 0;
+		private int http2LastCreatedStreamId = 0;
 		private int http2FramePos = 0;
 		private FrameType http2FrameType = 0;
+		private Dictionary<int, Http2Stream> http2Streams = null;
 		private byte http2FrameFlags = 0;
 		private byte[] http2Frame = null;
+
+		internal ConnectionSettings Settings => this.settings;
 
 		private async Task<bool> ProcessHttp2Frame()
 		{
@@ -507,6 +517,7 @@ namespace Waher.Networking.HTTP
 			{
 				StringBuilder sb = new StringBuilder();
 
+				sb.Append("RX: ");
 				sb.Append(this.http2FrameType.ToString());
 				sb.Append(", Flags ");
 				sb.Append(this.http2FrameFlags.ToString("X2"));
@@ -523,6 +534,33 @@ namespace Waher.Networking.HTTP
 				this.reader = new HTTP2.BinaryReader(this.http2Frame, 0, this.http2FrameLength);
 			else
 				this.reader.Reset(this.http2Frame, 0, this.http2FrameLength);
+
+			Http2Stream Stream;
+			ushort Key;
+			uint Value;
+
+			if (this.http2StreamId == 0)
+				Stream = null;
+			else
+			{
+				lock (this.http2Streams)
+				{
+					if (!this.http2Streams.TryGetValue(this.http2StreamId, out Stream))
+					{
+						if (this.http2StreamId > this.http2LastCreatedStreamId)
+						{
+							Stream = new Http2Stream(this.http2StreamId, this);
+							this.http2Streams[this.http2StreamId] = Stream;
+							this.http2LastCreatedStreamId = this.http2StreamId;
+						}
+						else
+							Stream = null;
+					}
+				}
+
+				if (Stream is null)
+					return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
+			}
 
 			switch (this.http2FrameType)
 			{
@@ -555,26 +593,28 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
+						int StartPos = this.reader.Position;
+						
 						while (this.reader.HasMore)
 						{
 							if (this.reader.BytesLeft < 6)
 								return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
 
-							ushort Key = this.reader.NextUInt16();
-							uint Value = this.reader.NextUInt32();
+							Key = this.reader.NextUInt16();
+							Value = this.reader.NextUInt32();
 
 							switch (Key)
 							{
 								case 1:
 									if (this.HasSniffers)
-										await this.Information("SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
+										await this.Information("RX: SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
 
 									this.settings.HeaderTableSize = Value;
 									break;
 
 								case 2:
 									if (this.HasSniffers)
-										await this.Information("SETTINGS_ENABLE_PUSH = " + Value.ToString());
+										await this.Information("RX: SETTINGS_ENABLE_PUSH = " + Value.ToString());
 
 									if (Value > 1)
 										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
@@ -584,14 +624,14 @@ namespace Waher.Networking.HTTP
 
 								case 3:
 									if (this.HasSniffers)
-										await this.Information("SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
+										await this.Information("RX: SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
 
 									this.settings.MaxConcurrentStreams = Value;
 									break;
 
 								case 4:
 									if (this.HasSniffers)
-										await this.Information("SETTINGS_INITIAL_WINDOW_SIZE = " + Value.ToString());
+										await this.Information("RX: SETTINGS_INITIAL_WINDOW_SIZE = " + Value.ToString());
 
 									if (Value > 0x7fffffff)
 										return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
@@ -601,7 +641,7 @@ namespace Waher.Networking.HTTP
 
 								case 5:
 									if (this.HasSniffers)
-										await this.Information("SETTINGS_MAX_FRAME_SIZE = " + Value.ToString());
+										await this.Information("RX: SETTINGS_MAX_FRAME_SIZE = " + Value.ToString());
 
 									if (Value > 0x00ffffff)
 										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
@@ -611,19 +651,23 @@ namespace Waher.Networking.HTTP
 
 								case 6:
 									if (this.HasSniffers)
-										await this.Information("SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
+										await this.Information("RX: SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
 
 									this.settings.MaxHeaderListSize = Value;
 									break;
 
 								default:
 									if (this.HasSniffers)
-										await this.Information("(" + Key.ToString() + ", " + Value.ToString() + ")");
+										await this.Information("RX: (" + Key.ToString() + ", " + Value.ToString() + ")");
 
 									break;  // Ignore
 							}
 
-							// TODO: Return Settings(Ack=1) frame
+							byte[] SettingsPayload = this.settings.ToArray();
+							if (this.reader.AreSame(SettingsPayload, StartPos))
+								return await this.SendHttp2Frame(FrameType.Settings, 1, 0);
+							else
+								return await this.SendHttp2Frame(FrameType.Settings, 0, 0, SettingsPayload);
 						}
 					}
 					break;
@@ -641,8 +685,29 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case FrameType.WindowUpdate:
-					// WINDOW_UPDATE, §6.10, RFC 7540: https://datatracker.ietf.org/doc/html/rfc7540#section-6.9
-					// TODO
+					// WINDOW_UPDATE, §6.9, RFC 7540: https://datatracker.ietf.org/doc/html/rfc7540#section-6.9
+
+					if (this.reader.BytesLeft != 4)
+						return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
+
+					Value = this.reader.NextUInt32() & 0x7fffffff;
+
+					if (this.HasSniffers)
+						await this.Information("RX: WINDOW_SIZE increment = " + Value.ToString());
+
+					if (Value == 0)
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId == 0);
+
+					if (Stream is null)
+					{
+						if (!this.settings.SetWindowSizeIncrement(Value))
+							return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
+					}
+					else
+					{
+						if (!Stream.SetWindowSizeIncrement(Value))
+							return await this.ReturnHttp2Error(Http2Error.FlowControlError, false);
+					}
 					break;
 
 				case FrameType.Continuation:
@@ -659,8 +724,91 @@ namespace Waher.Networking.HTTP
 			if (this.HasSniffers)
 				await this.Error(ErrorCode.ToString());
 
-			// TODO: Return frame.
-			return !ConnectionError;
+			int i = (int)ErrorCode;
+
+			if (ConnectionError)
+			{
+				byte[] Payload = new byte[8]
+				{
+					(byte)(this.http2LastCreatedStreamId >> 24),
+					(byte)(this.http2LastCreatedStreamId >> 16),
+					(byte)(this.http2LastCreatedStreamId >> 8),
+					(byte)this.http2LastCreatedStreamId,
+					(byte)(i >> 24),
+					(byte)(i >> 16),
+					(byte)(i >> 8),
+					(byte)i
+				};
+
+				await this.SendHttp2Frame(FrameType.GoAway, 0, 0, Payload);
+				this.mode = ConnectionMode.Closed;
+
+				return false;
+			}
+			else
+			{
+				byte[] Payload = new byte[4]
+				{
+					(byte)(i >> 24),
+					(byte)(i >> 16),
+					(byte)(i >> 8),
+					(byte)i
+				};
+
+				return await this.SendHttp2Frame(FrameType.ResetStream, 0, 0, Payload);
+			}
+		}
+
+		private Task<bool> SendHttp2Frame(FrameType Type, byte Flags, uint StreamId,
+			 params byte[] Payload)
+		{
+			return this.SendHttp2Frame(Type, Flags, StreamId, Payload, 0, Payload.Length);
+		}
+
+		private async Task<bool> SendHttp2Frame(FrameType Type, byte Flags, uint StreamId,
+			 byte[] Payload, int Offset, int Count)
+		{
+			int Len = Payload.Length;
+			if (Len > 0x00ffffff)
+				return false;
+
+			byte[] Header = new byte[9]
+			{
+				(byte)(Len >> 16),
+				(byte)(Len >> 8),
+				(byte)Len,
+				(byte)Type,
+				Flags,
+				(byte)(StreamId >> 24),
+				(byte)(StreamId >> 16),
+				(byte)(StreamId >> 8),
+				(byte)StreamId,
+			};
+
+			if (!await this.client.SendAsync(Header))
+				return false;
+
+			if (Count > 0 && !await this.client.SendAsync(Payload, Offset, Count))
+				return false;
+
+			if (this.HasSniffers)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("TX: ");
+				sb.Append(Type.ToString());
+				sb.Append(", Flags ");
+				sb.Append(Flags.ToString("X2"));
+				sb.Append(", Stream ");
+				sb.Append(StreamId.ToString());
+				sb.Append(", Size ");
+				sb.Append(Count.ToString());
+				sb.Append(" bytes");
+
+				await this.Information(sb.ToString());
+			}
+
+			return true;
 		}
 
 		internal static bool IsSniffableTextType(string ContentType)

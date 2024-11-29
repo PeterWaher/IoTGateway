@@ -122,5 +122,41 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Number of bytes left to read.
 		/// </summary>
 		public int BytesLeft => this.bufferSize - this.pos;
+
+		/// <summary>
+		/// Checks if a byte-array is equal to a portion of the read buffer.
+		/// </summary>
+		/// <param name="Buffer">Buffer</param>
+		/// <param name="ThisPosition">Start position in this object's buffer.</param>
+		/// <returns>If bytes are the same.</returns>
+		public bool AreSame(byte[] Buffer, int ThisPosition)
+		{
+			return this.AreSame(Buffer, 0, Buffer.Length, ThisPosition);
+		}
+
+		/// <summary>
+		/// Checks if a byte-array is equal to a portion of the read buffer.
+		/// </summary>
+		/// <param name="Buffer">Buffer</param>
+		/// <param name="Offset">Start offset in buffer.</param>
+		/// <param name="Count">Number of bytes to compare.</param>
+		/// <param name="ThisPosition">Start position in this object's buffer.</param>
+		/// <returns>If bytes are the same.</returns>
+		public bool AreSame(byte[] Buffer, int Offset, int Count, int ThisPosition)
+		{
+			if (ThisPosition + Count > this.bufferSize)
+				return false;
+
+			if (Offset + Count > Buffer.Length)
+				return false;
+
+			while (Count-- > 0)
+			{
+				if (Buffer[Offset++] != this.buffer[ThisPosition++])
+					return false;
+			}
+
+			return true;
+		}
 	}
 }

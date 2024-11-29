@@ -92,6 +92,7 @@ namespace Waher.Networking.HTTP.Test
 			Client.DefaultRequestVersion = HttpVersion.Version20;
 			Client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
 			Client.DefaultRequestHeaders.ConnectionClose = false;
+			Client.Timeout = TimeSpan.FromSeconds(10);
 
 			HttpResponseMessage Response = await Client.GetAsync("http://localhost:8081/test01.txt");
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();

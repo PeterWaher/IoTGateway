@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -54,6 +55,7 @@ namespace Waher.Networking.HTTP
 		private ConnectionSettings settings = null;
 		private WebSocket webSocket = null;
 		private Encoding rxEncoding = null;
+		private HTTP2.BinaryReader reader = null;
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
@@ -376,7 +378,7 @@ namespace Waher.Networking.HTTP
 					this.mode = ConnectionMode.Http2Live;
 
 					if (this.HasSniffers)
-						await this.ReceiveText("\r\n\r\nSM\r\n\r\n");
+						await this.ReceiveText("\r\nSM\r\n");
 
 					if (i + 1 < NrRead)
 						return await this.BinaryHttp2LiveDataReceived(Data, i + 1, NrRead - i - 1);
@@ -390,7 +392,129 @@ namespace Waher.Networking.HTTP
 
 		private async Task<bool> BinaryHttp2LiveDataReceived(byte[] Data, int Offset, int NrRead)
 		{
+			if (this.reader is null)
+				this.reader = new HTTP2.BinaryReader(Data, Offset, NrRead);
+			else
+				this.reader.Reset(Data, Offset, NrRead);
+
+			int End = Offset + NrRead;
+
+			while (Offset < End)
+			{
+				switch (this.http2State)
+				{
+					case 0:
+						this.http2FrameLength = Data[Offset++];
+						this.http2State++;
+						break;
+
+					case 1:
+					case 2:
+						this.http2FrameLength <<= 8;
+						this.http2FrameLength |= Data[Offset++];
+						this.http2State++;
+						break;
+
+					case 3:
+						this.http2FrameType = Data[Offset++];
+						this.http2State++;
+						break;
+
+					case 4:
+						this.http2FrameFlags = Data[Offset++];
+						this.http2State++;
+						break;
+
+					case 5:
+						this.http2StreamId = Data[Offset++] & 127;
+						this.http2State++;
+						break;
+
+					case 6:
+					case 7:
+						this.http2StreamId <<= 8;
+						this.http2StreamId |= Data[Offset++];
+						this.http2State++;
+						break;
+
+					case 8:
+						this.http2StreamId <<= 8;
+						this.http2StreamId |= Data[Offset++];
+
+						if (this.http2FrameLength == 0)
+						{
+							// TODO: Process frame.
+							this.http2State = 0;
+						}
+						else
+						{
+							this.http2FramePos = 0;
+
+							if (this.http2FrameLength > this.settings.MaxFrameSize)
+								this.http2State += 2;
+							else
+							{
+								this.http2Frame ??= new byte[this.settings.MaxFrameSize];
+								this.http2State++;
+							}
+						}
+						break;
+
+					case 9:
+						int i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
+						Array.Copy(Data, Offset, this.http2Frame, this.http2FramePos, i);
+						Offset += i;
+						this.http2FramePos += i;
+
+						if (this.http2FramePos >= this.http2FrameLength)
+						{
+							this.http2State = 0;
+
+							if (!await this.ProcessHttp2Frame())
+								return false;
+						}
+						break;
+
+					case 10:
+						i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
+						Offset += i;
+						this.http2FramePos += i;
+
+						if (this.http2FramePos >= this.http2FrameLength)
+						{
+							this.http2State = 0;
+						
+							if (!await this.ReturnHttp2Error(Http2Error.FrameSizeError))
+								return false;
+						}
+						break;
+
+					default:
+						return false;
+				}
+			}
+
 			return true;	// TODO
+		}
+
+		private int http2State = 0;
+		private int http2FrameLength = 0;
+		private int http2StreamId = 0;
+		private int http2FramePos = 0;
+		private byte http2FrameType = 0;
+		private byte http2FrameFlags = 0;
+		private byte[] http2Frame = null;
+
+		private async Task<bool> ProcessHttp2Frame()
+		{
+			// TODO: process frame and return response.
+			return true;
+		}
+
+		private async Task<bool> ReturnHttp2Error(Http2Error ErrorCode)
+		{
+			// TODO: Return frame.
+			return true;
 		}
 
 		internal static bool IsSniffableTextType(string ContentType)

@@ -73,7 +73,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public async Task Test_01_h2c_Upgrade()
+		public async Task Test_01_Connect_And_GET()
 		{
 			server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 

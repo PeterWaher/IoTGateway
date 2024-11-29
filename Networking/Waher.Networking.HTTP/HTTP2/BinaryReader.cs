@@ -7,16 +7,16 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class BinaryReader
 	{
-		private uint bufferSize;
 		private byte[] buffer;
-		private uint pos;
+		private int bufferSize;
+		private int pos;
 
 		/// <summary>
 		/// Deserializes binary data
 		/// </summary>
 		/// <param name="Buffer">Input buffer.</param>
 		public BinaryReader(byte[] Buffer)
-			: this(Buffer, 0, (uint)Buffer.Length)
+			: this(Buffer, 0, Buffer.Length)
 		{
 		}
 
@@ -26,7 +26,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="Offset">Start reading at this position.</param>
 		/// <param name="Count">Number of bytes to read.</param>
-		public BinaryReader(byte[] Buffer, uint Offset, uint Count)
+		public BinaryReader(byte[] Buffer, int Offset, int Count)
 		{
 			this.bufferSize = Offset + Count;
 			this.buffer = Buffer;
@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Current byte-position.
 		/// </summary>
-		public uint Position => this.pos;
+		public int Position => this.pos;
 
 		/// <summary>
 		/// Current buffer.
@@ -49,7 +49,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		public void Reset(byte[] Buffer)
 		{
-			this.Reset(Buffer, 0, (uint)Buffer.Length);
+			this.Reset(Buffer, 0, Buffer.Length);
 		}
 
 		/// <summary>
@@ -58,7 +58,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="Offset">Start reading at this position.</param>
 		/// <param name="Count">Number of bytes to read.</param>
-		public void Reset(byte[] Buffer, uint Offset, uint Count)
+		public void Reset(byte[] Buffer, int Offset, int Count)
 		{
 			this.bufferSize = Offset + Count;
 			this.buffer = Buffer;
@@ -94,7 +94,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Returns the next <see cref="uint"/>.
+		/// Returns the next <see cref="int"/>.
 		/// </summary>
 		/// <returns>Next 32-bit unsigned integer.</returns>
 		public uint NextUInt32()
@@ -121,6 +121,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Number of bytes left to read.
 		/// </summary>
-		public int BytesLeft => (int)(this.bufferSize - this.pos);
+		public int BytesLeft => this.bufferSize - this.pos;
 	}
 }

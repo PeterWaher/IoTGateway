@@ -110,7 +110,7 @@
 		/// <returns>If able to parse the settings frame.</returns>
 		public static bool TryParse(byte[] Data, out ConnectionSettings Settings)
 		{
-			return TryParse(Data, 0, (uint)Data.Length, out Settings);
+			return TryParse(Data, 0, Data.Length, out Settings);
 		}
 
 		/// <summary>
@@ -124,7 +124,7 @@
 		/// <param name="Count">Number of bytes available.</param>
 		/// <param name="Settings">Settings object, if successful.</param>
 		/// <returns>If able to parse the settings frame.</returns>
-		public static bool TryParse(byte[] Data, uint Offset, uint Count, out ConnectionSettings Settings)
+		public static bool TryParse(byte[] Data, int Offset, int Count, out ConnectionSettings Settings)
 		{
 			BinaryReader Reader = new BinaryReader(Data, Offset, Count);
 

@@ -33,12 +33,12 @@ namespace Waher.Networking.HTTP.Test
 				File.Delete("HTTP2.xml");
 				xmlSniffer = xmlSniffer = new XmlFileSniffer("HTTP2.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
-						int.MaxValue, BinaryPresentationMethod.Base64);
+						int.MaxValue, BinaryPresentationMethod.Hexadecimal);
 			}
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
 			server = new HttpServer(8081, 8088, Certificate,
-				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine),
 				xmlSniffer);
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
@@ -102,6 +102,7 @@ namespace Waher.Networking.HTTP.Test
 
 		/* To Test
 		 * 
+		 * Huffman encoded strings
 		 * Long headers (multiple HEADERS & CONTINUATION frames)
 		 * data requests (POST)
 		 * long data requests (multiple DATA & CONTINUATION frames)
@@ -109,7 +110,7 @@ namespace Waher.Networking.HTTP.Test
 		 * data responses (one DATA frame)
 		 * long data responses (multiple DATA & CONTINUATION frames)
 		 * long headers in data responses (multiple HEADER & CONTINUATION frames)
-		 * push
+		 * push promise
 		 * stream priorities
 		 * stream errors
 		 * connection errors

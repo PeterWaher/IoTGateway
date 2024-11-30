@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -388,7 +386,7 @@ namespace Waher.Networking.HTTP
 						await this.ReceiveText("\r\nSM\r\n");
 
 					if (i + 1 < NrRead)
-						return await this.BinaryHttp2LiveDataReceived(Data, i + 1, NrRead - i - 1);
+						return await this.BinaryHttp2LiveDataReceived(Data, i + 1, c - i - 1);
 					else
 						return true;
 				}
@@ -399,54 +397,58 @@ namespace Waher.Networking.HTTP
 
 		private async Task<bool> BinaryHttp2LiveDataReceived(byte[] Data, int Offset, int NrRead)
 		{
+			if (this.HasSniffers)
+				await this.ReceiveBinary(BinaryTcpClient.ToArray(Data, Offset, NrRead));
+
 			int End = Offset + NrRead;
 
 			while (Offset < End)
 			{
 				switch (this.http2State)
 				{
-					case 0:
+					case 0:	// Frame length MSB
 						this.http2FrameLength = Data[Offset++];
 						this.http2State++;
 						break;
 
-					case 1:
+					case 1:	// Frame length, bytes 2 & 3
 					case 2:
 						this.http2FrameLength <<= 8;
 						this.http2FrameLength |= Data[Offset++];
 						this.http2State++;
 						break;
 
-					case 3:
+					case 3:	// Frame type
 						this.http2FrameType = (FrameType)Data[Offset++];
 						this.http2State++;
 						break;
 
-					case 4:
+					case 4:	// Frame flags
 						this.http2FrameFlags = Data[Offset++];
 						this.http2State++;
 						break;
 
-					case 5:
+					case 5:	// Stream ID, MSB
 						this.http2StreamId = Data[Offset++] & 127;
 						this.http2State++;
 						break;
 
-					case 6:
+					case 6:	// Stream ID, bytes 2 & 3
 					case 7:
 						this.http2StreamId <<= 8;
 						this.http2StreamId |= Data[Offset++];
 						this.http2State++;
 						break;
 
-					case 8:
+					case 8:	// Stream ID, byte 4
 						this.http2StreamId <<= 8;
 						this.http2StreamId |= Data[Offset++];
 
 						if (this.http2FrameLength == 0)
 						{
-							// TODO: Process frame.
 							this.http2State = 0;
+							if (!await this.ProcessHttp2Frame())
+								return false;
 						}
 						else
 						{
@@ -462,7 +464,7 @@ namespace Waher.Networking.HTTP
 						}
 						break;
 
-					case 9:
+					case 9:	// Frame payload
 						int i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
 						Array.Copy(Data, Offset, this.http2Frame, this.http2FramePos, i);
 						Offset += i;
@@ -477,7 +479,7 @@ namespace Waher.Networking.HTTP
 						}
 						break;
 
-					case 10:
+					case 10:    // Skip Frame payload and return error.
 						i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
 						Offset += i;
 						this.http2FramePos += i;
@@ -496,7 +498,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			return true;    // TODO
+			return true;
 		}
 
 		private int http2State = 0;
@@ -685,7 +687,10 @@ namespace Waher.Networking.HTTP
 									if (this.HasSniffers)
 										await this.Information("RX: SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
 
-									this.settings.HeaderTableSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
+									if (Value > int.MaxValue)
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+									this.settings.HeaderTableSize = (int)Value;
 									break;
 
 								case 2:
@@ -702,7 +707,10 @@ namespace Waher.Networking.HTTP
 									if (this.HasSniffers)
 										await this.Information("RX: SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
 
-									this.settings.MaxConcurrentStreams = Value > int.MaxValue ? int.MaxValue : (int)Value;
+									if (Value > int.MaxValue)
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+									this.settings.MaxConcurrentStreams = (int)Value;
 									break;
 
 								case 4:
@@ -729,7 +737,10 @@ namespace Waher.Networking.HTTP
 									if (this.HasSniffers)
 										await this.Information("RX: SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
 
-									this.settings.MaxHeaderListSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
+									if (Value > int.MaxValue)
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+									this.settings.MaxHeaderListSize = (int)Value;
 									break;
 
 								default:
@@ -738,13 +749,9 @@ namespace Waher.Networking.HTTP
 
 									break;  // Ignore
 							}
-
-							byte[] SettingsPayload = this.settings.ToArray();
-							if (this.reader.AreSame(SettingsPayload, StartPos))
-								return await this.SendHttp2Frame(FrameType.Settings, 1, 0);
-							else
-								return await this.SendHttp2Frame(FrameType.Settings, 0, 0, SettingsPayload);
 						}
+
+						//return await this.SendHttp2Frame(FrameType.Settings, 1, 0);
 					}
 					break;
 
@@ -869,6 +876,9 @@ namespace Waher.Networking.HTTP
 
 			if (this.HasSniffers)
 			{
+				await this.TransmitBinary(Header);
+				await this.TransmitBinary(BinaryTcpClient.ToArray(Payload, Offset, Count));
+
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append("TX: ");

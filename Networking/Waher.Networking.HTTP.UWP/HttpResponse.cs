@@ -9,6 +9,7 @@ using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
 
@@ -26,6 +27,7 @@ namespace Waher.Networking.HTTP
 		private LinkedList<Cookie> cookies = null;
 		private List<string> challenges = null;
 		private readonly Encoding encoding = Encoding.UTF8;
+		private readonly Http2Stream http2Stream;
 		private bool encodingUsed = false;
 		private DateTimeOffset date = DateTimeOffset.Now;
 		private DateTimeOffset? expires = null;
@@ -58,6 +60,7 @@ namespace Waher.Networking.HTTP
 			this.clientConnection = null;
 			this.httpServer = null;
 			this.httpRequest = null;
+			this.http2Stream = null;
 		}
 
 		/// <summary>
@@ -73,6 +76,7 @@ namespace Waher.Networking.HTTP
 			this.desiredTransferEncoding = TransferEncoding;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
+			this.http2Stream = Request?.Http2Stream;
 
 			if (!(Request is null))
 			{
@@ -263,9 +267,7 @@ namespace Waher.Networking.HTTP
 							new KeyValuePair<string, object>("Header", FieldName),
 							new KeyValuePair<string, object>("Value", Value));
 
-						if (this.customHeaders is null)
-							this.customHeaders = new Dictionary<string, string>();
-
+						this.customHeaders ??= new Dictionary<string, string>();
 						this.customHeaders[FieldName] = Value;
 					}
 					break;
@@ -281,9 +283,7 @@ namespace Waher.Networking.HTTP
 							new KeyValuePair<string, object>("Header", FieldName),
 							new KeyValuePair<string, object>("Value", Value));
 
-						if (this.customHeaders is null)
-							this.customHeaders = new Dictionary<string, string>();
-
+						this.customHeaders ??= new Dictionary<string, string>();
 						this.customHeaders[FieldName] = Value;
 					}
 					break;
@@ -305,23 +305,19 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case "www-authenticate":
-					if (this.challenges is null)
-						this.challenges = new List<string>();
-
+					this.challenges ??= new List<string>();
 					this.challenges.Add(Value);
 					break;
 
 				case "etag":
-					if (Value.Length > 1 && Value[0] == '"' && Value[Value.Length - 1] == '"')
-						this.eTag = Value.Substring(1, Value.Length - 2);
+					if (Value.Length > 1 && Value[0] == '"' && Value[^1] == '"')
+						this.eTag = Value[1..^1];
 					else
 						this.eTag = Value;
 					break;
 
 				default:
-					if (this.customHeaders is null)
-						this.customHeaders = new Dictionary<string, string>();
-
+					this.customHeaders ??= new Dictionary<string, string>();
 					this.customHeaders[FieldName] = Value;
 					break;
 			}
@@ -700,109 +696,122 @@ namespace Waher.Networking.HTTP
 		{
 			if (this.transferEncoding is null)
 			{
-				if (this.desiredTransferEncoding is null)
+				if (this.http2Stream is null)
 				{
-					StringBuilder Output = new StringBuilder();
-
-					Output.Append("HTTP/1.1 ");
-					Output.Append(this.statusCode.ToString());
-					Output.Append(' ');
-					Output.Append(this.statusMessage);
-
-					Output.Append("\r\nDate: ");
-					Output.Append(CommonTypes.EncodeRfc822(this.date));
-
-					if (this.expires.HasValue)
+					if (this.desiredTransferEncoding is null)
 					{
-						Output.Append("\r\nExpires: ");
-						Output.Append(CommonTypes.EncodeRfc822(this.expires.Value));
-					}
+						StringBuilder Output = new StringBuilder();
 
-					if (!string.IsNullOrEmpty(this.server))
-					{
-						Output.Append("\r\nServer: ");
-						Output.Append(this.server);
-					}
-					else if (!string.IsNullOrEmpty(this.httpServer?.Name))
-					{
-						Output.Append("\r\nServer: ");
-						Output.Append(this.httpServer.Name);
-					}
+						Output.Append("HTTP/1.1 ");
+						Output.Append(this.statusCode.ToString());
+						Output.Append(' ');
+						Output.Append(this.statusMessage);
 
-					if (!string.IsNullOrEmpty(this.contentLanguage))
-					{
-						Output.Append("\r\nContent-Language: ");
-						Output.Append(this.contentLanguage);
-					}
+						Output.Append("\r\nDate: ");
+						Output.Append(CommonTypes.EncodeRfc822(this.date));
 
-					if (!string.IsNullOrEmpty(this.contentType))
-					{
-						Output.Append("\r\nContent-Type: ");
-						Output.Append(this.contentType);
-
-						if (!this.encodingUsed && this.contentType.StartsWith("text/"))
-							this.encodingUsed = true;
-
-						if (this.encodingUsed && !this.contentType.Contains("charset="))
+						if (this.expires.HasValue)
 						{
-							Output.Append("; charset=");
-							Output.Append(this.encoding.WebName);
-							this.txText = true;
+							Output.Append("\r\nExpires: ");
+							Output.Append(CommonTypes.EncodeRfc822(this.expires.Value));
 						}
-						else if (this.clientConnection?.HasSniffers ?? false)
-							this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
-						else
-							this.txText = false;
 
-						Output.Append("\r\nX-Content-Type-Options: nosniff");
-					}
-
-					if ((ExpectContent || this.contentLength.HasValue) &&
-						((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
-					{
-						throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
-
-						// When message bodies are required:
-						// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
-					}
-
-					IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
-					bool TxText = ContentEncoding is null && this.txText;
-
-					if (this.contentLength.HasValue && ContentEncoding is null)
-					{
-						Output.Append("\r\nContent-Length: ");
-						Output.Append(this.contentLength.Value.ToString());
-
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
-							this.contentLength.Value, this.clientConnection, TxText, this.encoding);
-					}
-					else if (ExpectContent)
-					{
-						if (!(ContentEncoding is null) &&
-							(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
-							(string.IsNullOrEmpty(this.contentType) ||
-							!(this.contentType.StartsWith("image/") ||
-							this.contentType.StartsWith("audio/") ||
-							this.contentType.StartsWith("video/") ||
-							this.contentType == BinaryCodec.DefaultContentType)))
+						if (!string.IsNullOrEmpty(this.server))
 						{
-							Output.Append("\r\nContent-Encoding: ");
-							Output.Append(ContentEncoding.Label);
+							Output.Append("\r\nServer: ");
+							Output.Append(this.server);
+						}
+						else if (!string.IsNullOrEmpty(this.httpServer?.Name))
+						{
+							Output.Append("\r\nServer: ");
+							Output.Append(this.httpServer.Name);
+						}
 
-							FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+						if (!string.IsNullOrEmpty(this.contentLanguage))
+						{
+							Output.Append("\r\nContent-Language: ");
+							Output.Append(this.contentLanguage);
+						}
 
-							if (PrecompressedFile?.Exists ?? false)
+						if (!string.IsNullOrEmpty(this.contentType))
+						{
+							Output.Append("\r\nContent-Type: ");
+							Output.Append(this.contentType);
+
+							if (!this.encodingUsed && this.contentType.StartsWith("text/"))
+								this.encodingUsed = true;
+
+							if (this.encodingUsed && !this.contentType.Contains("charset="))
 							{
-								TxText = false;
+								Output.Append("; charset=");
+								Output.Append(this.encoding.WebName);
+								this.txText = true;
+							}
+							else if (this.clientConnection?.HasSniffers ?? false)
+								this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
+							else
+								this.txText = false;
 
-								Output.Append("\r\nContent-Length: ");
-								Output.Append(PrecompressedFile.Length.ToString());
+							Output.Append("\r\nX-Content-Type-Options: nosniff");
+						}
 
-								this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
-									PrecompressedFile.Length, this.clientConnection, TxText, this.encoding);
+						if ((ExpectContent || this.contentLength.HasValue) &&
+							((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
+						{
+							throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
 
-								this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+							// When message bodies are required:
+							// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
+						}
+
+						IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+						bool TxText = ContentEncoding is null && this.txText;
+
+						if (this.contentLength.HasValue && ContentEncoding is null)
+						{
+							Output.Append("\r\nContent-Length: ");
+							Output.Append(this.contentLength.Value.ToString());
+
+							this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
+								this.contentLength.Value, this.clientConnection, TxText, this.encoding);
+						}
+						else if (ExpectContent)
+						{
+							if (!(ContentEncoding is null) &&
+								(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
+								(string.IsNullOrEmpty(this.contentType) ||
+								!(this.contentType.StartsWith("image/") ||
+								this.contentType.StartsWith("audio/") ||
+								this.contentType.StartsWith("video/") ||
+								this.contentType == BinaryCodec.DefaultContentType)))
+							{
+								Output.Append("\r\nContent-Encoding: ");
+								Output.Append(ContentEncoding.Label);
+
+								FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+
+								if (PrecompressedFile?.Exists ?? false)
+								{
+									TxText = false;
+
+									Output.Append("\r\nContent-Length: ");
+									Output.Append(PrecompressedFile.Length.ToString());
+
+									this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
+										PrecompressedFile.Length, this.clientConnection, TxText, this.encoding);
+
+									this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+								}
+								else
+								{
+									Output.Append("\r\nTransfer-Encoding: chunked");
+
+									this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
+										DefaultChunkSize, this.clientConnection, TxText, this.encoding);
+
+									this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
+										this.contentLength.HasValue ? this.eTag : null);
+								}
 							}
 							else
 							{
@@ -810,79 +819,206 @@ namespace Waher.Networking.HTTP
 
 								this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
 									DefaultChunkSize, this.clientConnection, TxText, this.encoding);
-
-								this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
-									this.contentLength.HasValue ? this.eTag : null);
 							}
 						}
 						else
 						{
-							Output.Append("\r\nTransfer-Encoding: chunked");
+							if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
+								Output.Append("\r\nContent-Length: 0");
 
-							this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
-								DefaultChunkSize, this.clientConnection, TxText, this.encoding);
+							this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0,
+								this.clientConnection, TxText, this.encoding);
 						}
+
+						if (!(this.challenges is null))
+						{
+							foreach (string Challenge in this.challenges)
+							{
+								Output.Append("\r\nWWW-Authenticate: ");
+								Output.Append(Challenge);
+							}
+						}
+
+						if (!string.IsNullOrEmpty(this.eTag))
+						{
+							Output.Append("\r\nETag: ");
+							Output.Append(this.eTag);
+						}
+
+						if (!(this.customHeaders is null))
+						{
+							foreach (KeyValuePair<string, string> P in this.customHeaders)
+							{
+								Output.Append("\r\n");
+								Output.Append(P.Key);
+								Output.Append(": ");
+								Output.Append(P.Value);
+							}
+						}
+
+						if (!(this.cookies is null))
+						{
+							foreach (Cookie Cookie in this.cookies)
+							{
+								Output.Append("\r\nSet-Cookie: ");
+								Output.Append(Cookie.ToString());
+							}
+						}
+
+						Output.Append("\r\n\r\n");
+
+						string Header = Output.ToString();
+						byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
+
+						if (this.responseStream is null || this.clientConnection.Disposed)
+							return;
+
+						this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
+						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+
+						if (this.clientConnection.HasSniffers)
+							await this.clientConnection.TransmitText(Header);
 					}
 					else
 					{
-						if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
-							Output.Append("\r\nContent-Length: 0");
-
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0,
-							this.clientConnection, TxText, this.encoding);
+						this.transferEncoding = this.desiredTransferEncoding;
+						await this.transferEncoding.BeforeContentAsync(this, ExpectContent);
 					}
-
-					if (!(this.challenges is null))
-					{
-						foreach (string Challenge in this.challenges)
-						{
-							Output.Append("\r\nWWW-Authenticate: ");
-							Output.Append(Challenge);
-						}
-					}
-
-					if (!string.IsNullOrEmpty(this.eTag))
-					{
-						Output.Append("\r\nETag: ");
-						Output.Append(this.eTag);
-					}
-
-					if (!(this.customHeaders is null))
-					{
-						foreach (KeyValuePair<string, string> P in this.customHeaders)
-						{
-							Output.Append("\r\n");
-							Output.Append(P.Key);
-							Output.Append(": ");
-							Output.Append(P.Value);
-						}
-					}
-
-					if (!(this.cookies is null))
-					{
-						foreach (Cookie Cookie in this.cookies)
-						{
-							Output.Append("\r\nSet-Cookie: ");
-							Output.Append(Cookie.ToString());
-						}
-					}
-
-					Output.Append("\r\n\r\n");
-
-					string Header = Output.ToString();
-					byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
-
-					if (this.responseStream is null || this.clientConnection.Disposed)
-						return;
-
-					this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
-					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
-					await this.clientConnection.TransmitText(Header);
 				}
 				else
 				{
-					this.transferEncoding = this.desiredTransferEncoding;
-					await this.transferEncoding.BeforeContentAsync(this, ExpectContent);
+					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream);
+					this.transferEncoding = Http2TransferEncoding;
+
+					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;
+					StringBuilder sb = this.clientConnection.HasSniffers ? new StringBuilder() : null;
+
+					await w.Lock();
+					try
+					{
+						w.Reset(sb);
+						w.WriteHeader(":status", this.statusCode.ToString(), IndexMode.Indexed, true);
+						w.WriteHeader("date", CommonTypes.EncodeRfc822(this.date), IndexMode.NotIndexed, true);
+
+						if (this.expires.HasValue)
+							w.WriteHeader("expires", CommonTypes.EncodeRfc822(this.expires.Value), IndexMode.NotIndexed, true);
+
+						if (!string.IsNullOrEmpty(this.server))
+							w.WriteHeader("server", this.server, IndexMode.Indexed, true);
+						else if (!string.IsNullOrEmpty(this.httpServer?.Name))
+							w.WriteHeader("server", this.httpServer.Name, IndexMode.Indexed, true);
+
+						if (!string.IsNullOrEmpty(this.contentLanguage))
+							w.WriteHeader("content-language", this.contentLanguage, IndexMode.Indexed, true);
+
+						if (!string.IsNullOrEmpty(this.contentType))
+						{
+							string s = this.contentType;
+
+							if (!this.encodingUsed && s.StartsWith("text/"))
+								this.encodingUsed = true;
+
+							if (this.encodingUsed && !s.Contains("charset="))
+							{
+								s += "; charset=" + this.encoding.WebName;
+								this.txText = true;
+							}
+							else if (this.clientConnection?.HasSniffers ?? false)
+								this.txText = HttpClientConnection.IsSniffableTextType(s);
+							else
+								this.txText = false;
+
+							w.WriteHeader("content-type", s, IndexMode.Indexed, true);
+							w.WriteHeader("x-content-type-options", "nosniff", IndexMode.Indexed, true);
+						}
+
+						if ((ExpectContent || this.contentLength.HasValue) &&
+							((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
+						{
+							throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
+
+							// When message bodies are required:
+							// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
+						}
+
+						IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+						Http2TransferEncoding.DataIsText = ContentEncoding is null && this.txText;
+
+						if (this.contentLength.HasValue && ContentEncoding is null)
+							w.WriteHeader("content-length", this.contentLength.Value.ToString(), IndexMode.NotIndexed, true);
+						else if (ExpectContent)
+						{
+							if (!(ContentEncoding is null) &&
+								(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
+								(string.IsNullOrEmpty(this.contentType) ||
+								!(this.contentType.StartsWith("image/") ||
+								this.contentType.StartsWith("audio/") ||
+								this.contentType.StartsWith("video/") ||
+								this.contentType == BinaryCodec.DefaultContentType)))
+							{
+								w.WriteHeader("content-encoding", ContentEncoding.Label, IndexMode.Indexed, true);
+
+								FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+
+								if (PrecompressedFile?.Exists ?? false)
+								{
+									Http2TransferEncoding.DataIsText = false;
+
+									w.WriteHeader("content-length", PrecompressedFile.Length.ToString(), IndexMode.NotIndexed, true);
+
+									this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+								}
+								else
+								{
+									this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
+										this.contentLength.HasValue ? this.eTag : null);
+								}
+							}
+						}
+						else
+						{
+							if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
+								w.WriteHeader("content-length", "0", IndexMode.Indexed, true);
+						}
+
+						if (!(this.challenges is null))
+						{
+							foreach (string Challenge in this.challenges)
+								w.WriteHeader("www-authenticate", Challenge, IndexMode.NotIndexed, true);
+						}
+
+						if (!string.IsNullOrEmpty(this.eTag))
+							w.WriteHeader("etag", this.eTag, IndexMode.NotIndexed, true);
+
+						if (!(this.customHeaders is null))
+						{
+							foreach (KeyValuePair<string, string> P in this.customHeaders)
+								w.WriteHeader(P.Key.ToLower(), P.Value, IndexMode.NotIndexed, true);
+						}
+
+						if (!(this.cookies is null))
+						{
+							foreach (Cookie Cookie in this.cookies)
+								w.WriteHeader("set-cookie", Cookie.ToString(), IndexMode.NotIndexed, true);
+						}
+
+						byte[] HeaderBin = w.ToArray();
+
+						if (this.clientConnection.Disposed)
+							return;
+
+						if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent))
+							return;
+
+						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+
+						if (!(sb is null))
+							await this.clientConnection.TransmitText(sb.ToString());
+					}
+					finally
+					{
+						w.Release();
+					}
 				}
 			}
 		}
@@ -936,27 +1072,25 @@ namespace Waher.Networking.HTTP
 		/// <param name="FileRef">File reference.</param>
 		public async Task Return(FileReference FileRef)
 		{
-			using (FileStream f = File.OpenRead(FileRef.FileName))
+			using FileStream f = File.OpenRead(FileRef.FileName);
+			long Pos = 0;
+			long Len = f.Length;
+			int BufSize = (int)Math.Min(Len, 65536 * 4);
+			byte[] Buf = new byte[BufSize];
+			int c;
+
+			this.contentType = FileRef.ContentType;
+			this.ContentLength = Len;
+
+			while (Pos < Len)
 			{
-				long Pos = 0;
-				long Len = f.Length;
-				int BufSize = (int)Math.Min(Len, 65536 * 4);
-				byte[] Buf = new byte[BufSize];
-				int c;
-
-				this.contentType = FileRef.ContentType;
-				this.ContentLength = Len;
-
-				while (Pos < Len)
-				{
-					c = (int)Math.Min(BufSize, Len - Pos);
-					await f.ReadAllAsync(Buf, 0, c);
-					await this.Write(Buf, 0, c);
-					Pos += c;
-				}
-
-				await this.SendResponse();
+				c = (int)Math.Min(BufSize, Len - Pos);
+				await f.ReadAllAsync(Buf, 0, c);
+				await this.Write(Buf, 0, c);
+				Pos += c;
 			}
+
+			await this.SendResponse();
 		}
 
 		private class EncodingResult

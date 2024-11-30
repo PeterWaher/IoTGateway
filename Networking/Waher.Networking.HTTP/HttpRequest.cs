@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
@@ -22,6 +23,7 @@ namespace Waher.Networking.HTTP
 		private readonly HttpServer server;
 		private readonly string remoteEndPoint;
 		private readonly string localEndPoint;
+		private readonly Http2Stream http2Stream;
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
@@ -42,7 +44,22 @@ namespace Waher.Networking.HTTP
 		/// <param name="LocalEndPoint">Local end-point.</param>
 		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
 			string LocalEndPoint)
-			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false, null)
+		{
+		}
+
+		/// <summary>
+		/// Represents an HTTP request.
+		/// </summary>
+		/// <param name="Server">HTTP Server receiving the request.</param>
+		/// <param name="Header">HTTP Request header.</param>
+		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
+		/// <param name="RemoteEndPoint">Remote end-point.</param>
+		/// <param name="LocalEndPoint">Local end-point.</param>
+		/// <param name="Http2Stream">HTTP/2 stream</param>
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
+			string LocalEndPoint, Http2Stream Http2Stream)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false, Http2Stream)
 		{
 		}
 
@@ -57,6 +74,22 @@ namespace Waher.Networking.HTTP
 		/// <param name="DefaultEncrypted">If underlying transport is encrypted by default.</param>
 		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
 			string LocalEndPoint, bool DefaultEncrypted)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, DefaultEncrypted, null)
+		{
+		}
+
+		/// <summary>
+		/// Represents an HTTP request.
+		/// </summary>
+		/// <param name="Server">HTTP Server receiving the request.</param>
+		/// <param name="Header">HTTP Request header.</param>
+		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
+		/// <param name="RemoteEndPoint">Remote end-point.</param>
+		/// <param name="LocalEndPoint">Local end-point.</param>
+		/// <param name="DefaultEncrypted">If underlying transport is encrypted by default.</param>
+		/// <param name="Http2Stream">HTTP/2 stream</param>
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
+			string LocalEndPoint, bool DefaultEncrypted, Http2Stream Http2Stream)
 		{
 			this.server = Server;
 			this.header = Header;
@@ -64,6 +97,7 @@ namespace Waher.Networking.HTTP
 			this.remoteEndPoint = RemoteEndPoint;
 			this.localEndPoint = LocalEndPoint;
 			this.defaultEncrypted = DefaultEncrypted;
+			this.http2Stream = Http2Stream;
 
 			if (!(this.dataStream is null))
 				this.dataStream.Position = 0;
@@ -78,6 +112,11 @@ namespace Waher.Networking.HTTP
 		/// HTTP Server receiving the request.
 		/// </summary>
 		public HttpServer Server => this.server;
+
+		/// <summary>
+		/// HTTP/2 stream
+		/// </summary>
+		public Http2Stream Http2Stream => this.http2Stream;
 
 		/// <summary>
 		/// Decodes data sent in request.
@@ -214,8 +253,8 @@ namespace Waher.Networking.HTTP
 
 				int i = s.LastIndexOf(':');
 
-				if (int.TryParse(s.Substring(i + 1), out _))
-					return s.Substring(0, i);
+				if (int.TryParse(s[(i + 1)..], out _))
+					return s[..i];
 				else
 					return s;
 			}

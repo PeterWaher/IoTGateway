@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -477,6 +479,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		protected ulong nrHeadersCreated = 0;
 
+		private SemaphoreSlim syncObject = new SemaphoreSlim(1);
+
 		/// <summary>
 		/// Serializes HTTP/2 headers using HPACK, defined in RFC 7541.
 		/// https://datatracker.ietf.org/doc/html/rfc7541
@@ -518,6 +522,22 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Upper limit of the Maximum size of dynamic header (SETTINGS_HEADER_TABLE_SIZE).
 		/// </summary>
 		public int MaxDynamicHeaderSizeLimit => this.maxDynamicHeaderSizeLimit;
+
+		/// <summary>
+		/// Waits for the reader to be free.
+		/// </summary>
+		public Task Lock()
+		{
+			return this.syncObject.WaitAsync();
+		}
+
+		/// <summary>
+		/// Releases the object for use by another.
+		/// </summary>
+		public void Release()
+		{
+			this.syncObject.Release();
+		}
 
 		/// <summary>
 		/// Updates the maximum dynamic header size, and trims the dynamic header table.

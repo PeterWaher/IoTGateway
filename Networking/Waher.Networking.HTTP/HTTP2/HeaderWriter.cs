@@ -12,9 +12,11 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly int bufferSize;
 		private readonly byte[] buffer;
+		private StringBuilder snifferOutput;
 		private int pos = 0;
 		private byte bitsLeft = 8;
 		private byte current = 0;
+		private bool hasSnifferOutput = false;
 
 		/// <summary>
 		/// Serializes HTTP/2 headers using HPACK, defined in RFC 7541.
@@ -79,6 +81,21 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.pos = 0;
 			this.bitsLeft = 8;
 			this.current = 0;
+			this.snifferOutput = null;
+			this.hasSnifferOutput = false;
+		}
+
+		/// <summary>
+		/// Resets the writer for a new header, without clearing the dynamic header table.
+		/// </summary>
+		/// <param name="SnifferOutput">Sniffer output</param>
+		public void Reset(StringBuilder SnifferOutput)
+		{
+			this.pos = 0;
+			this.bitsLeft = 8;
+			this.current = 0;
+			this.snifferOutput = SnifferOutput;
+			this.hasSnifferOutput = !(SnifferOutput is null);
 		}
 
 		/// <summary>
@@ -346,6 +363,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
+		/// Sniffer output, if set.
+		/// </summary>
+		internal StringBuilder SnifferOutput
+		{
+			get => this.snifferOutput;
+			set
+			{
+				this.snifferOutput = value;
+				this.hasSnifferOutput = !(value is null);
+			}
+		}
+
+		/// <summary>
 		/// Writes a header and a value pair.
 		/// </summary>
 		/// <param name="Header">Header</param>
@@ -364,6 +394,13 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.TrimDynamicHeaders();
 
 			Header = Header.ToLower();
+
+			if (this.hasSnifferOutput)
+			{
+				this.snifferOutput.Append(Header);
+				this.snifferOutput.Append(": ");
+				this.snifferOutput.AppendLine(Value);
+			}
 
 			if (staticHeaders.TryGetValue(Header, out StaticRecord[] Records))
 			{

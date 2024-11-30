@@ -27,6 +27,13 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Contains information about all fields in an HTTP header.
 		/// </summary>
+		public HttpHeader()
+		{
+		}
+
+		/// <summary>
+		/// Contains information about all fields in an HTTP header.
+		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
 		/// <param name="VanityResources">Registered vanity resources.</param>
 		public HttpHeader(string Header, VanityResources VanityResources)
@@ -54,13 +61,26 @@ namespace Waher.Networking.HTTP
 					if (i < 0)
 						continue;
 
-					Key = Row.Substring(0, i).Trim();
-					Value = Row.Substring(i + 1).Trim();
+					Key = Row[..i].Trim();
+					Value = Row[(i + 1)..].Trim();
 
 					Field = this.ParseField(KeyLower = Key.ToLower(), Key, Value);
 					this.fields[KeyLower] = Field;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Adds a field to the header.
+		/// </summary>
+		/// <param name="Key">Header key (or name).</param>
+		/// <param name="Value">Header value.</param>
+		/// <param name="IsLower">If <paramref name="Key"/> is lowercase already.</param>
+		public void AddField(string Key, string Value, bool IsLower)
+		{
+			string s = IsLower ? Key : Key.ToLower();
+			HttpField Field = this.ParseField(s, Key, Value);
+			this.fields[s] = Field;
 		}
 
 		/// <summary>
@@ -114,19 +134,19 @@ namespace Waher.Networking.HTTP
 		/// <returns>HTTP header field object, corresponding to the particular field.</returns>
 		protected virtual HttpField ParseField(string KeyLower, string Key, string Value)
 		{
-			switch (KeyLower)
+			return KeyLower switch
 			{
-				case "content-encoding": return this.contentEncoding = new HttpFieldContentEncoding(Key, Value);
-				case "content-language": return this.contentLanguage = new HttpFieldContentLanguage(Key, Value);
-				case "content-length": return this.contentLength = new HttpFieldContentLength(Key, Value);
-				case "content-location": return this.contentLocation = new HttpFieldContentLocation(Key, Value);
-				case "content-md5": return this.contentMD5 = new HttpFieldContentMD5(Key, Value);
-				case "content-range": return this.contentRange = new HttpFieldContentRange(Key, Value);
-				case "content-type": return this.contentType = new HttpFieldContentType(Key, Value);
-				case "transfer-encoding": return this.transferEncoding = new HttpFieldTransferEncoding(Key, Value);
-				case "via": return this.via = new HttpFieldVia(Key, Value);
-				default: return new HttpField(Key, Value);
-			}
+				"content-encoding" => this.contentEncoding = new HttpFieldContentEncoding(Key, Value),
+				"content-language" => this.contentLanguage = new HttpFieldContentLanguage(Key, Value),
+				"content-length" => this.contentLength = new HttpFieldContentLength(Key, Value),
+				"content-location" => this.contentLocation = new HttpFieldContentLocation(Key, Value),
+				"content-md5" => this.contentMD5 = new HttpFieldContentMD5(Key, Value),
+				"content-range" => this.contentRange = new HttpFieldContentRange(Key, Value),
+				"content-type" => this.contentType = new HttpFieldContentType(Key, Value),
+				"transfer-encoding" => this.transferEncoding = new HttpFieldTransferEncoding(Key, Value),
+				"via" => this.via = new HttpFieldVia(Key, Value),
+				_ => new HttpField(Key, Value),
+			};
 		}
 
 		#region ICollection<HttpField>

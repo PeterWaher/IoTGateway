@@ -174,9 +174,9 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Len <= MaxFrameSize)
 			{
-				Flags |= 4;	// END_HEADERS
+				Flags |= 4; // END_HEADERS
 
-				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, 
+				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags,
 					(uint)this.streamId, Headers);
 			}
 			else
@@ -202,9 +202,71 @@ namespace Waher.Networking.HTTP.HTTP2
 					Type = FrameType.Continuation;
 					Flags = 0;
 				}
-				
+
 				return true;
 			}
 		}
+
+		/// <summary>
+		/// Writes DATA to the remote party.
+		/// </summary>
+		/// <param name="Data">Binary data</param>
+		/// <param name="Offset">Offset into buffer where data begins.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Last">If it is the last data to be written for this stream.</param>
+		/// <returns>If data was written.</returns>
+		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last)
+		{
+			int MaxFrameSize = this.connection.Settings.MaxFrameSize;
+			byte Flags = 0;
+
+			if (Count <= MaxFrameSize)
+			{
+				if (Last)
+				{
+					Flags = 1;  // END_STREAM
+					this.state = StreamState.HalfClosedLocal;
+				}
+
+				if (!await this.connection.SendHttp2Frame(FrameType.Data, Flags,
+					(uint)this.streamId, Data, Offset, Count))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				int Left = Count;
+				int Delta;
+
+				while (Left > 0)
+				{
+					if (Left > MaxFrameSize)
+						Delta = MaxFrameSize;
+					else
+					{
+						Delta = Left;
+
+						if (Last)
+						{
+							Flags = 1; // END_STREAM
+							this.state = StreamState.HalfClosedLocal;
+						}
+					}
+
+					if (!await this.connection.SendHttp2Frame(FrameType.Data, Flags,
+						(uint)this.streamId, Data, Offset, Delta))
+					{
+						return false;
+					}
+
+					Offset += Delta;
+					Left -= Delta;
+				}
+			}
+		
+			return true;
+		}
+
 	}
 }

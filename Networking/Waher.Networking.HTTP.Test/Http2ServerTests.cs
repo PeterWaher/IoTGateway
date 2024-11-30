@@ -103,6 +103,7 @@ namespace Waher.Networking.HTTP.Test
 		/* To Test
 		 * 
 		 * Huffman encoded strings
+		 * padding in requests
 		 * Long headers (multiple HEADERS & CONTINUATION frames)
 		 * data requests (POST)
 		 * long data requests (multiple DATA & CONTINUATION frames)

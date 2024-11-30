@@ -678,7 +678,7 @@ namespace Waher.Networking.HTTP
 									return false;
 
 								if (this.HasSniffers)
-									await this.Information("RX: " + HeaderName + ": " + HeaderValue);
+									await this.ReceiveText(HeaderName + ": " + HeaderValue);
 
 								Stream.AddParsedHeader(HeaderName, HeaderValue);
 							}

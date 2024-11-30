@@ -888,7 +888,7 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream);
+					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength);
 					this.transferEncoding = Http2TransferEncoding;
 
 					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;
@@ -943,7 +943,9 @@ namespace Waher.Networking.HTTP
 						}
 
 						IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
-						Http2TransferEncoding.DataIsText = ContentEncoding is null && this.txText;
+
+						if (ContentEncoding is null && this.txText)
+							Http2TransferEncoding.DataEncoding = this.encoding;
 
 						if (this.contentLength.HasValue && ContentEncoding is null)
 							w.WriteHeader("content-length", this.contentLength.Value.ToString(), IndexMode.NotIndexed, true);
@@ -963,9 +965,10 @@ namespace Waher.Networking.HTTP
 
 								if (PrecompressedFile?.Exists ?? false)
 								{
-									Http2TransferEncoding.DataIsText = false;
+									Http2TransferEncoding.DataEncoding = null;
 
 									w.WriteHeader("content-length", PrecompressedFile.Length.ToString(), IndexMode.NotIndexed, true);
+									Http2TransferEncoding.ContentLength = PrecompressedFile.Length;
 
 									this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
 								}

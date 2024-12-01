@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.Test
 	/// https://datatracker.ietf.org/doc/html/rfc7541
 	/// </summary>
 	[TestClass]
-	public class Http2HeaderSerializationTests
+	public class Http20HeaderSerializationTests
 	{
 		/// <summary>
 		/// C.1.1.  Example 1: Encoding 10 Using a 5-Bit Prefix

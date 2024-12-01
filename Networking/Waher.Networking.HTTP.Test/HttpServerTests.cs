@@ -18,22 +18,11 @@ using Waher.Security;
 
 namespace Waher.Networking.HTTP.Test
 {
-	[TestClass]
-	public class HttpServerTests : IUserSource
+	public abstract class HttpServerTests : IUserSource
 	{
 		private static HttpServer server;
 		private static ConsoleEventSink sink = null;
 		private static XmlFileSniffer xmlSniffer = null;
-
-		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext _)
-		{
-			Runtime.Inventory.Types.Initialize(
-				typeof(HttpServerTests).Assembly,
-				typeof(Script.Expression).Assembly,
-				typeof(Content.Images.ImageCodec).Assembly,
-				typeof(CommonTypes).Assembly);
-		}
 
 		[ClassInitialize]
 		public static void ClassInitialize(TestContext _)
@@ -85,7 +74,7 @@ namespace Waher.Networking.HTTP.Test
 				return Task.FromResult<IUser>(null);
 		}
 
-		public virtual Version ProtocolVersion => HttpVersion.Version11;
+		public abstract Version ProtocolVersion { get; }
 
 		[TestMethod]
 		public async Task Test_01_GET_HTTP_ContentLength()

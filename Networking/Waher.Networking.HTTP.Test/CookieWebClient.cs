@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Security;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.Test

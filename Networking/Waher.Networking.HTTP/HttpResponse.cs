@@ -997,7 +997,7 @@ namespace Waher.Networking.HTTP
 						if (!(this.customHeaders is null))
 						{
 							foreach (KeyValuePair<string, string> P in this.customHeaders)
-								w.WriteHeader(P.Key.ToLower(), P.Value, IndexMode.NotIndexed, true);
+								w.WriteHeaderCheckCookie(P.Key.ToLower(), P.Value, IndexMode.NotIndexed, true);
 						}
 
 						if (!(this.cookies is null))

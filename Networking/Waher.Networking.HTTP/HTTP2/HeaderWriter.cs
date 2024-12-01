@@ -376,6 +376,35 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
+		/// Writes a header and a value pair, with special treatment for the Cookie header.
+		/// Ref: §8.1.2.5, RFC 7540
+		/// https://datatracker.ietf.org/doc/html/rfc7540#section-8.1.2.5
+		/// </summary>
+		/// <param name="Header">Header</param>
+		/// <param name="Value">Value</param>
+		/// <param name="Mode">Serialization mode with respect to indexing.</param>
+		/// <param name="Huffman">If Huffman encoding should be used.</param>
+		/// <returns>If write was successful (true), or if buffer size did not permit write operation (false).</returns>
+		public bool WriteHeaderCheckCookie(string Header, string Value, IndexMode Mode, bool Huffman)
+		{
+			if (string.Compare(Header, "cookie", true) == 0)
+			{
+				string[] Cookies = Value.Split(';');
+
+				foreach (string Cookie in Cookies)
+				{
+					string s = Cookie.Trim();
+					if (!string.IsNullOrEmpty(s) && !this.WriteHeader(Header, s, Mode, Huffman))
+						return false;
+				}
+
+				return true;
+			}
+			else
+				return this.WriteHeader(Header, Value, Mode, Huffman);
+		}
+
+		/// <summary>
 		/// Writes a header and a value pair.
 		/// </summary>
 		/// <param name="Header">Header</param>

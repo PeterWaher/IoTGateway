@@ -479,7 +479,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		protected ulong nrHeadersCreated = 0;
 
-		private SemaphoreSlim syncObject = new SemaphoreSlim(1);
+		private readonly SemaphoreSlim syncObject = new SemaphoreSlim(1);
 
 		/// <summary>
 		/// Serializes HTTP/2 headers using HPACK, defined in RFC 7541.

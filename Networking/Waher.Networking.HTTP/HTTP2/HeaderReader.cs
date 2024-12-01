@@ -488,9 +488,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Reads available fields.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>If successful</returns>
 		public bool ReadFields(out IEnumerable<HttpField> Fields)
 		{
+			string Cookie = null;   // Ref: §8.1.2.5, RFC 7540
 			LinkedList<HttpField> Result = new LinkedList<HttpField>();
 			Fields = Result;
 
@@ -499,8 +500,19 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!this.ReadHeader(out string Header, out string Value, out _))
 					return false;
 
-				Result.AddLast(new HttpField(Header, Value));
+				if (Header == "cookie")
+				{
+					if (Cookie is null)
+						Cookie = Value;
+					else
+						Cookie += "; " + Value;
+				}
+				else
+					Result.AddLast(new HttpField(Header, Value));
 			}
+
+			if (!string.IsNullOrEmpty(Cookie))
+				Result.AddLast(new HttpField("cookie", Cookie));
 
 			return true;
 		}

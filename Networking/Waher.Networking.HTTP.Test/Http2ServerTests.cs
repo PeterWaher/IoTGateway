@@ -59,8 +59,6 @@ namespace Waher.Networking.HTTP.Test
 		 * Huffman encoded strings
 		 * padding in requests
 		 * Long headers (multiple HEADERS & CONTINUATION frames)
-		 * data requests (POST)
-		 * long data requests (multiple DATA & CONTINUATION frames)
 		 * data-less responses
 		 * data responses (one DATA frame)
 		 * long data responses (multiple DATA & CONTINUATION frames)
@@ -69,6 +67,7 @@ namespace Waher.Networking.HTTP.Test
 		 * stream priorities
 		 * stream errors
 		 * connection errors
+		 * ping/pong
 		 */
 	}
 }

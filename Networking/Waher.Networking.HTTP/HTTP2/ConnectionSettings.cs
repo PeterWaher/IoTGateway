@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Threading;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -7,14 +8,21 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class ConnectionSettings
 	{
-		private int bufferSize = 65535;
-		private byte[] outputBuffer;
+		private int connectionWindowSize = 65535;
+		private List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
+		private bool hasPendingIncrements = false;
 
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		public ConnectionSettings()
 		{
+		}
+
+		internal class PendingWindowIncrement
+		{
+			public Http2Stream Stream;
+			public int NrBytes;
 		}
 
 		/// <summary>
@@ -105,6 +113,55 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal int InitStep = 0;
 
 		/// <summary>
+		/// If the settings have been acknowledged or sent.
+		/// </summary>
+		internal bool AcknowledgedOrSent = false;
+
+		/// <summary>
+		/// If the connection has pending window size increments.
+		/// </summary>
+		internal bool HasPendingIncrements => this.hasPendingIncrements;
+
+		/// <summary>
+		/// Gets available pending window size increments.
+		/// </summary>
+		/// <returns>Array of increments.</returns>
+		internal PendingWindowIncrement[] GetPendingIncrements()
+		{
+			PendingWindowIncrement[] Result = this.pendingIncrements.ToArray();
+			this.pendingIncrements.Clear();
+			this.hasPendingIncrements = false;
+			return Result;
+		}
+
+		/// <summary>
+		/// Adds a pending window size increment
+		/// </summary>
+		/// <param name="Stream">Stream</param>
+		/// <param name="NrBytes">Size of increment, in number of bytes.</param>
+		internal void AddPendingIncrement(Http2Stream Stream, int NrBytes)
+		{
+			int StreamId = Stream.StreamId;
+
+			foreach (PendingWindowIncrement Increment in this.pendingIncrements)
+			{
+				if (Increment.Stream.StreamId == StreamId)
+				{
+					Increment.NrBytes += NrBytes;
+					return;
+				}
+			}
+
+			this.pendingIncrements.Add(new PendingWindowIncrement()
+			{
+				Stream = Stream,
+				NrBytes = NrBytes
+			});
+
+			this.hasPendingIncrements = true;
+		}
+
+		/// <summary>
 		/// Tries to parse a SETTINGS fame.
 		/// 
 		/// Ref: §6.5.2, RFC 7540
@@ -162,7 +219,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					case 3:
 						if (Value > int.MaxValue)
 							return false;
-						
+
 						Settings.MaxConcurrentStreams = (int)Value;
 						break;
 
@@ -183,7 +240,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					case 6:
 						if (Value > int.MaxValue)
 							return false;
-						
+
 						Settings.MaxHeaderListSize = (int)Value;
 						break;
 
@@ -198,7 +255,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Serializes current settings.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Byte array</returns>
 		public byte[] ToArray()
 		{
 			BinaryWriter w = new BinaryWriter();
@@ -224,20 +281,17 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			long Size = this.InitialWindowSize + Increment;
 
-			if (Size > int.MaxValue - 1)
+			if (Size < 0 || Size > int.MaxValue - 1)
 				return false;
 
-			this.bufferSize = (int)Size;
-
-			if (!(this.outputBuffer is null) && this.outputBuffer.Length < this.bufferSize)
-				Array.Resize(ref this.outputBuffer, this.bufferSize);
+			this.connectionWindowSize = (int)Size;
 
 			return true;
 		}
 
 		/// <summary>
-		/// Buffer size
+		/// Connection window size
 		/// </summary>
-		public int BufferSize => this.bufferSize;
+		public int ConnectionWindowSize => this.connectionWindowSize;
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Waher.Runtime.Temporary;
 
@@ -12,12 +11,16 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly int streamId;
 		private readonly HttpClientConnection connection;
+		private readonly long headerInputWindowSize;
 		private HttpRequestHeader headers = null;
 		private MemoryStream buildingHeaders = null;
-		private TemporaryStream dataStream = null;
+		private TemporaryStream inputDataStream = null;
 		private StreamState state = StreamState.Idle;
-		private int bufferSize;
-		private byte[] outputBuffer;
+		private long headerBytesReceived = 0;
+		private long dataBytesReceived = 0;
+		private long dataBytesSent = 0;
+		private long dataInputWindowSize;
+		private long dataOutputWindowSize;
 
 		/// <summary>
 		/// HTTP/2 stream
@@ -28,8 +31,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.streamId = StreamId;
 			this.connection = Connection;
-			this.bufferSize = this.connection.Settings.BufferSize;
-			this.outputBuffer = null;
+			this.dataInputWindowSize = this.connection.LocalSettings.ConnectionWindowSize;
+			this.dataOutputWindowSize = this.connection.RemoteSettings.ConnectionWindowSize;
+			this.headerInputWindowSize = Connection.LocalSettings.MaxHeaderListSize;
 		}
 
 		/// <summary>
@@ -48,9 +52,39 @@ namespace Waher.Networking.HTTP.HTTP2
 		public HttpRequestHeader Headers => this.headers;
 
 		/// <summary>
-		/// Data stream, if defined.
+		/// Header input window size.
 		/// </summary>
-		public TemporaryStream DataStream => this.dataStream;
+		public long HeaderInputWindowSize => this.headerInputWindowSize;
+
+		/// <summary>
+		/// Header bytes received
+		/// </summary>
+		public long HeadersBytesReceived => this.headerBytesReceived;
+
+		/// <summary>
+		/// Data bytes received
+		/// </summary>
+		public long DataBytesReceived => this.dataBytesReceived;
+
+		/// <summary>
+		/// Data bytes sent
+		/// </summary>
+		public long DataBytesSent => this.dataBytesSent;
+
+		/// <summary>
+		/// Data input window size
+		/// </summary>
+		public long DataInputWindowSize => this.dataInputWindowSize;
+
+		/// <summary>
+		/// Data output window size
+		/// </summary>
+		public long DataOutputWindowSize => this.dataOutputWindowSize;
+
+		/// <summary>
+		/// Input data stream, if defined.
+		/// </summary>
+		public TemporaryStream InputDataStream => this.inputDataStream;
 
 		/// <summary>
 		/// HTTP/2 connection.
@@ -72,10 +106,21 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Buffer containing header payload.</param>
 		/// <param name="Position">Position into buffer where header payload starts.</param>
 		/// <param name="Count">Number of header bytes.</param>
-		public void BuildHeaders(byte[] Buffer, int Position, int Count)
+		/// <returns>If successful adding headers to the stream.</returns>
+		public bool BuildHeaders(byte[] Buffer, int Position, int Count)
 		{
-			this.buildingHeaders ??= new MemoryStream();
-			this.buildingHeaders.Write(Buffer, Position, Count);
+			this.headerBytesReceived += Count;
+			if (this.headerBytesReceived > this.headerInputWindowSize)
+			{
+				this.state = StreamState.Closed;
+				return false;
+			}
+			else
+			{
+				this.buildingHeaders ??= new MemoryStream();
+				this.buildingHeaders.Write(Buffer, Position, Count);
+				return true;
+			}
 		}
 
 		/// <summary>
@@ -130,29 +175,55 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Buffer containing data payload.</param>
 		/// <param name="Position">Position into buffer where data payload starts.</param>
 		/// <param name="Count">Number of data bytes.</param>
-		/// <returns></returns>
-		public async Task DataReceived(byte[] Buffer, int Position, int Count)
+		/// <returns>If successful adding headers to the stream.</returns>
+		public async Task<bool> DataReceived(byte[] Buffer, int Position, int Count)
 		{
-			this.dataStream ??= new TemporaryStream();
-			await this.dataStream.WriteAsync(Buffer, Position, Count);
+			this.dataBytesReceived += Count;
+			if (this.dataBytesReceived > this.dataInputWindowSize)
+			{
+				this.state = StreamState.Closed;
+				return false;
+			}
+			else
+			{
+				this.inputDataStream ??= new TemporaryStream();
+				await this.inputDataStream.WriteAsync(Buffer, Position, Count);
+				return true;
+			}
 		}
 
 		/// <summary>
-		/// Sets the window size increment for stream, modified using the WINDOW_UPDATE
-		/// frame.
+		/// Sets the output window size increment for stream, modified using the 
+		/// WINDOW_UPDATE frame.
 		/// </summary>
-		public bool SetWindowSizeIncrement(uint Increment)
+		public Task<bool> SetOutputWindowSizeIncrement(uint Increment)
 		{
-			long Size = this.connection.Settings.BufferSize;
-			Size += Increment;
+			long Size = this.dataOutputWindowSize + Increment;
 
-			if (Size > int.MaxValue - 1)
+			if (Size < 0 || Size > int.MaxValue - 1)
+				return Task.FromResult(false);
+
+			this.dataOutputWindowSize = (int)Size;
+
+			// TODO: Flow control
+
+			return Task.FromResult(true);
+		}
+
+		/// <summary>
+		/// Sets the output window size increment for stream, modified using the 
+		/// WINDOW_UPDATE frame.
+		/// </summary>
+		public async Task<bool> SetInputWindowSizeIncrement(uint Increment)
+		{
+			long Size = this.dataInputWindowSize + Increment;
+
+			if (Size < 0 || Size > int.MaxValue - 1)
 				return false;
 
-			this.bufferSize = (int)Size;
+			this.dataInputWindowSize = (int)Size;
 
-			if (!(this.outputBuffer is null) && this.outputBuffer.Length < this.bufferSize)
-				Array.Resize(ref this.outputBuffer, this.bufferSize);
+			// TODO: Flow control
 
 			return true;
 		}
@@ -168,7 +239,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.state == StreamState.Idle)
 				this.state = StreamState.Open;
 
-			int MaxFrameSize = this.connection.Settings.MaxFrameSize;
+			int MaxFrameSize = this.connection.RemoteSettings.MaxFrameSize;
 			byte Flags = (byte)(ExpectData ? 0 : 1);    // END_STREAM
 			int Len = Headers.Length;
 
@@ -217,8 +288,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If data was written.</returns>
 		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last)
 		{
-			int MaxFrameSize = this.connection.Settings.MaxFrameSize;
+			int MaxFrameSize = this.connection.RemoteSettings.MaxFrameSize;
 			byte Flags = 0;
+
+			// TODO: Flow control
 
 			if (Count <= MaxFrameSize)
 			{
@@ -233,6 +306,8 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					return false;
 				}
+
+				this.dataBytesSent += Count;
 			}
 			else
 			{
@@ -260,11 +335,12 @@ namespace Waher.Networking.HTTP.HTTP2
 						return false;
 					}
 
+					this.dataBytesSent += Delta;
 					Offset += Delta;
 					Left -= Delta;
 				}
 			}
-		
+
 			return true;
 		}
 

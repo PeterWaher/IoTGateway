@@ -609,12 +609,15 @@ namespace Waher.Networking.HTTP
 					if (DataSize < 0)
 						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
 
-					// TODO: Connection flow control.
+					if (DataSize > 0)
+					{
+						// TODO: Connection flow control.
 
-					if (!await Stream.DataReceived(this.reader.Buffer, this.reader.Position, DataSize))
-						return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, false);
+						if (!await Stream.DataReceived(this.reader.Buffer, this.reader.Position, DataSize))
+							return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, false);
 
-					this.localSettings.AddPendingIncrement(Stream, DataSize);
+						this.localSettings.AddPendingIncrement(Stream, DataSize);
+					}
 
 					if (EndStream)
 					{

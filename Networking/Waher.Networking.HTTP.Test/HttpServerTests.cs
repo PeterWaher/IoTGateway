@@ -208,7 +208,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebException))]
+		[ExpectedException(typeof(HttpRequestException))]
 		public async Task Test_10_FolderResource_PUT_File_NotAllowed()
 		{
 			server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
@@ -231,7 +231,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebException))]
+		[ExpectedException(typeof(HttpRequestException))]
 		public async Task Test_12_FolderResource_DELETE_File_NotAllowed()
 		{
 			server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
@@ -519,7 +519,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebException))]
+		[ExpectedException(typeof(HttpRequestException))]
 		public async Task Test_23_Conditional_GET_IfModifiedSince_1()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
@@ -547,7 +547,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebException))]
+		[ExpectedException(typeof(HttpRequestException))]
 		public async Task Test_25_Conditional_PUT_IfUnmodifiedSince_1()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
@@ -576,7 +576,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(WebException))]
+		[ExpectedException(typeof(HttpRequestException))]
 		public async Task Test_27_NotAcceptable()
 		{
 			server.Register(new HttpFolderResource("/Test27", "Data", false, false, true, false));

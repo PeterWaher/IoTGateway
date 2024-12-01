@@ -55,6 +55,7 @@ namespace Waher.Networking.HTTP.Test
 			using HttpClient Client = this.GetClient();
 			HttpRequestMessage Request = this.GetRequest(HttpMethod.Get, Url);
 			HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
 			return await Response.Content.ReadAsByteArrayAsync();
 		}
 
@@ -62,8 +63,9 @@ namespace Waher.Networking.HTTP.Test
 		{
 			SocketsHttpHandler Handler = new()
 			{
+				Credentials = this.credentials,
 				CookieContainer = this.cookies,
-				AllowAutoRedirect = false,
+				AllowAutoRedirect = true,
 				UseCookies = true,
 				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 				InitialHttp2StreamWindowSize = 65535,
@@ -99,12 +101,6 @@ namespace Waher.Networking.HTTP.Test
 			if (!string.IsNullOrEmpty(this.accept))
 				Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(this.accept));
 
-			if (!(this.credentials is null))
-			{
-				Request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(
-					Encoding.ASCII.GetBytes(this.credentials.UserName + ":" + this.credentials.Password)));
-			}
-
 			return Request;
 		}
 
@@ -112,9 +108,10 @@ namespace Waher.Networking.HTTP.Test
 		{
 			using HttpClient Client = this.GetClient();
 			HttpRequestMessage Request = this.GetRequest(Method, Url);
-			ByteArrayContent DataContent = new(Data);
+			Request.Content = new ByteArrayContent(Data);
 
-			HttpResponseMessage Response = await Client.PostAsync(Url, DataContent);
+			HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
 			return await Response.Content.ReadAsByteArrayAsync();
 		}
 	}

@@ -203,7 +203,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// returned.
 		/// </summary>
 		/// <param name="Actor">Actor</param>
-		/// <returns></returns>
+		/// <returns>Read fields, if successful.</returns>
 		public async Task<Field[]> TryReadSensor(string Actor)
 		{
 			try

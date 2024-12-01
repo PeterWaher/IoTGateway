@@ -56,7 +56,7 @@ namespace Waher.Content.Dsn
 		/// </summary>
 		/// <param name="Value">Field value</param>
 		/// <param name="Type">Resulting type.</param>
-		/// <returns></returns>
+		/// <returns>If successful.</returns>
 		protected bool ParseType(ref string Value, out string Type)
 		{
 			int i = Value.IndexOf(';');

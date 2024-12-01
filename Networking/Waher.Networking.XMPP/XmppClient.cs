@@ -988,7 +988,6 @@ namespace Waher.Networking.XMPP
 		/// Sets the current state of the connection.
 		/// </summary>
 		/// <param name="NewState"></param>
-		/// <returns></returns>
 		internal async Task SetState(XmppState NewState)
 		{
 			if (this.state != NewState)

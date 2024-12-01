@@ -89,7 +89,11 @@ namespace Waher.Networking.HTTP.Test
 
 		private HttpRequestMessage GetRequest(HttpMethod Method, string Url)
 		{
-			HttpRequestMessage Request = new(Method, Url);
+			HttpRequestMessage Request = new(Method, Url)
+			{
+				Version = this.protocolVersion,
+				VersionPolicy = HttpVersionPolicy.RequestVersionExact
+			};
 
 			if (this.ifModifiedSince.HasValue)
 				Request.Headers.IfModifiedSince = this.ifModifiedSince.Value;

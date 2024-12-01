@@ -46,7 +46,7 @@ namespace Waher.Networking.HTTP.Test
 				File.Delete("HTTP.xml");
 				xmlSniffer = xmlSniffer = new XmlFileSniffer("HTTP.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
-						int.MaxValue, BinaryPresentationMethod.Base64);
+						int.MaxValue, BinaryPresentationMethod.Hexadecimal);
 			}
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/

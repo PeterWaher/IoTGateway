@@ -41,6 +41,9 @@ using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Model.Muc;
 using Waher.Runtime.Settings;
 using Waher.Networking.XMPP.Events;
+using Waher.Content.Markdown.Contracts;
+using Waher.Content.Markdown.Latex;
+using Waher.Content.Markdown.Wpf;
 
 namespace Waher.Client.WPF
 {
@@ -97,9 +100,12 @@ namespace Waher.Client.WPF
 				typeof(Content.Rss.RssDocument).Assembly,
 				typeof(MarkdownDocument).Assembly,
 				typeof(Consolidator).Assembly,
+				typeof(ContractsRenderer).Assembly,
 				typeof(GraphViz).Assembly,
 				typeof(XmlLayout).Assembly,
+				typeof(LatexRenderer).Assembly,
 				typeof(PlantUml).Assembly,
+				typeof(WpfXamlRenderer).Assembly,
 				typeof(Layout2DDocument).Assembly,
 				typeof(XML).Assembly,
 				typeof(Content.Xsl.XSL).Assembly,

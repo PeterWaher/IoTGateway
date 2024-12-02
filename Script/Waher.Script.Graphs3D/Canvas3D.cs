@@ -46,6 +46,17 @@ namespace Waher.Script.Graphs3D
 		/// By default, the camera is looking along the z-axis, with no projection, and no scaling.
 		/// The center of the canvas is located at origo.
 		/// </summary>
+		public Canvas3D()
+			: base(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// 3D drawing area.
+		/// 
+		/// By default, the camera is looking along the z-axis, with no projection, and no scaling.
+		/// The center of the canvas is located at origo.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public Canvas3D(Variables Variables)
 			: base(Variables)

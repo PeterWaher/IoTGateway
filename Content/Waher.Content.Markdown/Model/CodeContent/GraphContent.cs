@@ -76,7 +76,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			Type T = Types.GetType(TypeName)
 				?? throw new Exception("Type not recognized: " + TypeName);
 
-			Graph G = (Graph)Activator.CreateInstance(T);
+			Graph G = (Graph)Types.Instantiate(T);
 			G.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)

@@ -154,7 +154,7 @@ namespace Waher.Content.Markdown.Consolidation
 										Result.type = DocumentType.SingleXml;
 									else
 									{
-										Result.graph = (Graph)Activator.CreateInstance(Result.graphType);
+										Result.graph = (Graph)Types.Instantiate(Result.graphType);
 										Result.graph.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
 
 										foreach (XmlNode N in Xml.DocumentElement.ChildNodes)

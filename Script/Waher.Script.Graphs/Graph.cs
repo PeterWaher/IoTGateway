@@ -123,6 +123,14 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Base class for graphs.
 		/// </summary>
+		public Graph()
+			: this(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// Base class for graphs.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public Graph(Variables Variables)
 			: this(Variables, null, null)

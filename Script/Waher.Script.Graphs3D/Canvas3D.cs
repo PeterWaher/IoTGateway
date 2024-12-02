@@ -3520,7 +3520,6 @@ namespace Waher.Script.Graphs3D
 		public override async Task ImportGraphAsync(XmlElement Xml)
 		{
 			Variables Variables = new Variables();
-			Expression Exp;
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
@@ -3548,13 +3547,11 @@ namespace Waher.Script.Graphs3D
 						break;
 
 					case "bgColor":
-						Exp = new Expression(Attr.Value);
-						this.backgroundColor = (SKColor)await Exp.EvaluateAsync(Variables);
+						this.backgroundColor = (SKColor)(await ParseAsync(Attr.Value, Variables)).AssociatedObjectValue;
 						break;
 
 					case "pos":
-						Exp = new Expression(Attr.Value);
-						this.viewerPosition = (Vector3)await Exp.EvaluateAsync(Variables);
+						this.viewerPosition = (Vector3)(await ParseAsync(Attr.Value, Variables)).AssociatedObjectValue;
 						break;
 				}
 			}
@@ -3594,8 +3591,7 @@ namespace Waher.Script.Graphs3D
 				if (N is XmlElement E && E.LocalName == "Shader")
 				{
 					int Index = int.Parse(E.GetAttribute("index"));
-					Exp = new Expression(E.InnerText);
-					Shaders[Index] = (I3DShader)await Exp.EvaluateAsync(Variables);
+					Shaders[Index] = (I3DShader)(await ParseAsync(E.InnerText, Variables)).AssociatedObjectValue;
 				}
 			}
 
@@ -3606,13 +3602,11 @@ namespace Waher.Script.Graphs3D
 					switch (E.LocalName)
 					{
 						case "Projection":
-							Exp = new Expression(E.InnerText);
-							this.projectionTransformation = (Matrix4x4)await Exp.EvaluateAsync(Variables);
+							this.projectionTransformation = (Matrix4x4)(await ParseAsync(E.InnerText, Variables)).AssociatedObjectValue;
 							break;
 
 						case "Model":
-							Exp = new Expression(E.InnerText);
-							this.modelTransformation = (Matrix4x4)await Exp.EvaluateAsync(Variables);
+							this.modelTransformation = (Matrix4x4)(await ParseAsync(E.InnerText, Variables)).AssociatedObjectValue;
 							break;
 
 						case "Pixels":
@@ -3620,8 +3614,7 @@ namespace Waher.Script.Graphs3D
 							break;
 
 						case "ZBuffer":
-							Exp = new Expression(E.InnerText);
-							double[] v = (double[])await Exp.EvaluateAsync(Variables);
+							double[] v = (double[])(await ParseAsync(E.InnerText, Variables)).AssociatedObjectValue;
 
 							c = v.Length;
 							this.zBuffer = new float[c];

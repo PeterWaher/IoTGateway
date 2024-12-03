@@ -44,7 +44,7 @@ namespace Waher.IoTGateway
 			e.Socket.Closed += this.Socket_Closed;
 			e.Socket.Disposed += this.Socket_Disposed;
 			e.Socket.TextReceived += this.Socket_TextReceived;
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -109,10 +109,17 @@ namespace Waher.IoTGateway
 
 		private async Task Close(WebSocket Socket)
 		{
-			if (Socket.Tag is Info Info)
+			try
 			{
-				await ClientEvents.UnregisterWebSocket(Socket, Info.Location, Info.TabID);
-				Socket.Tag = null;
+				if (Socket.Tag is Info Info)
+				{
+					await ClientEvents.UnregisterWebSocket(Socket, Info.Location, Info.TabID);
+					Socket.Tag = null;
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 

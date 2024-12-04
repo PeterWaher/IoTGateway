@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
+using System.Text;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -8,8 +8,16 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class ConnectionSettings
 	{
-		private int connectionWindowSize = 65535;
-		private List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
+		private long connectionWindowSize = 65535;
+		private long connectionBytesCommunicated = 0;
+		private int headerTableSize = 4096;
+		private int maxConcurrentStreams = 100;
+		private int initialWindowSize = 65535;
+		private int maxFrameSize = 16384;
+		private int maxHeaderListSize = HttpClientConnection.MaxHeaderSize;
+		private bool enablePush = true;
+
+		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
 		private bool hasPendingIncrements = false;
 
 		/// <summary>
@@ -35,7 +43,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// header block(see[COMPRESSION]).  The initial value is 4,096
 		/// octets.
 		/// </summary>
-		public int HeaderTableSize = 4096;
+		public int HeaderTableSize => this.headerTableSize;
 
 		/// <summary>
 		/// SETTINGS_ENABLE_PUSH (0x2):  This setting can be used to disable
@@ -50,7 +58,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// permitted.Any value other than 0 or 1 MUST be treated as a
 		/// connection error(Section 5.4.1) of type PROTOCOL_ERROR.
 		/// </summary>
-		public bool EnablePush = true;
+		public bool EnablePush => this.enablePush;
 
 		/// <summary>
 		/// SETTINGS_MAX_CONCURRENT_STREAMS (0x3):  Indicates the maximum number
@@ -67,7 +75,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// set a zero value for short durations; if a server does not wish to
 		/// accept requests, closing the connection is more appropriate.
 		/// </summary>
-		public int MaxConcurrentStreams = 100;
+		public int MaxConcurrentStreams => this.maxConcurrentStreams;
 
 		/// <summary>
 		/// SETTINGS_INITIAL_WINDOW_SIZE (0x4):  Indicates the sender's initial
@@ -81,7 +89,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// be treated as a connection error(Section 5.4.1) of type
 		/// FLOW_CONTROL_ERROR.
 		/// </summary>
-		public int InitialWindowSize = 65535;
+		public int InitialWindowSize => this.initialWindowSize;
 
 		/// <summary>
 		/// SETTINGS_MAX_FRAME_SIZE (0x5):  Indicates the size of the largest
@@ -92,7 +100,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Values outside this range MUST be treated as a connection error
 		/// (Section 5.4.1) of type PROTOCOL_ERROR.
 		/// </summary>
-		public int MaxFrameSize = 16384;
+		public int MaxFrameSize => this.maxFrameSize;
 
 		/// <summary>
 		///  SETTINGS_MAX_HEADER_LIST_SIZE (0x6):  This advisory setting informs a
@@ -105,7 +113,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		///  For any given request, a lower limit than what is advertised MAY
 		///  be enforced.The initial value of this setting is unlimited.
 		/// </summary>
-		public int MaxHeaderListSize = HttpClientConnection.MaxHeaderSize;
+		public int MaxHeaderListSize => this.maxHeaderListSize;
 
 		/// <summary>
 		/// Initialization step.
@@ -174,7 +182,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			return TryParse(Data, 0, Data.Length, out Settings);
 		}
-
+		
 		/// <summary>
 		/// Tries to parse a SETTINGS fame.
 		/// 
@@ -189,13 +197,27 @@ namespace Waher.Networking.HTTP.HTTP2
 		public static bool TryParse(byte[] Data, int Offset, int Count, out ConnectionSettings Settings)
 		{
 			BinaryReader Reader = new BinaryReader(Data, Offset, Count);
+			return TryParse(Reader, null, out Settings) is null;
+		}
 
+		/// <summary>
+		/// Tries to parse a SETTINGS fame.
+		/// 
+		/// Ref: §6.5.2, RFC 7540
+		/// https://datatracker.ietf.org/doc/html/rfc7540#section-6.5.2
+		/// </summary>
+		/// <param name="Reader">Binary data reader.</param>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
+		/// <param name="Settings">Settings object, if successful.</param>
+		/// <returns>Null, if able to parse the settings frame, otherwise the corresponding error to return.</returns>
+		public static Http2Error? TryParse(BinaryReader Reader, StringBuilder SnifferOutput, out ConnectionSettings Settings)
+		{
 			Settings = new ConnectionSettings();
 
 			while (Reader.HasMore)
 			{
 				if (Reader.BytesLeft < 6)
-					return false;
+					return Http2Error.FrameSizeError;
 
 				ushort Key = Reader.NextUInt16();
 				uint Value = Reader.NextUInt32();
@@ -203,53 +225,67 @@ namespace Waher.Networking.HTTP.HTTP2
 				switch (Key)
 				{
 					case 1:
-						if (Value > int.MaxValue)
-							return false;
+						SnifferOutput?.AppendLine("RX: SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
 
-						Settings.HeaderTableSize = (int)Value;
+						if (Value > int.MaxValue)
+							return Http2Error.ProtocolError;
+
+						Settings.headerTableSize = (int)Value;
 						break;
 
 					case 2:
-						if (Value > 1)
-							return false;
+						SnifferOutput?.AppendLine("RX: SETTINGS_ENABLE_PUSH = " + Value.ToString());
 
-						Settings.EnablePush = Value != 0;
+						if (Value > 1)
+							return Http2Error.ProtocolError;
+
+						Settings.enablePush = Value != 0;
 						break;
 
 					case 3:
-						if (Value > int.MaxValue)
-							return false;
+						SnifferOutput?.AppendLine("RX: SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
 
-						Settings.MaxConcurrentStreams = (int)Value;
+						if (Value > int.MaxValue)
+							return Http2Error.ProtocolError;
+
+						Settings.maxConcurrentStreams = (int)Value;
 						break;
 
 					case 4:
-						if (Value > 0x7fffffff)
-							return false;
+						SnifferOutput?.AppendLine("RX: SETTINGS_INITIAL_WINDOW_SIZE = " + Value.ToString());
 
-						Settings.InitialWindowSize = (int)Value;
+						if (Value > 0x7fffffff)
+							return Http2Error.FlowControlError;
+
+						Settings.initialWindowSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 						break;
 
 					case 5:
-						if (Value > 0x00ffffff)
-							return false;
+						SnifferOutput?.AppendLine("RX: SETTINGS_MAX_FRAME_SIZE = " + Value.ToString());
 
-						Settings.MaxFrameSize = (int)Value;
+						if (Value > 0x00ffffff)
+							return Http2Error.ProtocolError;
+
+						Settings.maxFrameSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 						break;
 
 					case 6:
-						if (Value > int.MaxValue)
-							return false;
+						SnifferOutput?.AppendLine("RX: SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
 
-						Settings.MaxHeaderListSize = (int)Value;
+						if (Value > int.MaxValue)
+							return Http2Error.ProtocolError;
+
+						Settings.maxHeaderListSize = (int)Value;
 						break;
 
 					default:
+						SnifferOutput?.AppendLine("RX: (" + Key.ToString() + ", " + Value.ToString() + ")");
+
 						break;  // Ignore
 				}
 			}
 
-			return true;
+			return null;
 		}
 
 		/// <summary>
@@ -274,9 +310,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Sets the window size increment for stream, modified using the WINDOW_UPDATE
 		/// frame.
 		/// </summary>
-		public bool SetWindowSizeIncrement(int Increment)
+		/// <returns>If increment was valid.</returns>
+		public bool SetWindowSizeIncrementLocked(int Increment)
 		{
-			if (Increment < 0)
+			if (Increment <= 0 || Increment > int.MaxValue - 1)
 				return false;
 
 			long Size = this.InitialWindowSize + Increment;
@@ -284,14 +321,23 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (Size < 0 || Size > int.MaxValue - 1)
 				return false;
 
-			this.connectionWindowSize = (int)Size;
+			this.connectionWindowSize = Size;
 
 			return true;
 		}
 
 		/// <summary>
+		/// Number of data bytes sent over the connection
+		/// </summary>
+		/// <param name="Increment">Increment</param>
+		public void DataBytesSentLocked(int Increment)
+		{
+			this.connectionBytesCommunicated += Increment;
+		}
+
+		/// <summary>
 		/// Connection window size
 		/// </summary>
-		public int ConnectionWindowSize => this.connectionWindowSize;
+		public int ConnectionWindowSize => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
 	}
 }

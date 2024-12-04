@@ -52,8 +52,6 @@ namespace Waher.Networking.HTTP
 		private BinaryTcpClient client;
 		private HttpRequestHeader header = null;
 		private ConnectionMode mode = ConnectionMode.Http;
-		private ConnectionSettings localSettings = null;
-		private ConnectionSettings remoteSettings = null;
 		private WebSocket webSocket = null;
 		private Encoding rxEncoding = null;
 		private HTTP2.BinaryReader reader = null;
@@ -63,6 +61,27 @@ namespace Waher.Networking.HTTP
 		private readonly bool encrypted;
 		private bool disposed = false;
 		private bool rxText = false;
+
+		// HTTP/2
+		private int http2State = 0;
+		private int http2FrameLength = 0;
+		private int http2StreamId = 0;
+		private int http2LastCreatedStreamId = 0;
+		private int http2FramePos = 0;
+		private FrameType http2FrameType = 0;
+		private ConnectionSettings localSettings = null;
+		private ConnectionSettings remoteSettings = null;
+		private FlowControl flowControl = null;
+		private HeaderReader http2HeaderReader = null;
+		private HeaderWriter http2HeaderWriter = null;
+		private byte http2FrameFlags = 0;
+		private byte[] http2Frame = null;
+
+		internal ConnectionSettings LocalSettings => this.localSettings;
+		internal ConnectionSettings RemoteSettings => this.remoteSettings;
+		internal HeaderReader HttpHeaderReader => this.http2HeaderReader;
+		internal HeaderWriter HttpHeaderWriter => this.http2HeaderWriter;
+
 
 		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, bool Encrypted, params ISniffer[] Sniffers)
 			: base(false, Sniffers)
@@ -154,6 +173,9 @@ namespace Waher.Networking.HTTP
 				this.client = null;
 
 				this.server.Remove(this);
+
+				this.flowControl?.Dispose();
+				this.flowControl = null;
 			}
 		}
 
@@ -273,7 +295,6 @@ namespace Waher.Networking.HTTP
 				{
 					this.mode = ConnectionMode.Http2Init;
 					this.localSettings = new ConnectionSettings();
-					this.http2Streams = new Dictionary<int, Http2Stream>();
 
 					if (i + 1 < NrRead)
 						return await this.BinaryHttp2InitDataReceived(Data, i + 1, NrRead - i - 1);
@@ -296,7 +317,7 @@ namespace Waher.Networking.HTTP
 								this.localSettings = new ConnectionSettings();
 								this.remoteSettings = Settings;
 								this.mode = ConnectionMode.Http2Live;
-								this.http2Streams ??= new Dictionary<int, Http2Stream>();
+								this.flowControl = new FlowControl(this.remoteSettings);
 
 								using HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
@@ -381,7 +402,6 @@ namespace Waher.Networking.HTTP
 				if (this.localSettings.InitStep == 6)
 				{
 					this.mode = ConnectionMode.Http2Live;
-					this.http2Streams ??= new Dictionary<int, Http2Stream>();
 
 					if (this.HasSniffers)
 						await this.ReceiveText("\r\nSM\r\n");
@@ -480,7 +500,7 @@ namespace Waher.Networking.HTTP
 
 							if (!await this.ProcessHttp2Frame())
 								return false;
-					
+
 							FramesProcessed = true;
 						}
 						break;
@@ -505,27 +525,10 @@ namespace Waher.Networking.HTTP
 			}
 
 			if (FramesProcessed)
-				return await this.CheckFlowControl();
+				return await this.SendPendingWindowUpdates();
 			else
 				return true;
 		}
-
-		private int http2State = 0;
-		private int http2FrameLength = 0;
-		private int http2StreamId = 0;
-		private int http2LastCreatedStreamId = 0;
-		private int http2FramePos = 0;
-		private FrameType http2FrameType = 0;
-		private Dictionary<int, Http2Stream> http2Streams = null;
-		private HeaderReader http2HeaderReader = null;
-		private HeaderWriter http2HeaderWriter = null;
-		private byte http2FrameFlags = 0;
-		private byte[] http2Frame = null;
-
-		internal ConnectionSettings LocalSettings => this.localSettings;
-		internal ConnectionSettings RemoteSettings => this.remoteSettings;
-		internal HeaderReader HttpHeaderReader => this.http2HeaderReader;
-		internal HeaderWriter HttpHeaderWriter => this.http2HeaderWriter;
 
 		private async Task<bool> ProcessHttp2Frame()
 		{
@@ -551,55 +554,17 @@ namespace Waher.Networking.HTTP
 			else
 				this.reader.Reset(this.http2Frame, 0, this.http2FrameLength);
 
-			Http2Stream Stream;
-			ushort Key;
-			uint Value;
-
-			if (this.http2StreamId == 0)
-				Stream = null;
-			else
-			{
-				bool Created = false;
-
-				lock (this.http2Streams)
-				{
-					if (!this.http2Streams.TryGetValue(this.http2StreamId, out Stream))
-					{
-						if (this.http2StreamId > this.http2LastCreatedStreamId)
-						{
-							Stream = new Http2Stream(this.http2StreamId, this);
-							this.http2Streams[this.http2StreamId] = Stream;
-							this.http2LastCreatedStreamId = this.http2StreamId;
-							Created = true;
-						}
-						else
-							Stream = null;
-					}
-				}
-
-				if (Stream is null)
-					return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
-
-				if (Created && this.HasSniffers)
-				{
-					StringBuilder sb = new StringBuilder();
-					sb.Append("Stream ");
-					sb.Append(this.http2StreamId);
-					sb.Append(" creted. (Window input size: ");
-					sb.Append(Stream.DataInputWindowSize.ToString());
-					sb.Append(" creted. (Window output size: ");
-					sb.Append(Stream.DataOutputWindowSize.ToString());
-				}
-			}
-
 			switch (this.http2FrameType)
 			{
 				case FrameType.Data:
 					if (this.http2StreamId == 0)
 						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
 
-					if (Stream.State != StreamState.Open)
+					if (!this.flowControl.TryGetStream(this.http2StreamId, out Http2Stream Stream) ||
+						Stream.State != StreamState.Open)
+					{
 						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
+					}
 
 					bool EndStream = (this.http2FrameFlags & 1) != 0;
 					bool Padded = (this.http2FrameFlags & 8) != 0;
@@ -636,14 +601,35 @@ namespace Waher.Networking.HTTP
 					if (this.http2StreamId == 0)
 						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
 
+					bool StreamCreated = false;
+
+					if (this.http2FrameType == FrameType.Headers)
+					{
+						if (!this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+						{
+							if (this.http2StreamId < this.http2LastCreatedStreamId)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+							Stream = new Http2Stream(this.http2StreamId, this);
+							StreamCreated = true;
+						}
+					}
+					else if (!this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
+
 					if (Stream.State == StreamState.Idle)
 						Stream.State = StreamState.Open;
+					else if (Stream.State == StreamState.Open)
+					{
+						if (this.http2FrameType != FrameType.Continuation)
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+					}
 					else
 						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
 
 					bool EndHeaders = (this.http2FrameFlags & 4) != 0;
-					uint StreamIdDependency = 0;
-					byte Weight = 0;
+					uint StreamIdDependency = 0;    // Root
+					byte Weight = 16;               // Default weight, §5.3.5 RFC 7540
 					bool Priority = false;
 					bool Exclusive = false;
 
@@ -664,14 +650,33 @@ namespace Waher.Networking.HTTP
 						}
 					}
 					else
-					{
-						Padded = false;
 						PaddingLen = 0;
-					}
 
 					int HeaderSize = this.reader.BytesLeft - PaddingLen;
 					if (HeaderSize < 0)
 						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+					if (StreamCreated)
+					{
+						if (!this.flowControl.AddStream(Stream, Weight, (int)StreamIdDependency, Exclusive))
+							return await this.ReturnHttp2Error(Http2Error.RefusedStream, false);
+
+						this.http2LastCreatedStreamId = this.http2StreamId;
+
+						if (this.HasSniffers)
+						{
+							StringBuilder sb = new StringBuilder();
+							sb.Append("Stream ");
+							sb.Append(this.http2StreamId);
+							sb.Append(" creted. (Window input size: ");
+							sb.Append(Stream.DataInputWindowSize.ToString());
+							sb.Append(')');
+
+							await this.Information(sb.ToString());
+						}
+					}
+					else if (Priority)
+						this.flowControl.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
 
 					if (EndHeaders)
 					{
@@ -775,96 +780,31 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						this.remoteSettings = new ConnectionSettings();
+						StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
+						Http2Error? Error = ConnectionSettings.TryParse(this.reader, sb, out this.remoteSettings);
+						string s = sb?.ToString().Trim();
 
-						while (this.reader.HasMore)
-						{
-							if (this.reader.BytesLeft < 6)
-								return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
+						if (!string.IsNullOrEmpty(s))
+							await this.Information(s);
 
-							Key = this.reader.NextUInt16();
-							Value = this.reader.NextUInt32();
+						if (Error.HasValue)
+							return await this.ReturnHttp2Error(Error.Value, true);
 
-							switch (Key)
-							{
-								case 1:
-									if (this.HasSniffers)
-										await this.Information("RX: SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
-
-									if (Value > int.MaxValue)
-										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
-
-									this.remoteSettings.HeaderTableSize = (int)Value;
-									break;
-
-								case 2:
-									if (this.HasSniffers)
-										await this.Information("RX: SETTINGS_ENABLE_PUSH = " + Value.ToString());
-
-									if (Value > 1)
-										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
-
-									this.remoteSettings.EnablePush = Value != 0;
-									break;
-
-								case 3:
-									if (this.HasSniffers)
-										await this.Information("RX: SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
-
-									if (Value > int.MaxValue)
-										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
-
-									this.remoteSettings.MaxConcurrentStreams = (int)Value;
-									break;
-
-								case 4:
-									if (this.HasSniffers)
-										await this.Information("RX: SETTINGS_INITIAL_WINDOW_SIZE = " + Value.ToString());
-
-									if (Value > 0x7fffffff)
-										return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
-
-									this.remoteSettings.InitialWindowSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
-									break;
-
-								case 5:
-									if (this.HasSniffers)
-										await this.Information("RX: SETTINGS_MAX_FRAME_SIZE = " + Value.ToString());
-
-									if (Value > 0x00ffffff)
-										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
-
-									this.remoteSettings.MaxFrameSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
-									break;
-
-								case 6:
-									if (this.HasSniffers)
-										await this.Information("RX: SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
-
-									if (Value > int.MaxValue)
-										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
-
-									this.remoteSettings.MaxHeaderListSize = (int)Value;
-									break;
-
-								default:
-									if (this.HasSniffers)
-										await this.Information("RX: (" + Key.ToString() + ", " + Value.ToString() + ")");
-
-									break;  // Ignore
-							}
-						}
+						if (this.flowControl is null)
+							this.flowControl = new FlowControl(this.remoteSettings);
+						else
+							this.flowControl.UpdateSettings(this.remoteSettings);
 
 						if (this.localSettings.AcknowledgedOrSent)
 						{
-							if (!await this.SendHttp2Frame(FrameType.Settings, 1, 0))   // Ack
+							if (!await this.SendHttp2Frame(FrameType.Settings, 1, null))   // Ack
 								return false;
 						}
 						else
 						{
 							this.localSettings.AcknowledgedOrSent = true;
 
-							if (!await this.SendHttp2Frame(FrameType.Settings, 0, 0, this.localSettings.ToArray()))
+							if (!await this.SendHttp2Frame(FrameType.Settings, 0, null, this.localSettings.ToArray()))
 								return false;
 						}
 					}
@@ -888,31 +828,33 @@ namespace Waher.Networking.HTTP
 					if (this.reader.BytesLeft != 4)
 						return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
 
-					Value = this.reader.NextUInt32() & 0x7fffffff;
+					uint Increment = this.reader.NextUInt32() & 0x7fffffff;
 
 					if (this.HasSniffers)
-						await this.Information("RX: WINDOW_SIZE increment = " + Value.ToString());
+						await this.Information("RX: WINDOW_SIZE increment = " + Increment.ToString());
 
-					if (Value == 0)
+					if (Increment == 0)
 						return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId == 0);
 
-					if (Stream is null)
+					if (this.http2StreamId == 0)
 					{
-						if (!this.remoteSettings.SetWindowSizeIncrement((int)Value))
+						if (!(this.flowControl?.ReleaseConnectionResources((int)Increment) ?? false))
 							return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
 					}
-					else
+					else if (this.flowControl.TryGetStream(this.http2StreamId, out Stream))
 					{
-						if (!await Stream.SetOutputWindowSizeIncrement(Value))
+						if (!(this.flowControl?.ReleaseStreamResources(Stream.StreamId, (int)Increment) ?? false))
 							return await this.ReturnHttp2Error(Http2Error.FlowControlError, false);
 					}
+					else
+						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
 					break;
 			}
 
 			return true;
 		}
 
-		private async Task<bool> CheckFlowControl()
+		private async Task<bool> SendPendingWindowUpdates()
 		{
 			if (!this.localSettings.HasPendingIncrements)
 				return true;
@@ -925,10 +867,10 @@ namespace Waher.Networking.HTTP
 				i = Increment.NrBytes;
 				Total += i;
 
-				if (!await Increment.Stream.SetInputWindowSizeIncrement((uint)i))
+				if (!Increment.Stream.SetInputWindowSizeIncrement((uint)i))
 					return false;
 
-				if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, (uint)Increment.Stream.StreamId,
+				if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, Increment.Stream,
 					(byte)(i >> 24),
 					(byte)(i >> 16),
 					(byte)(i >> 8),
@@ -938,7 +880,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, 0,
+			if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, null,
 				(byte)(Total >> 24),
 				(byte)(Total >> 16),
 				(byte)(Total >> 8),
@@ -959,7 +901,7 @@ namespace Waher.Networking.HTTP
 
 			if (ConnectionError)
 			{
-				await this.SendHttp2Frame(FrameType.GoAway, 0, 0,
+				await this.SendHttp2Frame(FrameType.GoAway, 0, null,
 					(byte)(this.http2LastCreatedStreamId >> 24),
 					(byte)(this.http2LastCreatedStreamId >> 16),
 					(byte)(this.http2LastCreatedStreamId >> 8),
@@ -974,7 +916,7 @@ namespace Waher.Networking.HTTP
 			}
 			else
 			{
-				return await this.SendHttp2Frame(FrameType.ResetStream, 0, 0,
+				return await this.SendHttp2Frame(FrameType.ResetStream, 0, null,
 					(byte)(i >> 24),
 					(byte)(i >> 16),
 					(byte)(i >> 8),
@@ -982,19 +924,69 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal Task<bool> SendHttp2Frame(FrameType Type, byte Flags, uint StreamId,
-			 params byte[] Payload)
+		/// <summary>
+		/// Writes DATA to the remote party.
+		/// </summary>
+		/// <param name="Stream">Stream sending data.</param>
+		/// <param name="Data">Binary data</param>
+		/// <param name="Offset">Offset into buffer where data begins.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Last">If it is the last data to be written for this stream.</param>
+		/// <returns>If data was written.</returns>
+		internal async Task<bool> WriteData(Http2Stream Stream, byte[] Data, int Offset, int Count, bool Last)
 		{
-			return this.SendHttp2Frame(Type, Flags, StreamId, Payload, 0, Payload.Length);
+			int StreamId = Stream.StreamId;
+
+			if (Count == 0)
+			{
+				if (Last)
+					return await this.SendHttp2Frame(FrameType.Data, 1, Stream, Data, Offset, 0);   // END_STREAM
+				else
+					return true;
+			}
+
+			int NrBytes;
+			byte Flags = 0;
+
+			while (Count > 0)
+			{
+				if (this.flowControl is null)
+					return false;
+
+				NrBytes = await this.flowControl.RequestResources(StreamId, Count);
+				if (NrBytes < 0)
+					return false;
+
+				if (Last && NrBytes == Count)
+					Flags = 1;  // END_STREAM
+
+				if (!await this.SendHttp2Frame(FrameType.Data, Flags, Stream, Data, Offset, NrBytes))
+					return false;
+
+				Offset += NrBytes;
+				Count -= NrBytes;
+			}
+
+			if (Last)
+				this.flowControl.RemoveStream(Stream);
+
+			return true;
 		}
 
-		internal async Task<bool> SendHttp2Frame(FrameType Type, byte Flags, uint StreamId,
+		internal Task<bool> SendHttp2Frame(FrameType Type, byte Flags, Http2Stream Stream,
+			 params byte[] Payload)
+		{
+			return this.SendHttp2Frame(Type, Flags, Stream, Payload, 0, Payload.Length);
+		}
+
+		internal async Task<bool> SendHttp2Frame(FrameType Type, byte Flags, Http2Stream Stream,
 			 byte[] Payload, int Offset, int Count)
 		{
 			if (Count > 0x00ffffff)
 				return false;
 
 			byte[] Data = new byte[9 + Count];
+			int StreamId = Stream?.StreamId ?? 0;
 
 			Data[0] = (byte)(Count >> 16);
 			Data[1] = (byte)(Count >> 8);

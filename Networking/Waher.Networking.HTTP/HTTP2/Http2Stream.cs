@@ -18,9 +18,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private StreamState state = StreamState.Idle;
 		private long headerBytesReceived = 0;
 		private long dataBytesReceived = 0;
-		private long dataBytesSent = 0;
 		private long dataInputWindowSize;
-		private long dataOutputWindowSize;
 
 		/// <summary>
 		/// HTTP/2 stream
@@ -31,8 +29,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.streamId = StreamId;
 			this.connection = Connection;
-			this.dataInputWindowSize = this.connection.LocalSettings.ConnectionWindowSize;
-			this.dataOutputWindowSize = this.connection.RemoteSettings.ConnectionWindowSize;
+			this.dataInputWindowSize = this.connection.LocalSettings.InitialWindowSize;
 			this.headerInputWindowSize = Connection.LocalSettings.MaxHeaderListSize;
 		}
 
@@ -67,19 +64,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		public long DataBytesReceived => this.dataBytesReceived;
 
 		/// <summary>
-		/// Data bytes sent
-		/// </summary>
-		public long DataBytesSent => this.dataBytesSent;
-
-		/// <summary>
 		/// Data input window size
 		/// </summary>
 		public long DataInputWindowSize => this.dataInputWindowSize;
-
-		/// <summary>
-		/// Data output window size
-		/// </summary>
-		public long DataOutputWindowSize => this.dataOutputWindowSize;
 
 		/// <summary>
 		/// Input data stream, if defined.
@@ -196,25 +183,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Sets the output window size increment for stream, modified using the 
 		/// WINDOW_UPDATE frame.
 		/// </summary>
-		public Task<bool> SetOutputWindowSizeIncrement(uint Increment)
-		{
-			long Size = this.dataOutputWindowSize + Increment;
-
-			if (Size < 0 || Size > int.MaxValue - 1)
-				return Task.FromResult(false);
-
-			this.dataOutputWindowSize = (int)Size;
-
-			// TODO: Flow control
-
-			return Task.FromResult(true);
-		}
-
-		/// <summary>
-		/// Sets the output window size increment for stream, modified using the 
-		/// WINDOW_UPDATE frame.
-		/// </summary>
-		public async Task<bool> SetInputWindowSizeIncrement(uint Increment)
+		public bool SetInputWindowSizeIncrement(uint Increment)
 		{
 			long Size = this.dataInputWindowSize + Increment;
 
@@ -222,8 +191,6 @@ namespace Waher.Networking.HTTP.HTTP2
 				return false;
 
 			this.dataInputWindowSize = (int)Size;
-
-			// TODO: Flow control
 
 			return true;
 		}
@@ -247,8 +214,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				Flags |= 4; // END_HEADERS
 
-				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags,
-					(uint)this.streamId, Headers);
+				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, this, Headers);
 			}
 			else
 			{
@@ -263,11 +229,8 @@ namespace Waher.Networking.HTTP.HTTP2
 					else
 						Flags = 4; // END_HEADERS
 
-					if (!await this.connection.SendHttp2Frame(Type, Flags,
-						(uint)this.streamId, Headers, Pos, Diff))
-					{
+					if (!await this.connection.SendHttp2Frame(Type, Flags, this, Headers, Pos, Diff))
 						return false;
-					}
 
 					Pos += Diff;
 					Type = FrameType.Continuation;
@@ -288,58 +251,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If data was written.</returns>
 		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last)
 		{
-			int MaxFrameSize = this.connection.RemoteSettings.MaxFrameSize;
-			byte Flags = 0;
+			if (!await this.connection.WriteData(this, Data, Offset, Count, Last))
+				return false;
 
-			// TODO: Flow control
-
-			if (Count <= MaxFrameSize)
-			{
-				if (Last)
-				{
-					Flags = 1;  // END_STREAM
-					this.state = StreamState.HalfClosedLocal;
-				}
-
-				if (!await this.connection.SendHttp2Frame(FrameType.Data, Flags,
-					(uint)this.streamId, Data, Offset, Count))
-				{
-					return false;
-				}
-
-				this.dataBytesSent += Count;
-			}
-			else
-			{
-				int Left = Count;
-				int Delta;
-
-				while (Left > 0)
-				{
-					if (Left > MaxFrameSize)
-						Delta = MaxFrameSize;
-					else
-					{
-						Delta = Left;
-
-						if (Last)
-						{
-							Flags = 1; // END_STREAM
-							this.state = StreamState.HalfClosedLocal;
-						}
-					}
-
-					if (!await this.connection.SendHttp2Frame(FrameType.Data, Flags,
-						(uint)this.streamId, Data, Offset, Delta))
-					{
-						return false;
-					}
-
-					this.dataBytesSent += Delta;
-					Offset += Delta;
-					Left -= Delta;
-				}
-			}
+			if (Last)
+				this.state = StreamState.HalfClosedLocal;
 
 			return true;
 		}

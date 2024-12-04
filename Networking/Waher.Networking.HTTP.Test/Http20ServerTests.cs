@@ -36,6 +36,7 @@ namespace Waher.Networking.HTTP.Test
 		 * stream errors
 		 * connection errors
 		 * ping/pong
+		 * internal flow control parameters OK at end of test.
 		 */
 	}
 }

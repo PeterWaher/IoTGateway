@@ -294,7 +294,12 @@ namespace Waher.Networking.HTTP
 				if (this.header.Method == "PRI")
 				{
 					this.mode = ConnectionMode.Http2Init;
-					this.localSettings = new ConnectionSettings();
+					this.localSettings = new ConnectionSettings(
+						this.server.Http2InitialWindowSize,
+						this.server.Http2MaxFrameSize,
+						this.server.Http2MaxConcurrentStreams,
+						this.server.Http2HeaderTableSize,
+						this.server.Http2EnablePush);
 
 					if (i + 1 < NrRead)
 						return await this.BinaryHttp2InitDataReceived(Data, i + 1, NrRead - i - 1);
@@ -314,7 +319,13 @@ namespace Waher.Networking.HTTP
 							byte[] Bin = Convert.FromBase64String(Http2Settings.Value);
 							if (ConnectionSettings.TryParse(Bin, out ConnectionSettings Settings))
 							{
-								this.localSettings = new ConnectionSettings();
+								this.localSettings = new ConnectionSettings(
+									this.server.Http2InitialWindowSize,
+									this.server.Http2MaxFrameSize,
+									this.server.Http2MaxConcurrentStreams,
+									this.server.Http2HeaderTableSize,
+									this.server.Http2EnablePush);
+
 								this.remoteSettings = Settings;
 								this.mode = ConnectionMode.Http2Live;
 								this.flowControl = new FlowControl(this.remoteSettings);

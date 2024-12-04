@@ -1004,6 +1004,8 @@ namespace Waher.IoTGateway
 					}
 				}
 
+				webServer.SetHttp2ConnectionSettings(262144, 65536, 100, 4096, true, true);
+
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
 				Types.SetModuleParameter("LoginAuditor", webServer.LoginAuditor);

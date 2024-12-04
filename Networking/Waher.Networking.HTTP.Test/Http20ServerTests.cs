@@ -37,6 +37,7 @@ namespace Waher.Networking.HTTP.Test
 		 * connection errors
 		 * ping/pong
 		 * internal flow control parameters OK at end of test.
+		 * maximum concurrent streams.
 		 */
 	}
 }

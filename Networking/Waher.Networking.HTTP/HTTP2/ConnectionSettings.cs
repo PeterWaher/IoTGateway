@@ -8,14 +8,39 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class ConnectionSettings
 	{
-		private long connectionWindowSize = 65535;
+		/// <summary>
+		/// Default Initial Window Size for an HTTP/2 connection (65535).
+		/// </summary>
+		public const int DefaultHttp2InitialWindowSize = 65535;
+
+		/// <summary>
+		/// Default Maximum Frame Size for an HTTP/2 connection (4096).
+		/// </summary>
+		public const int DefaultHttp2MaxFrameSize = 16384;
+
+		/// <summary>
+		/// Default Maximum Concurrent Streams for an HTTP/2 connection (100).
+		/// </summary>
+		public const int DefaultHttp2MaxConcurrentStreams = 100;
+
+		/// <summary>
+		/// Default Header Table Size for an HTTP/2 connection (4096).
+		/// </summary>
+		public const int DefaultHttp2HeaderTableSize = 4096;
+
+		/// <summary>
+		/// Default Enable Push Promises for an HTTP/2 connection (true).
+		/// </summary>
+		public const bool DefaultHttp2EnablePush = true;
+
+		private long connectionWindowSize;
 		private long connectionBytesCommunicated = 0;
-		private int headerTableSize = 4096;
-		private int maxConcurrentStreams = 100;
-		private int initialWindowSize = 65535;
-		private int maxFrameSize = 16384;
+		private int headerTableSize;
+		private int maxConcurrentStreams;
+		private int initialWindowSize;
+		private int maxFrameSize;
 		private int maxHeaderListSize = HttpClientConnection.MaxHeaderSize;
-		private bool enablePush = true;
+		private bool enablePush;
 
 		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
 		private bool hasPendingIncrements = false;
@@ -25,6 +50,31 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		public ConnectionSettings()
 		{
+			this.connectionWindowSize = DefaultHttp2InitialWindowSize;
+			this.initialWindowSize = DefaultHttp2InitialWindowSize;
+			this.maxFrameSize = DefaultHttp2MaxFrameSize;
+			this.maxConcurrentStreams = DefaultHttp2MaxConcurrentStreams;
+			this.headerTableSize = DefaultHttp2HeaderTableSize;
+			this.enablePush = DefaultHttp2EnablePush;
+		}
+
+		/// <summary>
+		/// HTTP/2 connection settings (SETTINGS).
+		/// </summary>
+		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="MaxFrameSize">Maximum frame size.</param>
+		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
+		/// <param name="HeaderTableSize">Header table size.</param>
+		/// <param name="EnablePush">If push promises are enabled.</param>
+		public ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
+			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush)
+		{
+			this.connectionWindowSize = InitialWindowSize;
+			this.initialWindowSize = InitialWindowSize;
+			this.maxFrameSize = MaxFrameSize;
+			this.maxConcurrentStreams = MaxConcurrentStreams;
+			this.headerTableSize = HeaderTableSize;
+			this.enablePush = EnablePush;
 		}
 
 		internal class PendingWindowIncrement

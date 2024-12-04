@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -89,6 +90,58 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
+		/// Tries to add a stream to flow control for testing purposes, using
+		/// default priority settings.
+		/// </summary>
+		/// <param name="StreamId">ID of stream to add.</param>
+		/// <returns>If the stream could be added.</returns>
+		public bool AddStreamForTest(int StreamId)
+		{
+			return this.AddStreamForTest(StreamId, this.settings, 16, 0, false);
+		}
+
+		/// <summary>
+		/// Tries to add a stream to flow control for testing purposes, using
+		/// default priority settings.
+		/// </summary>
+		/// <param name="StreamId">ID of stream to add.</param>
+		/// <param name="Settings">Settings to use.</param>
+		/// <returns>If the stream could be added.</returns>
+		public bool AddStreamForTest(int StreamId, ConnectionSettings Settings)
+		{
+			return this.AddStreamForTest(StreamId, Settings, 16, 0, false);
+		}
+
+		/// <summary>
+		/// Tries to add a stream to flow control for testing purposes.
+		/// </summary>
+		/// <param name="StreamId">ID of stream to add.</param>
+		/// <param name="Weight">Weight</param>
+		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
+		/// <param name="Exclusive">If the stream is exclusive child.</param>
+		/// <returns>If the stream could be added.</returns>
+		public bool AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency, bool Exclusive)
+		{
+			return this.AddStreamForTest(StreamId, this.settings, Weight, StreamIdDependency, Exclusive);
+		}
+
+		/// <summary>
+		/// Tries to add a stream to flow control for testing purposes.
+		/// </summary>
+		/// <param name="StreamId">ID of stream to add.</param>
+		/// <param name="Settings">Settings to use.</param>
+		/// <param name="Weight">Weight</param>
+		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
+		/// <param name="Exclusive">If the stream is exclusive child.</param>
+		/// <returns>If the stream could be added.</returns>
+		public bool AddStreamForTest(int StreamId, ConnectionSettings Settings, 
+			byte Weight, int StreamIdDependency, bool Exclusive)
+		{
+			Http2Stream Stream = new Http2Stream(StreamId, Settings);
+			return this.AddStream(Stream, Weight, StreamIdDependency, Exclusive);
+		}
+
+		/// <summary>
 		/// Tries to add a stream to flow control.
 		/// </summary>
 		/// <param name="Stream">Stream to add.</param>
@@ -106,39 +159,41 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.nodes.Count >= this.settings.MaxConcurrentStreams)
 					return false;
 
-				PriorityNode Parent;
+				if (StreamIdDependency == 0 ||
+					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNode DependentOn))
+				{
+					DependentOn = null;
+				}
 
-				if (StreamIdDependency == 0)
-					Parent = this.root;
-				else if (!this.nodes.TryGetValue(StreamIdDependency, out Parent))
-					Parent = this.root;
+				PriorityNode Parent = DependentOn ?? this.root;
 
 				if (this.nodes.TryGetValue(Stream.StreamId, out PriorityNode Node))
 				{
 					bool Add = false;
 
-					if (Node.Parent != Parent || Exclusive)
+					if (!(Node.DependentOn is null) &&
+						(Node.DependentOn != DependentOn || Exclusive))
 					{
-						Node.Parent.RemoveChild(Node);
+						Node.Parent.RemoveChildDependency(Node);
 						Add = true;
 					}
 
 					if (Exclusive)
-						this.MoveChildren(Parent, Node);
+						this.MoveChildren(DependentOn, Node);
 
 					if (Add)
-						Parent.AddChild(Node);
+						Parent.AddChildDependency(Node);
 
 					Node.Weight = Weight;
 				}
 				else
 				{
-					Node = new PriorityNode(Parent, this.root, Stream, Weight, this);
+					Node = new PriorityNode(DependentOn, this.root, Stream, Weight, this);
 
 					if (Exclusive)
-						this.MoveChildren(Parent, Node);
+						this.MoveChildren(DependentOn, Node);
 
-					Parent.AddChild(Node);
+					Parent.AddChildDependency(Node);
 					this.nodes[Stream.StreamId] = Node;
 				}
 
@@ -167,29 +222,31 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				PriorityNode Parent;
+				if (StreamIdDependency == 0 ||
+					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNode DependentOn))
+				{
+					DependentOn = null;
+				}
 
-				if (StreamIdDependency == 0)
-					Parent = this.root;
-				else if (!this.nodes.TryGetValue(StreamIdDependency, out Parent))
-					Parent = this.root;
+				PriorityNode Parent = DependentOn ?? this.root;
 
 				if (!this.nodes.TryGetValue(Stream.StreamId, out PriorityNode Node))
 					return false;
 
 				bool Add = false;
 
-				if (Node.Parent != Parent || Exclusive)
+				if (!(Node.DependentOn is null) &&
+					(Node.DependentOn != DependentOn || Exclusive))
 				{
-					Node.Parent.RemoveChild(Node);
+					Node.Parent.RemoveChildDependency(Node);
 					Add = true;
 				}
 
 				if (Exclusive)
-					this.MoveChildren(Parent, Node);
+					this.MoveChildren(DependentOn, Node);
 
 				if (Add)
-					Parent.AddChild(Node);
+					Parent.AddChildDependency(Node);
 
 				Node.Weight = Weight;
 
@@ -214,12 +271,12 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.nodes.Remove(Stream.StreamId);
 
-				PriorityNode Parent = Node.Parent;
-				if (!(Parent is null))
+				PriorityNode DependentOn = Node.DependentOn;
+				if (!(DependentOn is null))
 				{
 					double Scale = ((double)Node.Weight) / Node.TotalChildWeights;
 
-					Parent.RemoveChild(Node);
+					DependentOn.RemoveChildDependency(Node);
 
 					while (Node.HasChildren)
 					{
@@ -228,9 +285,9 @@ namespace Waher.Networking.HTTP.HTTP2
 						if (ScaledWeight > 255)
 							ScaledWeight = 255;
 
-						Node.RemoveChild(Child);
+						Node.RemoveChildDependency(Child);
 						Child.Weight = (byte)ScaledWeight;
-						Parent.AddChild(Child);
+						DependentOn.AddChildDependency(Child);
 					}
 				}
 
@@ -247,6 +304,20 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// longer controlled (i.e. it has been removed and/or closed).</returns>
 		public Task<int> RequestResources(int StreamId, int RequestedResources)
 		{
+			return this.RequestResources(StreamId, RequestedResources, null);
+		}
+
+		/// <summary>
+		/// Requests resources for a stream.
+		/// </summary>
+		/// <param name="StreamId">ID of stream requesting resources.</param>
+		/// <param name="RequestedResources">Amount of resources.</param>
+		/// <param name="CancelToken">Optional cancel token</param>
+		/// <returns>Amount of resources granted. If negative, the stream is no
+		/// longer controlled (i.e. it has been removed and/or closed).</returns>
+		public Task<int> RequestResources(int StreamId, int RequestedResources, 
+			CancellationToken? CancelToken)
+		{
 			if (this.disposed)
 				return Task.FromResult(-1);
 
@@ -255,7 +326,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!this.nodes.TryGetValue(StreamId, out PriorityNode Node))
 					return Task.FromResult(-1);
 
-				return Node.RequestAvailableResources(RequestedResources);
+				return Node.RequestAvailableResources(RequestedResources, CancelToken);
 			}
 		}
 

@@ -21,6 +21,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		private long dataInputWindowSize;
 
 		/// <summary>
+		/// HTTP/2 stream, for testing purposes.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Settings">Settings.</param>
+		internal Http2Stream(int StreamId, ConnectionSettings Settings)
+		{
+			this.streamId = StreamId;
+			this.connection = null;
+			this.dataInputWindowSize = Settings.InitialWindowSize;
+			this.headerInputWindowSize = Settings.MaxHeaderListSize;
+		}
+
+		/// <summary>
 		/// HTTP/2 stream
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -29,17 +30,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Represents a node in a HTTP/2 priority tree
 		/// </summary>
-		/// <param name="Parent">Parent node.</param>
+		/// <param name="DependentNode">Node dependency.</param>
 		/// <param name="Root">Root node.</param>
 		/// <param name="Stream">Corresponding HTTP/2 stream.</param>
 		/// <param name="Weight">Weight assigned to the node.</param>
 		/// <param name="FlowControl">Flow control object.</param>
-		public PriorityNode(PriorityNode Parent, PriorityNode Root, Http2Stream Stream, byte Weight,
+		public PriorityNode(PriorityNode DependentNode, PriorityNode Root, Http2Stream Stream, byte Weight,
 			FlowControl FlowControl)
 		{
 			ConnectionSettings Settings = FlowControl.Settings;
 
-			this.Parent = Parent;
+			this.DependentOn = DependentNode;
 			this.Root = Root;
 			this.Stream = Stream;
 			this.weight = Weight;
@@ -50,11 +51,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Parent node.
 		/// </summary>
-		public PriorityNode Parent
+		public PriorityNode DependentOn
 		{
 			get;
 			internal set;
 		}
+
+		/// <summary>
+		/// Parent node in the priority tree.
+		/// </summary>
+		public PriorityNode Parent => this.DependentOn ?? this.Root;
 
 		/// <summary>
 		/// Root node.
@@ -109,33 +115,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		public int AvailableResources => this.windowSize + this.windowSizeFraction - this.windowSize0;
 
 		/// <summary>
-		/// Currently available resources in the branch defined by the node, and its
-		/// ancestors, all the way to the root.
-		/// </summary>
-		public int AvailableResourcesInBrach
-		{
-			get
-			{
-				int Available = this.AvailableResources;
-				if (Available == 0)
-					return 0;
-
-				if (!(this.Parent is null))
-				{
-					int AvailableParent = this.Parent.AvailableResourcesInBrach;
-					if (AvailableParent < Available)
-						Available = AvailableParent;
-
-					Available = Available * this.weight / this.Parent.totalChildWeights;
-					if (AvailableParent == 0)
-						return 0;
-				}
-
-				return Available;
-			}
-		}
-
-		/// <summary>
 		/// Weight assigned to the node.
 		/// </summary>
 		public byte Weight
@@ -145,11 +124,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				if (this.weight != value)
 				{
-					if (!(this.Parent is null))
-						this.Parent.totalChildWeights += value - this.weight;
+					if (!(this.DependentOn is null))
+						this.DependentOn.totalChildWeights += value - this.weight;
 
 					this.weight = value;
-					this.ResourceFraction = this.Parent.ResourceFraction * this.weight / this.Parent.totalChildWeights;
+					this.ResourceFraction = this.DependentOn.ResourceFraction * this.weight / this.DependentOn.totalChildWeights;
 				}
 			}
 		}
@@ -173,19 +152,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Adds a child node to the node.
 		/// </summary>
 		/// <param name="Child">Child node.</param>
-		public void AddChild(PriorityNode Child)
+		public void AddChildDependency(PriorityNode Child)
 		{
-			PriorityNode OrgChildParent = Child.Parent;
-			OrgChildParent?.RemoveChild(Child);
+			PriorityNode OrgChildDependentNode = Child.DependentOn;
+			OrgChildDependentNode?.RemoveChildDependency(Child);
 
-			PriorityNode Loop = this.Parent;
+			PriorityNode Loop = this.DependentOn;
 			while (!(Loop is null) && Loop != Child)
-				Loop = Loop.Parent;
+				Loop = Loop.DependentOn;
 
 			if (!(Loop is null))
 			{
-				this.Parent.RemoveChild(this);
-				OrgChildParent.AddChild(this);
+				this.DependentOn.RemoveChildDependency(this);
+				OrgChildDependentNode.AddChildDependency(this);
 			}
 
 			this.childNodes ??= new LinkedList<PriorityNode>();
@@ -201,12 +180,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Child">Child node.</param>
 		/// <returns>If the child node was not found.</returns>
-		public bool RemoveChild(PriorityNode Child)
+		public bool RemoveChildDependency(PriorityNode Child)
 		{
-			if (Child.Parent != this)
+			if (Child.DependentOn != this)
 				return false;
 
-			Child.Parent = null;
+			Child.DependentOn = null;
 
 			if (this.childNodes is null)
 				return false;
@@ -247,7 +226,20 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>Number of resources granted.</returns>
 		public Task<int> RequestAvailableResources(int RequestedResources)
 		{
-			int Available = Math.Min(RequestedResources, this.AvailableResourcesInBrach);
+			return this.RequestAvailableResources(RequestedResources, null);
+		}
+
+		/// <summary>
+		/// Requests resources from the available pool of resources in the tree.
+		/// </summary>
+		/// <param name="RequestedResources">Requested amount of resources.</param>
+		/// <param name="CancelToken">Optional cancel token</param>
+		/// <returns>Number of resources granted.</returns>
+		public Task<int> RequestAvailableResources(int RequestedResources,
+			CancellationToken? CancelToken)
+		{
+			int Available = Math.Min(RequestedResources, this.AvailableResources);
+			Available = Math.Min(Available, this.Root.AvailableResources);
 
 			if (Available == 0)
 			{
@@ -258,6 +250,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				};
 				this.pendingRequests ??= new LinkedList<PendingRequest>();
 				this.pendingRequests.AddLast(Request);
+
+				if (CancelToken.HasValue)
+					CancelToken.Value.Register(() => Request.Request.TrySetException(new OperationCanceledException()));
 
 				return Request.Request.Task;
 			}
@@ -280,7 +275,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public bool ReleaseStreamResources(int Resources)
 		{
 			int NewSize = this.windowSize + Resources;
-			if (NewSize < 0)
+			if (NewSize < 0 || NewSize > this.windowSize0)
 				return false;
 
 			this.windowSize = NewSize;
@@ -315,7 +310,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public bool ReleaseConnectionResources(int Resources)
 		{
 			int NewSize = this.windowSize + Resources;
-			if (NewSize < 0)
+			if (NewSize < 0 || NewSize > this.windowSize0)
 				return false;
 
 			this.windowSize = NewSize;
@@ -345,7 +340,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Part > 0)
 				{
 					Part = Delta = Math.Min(Part, Resources);
-					this.TriggerPendingIfAvailbleDown(ref Part);
+					Child.TriggerPendingIfAvailbleDown(ref Part);
 					Delta -= Part;
 					Resources -= Delta;
 				}

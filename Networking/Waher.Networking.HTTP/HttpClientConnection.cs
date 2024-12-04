@@ -576,8 +576,6 @@ namespace Waher.Networking.HTTP
 
 					if (DataSize > 0)
 					{
-						// TODO: Connection flow control.
-
 						if (!await Stream.DataReceived(this.reader.Buffer, this.reader.Position, DataSize))
 							return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, false);
 
@@ -641,7 +639,7 @@ namespace Waher.Networking.HTTP
 						Padded = (this.http2FrameFlags & 8) != 0;
 						PaddingLen = Padded ? this.reader.NextByte() : (byte)0;
 
-						if (Priority)   // TODO: Stream priorities
+						if (Priority)
 						{
 							StreamIdDependency = this.reader.NextUInt32();
 							Exclusive = (StreamIdDependency & 0x80000000) != 0;

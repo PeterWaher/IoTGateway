@@ -841,8 +841,8 @@ namespace Waher.Networking.HTTP
 					}
 					else if (this.flowControl.TryGetStream(this.http2StreamId, out Stream))
 					{
-						if (!(this.flowControl?.ReleaseStreamResources(Stream.StreamId, (int)Increment) ?? false))
-							return await this.ReturnHttp2Error(Http2Error.FlowControlError, false);
+						this.flowControl?.ReleaseStreamResources(Stream.StreamId, (int)Increment);
+						// Ignore returning error if stream has been removed.
 					}
 					else
 						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);

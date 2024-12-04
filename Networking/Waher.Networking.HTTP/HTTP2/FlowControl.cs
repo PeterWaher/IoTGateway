@@ -32,6 +32,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		public ConnectionSettings Settings => this.settings;
 
 		/// <summary>
+		/// Root node.
+		/// </summary>
+		public PriorityNode Root => this.root;
+
+		/// <summary>
 		/// Updates remote settings.
 		/// </summary>
 		/// <param name="Settings"></param>
@@ -261,15 +266,25 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the stream could be found, and was removed.</returns>
 		public bool RemoveStream(Http2Stream Stream)
 		{
+			return this.RemoveStream(Stream.StreamId);
+		}
+
+		/// <summary>
+		/// Tries to remove a string from flow control.
+		/// </summary>
+		/// <param name="StreamId">ID of stream to remove.</param>
+		/// <returns>If the stream could be found, and was removed.</returns>
+		public bool RemoveStream(int StreamId)
+		{
 			if (this.disposed)
 				return false;
 
 			lock (this.synchObj)
 			{
-				if (!this.nodes.TryGetValue(Stream.StreamId, out PriorityNode Node))
+				if (!this.nodes.TryGetValue(StreamId, out PriorityNode Node))
 					return false;
 
-				this.nodes.Remove(Stream.StreamId);
+				this.nodes.Remove(StreamId);
 
 				PriorityNode DependentOn = Node.DependentOn;
 				if (!(DependentOn is null))
@@ -290,6 +305,8 @@ namespace Waher.Networking.HTTP.HTTP2
 						DependentOn.AddChildDependency(Child);
 					}
 				}
+
+				Node.Dispose();
 
 				return true;
 			}

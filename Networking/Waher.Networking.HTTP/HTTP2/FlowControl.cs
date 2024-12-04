@@ -14,6 +14,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly object synchObj = new object();
 		private readonly PriorityNode root;
 		private ConnectionSettings settings;
+		private int lastNodeStreamId = -1;
+		private PriorityNode lastNode = null;
 		private bool disposed = false;
 
 		/// <summary>
@@ -59,7 +61,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				return false;
 			}
 
-			lock (this.nodes)
+			lock (this.synchObj)
 			{
 				return this.nodes.TryGetValue(StreamId, out Node);
 			}
@@ -139,7 +141,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
 		/// <returns>If the stream could be added.</returns>
-		public bool AddStreamForTest(int StreamId, ConnectionSettings Settings, 
+		public bool AddStreamForTest(int StreamId, ConnectionSettings Settings,
 			byte Weight, int StreamIdDependency, bool Exclusive)
 		{
 			Http2Stream Stream = new Http2Stream(StreamId, Settings);
@@ -285,13 +287,18 @@ namespace Waher.Networking.HTTP.HTTP2
 					return false;
 
 				this.nodes.Remove(StreamId);
-
-				PriorityNode DependentOn = Node.DependentOn;
-				if (!(DependentOn is null))
+				if (this.lastNodeStreamId == StreamId)
 				{
-					double Scale = ((double)Node.Weight) / Node.TotalChildWeights;
+					this.lastNodeStreamId = 0;
+					this.lastNode = null;
+				}
 
-					DependentOn.RemoveChildDependency(Node);
+				PriorityNode Parent = Node.Parent;
+				if (!(Parent is null))
+				{
+					Parent.RemoveChildDependency(Node);
+
+					double Scale = ((double)Node.Weight) / Parent.TotalChildWeights;
 
 					while (Node.HasChildren)
 					{
@@ -302,7 +309,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 						Node.RemoveChildDependency(Child);
 						Child.Weight = (byte)ScaledWeight;
-						DependentOn.AddChildDependency(Child);
+						Parent.AddChildDependency(Child);
 					}
 				}
 
@@ -332,7 +339,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="CancelToken">Optional cancel token</param>
 		/// <returns>Amount of resources granted. If negative, the stream is no
 		/// longer controlled (i.e. it has been removed and/or closed).</returns>
-		public Task<int> RequestResources(int StreamId, int RequestedResources, 
+		public Task<int> RequestResources(int StreamId, int RequestedResources,
 			CancellationToken? CancelToken)
 		{
 			if (this.disposed)
@@ -340,10 +347,15 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (!this.nodes.TryGetValue(StreamId, out PriorityNode Node))
-					return Task.FromResult(-1);
+				if (StreamId != this.lastNodeStreamId)
+				{
+					if (!this.nodes.TryGetValue(StreamId, out this.lastNode))
+						return Task.FromResult(-1);
 
-				return Node.RequestAvailableResources(RequestedResources, CancelToken);
+					this.lastNodeStreamId = StreamId;
+				}
+
+				return this.lastNode.RequestAvailableResources(RequestedResources, CancelToken);
 			}
 		}
 
@@ -360,10 +372,15 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (!this.nodes.TryGetValue(StreamId, out PriorityNode Node))
-					return false;
+				if (StreamId != this.lastNodeStreamId)
+				{
+					if (!this.nodes.TryGetValue(StreamId, out this.lastNode))
+						return false;
 
-				return Node.ReleaseStreamResources(Resources);
+					this.lastNodeStreamId = StreamId;
+				}
+
+				return this.lastNode.ReleaseStreamResources(Resources);
 			}
 		}
 

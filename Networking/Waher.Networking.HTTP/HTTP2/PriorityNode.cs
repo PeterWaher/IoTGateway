@@ -81,7 +81,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			internal set
 			{
 				this.resourceFraction = value;
-				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize * this.resourceFraction);
+				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			}
 		}
 
@@ -154,17 +154,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Child">Child node.</param>
 		public void AddChildDependency(PriorityNode Child)
 		{
-			PriorityNode OrgChildDependentNode = Child.DependentOn;
-			OrgChildDependentNode?.RemoveChildDependency(Child);
+			PriorityNode OrgChildParent = Child.Parent;
+			OrgChildParent?.RemoveChildDependency(Child);
 
-			PriorityNode Loop = this.DependentOn;
+			PriorityNode Loop = this.Parent;
 			while (!(Loop is null) && Loop != Child)
-				Loop = Loop.DependentOn;
+				Loop = Loop.Parent;
 
 			if (!(Loop is null))
 			{
-				this.DependentOn.RemoveChildDependency(this);
-				OrgChildDependentNode.AddChildDependency(this);
+				this.Parent.RemoveChildDependency(this);
+				OrgChildParent.AddChildDependency(this);
 			}
 
 			this.childNodes ??= new LinkedList<PriorityNode>();
@@ -182,7 +182,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the child node was not found.</returns>
 		public bool RemoveChildDependency(PriorityNode Child)
 		{
-			if (Child.DependentOn != this)
+			if (Child.Parent != this)
 				return false;
 
 			Child.DependentOn = null;

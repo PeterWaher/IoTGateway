@@ -49,7 +49,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
 			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
 			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000));
-			
+
 			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
 			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
 			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
@@ -377,9 +377,47 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(3, Stream2.StreamId);
 		}
 
+		[TestMethod]
+		public async Task Test_13_ChangingRelativeWindowSizes()
+		{
+			ConnectionSettings Settings = new();
+			using FlowControl FlowControl = new(Settings);
+
+			FlowControl.AddStreamForTest(1);
+			FlowControl.AddStreamForTest(3);
+
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000));
+
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(2767, await FlowControl.RequestResources(3, 10000));
+
+			FlowControl.ReleaseConnectionResources(32768);
+			FlowControl.ReleaseStreamResources(1, 32768);
+			FlowControl.RemoveStream(1);
+
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(2768, await FlowControl.RequestResources(3, 10000));
+
+			Assert.IsFalse(FlowControl.TryGetPriorityNode(1, out _));
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(3, out PriorityNode Node2));
+			Assert.AreEqual(0, Node2.AvailableResources);
+			Assert.AreEqual(0, FlowControl.Root.AvailableResources);
+
+			Assert.IsFalse(FlowControl.TryGetStream(1, out _));
+			Assert.IsTrue(FlowControl.TryGetStream(3, out Http2Stream Stream2));
+			Assert.AreEqual(3, Stream2.StreamId);
+		}
+
 
 		/* 
-		 * Releasing resources of streams that have been removed
+		 * trigger sibling resources if sibling removed
 		 * UpdatePriority
 		 * UpdateSettings
 		 * Exclusive reorder

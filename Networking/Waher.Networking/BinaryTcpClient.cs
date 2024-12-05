@@ -1345,6 +1345,15 @@ namespace Waher.Networking
 		/// Upgrades a server connection to TLS.
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
 		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, params string[] AlpnProtocols)
@@ -1357,11 +1366,32 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
 		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, params string[] AlpnProtocols)
 		{
 			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates.Optional, null, false, AlpnProtocols);
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -1384,12 +1414,40 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
+			RemoteCertificateValidationCallback CertificateValidationCheck)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, CertificateValidationCheck, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
 		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
 			RemoteCertificateValidationCallback CertificateValidationCheck, params string[] AlpnProtocols)
 		{
 			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, CertificateValidationCheck, false, AlpnProtocols);
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates,
+				CertificateValidationCheck, TrustRemoteEndpoint, Array.Empty<string>());
 		}
 
 		/// <summary>

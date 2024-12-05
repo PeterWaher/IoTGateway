@@ -187,7 +187,7 @@ namespace Waher.Networking.MQTT
 #if WINDOWS_UWP
 					await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
-					await this.client.UpgradeToTlsAsClient(this.clientCertificate, Crypto.SecureTls, this.trustServer);
+					await this.client.UpgradeToTlsAsClient(this.clientCertificate, Crypto.SecureTls, this.trustServer, "mqtt");
 #endif
 					this.client.Continue();
 				}

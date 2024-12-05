@@ -969,8 +969,7 @@ namespace Waher.Networking
 				if (!this.connected || !this.sending)
 					return Task.FromResult(true);
 
-				if (this.idleQueue is null)
-					this.idleQueue = new LinkedList<TaskCompletionSource<bool>>();
+				this.idleQueue ??= new LinkedList<TaskCompletionSource<bool>>();
 
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 				this.idleQueue.AddLast(Result);
@@ -1059,14 +1058,24 @@ namespace Waher.Networking
 		/// </summary>
 		public Certificate RemoteCertificate => this.remoteCertificate;
 #else
-
 		/// <summary>
 		/// Upgrades a client connection to TLS.
 		/// </summary>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsClient(null, Protocols, null, false, this.hostName);
+			return this.UpgradeToTlsAsClient(Protocols, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(SslProtocols Protocols, params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, null, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1076,7 +1085,20 @@ namespace Waher.Networking
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		public Task UpgradeToTlsAsClient(SslProtocols Protocols, RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false, this.hostName);
+			return this.UpgradeToTlsAsClient(Protocols, CertificateValidationCheck, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(SslProtocols Protocols, RemoteCertificateValidationCallback CertificateValidationCheck,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1086,7 +1108,20 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1098,7 +1133,22 @@ namespace Waher.Networking
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1109,7 +1159,21 @@ namespace Waher.Networking
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols, bool TrustRemoteEndpoint)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustRemoteEndpoint, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, TrustRemoteEndpoint, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols, bool TrustRemoteEndpoint,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustRemoteEndpoint, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1122,7 +1186,23 @@ namespace Waher.Networking
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1133,8 +1213,27 @@ namespace Waher.Networking
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
 		/// <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
-		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint, string DomainName)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, 
+				CertificateValidationCheck, TrustRemoteEndpoint, DomainName,
+				Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint, string DomainName,
+			params string[] AlpnProtocols)
 		{
 			lock (this.synchObj)
 			{
@@ -1164,11 +1263,29 @@ namespace Waher.Networking
 					};
 				}
 
+				SslClientAuthenticationOptions Options = new SslClientAuthenticationOptions()
+				{
+					AllowRenegotiation = false,
+					ApplicationProtocols = null,
+					CertificateRevocationCheckMode = X509RevocationMode.Online,
+					ClientCertificates = ClientCertificates,
+					EnabledSslProtocols = Protocols,
+					EncryptionPolicy = EncryptionPolicy.RequireEncryption,
+					TargetHost = this.domainName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString()
+				};
+
+				if (!(AlpnProtocols is null) && AlpnProtocols.Length > 0)
+				{
+					Options.ApplicationProtocols = new List<SslApplicationProtocol>();
+
+					foreach (string AlpnProtocol in AlpnProtocols)
+						Options.ApplicationProtocols.Add(new SslApplicationProtocol(AlpnProtocol));
+				}
+
 				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateRequired);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsClientAsync(this.domainName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString(),
-					ClientCertificates, Protocols, true);
+				await SslStream.AuthenticateAsClientAsync(Options, CancellationToken.None);
 			}
 			finally
 			{
@@ -1487,7 +1604,7 @@ namespace Waher.Networking
 					ApplicationProtocols = null,
 					CertificateRevocationCheckMode = X509RevocationMode.Online,
 					ClientCertificateRequired = false,
-					EnabledSslProtocols = Crypto.SecureTls,
+					EnabledSslProtocols = Protocols,
 					EncryptionPolicy = EncryptionPolicy.RequireEncryption,
 					ServerCertificate = ServerCertificate
 				};
@@ -1577,9 +1694,7 @@ namespace Waher.Networking
 				{
 					this.cancelRead = true;
 
-					if (this.cancelledQueue is null)
-						this.cancelledQueue = new LinkedList<TaskCompletionSource<bool>>();
-
+					this.cancelledQueue ??= new LinkedList<TaskCompletionSource<bool>>();
 					this.cancelledQueue.AddLast(Task);
 #if WINDOWS_UWP
 					IAsyncAction _ = this.client.CancelIOAsync();

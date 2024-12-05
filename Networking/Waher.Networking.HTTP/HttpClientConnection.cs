@@ -861,13 +861,11 @@ namespace Waher.Networking.HTTP
 						if (!(this.flowControl?.ReleaseConnectionResources((int)Increment) ?? false))
 							return await this.ReturnHttp2Error(Http2Error.FlowControlError, true);
 					}
-					else if (this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+					else
 					{
-						this.flowControl?.ReleaseStreamResources(Stream.StreamId, (int)Increment);
+						this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment);
 						// Ignore returning error if stream has been removed.
 					}
-					else
-						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
 					break;
 
 				case FrameType.PriorityUpdate:

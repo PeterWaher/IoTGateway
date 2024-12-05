@@ -400,7 +400,8 @@ namespace Waher.Networking.HTTP
 									break;
 
 								default:
-									ProxyRequest.Headers.Add(Field.Key, Field.Value);
+									if (!Field.Key.StartsWith(':'))		// Avoid HTTP/2 pseudo-headers
+										ProxyRequest.Headers.Add(Field.Key, Field.Value);
 									break;
 							}
 						}

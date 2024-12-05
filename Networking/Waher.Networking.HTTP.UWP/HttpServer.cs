@@ -26,6 +26,7 @@ using Waher.Networking.HTTP.Vanity;
 using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
+using Waher.Networking.HTTP.HTTP2;
 
 namespace Waher.Networking.HTTP
 {
@@ -100,6 +101,15 @@ namespace Waher.Networking.HTTP
 		private bool closed = false;
 #endif
 		private bool adaptToNetworkChanges;
+
+		// HTTP/2 default settings
+
+		private int http2InitialWindowSize = ConnectionSettings.DefaultHttp2InitialWindowSize;
+		private int http2MaxFrameSize = ConnectionSettings.DefaultHttp2MaxFrameSize;
+		private int http2MaxConcurrentStreams = ConnectionSettings.DefaultHttp2MaxConcurrentStreams;
+		private int http2HeaderTableSize = ConnectionSettings.DefaultHttp2HeaderTableSize;
+		private bool http2EnablePush = ConnectionSettings.DefaultHttp2EnablePush;
+		private bool http2SettingsLocked = false;
 
 		#region Constructors
 
@@ -921,6 +931,58 @@ namespace Waher.Networking.HTTP
 
 		#endregion
 
+		#region HTTP/2 Properties
+
+		/// <summary>
+		/// HTTP/2: Initial window size.
+		/// </summary>
+		public int Http2InitialWindowSize => this.http2InitialWindowSize;
+
+		/// <summary>
+		/// HTTP/2: Maximum frame size.
+		/// </summary>
+		public int Http2MaxFrameSize => this.http2MaxFrameSize;
+
+		/// <summary>
+		/// HTTP/2: Maximum number of concurrent streams.
+		/// </summary>
+		public int Http2MaxConcurrentStreams => this.http2MaxConcurrentStreams;
+
+		/// <summary>
+		/// HTTP/2: Header table size.
+		/// </summary>
+		public int Http2HeaderTableSize => this.http2HeaderTableSize;
+
+		/// <summary>
+		/// HTTP/2: If push promises are enabled.
+		/// </summary>
+		public bool Http2EnablePush => this.http2EnablePush;
+
+		/// <summary>
+		/// HTTP/2 connection settings (SETTINGS).
+		/// </summary>
+		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="MaxFrameSize">Maximum frame size.</param>
+		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
+		/// <param name="HeaderTableSize">Header table size.</param>
+		/// <param name="EnablePush">If push promises are enabled.</param>
+		/// <param name="Lock">If settings are to be locked.</param>
+		public void SetHttp2ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
+			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush, bool Lock)
+		{
+			if (this.http2SettingsLocked)
+				throw new InvalidOperationException("HTTP/2 settings locked.");
+
+			this.http2InitialWindowSize = InitialWindowSize;
+			this.http2MaxFrameSize = MaxFrameSize;
+			this.http2MaxConcurrentStreams = MaxConcurrentStreams;
+			this.http2HeaderTableSize = HeaderTableSize;
+			this.http2EnablePush = EnablePush;
+			this.http2SettingsLocked = Lock;
+		}
+
+		#endregion
+
 		#region Connections
 
 #if WINDOWS_UWP
@@ -1087,7 +1149,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls, 
-						ClientCertificates, null, TrustCertificates, "http/1.1", "h2");
+						ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
 
 					if (this.HasSniffers)
 					{

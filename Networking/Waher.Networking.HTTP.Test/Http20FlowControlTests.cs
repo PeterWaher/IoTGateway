@@ -417,13 +417,15 @@ namespace Waher.Networking.HTTP.Test
 
 
 		/* 
+		 * delayed release stream resources => trigger
+		 * delayed release connection resources => trigger
 		 * trigger sibling resources if sibling removed
-		 * UpdatePriority
-		 * UpdateSettings
-		 * Exclusive reorder
-		 * Changing priority to exclusive
+		 * UpdatePriority + trigger
+		 * UpdateSettings + trigger
+		 * Exclusive reorder + trigger
+		 * Changing priority to exclusive + trigger
 		 * changing dependency and solve circular references
-		 * changing window sizes if sibling removed
+		 * changing window sizes if sibling removed + trigger
 		 */
 	}
 }

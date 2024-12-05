@@ -46,6 +46,7 @@ namespace Waher.IoTGateway.Svc
 			this.CanStop = true;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnStart(string[] args)
 		{
 			try
@@ -137,11 +138,13 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnPause()
 		{
 			this.OnStop();
 		}
 
+		/// <inheritdoc/>
 		protected override void OnContinue()
 		{
 			try
@@ -179,6 +182,7 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
 		{
 			switch (powerStatus)
@@ -219,6 +223,7 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnSessionChange(SessionChangeDescription ChangeDescription)
 		{
 			int SessionId = ChangeDescription.SessionId;
@@ -469,12 +474,14 @@ namespace Waher.IoTGateway.Svc
 		];
 
 
+		/// <inheritdoc/>
 		protected override void OnShutdown()
 		{
 			Log.Notice("System is shutting down.");
 			this.Stop();
 		}
 
+		/// <inheritdoc/>
 		protected override void OnStop()
 		{
 			Log.Notice("Service is being stopped.");
@@ -501,6 +508,7 @@ namespace Waher.IoTGateway.Svc
 				Ledger.Provider.Flush().Wait();
 		}
 
+		/// <inheritdoc/>
 		protected override async void OnCustomCommand(int command)
 		{
 			try

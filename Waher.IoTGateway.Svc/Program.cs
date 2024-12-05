@@ -48,8 +48,16 @@ namespace Waher.IoTGateway.Svc
 	{
 		private static string instanceName = string.Empty;
 
+		/// <summary>
+		/// Instance name
+		/// </summary>
 		public static string InstanceName => instanceName;
 
+		/// <summary>
+		/// Main program entry point
+		/// </summary>
+		/// <param name="args"></param>
+		/// <returns></returns>
 		public static int Main(string[] args)
 		{
 			AppDomain.CurrentDomain.UnhandledException += (Sender, e) =>

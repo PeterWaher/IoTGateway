@@ -1,41 +1,57 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 
 namespace Waher.IoTGateway.Svc.ServiceManagement.Structures
 {
+	/// <summary>
+	/// Service controller action
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ScAction : IEquatable<ScAction>
 	{
 		private ScActionType _Type;
 		private uint _Delay;
 
+		/// <summary>
+		/// Action type
+		/// </summary>
 		public ScActionType Type
 		{
-			get => _Type;
-			set => _Type = value;
+			get => this._Type;
+			set => this._Type = value;
 		}
 
+		/// <summary>
+		/// Delay
+		/// </summary>
 		public TimeSpan Delay
 		{
-			get => TimeSpan.FromMilliseconds(_Delay);
-			set => _Delay = (uint)Math.Round(value.TotalMilliseconds);
+			get => TimeSpan.FromMilliseconds(this._Delay);
+			set => this._Delay = (uint)Math.Round(value.TotalMilliseconds);
 		}
 
-		public bool Equals(ScAction other)
+		/// <summary>
+		/// Compares to instances
+		/// </summary>
+		/// <param name="Other">Other instance</param>
+		/// <returns>If they are equal</returns>
+		public bool Equals(ScAction Other)
 		{
-			return _Type == other._Type && _Delay == other._Delay;
+			return this._Type == Other._Type && 
+				this._Delay == Other._Delay;
 		}
 
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is null)
 				return false;
 
-			return obj is ScAction && Equals((ScAction)obj);
+			return obj is ScAction Typed && this.Equals(Typed);
 		}
 
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int h1 = this.Delay.GetHashCode();

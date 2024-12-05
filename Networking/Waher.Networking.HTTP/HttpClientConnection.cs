@@ -71,7 +71,7 @@ namespace Waher.Networking.HTTP
 		private FrameType http2FrameType = 0;
 		private ConnectionSettings localSettings = null;
 		private ConnectionSettings remoteSettings = null;
-		private FlowControl flowControl = null;
+		private IFlowControl flowControl = null;
 		private HeaderReader http2HeaderReader = null;
 		private HeaderWriter http2HeaderWriter = null;
 		private byte http2FrameFlags = 0;
@@ -299,7 +299,8 @@ namespace Waher.Networking.HTTP
 						this.server.Http2MaxFrameSize,
 						this.server.Http2MaxConcurrentStreams,
 						this.server.Http2HeaderTableSize,
-						this.server.Http2EnablePush);
+						this.server.Http2EnablePush,
+						this.server.Http2NoRfc7540Priorities);
 
 					if (i + 1 < NrRead)
 						return await this.BinaryHttp2InitDataReceived(Data, i + 1, NrRead - i - 1);
@@ -324,11 +325,16 @@ namespace Waher.Networking.HTTP
 									this.server.Http2MaxFrameSize,
 									this.server.Http2MaxConcurrentStreams,
 									this.server.Http2HeaderTableSize,
-									this.server.Http2EnablePush);
+									this.server.Http2EnablePush,
+									this.server.Http2NoRfc7540Priorities);
 
 								this.remoteSettings = Settings;
 								this.mode = ConnectionMode.Http2Live;
-								this.flowControl = new FlowControl(this.remoteSettings);
+
+								if (this.remoteSettings.NoRfc7540Priorities)
+									this.flowControl = new FlowControlRfc9218(this.remoteSettings);
+								else
+									this.flowControl = new FlowControlRfc7540(this.remoteSettings);
 
 								using HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
@@ -800,7 +806,12 @@ namespace Waher.Networking.HTTP
 							return await this.ReturnHttp2Error(Error.Value, true);
 
 						if (this.flowControl is null)
-							this.flowControl = new FlowControl(this.remoteSettings);
+						{
+							if (this.remoteSettings.NoRfc7540Priorities)
+								this.flowControl = new FlowControlRfc9218(this.remoteSettings);
+							else
+								this.flowControl = new FlowControlRfc7540(this.remoteSettings);
+						}
 						else
 							this.flowControl.UpdateSettings(this.remoteSettings);
 
@@ -858,6 +869,11 @@ namespace Waher.Networking.HTTP
 					else
 						return await this.ReturnHttp2Error(Http2Error.StreamClosed, false);
 					break;
+
+				case FrameType.PriorityUpdate:
+					// TODO: process frame and return response.
+					break;
+
 			}
 
 			return true;

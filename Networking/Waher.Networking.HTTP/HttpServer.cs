@@ -110,6 +110,7 @@ namespace Waher.Networking.HTTP
 		private int http2HeaderTableSize = ConnectionSettings.DefaultHttp2HeaderTableSize;
 		private bool http2EnablePush = ConnectionSettings.DefaultHttp2EnablePush;
 		private bool http2SettingsLocked = false;
+		private bool http2NoRfc7540Priorities = false;
 
 		#region Constructors
 
@@ -959,6 +960,12 @@ namespace Waher.Networking.HTTP
 		public bool Http2EnablePush => this.http2EnablePush;
 
 		/// <summary>
+		/// HTTP/2: If RFC 7540 priorities are obsoleted, as defined in RFC 9218:
+		/// https://www.rfc-editor.org/rfc/rfc9218.html
+		/// </summary>
+		public bool Http2NoRfc7540Priorities => this.http2NoRfc7540Priorities;
+
+		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		/// <param name="InitialWindowSize">Initial window size.</param>
@@ -966,9 +973,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
+		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
 		public void SetHttp2ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
-			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush, bool Lock)
+			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
+			bool NoRfc7540Priorities, bool Lock)
 		{
 			if (this.http2SettingsLocked)
 				throw new InvalidOperationException("HTTP/2 settings locked.");
@@ -978,6 +987,7 @@ namespace Waher.Networking.HTTP
 			this.http2MaxConcurrentStreams = MaxConcurrentStreams;
 			this.http2HeaderTableSize = HeaderTableSize;
 			this.http2EnablePush = EnablePush;
+			this.http2NoRfc7540Priorities = NoRfc7540Priorities;
 			this.http2SettingsLocked = Lock;
 		}
 

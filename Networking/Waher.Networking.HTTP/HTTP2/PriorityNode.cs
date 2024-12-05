@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Weight">Weight assigned to the node.</param>
 		/// <param name="FlowControl">Flow control object.</param>
 		public PriorityNode(PriorityNode DependentNode, PriorityNode Root, Http2Stream Stream, byte Weight,
-			FlowControl FlowControl)
+			IFlowControl FlowControl)
 		{
 			ConnectionSettings Settings = FlowControl.Settings;
 

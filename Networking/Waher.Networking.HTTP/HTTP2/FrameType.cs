@@ -68,6 +68,11 @@
 		/// The CONTINUATION frame (type=0x9) is used to continue a sequence of
 		/// header block fragments (Section 4.3).
 		/// </summary>
-		Continuation = 9
+		Continuation = 9,
+
+		/// <summary>
+		/// PRIORITY_UPDATE, as defined in RFC 9218
+		/// </summary>
+		PriorityUpdate = 0x10
 	}
 }

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 namespace Waher.Networking.HTTP.HTTP2
 {
 	/// <summary>
-	/// Class that manages HTTP/2 flow control using trees of priorty nodes.
+	/// Class that manages HTTP/2 flow control using trees of priorty nodes, as defined
+	/// in RFC 7540.
 	/// </summary>
-	public class FlowControl : IDisposable
+	public class FlowControlRfc7540 : IFlowControl
 	{
 		private readonly Dictionary<int, PriorityNode> nodes = new Dictionary<int, PriorityNode>();
 		private readonly object synchObj = new object();
@@ -22,7 +23,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Class that manages HTTP/2 flow control using trees of priorty nodes.
 		/// </summary>
 		/// <param name="Settings">Connection settings.</param>
-		public FlowControl(ConnectionSettings Settings)
+		public FlowControlRfc7540(ConnectionSettings Settings)
 		{
 			this.settings = Settings;
 			this.root = new PriorityNode(null, null, null, 1, this);
@@ -41,7 +42,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Updates remote settings.
 		/// </summary>
-		/// <param name="Settings"></param>
+		/// <param name="Settings">Connection settings.</param>
 		public void UpdateSettings(ConnectionSettings Settings)
 		{
 			this.settings = Settings;

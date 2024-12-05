@@ -33,6 +33,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		public const bool DefaultHttp2EnablePush = true;
 
+		/// <summary>
+		/// Default SETTINGS_NO_RFC7540_PRIORITIES is false, meaning priorities
+		/// as defined in RFC7540 are used.
+		/// </summary>
+		public const bool DefaultNoRfc7540Priorities = false;
+
 		private long connectionWindowSize;
 		private long connectionBytesCommunicated = 0;
 		private int headerTableSize;
@@ -41,6 +47,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private int maxFrameSize;
 		private int maxHeaderListSize = HttpClientConnection.MaxHeaderSize;
 		private bool enablePush;
+		private bool noRfc7540Priorities;
 
 		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
 		private bool hasPendingIncrements = false;
@@ -56,6 +63,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.maxConcurrentStreams = DefaultHttp2MaxConcurrentStreams;
 			this.headerTableSize = DefaultHttp2HeaderTableSize;
 			this.enablePush = DefaultHttp2EnablePush;
+			this.noRfc7540Priorities = DefaultNoRfc7540Priorities;
 		}
 
 		/// <summary>
@@ -66,8 +74,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
+		/// <param name="NoRfc7540Priorities">If RFC7540 priorities are obsoleted.</param>
 		public ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
-			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush)
+			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
+			bool NoRfc7540Priorities)
 		{
 			this.connectionWindowSize = InitialWindowSize;
 			this.initialWindowSize = InitialWindowSize;
@@ -75,6 +85,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.maxConcurrentStreams = MaxConcurrentStreams;
 			this.headerTableSize = HeaderTableSize;
 			this.enablePush = EnablePush;
+			this.noRfc7540Priorities |= NoRfc7540Priorities;
 		}
 
 		internal class PendingWindowIncrement
@@ -164,6 +175,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		///  be enforced.The initial value of this setting is unlimited.
 		/// </summary>
 		public int MaxHeaderListSize => this.maxHeaderListSize;
+
+		/// <summary>
+		/// If RFC 7540 priorities are obsoleted, as defined in RFC 9218:
+		/// https://www.rfc-editor.org/rfc/rfc9218.html
+		/// </summary>
+		public bool NoRfc7540Priorities => this.noRfc7540Priorities;
 
 		/// <summary>
 		/// Initialization step.
@@ -326,6 +343,15 @@ namespace Waher.Networking.HTTP.HTTP2
 							return Http2Error.ProtocolError;
 
 						Settings.maxHeaderListSize = (int)Value;
+						break;
+
+					case 9:
+						SnifferOutput?.AppendLine("RX: SETTINGS_NO_RFC7540_PRIORITIES = " + Value.ToString());
+
+						if (Value > 1)
+							return Http2Error.ProtocolError;
+
+						Settings.noRfc7540Priorities = Value != 0;
 						break;
 
 					default:

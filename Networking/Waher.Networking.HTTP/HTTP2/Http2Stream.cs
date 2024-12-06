@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -16,6 +18,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		private MemoryStream buildingHeaders = null;
 		private TemporaryStream inputDataStream = null;
 		private StreamState state = StreamState.Idle;
+		private int rfc9218Priority = 3;
+		private bool rfc9218Incremental = false;
 		private long headerBytesReceived = 0;
 		private long dataBytesReceived = 0;
 		private long dataInputWindowSize;
@@ -92,6 +96,24 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal HttpClientConnection Connection => this.connection;
 
 		/// <summary>
+		/// Priority, as defined in RFC 9218
+		/// </summary>
+		public int Rfc9218Priority
+		{
+			get => this.rfc9218Priority;
+			internal set => this.rfc9218Priority = value;
+		}
+
+		/// <summary>
+		/// Incremental, as defined in RFC 9218
+		/// </summary>
+		public bool Rfc9218Incremental
+		{
+			get => this.rfc9218Incremental;
+			internal set => this.rfc9218Incremental = value;
+		}
+
+		/// <summary>
 		/// Stream state.
 		/// </summary>
 		public StreamState State
@@ -144,29 +166,47 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.headers ??= new HttpRequestHeader(2.0);
 
-			if (!string.IsNullOrEmpty(Name) && Name[0] == ':')
+			switch (Name)
 			{
-				switch (Name)
-				{
-					case ":method":
-						this.headers.Method = Value;
-						break;
+				case ":method":
+					this.headers.Method = Value;
+					break;
 
-					case ":path":
-						this.headers.SetResource(Value, this.connection.Server.VanityResources);
-						break;
+				case ":authority":
+					this.headers.AddField("host", Value, true);
+					break;
 
-					case ":scheme":
-						this.headers.UriScheme = Value;
-						break;
+				case ":path":
+					this.headers.SetResource(Value, this.connection.Server.VanityResources);
+					break;
 
-					default:
-						this.headers.AddField(Name, Value, true);
-						break;
-				}
+				case ":scheme":
+					this.headers.UriScheme = Value;
+					break;
+
+				case "priority":
+					this.headers.AddField(Name, Value, true);
+
+					foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Value))
+					{
+						switch (P.Key)
+						{
+							case "u":
+								if (int.TryParse(P.Value, out int i) && i >= 0 && i <= 7)
+									this.rfc9218Priority = i;
+								break;
+
+							case "i":
+								this.rfc9218Incremental = true;
+								break;
+						}
+					}
+					break;
+
+				default:
+					this.headers.AddField(Name, Value, true);
+					break;
 			}
-			else
-				this.headers.AddField(Name, Value, true);
 		}
 
 		/// <summary>

@@ -31,8 +31,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 			}
 			else
 			{
-				this.type = Value.Substring(0, i).Trim();
-				this.fields = CommonTypes.ParseFieldValues(Value.Substring(i + 1).Trim());
+				this.type = Value[..i].Trim();
+				this.fields = CommonTypes.ParseFieldValues(Value[(i + 1)..].Trim());
 
 				foreach (KeyValuePair<string, string> P in this.fields)
 				{

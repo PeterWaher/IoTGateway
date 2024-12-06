@@ -779,7 +779,17 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case FrameType.ResetStream:
-					// TODO: process frame and return response.
+					if (this.http2StreamId == 0)
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+					if (this.reader.BytesLeft != 4)
+						return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
+
+					Http2Error? Error = (Http2Error)(this.reader.NextUInt32() & 0x7fffffff);
+					if (this.HasSniffers)
+						await this.Error(Error.ToString());
+
+					this.flowControl.RemoveStream(this.http2StreamId);
 					break;
 
 				case FrameType.Settings:
@@ -796,7 +806,7 @@ namespace Waher.Networking.HTTP
 					else
 					{
 						StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
-						Http2Error? Error = ConnectionSettings.TryParse(this.reader, sb, out this.remoteSettings);
+						Error = ConnectionSettings.TryParse(this.reader, sb, out this.remoteSettings);
 						string s = sb?.ToString().Trim();
 
 						if (!string.IsNullOrEmpty(s))

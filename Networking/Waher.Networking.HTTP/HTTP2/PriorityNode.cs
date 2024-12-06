@@ -377,6 +377,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				this.childNodes = null;
+
+				if (!(this.Stream is null))
+					this.Stream.State = StreamState.Closed;
 			}
 		}
 	}

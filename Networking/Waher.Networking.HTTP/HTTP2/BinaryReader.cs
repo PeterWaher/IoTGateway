@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -109,6 +110,23 @@ namespace Waher.Networking.HTTP.HTTP2
 			Result |= this.buffer[this.pos++];
 			Result <<= 8;
 			Result |= this.buffer[this.pos++];
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Reads a specified number of bytes.
+		/// </summary>
+		/// <param name="NrBytes">Number of bytes to read.</param>
+		/// <returns>Bytes read.</returns>
+		public byte[] NextBytes(int NrBytes)
+		{
+			if (this.pos + NrBytes > this.bufferSize)
+				throw new IOException("Unexpected end of data.");
+
+			byte[] Result = new byte[NrBytes];
+			Array.Copy(this.buffer, this.pos, Result, 0, NrBytes);
+			this.pos += NrBytes;
 
 			return Result;
 		}

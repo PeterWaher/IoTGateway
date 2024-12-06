@@ -827,14 +827,14 @@ namespace Waher.Networking.HTTP
 
 						if (this.localSettings.AcknowledgedOrSent)
 						{
-							if (!await this.SendHttp2Frame(FrameType.Settings, 1, null))   // Ack
+							if (!await this.SendHttp2Frame(FrameType.Settings, 1, false, null))   // Ack
 								return false;
 						}
 						else
 						{
 							this.localSettings.AcknowledgedOrSent = true;
 
-							if (!await this.SendHttp2Frame(FrameType.Settings, 0, null, this.localSettings.ToArray()))
+							if (!await this.SendHttp2Frame(FrameType.Settings, 0, false, null, this.localSettings.ToArray()))
 								return false;
 						}
 					}
@@ -845,7 +845,17 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case FrameType.Ping:
-					// TODO: process frame and return response.
+					if (this.http2StreamId != 0)
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+					if (this.reader.BytesLeft != 8)
+						return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
+
+					if ((this.http2FrameFlags & 1) == 0)	// No ACK
+					{
+						byte[] Data = this.reader.NextBytes(8);
+						await this.SendHttp2Frame(FrameType.Ping, 1, true, null, Data);
+					}
 					break;
 
 				case FrameType.GoAway:
@@ -903,7 +913,7 @@ namespace Waher.Networking.HTTP
 				if (!Increment.Stream.SetInputWindowSizeIncrement((uint)i))
 					return false;
 
-				if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, Increment.Stream,
+				if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, false, Increment.Stream,
 					(byte)(i >> 24),
 					(byte)(i >> 16),
 					(byte)(i >> 8),
@@ -913,7 +923,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, null,
+			if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, false, null,
 				(byte)(Total >> 24),
 				(byte)(Total >> 16),
 				(byte)(Total >> 8),
@@ -934,7 +944,7 @@ namespace Waher.Networking.HTTP
 
 			if (ConnectionError)
 			{
-				await this.SendHttp2Frame(FrameType.GoAway, 0, null,
+				await this.SendHttp2Frame(FrameType.GoAway, 0, false, null,
 					(byte)(this.http2LastCreatedStreamId >> 24),
 					(byte)(this.http2LastCreatedStreamId >> 16),
 					(byte)(this.http2LastCreatedStreamId >> 8),
@@ -949,7 +959,7 @@ namespace Waher.Networking.HTTP
 			}
 			else
 			{
-				return await this.SendHttp2Frame(FrameType.ResetStream, 0, null,
+				return await this.SendHttp2Frame(FrameType.ResetStream, 0, false, null,
 					(byte)(i >> 24),
 					(byte)(i >> 16),
 					(byte)(i >> 8),
@@ -973,7 +983,7 @@ namespace Waher.Networking.HTTP
 			if (Count == 0)
 			{
 				if (Last)
-					return await this.SendHttp2Frame(FrameType.Data, 1, Stream, Data, Offset, 0);   // END_STREAM
+					return await this.SendHttp2Frame(FrameType.Data, 1, false, Stream, Data, Offset, 0);   // END_STREAM
 				else
 					return true;
 			}
@@ -993,7 +1003,7 @@ namespace Waher.Networking.HTTP
 				if (Last && NrBytes == Count)
 					Flags = 1;  // END_STREAM
 
-				if (!await this.SendHttp2Frame(FrameType.Data, Flags, Stream, Data, Offset, NrBytes))
+				if (!await this.SendHttp2Frame(FrameType.Data, Flags, false, Stream, Data, Offset, NrBytes))
 					return false;
 
 				Offset += NrBytes;
@@ -1006,14 +1016,14 @@ namespace Waher.Networking.HTTP
 			return true;
 		}
 
-		internal Task<bool> SendHttp2Frame(FrameType Type, byte Flags, Http2Stream Stream,
-			 params byte[] Payload)
+		internal Task<bool> SendHttp2Frame(FrameType Type, byte Flags, bool Priority, Http2Stream Stream,
+			params byte[] Payload)
 		{
-			return this.SendHttp2Frame(Type, Flags, Stream, Payload, 0, Payload.Length);
+			return this.SendHttp2Frame(Type, Flags, Priority, Stream, Payload, 0, Payload.Length);
 		}
 
-		internal async Task<bool> SendHttp2Frame(FrameType Type, byte Flags, Http2Stream Stream,
-			 byte[] Payload, int Offset, int Count)
+		internal async Task<bool> SendHttp2Frame(FrameType Type, byte Flags, bool Priority, 
+			Http2Stream Stream, byte[] Payload, int Offset, int Count)
 		{
 			if (Count > 0x00ffffff)
 				return false;
@@ -1037,7 +1047,7 @@ namespace Waher.Networking.HTTP
 			if (this.client is null)
 				return false;
 
-			if (!await this.client.SendAsync(Data))
+			if (!await this.client.SendAsync(Data, Priority))
 				return false;
 
 			if (this.HasSniffers)

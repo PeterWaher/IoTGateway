@@ -694,7 +694,18 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public Task<bool> SendAsync(byte[] Packet)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, null, null);
+			return this.SendAsync(Packet, 0, Packet.Length, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(byte[] Packet, bool Priority)
+		{
+			return this.SendAsync(Packet, 0, Packet.Length, Priority, null, null);
 		}
 
 		/// <summary>
@@ -706,7 +717,20 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, Callback, State);
+			return this.SendAsync(Packet, 0, Packet.Length, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(Packet, 0, Packet.Length, Priority, Callback, State);
 		}
 
 		/// <summary>
@@ -718,7 +742,20 @@ namespace Waher.Networking
 		/// <returns>If data was sent.</returns>
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count)
 		{
-			return this.SendAsync(Buffer, Offset, Count, null, null);
+			return this.SendAsync(Buffer, Offset, Count, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority)
+		{
+			return this.SendAsync(Buffer, Offset, Count, Priority, null, null);
 		}
 
 		/// <summary>
@@ -730,15 +767,32 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(Buffer, Offset, Count, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority,
+			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.BeginSend(Buffer, Offset, Count, Result, Callback, State, true);
+			await this.BeginSend(Buffer, Offset, Count, Priority, Result, Callback, State, true);
 			return await Result.Task;
 		}
 
-		private async Task BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
-			EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool CheckSending)
+		private async Task BeginSend(byte[] Buffer, int Offset, int Count, bool Priority,
+			TaskCompletionSource<bool> Task, EventHandlerAsync<DeliveryEventArgs> Callback,
+			object State, bool CheckSending)
 		{
 			if (Buffer is null)
 				throw new ArgumentException("Cannot be null.", nameof(Buffer));
@@ -791,13 +845,18 @@ namespace Waher.Networking
 							{
 								byte[] Packet = new byte[Count];
 								Array.Copy(Buffer, Offset, Packet, 0, Count);
-								this.queue.AddLast(new Rec()
+								Rec Item = new Rec()
 								{
 									Data = Packet,
 									Callback = Callback,
 									State = State,
 									Task = Task
-								});
+								};
+
+								if (Priority)
+									this.queue.AddFirst(Item);
+								else
+									this.queue.AddLast(Item);
 								return;
 							}
 

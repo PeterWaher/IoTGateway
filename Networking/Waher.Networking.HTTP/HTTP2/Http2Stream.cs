@@ -267,7 +267,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				Flags |= 4; // END_HEADERS
 
-				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, this, Headers);
+				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, false, this, Headers);
 			}
 			else
 			{
@@ -282,7 +282,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					else
 						Flags = 4; // END_HEADERS
 
-					if (!await this.connection.SendHttp2Frame(Type, Flags, this, Headers, Pos, Diff))
+					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this, Headers, Pos, Diff))
 						return false;
 
 					Pos += Diff;

@@ -21,12 +21,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		private byte weight;
 		private bool disposed = false;
 
-		private class PendingRequest
-		{
-			public TaskCompletionSource<int> Request;
-			public int Requested;
-		}
-
 		/// <summary>
 		/// Represents a node in a HTTP/2 priority tree
 		/// </summary>
@@ -243,11 +237,8 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Available == 0)
 			{
-				PendingRequest Request = new PendingRequest()
-				{
-					Request = new TaskCompletionSource<int>(),
-					Requested = RequestedResources
-				};
+				PendingRequest Request = new PendingRequest(RequestedResources);
+				
 				this.pendingRequests ??= new LinkedList<PendingRequest>();
 				this.pendingRequests.AddLast(Request);
 

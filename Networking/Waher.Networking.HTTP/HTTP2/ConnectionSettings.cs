@@ -180,7 +180,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// If RFC 7540 priorities are obsoleted, as defined in RFC 9218:
 		/// https://www.rfc-editor.org/rfc/rfc9218.html
 		/// </summary>
-		public bool NoRfc7540Priorities => this.noRfc7540Priorities;
+		public bool NoRfc7540Priorities
+		{
+			get => this.noRfc7540Priorities;
+			internal set => this.noRfc7540Priorities = value;
+		}
 
 		/// <summary>
 		/// Initialization step.
@@ -249,7 +253,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			return TryParse(Data, 0, Data.Length, out Settings);
 		}
-		
+
 		/// <summary>
 		/// Tries to parse a SETTINGS fame.
 		/// 

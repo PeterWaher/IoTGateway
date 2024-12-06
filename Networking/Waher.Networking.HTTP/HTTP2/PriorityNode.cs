@@ -275,7 +275,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public bool ReleaseStreamResources(int Resources)
 		{
 			int NewSize = this.windowSize + Resources;
-			if (NewSize < 0 || NewSize > this.windowSize0)
+			if (NewSize < 0 || NewSize > int.MaxValue - 1)
 				return false;
 
 			this.windowSize = NewSize;
@@ -310,7 +310,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public bool ReleaseConnectionResources(int Resources)
 		{
 			int NewSize = this.windowSize + Resources;
-			if (NewSize < 0 || NewSize > this.windowSize0)
+			if (NewSize < 0 || NewSize > int.MaxValue - 1)
 				return false;
 
 			this.windowSize = NewSize;

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
@@ -13,6 +15,7 @@ using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.Persistence;
 using Waher.Runtime.Inventory;
+
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -234,28 +237,20 @@ namespace Waher.IoTGateway.Svc
 			];
 
 			AddWtsUserName(Tags, SessionId);
-			AddWtsName(Tags, "Initial Program", SessionId, WtsInfoClass.WTSInitialProgram);
-			AddWtsName(Tags, "Application Name", SessionId, WtsInfoClass.WTSApplicationName);
-			AddWtsName(Tags, "Working Directory", SessionId, WtsInfoClass.WTSWorkingDirectory);
-			AddWtsName(Tags, "OEM ID", SessionId, WtsInfoClass.WTSOEMId);
-			AddWtsName(Tags, "Station Name", SessionId, WtsInfoClass.WTSWinStationName);
-			AddWtsName(Tags, "Connect State", SessionId, WtsInfoClass.WTSConnectState);
-			AddWtsName(Tags, "Client Build Number", SessionId, WtsInfoClass.WTSClientBuildNumber);
-			AddWtsName(Tags, "Client Name", SessionId, WtsInfoClass.WTSClientName);
-			AddWtsName(Tags, "Client Directory", SessionId, WtsInfoClass.WTSClientDirectory);
-			AddWtsName(Tags, "Client Product ID", SessionId, WtsInfoClass.WTSClientProductId);
-			AddWtsName(Tags, "Client Hardware ID", SessionId, WtsInfoClass.WTSClientHardwareId);
-			AddWtsName(Tags, "Client Address", SessionId, WtsInfoClass.WTSClientAddress);
-			AddWtsName(Tags, "Client Display", SessionId, WtsInfoClass.WTSClientDisplay);
-			AddWtsName(Tags, "Client Protocol Type", SessionId, WtsInfoClass.WTSClientProtocolType);
-			AddWtsName(Tags, "Idle Time", SessionId, WtsInfoClass.WTSIdleTime);
-			AddWtsName(Tags, "Logon Time", SessionId, WtsInfoClass.WTSLogonTime);
-			AddWtsName(Tags, "Incoming Bytes", SessionId, WtsInfoClass.WTSIncomingBytes);
-			AddWtsName(Tags, "Outgoing Bytes", SessionId, WtsInfoClass.WTSOutgoingBytes);
-			AddWtsName(Tags, "Incoming Frames", SessionId, WtsInfoClass.WTSIncomingFrames);
-			AddWtsName(Tags, "Outgoing Frames", SessionId, WtsInfoClass.WTSOutgoingFrames);
-			AddWtsName(Tags, "Client Info", SessionId, WtsInfoClass.WTSClientInfo);
-			AddWtsName(Tags, "Session Info", SessionId, WtsInfoClass.WTSSessionInfo);
+			AddWtsName(Tags, "Initial Program", SessionId, WtsInfoClass.WTSInitialProgram, NullTerminatedString);
+			AddWtsName(Tags, "Application Name", SessionId, WtsInfoClass.WTSApplicationName, NullTerminatedString);
+			AddWtsName(Tags, "Working Directory", SessionId, WtsInfoClass.WTSWorkingDirectory, NullTerminatedString);
+			AddWtsName(Tags, "Station Name", SessionId, WtsInfoClass.WTSWinStationName, NullTerminatedString);
+			AddWtsName(Tags, "Connect State", SessionId, WtsInfoClass.WTSConnectState, EnumerationString<WtsConnectClass>);
+			AddWtsName(Tags, "Client Build Number", SessionId, WtsInfoClass.WTSClientBuildNumber, IntegerValue);
+			AddWtsName(Tags, "Client Name", SessionId, WtsInfoClass.WTSClientName, NullTerminatedString);
+			AddWtsName(Tags, "Client Directory", SessionId, WtsInfoClass.WTSClientDirectory, NullTerminatedString);
+			AddWtsName(Tags, "Client Product ID", SessionId, WtsInfoClass.WTSClientProductId, IntegerValue);
+			AddWtsName(Tags, "Client Hardware ID", SessionId, WtsInfoClass.WTSClientHardwareId, IntegerValue);
+			AddWtsName(Tags, "Client Address", SessionId, WtsInfoClass.WTSClientAddress, ClientAddress);
+			AddWtsName(Tags, "Client Display", SessionId, WtsInfoClass.WTSClientDisplay, ClientDisplay);
+			AddWtsName(Tags, "Client Protocol Type", SessionId, WtsInfoClass.WTSClientProtocolType, EnumerationString<WtsClientProtocolType>);
+			AddWtsName(Tags, "Client Info", SessionId, WtsInfoClass.WTSClientInfo, NullTerminatedString);
 
 			string Message;
 
@@ -341,10 +336,11 @@ namespace Waher.IoTGateway.Svc
 				Tags.Add(new KeyValuePair<string, object>("User Name", Value));
 		}
 
-		private static void AddWtsName(List<KeyValuePair<string, object>> Tags, string Key, int SessionId, WtsInfoClass InfoClass)
+		private static void AddWtsName(List<KeyValuePair<string, object>> Tags, string Key, int SessionId,
+			WtsInfoClass InfoClass, ParseWtsInfo Parser)
 		{
-			string Value = GetWtsName(SessionId, InfoClass);
-			if (!string.IsNullOrEmpty(Value))
+			object Value = GetWtsValue(SessionId, InfoClass, Parser);
+			if (Value is not null)
 				Tags.Add(new KeyValuePair<string, object>(Key, Value));
 		}
 
@@ -352,11 +348,11 @@ namespace Waher.IoTGateway.Svc
 		{
 			try
 			{
-				string UserName = GetWtsName(SessionId, WtsInfoClass.WTSUserName);
+				string UserName = GetWtsValue(SessionId, WtsInfoClass.WTSUserName, NullTerminatedString) as string;
 				if (string.IsNullOrEmpty(UserName))
 					return null;
 
-				string Domain = GetWtsName(SessionId, WtsInfoClass.WTSDomainName);
+				string Domain = GetWtsValue(SessionId, WtsInfoClass.WTSDomainName, NullTerminatedString) as string;
 				if (!string.IsNullOrEmpty(Domain))
 					UserName = Domain + "\\" + UserName;
 
@@ -369,17 +365,144 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private static string GetWtsName(int SessionId, WtsInfoClass InfoClass)
+		private delegate object ParseWtsInfo(IntPtr Buffer, int Len);
+
+		private static object NullTerminatedString(IntPtr Buffer, int _)
 		{
-			string Result;
+			string s = Marshal.PtrToStringAnsi(Buffer);
+
+			if (!string.IsNullOrEmpty(s))
+				s = CommonTypes.Escape(s, specialCharactersToEscape, specialCharacterEscapes);
+
+			return s;
+		}
+
+		private static long GetInteger(IntPtr Buffer, int Len)
+		{
+			switch (Len)
+			{
+				case 1: return Marshal.ReadByte(Buffer, 0);
+				case 2: return Marshal.ReadInt16(Buffer, 0);
+				case 4: return Marshal.ReadInt32(Buffer, 0);
+				case 8: return Marshal.ReadInt64(Buffer, 0);
+				default:
+					if (Len > 8)
+						Len = 8;
+
+					byte[] Bin = new byte[8];
+					int i;
+
+					for (i = 0; i < Len; i++)
+						Bin[i] = Marshal.ReadByte(Buffer, i);
+
+					return BitConverter.ToInt64(Bin, 0);
+			}
+		}
+
+		private static object IntegerValue(IntPtr Buffer, int Len)
+		{
+			return GetInteger(Buffer, Len);
+		}
+
+		private static object EnumerationString<T>(IntPtr Buffer, int Len)
+			where T : Enum
+		{
+			long i = GetInteger(Buffer, Len);
+			return Enum.ToObject(typeof(T), i);
+		}
+
+		private static object ClientAddress(IntPtr Buffer, int Len)
+		{
+			// https://www.pinvoke.net/default.aspx/wtsapi32/WTS_CLIENT_ADDRESS.html
+
+			if (EnumerationString<AddressFamily>(Buffer, Math.Min(4, Len)) is not AddressFamily AddressFamily)
+				return null;
+
+			switch (AddressFamily)
+			{
+				case AddressFamily.InterNetwork:
+					if (Len < 10)
+						return AddressFamily;
+
+					byte[] Bin = new byte[4];
+					Marshal.Copy(Buffer, Bin, 6, 4);
+
+					return new IPAddress(Bin).ToString();
+
+				case AddressFamily.InterNetworkV6:
+					if (Len < 20)
+						return AddressFamily;
+
+					Bin = new byte[16];
+					Marshal.Copy(Buffer, Bin, 4, 16);
+
+					return new IPAddress(Bin).ToString();
+
+				default:
+					return AddressFamily;
+			}
+		}
+
+		private static object ClientDisplay(IntPtr Buffer, int Len)
+		{
+			// https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/ns-wtsapi32-wts_client_display
+
+			if (Len < 12)
+				return null;
+
+			byte[] Bin = new byte[12];
+			Marshal.Copy(Buffer, Bin, 0, 12);
+
+			int Width = BitConverter.ToInt32(Bin, 0);
+			int Height = BitConverter.ToInt32(Bin, 4);
+			int ColorDepth = BitConverter.ToInt32(Bin, 8);
+			string s = Width.ToString() + "x" + Height.ToString();
+
+			switch (ColorDepth)
+			{
+				case 1:
+					s += " (4 bits per pixel.)";
+					break;
+
+				case 2:
+					s += " (8 bits per pixel.)";
+					break;
+
+				case 4:
+					s += " (16 bits per pixel.)";
+					break;
+
+				case 8:
+					s += " (3 byte RGB).";
+					break;
+
+				case 16:
+					s += " (15 bits per pixel.)";
+					break;
+
+				case 24:
+					s += " (24 bits per pixel.)";
+					break;
+
+				case 32:
+					s += " (32 bits per pixel.)";
+					break;
+			}
+
+			return s;
+		}
+
+		private static object GetWtsValue(int SessionId, WtsInfoClass InfoClass, ParseWtsInfo Parser)
+		{
+			object Result;
 
 			try
 			{
-				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int StrLen) && StrLen > 1)
+				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int Len) && Len > 1)
 				{
 					try
 					{
-						Result = Marshal.PtrToStringAnsi(Buffer);
+						Result = Parser(Buffer, Len);
 						Win32.WTSFreeMemory(Buffer);
 						Buffer = IntPtr.Zero;
 					}
@@ -398,9 +521,6 @@ namespace Waher.IoTGateway.Svc
 				return null;
 			}
 
-			if (!string.IsNullOrEmpty(Result))
-				Result = CommonTypes.Escape(Result, specialCharactersToEscape, specialCharacterEscapes);
-			
 			return Result;
 		}
 

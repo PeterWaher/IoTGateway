@@ -104,7 +104,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// header block(see[COMPRESSION]).  The initial value is 4,096
 		/// octets.
 		/// </summary>
-		public int HeaderTableSize => this.headerTableSize;
+		public int HeaderTableSize
+		{
+			get => this.headerTableSize;
+			internal set => this.headerTableSize = value;
+		}
+
 
 		/// <summary>
 		/// SETTINGS_ENABLE_PUSH (0x2):  This setting can be used to disable
@@ -119,7 +124,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// permitted.Any value other than 0 or 1 MUST be treated as a
 		/// connection error(Section 5.4.1) of type PROTOCOL_ERROR.
 		/// </summary>
-		public bool EnablePush => this.enablePush;
+		public bool EnablePush
+		{
+			get => this.enablePush;
+			internal set => this.enablePush = value;
+		}
+
 
 		/// <summary>
 		/// SETTINGS_MAX_CONCURRENT_STREAMS (0x3):  Indicates the maximum number
@@ -136,7 +146,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// set a zero value for short durations; if a server does not wish to
 		/// accept requests, closing the connection is more appropriate.
 		/// </summary>
-		public int MaxConcurrentStreams => this.maxConcurrentStreams;
+		public int MaxConcurrentStreams
+		{
+			get => this.maxConcurrentStreams;
+			internal set => this.maxConcurrentStreams = value;
+		}
+
 
 		/// <summary>
 		/// SETTINGS_INITIAL_WINDOW_SIZE (0x4):  Indicates the sender's initial
@@ -150,7 +165,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// be treated as a connection error(Section 5.4.1) of type
 		/// FLOW_CONTROL_ERROR.
 		/// </summary>
-		public int InitialWindowSize => this.initialWindowSize;
+		public int InitialWindowSize
+		{
+			get => this.initialWindowSize;
+			internal set => this.initialWindowSize = value;
+		}
 
 		/// <summary>
 		/// SETTINGS_MAX_FRAME_SIZE (0x5):  Indicates the size of the largest
@@ -161,7 +180,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Values outside this range MUST be treated as a connection error
 		/// (Section 5.4.1) of type PROTOCOL_ERROR.
 		/// </summary>
-		public int MaxFrameSize => this.maxFrameSize;
+		public int MaxFrameSize
+		{
+			get => this.maxFrameSize;
+			internal set => this.maxFrameSize = value;
+		}
+
 
 		/// <summary>
 		///  SETTINGS_MAX_HEADER_LIST_SIZE (0x6):  This advisory setting informs a
@@ -174,7 +198,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		///  For any given request, a lower limit than what is advertised MAY
 		///  be enforced.The initial value of this setting is unlimited.
 		/// </summary>
-		public int MaxHeaderListSize => this.maxHeaderListSize;
+		public int MaxHeaderListSize
+		{
+			get => this.maxHeaderListSize;
+			internal set => this.maxHeaderListSize = value;
+		}
 
 		/// <summary>
 		/// If RFC 7540 priorities are obsoleted, as defined in RFC 9218:
@@ -296,7 +324,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				switch (Key)
 				{
 					case 1:
-						SnifferOutput?.AppendLine("RX: SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_HEADER_TABLE_SIZE = " + Value.ToString());
 
 						if (Value > int.MaxValue)
 							return Http2Error.ProtocolError;
@@ -305,7 +333,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 2:
-						SnifferOutput?.AppendLine("RX: SETTINGS_ENABLE_PUSH = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_ENABLE_PUSH = " + Value.ToString());
 
 						if (Value > 1)
 							return Http2Error.ProtocolError;
@@ -314,7 +342,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 3:
-						SnifferOutput?.AppendLine("RX: SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_MAX_CONCURRENT_STREAMS = " + Value.ToString());
 
 						if (Value > int.MaxValue)
 							return Http2Error.ProtocolError;
@@ -323,7 +351,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 4:
-						SnifferOutput?.AppendLine("RX: SETTINGS_INITIAL_WINDOW_SIZE = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_INITIAL_WINDOW_SIZE = " + Value.ToString());
 
 						if (Value > 0x7fffffff)
 							return Http2Error.FlowControlError;
@@ -332,7 +360,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 5:
-						SnifferOutput?.AppendLine("RX: SETTINGS_MAX_FRAME_SIZE = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_MAX_FRAME_SIZE = " + Value.ToString());
 
 						if (Value > 0x00ffffff)
 							return Http2Error.ProtocolError;
@@ -341,7 +369,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 6:
-						SnifferOutput?.AppendLine("RX: SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_MAX_HEADER_LIST_SIZE = " + Value.ToString());
 
 						if (Value > int.MaxValue)
 							return Http2Error.ProtocolError;
@@ -350,7 +378,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					case 9:
-						SnifferOutput?.AppendLine("RX: SETTINGS_NO_RFC7540_PRIORITIES = " + Value.ToString());
+						SnifferOutput?.AppendLine("SETTINGS_NO_RFC7540_PRIORITIES = " + Value.ToString());
 
 						if (Value > 1)
 							return Http2Error.ProtocolError;
@@ -359,7 +387,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						break;
 
 					default:
-						SnifferOutput?.AppendLine("RX: (" + Key.ToString() + ", " + Value.ToString() + ")");
+						SnifferOutput?.AppendLine("(" + Key.ToString() + ", " + Value.ToString() + ")");
 
 						break;  // Ignore
 				}
@@ -374,14 +402,41 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>Byte array</returns>
 		public byte[] ToArray()
 		{
+			return this.ToArray(null);
+		}
+
+		/// <summary>
+		/// Serializes current settings.
+		/// </summary>
+		/// <param name="SnifferOutput">Optional sniffer output.</param>
+		/// <returns>Byte array</returns>
+		public byte[] ToArray(StringBuilder SnifferOutput)
+		{
 			BinaryWriter w = new BinaryWriter();
 
 			w.WriteKeyValue(1, (uint)this.HeaderTableSize);
+			SnifferOutput?.AppendLine("SETTINGS_HEADER_TABLE_SIZE = " + this.HeaderTableSize.ToString());
+			
 			w.WriteKeyValue(2, this.EnablePush ? 1U : 0U);
+			SnifferOutput?.AppendLine("SETTINGS_ENABLE_PUSH = " + (this.EnablePush ? 1 : 0).ToString());
+			
 			w.WriteKeyValue(3, (uint)this.MaxConcurrentStreams);
+			SnifferOutput?.AppendLine("SETTINGS_MAX_CONCURRENT_STREAMS = " + this.MaxConcurrentStreams.ToString());
+			
 			w.WriteKeyValue(4, (uint)this.InitialWindowSize);
+			SnifferOutput?.AppendLine("SETTINGS_INITIAL_WINDOW_SIZE = " + this.InitialWindowSize.ToString());
+			
 			w.WriteKeyValue(5, (uint)this.MaxFrameSize);
+			SnifferOutput?.AppendLine("SETTINGS_MAX_FRAME_SIZE = " + this.MaxFrameSize.ToString());
+			
 			w.WriteKeyValue(6, (uint)this.MaxHeaderListSize);
+			SnifferOutput?.AppendLine("SETTINGS_MAX_HEADER_LIST_SIZE = " + this.MaxHeaderListSize.ToString());
+
+			if (this.noRfc7540Priorities)
+			{
+				w.WriteKeyValue(9, 1U);
+				SnifferOutput?.AppendLine("SETTINGS_NO_RFC7540_PRIORITIES = " + (this.noRfc7540Priorities ? 1 : 0).ToString());
+			}
 
 			return w.ToArray();
 		}

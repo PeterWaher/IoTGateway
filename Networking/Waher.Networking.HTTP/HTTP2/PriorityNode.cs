@@ -12,10 +12,10 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private LinkedList<PendingRequest> pendingRequests = null;
 		private LinkedList<PriorityNode> childNodes = null;
-		private readonly int windowSize0;
 		private readonly int maxFrameSize;
 		private double resourceFraction = 1;
 		private int totalChildWeights = 0;
+		private int windowSize0;
 		private int windowSize;
 		private int windowSizeFraction;
 		private byte weight;
@@ -238,7 +238,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (Available == 0)
 			{
 				PendingRequest Request = new PendingRequest(RequestedResources);
-				
+
 				this.pendingRequests ??= new LinkedList<PendingRequest>();
 				this.pendingRequests.AddLast(Request);
 
@@ -263,17 +263,21 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Releases stream resources back to the stream.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
-		public bool ReleaseStreamResources(int Resources)
+		/// <returns>Size of current window. Negative = error</returns>
+		public int ReleaseStreamResources(int Resources)
 		{
 			int NewSize = this.windowSize + Resources;
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
-				return false;
+				return -1;
 
 			this.windowSize = NewSize;
 
+			if (NewSize > this.windowSize0)
+				this.windowSize0 = NewSize;
+
 			this.TriggerPending(ref Resources);
 
-			return true;
+			return NewSize;
 		}
 
 		private void TriggerPending(ref int Resources)
@@ -297,18 +301,21 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Releases connection resources back.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
-		/// <returns>If successful.</returns>
-		public bool ReleaseConnectionResources(int Resources)
+		/// <returns>Size of current window. Negative = error</returns>
+		public int ReleaseConnectionResources(int Resources)
 		{
 			int NewSize = this.windowSize + Resources;
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
-				return false;
+				return -1;
 
 			this.windowSize = NewSize;
 
+			if (NewSize > this.windowSize0)
+				this.windowSize0 = NewSize;
+
 			this.TriggerPendingIfAvailbleDown(ref Resources);
 
-			return true;
+			return NewSize;
 		}
 
 		private void TriggerPendingIfAvailbleDown(ref int Resources)

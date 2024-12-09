@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Temporary;
@@ -81,7 +82,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public long DataBytesReceived => this.dataBytesReceived;
 
 		/// <summary>
-		/// Data input window size
+		/// Data Input window size
 		/// </summary>
 		public long DataInputWindowSize => this.dataInputWindowSize;
 
@@ -282,7 +283,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					else
 						Flags = 4; // END_HEADERS
 
-					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this, Headers, Pos, Diff))
+					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this, Headers, Pos, Diff, null))
 						return false;
 
 					Pos += Diff;
@@ -301,10 +302,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Offset">Offset into buffer where data begins.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Last">If it is the last data to be written for this stream.</param>
+		/// <param name="DataEncoding">Optional encoding, if data is text.</param>
 		/// <returns>If data was written.</returns>
-		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last)
+		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last, 
+			Encoding DataEncoding)
 		{
-			if (!await this.connection.WriteData(this, Data, Offset, Count, Last))
+			if (!await this.connection.WriteData(this, Data, Offset, Count, Last, DataEncoding))
 				return false;
 
 			if (Last)

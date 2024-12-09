@@ -88,8 +88,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// default priority settings.
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
-		/// <returns>If the stream could be added.</returns>
-		public bool AddStreamForTest(int StreamId)
+		/// <returns>Size of window associated with stream. Negative = error</returns>
+		public int AddStreamForTest(int StreamId)
 		{
 			return this.AddStreamForTest(StreamId, this.settings, 16, 0, false);
 		}
@@ -100,8 +100,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
 		/// <param name="Settings">Settings to use.</param>
-		/// <returns>If the stream could be added.</returns>
-		public bool AddStreamForTest(int StreamId, ConnectionSettings Settings)
+		/// <returns>Size of window associated with stream. Negative = error</returns>
+		public int AddStreamForTest(int StreamId, ConnectionSettings Settings)
 		{
 			return this.AddStreamForTest(StreamId, Settings, 16, 0, false);
 		}
@@ -113,8 +113,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Weight">Weight</param>
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
-		/// <returns>If the stream could be added.</returns>
-		public bool AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency, bool Exclusive)
+		/// <returns>Size of window associated with stream. Negative = error</returns>
+		public int AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency, bool Exclusive)
 		{
 			return this.AddStreamForTest(StreamId, this.settings, Weight, StreamIdDependency, Exclusive);
 		}
@@ -127,8 +127,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Weight">Weight</param>
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
-		/// <returns>If the stream could be added.</returns>
-		public bool AddStreamForTest(int StreamId, ConnectionSettings Settings,
+		/// <returns>Size of window associated with stream. Negative = error</returns>
+		public int AddStreamForTest(int StreamId, ConnectionSettings Settings,
 			byte Weight, int StreamIdDependency, bool Exclusive)
 		{
 			Http2Stream Stream = new Http2Stream(StreamId, Settings);
@@ -142,16 +142,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Weight">Weight</param>
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
-		/// <returns>If the stream could be added.</returns>
-		public bool AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive)
+		/// <returns>Size of window associated with stream. Negative = error</returns>
+		public int AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive)
 		{
 			if (this.disposed)
-				return false;
+				return -1;
 
 			lock (this.synchObj)
 			{
 				if (this.streams.Count >= this.settings.MaxConcurrentStreams)
-					return false;
+					return -1;
 
 				int Priority = Stream.Rfc9218Priority;
 				if (Priority < 0 || Priority > 7)
@@ -175,7 +175,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				Nodes.AddLast(Rec.Node);
 
-				return true;
+				return Rec.Node.AvailableResources;
 			}
 		}
 
@@ -293,18 +293,18 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
-		/// <returns>If stream was found with the corresponding ID.</returns>
-		public bool ReleaseStreamResources(int StreamId, int Resources)
+		/// <returns>Size of current window. Negative = error</returns>
+		public int ReleaseStreamResources(int StreamId, int Resources)
 		{
 			if (this.disposed)
-				return false;
+				return -1;
 
 			lock (this.synchObj)
 			{
 				if (StreamId != this.lastNodeStreamId)
 				{
 					if (!this.streams.TryGetValue(StreamId, out this.lastRec))
-						return false;
+						return -1;
 				}
 
 				return this.lastRec.Node.ReleaseStreamResources(Resources);
@@ -315,11 +315,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Releases connection resources back.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
-		/// <returns>If successful.</returns>
-		public bool ReleaseConnectionResources(int Resources)
+		/// <returns>Size of current window. Negative = error</returns>
+		public int ReleaseConnectionResources(int Resources)
 		{
 			if (this.disposed)
-				return false;
+				return -1;
 
 			lock (this.synchObj)
 			{

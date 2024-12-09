@@ -34,8 +34,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Weight">Weight</param>
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
-		/// <returns>If the stream could be added.</returns>
-		bool AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive);
+		/// <returns>Size of window associated with stream. Negative = error</returns>
+		int AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive);
 
 		/// <summary>
 		/// Updates the priority of a stream in the flow control.
@@ -75,14 +75,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
-		/// <returns>If stream was found with the corresponding ID.</returns>
-		bool ReleaseStreamResources(int StreamId, int Resources);
+		/// <returns>Size of current window. Negative = error</returns>
+		int ReleaseStreamResources(int StreamId, int Resources);
 
 		/// <summary>
 		/// Releases connection resources back.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
-		/// <returns>If successful.</returns>
-		bool ReleaseConnectionResources(int Resources);
+		/// <returns>Size of current window. Negative = error</returns>
+		int ReleaseConnectionResources(int Resources);
 	}
 }

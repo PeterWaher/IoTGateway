@@ -155,7 +155,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
 			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
 
-			Assert.IsTrue(FlowControl.ReleaseStreamResources(1, 10000));
+			Assert.AreEqual(10000, FlowControl.ReleaseStreamResources(1, 10000));
 
 			DateTime Start = DateTime.Now;
 			CancellationTokenSource Cancel = new();
@@ -187,7 +187,7 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
 			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
 
-			Assert.IsTrue(FlowControl.ReleaseConnectionResources(10000));
+			Assert.AreEqual(10000, FlowControl.ReleaseConnectionResources(10000));
 
 			DateTime Start = DateTime.Now;
 			CancellationTokenSource Cancel = new();
@@ -220,8 +220,8 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
 			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
 
-			Assert.IsTrue(FlowControl.ReleaseStreamResources(1, 10000));
-			Assert.IsTrue(FlowControl.ReleaseConnectionResources(10000));
+			Assert.AreEqual(10000, FlowControl.ReleaseStreamResources(1, 10000));
+			Assert.AreEqual(10000, FlowControl.ReleaseConnectionResources(10000));
 
 			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
 
@@ -366,8 +366,8 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.RemoveStream(1);
 
-			Assert.IsTrue(FlowControl.ReleaseConnectionResources(20000));
-			Assert.IsFalse(FlowControl.ReleaseStreamResources(1, 20000));
+			Assert.AreEqual(65535, FlowControl.ReleaseConnectionResources(20000));
+			Assert.AreEqual(-1, FlowControl.ReleaseStreamResources(1, 20000));
 
 			Assert.IsFalse(FlowControl.TryGetPriorityNode(1, out _));
 			Assert.AreEqual(65535, FlowControl.Root.AvailableResources);

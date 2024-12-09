@@ -103,7 +103,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.pos + 3 >= this.bufferSize)
 				throw new IOException("Unexpected end of data.");
 
-			ushort Result = this.buffer[this.pos++];
+			uint Result = this.buffer[this.pos++];
 			Result <<= 8;
 			Result |= this.buffer[this.pos++];
 			Result <<= 8;

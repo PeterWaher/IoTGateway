@@ -92,9 +92,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					NrBytes -= i;
 					this.pos += i;
 
-					if (this.pos == this.bufferSize)
+					bool Last = this.ended && NrBytes == 0;
+
+					if (this.pos == this.bufferSize || Last)
 					{
-						if (!await this.stream.WriteData(this.buffer, 0, this.pos, this.ended && NrBytes == 0, this.dataEncoding))
+						if (!await this.stream.WriteData(this.buffer, 0, this.pos, Last, this.dataEncoding))
 							return false;
 
 						this.pos = 0;

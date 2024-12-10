@@ -237,6 +237,10 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Available == 0)
 			{
+				// TODO: Remove
+				this.Stream?.Connection.Warning("Waiting for resources (stream " + this.Stream.StreamId.ToString() +
+					", requested " + RequestedResources.ToString() + ")");
+
 				PendingRequest Request = new PendingRequest(RequestedResources);
 
 				this.pendingRequests ??= new LinkedList<PendingRequest>();
@@ -273,7 +277,10 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.windowSize = NewSize;
 
 			if (NewSize > this.windowSize0)
+			{
 				this.windowSize0 = NewSize;
+				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
+			}
 
 			this.TriggerPending(ref Resources);
 
@@ -289,8 +296,18 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				this.pendingRequests.RemoveFirst();
 
-				i = Math.Min(Loop.Value.Requested, Resources);
-				i = Math.Min(i, this.maxFrameSize);
+				i = Loop.Value.Requested;
+				
+				if (Resources < i)
+					i = Resources;
+				
+				if (this.maxFrameSize < i)
+					i = this.maxFrameSize;
+
+				// TODO: Remove
+				this.Stream?.Connection.Warning("Trigger pending request (stream " + this.Stream.StreamId.ToString() +
+					", approved " + i.ToString() + ")");
+
 				this.windowSize -= i;
 				Loop.Value.Request.TrySetResult(i);
 				Resources -= i;
@@ -311,7 +328,10 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.windowSize = NewSize;
 
 			if (NewSize > this.windowSize0)
+			{
 				this.windowSize0 = NewSize;
+				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
+			}
 
 			this.TriggerPendingIfAvailbleDown(ref Resources);
 

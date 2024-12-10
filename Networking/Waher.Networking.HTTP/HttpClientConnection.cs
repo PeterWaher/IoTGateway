@@ -1141,7 +1141,7 @@ namespace Waher.Networking.HTTP
 			}
 
 			if (Last)
-				this.flowControl.RemoveStream(Stream);
+				this.flowControl?.RemoveStream(Stream);
 
 			return true;
 		}

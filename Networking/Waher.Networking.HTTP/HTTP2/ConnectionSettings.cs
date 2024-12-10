@@ -473,6 +473,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Connection window size
 		/// </summary>
-		public int ConnectionWindowSize => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
+		public int ConnectionWindowSize
+		{
+			get => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
+			internal set => this.connectionWindowSize = this.connectionBytesCommunicated + value;
+		}
 	}
 }

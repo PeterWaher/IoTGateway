@@ -323,7 +323,12 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				return this.root.ReleaseConnectionResources(Resources);
+				int Available = this.root.ReleaseConnectionResources(Resources);
+
+				if (Available > this.settings.ConnectionWindowSize)
+					this.settings.ConnectionWindowSize = Available;
+
+				return Available;
 			}
 		}
 

@@ -502,7 +502,7 @@ namespace Waher.Networking.HTTP
 									{
 										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
 										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, false, ClientCertificates.NotUsed, false);
+										Task T = this.ListenForIncomingConnections(Listener, false, HttpPort, ClientCertificates.NotUsed, false);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
 									}
@@ -607,7 +607,7 @@ namespace Waher.Networking.HTTP
 
 										Listener = new TcpListener(DesiredEndpoint);
 										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, true, ClientCertificates, TrustCertificates);
+										Task T = this.ListenForIncomingConnections(Listener, true, HttpsPort, ClientCertificates, TrustCertificates);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
 									}
@@ -1033,7 +1033,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 #else
-		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls, ClientCertificates ClientCertificates,
+		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls, int Port, ClientCertificates ClientCertificates,
 			bool TrustCertificates)
 		{
 			try
@@ -1080,11 +1080,11 @@ namespace Waher.Networking.HTTP
 
 							if (Tls)
 							{
-								Task _ = this.SwitchToTls(BinaryTcpClient, ClientCertificates, TrustCertificates);
+								Task _ = this.SwitchToTls(BinaryTcpClient, ClientCertificates, TrustCertificates, Port);
 							}
 							else
 							{
-								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
+								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
 								BinaryTcpClient.Continue();
 
 								lock (this.connections)
@@ -1138,7 +1138,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task SwitchToTls(BinaryTcpClient Client, ClientCertificates ClientCertificates, bool TrustCertificates)
+		private async Task SwitchToTls(BinaryTcpClient Client, ClientCertificates ClientCertificates, bool TrustCertificates, int Port)
 		{
 			string RemoteIpEndpoint;
 			EndPoint EP = Client.Client.Client.RemoteEndPoint;
@@ -1190,7 +1190,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
+					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, Port, this.Sniffers);
 
 					if (this.HasSniffers)
 					{

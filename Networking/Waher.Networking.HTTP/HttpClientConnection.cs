@@ -59,6 +59,7 @@ namespace Waher.Networking.HTTP
 		private byte b2 = 0;
 		private byte b3 = 0;
 		private readonly bool encrypted;
+		private readonly int port;
 		private bool disposed = false;
 		private bool rxText = false;
 
@@ -84,12 +85,14 @@ namespace Waher.Networking.HTTP
 		internal HeaderReader HttpHeaderReader => this.http2HeaderReader;
 		internal HeaderWriter HttpHeaderWriter => this.http2HeaderWriter;
 
-		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, bool Encrypted, params ISniffer[] Sniffers)
+		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, 
+			bool Encrypted, int Port, params ISniffer[] Sniffers)
 			: base(false, Sniffers)
 		{
 			this.server = Server;
 			this.client = Client;
 			this.encrypted = Encrypted;
+			this.port = Port;
 
 			this.client.OnDisconnected += this.Client_OnDisconnected;
 			this.client.OnError += this.Client_OnError;
@@ -181,16 +184,11 @@ namespace Waher.Networking.HTTP
 		}
 
 		internal Guid Id => this.id;
-
 		internal HttpServer Server => this.server;
-
 		internal bool Disposed => this.disposed;
-
 		internal BinaryTcpClient Client => this.client;
-
-#if !WINDOWS_UWP
 		internal bool Encrypted => this.encrypted;
-#endif
+		internal int Port => this.port;
 
 		private async Task<bool> BinaryHeaderReceived(byte[] Data, int Offset, int NrRead)
 		{

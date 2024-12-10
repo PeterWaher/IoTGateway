@@ -237,10 +237,6 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Available == 0)
 			{
-				// TODO: Remove
-				this.Stream?.Connection.Warning("Waiting for resources (stream " + this.Stream.StreamId.ToString() +
-					", requested " + RequestedResources.ToString() + ")");
-
 				PendingRequest Request = new PendingRequest(RequestedResources);
 
 				this.pendingRequests ??= new LinkedList<PendingRequest>();
@@ -303,10 +299,6 @@ namespace Waher.Networking.HTTP.HTTP2
 				
 				if (this.maxFrameSize < i)
 					i = this.maxFrameSize;
-
-				// TODO: Remove
-				this.Stream?.Connection.Warning("Trigger pending request (stream " + this.Stream.StreamId.ToString() +
-					", approved " + i.ToString() + ")");
 
 				this.windowSize -= i;
 				Loop.Value.Request.TrySetResult(i);

@@ -8,10 +8,12 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// <summary>
 	/// Represents a node in a HTTP/2 priority tree
 	/// </summary>
-	public class PriorityNode : IDisposable
+	public class PriorityNodeRfc7540 : IPriorityNode
 	{
 		private LinkedList<PendingRequest> pendingRequests = null;
-		private LinkedList<PriorityNode> childNodes = null;
+		private LinkedList<PriorityNodeRfc7540> childNodes = null;
+		private PriorityNodeRfc7540 dependentOn;
+		private readonly PriorityNodeRfc7540 root;
 		private readonly int maxFrameSize;
 		private double resourceFraction = 1;
 		private int totalChildWeights = 0;
@@ -29,13 +31,13 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Stream">Corresponding HTTP/2 stream.</param>
 		/// <param name="Weight">Weight assigned to the node.</param>
 		/// <param name="FlowControl">Flow control object.</param>
-		public PriorityNode(PriorityNode DependentNode, PriorityNode Root, Http2Stream Stream, byte Weight,
-			IFlowControl FlowControl)
+		public PriorityNodeRfc7540(PriorityNodeRfc7540 DependentNode, PriorityNodeRfc7540 Root, Http2Stream Stream, byte Weight,
+			FlowControlRfc7540 FlowControl)
 		{
 			ConnectionSettings Settings = FlowControl.Settings;
 
-			this.DependentOn = DependentNode;
-			this.Root = Root;
+			this.dependentOn = DependentNode;
+			this.root = Root;
 			this.Stream = Stream;
 			this.weight = Weight;
 			this.windowSize = this.windowSize0 = this.windowSizeFraction = Settings.InitialWindowSize;
@@ -45,21 +47,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Parent node.
 		/// </summary>
-		public PriorityNode DependentOn
+		public PriorityNodeRfc7540 DependentOn
 		{
-			get;
-			internal set;
+			get => this.dependentOn;
+			internal set => this.dependentOn = value;
 		}
 
 		/// <summary>
 		/// Parent node in the priority tree.
 		/// </summary>
-		public PriorityNode Parent => this.DependentOn ?? this.Root;
-
-		/// <summary>
-		/// Root node.
-		/// </summary>
-		public PriorityNode Root { get; }
+		public PriorityNodeRfc7540 Parent => this.DependentOn ?? this.root;
 
 		/// <summary>
 		/// Corresponding HTTP/2 stream.
@@ -79,21 +76,21 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
-		internal LinkedList<PriorityNode> MoveChildrenFrom()
+		internal LinkedList<PriorityNodeRfc7540> MoveChildrenFrom()
 		{
-			LinkedList<PriorityNode> Result = this.childNodes;
+			LinkedList<PriorityNodeRfc7540> Result = this.childNodes;
 			this.childNodes = null;
 			this.totalChildWeights = 0;
 			return Result;
 		}
 
-		internal void MoveChildrenTo(LinkedList<PriorityNode> Children)
+		internal void MoveChildrenTo(LinkedList<PriorityNodeRfc7540> Children)
 		{
 			if (!(Children is null))
 			{
-				this.childNodes ??= new LinkedList<PriorityNode>();
+				this.childNodes ??= new LinkedList<PriorityNodeRfc7540>();
 
-				foreach (PriorityNode Child in Children)
+				foreach (PriorityNodeRfc7540 Child in Children)
 				{
 					this.childNodes.AddLast(Child);
 					this.totalChildWeights += Child.Weight;
@@ -119,10 +116,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.weight != value)
 				{
 					if (!(this.DependentOn is null))
-						this.DependentOn.totalChildWeights += value - this.weight;
+						this.dependentOn.totalChildWeights += value - this.weight;
 
 					this.weight = value;
-					this.ResourceFraction = this.DependentOn.ResourceFraction * this.weight / this.DependentOn.totalChildWeights;
+					this.ResourceFraction = this.DependentOn.ResourceFraction * this.weight / this.dependentOn.TotalChildWeights;
 				}
 			}
 		}
@@ -140,18 +137,18 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// First child node, if any, or null if none.
 		/// </summary>
-		public LinkedListNode<PriorityNode> FirstChild => this.childNodes?.First;
+		public LinkedListNode<PriorityNodeRfc7540> FirstChild => this.childNodes?.First;
 
 		/// <summary>
 		/// Adds a child node to the node.
 		/// </summary>
 		/// <param name="Child">Child node.</param>
-		public void AddChildDependency(PriorityNode Child)
+		public void AddChildDependency(PriorityNodeRfc7540 Child)
 		{
-			PriorityNode OrgChildParent = Child.Parent;
+			PriorityNodeRfc7540 OrgChildParent = Child.Parent;
 			OrgChildParent?.RemoveChildDependency(Child);
 
-			PriorityNode Loop = this.Parent;
+			PriorityNodeRfc7540 Loop = this.Parent;
 			while (!(Loop is null) && Loop != Child)
 				Loop = Loop.Parent;
 
@@ -161,7 +158,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				OrgChildParent.AddChildDependency(this);
 			}
 
-			this.childNodes ??= new LinkedList<PriorityNode>();
+			this.childNodes ??= new LinkedList<PriorityNodeRfc7540>();
 			this.childNodes.AddLast(Child);
 
 			this.totalChildWeights += Child.Weight;
@@ -174,7 +171,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Child">Child node.</param>
 		/// <returns>If the child node was not found.</returns>
-		public bool RemoveChildDependency(PriorityNode Child)
+		public bool RemoveChildDependency(PriorityNodeRfc7540 Child)
 		{
 			if (Child.Parent != this)
 				return false;
@@ -201,8 +198,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			if (!(this.childNodes is null))
 			{
-				LinkedListNode<PriorityNode> Loop = this.childNodes.First;
-				PriorityNode Child;
+				LinkedListNode<PriorityNodeRfc7540> Loop = this.childNodes.First;
+				PriorityNodeRfc7540 Child;
 
 				while (!(Loop is null))
 				{
@@ -233,7 +230,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			CancellationToken? CancelToken)
 		{
 			int Available = Math.Min(RequestedResources, this.AvailableResources);
-			Available = Math.Min(Available, this.Root.AvailableResources);
+			Available = Math.Min(Available, this.root.AvailableResources);
 
 			if (Available == 0)
 			{
@@ -253,7 +250,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					Available = this.maxFrameSize;
 
 				this.windowSize -= Available;
-				this.Root.windowSize -= Available;
+				this.root.windowSize -= Available;
 
 				return Task.FromResult(Available);
 			}
@@ -278,6 +275,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			}
 
+			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
 
 			return NewSize;
@@ -301,6 +299,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					i = this.maxFrameSize;
 
 				this.windowSize -= i;
+				this.root.windowSize -= i;
 				Loop.Value.Request.TrySetResult(i);
 				Resources -= i;
 			}
@@ -325,6 +324,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			}
 
+			Resources = NewSize;
 			this.TriggerPendingIfAvailbleDown(ref Resources);
 
 			return NewSize;
@@ -336,8 +336,8 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (Resources <= 0)
 				return;
 
-			LinkedListNode<PriorityNode> ChildLoop = this.childNodes?.First;
-			PriorityNode Child;
+			LinkedListNode<PriorityNodeRfc7540> ChildLoop = this.childNodes?.First;
+			PriorityNodeRfc7540 Child;
 			int Resources0 = Resources;
 			int Part;
 			int Delta;
@@ -378,7 +378,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.pendingRequests = null;
 
-				LinkedListNode<PriorityNode> ChildLoop = this.childNodes?.First;
+				LinkedListNode<PriorityNodeRfc7540> ChildLoop = this.childNodes?.First;
 
 				while (!(ChildLoop is null))
 				{

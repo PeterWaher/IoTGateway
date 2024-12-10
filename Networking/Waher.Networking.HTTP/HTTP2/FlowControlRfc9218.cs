@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -9,9 +10,9 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class FlowControlRfc9218 : IFlowControl
 	{
-		private readonly LinkedList<PriorityNode>[] priorities = new LinkedList<PriorityNode>[8];
+		private readonly LinkedList<PriorityNodeRfc9218>[] priorities = new LinkedList<PriorityNodeRfc9218>[8];
 		private readonly Dictionary<int, StreamRec> streams = new Dictionary<int, StreamRec>();
-		private readonly PriorityNode root;
+		private readonly PriorityNodeRfc9218 root;
 		private readonly object synchObj = new object();
 		private ConnectionSettings settings;
 		private int lastNodeStreamId = -1;
@@ -21,7 +22,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private class StreamRec
 		{
 			public Http2Stream Stream;
-			public PriorityNode Node;
+			public PriorityNodeRfc9218 Node;
 			public int Priority;
 		}
 
@@ -32,7 +33,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public FlowControlRfc9218(ConnectionSettings Settings)
 		{
 			this.settings = Settings;
-			this.root = new PriorityNode(null, null, null, 1, this);
+			this.root = new PriorityNodeRfc9218(null, this);
 		}
 
 		/// <summary>
@@ -43,7 +44,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Root node.
 		/// </summary>
-		public PriorityNode Root => this.root;
+		public PriorityNodeRfc9218 Root => this.root;
 
 		/// <summary>
 		/// Updates remote settings.
@@ -52,6 +53,35 @@ namespace Waher.Networking.HTTP.HTTP2
 		public void UpdateSettings(ConnectionSettings Settings)
 		{
 			this.settings = Settings;
+		}
+
+		/// <summary>
+		/// Tries to get a priority node, given its associated Stream ID.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Node">Priority node, if found.</param>
+		/// <returns>If a priority node was found with the corresponding ID.</returns>
+		public bool TryGetPriorityNode(int StreamId, out PriorityNodeRfc9218 Node)
+		{
+			if (this.disposed)
+			{
+				Node = null;
+				return false;
+			}
+
+			lock (this.synchObj)
+			{
+				if (this.streams.TryGetValue(StreamId, out StreamRec Rec))
+				{
+					Node = Rec.Node;
+					return true;
+				}
+				else
+				{
+					Node = null;
+					return false;
+				}
+			}
 		}
 
 		/// <summary>
@@ -88,10 +118,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// default priority settings.
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
+		/// <param name="Rfc9218Priority">Priority, as defined by RFC 9218.</param>
+		/// <param name="Rfc9218Incremental">If stream is incremental</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId)
+		public int AddStreamForTest(int StreamId, int Rfc9218Priority, bool Rfc9218Incremental)
 		{
-			return this.AddStreamForTest(StreamId, this.settings, 16, 0, false);
+			return this.AddStreamForTest(StreamId, this.settings, Rfc9218Priority, Rfc9218Incremental);
 		}
 
 		/// <summary>
@@ -103,20 +135,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>Size of window associated with stream. Negative = error</returns>
 		public int AddStreamForTest(int StreamId, ConnectionSettings Settings)
 		{
-			return this.AddStreamForTest(StreamId, Settings, 16, 0, false);
-		}
-
-		/// <summary>
-		/// Tries to add a stream to flow control for testing purposes.
-		/// </summary>
-		/// <param name="StreamId">ID of stream to add.</param>
-		/// <param name="Weight">Weight</param>
-		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
-		/// <param name="Exclusive">If the stream is exclusive child.</param>
-		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency, bool Exclusive)
-		{
-			return this.AddStreamForTest(StreamId, this.settings, Weight, StreamIdDependency, Exclusive);
+			return this.AddStreamForTest(StreamId, Settings, 3, false);
 		}
 
 		/// <summary>
@@ -124,15 +143,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
 		/// <param name="Settings">Settings to use.</param>
-		/// <param name="Weight">Weight</param>
-		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
-		/// <param name="Exclusive">If the stream is exclusive child.</param>
+		/// <param name="Rfc9218Priority">Priority, as defined by RFC 9218.</param>
+		/// <param name="Rfc9218Incremental">If stream is incremental</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
 		public int AddStreamForTest(int StreamId, ConnectionSettings Settings,
-			byte Weight, int StreamIdDependency, bool Exclusive)
+			int Rfc9218Priority, bool Rfc9218Incremental)
 		{
-			Http2Stream Stream = new Http2Stream(StreamId, Settings);
-			return this.AddStream(Stream, Weight, StreamIdDependency, Exclusive);
+			Http2Stream Stream = new Http2Stream(StreamId, Settings)
+			{
+				Rfc9218Priority = Rfc9218Priority,
+				Rfc9218Incremental = Rfc9218Incremental
+			};
+
+			return this.AddStream(Stream, 0, 0, false);
 		}
 
 		/// <summary>
@@ -160,16 +183,16 @@ namespace Waher.Networking.HTTP.HTTP2
 				StreamRec Rec = new StreamRec()
 				{
 					Stream = Stream,
-					Node = new PriorityNode(null, this.root, Stream, Weight, this),
+					Node = new PriorityNodeRfc9218(Stream, this),
 					Priority = Priority
 				};
 
 				this.streams[Stream.StreamId] = Rec;
 
-				LinkedList<PriorityNode> Nodes = this.priorities[Priority];
+				LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Priority];
 				if (Nodes is null)
 				{
-					Nodes = new LinkedList<PriorityNode>();
+					Nodes = new LinkedList<PriorityNodeRfc9218>();
 					this.priorities[Priority] = Nodes;
 				}
 
@@ -204,14 +227,14 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Priority == Rec.Priority)
 					return true;
 
-				LinkedList<PriorityNode> Nodes = this.priorities[Rec.Priority];
+				LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Rec.Priority];
 				Nodes.Remove(Rec.Node);
 
 				Rec.Priority = Priority;
 				Nodes = this.priorities[Priority];
 				if (Nodes is null)
 				{
-					Nodes = new LinkedList<PriorityNode>();
+					Nodes = new LinkedList<PriorityNodeRfc9218>();
 					this.priorities[Priority] = Nodes;
 				}
 
@@ -248,14 +271,16 @@ namespace Waher.Networking.HTTP.HTTP2
 					Rec.Stream.State = StreamState.Closed;
 					this.streams.Remove(StreamId);
 
-					LinkedList<PriorityNode> Nodes = this.priorities[Rec.Priority];
-					Nodes.Remove(Rec.Node);
+					LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Rec.Priority];
+					Nodes?.Remove(Rec.Node);
 
 					if (this.lastNodeStreamId == StreamId)
 					{
 						this.lastNodeStreamId = 0;
 						this.lastRec = null;
 					}
+
+					Rec.Node.Dispose();
 
 					return true;
 				}
@@ -273,6 +298,20 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// longer controlled (i.e. it has been removed and/or closed).</returns>
 		public Task<int> RequestResources(int StreamId, int RequestedResources)
 		{
+			return this.RequestResources(StreamId, RequestedResources, null);
+		}
+
+		/// <summary>
+		/// Requests resources for a stream.
+		/// </summary>
+		/// <param name="StreamId">ID of stream requesting resources.</param>
+		/// <param name="RequestedResources">Amount of resources.</param>
+		/// <param name="CancelToken">Optional cancel token</param>
+		/// <returns>Amount of resources granted. If negative, the stream is no
+		/// longer controlled (i.e. it has been removed and/or closed).</returns>
+		public Task<int> RequestResources(int StreamId, int RequestedResources,
+			CancellationToken? CancelToken)
+		{
 			if (this.disposed)
 				return Task.FromResult(-1);
 
@@ -282,9 +321,11 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if (!this.streams.TryGetValue(StreamId, out this.lastRec))
 						return Task.FromResult(-1);
+
+					this.lastNodeStreamId = StreamId;
 				}
 
-				return this.lastRec.Node.RequestAvailableResources(RequestedResources);
+				return this.lastRec.Node.RequestAvailableResources(RequestedResources, CancelToken);
 			}
 		}
 
@@ -305,6 +346,8 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if (!this.streams.TryGetValue(StreamId, out this.lastRec))
 						return -1;
+
+					this.lastNodeStreamId = StreamId;
 				}
 
 				return this.lastRec.Node.ReleaseStreamResources(Resources);
@@ -328,6 +371,24 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Available > this.settings.ConnectionWindowSize)
 					this.settings.ConnectionWindowSize = Available;
 
+				int Left = Available;
+				for (int i = 0; i < 8; i++)
+				{
+					LinkedList<PriorityNodeRfc9218> Queue = this.priorities[i];
+					if (!(Queue is null))
+					{
+						foreach (PriorityNodeRfc9218 Node in Queue)
+						{
+							Node.TriggerPending(ref Left);
+							if (Left <= 0)
+								break;
+						}
+
+						if (Left <= 0)
+							break;
+					}
+				}
+
 				return Available;
 			}
 		}
@@ -341,6 +402,15 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				this.disposed = true;
 				this.root?.Dispose();
+
+				foreach (LinkedList<PriorityNodeRfc9218> Nodes in this.priorities)
+				{
+					if (Nodes is null)
+						continue;
+
+					foreach (PriorityNodeRfc9218 Node in Nodes)
+						Node.Dispose();
+				}
 			}
 		}
 	}

@@ -11,12 +11,12 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class FlowControlRfc7540 : IFlowControl
 	{
-		private readonly Dictionary<int, PriorityNode> nodes = new Dictionary<int, PriorityNode>();
+		private readonly Dictionary<int, PriorityNodeRfc7540> nodes = new Dictionary<int, PriorityNodeRfc7540>();
 		private readonly object synchObj = new object();
-		private readonly PriorityNode root;
+		private readonly PriorityNodeRfc7540 root;
 		private ConnectionSettings settings;
 		private int lastNodeStreamId = -1;
-		private PriorityNode lastNode = null;
+		private PriorityNodeRfc7540 lastNode = null;
 		private bool disposed = false;
 
 		/// <summary>
@@ -26,7 +26,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public FlowControlRfc7540(ConnectionSettings Settings)
 		{
 			this.settings = Settings;
-			this.root = new PriorityNode(null, null, null, 1, this);
+			this.root = new PriorityNodeRfc7540(null, null, null, 1, this);
 		}
 
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Root node.
 		/// </summary>
-		public PriorityNode Root => this.root;
+		public PriorityNodeRfc7540 Root => this.root;
 
 		/// <summary>
 		/// Updates remote settings.
@@ -54,7 +54,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Node">Priority node, if found.</param>
 		/// <returns>If a priority node was found with the corresponding ID.</returns>
-		public bool TryGetPriorityNode(int StreamId, out PriorityNode Node)
+		public bool TryGetPriorityNode(int StreamId, out PriorityNodeRfc7540 Node)
 		{
 			if (this.disposed)
 			{
@@ -84,7 +84,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (this.nodes.TryGetValue(StreamId, out PriorityNode Node))
+				if (this.nodes.TryGetValue(StreamId, out PriorityNodeRfc7540 Node))
 				{
 					Stream = Node.Stream;
 					return true;
@@ -168,14 +168,14 @@ namespace Waher.Networking.HTTP.HTTP2
 					return -1;
 
 				if (StreamIdDependency == 0 ||
-					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNode DependentOn))
+					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNodeRfc7540 DependentOn))
 				{
 					DependentOn = null;
 				}
 
-				PriorityNode Parent = DependentOn ?? this.root;
+				PriorityNodeRfc7540 Parent = DependentOn ?? this.root;
 
-				if (this.nodes.TryGetValue(Stream.StreamId, out PriorityNode Node))
+				if (this.nodes.TryGetValue(Stream.StreamId, out PriorityNodeRfc7540 Node))
 				{
 					bool Add = false;
 
@@ -196,7 +196,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 				else
 				{
-					Node = new PriorityNode(DependentOn, this.root, Stream, Weight, this);
+					Node = new PriorityNodeRfc7540(DependentOn, this.root, Stream, Weight, this);
 
 					if (Exclusive)
 						this.MoveChildren(DependentOn, Node);
@@ -209,9 +209,9 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
-		private void MoveChildren(PriorityNode From, PriorityNode To)
+		private void MoveChildren(PriorityNodeRfc7540 From, PriorityNodeRfc7540 To)
 		{
-			LinkedList<PriorityNode> Children = From.MoveChildrenFrom();
+			LinkedList<PriorityNodeRfc7540> Children = From.MoveChildrenFrom();
 			To.MoveChildrenTo(Children);
 		}
 
@@ -231,14 +231,14 @@ namespace Waher.Networking.HTTP.HTTP2
 			lock (this.synchObj)
 			{
 				if (StreamIdDependency == 0 ||
-					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNode DependentOn))
+					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNodeRfc7540 DependentOn))
 				{
 					DependentOn = null;
 				}
 
-				PriorityNode Parent = DependentOn ?? this.root;
+				PriorityNodeRfc7540 Parent = DependentOn ?? this.root;
 
-				if (!this.nodes.TryGetValue(Stream.StreamId, out PriorityNode Node))
+				if (!this.nodes.TryGetValue(Stream.StreamId, out PriorityNodeRfc7540 Node))
 					return false;
 
 				bool Add = false;
@@ -284,7 +284,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (!this.nodes.TryGetValue(StreamId, out PriorityNode Node))
+				if (!this.nodes.TryGetValue(StreamId, out PriorityNodeRfc7540 Node))
 					return false;
 
 				this.nodes.Remove(StreamId);
@@ -294,7 +294,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					this.lastNode = null;
 				}
 
-				PriorityNode Parent = Node.Parent;
+				PriorityNodeRfc7540 Parent = Node.Parent;
 				if (!(Parent is null))
 				{
 					Parent.RemoveChildDependency(Node);
@@ -303,7 +303,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 					while (Node.HasChildren)
 					{
-						PriorityNode Child = Node.FirstChild.Value;
+						PriorityNodeRfc7540 Child = Node.FirstChild.Value;
 						int ScaledWeight = (int)Math.Ceiling(Child.Weight * Scale);
 						if (ScaledWeight > 255)
 							ScaledWeight = 255;

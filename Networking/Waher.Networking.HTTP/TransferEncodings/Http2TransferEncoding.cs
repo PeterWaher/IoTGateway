@@ -68,7 +68,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </returns>
 		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
-			return Task.FromResult(0UL);    // TODO
+			return Task.FromResult(0UL);    
 		}
 
 		/// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -115,6 +117,15 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
+		/// Returns the rest of available data as a byte array.
+		/// </summary>
+		/// <returns>Bytes read.</returns>
+		public byte[] NextBytes()
+		{
+			return this.NextBytes(this.bufferSize - this.pos);
+		}
+
+		/// <summary>
 		/// Reads a specified number of bytes.
 		/// </summary>
 		/// <param name="NrBytes">Number of bytes to read.</param>
@@ -126,6 +137,33 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			byte[] Result = new byte[NrBytes];
 			Array.Copy(this.buffer, this.pos, Result, 0, NrBytes);
+			this.pos += NrBytes;
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Reads a string using the rest of available data.
+		/// </summary>
+		/// <param name="Encoding">Text encoding to use.</param>
+		/// <returns>String read.</returns>
+		public string NextString(Encoding Encoding)
+		{
+			return this.NextString(Encoding, this.bufferSize - this.pos);
+		}
+
+		/// <summary>
+		/// Reads a string using a specified number of bytes.
+		/// </summary>
+		/// <param name="Encoding">Text encoding to use.</param>
+		/// <param name="NrBytes">Number of bytes to read.</param>
+		/// <returns>String read.</returns>
+		public string NextString(Encoding Encoding, int NrBytes)
+		{
+			if (this.pos + NrBytes > this.bufferSize)
+				throw new IOException("Unexpected end of data.");
+
+			string Result = Encoding.GetString(this.buffer, this.pos, NrBytes);
 			this.pos += NrBytes;
 
 			return Result;

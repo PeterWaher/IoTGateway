@@ -38,16 +38,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		int AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive);
 
 		/// <summary>
-		/// Updates the priority of a stream in the flow control.
-		/// </summary>
-		/// <param name="Stream">Stream to update.</param>
-		/// <param name="Weight">Weight</param>
-		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
-		/// <param name="Exclusive">If the stream is exclusive child.</param>
-		/// <returns>If the stream could be updated.</returns>
-		bool UpdatePriority(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive);
-
-		/// <summary>
 		/// Tries to remove a string from flow control.
 		/// </summary>
 		/// <param name="Stream">Stream to remove.</param>
@@ -84,5 +74,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
 		int ReleaseConnectionResources(int Resources);
+
+		/// <summary>
+		/// Connection is being terminated. Streams above <paramref name="LastPermittedStreamId"/>
+		/// can be closed.
+		/// </summary>
+		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
+		void GoingAway(int LastPermittedStreamId);
 	}
 }

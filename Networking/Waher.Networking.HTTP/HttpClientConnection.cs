@@ -67,6 +67,7 @@ namespace Waher.Networking.HTTP
 		private int http2FrameLength = 0;
 		private int http2StreamId = 0;
 		private int http2LastCreatedStreamId = 0;
+		private int http2LastPermittedStreamId = int.MaxValue;
 		private int http2FramePos = 0;
 		private FrameType http2FrameType = 0;
 		private ConnectionSettings localSettings = null;
@@ -74,6 +75,7 @@ namespace Waher.Networking.HTTP
 		private IFlowControl flowControl = null;
 		private HeaderReader http2HeaderReader = null;
 		private HeaderWriter http2HeaderWriter = null;
+		private Dictionary<int, PrioritySettings> rfc9218PrioritySettings = null;
 		private byte http2FrameFlags = 0;
 		private byte[] http2Frame = null;
 
@@ -81,7 +83,6 @@ namespace Waher.Networking.HTTP
 		internal ConnectionSettings RemoteSettings => this.remoteSettings;
 		internal HeaderReader HttpHeaderReader => this.http2HeaderReader;
 		internal HeaderWriter HttpHeaderWriter => this.http2HeaderWriter;
-
 
 		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, bool Encrypted, params ISniffer[] Sniffers)
 			: base(false, Sniffers)
@@ -587,17 +588,14 @@ namespace Waher.Networking.HTTP
 						sb.Append(", ACK");
 					break;
 
-				case FrameType.WindowUpdate:
-					break;
-
-				case FrameType.PriorityUpdate:
-					break;
-
 				case FrameType.Priority:
-				// TODO: process frame and return response.
-				case FrameType.PushPromise:
-				// TODO: process frame and return response.
+				case FrameType.WindowUpdate:
+				case FrameType.PriorityUpdate:
 				case FrameType.GoAway:
+					// No flags.
+					break;
+
+				case FrameType.PushPromise:
 				// TODO: process frame and return response.
 				default:
 					sb.Append(", Flags ");
@@ -616,7 +614,11 @@ namespace Waher.Networking.HTTP
 				{
 					sb = new StringBuilder();
 
-					sb.Append("RX: ");
+					if (this.http2StreamId > this.http2LastPermittedStreamId)
+						sb.Append("Ignoring: ");
+					else
+						sb.Append("RX: ");
+
 					sb.Append(this.http2FrameType.ToString());
 					AppendFlags(this.http2FrameType, this.http2FrameFlags, sb);
 					sb.Append(", Stream ");
@@ -627,6 +629,9 @@ namespace Waher.Networking.HTTP
 
 					await this.Information(sb.ToString());
 				}
+
+				if (this.http2StreamId > this.http2LastPermittedStreamId)
+					return true;
 
 				if (this.reader is null)
 					this.reader = new HTTP2.BinaryReader(this.http2Frame, 0, this.http2FrameLength);
@@ -735,6 +740,18 @@ namespace Waher.Networking.HTTP
 
 						if (StreamCreated)
 						{
+							if (!(this.rfc9218PrioritySettings is null) &&
+								this.rfc9218PrioritySettings.TryGetValue(this.http2StreamId, out PrioritySettings PrioritySettings))
+							{
+								this.rfc9218PrioritySettings.Remove(this.http2StreamId);
+
+								if (PrioritySettings.Rfc9218Priority.HasValue)
+									Stream.Rfc9218Priority = PrioritySettings.Rfc9218Priority.Value;
+
+								if (PrioritySettings.Rfc9218Incremental.HasValue)
+									Stream.Rfc9218Incremental = PrioritySettings.Rfc9218Incremental.Value;
+							}
+
 							int OutputWindow = this.flowControl.AddStream(Stream, Weight, (int)StreamIdDependency, Exclusive);
 							if (OutputWindow < 0)
 								return await this.ReturnHttp2Error(Http2Error.RefusedStream, false);
@@ -755,8 +772,8 @@ namespace Waher.Networking.HTTP
 								await this.Information(sb.ToString());
 							}
 						}
-						else if (Priority)
-							this.flowControl.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
+						else if (Priority && this.flowControl is FlowControlRfc7540 FlowControlRfc7540_2)
+							FlowControlRfc7540_2.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
 
 						if (EndHeaders)
 						{
@@ -840,7 +857,22 @@ namespace Waher.Networking.HTTP
 						break;
 
 					case FrameType.Priority:
-						// TODO: process frame and return response.
+						if (this.http2StreamId == 0)
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+						if (this.reader.BytesLeft != 5)
+							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
+
+						StreamIdDependency = this.reader.NextUInt32();
+						Exclusive = (StreamIdDependency & 0x80000000) != 0;
+						Weight = this.reader.NextByte();
+						StreamIdDependency &= 0x7fffffff;
+
+						if (this.flowControl is FlowControlRfc7540 FlowControlRfc7540 &&
+							this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+						{
+							FlowControlRfc7540.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
+						}
 						break;
 
 					case FrameType.ResetStream:
@@ -850,9 +882,14 @@ namespace Waher.Networking.HTTP
 						if (this.reader.BytesLeft != 4)
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
 
-						Http2Error? Error = (Http2Error)(this.reader.NextUInt32() & 0x7fffffff);
+						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
 						if (this.HasSniffers)
-							await this.Error(Error.ToString());
+						{
+							if (Error.Value != Http2Error.NoError)
+								await this.Error("Reset Stream: " + Error.ToString());
+							else
+								await this.Information("Reset Stream: " + Error.ToString());
+						}
 
 						this.flowControl.RemoveStream(this.http2StreamId);
 						break;
@@ -931,7 +968,23 @@ namespace Waher.Networking.HTTP
 						break;
 
 					case FrameType.GoAway:
-						// TODO: process frame and return response.
+						if (this.http2StreamId != 0)
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
+
+						if (this.reader.BytesLeft < 8)
+							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
+
+						this.http2LastPermittedStreamId = (int)(this.reader.NextUInt32() & 0x7fffffff);
+						Error = (Http2Error)this.reader.NextUInt32();
+						if (this.HasSniffers)
+						{
+							if (Error.Value != Http2Error.NoError)
+								await this.Error("Going away: " + Error.ToString());
+							else
+								await this.Information("Going away: " + Error.ToString());
+						}
+
+						this.flowControl?.GoingAway(this.http2LastPermittedStreamId);
 						break;
 
 					case FrameType.WindowUpdate:
@@ -1006,12 +1059,42 @@ namespace Waher.Networking.HTTP
 							StreamIdDependency = this.reader.NextUInt32();
 							StreamIdDependency &= 0x7fffffff;
 
-							// TODO: Structured fields: https://www.rfc-editor.org/rfc/rfc8941.html
-							// TODO: Update priority
+							string s = this.reader.NextString(Encoding.ASCII);
+							int? Rfc9218Priority = null;
+							bool? Rfc9218Incremental = null;
+
+							foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(s))
+							{
+								switch (P.Key)
+								{
+									case "u":
+										if (int.TryParse(P.Value, out int i) && i >= 0 && i <= 7)
+											Rfc9218Priority = i;
+										break;
+
+									case "i":
+										Rfc9218Incremental = true;
+										break;
+								}
+							}
+
+							if (this.flowControl is FlowControlRfc9218 FlowControlRfc9218)
+							{
+								if (this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+									FlowControlRfc9218.UpdatePriority(Stream, Rfc9218Priority, Rfc9218Incremental);
+								else if (this.http2StreamId > this.http2LastCreatedStreamId)
+								{
+									this.rfc9218PrioritySettings ??= new Dictionary<int, PrioritySettings>();
+									this.rfc9218PrioritySettings[this.http2StreamId] = new PrioritySettings()
+									{
+										Rfc9218Priority = Rfc9218Priority,
+										Rfc9218Incremental = Rfc9218Incremental
+									};
+								}
+							}
 							break;
 						}
 						break;
-
 				}
 
 				return true;

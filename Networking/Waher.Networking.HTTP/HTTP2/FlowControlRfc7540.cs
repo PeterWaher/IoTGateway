@@ -417,5 +417,34 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.root?.Dispose();
 			}
 		}
+
+		/// <summary>
+		/// Connection is being terminated. Streams above <paramref name="LastPermittedStreamId"/>
+		/// can be closed.
+		/// </summary>
+		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
+		public void GoingAway(int LastPermittedStreamId)
+		{
+			LinkedList<int> ToRemove = null;
+
+			lock (this.synchObj)
+			{
+				foreach (int StreamId in this.nodes.Keys)
+				{
+					if (StreamId > LastPermittedStreamId)
+					{
+						ToRemove ??= new LinkedList<int>();
+						ToRemove.AddLast(StreamId);
+					}
+				}
+			}
+
+			if (!(ToRemove is null))
+			{
+				foreach (int StreamId in ToRemove)
+					this.RemoveStream(StreamId);
+			}
+		}
+
 	}
 }

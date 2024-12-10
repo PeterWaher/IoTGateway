@@ -206,11 +206,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Updates the priority of a stream in the flow control.
 		/// </summary>
 		/// <param name="Stream">Stream to update.</param>
-		/// <param name="Weight">Weight</param>
-		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
-		/// <param name="Exclusive">If the stream is exclusive child.</param>
+		/// <param name="Rfc9218Priority">Priority, as defined by RFC 9218.</param>
+		/// <param name="Rfc9218Incremental">If stream is incremental</param>
 		/// <returns>If the stream could be updated.</returns>
-		public bool UpdatePriority(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive)
+		public bool UpdatePriority(Http2Stream Stream, int? Rfc9218Priority, bool? Rfc9218Incremental)
 		{
 			if (this.disposed)
 				return false;
@@ -220,25 +219,31 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!this.streams.TryGetValue(Stream.StreamId, out StreamRec Rec))
 					return false;
 
-				int Priority = Stream.Rfc9218Priority;
-				if (Priority < 0 || Priority > 7)
-					Priority = 3;
+				if (Rfc9218Incremental.HasValue)
+					Rec.Stream.Rfc9218Incremental = Rfc9218Incremental.Value;
 
-				if (Priority == Rec.Priority)
-					return true;
-
-				LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Rec.Priority];
-				Nodes.Remove(Rec.Node);
-
-				Rec.Priority = Priority;
-				Nodes = this.priorities[Priority];
-				if (Nodes is null)
+				if (Rfc9218Priority.HasValue)
 				{
-					Nodes = new LinkedList<PriorityNodeRfc9218>();
-					this.priorities[Priority] = Nodes;
-				}
+					int Priority = Rfc9218Priority.Value;
+					if (Priority < 0 || Priority > 7)
+						Priority = 3;
 
-				Nodes.AddLast(Rec.Node);
+					if (Priority != Rec.Priority)
+					{
+						LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Rec.Priority];
+						Nodes.Remove(Rec.Node);
+
+						Rec.Priority = Priority;
+						Nodes = this.priorities[Priority];
+						if (Nodes is null)
+						{
+							Nodes = new LinkedList<PriorityNodeRfc9218>();
+							this.priorities[Priority] = Nodes;
+						}
+
+						Nodes.AddLast(Rec.Node);
+					}
+				}
 
 				return true;
 			}
@@ -413,5 +418,34 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 			}
 		}
+
+		/// <summary>
+		/// Connection is being terminated. Streams above <paramref name="LastPermittedStreamId"/>
+		/// can be closed.
+		/// </summary>
+		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
+		public void GoingAway(int LastPermittedStreamId)
+		{
+			LinkedList<int> ToRemove = null;
+
+			lock (this.synchObj)
+			{
+				foreach (int StreamId in this.streams.Keys)
+				{
+					if (StreamId > LastPermittedStreamId)
+					{
+						ToRemove ??= new LinkedList<int>();
+						ToRemove.AddLast(StreamId);
+					}
+				}
+			}
+
+			if (!(ToRemove is null))
+			{
+				foreach (int StreamId in ToRemove)
+					this.RemoveStream(StreamId);
+			}
+		}
+
 	}
 }

@@ -728,6 +728,13 @@ namespace Waher.Networking.HTTP
 							Output.Append(this.httpServer.Name);
 						}
 
+						Output.Append("\r\nAlt-Svc: h2");
+						if (!this.clientConnection.Encrypted)
+							Output.Append('c');
+						Output.Append("=\":");
+						Output.Append(this.clientConnection.Port.ToString());
+						Output.Append("\"; ma=3600");
+
 						if (!string.IsNullOrEmpty(this.contentLanguage))
 						{
 							Output.Append("\r\nContent-Language: ");

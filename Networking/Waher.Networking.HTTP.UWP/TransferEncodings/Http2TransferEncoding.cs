@@ -10,12 +10,14 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class Http2TransferEncoding : TransferEncoding
 	{
+		private readonly byte[] buffer;
+		private readonly int bufferSize;
 		private readonly Http2Stream stream;
 		private Encoding dataEncoding = null;
 		private long? contentLength;
 		private long contentTransmitted = 0;
+		private int pos = 0;
 		private bool ended = false;
-		private bool dataIsText = false;
 
 		/// <summary>
 		/// Implements HTTP/2 transfer, in accordance with RFC 7540.
@@ -27,6 +29,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		{
 			this.stream = Stream;
 			this.contentLength = ContentLength;
+
+			this.bufferSize = Stream.Connection.LocalSettings.MaxFrameSize;
+			if (ContentLength.HasValue && ContentLength.Value < this.bufferSize)
+				this.bufferSize = (int)ContentLength.Value;
+
+			this.buffer = new byte[this.bufferSize];
 		}
 
 		/// <summary>
@@ -35,11 +43,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public Encoding DataEncoding
 		{
 			get => this.dataEncoding;
-			internal set
-			{
-				this.dataEncoding = value;
-				this.dataIsText = !(value is null);
-			}
+			internal set => this.dataEncoding = value;
 		}
 
 		/// <summary>
@@ -64,7 +68,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </returns>
 		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
-			return Task.FromResult(0UL);    // TODO
+			return Task.FromResult(0UL);    
 		}
 
 		/// <summary>
@@ -80,36 +84,61 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				this.contentTransmitted += NrBytes;
 				this.ended = this.contentLength.HasValue && this.contentTransmitted >= this.contentLength.Value;
 
-				if (!await this.stream.WriteData(Data, Offset, NrBytes, this.ended))
-					return false;
+				while (NrBytes > 0)
+				{
+					int i = Math.Min(NrBytes, this.bufferSize - this.pos);
+					Array.Copy(Data, Offset, this.buffer, this.pos, i);
+					Offset += i;
+					NrBytes -= i;
+					this.pos += i;
 
-				if (this.dataIsText && this.stream.Connection.HasSniffers)
-					await this.stream.Connection.TransmitText(this.dataEncoding.GetString(Data, Offset, NrBytes));
+					bool Last = this.ended && NrBytes == 0;
+
+					if (this.pos == this.bufferSize || Last)
+					{
+						if (!await this.stream.WriteData(this.buffer, 0, this.pos, Last, this.dataEncoding))
+							return false;
+
+						this.pos = 0;
+					}
+				}
 			}
-			
+
 			return true;
 		}
 
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override Task<bool> FlushAsync()
+		public override async Task<bool> FlushAsync()
 		{
-			return Task.FromResult(true);
+			if (this.pos > 0)
+			{
+				if (!await this.stream.WriteData(this.buffer, 0, this.pos, this.ended, this.dataEncoding))
+					return false;
+
+				this.pos = 0;
+			}
+
+			return true;
 		}
 
 		/// <summary>
 		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
 		/// </summary>
-		public override Task<bool> ContentSentAsync()
+		public override async Task<bool> ContentSentAsync()
 		{
 			if (!this.ended)
 			{
 				this.ended = true;
-				return this.stream.WriteData(Array.Empty<byte>(), 0, 0, this.ended);
+
+				if (!await this.stream.WriteData(this.buffer, 0, this.pos, this.ended, this.dataEncoding))
+					return false;
+
+				this.pos = 0;
 			}
-			else
-				return Task.FromResult(true);
+
+			return true;
 		}
 	}
 }

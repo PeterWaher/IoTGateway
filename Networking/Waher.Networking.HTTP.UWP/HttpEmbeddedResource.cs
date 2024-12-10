@@ -55,37 +55,22 @@ namespace Waher.Networking.HTTP
 		/// If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).
 		/// </summary>
-		public override bool Synchronous
-		{
-			get { return true; }
-		}
+		public override bool Synchronous => true;
 
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get { return false; }
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get { return false; }
-		}
+		public override bool UserSessions => false;
 
 		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
-		public bool AllowsGET
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public bool AllowsGET => true;
 
 		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
@@ -104,13 +89,12 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			using (Stream f = this.assembly.GetManifestResourceStream(this.embeddedResourceName))
-			{
-                if (f is null)
-                    throw new NotFoundException("Resource not found: " + this.embeddedResourceName);
+			Stream f = this.assembly.GetManifestResourceStream(this.embeddedResourceName)
+				?? throw new NotFoundException("Resource not found: " + this.embeddedResourceName);
 
-				if (this.etag is null)
-					this.etag = this.ComputeETag(f);
+			try
+			{
+				this.etag ??= this.ComputeETag(f);
 
 				if (!(Request.Header.IfNoneMatch is null) && Request.Header.IfNoneMatch.Value == this.etag)
 					throw new NotModifiedException();
@@ -138,6 +122,10 @@ namespace Waher.Networking.HTTP
 						Pos += i;
 					}
 				}
+			}
+			finally
+			{
+				f.Dispose();
 			}
 		}
 

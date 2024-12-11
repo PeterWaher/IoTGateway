@@ -167,10 +167,12 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.nodes.Count >= this.settings.MaxConcurrentStreams)
 					return -1;
 
-				if (StreamIdDependency == 0 ||
-					!this.nodes.TryGetValue(StreamIdDependency, out PriorityNodeRfc7540 DependentOn))
+				if (!this.nodes.TryGetValue(StreamIdDependency, out PriorityNodeRfc7540 DependentOn))
 				{
-					DependentOn = null;
+					if (StreamIdDependency == 0)
+						DependentOn = this.root; 
+					else
+						DependentOn = null;
 				}
 
 				PriorityNodeRfc7540 Parent = DependentOn ?? this.root;
@@ -198,7 +200,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					Node = new PriorityNodeRfc7540(DependentOn, this.root, Stream, Weight, this);
 
-					if (Exclusive)
+					if (Exclusive && !(DependentOn is null))
 						this.MoveChildren(DependentOn, Node);
 
 					Parent.AddChildDependency(Node);

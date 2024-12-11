@@ -415,6 +415,29 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(3, Stream2.StreamId);
 		}
 
+		[TestMethod]
+		public async Task Test_14_BasicExclusiveFlowControl()
+		{
+			ConnectionSettings Settings = new();
+			using FlowControlRfc7540 FlowControl = new(Settings);
+
+			FlowControl.AddStreamForTest(1, 16, 0, true);
+
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+
+			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node));
+			Assert.AreEqual(0, Node.AvailableResources);
+			Assert.AreEqual(0, FlowControl.Root.AvailableResources);
+
+			Assert.IsTrue(FlowControl.TryGetStream(1, out Http2Stream Stream));
+			Assert.AreEqual(1, Stream.StreamId);
+		}
 
 		/* 
 		 * delayed release stream resources => trigger

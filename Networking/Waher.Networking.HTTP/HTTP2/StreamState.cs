@@ -51,11 +51,6 @@
 		/// <summary>
 		/// The "closed" state is the terminal state.
 		/// </summary>
-		Closed,
-
-		/// <summary>
-		/// Stream is upgraded to a Web Socket, using RFC 8441
-		/// </summary>
-		WebSocket
+		Closed
 	}
 }

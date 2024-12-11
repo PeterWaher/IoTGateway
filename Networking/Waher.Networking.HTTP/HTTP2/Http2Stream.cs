@@ -100,6 +100,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal HttpClientConnection Connection => this.connection;
 
 		/// <summary>
+		/// If the stream has been upgraded to a web-socket.
+		/// </summary>
+		public bool UpgradedToWebSocket => this.upgradedToWebSocket;
+
+		/// <summary>
 		/// Priority, as defined in RFC 9218
 		/// </summary>
 		public int Rfc9218Priority
@@ -219,14 +224,22 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Buffer">Buffer containing data payload.</param>
 		/// <param name="Position">Position into buffer where data payload starts.</param>
 		/// <param name="Count">Number of data bytes.</param>
-		/// <returns>If successful adding headers to the stream.</returns>
+		/// <returns>If data was received ok (true), or if data was more than allowed and therefore
+		/// rejected (false).</returns>
 		public async Task<bool> DataReceived(byte[] Buffer, int Position, int Count)
 		{
 			this.dataBytesReceived += Count;
+
 			if (this.dataBytesReceived > this.dataInputWindowSize)
 			{
 				this.state = StreamState.Closed;
 				return false;
+			}
+			else if (this.upgradedToWebSocket)
+			{
+				await this.webSocket.WebSocketDataReceived(Buffer, Position, Count);
+				// Ignore web-socket errors.
+				return true;
 			}
 			else
 			{
@@ -323,7 +336,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.webSocket = WebSocket;
 			this.upgradedToWebSocket = true;
-			this.state = StreamState.WebSocket;
+			this.state = StreamState.Open;
 		}
 	}
 }

@@ -538,7 +538,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Transfer encoding in response.
 		/// </summary>
-		public TransferEncoding TransferEncoding => this.transferEncoding ?? this.desiredTransferEncoding;
+		public TransferEncoding TransferEncoding
+		{
+			get => this.transferEncoding ?? this.desiredTransferEncoding;
+			internal set => this.transferEncoding = value;
+		}
 
 		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
@@ -693,7 +697,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task StartSendResponse(bool ExpectContent)
+		internal async Task StartSendResponse(bool ExpectContent)
 		{
 			if (this.transferEncoding is null)
 			{
@@ -895,7 +899,7 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength);
+					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, this.http2Stream.UpgradedToWebSocket);
 					this.transferEncoding = Http2TransferEncoding;
 
 					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;

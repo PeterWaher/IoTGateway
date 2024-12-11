@@ -40,7 +40,7 @@ namespace Waher.Networking.HTTP.Test
 				File.Delete("WebSocket.xml");
 				xmlSniffer = xmlSniffer = new XmlFileSniffer("WebSocket.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
-						int.MaxValue, BinaryPresentationMethod.Hexadecimal);
+						int.MaxValue, BinaryPresentationMethod.ByteCount);
 			}
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
@@ -376,8 +376,8 @@ namespace Waher.Networking.HTTP.Test
 			await Client.ConnectAsync(new Uri("ws://localhost:8081/ws"),
 				new HttpMessageInvoker(Handler), CancellationToken.None);
 
-			await Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
-				WebSocketMessageType.Binary, true, CancellationToken.None);
+			Task T1 = Task.Run(() => Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
+				WebSocketMessageType.Binary, true, CancellationToken.None));
 
 			Task _ = Task.Delay(5000).ContinueWith((_) =>
 			{
@@ -387,7 +387,8 @@ namespace Waher.Networking.HTTP.Test
 					Result.TrySetException(new TimeoutException());
 			});
 
-			await Result.Task;
+			await Task.WhenAny(Result.Task, T1);
+
 			Assert.Fail("Binary data received, contrary to expectation.");
 		}
 

@@ -13,6 +13,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		private readonly byte[] buffer;
 		private readonly int bufferSize;
 		private readonly Http2Stream stream;
+		private readonly bool leaveStreamOpen;
 		private Encoding dataEncoding = null;
 		private long? contentLength;
 		private long contentTransmitted = 0;
@@ -24,7 +25,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		/// <param name="Stream">HTTP/2 stream.</param>
 		/// <param name="ContentLength">Content-Length, if known.</param>
-		public Http2TransferEncoding(Http2Stream Stream, long? ContentLength)
+		/// <param name="LeaveStreamOpen">If stream should be left open after transmission.</param>
+		public Http2TransferEncoding(Http2Stream Stream, long? ContentLength, 
+			bool LeaveStreamOpen)
 			: base()
 		{
 			this.stream = Stream;
@@ -35,6 +38,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				this.bufferSize = (int)ContentLength.Value;
 
 			this.buffer = new byte[this.bufferSize];
+			this.leaveStreamOpen = LeaveStreamOpen;
 		}
 
 		/// <summary>
@@ -54,6 +58,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			get => this.contentLength;
 			internal set => this.contentLength = value;
 		}
+
+		/// <summary>
+		/// If stream should be left open after transmission.
+		/// </summary>
+		public bool LeaveStreamOpen => this.leaveStreamOpen;
 
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
@@ -130,7 +139,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		{
 			if (!this.ended)
 			{
-				this.ended = true;
+				if (!this.leaveStreamOpen)
+					this.ended = true;
 
 				if (!await this.stream.WriteData(this.buffer, 0, this.pos, this.ended, this.dataEncoding))
 					return false;

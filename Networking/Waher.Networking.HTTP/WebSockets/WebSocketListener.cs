@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP.HTTP2;
+using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -250,7 +251,9 @@ namespace Waher.Networking.HTTP.WebSockets
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
 
 			Stream.Upgrade(Socket);
+			//Response.TransferEncoding ??= new Http2TransferEncoding(Stream, null, true);
 
+			await Response.StartSendResponse(true);
 			await Response.SendResponse();
 
 			await this.Connected.Raise(this, new WebSocketEventArgs(Socket));

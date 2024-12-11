@@ -15,8 +15,10 @@ using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Console.Worker;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
+using Waher.Script.Functions.Logging;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -858,8 +860,16 @@ namespace Waher.Networking.HTTP
 								Protocol.Value != "websocket" ||
 								!this.server.TryGetResource(Stream.Headers.Resource, out HttpResource Resource, out string SubPath) ||
 								!(Resource is WebSocketListener WebSocketListener) ||
-								(!string.IsNullOrEmpty(SubPath) && !Resource.HandlesSubPaths) ||
-								!await WebSocketListener.Connect(Stream))
+								(!string.IsNullOrEmpty(SubPath) && !Resource.HandlesSubPaths))
+							{
+								this.flowControl.RemoveStream(this.http2StreamId);
+								return await this.ReturnHttp2Error(Http2Error.Cancel, false);
+							}
+
+							this.http2HeaderWriter ??= new HeaderWriter(this.localSettings.HeaderTableSize,
+								this.localSettings.MaxHeaderListSize);
+
+							if (!await WebSocketListener.Connect(Stream))
 							{
 								this.flowControl.RemoveStream(this.http2StreamId);
 								return await this.ReturnHttp2Error(Http2Error.Cancel, false);
@@ -894,13 +904,7 @@ namespace Waher.Networking.HTTP
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true);
 
 						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
-						if (this.HasSniffers)
-						{
-							if (Error.Value != Http2Error.NoError)
-								await this.Error("Reset Stream: " + Error.ToString());
-							else
-								await this.Information("Reset Stream: " + Error.ToString());
-						}
+						await this.LogError(Error.Value);
 
 						this.flowControl.RemoveStream(this.http2StreamId);
 						break;
@@ -987,13 +991,7 @@ namespace Waher.Networking.HTTP
 
 						this.http2LastPermittedStreamId = (int)(this.reader.NextUInt32() & 0x7fffffff);
 						Error = (Http2Error)this.reader.NextUInt32();
-						if (this.HasSniffers)
-						{
-							if (Error.Value != Http2Error.NoError)
-								await this.Error("Going away: " + Error.ToString());
-							else
-								await this.Information("Going away: " + Error.ToString());
-						}
+						await this.LogError(Error.Value);
 
 						this.flowControl?.GoingAway(this.http2LastPermittedStreamId);
 						break;
@@ -1160,10 +1158,35 @@ namespace Waher.Networking.HTTP
 			return true;
 		}
 
-		private async Task<bool> ReturnHttp2Error(Http2Error ErrorCode, bool ConnectionError)
+		private static bool IsError(Http2Error Error)
+		{
+			switch (Error)
+			{
+				case Http2Error.NoError:
+				case Http2Error.StreamClosed:
+					return false;
+
+				default:
+					return true;
+			}
+		}
+
+		private Task LogError(Http2Error ErrorCode)
 		{
 			if (this.HasSniffers)
-				await this.Error(ErrorCode.ToString());
+			{
+				if (IsError(ErrorCode))
+					return this.Error(ErrorCode.ToString());
+				else
+					return this.Information(ErrorCode.ToString());
+			}
+			else
+				return Task.CompletedTask;
+		}
+
+		private async Task<bool> ReturnHttp2Error(Http2Error ErrorCode, bool ConnectionError)
+		{
+			await this.LogError(ErrorCode);
 
 			int i = (int)ErrorCode;
 

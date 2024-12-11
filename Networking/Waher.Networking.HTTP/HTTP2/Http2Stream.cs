@@ -323,6 +323,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.webSocket = WebSocket;
 			this.upgradedToWebSocket = true;
+			this.state = StreamState.WebSocket;
 		}
 	}
 }

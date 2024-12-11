@@ -245,8 +245,6 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 
 			Response.StatusCode = 200;
-			Response.SetHeader("Upgrade", "websocket");
-			Response.SetHeader("Connection", "Upgrade");
 
 			if (!(WebSocketProtocol is null))
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);

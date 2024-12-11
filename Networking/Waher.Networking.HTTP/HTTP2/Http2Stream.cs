@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking.HTTP.WebSockets;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -19,8 +20,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		private MemoryStream buildingHeaders = null;
 		private TemporaryStream inputDataStream = null;
 		private StreamState state = StreamState.Idle;
+		private WebSocket webSocket = null;
 		private int rfc9218Priority = 3;
 		private bool rfc9218Incremental = false;
+		private bool upgradedToWebSocket = false;
 		private long headerBytesReceived = 0;
 		private long dataBytesReceived = 0;
 		private long dataInputWindowSize;
@@ -316,5 +319,10 @@ namespace Waher.Networking.HTTP.HTTP2
 			return true;
 		}
 
+		internal void Upgrade(WebSocket WebSocket)
+		{
+			this.webSocket = WebSocket;
+			this.upgradedToWebSocket = true;
+		}
 	}
 }

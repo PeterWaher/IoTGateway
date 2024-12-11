@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.HTTP.HTTP2;
 using Waher.Security;
+#if WINDOWS_UWP
+using Windows.Networking.Sockets;
+#endif
 
 namespace Waher.Networking.HTTP.WebSockets
 {
@@ -165,6 +170,94 @@ namespace Waher.Networking.HTTP.WebSockets
 			await Response.SendResponse();
 
 			await this.Connected.Raise(this, new WebSocketEventArgs(Socket));
+		}
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Stream">HTTP/2 stream being upgraded to a Web Socket.</param>
+		/// <returns>If connection and conversion was possible.</returns>
+		public async virtual Task<bool> Connect(Http2Stream Stream)
+		{
+			string WebSocketProtocol = null;
+			int? WebSocketVersion;
+			int i;
+
+			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Protocol", out HttpField Field))
+			{
+				string[] Options = Field.Value.Split(',');
+
+				foreach (string Option in Options)
+				{
+					i = Array.IndexOf(this.subProtocols, Option.Trim().ToLower());
+					if (i >= 0)
+					{
+						WebSocketProtocol = this.subProtocols[i];
+						break;
+					}
+				}
+
+				if (WebSocketProtocol is null)
+					return false;
+			}
+
+			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Version", out Field) &&
+				int.TryParse(Field.Value, out i))
+			{
+				if (i < 13)
+					return false;
+
+				WebSocketVersion = i;
+			}
+			else
+				return false;
+
+			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Extensions", out Field))
+			{
+				// TODO: §9.1
+			}
+
+#if WINDOWS_UWP
+			StreamSocket UnderlyingSocket = Stream.Connection.Client;
+			HttpRequest Request = new HttpRequest(Stream.Connection.Server, 
+				Stream.Headers, null,
+				UnderlyingSocket.Information.RemoteAddress.ToString() + ":" + UnderlyingSocket.Information.RemotePort,
+				UnderlyingSocket.Information.LocalAddress.ToString() + ":" + UnderlyingSocket.Information.LocalPort,
+				Stream);
+#else
+			Socket UnderlyingSocket = Stream.Connection.Client.Client.Client;
+			HttpRequest Request = new HttpRequest(Stream.Connection.Server, 
+				Stream.Headers, null,
+				UnderlyingSocket.RemoteEndPoint.ToString(),
+				UnderlyingSocket.LocalEndPoint.ToString(),
+				Stream);
+#endif
+
+			HttpResponse Response = new HttpResponse(Stream.Connection.Client,
+				Stream.Connection, Stream.Connection.Server, Request);
+			WebSocket Socket = new WebSocket(this, Stream, Request, Response);
+
+			EventHandlerAsync<WebSocketEventArgs> Accept = this.Accept;
+			if (!(Accept is null))
+			{
+				if (!await Accept.Raise(this, new WebSocketEventArgs(Socket)))
+					return false;
+			}
+
+			Response.StatusCode = 200;
+			Response.SetHeader("Upgrade", "websocket");
+			Response.SetHeader("Connection", "Upgrade");
+
+			if (!(WebSocketProtocol is null))
+				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
+
+			Stream.Upgrade(Socket);
+
+			await Response.SendResponse();
+
+			await this.Connected.Raise(this, new WebSocketEventArgs(Socket));
+
+			return true;
 		}
 
 		/// <summary>

@@ -34,6 +34,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		public const bool DefaultHttp2EnablePush = true;
 
 		/// <summary>
+		/// Default Enable Connect Protocol over HTTP/2 (true).
+		/// </summary>
+		public const bool DefaultHttp2EnableConnectProtocol = true;
+
+		/// <summary>
 		/// Default SETTINGS_NO_RFC7540_PRIORITIES is false, meaning priorities
 		/// as defined in RFC7540 are used.
 		/// </summary>
@@ -48,6 +53,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private int maxHeaderListSize = HttpClientConnection.MaxHeaderSize;
 		private bool enablePush;
 		private bool noRfc7540Priorities;
+		private bool enableConnectProtocol;
 
 		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
 		private bool hasPendingIncrements = false;
@@ -64,6 +70,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.headerTableSize = DefaultHttp2HeaderTableSize;
 			this.enablePush = DefaultHttp2EnablePush;
 			this.noRfc7540Priorities = DefaultNoRfc7540Priorities;
+			this.enableConnectProtocol = DefaultHttp2EnableConnectProtocol;
 		}
 
 		/// <summary>
@@ -86,6 +93,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.headerTableSize = HeaderTableSize;
 			this.enablePush = EnablePush;
 			this.noRfc7540Priorities |= NoRfc7540Priorities;
+			this.enableConnectProtocol = DefaultHttp2EnableConnectProtocol;
 		}
 
 		internal class PendingWindowIncrement
@@ -212,6 +220,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			get => this.noRfc7540Priorities;
 			internal set => this.noRfc7540Priorities = value;
+		}
+
+		/// <summary>
+		/// If the extended connect protocol is supported, as defined in RFC 8441:
+		/// https://datatracker.ietf.org/doc/html/rfc8441
+		/// </summary>
+		public bool EnableConnectProtocol
+		{
+			get => this.enableConnectProtocol;
+			internal set => this.enableConnectProtocol = value;
 		}
 
 		/// <summary>
@@ -377,6 +395,15 @@ namespace Waher.Networking.HTTP.HTTP2
 						Settings.maxHeaderListSize = (int)Value;
 						break;
 
+					case 8:
+						SnifferOutput?.AppendLine("SETTINGS_ENABLE_CONNECT_PROTOCOL = " + Value.ToString());
+
+						if (Value > 1)
+							return Http2Error.ProtocolError;
+
+						Settings.enableConnectProtocol = Value != 0;
+						break;
+
 					case 9:
 						SnifferOutput?.AppendLine("SETTINGS_NO_RFC7540_PRIORITIES = " + Value.ToString());
 
@@ -435,8 +462,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.noRfc7540Priorities)
 			{
 				w.WriteKeyValue(9, 1U);
-				SnifferOutput?.AppendLine("SETTINGS_NO_RFC7540_PRIORITIES = " + (this.noRfc7540Priorities ? 1 : 0).ToString());
+				SnifferOutput?.AppendLine("SETTINGS_NO_RFC7540_PRIORITIES = 1");
 			}
+
+			w.WriteKeyValue(8, this.enableConnectProtocol ? 1U : 0U);
+			SnifferOutput?.AppendLine("SETTINGS_ENABLE_CONNECT_PROTOCOL = " + (this.enableConnectProtocol ? 1 : 0).ToString());
 
 			return w.ToArray();
 		}

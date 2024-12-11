@@ -85,7 +85,7 @@ namespace Waher.Networking.HTTP
 		internal HeaderReader HttpHeaderReader => this.http2HeaderReader;
 		internal HeaderWriter HttpHeaderWriter => this.http2HeaderWriter;
 
-		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, 
+		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client,
 			bool Encrypted, int Port, params ISniffer[] Sniffers)
 			: base(false, Sniffers)
 		{
@@ -852,6 +852,19 @@ namespace Waher.Networking.HTTP
 							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
 								return false;
 						}
+						else if (EndHeaders && Stream.Headers.Method == "CONNECT")
+						{
+							if (!Stream.Headers.TryGetHeaderField(":protocol", out HttpField Protocol) ||
+								Protocol.Value != "websocket" ||
+								!this.server.TryGetResource(Stream.Headers.Resource, out HttpResource Resource, out string SubPath) ||
+								!(Resource is WebSocketListener WebSocketListener) ||
+								(!string.IsNullOrEmpty(SubPath) && !Resource.HandlesSubPaths) ||
+								!await WebSocketListener.Connect(Stream))
+							{
+								this.flowControl.RemoveStream(this.http2StreamId);
+								return await this.ReturnHttp2Error(Http2Error.Cancel, false);
+							}
+						}
 						break;
 
 					case FrameType.Priority:
@@ -1093,6 +1106,9 @@ namespace Waher.Networking.HTTP
 							break;
 						}
 						break;
+
+					default:
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, false);
 				}
 
 				return true;

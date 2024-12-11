@@ -357,7 +357,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		/// <summary>
-		/// Drops the collection from the source.
+		/// Drops the collection specified by the source.
 		/// </summary>
 		public Task DropCollection()
 		{

@@ -36,7 +36,7 @@
 		<ManifestCertificateThumbprint>76518A29D2DDB20C1A5725F5B32B0E5CA84B6521</ManifestCertificateThumbprint>
 	</PropertyGroup>
 	<PropertyGroup>
-		<ManifestKeyFile>Waher.Client.WPF_1_TemporaryKey.pfx</ManifestKeyFile>
+		<ManifestKeyFile>Waher.Client.WPF_TemporaryKey.pfx</ManifestKeyFile>
 	</PropertyGroup>
 	<PropertyGroup>
 		<GenerateManifests>true</GenerateManifests>
@@ -48,6 +48,7 @@
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
 		<Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
+		<SignAssembly>False</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Dialogs\AvalonExtensions\Markdown.xshd" />

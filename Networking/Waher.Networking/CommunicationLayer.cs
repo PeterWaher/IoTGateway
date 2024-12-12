@@ -55,9 +55,12 @@ namespace Waher.Networking
 			{
 				lock (this.sniffers)
 				{
-					this.sniffers.Add(Sniffer);
-					this.staticList = this.sniffers.ToArray();
-					this.hasSniffers = this.staticList.Length > 0;
+					if (!this.sniffers.Contains(Sniffer))
+					{
+						this.sniffers.Add(Sniffer);
+						this.staticList = this.sniffers.ToArray();
+						this.hasSniffers = this.staticList.Length > 0;
+					}
 				}
 			}
 		}
@@ -73,7 +76,7 @@ namespace Waher.Networking
 				{
 					foreach (ISniffer Sniffer in Sniffers)
 					{
-						if (!(Sniffer is null))
+						if (!(Sniffer is null) && !this.sniffers.Contains(Sniffer))
 							this.sniffers.Add(Sniffer);
 					}
 

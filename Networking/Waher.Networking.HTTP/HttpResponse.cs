@@ -899,7 +899,8 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, this.http2Stream.UpgradedToWebSocket);
+					bool LeaveOpen = this.http2Stream.UpgradedToWebSocket;
+					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, LeaveOpen);
 					this.transferEncoding = Http2TransferEncoding;
 
 					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;
@@ -1022,7 +1023,7 @@ namespace Waher.Networking.HTTP
 						if (this.clientConnection.Disposed)
 							return;
 
-						if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent))
+						if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
 							return;
 
 						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);

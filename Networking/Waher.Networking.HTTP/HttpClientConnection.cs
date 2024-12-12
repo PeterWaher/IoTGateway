@@ -869,11 +869,8 @@ namespace Waher.Networking.HTTP
 							this.http2HeaderWriter ??= new HeaderWriter(this.localSettings.HeaderTableSize,
 								this.localSettings.MaxHeaderListSize);
 
-							if (!await WebSocketListener.Connect(Stream))
-							{
-								this.flowControl.RemoveStream(this.http2StreamId);
-								return await this.ReturnHttp2Error(Http2Error.Cancel, false);
-							}
+							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+								return false;
 						}
 						break;
 

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP.HTTP2;
-using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -16,7 +14,7 @@ namespace Waher.Networking.HTTP.WebSockets
 	/// HTTP resource implementing the WebSocket Protocol as defined in RFC 6455:
 	/// https://tools.ietf.org/html/rfc6455
 	/// </summary>
-	public class WebSocketListener : HttpSynchronousResource, IHttpGetMethod, IDisposable
+	public class WebSocketListener : HttpSynchronousResource, IHttpGetMethod, IHttpConnectMethod, IDisposable
 	{
 		private readonly string[] subProtocols;
 		private readonly int maximumTextPayloadSize;
@@ -69,6 +67,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// If the GET method is allowed.
 		/// </summary>
 		public bool AllowsGET => true;
+
+		/// <summary>
+		/// If the CONNECT method is allowed.
+		/// </summary>
+		public bool AllowsCONNECT => true;
 
 		/// <summary>
 		/// Maximum text payload size.
@@ -174,15 +177,19 @@ namespace Waher.Networking.HTTP.WebSockets
 		}
 
 		/// <summary>
-		/// Executes the GET method on the resource.
+		/// Executes the CONNECT method on the resource.
 		/// </summary>
-		/// <param name="Stream">HTTP/2 stream being upgraded to a Web Socket.</param>
-		/// <returns>If connection and conversion was possible.</returns>
-		public async virtual Task<bool> Connect(Http2Stream Stream)
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task CONNECT(HttpRequest Request, HttpResponse Response)
 		{
 			string WebSocketProtocol = null;
 			int? WebSocketVersion;
 			int i;
+
+			Http2Stream Stream = Request.Http2Stream
+				?? throw new ForbiddenException("Expected HTTP/2 or later.");
 
 			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Protocol", out HttpField Field))
 			{
@@ -199,51 +206,30 @@ namespace Waher.Networking.HTTP.WebSockets
 				}
 
 				if (WebSocketProtocol is null)
-					return false;
+					throw new NotSupportedException();
 			}
 
 			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Version", out Field) &&
 				int.TryParse(Field.Value, out i))
 			{
 				if (i < 13)
-					return false;
+					throw new PreconditionFailedException();
 
 				WebSocketVersion = i;
 			}
 			else
-				return false;
+				throw new BadRequestException("Sec-WebSocket-Version header field missing.");
 
 			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Extensions", out Field))
 			{
 				// TODO: §9.1
 			}
 
-#if WINDOWS_UWP
-			StreamSocket UnderlyingSocket = Stream.Connection.Client;
-			HttpRequest Request = new HttpRequest(Stream.Connection.Server, 
-				Stream.Headers, null,
-				UnderlyingSocket.Information.RemoteAddress.ToString() + ":" + UnderlyingSocket.Information.RemotePort,
-				UnderlyingSocket.Information.LocalAddress.ToString() + ":" + UnderlyingSocket.Information.LocalPort,
-				Stream);
-#else
-			Socket UnderlyingSocket = Stream.Connection.Client.Client.Client;
-			HttpRequest Request = new HttpRequest(Stream.Connection.Server, 
-				Stream.Headers, null,
-				UnderlyingSocket.RemoteEndPoint.ToString(),
-				UnderlyingSocket.LocalEndPoint.ToString(),
-				Stream);
-#endif
-
-			HttpResponse Response = new HttpResponse(Stream.Connection.Client,
-				Stream.Connection, Stream.Connection.Server, Request);
 			WebSocket Socket = new WebSocket(this, Stream, Request, Response);
 
 			EventHandlerAsync<WebSocketEventArgs> Accept = this.Accept;
 			if (!(Accept is null))
-			{
-				if (!await Accept.Raise(this, new WebSocketEventArgs(Socket)))
-					return false;
-			}
+				await Accept.Invoke(this, new WebSocketEventArgs(Socket));  // Allow event handler to throw exception
 
 			Response.StatusCode = 200;
 
@@ -251,14 +237,10 @@ namespace Waher.Networking.HTTP.WebSockets
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
 
 			Stream.Upgrade(Socket);
-			//Response.TransferEncoding ??= new Http2TransferEncoding(Stream, null, true);
 
-			await Response.StartSendResponse(true);
 			await Response.SendResponse();
 
 			await this.Connected.Raise(this, new WebSocketEventArgs(Socket));
-
-			return true;
 		}
 
 		/// <summary>

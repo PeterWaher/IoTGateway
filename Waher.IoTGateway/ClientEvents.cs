@@ -98,7 +98,7 @@ namespace Waher.IoTGateway
 			if (string.IsNullOrEmpty(Request.SubPath))
 				throw new BadRequestException("Sub-path missing.");
 
-			string Id = Request.SubPath.Substring(1);
+			string Id = Request.SubPath[1..];
 			string ContentType;
 			byte[] Content;
 			bool More;
@@ -226,7 +226,7 @@ namespace Waher.IoTGateway
 			{
 				s = Uri.Query;
 				if (s.StartsWith("?"))
-					s = s.Substring(1);
+					s = s[1..];
 
 				string[] Parts = s.Split('&');
 				Query = new (string, string, string)[Parts.Length];
@@ -239,8 +239,8 @@ namespace Waher.IoTGateway
 						Query[j++] = (Part, string.Empty, string.Empty);
 					else
 					{
-						string s2 = Part.Substring(i + 1);
-						Query[j++] = (Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2));
+						string s2 = Part[(i + 1)..];
+						Query[j++] = (Part[..i], s2, System.Net.WebUtility.UrlDecode(s2));
 					}
 				}
 			}
@@ -1393,8 +1393,7 @@ namespace Waher.IoTGateway
 
 				string s = Json.ToString();
 
-				if (TabIDs is null)
-					TabIDs = eventsByTabID.GetKeys();
+				TabIDs ??= eventsByTabID.GetKeys();
 
 				foreach (string TabID in TabIDs)
 				{

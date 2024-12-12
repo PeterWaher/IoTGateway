@@ -362,6 +362,13 @@ namespace Waher.IoTGateway.Setup
 		public bool HasToS => !string.IsNullOrEmpty(this.urlToS);
 
 		/// <summary>
+		/// If the configuration has a certificate.
+		/// </summary>
+		public bool HasCertificate =>
+			(!(this.certificate is null) && !(this.privateKey is null)) ||
+			(!(this.pfx is null) && !(this.password is null));
+
+		/// <summary>
 		/// Resource to be redirected to, to perform the configuration.
 		/// </summary>
 		public override string Resource => "/Settings/Domain.md";

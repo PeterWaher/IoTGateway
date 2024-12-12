@@ -1867,9 +1867,7 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				if (Configuration.UseEncryption &&
-					!(Configuration.Certificate is null) &&
-					!(Configuration.PrivateKey is null))
+				if (Configuration.UseEncryption && Configuration.HasCertificate)
 				{
 					await UpdateCertificate(Configuration);
 

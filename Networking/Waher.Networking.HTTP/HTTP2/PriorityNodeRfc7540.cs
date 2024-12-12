@@ -115,11 +115,13 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				if (this.weight != value)
 				{
-					if (!(this.DependentOn is null))
-						this.dependentOn.totalChildWeights += value - this.weight;
-
 					this.weight = value;
-					this.ResourceFraction = this.DependentOn.ResourceFraction * this.weight / this.dependentOn.TotalChildWeights;
+
+					if (!(this.dependentOn is null))
+					{
+						this.dependentOn.totalChildWeights += value - this.weight;
+						this.ResourceFraction = this.dependentOn.ResourceFraction * this.weight / this.dependentOn.TotalChildWeights;
+					}
 				}
 			}
 		}

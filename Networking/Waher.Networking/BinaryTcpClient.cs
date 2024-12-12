@@ -1028,8 +1028,7 @@ namespace Waher.Networking
 				if (!this.connected || !this.sending)
 					return Task.FromResult(true);
 
-				if (this.idleQueue is null)
-					this.idleQueue = new LinkedList<TaskCompletionSource<bool>>();
+				this.idleQueue ??= new LinkedList<TaskCompletionSource<bool>>();
 
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 				this.idleQueue.AddLast(Result);
@@ -1754,9 +1753,7 @@ namespace Waher.Networking
 				{
 					this.cancelRead = true;
 
-					if (this.cancelledQueue is null)
-						this.cancelledQueue = new LinkedList<TaskCompletionSource<bool>>();
-
+					this.cancelledQueue ??= new LinkedList<TaskCompletionSource<bool>>();
 					this.cancelledQueue.AddLast(Task);
 #if WINDOWS_UWP
 					IAsyncAction _ = this.client.CancelIOAsync();

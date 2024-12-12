@@ -528,6 +528,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		public int MaxDynamicHeaderSizeLimit => this.maxDynamicHeaderSizeLimit;
 
 #if DEBUG
+		/// <summary>
+		/// Stack trace of current lock.
+		/// </summary>
 		public string LockedFrom => this.lockedFrom;
 #endif
 
@@ -573,7 +576,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		public void Release()
 		{
+#if DEBUG
 			this.lockedFrom = null;
+#endif
 			this.syncObject.Release();
 		}
 

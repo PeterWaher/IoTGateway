@@ -409,7 +409,9 @@ namespace Waher.Networking.HTTP.HTTP2
 							return false;
 						}
 
-						this.dynamicHeaderSize = (int)Index;
+						this.maxDynamicHeaderSize = (int)Index;
+						this.TrimDynamicHeaders();
+
 						return this.ReadHeader(out Header, out Value, out Mode);
 					}
 					else

@@ -778,7 +778,7 @@ namespace Waher.Networking.HTTP
 								sb.Clear();
 								sb.Append("Stream ");
 								sb.Append(this.http2StreamId);
-								sb.Append(" creted. (Window input/output size: ");
+								sb.Append(" created. (Window input/output size: ");
 								sb.Append(Stream.DataInputWindowSize.ToString());
 								sb.Append('/');
 								sb.Append(OutputWindow.ToString());

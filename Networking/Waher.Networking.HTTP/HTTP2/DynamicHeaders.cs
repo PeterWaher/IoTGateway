@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -480,6 +481,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		protected ulong nrHeadersCreated = 0;
 
 		private readonly SemaphoreSlim syncObject = new SemaphoreSlim(1);
+#if DEBUG
+		private string lockedFrom = null;
+#endif
 
 		/// <summary>
 		/// Serializes HTTP/2 headers using HPACK, defined in RFC 7541.
@@ -523,19 +527,53 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		public int MaxDynamicHeaderSizeLimit => this.maxDynamicHeaderSizeLimit;
 
+#if DEBUG
+		public string LockedFrom => this.lockedFrom;
+#endif
+
 		/// <summary>
 		/// Waits for the reader to be free.
 		/// </summary>
+#if DEBUG
+		public async Task Lock()
+		{
+			await this.syncObject.WaitAsync();
+			this.lockedFrom = Environment.StackTrace;
+		}
+#else
 		public Task Lock()
 		{
 			return this.syncObject.WaitAsync();
 		}
+#endif
+		/// <summary>
+		/// Waits for the reader to be free.
+		/// </summary>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds.</param>
+		/// <returns>If lock was granted.</returns>
+#if DEBUG
+		public async Task<bool> TryLock(int TimeoutMilliseconds)
+		{
+			if (!await this.syncObject.WaitAsync(TimeoutMilliseconds))
+				return false;
+
+			this.lockedFrom = Environment.StackTrace;
+
+			return true;
+		}
+#else
+		public Task<bool> TryLock(int TimeoutMilliseconds)
+		{
+			return this.syncObject.WaitAsync(TimeoutMilliseconds);
+		}
+#endif
 
 		/// <summary>
 		/// Releases the object for use by another.
 		/// </summary>
 		public void Release()
 		{
+			this.lockedFrom = null;
 			this.syncObject.Release();
 		}
 

@@ -906,6 +906,8 @@ namespace Waher.Networking.HTTP
 					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;
 					StringBuilder sb = this.clientConnection.HasSniffers ? new StringBuilder() : null;
 
+					byte[] HeaderBin;
+
 					await w.Lock();
 					try
 					{
@@ -1018,23 +1020,23 @@ namespace Waher.Networking.HTTP
 								w.WriteHeader("set-cookie", Cookie.ToString(), IndexMode.NotIndexed, true);
 						}
 
-						byte[] HeaderBin = w.ToArray();
-
-						if (this.clientConnection.Disposed)
-							return;
-
-						if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
-							return;
-
-						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
-
-						if (!(sb is null))
-							await this.clientConnection.TransmitText(sb.ToString());
+						HeaderBin = w.ToArray();
 					}
 					finally
 					{
 						w.Release();
 					}
+
+					if (this.clientConnection.Disposed)
+						return;
+
+					if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
+						return;
+
+					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+
+					if (!(sb is null))
+						await this.clientConnection.TransmitText(sb.ToString());
 				}
 			}
 		}

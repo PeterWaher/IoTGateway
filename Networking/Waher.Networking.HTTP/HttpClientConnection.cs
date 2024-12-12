@@ -608,7 +608,7 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
-				StringBuilder sb;
+				StringBuilder sb = null;
 
 				if (this.HasSniffers)
 				{
@@ -729,6 +729,21 @@ namespace Waher.Networking.HTTP
 								Exclusive = (StreamIdDependency & 0x80000000) != 0;
 								StreamIdDependency &= 0x7fffffff;
 								Weight = this.reader.NextByte();
+
+								if (this.HasSniffers)
+								{
+									sb.Clear();
+									sb.Append("Stream ");
+									sb.Append(this.http2StreamId.ToString());
+									sb.Append(" priority: Dependency: ");
+									sb.Append(StreamIdDependency.ToString());
+									sb.Append(", Exclusive: ");
+									sb.Append(Exclusive.ToString());
+									sb.Append(", Weight: ");
+									sb.Append(Weight.ToString());
+
+									await this.Information(sb.ToString());
+								}
 							}
 						}
 						else
@@ -760,7 +775,7 @@ namespace Waher.Networking.HTTP
 
 							if (this.HasSniffers)
 							{
-								sb = new StringBuilder();
+								sb.Clear();
 								sb.Append("Stream ");
 								sb.Append(this.http2StreamId);
 								sb.Append(" creted. (Window input/output size: ");
@@ -806,6 +821,7 @@ namespace Waher.Networking.HTTP
 								ResetHeader = false;
 							}
 
+							sb?.Clear();
 							await this.http2HeaderReader.Lock();
 							try
 							{
@@ -817,10 +833,14 @@ namespace Waher.Networking.HTTP
 								while (this.http2HeaderReader.HasMore)
 								{
 									if (!this.http2HeaderReader.ReadHeader(out string HeaderName, out string HeaderValue, out _))
-										return false;
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, true);
 
 									if (this.HasSniffers)
-										await this.ReceiveText(HeaderName + ": " + HeaderValue);
+									{
+										sb.Append(HeaderName);
+										sb.Append(": ");
+										sb.AppendLine(HeaderValue);
+									}
 
 									if (HeaderName == "cookie")
 									{
@@ -840,6 +860,9 @@ namespace Waher.Networking.HTTP
 							{
 								this.http2HeaderReader.Release();
 							}
+
+							if (this.HasSniffers)
+								await this.ReceiveText(sb.ToString());
 						}
 						else if (!Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize))
 							return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, false);
@@ -919,7 +942,8 @@ namespace Waher.Networking.HTTP
 						}
 						else
 						{
-							sb = this.HasSniffers ? new StringBuilder() : null;
+							sb?.Clear();
+
 							Error = ConnectionSettings.TryParse(this.reader, sb, out this.remoteSettings);
 
 							if (!(sb is null))
@@ -1014,8 +1038,7 @@ namespace Waher.Networking.HTTP
 
 							if (this.HasSniffers)
 							{
-								sb = new StringBuilder();
-
+								sb.Clear();
 								sb.Append("Connection Window +");
 								sb.Append(Increment.ToString());
 								sb.Append(" (Available for output: ");
@@ -1032,8 +1055,7 @@ namespace Waher.Networking.HTTP
 
 							if (this.HasSniffers)
 							{
-								sb = new StringBuilder();
-
+								sb.Clear();
 								sb.Append("Stream ");
 								sb.Append(this.http2StreamId.ToString());
 								sb.Append(" Window +");

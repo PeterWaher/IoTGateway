@@ -393,22 +393,38 @@ namespace Waher.Networking.HTTP.HTTP2
 					Mode = IndexMode.Indexed;
 				else
 				{
-					if (!this.ReadByteBits(out byte b, 2))
+					if (!this.ReadBit(out Bit))
 					{
 						Header = Value = null;
 						Mode = IndexMode.NotIndexed;
 						return false;
 					}
 
-					if (b == 0)
-						Mode = IndexMode.NotIndexed;
-					else if (b == 1)
-						Mode = IndexMode.NeverIndexed;
+					if (Bit)    // Dynamic Table Size Update
+					{
+						if (!this.ReadInteger(out Index) || Index > (ulong)this.maxDynamicHeaderSizeLimit)
+						{
+							Header = Value = null;
+							Mode = IndexMode.NotIndexed;
+							return false;
+						}
+
+						this.dynamicHeaderSize = (int)Index;
+						return this.ReadHeader(out Header, out Value, out Mode);
+					}
 					else
 					{
-						Header = Value = null;
-						Mode = IndexMode.NotIndexed;
-						return false;
+						if (!this.ReadBit(out Bit))
+						{
+							Header = Value = null;
+							Mode = IndexMode.NotIndexed;
+							return false;
+						}
+
+						if (Bit)
+							Mode = IndexMode.NeverIndexed;
+						else
+							Mode = IndexMode.NotIndexed;
 					}
 				}
 

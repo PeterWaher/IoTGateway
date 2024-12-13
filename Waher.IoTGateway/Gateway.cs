@@ -1467,9 +1467,9 @@ namespace Waher.IoTGateway
 		private static Task GoToDefaultPage(HttpRequest Request, HttpResponse Response)
 		{
 			if (TryGetDefaultPage(Request, out string DefaultPage))
-				throw new TemporaryRedirectException(DefaultPage);
+				return Response.SendResponse(new TemporaryRedirectException(DefaultPage));
 			else
-				throw new NotFoundException("No default page defined.");
+				return Response.SendResponse(new NotFoundException("No default page defined."));
 		}
 
 		private class ModuleStartOrder : IComparer<IModule>

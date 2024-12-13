@@ -162,6 +162,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			this.childNodes ??= new LinkedList<PriorityNodeRfc7540>();
 			this.childNodes.AddLast(Child);
+			Child.dependentOn = this;
 
 			this.totalChildWeights += Child.Weight;
 
@@ -198,7 +199,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 		private void RecalculateChildFractions()
 		{
-			if (!(this.childNodes is null))
+			if (!(this.childNodes is null) && this.totalChildWeights > 0)
 			{
 				LinkedListNode<PriorityNodeRfc7540> Loop = this.childNodes.First;
 				PriorityNodeRfc7540 Child;
@@ -335,7 +336,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private void TriggerPendingIfAvailbleDown(ref int Resources)
 		{
 			this.TriggerPending(ref Resources);
-			if (Resources <= 0)
+			if (Resources <= 0 || this.totalChildWeights <= 0)
 				return;
 
 			LinkedListNode<PriorityNodeRfc7540> ChildLoop = this.childNodes?.First;

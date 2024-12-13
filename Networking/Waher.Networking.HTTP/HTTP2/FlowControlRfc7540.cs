@@ -198,7 +198,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 				else
 				{
-					Node = new PriorityNodeRfc7540(DependentOn, this.root, Stream, Weight, this);
+					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this);
 
 					if (Exclusive && !(DependentOn is null))
 						this.MoveChildren(DependentOn, Node);
@@ -286,40 +286,46 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (!this.nodes.TryGetValue(StreamId, out PriorityNodeRfc7540 Node))
-					return false;
-
-				this.nodes.Remove(StreamId);
-				if (this.lastNodeStreamId == StreamId)
-				{
-					this.lastNodeStreamId = 0;
-					this.lastNode = null;
-				}
-
-				PriorityNodeRfc7540 Parent = Node.Parent;
-				if (!(Parent is null))
-				{
-					Parent.RemoveChildDependency(Node);
-
-					double Scale = ((double)Node.Weight) / Parent.TotalChildWeights;
-
-					while (Node.HasChildren)
-					{
-						PriorityNodeRfc7540 Child = Node.FirstChild.Value;
-						int ScaledWeight = (int)Math.Ceiling(Child.Weight * Scale);
-						if (ScaledWeight > 255)
-							ScaledWeight = 255;
-
-						Node.RemoveChildDependency(Child);
-						Child.Weight = (byte)ScaledWeight;
-						Parent.AddChildDependency(Child);
-					}
-				}
-
-				Node.Dispose();
-
-				return true;
+				return this.RemoveStreamLocked(StreamId);
 			}
+		}
+
+		private bool RemoveStreamLocked(int StreamId)
+		{
+			if (!this.nodes.TryGetValue(StreamId, out PriorityNodeRfc7540 Node))
+				return false;
+
+			this.nodes.Remove(StreamId);
+
+			if (this.lastNodeStreamId == StreamId)
+			{
+				this.lastNodeStreamId = 0;
+				this.lastNode = null;
+			}
+
+			PriorityNodeRfc7540 Parent = Node.Parent;
+			if (!(Parent is null))
+			{
+				Parent.RemoveChildDependency(Node);
+
+				double Scale = ((double)Node.Weight) / Parent.TotalChildWeights;
+
+				while (Node.HasChildren)
+				{
+					PriorityNodeRfc7540 Child = Node.FirstChild.Value;
+					int ScaledWeight = (int)Math.Ceiling(Child.Weight * Scale);
+					if (ScaledWeight > 255)
+						ScaledWeight = 255;
+
+					Node.RemoveChildDependency(Child);
+					Child.Weight = (byte)ScaledWeight;
+					Parent.AddChildDependency(Child);
+				}
+			}
+
+			Node.Dispose();
+
+			return true;
 		}
 
 		/// <summary>
@@ -427,10 +433,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
 		public void GoingAway(int LastPermittedStreamId)
 		{
-			LinkedList<int> ToRemove = null;
-
 			lock (this.synchObj)
 			{
+				LinkedList<int> ToRemove = null;
+
 				foreach (int StreamId in this.nodes.Keys)
 				{
 					if (StreamId > LastPermittedStreamId)
@@ -439,12 +445,12 @@ namespace Waher.Networking.HTTP.HTTP2
 						ToRemove.AddLast(StreamId);
 					}
 				}
-			}
 
-			if (!(ToRemove is null))
-			{
-				foreach (int StreamId in ToRemove)
-					this.RemoveStream(StreamId);
+				if (!(ToRemove is null))
+				{
+					foreach (int StreamId in ToRemove)
+						this.RemoveStreamLocked(StreamId);
+				}
 			}
 		}
 

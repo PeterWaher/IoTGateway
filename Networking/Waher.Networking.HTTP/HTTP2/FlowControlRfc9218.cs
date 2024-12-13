@@ -271,27 +271,32 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (this.streams.TryGetValue(StreamId, out StreamRec Rec))
-				{
-					Rec.Stream.State = StreamState.Closed;
-					this.streams.Remove(StreamId);
-
-					LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Rec.Priority];
-					Nodes?.Remove(Rec.Node);
-
-					if (this.lastNodeStreamId == StreamId)
-					{
-						this.lastNodeStreamId = 0;
-						this.lastRec = null;
-					}
-
-					Rec.Node.Dispose();
-
-					return true;
-				}
-				else
-					return false;
+				return this.RemoveStreamLocked(StreamId);
 			}
+		}
+
+		private bool RemoveStreamLocked(int StreamId)
+		{
+			if (this.streams.TryGetValue(StreamId, out StreamRec Rec))
+			{
+				Rec.Stream.State = StreamState.Closed;
+				this.streams.Remove(StreamId);
+
+				LinkedList<PriorityNodeRfc9218> Nodes = this.priorities[Rec.Priority];
+				Nodes?.Remove(Rec.Node);
+
+				if (this.lastNodeStreamId == StreamId)
+				{
+					this.lastNodeStreamId = 0;
+					this.lastRec = null;
+				}
+
+				Rec.Node.Dispose();
+
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -426,10 +431,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
 		public void GoingAway(int LastPermittedStreamId)
 		{
-			LinkedList<int> ToRemove = null;
-
 			lock (this.synchObj)
 			{
+				LinkedList<int> ToRemove = null;
+
 				foreach (int StreamId in this.streams.Keys)
 				{
 					if (StreamId > LastPermittedStreamId)
@@ -438,12 +443,12 @@ namespace Waher.Networking.HTTP.HTTP2
 						ToRemove.AddLast(StreamId);
 					}
 				}
-			}
 
-			if (!(ToRemove is null))
-			{
-				foreach (int StreamId in ToRemove)
-					this.RemoveStream(StreamId);
+				if (!(ToRemove is null))
+				{
+					foreach (int StreamId in ToRemove)
+						this.RemoveStreamLocked(StreamId);
+				}
 			}
 		}
 

@@ -439,6 +439,36 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(1, Stream.StreamId);
 		}
 
+		[TestMethod]
+		public async Task Test_15_EdgeSniff()
+		{
+			ConnectionSettings Settings = new();
+			using FlowControlRfc7540 FlowControl = new(Settings);
+
+			FlowControl.AddStreamForTest(1, 255, 0, true);  // .md
+			
+			// 1: TX, D4200, ES
+			Assert.AreEqual(4200, await FlowControl.RequestResources(1, 4200));
+			Assert.IsTrue(FlowControl.RemoveStream(1));
+
+			FlowControl.AddStreamForTest(3, 255, 0, true);  // .cssx
+			FlowControl.AddStreamForTest(5, 219, 3, true);  // .js
+			FlowControl.AddStreamForTest(7, 182, 5, true);  // .png
+
+			// 7: TX, EH, D16384, D1732 ES
+			Assert.AreEqual(16384, await FlowControl.RequestResources(7, 18116));
+			Assert.AreEqual(1732, await FlowControl.RequestResources(7, 1732));
+			Assert.IsTrue(FlowControl.RemoveStream(7));
+
+			// 5: TX, EH, D2165 ES
+			Assert.AreEqual(2165, await FlowControl.RequestResources(5, 2165));
+			Assert.IsTrue(FlowControl.RemoveStream(5));
+
+			// 3: TX, EH
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.IsTrue(FlowControl.RemoveStream(3));
+		}
+
 		/* 
 		 * delayed release stream resources => trigger
 		 * delayed release connection resources => trigger

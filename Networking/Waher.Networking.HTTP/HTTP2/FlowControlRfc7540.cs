@@ -359,7 +359,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (StreamId != this.lastNodeStreamId)
 				{
 					if (!this.nodes.TryGetValue(StreamId, out this.lastNode))
+					{
+						this.lastNodeStreamId = 0;
 						return Task.FromResult(-1);
+					}
 
 					this.lastNodeStreamId = StreamId;
 				}
@@ -384,7 +387,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (StreamId != this.lastNodeStreamId)
 				{
 					if (!this.nodes.TryGetValue(StreamId, out this.lastNode))
+					{
+						this.lastNodeStreamId = 0;
 						return -1;
+					}
 
 					this.lastNodeStreamId = StreamId;
 				}

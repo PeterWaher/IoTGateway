@@ -1344,8 +1344,15 @@ namespace Waher.Networking.HTTP
 					await this.TransmitBinary(Data);
 				else
 				{
-					await this.TransmitBinary(BinaryTcpClient.ToArray(Data, 0, 9));
-					await this.TransmitText(DataEncoding.GetString(Payload, Offset, Count));
+					string s = DataEncoding.GetString(Payload, Offset, Count);
+
+					if (ContainsControlCharacters(s))
+						await this.TransmitBinary(Data);
+					else
+					{
+						await this.TransmitBinary(BinaryTcpClient.ToArray(Data, 0, 9));
+						await this.TransmitText(s);
+					}
 				}
 			}
 
@@ -1354,6 +1361,9 @@ namespace Waher.Networking.HTTP
 
 		internal static bool IsSniffableTextType(string ContentType)
 		{
+			if (string.IsNullOrEmpty(ContentType))
+				return false;
+
 			ContentType = ContentType.ToLower();
 			int j = ContentType.IndexOf('/');
 			if (j < 0)

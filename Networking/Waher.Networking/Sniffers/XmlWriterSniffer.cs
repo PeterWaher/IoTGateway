@@ -106,8 +106,8 @@ namespace Waher.Networking.Sniffers
 								{
 									if (s.Length > 76)
 									{
-										this.output.WriteElementString("Row", s.Substring(0, 76));
-										s = s.Substring(76);
+										this.output.WriteElementString("Row", s[..76]);
+										s = s[76..];
 									}
 									else
 									{
@@ -192,20 +192,7 @@ namespace Waher.Networking.Sniffers
 			if (this.disposed)
 				return;
 
-			int i = Text.IndexOfAny(controlCharacters);
-			int j;
-			string s;
-			char ch;
-
-			while (i >= 0)
-			{
-				ch = Text[i];
-				j = Array.IndexOf(controlCharacters, ch);
-				s = controlCharacterNames[j];
-				Text = Text.Remove(i, 1).Insert(i, " " + s + " ");
-				i += s.Length + 2;
-				i = Text.IndexOfAny(controlCharacters, i);
-			}
+			Text = CommunicationLayer.EncodeControlCharacters(Text);
 
 			await this.semaphore.BeginWrite();
 			try
@@ -249,22 +236,6 @@ namespace Waher.Networking.Sniffers
 				await this.semaphore.EndWrite();
 			}
 		}
-
-		private static readonly char[] controlCharacters = new char[]
-		{
-			(char)00, (char)01, (char)02, (char)03, (char)04, (char)05, (char)06, (char)07, (char)08,
-			(char)11, (char)12, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19,
-			(char)20, (char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29,
-			(char)30, (char)31
-		};
-
-		private static readonly string[] controlCharacterNames = new string[]
-		{
-			"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS",
-			"VT", "FF", "SO", "SI", "DLE", "DC1", "DC2", "DC3",
-			"DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS",
-			"RS", "US"
-		};
 
 		private static string[] GetRows(string s)
 		{

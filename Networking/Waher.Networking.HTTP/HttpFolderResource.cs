@@ -532,6 +532,11 @@ namespace Waher.Networking.HTTP
 				CacheRec Rec;
 
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+				if (Rec is null)
+				{
+					await Response.SendResponse(new NotModifiedException());
+					return;
+				}
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
@@ -697,14 +702,14 @@ namespace Waher.Networking.HTTP
 				if (!(Header.IfNoneMatch is null))
 				{
 					if (Header.IfNoneMatch.Value == Rec.ETag)
-						throw new NotModifiedException();
+						return null;
 				}
 				else if (!(Header.IfModifiedSince is null))
 				{
 					if ((Limit = Header.IfModifiedSince.Timestamp).HasValue &&
 						LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 					{
-						throw new NotModifiedException();
+						return null;
 					}
 				}
 			}
@@ -1104,6 +1109,11 @@ namespace Waher.Networking.HTTP
 				}
 
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+				if (Rec is null)
+				{
+					await Response.SendResponse(new NotModifiedException());
+					return;
+				}
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);

@@ -219,7 +219,10 @@ namespace Waher.Networking.XMPP.HTTPX
 						if (!(Request.Header.IfNoneMatch is null))
 						{
 							if (!(CachedResource.ETag is null) && Request.Header.IfNoneMatch.Value == CachedResource.ETag)
-								throw new NotModifiedException();
+							{
+								await Response.SendResponse(new NotModifiedException());
+								return;
+							}
 						}
 						else if (!(Request.Header.IfModifiedSince is null))
 						{
@@ -228,7 +231,8 @@ namespace Waher.Networking.XMPP.HTTPX
 							if ((Limit = Request.Header.IfModifiedSince.Timestamp).HasValue &&
 								HttpFolderResource.LessOrEqual(CachedResource.LastModified.UtcDateTime, Limit.Value.ToUniversalTime()))
 							{
-								throw new NotModifiedException();
+								await Response.SendResponse(new NotModifiedException());
+								return;
 							}
 						}
 

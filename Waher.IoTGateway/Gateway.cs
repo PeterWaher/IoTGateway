@@ -472,7 +472,7 @@ namespace Waher.IoTGateway
 										catch (IOException)
 										{
 											exceptionFile = null;
-											Thread.Sleep(1000);
+											await Task.Delay(1000);
 										}
 									}
 									while (exceptionFile is null && --MaxTries > 0);

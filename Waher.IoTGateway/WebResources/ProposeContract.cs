@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Xml;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content.Markdown.Web.ScriptExtensions;
+using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Script;
-using Waher.Networking.HTTP.ScriptExtensions;
-using System.Text;
-using Waher.Content.Xml;
 
 namespace Waher.IoTGateway.WebResources
 {

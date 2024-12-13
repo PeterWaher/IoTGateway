@@ -2312,11 +2312,11 @@ for all script on the server, if accessed through the `Global` variables collect
 
 Example:
 
-	This page has been viewed {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the server was last restarted.
+	This page has been viewed {Global.NrTimesMarkdownLoaded:=exists(Global.NrTimesMarkdownLoaded) ? Global.NrTimesMarkdownLoaded+1 : 1} times since the server was last restarted.
 
 This becomes:
 
-This page has been viewed {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the server was last restarted.
+This page has been viewed {Global.NrTimesMarkdownLoaded:=exists(Global.NrTimesMarkdownLoaded) ? Global.NrTimesMarkdownLoaded+1 : 1} times since the server was last restarted.
 
 **Note**: If the count does not increment when the page is loaded or refreshed, it means you're receiving a cached result. You can control
 page cache rules using [Metadata tags](#metadata).
@@ -2329,11 +2329,11 @@ temporary information related to the current page.
 
 Example:
 
-	This page has been viewed {Page.NrTimesMarkdownLoaded:=try Page.NrTimesMarkdownLoaded+1 catch 1} times since you last navigated to this page.
+	This page has been viewed {Page.NrTimesMarkdownLoaded:=exists(Page.NrTimesMarkdownLoaded) ? Page.NrTimesMarkdownLoaded+1 : 1} times since you last navigated to this page.
 
 This becomes:
 
-This page has been viewed {Page.NrTimesMarkdownLoaded:=try Page.NrTimesMarkdownLoaded+1 catch 1} times since you last navigated to this page.
+This page has been viewed {Page.NrTimesMarkdownLoaded:=exists(Page.NrTimesMarkdownLoaded) ? Page.NrTimesMarkdownLoaded+1 : 1} times since you last navigated to this page.
 
 ### Current request
 

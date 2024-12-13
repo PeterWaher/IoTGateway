@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Content.Html;
 using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Web.ScriptExtensions;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
@@ -118,7 +118,7 @@ namespace Waher.Content.Markdown.Web
 					{
 						HttpRequestHeader RequestHeader = Request.Header;
 						Variables Variables = State.Session;
-						string Header = Markdown.Substring(0, i);
+						string Header = Markdown[..i];
 						string Parameter;
 
 						foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
@@ -126,7 +126,7 @@ namespace Waher.Content.Markdown.Web
 							if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
 								continue;
 
-							Parameter = Row.Substring(10).Trim();
+							Parameter = Row[10..].Trim();
 							if (RequestHeader.TryGetQueryParameter(Parameter, out string Value))
 							{
 								Value = System.Net.WebUtility.UrlDecode(Value);

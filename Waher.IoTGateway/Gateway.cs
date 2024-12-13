@@ -462,12 +462,17 @@ namespace Waher.IoTGateway
 
 									do
 									{
+										Now = DateTime.Now;
+
 										exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
 											" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
 
 										try
 										{
-											exceptionFile = File.CreateText(exceptionFileName);
+											if (!File.Exists(exceptionFileName))
+												exceptionFile = File.CreateText(exceptionFileName);
+											else
+												await Task.Delay(1000);
 										}
 										catch (IOException)
 										{

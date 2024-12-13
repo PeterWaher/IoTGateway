@@ -2194,7 +2194,7 @@ result loaded to the client. You can use the `preview` function to display a par
     Start:=Now;
     foreach x in 1..60 do
     (
-        System.Threading.Thread.Sleep(1000);
+        Sleep(1000);
         CPU:=join(CPU,(PerformanceCounterValue("Processor","_Total","% Processor Time") ??? Uniform(0,100)));
         TP:=join(TP,Now.Subtract(Start).TotalSeconds);
         preview(PlotCPU(TP,CPU))
@@ -2231,7 +2231,7 @@ CPU:=[];
 Start:=Now;
 foreach x in 1..60 do
 (
-    System.Threading.Thread.Sleep(1000);
+    Sleep(1000);
     CPU:=join(CPU,(PerformanceCounterValue("Processor","_Total","% Processor Time") ??? Uniform(0,100)));
     TP:=join(TP,Now.Subtract(Start).TotalSeconds);
     preview(PlotCPU(TP,CPU))

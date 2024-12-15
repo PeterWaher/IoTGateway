@@ -28,24 +28,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -61,7 +49,10 @@ namespace Waher.IoTGateway.WebResources
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session is null)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			object Obj = await Request.DecodeDataAsync();
 			string From;
@@ -70,7 +61,8 @@ namespace Waher.IoTGateway.WebResources
 				!Form.TryGetValue("UserName", out string UserName) ||
 				!Form.TryGetValue("Password", out string Password))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			if (Request.Session.TryGetVariable("from", out Variable v))
@@ -94,7 +86,8 @@ namespace Waher.IoTGateway.WebResources
 					sb.Append(") has been blocked from the system.");
 
 					Request.Session["LoginError"] = sb.ToString();
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.TemporarilyBlocked:
 					sb = new StringBuilder();
@@ -119,16 +112,19 @@ namespace Waher.IoTGateway.WebResources
 					sb.Append(Request.RemoteEndPoint);
 
 					Request.Session["LoginError"] = sb.ToString();
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.NoPassword:
 					Request.Session["LoginError"] = "No password provided.";
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.InvalidCredentials:
 				default:
 					Request.Session["LoginError"] = "Invalid login credentials provided.";
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.Success:
 					DoLogin(Request, From, Result.User);
@@ -195,7 +191,7 @@ namespace Waher.IoTGateway.WebResources
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.HardwareName, Environment.MachineName));
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareName, OsName));
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareVersion, OsVersion));
-				
+
 				return Task.FromResult<IEnumerable<KeyValuePair<string, object>>>(Claims);
 			}
 

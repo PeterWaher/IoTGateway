@@ -899,6 +899,9 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
+					if (!this.clientConnection.IsStreamOpen(this.http2Stream.StreamId))
+						return;
+
 					bool LeaveOpen = this.http2Stream.UpgradedToWebSocket;
 					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, LeaveOpen);
 					this.transferEncoding = Http2TransferEncoding;

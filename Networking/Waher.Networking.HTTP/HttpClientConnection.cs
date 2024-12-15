@@ -1240,6 +1240,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		internal bool IsStreamOpen(int StreamId)
+		{
+			return this.flowControl?.TryGetStream(StreamId, out _) ?? false;
+		}
+
 		/// <summary>
 		/// Writes DATA to the remote party.
 		/// </summary>

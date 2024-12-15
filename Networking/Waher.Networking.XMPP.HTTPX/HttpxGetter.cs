@@ -341,54 +341,50 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal static Exception GetExceptionObject(int StatusCode, string StatusMessage,
 			HttpResponse Response, byte[] Data, string ContentType)
 		{
-			switch (StatusCode)
+			return StatusCode switch
 			{
 				// Client Errors
-				case BadRequestException.Code: throw new BadRequestException(Data, ContentType);
-				case ConflictException.Code: throw new ConflictException(Data, ContentType);
-				case FailedDependencyException.Code: throw new FailedDependencyException(Data, ContentType);
-				case ForbiddenException.Code: throw new ForbiddenException(Data, ContentType);
-				case GoneException.Code: throw new GoneException(Data, ContentType);
-				case LockedException.Code: throw new LockedException(Data, ContentType);
-				case MethodNotAllowedException.Code: throw new MethodNotAllowedException(GetMethods(Response.GetFirstHeader("Allow")), Data, ContentType);
-				case MisdirectedRequestException.Code: throw new MisdirectedRequestException(Data, ContentType);
-				case NotAcceptableException.Code: throw new NotAcceptableException(Data, ContentType);
-				case NotFoundException.Code: throw new NotFoundException(Data, ContentType);
-				case PreconditionFailedException.Code: throw new PreconditionFailedException(Data, ContentType);
-				case PreconditionRequiredException.Code: throw new PreconditionRequiredException(Data, ContentType);
-				case RangeNotSatisfiableException.Code: throw new RangeNotSatisfiableException(Data, ContentType);
-				case RequestTimeoutException.Code: throw new RequestTimeoutException(Data, ContentType);
-				case TooManyRequestsException.Code: throw new TooManyRequestsException(Data, ContentType);
-				case UnauthorizedException.Code: throw new UnauthorizedException(Data, ContentType, Response.GetChallenges());
-				case UnavailableForLegalReasonsException.Code: throw new UnavailableForLegalReasonsException(Data, ContentType);
-				case UnprocessableEntityException.Code: throw new UnprocessableEntityException(Data, ContentType);
-				case UnsupportedMediaTypeException.Code: throw new UnsupportedMediaTypeException(Data, ContentType);
-				case UpgradeRequiredException.Code: throw new UpgradeRequiredException(Response.GetFirstHeader("Upgrade"), Data, ContentType);
-
+				BadRequestException.Code => new BadRequestException(Data, ContentType),
+				ConflictException.Code => new ConflictException(Data, ContentType),
+				FailedDependencyException.Code => new FailedDependencyException(Data, ContentType),
+				ForbiddenException.Code => new ForbiddenException(Data, ContentType),
+				GoneException.Code => new GoneException(Data, ContentType),
+				LockedException.Code => new LockedException(Data, ContentType),
+				MethodNotAllowedException.Code => new MethodNotAllowedException(GetMethods(Response.GetFirstHeader("Allow")), Data, ContentType),
+				MisdirectedRequestException.Code => new MisdirectedRequestException(Data, ContentType),
+				NotAcceptableException.Code => new NotAcceptableException(Data, ContentType),
+				NotFoundException.Code => new NotFoundException(Data, ContentType),
+				PreconditionFailedException.Code => new PreconditionFailedException(Data, ContentType),
+				PreconditionRequiredException.Code => new PreconditionRequiredException(Data, ContentType),
+				RangeNotSatisfiableException.Code => new RangeNotSatisfiableException(Data, ContentType),
+				RequestTimeoutException.Code => new RequestTimeoutException(Data, ContentType),
+				TooManyRequestsException.Code => new TooManyRequestsException(Data, ContentType),
+				UnauthorizedException.Code => new UnauthorizedException(Data, ContentType, Response.GetChallenges()),
+				UnavailableForLegalReasonsException.Code => new UnavailableForLegalReasonsException(Data, ContentType),
+				UnprocessableEntityException.Code => new UnprocessableEntityException(Data, ContentType),
+				UnsupportedMediaTypeException.Code => new UnsupportedMediaTypeException(Data, ContentType),
+				UpgradeRequiredException.Code => new UpgradeRequiredException(Response.GetFirstHeader("Upgrade"), Data, ContentType),
 				// Redirections
-				case MovedPermanentlyException.Code: throw new MovedPermanentlyException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case FoundException.Code: throw new FoundException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case SeeOtherException.Code: throw new SeeOtherException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case NotModifiedException.Code: throw new NotModifiedException();
-				case UseProxyException.Code: throw new UseProxyException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case TemporaryRedirectException.Code: throw new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case PermanentRedirectException.Code: throw new PermanentRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
-
+				MovedPermanentlyException.Code => new MovedPermanentlyException(Response.GetFirstHeader("Location"), Data, ContentType),
+				FoundException.Code => new FoundException(Response.GetFirstHeader("Location"), Data, ContentType),
+				SeeOtherException.Code => new SeeOtherException(Response.GetFirstHeader("Location"), Data, ContentType),
+				NotModifiedException.Code => new NotModifiedException(),
+				UseProxyException.Code => new UseProxyException(Response.GetFirstHeader("Location"), Data, ContentType),
+				TemporaryRedirectException.Code => new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType),
+				PermanentRedirectException.Code => new PermanentRedirectException(Response.GetFirstHeader("Location"), Data, ContentType),
 				// Server Errors
-				case BadGatewayException.Code: throw new BadGatewayException(Data, ContentType);
-				case GatewayTimeoutException.Code: throw new GatewayTimeoutException(Data, ContentType);
-				case InsufficientStorageException.Code: throw new InsufficientStorageException(Data, ContentType);
-				case InternalServerErrorException.Code: throw new InternalServerErrorException(Data, ContentType);
-				case LoopDetectedException.Code: throw new LoopDetectedException(Data, ContentType);
-				case NetworkAuthenticationRequiredException.Code: throw new NetworkAuthenticationRequiredException(Data, ContentType);
-				case NotExtendedException.Code: throw new NotExtendedException(Data, ContentType);
-				case HTTP.NotImplementedException.Code: throw new HTTP.NotImplementedException(Data, ContentType);
-				case ServiceUnavailableException.Code: throw new ServiceUnavailableException(Data, ContentType);
-				case VariantAlsoNegotiatesException.Code: throw new VariantAlsoNegotiatesException(Data, ContentType);
-
-				default:
-					throw new HttpException(StatusCode, StatusMessage, Data, ContentType);
-			}
+				BadGatewayException.Code => new BadGatewayException(Data, ContentType),
+				GatewayTimeoutException.Code => new GatewayTimeoutException(Data, ContentType),
+				InsufficientStorageException.Code => new InsufficientStorageException(Data, ContentType),
+				InternalServerErrorException.Code => new InternalServerErrorException(Data, ContentType),
+				LoopDetectedException.Code => new LoopDetectedException(Data, ContentType),
+				NetworkAuthenticationRequiredException.Code => new NetworkAuthenticationRequiredException(Data, ContentType),
+				NotExtendedException.Code => new NotExtendedException(Data, ContentType),
+				HTTP.NotImplementedException.Code => new HTTP.NotImplementedException(Data, ContentType),
+				ServiceUnavailableException.Code => new ServiceUnavailableException(Data, ContentType),
+				VariantAlsoNegotiatesException.Code => new VariantAlsoNegotiatesException(Data, ContentType),
+				_ => new HttpException(StatusCode, StatusMessage, Data, ContentType),
+			};
 		}
 
 		private static string[] GetMethods(string Allow)

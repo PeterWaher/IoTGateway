@@ -697,7 +697,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal async Task StartSendResponse(bool ExpectContent)
+		internal async Task<bool> StartSendResponse(bool ExpectContent)
 		{
 			if (this.transferEncoding is null)
 			{
@@ -883,7 +883,7 @@ namespace Waher.Networking.HTTP
 						byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
 						if (this.responseStream is null || this.clientConnection.Disposed)
-							return;
+							return false;
 
 						this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
 						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
@@ -900,7 +900,7 @@ namespace Waher.Networking.HTTP
 				else
 				{
 					if (!this.clientConnection.IsStreamOpen(this.http2Stream.StreamId))
-						return;
+						return false;
 
 					bool LeaveOpen = this.http2Stream.UpgradedToWebSocket;
 					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, LeaveOpen);
@@ -1031,10 +1031,10 @@ namespace Waher.Networking.HTTP
 					}
 
 					if (this.clientConnection.Disposed)
-						return;
+						return false;
 
 					if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
-						return;
+						return false;
 
 					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 
@@ -1042,6 +1042,8 @@ namespace Waher.Networking.HTTP
 						await this.clientConnection.TransmitText(sb.ToString());
 				}
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -1216,7 +1218,10 @@ namespace Waher.Networking.HTTP
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				await this.StartSendResponse(true);
+			{
+				if (!await this.StartSendResponse(true))
+					return;
+			}
 
 			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
 
@@ -1254,7 +1259,10 @@ namespace Waher.Networking.HTTP
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				await this.StartSendResponse(true);
+			{
+				if (!await this.StartSendResponse(true))
+					return;
+			}
 
 			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
 

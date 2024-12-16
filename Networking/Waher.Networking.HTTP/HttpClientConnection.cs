@@ -1211,7 +1211,10 @@ namespace Waher.Networking.HTTP
 
 		private async Task<bool> ReturnHttp2Error(Http2Error ErrorCode, bool ConnectionError, string Reason)
 		{
-			await this.LogError(ErrorCode, Reason);
+			if (ConnectionError)
+				await this.LogError(ErrorCode, Reason);
+			else
+				await this.LogError(ErrorCode, Reason + " (Stream ID " + this.http2StreamId.ToString() + ")");
 
 			int i = (int)ErrorCode;
 

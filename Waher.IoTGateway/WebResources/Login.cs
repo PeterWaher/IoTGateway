@@ -127,29 +127,37 @@ namespace Waher.IoTGateway.WebResources
 					return;
 
 				case LoginResultType.Success:
-					DoLogin(Request, From, Result.User);
+					await DoLogin(Request, Response, From, Result.User, false);
 					break;
 			}
 		}
 
-		internal static void DoLogin(HttpRequest Request, string From, User User)
+		internal static Task DoLogin(HttpRequest Request, HttpResponse Response, 
+			string From, User User, bool ThrowRedirection)
 		{
-			DoLogin(Request, From, false, User);
+			return DoLogin(Request, Response, From, false, User, ThrowRedirection);
 		}
 
-		internal static void DoLogin(HttpRequest Request, string From)
+		internal static Task DoLogin(HttpRequest Request, HttpResponse Response, 
+			string From, bool ThrowRedirection)
 		{
-			DoLogin(Request, From, true, new InternalUser());
+			return DoLogin(Request, Response, From, true, new InternalUser(), ThrowRedirection);
 		}
 
-		private static void DoLogin(HttpRequest Request, string From, bool AutoLogin, IUser User)
+		private static async Task DoLogin(HttpRequest Request, HttpResponse Response, 
+			string From, bool AutoLogin, IUser User, bool ThrowRedirection)
 		{
 			Request.Session["User"] = User;
 			Request.Session[" AutoLogin "] = AutoLogin;
 			Request.Session.Remove("LoginError");
 
 			if (!string.IsNullOrEmpty(From))
-				throw new SeeOtherException(From);
+			{
+				if (ThrowRedirection)
+					throw new SeeOtherException(From);
+				else
+					await Response.SendResponse(new SeeOtherException(From));
+			}
 		}
 
 		private class InternalUser : IUserWithClaims, IRequestOrigin
@@ -186,7 +194,7 @@ namespace Waher.IoTGateway.WebResources
 				string OsVersion = Environment.OSVersion.Version.ToString();
 
 				if (OsName.EndsWith(OsVersion))
-					OsName = OsName.Substring(0, OsName.Length - OsVersion.Length).TrimEnd();
+					OsName = OsName[..^OsVersion.Length].TrimEnd();
 
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.HardwareName, Environment.MachineName));
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareName, OsName));

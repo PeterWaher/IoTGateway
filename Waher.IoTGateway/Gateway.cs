@@ -11,7 +11,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -2615,7 +2614,19 @@ namespace Waher.IoTGateway
 		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
 		/// </summary>
 		/// <param name="Request">Web request</param>
-		public static void CheckLocalLogin(HttpRequest Request)
+		public static Task CheckLocalLogin(HttpRequest Request)
+		{
+			return CheckLocalLogin(Request, Request.Response, true);
+		}
+
+		/// <summary>
+		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
+		/// </summary>
+		/// <param name="Request">Web request</param>
+		/// <param name="Response">Response object.</param>
+		/// <param name="ThrowRedirection">If the redirection should be thrown as an Exception (true),
+		/// or written as a response directly (false).</param>
+		public static async Task CheckLocalLogin(HttpRequest Request, HttpResponse Response, bool ThrowRedirection)
 		{
 			Profiler Profiler = new Profiler();
 			Profiler.Start();
@@ -2651,7 +2662,7 @@ namespace Waher.IoTGateway
 					LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
 						string.Empty, Request.RemoteEndPoint, "Web");
 
-					Login.DoLogin(Request, From);
+					await Login.DoLogin(Request, Response, From, ThrowRedirection);
 					return;
 				}
 
@@ -2688,7 +2699,7 @@ namespace Waher.IoTGateway
 #endif
 				{
 					LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-					Login.DoLogin(Request, From);
+					await Login.DoLogin(Request, Response, From, ThrowRedirection);
 					return;
 				}
 
@@ -2803,7 +2814,7 @@ namespace Waher.IoTGateway
 								if (P.SessionId == CurrentSession)
 								{
 									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-									Login.DoLogin(Request, From);
+									await Login.DoLogin(Request, Response, From, ThrowRedirection);
 									return;
 								}
 								break;
@@ -2831,7 +2842,7 @@ namespace Waher.IoTGateway
 								if (P.SessionId == CurrentSession)
 								{
 									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-									Login.DoLogin(Request, From);
+									await Login.DoLogin(Request, Response, From, ThrowRedirection);
 									return;
 								}
 								break;

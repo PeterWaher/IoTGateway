@@ -125,6 +125,7 @@ namespace Waher.Things.Files
 
 						watchers[Node.FolderPath] = new KeyValuePair<FolderNode, FileSystemWatcher>(Node, Watcher);
 
+						Watcher.InternalBufferSize = 65536;
 						Watcher.NotifyFilter =
 							NotifyFilters.Attributes |
 							NotifyFilters.CreationTime |

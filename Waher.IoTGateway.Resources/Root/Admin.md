@@ -29,9 +29,19 @@ MenuFooter():=
 [[
 );
 
+IsAuthorized(Privileges[]):=
+(
+	if !exists(User) then
+		false
+	else if count(Privileges)=0 then
+		true
+	else
+		And([foreach Privilege in Privileges do (User.HasPrivilege(Privilege)???false)])
+);
+
 MenuItem(Text,Url,Privileges[]):=
 (
-	if count(Privileges)=0 or And([foreach Privilege in Privileges do (User.HasPrivilege(Privilege)???false)]) then
+	if IsAuthorized(Privileges) then
 		]]<div class="menuItem" onclick="OpenPage('((Url))')"><div class="menuItemContent">((Text))</div></div>
 [[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
 [[
@@ -39,7 +49,7 @@ MenuItem(Text,Url,Privileges[]):=
 
 SnifferItem(Text,Url,Privileges[]):=
 (
-	if And([foreach Privilege in Privileges do (User.HasPrivilege(Privilege)???false)]) then
+	if IsAuthorized(Privileges) then
 		]]<div class="menuItem" onclick="OpenSniffer('((Url))')"><div class="menuItemContent">((Text))</div></div>
 [[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
 [[

@@ -31,7 +31,7 @@ MenuFooter():=
 
 IsAuthorized(Privileges[]):=
 (
-	if !exists(User) then
+	if !exists(User) || User is not Waher.Security.IUser then
 		false
 	else if count(Privileges)=0 then
 		true

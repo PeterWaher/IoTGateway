@@ -155,9 +155,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Value">Header value.</param>
 		public void AddDefaultResponseHeader(string Key, string Value)
 		{
-			if (this.defaultResponseHeaders is null)
-				this.defaultResponseHeaders = new LinkedList<KeyValuePair<string, string>>();
-
+			this.defaultResponseHeaders ??= new LinkedList<KeyValuePair<string, string>>();
 			this.defaultResponseHeaders.AddLast(new KeyValuePair<string, string>(Key, Value));
 		}
 
@@ -173,7 +171,7 @@ namespace Waher.Networking.HTTP
 
 				int c = s.Length;
 				if (c > 0 && (s[c - 1] == Path.DirectorySeparatorChar || s[c - 1] == '/' || s[c - 1] == '\\'))
-					s = s.Substring(0, c - 1);
+					s = s[..(c - 1)];
 
 				this.folderPath = s;
 			}
@@ -396,7 +394,7 @@ namespace Waher.Networking.HTTP
 					i = Host.IndexOf(':');
 
 					if (i > 0)
-						Host = Host.Substring(0, i);
+						Host = Host[..i];
 
 					if (ContainsInvalidFileCharacters(Host, false, true))
 					{
@@ -436,8 +434,8 @@ namespace Waher.Networking.HTTP
 
 				i = s2.LastIndexOf('.');
 				if (i > 0 &&
-					File.Exists(s3 = s2.Substring(0, i)) &&
-					InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
+					File.Exists(s3 = s2[..i]) &&
+					InternetContent.TryGetContentType(s2[(i + 1)..], out ContentType) &&
 					(Header?.Accept?.IsAcceptable(ContentType) ?? true))
 				{
 					if (!(Header is null))
@@ -455,8 +453,8 @@ namespace Waher.Networking.HTTP
 
 			i = s2.LastIndexOf('.');
 			if (i > 0 &&
-				File.Exists(s3 = s2.Substring(0, i)) &&
-				InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
+				File.Exists(s3 = s2[..i]) &&
+				InternetContent.TryGetContentType(s2[(i + 1)..], out ContentType) &&
 				(Header?.Accept?.IsAcceptable(ContentType) ?? true))
 			{
 				if (!(Header is null))
@@ -485,7 +483,7 @@ namespace Waher.Networking.HTTP
 
 				if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
 				{
-					Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
+					Folder = this.folderPath + Path.DirectorySeparatorChar + Host[4..];
 					if (Directory.Exists(Folder))
 					{
 						this.folders[Host] = Folder;
@@ -496,7 +494,7 @@ namespace Waher.Networking.HTTP
 				int i = Host.IndexOf('.');
 				if (i > 0)
 				{
-					Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(0, i);
+					Folder = this.folderPath + Path.DirectorySeparatorChar + Host[..i];
 					if (Directory.Exists(Folder))
 					{
 						this.folders[Host] = Folder;
@@ -540,11 +538,11 @@ namespace Waher.Networking.HTTP
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				if (AcceptableResponse is null || Response.ResponseSent)
+					return;
+
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
-
-				if (Response.ResponseSent)
-					return;
 
 				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified,
 					Response, Request, this.defaultResponseHeaders);
@@ -912,9 +910,7 @@ namespace Waher.Networking.HTTP
 
 								if (All || Array.IndexOf(Range, AcceptRecord.Item) >= 0)
 								{
-									if (Alternatives is null)
-										Alternatives = new List<string>();
-
+									Alternatives ??= new List<string>();
 									Alternatives.Add(AcceptRecord.Item);
 								}
 							}
@@ -928,8 +924,16 @@ namespace Waher.Networking.HTTP
 								Result.Dynamic = true;
 							}
 
-							Result.ContentType = NewContentType;
-							Ok = true;
+							if (State.HasError)
+							{
+								await Response.SendResponse(State.Error);
+								return null;
+							}
+							else
+							{
+								Result.ContentType = NewContentType;
+								Ok = true;
+							}
 						}
 						finally
 						{
@@ -954,13 +958,24 @@ namespace Waher.Networking.HTTP
 				}
 
 				if (!Acceptable)
-					throw new NotAcceptableException();
+				{
+					await Response.SendResponse(new NotAcceptableException());
+					return null;
+				}
 			}
+
+			bool Protected;
 
 			lock (protectedContentTypes)
 			{
-				if (protectedContentTypes.TryGetValue(ContentType, out bool Protected) && Protected)
-					throw new ForbiddenException("Resource is protected.");
+				if (!protectedContentTypes.TryGetValue(ContentType, out Protected))
+					Protected = false;
+			}
+
+			if (Protected)
+			{
+				await Response.SendResponse(new ForbiddenException("Resource is protected."));
+				return null;
 			}
 
 			return Result;
@@ -1117,11 +1132,11 @@ namespace Waher.Networking.HTTP
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				if (AcceptableResponse is null || Response.ResponseSent)
+					return;
+
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
-
-				if (Response.ResponseSent)
-					return;
 
 				ReadProgress Progress = new ReadProgress()
 				{
@@ -1239,7 +1254,10 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, false, out bool _);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No data in " + Request.Header.Method + " request.");
+			{
+				await Response.SendResponse(new BadRequestException("No data in " + Request.Header.Method + " request."));
+				return;
+			}
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))
@@ -1292,7 +1310,10 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, false, out bool Exists);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No data in " + Request.Header.Method + " request.");
+			{
+				await Response.SendResponse(new BadRequestException("No data in " + Request.Header.Method + " request."));
+				return;
+			}
 
 			if (!Exists)
 			{
@@ -1347,7 +1368,10 @@ namespace Waher.Networking.HTTP
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);
 			else
-				throw new NotFoundException("File not found: " + Request.SubPath);
+			{
+				await Response.SendResponse(new NotFoundException("File not found: " + Request.SubPath));
+				return;
+			}
 
 			await Response.SendResponse();
 			await Response.DisposeAsync();
@@ -1414,8 +1438,12 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			Variables Session = Request.Session
-				?? throw new MethodNotAllowedException(this.AllowedMethods);
+			Variables Session = Request.Session;
+			if (Session is null)
+			{
+				await Response.SendResponse(new MethodNotAllowedException(this.AllowedMethods));
+				return;
+			}
 
 			string Referer = Request.Header.Referer?.Value;
 
@@ -1430,10 +1458,11 @@ namespace Waher.Networking.HTTP
 				Uri.TryCreate(Referer, UriKind.RelativeOrAbsolute, out Uri RefererUri) &&
 				string.Compare(Request.SubPath, RefererUri.AbsolutePath, true) == 0)
 			{
-				throw new SeeOtherException(Referer);  // PRG pattern.
+				await Response.SendResponse(new SeeOtherException(Referer));  // PRG pattern.
+				return;
 			}
-			else
-				await this.GET(Request, Response);
+				
+			await this.GET(Request, Response);
 		}
 	}
 }

@@ -123,7 +123,10 @@ namespace Waher.Content.Markdown.GraphViz
                 State.ToContentType = ImageCodec.ContentTypePng;
             }
             else
-                throw new Exception("Unable to convert document from " + State.FromContentType + " to " + State.ToContentType);
+            {
+                State.Error = new Exception("Unable to convert document from " + State.FromContentType + " to " + State.ToContentType);
+                return false;
+            }
 
             byte[] Data = await Resources.ReadAllBytesAsync(Graph.FileName);
 

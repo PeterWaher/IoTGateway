@@ -263,16 +263,21 @@ namespace Waher.Content.Markdown.Web
 							else
 								Location.Append(System.Net.WebUtility.UrlEncode(State.URL));
 
-							throw new TemporaryRedirectException(Location.ToString());
+							State.Error = new TemporaryRedirectException(Location.ToString());
+							return false;
 						}
 					}
 
-					throw ForbiddenException.AccessDenied(State.FromFileName, User2?.UserName ?? User?.ToString() ?? string.Empty,
+					State.Error = ForbiddenException.AccessDenied(State.FromFileName, User2?.UserName ?? User?.ToString() ?? string.Empty,
 						MissingPrivilege);
+					return false;
 				}
 
 				if (User is null)
-					throw ForbiddenException.AccessDenied(State.FromFileName, string.Empty, string.Empty);
+				{
+					State.Error = ForbiddenException.AccessDenied(State.FromFileName, string.Empty, string.Empty);
+					return false;
+				}
 
 				State.Session[" User "] = User;
 			}

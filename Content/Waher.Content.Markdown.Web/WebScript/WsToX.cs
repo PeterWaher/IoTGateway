@@ -92,7 +92,10 @@ namespace Waher.Content.Markdown.Web.WebScript
 					}
 
 					if (!AlternativeFound)
-						throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + State.ToContentType);
+					{
+						State.Error = new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + State.ToContentType);
+						return false;
+					}
 				}
 
 				KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);

@@ -52,6 +52,12 @@ namespace Waher.Content
 						if (await this.sequence[i].Value.ConvertAsync(State2))
 							Dynamic = true;
 
+						if (State2.HasError)
+						{
+							State.Error = State2.Error;
+							return Dynamic;
+						}
+
 						State.ToContentType = State2.ToContentType;
 					}
 					else
@@ -68,6 +74,12 @@ namespace Waher.Content
 
 						if (await this.sequence[i].Value.ConvertAsync(State2))
 							Dynamic = true;
+
+						if (State2.HasError)
+						{
+							State.Error = State2.Error;
+							return Dynamic;
+						}
 
 						ToType = State2.ToContentType;
 

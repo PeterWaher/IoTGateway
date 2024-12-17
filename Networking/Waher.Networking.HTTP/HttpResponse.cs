@@ -317,6 +317,11 @@ namespace Waher.Networking.HTTP
 						this.eTag = Value;
 					break;
 
+				case "set-cookie":
+					this.cookies ??= new LinkedList<Cookie>();
+					this.cookies.AddLast(Cookie.FromSetCookie(Value));
+					break;
+
 				default:
 					this.customHeaders ??= new Dictionary<string, string>();
 					this.customHeaders[FieldName] = Value;
@@ -911,7 +916,9 @@ namespace Waher.Networking.HTTP
 
 					byte[] HeaderBin;
 
-					await w.Lock();
+					if (!await w.TryLock(10000))
+						return await this.clientConnection.ReturnHttp2Error(Http2Error.InternalError, true, "Unable to get access to HTTP/2 header reader.");
+
 					try
 					{
 						w.Reset(sb);

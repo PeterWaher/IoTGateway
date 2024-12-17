@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					}
 
 					if (Exclusive)
-						this.MoveChildren(DependentOn, Node);
+						this.MoveChildrenLocked(DependentOn, Node);
 
 					if (Add)
 						Parent.AddChildDependency(Node);
@@ -201,7 +201,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this);
 
 					if (Exclusive && !(DependentOn is null))
-						this.MoveChildren(DependentOn, Node);
+						this.MoveChildrenLocked(DependentOn, Node);
 
 					Parent.AddChildDependency(Node);
 					this.nodes[Stream.StreamId] = Node;
@@ -211,9 +211,9 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
-		private void MoveChildren(PriorityNodeRfc7540 From, PriorityNodeRfc7540 To)
+		private void MoveChildrenLocked(PriorityNodeRfc7540 From, PriorityNodeRfc7540 To)
 		{
-			LinkedList<PriorityNodeRfc7540> Children = From.MoveChildrenFrom();
+			LinkedList<PriorityNodeRfc7540> Children = From?.MoveChildrenFrom();
 			To.MoveChildrenTo(Children);
 		}
 
@@ -253,7 +253,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				if (Exclusive)
-					this.MoveChildren(DependentOn, Node);
+					this.MoveChildrenLocked(DependentOn, Node);
 
 				if (Add)
 					Parent.AddChildDependency(Node);
@@ -317,9 +317,13 @@ namespace Waher.Networking.HTTP.HTTP2
 					if (ScaledWeight > 255)
 						ScaledWeight = 255;
 
-					Node.RemoveChildDependency(Child);
-					Child.Weight = (byte)ScaledWeight;
-					Parent.AddChildDependency(Child);
+					if (Node.RemoveChildDependency(Child))
+					{
+						Child.Weight = (byte)ScaledWeight;
+						Parent.AddChildDependency(Child);
+					}
+					else
+						break;
 				}
 			}
 

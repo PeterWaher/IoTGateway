@@ -10,11 +10,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	public class ChunkedTransferEncoding : TransferEncoding
 	{
 		private readonly Encoding textEncoding;
-		private readonly bool txText;
 		private readonly byte[] chunk;
 		private int state = 0;
 		private int chunkSize = 0;
 		private int pos;
+		private bool txText;
 
 		/// <summary>
 		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
@@ -230,10 +230,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				if (this.clientConnection.HasSniffers)
 				{
-					if (this.txText)
+					if (this.txText && this.pos < 1000)
 						await this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
 					else
+					{
 						await this.clientConnection.TransmitBinary(Chunk);
+						this.txText = false;
+					}
 				}
 			}
 

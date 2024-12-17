@@ -15,10 +15,8 @@ using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
-using Waher.Runtime.Console.Worker;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
-using Waher.Script.Functions.Logging;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -822,7 +820,10 @@ namespace Waher.Networking.HTTP
 							}
 
 							sb?.Clear();
-							await this.http2HeaderReader.Lock();
+
+							if (!await this.http2HeaderReader.TryLock(10000))
+								return await this.ReturnHttp2Error(Http2Error.InternalError, true, "Unable to get access to HTTP/2 header reader.");
+
 							try
 							{
 								if (ResetHeader)
@@ -924,7 +925,7 @@ namespace Waher.Networking.HTTP
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, true, "Expected exactly 4 bytes of data.");
 
 						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
-						await this.LogError(Error.Value, "Client reset the stream.");
+						await this.LogError(Error.Value, "Client reset the stream.", false);
 
 						this.flowControl.RemoveStream(this.http2StreamId);
 						break;
@@ -1012,7 +1013,7 @@ namespace Waher.Networking.HTTP
 
 						this.http2LastPermittedStreamId = (int)(this.reader.NextUInt32() & 0x7fffffff);
 						Error = (Http2Error)this.reader.NextUInt32();
-						await this.LogError(Error.Value, "Client requested connection to close.");
+						await this.LogError(Error.Value, "Client requested connection to close.", true);
 
 						this.flowControl?.GoingAway(this.http2LastPermittedStreamId);
 						break;
@@ -1190,7 +1191,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private Task LogError(Http2Error ErrorCode, string Reason)
+		private Task LogError(Http2Error ErrorCode, string Reason, bool ConnectionError)
 		{
 			if (this.HasSniffers)
 			{
@@ -1199,6 +1200,13 @@ namespace Waher.Networking.HTTP
 				sb.Append(ErrorCode.ToString());
 				sb.Append(": ");
 				sb.Append(Reason);
+
+				if (!ConnectionError)
+				{
+					sb.Append(" (Stream ");
+					sb.Append(this.http2StreamId.ToString());
+					sb.Append(')');
+				}
 
 				if (IsError(ErrorCode))
 					return this.Error(sb.ToString());
@@ -1209,12 +1217,9 @@ namespace Waher.Networking.HTTP
 				return Task.CompletedTask;
 		}
 
-		private async Task<bool> ReturnHttp2Error(Http2Error ErrorCode, bool ConnectionError, string Reason)
+		internal async Task<bool> ReturnHttp2Error(Http2Error ErrorCode, bool ConnectionError, string Reason)
 		{
-			if (ConnectionError)
-				await this.LogError(ErrorCode, Reason);
-			else
-				await this.LogError(ErrorCode, Reason + " (Stream ID " + this.http2StreamId.ToString() + ")");
+			await this.LogError(ErrorCode, Reason, ConnectionError);
 
 			int i = (int)ErrorCode;
 
@@ -1824,20 +1829,6 @@ namespace Waher.Networking.HTTP
 			return Result;
 		}
 
-		private KeyValuePair<string, string>[] Merge(KeyValuePair<string, string>[] Headers, LinkedList<Cookie> Cookies)
-		{
-			if (Cookies is null || Cookies.First is null)
-				return Headers;
-
-			List<KeyValuePair<string, string>> Result = new List<KeyValuePair<string, string>>();
-			Result.AddRange(Headers);
-
-			foreach (Cookie Cookie in Cookies)
-				Result.Add(new KeyValuePair<string, string>("Set-Cookie", Cookie.ToString()));
-
-			return Result.ToArray();
-		}
-
 		private async Task ProcessRequest(HttpRequest Request, HttpResource Resource)
 		{
 			HttpResponse Response = null;
@@ -1904,7 +1895,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						await this.SendResponse(Request, Response, ex, false, this.Merge(ex.HeaderFields, Response.Cookies));
+						await this.SendResponse(Request, Response, ex, false, ex.HeaderFields);
 					}
 					catch (Exception)
 					{
@@ -2006,8 +1997,8 @@ namespace Waher.Networking.HTTP
 			this.client = null;
 		}
 
-		private async Task SendResponse(HttpRequest Request, HttpResponse Response, HttpException ex, bool CloseAfterTransmission,
-			params KeyValuePair<string, string>[] HeaderFields)
+		private async Task SendResponse(HttpRequest Request, HttpResponse Response, HttpException ex, 
+			bool CloseAfterTransmission, params KeyValuePair<string, string>[] HeaderFields)
 		{
 			bool DisposeResponse;
 

@@ -2062,7 +2062,7 @@ Script in Markdown can be processed in three different ways:
 1. **Inline processing**: The script is evaluated as part of rendering, and the result presented in the place of the script.
 2. **Pre-processing**: Script is evaluated prior to rendering the page for display. This allows script to modify the structure of the
 Markdown document.
-3. **Asynchronous processing*: Long-running script can be run asynchronously. This means the page is rendered and returned to the client.
+3. **Asynchronous processing**: Long-running script can be run asynchronously. This means the page is rendered and returned to the client.
 When the script is evaluated, it is returned to the client, which inserts it in the place of the script.
 
 ### Inline script

@@ -284,7 +284,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				Flags |= 4; // END_HEADERS
 
-				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, false, this, Headers);
+				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, false, this.streamId, Headers);
 			}
 			else
 			{
@@ -299,7 +299,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					else
 						Flags = 4; // END_HEADERS
 
-					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this, Headers, Pos, Diff, null))
+					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this.streamId, Headers, Pos, Diff, null))
 						return false;
 
 					Pos += Diff;
@@ -323,7 +323,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last, 
 			Encoding DataEncoding)
 		{
-			if (!await this.connection.WriteData(this, Data, Offset, Count, Last, DataEncoding))
+			if (!await this.connection.WriteData(this.streamId, Data, Offset, Count, Last, DataEncoding))
 				return false;
 
 			if (Last)

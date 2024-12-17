@@ -917,7 +917,7 @@ namespace Waher.Networking.HTTP
 					byte[] HeaderBin;
 
 					if (!await w.TryLock(10000))
-						return await this.clientConnection.ReturnHttp2Error(Http2Error.InternalError, true, "Unable to get access to HTTP/2 header reader.");
+						return await this.clientConnection.ReturnHttp2Error(Http2Error.InternalError, 0, "Unable to get access to HTTP/2 header reader.");
 
 					try
 					{

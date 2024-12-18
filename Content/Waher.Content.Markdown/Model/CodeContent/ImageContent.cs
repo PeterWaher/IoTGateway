@@ -157,8 +157,8 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			object Obj = await InternetContent.DecodeAsync(Language, Convert.FromBase64String(GetImageBase64(Rows)), null);
-			if (!(Obj is SKImage Image))
+			ContentResponse Obj = await InternetContent.DecodeAsync(Language, Convert.FromBase64String(GetImageBase64(Rows)), null);
+			if (Obj.HasError || !(Obj.Decoded is SKImage Image))
 				throw new Exception("Unable to decode raw data as an image.");
 
 			return PixelInformation.FromImage(Image);

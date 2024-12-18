@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
@@ -138,11 +139,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string Address))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string Address))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			string TabID = Request.Header["X-TabID"];
 
@@ -183,7 +190,10 @@ namespace Waher.IoTGateway.Setup
 				if (!string.IsNullOrEmpty(TabID))
 					await Response.Write(0);
 				else
-					throw new BadRequestException(ex.Message);
+				{
+					await Response.SendResponse(new BadRequestException(ex.Message));
+					return;
+				}
 			}
 
 			await Response.SendResponse();

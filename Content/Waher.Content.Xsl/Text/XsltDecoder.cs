@@ -7,7 +7,7 @@ using System.Xml;
 using System.Xml.Xsl;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Xml.Text
+namespace Waher.Content.Xsl.Text
 {
 	/// <summary>
 	/// XSLT decoder.
@@ -79,7 +79,7 @@ namespace Waher.Content.Xml.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			using (Stream f = new MemoryStream(Data))
 			{
@@ -88,7 +88,7 @@ namespace Waher.Content.Xml.Text
 					XslCompiledTransform Xslt = new XslCompiledTransform();
 					Xslt.Load(r);
 
-					return Task.FromResult<object>(Xslt);
+					return Task.FromResult(new ContentResponse(ContentType, Xslt, Data));
 				}
 			}
 		}

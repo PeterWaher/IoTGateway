@@ -167,8 +167,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback,
 			object State, params HttpField[] Headers)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Data, Encoding.UTF8);
-			await this.POST(To, Resource, P.Key, P.Value, Callback, DataCallback, State, Headers);
+			ContentResponse P = await InternetContent.EncodeAsync(Data, Encoding.UTF8);
+			P.AssertOk();
+
+			await this.POST(To, Resource, P.Encoded, P.ContentType, Callback, DataCallback, State, Headers);
 		}
 
 		/// <summary>
@@ -560,8 +562,8 @@ namespace Waher.Networking.XMPP.HTTPX
 						}
 						else
 						{
-							CipherLocalName = this.symmetricCipherReference.Substring(i + 1);
-							CipherNamespace = this.symmetricCipherReference.Substring(0, i);
+							CipherLocalName = this.symmetricCipherReference[(i + 1)..];
+							CipherNamespace = this.symmetricCipherReference[..i];
 						}
 
 						if (!this.endpointSecurity.TryGetSymmetricCipher(CipherLocalName, CipherNamespace, out IE2eSymmetricCipher SymmetricCipher))

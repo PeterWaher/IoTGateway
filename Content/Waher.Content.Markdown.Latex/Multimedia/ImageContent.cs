@@ -40,20 +40,26 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 
 				if (Uri.TryCreate(Url, UriKind.RelativeOrAbsolute, out Uri ParsedUri))
 				{
-					KeyValuePair<string, TemporaryStream> P;
+					Stream f;
 
 					if (ParsedUri.IsAbsoluteUri)
 					{
-						P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000);
+						ContentStreamResponse P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000);
+						if (P.HasError)
+							continue;
+
+						f = P.Encoded;
 					}
 					else
 					{
 						string FileName = Document.Settings.GetFileName(Document.FileName, Url);
 						if (!File.Exists(FileName))
 							continue;
+
+						f = File.OpenRead(FileName);
 					}
 
-					using (TemporaryStream f = P.Value)
+					try
 					{
 						byte[] Bin = await f.ReadAllAsync();
 						string FileName = await GetTemporaryFile(Bin);
@@ -99,6 +105,10 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 							Output.AppendLine("\\end{figure}");
 							Output.AppendLine();
 						}
+					}
+					finally
+					{
+						f.Dispose();
 					}
 				}
 			}

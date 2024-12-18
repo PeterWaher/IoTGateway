@@ -1135,13 +1135,16 @@ namespace Waher.Networking.HTTP
 
 			if (Accept is null)
 			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
-				this.encodingUsed |= P.Value.StartsWith("text/");
+				ContentResponse P = await InternetContent.EncodeAsync(Object, this.encoding);
+				if (P.HasError)
+					return null;
+
+				this.encodingUsed |= P.ContentType.StartsWith("text/");
 
 				return new EncodingResult()
 				{
-					Data = P.Key,
-					ContentType = P.Value
+					Data = P.Encoded,
+					ContentType = P.ContentType
 				};
 			}
 			else
@@ -1154,10 +1157,13 @@ namespace Waher.Networking.HTTP
 					switch (Rec.Detail)
 					{
 						case 0: // Wildcard
-							KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
-							this.encodingUsed |= P.Value.StartsWith("text/");
-							Data = P.Key;
-							ContentType = P.Value;
+							ContentResponse P = await InternetContent.EncodeAsync(Object, this.encoding);
+							if (P.HasError)
+								return null;
+
+							this.encodingUsed |= P.ContentType.StartsWith("text/");
+							Data = P.Encoded;
+							ContentType = P.ContentType;
 							break;
 
 						case 1: // Top Type only
@@ -1184,9 +1190,9 @@ namespace Waher.Networking.HTTP
 							if (!(Best is null))
 							{
 								P = await Best.EncodeAsync(Object, this.encoding, ContentType, BestContentType);
-								this.encodingUsed |= P.Value.StartsWith("text/");
-								Data = P.Key;
-								ContentType = P.Value;
+								this.encodingUsed |= P.ContentType.StartsWith("text/");
+								Data = P.Encoded;
+								ContentType = P.ContentType;
 							}
 							break;
 
@@ -1195,9 +1201,9 @@ namespace Waher.Networking.HTTP
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
 							{
 								P = await Encoder.EncodeAsync(Object, this.encoding, ContentType, Rec.Item);
-								this.encodingUsed |= P.Value.StartsWith("text/");
-								Data = P.Key;
-								ContentType = P.Value;
+								this.encodingUsed |= P.ContentType.StartsWith("text/");
+								Data = P.Encoded;
+								ContentType = P.ContentType;
 							}
 							break;
 					}

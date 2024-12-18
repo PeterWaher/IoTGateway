@@ -9,7 +9,6 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Events;
@@ -376,11 +375,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string JID))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string JID))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
@@ -426,11 +431,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string JID))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string JID))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
@@ -451,11 +462,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string JID))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string JID))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
@@ -476,11 +493,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string JID))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string JID))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
@@ -501,13 +524,24 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string NewName))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
+
 			string JID = Request.Header["X-BareJID"];
-			string NewName = Obj as string;
 			if (JID is null || string.IsNullOrEmpty(JID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
@@ -528,16 +562,25 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			string BareJid = Obj as string;
-			if (string.IsNullOrEmpty(BareJid))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string BareJid) || string.IsNullOrEmpty(BareJid))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			XmppClient Client = Gateway.XmppClient;
-			RosterItem Contact = Client.GetRosterItem(BareJid)
-				?? throw new NotFoundException();
+			RosterItem Contact = Client.GetRosterItem(BareJid);
+			if (Contact is null)
+			{
+				await Response.SendResponse(new NotFoundException());
+				return;
+			}
 
 			SortedDictionary<string, bool> Groups = new SortedDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 			string[] GroupsArray;
@@ -583,11 +626,18 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			string StartsWith = await Request.DecodeDataAsync() as string;
-			if (string.IsNullOrEmpty(StartsWith))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+
+			if (Content.HasError || !(Content.Decoded is string StartsWith) || string.IsNullOrEmpty(StartsWith))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			SuggestionEventArgs e = new SuggestionEventArgs(StartsWith.Trim());
 
@@ -643,11 +693,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string JID))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string JID))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
@@ -677,11 +733,17 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string JID))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string JID))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 

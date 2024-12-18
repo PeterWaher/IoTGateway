@@ -65,7 +65,10 @@ namespace Waher.WebService.Sparql
 			CheckAuthorization(Request);
 
 			if (!Request.Header.TryGetQueryParameter("query", out _))
-				throw new SeeOtherException("/Sparql.md");
+			{
+				await Response.SendResponse(new SeeOtherException("/Sparql.md"));
+				return;
+			}
 
 			// TODO: Return page if empty GET.
 
@@ -140,9 +143,7 @@ namespace Waher.WebService.Sparql
 							IGraphSource Source = await SparqlQuery.GetSourceHandler(SourceUri, false);
 							ISemanticCube Cube = await Source.LoadGraph(SourceUri, Query, false, await State.GetOrigin());
 
-							if (DefaultGraphs is null)
-								DefaultGraphs = new List<ISemanticCube>();
-
+							DefaultGraphs ??= new List<ISemanticCube>();
 							DefaultGraphs.Add(Cube);
 						}
 						break;
@@ -150,9 +151,7 @@ namespace Waher.WebService.Sparql
 					case "named-graph-uri":
 						if (!string.IsNullOrEmpty(P.Value))
 						{
-							if (NamedGraphs is null)
-								NamedGraphs = new List<string>();
-
+							NamedGraphs ??= new List<string>();
 							NamedGraphs.Add(P.Value);
 						}
 						break;
@@ -180,10 +179,23 @@ namespace Waher.WebService.Sparql
 		{
 			CheckAuthorization(Request);
 
+			if (!Request.HasData)
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
+
 			State State = new State(Request);
 			State.Start();
 
-			object Obj = Request.HasData ? await Request.DecodeDataAsync() : null;
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError)
+			{
+				await Response.SendResponse(Content.Error);
+				return;
+			}
+
+			object Obj = Content.Decoded;
 			ISemanticCube[] DefaultGraphs;
 			string[] NamedGraphs;
 			bool Pretty;
@@ -226,17 +238,26 @@ namespace Waher.WebService.Sparql
 							if (Item is string s2)
 								Parameters.AddLast(new KeyValuePair<string, string>(P.Key, s2));
 							else
-								throw new BadRequestException("Invalid form.");
+							{
+								await Response.SendResponse(new BadRequestException("Invalid form."));
+								return;
+							}
 						}
 					}
 					else
-						throw new BadRequestException("Invalid form.");
+					{
+						await Response.SendResponse(new BadRequestException("Invalid form."));
+						return;
+					}
 				}
 
 				(Query, DefaultGraphs, NamedGraphs, Pretty) = await this.GetQueryGraphs(Parameters, State);
 			}
 			else
-				throw new UnsupportedMediaTypeException("Content must be a SPARQL query or a web form containing a SPARQL query.");
+			{
+				await Response.SendResponse(new UnsupportedMediaTypeException("Content must be a SPARQL query or a web form containing a SPARQL query."));
+				return;
+			}
 
 			Task _ = Task.Run(() => this.Process(Request, Response, Query, DefaultGraphs, NamedGraphs, State, Pretty));
 		}

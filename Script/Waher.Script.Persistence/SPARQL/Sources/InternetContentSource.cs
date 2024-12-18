@@ -61,9 +61,14 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 			{
 				// TODO: Include credentials in request, if available.
 
-				Result = await InternetContent.GetAsync(Source,
+				ContentResponse Content = await InternetContent.GetAsync(Source,
 					new KeyValuePair<string, string>("Accept", "text/turtle, application/x-turtle, application/rdf+xml;q=0.9, application/ld+json;q=0.8, text/xml;q=0.2, " + PlainTextCodec.DefaultContentType + ";q=0.1"));
+				if (NullIfNotFound && Content.HasError)
+					return null;
+				else
+					Content.AssertOk();
 
+				Result = Content.Decoded;
 				if (Result is ISemanticCube Cube)
 					return Cube;
 

@@ -30,7 +30,9 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ContentType };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -67,13 +69,13 @@ namespace Waher.Content.Multipart
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
 			await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
 
-			return new MixedContent(List.ToArray());
+			return new ContentResponse(ContentType, new MixedContent(List.ToArray()), Data);
 		}
 
 		/// <summary>
@@ -146,17 +148,17 @@ namespace Waher.Content.Multipart
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Object is MixedContent Mixed &&
 				InternetContent.IsAccepted(ContentType, AcceptedContentTypes))
 			{
 				string Boundary = Guid.NewGuid().ToString();
 				string ContentType = MixedCodec.ContentType + "; boundary=\"" + Boundary + "\"";
-				return new KeyValuePair<byte[], string>(await FormDataDecoder.Encode(Mixed.Content, Boundary), ContentType);
+				return new ContentResponse(ContentType, Object, await FormDataDecoder.Encode(Mixed.Content, Boundary));
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				return new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object)));
 		}
 	}
 }

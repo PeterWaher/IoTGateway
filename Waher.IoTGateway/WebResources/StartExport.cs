@@ -76,29 +76,57 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
-				if (!Request.HasData || !(await Request.DecodeDataAsync() is Dictionary<string, object> RequestObj))
-					throw new UnsupportedMediaTypeException("Invalid request.");
+				if (!Request.HasData)
+				{
+					await Response.SendResponse(new UnsupportedMediaTypeException("Invalid request."));
+					return;
+				}
+
+				ContentResponse Content = await Request.DecodeDataAsync();
+				if (Content.HasError || !(Content.Decoded is Dictionary<string, object> RequestObj))
+				{
+					await Response.SendResponse(new UnsupportedMediaTypeException("Invalid request."));
+					return;
+				}
 
 				if (!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile))
-					throw new BadRequestException("Missing: TypeOfFile");
+				{
+					await Response.SendResponse(new BadRequestException("Missing: TypeOfFile"));
+					return;
+				}
 
 				if (!RequestObj.TryGetValue("Database", out Obj) || !(Obj is bool Database))
-					throw new BadRequestException("Missing: Database");
+				{
+					await Response.SendResponse(new BadRequestException("Missing: Database"));
+					return;
+				}
 
 				if (!RequestObj.TryGetValue("Ledger", out Obj) || !(Obj is bool Ledger))
 					Ledger = false;
 
 				if (!RequestObj.TryGetValue("WebContent", out Obj) || !(Obj is bool WebContent))
-					throw new BadRequestException("Missing: WebContent");
+				{
+					await Response.SendResponse(new BadRequestException("Missing: WebContent"));
+					return;
+				}
 
 				if (!RequestObj.TryGetValue("OnlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections))
-					throw new BadRequestException("Missing: OnlySelectedCollections");
+				{
+					await Response.SendResponse(new BadRequestException("Missing: OnlySelectedCollections"));
+					return;
+				}
 
 				if (!RequestObj.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections))
-					throw new BadRequestException("Missing: selectedCollections");
+				{
+					await Response.SendResponse(new BadRequestException("Missing: selectedCollections"));
+					return;
+				}
 
 				if (!RequestObj.TryGetValue("exportOnly", out Obj) || !(Obj is bool ExportOnly))
-					throw new BadRequestException("Missing: exportOnly");
+				{
+					await Response.SendResponse(new BadRequestException("Missing: exportOnly"));
+					return;
+				}
 
 				ExportInfo ExportInfo = await GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
 				Task T;
@@ -192,7 +220,7 @@ namespace Waher.IoTGateway.WebResources
 					XmlWriterSettings Settings = XML.WriterSettings(true, false);
 					Settings.Async = true;
 					XmlWriter XmlOutput = XmlWriter.Create(fs, Settings);
-					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
+					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
 					Result.Exporter = new XmlExportFormat(Result.LocalBackupFileName, Created, XmlOutput, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
@@ -200,7 +228,7 @@ namespace Waher.IoTGateway.WebResources
 					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".bin");
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
-					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
+					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
 					Result.Exporter = new BinaryExportFormat(Result.LocalBackupFileName, Created, fs, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
@@ -208,7 +236,7 @@ namespace Waher.IoTGateway.WebResources
 					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".gz");
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
-					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
+					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
 					GZipStream gz = new GZipStream(fs, CompressionLevel.Optimal, false);
 					Result.Exporter = new BinaryExportFormat(Result.LocalBackupFileName, Created, gz, fs, OnlySelectedCollections, SelectedCollections);
 					break;
@@ -217,7 +245,7 @@ namespace Waher.IoTGateway.WebResources
 					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".bak");
 					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
 					Created = File.GetCreationTime(Result.FullBackupFileName);
-					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
+					Result.LocalBackupFileName = Result.FullBackupFileName[BasePath.Length..];
 
 					byte[] Key = Gateway.NextBytes(32);
 					byte[] IV = Gateway.NextBytes(16);
@@ -515,7 +543,7 @@ namespace Waher.IoTGateway.WebResources
 			using (FileStream fs = File.OpenRead(FileName))
 			{
 				if (FileName.StartsWith(Gateway.AppDataFolder))
-					FileName = FileName.Substring(Gateway.AppDataFolder.Length);
+					FileName = FileName[Gateway.AppDataFolder.Length..];
 
 				if (!await Output.ExportFile(FileName, fs))
 					return false;
@@ -618,51 +646,49 @@ namespace Waher.IoTGateway.WebResources
 						{
 							BackupInfo.Thread?.NewState("Discover_" + Recipient);
 
-							using (HttpFileUploadClient UploadClient = new HttpFileUploadClient(Gateway.XmppClient, Recipient, null))
+							using HttpFileUploadClient UploadClient = new HttpFileUploadClient(Gateway.XmppClient, Recipient, null);
+							
+							await UploadClient.DiscoverAsync(Recipient);
+
+							if (UploadClient.HasSupport)
 							{
-								await UploadClient.DiscoverAsync(Recipient);
+								using FileStream fs = File.OpenRead(BackupInfo.FullFileName);
+								
+								BackupInfo.Thread?.NewState("Prepare_" + Recipient);
 
-								if (UploadClient.HasSupport)
-								{
-									using (FileStream fs = File.OpenRead(BackupInfo.FullFileName))
-									{
-										BackupInfo.Thread?.NewState("Prepare_" + Recipient);
+								StringBuilder Xml = new StringBuilder();
+								long FileSize = fs.Length;
 
-										StringBuilder Xml = new StringBuilder();
-										long FileSize = fs.Length;
+								Xml.Append("<prepare xmlns='http://waher.se/Schema/Backups.xsd' filename='");
+								Xml.Append(XML.Encode(BackupInfo.LocalFileName));
+								Xml.Append("' size='");
+								Xml.Append(FileSize.ToString());
+								Xml.Append("' content-type='application/octet-stream'/>");
 
-										Xml.Append("<prepare xmlns='http://waher.se/Schema/Backups.xsd' filename='");
-										Xml.Append(XML.Encode(BackupInfo.LocalFileName));
-										Xml.Append("' size='");
-										Xml.Append(FileSize.ToString());
-										Xml.Append("' content-type='application/octet-stream'/>");
+								BackupInfo.Thread?.NewState("Get_Slot_" + Recipient);
 
-										BackupInfo.Thread?.NewState("Get_Slot_" + Recipient);
+								await UploadClient.Client.IqSetAsync(UploadClient.FileUploadJid, Xml.ToString());
+								// Empty response expected. Errors cause an exception to be raised.
 
-										await UploadClient.Client.IqSetAsync(UploadClient.FileUploadJid, Xml.ToString());
-										// Empty response expected. Errors cause an exception to be raised.
+								HttpFileUploadEventArgs e2 = await UploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
+									BinaryCodec.DefaultContentType, FileSize, false);
 
-										HttpFileUploadEventArgs e2 = await UploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
-											BinaryCodec.DefaultContentType, FileSize, false);
+								if (!e2.Ok)
+									throw e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file.");
 
-										if (!e2.Ok)
-											throw (e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file."));
+								BackupInfo.Thread?.NewState("Upload_" + Recipient);
 
-										BackupInfo.Thread?.NewState("Upload_" + Recipient);
+								if (BackupInfo.IsKey)
+									Log.Informational("Uploading key file to " + Recipient + ".", BackupInfo.LocalFileName);
+								else
+									Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
 
-										if (BackupInfo.IsKey)
-											Log.Informational("Uploading key file to " + Recipient + ".", BackupInfo.LocalFileName);
-										else
-											Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
+								await e2.PUT(fs, BinaryCodec.DefaultContentType, 60 * 60 * 1000);   // 1h timeout
 
-										await e2.PUT(fs, BinaryCodec.DefaultContentType, 60 * 60 * 1000);   // 1h timeout
-
-										if (BackupInfo.IsKey)
-											Log.Informational("Key file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
-										else
-											Log.Informational("Backup file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
-									}
-								}
+								if (BackupInfo.IsKey)
+									Log.Informational("Key file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
+								else
+									Log.Informational("Backup file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
 							}
 						}
 						catch (Exception ex)

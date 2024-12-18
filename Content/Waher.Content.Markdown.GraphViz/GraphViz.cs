@@ -854,8 +854,9 @@ namespace Waher.Content.Markdown.GraphViz
 
 				byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
 				string ContentType = ImageCodec.ContentTypePng;
+				ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Data, null);
 
-				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
+				if (Content.HasError || !(Content.Decoded is SKImage Image))
 					return false;
 
 				XmlWriter Output = Renderer.XmlOutput;

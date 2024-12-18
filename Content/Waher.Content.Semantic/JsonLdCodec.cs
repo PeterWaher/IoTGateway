@@ -77,11 +77,11 @@ namespace Waher.Content.Semantic
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
 		/// <returns>Decoded object.</returns>
-		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
 			JsonLdDocument Parsed = await JsonLdDocument.CreateAsync(s, BaseUri, "n", BlankNodeIdMode.Guid);
-			return Parsed;
+			return new ContentResponse(ContentType, Parsed, Data);
 		}
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
@@ -150,7 +150,7 @@ namespace Waher.Content.Semantic
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = JsonLdContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		/// <summary>

@@ -135,7 +135,7 @@ namespace Waher.Content.Rss
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string Xml = CommonTypes.GetString(Data, Encoding);
 			XmlDocument Doc = new XmlDocument()
@@ -145,7 +145,7 @@ namespace Waher.Content.Rss
 
 			Doc.LoadXml(Xml);
 
-			return Task.FromResult<object>(new RssDocument(Doc, BaseUri));
+			return Task.FromResult(new ContentResponse(ContentType, new RssDocument(Doc, BaseUri), Data));
 		}
 
 		/// <summary>
@@ -156,7 +156,7 @@ namespace Waher.Content.Rss
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is RssDocument Doc) ||
 				!InternetContent.IsAccepted(contentTypes, out string ContentType, AcceptedContentTypes))

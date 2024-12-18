@@ -84,14 +84,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			string SchemaName = UriToResource(Uri);
 			if (string.IsNullOrEmpty(SchemaName))
 				throw new Exception("URI not recognized.");
 
-			return Task.FromResult<object>(XSL.LoadSchema(SchemaName));
+			return Task.FromResult(new ContentResponse(XmlCodec.SchemaContentType, XSL.LoadSchema(SchemaName), Array.Empty<byte>()));
 		}
 
 		/// <summary>
@@ -103,7 +103,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
@@ -117,7 +117,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			string SchemaName = UriToResource(Uri);
@@ -128,7 +128,7 @@ namespace Waher.Networking.XMPP.Contracts
 			TemporaryStream f = new TemporaryStream();
 			await f.WriteAsync(Bin, 0, Bin.Length);
 
-			return new KeyValuePair<string, TemporaryStream>(XmlCodec.DefaultContentType, f);
+			return new ContentStreamResponse(XmlCodec.DefaultContentType, f);
 
 		}
 
@@ -141,7 +141,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
@@ -167,10 +167,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
-		public Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
-			return Task.FromResult<object>(null);
+			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
 		}
 
 		/// <summary>
@@ -182,10 +182,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
-		public Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			return Task.FromResult<object>(null);
+			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
 	}
 }

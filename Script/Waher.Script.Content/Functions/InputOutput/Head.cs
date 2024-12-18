@@ -90,7 +90,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
 			List<KeyValuePair<string, string>> HeaderList = null;
-			object Result;
+			ContentResponse Content;
 
 			if (Arguments.Length > 1)
 				HeaderList = Get.GetHeaders(Arguments[1].AssociatedObjectValue, this);
@@ -100,12 +100,15 @@ namespace Waher.Script.Content.Functions.InputOutput
 				if (!(Arguments[2].AssociatedObjectValue is X509Certificate2 Certificate))
 					throw new ScriptRuntimeException("Expected a certificate in the third argument.", this);
 
-				Result = await InternetContent.HeadAsync(Url, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Content = await InternetContent.HeadAsync(Url, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 			}
 			else
-				Result = await InternetContent.HeadAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Content = await InternetContent.HeadAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 
-			return Expression.Encapsulate(Result);
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
+
+			return Expression.Encapsulate(Content.Decoded);
 		}
 	}
 }

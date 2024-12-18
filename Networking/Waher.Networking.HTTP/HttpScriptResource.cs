@@ -143,9 +143,15 @@ namespace Waher.Networking.HTTP
 				return;
 			}
 
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Result, Encoding.UTF8);
-			byte[] Binary = P.Key;
-			string ContentType = P.Value;
+			ContentResponse P = await InternetContent.EncodeAsync(Result, Encoding.UTF8);
+			if (P.HasError)
+			{
+				await Response.SendResponse(P.Error);
+				return;
+			}
+
+			byte[] Binary = P.Encoded;
+			string ContentType = P.ContentType;
 
 			bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
 

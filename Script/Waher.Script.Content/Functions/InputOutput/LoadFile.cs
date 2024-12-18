@@ -111,9 +111,13 @@ namespace Waher.Script.Content.Functions.InputOutput
 				}
 			}
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
+			ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
 
-			return Expression.Encapsulate(Decoded);
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
+
+			return Expression.Encapsulate(Content.Decoded);
+
 		}
 	}
 }

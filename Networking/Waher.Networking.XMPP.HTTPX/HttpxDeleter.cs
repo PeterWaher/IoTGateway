@@ -71,7 +71,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
-		public override async Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate,
+		public override async Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpxClient HttpxClient;
@@ -171,8 +171,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							if (e.HasData)
 							{
-								if (State.Data is null)
-									State.Data = new MemoryStream();
+								State.Data ??= new MemoryStream();
 
 								if (!(e.Data is null))
 								{
@@ -188,8 +187,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					}, async (Sender, e) =>
 					{
-						if (State.Data is null)
-							State.Data = new MemoryStream();
+						State.Data ??= new MemoryStream();
 
 						await State.Data.WriteAsync(e.Data, 0, e.Data.Length);
 						if (e.Last)
@@ -204,7 +202,10 @@ namespace Waher.Networking.XMPP.HTTPX
 				Timer = null;
 
 				if (State.StatusCode >= 200 && State.StatusCode < 300)
-					return new KeyValuePair<byte[], string>(State.Data?.ToArray(), State.HttpResponse?.ContentType);
+				{
+					byte[] Data = State.Data?.ToArray();
+					return new ContentResponse(State.HttpResponse?.ContentType, Data, Data);
+				}
 				else
 				{
 					string ContentType = string.Empty;

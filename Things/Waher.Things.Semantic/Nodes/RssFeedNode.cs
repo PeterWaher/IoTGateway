@@ -98,17 +98,29 @@ namespace Waher.Things.Semantic.Nodes
 			try
 			{
 				if (!Uri.TryCreate(this.url, UriKind.Absolute, out Uri Link))
-					throw new Exception("Invalid URL.");
+				{
+					await Request.ReportErrors(true, new ThingError(this, "Invalid URL."));
+					return;
+				}
 
-				object Obj = await InternetContent.GetAsync(Link, Gateway.Certificate, 10000,
+				ContentResponse Content = await InternetContent.GetAsync(Link, Gateway.Certificate, 10000,
 					new KeyValuePair<string, string>("Accept", RssCodec.ContentType));
 
-				if (!(Obj is RssDocument Doc))
+				if (Content.HasError)
 				{
-					if (Obj is XmlDocument Xml)
+					await Request.ReportErrors(true, new ThingError(this, Content.Error.Message));
+					return;
+				}
+
+				if (!(Content.Decoded is RssDocument Doc))
+				{
+					if (Content.Decoded is XmlDocument Xml)
 						Doc = new RssDocument(Xml, Link);
 					else
-						throw new Exception("URL did not return an RSS document.");
+					{
+						await Request.ReportErrors(true, new ThingError(this, "URL did not return an RSS document."));
+						return;
+					}
 				}
 
 				DateTime Now = DateTime.UtcNow;

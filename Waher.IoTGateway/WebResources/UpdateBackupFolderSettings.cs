@@ -47,17 +47,22 @@ namespace Waher.IoTGateway.WebResources
 			Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
+			ContentResponse Content = await Request.DecodeDataAsync();
 
-			if (!(Obj is Dictionary<string, object> Form) ||
-				!Form.TryGetValue("ExportFolder", out Obj) || !(Obj is string ExportFolder) ||
+			if (Content.HasError ||
+				!(Content.Decoded is Dictionary<string, object> Form) ||
+				!Form.TryGetValue("ExportFolder", out object Obj) || !(Obj is string ExportFolder) ||
 				!Form.TryGetValue("KeyFolder", out Obj) || !(Obj is string KeyFolder) ||
 				!Form.TryGetValue("BackupHosts", out Obj) || !(Obj is string BackupHostsStr) ||
 				!Form.TryGetValue("KeyHosts", out Obj) || !(Obj is string KeyHostsStr))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 
@@ -73,11 +78,11 @@ namespace Waher.IoTGateway.WebResources
 
 			Len = ExportFolder.Length;
 			if (Len > 0 && (ExportFolder[Len - 1] == '/' || ExportFolder[Len - 1] == '\\'))
-				ExportFolder = ExportFolder.Substring(0, Len - 1);
+				ExportFolder = ExportFolder[..(Len - 1)];
 
 			Len = KeyFolder.Length;
 			if (Len > 0 && (KeyFolder[Len - 1] == '/' || KeyFolder[Len - 1] == '\\'))
-				KeyFolder = KeyFolder.Substring(0, Len - 1);
+				KeyFolder = KeyFolder[..(Len - 1)];
 
 			if (!string.IsNullOrEmpty(ExportFolder))
 			{

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -63,7 +62,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (i < 0)
 				return false;
 
-			string s2 = s.Substring(0, i);
+			string s2 = s[..i];
 			if (string.Compare(Aes256UriScheme, s2, true) != 0)
 				return false;
 
@@ -88,7 +87,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					return false;
 
 				ContentType = s.Substring(i + 1, j - i - 1);
-				EncryptedUri = new Uri(s.Substring(j + 1));
+				EncryptedUri = new Uri(s[(j + 1)..]);
 
 				return true;
 			}
@@ -107,7 +106,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Headers">Additional headers</param>
 		/// <returns>Decrypted and decoded content.</returns>
 		/// <exception cref="ArgumentException">If URI cannot be parsed.</exception>
-		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -123,25 +122,34 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Headers">Additional headers</param>
 		/// <returns>Decrypted and decoded content.</returns>
 		/// <exception cref="ArgumentException">If URI cannot be parsed.</exception>
-		public async Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public async Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			Tuple<string, byte[], Uri> T = await this.GetAndDecrypt(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
-			string ContentType = T.Item1;
-			byte[] Bin = T.Item2;
-			Uri EncryptedUri = T.Item3;
+			Tuple<string, byte[], Uri, Exception> T = await this.GetAndDecrypt(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 
-			return await InternetContent.DecodeAsync(ContentType, Bin, EncryptedUri);
+			if (T.Item4 is null)
+			{
+				string ContentType = T.Item1;
+				byte[] Bin = T.Item2;
+				Uri EncryptedUri = T.Item3;
+
+				return await InternetContent.DecodeAsync(ContentType, Bin, EncryptedUri);
+			}
+			else
+				return new ContentResponse(T.Item4);
 		}
 
-		private async Task<Tuple<string, byte[], Uri>> GetAndDecrypt(Uri Uri, X509Certificate Certificate,
+		private async Task<Tuple<string, byte[], Uri, Exception>> GetAndDecrypt(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!TryParse(Uri, out byte[] Key, out byte[] IV, out string ContentType, out Uri EncryptedUri))
-				throw new ArgumentException("URI not supported.", nameof(Uri));
+				return new Tuple<string, byte[], Uri, Exception>(null, null, null, new ArgumentException("URI not supported.", nameof(Uri)));
 
-			byte[] Bin = await InternetContent.GetAsync(EncryptedUri, Certificate, RemoteCertificateValidator, TimeoutMs, AcceptBinary(Headers)) as byte[]
-				?? throw new IOException("Expected binary response.");
+			ContentResponse Content = await InternetContent.GetAsync(EncryptedUri, Certificate, RemoteCertificateValidator, TimeoutMs, AcceptBinary(Headers));
+			if (Content.HasError)
+				return new Tuple<string, byte[], Uri, Exception>(null, null, null, Content.Error);
+
+			byte[] Bin = Content.Encoded;
 
 			Aes Aes = Aes.Create();
 			Aes.BlockSize = 128;
@@ -154,7 +162,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				Bin = Transform.TransformFinalBlock(Bin, 0, Bin.Length);
 			}
 
-			return new Tuple<string, byte[], Uri>(ContentType, Bin, EncryptedUri);
+			return new Tuple<string, byte[], Uri, Exception>(ContentType, Bin, EncryptedUri, null);
 		}
 
 		private static KeyValuePair<string, string>[] AcceptBinary(KeyValuePair<string, string>[] Headers)
@@ -183,7 +191,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="RemoteCertificateValidator">Optional callback method for validating remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -198,18 +206,24 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			Tuple<string, byte[], Uri> T = await this.GetAndDecrypt(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
-			string ContentType = T.Item1;
-			byte[] Bin = T.Item2;
+			Tuple<string, byte[], Uri, Exception> T = await this.GetAndDecrypt(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 
-			TemporaryStream Result = new TemporaryStream();
-			await Result.WriteAsync(Bin, 0, Bin.Length);
-			Result.Position = 0;
+			if (T.Item4 is null)
+			{
+				string ContentType = T.Item1;
+				byte[] Bin = T.Item2;
 
-			return new KeyValuePair<string, TemporaryStream>(ContentType, Result);
+				TemporaryStream Result = new TemporaryStream();
+				await Result.WriteAsync(Bin, 0, Bin.Length);
+				Result.Position = 0;
+
+				return new ContentStreamResponse(ContentType, Result);
+			}
+			else
+				return new ContentStreamResponse(T.Item4);
 		}
 	}
 }

@@ -96,7 +96,10 @@ namespace Waher.IoTGateway
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (string.IsNullOrEmpty(Request.SubPath))
-				throw new BadRequestException("Sub-path missing.");
+			{
+				await Response.SendResponse(new BadRequestException("Sub-path missing."));
+				return;
+			}
 
 			string Id = Request.SubPath[1..];
 			string ContentType;
@@ -154,17 +157,26 @@ namespace Waher.IoTGateway
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session is null)
-				throw new BadRequestException("POST request missing data.");
+			{
+				await Response.SendResponse(new BadRequestException("POST request missing data."));
+				return;
+			}
 
 			// TODO: Check User authenticated
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string Location))
-				throw new BadRequestException("Expected location.");
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string Location))
+			{
+				await Response.SendResponse(new BadRequestException("Expected location."));
+				return;
+			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException("Expected X-TabID header.");
+			{
+				await Response.SendResponse(new BadRequestException("Expected X-TabID header."));
+				return;
+			}
 
 			TabQueue Queue = Register(Request, Response, null, Location, TabID);
 			StringBuilder Json = null;
@@ -174,7 +186,10 @@ namespace Waher.IoTGateway
 			Response.ContentType = JsonCodec.DefaultContentType;
 
 			if (!await Queue.SyncObj.TryBeginWrite(10000))
-				throw new InternalServerErrorException("Unable to get access to queue.");
+			{
+				await Response.SendResponse(new InternalServerErrorException("Unable to get access to queue."));
+				return;
+			}
 
 			try
 			{

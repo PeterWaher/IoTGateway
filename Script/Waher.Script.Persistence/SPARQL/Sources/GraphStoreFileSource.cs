@@ -71,7 +71,8 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 					continue;
 
 				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
-				object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, Source);
+				ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Bin, Source);
+				Content.AssertOk();
 
 				if (Union is null && !(Result is null))
 				{
@@ -81,10 +82,10 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 
 				if (Union is null)
 				{
-					Result = Decoded as ISemanticCube;
+					Result = Content.Decoded as ISemanticCube;
 					if (Result is null)
 					{
-						if (Decoded is ISemanticModel Model)
+						if (Content.Decoded is ISemanticModel Model)
 							Result = await InMemorySemanticCube.Create(Model);
 						else
 							continue;
@@ -92,7 +93,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 				}
 				else
 				{
-					if (Decoded is ISemanticModel Model)
+					if (Content.Decoded is ISemanticModel Model)
 						await Union.Add(Model);
 				}
 			}

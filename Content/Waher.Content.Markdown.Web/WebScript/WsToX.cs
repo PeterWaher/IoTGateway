@@ -98,9 +98,9 @@ namespace Waher.Content.Markdown.Web.WebScript
 					}
 				}
 
-				KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
-				await State.To.WriteAsync(P.Key, 0, P.Key.Length);
-				State.ToContentType = P.Value;
+				ContentResponse P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
+				await State.To.WriteAsync(P.Encoded, 0, P.Encoded.Length);
+				State.ToContentType = P.ContentType;
 			}
 
 			return true;

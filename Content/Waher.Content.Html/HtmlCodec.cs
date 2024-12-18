@@ -83,10 +83,10 @@ namespace Waher.Content.Html
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string Html = CommonTypes.GetString(Data, Encoding);
-			return Task.FromResult<object>(new HtmlDocument(Html));
+			return Task.FromResult(new ContentResponse(ContentType, new HtmlDocument(Html), Data));
 		}
 
 		/// <summary>
@@ -169,7 +169,7 @@ namespace Waher.Content.Html
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!InternetContent.IsAccepted(HtmlContentTypes, out string ContentType, AcceptedContentTypes))
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
@@ -198,7 +198,7 @@ namespace Waher.Content.Html
 				}
 			}
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 	}
 }

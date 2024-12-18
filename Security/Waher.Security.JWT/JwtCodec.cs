@@ -27,7 +27,9 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ContentType };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -44,11 +46,11 @@ namespace Waher.Security.JWT
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
 			KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string Token = (Encoding ?? Encoding.ASCII).GetString(Data);
-			return Task.FromResult<object>(new JwtToken(Token));
+			return Task.FromResult(new ContentResponse(ContentType, new JwtToken(Token), Data));
 		}
 
 		/// <summary>
@@ -119,10 +121,10 @@ namespace Waher.Security.JWT
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is JwtToken Token))
-				throw new ArgumentException("Object not a JWT token.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Object not a JWT token.", nameof(Object))));
 
 			string ContentType = JwtCodec.ContentType;
 			string s = Token.Header + "." + Token.Payload + "." + Token.Signature;
@@ -133,7 +135,7 @@ namespace Waher.Security.JWT
 			else
 				Bin = Encoding.GetBytes(s);
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		/// <summary>

@@ -16,7 +16,6 @@ using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.Runtime.Counters;
 using Waher.Runtime.Language;
 using Waher.Script.Persistence.SPARQL;
 using Waher.Script.Persistence.SPARQL.Sources;
@@ -96,7 +95,10 @@ namespace Waher.WebService.Sparql
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.GetPrivileges))
-				throw new ForbiddenException("Access to store denied.");
+			{
+				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				return;
+			}
 
 			ISemanticModel Graph;
 
@@ -242,34 +244,46 @@ namespace Waher.WebService.Sparql
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public Task PUT(HttpRequest Request, HttpResponse Response)
+		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.AddPrivileges))
-				throw new ForbiddenException("Access to store denied.");
+			{
+				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				return;
+			}
 
-			return this.Update(Request, Response, true);
+			await this.Update(Request, Response, true);
 		}
 
 		private async Task Update(HttpRequest Request, HttpResponse Response, bool DeleteOld)
 		{
 			if (!Request.HasData)
-				throw new BadRequestException("No data in request.");
+			{
+				await Response.SendResponse(new BadRequestException("No data in request."));
+				return;
+			}
 
-			object Decoded = await Request.DecodeDataAsync();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError)
+			{
+				await Response.SendResponse(Content.Error);
+				return;
+			}
+
 			List<KeyValuePair<string, string>> Files = new List<KeyValuePair<string, string>>();
 			LinkedList<ISemanticModel> Models = new LinkedList<ISemanticModel>();
 
-			if (Decoded is TurtleDocument TurtleDoc)
+			if (Content.Decoded is TurtleDocument TurtleDoc)
 			{
 				Files.Add(new KeyValuePair<string, string>(TurtleDoc.Text, TurtleCodec.DefaultExtension));
 				Models.AddLast(TurtleDoc);
 			}
-			else if (Decoded is RdfDocument RdfDoc)
+			else if (Content.Decoded is RdfDocument RdfDoc)
 			{
 				Files.Add(new KeyValuePair<string, string>(RdfDoc.Text, RdfCodec.DefaultExtension));
 				Models.AddLast(RdfDoc);
 			}
-			else if (Decoded is Dictionary<string, object> Form)
+			else if (Content.Decoded is Dictionary<string, object> Form)
 			{
 				foreach (KeyValuePair<string, object> P in Form)
 				{
@@ -284,10 +298,13 @@ namespace Waher.WebService.Sparql
 						Models.AddLast(RdfDoc2);
 					}
 					else
-						throw new UnsupportedMediaTypeException("Content in form must be semantic triples documents.");
+					{
+						await Response.SendResponse(new UnsupportedMediaTypeException("Content in form must be semantic triples documents."));
+						return;
+					}
 				}
 			}
-			else if (Decoded is MultipartContent Form2)
+			else if (Content.Decoded is MultipartContent Form2)
 			{
 				foreach (EmbeddedContent P in Form2.Content)
 				{
@@ -302,10 +319,13 @@ namespace Waher.WebService.Sparql
 						Models.AddLast(RdfDoc2);
 					}
 					else
-						throw new UnsupportedMediaTypeException("Content in form must be semantic triples documents.");
+					{
+						await Response.SendResponse(new UnsupportedMediaTypeException("Content in form must be semantic triples documents."));
+						return;
+					}
 				}
 			}
-			else if (Decoded is string s)
+			else if (Content.Decoded is string s)
 			{
 				if (XML.IsValidXml(s))
 				{
@@ -316,7 +336,8 @@ namespace Waher.WebService.Sparql
 					}
 					catch (Exception)
 					{
-						throw new BadRequestException("Unable to parse document as an RDF/XML document.");
+						await Response.SendResponse(new BadRequestException("Unable to parse document as an RDF/XML document."));
+						return;
 					}
 				}
 				else
@@ -328,12 +349,16 @@ namespace Waher.WebService.Sparql
 					}
 					catch (Exception)
 					{
-						throw new BadRequestException("Unable to parse the document as a Turtle document.");
+						await Response.SendResponse(new BadRequestException("Unable to parse the document as a Turtle document."));
+						return;
 					}
 				}
 			}
 			else
-				throw new UnsupportedMediaTypeException("Content must be a semantic triples document, or a collection of semantic triples document in a multipart form.");
+			{
+				await Response.SendResponse(new UnsupportedMediaTypeException("Content must be a semantic triples document, or a collection of semantic triples document in a multipart form."));
+				return;
+			}
 
 			(GraphReference Reference, Uri GraphUri) = await GetGraphReference(Request, true);
 			DateTime TP = DateTime.UtcNow;
@@ -447,7 +472,10 @@ namespace Waher.WebService.Sparql
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.DeletePrivileges))
-				throw new ForbiddenException("Access to store denied.");
+			{
+				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				return;
+			}
 
 			(GraphReference Reference, Uri _) = await GetGraphReference(Request, false);
 			bool FilesDeleted = false;
@@ -478,12 +506,15 @@ namespace Waher.WebService.Sparql
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public Task POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.UpdatePrivileges))
-				throw new ForbiddenException("Access to store denied.");
+			{
+				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				return;
+			}
 
-			return this.Update(Request, Response, false);
+			await this.Update(Request, Response, false);
 		}
 	}
 }

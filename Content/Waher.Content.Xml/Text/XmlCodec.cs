@@ -94,7 +94,7 @@ namespace Waher.Content.Xml.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			XmlDocument Doc = new XmlDocument()
 			{
@@ -114,7 +114,7 @@ namespace Waher.Content.Xml.Text
 				Doc.LoadXml(s);
 			}
 
-			return Task.FromResult<object>(Doc);
+			return Task.FromResult(new ContentResponse(ContentType, Doc, Data));
 		}
 
 		/// <summary>
@@ -210,7 +210,7 @@ namespace Waher.Content.Xml.Text
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (InternetContent.IsAccepted(XmlContentTypes, out string ContentType, AcceptedContentTypes))
 			{
@@ -244,7 +244,7 @@ namespace Waher.Content.Xml.Text
 		/// <param name="Encoding">Character encoding to use.</param>
 		/// <param name="ContentType">Internet Content-Type to use.</param>
 		/// <returns>Encoded document.</returns>
-		public static Task<KeyValuePair<byte[], string>> EncodeXmlAsync(XmlDocument Xml, Encoding Encoding, string ContentType)
+		public static Task<ContentResponse> EncodeXmlAsync(XmlDocument Xml, Encoding Encoding, string ContentType)
 		{
 			MemoryStream ms = null;
 			XmlWriterSettings Settings;
@@ -280,7 +280,7 @@ namespace Waher.Content.Xml.Text
 				ms?.Dispose();
 			}
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Result, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Xml, Result));
 		}
 
 		/// <summary>
@@ -290,7 +290,7 @@ namespace Waher.Content.Xml.Text
 		/// <param name="Encoding">Character encoding to use.</param>
 		/// <param name="ContentType">Internet Content-Type to use.</param>
 		/// <returns>Encoded document.</returns>
-		public static Task<KeyValuePair<byte[], string>> EncodeXmlAsync(string Xml, Encoding Encoding, string ContentType)
+		public static Task<ContentResponse> EncodeXmlAsync(string Xml, Encoding Encoding, string ContentType)
 		{
 			byte[] Bin;
 
@@ -305,7 +305,7 @@ namespace Waher.Content.Xml.Text
 				Bin = Encoding.GetBytes(Xml);
 			}
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Xml, Bin));
 		}
 	}
 }

@@ -74,10 +74,10 @@ namespace Waher.Content.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding);
-			return Task.FromResult<object>(CSV.Parse(s));
+			return Task.FromResult(new ContentResponse(ContentType, CSV.Parse(s), Data));
 		}
 
 
@@ -151,7 +151,7 @@ namespace Waher.Content.Text
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			string Csv;
 
@@ -160,12 +160,12 @@ namespace Waher.Content.Text
 			else if (Object is IMatrix M)
 				Csv = CSV.Encode(M);
 			else
-				throw new ArgumentException("Unable to encode as CSV.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode as CSV.", nameof(Object))));
 
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Csv), ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Csv, Encoding.GetBytes(Csv)));
 		}
 	}
 }

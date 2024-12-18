@@ -499,9 +499,7 @@ namespace Waher.Things.Virtual
 
 					if (Field.Type.HasFlag(SensorData.FieldType.Momentary))
 					{
-						if (this.toReport is null)
-							this.toReport = new List<SensorData.Field>();
-
+						this.toReport ??= new List<SensorData.Field>();
 						this.toReport.Add(Field);
 						this.hasReport = true;
 					}
@@ -794,7 +792,8 @@ namespace Waher.Things.Virtual
 			};
 
 			object Payload = await Expression.EvalAsync(PayloadScript, v);
-			await InternetContent.PostAsync(new Uri(CallbackUrl), Payload);
+			ContentResponse Content = await InternetContent.PostAsync(new Uri(CallbackUrl), Payload);
+			Content.AssertOk();
 		}
 
 		/// <summary>

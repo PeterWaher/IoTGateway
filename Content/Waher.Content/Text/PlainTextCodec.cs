@@ -100,9 +100,9 @@ namespace Waher.Content.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return Task.FromResult<object>(CommonTypes.GetString(Data, Encoding));
+			return Task.FromResult(new ContentResponse(ContentType, CommonTypes.GetString(Data, Encoding), Data));
 		}
 
 		/// <summary>
@@ -214,19 +214,19 @@ namespace Waher.Content.Text
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			string ContentType;
 
 			if (Encoding is null)
 			{
-				ContentType = PlainTextCodec.DefaultContentType + "; charset=utf-8";
+				ContentType = DefaultContentType + "; charset=utf-8";
 				Encoding = Encoding.UTF8;
 			}
 			else
-				ContentType = PlainTextCodec.DefaultContentType + "; charset=" + Encoding.WebName;
+				ContentType = DefaultContentType + "; charset=" + Encoding.WebName;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Object.ToString()), ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Encoding.GetBytes(Object.ToString())));
 		}
 	}
 }

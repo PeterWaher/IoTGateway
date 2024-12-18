@@ -301,16 +301,13 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		[Obsolete("Use the EncodeAsync method for more efficient processing of content including asynchronous processing elements in parallel environments.")]
-		public static byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public static ContentResponse Encode(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			KeyValuePair<byte[], string> P = EncodeAsync(Object, Encoding, AcceptedContentTypes).Result;
-			ContentType = P.Value;
-			return P.Key;
+			return EncodeAsync(Object, Encoding, AcceptedContentTypes).Result;
 		}
 
 		/// <summary>
@@ -321,7 +318,7 @@ namespace Waher.Content
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, and Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public static Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public static Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!Encodes(Object, out Grade _, out IContentEncoder Encoder, AcceptedContentTypes))
 				throw new ArgumentException("No encoder found to encode objects of type " + (Object?.GetType()?.FullName) + ".", nameof(Object));
@@ -529,7 +526,7 @@ namespace Waher.Content
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		[Obsolete("Use the DecoceAsync method for more efficient processing of content including asynchronous processing elements in parallel environments.")]
-		public static object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public static ContentResponse Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri).Result;
 		}
@@ -544,7 +541,7 @@ namespace Waher.Content
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public static Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			if (!Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
 				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", nameof(ContentType));
@@ -561,7 +558,7 @@ namespace Waher.Content
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		[Obsolete("Use the DecoceAsync method for more efficient processing of content including asynchronous processing elements in parallel environments.")]
-		public static object Decode(string ContentType, byte[] Data, Uri BaseUri)
+		public static ContentResponse Decode(string ContentType, byte[] Data, Uri BaseUri)
 		{
 			return DecodeAsync(ContentType, Data, BaseUri).Result;
 		}
@@ -574,7 +571,7 @@ namespace Waher.Content
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public static Task<object> DecodeAsync(string ContentType, byte[] Data, Uri BaseUri)
+		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Uri BaseUri)
 		{
 			Encoding Encoding = null;
 			KeyValuePair<string, string>[] Fields;
@@ -1125,7 +1122,7 @@ namespace Waher.Content
 		/// <param name="Uri">Uniform resource identifier.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetAsync(Uri, null, null, Headers);
 		}
@@ -1137,7 +1134,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> GetAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetAsync(Uri, Certificate, null, Headers);
 		}
@@ -1150,7 +1147,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
+		public static Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
@@ -1166,7 +1163,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetAsync(Uri, null, null, TimeoutMs, Headers);
 		}
@@ -1179,7 +1176,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> GetAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetAsync(Uri, Certificate, null, TimeoutMs, Headers);
 		}
@@ -1193,7 +1190,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
+		public static Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
@@ -1208,7 +1205,7 @@ namespace Waher.Content
 		/// <param name="Uri">Uniform resource identifier.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetTempStreamAsync(Uri, null, null, Headers);
 		}
@@ -1220,7 +1217,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetTempStreamAsync(Uri, Certificate, null, Headers);
 		}
@@ -1233,7 +1230,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
@@ -1249,7 +1246,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetTempStreamAsync(Uri, null, null, TimeoutMs, Headers);
 		}
@@ -1262,7 +1259,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetTempStreamAsync(Uri, Certificate, null, TimeoutMs, Headers);
 		}
@@ -1276,7 +1273,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
@@ -1424,7 +1421,7 @@ namespace Waher.Content
 		/// <param name="Data">Data to post.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, Data, null, null, Headers);
 		}
@@ -1437,7 +1434,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, Data, Certificate, null, Headers);
 		}
@@ -1451,7 +1448,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
+		public static Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
@@ -1468,7 +1465,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, Data, null, null, TimeoutMs, Headers);
 		}
@@ -1482,7 +1479,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, Data, Certificate, null, TimeoutMs, Headers);
 		}
@@ -1497,7 +1494,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
+		public static Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
@@ -1514,7 +1511,7 @@ namespace Waher.Content
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, EncodedData, ContentType, null, null, Headers);
 		}
@@ -1528,7 +1525,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType,
+		public static Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType,
 			X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, EncodedData, ContentType, Certificate, null, Headers);
@@ -1544,7 +1541,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType,
+		public static Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType,
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
@@ -1562,7 +1559,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, EncodedData, ContentType, null, null, TimeoutMs, Headers);
 		}
@@ -1577,7 +1574,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType,
+		public static Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType,
 			X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PostAsync(Uri, EncodedData, ContentType, Certificate, null, TimeoutMs, Headers);
@@ -1594,7 +1591,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+		public static Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
 			params KeyValuePair<string, string>[] Headers)
 		{
@@ -1743,7 +1740,7 @@ namespace Waher.Content
 		/// <param name="Data">Data to put.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PutAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PutAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, Data, null, null, Headers);
 		}
@@ -1756,7 +1753,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PutAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, Data, Certificate, null, Headers);
 		}
@@ -1770,7 +1767,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate,
+		public static Task<ContentResponse> PutAsync(Uri Uri, object Data, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
@@ -1787,7 +1784,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PutAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PutAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, Data, null, null, TimeoutMs, Headers);
 		}
@@ -1801,7 +1798,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> PutAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, Data, Certificate, null, TimeoutMs, Headers);
 		}
@@ -1816,7 +1813,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate,
+		public static Task<ContentResponse> PutAsync(Uri Uri, object Data, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
@@ -1833,7 +1830,7 @@ namespace Waher.Content
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, EncodedData, ContentType, null, null, Headers);
 		}
@@ -1847,7 +1844,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, EncodedData, ContentType, Certificate, null, Headers);
 		}
@@ -1862,7 +1859,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+		public static Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
@@ -1880,7 +1877,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, EncodedData, ContentType, null, null, TimeoutMs, Headers);
 		}
@@ -1895,7 +1892,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return PutAsync(Uri, EncodedData, ContentType, Certificate, null, TimeoutMs, Headers);
 		}
@@ -1911,7 +1908,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+		public static Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
@@ -2058,7 +2055,7 @@ namespace Waher.Content
 		/// <param name="Uri">URI</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> DeleteAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> DeleteAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
 			return DeleteAsync(Uri, null, null, Headers);
 		}
@@ -2070,7 +2067,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
 			return DeleteAsync(Uri, Certificate, null, Headers);
 		}
@@ -2083,7 +2080,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate,
+		public static Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanDelete(Uri, out Grade _, out IContentDeleter Deleter))
@@ -2099,7 +2096,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> DeleteAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> DeleteAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return DeleteAsync(Uri, null, null, TimeoutMs, Headers);
 		}
@@ -2112,7 +2109,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return DeleteAsync(Uri, Certificate, null, TimeoutMs, Headers);
 		}
@@ -2126,7 +2123,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public static Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate,
+		public static Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs,
 			params KeyValuePair<string, string>[] Headers)
 		{
@@ -2274,7 +2271,7 @@ namespace Waher.Content
 		/// <param name="Uri">Uniform resource identifier.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> HeadAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> HeadAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
 			return HeadAsync(Uri, null, null, Headers);
 		}
@@ -2286,7 +2283,7 @@ namespace Waher.Content
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{ 
 			return HeadAsync(Uri, Certificate, null, Headers);
 		}
@@ -2299,7 +2296,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
+		public static Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanHead(Uri, out Grade _, out IContentHeader Header))
@@ -2315,7 +2312,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> HeadAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> HeadAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return HeadAsync(Uri, null, null, TimeoutMs, Headers);
 		}
@@ -2328,7 +2325,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public static Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return HeadAsync(Uri, Certificate, null, TimeoutMs, Headers);
 		}
@@ -2342,7 +2339,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Object.</returns>
-		public static Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
+		public static Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanHead(Uri, out Grade _, out IContentHeader Header))

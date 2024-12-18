@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
@@ -185,11 +186,8 @@ namespace Waher.Networking.XMPP.HTTPX
 									TemporaryStream File = new TemporaryStream();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 
-									if (Header is null)
-									{
-										Header = new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
-											this.server.VanityResources, HeaderFields.ToArray());
-									}
+									Header ??= new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
+										this.server.VanityResources, HeaderFields.ToArray());
 
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
 										new HttpRequest(this.server, Header, File, e.From, e.To, e.UsesE2eEncryption), 
@@ -217,11 +215,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			if (Header is null)
-			{
-				Header = new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
-					this.server.VanityResources, HeaderFields.ToArray());
-			}
+			Header ??= new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
+				this.server.VanityResources, HeaderFields.ToArray());
 
 			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From, e.To, e.UsesE2eEncryption), 
 				e.E2eEncryption, e.E2eReference, MaxChunkSize, PostResource, Ibb, Socks5);
@@ -394,7 +389,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			return Task.CompletedTask;
 		}
 
-		internal async Task<KeyValuePair<string, TemporaryStream>> GetLocalTempStreamAsync(string LocalUrl)
+		internal async Task<ContentStreamResponse> GetLocalTempStreamAsync(string LocalUrl)
 		{
 			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, new Script.Variables());
 			int Code = T.Item1;
@@ -402,7 +397,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			byte[] Bin = T.Item3;
 
 			if (Code < 200 || Code >= 300)
-				throw new HttpException(Code, HttpException.GetStatusMessage(Code), Bin, ContentType);
+				return new ContentStreamResponse(new HttpException(Code, HttpException.GetStatusMessage(Code), Bin, ContentType));
 
 			TemporaryStream f = new TemporaryStream();
 			try
@@ -412,10 +407,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			catch (Exception ex)
 			{
 				f.Dispose();
-				ExceptionDispatchInfo.Capture(ex).Throw();
+				return new ContentStreamResponse(ex);
 			}
 
-			return new KeyValuePair<string, TemporaryStream>(ContentType, f);
+			return new ContentStreamResponse(ContentType, f);
 		}
 
 	}

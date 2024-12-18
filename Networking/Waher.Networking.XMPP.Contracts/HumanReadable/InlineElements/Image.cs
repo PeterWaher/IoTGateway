@@ -94,11 +94,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 
 			try
 			{
-				object Obj = await InternetContent.DecodeAsync(this.contentType, this.Data, null);
-				if (Obj is null)
+				ContentResponse Content = await InternetContent.DecodeAsync(this.contentType, this.Data, null);
+				if (Content.HasError)
 					return this;
 
-				if (Obj is IDisposable Disposable)
+				if (Content.Decoded is IDisposable Disposable)
 					Disposable.Dispose();
 
 				return null;

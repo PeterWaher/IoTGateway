@@ -59,7 +59,7 @@ namespace Waher.Content.Posters
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+		public override async Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
 			params KeyValuePair<string, string>[] Headers)
 		{
@@ -94,7 +94,7 @@ namespace Waher.Content.Posters
 		/// <param name="Uri">Original URI of request.</param>
 		/// <returns>Decoded response, if success.</returns>
 		/// <exception cref="WebException">If response does not indicate a success.</exception>
-		public static async Task<KeyValuePair<byte[], string>> ProcessResponse(HttpResponseMessage Response, Uri Uri)
+		public static async Task<ContentBinaryResponse> ProcessResponse(HttpResponseMessage Response, Uri Uri)
 		{
 			if (!Response.IsSuccessStatusCode)
 				await WebGetter.ProcessResponse(Response, Uri);
@@ -102,7 +102,7 @@ namespace Waher.Content.Posters
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType?.ToString() ?? BinaryCodec.DefaultContentType;
 
-			return new KeyValuePair<byte[], string>(Bin, ContentType);
+			return new ContentBinaryResponse(ContentType, Bin);
 		}
 
 	}

@@ -4,10 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Security;
-using System.Runtime.ExceptionServices;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Waher.Content.Binary;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Security;
@@ -60,7 +59,7 @@ namespace Waher.Content.Getters
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers)
 		{
@@ -76,7 +75,7 @@ namespace Waher.Content.Getters
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public async Task<object> GetAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
@@ -186,34 +185,32 @@ namespace Waher.Content.Getters
 		/// <param name="Response">Web response.</param>
 		/// <param name="Uri">Original URI of request.</param>
 		/// <returns>Decoded response, if success.</returns>
-		/// <exception cref="WebException">If response does not indicate a success.</exception>
-		public static async Task<object> ProcessResponse(HttpResponseMessage Response, Uri Uri)
+		public static async Task<ContentResponse> ProcessResponse(HttpResponseMessage Response, Uri Uri)
 		{
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType;
-			object Decoded;
+			ContentResponse Decoded;
 
 			if (Bin.Length == 0 || Response.Content.Headers.ContentType is null)
-			{
-				Decoded = Bin;
-				ContentType = string.Empty;
-			}
+				Decoded = new ContentResponse(BinaryCodec.DefaultContentType, Bin, Bin);
 			else
 			{
 				ContentType = Response.Content.Headers.ContentType.ToString();
 				Decoded = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
+				if (Decoded.HasError)
+					return Decoded;
 			}
 
-			if (Decoded is IWebServerMetaContent WebServerMetaContent)
+			if (Decoded.Decoded is IWebServerMetaContent WebServerMetaContent)
 				await WebServerMetaContent.DecodeMetaInformation(Response);
 
 			if (!Response.IsSuccessStatusCode)
 			{
-				if (!(Decoded is string Message))
+				if (!(Decoded.Decoded is string Message))
 				{
-					if (Decoded is null ||
-						(Decoded is byte[] Bin2 && Bin2.Length == 0) ||
-						Decoded is Dictionary<string, object>)
+					if (Decoded.Decoded is null ||
+						(Decoded.Decoded is byte[] Bin2 && Bin2.Length == 0) ||
+						Decoded.Decoded is Dictionary<string, object>)
 					{
 						Message = Response.ReasonPhrase;
 					}
@@ -221,7 +218,8 @@ namespace Waher.Content.Getters
 						Message = Decoded.ToString();
 				}
 
-				throw new WebException(Message, Response.StatusCode, ContentType, Bin, Decoded, Response.Headers);
+				Decoded = new ContentResponse(new WebException(Message, Response.StatusCode, 
+					Decoded.ContentType, Bin, Decoded.Decoded, Response.Headers));
 			}
 
 			return Decoded;
@@ -269,7 +267,7 @@ namespace Waher.Content.Getters
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -284,7 +282,7 @@ namespace Waher.Content.Getters
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
@@ -317,10 +315,10 @@ namespace Waher.Content.Getters
 						File.Dispose();
 						File = null;
 
-						ExceptionDispatchInfo.Capture(ex).Throw();
+						return new ContentStreamResponse(ex);
 					}
 
-					return new KeyValuePair<string, TemporaryStream>(ContentType, File);
+					return new ContentStreamResponse(ContentType, File);
 				}
 			}
 		}
@@ -344,7 +342,7 @@ namespace Waher.Content.Getters
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
-		public Task<object> HeadAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers)
 		{
@@ -360,7 +358,7 @@ namespace Waher.Content.Getters
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
-		public async Task<object> HeadAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
@@ -412,7 +410,7 @@ namespace Waher.Content.Getters
 							Result[Header.Key] = List.ToArray();
 					}
 
-					return Result;
+					return new ContentResponse(Response.Content?.Headers.ContentType?.ToString() ?? string.Empty, Result, null);
 				}
 			}
 		}

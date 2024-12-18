@@ -72,7 +72,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			string Html;
 
@@ -108,7 +108,7 @@ namespace Waher.Content.Semantic
 			byte[] Bin = Encoding.GetBytes(Html);
 			string ContentType = HtmlCodec.HtmlContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return new KeyValuePair<byte[], string>(Bin, ContentType);
+			return new ContentResponse(ContentType, Object, Bin);
 		}
 
 		/// <summary>

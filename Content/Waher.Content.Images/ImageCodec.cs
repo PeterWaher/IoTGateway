@@ -1,9 +1,9 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using SkiaSharp;
-using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Images
 {
@@ -199,10 +199,10 @@ namespace Waher.Content.Images
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			SKBitmap Bitmap = SKBitmap.Decode(Data);
-			return Task.FromResult<object>(SKImage.FromBitmap(Bitmap));
+			return Task.FromResult(new ContentResponse(ContentType, SKImage.FromBitmap(Bitmap), Data));
 		}
 
 		/// <summary>
@@ -214,7 +214,8 @@ namespace Waher.Content.Images
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if ((Object is SKImage || Object is SKBitmap) && InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
+			if ((Object is SKImage || Object is SKBitmap) && 
+				InternetContent.IsAccepted(ImageContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;
@@ -234,7 +235,7 @@ namespace Waher.Content.Images
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			SKData Data;
 			bool Dispose = false;
@@ -249,7 +250,7 @@ namespace Waher.Content.Images
 					Dispose = true;
 				}
 				else
-					throw new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", nameof(Object))));
 			}
 
 			if (InternetContent.IsAccepted(ContentTypeWebP, AcceptedContentTypes))
@@ -291,7 +292,7 @@ namespace Waher.Content.Images
 			if (Dispose)
 				Image.Dispose();
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		/// <summary>

@@ -8,6 +8,7 @@ using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Security;
+using Waher.Content;
 
 namespace Waher.WebService.Script
 {
@@ -59,15 +60,34 @@ namespace Waher.WebService.Script
 				((User = v.ValueObject as IUser) is null) ||
 				!User.HasPrivilege("Admin.Lab.Script"))
 			{
-				throw ForbiddenException.AccessDenied(this.ResourceName, User?.UserName ?? string.Empty, "Admin.Lab.Script");
+				await Response.SendResponse(ForbiddenException.AccessDenied(this.ResourceName, User?.UserName ?? string.Empty, "Admin.Lab.Script"));
+				return;
 			}
 
-			object Obj = Request.HasData ? await Request.DecodeDataAsync() : null;
-			string s = Obj as string;
+			string s;
+
+			if (Request.HasData)
+			{
+				ContentResponse Content = await Request.DecodeDataAsync();
+
+				if (Content.HasError)
+				{
+					await Response.SendResponse(Content.Error);
+					return;
+				}
+
+				s = Content.Decoded as string;
+			}
+			else
+				s = null;
+
 			string Tag = Request.Header["X-TAG"];
 
 			if (string.IsNullOrEmpty(Tag))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			State State;
 
@@ -79,15 +99,22 @@ namespace Waher.WebService.Script
 					if (!Request.Session.TryGetVariable("Graphs", out v) ||
 						!(v.ValueObject is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
 					{
-						throw new NotFoundException("Graphs not found.");
+						await Response.SendResponse(new NotFoundException("Graphs not found."));
+						return;
 					}
 
 					KeyValuePair<Graph, object[]> Rec;
+					bool Found;
 
 					lock (Graphs)
 					{
-						if (!Graphs.TryGetValue(Tag, out Rec))
-							throw new NotFoundException("Graph not found.");
+						Found = Graphs.TryGetValue(Tag, out Rec);
+					}
+
+					if (!Found)
+					{
+						await Response.SendResponse(new NotFoundException("Graph not found."));
+						return;
 					}
 
 					s = Rec.Key.GetBitmapClickScript(x, y, Rec.Value);
@@ -99,7 +126,10 @@ namespace Waher.WebService.Script
 				else
 				{
 					if (!State.TryGetState(Tag, out State))
-						throw new NotFoundException("Expression not found.");
+					{
+						await Response.SendResponse(new NotFoundException("Expression not found."));
+						return;
+					}
 
 					State.SetRequestResponse(Request, Response, User);
 				}

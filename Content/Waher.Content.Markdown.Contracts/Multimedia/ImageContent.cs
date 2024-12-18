@@ -47,20 +47,20 @@ namespace Waher.Content.Markdown.Contracts.Multimedia
 					try
 					{
 						Uri Uri = new Uri(Item.Url);
-						KeyValuePair<string, TemporaryStream> P = await InternetContent.GetTempStreamAsync(
-							new Uri(Item.Url), 10000, new KeyValuePair<string, string>("Accept", "image/*"));
-
-						using (TemporaryStream f = P.Value)
+						using (ContentStreamResponse P = await InternetContent.GetTempStreamAsync(
+							new Uri(Item.Url), 10000, new KeyValuePair<string, string>("Accept", "image/*")))
 						{
+							TemporaryStream f = P.Encoded;
 							MemoryStream ms = new MemoryStream();
 							f.Position = 0;
 
 							await f.CopyToAsync(ms);
 
 							Bin = ms.ToArray();
-							ContentType = P.Key;
+							ContentType = P.ContentType;
 
-							if (!(await InternetContent.DecodeAsync(ContentType, Bin, Uri) is SKImage Image))
+							ContentResponse DecodedItem = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
+							if (DecodedItem.HasError || !(DecodedItem.Decoded is SKImage Image))
 								continue;
 
 							Width = Item.Width ?? Image.Width;

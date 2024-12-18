@@ -90,10 +90,8 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 			try
 			{
-				using (FileStream fs = File.OpenRead(FileName))
-				{
-					Bin = await fs.ReadAllAsync();
-				}
+				using FileStream fs = File.OpenRead(FileName);
+				Bin = await fs.ReadAllAsync();
 			}
 			catch (IOException)
 			{
@@ -102,10 +100,8 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 				try
 				{
-					using (FileStream fs = File.OpenRead(TempFileName))
-					{
-						Bin = await fs.ReadAllAsync();
-					}
+					using FileStream fs = File.OpenRead(TempFileName);
+					Bin = await fs.ReadAllAsync();
 				}
 				finally
 				{
@@ -113,9 +109,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				}
 			}
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(Gateway.GetUrl(LocalResource)));
+			ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(Gateway.GetUrl(LocalResource)));
 
-			return Expression.Encapsulate(Decoded);
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
+
+			return Expression.Encapsulate(Content.Decoded);
 		}
 	}
 }

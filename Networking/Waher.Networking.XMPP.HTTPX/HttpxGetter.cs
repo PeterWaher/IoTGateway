@@ -67,7 +67,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -90,31 +90,22 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
 		/// <returns>Decoded object.</returns>
-		public async Task<object> GetAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			KeyValuePair<string, TemporaryStream> Rec = await this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
-			string ContentType = Rec.Key;
-			TemporaryStream File = Rec.Value;
+			using ContentStreamResponse Rec = await this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 
-			try
-			{
-				if (File is null)
-					return null;
+			if (Rec.HasError)
+				return new ContentResponse(Rec.Error);
 
-				File.Position = 0;
+			Rec.Encoded.Position = 0;
 
-				if (File.Length > int.MaxValue)
-					throw new OutOfMemoryException("Resource too large.");
+			if (Rec.Encoded.Length > int.MaxValue)
+				return new ContentResponse(new OutOfMemoryException("Resource too large."));
 
-				byte[] Bin = await File.ReadAllAsync();
+			byte[] Bin = await Rec.Encoded.ReadAllAsync();
 
-				return await InternetContent.DecodeAsync(ContentType, Bin, Uri);
-			}
-			finally
-			{
-				File?.Dispose();
-			}
+			return await InternetContent.DecodeAsync(Rec.ContentType, Bin, Uri);
 		}
 
 		/// <summary>
@@ -130,7 +121,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -150,7 +141,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpxClient HttpxClient;
@@ -161,7 +152,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Types.TryGetModuleParameter("HTTPX", out object Obj) && Obj is HttpxProxy Proxy)
 			{
 				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
-					throw new InvalidOperationException("Service is being shut down.");
+					return new ContentStreamResponse(new InvalidOperationException("Service is being shut down."));
 
 				if (string.Compare(BareJid, Proxy.DefaultXmppClient.BareJID, true) == 0 &&
 					Proxy.DefaultXmppClient.TryGetExtension(out HttpxServer Server))
@@ -181,7 +172,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
 			{
 				if (XmppClient.Disposed)
-					throw new InvalidOperationException("Service is being shut down.");
+					return new ContentStreamResponse(new InvalidOperationException("Service is being shut down."));
 
 				if (string.Compare(BareJid, XmppClient.BareJID, true) == 0 &&
 					XmppClient.TryGetExtension(out HttpxServer Server))
@@ -191,7 +182,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				else
 				{
 					if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
-						throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
+						return new ContentStreamResponse(new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client."));
 
 					HttpxClient = HttpxClient2;
 
@@ -204,9 +195,9 @@ namespace Waher.Networking.XMPP.HTTPX
 						RosterItem Item = XmppClient.GetRosterItem(BareJid);
 
 						if (Item is null)
-							throw new ConflictException("No approved presence subscription with " + BareJid + ".");
+							return new ContentStreamResponse(new ConflictException("No approved presence subscription with " + BareJid + "."));
 						else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
-							throw new ServiceUnavailableException(BareJid + " is not online.");
+							return new ContentStreamResponse(new ServiceUnavailableException(BareJid + " is not online."));
 						else
 							FullJid = Item.LastPresenceFullJid;
 					}
@@ -215,7 +206,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 			else
-				throw new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered.");
+				return new ContentStreamResponse(new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered."));
 
 			List<HttpField> Headers2 = new List<HttpField>();
 			bool HasHost = false;
@@ -257,7 +248,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				// TODO: Transport public part of Client certificate, if provided.
 
 				if (HttpxClient is null)
-					throw new Exception("No HTTPX client available.");
+					return new ContentStreamResponse(new Exception("No HTTPX client available."));
 
 				await HttpxClient.Request(FullJid, "GET", LocalUrl, async (Sender, e) =>
 				{
@@ -292,7 +283,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}, State, Headers2.ToArray());
 
 				if (!await State.Done.Task)
-					throw new TimeoutException("Request timed out.");
+					return new ContentStreamResponse(new TimeoutException("Request timed out."));
 
 				Timer.Dispose();
 				Timer = null;
@@ -302,7 +293,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					TemporaryStream Result = State.File;
 					State.File = null;
 
-					return new KeyValuePair<string, TemporaryStream>(State.HttpResponse?.ContentType, Result);
+					return new ContentStreamResponse(State.HttpResponse?.ContentType, Result);
 				}
 				else
 				{
@@ -318,8 +309,8 @@ namespace Waher.Networking.XMPP.HTTPX
 						Data = await State.File.ReadAllAsync();
 					}
 
-					throw GetExceptionObject(State.StatusCode, State.StatusMessage,
-						State.HttpResponse, Data, ContentType);
+					return new ContentStreamResponse(GetExceptionObject(State.StatusCode, State.StatusMessage,
+						State.HttpResponse, Data, ContentType));
 				}
 			}
 			finally

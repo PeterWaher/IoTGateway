@@ -150,7 +150,7 @@ namespace Waher.Networking.SMTP
 			if (i < 0)
 				i = Row.Length;
 
-			if (!int.TryParse(Row.Substring(0, i), out int Code))
+			if (!int.TryParse(Row[..i], out int Code))
 			{
 				await this.Error("Invalid response returned.");
 				return true;
@@ -161,7 +161,7 @@ namespace Waher.Networking.SMTP
 			lock (this.synchObj)
 			{
 				if (i < Row.Length)
-					Row = Row.Substring(i + 1).Trim();
+					Row = Row[(i + 1)..].Trim();
 				else
 					Row = string.Empty;
 
@@ -370,7 +370,7 @@ namespace Waher.Networking.SMTP
 						}
 						else*/
 						if (s.StartsWith("AUTH "))
-							this.authMechanisms = s.Substring(5).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
+							this.authMechanisms = s[5..].Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
 						break;
 				}
 			}
@@ -623,7 +623,7 @@ namespace Waher.Networking.SMTP
 				}
 			});
 
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Content, Encoding.UTF8);
+			ContentResponse P = await InternetContent.EncodeAsync(Content, Encoding.UTF8);
 
 			if (Attachments.Length > 0)
 			{
@@ -631,18 +631,18 @@ namespace Waher.Networking.SMTP
 				{
 					new EmbeddedContent()
 					{
-						ContentType = P.Value,
-						Raw = P.Key
+						ContentType = P.ContentType,
+						Raw = P.Encoded
 					}
 				};
 
 				foreach (object Attachment in Attachments)
 				{
-					KeyValuePair<byte[], string> P2 = await InternetContent.EncodeAsync(Attachment, Encoding.UTF8);
+					ContentResponse P2 = await InternetContent.EncodeAsync(Attachment, Encoding.UTF8);
 					Parts.Add(new EmbeddedContent()
 					{
-						ContentType = P2.Value,
-						Raw = P2.Key
+						ContentType = P2.ContentType,
+						Raw = P2.Encoded
 					});
 				}
 
@@ -651,8 +651,8 @@ namespace Waher.Networking.SMTP
 				P = await InternetContent.EncodeAsync(Mixed, Encoding.UTF8);
 			}
 
-			byte[] BodyBin = P.Key;
-			string ContentType = P.Value;
+			byte[] BodyBin = P.Encoded;
+			string ContentType = P.ContentType;
 
 			List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>()
 			{

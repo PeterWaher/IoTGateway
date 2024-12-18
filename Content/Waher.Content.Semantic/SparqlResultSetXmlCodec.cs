@@ -72,11 +72,11 @@ namespace Waher.Content.Semantic
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
 			SparqlResultSet Parsed = new SparqlResultSet(s, BaseUri);
-			return Task.FromResult<object>(Parsed);
+			return Task.FromResult(new ContentResponse(ContentType, Parsed, Data));
 		}
 
 		/// <summary>
@@ -120,7 +120,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
@@ -166,7 +166,7 @@ namespace Waher.Content.Semantic
 				byte[] Bin = Encoding.GetBytes(Text);
 				string ContentType = SparqlResultSetContentTypes[0] + "; charset=" + Encoding.WebName;
 
-				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+				return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 			}
 		}
 

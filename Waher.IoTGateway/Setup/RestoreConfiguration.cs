@@ -132,16 +132,14 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private Task UploadBackup(HttpRequest Request, HttpResponse Response)
+		private async Task UploadBackup(HttpRequest Request, HttpResponse Response)
 		{
-			this.Upload(Request, Response, ref this.expectedBlockBackup, this.backupFilePerSession, "backup");
-			return Task.CompletedTask;
+			this.expectedBlockBackup = await this.Upload(Request, Response, this.expectedBlockBackup, this.backupFilePerSession, "backup");
 		}
 
-		private Task UploadKey(HttpRequest Request, HttpResponse Response)
+		private async Task UploadKey(HttpRequest Request, HttpResponse Response)
 		{
-			this.Upload(Request, Response, ref this.expectedBlockKey, this.keyFilePerSession, "key");
-			return Task.CompletedTask;
+			this.expectedBlockKey = await this.Upload(Request, Response, this.expectedBlockKey, this.keyFilePerSession, "key");
 		}
 
 		/// <summary>
@@ -149,7 +147,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected override string ConfigPrivilege => "Admin.Data.Restore";
 
-		private void Upload(HttpRequest Request, HttpResponse Response, ref int ExpectedBlockNr, Dictionary<string, TemporaryFile> Files, string Name)
+		private async Task<int> Upload(HttpRequest Request, HttpResponse Response, int ExpectedBlockNr, Dictionary<string, TemporaryFile> Files, string Name)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
@@ -166,7 +164,8 @@ namespace Waher.IoTGateway.Setup
 				!CommonTypes.TryParse(F.Value, out bool More) ||
 				string.IsNullOrEmpty(HttpSessionID = HttpResource.GetSessionId(Request, Response)))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return ExpectedBlockNr;
 			}
 
 			if (BlockNr == 0)
@@ -177,11 +176,17 @@ namespace Waher.IoTGateway.Setup
 				if (Request.Header.TryGetHeaderField("X-FileName", out F) && !string.IsNullOrEmpty(F.Value))
 					Request.Session[Name + "FileName"] = F.Value;
 				else
-					throw new BadRequestException();
+				{
+					await Response.SendResponse(new BadRequestException());
+					return ExpectedBlockNr;
+				}
 			}
 
 			if (BlockNr != ExpectedBlockNr)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return ExpectedBlockNr;
+			}
 
 			ExpectedBlockNr++;
 
@@ -194,14 +199,16 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
-			Request.DataStream.CopyTo(File);
+			await Request.DataStream.CopyToAsync(File);
 
 			if (!More)
-				File.Flush();
+				await File.FlushAsync();
 
 			ShowStatus(TabID, Name + "Bytes", Export.FormatBytes(File.Length) + " received of " + Name + " file.");
 
 			Response.StatusCode = 200;
+
+			return ExpectedBlockNr;
 		}
 
 		internal static string[] GetTabIDs(string TabID)
@@ -245,19 +252,24 @@ namespace Waher.IoTGateway.Setup
 				string.IsNullOrEmpty(TabID = F.Value) ||
 				string.IsNullOrEmpty(HttpSessionID = HttpResource.GetSessionId(Request, Response)))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("overwrite", out Obj) || !(Obj is bool Overwrite) ||
+			if (!Parameters.TryGetValue("overwrite", out object Obj) || !(Obj is bool Overwrite) ||
 				!Parameters.TryGetValue("onlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections) ||
 				!Parameters.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections) ||
 				!Parameters.TryGetValue("selectedParts", out Obj) || !(Obj is Array SelectedParts))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			BackupFile = GetAndRemoveFile(HttpSessionID, this.backupFilePerSession);
@@ -756,19 +768,18 @@ namespace Waher.IoTGateway.Setup
 						case "MetaData":
 							if (r.Depth == 4 && BlockStarted)
 							{
-								using (XmlReader r2 = r.ReadSubtree())
+								using XmlReader r2 = r.ReadSubtree();
+								
+								await r2.ReadAsync();
+
+								while (await r2.ReadAsync())
 								{
-									await r2.ReadAsync();
-
-									while (await r2.ReadAsync())
+									if (r2.IsStartElement())
 									{
-										if (r2.IsStartElement())
-										{
-											P = await ReadValue(r2);
+										P = await ReadValue(r2);
 
-											if (ImportCollection)
-												await Import.BlockMetaData(P.Key, P.Value);
-										}
+										if (ImportCollection)
+											await Import.BlockMetaData(P.Key, P.Value);
 									}
 								}
 							}
@@ -782,30 +793,15 @@ namespace Waher.IoTGateway.Setup
 						case "Clear":
 							if (r.Depth != 4 || !CollectionStarted || !BlockStarted)
 								throw new Exception("Entry element not expected.");
-
-							EntryType EntryType;
-
-							switch (r.LocalName)
+							
+							EntryType EntryType = r.LocalName switch
 							{
-								case "New":
-									EntryType = EntryType.New;
-									break;
-
-								case "Update":
-									EntryType = EntryType.Update;
-									break;
-
-								case "Delete":
-									EntryType = EntryType.Delete;
-									break;
-
-								case "Clear":
-									EntryType = EntryType.Clear;
-									break;
-
-								default:
-									throw new Exception("Unexpected element: " + r.LocalName);
-							}
+								"New" => EntryType.New,
+								"Update" => EntryType.Update,
+								"Delete" => EntryType.Delete,
+								"Clear" => EntryType.Clear,
+								_ => throw new Exception("Unexpected element: " + r.LocalName),
+							};
 
 							using (XmlReader r2 = r.ReadSubtree())
 							{
@@ -927,40 +923,39 @@ namespace Waher.IoTGateway.Setup
 									if (Path.IsPathRooted(FileName))
 									{
 										if (FileName.StartsWith(Gateway.AppDataFolder))
-											FileName = FileName.Substring(Gateway.AppDataFolder.Length);
+											FileName = FileName[Gateway.AppDataFolder.Length..];
 										else
 											throw new Exception("Absolute path names not allowed: " + FileName);
 									}
 
 									FileName = Path.Combine(Gateway.AppDataFolder, FileName);
 
-									using (TemporaryFile fs = new TemporaryFile())
+									using TemporaryFile fs = new TemporaryFile();
+									
+									while (await r2.ReadAsync())
 									{
-										while (await r2.ReadAsync())
+										if (r2.IsStartElement())
 										{
-											if (r2.IsStartElement())
+											while (r2.LocalName == "Chunk")
 											{
-												while (r2.LocalName == "Chunk")
-												{
-													string Base64 = await r2.ReadElementContentAsStringAsync();
-													byte[] Data = Convert.FromBase64String(Base64);
-													fs.Write(Data, 0, Data.Length);
-												}
+												string Base64 = await r2.ReadElementContentAsStringAsync();
+												byte[] Data = Convert.FromBase64String(Base64);
+												fs.Write(Data, 0, Data.Length);
 											}
 										}
-
-										fs.Position = 0;
-
-										if (!OnlySelectedCollections)
-										{
-											if (FirstFile && FileName.EndsWith(Gateway.GatewayConfigLocalFileName, StringComparison.CurrentCultureIgnoreCase))
-												ImportGatewayConfig(fs);
-											else
-												await Import.ExportFile(FileName, fs);
-										}
-
-										FirstFile = false;
 									}
+
+									fs.Position = 0;
+
+									if (!OnlySelectedCollections)
+									{
+										if (FirstFile && FileName.EndsWith(Gateway.GatewayConfigLocalFileName, StringComparison.CurrentCultureIgnoreCase))
+											ImportGatewayConfig(fs);
+										else
+											await Import.ExportFile(FileName, fs);
+									}
+
+									FirstFile = false;
 								}
 							}
 							break;
@@ -1437,295 +1432,292 @@ namespace Waher.IoTGateway.Setup
 			bool ImportCollection = !OnlySelectedCollections;
 			bool ImportPart;
 
-			using (BinaryReader r = new BinaryReader(BackupFile, System.Text.Encoding.UTF8, true))
+			using BinaryReader r = new BinaryReader(BackupFile, System.Text.Encoding.UTF8, true);
+			string s = r.ReadString();
+			if (s != BinaryExportFormat.Preamble)
+				throw new Exception("Invalid backup file.");
+
+			await Import.Start();
+
+			while ((Command = r.ReadByte()) != 0)
 			{
-				string s = r.ReadString();
-				if (s != BinaryExportFormat.Preamble)
-					throw new Exception("Invalid backup file.");
-
-				await Import.Start();
-
-				while ((Command = r.ReadByte()) != 0)
+				switch (Command)
 				{
-					switch (Command)
-					{
-						case 1:
-							throw new Exception("Obsolete file.");  // 1 is obsolete (previously XMPP Credentials)
+					case 1:
+						throw new Exception("Obsolete file.");  // 1 is obsolete (previously XMPP Credentials)
 
-						case 2: // Database
-							string CollectionName;
-							string ObjectId;
-							string TypeName;
-							string FieldName;
-							bool Ascending;
+					case 2: // Database
+						string CollectionName;
+						string ObjectId;
+						string TypeName;
+						string FieldName;
+						bool Ascending;
 
-							ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Database") >= 0 || SelectedParts.Length == 0;
+						ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Database") >= 0 || SelectedParts.Length == 0;
 
-							if (!ImportPart)
-								ShowStatus(TabID, "Skipping database section.");
-							else if (Overwrite)
-								ShowStatus(TabID, "Restoring database section.");
-							else
-								ShowStatus(TabID, "Validating database section.");
+						if (!ImportPart)
+							ShowStatus(TabID, "Skipping database section.");
+						else if (Overwrite)
+							ShowStatus(TabID, "Restoring database section.");
+						else
+							ShowStatus(TabID, "Validating database section.");
 
-							await Import.StartDatabase();
+						await Import.StartDatabase();
 
-							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+						{
+							if (OnlySelectedCollections)
 							{
-								if (OnlySelectedCollections)
-								{
-									ImportCollection = ImportPart && (Array.IndexOf(SelectedCollections, CollectionName) >= 0 ||
-										SelectedCollections.Length == 0);
-								}
-
-								if (ImportCollection)
-								{
-									await Import.StartCollection(CollectionName);
-									CollectionFound(TabID, CollectionName);
-								}
-
-								byte b;
-
-								while ((b = r.ReadByte()) != 0)
-								{
-									switch (b)
-									{
-										case 1:
-											if (ImportCollection)
-												await Import.StartIndex();
-
-											while (!string.IsNullOrEmpty(FieldName = r.ReadString()))
-											{
-												Ascending = r.ReadBoolean();
-
-												if (ImportCollection)
-													await Import.ReportIndexField(FieldName, Ascending);
-											}
-
-											if (ImportCollection)
-												await Import.EndIndex();
-											break;
-
-										case 2:
-											ObjectId = r.ReadString();
-											TypeName = r.ReadString();
-
-											if (ImportCollection)
-												await Import.StartObject(ObjectId, TypeName);
-
-											byte PropertyType = r.ReadByte();
-											string PropertyName = r.ReadString();
-											object PropertyValue;
-
-											while (!string.IsNullOrEmpty(PropertyName))
-											{
-												PropertyValue = ReadValue(r, PropertyType);
-
-												if (ImportCollection)
-													await Import.ReportProperty(PropertyName, PropertyValue);
-
-												PropertyType = r.ReadByte();
-												PropertyName = r.ReadString();
-											}
-
-											if (ImportCollection)
-												await Import.EndObject();
-											break;
-
-										default:
-											throw new Exception("Unsupported collection section: " + b.ToString());
-									}
-
-									ShowReport(TabID, Import, ref LastReport, Overwrite);
-								}
-
-								if (ImportCollection)
-									await Import.EndCollection();
+								ImportCollection = ImportPart && (Array.IndexOf(SelectedCollections, CollectionName) >= 0 ||
+									SelectedCollections.Length == 0);
 							}
 
-							await Import.EndDatabase();
-							break;
-
-						case 3: // Files
-							string FileName;
-							int MaxLen = 256 * 1024;
-							byte[] Buffer = new byte[MaxLen];
-
-							ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Files") >= 0 || SelectedParts.Length == 0;
-
-							if (!ImportPart)
-								ShowStatus(TabID, "Skipping files section.");
-							else if (Overwrite)
-								ShowStatus(TabID, "Restoring files section.");
-							else
-								ShowStatus(TabID, "Validating files section.");
-
-							await Import.StartFiles();
-
-							bool FirstFile = true;
-
-							while (!string.IsNullOrEmpty(FileName = r.ReadString()))
+							if (ImportCollection)
 							{
-								long Length = r.ReadInt64();
-
-								if (Path.IsPathRooted(FileName))
-								{
-									if (FileName.StartsWith(Gateway.AppDataFolder))
-										FileName = FileName.Substring(Gateway.AppDataFolder.Length);
-									else
-										throw new Exception("Absolute path names not allowed: " + FileName);
-								}
-
-								FileName = Path.Combine(Gateway.AppDataFolder, FileName);
-
-								using (TemporaryFile File = new TemporaryFile())
-								{
-									while (Length > 0)
-									{
-										int Nr = r.Read(Buffer, 0, (int)Math.Min(Length, MaxLen));
-										Length -= Nr;
-										await File.WriteAsync(Buffer, 0, Nr);
-									}
-
-									File.Position = 0;
-									if (ImportPart)
-									{
-										try
-										{
-											if (FirstFile && FileName.EndsWith(Gateway.GatewayConfigLocalFileName, StringComparison.CurrentCultureIgnoreCase))
-												ImportGatewayConfig(File);
-											else
-												await Import.ExportFile(FileName, File);
-
-											ShowReport(TabID, Import, ref LastReport, Overwrite);
-										}
-										catch (Exception ex)
-										{
-											ShowStatus(TabID, "Unable to restore " + FileName + ": " + ex.Message);
-										}
-									}
-
-									FirstFile = false;
-								}
+								await Import.StartCollection(CollectionName);
+								CollectionFound(TabID, CollectionName);
 							}
 
-							await Import.EndFiles();
-							break;
+							byte b;
 
-						case 4:
-							throw new Exception("Export file contains reported errors.");
-
-						case 5:
-							throw new Exception("Export file contains reported exceptions.");
-
-						case 6: // Ledger
-
-							ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Ledger") >= 0 || SelectedParts.Length == 0;
-
-							if (!ImportPart)
-								ShowStatus(TabID, "Skipping ledger section.");
-							else if (Overwrite)
-								ShowStatus(TabID, "Restoring ledger section.");
-							else
-								ShowStatus(TabID, "Validating ledger section.");
-
-							await Import.StartLedger();
-
-							while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+							while ((b = r.ReadByte()) != 0)
 							{
-								if (OnlySelectedCollections)
+								switch (b)
 								{
-									ImportCollection = ImportPart && (Array.IndexOf(SelectedCollections, CollectionName) >= 0 ||
-										SelectedCollections.Length == 0);
-								}
+									case 1:
+										if (ImportCollection)
+											await Import.StartIndex();
 
-								if (ImportCollection)
-								{
-									await Import.StartCollection(CollectionName);
-									CollectionFound(TabID, CollectionName);
-								}
-
-								byte b;
-
-								while ((b = r.ReadByte()) != 0)
-								{
-									switch (b)
-									{
-										case 1:
-											string BlockID = r.ReadString();
-											if (ImportCollection)
-												await Import.StartBlock(BlockID);
-											break;
-
-										case 2:
-											ObjectId = r.ReadString();
-											TypeName = r.ReadString();
-											EntryType EntryType = (EntryType)r.ReadByte();
-											DateTimeKind Kind = (DateTimeKind)r.ReadByte();
-											long Ticks = r.ReadInt64();
-											DateTime DT = new DateTime(Ticks, Kind);
-											Ticks = r.ReadInt64();
-											Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
-											TimeSpan TS = new TimeSpan(Ticks);
-											DateTimeOffset EntryTimestamp = new DateTimeOffset(DT, TS);
+										while (!string.IsNullOrEmpty(FieldName = r.ReadString()))
+										{
+											Ascending = r.ReadBoolean();
 
 											if (ImportCollection)
-												await Import.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+												await Import.ReportIndexField(FieldName, Ascending);
+										}
 
-											byte PropertyType = r.ReadByte();
-											string PropertyName = r.ReadString();
-											object PropertyValue;
+										if (ImportCollection)
+											await Import.EndIndex();
+										break;
 
-											while (!string.IsNullOrEmpty(PropertyName))
-											{
-												PropertyValue = ReadValue(r, PropertyType);
+									case 2:
+										ObjectId = r.ReadString();
+										TypeName = r.ReadString();
 
-												if (ImportCollection)
-													await Import.ReportProperty(PropertyName, PropertyValue);
+										if (ImportCollection)
+											await Import.StartObject(ObjectId, TypeName);
 
-												PropertyType = r.ReadByte();
-												PropertyName = r.ReadString();
-											}
+										byte PropertyType = r.ReadByte();
+										string PropertyName = r.ReadString();
+										object PropertyValue;
 
-											if (ImportCollection)
-												await Import.EndEntry();
-											break;
-
-										case 3:
-											if (ImportCollection)
-												await Import.EndBlock();
-											break;
-
-										case 4:
-											PropertyName = r.ReadString();
-											PropertyType = r.ReadByte();
+										while (!string.IsNullOrEmpty(PropertyName))
+										{
 											PropertyValue = ReadValue(r, PropertyType);
 
-											await Import.BlockMetaData(PropertyName, PropertyValue);
-											break;
+											if (ImportCollection)
+												await Import.ReportProperty(PropertyName, PropertyValue);
 
-										default:
-											throw new Exception("Unsupported collection section: " + b.ToString());
-									}
+											PropertyType = r.ReadByte();
+											PropertyName = r.ReadString();
+										}
+
+										if (ImportCollection)
+											await Import.EndObject();
+										break;
+
+									default:
+										throw new Exception("Unsupported collection section: " + b.ToString());
+								}
+
+								ShowReport(TabID, Import, ref LastReport, Overwrite);
+							}
+
+							if (ImportCollection)
+								await Import.EndCollection();
+						}
+
+						await Import.EndDatabase();
+						break;
+
+					case 3: // Files
+						string FileName;
+						int MaxLen = 256 * 1024;
+						byte[] Buffer = new byte[MaxLen];
+
+						ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Files") >= 0 || SelectedParts.Length == 0;
+
+						if (!ImportPart)
+							ShowStatus(TabID, "Skipping files section.");
+						else if (Overwrite)
+							ShowStatus(TabID, "Restoring files section.");
+						else
+							ShowStatus(TabID, "Validating files section.");
+
+						await Import.StartFiles();
+
+						bool FirstFile = true;
+
+						while (!string.IsNullOrEmpty(FileName = r.ReadString()))
+						{
+							long Length = r.ReadInt64();
+
+							if (Path.IsPathRooted(FileName))
+							{
+								if (FileName.StartsWith(Gateway.AppDataFolder))
+									FileName = FileName[Gateway.AppDataFolder.Length..];
+								else
+									throw new Exception("Absolute path names not allowed: " + FileName);
+							}
+
+							FileName = Path.Combine(Gateway.AppDataFolder, FileName);
+
+							using TemporaryFile File = new TemporaryFile();
+							
+							while (Length > 0)
+							{
+								int Nr = r.Read(Buffer, 0, (int)Math.Min(Length, MaxLen));
+								Length -= Nr;
+								await File.WriteAsync(Buffer, 0, Nr);
+							}
+
+							File.Position = 0;
+							if (ImportPart)
+							{
+								try
+								{
+									if (FirstFile && FileName.EndsWith(Gateway.GatewayConfigLocalFileName, StringComparison.CurrentCultureIgnoreCase))
+										ImportGatewayConfig(File);
+									else
+										await Import.ExportFile(FileName, File);
 
 									ShowReport(TabID, Import, ref LastReport, Overwrite);
 								}
-
-								if (ImportCollection)
-									await Import.EndCollection();
+								catch (Exception ex)
+								{
+									ShowStatus(TabID, "Unable to restore " + FileName + ": " + ex.Message);
+								}
 							}
 
-							await Import.EndLedger();
-							break;
+							FirstFile = false;
+						}
 
-						default:
-							throw new Exception("Unsupported section: " + Command.ToString());
-					}
+						await Import.EndFiles();
+						break;
+
+					case 4:
+						throw new Exception("Export file contains reported errors.");
+
+					case 5:
+						throw new Exception("Export file contains reported exceptions.");
+
+					case 6: // Ledger
+
+						ImportPart = !OnlySelectedCollections || Array.IndexOf(SelectedParts, "Ledger") >= 0 || SelectedParts.Length == 0;
+
+						if (!ImportPart)
+							ShowStatus(TabID, "Skipping ledger section.");
+						else if (Overwrite)
+							ShowStatus(TabID, "Restoring ledger section.");
+						else
+							ShowStatus(TabID, "Validating ledger section.");
+
+						await Import.StartLedger();
+
+						while (!string.IsNullOrEmpty(CollectionName = r.ReadString()))
+						{
+							if (OnlySelectedCollections)
+							{
+								ImportCollection = ImportPart && (Array.IndexOf(SelectedCollections, CollectionName) >= 0 ||
+									SelectedCollections.Length == 0);
+							}
+
+							if (ImportCollection)
+							{
+								await Import.StartCollection(CollectionName);
+								CollectionFound(TabID, CollectionName);
+							}
+
+							byte b;
+
+							while ((b = r.ReadByte()) != 0)
+							{
+								switch (b)
+								{
+									case 1:
+										string BlockID = r.ReadString();
+										if (ImportCollection)
+											await Import.StartBlock(BlockID);
+										break;
+
+									case 2:
+										ObjectId = r.ReadString();
+										TypeName = r.ReadString();
+										EntryType EntryType = (EntryType)r.ReadByte();
+										DateTimeKind Kind = (DateTimeKind)r.ReadByte();
+										long Ticks = r.ReadInt64();
+										DateTime DT = new DateTime(Ticks, Kind);
+										Ticks = r.ReadInt64();
+										Ticks -= Ticks % 600000000; // Offsets must be in whole minutes.
+										TimeSpan TS = new TimeSpan(Ticks);
+										DateTimeOffset EntryTimestamp = new DateTimeOffset(DT, TS);
+
+										if (ImportCollection)
+											await Import.StartEntry(ObjectId, TypeName, EntryType, EntryTimestamp);
+
+										byte PropertyType = r.ReadByte();
+										string PropertyName = r.ReadString();
+										object PropertyValue;
+
+										while (!string.IsNullOrEmpty(PropertyName))
+										{
+											PropertyValue = ReadValue(r, PropertyType);
+
+											if (ImportCollection)
+												await Import.ReportProperty(PropertyName, PropertyValue);
+
+											PropertyType = r.ReadByte();
+											PropertyName = r.ReadString();
+										}
+
+										if (ImportCollection)
+											await Import.EndEntry();
+										break;
+
+									case 3:
+										if (ImportCollection)
+											await Import.EndBlock();
+										break;
+
+									case 4:
+										PropertyName = r.ReadString();
+										PropertyType = r.ReadByte();
+										PropertyValue = ReadValue(r, PropertyType);
+
+										await Import.BlockMetaData(PropertyName, PropertyValue);
+										break;
+
+									default:
+										throw new Exception("Unsupported collection section: " + b.ToString());
+								}
+
+								ShowReport(TabID, Import, ref LastReport, Overwrite);
+							}
+
+							if (ImportCollection)
+								await Import.EndCollection();
+						}
+
+						await Import.EndLedger();
+						break;
+
+					default:
+						throw new Exception("Unsupported section: " + Command.ToString());
 				}
-
-				await Import.End();
-				ShowReport(TabID, Import, Overwrite);
 			}
+
+			await Import.End();
+			ShowReport(TabID, Import, Overwrite);
 		}
 
 		private static void ImportGatewayConfig(Stream File)
@@ -1763,9 +1755,7 @@ namespace Waher.IoTGateway.Setup
 								s = E.InnerText;
 								string Host = XML.Attribute(E, "host");
 
-								if (DefaultPages is null)
-									DefaultPages = new List<KeyValuePair<string, string>>();
-
+								DefaultPages ??= new List<KeyValuePair<string, string>>();
 								DefaultPages.Add(new KeyValuePair<string, string>(Host, s));
 								break;
 
@@ -1884,10 +1874,9 @@ namespace Waher.IoTGateway.Setup
 		private static async Task RestoreCompressed(Stream BackupFile, string TabID, ValidateBackupFile Import, bool Overwrite,
 			bool OnlySelectedCollections, Array SelectedCollections, Array SelectedParts)
 		{
-			using (GZipStream gz = new GZipStream(BackupFile, CompressionMode.Decompress, true))
-			{
-				await RestoreBinary(gz, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections, SelectedParts);
-			}
+			using GZipStream gz = new GZipStream(BackupFile, CompressionMode.Decompress, true);
+			
+			await RestoreBinary(gz, TabID, Import, Overwrite, OnlySelectedCollections, SelectedCollections, SelectedParts);
 		}
 
 		private static async Task<(ICryptoTransform, CryptoStream)> RestoreEncrypted(Stream BackupFile, Stream KeyFile, string TabID, ValidateBackupFile Import,
@@ -1937,12 +1926,10 @@ namespace Waher.IoTGateway.Setup
 			using (FileStream fs = File.Create(XmlPath))
 			{
 				XmlWriterSettings Settings = XML.WriterSettings(true, false);
-				using (XmlWriter w = XmlWriter.Create(fs, Settings))
-				{
-					await Database.Analyze(w, XsltPath, Gateway.AppDataFolder, false);
-					w.Flush();
-					fs.Flush();
-				}
+				using XmlWriter w = XmlWriter.Create(fs, Settings);
+				await Database.Analyze(w, XsltPath, Gateway.AppDataFolder, false);
+				w.Flush();
+				fs.Flush();
 			}
 
 			XslCompiledTransform Xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");

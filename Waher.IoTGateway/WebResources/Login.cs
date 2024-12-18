@@ -54,10 +54,11 @@ namespace Waher.IoTGateway.WebResources
 				return;
 			}
 
-			object Obj = await Request.DecodeDataAsync();
+			ContentResponse Content = await Request.DecodeDataAsync();
 			string From;
 
-			if (!(Obj is Dictionary<string, string> Form) ||
+			if (Content.HasError ||
+				!(Content.Decoded is Dictionary<string, string> Form) ||
 				!Form.TryGetValue("UserName", out string UserName) ||
 				!Form.TryGetValue("Password", out string Password))
 			{

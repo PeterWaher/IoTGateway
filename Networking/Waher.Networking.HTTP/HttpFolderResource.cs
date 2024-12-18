@@ -1446,10 +1446,16 @@ namespace Waher.Networking.HTTP
 			}
 
 			string Referer = Request.Header.Referer?.Value;
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError)
+			{
+				await Response.SendResponse(Content.Error);
+				return;
+			}
 
 			Session[" LastPost "] = new PostedInformation()
 			{
-				DecodedContent = Expression.Encapsulate(await Request.DecodeDataAsync()),
+				DecodedContent = Expression.Encapsulate(Content.Decoded),
 				Resource = Request.SubPath,
 				Referer = Referer
 			};

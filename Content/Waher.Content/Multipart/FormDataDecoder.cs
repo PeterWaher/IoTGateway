@@ -32,7 +32,9 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ContentType };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -69,13 +71,13 @@ namespace Waher.Content.Multipart
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			Dictionary<string, object> Form = new Dictionary<string, object>();
 
 			await Decode(Data, Fields, Form, null, BaseUri);
 
-			return Form;
+			return new ContentResponse(ContentType, Form, Data);
 		}
 
 		/// <summary>
@@ -269,7 +271,11 @@ namespace Waher.Content.Multipart
 
 				try
 				{
-					EmbeddedContent.Decoded = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri);
+					ContentResponse Item = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri);
+					if (Item.HasError)
+						EmbeddedContent.Decoded = Data2;
+					else
+						EmbeddedContent.Decoded = Item.Decoded;
 				}
 				catch (Exception)
 				{

@@ -66,14 +66,23 @@ namespace Waher.IoTGateway.WebResources
 			Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("repair", out Obj) || !(Obj is bool Repair))
-				throw new BadRequestException();
+			if (!Parameters.TryGetValue("repair", out object Obj) || !(Obj is bool Repair))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!CanStartAnalyzeDB())
 			{
@@ -98,7 +107,7 @@ namespace Waher.IoTGateway.WebResources
 				fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
 				DateTime Created = File.GetCreationTime(FullFileName);
 				XmlWriter XmlOutput = XmlWriter.Create(fs, XML.WriterSettings(true, false));
-				string FileName = FullFileName.Substring(BasePath.Length);
+				string FileName = FullFileName[BasePath.Length..];
 
 				Task _ = Task.Run(() => DoAnalyze(FullFileName, FileName, Created, XmlOutput, fs, Repair));
 
@@ -175,17 +184,16 @@ namespace Waher.IoTGateway.WebResources
 				fs.Dispose();
 				fs = null;
 
-				if (xslt is null)
-					xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
+				xslt ??= XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
 
 				string s = await Resources.ReadAllTextAsync(FullPath);
 				s = XSL.Transform(s, xslt);
 				byte[] Bin = utf8Bom.GetBytes(s);
 
-				string FullPath2 = FullPath.Substring(0, FullPath.Length - 4) + ".html";
+				string FullPath2 = FullPath[..^4] + ".html";
 				await Resources.WriteAllBytesAsync(FullPath2, Bin);
 
-				ExportFormats.ExportFormat.UpdateClientsFileUpdated(FileName.Substring(0, FileName.Length - 4) + ".html", Bin.Length, Created);
+				ExportFormats.ExportFormat.UpdateClientsFileUpdated(FileName[..^4] + ".html", Bin.Length, Created);
 
 				Log.Informational("Database analysis successfully completed.", FileName);
 			}

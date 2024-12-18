@@ -80,9 +80,9 @@ namespace Waher.Content.Binary
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return Task.FromResult<object>(Data);
+			return Task.FromResult(new ContentResponse(ContentType, Data, Data));
 		}
 
 		/// <summary>
@@ -161,14 +161,14 @@ namespace Waher.Content.Binary
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Object is byte[] Bin)
-				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, DefaultContentType));
+				return Task.FromResult(new ContentResponse(DefaultContentType, Bin, Bin));
 			else if (Object is EncodedObject Obj)
-				return Task.FromResult(new KeyValuePair<byte[], string>(Obj.Data, Obj.ContentType));
+				return Task.FromResult(new ContentResponse(Obj.ContentType, Obj.Data, Obj.Data));
 			else
-				throw new ArgumentException("Unable to encode as binary.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode as binary.", nameof(Object))));
 		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 #endif
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.Inventory;
@@ -123,7 +124,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <returns>Decoded data.</returns>
 		[Obsolete("Use DecodeDataAsync() instead, for better performance processing asynchronous elements in parallel environments.")]
-		public object DecodeData()
+		public ContentResponse DecodeData()
 		{
 			return this.DecodeDataAsync().Result;
 		}
@@ -132,7 +133,7 @@ namespace Waher.Networking.HTTP
 		/// Decodes data sent in request.
 		/// </summary>
 		/// <returns>Decoded data.</returns>
-		public async Task<object> DecodeDataAsync()
+		public async Task<ContentResponse> DecodeDataAsync()
 		{
 			byte[] Data = await this.ReadDataAsync();
 			if (Data is null)
@@ -140,7 +141,7 @@ namespace Waher.Networking.HTTP
 
 			HttpFieldContentType ContentType = this.header.ContentType;
 			if (ContentType is null)
-				return Data;
+				return new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
 
 			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
 				new Uri(this.header.GetURL(false, false)));

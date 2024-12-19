@@ -10,8 +10,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	public class ContentLengthEncoding : TransferEncoding
 	{
 		private readonly Encoding textEncoding;
-		private readonly bool txText;
 		private long bytesLeft;
+		private bool txText;
 
 		/// <summary>
 		/// Encodes content using a content length.
@@ -80,20 +80,24 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				{
 					if (Offset == 0 && c == Data.Length)
 					{
-						if (this.txText)
+						if (this.txText && c < 1000)
 							await this.clientConnection.TransmitText(this.textEncoding.GetString(Data));
 						else
+						{
 							await this.clientConnection.TransmitBinary(Data);
+							this.txText = false;
+						}
 					}
 					else
 					{
-						if (this.txText)
+						if (this.txText && c < 1000)
 							await this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
 						else
 						{
 							byte[] Data2 = new byte[c];
 							Array.Copy(Data, Offset, Data2, 0, c);
 							await this.clientConnection.TransmitBinary(Data2);
+							this.txText = false;
 						}
 					}
 				}

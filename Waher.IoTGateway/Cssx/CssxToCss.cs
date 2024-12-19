@@ -80,6 +80,18 @@ namespace Waher.IoTGateway.Cssx
 		/// Converts CSSX to CSS, using the current theme
 		/// </summary>
 		/// <param name="Cssx">CSSX</param>
+		/// <param name="Session">Current session</param>
+		/// <param name="FileName">Source file name.</param>
+		/// <returns>CSS</returns>
+		public static Task<string> Convert(string Cssx, Variables Session, string FileName)
+		{
+			return Convert(Cssx, null, Session, FileName, true);
+		}
+
+		/// <summary>
+		/// Converts CSSX to CSS, using the current theme
+		/// </summary>
+		/// <param name="Cssx">CSSX</param>
 		/// <param name="State">Conversion state, if available.</param>
 		/// <param name="Session">Current session</param>
 		/// <param name="FileName">Source file name.</param>

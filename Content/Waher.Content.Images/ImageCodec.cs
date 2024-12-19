@@ -282,7 +282,7 @@ namespace Waher.Content.Images
 				ContentType = ContentTypeIcon;
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 
 			Bin = Data.ToArray();
 			Data.Dispose();

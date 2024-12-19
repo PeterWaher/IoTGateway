@@ -170,7 +170,7 @@ namespace Waher.Content.Html
 		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!InternetContent.IsAccepted(HtmlContentTypes, out string ContentType, AcceptedContentTypes))
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 
 			string Html = null;
 			byte[] Bin;

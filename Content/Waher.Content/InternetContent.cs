@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
-using Waher.Runtime.Temporary;
-using System.Security.Cryptography.X509Certificates;
 using Waher.Content.Binary;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content
 {
@@ -319,7 +318,7 @@ namespace Waher.Content
 		public static Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!Encodes(Object, out Grade _, out IContentEncoder Encoder, AcceptedContentTypes))
-				throw new ArgumentException("No encoder found to encode objects of type " + (Object?.GetType()?.FullName) + ".", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("No encoder found to encode objects of type " + (Object?.GetType()?.FullName) + ".", nameof(Object))));
 
 			return Encoder.EncodeAsync(Object, Encoding);
 		}
@@ -356,7 +355,10 @@ namespace Waher.Content
 		public static bool IsAccepted(string[] ContentTypes, out string ContentType, params string[] AcceptedContentTypes)
 		{
 			if (ContentTypes.Length == 0)
-				throw new ArgumentException("Empty list of content types not permitted.", nameof(ContentTypes));
+			{
+				ContentType = null;
+				return false;
+			}
 
 			if ((AcceptedContentTypes?.Length ?? 0) == 0)
 			{
@@ -540,7 +542,7 @@ namespace Waher.Content
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			if (!Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
-				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", nameof(ContentType));
+				return Task.FromResult(new ContentResponse(new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", nameof(ContentType))));
 
 			return Decoder.DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri);
 		}
@@ -1078,7 +1080,11 @@ namespace Waher.Content
 		public static bool CanGet(Uri Uri, out Grade Grade, out IContentGetter Getter)
 		{
 			if (Uri is null)
-				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+			{
+				Grade = Grade.NotAtAll;
+				Getter = null;
+				return false;
+			}
 
 			if (getters is null)
 				BuildGetters();
@@ -1145,7 +1151,7 @@ namespace Waher.Content
 			params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
 
 			return Getter.GetAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -1188,7 +1194,7 @@ namespace Waher.Content
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
 
 			return Getter.GetAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -1228,7 +1234,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentStreamResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
 
 			return Getter.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -1271,7 +1277,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentStreamResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
 
 			return Getter.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -1376,7 +1382,11 @@ namespace Waher.Content
 		public static bool CanPost(Uri Uri, out Grade Grade, out IContentPoster Poster)
 		{
 			if (Uri is null)
-				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+			{
+				Grade = Grade.NotAtAll;
+				Poster = null;
+				return false;
+			}
 
 			if (posters is null)
 				BuildPosters();
@@ -1446,7 +1456,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri))));
 
 			return Poster.PostAsync(Uri, Data, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -1492,7 +1502,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri))));
 
 			return Poster.PostAsync(Uri, Data, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -1539,7 +1549,7 @@ namespace Waher.Content
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentBinaryResponse(new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri))));
 
 			return Poster.PostAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -1590,7 +1600,7 @@ namespace Waher.Content
 			params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentBinaryResponse(new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri))));
 
 			return Poster.PostAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -1695,7 +1705,11 @@ namespace Waher.Content
 		public static bool CanPut(Uri Uri, out Grade Grade, out IContentPutter Putter)
 		{
 			if (Uri is null)
-				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+			{
+				Grade = Grade.NotAtAll;
+				Putter = null;
+				return false;
+			}
 
 			if (putters is null)
 				BuildPutters();
@@ -1765,7 +1779,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
-				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
 
 			return Putter.PutAsync(Uri, Data, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -1811,7 +1825,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
-				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
 
 			return Putter.PutAsync(Uri, Data, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -1857,7 +1871,7 @@ namespace Waher.Content
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
-				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentBinaryResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
 
 			return Putter.PutAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -1906,7 +1920,7 @@ namespace Waher.Content
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
-				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentBinaryResponse(new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri))));
 
 			return Putter.PutAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -2011,7 +2025,11 @@ namespace Waher.Content
 		public static bool CanDelete(Uri Uri, out Grade Grade, out IContentDeleter Deleter)
 		{
 			if (Uri is null)
-				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+			{
+				Grade = Grade.NotAtAll;
+				Deleter = null;
+				return false;
+			}
 
 			if (deleters is null)
 				BuildDeleters();
@@ -2078,7 +2096,7 @@ namespace Waher.Content
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanDelete(Uri, out Grade _, out IContentDeleter Deleter))
-				throw new ArgumentException("URI Scheme not recognized (DELETE): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (DELETE): " + Uri.Scheme, nameof(Uri))));
 
 			return Deleter.DeleteAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -2122,7 +2140,7 @@ namespace Waher.Content
 			params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanDelete(Uri, out Grade _, out IContentDeleter Deleter))
-				throw new ArgumentException("URI Scheme not recognized (DELETE): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (DELETE): " + Uri.Scheme, nameof(Uri))));
 
 			return Deleter.DeleteAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}
@@ -2227,7 +2245,11 @@ namespace Waher.Content
 		public static bool CanHead(Uri Uri, out Grade Grade, out IContentHeader Header)
 		{
 			if (Uri is null)
-				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+			{
+				Grade = Grade.NotAtAll;
+				Header = null;
+				return false;
+			}
 
 			if (headers is null)
 				BuildHeaders();
@@ -2294,7 +2316,7 @@ namespace Waher.Content
 			params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanHead(Uri, out Grade _, out IContentHeader Header))
-				throw new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri))));
 
 			return Header.HeadAsync(Uri, Certificate, RemoteCertificateValidator, Headers);
 		}
@@ -2337,7 +2359,7 @@ namespace Waher.Content
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanHead(Uri, out Grade _, out IContentHeader Header))
-				throw new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri));
+				return Task.FromResult(new ContentResponse(new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri))));
 
 			return Header.HeadAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 		}

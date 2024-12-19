@@ -159,7 +159,7 @@ namespace Waher.Content.Rss
 			if (!(Object is RssDocument Doc) ||
 				!InternetContent.IsAccepted(contentTypes, out string ContentType, AcceptedContentTypes))
 			{
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 			}
 
 			return XmlCodec.EncodeXmlAsync(Doc.Xml, Encoding, ContentType);

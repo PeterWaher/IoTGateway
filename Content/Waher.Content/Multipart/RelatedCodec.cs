@@ -72,7 +72,10 @@ namespace Waher.Content.Multipart
 		{
 			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
-			await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
+			Exception Error = await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
+			if (!(Error is null))
+				return new ContentResponse(Error);
+
 			string Type = string.Empty;
 
 			foreach (KeyValuePair<string, string> P in Fields)

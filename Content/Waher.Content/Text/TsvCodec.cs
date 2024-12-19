@@ -153,7 +153,7 @@ namespace Waher.Content.Text
 			else if (Object is IMatrix M)
 				Tsv = TSV.Encode(M);
 			else
-				throw new ArgumentException("Unable to encode as TSV.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode as TSV.", nameof(Object))));
 
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;

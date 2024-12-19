@@ -156,7 +156,7 @@ namespace Waher.Content.Markdown.PlantUml
         public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
         {
             if (!InternetContent.IsAccepted(PlantUmlContentTypes, out string ContentType, AcceptedContentTypes))
-                throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 
             string s;
 

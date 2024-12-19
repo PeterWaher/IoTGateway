@@ -232,7 +232,7 @@ namespace Waher.Content.Xml.Text
 				}
 			}
 
-			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+			return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 		}
 
 		/// <summary>

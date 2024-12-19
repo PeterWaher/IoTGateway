@@ -74,9 +74,12 @@ namespace Waher.Content.Multipart
 		{
 			Dictionary<string, object> Form = new Dictionary<string, object>();
 
-			await Decode(Data, Fields, Form, null, BaseUri);
+			Exception Error = await Decode(Data, Fields, Form, null, BaseUri);
 
-			return new ContentResponse(ContentType, Form, Data);
+			if (Error is null)
+				return new ContentResponse(ContentType, Form, Data);
+			else
+				return new ContentResponse(Error);
 		}
 
 		/// <summary>
@@ -87,7 +90,8 @@ namespace Waher.Content.Multipart
 		/// <param name="Form">Resulting Form, or null if not of interest.</param>
 		/// <param name="List">Decoded embedded objects will be added to this list.</param>
 		/// <param name="BaseUri">Bare URI</param>
-		public static async Task Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
+		/// <returns>Null if successful, exception object if not.</returns>
+		public static async Task<Exception> Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
 			List<EmbeddedContent> List, Uri BaseUri)
 		{
 			string Boundary = null;
@@ -105,8 +109,9 @@ namespace Waher.Content.Multipart
 			}
 
 			if (string.IsNullOrEmpty(Boundary))
-				throw new Exception("No boundary defined.");
+				return new Exception("No boundary defined.");
 
+			Exception Error;
 			byte[] BoundaryBin = Encoding.ASCII.GetBytes(Boundary);
 			int Start = 0;
 			int i = 0;
@@ -125,7 +130,9 @@ namespace Waher.Content.Multipart
 
 				if (j == d)
 				{
-					await AddPart(Data, Start, i, false, Form, List, BaseUri);
+					Error = await AddPart(Data, Start, i, false, Form, List, BaseUri);
+					if (!(Error is null))
+						return Error;
 
 					i += d;
 					while (i < c && Data[i] <= 32)
@@ -138,10 +145,16 @@ namespace Waher.Content.Multipart
 			}
 
 			if (Start < c)
-				await AddPart(Data, Start, c, true, Form, List, BaseUri);
+			{
+				Error = await AddPart(Data, Start, c, true, Form, List, BaseUri);
+				if (!(Error is null))
+					return Error;
+			}
+
+			return null;
 		}
 
-		private static async Task AddPart(byte[] Data, int Start, int i, bool Last,
+		private static async Task<Exception> AddPart(byte[] Data, int Start, int i, bool Last,
 			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri)
 		{
 			int j, k, l, m;
@@ -154,7 +167,7 @@ namespace Waher.Content.Multipart
 			}
 
 			if (j == Start)
-				return;
+				return null;
 
 			if (j < i)
 			{
@@ -169,7 +182,7 @@ namespace Waher.Content.Multipart
 
 				int NrBytes = i - j - 4 - k;
 				if (NrBytes < 0 || (NrBytes == 0 && Last))
-					return;
+					return null;
 
 				string Header = Encoding.ASCII.GetString(Data, Start, j - Start);
 				string Key, Value;
@@ -265,7 +278,7 @@ namespace Waher.Content.Multipart
 					if (TryTransferDecode(Data2, EmbeddedContent.TransferEncoding, out Data2))
 						EmbeddedContent.TransferDecoded = Data2;
 					else
-						throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
+						return new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
 				}
 
 				try
@@ -295,6 +308,8 @@ namespace Waher.Content.Multipart
 
 				List?.Add(EmbeddedContent);
 			}
+
+			return null;
 		}
 
 		private static void ParseContentFields(string s, EmbeddedContent EmbeddedContent)

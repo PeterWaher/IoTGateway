@@ -73,9 +73,12 @@ namespace Waher.Content.Dsn
 		{
 			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
-			await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
+			Exception Error = await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
 
-			return new ContentResponse(ContentType, new ReportContent(List.ToArray()), Data);
+			if (Error is null)
+				return new ContentResponse(ContentType, new ReportContent(List.ToArray()), Data);
+			else
+					return new ContentResponse(Error);
 		}
 
 		/// <summary>

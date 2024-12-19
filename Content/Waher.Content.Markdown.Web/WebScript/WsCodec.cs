@@ -207,7 +207,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 				return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 			}
 
-			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+			return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 		}
 	}
 }

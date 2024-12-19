@@ -97,9 +97,10 @@ namespace Waher.Content.Rss.Test
 			Xml.Load(Path.Combine(Environment.CurrentDirectory, "Data", FileName));
 			RssDocument Doc = new(Xml, null);
 
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Doc, Encoding.UTF8);
-			byte[] Data = P.Key;
-			string ContentType = P.Value;
+			ContentResponse P = await InternetContent.EncodeAsync(Doc, Encoding.UTF8);
+			P.AssertOk();
+			byte[] Data = P.Encoded;
+			string ContentType = P.ContentType;
 
 			Assert.IsNotNull(Data);
 			Assert.AreEqual("application/rss+xml; charset=utf-8", ContentType);

@@ -131,10 +131,11 @@ namespace Waher.Content.Semantic.Test
 
 		internal static async Task Print(TurtleDocument Parsed)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
-			Assert.AreEqual("text/turtle; charset=utf-8", P.Value);
+			ContentResponse P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
+			P.AssertOk();
+			Assert.AreEqual("text/turtle; charset=utf-8", P.ContentType);
 
-			byte[] Data = P.Key;
+			byte[] Data = P.Encoded;
 			string s = Encoding.UTF8.GetString(Data);
 
 			Console.Out.WriteLine(s);

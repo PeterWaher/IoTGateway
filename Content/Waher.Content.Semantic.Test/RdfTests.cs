@@ -314,10 +314,11 @@ namespace Waher.Content.Semantic.Test
 
 		private static async Task Print(RdfDocument Parsed)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
-			Assert.AreEqual("application/rdf+xml; charset=utf-8", P.Value);
+			ContentResponse P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
+			P.AssertOk();
+			Assert.AreEqual("application/rdf+xml; charset=utf-8", P.ContentType);
 
-			byte[] Data = P.Key;
+			byte[] Data = P.Encoded;
 			string s = Encoding.UTF8.GetString(Data);
 
 			Console.Out.WriteLine(s);

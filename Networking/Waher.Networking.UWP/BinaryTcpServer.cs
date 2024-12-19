@@ -783,7 +783,7 @@ namespace Waher.Networking
 			}
 
 			if (this.HasSniffers)
-				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(Buffer, Offset, Count);
 
 			await this.OnDataReceived.Raise(this, new ServerConnectionDataEventArgs(Connection, Buffer, Offset, Count));
 		}

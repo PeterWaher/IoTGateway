@@ -13,10 +13,10 @@ using Waher.Security;
 
 namespace Waher.IoTGateway.WebResources
 {
-    /// <summary>
-    /// Sending sniffer events to the corresponding web page(s).
-    /// </summary>
-    public class WebSniffer : SnifferBase, IDisposable
+	/// <summary>
+	/// Sending sniffer events to the corresponding web page(s).
+	/// </summary>
+	public class WebSniffer : SnifferBase, IDisposable
 	{
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private readonly DateTime created = DateTime.Now;
@@ -148,15 +148,15 @@ namespace Waher.IoTGateway.WebResources
 			this.Dispose();
 		}
 
-		private Task Process(DateTime Timestamp, byte[] Data, string Function)
+		private Task Process(DateTime Timestamp, byte[] Data, int Offset, int Count, string Function)
 		{
 			if (Timestamp >= this.expires)
 				return this.Close();
 			else
-				return this.Push(Timestamp, this.HexOutput(Data), Function, true);
+				return this.Push(Timestamp, this.HexOutput(Data, Offset, Count), Function, true);
 		}
 
-		private string HexOutput(byte[] Data)
+		private string HexOutput(byte[] Data, int Offset, int Count)
 		{
 			switch (this.binaryPresentationMethod)
 			{
@@ -164,9 +164,12 @@ namespace Waher.IoTGateway.WebResources
 					StringBuilder sb = new StringBuilder();
 					int i = 0;
 					bool First = true;
+					byte b;
 
-					foreach (byte b in Data)
+					while (Count-- > 0)
 					{
+						b = Data[Offset++];
+
 						if (i > 0)
 							sb.Append(' ');
 						else if (First)
@@ -225,9 +228,11 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
-			return this.Process(Timestamp, Data, "Rx");
+			return this.Process(Timestamp, Data, Offset, Count, "Rx");
 		}
 
 		/// <summary>
@@ -245,9 +250,11 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
-			return this.Process(Timestamp, Data, "Tx");
+			return this.Process(Timestamp, Data, Offset, Count, "Tx");
 		}
 
 		/// <summary>

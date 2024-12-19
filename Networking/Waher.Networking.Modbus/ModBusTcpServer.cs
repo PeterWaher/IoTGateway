@@ -163,10 +163,26 @@ namespace Waher.Networking.Modbus
 		public Task ReceiveBinary(byte[] Data) => this.server?.ReceiveBinary(Data) ?? Task.CompletedTask;
 
 		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public Task ReceiveBinary(byte[] Data, int Offset, int Count) => this.server?.ReceiveBinary(Data, Offset, Count) ?? Task.CompletedTask;
+
+		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
 		public Task TransmitBinary(byte[] Data) => this.server?.TransmitBinary(Data) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public Task TransmitBinary(byte[] Data, int Offset, int Count) => this.server?.TransmitBinary(Data, Offset, Count) ?? Task.CompletedTask;
 
 		/// <summary>
 		/// Called when text has been received.
@@ -218,11 +234,29 @@ namespace Waher.Networking.Modbus
 		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.server?.ReceiveBinary(Timestamp, Data) ?? Task.CompletedTask;
 
 		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => this.server?.ReceiveBinary(Timestamp, Data, Offset, Count) ?? Task.CompletedTask;
+
+		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
 		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.server?.TransmitBinary(Timestamp, Data) ?? Task.CompletedTask;
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => this.server?.TransmitBinary(Timestamp, Data, Offset, Count) ?? Task.CompletedTask;
 
 		/// <summary>
 		/// Called when text has been received.

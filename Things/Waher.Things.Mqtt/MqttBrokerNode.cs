@@ -14,10 +14,10 @@ using Waher.Things.Mqtt.Model;
 
 namespace Waher.Things.Mqtt
 {
-    /// <summary>
-    /// Node representing a connection to an MQTT broker.
-    /// </summary>
-    public class MqttBrokerNode : IpHostPort, ICommunicationLayer
+	/// <summary>
+	/// Node representing a connection to an MQTT broker.
+	/// </summary>
+	public class MqttBrokerNode : IpHostPort, ICommunicationLayer
 	{
 		private MqttQualityOfService willQoS = MqttQualityOfService.AtLeastOnce;
 		private string userName = string.Empty;
@@ -182,7 +182,7 @@ namespace Waher.Things.Mqtt
 			get
 			{
 				string PrevKey = this.brokerKey;
-				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password, 
+				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.trustServer, this.userName, this.password,
 					this.connectionSubscription);
 
 				if (PrevKey != this.brokerKey && !string.IsNullOrEmpty(PrevKey))
@@ -236,7 +236,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public void Add(ISniffer Sniffer)
 		{
-			this.GetBroker().Result.Client?.Add(Sniffer);	// TODO: Avoid blocking call
+			this.GetBroker().Result.Client?.Add(Sniffer);   // TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -244,7 +244,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
-			this.GetBroker().Result.Client?.AddRange(Sniffers);	// TODO: Avoid blocking call
+			this.GetBroker().Result.Client?.AddRange(Sniffers); // TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -252,7 +252,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public bool Remove(ISniffer Sniffer)
 		{
-			return this.GetBroker().Result.Client?.Remove(Sniffer) ?? false;	// TODO: Avoid blocking call
+			return this.GetBroker().Result.Client?.Remove(Sniffer) ?? false;    // TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -288,24 +288,46 @@ namespace Waher.Things.Mqtt
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(byte[] Data)
+		public Task ReceiveBinary(byte[] Data)
+		{
+			return this.ReceiveBinary(Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public async Task ReceiveBinary(byte[] Data, int Offset, int Count)
 		{
 			MqttBroker Broker = await this.GetBroker();
 			MqttClient Client = Broker.Client;
 			if (!(Client is null))
-				await Client.ReceiveBinary(Data);
+				await Client.ReceiveBinary(Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(byte[] Data)
+		public Task TransmitBinary(byte[] Data)
+		{
+			return this.TransmitBinary(Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public async Task TransmitBinary(byte[] Data, int Offset, int Count)
 		{
 			MqttBroker Broker = await this.GetBroker();
 			MqttClient Client = Broker.Client;
 			if (!(Client is null))
-				await Client.TransmitBinary(Data);
+				await Client.TransmitBinary(Data, Offset, Count);
 		}
 
 		/// <summary>
@@ -397,12 +419,24 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		{
+			return this.ReceiveBinary(Timestamp, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
 			MqttBroker Broker = await this.GetBroker();
 			MqttClient Client = Broker.Client;
 			if (!(Client is null))
-				await Client.ReceiveBinary(Timestamp, Data);
+				await Client.ReceiveBinary(Timestamp, Data, Offset, Count);
 		}
 
 		/// <summary>
@@ -410,12 +444,24 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		public Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		{
+			return this.TransmitBinary(Timestamp, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public async Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
 			MqttBroker Broker = await this.GetBroker();
 			MqttClient Client = Broker.Client;
 			if (!(Client is null))
-				await Client.TransmitBinary(Timestamp, Data);
+				await Client.TransmitBinary(Timestamp, Data, Offset, Count);
 		}
 
 		/// <summary>

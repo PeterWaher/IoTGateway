@@ -247,10 +247,26 @@ namespace Waher.Things.Xmpp
 		public async Task ReceiveBinary(byte[] Data) => await ((await this.GetBroker()).Client?.ReceiveBinary(Data) ?? Task.CompletedTask);
 
 		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public async Task ReceiveBinary(byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.ReceiveBinary(Data, Offset, Count) ?? Task.CompletedTask);
+
+		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
 		public async Task TransmitBinary(byte[] Data) => await ((await this.GetBroker()).Client?.TransmitBinary(Data) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public async Task TransmitBinary(byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.TransmitBinary(Data, Offset, Count) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called when text has been received.
@@ -302,11 +318,29 @@ namespace Waher.Things.Xmpp
 		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data) => await ((await this.GetBroker()).Client?.ReceiveBinary(Timestamp, Data) ?? Task.CompletedTask);
 
 		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.ReceiveBinary(Timestamp, Data, Offset, Count) ?? Task.CompletedTask);
+
+		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
 		public async Task TransmitBinary(DateTime Timestamp, byte[] Data) => await ((await this.GetBroker()).Client?.TransmitBinary(Timestamp, Data) ?? Task.CompletedTask);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public async Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.TransmitBinary(Timestamp, Data, Offset, Count) ?? Task.CompletedTask);
 
 		/// <summary>
 		/// Called when text has been received.

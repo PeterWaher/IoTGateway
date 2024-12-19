@@ -179,7 +179,7 @@ namespace Waher.Networking.Modbus
 		private async Task<bool> TcpClient_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(Buffer, Offset, Count);
 
 			int i;
 			byte b;

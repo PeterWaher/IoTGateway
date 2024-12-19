@@ -50,7 +50,16 @@ namespace Waher.Networking.Sniffers
 		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				return this.HexOutput(Data, this.Prefix(Timestamp, "Rx"));
+				return this.HexOutput(Data, 0, Data.Length, this.Prefix(Timestamp, "Rx"));
+			else
+				return Task.CompletedTask;
+		}
+
+		/// <inheritdoc/>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		{
+			if (Count > 0)
+				return this.HexOutput(Data, Offset, Count, this.Prefix(Timestamp, "Rx"));
 			else
 				return Task.CompletedTask;
 		}
@@ -63,7 +72,7 @@ namespace Waher.Networking.Sniffers
 				return Type + ": ";
 		}
 
-		private async Task HexOutput(byte[] Data, string RowPrefix)
+		private async Task HexOutput(byte[] Data, int Offset, int Count, string RowPrefix)
 		{
 			await this.BeforeWrite();
 			try
@@ -73,9 +82,12 @@ namespace Waher.Networking.Sniffers
 					case BinaryPresentationMethod.Hexadecimal:
 						StringBuilder sb = new StringBuilder();
 						int i = 0;
+						byte b;
 
-						foreach (byte b in Data)
+						while (Count-- > 0)
 						{
+							b = Data[Offset++];
+
 							if (i == 0)
 								sb.Append(RowPrefix);
 							else
@@ -96,11 +108,11 @@ namespace Waher.Networking.Sniffers
 						break;
 
 					case BinaryPresentationMethod.Base64:
-						await this.WriteLine(RowPrefix + Convert.ToBase64String(Data));
+						await this.WriteLine(RowPrefix + Convert.ToBase64String(Data, Offset, Count));
 						break;
 
 					case BinaryPresentationMethod.ByteCount:
-						await this.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
+						await this.WriteLine(RowPrefix + "<" + Count.ToString() + " bytes>");
 						break;
 				}
 			}
@@ -114,7 +126,16 @@ namespace Waher.Networking.Sniffers
 		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				return this.HexOutput(Data, this.Prefix(Timestamp, "Tx"));
+				return this.HexOutput(Data, 0, Data.Length, this.Prefix(Timestamp, "Tx"));
+			else
+				return Task.CompletedTask;
+		}
+
+		/// <inheritdoc/>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		{
+			if (Count > 0)
+				return this.HexOutput(Data, Offset, Count, this.Prefix(Timestamp, "Tx"));
 			else
 				return Task.CompletedTask;
 		}

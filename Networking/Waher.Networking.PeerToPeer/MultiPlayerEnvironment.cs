@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Net;
 using Waher.Events;
 using Waher.Networking.MQTT;
+using Waher.Networking.Sniffers;
 #if LineListener
 using Waher.Runtime.Console;
 #endif
@@ -467,7 +468,7 @@ namespace Waher.Networking.PeerToPeer
 
 			if (Connection.StateObject is null)
 			{
-				BinaryInput Input = new BinaryInput(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				BinaryInput Input = new BinaryInput(InMemorySniffer.CloneSection(Buffer, Offset, Count));
 				Guid PlayerId;
 				IPAddress PlayerRemoteAddress;
 				IPEndPoint PlayerRemoteEndpoint;
@@ -536,7 +537,7 @@ namespace Waher.Networking.PeerToPeer
 			else
 			{
 				Player = (Player)Connection.StateObject;
-				Packet = BinaryTcpClient.ToArray(Buffer, Offset, Count);
+				Packet = InMemorySniffer.CloneSection(Buffer, Offset, Count);
 			}
 
 			await this.GameDataReceived(Player, Connection, Packet);
@@ -795,7 +796,7 @@ namespace Waher.Networking.PeerToPeer
 
 			try
 			{
-				BinaryInput Input = new BinaryInput(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				BinaryInput Input = new BinaryInput(InMemorySniffer.CloneSection(Buffer, Offset, Count));
 
 				PlayerId = Input.ReadGuid();
 				PlayerRemoteAddress = IPAddress.Parse(Input.ReadString());
@@ -973,15 +974,11 @@ namespace Waher.Networking.PeerToPeer
 		/// <returns>true, if environment is ready to play, false if an error has occurred, or the environment could not be setup in the allotted time frame.</returns>
 		public bool Wait(int TimeoutMilliseconds)
 		{
-			switch (WaitHandle.WaitAny(new WaitHandle[] { this.ready, this.error }, TimeoutMilliseconds))
+			return WaitHandle.WaitAny(new WaitHandle[] { this.ready, this.error }, TimeoutMilliseconds) switch
 			{
-				case 0:
-					return true;
-
-				case 1:
-				default:
-					return false;
-			}
+				0 => true,
+				_ => false,
+			};
 		}
 
 		/// <summary>

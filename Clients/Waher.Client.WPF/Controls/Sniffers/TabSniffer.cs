@@ -6,43 +6,41 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Client.WPF.Controls.Sniffers
 {
-	public class TabSniffer : SnifferBase
+	public class TabSniffer(SnifferView View) : SnifferBase
 	{
-		private readonly SnifferView view;
-		private string snifferId = null;
-
-		public TabSniffer(SnifferView View)
-		{
-			this.view = View;
-		}
+		private readonly SnifferView view = View;
+		private string? snifferId = null;
 
 		public SnifferView View => this.view;
 
-		public string SnifferId
+		public string? SnifferId
 		{
 			get => this.snifferId;
 			set => this.snifferId = value;
 		}
 
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
-			this.view.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data, Offset, Count), Data, Colors.White, Colors.Navy));
 			return Task.CompletedTask;
 		}
 
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
-			this.view.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
+			this.view.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data, Offset, Count), Data, Colors.Black, Colors.White));
 			return Task.CompletedTask;
 		}
 
-		internal static string HexToString(byte[] Data)
+		internal static string HexToString(byte[] Data, int Offset, int Count)
 		{
-			StringBuilder Output = new StringBuilder();
+			StringBuilder Output = new();
 			int i = 0;
+			byte b;
 
-			foreach (byte b in Data)
+			while (Count-- > 0)
 			{
+				b = Data[Offset++];
+
 				if (i > 0)
 					Output.Append(' ');
 

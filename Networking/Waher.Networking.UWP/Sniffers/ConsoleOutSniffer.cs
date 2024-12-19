@@ -103,7 +103,19 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			return this.BinaryOutput(Timestamp, Data, ConsoleColor.Black, ConsoleColor.White);
+			return this.BinaryOutput(Timestamp, Data, 0, Data.Length, ConsoleColor.Black, ConsoleColor.White);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		{
+			return this.BinaryOutput(Timestamp, Data, Offset, Count, ConsoleColor.Black, ConsoleColor.White);
 		}
 
 		/// <summary>
@@ -113,19 +125,34 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			return this.BinaryOutput(Timestamp, Data, ConsoleColor.White, ConsoleColor.DarkBlue);
+			return this.BinaryOutput(Timestamp, Data, 0, Data.Length, ConsoleColor.White, ConsoleColor.DarkBlue);
 		}
 
-		private Task BinaryOutput(DateTime Timestamp, byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		{
+			return this.BinaryOutput(Timestamp, Data, Offset, Count, ConsoleColor.White, ConsoleColor.DarkBlue);
+		}
+
+		private Task BinaryOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, ConsoleColor Fg, ConsoleColor Bg)
 		{
 			switch (this.binaryPresentationMethod)
 			{
 				case BinaryPresentationMethod.Hexadecimal:
 					StringBuilder Row = new StringBuilder();
 					int i = 0;
+					byte b;
 
-					foreach (byte b in Data)
+					while (Count-- > 0)
 					{
+						b = Data[Offset++];
+
 						if (i > 0)
 							Row.Append(' ');
 
@@ -144,11 +171,11 @@ namespace Waher.Networking.Sniffers
 					break;
 
 				case BinaryPresentationMethod.Base64:
-					this.Output(Timestamp, Convert.ToBase64String(Data), Fg, Bg);
+					this.Output(Timestamp, Convert.ToBase64String(Data, Offset, Count), Fg, Bg);
 					break;
 
 				case BinaryPresentationMethod.ByteCount:
-					this.Output(Timestamp, "<" + Data.Length.ToString() + " bytes>", Fg, Bg);
+					this.Output(Timestamp, "<" + Count.ToString() + " bytes>", Fg, Bg);
 					break;
 			}
 

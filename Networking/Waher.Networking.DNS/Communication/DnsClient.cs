@@ -253,44 +253,42 @@ namespace Waher.Networking.DNS.Communication
 		public Task SendRequest(OpCode OpCode, bool Recursive, Question[] Questions,
 			IPEndPoint Destination, EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
-			using (MemoryStream Request = new MemoryStream())
+			using MemoryStream Request = new MemoryStream();
+			ushort ID = DnsResolver.NextID;
+
+			WriteUInt16(ID, Request);
+
+			byte b = (byte)((int)OpCode << 3);
+			if (Recursive)
+				b |= 1;
+
+			Request.WriteByte(b);
+			Request.WriteByte((byte)RCode.NoError);
+
+			int c = Questions.Length;
+			if (c == 0)
+				throw new ArgumentException("No questions included in request.", nameof(Questions));
+
+			if (c > ushort.MaxValue)
+				throw new ArgumentException("Too many questions in request.", nameof(Questions));
+
+			WriteUInt16((ushort)c, Request);    // Query Count
+			WriteUInt16(0, Request);            // Answer Count
+			WriteUInt16(0, Request);            // Authoritative Count
+			WriteUInt16(0, Request);            // Additional Count
+
+			Dictionary<string, ushort> NamePositions = new Dictionary<string, ushort>();
+
+			foreach (Question Q in Questions)
 			{
-				ushort ID = DnsResolver.NextID;
-
-				WriteUInt16(ID, Request);
-
-				byte b = (byte)((int)OpCode << 3);
-				if (Recursive)
-					b |= 1;
-
-				Request.WriteByte(b);
-				Request.WriteByte((byte)RCode.NoError);
-
-				int c = Questions.Length;
-				if (c == 0)
-					throw new ArgumentException("No questions included in request.", nameof(Questions));
-
-				if (c > ushort.MaxValue)
-					throw new ArgumentException("Too many questions in request.", nameof(Questions));
-
-				WriteUInt16((ushort)c, Request);    // Query Count
-				WriteUInt16(0, Request);            // Answer Count
-				WriteUInt16(0, Request);            // Authoritative Count
-				WriteUInt16(0, Request);            // Additional Count
-
-				Dictionary<string, ushort> NamePositions = new Dictionary<string, ushort>();
-
-				foreach (Question Q in Questions)
-				{
-					WriteName(Q.QNAME, Request, NamePositions);
-					WriteUInt16((ushort)Q.QTYPE, Request);
-					WriteUInt16((ushort)Q.QCLASS, Request);
-				}
-
-				byte[] Packet = Request.ToArray();
-
-				return this.BeginTransmit(ID, Packet, Destination, Callback, State);
+				WriteName(Q.QNAME, Request, NamePositions);
+				WriteUInt16((ushort)Q.QTYPE, Request);
+				WriteUInt16((ushort)Q.QCLASS, Request);
 			}
+
+			byte[] Packet = Request.ToArray();
+
+			return this.BeginTransmit(ID, Packet, Destination, Callback, State);
 		}
 
 		/// <summary>
@@ -514,9 +512,8 @@ namespace Waher.Networking.DNS.Communication
 			List<ResourceRecord> Result = new List<ResourceRecord>();
 			ResourceRecord Rec;
 
-			while (Count > 0)
+			while (Count-- > 0)
 			{
-				Count--;
 				Rec = ResourceRecord.Create(Data);
 
 				if (!(Rec is null))

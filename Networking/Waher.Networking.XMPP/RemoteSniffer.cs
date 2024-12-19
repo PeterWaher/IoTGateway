@@ -92,7 +92,9 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
 			if (this.HasExpired(Timestamp))
 				return Task.CompletedTask;
@@ -100,7 +102,7 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<rxBin>");
-			Xml.Append(Convert.ToBase64String(Data));
+			Xml.Append(Convert.ToBase64String(Data, Offset, Count));
 			Xml.Append("</rxBin>");
 
 			return this.Send(Xml);
@@ -132,7 +134,9 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
 		{
 			if (this.HasExpired(Timestamp))
 				return Task.CompletedTask;
@@ -140,7 +144,7 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
 			Xml.Append("<txBin>");
-			Xml.Append(Convert.ToBase64String(Data));
+			Xml.Append(Convert.ToBase64String(Data, Offset, Count));
 			Xml.Append("</txBin>");
 
 			return this.Send(Xml);

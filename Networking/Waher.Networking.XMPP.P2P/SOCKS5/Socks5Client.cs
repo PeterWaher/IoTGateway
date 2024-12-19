@@ -157,7 +157,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private Task Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				return this.TransmitBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				return this.TransmitBinary(Buffer, Offset, Count);
 			else
 				return Task.CompletedTask;
 		}
@@ -165,7 +165,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private async Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(Buffer, Offset, Count);
 
 			try
 			{
@@ -466,49 +466,47 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private Task Request(Command Command, IPAddress DestinationAddress, int Port)
 		{
-			using (MemoryStream Req = new MemoryStream())
-			{
-				Req.WriteByte(5);
-				Req.WriteByte((byte)Command);
-				Req.WriteByte(0);
+			using MemoryStream Req = new MemoryStream();
 
-				if (DestinationAddress.AddressFamily == AddressFamily.InterNetwork)
-					Req.WriteByte(1);
-				else if (DestinationAddress.AddressFamily == AddressFamily.InterNetworkV6)
-					Req.WriteByte(4);
-				else
-					throw new ArgumentException("Invalid address family.", nameof(DestinationAddress));
+			Req.WriteByte(5);
+			Req.WriteByte((byte)Command);
+			Req.WriteByte(0);
 
-				byte[] Addr = DestinationAddress.GetAddressBytes();
-				Req.Write(Addr, 0, Addr.Length);
-				Req.WriteByte((byte)(Port >> 8));
-				Req.WriteByte((byte)Port);
+			if (DestinationAddress.AddressFamily == AddressFamily.InterNetwork)
+				Req.WriteByte(1);
+			else if (DestinationAddress.AddressFamily == AddressFamily.InterNetworkV6)
+				Req.WriteByte(4);
+			else
+				throw new ArgumentException("Invalid address family.", nameof(DestinationAddress));
 
-				return this.SendPacket(Req.ToArray());
-			}
+			byte[] Addr = DestinationAddress.GetAddressBytes();
+			Req.Write(Addr, 0, Addr.Length);
+			Req.WriteByte((byte)(Port >> 8));
+			Req.WriteByte((byte)Port);
+
+			return this.SendPacket(Req.ToArray());
 		}
 
 		private Task Request(Command Command, string DestinationDomainName, int Port)
 		{
-			using (MemoryStream Req = new MemoryStream())
-			{
-				Req.WriteByte(5);
-				Req.WriteByte((byte)Command);
-				Req.WriteByte(0);
-				Req.WriteByte(3);
+			using MemoryStream Req = new MemoryStream();
 
-				byte[] Bytes = Encoding.ASCII.GetBytes(DestinationDomainName);
-				int c = Bytes.Length;
-				if (c > 255)
-					throw new IOException("Domain name too long.");
+			Req.WriteByte(5);
+			Req.WriteByte((byte)Command);
+			Req.WriteByte(0);
+			Req.WriteByte(3);
 
-				Req.WriteByte((byte)c);
-				Req.Write(Bytes, 0, Bytes.Length);
-				Req.WriteByte((byte)(Port >> 8));
-				Req.WriteByte((byte)Port);
+			byte[] Bytes = Encoding.ASCII.GetBytes(DestinationDomainName);
+			int c = Bytes.Length;
+			if (c > 255)
+				throw new IOException("Domain name too long.");
 
-				return this.SendPacket(Req.ToArray());
-			}
+			Req.WriteByte((byte)c);
+			Req.Write(Bytes, 0, Bytes.Length);
+			Req.WriteByte((byte)(Port >> 8));
+			Req.WriteByte((byte)Port);
+
+			return this.SendPacket(Req.ToArray());
 		}
 
 		/// <summary>

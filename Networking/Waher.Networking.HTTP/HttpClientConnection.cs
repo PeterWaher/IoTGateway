@@ -435,7 +435,7 @@ namespace Waher.Networking.HTTP
 		private async Task<bool> BinaryHttp2LiveDataReceived(byte[] Data, int Offset, int NrRead)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(BinaryTcpClient.ToArray(Data, Offset, NrRead));
+				await this.ReceiveBinary(Data, Offset, NrRead);
 
 			int End = Offset + NrRead;
 			bool FramesProcessed = false;
@@ -1361,7 +1361,7 @@ namespace Waher.Networking.HTTP
 						await this.TransmitBinary(Data);
 					else
 					{
-						await this.TransmitBinary(BinaryTcpClient.ToArray(Data, 0, 9));
+						await this.TransmitBinary(Data, 0, 9);
 						await this.TransmitText(s);
 					}
 				}

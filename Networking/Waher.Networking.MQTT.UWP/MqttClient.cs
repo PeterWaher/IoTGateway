@@ -354,7 +354,7 @@ namespace Waher.Networking.MQTT
 		private async Task<bool> Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				await this.TransmitBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.TransmitBinary(Buffer, Offset, Count);
 
 			return true;
 		}
@@ -362,7 +362,7 @@ namespace Waher.Networking.MQTT
 		private async Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(Buffer, Offset, Count);
 
 			byte b;
 			bool Result = true;

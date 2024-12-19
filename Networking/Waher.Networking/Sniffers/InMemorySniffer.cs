@@ -73,7 +73,33 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Data">Binary Data.</param>
 		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			return this.Add(new SnifferRxBinary(Timestamp, Data));
+			return this.Add(new SnifferRxBinary(Timestamp, (byte[])Data.Clone()));
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		{
+			return this.Add(new SnifferRxBinary(Timestamp, CloneSection(Data, Offset, Count)));
+		}
+
+		/// <summary>
+		/// Clones a section of a binary buffer.
+		/// </summary>
+		/// <param name="Data">Binary buffer.</param>
+		/// <param name="Offset">Offset to start of section to clone.</param>
+		/// <param name="Count">Number of bytes to clone.</param>
+		/// <returns>Clone array</returns>
+		public static byte[] CloneSection(byte[] Data, int Offset, int Count)
+		{
+			byte[] Clone = new byte[Count];
+			Array.Copy(Data, Offset, Clone, 0, Count);
+			return Clone;
 		}
 
 		/// <summary>
@@ -93,7 +119,19 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Data">Binary Data.</param>
 		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			return this.Add(new SnifferTxBinary(Timestamp, Data));
+			return this.Add(new SnifferTxBinary(Timestamp, (byte[])Data.Clone()));
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		{
+			return this.Add(new SnifferTxBinary(Timestamp, CloneSection(Data, Offset, Count)));
 		}
 
 		/// <summary>

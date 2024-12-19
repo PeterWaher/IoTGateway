@@ -43,10 +43,9 @@ namespace Waher.Networking.Modbus
 			int Offset = e.Offset;
 			byte b;
 
-			while (Count > 0)
+			while (Count-- > 0)
 			{
 				b = Buffer[Offset++];
-				Count--;
 
 				switch (this.state)
 				{

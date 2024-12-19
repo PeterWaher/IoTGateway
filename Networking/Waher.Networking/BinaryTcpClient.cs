@@ -624,31 +624,13 @@ namespace Waher.Networking
 		protected virtual async Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				await this.ReceiveBinary(ToArray(Buffer, Offset, Count));
+				await this.ReceiveBinary(Buffer, Offset, Count);
 
 			BinaryDataReadEventHandler h = this.OnReceived;
 			if (h is null)
 				return true;
 			else
 				return await h(this, Buffer, Offset, Count);
-		}
-
-		/// <summary>
-		/// Converts a binary subset of a buffer into an array.
-		/// </summary>
-		/// <param name="Buffer">Binary Data Buffer</param>
-		/// <param name="Offset">Start index of first byte read.</param>
-		/// <param name="Count">Number of bytes read.</param>
-		/// <returns>Array</returns>
-		public static byte[] ToArray(byte[] Buffer, int Offset, int Count)
-		{
-			if (Offset == 0 && Count == Buffer.Length)
-				return Buffer;
-
-			byte[] Result = new byte[Count];
-			Array.Copy(Buffer, Offset, Result, 0, Count);
-
-			return Result;
 		}
 
 		/// <summary>
@@ -902,7 +884,7 @@ namespace Waher.Networking
 #if WINDOWS_UWP
 					if (Offset > 0 || Count < c)
 					{
-						Buffer = ToArray(Buffer, Offset, Count);
+						Buffer = InMemorySniffer.CloneSection(Buffer, Offset, Count);
 						Offset = 0;
 						Count = c;
 					}
@@ -1002,7 +984,7 @@ namespace Waher.Networking
 		protected virtual async Task BinaryDataSent(byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				await this.TransmitBinary(ToArray(Buffer, Offset, Count));
+				await this.TransmitBinary(Buffer, Offset, Count);
 
 			BinaryDataWrittenEventHandler h = this.OnSent;
 			if (!(h is null))

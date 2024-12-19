@@ -34,6 +34,26 @@ namespace Waher.Networking.Sniffers
 		public abstract Task ReceiveBinary(DateTime Timestamp, byte[] Data);
 
 		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public virtual Task ReceiveBinary(byte[] Data, int Offset, int Count)
+		{
+			return this.ReceiveBinary(DateTime.Now, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public abstract Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count);
+
+		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
@@ -48,6 +68,26 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
 		public abstract Task TransmitBinary(DateTime Timestamp, byte[] Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public virtual Task TransmitBinary(byte[] Data, int Offset, int Count)
+		{
+			return this.TransmitBinary(DateTime.Now, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public abstract Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count);
 
 		/// <summary>
 		/// Called when text has been received.

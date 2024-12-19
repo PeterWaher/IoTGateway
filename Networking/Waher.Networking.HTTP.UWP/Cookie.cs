@@ -257,9 +257,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Value">Value of property.</param>
 		public void AddProperty(string Name, string Value)
 		{
-			if (this.otherProperties is null)
-				this.otherProperties = new Dictionary<string, string>();
-
+			this.otherProperties ??= new Dictionary<string, string>();
 			this.otherProperties[Name] = Value;
 		}
 

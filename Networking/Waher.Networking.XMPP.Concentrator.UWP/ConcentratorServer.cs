@@ -1161,9 +1161,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
-						if (OnlyIfDerivedFrom is null)
-							OnlyIfDerivedFrom = new LinkedList<TypeInfo>();
-
+						OnlyIfDerivedFrom ??= new LinkedList<TypeInfo>();
 						OnlyIfDerivedFrom.AddLast(T.GetTypeInfo());
 					}
 				}
@@ -1259,9 +1257,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					foreach (Type Interface in TI.ImplementedInterfaces)
 					{
-						if (Interfaces is null)
-							Interfaces = new SortedDictionary<string, bool>();
-
+						Interfaces ??= new SortedDictionary<string, bool>();
 						Interfaces[Interface.FullName] = true;
 					}
 
@@ -1454,8 +1450,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					ThingRef = Node.Parent;
 					Node = ThingRef as INode;
-					if (Node is null)
-						Node = await Rec.Source.GetNodeAsync(Node.Parent);
+					Node ??= await Rec.Source.GetNodeAsync(Node.Parent);
 				}
 
 				Xml.Append("</nodeInfos>");
@@ -1575,15 +1570,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				ThingRef = Node.Parent;
 				if (ThingRef is null)
 				{
-					if (RootNodes is null)
-						RootNodes = new LinkedList<INode>();
-
+					RootNodes ??= new LinkedList<INode>();
 					RootNodes.AddLast(Node);
 				}
 				else
 				{
-					if (NodesPerParent is null)
-						NodesPerParent = new Dictionary<string, LinkedList<INode>>();
+					NodesPerParent ??= new Dictionary<string, LinkedList<INode>>();
 
 					Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
 					if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
@@ -1666,15 +1658,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				ThingRef = Node.Parent;
 				if (ThingRef is null)
 				{
-					if (RootNodes is null)
-						RootNodes = new LinkedList<INode>();
-
+					RootNodes ??= new LinkedList<INode>();
 					RootNodes.AddLast(Node);
 				}
 				else
 				{
-					if (NodesPerParent is null)
-						NodesPerParent = new Dictionary<string, LinkedList<INode>>();
+					NodesPerParent ??= new Dictionary<string, LinkedList<INode>>();
 
 					Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
 					if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
@@ -1825,8 +1814,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					ILifeCycleManagement LifeCycleManagement = Node as ILifeCycleManagement;
 					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
-					if (Result is null)
-						Result = await Parameters.SetEditableForm(e, Node, Form, true);
+					Result ??= await Parameters.SetEditableForm(e, Node, Form, true);
 
 					if (Result.Errors is null)
 					{
@@ -1999,9 +1987,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
-						if (Nodes is null)
-							Nodes = new LinkedList<Tuple<IDataSource, INode>>();
-
+						Nodes ??= new LinkedList<Tuple<IDataSource, INode>>();
 						Nodes.AddLast(new Tuple<IDataSource, INode>(Rec.Source, Node));
 						break;
 
@@ -2053,8 +2039,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					ILifeCycleManagement LifeCycleManagement = P.Item2 as ILifeCycleManagement;
 					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
-					if (Result is null)
-						Result = await Parameters.SetEditableForm(e, P.Item2, Form, true);
+					Result ??= await Parameters.SetEditableForm(e, P.Item2, Form, true);
 
 					if (!(Result.Errors is null))
 					{
@@ -3416,13 +3401,22 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						try
 						{
-							KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
+							ContentResponse Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
 
-							Xml.Append("<base64 contentType='");
-							Xml.Append(XML.Encode(Encoded.Value));
-							Xml.Append("'>");
-							Xml.Append(Convert.ToBase64String(Encoded.Key));
-							Xml.Append("</base64>");
+							if (Encoded.HasError)
+							{
+								Xml.Append("<string>");
+								Xml.Append(XML.Encode(Encoded.Error.Message));
+								Xml.Append("</string>");
+							}
+							else
+							{
+								Xml.Append("<base64 contentType='");
+								Xml.Append(XML.Encode(Encoded.ContentType));
+								Xml.Append("'>");
+								Xml.Append(Convert.ToBase64String(Encoded.Encoded));
+								Xml.Append("</base64>");
+							}
 						}
 						catch (Exception ex)
 						{
@@ -3448,15 +3442,28 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-			KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(e.Object, Encoding.UTF8);
+			ContentResponse Encoded = await InternetContent.EncodeAsync(e.Object, Encoding.UTF8);
 
 			this.StartQueryProgress(Xml, e);
 
-			Xml.Append("<newObject contentType='");
-			Xml.Append(XML.Encode(Encoded.Value));
-			Xml.Append("'>");
-			Xml.Append(Convert.ToBase64String(Encoded.Key));
-			Xml.Append("</newObject>");
+			if (Encoded.HasError)
+			{
+				Xml.Append("<queryMessage type='");
+				Xml.Append(QueryEventType.Exception.ToString());
+				Xml.Append("' level='");
+				Xml.Append(QueryEventLevel.Medium.ToString());
+				Xml.Append("'>");
+				Xml.Append(XML.Encode(Encoded.Error.Message));
+				Xml.Append("</queryMessage>");
+			}
+			else
+			{
+				Xml.Append("<newObject contentType='");
+				Xml.Append(XML.Encode(Encoded.ContentType));
+				Xml.Append("'>");
+				Xml.Append(Convert.ToBase64String(Encoded.Encoded));
+				Xml.Append("</newObject>");
+			}
 
 			this.EndQueryProgress(Xml);
 
@@ -3811,8 +3818,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					if (Nodes is null)
-						Nodes = new LinkedList<INode>();
+					Nodes ??= new LinkedList<INode>();
 
 					Nodes.AddLast(Node);
 
@@ -4488,9 +4494,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Subscription.Expires <= DateTime.Now)
 			{
-				if (Rec.ToRemove is null)
-					Rec.ToRemove = new LinkedList<string>();
-
+				Rec.ToRemove ??= new LinkedList<string>();
 				Rec.ToRemove.AddLast(Subscription.Jid);
 			}
 			else if ((Subscription.EventTypes & EventType) != 0)

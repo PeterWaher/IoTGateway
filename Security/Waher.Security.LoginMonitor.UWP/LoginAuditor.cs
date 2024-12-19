@@ -4,7 +4,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.WHOIS;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -439,6 +438,11 @@ namespace Waher.Security.LoginMonitor
 			EP.Reset(true);
 
 			await Database.UpdateLazy(EP);
+
+			lock (tlsHackEndpoints)
+			{
+				tlsHackEndpoints.Remove(RemoteEndpoint);
+			}
 		}
 
 		/// <summary>

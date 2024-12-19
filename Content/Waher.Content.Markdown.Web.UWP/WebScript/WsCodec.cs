@@ -100,11 +100,10 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding);
-			return Task.FromResult<object>(new Expression(s, BaseUri?.ToString()));
+			return Task.FromResult(new ContentResponse(ContentType, new Expression(s, BaseUri?.ToString()), Data));
 		}
 
 		/// <summary>
@@ -177,8 +176,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (allowEncoding && InternetContent.IsAccepted(WsContentTypes, out string ContentType, AcceptedContentTypes))
 			{
@@ -206,10 +204,10 @@ namespace Waher.Content.Markdown.Web.WebScript
 					}
 				}
 
-				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+				return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 			}
 
-			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+			return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object))));
 		}
 	}
 }

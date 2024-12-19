@@ -493,11 +493,8 @@ namespace Waher.Networking
 		{
 			lock (this.synchObj)
 			{
-				if (this.disposing || this.disposed)
+				if (this.disposing || this.disposed || this.reading)
 					return;
-
-				if (this.reading)
-					throw new InvalidOperationException("Already in a reading state.");
 
 				this.reading = true;
 			}

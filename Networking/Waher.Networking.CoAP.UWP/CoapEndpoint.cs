@@ -18,6 +18,7 @@ using Waher.Runtime.Timing;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.DTLS;
+using Waher.Content.Binary;
 #if WINDOWS_UWP
 using Windows.Networking;
 using Windows.Networking.Connectivity;
@@ -716,8 +717,7 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 15:
-						if (IncomingMessage.UriQuery is null)
-							IncomingMessage.UriQuery = new Dictionary<string, string>();
+						IncomingMessage.UriQuery ??= new Dictionary<string, string>();
 
 						CoapOptionKeyValue Query = (CoapOptionKeyValue)Option;
 
@@ -729,8 +729,7 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 20:
-						if (IncomingMessage.LocationQuery is null)
-							IncomingMessage.LocationQuery = new Dictionary<string, string>();
+						IncomingMessage.LocationQuery ??= new Dictionary<string, string>();
 
 						Query = (CoapOptionLocationQuery)Option;
 
@@ -957,8 +956,8 @@ namespace Waher.Networking.CoAP
 							if (i < 0)
 								break;
 
-							SubPath = Path.Substring(i) + SubPath;
-							Path = Path.Substring(0, i);
+							SubPath = Path[i..] + SubPath;
+							Path = Path[..i];
 						}
 					}
 
@@ -1905,7 +1904,7 @@ namespace Waher.Networking.CoAP
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		[Obsolete("Use DecodeAsync for better asynchronous performance.")]
-		public static object Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
+		public static ContentResponse Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
 			return DecodeAsync(ContentFormat, Payload, BaseUri).Result;
 		}
@@ -1917,12 +1916,12 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Payload.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		public static async Task<object> DecodeAsync(int ContentFormat, byte[] Payload, Uri BaseUri)
+		public static async Task<ContentResponse> DecodeAsync(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
 			if (contentFormatsByCode.TryGetValue(ContentFormat, out ICoapContentFormat Format))
 				return await InternetContent.DecodeAsync(Format.ContentType, Payload, BaseUri);
 			else
-				return Payload;
+				return new ContentResponse(BinaryCodec.DefaultContentType, Payload, Payload);
 		}
 
 		/// <summary>
@@ -1946,12 +1945,12 @@ namespace Waher.Networking.CoAP
 		/// <returns>Decoded object and Content format of encoded content..</returns>
 		public static async Task<KeyValuePair<byte[], int>> EncodeAsync(object Payload)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Payload, Encoding.UTF8);
+			ContentResponse P = await InternetContent.EncodeAsync(Payload, Encoding.UTF8);
 
-			if (contentFormatsByContentType.TryGetValue(P.Value, out ICoapContentFormat Format))
-				return new KeyValuePair<byte[], int>(P.Key, Format.ContentFormat);
+			if (contentFormatsByContentType.TryGetValue(P.ContentType, out ICoapContentFormat Format))
+				return new KeyValuePair<byte[], int>(P.Encoded, Format.ContentFormat);
 			else
-				throw new Exception("Unable to encode content of type " + P.Value);
+				throw new Exception("Unable to encode content of type " + P.ContentType);
 		}
 
 		private async Task<IPEndPoint> GetIPEndPoint(string Destination, int Port, EventHandlerAsync<CoapResponseEventArgs> Callback, object State)
@@ -2004,19 +2003,12 @@ namespace Waher.Networking.CoAP
 
 		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, out bool Encrypted, params CoapOption[] Options)
 		{
-			switch (Uri.Scheme.ToLower())
+			Encrypted = Uri.Scheme.ToLower() switch
 			{
-				case "coap":
-					Encrypted = false;
-					break;
-
-				case "coaps":
-					Encrypted = true;
-					break;
-
-				default:
-					throw new ArgumentException("Invalid URI scheme.", nameof(Uri));
-			}
+				"coap" => false,
+				"coaps" => true,
+				_ => throw new ArgumentException("Invalid URI scheme.", nameof(Uri)),
+			};
 
 			List<CoapOption> Options2 = new List<CoapOption>();
 			int i;
@@ -2044,10 +2036,10 @@ namespace Waher.Networking.CoAP
 
 			string s = Uri.AbsolutePath;
 			if (s.StartsWith("/"))
-				s = s.Substring(1);
+				s = s[1..];
 
 			if (s.EndsWith("/"))
-				s = s.Substring(0, s.Length - 1);
+				s = s[..^1];
 
 			if (!string.IsNullOrEmpty(s))
 			{
@@ -2058,7 +2050,7 @@ namespace Waher.Networking.CoAP
 			s = Uri.Query;
 
 			if (s.StartsWith("?"))
-				s = s.Substring(1);
+				s = s[1..];
 
 			if (!string.IsNullOrEmpty(s))
 			{

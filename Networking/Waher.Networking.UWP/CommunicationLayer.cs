@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -55,9 +57,12 @@ namespace Waher.Networking
 			{
 				lock (this.sniffers)
 				{
-					this.sniffers.Add(Sniffer);
-					this.staticList = this.sniffers.ToArray();
-					this.hasSniffers = this.staticList.Length > 0;
+					if (!this.sniffers.Contains(Sniffer))
+					{
+						this.sniffers.Add(Sniffer);
+						this.staticList = this.sniffers.ToArray();
+						this.hasSniffers = this.staticList.Length > 0;
+					}
 				}
 			}
 		}
@@ -73,7 +78,7 @@ namespace Waher.Networking
 				{
 					foreach (ISniffer Sniffer in Sniffers)
 					{
-						if (!(Sniffer is null))
+						if (!(Sniffer is null) && !this.sniffers.Contains(Sniffer))
 							this.sniffers.Add(Sniffer);
 					}
 
@@ -401,6 +406,65 @@ namespace Waher.Networking
 					await Sniffer.Exception(Timestamp, Exception);
 			}
 		}
+
+		/// <summary>
+		/// Checks if the string contains control characters.
+		/// </summary>
+		/// <param name="Text">String</param>
+		/// <returns>If the string contains control characters</returns>
+		public static bool ContainsControlCharacters(string Text)
+		{
+			return Text.IndexOfAny(controlCharacters) >= 0;
+		}
+
+		/// <summary>
+		/// Encodes control characters in a string.
+		/// </summary>
+		/// <param name="Text">String</param>
+		/// <returns>String, with control characters encoded.</returns>
+		public static string EncodeControlCharacters(string Text)
+		{
+			int i = Text.IndexOfAny(controlCharacters);
+			if (i < 0)
+				return Text;
+
+			StringBuilder sb = new StringBuilder();
+			int j = 0;
+
+			while (i >= 0)
+			{
+				if (i > j)
+					sb.Append(Text.Substring(j, i - j));
+
+				sb.Append(' ');
+				sb.Append(controlCharacterNames[Array.IndexOf(controlCharacters, Text[i])]);
+				sb.Append(' ');
+
+				j = i + 1;
+				i = Text.IndexOfAny(controlCharacters, j);
+			}
+
+			if (j < Text.Length)
+				sb.Append(Text.Substring(j));
+
+			return sb.ToString();
+		}
+
+		private static readonly char[] controlCharacters = new char[]
+		{
+			(char)00, (char)01, (char)02, (char)03, (char)04, (char)05, (char)06, (char)07, (char)08,
+			(char)11, (char)12, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19,
+			(char)20, (char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29,
+			(char)30, (char)31
+		};
+
+		private static readonly string[] controlCharacterNames = new string[]
+		{
+			"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS",
+			"VT", "FF", "SO", "SI", "DLE", "DC1", "DC2", "DC3",
+			"DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS",
+			"RS", "US"
+		};
 
 	}
 }

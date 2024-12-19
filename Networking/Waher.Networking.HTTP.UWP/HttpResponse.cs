@@ -317,6 +317,11 @@ namespace Waher.Networking.HTTP
 						this.eTag = Value;
 					break;
 
+				case "set-cookie":
+					this.cookies ??= new LinkedList<Cookie>();
+					this.cookies.AddLast(Cookie.FromSetCookie(Value));
+					break;
+
 				default:
 					this.customHeaders ??= new Dictionary<string, string>();
 					this.customHeaders[FieldName] = Value;
@@ -538,7 +543,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Transfer encoding in response.
 		/// </summary>
-		public TransferEncoding TransferEncoding => this.transferEncoding ?? this.desiredTransferEncoding;
+		public TransferEncoding TransferEncoding
+		{
+			get => this.transferEncoding ?? this.desiredTransferEncoding;
+			internal set => this.transferEncoding = value;
+		}
 
 		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
@@ -693,7 +702,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task StartSendResponse(bool ExpectContent)
+		internal async Task<bool> StartSendResponse(bool ExpectContent)
 		{
 			if (this.transferEncoding is null)
 			{
@@ -879,7 +888,7 @@ namespace Waher.Networking.HTTP
 						byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
 						if (this.responseStream is null || this.clientConnection.Disposed)
-							return;
+							return false;
 
 						this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
 						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
@@ -895,13 +904,21 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength);
+					if (!this.clientConnection.IsStreamOpen(this.http2Stream.StreamId))
+						return false;
+
+					bool LeaveOpen = this.http2Stream.UpgradedToWebSocket;
+					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, LeaveOpen);
 					this.transferEncoding = Http2TransferEncoding;
 
 					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;
 					StringBuilder sb = this.clientConnection.HasSniffers ? new StringBuilder() : null;
 
-					await w.Lock();
+					byte[] HeaderBin;
+
+					if (!await w.TryLock(10000))
+						return await this.clientConnection.ReturnHttp2Error(Http2Error.InternalError, 0, "Unable to get access to HTTP/2 header reader.");
+
 					try
 					{
 						w.Reset(sb);
@@ -1013,25 +1030,27 @@ namespace Waher.Networking.HTTP
 								w.WriteHeader("set-cookie", Cookie.ToString(), IndexMode.NotIndexed, true);
 						}
 
-						byte[] HeaderBin = w.ToArray();
-
-						if (this.clientConnection.Disposed)
-							return;
-
-						if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent))
-							return;
-
-						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
-
-						if (!(sb is null))
-							await this.clientConnection.TransmitText(sb.ToString());
+						HeaderBin = w.ToArray();
 					}
 					finally
 					{
 						w.Release();
 					}
+
+					if (this.clientConnection.Disposed)
+						return false;
+
+					if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
+						return false;
+
+					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+
+					if (!(sb is null))
+						await this.clientConnection.TransmitText(sb.ToString());
 				}
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -1116,13 +1135,16 @@ namespace Waher.Networking.HTTP
 
 			if (Accept is null)
 			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
-				this.encodingUsed |= P.Value.StartsWith("text/");
+				ContentResponse P = await InternetContent.EncodeAsync(Object, this.encoding);
+				if (P.HasError)
+					return null;
+
+				this.encodingUsed |= P.ContentType.StartsWith("text/");
 
 				return new EncodingResult()
 				{
-					Data = P.Key,
-					ContentType = P.Value
+					Data = P.Encoded,
+					ContentType = P.ContentType
 				};
 			}
 			else
@@ -1135,10 +1157,13 @@ namespace Waher.Networking.HTTP
 					switch (Rec.Detail)
 					{
 						case 0: // Wildcard
-							KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
-							this.encodingUsed |= P.Value.StartsWith("text/");
-							Data = P.Key;
-							ContentType = P.Value;
+							ContentResponse P = await InternetContent.EncodeAsync(Object, this.encoding);
+							if (P.HasError)
+								return null;
+
+							this.encodingUsed |= P.ContentType.StartsWith("text/");
+							Data = P.Encoded;
+							ContentType = P.ContentType;
 							break;
 
 						case 1: // Top Type only
@@ -1165,9 +1190,9 @@ namespace Waher.Networking.HTTP
 							if (!(Best is null))
 							{
 								P = await Best.EncodeAsync(Object, this.encoding, ContentType, BestContentType);
-								this.encodingUsed |= P.Value.StartsWith("text/");
-								Data = P.Key;
-								ContentType = P.Value;
+								this.encodingUsed |= P.ContentType.StartsWith("text/");
+								Data = P.Encoded;
+								ContentType = P.ContentType;
 							}
 							break;
 
@@ -1176,9 +1201,9 @@ namespace Waher.Networking.HTTP
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
 							{
 								P = await Encoder.EncodeAsync(Object, this.encoding, ContentType, Rec.Item);
-								this.encodingUsed |= P.Value.StartsWith("text/");
-								Data = P.Key;
-								ContentType = P.Value;
+								this.encodingUsed |= P.ContentType.StartsWith("text/");
+								Data = P.Encoded;
+								ContentType = P.ContentType;
 							}
 							break;
 					}
@@ -1206,7 +1231,10 @@ namespace Waher.Networking.HTTP
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				await this.StartSendResponse(true);
+			{
+				if (!await this.StartSendResponse(true))
+					return;
+			}
 
 			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
 
@@ -1244,7 +1272,10 @@ namespace Waher.Networking.HTTP
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				await this.StartSendResponse(true);
+			{
+				if (!await this.StartSendResponse(true))
+					return;
+			}
 
 			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
 

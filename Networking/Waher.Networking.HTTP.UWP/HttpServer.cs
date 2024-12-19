@@ -1207,22 +1207,37 @@ namespace Waher.Networking.HTTP
 				}
 				catch (AuthenticationException ex)
 				{
+					if (this.HasSniffers)
+						await this.Exception(ex);
+
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
-				catch (SocketException)
+				catch (SocketException ex)
 				{
+					if (this.HasSniffers)
+						await this.Exception(ex);
+
 					Client.Dispose();
 				}
 				catch (Win32Exception ex)
 				{
+					if (this.HasSniffers)
+						await this.Exception(ex);
+
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
+					if (this.HasSniffers)
+						await this.Exception(ex);
+
 					Client.Dispose();
 				}
 				catch (Exception ex)
 				{
+					if (this.HasSniffers)
+						await this.Exception(ex);
+
 					Client.Dispose();
 					Log.Exception(ex);
 				}

@@ -106,8 +106,8 @@ namespace Waher.Networking.Sniffers
 								{
 									if (s.Length > 76)
 									{
-										this.output.WriteElementString("Row", s[..76]);
-										s = s[76..];
+										this.output.WriteElementString("Row", s.Substring(0, 76));
+										s = s.Substring(76);
 									}
 									else
 									{

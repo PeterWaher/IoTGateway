@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -433,18 +434,18 @@ namespace Waher.Networking
 			while (i >= 0)
 			{
 				if (i > j)
-					sb.Append(Text[j..i]);
+					sb.Append(Text.Substring(j, i - j));
 
 				sb.Append(' ');
 				sb.Append(controlCharacterNames[Array.IndexOf(controlCharacters, Text[i])]);
 				sb.Append(' ');
-				
+
 				j = i + 1;
 				i = Text.IndexOfAny(controlCharacters, j);
 			}
 
 			if (j < Text.Length)
-				sb.Append(Text[j..]);
+				sb.Append(Text.Substring(j));
 
 			return sb.ToString();
 		}

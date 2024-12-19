@@ -107,73 +107,68 @@ namespace Waher.Networking.HTTP
 		/// <returns>Status message.</returns>
 		public static string GetStatusMessage(int StatusCode)
 		{
-			switch (StatusCode)
+			return StatusCode switch
 			{
 				// Information
-				case 100: return "Continue";
-				case 101: return "Switching Protocols";
-				case 102: return "Processing";
-				case 103: return "Early Hints";
-
+				100 => "Continue",
+				101 => "Switching Protocols",
+				102 => "Processing",
+				103 => "Early Hints",
 				// Successful responses
-				case 200: return "OK";
-				case 201: return "Created";
-				case 202: return "Accepted";
-				case 203: return "Non-Authoritative Information";
-				case 204: return "No Content";
-				case 205: return "Reset Content";
-				case 206: return "Partial Content";
-				case 207: return "Multi-Status";
-				case 208: return "Already Reported";
-				case 226: return "IM Used";
-
+				200 => "OK",
+				201 => "Created",
+				202 => "Accepted",
+				203 => "Non-Authoritative Information",
+				204 => "No Content",
+				205 => "Reset Content",
+				206 => "Partial Content",
+				207 => "Multi-Status",
+				208 => "Already Reported",
+				226 => "IM Used",
 				// Redirections
-				case 300:return "Multiple Choices";
-				case MovedPermanentlyException.Code: return MovedPermanentlyException.StatusMessage;
-				case FoundException.Code: return FoundException.StatusMessage;
-				case SeeOtherException.Code: return SeeOtherException.StatusMessage;
-				case NotModifiedException.Code: return NotModifiedException.StatusMessage;
-				case UseProxyException.Code: return UseProxyException.StatusMessage;
-				case 306:return "unused";
-				case TemporaryRedirectException.Code: return TemporaryRedirectException.StatusMessage;
-				case PermanentRedirectException.Code: return PermanentRedirectException.StatusMessage;
-
+				300 => "Multiple Choices",
+				MovedPermanentlyException.Code => MovedPermanentlyException.StatusMessage,
+				FoundException.Code => FoundException.StatusMessage,
+				SeeOtherException.Code => SeeOtherException.StatusMessage,
+				NotModifiedException.Code => NotModifiedException.StatusMessage,
+				UseProxyException.Code => UseProxyException.StatusMessage,
+				306 => "unused",
+				TemporaryRedirectException.Code => TemporaryRedirectException.StatusMessage,
+				PermanentRedirectException.Code => PermanentRedirectException.StatusMessage,
 				// Client errors
-				case BadRequestException.Code: return BadRequestException.StatusMessage;
-				case ConflictException.Code: return ConflictException.StatusMessage;
-				case FailedDependencyException.Code: return FailedDependencyException.StatusMessage;
-				case ForbiddenException.Code: return ForbiddenException.StatusMessage;
-				case GoneException.Code: return GoneException.StatusMessage;
-				case LockedException.Code: return LockedException.StatusMessage;
-				case MethodNotAllowedException.Code: return MethodNotAllowedException.StatusMessage;
-				case MisdirectedRequestException.Code: return MisdirectedRequestException.StatusMessage;
-				case NotAcceptableException.Code: return NotAcceptableException.StatusMessage;
-				case NotFoundException.Code: return NotFoundException.StatusMessage;
-				case PreconditionFailedException.Code: return PreconditionFailedException.StatusMessage;
-				case PreconditionRequiredException.Code: return PreconditionRequiredException.StatusMessage;
-				case RangeNotSatisfiableException.Code: return RangeNotSatisfiableException.StatusMessage;
-				case RequestTimeoutException.Code: return RequestTimeoutException.StatusMessage;
-				case TooManyRequestsException.Code: return TooManyRequestsException.StatusMessage;
-				case UnauthorizedException.Code: return UnauthorizedException.StatusMessage;
-				case UnavailableForLegalReasonsException.Code: return UnavailableForLegalReasonsException.StatusMessage;
-				case UnprocessableEntityException.Code: return UnprocessableEntityException.StatusMessage;
-				case UnsupportedMediaTypeException.Code: return UnsupportedMediaTypeException.StatusMessage;
-				case UpgradeRequiredException.Code: return UpgradeRequiredException.StatusMessage;
-
+				BadRequestException.Code => BadRequestException.StatusMessage,
+				ConflictException.Code => ConflictException.StatusMessage,
+				FailedDependencyException.Code => FailedDependencyException.StatusMessage,
+				ForbiddenException.Code => ForbiddenException.StatusMessage,
+				GoneException.Code => GoneException.StatusMessage,
+				LockedException.Code => LockedException.StatusMessage,
+				MethodNotAllowedException.Code => MethodNotAllowedException.StatusMessage,
+				MisdirectedRequestException.Code => MisdirectedRequestException.StatusMessage,
+				NotAcceptableException.Code => NotAcceptableException.StatusMessage,
+				NotFoundException.Code => NotFoundException.StatusMessage,
+				PreconditionFailedException.Code => PreconditionFailedException.StatusMessage,
+				PreconditionRequiredException.Code => PreconditionRequiredException.StatusMessage,
+				RangeNotSatisfiableException.Code => RangeNotSatisfiableException.StatusMessage,
+				RequestTimeoutException.Code => RequestTimeoutException.StatusMessage,
+				TooManyRequestsException.Code => TooManyRequestsException.StatusMessage,
+				UnauthorizedException.Code => UnauthorizedException.StatusMessage,
+				UnavailableForLegalReasonsException.Code => UnavailableForLegalReasonsException.StatusMessage,
+				UnprocessableEntityException.Code => UnprocessableEntityException.StatusMessage,
+				UnsupportedMediaTypeException.Code => UnsupportedMediaTypeException.StatusMessage,
+				UpgradeRequiredException.Code => UpgradeRequiredException.StatusMessage,
 				// Server errors
-				case BadGatewayException.Code: return BadGatewayException.StatusMessage;
-				case GatewayTimeoutException.Code: return GatewayTimeoutException.StatusMessage;
-				case InsufficientStorageException.Code: return InsufficientStorageException.StatusMessage;
-				case InternalServerErrorException.Code: return InternalServerErrorException.StatusMessage;
-				case LoopDetectedException.Code: return LoopDetectedException.StatusMessage;
-				case NetworkAuthenticationRequiredException.Code: return NetworkAuthenticationRequiredException.StatusMessage;
-				case NotExtendedException.Code: return NotExtendedException.StatusMessage;
-				case NotImplementedException.Code: return NotImplementedException.StatusMessage;
-				case ServiceUnavailableException.Code: return ServiceUnavailableException.StatusMessage;
-				case VariantAlsoNegotiatesException.Code: return VariantAlsoNegotiatesException.StatusMessage;
-
-				default: return "Error";
-			}
+				BadGatewayException.Code => BadGatewayException.StatusMessage,
+				GatewayTimeoutException.Code => GatewayTimeoutException.StatusMessage,
+				InsufficientStorageException.Code => InsufficientStorageException.StatusMessage,
+				InternalServerErrorException.Code => InternalServerErrorException.StatusMessage,
+				LoopDetectedException.Code => LoopDetectedException.StatusMessage,
+				NetworkAuthenticationRequiredException.Code => NetworkAuthenticationRequiredException.StatusMessage,
+				NotExtendedException.Code => NotExtendedException.StatusMessage,
+				NotImplementedException.Code => NotImplementedException.StatusMessage,
+				ServiceUnavailableException.Code => ServiceUnavailableException.StatusMessage,
+				VariantAlsoNegotiatesException.Code => VariantAlsoNegotiatesException.StatusMessage,
+				_ => "Error",
+			};
 		}
 
 		/// <summary>
@@ -229,7 +224,12 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				HttpFieldContentType ContentType = new HttpFieldContentType("Content-Type", this.contentType);
-				this.contentObject = await InternetContent.DecodeAsync(ContentType.Type, this.content, ContentType.Encoding, null, null);
+				ContentResponse Content = await InternetContent.DecodeAsync(ContentType.Type, this.content, ContentType.Encoding, null, null);
+
+				if (Content.HasError)
+					this.contentObject = this.content;
+				else
+					this.contentObject = Content.Decoded;
 			}
 			catch (Exception)
 			{

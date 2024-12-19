@@ -97,7 +97,10 @@ namespace Waher.Networking.HTTP
 				this.etag ??= this.ComputeETag(f);
 
 				if (!(Request.Header.IfNoneMatch is null) && Request.Header.IfNoneMatch.Value == this.etag)
-					throw new NotModifiedException();
+				{
+					await Response.SendResponse(new NotModifiedException());
+					return;
+				}
 
 				Response.SetHeader("ETag", this.etag);
 

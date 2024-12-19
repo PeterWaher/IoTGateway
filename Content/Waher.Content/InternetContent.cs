@@ -303,7 +303,6 @@ namespace Waher.Content
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		[Obsolete("Use the EncodeAsync method for more efficient processing of content including asynchronous processing elements in parallel environments.")]
 		public static ContentResponse Encode(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
@@ -317,7 +316,6 @@ namespace Waher.Content
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, and Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public static Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!Encodes(Object, out Grade _, out IContentEncoder Encoder, AcceptedContentTypes))
@@ -524,7 +522,6 @@ namespace Waher.Content
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		[Obsolete("Use the DecoceAsync method for more efficient processing of content including asynchronous processing elements in parallel environments.")]
 		public static ContentResponse Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
@@ -540,7 +537,6 @@ namespace Waher.Content
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			if (!Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
@@ -556,7 +552,6 @@ namespace Waher.Content
 		/// <param name="Data">Encoded object.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		[Obsolete("Use the DecoceAsync method for more efficient processing of content including asynchronous processing elements in parallel environments.")]
 		public static ContentResponse Decode(string ContentType, byte[] Data, Uri BaseUri)
 		{
@@ -570,7 +565,6 @@ namespace Waher.Content
 		/// <param name="Data">Encoded object.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Uri BaseUri)
 		{
 			Encoding Encoding = null;

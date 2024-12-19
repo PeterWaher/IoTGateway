@@ -67,7 +67,6 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, System.Text.Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			return Task.FromResult(new ContentResponse(ContentType, CommonTypes.GetString(Data, Encoding), Data));

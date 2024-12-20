@@ -129,7 +129,7 @@ namespace Waher.Content.Semantic
 			else
 			{
 				if (!(Object is ISemanticModel Model))
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 				StringBuilder sb = new StringBuilder();
 

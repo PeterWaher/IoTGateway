@@ -1,10 +1,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Images;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 
 namespace Waher.Content.Markdown.PlantUml
 {

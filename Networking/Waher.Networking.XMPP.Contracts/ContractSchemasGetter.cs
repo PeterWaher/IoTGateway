@@ -89,7 +89,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			string SchemaName = UriToResource(Uri);
 			if (string.IsNullOrEmpty(SchemaName))
-				throw new Exception("URI not recognized.");
+				return Task.FromResult(new ContentResponse(new Exception("URI not recognized.")));
 
 			return Task.FromResult(new ContentResponse(XmlCodec.SchemaContentType, XSL.LoadSchema(SchemaName), Array.Empty<byte>()));
 		}
@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			string SchemaName = UriToResource(Uri);
 			if (string.IsNullOrEmpty(SchemaName))
-				throw new Exception("URI not recognized.");
+				return new ContentStreamResponse(new Exception("URI not recognized."));
 
 			byte[] Bin = Resources.LoadResource(SchemaName);
 			TemporaryStream f = new TemporaryStream();

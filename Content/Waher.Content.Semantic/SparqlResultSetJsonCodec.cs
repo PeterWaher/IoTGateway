@@ -77,7 +77,7 @@ namespace Waher.Content.Semantic
 			object Obj = JSON.Parse(s);
 
 			if (!(Obj is Dictionary<string, object> Doc))
-				throw new Exception("Unable to decode JSON.");
+				return Task.FromResult(new ContentResponse(new Exception("Unable to decode JSON.")));
 
 			SparqlResultSet Parsed = new SparqlResultSet(Doc, BaseUri);
 			return Task.FromResult(new ContentResponse(ContentType, Parsed, Data));
@@ -142,7 +142,7 @@ namespace Waher.Content.Semantic
 			else if (Object is bool b)
 				ResultObj = this.EncodeAsync(b);
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 			string Text = JSON.Encode(ResultObj, Pretty);
 			byte[] Bin = Encoding.GetBytes(Text);

@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Types.TryGetModuleParameter("HTTPX", out object Obj) && Obj is HttpxProxy Proxy)
 			{
 				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
-					throw new InvalidOperationException("Service is being shut down.");
+					return new ContentBinaryResponse(new InvalidOperationException("Service is being shut down."));
 
 				GetClientResponse Rec = await Proxy.GetClientAsync(Uri);
 
@@ -97,10 +97,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
 			{
 				if (XmppClient.Disposed)
-					throw new InvalidOperationException("Service is being shut down.");
+					return new ContentBinaryResponse(new InvalidOperationException("Service is being shut down."));
 
 				if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
-					throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
+					return new ContentBinaryResponse(new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client."));
 
 				HttpxClient = HttpxClient2;
 
@@ -113,9 +113,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					RosterItem Item = XmppClient.GetRosterItem(BareJid);
 
 					if (Item is null)
-						throw new ConflictException("No approved presence subscription with " + BareJid + ".");
+						return new ContentBinaryResponse(new ConflictException("No approved presence subscription with " + BareJid + "."));
 					else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
-						throw new ServiceUnavailableException(BareJid + " is not online.");
+						return new ContentBinaryResponse(new ServiceUnavailableException(BareJid + " is not online."));
 					else
 						FullJid = Item.LastPresenceFullJid;
 				}
@@ -123,7 +123,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				LocalUrl = Uri.PathAndQuery + Uri.Fragment;
 			}
 			else
-				throw new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered.");
+				return new ContentBinaryResponse(new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered."));
 
 			List<HttpField> Headers2 = new List<HttpField>();
 			bool HasContentType = false;
@@ -209,7 +209,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					}, State);
 
 				if (!await State.Done.Task)
-					throw new TimeoutException("Request timed out.");
+					return new ContentBinaryResponse(new TimeoutException("Request timed out."));
 
 				Timer.Dispose();
 				Timer = null;
@@ -221,8 +221,8 @@ namespace Waher.Networking.XMPP.HTTPX
 					ContentType = string.Empty;
 					EncodedData = State.Data?.ToArray();
 
-					throw HttpxGetter.GetExceptionObject(State.StatusCode, State.StatusMessage,
-						State.HttpResponse, EncodedData, ContentType);
+					return new ContentBinaryResponse(HttpxGetter.GetExceptionObject(State.StatusCode, State.StatusMessage,
+						State.HttpResponse, EncodedData, ContentType));
 				}
 			}
 			finally

@@ -157,7 +157,7 @@ namespace Waher.Content.Semantic
 				else if (Object is bool b)
 					this.EncodeAsync(b, w);
 				else
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 				w.Flush();
 

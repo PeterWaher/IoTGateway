@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
@@ -103,7 +102,7 @@ namespace Waher.Content.Semantic
 				Text = CSV.Encode(Records);
 			}
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = CsvCodec.CsvContentTypes[0] + "; charset=" + Encoding.WebName;

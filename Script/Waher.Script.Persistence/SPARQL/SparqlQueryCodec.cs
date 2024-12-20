@@ -75,9 +75,9 @@ namespace Waher.Script.Persistence.SPARQL
 			Expression Exp = new Expression(s, BaseUri?.AbsolutePath);
 
 			if (!(Exp.Root is SparqlQuery Query))
-				throw new Exception("Invalid SPARQL query.");
-
-			return Task.FromResult(new ContentResponse(ContentType, Query, Data));
+				return Task.FromResult(new ContentResponse(new Exception("Invalid SPARQL query.")));
+			else
+				return Task.FromResult(new ContentResponse(ContentType, Query, Data));
 		}
 
 		/// <summary>
@@ -126,7 +126,7 @@ namespace Waher.Script.Persistence.SPARQL
 				if (Object is Expression Exp && Exp.Root is SparqlQuery Query2)
 					Query = Query2;
 				else
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 			}
 
 			string Text = JSON.Encode(Query.SubExpression, false);

@@ -103,7 +103,7 @@ namespace Waher.Content.Semantic
 			else if (Object is bool b)
 				Html = CommonTypes.Encode(b);
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object)));
 
 			byte[] Bin = Encoding.GetBytes(Html);
 			string ContentType = HtmlCodec.HtmlContentTypes[0] + "; charset=" + Encoding.WebName;

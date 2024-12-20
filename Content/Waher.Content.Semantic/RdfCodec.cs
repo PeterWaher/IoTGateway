@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -233,7 +232,7 @@ namespace Waher.Content.Semantic
 								w.WriteEndElement();
 							}
 							else
-								throw new Exception("Unable to encode semantic model as RDF document. RDF documents require predicates to be URIs.");
+								return Task.FromResult(new ContentResponse(new Exception("Unable to encode semantic model as RDF document. RDF documents require predicates to be URIs.")));
 						}
 
 						w.WriteEndElement();
@@ -246,7 +245,7 @@ namespace Waher.Content.Semantic
 				}
 			}
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = RdfContentTypes[0] + "; charset=" + Encoding.WebName;

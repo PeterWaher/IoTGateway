@@ -35,10 +35,10 @@ namespace Waher.Script.Test
 			Assert.IsFalse(string.IsNullOrEmpty(ContentType));
 
 			byte[] Bin = Resources.LoadResource(typeof(ScriptSparqlTests).Namespace + ".Sparql.Query." + FileName);
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
-			Assert.IsNotNull(Decoded);
+			ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
+			Decoded.AssertOk();
 
-			SparqlResultSet Result = Decoded as SparqlResultSet;
+			SparqlResultSet Result = Decoded.Decoded as SparqlResultSet;
 			Assert.IsNotNull(Result);
 
 			return (CommonTypes.GetString(Bin, Encoding.UTF8), Result);
@@ -127,8 +127,8 @@ namespace Waher.Script.Test
 		public async Task Query_Test(string DataSetFileName, string QueryFileName,
 			string SourceName, string ResultName)
 		{
-			List<TurtleDocument> Docs = new();
-			Variables v = new();
+			List<TurtleDocument> Docs = [];
+			Variables v = [];
 			string[] SourceFileNames = DataSetFileName.Split('|');
 			string[] SourceUris = SourceName?.Split('|');
 			int i, c;
@@ -146,10 +146,10 @@ namespace Waher.Script.Test
 					v[" " + SourceUris[i] + " "] = Doc;
 			}
 
-			await this.Test(v, QueryFileName, ResultName, SourceUris, Docs.ToArray());
+			await Test(v, QueryFileName, ResultName, SourceUris, [.. Docs]);
 		}
 
-		private async Task Test(Variables v, string QueryFileName, string ResultName,
+		private static async Task Test(Variables v, string QueryFileName, string ResultName,
 			string[] SourceUris, TurtleDocument[] Docs)
 		{
 			string Query = LoadTextResource("Query." + QueryFileName);
@@ -196,7 +196,7 @@ namespace Waher.Script.Test
 					c = Expected.Records?.Length ?? 0;
 					Assert.AreEqual(c, ResultSet.Records?.Length ?? 0, "Record count not as expected.");
 
-					Dictionary<string, string> BlankNodeDictionary = new();
+					Dictionary<string, string> BlankNodeDictionary = [];
 
 					for (i = 0; i < c; i++)
 					{
@@ -229,7 +229,7 @@ namespace Waher.Script.Test
 				{
 					TurtleDocument Expected = LoadTurtleResource(ResultName);
 
-					Dictionary<string, string> BlankNodeDictionary = new();
+					Dictionary<string, string> BlankNodeDictionary = [];
 					IEnumerator<ISemanticTriple> e1 = Expected.GetEnumerator();
 					IEnumerator<ISemanticTriple> e2 = Model.GetEnumerator();
 					bool b1 = e1.MoveNext();
@@ -317,7 +317,7 @@ namespace Waher.Script.Test
 
 			try
 			{
-				Result2 = await Exp2.EvaluateAsync(new Variables());
+				Result2 = await Exp2.EvaluateAsync([]);
 			}
 			catch (Exception ex)
 			{

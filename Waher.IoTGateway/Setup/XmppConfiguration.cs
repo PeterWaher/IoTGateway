@@ -924,7 +924,10 @@ namespace Waher.IoTGateway.Setup
 								Uri Uri = new Uri("http://" + this.host + "/.well-known/host-meta");
 								HttpResponseMessage Response = await HttpClient.GetAsync(Uri);
 								if (!Response.IsSuccessStatusCode)
-									await Content.Getters.WebGetter.ProcessResponse(Response, Uri);
+								{
+									ContentResponse Temp = await Content.Getters.WebGetter.ProcessResponse(Response, Uri);
+									Temp.AssertOk();
+								}
 
 								Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
 								byte[] Bin = await Response.Content.ReadAsByteArrayAsync();

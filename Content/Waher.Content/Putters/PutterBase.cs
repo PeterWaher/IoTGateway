@@ -66,7 +66,10 @@ namespace Waher.Content.Putters
 			ContentBinaryResponse Result = await this.PutAsync(Uri, P.Encoded, P.ContentType, Certificate,
 				RemoteCertificateValidator, TimeoutMs, Headers);
 
-			return await InternetContent.DecodeAsync(Result.ContentType, Result.Encoded, Uri);
+			if (Result.HasError)
+				return new ContentResponse(Result.Error);
+			else
+				return await InternetContent.DecodeAsync(Result.ContentType, Result.Encoded, Uri);
 		}
 
 		/// <summary>

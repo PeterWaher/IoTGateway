@@ -355,7 +355,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (KeyValuePair<string, object> Setting in Settings)
 				{
-					string LocalName = Setting.Key.Substring(this.keySettingsPrefix.Length);
+					string LocalName = Setting.Key[this.keySettingsPrefix.Length..];
 
 					if (Setting.Value is string d)
 					{
@@ -559,7 +559,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (KeyValuePair<string, object> Setting in Settings)
 			{
-				string Name = Setting.Key.Substring(this.keySettingsPrefix.Length);
+				string Name = Setting.Key[this.keySettingsPrefix.Length..];
 
 				if (Setting.Value is string s)
 				{
@@ -592,7 +592,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (KeyValuePair<string, object> Setting in Settings)
 			{
-				string Name = Setting.Key.Substring(this.contractKeySettingsPrefix.Length);
+				string Name = Setting.Key[this.contractKeySettingsPrefix.Length..];
 
 				if (Setting.Value is string s)
 				{
@@ -1502,31 +1502,29 @@ namespace Waher.Networking.XMPP.Contracts
 					try
 					{
 						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, SignWith.LatestApprovedIdOrCurrentKeys, 30000);
-
-						using (TemporaryFile File = P.Value)
+						using TemporaryFile File = P.Value;
+						
+						if (P.Key != Attachment.ContentType)
 						{
-							if (P.Key != Attachment.ContentType)
+							await this.ReturnStatus(IdentityStatus.AttachmentInconsistency, Callback, State);
+							return;
+						}
+
+						File.Position = 0;
+
+						b = this.ValidateSignature(Identity, File, Attachment.Signature);
+						if (b.HasValue)
+						{
+							if (!b.Value)
 							{
-								await this.ReturnStatus(IdentityStatus.AttachmentInconsistency, Callback, State);
+								await this.ReturnStatus(IdentityStatus.AttachmentSignatureInvalid, Callback, State);
 								return;
 							}
-
-							File.Position = 0;
-
-							b = this.ValidateSignature(Identity, File, Attachment.Signature);
-							if (b.HasValue)
-							{
-								if (!b.Value)
-								{
-									await this.ReturnStatus(IdentityStatus.AttachmentSignatureInvalid, Callback, State);
-									return;
-								}
-							}
-							else
-							{
-								await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
-								return;
-							}
+						}
+						else
+						{
+							await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
+							return;
 						}
 					}
 					catch (Exception ex)
@@ -1617,7 +1615,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public bool? ValidateSignature(LegalIdentity Identity, byte[] Data, byte[] Signature)
 		{
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
-				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
+				int.TryParse(Identity.ClientKeyName[3..], out int KeySize))
 			{
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
@@ -1646,7 +1644,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public bool? ValidateSignature(LegalIdentity Identity, Stream Data, byte[] Signature)
 		{
 			if (Identity.ClientKeyName.StartsWith("RSA") &&
-				int.TryParse(Identity.ClientKeyName.Substring(3), out int KeySize))
+				int.TryParse(Identity.ClientKeyName[3..], out int KeySize))
 			{
 				return RsaEndpoint.Verify(Data, Signature, KeySize, Identity.ClientPubKey);
 			}
@@ -1705,7 +1703,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (i < 0)
 				return false;
 
-			Id = Id.Substring(i + 1);
+			Id = Id[(i + 1)..];
 
 			i = From.IndexOf('@');
 			if (i >= 0)
@@ -2020,7 +2018,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (i < 0)
 				return this.componentAddress;
 			else
-				return EntityId.Substring(i + 1);
+				return EntityId[(i + 1)..];
 		}
 
 		/// <summary>
@@ -2266,23 +2264,12 @@ namespace Waher.Networking.XMPP.Contracts
 			this.AssertAllowed();
 
 			byte[] Signature = null;
-			IE2eEndpoint Key;
-
-			switch (SignWith)
+			IE2eEndpoint Key = SignWith switch
 			{
-				case SignWith.CurrentKeys:
-					Key = null;
-					break;
-
-				case SignWith.LatestApprovedId:
-					Key = await this.GetLatestApprovedKey(true);
-					break;
-
-				case SignWith.LatestApprovedIdOrCurrentKeys:
-				default:
-					Key = await this.GetLatestApprovedKey(false);
-					break;
-			}
+				SignWith.CurrentKeys => null,
+				SignWith.LatestApprovedId => await this.GetLatestApprovedKey(true),
+				_ => await this.GetLatestApprovedKey(false),
+			};
 
 			if (Key is null)
 			{
@@ -2637,8 +2624,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Contract.HasEncryptedParameters)
 			{
-				if (Algorithm is null)
-					Algorithm = await ParameterEncryptionAlgorithm.Create(EncryptionAlgorithm, this);
+				Algorithm ??= await ParameterEncryptionAlgorithm.Create(EncryptionAlgorithm, this);
 
 				Contract.EncryptEncryptedParameters(this.client.BareJID, Algorithm);
 			}
@@ -2894,8 +2880,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (HasEncryptedParameters)
 			{
-				if (Algorithm is null)
-					Algorithm = await ParameterEncryptionAlgorithm.Create(EncryptionAlgorithm, this);
+				Algorithm ??= await ParameterEncryptionAlgorithm.Create(EncryptionAlgorithm, this);
 
 				for (i = 0; i < c; i++)
 				{
@@ -2977,12 +2962,9 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (Parameter.Protection == ProtectionLevel.Transient)
 					{
-						if (Parameter.ProtectedValue is null)
-							Parameter.ProtectedValue = Guid.NewGuid().ToByteArray();
-
-						if (TransientParameters is null)
-							TransientParameters = new LinkedList<Parameter>();
-
+						Parameter.ProtectedValue ??= Guid.NewGuid().ToByteArray();
+						
+						TransientParameters ??= new LinkedList<Parameter>();
 						TransientParameters.AddLast(Parameter);
 					}
 
@@ -4439,7 +4421,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (i < 0)
 				ContractComponent = this.componentAddress;
 			else
-				ContractComponent = Contract.ContractId.Substring(i + 1);
+				ContractComponent = Contract.ContractId[(i + 1)..];
 
 			foreach (string Namespace in Namespaces)
 			{
@@ -4563,50 +4545,48 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, SignWith.LatestApprovedId, 30000);
 						bool? IsValid;
-
-						using (TemporaryFile File = P.Value)
+						using TemporaryFile File = P.Value;
+						
+						if (P.Key != Attachment.ContentType)
 						{
-							if (P.Key != Attachment.ContentType)
+							await this.ReturnStatus(ContractStatus.AttachmentInconsistency, Callback, State);
+							return;
+						}
+
+						File.Position = 0;
+
+						if (Identities.TryGetValue(Attachment.LegalId, out LegalIdentity Identity))
+							IsValid = this.ValidateSignature(Identity, File, Attachment.Signature);
+						else
+						{
+							MemoryStream ms = new MemoryStream();
+							await File.CopyToAsync(ms);
+							Data = ms.ToArray();
+
+							try
 							{
-								await this.ReturnStatus(ContractStatus.AttachmentInconsistency, Callback, State);
-								return;
+								Identity = await this.ValidateSignatureAsync(Attachment.LegalId, Data, Attachment.Signature);
+								Identities[Attachment.LegalId] = Identity;
+								IsValid = true;
 							}
-
-							File.Position = 0;
-
-							if (Identities.TryGetValue(Attachment.LegalId, out LegalIdentity Identity))
-								IsValid = this.ValidateSignature(Identity, File, Attachment.Signature);
-							else
+							catch (Exception)
 							{
-								MemoryStream ms = new MemoryStream();
-								await File.CopyToAsync(ms);
-								Data = ms.ToArray();
-
-								try
-								{
-									Identity = await this.ValidateSignatureAsync(Attachment.LegalId, Data, Attachment.Signature);
-									Identities[Attachment.LegalId] = Identity;
-									IsValid = true;
-								}
-								catch (Exception)
-								{
-									IsValid = false;
-								}
+								IsValid = false;
 							}
+						}
 
-							if (IsValid.HasValue)
-							{
-								if (!IsValid.Value)
-								{
-									await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
-									return;
-								}
-							}
-							else
+						if (IsValid.HasValue)
+						{
+							if (!IsValid.Value)
 							{
 								await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
 								return;
 							}
+						}
+						else
+						{
+							await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
+							return;
 						}
 					}
 					catch (Exception)
@@ -6859,108 +6839,109 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Content-Type, and attachment.</returns>
 		public async Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url, SignWith SignWith, int Timeout)
 		{
-			using (HttpClient HttpClient = new HttpClient()
+			using HttpClient HttpClient = new HttpClient()
 			{
 				Timeout = TimeSpan.FromMilliseconds(Timeout)
-			})
+			};
+			HttpRequestMessage Request;
+			HttpResponseMessage Response = null;
+
+			Request = new HttpRequestMessage()
 			{
-				HttpRequestMessage Request;
-				HttpResponseMessage Response = null;
+				RequestUri = new Uri(Url),
+				Method = HttpMethod.Get
+			};
 
-				Request = new HttpRequestMessage()
+			try
+			{
+				Response = await HttpClient.SendAsync(Request);
+
+				if (Response.StatusCode == System.Net.HttpStatusCode.Unauthorized &&
+					!(Response.Headers.WwwAuthenticate is null))
 				{
-					RequestUri = new Uri(Url),
-					Method = HttpMethod.Get
-				};
-
-				try
-				{
-					Response = await HttpClient.SendAsync(Request);
-
-					if (Response.StatusCode == System.Net.HttpStatusCode.Unauthorized &&
-						!(Response.Headers.WwwAuthenticate is null))
+					foreach (AuthenticationHeaderValue Header in Response.Headers.WwwAuthenticate)
 					{
-						foreach (AuthenticationHeaderValue Header in Response.Headers.WwwAuthenticate)
+						if (Header.Scheme == "NeuroFoundation.Sign")
 						{
-							if (Header.Scheme == "NeuroFoundation.Sign")
+							KeyValuePair<string, string>[] Parameters = CommonTypes.ParseFieldValues(Header.Parameter);
+							string Realm = null;
+							string NonceStr = null;
+							byte[] Nonce = null;
+
+							foreach (KeyValuePair<string, string> P in Parameters)
 							{
-								KeyValuePair<string, string>[] Parameters = CommonTypes.ParseFieldValues(Header.Parameter);
-								string Realm = null;
-								string NonceStr = null;
-								byte[] Nonce = null;
-
-								foreach (KeyValuePair<string, string> P in Parameters)
+								switch (P.Key)
 								{
-									switch (P.Key)
-									{
-										case "realm":
-											Realm = P.Value;
-											break;
+									case "realm":
+										Realm = P.Value;
+										break;
 
-										case "n":
-											NonceStr = P.Value;
-											Nonce = Convert.FromBase64String(NonceStr);
-											break;
-									}
+									case "n":
+										NonceStr = P.Value;
+										Nonce = Convert.FromBase64String(NonceStr);
+										break;
 								}
-
-								if (!string.IsNullOrEmpty(Realm) && !string.IsNullOrEmpty(NonceStr))
-								{
-									byte[] Signature = await this.SignAsync(Nonce, SignWith);
-									StringBuilder sb = new StringBuilder();
-
-									sb.Append("jid=\"");
-									sb.Append(this.client.FullJID);
-									sb.Append("\", realm=\"");
-									sb.Append(Realm);
-									sb.Append("\", n=\"");
-									sb.Append(NonceStr);
-									sb.Append("\", s=\"");
-									sb.Append(Convert.ToBase64String(Signature));
-									sb.Append("\"");
-
-									Request.Dispose();
-									Request = new HttpRequestMessage()
-									{
-										RequestUri = new Uri(Url),
-										Method = HttpMethod.Get
-									};
-
-									Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Scheme, sb.ToString());
-
-									Response.Dispose();
-									Response = null;
-									Response = await HttpClient.SendAsync(Request);
-								}
-								break;
 							}
+
+							if (!string.IsNullOrEmpty(Realm) && !string.IsNullOrEmpty(NonceStr))
+							{
+								byte[] Signature = await this.SignAsync(Nonce, SignWith);
+								StringBuilder sb = new StringBuilder();
+
+								sb.Append("jid=\"");
+								sb.Append(this.client.FullJID);
+								sb.Append("\", realm=\"");
+								sb.Append(Realm);
+								sb.Append("\", n=\"");
+								sb.Append(NonceStr);
+								sb.Append("\", s=\"");
+								sb.Append(Convert.ToBase64String(Signature));
+								sb.Append("\"");
+
+								Request.Dispose();
+								Request = new HttpRequestMessage()
+								{
+									RequestUri = new Uri(Url),
+									Method = HttpMethod.Get
+								};
+
+								Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Scheme, sb.ToString());
+
+								Response.Dispose();
+								Response = null;
+								Response = await HttpClient.SendAsync(Request);
+							}
+							break;
 						}
 					}
-
-					if (!Response.IsSuccessStatusCode)
-						await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
-
-					string ContentType = Response.Content.Headers.ContentType.ToString();
-					TemporaryFile File = new TemporaryFile();
-					try
-					{
-						await Response.Content.CopyToAsync(File);
-					}
-					catch (Exception ex)
-					{
-						File.Dispose();
-						File = null;
-
-						ExceptionDispatchInfo.Capture(ex).Throw();
-					}
-
-					return new KeyValuePair<string, TemporaryFile>(ContentType, File);
 				}
-				finally
+
+				if (!Response.IsSuccessStatusCode)
 				{
-					Request?.Dispose();
-					Response?.Dispose();
+					ContentResponse Temp = await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
+					Temp.AssertOk();
 				}
+
+				string ContentType = Response.Content.Headers.ContentType.ToString();
+				TemporaryFile File = new TemporaryFile();
+				try
+				{
+					await Response.Content.CopyToAsync(File);
+				}
+				catch (Exception ex)
+				{
+					File.Dispose();
+					File = null;
+
+					ExceptionDispatchInfo.Capture(ex).Throw();
+				}
+
+				return new KeyValuePair<string, TemporaryFile>(ContentType, File);
+			}
+			finally
+			{
+				Request?.Dispose();
+				Response?.Dispose();
 			}
 		}
 
@@ -7160,10 +7141,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			lock (this.aes)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV))
-				{
-					Encrypted = Aes.TransformFinalBlock(ToEncrypt, 0, c);
-				}
+				using ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV);
+				Encrypted = Aes.TransformFinalBlock(ToEncrypt, 0, c);
 			}
 
 			return (Encrypted, LocalPublicKey);
@@ -7199,10 +7178,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			lock (this.aes)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
-				{
-					Decrypted = Aes.TransformFinalBlock(EncryptedMessage, 0, EncryptedMessage.Length);
-				}
+				using ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV);
+				Decrypted = Aes.TransformFinalBlock(EncryptedMessage, 0, EncryptedMessage.Length);
 			}
 
 			i = 0;

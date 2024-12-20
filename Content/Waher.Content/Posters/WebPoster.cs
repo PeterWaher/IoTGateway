@@ -97,7 +97,10 @@ namespace Waher.Content.Posters
 		public static async Task<ContentBinaryResponse> ProcessResponse(HttpResponseMessage Response, Uri Uri)
 		{
 			if (!Response.IsSuccessStatusCode)
-				await WebGetter.ProcessResponse(Response, Uri);
+			{
+				ContentResponse Temp = await WebGetter.ProcessResponse(Response, Uri);
+				return new ContentBinaryResponse(Temp.Error);
+			}
 
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType?.ToString() ?? BinaryCodec.DefaultContentType;

@@ -64,7 +64,10 @@ namespace Waher.Content.Posters
 		{
 			ContentResponse P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
 			ContentBinaryResponse Result = await this.PostAsync(Uri, P.Encoded, P.ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
-			return await InternetContent.DecodeAsync(Result.ContentType, Result.Encoded, Uri);
+			if (Result.HasError)
+				return new ContentResponse(Result.Error);
+			else
+				return await InternetContent.DecodeAsync(Result.ContentType, Result.Encoded, Uri);
 		}
 
 		/// <summary>

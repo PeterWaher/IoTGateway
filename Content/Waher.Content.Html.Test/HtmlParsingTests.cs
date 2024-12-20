@@ -30,7 +30,10 @@ namespace Waher.Content.Html.Test
 
 			HttpResponseMessage Response = await Client.GetAsync(Url);
 			if (!Response.IsSuccessStatusCode)
-				await Getters.WebGetter.ProcessResponse(Response, new Uri(Url));
+			{
+				ContentResponse Temp = await Getters.WebGetter.ProcessResponse(Response, new Uri(Url));
+				Temp.AssertOk();
+			}
 
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType.ToString();

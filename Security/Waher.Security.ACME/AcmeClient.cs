@@ -164,7 +164,10 @@ namespace Waher.Security.ACME
 			HttpResponseMessage Response = await this.httpClient.SendAsync(Request);
 
 			if (!Response.IsSuccessStatusCode)
-				await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
+			{
+				ContentResponse Temp = await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
+				Temp.AssertOk();
+			}
 
 			if (Response.Headers.TryGetValues("Replay-Nonce", out IEnumerable<string> Values))
 			{
@@ -726,7 +729,10 @@ namespace Waher.Security.ACME
 			HttpResponseMessage Response = await this.HttpPost(CertificateLocation, AccountLocation, ContentType, null);
 
 			if (!Response.IsSuccessStatusCode)
-				await Waher.Content.Getters.WebGetter.ProcessResponse(Response, AccountLocation);
+			{
+				ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, AccountLocation);
+				Temp.AssertOk();
+			}
 
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 

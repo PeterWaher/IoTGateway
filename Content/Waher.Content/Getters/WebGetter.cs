@@ -302,7 +302,10 @@ namespace Waher.Content.Getters
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 
 					if (!Response.IsSuccessStatusCode)
-						await ProcessResponse(Response, Uri);
+					{
+						ContentResponse Temp = await ProcessResponse(Response, Uri);
+						return new ContentStreamResponse(Temp.Error);
+					}
 
 					string ContentType = Response.Content.Headers.ContentType.ToString();
 					TemporaryStream File = new TemporaryStream();

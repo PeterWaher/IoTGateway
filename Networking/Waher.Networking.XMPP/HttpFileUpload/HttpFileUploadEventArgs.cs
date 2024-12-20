@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Inventory;
@@ -180,7 +181,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 							await this.LogReceived(Response);
 
 							if (!Response.IsSuccessStatusCode)
-								await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+							{
+								ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+								Temp.AssertOk();
+							}
 						}
 
 						Pos += c;
@@ -216,7 +220,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				await this.LogReceived(Response);
 
 				if (!Response.IsSuccessStatusCode)
-					await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+				{
+					ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+					Temp.AssertOk();
+				}
 
 				if (Response.StatusCode != System.Net.HttpStatusCode.Created)
 					throw new IOException("Unexpected response.");

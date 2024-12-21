@@ -60,6 +60,9 @@
     <Compile Include=".bak\Waher.Content\Binary\EncodedObject.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileReference.cs" />
+    <Compile Include=".bak\Waher.Content\ContentBinaryResponse.cs" />
+    <Compile Include=".bak\Waher.Content\ContentResponse.cs" />
+    <Compile Include=".bak\Waher.Content\ContentStreamResponse.cs" />
     <Compile Include=".bak\Waher.Content\ConversionState.cs" />
     <Compile Include=".bak\Waher.Content\IContentDeleter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />

@@ -59,7 +59,7 @@
     <ProjectReference Include="..\..\Waher.IoTGateway\Waher.IoTGateway.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="&quot;C:\My Projects\IoTGateway\Utilities\Waher.Utility.Install\bin\$(ConfigurationName)\net8.0\win-x86\Waher.Utility.Install.exe&quot; -s &quot;C:\My Projects\IoTGateway\Waher.IoTGateway.Console\bin\$(ConfigurationName)\net8.0\Waher.IoTGateway.Console.exe&quot; -d &quot;C:\ProgramData\IoT Gateway Dev&quot; -m &quot;C:\My Projects\IoTGateway\WebServices\Waher.WebService.Tesseract\bin\$(ConfigurationName)\netstandard2.0\Waher.WebService.Tesseract.manifest&quot;" Condition="'$(OS)'=='Windows_NT'" />
+    <Exec Command="&quot;C:\My Projects\IoTGateway\Utilities\Waher.Utility.Install\bin\$(ConfigurationName)\net8.0\win-x86\Waher.Utility.Install.exe&quot; -s &quot;C:\My Projects\IoTGateway\Waher.IoTGateway.Console\bin\$(ConfigurationName)\net8.0\Waher.IoTGateway.Console.exe&quot; -d &quot;C:\ProgramData\IoT Gateway Dev&quot; -m &quot;C:\My Projects\IoTGateway\WebServices\Waher.WebService.Tesseract\bin\$(ConfigurationName)\netstandard2.1\Waher.WebService.Tesseract.manifest&quot;" Condition="'$(OS)'=='Windows_NT'" />
     <Exec Command="&quot;/My Projects/IoTGateway/Utilities/Waher.Utility.Install/bin/$(ConfigurationName)/net8.0/osx-arm64/Waher.Utility.Install&quot; -s &quot;/My Projects/IoTGateway/Waher.IoTGateway.Console/bin/$(ConfigurationName)/net8.0/Waher.IoTGateway.Console.dll&quot; -d &quot;/usr/local/share/IoT Gateway Dev&quot; -m &quot;/My Projects/IoTGateway/WebServices/Waher.WebService.Tesseract/bin/$(ConfigurationName)/netstandard2.0/Waher.WebService.Tesseract.manifest&quot;" Condition="'$(OS)'=='Unix'" />
   </Target>
 </Project>

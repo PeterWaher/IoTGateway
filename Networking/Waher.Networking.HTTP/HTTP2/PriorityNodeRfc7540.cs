@@ -176,9 +176,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the child node was not found.</returns>
 		public bool RemoveChildDependency(PriorityNodeRfc7540 Child)
 		{
-			if (Child.Parent != this)
-				return false;
-
 			Child.DependentOn = null;
 
 			if (this.childNodes is null)

@@ -308,7 +308,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				Parent.RemoveChildDependency(Node);
 
-				double Scale = ((double)Node.Weight) / Parent.TotalChildWeights;
+				double Scale = Parent.TotalChildWeights == 0 ? 1 : ((double)Node.Weight) / Parent.TotalChildWeights;
 
 				while (Node.HasChildren)
 				{

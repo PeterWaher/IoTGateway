@@ -1083,7 +1083,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Block">Block.</param>
 		internal void AddBlockToCache(int FileId, uint BlockIndex, byte[] Block)
 		{
-			this.blocks.Add(this.GetBlockKey(FileId, BlockIndex), Block);
+			this.blocks?.Add(this.GetBlockKey(FileId, BlockIndex), Block);
 		}
 
 		/// <summary>

@@ -7,6 +7,9 @@ namespace Waher.Content
 	/// </summary>
 	public class ContentResponse : IDisposable
 	{
+		private readonly object decoded;
+		private readonly bool hasError;
+
 		/// <summary>
 		/// Contains information about a success response to a content request.
 		/// </summary>
@@ -15,10 +18,11 @@ namespace Waher.Content
 		/// <param name="Encoded">Encoded object.</param>
 		public ContentResponse(string ContentType, object Decoded, byte[] Encoded)
 		{
+			this.decoded = Decoded;
+			this.hasError = false;
+			
 			this.ContentType = ContentType;
-			this.Decoded = Decoded;
 			this.Encoded = Encoded;
-			this.HasError = false;
 			this.Error = null;
 		}
 
@@ -28,10 +32,11 @@ namespace Waher.Content
 		/// <param name="Error">Encoded error.</param>
 		public ContentResponse(Exception Error)
 		{
+			this.decoded = null;
+			this.hasError = true;
+
 			this.ContentType = null;
-			this.Decoded = null;
 			this.Encoded = null;
-			this.HasError = true;
 			this.Error = Error;
 		}
 
@@ -43,7 +48,16 @@ namespace Waher.Content
 		/// <summary>
 		/// Decoded object.
 		/// </summary>
-		public object Decoded { get; }
+		public object Decoded 
+		{
+			get
+			{
+				if (this.hasError)
+					throw this.Error;
+				else
+					return this.decoded;
+			}
+		}
 
 		/// <summary>
 		/// Encoded object.
@@ -53,7 +67,7 @@ namespace Waher.Content
 		/// <summary>
 		/// If an error occurred.
 		/// </summary>
-		public bool HasError { get; }
+		public bool HasError => this.hasError;
 
 		/// <summary>
 		/// Error response.
@@ -74,7 +88,7 @@ namespace Waher.Content
 		/// </summary>
 		public void AssertOk()
 		{
-			if (this.HasError)
+			if (this.hasError)
 				throw this.Error;
 		}
 	}

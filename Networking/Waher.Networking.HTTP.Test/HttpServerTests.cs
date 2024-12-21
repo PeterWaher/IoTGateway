@@ -636,15 +636,15 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register("/Remote/test31/SetA", null, async (req, resp) =>
 			{
-				req.Session["A"] = await req.DecodeDataAsync();
+				req.Session["A"] = (await req.DecodeDataAsync()).Decoded;
 			}, true, false, true);
 			server.Register("/Remote/test31/SetB", null, async (req, resp) =>
 			{
-				req.Session["B"] = await req.DecodeDataAsync();
+				req.Session["B"] = (await req.DecodeDataAsync()).Decoded;
 			}, true, false, true);
 			server.Register("/Remote/test31/SetC", null, async (req, resp) =>
 			{
-				req.Session["C"] = await req.DecodeDataAsync();
+				req.Session["C"] = (await req.DecodeDataAsync()).Decoded;
 			}, true, false, true);
 			server.Register("/Remote/test31.txt", async (req, resp) =>
 			{

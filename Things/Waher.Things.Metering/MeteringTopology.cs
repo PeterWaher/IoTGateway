@@ -44,9 +44,7 @@ namespace Waher.Things.Metering
 		public MeteringTopology()
 		{
 			this.lastChanged = RuntimeSettings.Get(SourceID + ".LastChanged", DateTime.MinValue);
-
-			if (instance is null)
-				instance = this;
+			instance ??= this;
 		}
 
 		/// <summary>
@@ -350,7 +348,7 @@ namespace Waher.Things.Metering
 		internal static async Task NewEvent(SourceEvent Event)
 		{
 			await Database.InsertLazy(Event);
-			await instance?.OnEvent?.Raise(instance, Event);
+			await (instance?.OnEvent?.Raise(instance, Event) ?? Task.CompletedTask);
 		}
 
 		/// <summary>

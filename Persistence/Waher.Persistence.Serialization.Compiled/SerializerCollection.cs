@@ -236,7 +236,7 @@ namespace Waher.Persistence.Serialization
 			{
 				lock (this.synchObj)
 				{
-					if (this.serializers.TryGetValue(Type, out IObjectSerializer Result2) &&
+					if ((this.serializers?.TryGetValue(Type, out IObjectSerializer Result2) ?? false) &&
 						Result2 == Result)
 					{
 						this.serializers.Remove(Type);

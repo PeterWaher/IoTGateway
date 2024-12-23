@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 
 				this.isWriting = true;
-				await this.client.Send(Block);
+				await this.client.Send(true, Block);
 			}
 
 			this.flush = false;
@@ -319,7 +319,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private async Task SendClose()
 		{
 			this.client.OnWriteQueueEmpty -= this.WriteQueueEmpty;
-			await this.client.Send(new byte[] { 0, 0 });
+			await this.client.Send(true, new byte[] { 0, 0 });
 			this.client.CloseWhenDone();
 			this.Dispose();
 		}

@@ -92,9 +92,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void AddCallback(EventHandlerAsync<PeerConnectionEventArgs> Callback, object State)
 		{
-			if (this.callbacks is null)
-				this.callbacks = new LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>>();
-
+			this.callbacks ??= new LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>>();
 			this.callbacks.AddLast(new KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>(Callback, State));
 		}
 
@@ -632,7 +630,7 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				int i = Xml.IndexOf("?>");
 				if (i >= 0)
-					Xml = Xml.Substring(i + 2).TrimStart();
+					Xml = Xml[(i + 2)..].TrimStart();
 
 				this.streamHeader = Xml;
 
@@ -640,7 +638,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (i < 0)
 					this.streamFooter = "</stream>";
 				else
-					this.streamFooter = "</" + Xml.Substring(1, i - 1) + ":stream>";
+					this.streamFooter = "</" + Xml[1..i] + ":stream>";
 
 				XmlDocument Doc = new XmlDocument()
 				{
@@ -923,7 +921,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(this.peer is null))
 			{
-				this.peer.SendTcp(Data, Callback, State);
+				this.peer.SendTcp(true, Data, Callback, State);
 				this.lastActivity = DateTime.Now;
 			}
 

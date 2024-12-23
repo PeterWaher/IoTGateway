@@ -458,7 +458,7 @@ namespace Waher.Networking.Modbus
 			if (Len > 0)
 				Frame.Write(Data, 0, Len);
 
-			return e.SendAsync(Frame.ToArray());
+			return e.SendAsync(true, Frame.ToArray());
 		}
 
 	}

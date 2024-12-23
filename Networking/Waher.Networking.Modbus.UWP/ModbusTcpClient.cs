@@ -346,7 +346,7 @@ namespace Waher.Networking.Modbus
 			{
 				byte[] Bin = Req.Request.ToArray();
 
-				await this.tcpClient.SendAsync(Bin);
+				await this.tcpClient.SendAsync(true, Bin);
 				await this.TransmitBinary(Bin);
 
 				Task<ModbusResponse> Result = Req.Handle.Task;

@@ -227,9 +227,22 @@ namespace Waher.Networking.PeerToPeer
 		/// buffered if a sending operation is being performed.
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcp(byte[] Packet)
 		{
-			return this.SendTcp(Packet, null, null);
+			return this.SendTcp(false, Packet);
+		}
+
+		/// <summary>
+		/// Sends a packet to the peer at the other side of the TCP connection. Transmission is done asynchronously and is
+		/// buffered if a sending operation is being performed.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Packet">Packet to send.</param>
+		public Task SendTcp(bool OneTimeBuffer, byte[] Packet)
+		{
+			return this.SendTcp(OneTimeBuffer, Packet, null, null);
 		}
 
 		/// <summary>
@@ -239,19 +252,37 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcp(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendTcp(false, Packet, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a packet to the peer at the other side of the TCP connection. Transmission is done asynchronously and is
+		/// buffered if a sending operation is being performed.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Packet">Packet to send.</param>
+		/// <param name="Callback">Optional method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task SendTcp(bool OneTimeBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (this.disposed)
 				return Task.CompletedTask;
 
-			byte[] EncodedPacket = this.EncodePacket(Packet, false);
-			return this.tcpConnection.SendAsync(EncodedPacket, Callback, State);
+			byte[] EncodedPacket = this.EncodePacket(Packet, false, out bool OneTimeBuffer2);
+			return this.tcpConnection.SendAsync(OneTimeBuffer || OneTimeBuffer2, EncodedPacket, Callback, State);
 		}
 
-		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber)
+		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber, out bool OneTimeBuffer)
 		{
 			if (!this.encapsulatePackets)
+			{
+				OneTimeBuffer = false;
 				return Packet;
+			}
 
 			ushort PacketNr;
 			int i = Packet.Length;
@@ -273,6 +304,7 @@ namespace Waher.Networking.PeerToPeer
 
 			byte[] Packet2 = new byte[c + i];
 			Array.Copy(Packet, 0, Packet2, c, i);
+			OneTimeBuffer = true;
 
 			do
 			{
@@ -307,7 +339,7 @@ namespace Waher.Networking.PeerToPeer
 		/// total size of datagram packets.</param>
 		public Task SendUdp(byte[] Packet, int IncludeNrPreviousPackets)
 		{
-			byte[] EncodedPacket = this.EncodePacket(Packet, true);
+			byte[] EncodedPacket = this.EncodePacket(Packet, true, out bool _);
 
 			lock (this.historicPackets)
 			{
@@ -466,9 +498,7 @@ namespace Waher.Networking.PeerToPeer
 							}
 							else
 							{
-								if (LostPackets is null)
-									LostPackets = new LinkedList<KeyValuePair<ushort, byte[]>>();
-
+								LostPackets ??= new LinkedList<KeyValuePair<ushort, byte[]>>();
 								LostPackets.AddFirst(new KeyValuePair<ushort, byte[]>(PacketNr, Packet));   // Reverse order
 							}
 						}
@@ -548,7 +578,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						await this.SendTcp(new byte[0]);
+						await this.SendTcp(true, new byte[0]);
 					}
 					catch (Exception)
 					{

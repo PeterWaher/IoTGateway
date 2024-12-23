@@ -258,9 +258,9 @@ namespace Waher.Networking.SMTP
 			return this.client.SendAsync(Row);
 		}
 
-		private Task Write(byte[] Bytes)
+		private Task Write(bool OneTimeBuffer, byte[] Bytes)
 		{
-			return this.client.SendAsync(Bytes);
+			return this.client.SendAsync(OneTimeBuffer, Bytes);
 		}
 
 		private Task<string> AssertOkResult()
@@ -481,7 +481,15 @@ namespace Waher.Networking.SMTP
 		/// <summary>
 		/// Executes the DATA command.
 		/// </summary>
-		public async Task DATA(KeyValuePair<string, string>[] Headers, byte[] Body)
+		public Task DATA(KeyValuePair<string, string>[] Headers, byte[] Body)
+		{
+			return this.DATA(Headers, false, Body);
+		}
+
+		/// <summary>
+		/// Executes the DATA command.
+		/// </summary>
+		public async Task DATA(KeyValuePair<string, string>[] Headers, bool OneTimeBody, byte[] Body)
 		{
 			await this.WriteLine("DATA");
 			await this.AssertContinue();
@@ -502,18 +510,18 @@ namespace Waher.Networking.SMTP
 					j = c;
 
 				if (i == 0 && j == c)
-					await this.Write(Body);
+					await this.Write(OneTimeBody, Body);
 				else
 				{
 					byte[] Bin = new byte[j - i];
 					Array.Copy(Body, i, Bin, 0, j - i);
-					await this.Write(Bin);
+					await this.Write(true, Bin);
 				}
 
 				i = j;
 				if (i < c)
 				{
-					await this.Write(crLfDot);
+					await this.Write(true, crLfDot);
 					i += 2;
 				}
 			}
@@ -669,7 +677,7 @@ namespace Waher.Networking.SMTP
 
 			await this.MAIL_FROM(Sender);
 			await this.RCPT_TO(Recipient);
-			await this.DATA(Headers.ToArray(), BodyBin);
+			await this.DATA(Headers.ToArray(), true, BodyBin);
 		}
 
 	}

@@ -212,7 +212,7 @@ namespace Waher.Events.Socket
 						}
 					}
 
-					if (!await this.client.SendAsync(Bin))
+					if (!await this.client.SendAsync(true, Bin))
 					{
 						Event Event = new Event(EventType.Error, "Unable to sent event to event recipient.", this.ObjectID,
 							string.Empty, string.Empty, EventLevel.Major, string.Empty, string.Empty, string.Empty);

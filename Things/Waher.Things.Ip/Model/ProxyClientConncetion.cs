@@ -70,7 +70,7 @@ namespace Waher.Things.Ip.Model
 
 		private async Task<bool> Outgoing_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			if (await this.incoming.SendAsync(Buffer, Offset, Count))
+			if (await this.incoming.SendAsync(false, Buffer, Offset, Count))
 			{
 				this.port.IncUplink(Count);
 				return true;
@@ -93,7 +93,7 @@ namespace Waher.Things.Ip.Model
 
 		private async Task<bool> Incoming_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
 		{
-			if (await this.outgoing.SendAsync(Buffer, Offset, Count))
+			if (await this.outgoing.SendAsync(false, Buffer, Offset, Count))
 			{
 				this.port.IncDownlink(Count);
 				return true;

@@ -80,9 +80,22 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Data">Data to send.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Data)
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Data)
 		{
-			if (!await this.Client.SendAsync(Data))
+			return this.SendAsync(false, Data);
+		}
+
+		/// <summary>
+		/// Sends data back to the client.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Data">Data to send.</param>
+		/// <returns>If data was sent.</returns>
+		public async Task<bool> SendAsync(bool OneTimeBuffer, byte[] Data)
+		{
+			if (!await this.Client.SendAsync(OneTimeBuffer, Data))
 			{
 				this.Dispose();
 				return false;

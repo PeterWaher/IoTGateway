@@ -671,9 +671,22 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Packet">Binary packet.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, false, null, null);
+			return this.SendAsync(false, Packet, 0, Packet.Length, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet)
+		{
+			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, false, null, null);
 		}
 
 		/// <summary>
@@ -682,9 +695,23 @@ namespace Waher.Networking
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, bool Priority)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, Priority, null, null);
+			return this.SendAsync(false, Packet, 0, Packet.Length, Priority, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet, bool Priority)
+		{
+			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, Priority, null, null);
 		}
 
 		/// <summary>
@@ -694,9 +721,24 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, false, Callback, State);
+			return this.SendAsync(false, Packet, 0, Packet.Length, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, false, Callback, State);
 		}
 
 		/// <summary>
@@ -707,9 +749,25 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, Priority, Callback, State);
+			return this.SendAsync(false, Packet, 0, Packet.Length, Priority, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, Priority, Callback, State);
 		}
 
 		/// <summary>
@@ -719,9 +777,24 @@ namespace Waher.Networking
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count)
 		{
-			return this.SendAsync(Buffer, Offset, Count, false, null, null);
+			return this.SendAsync(false, Buffer, Offset, Count, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			return this.SendAsync(OneTimeBuffer, Buffer, Offset, Count, false, null, null);
 		}
 
 		/// <summary>
@@ -732,9 +805,25 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority)
 		{
-			return this.SendAsync(Buffer, Offset, Count, Priority, null, null);
+			return this.SendAsync(false, Buffer, Offset, Count, Priority, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, bool Priority)
+		{
+			return this.SendAsync(OneTimeBuffer, Buffer, Offset, Count, Priority, null, null);
 		}
 
 		/// <summary>
@@ -746,9 +835,26 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Buffer, Offset, Count, false, Callback, State);
+			return this.SendAsync(false, Buffer, Offset, Count, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(OneTimeBuffer, Buffer, Offset, Count, false, Callback, State);
 		}
 
 		/// <summary>
@@ -761,15 +867,34 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority,
+		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority,
+			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(false, Buffer, Offset, Count, Priority, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
+		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public async Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.BeginSend(Buffer, Offset, Count, Priority, Result, Callback, State, true);
+			await this.BeginSend(OneTimeBuffer, Buffer, Offset, Count, Priority, Result, Callback, State, true);
 			return await Result.Task;
 		}
 
-		private async Task BeginSend(byte[] Buffer, int Offset, int Count, bool Priority,
+		private async Task BeginSend(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
 			TaskCompletionSource<bool> Task, EventHandlerAsync<DeliveryEventArgs> Callback,
 			object State, bool CheckSending)
 		{
@@ -822,8 +947,16 @@ namespace Waher.Networking
 
 							if (this.sending)
 							{
-								byte[] Packet = new byte[Count];
-								Array.Copy(Buffer, Offset, Packet, 0, Count);
+								byte[] Packet;
+
+								if (OneTimeBuffer && Offset == 0 && Count == Buffer.Length)
+									Packet = Buffer;
+								else
+								{
+									Packet = new byte[Count];
+									Array.Copy(Buffer, Offset, Packet, 0, Count);
+								}
+
 								Rec Item = new Rec()
 								{
 									Data = Packet,
@@ -865,6 +998,7 @@ namespace Waher.Networking
 								Callback = Rec.Callback;
 								State = Rec.State;
 								Task = Rec.Task;
+								OneTimeBuffer = true;
 							}
 						}
 

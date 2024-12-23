@@ -183,7 +183,7 @@ namespace Waher.Networking
 		{
 			byte[] Data = this.encoding.GetBytes(Text);
 			this.lastTransmittedBytes = Data.Length;
-			bool Result = await base.SendAsync(Data, Callback, State);
+			bool Result = await base.SendAsync(true, Data, Callback, State);
 			await this.TextDataSent(Text);
 			return Result;
 		}

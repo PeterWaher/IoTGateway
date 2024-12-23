@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -61,7 +60,7 @@ namespace Waher.Networking
 					{
 						this.sniffers.Add(Sniffer);
 						this.staticList = this.sniffers.ToArray();
-						this.hasSniffers = this.staticList.Length > 0;
+						this.hasSniffers = true;
 					}
 				}
 			}

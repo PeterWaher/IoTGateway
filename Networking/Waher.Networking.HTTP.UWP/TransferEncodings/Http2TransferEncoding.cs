@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.HTTP2;
 
@@ -26,9 +27,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Stream">HTTP/2 stream.</param>
 		/// <param name="ContentLength">Content-Length, if known.</param>
 		/// <param name="LeaveStreamOpen">If stream should be left open after transmission.</param>
-		public Http2TransferEncoding(Http2Stream Stream, long? ContentLength, 
+		public Http2TransferEncoding(Http2Stream Stream, long? ContentLength,
 			bool LeaveStreamOpen)
-			: base()
+			: base(null, Stream.Connection)
 		{
 			this.stream = Stream;
 			this.contentLength = ContentLength;
@@ -77,7 +78,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </returns>
 		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
-			return Task.FromResult(0UL);    
+			return Task.FromResult(0UL);
 		}
 
 		/// <summary>
@@ -88,29 +89,58 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="NrBytes">Number of bytes to encode.</param>
 		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
 		{
-			if (!this.ended)
+			if (this.ended)
+				return true;
+
+			if (NrBytes > 1000)
+				this.dataEncoding = null;
+
+			this.contentTransmitted += NrBytes;
+			this.ended = this.contentLength.HasValue && this.contentTransmitted >= this.contentLength.Value;
+
+			int NrToWrite;
+			int NrWritten;
+			bool Last;
+
+			while (NrBytes > 0)
 			{
-				this.contentTransmitted += NrBytes;
-				this.ended = this.contentLength.HasValue && this.contentTransmitted >= this.contentLength.Value;
+				NrToWrite = Math.Min(NrBytes, this.bufferSize - this.pos);
+				Last = this.ended && NrBytes == NrToWrite;
 
-				while (NrBytes > 0)
+				if (NrToWrite == this.bufferSize ||     // Means this.pos == 0
+					(Last && this.pos == 0))
 				{
-					int i = Math.Min(NrBytes, this.bufferSize - this.pos);
-					Array.Copy(Data, Offset, this.buffer, this.pos, i);
-					Offset += i;
-					NrBytes -= i;
-					this.pos += i;
-
-					bool Last = this.ended && NrBytes == 0;
+					NrWritten = await this.stream.TryWriteData(Data, Offset, NrToWrite, Last, this.dataEncoding);
+					if (NrWritten < 0)
+						return false;
+				}
+				else
+				{
+					Array.Copy(Data, Offset, this.buffer, this.pos, NrToWrite);
+					this.pos += NrToWrite;
 
 					if (this.pos == this.bufferSize || Last)
 					{
-						if (!await this.stream.WriteData(this.buffer, 0, this.pos, Last, this.dataEncoding))
+						NrWritten = await this.stream.TryWriteData(this.buffer, 0, this.pos, Last, this.dataEncoding);
+						if (NrWritten < 0)
 							return false;
 
-						this.pos = 0;
+						if (NrWritten < this.pos)
+						{
+							int RestBytes = this.pos - NrWritten;
+
+							Array.Copy(this.buffer, NrWritten, this.buffer, 0, RestBytes);
+							this.pos = RestBytes;
+						}
+						else
+							this.pos = 0;
 					}
+					
+					NrWritten = NrToWrite;
 				}
+
+				Offset += NrWritten;
+				NrBytes -= NrWritten;
 			}
 
 			return true;
@@ -123,8 +153,17 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		{
 			if (this.pos > 0)
 			{
-				if (!await this.stream.WriteData(this.buffer, 0, this.pos, this.ended, this.dataEncoding))
-					return false;
+				int i = 0;
+				int j;
+
+				while (i < this.pos)
+				{
+					j = await this.stream.TryWriteData(this.buffer, i, this.pos - i, this.ended, this.dataEncoding);
+					if (j < 0)
+						return false;
+
+					i += j;
+				}
 
 				this.pos = 0;
 			}
@@ -141,14 +180,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			{
 				if (!this.leaveStreamOpen)
 					this.ended = true;
-
-				if (!await this.stream.WriteData(this.buffer, 0, this.pos, this.ended, this.dataEncoding))
-					return false;
-
-				this.pos = 0;
 			}
 
-			return true;
+			if (this.pos > 0)
+				return await this.FlushAsync();
+			else
+				return true;
 		}
 	}
 }

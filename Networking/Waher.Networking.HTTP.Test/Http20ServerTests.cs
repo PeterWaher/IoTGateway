@@ -17,7 +17,6 @@ namespace Waher.Networking.HTTP.Test
 		public new static void ClassCleanup()
 		{
 			HttpServerTests.ClassCleanup();
-
 		}
 
 		public override Version ProtocolVersion => HttpVersion.Version20;
@@ -28,8 +27,6 @@ namespace Waher.Networking.HTTP.Test
 		 * padding in requests
 		 * Long headers (multiple HEADERS & CONTINUATION frames)
 		 * data-less responses
-		 * data responses (one DATA frame)
-		 * long data responses (multiple DATA & CONTINUATION frames)
 		 * long headers in data responses (multiple HEADER & CONTINUATION frames)
 		 * push promise
 		 * stream priorities

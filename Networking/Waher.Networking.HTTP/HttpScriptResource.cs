@@ -251,7 +251,7 @@ namespace Waher.Networking.HTTP
 
 							if (All || Array.IndexOf(Range, AcceptRecord.Item) >= 0)
 							{
-								if(Alternatives is null)
+								if (Alternatives is null)
 									Alternatives = new List<string>();
 
 								Alternatives.Add(AcceptRecord.Item);

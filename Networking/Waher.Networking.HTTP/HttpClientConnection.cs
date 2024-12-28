@@ -1188,34 +1188,89 @@ namespace Waher.Networking.HTTP
 			if (!this.localSettings.HasPendingIncrements)
 				return true;
 
-			long Total = 0;
-			int i;
+			MemoryStream Output = null;
+			StringBuilder sb = null;
+			int Total = 0;
+			int i, j;
 
 			foreach (ConnectionSettings.PendingWindowIncrement Increment in this.localSettings.GetPendingIncrements())
 			{
+				if (Output is null)
+				{
+					Output = new MemoryStream();
+
+					if (this.HasSniffers)
+					{
+						sb = new StringBuilder();
+						sb.Append("TX: WindowUpdate");
+					}
+				}
+
 				i = Increment.NrBytes;
 				Total += i;
 
 				if (!Increment.Stream.SetInputWindowSizeIncrement((uint)i))
 					return false;
 
-				if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, false, Increment.Stream.StreamId, null,
-					(byte)(i >> 24),
-					(byte)(i >> 16),
-					(byte)(i >> 8),
-					(byte)i))
+				j = Increment.Stream.StreamId;
+
+				Output.WriteByte(0);				// 4 bytes payload
+				Output.WriteByte(0);
+				Output.WriteByte(4);	
+				Output.WriteByte((byte)FrameType.WindowUpdate);
+				Output.WriteByte(0);				// Flags
+				Output.WriteByte((byte)(j >> 24));	// Stream ID
+				Output.WriteByte((byte)(j >> 16));
+				Output.WriteByte((byte)(j >> 8));
+				Output.WriteByte((byte)j);
+				Output.WriteByte((byte)(i >> 24));	// Payload
+				Output.WriteByte((byte)(i >> 16));
+				Output.WriteByte((byte)(i >> 8));
+				Output.WriteByte((byte)i);
+
+				if (this.HasSniffers)
 				{
-					return false;
+					sb.Append(", Stream ");
+					sb.Append(j);
+					sb.Append(" +");
+					sb.Append(i);
 				}
 			}
 
-			if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, false, 0, null,
-				(byte)(Total >> 24),
-				(byte)(Total >> 16),
-				(byte)(Total >> 8),
-				(byte)Total))
+			if (Total == 0)
+				return true;
+
+			Output.WriteByte(0);                // 4 bytes payload
+			Output.WriteByte(0);
+			Output.WriteByte(4);
+			Output.WriteByte((byte)FrameType.WindowUpdate);
+			Output.WriteByte(0);                // Flags
+			Output.WriteByte(0);				// Stream ID = 0, Connection
+			Output.WriteByte(0);
+			Output.WriteByte(0);
+			Output.WriteByte(0);
+			Output.WriteByte((byte)(Total >> 24));  // Payload
+			Output.WriteByte((byte)(Total >> 16));
+			Output.WriteByte((byte)(Total >> 8));
+			Output.WriteByte((byte)Total);
+
+			if (this.HasSniffers)
 			{
+				sb.Append(", Connection +");
+				sb.Append(Total);
+			}
+
+			if (this.client is null)
 				return false;
+
+			byte[] Data = Output.ToArray();
+			if (!await this.client.SendAsync(true, Data, true))
+				return false;
+
+			if (this.HasSniffers)
+			{
+				await this.Information(sb.ToString());
+				await this.TransmitBinary(Data);
 			}
 
 			return true;

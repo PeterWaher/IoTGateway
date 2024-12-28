@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define INFO_IN_SNIFFERS
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
@@ -17,7 +19,6 @@ using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
-using Waher.Script.Functions.Vectors;
 using Waher.Security;
 #if WINDOWS_UWP
 using Windows.Networking.Sockets;
@@ -611,8 +612,13 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
+#if INFO_IN_SNIFFERS
 				StringBuilder sb = null;
+#else
+				StringBuilder sb;
+#endif
 
+#if INFO_IN_SNIFFERS
 				if (this.HasSniffers)
 				{
 					sb = new StringBuilder();
@@ -633,7 +639,7 @@ namespace Waher.Networking.HTTP
 					if (this.http2FrameType != FrameType.Data && this.http2FrameType != FrameType.WindowUpdate)
 						await this.Information(sb.ToString());
 				}
-
+#endif
 				if (this.http2StreamId > this.http2LastPermittedStreamId)
 					return true;
 
@@ -647,25 +653,28 @@ namespace Waher.Networking.HTTP
 					case FrameType.Data:
 						if (this.http2StreamId == 0)
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 								await this.Information(sb.ToString());
-
+#endif
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream is 0");
 						}
 
 						if (!this.flowControl.TryGetStream(this.http2StreamId, out Http2Stream Stream))
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 								await this.Information(sb.ToString());
-
+#endif
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream not under flow control.");
 						}
 
 						if (Stream.State != StreamState.Open)
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 								await this.Information(sb.ToString());
-
+#endif
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream state is " + Stream.State.ToString());
 						}
 
@@ -676,12 +685,14 @@ namespace Waher.Networking.HTTP
 						int DataSize = this.reader.BytesLeft - PaddingLen;
 						if (DataSize < 0)
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 								await this.Information(sb.ToString());
-
+#endif
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Padding length larger than available data.");
 						}
 
+#if INFO_IN_SNIFFERS
 						if (this.HasSniffers)
 						{
 							sb.Append(" (total received: ");
@@ -690,7 +701,7 @@ namespace Waher.Networking.HTTP
 
 							await this.Information(sb.ToString());
 						}
-
+#endif
 						if (DataSize > 0)
 						{
 							if (!await Stream.DataReceived(this.reader.Buffer, this.reader.Position, DataSize))
@@ -766,6 +777,7 @@ namespace Waher.Networking.HTTP
 								StreamIdDependency &= 0x7fffffff;
 								Weight = this.reader.NextByte();
 
+#if INFO_IN_SNIFFERS
 								if (this.HasSniffers)
 								{
 									sb.Clear();
@@ -780,6 +792,7 @@ namespace Waher.Networking.HTTP
 
 									await this.Information(sb.ToString());
 								}
+#endif
 							}
 						}
 						else
@@ -809,6 +822,7 @@ namespace Waher.Networking.HTTP
 
 							this.http2LastCreatedStreamId = this.http2StreamId;
 
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 							{
 								sb.Clear();
@@ -822,6 +836,7 @@ namespace Waher.Networking.HTTP
 
 								await this.Information(sb.ToString());
 							}
+#endif
 						}
 						else if (Priority && this.flowControl is FlowControlRfc7540 FlowControlRfc7540_2)
 							FlowControlRfc7540_2.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
@@ -856,9 +871,11 @@ namespace Waher.Networking.HTTP
 									this.localSettings.HeaderTableSize, this.localSettings.MaxHeaderListSize);
 								ResetHeader = false;
 							}
-
+#if INFO_IN_SNIFFERS
 							sb?.Clear();
-
+#else
+							sb = new StringBuilder();
+#endif
 							if (!await this.http2HeaderReader.TryLock(10000))
 								return await this.ReturnHttp2Error(Http2Error.InternalError, 0, "Unable to get access to HTTP/2 header reader.");
 
@@ -913,7 +930,7 @@ namespace Waher.Networking.HTTP
 							if (this.http2HeaderWriter is null)
 							{
 								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
-								this.localSettings.MaxHeaderListSize);
+									this.localSettings.MaxHeaderListSize);
 							}
 
 							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
@@ -987,8 +1004,11 @@ namespace Waher.Networking.HTTP
 						}
 						else
 						{
+#if INFO_IN_SNIFFERS
 							sb?.Clear();
-
+#else
+							sb = new StringBuilder();
+#endif
 							Error = ConnectionSettings.TryParse(this.reader, sb, out this.remoteSettings);
 
 							if (!(sb is null))
@@ -1067,9 +1087,10 @@ namespace Waher.Networking.HTTP
 
 						if (this.reader.BytesLeft != 4)
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 								await this.Information(sb.ToString());
-
+#endif
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Expected exactly 4 bytes of data.");
 						}
 
@@ -1077,14 +1098,16 @@ namespace Waher.Networking.HTTP
 
 						if (Increment == 0)
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 								await this.Information(sb.ToString());
-
+#endif
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Increment set to 0.");
 						}
 
 						if (this.http2StreamId == 0)
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 							{
 								sb.Append(", Connection Window +");
@@ -1092,18 +1115,20 @@ namespace Waher.Networking.HTTP
 
 								await this.Information(sb.ToString());
 							}
-
+#endif
 							int NewSize = this.flowControl?.ReleaseConnectionResources((int)Increment) ?? -1;
 							if (NewSize < 0)
 							{
+#if INFO_IN_SNIFFERS
 								if (this.HasSniffers)
 									await this.Information(sb.ToString());
-
+#endif
 								return await this.ReturnHttp2Error(Http2Error.FlowControlError, 0, "Unable to release connection resources.");
 							}
 						}
 						else
 						{
+#if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
 							{
 								sb.Append(", Stream Window +");
@@ -1111,7 +1136,7 @@ namespace Waher.Networking.HTTP
 
 								await this.Information(sb.ToString());
 							}
-
+#endif
 							this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment);
 							// Ignore returning error if stream has been removed.
 						}
@@ -1269,7 +1294,9 @@ namespace Waher.Networking.HTTP
 
 			if (this.HasSniffers)
 			{
+#if INFO_IN_SNIFFERS
 				await this.Information(sb.ToString());
+#endif
 				await this.TransmitBinary(Data);
 			}
 
@@ -1436,6 +1463,7 @@ namespace Waher.Networking.HTTP
 
 			if (this.HasSniffers)
 			{
+#if INFO_IN_SNIFFERS
 				StringBuilder sb = new StringBuilder();
 
 				sb.Append("TX: ");
@@ -1455,6 +1483,7 @@ namespace Waher.Networking.HTTP
 				}
 
 				await this.Information(sb.ToString());
+#endif
 
 				if (DataEncoding is null)
 					await this.TransmitBinary(Data);

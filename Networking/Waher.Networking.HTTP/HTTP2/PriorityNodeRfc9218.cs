@@ -64,11 +64,13 @@ namespace Waher.Networking.HTTP.HTTP2
 			int Available = Math.Min(RequestedResources, this.AvailableResources);
 			Available = Math.Min(Available, this.root.AvailableResources);
 
-			if (Available == 0)
+			if (Available <= 0)
 			{
 				PendingRequest Request = new PendingRequest(RequestedResources);
 
-				this.pendingRequests ??= new LinkedList<PendingRequest>();
+				if (this.pendingRequests is null)
+					this.pendingRequests = new LinkedList<PendingRequest>();
+
 				this.pendingRequests.AddLast(Request);
 
 				if (CancelToken.HasValue)
@@ -120,10 +122,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.pendingRequests.RemoveFirst();
 
 				i = Loop.Value.Requested;
-				
+
 				if (Resources < i)
 					i = Resources;
-				
+
 				if (this.maxFrameSize < i)
 					i = this.maxFrameSize;
 

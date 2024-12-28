@@ -305,12 +305,16 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if ((Code & 0x80000000) == 0)
 					{
-						Loop.Zero ??= new HuffmanDecoding();
+						if (Loop.Zero is null)
+							Loop.Zero = new HuffmanDecoding();
+
 						Loop = Loop.Zero;
 					}
 					else
 					{
-						Loop.One ??= new HuffmanDecoding();
+						if (Loop.One is null)
+							Loop.One = new HuffmanDecoding();
+
 						Loop = Loop.One;
 					}
 
@@ -320,9 +324,15 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				if ((Code & 0x80000000) == 0)
-					Loop.Zero ??= new HuffmanDecoding((byte)i, PartOfEoS);
+				{
+					if (Loop.Zero is null)
+						Loop.Zero = new HuffmanDecoding((byte)i, PartOfEoS);
+				}
 				else
-					Loop.One ??= new HuffmanDecoding((byte)i, PartOfEoS);
+				{
+					if (Loop.One is null)
+						Loop.One = new HuffmanDecoding((byte)i, PartOfEoS);
+				}
 			}
 
 			return Root;

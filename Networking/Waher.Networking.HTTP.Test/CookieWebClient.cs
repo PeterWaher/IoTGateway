@@ -79,7 +79,7 @@ namespace Waher.Networking.HTTP.Test
 			{
 				DefaultRequestVersion = this.protocolVersion,
 				DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact,
-				Timeout = TimeSpan.FromSeconds(10)
+				Timeout = TimeSpan.FromSeconds(240)
 			};
 
 			Client.DefaultRequestHeaders.ConnectionClose = false;

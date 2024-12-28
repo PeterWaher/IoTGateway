@@ -72,7 +72,7 @@ namespace Waher.Networking.HTTP
 		public HttpResponse(TransferEncoding TransferEncoding, HttpServer HttpServer, HttpRequest Request)
 		{
 			this.responseStream = null;
-			this.clientConnection = null;
+			this.clientConnection = Request?.clientConnection;
 			this.desiredTransferEncoding = TransferEncoding;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
@@ -268,7 +268,9 @@ namespace Waher.Networking.HTTP
 							new KeyValuePair<string, object>("Header", FieldName),
 							new KeyValuePair<string, object>("Value", Value));
 
-						this.customHeaders ??= new Dictionary<string, string>();
+						if (this.customHeaders is null)
+							this.customHeaders = new Dictionary<string, string>();
+
 						this.customHeaders[FieldName] = Value;
 					}
 					break;
@@ -284,7 +286,9 @@ namespace Waher.Networking.HTTP
 							new KeyValuePair<string, object>("Header", FieldName),
 							new KeyValuePair<string, object>("Value", Value));
 
-						this.customHeaders ??= new Dictionary<string, string>();
+						if (this.customHeaders is null)
+							this.customHeaders = new Dictionary<string, string>();
+
 						this.customHeaders[FieldName] = Value;
 					}
 					break;
@@ -306,7 +310,9 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case "www-authenticate":
-					this.challenges ??= new List<string>();
+					if (this.challenges is null)
+						this.challenges = new List<string>();
+
 					this.challenges.Add(Value);
 					break;
 
@@ -318,12 +324,16 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case "set-cookie":
-					this.cookies ??= new LinkedList<Cookie>();
+					if (this.cookies is null)
+						this.cookies = new LinkedList<Cookie>();
+
 					this.cookies.AddLast(Cookie.FromSetCookie(Value));
 					break;
 
 				default:
-					this.customHeaders ??= new Dictionary<string, string>();
+					if (this.customHeaders is null)
+						this.customHeaders = new Dictionary<string, string>();
+
 					this.customHeaders[FieldName] = Value;
 					break;
 			}
@@ -525,6 +535,11 @@ namespace Waher.Networking.HTTP
 		/// Current client connection
 		/// </summary>
 		public BinaryTcpClient ClientConnection => this.clientConnection?.Client;
+
+		/// <summary>
+		/// Internal HTTP Client connection
+		/// </summary>
+		internal HttpClientConnection InternalClientConnection => this.clientConnection;
 
 		/// <summary>
 		/// If the response contains any WWW-Authenticate challenges.

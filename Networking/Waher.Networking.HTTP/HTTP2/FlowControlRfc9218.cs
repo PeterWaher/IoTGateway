@@ -445,7 +445,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if (StreamId > LastPermittedStreamId)
 					{
-						ToRemove ??= new LinkedList<int>();
+						if (ToRemove is null)
+							ToRemove = new LinkedList<int>();
+
 						ToRemove.AddLast(StreamId);
 					}
 				}

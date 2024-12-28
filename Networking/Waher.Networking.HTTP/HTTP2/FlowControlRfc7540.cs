@@ -170,7 +170,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!this.nodes.TryGetValue(StreamIdDependency, out PriorityNodeRfc7540 DependentOn))
 				{
 					if (StreamIdDependency == 0)
-						DependentOn = this.root; 
+						DependentOn = this.root;
 					else
 						DependentOn = null;
 				}
@@ -451,7 +451,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if (StreamId > LastPermittedStreamId)
 					{
-						ToRemove ??= new LinkedList<int>();
+						if (ToRemove is null)
+							ToRemove = new LinkedList<int>();
+
 						ToRemove.AddLast(StreamId);
 					}
 				}

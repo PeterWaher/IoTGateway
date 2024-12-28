@@ -88,7 +88,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			if (!(Children is null))
 			{
-				this.childNodes ??= new LinkedList<PriorityNodeRfc7540>();
+				if (this.childNodes is null)
+					this.childNodes = new LinkedList<PriorityNodeRfc7540>();
 
 				foreach (PriorityNodeRfc7540 Child in Children)
 				{
@@ -160,7 +161,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				OrgChildParent.AddChildDependency(this);
 			}
 
-			this.childNodes ??= new LinkedList<PriorityNodeRfc7540>();
+			if (this.childNodes is null)
+				this.childNodes = new LinkedList<PriorityNodeRfc7540>();
+
 			this.childNodes.AddLast(Child);
 			Child.dependentOn = this;
 
@@ -232,11 +235,13 @@ namespace Waher.Networking.HTTP.HTTP2
 			int Available = Math.Min(RequestedResources, this.AvailableResources);
 			Available = Math.Min(Available, this.root.AvailableResources);
 
-			if (Available == 0)
+			if (Available <= 0)
 			{
 				PendingRequest Request = new PendingRequest(RequestedResources);
 
-				this.pendingRequests ??= new LinkedList<PendingRequest>();
+				if (this.pendingRequests is null)
+					this.pendingRequests = new LinkedList<PendingRequest>();
+
 				this.pendingRequests.AddLast(Request);
 
 				if (CancelToken.HasValue)
@@ -291,10 +296,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.pendingRequests.RemoveFirst();
 
 				i = Loop.Value.Requested;
-				
+
 				if (Resources < i)
 					i = Resources;
-				
+
 				if (this.maxFrameSize < i)
 					i = this.maxFrameSize;
 
@@ -349,10 +354,13 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				if (Part > 0)
 				{
-					Part = Delta = Math.Min(Part, Resources);
-					Child.TriggerPendingIfAvailbleDown(ref Part);
-					Delta -= Part;
-					Resources -= Delta;
+					Part = Delta = Math.Min(Child.AvailableResources, Math.Min(Part, Resources));
+					if (Part > 0)
+					{
+						Child.TriggerPendingIfAvailbleDown(ref Part);
+						Delta -= Part;
+						Resources -= Delta;
+					}
 				}
 
 				ChildLoop = ChildLoop.Next;

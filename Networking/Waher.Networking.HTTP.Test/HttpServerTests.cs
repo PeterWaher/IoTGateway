@@ -35,7 +35,7 @@ namespace Waher.Networking.HTTP.Test
 				File.Delete("HTTP.xml");
 				xmlSniffer = xmlSniffer = new XmlFileSniffer("HTTP.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
-						int.MaxValue, BinaryPresentationMethod.Hexadecimal);
+						int.MaxValue, BinaryPresentationMethod.ByteCount);
 			}
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
@@ -87,23 +87,40 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual("hej på dej", s);
 		}
 
-		[TestMethod]
-		public async Task Test_02_GET_HTTP_Chunked()
+		[DataTestMethod]
+		[DataRow(100000)]
+		[DataRow(1000000)]
+		[DataRow(10000000)]
+		[DataRow(100000000)]
+		[DataRow(1000000000)]
+		public async Task Test_02_GET_HTTP_Chunked(int TotalSize)
 		{
-			server.Register("/test02.txt", async (req, resp) =>
+			HttpResource Resource = server.Register("/test02.txt", async (req, resp) =>
 			{
-				int i;
+				int i = 0;
+				int j;
 
 				resp.ContentType = PlainTextCodec.DefaultContentType;
-				for (i = 0; i < 1000; i++)
-					await resp.Write(new string('a', 100));
+				while (i < TotalSize)
+				{
+					j = Math.Min(2000, TotalSize - i);
+					await resp.Write(new string('a', j));
+					i += j;
+				}
 			});
 
-			using CookieWebClient Client = new(this.ProtocolVersion);
-			byte[] Data = await Client.DownloadData("http://localhost:8081/test02.txt");
-			string s = Encoding.UTF8.GetString(Data);
-			Assert.AreEqual(100000, s.Length);
-			Assert.AreEqual(new string('a', 100000), s);
+			try
+			{
+				using CookieWebClient Client = new(this.ProtocolVersion);
+				byte[] Data = await Client.DownloadData("http://localhost:8081/test02.txt");
+				string s = Encoding.UTF8.GetString(Data);
+				Assert.AreEqual(TotalSize, s.Length);
+				Assert.AreEqual(new string('a', TotalSize), s);
+			}
+			finally
+			{
+				server.Unregister(Resource);
+			}
 		}
 
 		[TestMethod]
@@ -180,20 +197,98 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(264, Bmp.Height);
 		}
 
-		[TestMethod]
-		public async Task Test_09_FolderResource_PUT_File()
+		[DataTestMethod]
+		[DataRow(10 * 1024)]            // 10 kB	(k=1024)
+		[DataRow(100 * 1024)]           // 100 kB	(k=1024)
+		[DataRow(1024 * 1024)]          // 1 MB		(k=1024)
+		[DataRow(10 * 1024 * 1024)]     // 10 MB	(k=1024)
+		[DataRow(100 * 1024 * 1024)]    // 100 MB	(k=1024)
+		[DataRow(500 * 1024 * 1024)]	// 500 MB	(k=1024)
+		[DataRow(10 * 1000)]            // 10 kB	(k=1000)
+		[DataRow(100 * 1000)]           // 100 kB	(k=1000)
+		[DataRow(1024 * 1000)]          // 1 MB		(k=1000)
+		[DataRow(10 * 1000 * 1000)]     // 10 MB	(k=1000)
+		[DataRow(100 * 1000 * 1000)]    // 100 MB	(k=1000)
+		[DataRow(500 * 1000 * 1000)]	// 500 MB	(k=1000)
+		public async Task Test_09_FolderResource_PUT_File(int FileSize)
 		{
-			server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
+			if (!server.TryGetResource("/Test09", false, out _, out _))
+				server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
+
+			StringBuilder sb = new();
+			int i = 0;
+
+			while (sb.Length < FileSize)
+			{
+				if (i > 0)
+					sb.Append('_');
+
+				sb.Append(i);
+				i++;
+			}
+
+			if (sb.Length > FileSize)
+				sb.Length = FileSize;
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
 			UTF8Encoding Utf8 = new(true);
-			string s1 = new('Ω', 100000);
-			await Client.UploadData("http://localhost:8081/Test09/string.txt", HttpMethod.Put, Utf8.GetBytes(s1));
+			string s1 = sb.ToString();
+			string FileName = "string_" + FileSize.ToString() + ".txt";
+			byte[] Data0 = Utf8.GetBytes(s1);
+			await Client.UploadData("http://localhost:8081/Test09/" + FileName, HttpMethod.Put, Data0);
 
-			byte[] Data = await Client.DownloadData("http://localhost:8081/Test09/string.txt");
+			byte[] Data = await Client.DownloadData("http://localhost:8081/Test09/" + FileName);
 			string s2 = Utf8.GetString(Data);
 
-			Assert.AreEqual(s1, s2);
+			string r1 = ToRows(s1);
+			string r2 = ToRows(s2);
+
+			File.WriteAllText("Data\\s1_" + FileSize.ToString() + ".txt", r1);
+			File.WriteAllText("Data\\s2_" + FileSize.ToString() + ".txt", r2);
+
+			if (s1 != s2)
+			{
+				Console.Out.WriteLine();
+				Console.Out.WriteLine("First diff");
+				Console.Out.WriteLine("===============");
+
+				string[] Rows1 = r1.Split("\r\n", StringSplitOptions.None);
+				string[] Rows2 = r2.Split("\r\n", StringSplitOptions.None);
+				int c = Math.Min(Rows1.Length, Rows2.Length);
+
+				for (i = 0; i < c; i++)
+				{
+					if (Rows1[i] != Rows2[i])
+					{
+						Console.Out.WriteLine("orignal:");
+						Console.Out.WriteLine(Rows1[i]);
+						Console.Out.WriteLine("vs:");
+						Console.Out.WriteLine(Rows2[i]);
+						break;
+					}
+				}
+
+				Assert.AreEqual(s1.Length, s2.Length);
+				Assert.AreEqual(Data0.Length, Data.Length);
+				Assert.AreEqual(s1, s2);
+				Assert.AreEqual(Convert.ToBase64String(Data0), Convert.ToBase64String(Data));
+			}
+		}
+
+		private static string ToRows(string s)
+		{
+			StringBuilder sb = new();
+			int i = 0, c = s.Length;
+			int j;
+
+			while (i < c)
+			{
+				j = Math.Min(c - i, 76);
+				sb.AppendLine(s.Substring(i, j));
+				i += j;
+			}
+
+			return sb.ToString();
 		}
 
 		[TestMethod]

@@ -155,7 +155,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="Value">Header value.</param>
 		public void AddDefaultResponseHeader(string Key, string Value)
 		{
-			this.defaultResponseHeaders ??= new LinkedList<KeyValuePair<string, string>>();
+			if (this.defaultResponseHeaders is null)
+				this.defaultResponseHeaders = new LinkedList<KeyValuePair<string, string>>();
+
 			this.defaultResponseHeaders.AddLast(new KeyValuePair<string, string>(Key, Value));
 		}
 
@@ -910,7 +912,9 @@ namespace Waher.Networking.HTTP
 
 								if (All || Array.IndexOf(Range, AcceptRecord.Item) >= 0)
 								{
-									Alternatives ??= new List<string>();
+									if (Alternatives is null)
+										Alternatives = new List<string>();
+
 									Alternatives.Add(AcceptRecord.Item);
 								}
 							}
@@ -1467,7 +1471,7 @@ namespace Waher.Networking.HTTP
 				await Response.SendResponse(new SeeOtherException(Referer));  // PRG pattern.
 				return;
 			}
-				
+
 			await this.GET(Request, Response);
 		}
 	}

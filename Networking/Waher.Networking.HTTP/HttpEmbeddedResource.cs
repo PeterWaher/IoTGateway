@@ -94,7 +94,8 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				this.etag ??= this.ComputeETag(f);
+				if (this.etag is null)
+					this.etag = this.ComputeETag(f);
 
 				if (!(Request.Header.IfNoneMatch is null) && Request.Header.IfNoneMatch.Value == this.etag)
 				{

@@ -15,7 +15,7 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly int streamId;
 		private readonly HttpClientConnection connection;
-		private readonly long headerInputWindowSize;
+		private readonly int headerInputWindowSize;
 		private HttpRequestHeader headers = null;
 		private MemoryStream buildingHeaders = null;
 		private TemporaryStream inputDataStream = null;
@@ -24,9 +24,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		private int rfc9218Priority = 3;
 		private bool rfc9218Incremental = false;
 		private bool upgradedToWebSocket = false;
-		private long headerBytesReceived = 0;
+		private int headerBytesReceived = 0;
 		private long dataBytesReceived = 0;
-		private long dataInputWindowSize;
+		private long dataBytesTransmitted = 0;
+		private int dataInputWindowSize;
 
 		/// <summary>
 		/// HTTP/2 stream, for testing purposes.
@@ -72,12 +73,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Header input window size.
 		/// </summary>
-		public long HeaderInputWindowSize => this.headerInputWindowSize;
+		public int HeaderInputWindowSize => this.headerInputWindowSize;
 
 		/// <summary>
 		/// Header bytes received
 		/// </summary>
-		public long HeadersBytesReceived => this.headerBytesReceived;
+		public int HeadersBytesReceived => this.headerBytesReceived;
 
 		/// <summary>
 		/// Data bytes received
@@ -85,9 +86,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		public long DataBytesReceived => this.dataBytesReceived;
 
 		/// <summary>
+		/// Data bytes transmitted
+		/// </summary>
+		public long DataBytesTransmitted => this.dataBytesTransmitted;
+
+		/// <summary>
 		/// Data Input window size
 		/// </summary>
-		public long DataInputWindowSize => this.dataInputWindowSize;
+		public int DataInputWindowSize => this.dataInputWindowSize;
 
 		/// <summary>
 		/// Input data stream, if defined.
@@ -141,14 +147,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		public bool BuildHeaders(byte[] Buffer, int Position, int Count)
 		{
 			this.headerBytesReceived += Count;
-			if (this.headerBytesReceived > this.headerInputWindowSize)
+			if (this.headerBytesReceived < 0 || this.headerBytesReceived > this.headerInputWindowSize)
 			{
 				this.state = StreamState.Closed;
 				return false;
 			}
 			else
 			{
-				this.buildingHeaders ??= new MemoryStream();
+				if (this.buildingHeaders is null)
+					this.buildingHeaders = new MemoryStream();
+
 				this.buildingHeaders.Write(Buffer, Position, Count);
 				return true;
 			}
@@ -173,7 +181,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Value">Value</param>
 		public void AddParsedHeader(string Name, string Value)
 		{
-			this.headers ??= new HttpRequestHeader(2.0);
+			if (this.headers is null)
+				this.headers = new HttpRequestHeader(2.0);
 
 			switch (Name)
 			{
@@ -243,7 +252,9 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 			else
 			{
-				this.inputDataStream ??= new TemporaryStream();
+				if (this.inputDataStream is null)
+					this.inputDataStream = new TemporaryStream();
+
 				await this.inputDataStream.WriteAsync(Buffer, Position, Count);
 				return true;
 			}
@@ -284,7 +295,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				Flags |= 4; // END_HEADERS
 
-				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, false, this.streamId, Headers);
+				return await this.connection.SendHttp2Frame(FrameType.Headers, Flags, false, this.streamId, this, Headers);
 			}
 			else
 			{
@@ -299,7 +310,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					else
 						Flags = 4; // END_HEADERS
 
-					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this.streamId, Headers, Pos, Diff, null))
+					if (!await this.connection.SendHttp2Frame(Type, Flags, false, this.streamId, this, Headers, Pos, Diff, null))
 						return false;
 
 					Pos += Diff;
@@ -312,22 +323,54 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Writes DATA to the remote party.
+		/// Tries to write DATA to the remote party. Flow control might restrict the number
+		/// of bytes written.
 		/// </summary>
 		/// <param name="Data">Binary data</param>
 		/// <param name="Offset">Offset into buffer where data begins.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Last">If it is the last data to be written for this stream.</param>
 		/// <param name="DataEncoding">Optional encoding, if data is text.</param>
-		/// <returns>If data was written.</returns>
-		public async Task<bool> WriteData(byte[] Data, int Offset, int Count, bool Last, 
+		/// <returns>Number of bytes written. If negative, request failed.</returns>
+		public async Task<int> TryWriteData(byte[] Data, int Offset, int Count, bool Last,
 			Encoding DataEncoding)
 		{
-			if (!await this.connection.WriteData(this.streamId, Data, Offset, Count, Last, DataEncoding))
-				return false;
+			int NrBytes = await this.connection.TryWriteData(this, Data, Offset, Count, Last, DataEncoding);
+			if (NrBytes < 0)
+				return -1;
 
-			if (Last)
-				this.state = StreamState.HalfClosedLocal;
+			this.dataBytesTransmitted += NrBytes;
+
+			if (Last && NrBytes == Count)
+				this.state = StreamState.Closed;
+
+			return NrBytes;
+		}
+
+		/// <summary>
+		/// Tries to write all DATA to the remote party. Flow control might require multiple
+		/// frames to be sent to send all data.
+		/// </summary>
+		/// <param name="Data">Binary data</param>
+		/// <param name="Offset">Offset into buffer where data begins.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Last">If it is the last data to be written for this stream.</param>
+		/// <param name="DataEncoding">Optional encoding, if data is text.</param>
+		/// <returns>If successful in sending all data.</returns>
+		public async Task<bool> TryWriteAllData(byte[] Data, int Offset, int Count, bool Last,
+			Encoding DataEncoding)
+		{
+			int NrWritten;
+
+			while (Count > 0)
+			{
+				NrWritten = await this.TryWriteData(Data, Offset, Count, Last, DataEncoding);
+				if (NrWritten < 0)
+					return false;
+
+				Offset += NrWritten;
+				Count -= NrWritten;
+			}
 
 			return true;
 		}

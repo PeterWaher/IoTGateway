@@ -591,7 +591,18 @@ namespace Waher.Networking.HTTP.WebSockets
 				while (!(Frame is null))
 				{
 					if (this.http2)
-						await this.http2Stream.WriteData(Frame, 0, Frame.Length, Last, null);
+					{
+						if (!await this.http2Stream.TryWriteAllData(Frame, 0, Frame.Length, Last, null))
+						{
+							lock (this.queue)
+							{
+								this.writing = false;
+								this.queue.Clear();
+							}
+
+							return;
+						}
+					}
 					else
 						await this.httpResponse.WriteRawAsync(Frame);
 

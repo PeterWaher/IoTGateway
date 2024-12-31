@@ -29,7 +29,7 @@ namespace Waher.Networking
 	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
 	/// permitted pace.
 	/// </summary>
-	public class BinaryTcpClient : CommunicationLayer, IDisposable, IBinaryTransportLayer
+	public class BinaryTcpClient : CommunicationLayer, IDisposableAsync, IBinaryTransportLayer
 	{
 		private const int BufferSize = 65536;
 
@@ -327,6 +327,8 @@ namespace Waher.Networking
 
 		private bool PostConnect(bool Paused)
 		{
+			bool Disposing = false;
+
 			lock (this.synchObj)
 			{
 				this.connecting = false;
@@ -335,12 +337,26 @@ namespace Waher.Networking
 					return false;
 
 				if (this.disposing)
-				{
-					this.DoDisposeLocked();
-					return false;
-				}
+					Disposing = true;
 				else
 					this.connected = true;
+			}
+
+			if (Disposing)
+			{
+				Task.Run(async () =>
+				{
+					try
+					{
+						await this.DoDisposeAsyncLocked();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				});
+
+				return false;
 			}
 
 #if WINDOWS_UWP
@@ -368,63 +384,98 @@ namespace Waher.Networking
 				}
 			}
 
-			this.Dispose();
+			Task.Run(() =>
+			{
+				try
+				{
+					this.DisposeAsync();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			});
 		}
 
 		/// <summary>
 		/// Disposes of the object. The underlying <see cref="TcpClient"/> is either disposed directly, or when asynchronous
 		/// operations have ceased.
 		/// </summary>
-		public virtual void Dispose()
+		[Obsolete("Use DisposeAsync() instead.")]
+		public void Dispose()
+		{
+			Task.Run(() => this.DisposeAsync());
+		}
+
+		/// <summary>
+		/// Disposes of the object asynchronously. The underlying <see cref="TcpClient"/> is 
+		/// either disposed directly, or when asynchronous operations have ceased.
+		/// </summary>
+		public virtual Task DisposeAsync()
 		{
 #if WINDOWS_UWP
 			bool Cancel;
+			bool DoDispose = false;
 
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
-					return;
+					return Task.CompletedTask;
 
 				if (Cancel = this.connecting || this.reading || this.sending)
 					this.disposing = true;
 				else
-					this.DoDisposeLocked();
+					DoDispose = true;
 			}
 
 			if (Cancel)
 			{
 				IAsyncAction _ = this.client.CancelIOAsync();
 			}
+
+			if (DoDispose)
+				return this.DoDisposeAsyncLocked();
+			else
+				return Task.CompletedTask;
 		}
 #else
+			bool DelayedDispose;
+
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
-					return;
+					return Task.CompletedTask;
 
 				if (this.connecting || this.reading || this.sending)
 				{
 					this.disposing = true;
 					this.cancelReading.Cancel();
 					NetworkingModule.UnregisterToken(this.id);
-					Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
-					return;
+					DelayedDispose = true;
 				}
-
-				this.DoDisposeLocked();
+				else
+					DelayedDispose = false;
 			}
+
+			if (DelayedDispose)
+			{
+				Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
+				return Task.CompletedTask;
+			}
+			else
+				return this.DoDisposeAsyncLocked();
 		}
 
 		private Task AbortRead(object P)
 		{
-			if (!this.disposed)
-				this.DoDisposeLocked();
-
-			return Task.CompletedTask;
+			if (this.disposed)
+				return Task.CompletedTask;
+			else
+				return this.DoDisposeAsyncLocked();
 		}
 #endif
 
-		private void DoDisposeLocked()
+		private async Task DoDisposeAsyncLocked()
 		{
 			this.disposed = true;
 			this.connecting = false;
@@ -461,7 +512,9 @@ namespace Waher.Networking
 				{
 					this.Remove(Sniffer);
 
-					if (Sniffer is IDisposable Disposable)
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
 						Disposable.Dispose();
 				}
 			}
@@ -558,23 +611,25 @@ namespace Waher.Networking
 					try
 					{
 #if WINDOWS_UWP
-						Continue = await this.BinaryDataReceived(Packet, 0, NrRead);
+						Continue = await this.BinaryDataReceived(false, Packet, 0, NrRead);
 #else
-						Continue = await this.BinaryDataReceived(this.buffer, 0, NrRead);
+						Continue = await this.BinaryDataReceived(false, this.buffer, 0, NrRead);
 #endif
 					}
 					catch (Exception ex)
 					{
-						await this.Exception(ex);
+						this.Exception(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 			finally
 			{
+				bool Disposing = false;
+
 				lock (this.synchObj)
 				{
 					this.reading = false;
@@ -593,8 +648,11 @@ namespace Waher.Networking
 					}
 
 					if (this.disposing && !this.sending)
-						this.DoDisposeLocked();
+						Disposing = true;
 				}
+
+				if (Disposing)
+					await this.DoDisposeAsyncLocked();
 			}
 
 			if (!Continue && !this.disposed && !this.disposing)
@@ -617,20 +675,23 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte read.</param>
 		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		protected virtual async Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
+		protected virtual async Task<bool> BinaryDataReceived(bool ConstantBuffer,
+			byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				await this.ReceiveBinary(Buffer, Offset, Count);
+				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
 
 			BinaryDataReadEventHandler h = this.OnReceived;
 			if (h is null)
 				return true;
 			else
-				return await h(this, Buffer, Offset, Count);
+				return await h(this, ConstantBuffer, Buffer, Offset, Count);
 		}
 
 		/// <summary>
@@ -638,16 +699,31 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="ex">Exception</param>
-		public override async Task Exception(DateTime Timestamp, Exception ex)
+		public override void Exception(DateTime Timestamp, Exception ex)
 		{
 			try
 			{
-				await base.Exception(Timestamp, ex);
-				await this.OnError.Raise(this, ex);
+				base.Exception(Timestamp, ex);
 			}
 			catch (Exception ex2)
 			{
 				Log.Exception(ex2);
+			}
+
+			EventHandlerAsync<Exception> h = this.OnError;
+			if (!(h is null))
+			{
+				Task.Run(async () =>
+				{
+					try
+					{
+						await this.OnError.Raise(this, ex);
+					}
+					catch (Exception ex2)
+					{
+						Log.Exception(ex2);
+					}
+				});
 			}
 		}
 
@@ -671,7 +747,7 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Packet">Binary packet.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet)
 		{
 			return this.SendAsync(false, Packet, 0, Packet.Length, false, null, null);
@@ -680,13 +756,13 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
 		{
-			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, false, null, null);
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, false, null, null);
 		}
 
 		/// <summary>
@@ -695,7 +771,7 @@ namespace Waher.Networking
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, bool Priority)
 		{
 			return this.SendAsync(false, Packet, 0, Packet.Length, Priority, null, null);
@@ -704,14 +780,14 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet, bool Priority)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, bool Priority)
 		{
-			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, Priority, null, null);
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, Priority, null, null);
 		}
 
 		/// <summary>
@@ -721,7 +797,7 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			return this.SendAsync(false, Packet, 0, Packet.Length, false, Callback, State);
@@ -730,15 +806,15 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, false, Callback, State);
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, false, Callback, State);
 		}
 
 		/// <summary>
@@ -749,7 +825,7 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			return this.SendAsync(false, Packet, 0, Packet.Length, Priority, Callback, State);
@@ -758,16 +834,16 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(OneTimeBuffer, Packet, 0, Packet.Length, Priority, Callback, State);
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, Priority, Callback, State);
 		}
 
 		/// <summary>
@@ -777,7 +853,7 @@ namespace Waher.Networking
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count)
 		{
 			return this.SendAsync(false, Buffer, Offset, Count, false, null, null);
@@ -786,15 +862,15 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
-			return this.SendAsync(OneTimeBuffer, Buffer, Offset, Count, false, null, null);
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, false, null, null);
 		}
 
 		/// <summary>
@@ -805,7 +881,7 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority)
 		{
 			return this.SendAsync(false, Buffer, Offset, Count, Priority, null, null);
@@ -814,16 +890,16 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, bool Priority)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority)
 		{
-			return this.SendAsync(OneTimeBuffer, Buffer, Offset, Count, Priority, null, null);
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, Priority, null, null);
 		}
 
 		/// <summary>
@@ -835,7 +911,7 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			return this.SendAsync(false, Buffer, Offset, Count, false, Callback, State);
@@ -844,17 +920,17 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(OneTimeBuffer, Buffer, Offset, Count, false, Callback, State);
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, false, Callback, State);
 		}
 
 		/// <summary>
@@ -867,7 +943,7 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority,
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
@@ -877,8 +953,8 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
@@ -886,15 +962,15 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.BeginSend(OneTimeBuffer, Buffer, Offset, Count, Priority, Result, Callback, State, true);
+			await this.BeginSend(ConstantBuffer, Buffer, Offset, Count, Priority, Result, Callback, State, true);
 			return await Result.Task;
 		}
 
-		private async Task BeginSend(bool OneTimeBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
+		private async Task BeginSend(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
 			TaskCompletionSource<bool> Task, EventHandlerAsync<DeliveryEventArgs> Callback,
 			object State, bool CheckSending)
 		{
@@ -921,6 +997,7 @@ namespace Waher.Networking
 			if (Count < 0 || Offset + Count > c)
 				throw new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count));
 
+			bool DoDispose = false;
 			try
 			{
 #if WINDOWS_UWP
@@ -949,7 +1026,7 @@ namespace Waher.Networking
 							{
 								byte[] Packet;
 
-								if (OneTimeBuffer && Offset == 0 && Count == Buffer.Length)
+								if (ConstantBuffer && Offset == 0 && Count == Buffer.Length)
 									Packet = Buffer;
 								else
 								{
@@ -983,7 +1060,7 @@ namespace Waher.Networking
 								this.EmptyIdleQueueLocked();
 
 								if (this.disposing && !this.reading)
-									this.DoDisposeLocked();
+									DoDispose = true;
 
 								break;
 							}
@@ -998,7 +1075,7 @@ namespace Waher.Networking
 								Callback = Rec.Callback;
 								State = Rec.State;
 								Task = Rec.Task;
-								OneTimeBuffer = true;
+								ConstantBuffer = true;
 							}
 						}
 
@@ -1018,7 +1095,7 @@ namespace Waher.Networking
 #if WINDOWS_UWP
 					if (Offset > 0 || Count < c)
 					{
-						Buffer = InMemorySniffer.CloneSection(Buffer, Offset, Count);
+						Buffer = SnifferBase.CloneSection(Buffer, Offset, Count);
 						Offset = 0;
 						Count = c;
 					}
@@ -1031,11 +1108,11 @@ namespace Waher.Networking
 
 					try
 					{
-						await this.BinaryDataSent(Buffer, Offset, Count);
+						await this.BinaryDataSent(ConstantBuffer, Buffer, Offset, Count);
 					}
 					catch (Exception ex)
 					{
-						await this.Exception(ex);
+						this.Exception(ex);
 					}
 
 					Task.TrySetResult(true);
@@ -1055,7 +1132,7 @@ namespace Waher.Networking
 #endif
 					if (this.disposeWhenDone)
 					{
-						this.Dispose();
+						await this.DisposeAsync();
 						return;
 					}
 
@@ -1064,8 +1141,6 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				bool DoDispose;
-
 				lock (this.synchObj)
 				{
 					this.sending = false;
@@ -1073,12 +1148,25 @@ namespace Waher.Networking
 
 					this.EmptyIdleQueueLocked();
 
-					if (DoDispose = this.disposing && !this.reading)
-						this.DoDisposeLocked();
+					DoDispose = this.disposing && !this.reading;
 				}
 
 				if (!DoDispose)
-					await this.Exception(ex);
+					this.Exception(ex);
+			}
+			finally
+			{
+				if (DoDispose)
+				{
+					try
+					{
+						await this.DoDisposeAsyncLocked();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
 			}
 		}
 
@@ -1112,17 +1200,19 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when binary data has been sent.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte written.</param>
 		/// <param name="Count">Number of bytes written.</param>
-		protected virtual async Task BinaryDataSent(byte[] Buffer, int Offset, int Count)
+		protected virtual async Task BinaryDataSent(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				await this.TransmitBinary(Buffer, Offset, Count);
+				this.TransmitBinary(ConstantBuffer, Buffer, Offset, Count);
 
 			BinaryDataWrittenEventHandler h = this.OnSent;
 			if (!(h is null))
-				await h(this, Buffer, Offset, Count);
+				await h(this, ConstantBuffer, Buffer, Offset, Count);
 		}
 
 		/// <summary>
@@ -1512,17 +1602,14 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					Task.Run(async () =>
+					try
 					{
-						try
-						{
-							await this.Exception(ex);
-						}
-						catch (Exception ex2)
-						{
-							Log.Exception(ex2);
-						}
-					});
+						this.Exception(ex);
+					}
+					catch (Exception ex2)
+					{
+						Log.Exception(ex2);
+					}
 
 					Result = false;
 				}
@@ -1589,20 +1676,17 @@ namespace Waher.Networking
 						SniffMsg.Append("BASE64(Cert): ");
 						SniffMsg.Append(Base64);
 
-						Task.Run(async () =>
+						try
 						{
-							try
-							{
-								if (this.trustRemoteEndpoint)
-									await this.Information(SniffMsg.ToString());
-								else
-									await this.Warning(SniffMsg.ToString());
-							}
-							catch (Exception ex2)
-							{
-								Log.Exception(ex2);
-							}
-						});
+							if (this.trustRemoteEndpoint)
+								this.Information(SniffMsg.ToString());
+							else
+								this.Warning(SniffMsg.ToString());
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
 					}
 				}
 				else

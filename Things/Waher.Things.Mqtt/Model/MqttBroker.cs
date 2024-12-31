@@ -13,7 +13,7 @@ namespace Waher.Things.Mqtt.Model
 	/// <summary>
 	/// MQTT Broker connection object.
 	/// </summary>
-	public class MqttBroker : IDisposable
+	public class MqttBroker : IDisposableAsync
 	{
 		private static Scheduler scheduler = null;
 		private readonly SortedDictionary<string, MqttTopic> topics = new SortedDictionary<string, MqttTopic>();
@@ -96,16 +96,9 @@ namespace Waher.Things.Mqtt.Model
 		/// TODO
 		/// </summary>
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -417,6 +410,8 @@ namespace Waher.Things.Mqtt.Model
 						{
 							scheduler?.Dispose();
 							scheduler = null;
+
+							return Task.CompletedTask;
 						};
 					}
 				}

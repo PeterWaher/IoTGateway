@@ -1529,7 +1529,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception ex)
 					{
-						await this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
+						this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
 						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State);
 						return;
 					}
@@ -1719,13 +1719,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!this.IsFromTrustProvider(Identity.Id, e.From))
 			{
-				await this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
+				this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
 				return;
 			}
 
 			if (string.Compare(e.FromBareJID, Identity.Provider, true) != 0)
 			{
-				await this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
+				this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
 				return;
 			}
 
@@ -1733,7 +1733,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (e2.Status != IdentityStatus.Valid)
 				{
-					await this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
+					this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
 
 					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 						new KeyValuePair<string, object>("Status", e2.Status));
@@ -4943,7 +4943,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (!e.UsesE2eEncryption)
 					{
-						await this.client.Error("Confidential Proposal not sent using end-to-end encryption. Message discarded.");
+						this.client.Error("Confidential Proposal not sent using end-to-end encryption. Message discarded.");
 						return;
 					}
 
@@ -4953,7 +4953,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 					catch (Exception)
 					{
-						await this.client.Error("Invalid base64-encoded shared secret. Message discarded.");
+						this.client.Error("Invalid base64-encoded shared secret. Message discarded.");
 						return;
 					}
 
@@ -4974,7 +4974,7 @@ namespace Waher.Networking.XMPP.Contracts
 							break;
 
 						default:
-							await this.client.Error("Unrecognized key algorithm. Message discarded.");
+							this.client.Error("Unrecognized key algorithm. Message discarded.");
 							return;
 					}
 				}
@@ -5878,7 +5878,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (e2.Status != IdentityStatus.Valid)
 					{
-						await this.client.Error("Invalid legal identity received and discarded.");
+						this.client.Error("Invalid legal identity received and discarded.");
 
 						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 							new KeyValuePair<string, object>("Status", e2.Status));
@@ -6216,7 +6216,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (e2.Status != IdentityStatus.Valid && e2.Status != IdentityStatus.NoProviderSignature)
 				{
-					await this.client.Error("Invalid legal identity received and discarded.");
+					this.client.Error("Invalid legal identity received and discarded.");
 
 					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
 						new KeyValuePair<string, object>("Status", e2.Status));
@@ -6271,7 +6271,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!this.contentPerPid.TryGetValue(PetitionId, out KeyValuePair<byte[], bool> P))
 			{
-				await this.client.Warning("Petition ID not recognized: " + PetitionId + ".  Response ignored.");
+				this.client.Warning("Petition ID not recognized: " + PetitionId + ".  Response ignored.");
 				return;
 			}
 
@@ -6281,26 +6281,26 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (Identity is null)
 				{
-					await this.client.Warning("Identity missing. Response ignored.");
+					this.client.Warning("Identity missing. Response ignored.");
 					return;
 				}
 
 				if (Signature is null)
 				{
-					await this.client.Warning("Signature missing. Response ignored.");
+					this.client.Warning("Signature missing. Response ignored.");
 					return;
 				}
 
 				bool? Result = this.ValidateSignature(Identity, P.Key, Signature);
 				if (!Result.HasValue)
 				{
-					await this.client.Warning("Unable to validate signature. Response ignored.");
+					this.client.Warning("Unable to validate signature. Response ignored.");
 					return;
 				}
 
 				if (!Result.Value)
 				{
-					await this.client.Warning("Invalid signature. Response ignored.");
+					this.client.Warning("Invalid signature. Response ignored.");
 					return;
 				}
 			}
@@ -6309,7 +6309,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					await this.Client.Information(h.Method.Name);
+					this.Client.Information(h.Method.Name);
 
 					await h.Raise(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response, ClientEndpoint, Context));
 				}
@@ -6319,7 +6319,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 			else
-				await this.client.Warning("Sender invalid. Response ignored.");
+				this.client.Warning("Sender invalid. Response ignored.");
 		}
 
 		/// <summary>
@@ -6633,7 +6633,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (e2.Status != IdentityStatus.Valid)
 				{
-					await this.client.Error("Invalid identity received and discarded.");
+					this.client.Error("Invalid identity received and discarded.");
 
 					Log.Warning("Invalid identity received and discarded.", this.client.BareJID, e.From,
 						new KeyValuePair<string, object>("Status", e2.Status));

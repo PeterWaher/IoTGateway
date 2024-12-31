@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Waher.Runtime.Queue;
 
 namespace Waher.Runtime.Console.Worker
 {
@@ -21,7 +23,9 @@ namespace Waher.Runtime.Console.Worker
 		/// <summary>
 		/// Executes the console operation.
 		/// </summary>
-		public override Task Execute()
+		/// <param name="Cancel">Cancellation token.</param>
+		/// <param name="RegisterCancelToken">If task can be cancelled.</param>
+		protected override Task Execute(CancellationToken Cancel, bool RegisterCancelToken)
 		{
 			System.Console.Out.WriteLine(this.value);
 			return Task.CompletedTask;

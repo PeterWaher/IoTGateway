@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Runtime.Inventory
@@ -23,7 +24,7 @@ namespace Waher.Runtime.Inventory
 		{
 		}
 
-		internal static void Clear()
+		internal static async Task Clear()
 		{
 			SingletonRecord[] Objects;
 
@@ -36,11 +37,14 @@ namespace Waher.Runtime.Inventory
 
 			foreach (SingletonRecord Rec in Objects)
 			{
-				if (Rec.Instantiated && Rec.Instance is IDisposable Disposable)
+				if (Rec.Instantiated)
 				{
 					try
 					{
-						Disposable.Dispose();
+						if (Rec.Instance is IDisposableAsync DisposableAsync)
+							await DisposableAsync.DisposeAsync();
+						else if (Rec.Instance is IDisposable Disposable)
+							Disposable.Dispose();
 					}
 					catch (Exception ex)
 					{
@@ -75,7 +79,21 @@ namespace Waher.Runtime.Inventory
 			{
 				if (instances.TryGetValue(Key, out SingletonRecord Rec))
 				{
-					if (Object is IDisposable Disposable)
+					if (Object is IDisposableAsync DisposableAsync)
+					{
+						Task.Run(async () =>
+						{
+							try
+							{
+								await DisposableAsync.DisposeAsync();
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
+						});
+					}
+					else if (Object is IDisposable Disposable)
 						Disposable.Dispose();
 
 					return Rec.Instance;

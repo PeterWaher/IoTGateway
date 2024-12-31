@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.postResource = PostResource;
 		}
 
-		internal override async Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data)
+		internal override async Task<bool> ChunkReceived(int Nr, bool Last, bool ConstantBuffer, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
@@ -87,10 +87,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else if (Nr > this.nextChunk)
 			{
-				if (this.chunks is null)
-					this.chunks = new SortedDictionary<int, Chunk>();
-
-				this.chunks[Nr] = new Chunk(Nr, Last, Data);
+				this.chunks ??= new SortedDictionary<int, Chunk>();
+				this.chunks[Nr] = new Chunk(Nr, Last, ConstantBuffer, Data);
 			}
 
 			return true;

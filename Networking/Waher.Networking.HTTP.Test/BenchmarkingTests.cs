@@ -21,9 +21,9 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[ClassCleanup]
-		public new static void ClassCleanup()
+		public new static async Task ClassCleanup()
 		{
-			HttpServerTests.ClassCleanup();
+			await HttpServerTests.ClassCleanup();
 		}
 
 		[DataTestMethod]

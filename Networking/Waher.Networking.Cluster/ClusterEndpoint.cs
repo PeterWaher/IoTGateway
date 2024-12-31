@@ -25,10 +25,10 @@ using Windows.Networking.Connectivity;
 
 namespace Waher.Networking.Cluster
 {
-    /// <summary>
-    /// Represents one endpoint (or participant) in the network cluster.
-    /// </summary>
-    public class ClusterEndpoint : CommunicationLayer, IDisposable
+	/// <summary>
+	/// Represents one endpoint (or participant) in the network cluster.
+	/// </summary>
+	public class ClusterEndpoint : CommunicationLayer, IDisposableAsync
 	{
 		private static readonly Dictionary<Type, ObjectInfo> objectInfo = new Dictionary<Type, ObjectInfo>();
 		private static Dictionary<Type, IProperty> propertyTypes = null;
@@ -268,16 +268,9 @@ namespace Waher.Networking.Cluster
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		[Obsolete("Use DisposeAsync")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -328,7 +321,7 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		internal void Dispose2()
+		internal async Task Dispose2()
 		{
 			if (this.internalScheduler)
 				this.scheduler?.Dispose();
@@ -346,16 +339,16 @@ namespace Waher.Networking.Cluster
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
-				if (Sniffer is IDisposable Disposable)
+				try
 				{
-					try
-					{
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
 						Disposable.Dispose();
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 			}
 
@@ -507,14 +500,14 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
-		internal async void DataReceived(byte[] Data, IPEndPoint From)
+		internal async void DataReceived(bool ConstantBuffer, byte[] Data, IPEndPoint From)
 		{
 			try
 			{
 				if (Data.Length == 0)
 					return;
 
-				await this.ReceiveBinary(Data);
+				this.ReceiveBinary(ConstantBuffer, Data);
 
 				using (Deserializer Input = new Deserializer(Data))
 				{
@@ -531,7 +524,7 @@ namespace Waher.Networking.Cluster
 								await this.OnMessageReceived.Raise(this, new ClusterMessageEventArgs(Message));
 							}
 							else
-								await this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+								this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
 							break;
 
 						case 1: // Acknowledged message
@@ -572,7 +565,7 @@ namespace Waher.Networking.Cluster
 									}
 									catch (Exception ex)
 									{
-										await this.Exception(ex);
+										this.Exception(ex);
 										Log.Exception(ex);
 										Ack = false;
 									}
@@ -581,7 +574,7 @@ namespace Waher.Networking.Cluster
 								}
 								else
 								{
-									await this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+									this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
 									Ack = false;
 								}
 							}
@@ -591,7 +584,7 @@ namespace Waher.Networking.Cluster
 								Output.WriteByte(Ack ? (byte)2 : (byte)3);
 								Output.WriteGuid(Id);
 
-								await this.Transmit(Output.ToArray(), From);
+								this.Transmit(true, Output.ToArray(), From);
 							}
 							break;
 
@@ -683,7 +676,7 @@ namespace Waher.Networking.Cluster
 									rootObject.Serialize(Output, Obj);
 								}
 
-								await this.Transmit(Output.ToArray(), From);
+								this.Transmit(true, Output.ToArray(), From);
 							}
 							break;
 
@@ -752,7 +745,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 				Log.Exception(ex);
 			}
 		}
@@ -773,12 +766,12 @@ namespace Waher.Networking.Cluster
 		/// </summary>
 		public event EventHandlerAsync<ClusterMessageEventArgs> OnMessageReceived = null;
 
-		private async Task Transmit(byte[] Message, IPEndPoint Destination)
+		private void Transmit(bool ConstantBuffer, byte[] Message, IPEndPoint Destination)
 		{
-			await this.TransmitBinary(Message);
+			this.TransmitBinary(ConstantBuffer, Message);
 
 			foreach (ClusterUdpClient Client in this.outgoing)
-				Client.BeginTransmit(Message, Destination);
+				Client.BeginTransmit(ConstantBuffer, Message, Destination);
 		}
 
 		/// <summary>
@@ -793,14 +786,14 @@ namespace Waher.Networking.Cluster
 			{
 				Output.WriteByte(0);    // Unacknowledged message.
 				rootObject.Serialize(Output, Message);
-				await this.Transmit(Output.ToArray(), this.destination);
+				this.Transmit(true, Output.ToArray(), this.destination);
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
 
 				if (this.shuttingDown)
-					this.Dispose2();
+					await this.Dispose2();
 			}
 			finally
 			{
@@ -846,7 +839,7 @@ namespace Waher.Networking.Cluster
 
 				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
 
-				await this.Transmit(Bin, this.destination);
+				this.Transmit(true, Bin, this.destination);
 
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
 
@@ -864,7 +857,7 @@ namespace Waher.Networking.Cluster
 				Log.Exception(ex);
 
 				if (this.shuttingDown)
-					this.Dispose2();
+					await this.Dispose2();
 			}
 			finally
 			{
@@ -910,7 +903,7 @@ namespace Waher.Networking.Cluster
 						Output.WriteRaw(Rec.MessageBinary, 18, Rec.MessageBinary.Length - 18);
 
 						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
-						await this.Transmit(Output.ToArray(), this.destination);
+						this.Transmit(true, Output.ToArray(), this.destination);
 					}
 				}
 			}
@@ -986,7 +979,7 @@ namespace Waher.Networking.Cluster
 			try
 			{
 				ClusterGetStatusEventArgs e = new ClusterGetStatusEventArgs();
-				
+
 				await this.GetStatus.Raise(this, e);
 
 				this.localStatus = e.Status;
@@ -1221,7 +1214,7 @@ namespace Waher.Networking.Cluster
 
 				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
 
-				await this.Transmit(Bin, this.destination);
+				this.Transmit(true, Bin, this.destination);
 
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
 
@@ -1239,7 +1232,7 @@ namespace Waher.Networking.Cluster
 				Log.Exception(ex);
 
 				if (this.shuttingDown)
-					this.Dispose2();
+					await this.Dispose2();
 			}
 			finally
 			{
@@ -1285,7 +1278,7 @@ namespace Waher.Networking.Cluster
 						Output.WriteRaw(Rec.CommandBinary, 18, Rec.CommandBinary.Length - 18);
 
 						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
-						await this.Transmit(Output.ToArray(), this.destination);
+						this.Transmit(true, Output.ToArray(), this.destination);
 					}
 				}
 			}

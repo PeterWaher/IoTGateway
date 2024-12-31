@@ -106,76 +106,102 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 
 		private async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
 		{
-			try
+			if (this.HasSniffers)
 			{
-				await this.TransmitText(await GetJSON(e.Object));
-			}
-			catch (Exception)
-			{
-				await this.TransmitText("Object of type " + e.Object.GetType().FullName + " inserted.");
+				try
+				{
+					this.TransmitText(await GetJSON(e.Object));
+				}
+				catch (Exception)
+				{
+					this.TransmitText("Object of type " + e.Object.GetType().FullName + " inserted.");
+				}
 			}
 		}
 
 		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
 		{
-			try
+			if (this.HasSniffers)
 			{
-				await this.ReceiveText(await GetJSON(e.Object));
-			}
-			catch (Exception)
-			{
-				await this.ReceiveText("Object of type " + e.Object.GetType().FullName + " updated.");
+				try
+				{
+					this.ReceiveText(await GetJSON(e.Object));
+				}
+				catch (Exception)
+				{
+					this.ReceiveText("Object of type " + e.Object.GetType().FullName + " updated.");
+				}
 			}
 		}
 
 		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
 		{
-			try
+			if (this.HasSniffers)
 			{
-				await this.Error(await GetJSON(e.Object));
-			}
-			catch (Exception)
-			{
-				await this.Error("Object of type " + e.Object.GetType().FullName + " deleted.");
+				try
+				{
+					this.Error(await GetJSON(e.Object));
+				}
+				catch (Exception)
+				{
+					this.Error("Object of type " + e.Object.GetType().FullName + " deleted.");
+				}
 			}
 		}
 
-		private async Task Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
+		private Task Database_CollectionRepaired(object Sender, CollectionRepairedEventArgs e)
 		{
-			try
+			if (this.HasSniffers)
 			{
-				await this.Warning("Collection has been repaired: " + e.Collection);
-
-				if (!(e.Flagged is null))
+				try
 				{
-					foreach (FlagSource Source in e.Flagged)
-						await this.Exception("Flagged " + Source.Count.ToString() + " time(s) for:" + Source.Reason + "\r\n\r\n" + Source.StackTrace);
+					this.Warning("Collection has been repaired: " + e.Collection);
+
+					if (!(e.Flagged is null))
+					{
+						foreach (FlagSource Source in e.Flagged)
+							this.Exception("Flagged " + Source.Count.ToString() + " time(s) for:" + Source.Reason + "\r\n\r\n" + Source.StackTrace);
+					}
+				}
+				catch (Exception)
+				{
+					// Ignore.
 				}
 			}
-			catch (Exception)
-			{
-				// Ignore.
-			}
+
+			return Task.CompletedTask;
 		}
 
 		private Task Database_CollectionCleared(object Sender, CollectionEventArgs e)
 		{
-			return this.Information("Collection has been cleared: " + e.Collection);
+			if (this.HasSniffers)
+				this.Information("Collection has been cleared: " + e.Collection);
+
+			return Task.CompletedTask;
 		}
 
 		private Task Search_ObjectAddedToIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			return this.Information("Object added to full-text-search index: " + e.Reference.IndexCollection);
+			if (this.HasSniffers)
+				this.Information("Object added to full-text-search index: " + e.Reference.IndexCollection);
+		
+			return Task.CompletedTask;
 		}
 
 		private Task Search_ObjectUpdatedInIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			return this.Information("Object updated in full-text-search index: " + e.Reference.IndexCollection);
+			if (this.HasSniffers)
+				this.Information("Object updated in full-text-search index: " + e.Reference.IndexCollection);
+		
+			return Task.CompletedTask;
 		}
 
 		private Task Search_ObjectRemovedFromIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			return this.Information("Object removed from full-text-search index: " + e.Reference.IndexCollection);
+			if (this.HasSniffers)
+				this.Information("Object removed from full-text-search index: " + e.Reference.IndexCollection);
+		
+			return Task.CompletedTask;
 		}
 	}
 }

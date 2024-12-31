@@ -211,7 +211,7 @@ namespace Waher.Security.DTLS
 			return (this.NextDouble() <= this.probabilityPacketLoss);
 		}
 
-		private async Task DataReceived(byte[] Data, object RemoteEndpoint)
+		private async Task DataReceived(bool ConstantBuffer, byte[] Data, object RemoteEndpoint)
 		{
 			try
 			{
@@ -222,12 +222,12 @@ namespace Waher.Security.DTLS
 				if (this.probabilityPacketLoss > 0 && this.PacketLost())
 				{
 					if (this.HasSniffers)
-						await this.Warning(DateTime.Now.ToString("T") + " Received packet lost.");
+						this.Warning(DateTime.Now.ToString("T") + " Received packet lost.");
 
 					return;
 				}
 
-				await this.ReceiveBinary(Data);
+				this.ReceiveBinary(ConstantBuffer, Data);
 
 				EndpointState State = this.GetState(RemoteEndpoint, false);
 				bool First = true;
@@ -268,7 +268,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 		}
 
@@ -277,7 +277,7 @@ namespace Waher.Security.DTLS
 		{
 			if (Record.version.major != 254)
 			{
-				await this.Error(DateTime.Now.ToString("T") + " Packet dropped. Protocol version not recognized.");
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Protocol version not recognized.");
 				return false; // Not DTLS 1.x
 			}
 
@@ -308,7 +308,7 @@ namespace Waher.Security.DTLS
 
 			if (!ValidEpoch)
 			{
-				await this.Error(DateTime.Now.ToString("T") + " Packet dropped. Unexpected epoch (" +
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Unexpected epoch (" +
 					Record.epoch + ", expected " + State.currentEpoch.ToString() + ").");
 				return false;
 			}
@@ -317,13 +317,13 @@ namespace Waher.Security.DTLS
 
 			if (Offset < 0)
 			{
-				await this.Error(DateTime.Now.ToString("T") + " Packet dropped. Old sequence number.");
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Old sequence number.");
 				return false;
 			}
 
 			if (Offset < 64 && (State.receivedPacketsWindow & (1UL << (int)Offset)) != 0)
 			{
-				await this.Error(DateTime.Now.ToString("T") + " Packet dropped. Sequence number already processed.");
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Sequence number already processed.");
 				return false;
 			}
 
@@ -335,13 +335,13 @@ namespace Waher.Security.DTLS
 				}
 				catch (Exception ex)
 				{
-					await this.Exception(ex);
+					this.Exception(ex);
 					Record.fragment = null;
 				}
 
 				if (Record.fragment is null)
 				{
-					await this.Error(DateTime.Now.ToString("T") + " Packet dropped. Decryption failed.");
+					this.Error(DateTime.Now.ToString("T") + " Packet dropped. Decryption failed.");
 					State.acceptRollbackPrevEpoch = true;
 					return false;
 				}
@@ -407,7 +407,7 @@ namespace Waher.Security.DTLS
 			return Version.ToString();
 		}
 
-		private Task SniffMsg(byte[] Data, int Offset, bool Rx)
+		private void SniffMsg(byte[] Data, int Offset, bool Rx)
 		{
 			StringBuilder Msg = new StringBuilder();
 
@@ -473,7 +473,7 @@ namespace Waher.Security.DTLS
 
 			Msg.Append(')');
 
-			return this.Information(Msg.ToString());
+			this.Information(Msg.ToString());
 		}
 
 		private async Task<bool> ProcessRecord(DTLSPlaintext Record, EndpointState State, bool StartOfFlight)
@@ -481,7 +481,7 @@ namespace Waher.Security.DTLS
 			try
 			{
 				if (this.HasSniffers)
-					await this.SniffMsg(Record.datagram, Record.recordOffset, true);
+					this.SniffMsg(Record.datagram, Record.recordOffset, true);
 
 				switch (Record.type)
 				{
@@ -502,7 +502,7 @@ namespace Waher.Security.DTLS
 						{
 							if (MessageSeqNr != 0)
 							{
-								await this.Error(DateTime.Now.ToString("T") +
+								this.Error(DateTime.Now.ToString("T") +
 									" Packet dropped. Expected message number " +
 									State.next_receive_seq.ToString() + ", but was " +
 									MessageSeqNr.ToString() + ".");
@@ -517,7 +517,7 @@ namespace Waher.Security.DTLS
 							}
 							else
 							{
-								await this.Error(DateTime.Now.ToString("T") +
+								this.Error(DateTime.Now.ToString("T") +
 									" Packet dropped. Expected message number " +
 									State.next_receive_seq.ToString() + ", but was " +
 									MessageSeqNr.ToString() + ".");
@@ -545,7 +545,7 @@ namespace Waher.Security.DTLS
 
 						if (FragmentOffset > 0 || FragmentLength != PayloadLen)
 						{
-							await this.Error(DateTime.Now.ToString("T") +
+							this.Error(DateTime.Now.ToString("T") +
 								" Packet dropped. Fragmented messages not supported.");
 
 							return false;   // TODO: Reassembly of fragmented messages.
@@ -872,7 +872,7 @@ namespace Waher.Security.DTLS
 							if (Description == AlertDescription.close_notify)
 							{
 								if (this.HasSniffers)
-									await this.Information(DateTime.Now.ToString("T") + " Session closed.");
+									this.Information(DateTime.Now.ToString("T") + " Session closed.");
 
 								if (State.state == DtlsState.Handshake ||
 									State.state == DtlsState.SessionEstablished)
@@ -896,7 +896,7 @@ namespace Waher.Security.DTLS
 							}
 							else if (this.HasSniffers)
 							{
-								await this.Warning(DateTime.Now.ToString("T") + " Non-fatal alert received: " +
+								this.Warning(DateTime.Now.ToString("T") + " Non-fatal alert received: " +
 									Description.ToString());
 							}
 						}
@@ -1128,7 +1128,7 @@ namespace Waher.Security.DTLS
 				Array.Copy(Record, 0, Readable, 0, 13);
 				Array.Copy(Fragment, 0, Readable, 13, Fragment.Length);
 
-				await this.SniffMsg(Readable, 0, false);
+				this.SniffMsg(Readable, 0, false);
 			}
 
 			if (More && State.buffer is null)
@@ -1144,12 +1144,12 @@ namespace Waher.Security.DTLS
 					State.buffer = null;
 				}
 
-				await this.TransmitBinary(Record);
+				this.TransmitBinary(true, Record);
 
 				if (this.probabilityPacketLoss == 0 || !this.PacketLost())
-					await this.comLayer.SendPacket(Record, State.remoteEndpoint);
+					await this.comLayer.SendPacket(true, Record, State.remoteEndpoint);
 				else if (this.HasSniffers)
-					await this.Warning(DateTime.Now.ToString("T") + " Transmitted packet lost.");
+					this.Warning(DateTime.Now.ToString("T") + " Transmitted packet lost.");
 
 				if (!(Rec is null))
 				{
@@ -1171,7 +1171,7 @@ namespace Waher.Security.DTLS
 			else if (State.timeoutSeconds >= 8)
 			{
 				if (this.HasSniffers)
-					await this.Error(DateTime.Now.ToString("T") + " Timeout. No response.");
+					this.Error(DateTime.Now.ToString("T") + " Timeout. No response.");
 
 				await this.HandshakeFailure(State, "Timeout. No response.", AlertDescription.handshake_failure);
 				return;
@@ -1202,7 +1202,7 @@ namespace Waher.Security.DTLS
 			}
 
 			if (this.HasSniffers)
-				await this.Warning(DateTime.Now.ToString("T") + " Resending last flight.");
+				this.Warning(DateTime.Now.ToString("T") + " Resending last flight.");
 
 			foreach (ResendableRecord Rec in Resend)
 			{

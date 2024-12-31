@@ -10,7 +10,7 @@ namespace Waher.Networking.PeerToPeer
 	/// <summary>
 	/// Maintains a peer connection
 	/// </summary>
-	public class PeerConnection : IDisposable
+	public class PeerConnection : IDisposableAsync
 	{
 		private byte[] packetBuffer = null;
 		private readonly PeerToPeerNetwork network;
@@ -41,7 +41,7 @@ namespace Waher.Networking.PeerToPeer
 			this.tcpConnection.OnSent += this.TcpConnection_OnSent;
 		}
 
-		private async Task TcpConnection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task TcpConnection_OnSent(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			this.lastTcpPacket = DateTime.Now;
 
@@ -50,7 +50,7 @@ namespace Waher.Networking.PeerToPeer
 			{
 				try
 				{
-					await h(this, Buffer, Offset, Count);
+					await h(this, ConstantBuffer, Buffer, Offset, Count);
 				}
 				catch (Exception ex)
 				{
@@ -59,7 +59,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private async Task<bool> TcpConnection_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> TcpConnection_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			bool Continue = true;
 
@@ -128,7 +128,7 @@ namespace Waher.Networking.PeerToPeer
 			{
 				try
 				{
-					return await h(this, this.packetBuffer, 0, this.packetSize);
+					return await h(this, false, this.packetBuffer, 0, this.packetSize);
 				}
 				catch (Exception ex)
 				{
@@ -194,32 +194,28 @@ namespace Waher.Networking.PeerToPeer
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		[Obsolete("Use DisposeAsync()")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public Task DisposeAsync()
+		public async Task DisposeAsync()
 		{
 			this.disposed = true;
 
 			this.idleTimer?.Dispose();
 			this.idleTimer = null;
 
-			this.tcpConnection?.Dispose();
-			this.tcpConnection = null;
+			if (!(this.tcpConnection is null))
+			{
+				await this.tcpConnection.DisposeAsync();
+				this.tcpConnection = null;
+			}
 
-			return this.Closed();
+			await this.Closed();
 		}
 
 		/// <summary>
@@ -227,7 +223,7 @@ namespace Waher.Networking.PeerToPeer
 		/// buffered if a sending operation is being performed.
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcp(byte[] Packet)
 		{
 			return this.SendTcp(false, Packet);
@@ -237,12 +233,12 @@ namespace Waher.Networking.PeerToPeer
 		/// Sends a packet to the peer at the other side of the TCP connection. Transmission is done asynchronously and is
 		/// buffered if a sending operation is being performed.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Packet to send.</param>
-		public Task SendTcp(bool OneTimeBuffer, byte[] Packet)
+		public Task SendTcp(bool ConstantBuffer, byte[] Packet)
 		{
-			return this.SendTcp(OneTimeBuffer, Packet, null, null);
+			return this.SendTcp(ConstantBuffer, Packet, null, null);
 		}
 
 		/// <summary>
@@ -252,7 +248,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcp(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			return this.SendTcp(false, Packet, Callback, State);
@@ -262,25 +258,25 @@ namespace Waher.Networking.PeerToPeer
 		/// Sends a packet to the peer at the other side of the TCP connection. Transmission is done asynchronously and is
 		/// buffered if a sending operation is being performed.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task SendTcp(bool OneTimeBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public Task SendTcp(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (this.disposed)
 				return Task.CompletedTask;
 
-			byte[] EncodedPacket = this.EncodePacket(Packet, false, out bool OneTimeBuffer2);
-			return this.tcpConnection.SendAsync(OneTimeBuffer || OneTimeBuffer2, EncodedPacket, Callback, State);
+			byte[] EncodedPacket = this.EncodePacket(Packet, false, out bool ConstantBuffer2);
+			return this.tcpConnection.SendAsync(ConstantBuffer || ConstantBuffer2, EncodedPacket, Callback, State);
 		}
 
-		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber, out bool OneTimeBuffer)
+		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber, out bool ConstantBuffer)
 		{
 			if (!this.encapsulatePackets)
 			{
-				OneTimeBuffer = false;
+				ConstantBuffer = false;
 				return Packet;
 			}
 
@@ -304,7 +300,7 @@ namespace Waher.Networking.PeerToPeer
 
 			byte[] Packet2 = new byte[c + i];
 			Array.Copy(Packet, 0, Packet2, c, i);
-			OneTimeBuffer = true;
+			ConstantBuffer = true;
 
 			do
 			{
@@ -517,7 +513,7 @@ namespace Waher.Networking.PeerToPeer
 						{
 							try
 							{
-								await h(this, P.Value, 0, P.Value.Length);
+								await h(this, true, P.Value, 0, P.Value.Length);
 							}
 							catch (Exception ex)
 							{
@@ -530,7 +526,7 @@ namespace Waher.Networking.PeerToPeer
 					{
 						try
 						{
-							await h(this, FirstPacket, 0, FirstPacket.Length);
+							await h(this, true, FirstPacket, 0, FirstPacket.Length);
 						}
 						catch (Exception ex)
 						{
@@ -552,7 +548,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						await h(this, Packet, 0, Packet.Length);
+						await h(this, true, Packet, 0, Packet.Length);
 					}
 					catch (Exception ex)
 					{

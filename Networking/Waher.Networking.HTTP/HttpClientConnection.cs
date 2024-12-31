@@ -38,7 +38,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Class managing a remote client connection to a local <see cref="HttpServer"/>.
 	/// </summary>
-	internal class HttpClientConnection : CommunicationLayer, IDisposable
+	internal class HttpClientConnection : CommunicationLayer, IDisposableAsync
 	{
 		internal const byte CR = 13;
 		internal const byte LF = 10;
@@ -101,7 +101,7 @@ namespace Waher.Networking.HTTP
 			this.client.OnReceived += this.Client_OnReceived;
 		}
 
-		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private Task<bool> Client_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			this.server.DataReceived(Count);
 
@@ -109,18 +109,18 @@ namespace Waher.Networking.HTTP
 			{
 				case ConnectionMode.Http:
 					if (this.header is null)
-						return this.BinaryHeaderReceived(Buffer, Offset, Count);
+						return this.BinaryHeaderReceived(ConstantBuffer, Buffer, Offset, Count);
 					else
-						return this.BinaryDataReceived(Buffer, Offset, Count);
+						return this.BinaryDataReceived(ConstantBuffer, Buffer, Offset, Count);
 
 				case ConnectionMode.Http2Init:
-					return this.BinaryHttp2InitDataReceived(Buffer, Offset, Count);
+					return this.BinaryHttp2InitDataReceived(ConstantBuffer, Buffer, Offset, Count);
 
 				case ConnectionMode.Http2Live:
-					return this.BinaryHttp2LiveDataReceived(Buffer, Offset, Count);
+					return this.BinaryHttp2LiveDataReceived(ConstantBuffer, Buffer, Offset, Count);
 
 				case ConnectionMode.WebSocket:
-					return this.webSocket?.WebSocketDataReceived(Buffer, Offset, Count) ?? Task.FromResult(false);
+					return this.webSocket?.WebSocketDataReceived(ConstantBuffer, Buffer, Offset, Count) ?? Task.FromResult(false);
 
 				case ConnectionMode.Closed:
 				default:
@@ -142,16 +142,9 @@ namespace Waher.Networking.HTTP
 		/// Closes the connection and disposes of all resources.
 		/// </summary>
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -192,7 +185,7 @@ namespace Waher.Networking.HTTP
 		internal bool Encrypted => this.encrypted;
 		internal int Port => this.port;
 
-		private async Task<bool> BinaryHeaderReceived(byte[] Data, int Offset, int NrRead)
+		private async Task<bool> BinaryHeaderReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			string Header;
 			int i, c;
@@ -239,7 +232,7 @@ namespace Waher.Networking.HTTP
 
 				if (this.HasSniffers)
 				{
-					await this.ReceiveText(Header);
+					this.ReceiveText(Header);
 
 					HttpFieldContentType ContentType = this.header.ContentType;
 					if (ContentType is null)
@@ -304,7 +297,7 @@ namespace Waher.Networking.HTTP
 						this.server.Http2NoRfc7540Priorities);
 
 					if (i + 1 < NrRead)
-						return await this.BinaryHttp2InitDataReceived(Data, i + 1, NrRead - i - 1);
+						return await this.BinaryHttp2InitDataReceived(ConstantBuffer, Data, i + 1, NrRead - i - 1);
 					else
 						return true;
 				}
@@ -352,7 +345,7 @@ namespace Waher.Networking.HTTP
 								await Response.SendResponse();
 
 								if (i + 1 < NrRead)
-									return await this.BinaryHttp2LiveDataReceived(Data, i + 1, NrRead - i - 1);
+									return await this.BinaryHttp2LiveDataReceived(ConstantBuffer, Data, i + 1, NrRead - i - 1);
 								else
 									return true;
 							}
@@ -364,7 +357,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					if (i + 1 < NrRead)
-						return await this.BinaryDataReceived(Data, i + 1, NrRead - i - 1);
+						return await this.BinaryDataReceived(ConstantBuffer, Data, i + 1, NrRead - i - 1);
 
 					if (!this.header.HasMessageBody)
 						return await this.RequestReceived();
@@ -388,7 +381,7 @@ namespace Waher.Networking.HTTP
 					byte[] Data2 = new byte[d];
 					this.headerStream.Position = 0;
 					await this.headerStream.ReadAllAsync(Data2, 0, d);
-					await this.ReceiveBinary(Data2);
+					this.ReceiveBinary(true, Data2);
 				}
 
 				await this.SendResponse(null, null, new HttpException(431, "Request Header Fields Too Large",
@@ -399,7 +392,7 @@ namespace Waher.Networking.HTTP
 
 		private static readonly char[] http2Preface = new char[] { 'S', 'M', '\r', '\n', '\r', '\n' };
 
-		private async Task<bool> BinaryHttp2InitDataReceived(byte[] Data, int Offset, int NrRead)
+		private async Task<bool> BinaryHttp2InitDataReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			int i, c;
 			byte b;
@@ -413,7 +406,7 @@ namespace Waher.Networking.HTTP
 				if (b != http2Preface[this.localSettings.InitStep++])
 				{
 					if (this.HasSniffers && i > Offset)
-						await this.ReceiveText(InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset));
+						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset));
 
 					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid HTTP/2 connection preface."), true);
 					return false;
@@ -424,10 +417,10 @@ namespace Waher.Networking.HTTP
 					this.mode = ConnectionMode.Http2Live;
 
 					if (this.HasSniffers)
-						await this.ReceiveText("\r\nSM\r\n");
+						this.ReceiveText("\r\nSM\r\n");
 
 					if (i + 1 < NrRead)
-						return await this.BinaryHttp2LiveDataReceived(Data, i + 1, c - i - 1);
+						return await this.BinaryHttp2LiveDataReceived(ConstantBuffer, Data, i + 1, c - i - 1);
 					else
 						return true;
 				}
@@ -436,10 +429,10 @@ namespace Waher.Networking.HTTP
 			return true;
 		}
 
-		private async Task<bool> BinaryHttp2LiveDataReceived(byte[] Data, int Offset, int NrRead)
+		private async Task<bool> BinaryHttp2LiveDataReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(Data, Offset, NrRead);
+				this.ReceiveBinary(ConstantBuffer, Data, Offset, NrRead);
 
 			int End = Offset + NrRead;
 			bool FramesProcessed = false;
@@ -637,7 +630,7 @@ namespace Waher.Networking.HTTP
 					sb.Append(" bytes");
 
 					if (this.http2FrameType != FrameType.Data && this.http2FrameType != FrameType.WindowUpdate)
-						await this.Information(sb.ToString());
+						this.Information(sb.ToString());
 				}
 #endif
 				if (this.http2StreamId > this.http2LastPermittedStreamId)
@@ -655,7 +648,7 @@ namespace Waher.Networking.HTTP
 						{
 #if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 #endif
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream is 0");
 						}
@@ -664,7 +657,7 @@ namespace Waher.Networking.HTTP
 						{
 #if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 #endif
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream not under flow control.");
 						}
@@ -673,7 +666,7 @@ namespace Waher.Networking.HTTP
 						{
 #if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 #endif
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream state is " + Stream.State.ToString());
 						}
@@ -687,7 +680,7 @@ namespace Waher.Networking.HTTP
 						{
 #if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 #endif
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Padding length larger than available data.");
 						}
@@ -699,12 +692,12 @@ namespace Waher.Networking.HTTP
 							sb.Append((Stream.DataBytesReceived + DataSize).ToString());
 							sb.Append(')');
 
-							await this.Information(sb.ToString());
+							this.Information(sb.ToString());
 						}
 #endif
 						if (DataSize > 0)
 						{
-							if (!await Stream.DataReceived(this.reader.Buffer, this.reader.Position, DataSize))
+							if (!await Stream.DataReceived(true, this.reader.Buffer, this.reader.Position, DataSize))
 								return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Not sufficient resources available in stream.");
 
 							this.localSettings.AddPendingIncrement(Stream, DataSize);
@@ -790,7 +783,7 @@ namespace Waher.Networking.HTTP
 									sb.Append(", Weight: ");
 									sb.Append(Weight.ToString());
 
-									await this.Information(sb.ToString());
+									this.Information(sb.ToString());
 								}
 #endif
 							}
@@ -834,7 +827,7 @@ namespace Waher.Networking.HTTP
 								sb.Append(OutputWindow.ToString());
 								sb.Append(')');
 
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 							}
 #endif
 						}
@@ -918,7 +911,7 @@ namespace Waher.Networking.HTTP
 							}
 
 							if (this.HasSniffers)
-								await this.ReceiveText(sb.ToString());
+								this.ReceiveText(sb.ToString());
 						}
 						else if (!Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize))
 							return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Headers too large.");
@@ -986,7 +979,7 @@ namespace Waher.Networking.HTTP
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Expected exactly 4 bytes of data.");
 
 						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
-						await this.LogError(Error.Value, "Client reset the stream.", false);
+						this.LogError(Error.Value, "Client reset the stream.", false);
 
 						this.flowControl.RemoveStream(this.http2StreamId);
 						break;
@@ -1013,7 +1006,7 @@ namespace Waher.Networking.HTTP
 
 							if (!(sb is null))
 							{
-								await this.ReceiveText(sb.ToString().Trim());
+								this.ReceiveText(sb.ToString().Trim());
 								sb.Clear();
 							}
 
@@ -1045,7 +1038,7 @@ namespace Waher.Networking.HTTP
 									return false;
 
 								if (!(sb is null))
-									await this.TransmitText(sb.ToString().Trim());
+									this.TransmitText(sb.ToString().Trim());
 							}
 						}
 						break;
@@ -1077,7 +1070,7 @@ namespace Waher.Networking.HTTP
 
 						this.http2LastPermittedStreamId = (int)(this.reader.NextUInt32() & 0x7fffffff);
 						Error = (Http2Error)this.reader.NextUInt32();
-						await this.LogError(Error.Value, "Client requested connection to close.", true);
+						this.LogError(Error.Value, "Client requested connection to close.", true);
 
 						this.flowControl?.GoingAway(this.http2LastPermittedStreamId);
 						break;
@@ -1089,7 +1082,7 @@ namespace Waher.Networking.HTTP
 						{
 #if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 #endif
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Expected exactly 4 bytes of data.");
 						}
@@ -1100,7 +1093,7 @@ namespace Waher.Networking.HTTP
 						{
 #if INFO_IN_SNIFFERS
 							if (this.HasSniffers)
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 #endif
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Increment set to 0.");
 						}
@@ -1113,7 +1106,7 @@ namespace Waher.Networking.HTTP
 								sb.Append(", Connection Window +");
 								sb.Append(Increment.ToString());
 
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 							}
 #endif
 							int NewSize = this.flowControl?.ReleaseConnectionResources((int)Increment) ?? -1;
@@ -1121,7 +1114,7 @@ namespace Waher.Networking.HTTP
 							{
 #if INFO_IN_SNIFFERS
 								if (this.HasSniffers)
-									await this.Information(sb.ToString());
+									this.Information(sb.ToString());
 #endif
 								return await this.ReturnHttp2Error(Http2Error.FlowControlError, 0, "Unable to release connection resources.");
 							}
@@ -1134,7 +1127,7 @@ namespace Waher.Networking.HTTP
 								sb.Append(", Stream Window +");
 								sb.Append(Increment.ToString());
 
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 							}
 #endif
 							this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment);
@@ -1202,7 +1195,7 @@ namespace Waher.Networking.HTTP
 			catch (Exception ex)
 			{
 				if (this.HasSniffers)
-					await this.Exception(ex);
+					this.Exception(ex);
 
 				return await this.ReturnHttp2Error(Http2Error.InternalError, 0, ex.Message);
 			}
@@ -1295,9 +1288,9 @@ namespace Waher.Networking.HTTP
 			if (this.HasSniffers)
 			{
 #if INFO_IN_SNIFFERS
-				await this.Information(sb.ToString());
+				this.Information(sb.ToString());
 #endif
-				await this.TransmitBinary(Data);
+				this.TransmitBinary(true, Data);
 			}
 
 			return true;
@@ -1316,7 +1309,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private Task LogError(Http2Error ErrorCode, string Reason, bool ConnectionError)
+		private void LogError(Http2Error ErrorCode, string Reason, bool ConnectionError)
 		{
 			if (this.HasSniffers)
 			{
@@ -1334,19 +1327,17 @@ namespace Waher.Networking.HTTP
 				}
 
 				if (IsError(ErrorCode))
-					return this.Error(sb.ToString());
+					this.Error(sb.ToString());
 				else
-					return this.Information(sb.ToString());
+					this.Information(sb.ToString());
 			}
-			else
-				return Task.CompletedTask;
 		}
 
 		internal async Task<bool> ReturnHttp2Error(Http2Error ErrorCode, int StreamId, string Reason)
 		{
 			bool ConnectionError = StreamId == 0;
 
-			await this.LogError(ErrorCode, Reason, ConnectionError);
+			this.LogError(ErrorCode, Reason, ConnectionError);
 
 			int i = (int)ErrorCode;
 
@@ -1385,13 +1376,15 @@ namespace Waher.Networking.HTTP
 		/// of bytes written.
 		/// </summary>
 		/// <param name="Stream">Stream sending data.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary data</param>
 		/// <param name="Offset">Offset into buffer where data begins.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Last">If it is the last data to be written for this stream.</param>
 		/// <param name="DataEncoding">Optional encoding, if data is text.</param>
 		/// <returns>Number of bytes written. If negative, request failed.</returns>
-		internal async Task<int> TryWriteData(Http2Stream Stream, byte[] Data, int Offset, int Count, bool Last,
+		internal async Task<int> TryWriteData(Http2Stream Stream, bool ConstantBuffer, byte[] Data, int Offset, int Count, bool Last,
 			Encoding DataEncoding)
 		{
 			int StreamId = Stream.StreamId;
@@ -1482,21 +1475,21 @@ namespace Waher.Networking.HTTP
 					sb.Append(')');
 				}
 
-				await this.Information(sb.ToString());
+				this.Information(sb.ToString());
 #endif
 
 				if (DataEncoding is null)
-					await this.TransmitBinary(Data);
+					this.TransmitBinary(true, Data);
 				else
 				{
 					string s = DataEncoding.GetString(Payload, Offset, Count);
 
 					if (ContainsControlCharacters(s))
-						await this.TransmitBinary(Data);
+						this.TransmitBinary(true, Data);
 					else
 					{
-						await this.TransmitBinary(Data, 0, 9);
-						await this.TransmitText(s);
+						this.TransmitBinary(true, Data, 0, 9);
+						this.TransmitText(s);
 					}
 				}
 			}
@@ -1571,7 +1564,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task<bool> BinaryDataReceived(byte[] Data, int Offset, int NrRead)
+		private async Task<bool> BinaryDataReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			if (this.dataStream is null)
 			{
@@ -1626,7 +1619,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			ulong DecodingResponse = await this.transferEncoding.DecodeAsync(Data, Offset, NrRead);
+			ulong DecodingResponse = await this.transferEncoding.DecodeAsync(ConstantBuffer, Data, Offset, NrRead);
 			int NrAccepted = (int)DecodingResponse;
 			bool Complete = (DecodingResponse & 0x100000000) != 0;
 
@@ -1635,19 +1628,19 @@ namespace Waher.Networking.HTTP
 				if (Offset == 0 && NrAccepted == Data.Length)
 				{
 					if (this.rxText)
-						await this.ReceiveText(this.rxEncoding.GetString(Data));
+						this.ReceiveText(this.rxEncoding.GetString(Data));
 					else
-						await this.ReceiveBinary(Data);
+						this.ReceiveBinary(ConstantBuffer, Data);
 				}
 				else
 				{
 					if (this.rxText)
-						await this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
+						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
 					else
 					{
 						byte[] Data2 = new byte[NrAccepted];
 						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
-						await this.ReceiveBinary(Data2);
+						this.ReceiveBinary(true, Data2);
 					}
 				}
 			}
@@ -1675,7 +1668,7 @@ namespace Waher.Networking.HTTP
 						return false;
 
 					if (NrRead > 0)
-						return await this.BinaryHeaderReceived(Data, Offset, NrRead);
+						return await this.BinaryHeaderReceived(ConstantBuffer, Data, Offset, NrRead);
 					else
 						return true;
 				}
@@ -1920,13 +1913,13 @@ namespace Waher.Networking.HTTP
 			{
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				await this.SendResponse(Request, null, new NotImplementedException(ex.Message), !Result);
 			}
 			catch (IOException ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
@@ -1944,7 +1937,7 @@ namespace Waher.Networking.HTTP
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
 				ex = XML.AnnotateException(ex);
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
@@ -1952,7 +1945,7 @@ namespace Waher.Networking.HTTP
 			{
 				Result = Request.Header.Expect is null || !Request.Header.Expect.Continue100 || Request.HasData;
 
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
 			}
@@ -2039,7 +2032,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (System.NotImplementedException ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -2057,7 +2050,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (IOException ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -2083,7 +2076,7 @@ namespace Waher.Networking.HTTP
 			catch (XmlException ex)
 			{
 				ex = XML.AnnotateException(ex);
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{
@@ -2101,7 +2094,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				if (Response is null || !Response.HeaderSent)
 				{

@@ -108,7 +108,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			MqttBroker Broker = await this.brokerNode.GetBroker();
 
 			if (!(ToSniffer is null))
-				await this.brokerNode.Information(ToSniffer.ToString());
+				this.brokerNode.Information(ToSniffer.ToString());
 
 			await Broker.Publish(await this.topicNode.GetFullTopic(), MqttQualityOfService.AtLeastOnce, false, Request);
 		}

@@ -68,7 +68,7 @@ namespace Waher.Networking.Cluster
 					if (this.disposed)
 						return;
 
-					await this.endpoint.Information(Data.Buffer.Length.ToString() + " bytes received. (" + DateTime.Now.TimeOfDay.ToString() + ")");
+					this.endpoint.Information(Data.Buffer.Length.ToString() + " bytes received. (" + DateTime.Now.TimeOfDay.ToString() + ")");
 
 					try
 					{
@@ -120,7 +120,7 @@ namespace Waher.Networking.Cluster
 								Array.Copy(Decrypted, 20, Received, 0, c);
 
 								if (LastFragment && FragmentNr == 0)
-									this.endpoint.DataReceived(Received, Data.RemoteEndPoint);
+									this.endpoint.DataReceived(true, Received, Data.RemoteEndPoint);
 								else
 								{
 									string Key = Data.RemoteEndPoint.ToString() + " " + Ticks.ToString();
@@ -149,7 +149,7 @@ namespace Waher.Networking.Cluster
 										Fragments.NrParts == Fragments.Parts.Count)
 									{
 										this.endpoint.currentStatus.Remove(Key);
-										this.endpoint.DataReceived(Fragments.ToByteArray(), Fragments.Source);
+										this.endpoint.DataReceived(true, Fragments.ToByteArray(), Fragments.Source);
 									}
 								}
 							}
@@ -157,7 +157,7 @@ namespace Waher.Networking.Cluster
 					}
 					catch (Exception ex)
 					{
-						await this.endpoint.Exception(ex);
+						this.endpoint.Exception(ex);
 						Log.Exception(ex);
 					}
 				}
@@ -168,11 +168,11 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				await this.endpoint.Exception(ex);
+				this.endpoint.Exception(ex);
 			}
 		}
 
-		internal async void BeginTransmit(byte[] Message, IPEndPoint Destination)   // Starts parallel task
+		internal async void BeginTransmit(bool ConstantBuffer, byte[] Message, IPEndPoint Destination)   // Starts parallel task
 		{
 			try
 			{
@@ -183,6 +183,12 @@ namespace Waher.Networking.Cluster
 				{
 					if (this.isWriting)
 					{
+						if (!ConstantBuffer)
+						{
+							Message = (byte[])Message.Clone();
+							ConstantBuffer = true;
+						}
+
 						this.outputQueue.AddLast(Message);
 						return;
 					}
@@ -260,7 +266,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				await this.endpoint.Exception(ex);
+				this.endpoint.Exception(ex);
 
 				lock (this.outputQueue)
 				{
@@ -271,7 +277,7 @@ namespace Waher.Networking.Cluster
 			finally
 			{
 				if (this.endpoint.shuttingDown)
-					this.endpoint.Dispose2();
+					await this.endpoint.Dispose2();
 			}
 		}
 	}

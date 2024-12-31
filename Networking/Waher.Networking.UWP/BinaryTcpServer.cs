@@ -24,12 +24,12 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Waher.Networking
 {
-    /// <summary>
-    /// Implements a binary TCP Server. The server adapts to network changes,
-    /// maintains a list of current connection, and removes unused connections
-    /// automatically.
-    /// </summary>
-    public class BinaryTcpServer : CommunicationLayer, IDisposable
+	/// <summary>
+	/// Implements a binary TCP Server. The server adapts to network changes,
+	/// maintains a list of current connection, and removes unused connections
+	/// automatically.
+	/// </summary>
+	public class BinaryTcpServer : CommunicationLayer, IDisposable
 	{
 		/// <summary>
 		/// Default Client-to-Client Connection backlog (10).
@@ -505,7 +505,7 @@ namespace Waher.Networking
 					{
 						try
 						{
-							await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+							this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 							await this.Added(Connection);
 						}
 						catch (Exception ex2)
@@ -522,7 +522,7 @@ namespace Waher.Networking
 					{
 						try
 						{
-							await this.Warning("Connection rejected from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+							this.Warning("Connection rejected from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
 						}
 						catch (Exception ex2)
 						{
@@ -592,7 +592,7 @@ namespace Waher.Networking
 
 							if (await this.AcceptConnection(Connection))
 							{
-								await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+								this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 								if (this.tls)
 								{
@@ -606,8 +606,8 @@ namespace Waher.Networking
 							}
 							else
 							{
-								await this.Warning("Connection rejected from " + Client.Client.RemoteEndPoint.ToString() + ".");
-								Connection.Client.Dispose();
+								this.Warning("Connection rejected from " + Client.Client.RemoteEndPoint.ToString() + ".");
+								await Connection.Client.DisposeAsync();
 							}
 						}
 					}
@@ -659,37 +659,41 @@ namespace Waher.Networking
 		{
 			try
 			{
-				await this.Information("Switching to TLS.");
+				this.Information("Switching to TLS.");
 
 				await Connection.Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
 					this.clientCertificates, null, this.trustClientCertificates, this.alpnProtocols);
 
 				if (this.HasSniffers)
 				{
-					await this.Information("TLS established" +
-						". Cipher Strength: " + Connection.Client.CipherStrength.ToString() +
-						", Hash Strength: " + Connection.Client.HashStrength.ToString() +
-						", Key Exchange Strength: " + Connection.Client.KeyExchangeStrength.ToString());
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append("TLS established");
+					sb.Append(". Cipher Strength: ");
+					sb.Append(Connection.Client.CipherStrength.ToString());
+					sb.Append(", Hash Strength: ");
+					sb.Append(Connection.Client.HashStrength.ToString());
+					sb.Append(", Key Exchange Strength: ");
+					sb.Append(Connection.Client.KeyExchangeStrength.ToString());
+
+					this.Information(sb.ToString());
 
 					if (!(Connection.Client.RemoteCertificate is null))
 					{
-						if (this.HasSniffers)
-						{
-							StringBuilder sb = new StringBuilder();
+						sb.Clear();
 
-							sb.Append("Remote Certificate received. Valid: ");
-							sb.Append(Connection.Client.RemoteCertificateValid.ToString());
-							sb.Append(", Subject: ");
-							sb.Append(Connection.Client.RemoteCertificate.Subject);
-							sb.Append(", Issuer: ");
-							sb.Append(Connection.Client.RemoteCertificate.Issuer);
-							sb.Append(", S/N: ");
-							sb.Append(Convert.ToBase64String(Connection.Client.RemoteCertificate.GetSerialNumber()));
-							sb.Append(", Hash: ");
-							sb.Append(Convert.ToBase64String(Connection.Client.RemoteCertificate.GetCertHash()));
+						sb.Append("Remote Certificate received. Valid: ");
+						sb.Append(Connection.Client.RemoteCertificateValid.ToString());
+						sb.Append(", Subject: ");
+						sb.Append(Connection.Client.RemoteCertificate.Subject);
+						sb.Append(", Issuer: ");
+						sb.Append(Connection.Client.RemoteCertificate.Issuer);
+						sb.Append(", S/N: ");
+						sb.Append(Convert.ToBase64String(Connection.Client.RemoteCertificate.GetSerialNumber()));
+						sb.Append(", Hash: ");
+						sb.Append(Convert.ToBase64String(Connection.Client.RemoteCertificate.GetCertHash()));
 
-							await this.Information(sb.ToString());
-						}
+						this.Information(sb.ToString());
 					}
 				}
 
@@ -702,7 +706,7 @@ namespace Waher.Networking
 			}
 			catch (SocketException)
 			{
-				Connection.Client.Dispose();
+				await Connection.Client.DisposeAsync();
 			}
 			catch (Win32Exception ex)
 			{
@@ -710,11 +714,11 @@ namespace Waher.Networking
 			}
 			catch (IOException)
 			{
-				Connection.Client.Dispose();
+				await Connection.Client.DisposeAsync();
 			}
 			catch (Exception ex)
 			{
-				Connection.Client.Dispose();
+				await Connection.Client.DisposeAsync();
 				Log.Exception(ex);
 			}
 		}
@@ -725,7 +729,7 @@ namespace Waher.Networking
 
 			await this.OnTlsUpgradeError.Raise(this, new ServerTlsErrorEventArgs(Connection, ex2), false);
 
-			Connection.Client.Dispose();
+			await Connection.Client.DisposeAsync();
 		}
 
 		/// <summary>
@@ -752,7 +756,9 @@ namespace Waher.Networking
 		{
 			try
 			{
-				e.Value.Client?.Dispose();
+				BinaryTcpClient Client = e.Value.Client;
+				if (!(Client is null))
+					await Client.DisposeAsync();
 
 				await this.OnClientDisconnected.Raise(this, new ServerConnectionEventArgs(e.Value));
 			}
@@ -772,8 +778,8 @@ namespace Waher.Networking
 			this.connections.Remove(Connection.Id);
 		}
 
-		internal async Task DataReceived(ServerTcpConnection Connection, byte[] Buffer,
-			int Offset, int Count)
+		internal async Task DataReceived(ServerTcpConnection Connection, bool ConstantBuffer,
+			byte[] Buffer, int Offset, int Count)
 		{
 			this.connections?.ContainsKey(Connection.Id);   // Refreshes timer for connection.
 
@@ -783,9 +789,9 @@ namespace Waher.Networking
 			}
 
 			if (this.HasSniffers)
-				await this.ReceiveBinary(Buffer, Offset, Count);
+				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
 
-			await this.OnDataReceived.Raise(this, new ServerConnectionDataEventArgs(Connection, Buffer, Offset, Count));
+			await this.OnDataReceived.Raise(this, new ServerConnectionDataEventArgs(Connection, ConstantBuffer, Buffer, Offset, Count));
 		}
 
 		/// <summary>
@@ -793,14 +799,14 @@ namespace Waher.Networking
 		/// </summary>
 		public event EventHandlerAsync<ServerConnectionDataEventArgs> OnDataReceived;
 
-		internal Task DataSent(byte[] Data)
+		internal void DataSent(bool ConstantBuffer, byte[] Data)
 		{
 			lock (this.synchObj)
 			{
 				this.nrBytesTx += Data.Length;
 			}
 
-			return this.TransmitBinary(Data);
+			this.TransmitBinary(ConstantBuffer, Data);
 		}
 
 		/// <summary>

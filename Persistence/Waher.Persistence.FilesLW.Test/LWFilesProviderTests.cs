@@ -37,11 +37,11 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			if (this.provider is not null)
 			{
-				this.provider.Dispose();
+				await this.provider.DisposeAsync();
 				this.provider = null;
 				this.file = null;
 			}

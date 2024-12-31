@@ -1623,7 +1623,7 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 			Response.ContentType = BinaryCodec.DefaultContentType;
 			
-			await Response.Write(System.Text.Encoding.ASCII.GetBytes(this.token));
+			await Response.Write(true, System.Text.Encoding.ASCII.GetBytes(this.token));
 		}
 
 		private async Task SaveNames(HttpRequest Request, HttpResponse Response)

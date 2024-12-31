@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Waher.Events;
+﻿using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.XMPP;
 using Waher.Networking.Sniffers;
@@ -26,9 +21,9 @@ namespace Waher.Mock.Temperature
 	{
 		private const int MaxRecordsPerPeriod = 500;
 
-		private static XmppCredentials credentials;
-		private static ThingRegistryClient thingRegistryClient = null;
-		private static string ownerJid = null;
+		private static XmppCredentials? credentials;
+		private static ThingRegistryClient? thingRegistryClient = null;
+		private static string? ownerJid = null;
 		private static bool registered = false;
 
 		public static void Main(string[] _)
@@ -58,321 +53,316 @@ namespace Waher.Mock.Temperature
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					typeof(Program).Assembly);
 
-				using (XmppClient Client = new XmppClient(credentials, "en", typeof(Program).Assembly))
+				using XmppClient Client = new(credentials, "en", typeof(Program).Assembly);
+				
+				if (credentials.Sniffer)
+					Client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces));
+
+				if (!string.IsNullOrEmpty(credentials.Events))
+					Log.Register(new XmppEventSink("XMPP Event Sink", Client, credentials.Events, false));
+
+				if (!string.IsNullOrEmpty(credentials.ThingRegistry))
 				{
-					if (credentials.Sniffer)
-						Client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces));
+					thingRegistryClient = new ThingRegistryClient(Client, credentials.ThingRegistry);
 
-					if (!string.IsNullOrEmpty(credentials.Events))
-						Log.Register(new XmppEventSink("XMPP Event Sink", Client, credentials.Events, false));
-
-					if (!string.IsNullOrEmpty(credentials.ThingRegistry))
+					thingRegistryClient.Claimed += (Sender, e) =>
 					{
-						thingRegistryClient = new ThingRegistryClient(Client, credentials.ThingRegistry);
+						ownerJid = e.JID;
+						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+						return Task.CompletedTask;
+					};
 
-						thingRegistryClient.Claimed += (Sender, e) =>
-						{
-							ownerJid = e.JID;
-							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
-							return Task.CompletedTask;
-						};
+					thingRegistryClient.Disowned += async (Sender, e) =>
+					{
+						Log.Informational("Thing has been disowned.", ownerJid);
+						ownerJid = string.Empty;
+						await Register();
+					};
 
-						thingRegistryClient.Disowned += (Sender, e) =>
-						{
-							Log.Informational("Thing has been disowned.", ownerJid);
-							ownerJid = string.Empty;
-							Register();
-							return Task.CompletedTask;
-						};
+					thingRegistryClient.Removed += (Sender, e) =>
+					{
+						Log.Informational("Thing has been removed from the public registry.", ownerJid);
+						return Task.CompletedTask;
+					};
+				}
 
-						thingRegistryClient.Removed += (Sender, e) =>
+				ProvisioningClient? ProvisioningClient = null;
+				if (!string.IsNullOrEmpty(credentials.Provisioning))
+					ProvisioningClient = new ProvisioningClient(Client, credentials.Provisioning);
+
+				Timer ConnectionTimer = new(async (P) =>
+				{
+					if (Client.State == XmppState.Offline || Client.State == XmppState.Error || Client.State == XmppState.Authenticating)
+					{
+						try
 						{
-							Log.Informational("Thing has been removed from the public registry.", ownerJid);
-							return Task.CompletedTask;
-						};
+							await Client.Reconnect();
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
 					}
+				}, null, 60000, 60000);
 
-					ProvisioningClient ProvisioningClient = null;
-					if (!string.IsNullOrEmpty(credentials.Provisioning))
-						ProvisioningClient = new ProvisioningClient(Client, credentials.Provisioning);
+				bool Connected = false;
+				bool ImmediateReconnect;
 
-					Timer ConnectionTimer = new Timer((P) =>
+				Client.OnStateChanged += async (sender, NewState) =>
+				{
+					switch (NewState)
 					{
-						if (Client.State == XmppState.Offline || Client.State == XmppState.Error || Client.State == XmppState.Authenticating)
+						case XmppState.Connected:
+							Connected = true;
+
+							if (!registered && thingRegistryClient is not null)
+								await Register();
+							break;
+
+						case XmppState.Offline:
+							ImmediateReconnect = Connected;
+							Connected = false;
+
+							if (ImmediateReconnect)
+								await Client.Reconnect();
+							break;
+					}
+				};
+
+				Client.OnPresenceSubscribe += async (Sender, e) =>
+				{
+					await e.Accept();     // TODO: Provisioning
+
+					RosterItem Item = Client.GetRosterItem(e.FromBareJID);
+					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						await Client.RequestPresenceSubscription(e.FromBareJID);
+
+					await Client.SetPresence(Availability.Chat);
+				};
+
+				Client.OnPresenceUnsubscribe += async (Sender, e) =>
+				{
+					await e.Accept();
+				};
+
+				Client.OnRosterItemUpdated += (Sender, e) =>
+				{
+					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
+						Client.RemoveRosterItem(e.BareJid);
+
+					return Task.CompletedTask;
+				};
+
+				LinkedList<DayHistoryRecord> DayHistoricalValues = new();
+				LinkedList<MinuteHistoryRecord> MinuteHistoricalValues = new();
+				DateTime SampleTime = DateTime.Now;
+				DateTime PeriodStart = SampleTime.Date;
+				DateTime Now;
+				DateTime MinTime = SampleTime;
+				DateTime MaxTime = SampleTime;
+				double CurrentTemperature = ReadTemp();
+				double MinTemp = CurrentTemperature;
+				double MaxTemp = CurrentTemperature;
+				double SumTemp = CurrentTemperature;
+				int NrTemp = 1;
+				int NrDayRecords = 0;
+				int NrMinuteRecords = 0;
+				SemaphoreSlim SampleSynch = new(1);
+
+				SensorServer SensorServer = new(Client, ProvisioningClient, true);
+				SensorServer.OnExecuteReadoutRequest += async (Sender, Request) =>
+				{
+					Log.Informational("Readout requested", string.Empty, Request.Actor);
+
+					List<Field> Fields = [];
+					bool IncludeTemp = Request.IsIncluded("Temperature");
+					bool IncludeTempMin = Request.IsIncluded("Temperature, Min");
+					bool IncludeTempMax = Request.IsIncluded("Temperature, Max");
+					bool IncludeTempAvg = Request.IsIncluded("Temperature, Average");
+					bool IncludePeak = Request.IsIncluded(FieldType.Peak);
+					bool IncludeComputed = Request.IsIncluded(FieldType.Computed);
+
+					await SampleSynch.WaitAsync();
+					try
+					{
+						if (IncludeTemp && Request.IsIncluded(FieldType.Momentary))
 						{
-							try
+							Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", CurrentTemperature, 1, "°C",
+								FieldType.Momentary, FieldQoS.AutomaticReadout));
+						}
+
+						if (IncludePeak)
+						{
+							if (IncludeTempMin)
 							{
-								Client.Reconnect();
+								Fields.Add(new QuantityField(ThingReference.Empty, MinTime, "Temperature, Min", MinTemp, 1, "°C",
+									FieldType.Peak, FieldQoS.AutomaticReadout));
 							}
-							catch (Exception ex)
+
+							if (IncludeTempMax)
 							{
-								Log.Exception(ex);
+								Fields.Add(new QuantityField(ThingReference.Empty, MaxTime, "Temperature, Max", MaxTemp, 1, "°C",
+									FieldType.Peak, FieldQoS.AutomaticReadout));
 							}
 						}
-					}, null, 60000, 60000);
 
-					bool Connected = false;
-					bool ImmediateReconnect;
-
-					Client.OnStateChanged += (sender, NewState) =>
-					{
-						switch (NewState)
+						if (IncludeTempAvg && IncludeComputed)
 						{
-							case XmppState.Connected:
-								Connected = true;
-
-								if (!registered && !(thingRegistryClient is null))
-									Register();
-								break;
-
-							case XmppState.Offline:
-								ImmediateReconnect = Connected;
-								Connected = false;
-
-								if (ImmediateReconnect)
-									Client.Reconnect();
-								break;
+							Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature, Average", SumTemp / NrTemp, 2, "°C",
+								FieldType.Computed, FieldQoS.AutomaticReadout));
 						}
 
-						return Task.CompletedTask;
-					};
-
-					Client.OnPresenceSubscribe += (Sender, e) =>
-					{
-						e.Accept();     // TODO: Provisioning
-
-						RosterItem Item = Client.GetRosterItem(e.FromBareJID);
-						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-							Client.RequestPresenceSubscription(e.FromBareJID);
-
-						Client.SetPresence(Availability.Chat);
-
-						return Task.CompletedTask;
-					};
-
-					Client.OnPresenceUnsubscribe += (Sender, e) =>
-					{
-						e.Accept();
-						return Task.CompletedTask;
-					};
-
-					Client.OnRosterItemUpdated += (Sender, e) =>
-					{
-						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
-							Client.RemoveRosterItem(e.BareJid);
-
-						return Task.CompletedTask;
-					};
-
-					LinkedList<DayHistoryRecord> DayHistoricalValues = new LinkedList<DayHistoryRecord>();
-					LinkedList<MinuteHistoryRecord> MinuteHistoricalValues = new LinkedList<MinuteHistoryRecord>();
-					DateTime SampleTime = DateTime.Now;
-					DateTime PeriodStart = SampleTime.Date;
-					DateTime Now;
-					DateTime MinTime = SampleTime;
-					DateTime MaxTime = SampleTime;
-					double CurrentTemperature = ReadTemp();
-					double MinTemp = CurrentTemperature;
-					double MaxTemp = CurrentTemperature;
-					double SumTemp = CurrentTemperature;
-					int NrTemp = 1;
-					int NrDayRecords = 0;
-					int NrMinuteRecords = 0;
-					object SampleSynch = new object();
-
-					SensorServer SensorServer = new SensorServer(Client, ProvisioningClient, true);
-					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
-					{
-						Log.Informational("Readout requested", string.Empty, Request.Actor);
-
-						List<Field> Fields = new List<Field>();
-						bool IncludeTemp = Request.IsIncluded("Temperature");
-						bool IncludeTempMin = Request.IsIncluded("Temperature, Min");
-						bool IncludeTempMax = Request.IsIncluded("Temperature, Max");
-						bool IncludeTempAvg = Request.IsIncluded("Temperature, Average");
-						bool IncludePeak = Request.IsIncluded(FieldType.Peak);
-						bool IncludeComputed = Request.IsIncluded(FieldType.Computed);
-
-						lock (SampleSynch)
+						if (Request.IsIncluded(FieldType.Historical))
 						{
-							if (IncludeTemp && Request.IsIncluded(FieldType.Momentary))
+							foreach (DayHistoryRecord Rec in DayHistoricalValues)
 							{
-								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", CurrentTemperature, 1, "°C",
-									FieldType.Momentary, FieldQoS.AutomaticReadout));
-							}
+								if (!Request.IsIncluded(Rec.PeriodStart))
+									continue;
 
-							if (IncludePeak)
-							{
-								if (IncludeTempMin)
+								if (Fields.Count >= 100)
 								{
-									Fields.Add(new QuantityField(ThingReference.Empty, MinTime, "Temperature, Min", MinTemp, 1, "°C",
-										FieldType.Peak, FieldQoS.AutomaticReadout));
+									await Request.ReportFields(false, Fields);
+									Fields.Clear();
 								}
 
-								if (IncludeTempMax)
+								if (IncludePeak)
 								{
-									Fields.Add(new QuantityField(ThingReference.Empty, MaxTime, "Temperature, Max", MaxTemp, 1, "°C",
-										FieldType.Peak, FieldQoS.AutomaticReadout));
+									if (IncludeTempMin)
+									{
+										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
+											FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
+									}
+
+									if (IncludeTempMax)
+									{
+										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
+											FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
+									}
+								}
+
+								if (IncludeTempAvg && IncludeComputed)
+								{
+									Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
+										FieldType.Computed | FieldType.Historical, FieldQoS.AutomaticReadout));
 								}
 							}
 
-							if (IncludeTempAvg && IncludeComputed)
+							foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
 							{
-								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature, Average", SumTemp / NrTemp, 2, "°C",
-									FieldType.Computed, FieldQoS.AutomaticReadout));
-							}
+								if (!Request.IsIncluded(Rec.Timestamp))
+									continue;
 
-							if (Request.IsIncluded(FieldType.Historical))
-							{
-								foreach (DayHistoryRecord Rec in DayHistoricalValues)
+								if (IncludeTemp)
 								{
-									if (!Request.IsIncluded(Rec.PeriodStart))
-										continue;
-
 									if (Fields.Count >= 100)
 									{
-										Request.ReportFields(false, Fields);
+										await Request.ReportFields(false, Fields);
 										Fields.Clear();
 									}
 
-									if (IncludePeak)
-									{
-										if (IncludeTempMin)
-										{
-											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
-												FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
-										}
-
-										if (IncludeTempMax)
-										{
-											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
-												FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
-										}
-									}
-
-									if (IncludeTempAvg && IncludeComputed)
-									{
-										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
-											FieldType.Computed | FieldType.Historical, FieldQoS.AutomaticReadout));
-									}
-								}
-
-								foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
-								{
-									if (!Request.IsIncluded(Rec.Timestamp))
-										continue;
-
-									if (IncludeTemp)
-									{
-										if (Fields.Count >= 100)
-										{
-											Request.ReportFields(false, Fields);
-											Fields.Clear();
-										}
-
-										Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
-											FieldType.Historical, FieldQoS.AutomaticReadout));
-									}
+									Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
+										FieldType.Historical, FieldQoS.AutomaticReadout));
 								}
 							}
-
 						}
-						
-						Request.ReportFields(true, Fields);
-
-						return Task.CompletedTask;
-					};
-
-					Timer SampleTimer = new Timer((P) =>
+					}
+					finally
 					{
-						lock (SampleSynch)
-						{
-							Now = DateTime.Now;
+						SampleSynch.Release();
+					}
 
-							if (Now.Date != PeriodStart.Date)
-							{
-								DayHistoryRecord Rec = new DayHistoryRecord(PeriodStart.Date, PeriodStart.Date.AddDays(1).AddMilliseconds(-1),
-									MinTemp, MaxTemp, SumTemp / NrTemp);
+					await Request.ReportFields(true, Fields);
+				};
 
-								DayHistoricalValues.AddFirst(Rec);
-
-								if (NrDayRecords < MaxRecordsPerPeriod)
-									NrDayRecords++;
-								else
-									DayHistoricalValues.RemoveLast();
-
-								// TODO: Persistence
-
-								PeriodStart = Now.Date;
-								SumTemp = 0;
-								NrTemp = 0;
-							}
-
-							CurrentTemperature = ReadTemp();
-
-							if (Now.Minute != SampleTime.Minute)
-							{
-								MinuteHistoryRecord Rec = new MinuteHistoryRecord(Now, CurrentTemperature);
-
-								MinuteHistoricalValues.AddFirst(Rec);
-
-								if (NrMinuteRecords < MaxRecordsPerPeriod)
-									NrMinuteRecords++;
-								else
-									MinuteHistoricalValues.RemoveLast();
-
-								// TODO: Persistence
-							}
-
-							SampleTime = Now;
-
-							if (CurrentTemperature < MinTemp)
-							{
-								MinTemp = CurrentTemperature;
-								MinTime = SampleTime;
-							}
-
-							if (CurrentTemperature > MaxTemp)
-							{
-								MaxTemp = CurrentTemperature;
-								MaxTime = SampleTime;
-							}
-
-							SumTemp += CurrentTemperature;
-							NrTemp++;
-						}
-
-						if (SensorServer.HasSubscriptions(ThingReference.Empty))
-						{
-							SensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", 
-								CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
-						}
-
-					}, null, 1000 - PeriodStart.Millisecond, 1000);
-
-					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ProvisioningClient);
-
-					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
-					InteroperabilityServer.OnGetInterfaces += (Sender, e) =>
+				Timer SampleTimer = new((P) =>
+				{
+					lock (SampleSynch)
 					{
-						e.Add("XMPP.IoT.Sensor.Temperature",
-							"XMPP.IoT.Sensor.Temperature.History",
-							"XMPP.IoT.Sensor.Temperature.Average",
-							"XMPP.IoT.Sensor.Temperature.Average.History",
-							"XMPP.IoT.Sensor.Temperature.Min",
-							"XMPP.IoT.Sensor.Temperature.Min.History",
-							"XMPP.IoT.Sensor.Temperature.Max",
-							"XMPP.IoT.Sensor.Temperature.Max.History");
+						Now = DateTime.Now;
 
-						return Task.CompletedTask;
-					};
+						if (Now.Date != PeriodStart.Date)
+						{
+							DayHistoryRecord Rec = new(PeriodStart.Date, PeriodStart.Date.AddDays(1).AddMilliseconds(-1),
+								MinTemp, MaxTemp, SumTemp / NrTemp);
 
-					Client.Connect();
+							DayHistoricalValues.AddFirst(Rec);
 
-					while (true)
-						Thread.Sleep(1000);
-				}
+							if (NrDayRecords < MaxRecordsPerPeriod)
+								NrDayRecords++;
+							else
+								DayHistoricalValues.RemoveLast();
+
+							// TODO: Persistence
+
+							PeriodStart = Now.Date;
+							SumTemp = 0;
+							NrTemp = 0;
+						}
+
+						CurrentTemperature = ReadTemp();
+
+						if (Now.Minute != SampleTime.Minute)
+						{
+							MinuteHistoryRecord Rec = new(Now, CurrentTemperature);
+
+							MinuteHistoricalValues.AddFirst(Rec);
+
+							if (NrMinuteRecords < MaxRecordsPerPeriod)
+								NrMinuteRecords++;
+							else
+								MinuteHistoricalValues.RemoveLast();
+
+							// TODO: Persistence
+						}
+
+						SampleTime = Now;
+
+						if (CurrentTemperature < MinTemp)
+						{
+							MinTemp = CurrentTemperature;
+							MinTime = SampleTime;
+						}
+
+						if (CurrentTemperature > MaxTemp)
+						{
+							MaxTemp = CurrentTemperature;
+							MaxTime = SampleTime;
+						}
+
+						SumTemp += CurrentTemperature;
+						NrTemp++;
+					}
+
+					if (SensorServer.HasSubscriptions(ThingReference.Empty))
+					{
+						SensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
+							CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
+					}
+
+				}, null, 1000 - PeriodStart.Millisecond, 1000);
+
+				BobClient BobClient = new(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
+				ChatServer ChatServer = new(Client, BobClient, SensorServer, ProvisioningClient);
+
+				InteroperabilityServer InteroperabilityServer = new(Client);
+				InteroperabilityServer.OnGetInterfaces += (Sender, e) =>
+				{
+					e.Add("XMPP.IoT.Sensor.Temperature",
+						"XMPP.IoT.Sensor.Temperature.History",
+						"XMPP.IoT.Sensor.Temperature.Average",
+						"XMPP.IoT.Sensor.Temperature.Average.History",
+						"XMPP.IoT.Sensor.Temperature.Min",
+						"XMPP.IoT.Sensor.Temperature.Min.History",
+						"XMPP.IoT.Sensor.Temperature.Max",
+						"XMPP.IoT.Sensor.Temperature.Max.History");
+
+					return Task.CompletedTask;
+				};
+
+				Client.Connect();
+
+				while (true)
+					Thread.Sleep(1000);
 			}
 			catch (Exception ex)
 			{
@@ -381,7 +371,7 @@ namespace Waher.Mock.Temperature
 			}
 			finally
 			{
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			}
 		}
 
@@ -399,22 +389,25 @@ namespace Waher.Mock.Temperature
 			return Math.Round(Temp * 10) * 0.1;
 		}
 
-		private static void Register()
+		private static async Task Register()
 		{
+			if (thingRegistryClient is null)
+				return;
+
 			string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
-			MetaDataTag[] MetaData = new MetaDataTag[]
-			{
+			MetaDataTag[] MetaData =
+			[
 				new MetaDataStringTag("KEY", Key),
 				new MetaDataStringTag("CLASS", "Temperature Sensor"),
 				new MetaDataStringTag("MAN", "waher.se"),
 				new MetaDataStringTag("MODEL", "Waher.Mock.Temperature"),
 				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature"),
 				new MetaDataNumericTag("V",1.0)
-			};
+			];
 
-			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+			await thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{

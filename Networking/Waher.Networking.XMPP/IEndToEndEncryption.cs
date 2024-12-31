@@ -107,7 +107,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="DataXml">Data to encrypt.</param>
 		/// <param name="Xml">XML containing the encrypted data will be output here.</param>
 		/// <returns>If encryption was possible to the recipient, or not.</returns>
-		Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
+		bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml);
 
 		/// <summary>
 		/// Decrypts data from XML that has been received over XMPP.
@@ -120,7 +120,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="E2eElement">XML element containing the encrypted data.</param>
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
 		/// <returns>Decrypted XML, together with an endpoint reference, if successful, null otherwise..</returns>
-		Task<Tuple<string, string>> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
+		Tuple<string, string> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
             IE2eSymmetricCipher SymmetricCipher);
 
 		/// <summary>

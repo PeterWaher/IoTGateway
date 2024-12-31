@@ -104,7 +104,7 @@ namespace Waher.Networking.DNS.Communication
 					if (this.disposed)
 						return;
 
-					await this.ReceiveBinary(Data.Buffer);
+					this.ReceiveBinary(true, Data.Buffer);
 
 					try
 					{
@@ -113,7 +113,7 @@ namespace Waher.Networking.DNS.Communication
 					}
 					catch (Exception ex)
 					{
-						await this.Error("Unable to process DNS packet: " + ex.Message);
+						this.Error("Unable to process DNS packet: " + ex.Message);
 					}
 				}
 			}
@@ -123,17 +123,19 @@ namespace Waher.Networking.DNS.Communication
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 		}
 
 		/// <summary>
 		/// Sends a message to a destination.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Message">Message</param>
 		/// <param name="Destination">Destination. If null, default destination
 		/// is assumed.</param>
-		protected override Task SendAsync(byte[] Message, IPEndPoint Destination)
+		protected override Task SendAsync(bool ConstantBuffer, byte[] Message, IPEndPoint Destination)
 		{
 			return this.udp.SendAsync(Message, Message.Length, Destination ?? this.dnsEndpoint);
 		}

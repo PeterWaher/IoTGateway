@@ -253,7 +253,7 @@ namespace Waher.IoTGateway
 
             int i = Host.LastIndexOf(':');
             if (i > 0)
-                Host = Host.Substring(0, i);
+				Host = Host[..i];
 
             if (Gateway.IsDomain(Host, true) && !Gateway.IsDomain(Host, false))
                 return Host;

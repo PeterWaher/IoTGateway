@@ -53,18 +53,21 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
 			server?.Dispose();
 			server = null;
 
-			xmlSniffer?.Dispose();
-			xmlSniffer = null;
+			if (xmlSniffer is not null)
+			{
+				await xmlSniffer.DisposeAsync();
+				xmlSniffer = null;
+			}
 
 			if (sink is not null)
 			{
 				Log.Unregister(sink);
-				sink.Dispose();
+				await sink.DisposeAsync();
 				sink = null;
 			}
 		}

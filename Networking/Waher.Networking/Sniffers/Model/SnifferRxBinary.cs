@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers.Model
@@ -8,23 +9,36 @@ namespace Waher.Networking.Sniffers.Model
     /// </summary>
     public class SnifferRxBinary : SnifferBinaryEvent
     {
-        /// <summary>
-        /// Represents a sniffer binary reception event.
-        /// </summary>
+		/// <summary>
+		/// Represents a sniffer binary reception event.
+		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
-        /// <param name="Data">Data.</param>
-        public SnifferRxBinary(DateTime Timestamp, byte[] Data)
-            : base(Timestamp, Data)
+		/// <param name="Data">Data.</param>
+		/// <param name="Offset">Offset into array.</param>
+		/// <param name="Count">Number of bytes</param>
+		/// <param name="Processor">Sniff event processor</param>
+		public SnifferRxBinary(DateTime Timestamp, byte[] Data, int Offset, int Count, ISniffEventProcessor Processor)
+            : base(Timestamp, Data, Offset, Count, Processor)
         {
         }
 
-        /// <summary>
-        /// Replays the event to a given sniffer.
-        /// </summary>
-        /// <param name="Sniffer">Sniffer.</param>
-        public override Task Replay(ISniffer Sniffer)
+		/// <summary>
+		/// Executes the operation.
+		/// </summary>
+		/// <param name="Cancel">Cancellation token.</param>
+		/// <param name="RegisterCancelToken">If task can be cancelled.</param>
+		protected override sealed Task Execute(CancellationToken Cancel, bool RegisterCancelToken)
+		{
+			return this.Processor.Process(this);
+		}
+
+		/// <summary>
+		/// Replays the event to a given sniffer.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer.</param>
+		public override void Replay(ISniffer Sniffer)
         {
-            return Sniffer.ReceiveBinary(this.Timestamp, this.Data);
+            Sniffer.ReceiveBinary(this.Timestamp, true, this.Data, this.Offset, this.Count);
         }
 
         /// <inheritdoc/>

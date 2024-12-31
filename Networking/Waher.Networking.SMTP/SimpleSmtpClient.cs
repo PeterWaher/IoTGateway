@@ -11,6 +11,7 @@ using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Multipart;
 using Waher.Content.Text;
+using Waher.Events;
 using Waher.Networking.SASL;
 using Waher.Networking.SMTP.Exceptions;
 using Waher.Networking.Sniffers;
@@ -21,7 +22,7 @@ namespace Waher.Networking.SMTP
     /// <summary>
     /// Simple SMTP Client
     /// </summary>
-    public class SimpleSmtpClient : CommunicationLayer, ISaslClientSide, IDisposable
+    public class SimpleSmtpClient : CommunicationLayer, ISaslClientSide, IDisposableAsync
 	{
 		/// <summary>
 		/// 25
@@ -88,8 +89,11 @@ namespace Waher.Networking.SMTP
 		/// </summary>
 		public async Task Connect()
 		{
-			this.client?.Dispose();
-			this.client = null;
+			if (!(this.client is null))
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 
 			lock (this.synchObj)
 			{
@@ -106,45 +110,46 @@ namespace Waher.Networking.SMTP
 			this.client.OnInformation += this.Client_OnInformation;
 			this.client.OnWarning += this.Client_OnWarning;
 
-			await this.Information("Connecting to " + this.host + ":" + this.port.ToString());
+			this.Information("Connecting to " + this.host + ":" + this.port.ToString());
 			await this.client.ConnectAsync(this.host, this.port);
-			await this.Information("Connected to " + this.host + ":" + this.port.ToString());
+			this.Information("Connected to " + this.host + ":" + this.port.ToString());
 
 			await this.AssertOkResult();
 		}
 
-		private async Task<string> Client_OnWarning(string Text)
+		private string Client_OnWarning(string Text)
 		{
-			await this.Warning(Text);
+			this.Warning(Text);
 			return Text;
 		}
 
-		private async Task<string> Client_OnInformation(string Text)
+		private string Client_OnInformation(string Text)
 		{
-			await this.Information(Text);
+			this.Information(Text);
 			return Text;
 		}
 
 		private Task Client_OnError(object Sender, Exception Exception)
 		{
-			return this.Error(Exception.Message);
+			this.Error(Exception.Message);
+			return Task.CompletedTask;
 		}
 
-		private async Task<bool> Client_OnSent(object Sender, string Text)
+		private Task<bool> Client_OnSent(object Sender, string Text)
 		{
-			await this.TransmitText(Text);
-			return true;
+			this.TransmitText(Text);
+			return Task.FromResult(true);
 		}
 
-		private async Task<bool> Client_OnReceived(object Sender, string Row)
+		private Task<bool> Client_OnReceived(object Sender, string Row)
 		{
 			if (string.IsNullOrEmpty(Row))
 			{
-				await this.Error("No response returned.");
-				return true;
+				this.Error("No response returned.");
+				return Task.FromResult(true);
 			}
 
-			await this.ReceiveText(Row);
+			this.ReceiveText(Row);
 
 			int i = Row.IndexOfAny(spaceHyphen);
 			if (i < 0)
@@ -152,8 +157,8 @@ namespace Waher.Networking.SMTP
 
 			if (!int.TryParse(Row[..i], out int Code))
 			{
-				await this.Error("Invalid response returned.");
-				return true;
+				this.Error("Invalid response returned.");
+				return Task.FromResult(true);
 			}
 
 			bool More = i < Row.Length && Row[i] == '-';
@@ -174,25 +179,34 @@ namespace Waher.Networking.SMTP
 				}
 			}
 
-			return true;
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
 		/// Disposes of the client.
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
-			this.client?.Dispose();
-			this.client = null;
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
+		{
+			if (!(this.client is null))
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 		}
 
 		/// <summary>
 		/// Domain
 		/// </summary>
-		public string Domain
-		{
-			get => this.domain;
-		}
+		public string Domain => this.domain;
 
 		/// <summary>
 		/// If server certificate should be trusted by default (default=false).
@@ -258,9 +272,9 @@ namespace Waher.Networking.SMTP
 			return this.client.SendAsync(Row);
 		}
 
-		private Task Write(bool OneTimeBuffer, byte[] Bytes)
+		private Task Write(bool ConstantBuffer, byte[] Bytes)
 		{
-			return this.client.SendAsync(OneTimeBuffer, Bytes);
+			return this.client.SendAsync(ConstantBuffer, Bytes);
 		}
 
 		private Task<string> AssertOkResult()
@@ -382,9 +396,9 @@ namespace Waher.Networking.SMTP
 
 				await this.client.PauseReading();
 
-				await this.Information("Starting TLS handshake.");
+				this.Information("Starting TLS handshake.");
 				await this.client.UpgradeToTlsAsClient(null, Crypto.SecureTls, this.trustCertificate);
-				await this.Information("TLS handshake complete.");
+				this.Information("TLS handshake complete.");
 				this.client.Continue();
 
 				ResponseDomain = await this.EHLO(Domain);
@@ -489,7 +503,7 @@ namespace Waher.Networking.SMTP
 		/// <summary>
 		/// Executes the DATA command.
 		/// </summary>
-		public async Task DATA(KeyValuePair<string, string>[] Headers, bool OneTimeBody, byte[] Body)
+		public async Task DATA(KeyValuePair<string, string>[] Headers, bool ConstantBody, byte[] Body)
 		{
 			await this.WriteLine("DATA");
 			await this.AssertContinue();
@@ -510,7 +524,7 @@ namespace Waher.Networking.SMTP
 					j = c;
 
 				if (i == 0 && j == c)
-					await this.Write(OneTimeBody, Body);
+					await this.Write(ConstantBody, Body);
 				else
 				{
 					byte[] Bin = new byte[j - i];

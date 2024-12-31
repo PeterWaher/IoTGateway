@@ -97,7 +97,7 @@ namespace Waher.Networking.HTTP.WebSockets
 	/// <summary>
 	/// Class handling a web-socket.
 	/// </summary>
-	public class WebSocket : IDisposable
+	public class WebSocket : IDisposableAsync
 	{
 		private object tag = null;
 
@@ -195,16 +195,9 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// Disposes the object.
 		/// </summary>
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -229,20 +222,10 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		public event EventHandlerAsync Disposed = null;
 
-		internal async Task<bool> WebSocketDataReceived(byte[] Data, int Offset, int NrRead)
+		internal async Task<bool> WebSocketDataReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			if (this.connection?.HasSniffers ?? false)
-			{
-				if (Offset != 0 || Data.Length != NrRead)
-				{
-					byte[] Received = new byte[NrRead];
-					Array.Copy(Data, Offset, Received, 0, NrRead);
-					Data = Received;
-					Offset = 0;
-				}
-
-				this.connection?.ReceiveBinary(Data);
-			}
+				this.connection?.ReceiveBinary(ConstantBuffer, Data, Offset, NrRead);
 
 			int End = Offset + NrRead;
 			bool Again = false;
@@ -565,7 +548,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			return this.TextReceived.Raise(this, new WebSocketTextEventArgs(this, Payload));
 		}
 
-		private async Task BeginWriteRaw(byte[] Frame, bool Last, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		private async Task BeginWriteRaw(bool ConstantBuffer, byte[] Frame, bool Last, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (Frame is null)
 				throw new ArgumentException("Frame cannot be null.", nameof(Frame));
@@ -592,7 +575,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				{
 					if (this.http2)
 					{
-						if (!await this.http2Stream.TryWriteAllData(Frame, 0, Frame.Length, Last, null))
+						if (!await this.http2Stream.TryWriteAllData(ConstantBuffer, Frame, 0, Frame.Length, Last, null))
 						{
 							lock (this.queue)
 							{
@@ -604,7 +587,7 @@ namespace Waher.Networking.HTTP.WebSockets
 						}
 					}
 					else
-						await this.httpResponse.WriteRawAsync(Frame);
+						await this.httpResponse.WriteRawAsync(ConstantBuffer, Frame);
 
 					if (!(Callback is null))
 						await Callback.Raise(this, new DeliveryEventArgs(State, true));
@@ -703,7 +686,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		public async Task Send(string Payload, bool More, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			byte[] Frame = this.CreateFrame(Payload, More);
-			await this.BeginWriteRaw(Frame, false, Callback, State);
+			await this.BeginWriteRaw(true, Frame, false, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
 			this.connection?.TransmitText(Payload);
@@ -788,10 +771,10 @@ namespace Waher.Networking.HTTP.WebSockets
 		public async Task Send(byte[] Payload, bool More, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			byte[] Frame = this.CreateFrame(Payload, More);
-			await this.BeginWriteRaw(Frame, false, Callback, State);
+			await this.BeginWriteRaw(true, Frame, false, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
-			this.connection?.TransmitBinary(Payload);
+			this.connection?.TransmitBinary(true, Frame);
 		}
 
 		/// <summary>
@@ -917,10 +900,10 @@ namespace Waher.Networking.HTTP.WebSockets
 			this.closed = true;
 
 			byte[] Frame = this.CreateFrame(null, WebSocketOpcode.Close, false);
-			await this.BeginWriteRaw(Frame, true, Callback, State);
+			await this.BeginWriteRaw(true, Frame, true, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
-			this.connection?.TransmitBinary(Frame);
+			this.connection?.TransmitBinary(true, Frame);
 		}
 
 		/// <summary>
@@ -967,10 +950,10 @@ namespace Waher.Networking.HTTP.WebSockets
 			this.closed = true;
 
 			byte[] Frame = this.Encode(Code, Reason);
-			await this.BeginWriteRaw(Frame, true, Callback, State);
+			await this.BeginWriteRaw(true, Frame, true, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
-			this.connection?.TransmitBinary(Frame);
+			this.connection?.TransmitBinary(true,Frame);
 		}
 
 		/// <summary>
@@ -1043,10 +1026,10 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			Frame = this.CreateFrame(Bin, WebSocketOpcode.Pong, false);
 
-			await this.BeginWriteRaw(Frame, false, null, null);
+			await this.BeginWriteRaw(true, Frame, false, null, null);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
-			this.connection?.TransmitBinary(Frame);
+			this.connection?.TransmitBinary(true,Frame);
 		}
 
 		/// <summary>

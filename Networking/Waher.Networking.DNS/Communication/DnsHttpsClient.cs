@@ -36,10 +36,12 @@ namespace Waher.Networking.DNS.Communication
 		/// <summary>
 		/// Sends a message to a destination.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Message">Message</param>
 		/// <param name="Destination">Destination. If null, default destination
 		/// is assumed.</param>
-		protected override async Task SendAsync(byte[] Message, IPEndPoint Destination)
+		protected override async Task SendAsync(bool ConstantBuffer, byte[] Message, IPEndPoint Destination)
 		{
 			using (HttpClient HttpClient = new HttpClient()
 			{
@@ -62,7 +64,7 @@ namespace Waher.Networking.DNS.Communication
 					{
 						byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 
-						await this.ReceiveBinary(Bin);
+						this.ReceiveBinary(true, Bin);
 
 						try
 						{

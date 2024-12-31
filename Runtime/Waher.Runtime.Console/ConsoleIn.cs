@@ -32,7 +32,7 @@ namespace Waher.Runtime.Console
 		public static async Task<int> PeekAsync()
 		{
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			if (await ConsoleWorker.Queue(new ConsoleInPeekCharacter(Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInPeekCharacter(Result)))
 				return await Result.Task;
 			else
 				return -1;
@@ -56,7 +56,7 @@ namespace Waher.Runtime.Console
 		public static async Task<int> ReadAsync()
 		{
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			if (await ConsoleWorker.Queue(new ConsoleInReadCharacter(Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInReadCharacter(Result)))
 				return await Result.Task;
 			else
 				return -1;
@@ -103,7 +103,7 @@ namespace Waher.Runtime.Console
 			CheckArguments(buffer, index, count);
 
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			if (await ConsoleWorker.Queue(new ConsoleInRead(buffer, index, count, Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInRead(buffer, index, count, Result)))
 				return await Result.Task;
 			else
 				return 0;
@@ -166,7 +166,7 @@ namespace Waher.Runtime.Console
 			CheckArguments(buffer, index, count);
 
 			TaskCompletionSource<int> Result = new TaskCompletionSource<int>();
-			if (await ConsoleWorker.Queue(new ConsoleInReadBlock(buffer, index, count, Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInReadBlock(buffer, index, count, Result)))
 				return await Result.Task;
 			else
 				return 0;
@@ -190,7 +190,7 @@ namespace Waher.Runtime.Console
 		public static async Task<string> ReadLineAsync()
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			if (await ConsoleWorker.Queue(new ConsoleInReadLine(Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInReadLine(Result)))
 				return await Result.Task;
 			else
 				return null;
@@ -217,7 +217,7 @@ namespace Waher.Runtime.Console
 		public static async Task<string> ReadToEndAsync()
 		{
 			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
-			if (await ConsoleWorker.Queue(new ConsoleInReadToEnd(Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInReadToEnd(Result)))
 				return await Result.Task;
 			else
 				return string.Empty;
@@ -257,7 +257,7 @@ namespace Waher.Runtime.Console
 		public static async Task<ConsoleKeyInfo> ReadKeyAsync(bool intercept)
 		{
 			TaskCompletionSource<ConsoleKeyInfo> Result = new TaskCompletionSource<ConsoleKeyInfo>();
-			if (await ConsoleWorker.Queue(new ConsoleInReadKey(intercept, Result)))
+			if (await ConsoleWorker.Forward(new ConsoleInReadKey(intercept, Result)))
 				return await Result.Task;
 			else
 				return new ConsoleKeyInfo();

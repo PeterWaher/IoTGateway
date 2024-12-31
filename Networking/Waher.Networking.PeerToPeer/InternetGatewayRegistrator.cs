@@ -15,7 +15,7 @@ namespace Waher.Networking.PeerToPeer
 	/// <summary>
 	/// Manages registration of TCP and UDP ports in an Internet Gateway
 	/// </summary>
-	public class InternetGatewayRegistrator : IDisposable
+	public class InternetGatewayRegistrator : IDisposableAsync
 	{
 		internal readonly InternetGatewayRegistration[] ports;
 		internal IPAddress localAddress;
@@ -609,8 +609,11 @@ namespace Waher.Networking.PeerToPeer
 
 			this.serviceWANIPConnectionV1 = null;
 
-			this.upnpClient?.Dispose();
-			this.upnpClient = null;
+			if (!(this.upnpClient is null))
+			{
+				await this.upnpClient.DisposeAsync();
+				this.upnpClient = null;
+			}
 
 			this.ipAddressesFound?.Clear();
 			this.ipAddressesFound = null;

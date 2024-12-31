@@ -320,7 +320,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			this.client.OnWriteQueueEmpty -= this.WriteQueueEmpty;
 			await this.client.Send(true, new byte[] { 0, 0 });
-			this.client.CloseWhenDone();
+			await this.client.CloseWhenDone();
 			this.Dispose();
 		}
 

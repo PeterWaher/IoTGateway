@@ -89,6 +89,7 @@ namespace Waher.Content.Markdown.GraphViz
 						{
 							scheduler?.Dispose();
 							scheduler = null;
+							return Task.CompletedTask;
 						};
 					}
 				}

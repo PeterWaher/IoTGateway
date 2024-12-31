@@ -40,13 +40,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.symmetricCipher = SymmetricCipher;
 		}
 
-		internal override async Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data)
+		internal override async Task<bool> ChunkReceived(int Nr, bool Last, bool ConstantBuffer, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
 				if (Data.Length > 0 || Last)
 				{
-					if (!await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state), false))
+					HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(null, ConstantBuffer, Data, this.streamId, Last, this.state);
+					if (!await this.dataCallback.Raise(this.client, e, false))
 					{
 						await this.client.CancelTransfer(this.e.From, this.streamId);
 						return false;
@@ -69,7 +70,8 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								if (Chunk.Nr == this.nextChunk)
 								{
-									if (!await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last, this.state), false))
+									HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(null, Chunk.ConstantBuffer, Chunk.Data, this.streamId, Chunk.Last, this.state);
+									if (!await this.dataCallback.Raise(this.client, e, false))
 										return false;
 
 									this.nextChunk++;
@@ -92,10 +94,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else if (Nr > this.nextChunk)
 			{
-				if (this.chunks is null)
-					this.chunks = new SortedDictionary<int, Chunk>();
-
-				this.chunks[Nr] = new Chunk(Nr, Last, Data);
+				this.chunks ??= new SortedDictionary<int, Chunk>();
+				this.chunks[Nr] = new Chunk(Nr, Last, ConstantBuffer, Data);
 			}
 
 			return true;
@@ -121,7 +121,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (this.response is null)
 				return;
 
-			await this.dataCallback.Raise(this.client, new HttpxResponseDataEventArgs(null, new byte[0], this.streamId, true, this.state), false);
+			HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(null, true, new byte[0], this.streamId, true, this.state);
+			await this.dataCallback.Raise(this.client, e, false);
 
 			if (!this.response.HeaderSent)
 				await this.response.SendResponse(new InternalServerErrorException(Message));

@@ -26,11 +26,11 @@ using Windows.Networking.Connectivity;
 
 namespace Waher.Networking.CoAP
 {
-    /// <summary>
-    /// CoAP client. CoAP is defined in RFC7252:
-    /// https://tools.ietf.org/html/rfc7252
-    /// </summary>
-    public class CoapEndpoint : CommunicationLayer, IDisposable
+	/// <summary>
+	/// CoAP client. CoAP is defined in RFC7252:
+	/// https://tools.ietf.org/html/rfc7252
+	/// </summary>
+	public class CoapEndpoint : CommunicationLayer, IDisposableAsync
 	{
 		/// <summary>
 		/// Default CoAP port = 5683
@@ -420,7 +420,16 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.scheduler?.Dispose();
 			this.scheduler = null;
@@ -455,16 +464,16 @@ namespace Waher.Networking.CoAP
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
-				if (Sniffer is IDisposable Disposable)
+				try
 				{
-					try
-					{
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
 						Disposable.Dispose();
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -478,7 +487,7 @@ namespace Waher.Networking.CoAP
 		{
 			if (Packet.Length < 4)
 			{
-				await this.Error("Datagram too short.");
+				this.Error("Datagram too short.");
 				return;
 			}
 
@@ -486,7 +495,7 @@ namespace Waher.Networking.CoAP
 			int TokenLength = b & 15;
 			if (TokenLength > 8)
 			{
-				await this.Error("Invalid token length.");
+				this.Error("Invalid token length.");
 				return;
 			}
 
@@ -495,7 +504,7 @@ namespace Waher.Networking.CoAP
 			b >>= 2;
 			if (b != 1)
 			{
-				await this.Error("Unrecognized version.");
+				this.Error("Unrecognized version.");
 				return;
 			}
 
@@ -513,7 +522,7 @@ namespace Waher.Networking.CoAP
 			{
 				if (Pos >= Len)
 				{
-					await this.Error("Unexpected end of packet.");
+					this.Error("Unexpected end of packet.");
 					return;
 				}
 
@@ -544,7 +553,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -554,7 +563,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + 1 >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -565,7 +574,7 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Delta == 15)
 					{
-						await this.Error("Invalid delta-value.");
+						this.Error("Invalid delta-value.");
 						return;
 					}
 
@@ -573,7 +582,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -583,7 +592,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + 1 >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -594,7 +603,7 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Length == 15)
 					{
-						await this.Error("Invalid length-value.");
+						this.Error("Invalid length-value.");
 						return;
 					}
 
@@ -604,7 +613,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + Length > Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -623,7 +632,7 @@ namespace Waher.Networking.CoAP
 						}
 						catch (Exception ex)
 						{
-							await this.Exception(ex);
+							this.Exception(ex);
 
 							if (Option.Critical)
 								return;
@@ -662,7 +671,7 @@ namespace Waher.Networking.CoAP
 						ulong l = ((CoapOptionObserve)Option).Value;
 						if (l < 0 || l > 0xffffff)
 						{
-							await this.Error("Invalid observe value.");
+							this.Error("Invalid observe value.");
 							return;
 						}
 
@@ -673,7 +682,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionUriPort)Option).Value;
 						if (l < 0 || l > ushort.MaxValue)
 						{
-							await this.Error("Invalid port number.");
+							this.Error("Invalid port number.");
 							return;
 						}
 
@@ -698,7 +707,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionContentFormat)Option).Value;
 						if (l < 0 || l > ushort.MaxValue)
 						{
-							await this.Error("Invalid content format.");
+							this.Error("Invalid content format.");
 							return;
 						}
 
@@ -709,7 +718,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionMaxAge)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							await this.Error("Invalid max age.");
+							this.Error("Invalid max age.");
 							return;
 						}
 
@@ -748,7 +757,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionSize2)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							await this.Error("Invalid size2.");
+							this.Error("Invalid size2.");
 							return;
 						}
 
@@ -759,7 +768,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionSize1)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							await this.Error("Invalid size1.");
+							this.Error("Invalid size1.");
 							return;
 						}
 
@@ -1584,7 +1593,7 @@ namespace Waher.Networking.CoAP
 							Result.Add(Options[j]);
 					}
 				}
-				else 
+				else
 					Result?.Add(Option);
 			}
 

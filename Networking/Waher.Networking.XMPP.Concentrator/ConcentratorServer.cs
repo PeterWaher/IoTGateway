@@ -2789,10 +2789,15 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private static void DisposeObject(object Object)
+		private static Task DisposeObject(object Object)
 		{
+			if (Object is IDisposableAsync DisposableAsync)
+				return DisposableAsync.DisposeAsync();
+			
 			if (Object is IDisposable Disposable)
 				Disposable.Dispose();
+
+			return Task.CompletedTask;
 		}
 
 		private async Task ExecuteNodeCommandHandler(object Sender, IqEventArgs e)
@@ -2860,7 +2865,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (!(Result.Errors is null))
 						{
-							DisposeObject(Command);
+							await DisposeObject(Command);
 
 							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
 							await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
@@ -2876,7 +2881,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					finally
 					{
 						if (Command.Type != CommandType.Simple)
-							DisposeObject(Command);
+							await DisposeObject(Command);
 					}
 
 					await e.IqResult(string.Empty);
@@ -2942,7 +2947,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (!(Result.Errors is null))
 					{
-						DisposeObject(Command);
+						await DisposeObject(Command);
 						await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 						return;
 					}
@@ -2951,7 +2956,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (!this.RegisterQuery(Query))
 					{
-						DisposeObject(Command);
+						await DisposeObject(Command);
 						await e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
 						return;
 					}
@@ -2992,7 +2997,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					finally
 					{
-						DisposeObject(Command);
+						await DisposeObject(Command);
 					}
 				}
 			}
@@ -3884,7 +3889,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (!(Result.Errors is null))
 				{
-					DisposeObject(Command);
+					await DisposeObject(Command);
 					await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					return;
 				}
@@ -3920,7 +3925,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Command.Type != CommandType.Simple)
-				DisposeObject(Command);
+				await DisposeObject(Command);
 
 			Xml.Append("</partialExecution>");
 
@@ -4037,7 +4042,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (!(Result.Errors is null))
 			{
-				DisposeObject(Command);
+				await DisposeObject(Command);
 				await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 				return;
 			}
@@ -4054,7 +4059,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Query is null)
 			{
-				DisposeObject(Command);
+				await DisposeObject(Command);
 				await e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
 				return;
 			}
@@ -4115,7 +4120,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await Query.Abort();
 			}
 
-			DisposeObject(Command);
+			await DisposeObject(Command);
 
 			Xml.Append("</partialExecution>");
 

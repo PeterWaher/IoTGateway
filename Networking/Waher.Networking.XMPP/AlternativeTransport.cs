@@ -24,7 +24,17 @@ namespace Waher.Networking.XMPP
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
 		/// unmanaged resources.
 		/// </summary>
-		public abstract void Dispose();
+		[Obsolete("Use DisposeAsync() instead")]
+		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting
+		/// unmanaged resources.
+		/// </summary>
+		public abstract Task DisposeAsync();
 
 		/// <summary>
 		/// Sends a text packet.

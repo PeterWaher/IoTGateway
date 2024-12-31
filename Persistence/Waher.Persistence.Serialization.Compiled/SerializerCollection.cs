@@ -9,13 +9,14 @@ using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization.ReferenceTypes;
 using Waher.Persistence.Serialization.ValueTypes;
 using Waher.Script.Abstraction.Elements;
+using Waher.Events;
 
 namespace Waher.Persistence.Serialization
 {
 	/// <summary>
 	/// Maintains a set of serializers.
 	/// </summary>
-	public class SerializerCollection : IDisposable
+	public class SerializerCollection : IDisposableAsync
 	{
 		private Dictionary<Type, IObjectSerializer> serializers;
 		private AutoResetEvent serializerAdded = new AutoResetEvent(false);
@@ -80,29 +81,42 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!(this.serializers is null))
 			{
+				IObjectSerializer[] Serializers = new IObjectSerializer[this.serializers.Count];
+
 				lock (this.synchObj)
 				{
-					foreach (IObjectSerializer Serializer in this.serializers.Values)
-					{
-						if (Serializer is IDisposable d)
-						{
-							try
-							{
-								d.Dispose();
-							}
-							catch (Exception)
-							{
-								// Ignore
-							}
-						}
-					}
+					this.serializers.Values.CopyTo(Serializers, 0);
 
 					this.serializers.Clear();
 					this.serializers = null;
+				}
+
+				foreach (IObjectSerializer Serializer in Serializers)
+				{
+					try
+					{
+						if (Serializer is IDisposableAsync dAsync)
+							await dAsync.DisposeAsync();
+						else if (Serializer is IDisposable d)
+							d.Dispose();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 				}
 			}
 

@@ -78,6 +78,7 @@ namespace Waher.Content.Markdown.Layout2D
 					{
 						scheduler?.Dispose();
 						scheduler = null;
+						return Task.CompletedTask;
 					};
 				}
 			}

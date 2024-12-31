@@ -66,10 +66,10 @@ namespace Waher.Client.WPF.Model
 		private const string OtherGroupName = "Others";
 		private const string RemoteDesktopGroupName = "RDP";
 
-		private readonly Dictionary<string, RemoteDesktopView> activeViews = new Dictionary<string, RemoteDesktopView>();
-		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
-		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
-		private readonly Dictionary<string, List<EventHandlerAsync<RosterItem>>> rosterSubscriptions = new Dictionary<string, List<EventHandlerAsync<RosterItem>>>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, RemoteDesktopView> activeViews = [];
+		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new();
+		private readonly LinkedList<XmppComponent> components = new();
+		private readonly Dictionary<string, List<EventHandlerAsync<RosterItem>>> rosterSubscriptions = new(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Connections connections;
 		private EndpointSecurity e2eEncryption;
 		private XmppClient client;
@@ -168,7 +168,7 @@ namespace Waher.Client.WPF.Model
 
 		private void Init(params ISniffer[] Sniffers)
 		{
-			XmppCredentials Credentials = new XmppCredentials()
+			XmppCredentials Credentials = new()
 			{
 				Host = this.host,
 				Port = this.port,
@@ -200,7 +200,7 @@ namespace Waher.Client.WPF.Model
 				AllowQuickLogin = true,
 			};
 
-			if (!(Sniffers is null))
+			if (Sniffers is not null)
 				this.client.AddRange(Sniffers);
 
 			this.client.OnStateChanged += this.Client_OnStateChanged;
@@ -292,7 +292,7 @@ namespace Waher.Client.WPF.Model
 
 		private async Task ConcentratorClient_OnCustomSnifferMessage(object _, CustomSnifferEventArgs e)
 		{
-			TaskCompletionSource<SnifferView> View = new TaskCompletionSource<SnifferView>();
+			TaskCompletionSource<SnifferView> View = new();
 
 			MainWindow.UpdateGui(() =>
 			{
@@ -323,7 +323,7 @@ namespace Waher.Client.WPF.Model
 			{
 				this.unhandledMessages.AddLast(new KeyValuePair<DateTime, MessageEventArgs>(Now, e));
 
-				while (!(this.unhandledMessages.First is null) && this.unhandledMessages.First.Value.Key <= Limit)
+				while (this.unhandledMessages.First is not null && this.unhandledMessages.First.Value.Key <= Limit)
 					this.unhandledMessages.RemoveFirst();
 			}
 
@@ -332,7 +332,7 @@ namespace Waher.Client.WPF.Model
 
 		public IEnumerable<MessageEventArgs> GetUnhandledMessages(string LocalName, string Namespace)
 		{
-			LinkedList<MessageEventArgs> Result = new LinkedList<MessageEventArgs>();
+			LinkedList<MessageEventArgs> Result = new();
 			LinkedListNode<KeyValuePair<DateTime, MessageEventArgs>> Loop, Next;
 			bool Found;
 
@@ -340,7 +340,7 @@ namespace Waher.Client.WPF.Model
 			{
 				Loop = this.unhandledMessages.First;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					Next = Loop.Next;
 
@@ -405,7 +405,7 @@ namespace Waher.Client.WPF.Model
 					bool ImmediateReconnect = this.connected;
 					this.connected = false;
 
-					if (ImmediateReconnect && !(this.client is null))
+					if (ImmediateReconnect && this.client is not null)
 						await this.client.Reconnect();
 					break;
 			}
@@ -470,7 +470,7 @@ namespace Waher.Client.WPF.Model
 			this.eventReceptor?.Dispose();
 			this.eventReceptor = null;
 
-			if (!(this.client is null))
+			if (this.client is not null)
 			{
 				this.client.RemoveTag("E2E");
 
@@ -486,7 +486,7 @@ namespace Waher.Client.WPF.Model
 			{
 				this.connectionTimer = MainWindow.Scheduler.Add(DateTime.Now.AddMinutes(1), this.CheckConnection, null);
 
-				if (!(this.client is null) && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
+				if (this.client is not null && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
 					await this.client.Reconnect();
 			}
 			catch (Exception ex)
@@ -523,27 +523,27 @@ namespace Waher.Client.WPF.Model
 			Output.WriteEndElement();
 		}
 
-		internal static readonly BitmapImage away = new BitmapImage(new Uri("../Graphics/Away.png", UriKind.Relative));
-		internal static readonly BitmapImage busy = new BitmapImage(new Uri("../Graphics/DoNotDisturb.png", UriKind.Relative));
-		internal static readonly BitmapImage chat = new BitmapImage(new Uri("../Graphics/Chat.png", UriKind.Relative));
-		internal static readonly BitmapImage extendedAway = new BitmapImage(new Uri("../Graphics/ExtendedAway.png", UriKind.Relative));
-		internal static readonly BitmapImage offline = new BitmapImage(new Uri("../Graphics/Offline.png", UriKind.Relative));
-		internal static readonly BitmapImage online = new BitmapImage(new Uri("../Graphics/Online.png", UriKind.Relative));
-		internal static readonly BitmapImage folderBlueClosed = new BitmapImage(new Uri("../Graphics/folder-blue-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage folderBlueOpen = new BitmapImage(new Uri("../Graphics/folder-blue-open-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage folderYellowClosed = new BitmapImage(new Uri("../Graphics/folder-yellow-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage folderYellowOpen = new BitmapImage(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage box = new BitmapImage(new Uri("../Graphics/App-miscellaneous-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage hourglass = new BitmapImage(new Uri("../Graphics/hourglass-icon.png", UriKind.Relative));
-		internal static readonly BitmapImage database = new BitmapImage(new Uri("../Graphics/Database-icon_16.png", UriKind.Relative));
-		internal static readonly BitmapImage component = new BitmapImage(new Uri("../Graphics/server-components-icon_16.png", UriKind.Relative));
-		internal static readonly BitmapImage chatBubble = new BitmapImage(new Uri("../Graphics/Chat-icon_16.png", UriKind.Relative));
-		internal static readonly BitmapImage legal = new BitmapImage(new Uri("../Graphics/justice-balance-icon_16.png", UriKind.Relative));
-		internal static readonly BitmapImage log = new BitmapImage(new Uri("../Graphics/App-edit-icon_16.png", UriKind.Relative));
-		internal static readonly BitmapImage none = new BitmapImage(new Uri("../Graphics/None.png", UriKind.Relative));
-		internal static readonly BitmapImage from = new BitmapImage(new Uri("../Graphics/From.png", UriKind.Relative));
-		internal static readonly BitmapImage to = new BitmapImage(new Uri("../Graphics/To.png", UriKind.Relative));
-		internal static readonly BitmapImage both = new BitmapImage(new Uri("../Graphics/Both.png", UriKind.Relative));
+		internal static readonly BitmapImage away = new(new Uri("../Graphics/Away.png", UriKind.Relative));
+		internal static readonly BitmapImage busy = new(new Uri("../Graphics/DoNotDisturb.png", UriKind.Relative));
+		internal static readonly BitmapImage chat = new(new Uri("../Graphics/Chat.png", UriKind.Relative));
+		internal static readonly BitmapImage extendedAway = new(new Uri("../Graphics/ExtendedAway.png", UriKind.Relative));
+		internal static readonly BitmapImage offline = new(new Uri("../Graphics/Offline.png", UriKind.Relative));
+		internal static readonly BitmapImage online = new(new Uri("../Graphics/Online.png", UriKind.Relative));
+		internal static readonly BitmapImage folderBlueClosed = new(new Uri("../Graphics/folder-blue-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderBlueOpen = new(new Uri("../Graphics/folder-blue-open-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderYellowClosed = new(new Uri("../Graphics/folder-yellow-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage folderYellowOpen = new(new Uri("../Graphics/folder-yellow-open-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage box = new(new Uri("../Graphics/App-miscellaneous-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage hourglass = new(new Uri("../Graphics/hourglass-icon.png", UriKind.Relative));
+		internal static readonly BitmapImage database = new(new Uri("../Graphics/Database-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage component = new(new Uri("../Graphics/server-components-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage chatBubble = new(new Uri("../Graphics/Chat-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage legal = new(new Uri("../Graphics/justice-balance-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage log = new(new Uri("../Graphics/App-edit-icon_16.png", UriKind.Relative));
+		internal static readonly BitmapImage none = new(new Uri("../Graphics/None.png", UriKind.Relative));
+		internal static readonly BitmapImage from = new(new Uri("../Graphics/From.png", UriKind.Relative));
+		internal static readonly BitmapImage to = new(new Uri("../Graphics/To.png", UriKind.Relative));
+		internal static readonly BitmapImage both = new(new Uri("../Graphics/Both.png", UriKind.Relative));
 
 		public override ImageSource ImageResource
 		{
@@ -553,18 +553,12 @@ namespace Waher.Client.WPF.Model
 					return offline;
 				else
 				{
-					switch (this.client.State)
+					return this.client.State switch
 					{
-						case XmppState.Connected:
-							return online;
-
-						case XmppState.Error:
-							return busy;
-
-						case XmppState.Offline:
-						default:
-							return offline;
-					}
+						XmppState.Connected => online,
+						XmppState.Error => busy,
+						_ => offline,
+					};
 				}
 			}
 		}
@@ -622,7 +616,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				return !(this.client is null) && this.client.State == XmppState.Connected;
+				return this.client is not null && this.client.State == XmppState.Connected;
 			}
 		}
 
@@ -631,7 +625,7 @@ namespace Waher.Client.WPF.Model
 
 		public override void Add()
 		{
-			AddContactForm Dialog = new AddContactForm()
+			AddContactForm Dialog = new()
 			{
 				Owner = this.connections.Owner
 			};
@@ -645,14 +639,13 @@ namespace Waher.Client.WPF.Model
 		private void CheckRoster()
 		{
 			SortedDictionary<string, TreeNode> Contacts = this.children;
-			Dictionary<string, TreeNode> Existing = new Dictionary<string, TreeNode>();
+			Dictionary<string, TreeNode> Existing = [];
 			LinkedList<TreeNode> Added = null;
 			LinkedList<KeyValuePair<string, TreeNode>> Removed = null;
 			LinkedList<RosterItem> Resubscribe = null;
 			LinkedList<RosterItem> Reunsubscribe = null;
 
-			if (Contacts is null)
-				Contacts = new SortedDictionary<string, TreeNode>();
+			Contacts ??= [];
 
 			lock (Contacts)
 			{
@@ -675,25 +668,19 @@ namespace Waher.Client.WPF.Model
 
 						Contacts[Item.BareJid] = Contact;
 
-						if (Added is null)
-							Added = new LinkedList<TreeNode>();
-
+						Added ??= [];
 						Added.AddLast(Contact);
 					}
 
 					switch (Item.PendingSubscription)
 					{
 						case PendingSubscription.Subscribe:
-							if (Resubscribe is null)
-								Resubscribe = new LinkedList<RosterItem>();
-
+							Resubscribe ??= [];
 							Resubscribe.AddLast(Item);
 							break;
 
 						case PendingSubscription.Unsubscribe:
-							if (Reunsubscribe is null)
-								Reunsubscribe = new LinkedList<RosterItem>();
-
+							Reunsubscribe ??= [];
 							Reunsubscribe.AddLast(Item);
 							break;
 					}
@@ -708,14 +695,12 @@ namespace Waher.Client.WPF.Model
 						if (P.Value is XmppContact Contact &&
 							!Existing.ContainsKey(Contact.BareJID))
 						{
-							if (Removed is null)
-								Removed = new LinkedList<KeyValuePair<string, TreeNode>>();
-
+							Removed ??= new LinkedList<KeyValuePair<string, TreeNode>>();
 							Removed.AddLast(P);
 						}
 					}
 
-					if (!(Removed is null))
+					if (Removed is not null)
 					{
 						foreach (KeyValuePair<string, TreeNode> P in Removed)
 							this.children.Remove(P.Key);
@@ -723,25 +708,25 @@ namespace Waher.Client.WPF.Model
 				}
 			}
 
-			if (!(Added is null))
+			if (Added is not null)
 			{
 				foreach (TreeNode Node in Added)
 					this.connections.Owner.MainView.NodeAdded(this, Node);
 			}
 
-			if (!(Removed is null))
+			if (Removed is not null)
 			{
 				foreach (KeyValuePair<string, TreeNode> P in Removed)
 					this.connections.Owner.MainView.NodeRemoved(this, P.Value);
 			}
 
-			if (!(Resubscribe is null))
+			if (Resubscribe is not null)
 			{
 				foreach (RosterItem Item in Resubscribe)
 					this.client.RequestPresenceSubscription(Item.BareJid);
 			}
 
-			if (!(Reunsubscribe is null))
+			if (Reunsubscribe is not null)
 			{
 				foreach (RosterItem Item in Reunsubscribe)
 					this.client.RequestPresenceUnsubscription(Item.BareJid);
@@ -768,7 +753,7 @@ namespace Waher.Client.WPF.Model
 				{
 					if (this.children.TryGetValue(Item.BareJid, out TreeNode Node))
 					{
-						if (!((Contact = Node as XmppContact) is null))
+						if ((Contact = Node as XmppContact) is not null)
 							Contact.RosterItem = Item;
 					}
 					else
@@ -798,12 +783,12 @@ namespace Waher.Client.WPF.Model
 			lock (this.rosterSubscriptions)
 			{
 				if (this.rosterSubscriptions.TryGetValue(Item.BareJid, out List<EventHandlerAsync<RosterItem>> List))
-					h = List.ToArray();
+					h = [.. List];
 				else
 					h = null;
 			}
 
-			if (!(h is null))
+			if (h is not null)
 			{
 				foreach (EventHandlerAsync<RosterItem> h2 in h)
 					await h2.Raise(this, Item);
@@ -816,7 +801,7 @@ namespace Waher.Client.WPF.Model
 			{
 				if (!this.rosterSubscriptions.TryGetValue(BareJid, out List<EventHandlerAsync<RosterItem>> h))
 				{
-					h = new List<EventHandlerAsync<RosterItem>>();
+					h = [];
 					this.rosterSubscriptions[BareJid] = h;
 				}
 
@@ -866,7 +851,7 @@ namespace Waher.Client.WPF.Model
 						Node = null;
 				}
 
-				if (!(Node is null))
+				if (Node is not null)
 				{
 					Node.OnUpdated();
 
@@ -874,12 +859,12 @@ namespace Waher.Client.WPF.Model
 						this.CheckType(Node, e.From);
 				}
 				else if (string.Compare(e.FromBareJID, this.client.BareJID, true) == 0)
-					await this.client.Information("Presence from same bare JID. Ignored.");
+					this.client.Information("Presence from same bare JID. Ignored.");
 				else
-					await this.client.Warning("Presence from node not found in roster: " + e.FromBareJID);
+					this.client.Warning("Presence from node not found in roster: " + e.FromBareJID);
 
 				RosterItem Item = this.client?.GetRosterItem(e.FromBareJID);
-				if (!(Item is null))
+				if (Item is not null)
 					await this.CheckRosterItemSubscriptions(Item);
 			}
 		}
@@ -909,10 +894,10 @@ namespace Waher.Client.WPF.Model
 
 					this.children[Node.Key] = Node;
 
-					List<string> Groups = new List<string>()
-					{
+					List<string> Groups =
+					[
 						ConcentratorGroupName
-					};
+					];
 
 					if (SupportsEvents)
 						Groups.Add(EventsGroupName);
@@ -920,7 +905,7 @@ namespace Waher.Client.WPF.Model
 					if (SupportsRdp)
 						Groups.Add(RemoteDesktopGroupName);
 
-					this.AddGroups(Node, Groups.ToArray());
+					this.AddGroups(Node, [.. Groups]);
 				}
 				else if (e.HasAnyFeature(ControlClient.NamespacesControl))
 				{
@@ -936,10 +921,10 @@ namespace Waher.Client.WPF.Model
 
 					this.children[Node.Key] = Node;
 
-					List<string> Groups = new List<string>()
-					{
+					List<string> Groups =
+					[
 						ActuatorGroupName
-					};
+					];
 
 					if (IsSensor)
 						Groups.Add(SensorGroupName);
@@ -950,7 +935,7 @@ namespace Waher.Client.WPF.Model
 					if (SupportsRdp)
 						Groups.Add(RemoteDesktopGroupName);
 
-					this.AddGroups(Node, Groups.ToArray());
+					this.AddGroups(Node, [.. Groups]);
 				}
 				else if (e.HasAnyFeature(SensorClient.NamespacesSensorData))
 				{
@@ -965,10 +950,10 @@ namespace Waher.Client.WPF.Model
 
 					this.children[Node.Key] = Node;
 
-					List<string> Groups = new List<string>()
-					{
+					List<string> Groups =
+					[
 						SensorGroupName
-					};
+					];
 
 					if (SupportsEvents)
 						Groups.Add(EventsGroupName);
@@ -976,7 +961,7 @@ namespace Waher.Client.WPF.Model
 					if (SupportsRdp)
 						Groups.Add(RemoteDesktopGroupName);
 
-					this.AddGroups(Node, Groups.ToArray());
+					this.AddGroups(Node, [.. Groups]);
 				}
 				else
 				{
@@ -990,15 +975,15 @@ namespace Waher.Client.WPF.Model
 
 					this.children[Node.Key] = Node;
 
-					List<string> Groups = new List<string>()
-					{
+					List<string> Groups =
+					[
 						OtherGroupName
-					};
+					];
 
 					if (SupportsRdp)
 						Groups.Add(RemoteDesktopGroupName);
 
-					this.AddGroups(Node, Groups.ToArray());
+					this.AddGroups(Node, [.. Groups]);
 				}
 
 				this.OnUpdated();
@@ -1036,7 +1021,7 @@ namespace Waher.Client.WPF.Model
 		{
 			RosterItem Item = e.Client[e.FromBareJID];
 
-			if (!(Item is null) && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
+			if (Item is not null && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
 				await e.Accept();
 			else
 				MainWindow.UpdateGui(this.PresenceSubscribe, e);
@@ -1077,12 +1062,12 @@ namespace Waher.Client.WPF.Model
 
 		public override bool CanRecycle
 		{
-			get { return !(this.client is null); }
+			get { return this.client is not null; }
 		}
 
 		public override async Task Recycle(MainWindow Window)
 		{
-			if (!(this.children is null))
+			if (this.children is not null)
 			{
 				foreach (TreeNode Node in this.children.Values)
 				{
@@ -1098,7 +1083,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				return !(this.client is null) && this.client.State == XmppState.Connected;
+				return this.client is not null && this.client.State == XmppState.Connected;
 			}
 		}
 
@@ -1114,7 +1099,7 @@ namespace Waher.Client.WPF.Model
 		}
 
 		public override string Key => this.BareJID;
-		public override bool IsSniffable => !(this.client is null);
+		public override bool IsSniffable => this.client is not null;
 		public XmppClient Client => this.client;
 		//public XmppServerlessMessaging P2P => this.p2pNetwork;
 		public EndpointSecurity E2E => this.e2eEncryption;
@@ -1206,8 +1191,7 @@ namespace Waher.Client.WPF.Model
 							XmppComponent Component = null;
 							ThingRegistry ThingRegistry = null;
 
-							if (this.children is null)
-								this.children = new SortedDictionary<string, TreeNode>();
+							this.children ??= [];
 
 							lock (this.children)
 							{
@@ -1251,7 +1235,7 @@ namespace Waher.Client.WPF.Model
 							this.connections.Owner.MainView.NodeAdded(this, Component);
 							this.OnUpdated();
 
-							if (!(ThingRegistry is null) && ThingRegistry.SupportsProvisioning)
+							if (ThingRegistry is not null && ThingRegistry.SupportsProvisioning)
 							{
 								MainWindow.UpdateGui(() =>
 								{
@@ -1277,14 +1261,14 @@ namespace Waher.Client.WPF.Model
 
 		public override async Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
 		{
-			DataForm Form = new DataForm(this.client, this.ChangePassword, this.CancelChangePassword, this.BareJID, this.BareJID,
-				new TextPrivateField(null, "Password", "New password:", true, new string[] { string.Empty }, null,
+			DataForm Form = new(this.client, this.ChangePassword, this.CancelChangePassword, this.BareJID, this.BareJID,
+				new TextPrivateField(null, "Password", "New password:", true, [string.Empty], null,
 					"Enter new password here.", new StringDataType(), new PasswordValidation(), string.Empty, false, false, false),
-				new TextPrivateField(null, "Password2", "Retype password:", true, new string[] { string.Empty }, null,
+				new TextPrivateField(null, "Password2", "Retype password:", true, [string.Empty], null,
 					"Retype password here.", new StringDataType(), new Password2Validation(), string.Empty, false, false, false))
 			{
 				Title = "Change password",
-				Instructions = new string[] { "Enter the new password you wish to use." }
+				Instructions = ["Enter the new password you wish to use."]
 			};
 
 			await Callback.Raise(this, new DataFormEventArgs(Form, new IqResultEventArgs(null, string.Empty, this.BareJID, this.BareJID, true, State)));
@@ -1378,7 +1362,7 @@ namespace Waher.Client.WPF.Model
 		{
 			string Id = Guid.NewGuid().ToString();
 
-			CustomSensorDataClientRequest Request = new CustomSensorDataClientRequest(Id, string.Empty, string.Empty, null,
+			CustomSensorDataClientRequest Request = new(Id, string.Empty, string.Empty, null,
 				Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.Now, string.Empty, string.Empty, string.Empty);
 
 			await Request.Accept(false);
@@ -1388,7 +1372,7 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
-					List<Waher.Things.SensorData.Field> Fields = new List<Waher.Things.SensorData.Field>();
+					List<Waher.Things.SensorData.Field> Fields = [];
 					DateTime Now = DateTime.Now;
 
 					foreach (KeyValuePair<string, bool> Feature in e.Features)
@@ -1417,22 +1401,22 @@ namespace Waher.Client.WPF.Model
 
 								if (e2.Ok)
 								{
-									Request.LogFields(new Waher.Things.SensorData.Field[]
-									{
+									Request.LogFields(
+									[
 										new StringField(Waher.Things.ThingReference.Empty, Now, "Server, Name", e2.Name,
 											FieldType.Identity, FieldQoS.AutomaticReadout),
 										new StringField(Waher.Things.ThingReference.Empty, Now, "Server, OS", e2.OS,
 											FieldType.Identity, FieldQoS.AutomaticReadout),
 										new StringField(Waher.Things.ThingReference.Empty, Now, "Server, Version", e2.Version,
 											FieldType.Identity, FieldQoS.AutomaticReadout),
-									});
+									]);
 								}
 								else
 								{
-									Request.LogErrors(new Waher.Things.ThingError[]
-									{
-										new Waher.Things.ThingError(Waher.Things.ThingReference.Empty, Now, "Unable to read software version.")
-									});
+									Request.LogErrors(
+									[
+										new(Waher.Things.ThingReference.Empty, Now, "Unable to read software version.")
+									]);
 								}
 
 								VersionDone = true;
@@ -1494,7 +1478,7 @@ namespace Waher.Client.WPF.Model
 				Menu.Items.Add(Item = new MenuItem()
 				{
 					Header = "_Change password...",
-					IsEnabled = (!(this.client is null) && this.client.State == XmppState.Connected)
+					IsEnabled = (this.client is not null && this.client.State == XmppState.Connected)
 				});
 
 				Item.Click += this.ChangePassword_Click;
@@ -1506,15 +1490,13 @@ namespace Waher.Client.WPF.Model
 				{
 					if (Component is IMenuAggregator MenuAggregator)
 					{
-						if (Aggregators is null)
-							Aggregators = new LinkedList<IMenuAggregator>();
-
+						Aggregators ??= [];
 						Aggregators.AddLast(MenuAggregator);
 					}
 				}
 			}
 
-			if (!(Aggregators is null))
+			if (Aggregators is not null)
 			{
 				foreach (IMenuAggregator Aggregator in Aggregators)
 					Aggregator.AddContexMenuItems(Node, ref CurrentGroup, Menu);
@@ -1523,7 +1505,7 @@ namespace Waher.Client.WPF.Model
 
 		private void ChangePassword_Click(object Sender, RoutedEventArgs e)
 		{
-			ChangePasswordForm Dialog = new ChangePasswordForm();
+			ChangePasswordForm Dialog = new();
 			bool? Result = Dialog.ShowDialog();
 
 			if (Result.HasValue && Result.Value)
@@ -1551,7 +1533,7 @@ namespace Waher.Client.WPF.Model
 
 		public override void Edit()
 		{
-			ConnectToForm Dialog = new ConnectToForm()
+			ConnectToForm Dialog = new()
 			{
 				Owner = MainWindow.currentInstance
 			};
@@ -1591,10 +1573,10 @@ namespace Waher.Client.WPF.Model
 		private Task PepClient_SensorData(object _, PersonalEventNotificationEventArgs e)
 		{
 			if (e.PersonalEvent is SensorData SensorData &&
-				!(SensorData.Fields is null) &&
+				SensorData.Fields is not null &&
 				this.TryGetChild(e.FromBareJID, out TreeNode Node))
 			{
-				List<Waher.Things.DisplayableParameters.Parameter> Parameters = new List<Waher.Things.DisplayableParameters.Parameter>();
+				List<Waher.Things.DisplayableParameters.Parameter> Parameters = [];
 
 				foreach (Waher.Things.SensorData.Field F in SensorData.Fields)
 				{
@@ -1607,7 +1589,7 @@ namespace Waher.Client.WPF.Model
 							StringParameter(F.Name, F.Name, F.ValueString));
 				}
 
-				Node.Add(Parameters.ToArray());
+				Node.Add([.. Parameters]);
 				Node.OnUpdated();
 			}
 
@@ -1757,7 +1739,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If node can be copied to clipboard.
 		/// </summary>
-		public override bool CanCopy => !(this.client is null);
+		public override bool CanCopy => this.client is not null;
 
 		/// <summary>
 		/// Is called when the user wants to copy the node to the clipboard.
@@ -1792,7 +1774,7 @@ namespace Waher.Client.WPF.Model
 			if (!s.StartsWith("xmpp:"))
 				return false;
 
-			s = s.Substring(5);
+			s = s[5..];
 			if (!XmppClient.BareJidRegEx.IsMatch(s))
 				return false;
 

@@ -69,6 +69,8 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
@@ -77,15 +79,17 @@ namespace Waher.Networking.HTTP
 		/// Bit 32: If decoding has completed.
 		/// Bit 33: If transmission to underlying stream failed.
 		/// </returns>
-		public abstract Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead);
+		public abstract Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrRead);
 
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public abstract Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes);
+		public abstract Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes);
 
 		/// <summary>
 		/// Sends any remaining data to the client.

@@ -125,11 +125,13 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte read.</param>
 		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		protected override Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
+		protected override Task<bool> BinaryDataReceived(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			this.lastReceivedBytes = Count;
 			string Text = this.encoding.GetString(Buffer, Offset, Count);
@@ -148,7 +150,7 @@ namespace Waher.Networking
 		protected virtual async Task<bool> TextDataReceived(string Data)
 		{
 			if (this.sniffText && this.HasSniffers)
-				await this.ReceiveText(Data);
+				this.ReceiveText(Data);
 
 			TextEventHandler h = this.OnReceived;
 			if (h is null)
@@ -200,7 +202,7 @@ namespace Waher.Networking
 		protected virtual async Task TextDataSent(string Text)
 		{
 			if (this.sniffText && this.HasSniffers)
-				await this.TransmitText(Text);
+				this.TransmitText(Text);
 
 			TextEventHandler h = this.OnSent;
 			if (!(h is null))

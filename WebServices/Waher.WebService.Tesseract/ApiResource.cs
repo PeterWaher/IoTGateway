@@ -80,7 +80,7 @@ namespace Waher.WebService.Tesseract
 
 			string Text = await this.api.PerformOcr(ImageBin, ContentType, PageSegmentationMode, Language);
 
-			await Response.Return(PlainTextCodec.DefaultContentType + "; charset=utf-8", Encoding.UTF8.GetBytes(Text));
+			await Response.Return(PlainTextCodec.DefaultContentType + "; charset=utf-8", true, Encoding.UTF8.GetBytes(Text));
 		}
 	}
 }

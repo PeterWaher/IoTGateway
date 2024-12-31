@@ -22,7 +22,7 @@ namespace Waher.Layout.Layout2D
 	/// <summary>
 	/// Contains a 2D layout document.
 	/// </summary>
-	public class Layout2DDocument : IDisposable
+	public class Layout2DDocument : IDisposableAsync
 	{
 		/// <summary>
 		/// Layout2D
@@ -297,13 +297,24 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.root?.Dispose();
 
 			foreach (object Attachment in this.attachments.Values)
 			{
-				if (Attachment is IDisposable Disposable)
+				if (Attachment is IDisposableAsync DisposableAsync)
+					await DisposableAsync.DisposeAsync();
+				else if (Attachment is IDisposable Disposable)
 					Disposable.Dispose();
 			}
 		}
@@ -532,13 +543,15 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="ContentId">Content ID</param>
 		/// <returns>If content with the corresponding ID was found and disposed.</returns>
-		public bool DisposeContent(string ContentId)
+		public async Task<bool> DisposeContent(string ContentId)
 		{
 			if (this.attachments.TryGetValue(ContentId, out object Obj))
 			{
 				this.attachments.Remove(ContentId);
 
-				if (Obj is IDisposable Disposable)
+				if (Obj is IDisposableAsync DisposableAsync)
+					await DisposableAsync.DisposeAsync();
+				else if (Obj is IDisposable Disposable)
 					Disposable.Dispose();
 
 				return true;
@@ -572,9 +585,9 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="ContentId">Content ID</param>
 		/// <param name="Content">Content</param>
-		public void AddContent(string ContentId, object Content)
+		public async Task AddContent(string ContentId, object Content)
 		{
-			this.DisposeContent(ContentId);
+			await this.DisposeContent(ContentId);
 			this.attachments[ContentId] = Content;
 		}
 

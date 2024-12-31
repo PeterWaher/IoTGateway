@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.HTTP2;
 
@@ -68,6 +67,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
@@ -76,7 +77,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// Bit 32: If decoding has completed.
 		/// Bit 33: If transmission to underlying stream failed.
 		/// </returns>
-		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
+		public override Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			return Task.FromResult(0UL);
 		}
@@ -84,10 +85,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes)
 		{
 			if (this.ended)
 				return true;
@@ -110,7 +113,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				if (NrToWrite == this.bufferSize ||     // Means this.pos == 0
 					(Last && this.pos == 0))
 				{
-					NrWritten = await this.stream.TryWriteData(Data, Offset, NrToWrite, Last, this.dataEncoding);
+					NrWritten = await this.stream.TryWriteData(ConstantBuffer, Data, Offset, NrToWrite, Last, this.dataEncoding);
 					if (NrWritten < 0)
 						return false;
 				}
@@ -121,7 +124,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 					if (this.pos == this.bufferSize || Last)
 					{
-						NrWritten = await this.stream.TryWriteData(this.buffer, 0, this.pos, Last, this.dataEncoding);
+						NrWritten = await this.stream.TryWriteData(false, this.buffer, 0, this.pos, Last, this.dataEncoding);
 						if (NrWritten < 0)
 							return false;
 
@@ -158,7 +161,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				while (i < this.pos)
 				{
-					j = await this.stream.TryWriteData(this.buffer, i, this.pos - i, this.ended, this.dataEncoding);
+					j = await this.stream.TryWriteData(false, this.buffer, i, this.pos - i, this.ended, this.dataEncoding);
 					if (j < 0)
 						return false;
 

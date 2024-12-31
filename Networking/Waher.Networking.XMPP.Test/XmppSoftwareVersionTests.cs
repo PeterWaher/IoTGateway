@@ -15,9 +15,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
 		[TestMethod]

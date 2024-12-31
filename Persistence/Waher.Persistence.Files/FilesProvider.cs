@@ -552,7 +552,16 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.master?.Dispose();
 			this.master = null;
@@ -576,8 +585,11 @@ namespace Waher.Persistence.Files
 			this.blocks?.Dispose();
 			this.blocks = null;
 
-			this.serializers?.Dispose();
-			this.serializers = null;
+			if (!(this.serializers is null))
+			{
+				await this.serializers.DisposeAsync();
+				this.serializers = null;
+			}
 
 			this.WriteTimestamp("Stop.txt");
 		}
@@ -4141,7 +4153,7 @@ namespace Waher.Persistence.Files
 			while (await this.SaveUnsaved(First))
 				First = false;
 
-			this.Dispose();
+			await this.DisposeAsync();
 		}
 
 		/// <summary>

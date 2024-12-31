@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +54,7 @@ namespace Waher.Networking.XMPP
 	/// 
 	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 	/// </summary>
-	public class XmppClient : CommunicationLayer, IDisposable, IHostReference
+	public class XmppClient : CommunicationLayer, IDisposableAsync, IHostReference
 	{
 		/// <summary>
 		/// http://etherx.jabber.org/streams
@@ -603,25 +602,25 @@ namespace Waher.Networking.XMPP
 			this.textTransportLayer.OnSent += this.TextTransportLayer_OnSent;
 		}
 
-		private async Task<bool> TextTransportLayer_OnSent(object _, string Packet)
+		private Task<bool> TextTransportLayer_OnSent(object _, string Packet)
 		{
-			await this.TransmitText(Packet);
-			return true;
+			this.TransmitText(Packet);
+			return Task.FromResult(true);
 		}
 
-		private async Task<bool> TextTransportLayer_OnReceived(object _, string Packet)
+		private Task<bool> TextTransportLayer_OnReceived(object _, string Packet)
 		{
 			if (this.openBracketReceived)
 			{
 				this.openBracketReceived = false;
-				await this.ReceiveText("<" + Packet);
+				this.ReceiveText("<" + Packet);
 			}
 			else if (Packet == "<")
 				this.openBracketReceived = true;
 			else
-				await this.ReceiveText(Packet);
+				this.ReceiveText(Packet);
 
-			return await this.ProcessFragment(Packet);
+			return this.ProcessFragment(Packet);
 		}
 
 		private async Task<bool> TextTransportLayer_OnReceived_NoSniff(object _, string Packet)
@@ -730,30 +729,30 @@ namespace Waher.Networking.XMPP
 
 		private async Task Client_OnDisconnected(object Sender, EventArgs e)
 		{
-			await this.Information("Disconnected.");
+			this.Information("Disconnected.");
 			if (this.state != XmppState.Error)
 				await this.SetState(XmppState.Offline);
 		}
 
-		private async Task<bool> OnSent(object _, string Text)
+		private Task<bool> OnSent(object _, string Text)
 		{
-			await this.TransmitText(Text);
-			return true;
+			this.TransmitText(Text);
+			return Task.FromResult(true);
 		}
 
-		private async Task<bool> OnReceived(object _, string Text)
+		private Task<bool> OnReceived(object _, string Text)
 		{
 			if (this.openBracketReceived)
 			{
 				this.openBracketReceived = false;
-				await this.ReceiveText("<" + Text);
+				this.ReceiveText("<" + Text);
 			}
 			else if (Text == "<")
 				this.openBracketReceived = true;
 			else
-				await this.ReceiveText(Text);
+				this.ReceiveText(Text);
 
-			return await this.ParseIncoming(Text);
+			return this.ParseIncoming(Text);
 		}
 
 		private void RegisterDefaultHandlers()
@@ -847,7 +846,7 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				await this.Exception(Exception);
+				this.Exception(Exception);
 				await this.OnError.Raise(this, Exception);
 			}
 		}
@@ -993,7 +992,7 @@ namespace Waher.Networking.XMPP
 			if (this.state != NewState)
 			{
 				this.state = NewState;
-				await this.Information("State changed to " + NewState.ToString());
+				this.Information("State changed to " + NewState.ToString());
 				await this.RaiseOnStateChanged(NewState);
 
 				if (NewState == XmppState.Offline || NewState == XmppState.Error)
@@ -1099,16 +1098,9 @@ namespace Waher.Networking.XMPP
 		/// Closes the connection and disposes of all resources.
 		/// </summary>
 		[Obsolete("Use the DisposeAsync() or OfflineAndDisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -1150,8 +1142,13 @@ namespace Waher.Networking.XMPP
 			{
 				this.Remove(Sniffer);
 
-				if (DisposeSniffers && Sniffer is IDisposable Disposable)
-					Disposable.Dispose();
+				if (DisposeSniffers)
+				{
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
+						Disposable.Dispose();
+				}
 			}
 
 			await this.DisposeAsync();
@@ -1237,7 +1234,7 @@ namespace Waher.Networking.XMPP
 			if (!((TTL = this.textTransportLayer) is null))
 			{
 				this.textTransportLayer = null;
-				TTL.Dispose();
+				await TTL.DisposeAsync();
 			}
 		}
 
@@ -1276,7 +1273,7 @@ namespace Waher.Networking.XMPP
 			{
 				string s = this.fragment.ToString();
 				if (!string.IsNullOrEmpty(s))
-					await this.Warning("Input lost:\r\n\r\n" + s);
+					this.Warning("Input lost:\r\n\r\n" + s);
 
 				await this.Connect(this.domain);
 			}
@@ -1811,22 +1808,25 @@ namespace Waher.Networking.XMPP
 			return Result;
 		}
 
-		private Task ToError()
+		private async Task ToError()
 		{
 			this.inputState = -1;
 
-			this.client?.Dispose();
-			this.client = null;
+			if (!(this.client is null))
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 
 			ITextTransportLayer TTL;
 
 			if (!((TTL = this.textTransportLayer) is null))
 			{
 				this.textTransportLayer = null;
-				TTL.Dispose();
+				await TTL.DisposeAsync();
 			}
 
-			return this.SetState(XmppState.Error);
+			await this.SetState(XmppState.Error);
 		}
 
 		private async Task ProcessStream(string Xml)
@@ -2160,7 +2160,7 @@ namespace Waher.Networking.XMPP
 
 								if (!this.disposed)
 								{
-									await this.Information("Reconnecting to " + this.host);
+									this.Information("Reconnecting to " + this.host);
 									await this.Connect(this.domain);
 								}
 
@@ -2227,7 +2227,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					await this.Warning("Incoming message rejected.");
+					this.Warning("Incoming message rejected.");
 				}
 				catch (Exception ex)
 				{
@@ -2304,36 +2304,36 @@ namespace Waher.Networking.XMPP
 				}
 
 				if (!(MessageHandler is null))
-					await this.Information(MessageHandler.GetMethodInfo().Name);
+					this.Information(MessageHandler.GetMethodInfo().Name);
 				else if (!(FormHandler is null))
-					await this.Information(FormHandler.GetMethodInfo().Name);
+					this.Information(FormHandler.GetMethodInfo().Name);
 				else
 				{
 					switch (e.Type)
 					{
 						case MessageType.Chat:
-							await this.Information("OnChatMessage()");
+							this.Information("OnChatMessage()");
 							MessageHandler = this.OnChatMessage;
 							break;
 
 						case MessageType.Error:
-							await this.Information("OnErrorMessage()");
+							this.Information("OnErrorMessage()");
 							MessageHandler = this.OnErrorMessage;
 							break;
 
 						case MessageType.GroupChat:
-							await this.Information("OnGroupChatMessage()");
+							this.Information("OnGroupChatMessage()");
 							MessageHandler = this.OnGroupChatMessage;
 							break;
 
 						case MessageType.Headline:
-							await this.Information("OnHeadlineMessage()");
+							this.Information("OnHeadlineMessage()");
 							MessageHandler = this.OnHeadlineMessage;
 							break;
 
 						case MessageType.Normal:
 						default:
-							await this.Information("OnNormalMessage()");
+							this.Information("OnNormalMessage()");
 							MessageHandler = this.OnNormalMessage;
 							break;
 					}
@@ -2347,7 +2347,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						await this.Exception(ex);
+						this.Exception(ex);
 					}
 				}
 				else if (!(FormHandler is null))
@@ -2358,7 +2358,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						await this.Exception(ex);
+						this.Exception(ex);
 					}
 				}
 			}
@@ -2366,7 +2366,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					await this.Exception(ex);
+					this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -2552,7 +2552,7 @@ namespace Waher.Networking.XMPP
 					switch (e.Type)
 					{
 						case PresenceType.Available:
-							await this.Information("OnPresence()");
+							this.Information("OnPresence()");
 							Callback = this.OnPresence;
 							e.UpdateLastPresence = true;
 
@@ -2564,7 +2564,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case PresenceType.Unavailable:
-							await this.Information("OnPresence()");
+							this.Information("OnPresence()");
 							Callback = this.OnPresence;
 
 							lock (this.synchObject)
@@ -2577,7 +2577,7 @@ namespace Waher.Networking.XMPP
 						case PresenceType.Error:
 						case PresenceType.Probe:
 						default:
-							await this.Information("OnPresence()");
+							this.Information("OnPresence()");
 							Callback = this.OnPresence;
 							break;
 
@@ -2587,22 +2587,22 @@ namespace Waher.Networking.XMPP
 								this.subscriptionRequests[e.FromBareJID] = e;
 							}
 
-							await this.Information("OnPresenceSubscribe()");
+							this.Information("OnPresenceSubscribe()");
 							Callback = this.OnPresenceSubscribe;
 							break;
 
 						case PresenceType.Subscribed:
-							await this.Information("OnPresenceSubscribed()");
+							this.Information("OnPresenceSubscribed()");
 							Callback = this.OnPresenceSubscribed;
 							break;
 
 						case PresenceType.Unsubscribe:
-							await this.Information("OnPresenceUnsubscribe()");
+							this.Information("OnPresenceUnsubscribe()");
 							Callback = this.OnPresenceUnsubscribe;
 							break;
 
 						case PresenceType.Unsubscribed:
-							await this.Information("OnPresenceUnsubscribed()");
+							this.Information("OnPresenceUnsubscribed()");
 							Callback = this.OnPresenceUnsubscribed;
 							break;
 					}
@@ -2612,7 +2612,7 @@ namespace Waher.Networking.XMPP
 						foreach (KeyValuePair<EventHandlerAsync<PresenceEventArgs>, XmlElement> P in Handlers)
 						{
 							e.Content = P.Value;
-							await this.Information(P.Key.GetMethodInfo().Name);
+							this.Information(P.Key.GetMethodInfo().Name);
 
 							try
 							{
@@ -2620,7 +2620,7 @@ namespace Waher.Networking.XMPP
 							}
 							catch (Exception ex)
 							{
-								await this.Exception(ex);
+								this.Exception(ex);
 							}
 						}
 					}
@@ -2635,7 +2635,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					await this.Exception(ex);
+					this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -2687,7 +2687,7 @@ namespace Waher.Networking.XMPP
 					catch (Exception ex)
 					{
 						if (e.UsesE2eEncryption)
-							await e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, await this.ExceptionToXmppXml(ex));
+							await e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, this.ExceptionToXmppXml(ex));
 						else
 							await this.SendIqError(e.Id, e.From, ex);
 					}
@@ -2697,7 +2697,7 @@ namespace Waher.Networking.XMPP
 			{
 				try
 				{
-					await this.Exception(ex);
+					this.Exception(ex);
 				}
 				catch (Exception)
 				{
@@ -3782,7 +3782,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ex">Internal exception object.</param>
 		public async Task SendIqError(string Id, string To, Exception ex)
 		{
-			await this.SendIqError(Id, To, await this.ExceptionToXmppXml(ex));
+			await this.SendIqError(Id, To, this.ExceptionToXmppXml(ex));
 		}
 
 		/// <summary>
@@ -3790,12 +3790,12 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="ex">Exception.</param>
 		/// <returns>Error element.</returns>
-		public async Task<string> ExceptionToXmppXml(Exception ex)
+		public string ExceptionToXmppXml(Exception ex)
 		{
 			StringBuilder Xml = new StringBuilder();
 			if (ex is StanzaExceptionException ex2)
 			{
-				await this.Exception(ex2);
+				this.Exception(ex2);
 
 				Xml.Append("<error type='");
 				Xml.Append(ex2.ErrorType);
@@ -3809,7 +3809,7 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>");
@@ -4120,7 +4120,7 @@ namespace Waher.Networking.XMPP
 
 						if (!(Form is null))
 						{
-							await this.Information("OnRegistrationForm()");
+							this.Information("OnRegistrationForm()");
 							EventHandlerAsync<DataForm> h = this.OnRegistrationForm;
 							if (!(h is null))
 								await h.Raise(this, Form);
@@ -4290,7 +4290,7 @@ namespace Waher.Networking.XMPP
 
 				// TODO: Also update hash and hash method
 
-				await this.Information("OnPasswordChanged()");
+				this.Information("OnPasswordChanged()");
 				await this.OnPasswordChanged.Raise(this, EventArgs.Empty);
 			}
 			else
@@ -4323,7 +4323,7 @@ namespace Waher.Networking.XMPP
 									if (!(Field is null))
 										await Field.SetValue(NewPassword);
 
-									await this.Information("OnChangePasswordForm()");
+									this.Information("OnChangePasswordForm()");
 									EventHandlerAsync<DataForm> h = this.OnChangePasswordForm;
 									if (!(h is null))
 									{
@@ -5260,14 +5260,12 @@ namespace Waher.Networking.XMPP
 
 			await this.SendIqResult(e.Id, e.From, string.Empty);
 
-			Task T = Task.CompletedTask;
-
 			lock (this.synchObject)
 			{
 				if (Item.State == SubscriptionState.Remove)
 				{
 					this.roster.Remove(Item.BareJid);
-					T = this.Information("OnRosterItemRemoved()");
+					this.Information("OnRosterItemRemoved()");
 					h = this.OnRosterItemRemoved;
 				}
 				else
@@ -5277,25 +5275,23 @@ namespace Waher.Networking.XMPP
 						if (Item.Equals(Prev))
 						{
 							h = null;
-							T = this.Information("Roster item identical to previous.");
+							this.Information("Roster item identical to previous.");
 						}
 						else
 						{
 							this.roster[Item.BareJid] = Item;
-							T = this.Information("OnRosterItemUpdated()");
+							this.Information("OnRosterItemUpdated()");
 							h = this.OnRosterItemUpdated;
 						}
 					}
 					else
 					{
-						T = this.Information("OnRosterItemAdded()");
+						this.Information("OnRosterItemAdded()");
 						h = this.OnRosterItemAdded;
 						this.roster[Item.BareJid] = Item;
 					}
 				}
 			}
-
-			await T;
 
 			await h.Raise(this, Item);
 		}
@@ -7018,7 +7014,7 @@ namespace Waher.Networking.XMPP
 									{
 										try
 										{
-											await this.Warning("Reconnecting.");
+											this.Warning("Reconnecting.");
 											await this.Reconnect();
 										}
 										catch (Exception ex)
@@ -7032,7 +7028,7 @@ namespace Waher.Networking.XMPP
 							}
 							catch (Exception ex)
 							{
-								await this.Exception(ex);
+								this.Exception(ex);
 
 								if (!NetworkingModule.Stopping)
 									await this.Reconnect();
@@ -7044,7 +7040,7 @@ namespace Waher.Networking.XMPP
 						try
 						{
 							this.nextPing = DateTime.Now.AddSeconds(this.keepAliveSeconds);
-							await this.Warning("Reconnecting.");
+							this.Warning("Reconnecting.");
 
 							if (!NetworkingModule.Stopping)
 								await this.Reconnect();
@@ -7132,7 +7128,7 @@ namespace Waher.Networking.XMPP
 						}
 						catch (Exception ex)
 						{
-							await this.Exception(ex);
+							this.Exception(ex);
 						}
 					}
 				}

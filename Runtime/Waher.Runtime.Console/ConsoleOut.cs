@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console.Worker;
+using Waher.Runtime.Queue;
 
 namespace Waher.Runtime.Console
 {
@@ -86,7 +87,7 @@ namespace Waher.Runtime.Console
 			set
 			{
 				foregroundColor = value;
-				ConsoleWorker.Queue(new ConsoleForegroundColor(value));
+				ConsoleWorker.Forward(new ConsoleForegroundColor(value));
 			}
 		}
 
@@ -99,7 +100,7 @@ namespace Waher.Runtime.Console
 			set
 			{
 				backgroundColor = value;
-				ConsoleWorker.Queue(new ConsoleBackgroundColor(value));
+				ConsoleWorker.Forward(new ConsoleBackgroundColor(value));
 			}
 		}
 
@@ -110,7 +111,7 @@ namespace Waher.Runtime.Console
 		public static void Write(string value)
 		{
 			if (!string.IsNullOrEmpty(value))
-				ConsoleWorker.Queue(new ConsoleOutWriteString(value));
+				ConsoleWorker.Forward(new ConsoleOutWriteString(value));
 		}
 
 		/// <summary>
@@ -130,7 +131,7 @@ namespace Waher.Runtime.Console
 		/// <param name="BackgroundColor">Optional Background Color to use.</param>
 		public static void Write(CustomWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
 		{
-			ConsoleWorker.Queue(new ConsoleOutCustomWriter(Writer, ForegroundColor, BackgroundColor));
+			ConsoleWorker.Forward(new ConsoleOutCustomWriter(Writer, ForegroundColor, BackgroundColor));
 		}
 
 		/// <summary>
@@ -297,7 +298,7 @@ namespace Waher.Runtime.Console
 			{
 				WorkItem Item = new ConsoleOutWriteString(value.ToString());
 
-				if (!await ConsoleWorker.Queue(Item))
+				if (!await ConsoleWorker.Forward(Item))
 					return;
 
 				await Item.Wait();
@@ -352,7 +353,7 @@ namespace Waher.Runtime.Console
 		{
 			WorkItem Item = new ConsoleOutCustomAsyncWriter(Writer, ForegroundColor, BackgroundColor);
 
-			if (!await ConsoleWorker.Queue(Item))
+			if (!await ConsoleWorker.Forward(Item))
 				return;
 
 			await Item.Wait();
@@ -372,7 +373,7 @@ namespace Waher.Runtime.Console
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string value)
 		{
-			ConsoleWorker.Queue(new ConsoleOutWriteLineString(value));
+			ConsoleWorker.Forward(new ConsoleOutWriteLineString(value));
 		}
 
 		/// <summary>
@@ -537,7 +538,7 @@ namespace Waher.Runtime.Console
 		{
 			WorkItem Item = new ConsoleOutWriteLineString(value ?? string.Empty);
 
-			if (!await ConsoleWorker.Queue(Item))
+			if (!await ConsoleWorker.Forward(Item))
 				return;
 
 			await Item.Wait();
@@ -585,7 +586,7 @@ namespace Waher.Runtime.Console
 		/// </summary>
 		public static void Beep()
 		{
-			ConsoleWorker.Queue(new ConsoleBeep());
+			ConsoleWorker.Forward(new ConsoleBeep());
 		}
 
 		/// <summary>
@@ -627,7 +628,7 @@ namespace Waher.Runtime.Console
 			if (!ConsoleWorker.Terminating)
 			{
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-				if (await ConsoleWorker.Queue(new ConsoleFlush(Terminate, Result)))
+				if (await ConsoleWorker.Forward(new ConsoleFlush(Terminate, Result)))
 					await Result.Task;
 			}
 		}

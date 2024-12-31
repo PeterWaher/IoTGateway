@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
+using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.XMPP
 {
@@ -88,21 +89,18 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Called when binary data has been received.
+		/// Processes a binary reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where received data begins.</param>
-		/// <param name="Count">Number of bytes received.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxBinary Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<rxBin>");
-			Xml.Append(Convert.ToBase64String(Data, Offset, Count));
+			Xml.Append(Convert.ToBase64String(Event.Data, Event.Offset, Event.Count));
 			Xml.Append("</rxBin>");
 
 			return this.Send(Xml);
@@ -130,135 +128,126 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Called when binary data has been transmitted.
+		/// Processes a binary transmission event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
-		/// <param name="Count">Number of bytes transmitted.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxBinary Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<txBin>");
-			Xml.Append(Convert.ToBase64String(Data, Offset, Count));
+			Xml.Append(Convert.ToBase64String(Event.Data, Event.Offset, Event.Count));
 			Xml.Append("</txBin>");
 
 			return this.Send(Xml);
 		}
 
 		/// <summary>
-		/// Called when text has been received.
+		/// Processes a text reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public override Task ReceiveText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxText Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<rx>");
-			Xml.Append(XML.Encode(Text));
+			Xml.Append(XML.Encode(Event.Text));
 			Xml.Append("</rx>");
 
 			return this.Send(Xml);
 		}
 
 		/// <summary>
-		/// Called when text has been transmitted.
+		/// Processes a text transmission event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public override Task TransmitText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxText Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<tx>");
-			Xml.Append(XML.Encode(Text));
+			Xml.Append(XML.Encode(Event.Text));
 			Xml.Append("</tx>");
 
-			return this .Send(Xml);
+			return this.Send(Xml);
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of something.
+		/// Processes an information event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Comment">Comment.</param>
-		public override Task Information(DateTime Timestamp, string Comment)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferInformation Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<info>");
-			Xml.Append(XML.Encode(Comment));
+			Xml.Append(XML.Encode(Event.Text));
 			Xml.Append("</info>");
 
 			return this.Send(Xml);
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of a warning state.
+		/// Processes a warning event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Warning">Warning.</param>
-		public override Task Warning(DateTime Timestamp, string Warning)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferWarning Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<warning>");
-			Xml.Append(XML.Encode(Warning));
+			Xml.Append(XML.Encode(Event.Text));
 			Xml.Append("</warning>");
 
 			return this.Send(Xml);
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an error state.
+		/// Processes an error event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Error">Error.</param>
-		public override Task Error(DateTime Timestamp, string Error)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferError Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<error>");
-			Xml.Append(XML.Encode(Error));
+			Xml.Append(XML.Encode(Event.Text));
 			Xml.Append("</error>");
 
 			return this.Send(Xml);
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an exception state.
+		/// Processes an exception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		public override Task Exception(DateTime Timestamp, string Exception)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferException Event)
 		{
-			if (this.HasExpired(Timestamp))
+			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
 
-			StringBuilder Xml = this.GetHeader(Timestamp);
+			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
 			Xml.Append("<exception>");
-			Xml.Append(XML.Encode(Exception));
+			Xml.Append(XML.Encode(Event.Text));
 			Xml.Append("</exception>");
 
 			return this.Send(Xml);

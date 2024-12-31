@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Events
 {
@@ -87,34 +88,43 @@ namespace Waher.Events
 		/// <summary>
 		/// Must be called when the application is terminated. Stops all event sinks that have been registered.
 		/// </summary>
+		[Obsolete("Use TerminateAsync() instead.")]
 		public static void Terminate()
+		{
+			TerminateAsync().Wait();
+		}
+
+		/// <summary>
+		/// Must be called when the application is terminated. Stops all event sinks that have been registered.
+		/// </summary>
+		public static async Task TerminateAsync()
 		{
 			foreach (IEventSink Sink in Sinks)
 			{
 				Unregister(Sink);
 
-				if (Sink is IDisposable Disposable)
+				try
 				{
-					try
-					{
+					if (Sink is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sink is IDisposable Disposable)
 						Disposable.Dispose();
-					}
-					catch (Exception)
-					{
-						// Ignore.
-					}
+				}
+				catch (Exception)
+				{
+					// Ignore.
 				}
 			}
 
-			EventHandler h = Terminating;
+			EventHandlerAsync h = Terminating;
 			if (!(h is null))
-				h(null, EventArgs.Empty);
+				await h(null, EventArgs.Empty);
 		}
 
 		/// <summary>
 		/// Event raised when the application is terminating.
 		/// </summary>
-		public static event EventHandler Terminating = null;
+		public static event EventHandlerAsync Terminating = null;
 
 		/// <summary>
 		/// Registered sinks.

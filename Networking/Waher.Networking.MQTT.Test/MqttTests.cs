@@ -26,10 +26,13 @@ namespace Waher.Networking.MQTT.Test
 			}
 		}
 
-		public static void CloseSniffer()
+		public static async Task CloseSniffer()
 		{
-			xmlSniffer?.Dispose();
-			xmlSniffer = null;
+			if (xmlSniffer is not null)
+			{
+				await xmlSniffer.DisposeAsync();
+				xmlSniffer = null;
+			}
 		}
 
 		[TestInitialize]

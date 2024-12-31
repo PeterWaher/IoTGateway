@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Content
 {
 	/// <summary>
 	/// Contains information about a response to a content request.
 	/// </summary>
-	public class ContentResponse : IDisposable
+	public class ContentResponse : IDisposableAsync
 	{
 		private readonly object decoded;
 		private readonly bool hasError;
@@ -77,9 +79,20 @@ namespace Waher.Content
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
-			if (this.Decoded is IDisposable Disposable)
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
+		{ 
+			if (this.Decoded is IDisposableAsync DisposableAsync)
+				await DisposableAsync.DisposeAsync();
+			else if (this.Decoded is IDisposable Disposable)
 				Disposable.Dispose();
 		}
 

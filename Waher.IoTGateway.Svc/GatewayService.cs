@@ -611,7 +611,7 @@ namespace Waher.IoTGateway.Svc
 
 				Flush();
 				Gateway.Stop().Wait();
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			}
 			catch (Exception ex)
 			{

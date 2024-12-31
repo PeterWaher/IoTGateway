@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.MQTT.Test
 {
@@ -12,9 +13,9 @@ namespace Waher.Networking.MQTT.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			CloseSniffer();
+			await CloseSniffer();
 		}
 
 		public override bool Encypted => true;

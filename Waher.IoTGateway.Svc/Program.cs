@@ -110,7 +110,7 @@ namespace Waher.IoTGateway.Svc
 						Log.Emergency("Unexpected null exception thrown.");
 
 					Gateway.Stop().Wait();
-					Log.Terminate();
+					Log.TerminateAsync().Wait();
 				}
 				else
 				{
@@ -131,7 +131,7 @@ namespace Waher.IoTGateway.Svc
 			AppDomain.CurrentDomain.ProcessExit += (Sender, e) =>
 			{
 				Log.Informational("Exiting process.");
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			};
 
 			TaskScheduler.UnobservedTaskException += (Sender, e) =>
@@ -527,7 +527,7 @@ namespace Waher.IoTGateway.Svc
 			{
 				Gateway.Stop().Wait();
 				ConsoleOut.Flush(true);
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			}
 		}
 

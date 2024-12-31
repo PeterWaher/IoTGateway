@@ -147,7 +147,7 @@ namespace Waher.IoTGateway.Console
 							Log.Emergency("Unexpected null exception thrown.");
 
 						Gateway.Stop().Wait();
-						Log.Terminate();
+						Log.TerminateAsync().Wait();
 					}
 					else
 					{
@@ -253,7 +253,7 @@ namespace Waher.IoTGateway.Console
 			{
 				Gateway.Stop().Wait(30000);     // TODO: Fail-safe approach
 				ConsoleOut.Flush(true);
-				Log.Terminate();
+				Log.TerminateAsync().Wait(30000);
 			}
 		}
 

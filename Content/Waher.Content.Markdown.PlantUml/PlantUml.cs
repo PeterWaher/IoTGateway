@@ -87,6 +87,7 @@ namespace Waher.Content.Markdown.PlantUml
 						{
 							scheduler?.Dispose();
 							scheduler = null;
+							return Task.CompletedTask;
 						};
 					}
 				}

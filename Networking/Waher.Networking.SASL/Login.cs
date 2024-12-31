@@ -80,7 +80,7 @@ namespace Waher.Networking.SASL
 				Connection.Tag = s;   // User name
 				await Connection.SaslChallenge(Convert.ToBase64String(Encoding.UTF8.GetBytes("Password\x00")));
 
-				await Connection.SetUserIdentity(s);
+				Connection.SetUserIdentity(s);
 				return null;
 			}
 

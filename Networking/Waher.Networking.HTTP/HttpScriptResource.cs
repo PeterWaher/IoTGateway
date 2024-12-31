@@ -289,7 +289,7 @@ namespace Waher.Networking.HTTP
 				return;
 			}
 
-			await Response.Return(ContentType, Binary);
+			await Response.Return(ContentType, true, Binary);
 		}
 	}
 }

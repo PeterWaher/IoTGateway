@@ -8,6 +8,7 @@ using System.Net;
 using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Script.Functions.Vectors;
 #if LineListener
 using Waher.Runtime.Console;
 #endif
@@ -68,7 +69,7 @@ namespace Waher.Networking.PeerToPeer
 	/// <summary>
 	/// Manages a multi-player environment.
 	/// </summary>
-	public class MultiPlayerEnvironment : IDisposable
+	public class MultiPlayerEnvironment : IDisposableAsync
 	{
 		private PeerToPeerNetwork p2pNetwork;
 		private MqttClient mqttConnection = null;
@@ -460,7 +461,7 @@ namespace Waher.Networking.PeerToPeer
 			await Peer.SendTcp(true, Output.GetPacket());
 		}
 
-		private async Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Peer_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player;
@@ -468,7 +469,7 @@ namespace Waher.Networking.PeerToPeer
 
 			if (Connection.StateObject is null)
 			{
-				BinaryInput Input = new BinaryInput(InMemorySniffer.CloneSection(Buffer, Offset, Count));
+				BinaryInput Input = new BinaryInput(Buffer, Offset, Count);
 				Guid PlayerId;
 				IPAddress PlayerRemoteAddress;
 				IPEndPoint PlayerRemoteEndpoint;
@@ -537,7 +538,7 @@ namespace Waher.Networking.PeerToPeer
 			else
 			{
 				Player = (Player)Connection.StateObject;
-				Packet = InMemorySniffer.CloneSection(Buffer, Offset, Count);
+				Packet = SnifferBase.CloneSection(Buffer, Offset, Count);
 			}
 
 			await this.GameDataReceived(Player, Connection, Packet);
@@ -566,7 +567,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcpToAll(byte[] Packet)
 		{
 			return this.SendTcpToAll(false, Packet);
@@ -575,11 +576,11 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Sends a packet to all remote players using TCP. Can only be done if <see cref="State"/>=<see cref="MultiPlayerState.Ready"/>.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public async Task SendTcpToAll(bool OneTimeBuffer, byte[] Packet)
+		public async Task SendTcpToAll(bool ConstantBuffer, byte[] Packet)
 		{
 			if (this.state != MultiPlayerState.Ready)
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
@@ -588,7 +589,7 @@ namespace Waher.Networking.PeerToPeer
 			foreach (Player Player in this.remotePlayers)
 			{
 				if (!((Connection = Player.Connection) is null))
-					await Connection.SendTcp(OneTimeBuffer, Packet);
+					await Connection.SendTcp(ConstantBuffer, Packet);
 			}
 		}
 
@@ -598,7 +599,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Player">Player to send the packet to.</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcpTo(Player Player, byte[] Packet)
 		{
 			return this.SendTcpTo(Player, false, Packet);
@@ -608,17 +609,17 @@ namespace Waher.Networking.PeerToPeer
 		/// Sends a packet to a specific player using TCP. Can only be done if <see cref="State"/>=<see cref="MultiPlayerState.Ready"/>.
 		/// </summary>
 		/// <param name="Player">Player to send the packet to.</param>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public Task SendTcpTo(Player Player, bool OneTimeBuffer, byte[] Packet)
+		public Task SendTcpTo(Player Player, bool ConstantBuffer, byte[] Packet)
 		{
 			if (this.state != MultiPlayerState.Ready)
 				throw new Exception("The multiplayer environment is not ready to exchange data between players.");
 
 			PeerConnection Connection = Player.Connection;
-			return Connection?.SendTcp(OneTimeBuffer, Packet) ?? Task.CompletedTask;
+			return Connection?.SendTcp(ConstantBuffer, Packet) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -627,7 +628,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="PlayerId">ID of player to send the packet to.</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task SendTcpTo(Guid PlayerId, byte[] Packet)
 		{
 			return this.SendTcpTo(PlayerId, false, Packet);
@@ -637,11 +638,11 @@ namespace Waher.Networking.PeerToPeer
 		/// Sends a packet to a specific player using TCP. Can only be done if <see cref="State"/>=<see cref="MultiPlayerState.Ready"/>.
 		/// </summary>
 		/// <param name="PlayerId">ID of player to send the packet to.</param>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Packet to send.</param>
 		/// <exception cref="Exception">If <see cref="State"/>!=<see cref="MultiPlayerState.Ready"/>.</exception>
-		public Task SendTcpTo(Guid PlayerId, bool OneTimeBuffer, byte[] Packet)
+		public Task SendTcpTo(Guid PlayerId, bool ConstantBuffer, byte[] Packet)
 		{
 			Player Player;
 
@@ -652,7 +653,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			PeerConnection Connection = Player.Connection;
-			return Connection?.SendTcp(OneTimeBuffer, Packet) ?? Task.CompletedTask;
+			return Connection?.SendTcp(ConstantBuffer, Packet) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -828,7 +829,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private async Task<bool> Connection_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Connection_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Guid PlayerId;
@@ -837,7 +838,7 @@ namespace Waher.Networking.PeerToPeer
 
 			try
 			{
-				BinaryInput Input = new BinaryInput(InMemorySniffer.CloneSection(Buffer, Offset, Count));
+				BinaryInput Input = new BinaryInput(Buffer, Offset, Count);
 
 				PlayerId = Input.ReadGuid();
 				PlayerRemoteAddress = IPAddress.Parse(Input.ReadString());
@@ -885,7 +886,7 @@ namespace Waher.Networking.PeerToPeer
 			return true;
 		}
 
-		private async Task<bool> Connection_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Connection_OnSent(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			PeerConnection Connection = (PeerConnection)Sender;
 			Player Player = (Player)Connection.StateObject;
@@ -1026,16 +1027,9 @@ namespace Waher.Networking.PeerToPeer
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>

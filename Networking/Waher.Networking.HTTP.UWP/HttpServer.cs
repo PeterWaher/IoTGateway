@@ -30,10 +30,10 @@ using Waher.Networking.HTTP.HTTP2;
 
 namespace Waher.Networking.HTTP
 {
-    /// <summary>
-    /// Implements an HTTP server.
-    /// </summary>
-    public class HttpServer : CommunicationLayer, IDisposable, IResourceMap
+	/// <summary>
+	/// Implements an HTTP server.
+	/// </summary>
+	public class HttpServer : CommunicationLayer, IDisposable, IResourceMap
 	{
 		/// <summary>
 		/// Default HTTP Port (80).
@@ -996,7 +996,7 @@ namespace Waher.Networking.HTTP
 		#region Connections
 
 #if WINDOWS_UWP
-		private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+		private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
 		{
 			try
 			{
@@ -1008,11 +1008,14 @@ namespace Waher.Networking.HTTP
 					return;
 				}
 
-				await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+				this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+
+				if (!int.TryParse(sender.Information.LocalPort, out int Port))
+					Port = this.httpPorts[0];
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 				BinaryTcpClient.Bind(true);
-				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
+				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
 				BinaryTcpClient.Continue();
 
 				lock (this.connections)
@@ -1073,7 +1076,7 @@ namespace Waher.Networking.HTTP
 
 						if (!(Client is null))
 						{
-							await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 							BinaryTcpClient.Bind(true);
@@ -1154,25 +1157,32 @@ namespace Waher.Networking.HTTP
 				{
 					if (this.HasSniffers)
 					{
-						await this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
+						this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
 							", Trust Certificates: " + TrustCertificates.ToString() + ")");
 					}
 
-					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls, 
+					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
 						ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
 
 					if (this.HasSniffers)
 					{
-						await this.Information("TLS established" +
-							". Cipher Strength: " + Client.CipherStrength.ToString() +
-							", Hash Strength: " + Client.HashStrength.ToString() +
-							", Key Exchange Strength: " + Client.KeyExchangeStrength.ToString());
+						StringBuilder sb = new StringBuilder();
+
+						sb.Append("TLS established");
+						sb.Append(". Cipher Strength: ");
+						sb.Append(Client.CipherStrength.ToString());
+						sb.Append(", Hash Strength: ");
+						sb.Append(Client.HashStrength.ToString());
+						sb.Append(", Key Exchange Strength: ");
+						sb.Append(Client.KeyExchangeStrength.ToString());
+
+						this.Information(sb.ToString());
 
 						if (!(Client.RemoteCertificate is null))
 						{
 							if (this.HasSniffers)
 							{
-								StringBuilder sb = new StringBuilder();
+								sb.Clear();
 
 								sb.Append("Remote Certificate received. Valid: ");
 								sb.Append(Client.RemoteCertificateValid.ToString());
@@ -1185,7 +1195,7 @@ namespace Waher.Networking.HTTP
 								sb.Append(", Hash: ");
 								sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetCertHash()));
 
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 							}
 						}
 					}
@@ -1208,42 +1218,42 @@ namespace Waher.Networking.HTTP
 				catch (AuthenticationException ex)
 				{
 					if (this.HasSniffers)
-						await this.Exception(ex);
+						this.Exception(ex);
 
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
 				catch (SocketException ex)
 				{
 					if (this.HasSniffers)
-						await this.Exception(ex);
+						this.Exception(ex);
 
-					Client.Dispose();
+					await Client.DisposeAsync();
 				}
 				catch (Win32Exception ex)
 				{
 					if (this.HasSniffers)
-						await this.Exception(ex);
+						this.Exception(ex);
 
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
 				catch (IOException ex)
 				{
 					if (this.HasSniffers)
-						await this.Exception(ex);
+						this.Exception(ex);
 
-					Client.Dispose();
+					await Client.DisposeAsync();
 				}
 				catch (Exception ex)
 				{
 					if (this.HasSniffers)
-						await this.Exception(ex);
+						this.Exception(ex);
 
-					Client.Dispose();
+					await Client.DisposeAsync();
 					Log.Exception(ex);
 				}
 			}
 			else
-				Client.Dispose();
+				await Client.DisposeAsync();
 		}
 
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
@@ -1251,7 +1261,7 @@ namespace Waher.Networking.HTTP
 			Exception ex2 = Log.UnnestException(ex);
 			await Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
 
-			Client.Dispose();
+			await Client.DisposeAsync();
 		}
 #endif
 
@@ -1586,8 +1596,8 @@ namespace Waher.Networking.HTTP
 					if (i < 0)
 						break;
 
-					SubPath = ResourceName[i..] + SubPath;
-					ResourceName = ResourceName[..i];
+					SubPath = ResourceName.Substring(i) + SubPath;
+					ResourceName = ResourceName.Substring(0, i);
 				}
 			}
 
@@ -1806,7 +1816,7 @@ namespace Waher.Networking.HTTP
 					string s = Request.RemoteEndPoint;
 					int i = s.LastIndexOf(':');
 					if (i > 0)
-						s = s[..i];
+						s = s.Substring(0, i);
 
 					this.IncLocked(s, this.callsPerFrom);
 				}
@@ -1964,31 +1974,33 @@ namespace Waher.Networking.HTTP
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');
 			if (i >= 0)
-				ResourceName = ResourceName[..i];
+				ResourceName = ResourceName.Substring(0, i);
 
 			if (NetworkingModule.Stopping)
 				return new Tuple<int, string, byte[]>(ServiceUnavailableException.Code, ServiceUnavailableException.StatusMessage, null);
 			else if (this.TryGetResource(ResourceName, true, out HttpResource Resource, out string SubPath) &&
 				Resource is IHttpGetMethod GetMethod)
 			{
-				using MemoryStream ms = new MemoryStream();
-				HttpRequest Request = new HttpRequest(this,
-					new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "unknown", "unknown")
+				using (MemoryStream ms = new MemoryStream())
 				{
-					Session = Session,
-					SubPath = SubPath,
-					Resource = Resource
-				};
+					HttpRequest Request = new HttpRequest(this,
+						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "unknown", "unknown")
+					{
+						Session = Session,
+						SubPath = SubPath,
+						Resource = Resource
+					};
 
-				InternalTransfer InternalTransfer = new InternalTransfer(ms);
-				HttpResponse Response = new HttpResponse(InternalTransfer, this, Request);
+					InternalTransfer InternalTransfer = new InternalTransfer(ms);
+					HttpResponse Response = new HttpResponse(InternalTransfer, this, Request);
 
-				this.RequestReceived(Request, string.Empty, Resource, SubPath);
-				await GetMethod.GET(Request, Response);
+					this.RequestReceived(Request, string.Empty, Resource, SubPath);
+					await GetMethod.GET(Request, Response);
 
-				await InternalTransfer.WaitUntilSent(10000);
+					await InternalTransfer.WaitUntilSent(10000);
 
-				return new Tuple<int, string, byte[]>(Response.StatusCode, Response.ContentType, ms.ToArray());
+					return new Tuple<int, string, byte[]>(Response.StatusCode, Response.ContentType, ms.ToArray());
+				}
 			}
 			else
 				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.StatusMessage, null);
@@ -2017,7 +2029,7 @@ namespace Waher.Networking.HTTP
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');
 			if (i >= 0)
-				ResourceName = ResourceName[..i];
+				ResourceName = ResourceName.Substring(0, i);
 
 			if (this.TryGetResource(ResourceName, false, out HttpResource Resource, out string SubPath) &&
 				Resource is HttpFolderResource Folder)

@@ -56,7 +56,7 @@ namespace Waher.Networking.HTTP.Test
 
 			Profiler.NewState("Compress");
 
-			await Compressor.EncodeAsync(Data, 0, Data.Length);
+			await Compressor.EncodeAsync(true, Data, 0, Data.Length);
 			await Compressor.FlushAsync();
 
 			Profiler.NewState("Result");
@@ -180,7 +180,7 @@ namespace Waher.Networking.HTTP.Test
 			InternalTransfer TransferEncoding = new(Result);
 			TransferEncoding Compressor = ContentEncoding.GetEncoder(TransferEncoding, Data.Length, null);
 
-			await Compressor.EncodeAsync(Data, 0, Data.Length);
+			await Compressor.EncodeAsync(true, Data, 0, Data.Length);
 			await Compressor.FlushAsync();
 
 			byte[] Compressed = Result.ToArray();

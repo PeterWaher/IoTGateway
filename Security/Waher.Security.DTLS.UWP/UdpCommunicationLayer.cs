@@ -9,10 +9,10 @@ using Waher.Networking;
 
 namespace Waher.Security.DTLS
 {
-    /// <summary>
-    /// Class acting as an interface for DTLS to communicate UDP.
-    /// </summary>
-    public class UdpCommunicationLayer : CommunicationLayer, IDisposable, ICommunicationLayer
+	/// <summary>
+	/// Class acting as an interface for DTLS to communicate UDP.
+	/// </summary>
+	public class UdpCommunicationLayer : CommunicationLayer, IDisposable, ICommunicationLayer
 	{
 		private readonly LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
 		private UdpClient client;
@@ -46,14 +46,14 @@ namespace Waher.Security.DTLS
 					if (this.disposed)
 						return;
 
-					await this.ReceiveBinary(Data.Buffer);
+					this.ReceiveBinary(true, Data.Buffer);
 
 					try
 					{
 						DataReceivedEventHandler h = this.PacketReceived;
 
 						if (!(h is null))
-							await h(Data.Buffer, Data.RemoteEndPoint);
+							await h(true, Data.Buffer, Data.RemoteEndPoint);
 					}
 					catch (Exception ex)
 					{
@@ -68,11 +68,11 @@ namespace Waher.Security.DTLS
 			catch (Exception ex)
 			{
 				if (!this.disposed)
-					await this.Exception(ex);
+					this.Exception(ex);
 			}
 		}
 
-		private async Task BeginTransmit(byte[] Packet, IPEndPoint RemoteEndpoint)
+		private async Task BeginTransmit(bool ConstantBuffer, byte[] Packet, IPEndPoint RemoteEndpoint)
 		{
 			if (this.disposed)
 				return;
@@ -81,6 +81,12 @@ namespace Waher.Security.DTLS
 			{
 				if (this.isWriting)
 				{
+					if (!ConstantBuffer)
+					{
+						Packet = (byte[])Packet.Clone();
+						ConstantBuffer = true;
+					}
+
 					this.outputQueue.AddLast(new KeyValuePair<byte[], IPEndPoint>(Packet, RemoteEndpoint));
 					return;
 				}
@@ -114,7 +120,7 @@ namespace Waher.Security.DTLS
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 		}
 
@@ -126,12 +132,14 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Method called by the DTLS layer when a datagram is to be sent.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Datagram</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		public Task SendPacket(byte[] Packet, object RemoteEndpoint)
+		public Task SendPacket(bool ConstantBuffer, byte[] Packet, object RemoteEndpoint)
 		{
 			IPEndPoint EP = (IPEndPoint)RemoteEndpoint;
-			return this.BeginTransmit(Packet, EP);
+			return this.BeginTransmit(ConstantBuffer, Packet, EP);
 		}
 
 		/// <summary>

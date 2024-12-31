@@ -101,7 +101,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Logs accumulated sniffer output to associated sniffable interface.
 		/// </summary>
-		public Task LogInformationToSniffer()
+		public void LogInformationToSniffer()
 		{
 			if (this.hasSniffer)
 			{
@@ -112,11 +112,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 					this.snifferOutput.Clear();
 					this.firstOutput = true;
 				
-					return this.ComLayer.Information(s);
+					this.ComLayer.Information(s);
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

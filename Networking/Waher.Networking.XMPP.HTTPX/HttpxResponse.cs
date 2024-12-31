@@ -9,7 +9,6 @@ using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Temporary;
 using Waher.Security;
@@ -270,7 +269,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							IE2eEndpoint EndpointReference = await E2e.Encrypt(Resource, "POST", Client.FullJID, To, File, Encrypted);
 							if (EndpointReference is null)
 							{
-								await Client.Error("Unable to encrypt response back to recipient.");
+								Client.Error("Unable to encrypt response back to recipient.");
 								return;
 							}
 
@@ -340,14 +339,14 @@ namespace Waher.Networking.XMPP.HTTPX
 								Msg.Append(File.Length.ToString());
 							}
 
-							await Client.Error(Msg.ToString());
+							Client.Error(Msg.ToString());
 						}
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				await Client.Exception(ex);
+				Client.Exception(ex);
 			}
 			finally
 			{
@@ -356,12 +355,12 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		public override Task<ulong> DecodeAsync(byte[] Buffer, int Offset, int NrRead)
+		public override Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int NrRead)
 		{
 			throw new NotSupportedException();   // Will not be called.
 		}
 
-		public override async Task<bool> EncodeAsync(byte[] Buffer, int Offset, int NrBytes)
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int NrBytes)
 		{
 			this.AssertNotCancelled();
 

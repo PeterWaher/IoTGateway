@@ -25,6 +25,17 @@ namespace Waher.Networking.MQTT
 		/// Class that helps deserialize information stored in a binary packet.
 		/// </summary>
 		/// <param name="Data">Binary Data</param>
+		/// <param name="Offset">Offset into buffer where data starts.</param>
+		/// <param name="Count">Number of bytes of data.</param>
+		public BinaryInput(byte[] Data, int Offset, int Count)
+		{
+			this.ms = new MemoryStream(Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Class that helps deserialize information stored in a binary packet.
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
 		public BinaryInput(MemoryStream Data)
 		{
 			this.ms = Data;
@@ -204,18 +215,12 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Current position in input stream.
 		/// </summary>
-		public int Position
-		{
-			get { return (int)this.ms.Position; }
-		}
+		public int Position => (int)this.ms.Position;
 
 		/// <summary>
 		/// Number of bytes left.
 		/// </summary>
-		public int BytesLeft
-		{
-			get { return (int)(this.ms.Length - this.ms.Position); }
-		}
+		public int BytesLeft => (int)(this.ms.Length - this.ms.Position);
 
 		/// <summary>
 		/// Gets the remaining bytes.
@@ -227,7 +232,7 @@ namespace Waher.Networking.MQTT
 			byte[] Result = new byte[c];
 
 			if (c > 0)
-				Array.Copy(this.ms.ToArray(), (int)this.ms.Position, Result, 0, c);
+				this.ms.Read(Result, 0, c);
 
 			return Result;
 		}

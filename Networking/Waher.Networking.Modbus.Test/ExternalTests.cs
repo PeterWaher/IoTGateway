@@ -42,10 +42,13 @@ namespace Waher.Networking.Modbus.Test
 		}
 
 		[AssemblyCleanup]
-		public static void AssemblyCleanup()
+		public static async Task AssemblyCleanup()
 		{
-			filesProvider?.Dispose();
-			filesProvider = null;
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 
 			if (consoleEventSink is not null)
 			{
@@ -53,8 +56,11 @@ namespace Waher.Networking.Modbus.Test
 				consoleEventSink = null;
 			}
 
-			sniffer?.Dispose();
-			sniffer = null;
+			if (sniffer is not null)
+			{
+				await sniffer.DisposeAsync();
+				sniffer = null;
+			}
 		}
 
 		[ClassInitialize]

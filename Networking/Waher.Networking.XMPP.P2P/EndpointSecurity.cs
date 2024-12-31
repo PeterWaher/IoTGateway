@@ -851,14 +851,14 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DataXml">XML data</param>
 		/// <param name="Xml">Output</param>
 		/// <returns>If E2E information was available and encryption was possible.</returns>
-		public virtual async Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
+		public virtual bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
 		{
 			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
 			if (RemoteEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Warning("Remote E2E endpoint not found. Unable to encrypt message.");
+					Client.Warning("Remote E2E endpoint not found. Unable to encrypt message.");
 
 				return false;
 			}
@@ -867,7 +867,7 @@ namespace Waher.Networking.XMPP.P2P
 			if (LocalEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Warning("Local E2E endpoint matching remote endpoint not found. Unable to encrypt message.");
+					Client.Warning("Local E2E endpoint matching remote endpoint not found. Unable to encrypt message.");
 
 				return false;
 			}
@@ -877,7 +877,7 @@ namespace Waher.Networking.XMPP.P2P
 			bool Result = LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Xml, LocalEndpoint, RemoteEndpoint);
 
 			if (SniffE2eInfo)
-				await Client.Information(DataXml);
+				Client.Information(DataXml);
 
 			return Result;
 		}
@@ -943,7 +943,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="E2eElement">Encrypted XML data</param>
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
 		/// <returns>Decrypted XML, together with an endpoint reference, if successful, null otherwise..</returns>
-		public virtual async Task<Tuple<string, string>> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
+		public virtual Tuple<string, string> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
 			IE2eSymmetricCipher SymmetricCipher)
 		{
 			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
@@ -952,7 +952,7 @@ namespace Waher.Networking.XMPP.P2P
 			if (RemoteEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Error("Remote E2E endpoint not found. Unable to decrypt message.");
+					Client.Error("Remote E2E endpoint not found. Unable to decrypt message.");
 
 				return null;
 			}
@@ -961,7 +961,7 @@ namespace Waher.Networking.XMPP.P2P
 			if (LocalEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Error("Local E2E endpoint matching remote endpoint not found. Unable to decrypt message.");
+					Client.Error("Local E2E endpoint matching remote endpoint not found. Unable to decrypt message.");
 				
 				return null;
 			}
@@ -974,13 +974,13 @@ namespace Waher.Networking.XMPP.P2P
 			if (Xml is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Error("Unable to decrypt message.");
+					Client.Error("Unable to decrypt message.");
 				
 				return null;
 			}
 
 			if (SniffE2eInfo)
-				await Client.Information(Xml);
+				Client.Information(Xml);
 
 			return new Tuple<string, string>(Xml, EndpointReference);
 		}
@@ -1000,14 +1000,14 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eMessageHandler(Sender, e, this.cha);
 		}
 
-		private async Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
+		private Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
+			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
 			if (T is null)
 			{
-				await Client.Error("Unable to decrypt or verify message.");
-				return;
+				Client.Error("Unable to decrypt or verify message.");
+				return Task.CompletedTask;
 			}
 
 			string Xml = T.Item1;
@@ -1029,6 +1029,8 @@ namespace Waher.Networking.XMPP.P2P
 			};
 
 			Client.ProcessMessage(e2);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -1069,10 +1071,10 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(Cipher is null))
 			{
-				Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
+				Tuple<string, string> T = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
 				if (T is null)
 				{
-					await Client.Error("Unable to decrypt or verify response.");
+					Client.Error("Unable to decrypt or verify response.");
 					return;
 				}
 
@@ -1204,10 +1206,10 @@ namespace Waher.Networking.XMPP.P2P
 		private async Task E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
+			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
 			if (T is null)
 			{
-				await Client.Error("Unable to decrypt or verify request.");
+				Client.Error("Unable to decrypt or verify request.");
 				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
 				return;
 			}
@@ -1243,10 +1245,10 @@ namespace Waher.Networking.XMPP.P2P
 		private async Task E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
+			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
 			if (T is null)
 			{
-				await Client.Error("Unable to decrypt or verify request.");
+				Client.Error("Unable to decrypt or verify request.");
 				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
 				return;
 			}
@@ -1386,7 +1388,7 @@ namespace Waher.Networking.XMPP.P2P
 			string MessageXml = Xml.ToString();
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To, MessageXml, Encrypted))
+			if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To, MessageXml, Encrypted))
 			{
 				MessageXml = Encrypted.ToString();
 
@@ -1406,7 +1408,7 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						Encrypted.Clear();
 
-						if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From, MessageXml, Encrypted))
+						if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From, MessageXml, Encrypted))
 						{
 							await Client.SendMessage(QoS, MessageType.Normal, Id, e.From, Encrypted.ToString(), string.Empty,
 								string.Empty, string.Empty, string.Empty, string.Empty, DeliveryCallback, State);
@@ -1731,10 +1733,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Id">Id attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="ex">Exception object</param>
-		public async Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
+		public Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
 			Exception ex)
 		{
-			await this.SendIqError(Client, E2ETransmission, Id, To, await Client.ExceptionToXmppXml(ex));
+			return this.SendIqError(Client, E2ETransmission, Id, To, Client.ExceptionToXmppXml(ex));
 		}
 
 		/// <summary>
@@ -1800,7 +1802,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (await this.Encrypt(Client, Id, Type, this.client.FullJID, To, Xml, Encrypted))
+			if (this.Encrypt(Client, Id, Type, this.client.FullJID, To, Xml, Encrypted))
 			{
 				string XmlEnc = Encrypted.ToString();
 

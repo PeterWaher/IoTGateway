@@ -173,6 +173,11 @@ namespace Waher.Things.Xmpp
 			return base.NodeUpdated();
 		}
 
+		internal XmppBroker GetCachedBroker()
+		{
+			return XmppBrokers.GetCachedBroker(this.Key);
+		}
+
 		internal Task<XmppBroker> GetBroker()
 		{
 			return XmppBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.userName, this.password,
@@ -243,153 +248,169 @@ namespace Waher.Things.Xmpp
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(byte[] Data) => await ((await this.GetBroker()).Client?.ReceiveBinary(Data) ?? Task.CompletedTask);
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data) => this.GetCachedBroker()?.Client?.ReceiveBinary(ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public async Task ReceiveBinary(byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.ReceiveBinary(Data, Offset, Count) ?? Task.CompletedTask);
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.GetCachedBroker()?.Client?.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(byte[] Data) => await ((await this.GetBroker()).Client?.TransmitBinary(Data) ?? Task.CompletedTask);
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data) => this.GetCachedBroker()?.Client?.TransmitBinary(ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public async Task TransmitBinary(byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.TransmitBinary(Data, Offset, Count) ?? Task.CompletedTask);
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.GetCachedBroker()?.Client?.TransmitBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(string Text) => await ((await this.GetBroker()).Client?.ReceiveText(Text) ?? Task.CompletedTask);
+		public void ReceiveText(string Text) => this.GetCachedBroker()?.Client?.ReceiveText(Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(string Text) => await ((await this.GetBroker()).Client?.TransmitText(Text) ?? Task.CompletedTask);
+		public void TransmitText(string Text) => this.GetCachedBroker()?.Client?.TransmitText(Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(string Comment) => await ((await this.GetBroker()).Client?.Information(Comment) ?? Task.CompletedTask);
+		public void Information(string Comment) => this.GetCachedBroker()?.Client?.Information(Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(string Warning) => await ((await this.GetBroker()).Client?.Warning(Warning) ?? Task.CompletedTask);
+		public void Warning(string Warning) => this.GetCachedBroker()?.Client?.Warning(Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public async Task Error(string Error) => await ((await this.GetBroker()).Client?.Error(Error) ?? Task.CompletedTask);
+		public void Error(string Error) => this.GetCachedBroker()?.Client?.Error(Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(Exception Exception) => await ((await this.GetBroker()).Client?.Exception(Exception) ?? Task.CompletedTask);
+		public void Exception(Exception Exception) => this.GetCachedBroker()?.Client?.Exception(Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(string Exception) => await ((await this.GetBroker()).Client?.Exception(Exception) ?? Task.CompletedTask);
+		public void Exception(string Exception) => this.GetCachedBroker()?.Client?.Exception(Exception);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data) => await ((await this.GetBroker()).Client?.ReceiveBinary(Timestamp, Data) ?? Task.CompletedTask);
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.GetCachedBroker()?.Client?.ReceiveBinary(Timestamp, ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.ReceiveBinary(Timestamp, Data, Offset, Count) ?? Task.CompletedTask);
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.GetCachedBroker()?.Client?.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(DateTime Timestamp, byte[] Data) => await ((await this.GetBroker()).Client?.TransmitBinary(Timestamp, Data) ?? Task.CompletedTask);
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.GetCachedBroker()?.Client?.TransmitBinary(Timestamp, ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public async Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => await ((await this.GetBroker()).Client?.TransmitBinary(Timestamp, Data, Offset, Count) ?? Task.CompletedTask);
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.GetCachedBroker()?.Client?.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(DateTime Timestamp, string Text) => await ((await this.GetBroker()).Client?.ReceiveText(Timestamp, Text) ?? Task.CompletedTask);
+		public void ReceiveText(DateTime Timestamp, string Text) => this.GetCachedBroker()?.Client?.ReceiveText(Timestamp, Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(DateTime Timestamp, string Text) => await ((await this.GetBroker()).Client?.TransmitText(Timestamp, Text) ?? Task.CompletedTask);
+		public void TransmitText(DateTime Timestamp, string Text) => this.GetCachedBroker()?.Client?.TransmitText(Timestamp, Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(DateTime Timestamp, string Comment) => await ((await this.GetBroker()).Client?.Information(Timestamp, Comment) ?? Task.CompletedTask);
+		public void Information(DateTime Timestamp, string Comment) => this.GetCachedBroker()?.Client?.Information(Timestamp, Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(DateTime Timestamp, string Warning) => await ((await this.GetBroker()).Client?.Warning(Timestamp, Warning) ?? Task.CompletedTask);
+		public void Warning(DateTime Timestamp, string Warning) => this.GetCachedBroker()?.Client?.Warning(Timestamp, Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public async Task Error(DateTime Timestamp, string Error) => await ((await this.GetBroker()).Client?.Error(Timestamp, Error) ?? Task.CompletedTask);
+		public void Error(DateTime Timestamp, string Error) => this.GetCachedBroker()?.Client?.Error(Timestamp, Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(DateTime Timestamp, string Exception) => await ((await this.GetBroker()).Client?.Exception(Timestamp, Exception) ?? Task.CompletedTask);
+		public void Exception(DateTime Timestamp, string Exception) => this.GetCachedBroker()?.Client?.Exception(Timestamp, Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(DateTime Timestamp, Exception Exception) => await ((await this.GetBroker()).Client?.Exception(Timestamp, Exception) ?? Task.CompletedTask);
+		public void Exception(DateTime Timestamp, Exception Exception) => this.GetCachedBroker()?.Client?.Exception(Timestamp, Exception);
 
 		#endregion
 

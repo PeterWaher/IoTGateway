@@ -111,153 +111,169 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data) => this.Client.ReceiveBinary(Data);
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data) => this.Client.ReceiveBinary(ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public Task ReceiveBinary(byte[] Data, int Offset, int Count) => this.Client.ReceiveBinary(Data, Offset, Count);
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.Client.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data) => this.Client.TransmitBinary(Data);
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data) => this.Client.TransmitBinary(ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public Task TransmitBinary(byte[] Data, int Offset, int Count) => this.Client.TransmitBinary(Data, Offset, Count);
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.Client.TransmitBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(string Text) => this.Client.ReceiveText(Text);
+		public void ReceiveText(string Text) => this.Client.ReceiveText(Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(string Text) => this.Client.TransmitText(Text);
+		public void TransmitText(string Text) => this.Client.TransmitText(Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(string Comment) => this.Client.Information(Comment);
+		public void Information(string Comment) => this.Client.Information(Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(string Warning) => this.Client.Warning(Warning);
+		public void Warning(string Warning) => this.Client.Warning(Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public Task Error(string Error) => this.Client.Error(Error);
+		public void Error(string Error) => this.Client.Error(Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(Exception Exception) => this.Client.Exception(Exception);
+		public void Exception(Exception Exception) => this.Client.Exception(Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(string Exception) => this.Client.Exception(Exception);
+		public void Exception(string Exception) => this.Client.Exception(Exception);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.Client.ReceiveBinary(Timestamp, Data);
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.Client.ReceiveBinary(Timestamp, ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => this.Client.ReceiveBinary(Timestamp, Data, Offset, Count);
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.Client.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.Client.TransmitBinary(Timestamp, Data);
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.Client.TransmitBinary(Timestamp, ConstantBuffer, Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count) => this.Client.TransmitBinary(Timestamp, Data, Offset, Count);
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.Client.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(DateTime Timestamp, string Text) => this.Client.ReceiveText(Timestamp, Text);
+		public void ReceiveText(DateTime Timestamp, string Text) => this.Client.ReceiveText(Timestamp, Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(DateTime Timestamp, string Text) => this.Client.TransmitText(Timestamp, Text);
+		public void TransmitText(DateTime Timestamp, string Text) => this.Client.TransmitText(Timestamp, Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(DateTime Timestamp, string Comment) => this.Client.Information(Timestamp, Comment);
+		public void Information(DateTime Timestamp, string Comment) => this.Client.Information(Timestamp, Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(DateTime Timestamp, string Warning) => this.Client.Warning(Timestamp, Warning);
+		public void Warning(DateTime Timestamp, string Warning) => this.Client.Warning(Timestamp, Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public Task Error(DateTime Timestamp, string Error) => this.Client.Error(Timestamp, Error);
+		public void Error(DateTime Timestamp, string Error) => this.Client.Error(Timestamp, Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, string Exception) => this.Client.Exception(Timestamp, Exception);
+		public void Exception(DateTime Timestamp, string Exception) => this.Client.Exception(Timestamp, Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, Exception Exception) => this.Client.Exception(Timestamp, Exception);
+		public void Exception(DateTime Timestamp, Exception Exception) => this.Client.Exception(Timestamp, Exception);
 
 		#endregion
 	}

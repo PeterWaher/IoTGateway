@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			bool Last = XML.Attribute(e.Content, "last", false);
 			byte[] Data = Convert.FromBase64String(e.Content.InnerText);
 
-			if (!await Rec.ChunkReceived(Nr, Last, Data))
+			if (!await Rec.ChunkReceived(Nr, Last, true, Data))
 			{
 				await Rec.DisposeAsync();
 				chunkedStreams.Remove(Key);

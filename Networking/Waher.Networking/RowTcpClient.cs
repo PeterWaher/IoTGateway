@@ -146,7 +146,7 @@ namespace Waher.Networking
 					{
 						if (this.error)
 						{
-							await this.Error("Row too long: " + this.len.ToString() + " characters");
+							this.Error("Row too long: " + this.len.ToString() + " characters");
 							this.error = false;
 						}
 						else if (!await base.TextDataReceived(this.buffer.ToString()))

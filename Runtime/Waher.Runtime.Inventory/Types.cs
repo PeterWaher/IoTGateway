@@ -316,9 +316,9 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		public static event EventHandler OnInvalidated = null;
 
-		private static void OnProcessExit(object Sender, EventArgs e)
+		private static Task OnProcessExit(object Sender, EventArgs e)
 		{
-			StopAllModules();
+			return StopAllModules();
 		}
 
 		/// <summary>
@@ -382,7 +382,7 @@ namespace Waher.Runtime.Inventory
 					moduleParameters.Clear();
 				}
 
-				SingletonAttribute.Clear();
+				await SingletonAttribute.Clear();
 			}
 		}
 

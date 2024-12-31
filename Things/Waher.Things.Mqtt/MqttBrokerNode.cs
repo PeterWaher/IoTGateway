@@ -213,6 +213,15 @@ namespace Waher.Things.Mqtt
 		}
 
 		/// <summary>
+		/// Gets the corresponding broker node, if available in the cache.
+		/// </summary>
+		/// <returns>MQTT Broker connection object, or null if none in the cache.</returns>
+		public MqttBroker GetCachedBroker()
+		{
+			return MqttBrokers.GetCachedBroker(this.Key);
+		}
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public override async Task<bool> RemoveAsync(INode Child)
@@ -287,181 +296,186 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data)
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data)
 		{
-			return this.ReceiveBinary(Data, 0, Data.Length);
+			this.ReceiveBinary(ConstantBuffer, Data, 0, Data.Length);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public async Task ReceiveBinary(byte[] Data, int Offset, int Count)
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.ReceiveBinary(Data, Offset, Count);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data)
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data)
 		{
-			return this.TransmitBinary(Data, 0, Data.Length);
+			this.TransmitBinary(ConstantBuffer, Data, 0, Data.Length);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public async Task TransmitBinary(byte[] Data, int Offset, int Count)
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.TransmitBinary(Data, Offset, Count);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.TransmitBinary(ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(string Text)
+		public void ReceiveText(string Text)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.ReceiveText(Text);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.ReceiveText(Text);
 		}
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(string Text)
+		public void TransmitText(string Text)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.TransmitText(Text);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.TransmitText(Text);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(string Comment)
+		public void Information(string Comment)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Information(Comment);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Information(Comment);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(string Warning)
+		public void Warning(string Warning)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Warning(Warning);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Warning(Warning);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public async Task Error(string Error)
+		public void Error(string Error)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Error(Error);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Error(Error);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(Exception Exception)
+		public void Exception(Exception Exception)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Exception(Exception);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Exception(Exception);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(string Exception)
+		public void Exception(string Exception)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Exception(Exception);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Exception(Exception);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
 		{
-			return this.ReceiveBinary(Timestamp, Data, 0, Data.Length);
+			this.ReceiveBinary(Timestamp, ConstantBuffer, Data, 0, Data.Length);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.ReceiveBinary(Timestamp, Data, Offset, Count);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
 		{
-			return this.TransmitBinary(Timestamp, Data, 0, Data.Length);
+			this.TransmitBinary(Timestamp, ConstantBuffer, Data, 0, Data.Length);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public async Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.TransmitBinary(Timestamp, Data, Offset, Count);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
@@ -469,12 +483,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(DateTime Timestamp, string Text)
+		public void ReceiveText(DateTime Timestamp, string Text)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.ReceiveText(Timestamp, Text);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.ReceiveText(Timestamp, Text);
 		}
 
 		/// <summary>
@@ -482,12 +495,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(DateTime Timestamp, string Text)
+		public void TransmitText(DateTime Timestamp, string Text)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.TransmitText(Timestamp, Text);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.TransmitText(Timestamp, Text);
 		}
 
 		/// <summary>
@@ -495,12 +507,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(DateTime Timestamp, string Comment)
+		public void Information(DateTime Timestamp, string Comment)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Information(Timestamp, Comment);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Information(Timestamp, Comment);
 		}
 
 		/// <summary>
@@ -508,12 +519,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(DateTime Timestamp, string Warning)
+		public void Warning(DateTime Timestamp, string Warning)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Warning(Timestamp, Warning);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Warning(Timestamp, Warning);
 		}
 
 		/// <summary>
@@ -521,12 +531,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public async Task Error(DateTime Timestamp, string Error)
+		public void Error(DateTime Timestamp, string Error)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Error(Timestamp, Error);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Error(Timestamp, Error);
 		}
 
 		/// <summary>
@@ -534,12 +543,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(DateTime Timestamp, string Exception)
+		public void Exception(DateTime Timestamp, string Exception)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Exception(Timestamp, Exception);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Exception(Timestamp, Exception);
 		}
 
 		/// <summary>
@@ -547,12 +555,11 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public async Task Exception(DateTime Timestamp, Exception Exception)
+		public void Exception(DateTime Timestamp, Exception Exception)
 		{
-			MqttBroker Broker = await this.GetBroker();
-			MqttClient Client = Broker.Client;
-			if (!(Client is null))
-				await Client.Exception(Timestamp, Exception);
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.Exception(Timestamp, Exception);
 		}
 
 		#endregion

@@ -98,7 +98,7 @@ namespace Waher.IoTGateway.WebResources
 					await ClientEvents.PushEvent(this.tabIds, "SinkClosed", string.Empty, false, this.userVariable, this.privileges);
 
 					Log.Unregister(this);
-					this.Dispose();
+					await this.DisposeAsync();
 				}
 			}
 			catch (Exception ex)

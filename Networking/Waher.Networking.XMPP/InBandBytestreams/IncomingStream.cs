@@ -91,7 +91,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			get { return !(this.tempStream is null); }
 		}
 
-		internal async Task<bool> DataReceived(byte[] Data, int Seq)
+		internal async Task<bool> DataReceived(bool ConstantBuffer, byte[] Data, int Seq)
 		{
 			TemporaryStream File;
 
@@ -160,7 +160,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 						await File.ReadAllAsync(Buf, 0, c);
 						NrBytes -= c;
 
-						await this.DataReceived(Buf);
+						await this.DataReceived(false, Buf);
 					}
 				}
 				finally
@@ -169,14 +169,14 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				}
 			}
 
-			await this.DataReceived(Data);
+			await this.DataReceived(ConstantBuffer, Data);
 
 			return true;
 		}
 
-		private Task DataReceived(byte[] Bin)
+		private Task DataReceived(bool ConstantBuffer, byte[] Bin)
 		{
-			return this.dataCallback.Raise(this, new DataReceivedEventArgs(Bin, this.state));
+			return this.dataCallback.Raise(this, new DataReceivedEventArgs(ConstantBuffer, Bin, this.state));
 		}
 
 		internal Task Closed(CloseReason Reason)

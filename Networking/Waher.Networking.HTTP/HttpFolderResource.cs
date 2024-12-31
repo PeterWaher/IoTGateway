@@ -1017,7 +1017,7 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								await this.Response.Write(this.Buffer, 0, NrRead);
+								await this.Response.Write(false, this.Buffer, 0, NrRead);
 								this.BytesLeft -= NrRead;
 							}
 						}

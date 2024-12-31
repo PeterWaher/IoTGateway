@@ -120,6 +120,7 @@
     <Compile Include="ServerTcpConnection.cs" />
     <Compile Include="ServerTlsErrorEventArgs.cs" />
     <Compile Include="Sniffers\DebugSniffer.cs" />
+    <Compile Include="Sniffers\Model\ISniffEventProcessor.cs" />
     <Compile Include="Sniffers\SnifferBase.cs" />
     <Compile Include="Sniffers\SnifferProxy.cs" />
     <Compile Include="Sniffers\TextSnifferBase.cs" />

@@ -152,13 +152,13 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			ConsoleOut.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
 			if (this.provider is not null)
 			{
-				this.provider.Dispose();
+				await this.provider.DisposeAsync();
 				this.provider = null;
 				this.file = null;
 			}
@@ -300,8 +300,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 			try
 			{
-				List<Simple> Objects = new();
-				List<Guid> ObjectIds = new();
+				List<Simple> Objects = [];
+				List<Guid> ObjectIds = [];
 				int i, c = 0;
 
 				Simple Obj = CreateSimple(this.MaxStringLength);
@@ -317,7 +317,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				while (true)
 				{
-					this.TestCleanup();
+					await this.TestCleanup();
 					await this.TestInitialize();
 
 					Obj = CreateSimple(this.MaxStringLength);
@@ -586,8 +586,8 @@ namespace Waher.Persistence.FilesLW.Test
 				{
 					if (Stat is null)
 					{
-						Milliseconds = new List<double>();
-						Stat = new List<FileStatistics>();
+						Milliseconds = [];
+						Stat = [];
 					}
 
 					Milliseconds.Add((DateTime.Now - Start).TotalMilliseconds / LogStatisticsEvery.Value);
@@ -869,7 +869,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private async Task<SortedDictionary<Guid, Simple>> CreateObjects(int NrObjects)
 		{
-			SortedDictionary<Guid, Simple> Result = new();
+			SortedDictionary<Guid, Simple> Result = [];
 
 			await this.provider.StartBulk();
 

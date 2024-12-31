@@ -18,7 +18,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Represets a response of an HTTP client request.
 	/// </summary>
-	public class HttpResponse : IDisposable
+	public class HttpResponse : IDisposableAsync
 	{
 		private const int DefaultChunkSize = 32768;
 
@@ -451,16 +451,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -704,7 +697,7 @@ namespace Waher.Networking.HTTP
 						this.ContentType = string.IsNullOrEmpty(ContentType) ? BinaryCodec.DefaultContentType : ContentType;
 						this.ContentLength = Content.Length;
 
-						await this.Write(Content);
+						await this.Write(true, Content);
 					}
 
 					await this.SendResponse();
@@ -905,11 +898,11 @@ namespace Waher.Networking.HTTP
 						if (this.responseStream is null || this.clientConnection.Disposed)
 							return false;
 
-						this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
+						this.responseStream?.SendAsync(true, HeaderBin, 0, HeaderBin.Length);
 						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 
 						if (this.clientConnection.HasSniffers)
-							await this.clientConnection.TransmitText(Header);
+							this.clientConnection.TransmitText(Header);
 					}
 					else
 					{
@@ -1061,7 +1054,7 @@ namespace Waher.Networking.HTTP
 					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 
 					if (!(sb is null))
-						await this.clientConnection.TransmitText(sb.ToString());
+						this.clientConnection.TransmitText(sb.ToString());
 				}
 			}
 
@@ -1091,7 +1084,7 @@ namespace Waher.Networking.HTTP
 					this.ContentType = Result.ContentType;
 					this.ContentLength = Result.Data.Length;
 
-					await this.Write(Result.Data);
+					await this.Write(true, Result.Data);
 				}
 
 				await this.SendResponse();
@@ -1102,12 +1095,57 @@ namespace Waher.Networking.HTTP
 		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
 		/// that returns a response to the client.
 		/// </summary>
-		public async Task Return(string ContentType, byte[] Data)
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="Data">Data buffer.</param>
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Return(string ContentType, byte[] Data)
+		{
+			return this.Return(ContentType, false, Data);
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="Data">Data buffer.</param>
+		/// <param name="Offset">Offset into buffer where data to return begins.</param>
+		/// <param name="Count">Number of bytes to return.</param>
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Return(string ContentType, byte[] Data, int Offset, int Count)
+		{
+			return this.Return(ContentType, false, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Data buffer.</param>
+		public Task Return(string ContentType, bool ConstantBuffer, byte[] Data)
+		{
+			return this.Return(ContentType, ConstantBuffer, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Data buffer.</param>
+		/// <param name="Offset">Offset into buffer where data to return begins.</param>
+		/// <param name="Count">Number of bytes to return.</param>
+		public async Task Return(string ContentType, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			this.ContentType = ContentType;
-			this.ContentLength = Data.Length;
+			this.ContentLength = Count;
 
-			await this.Write(Data);
+			await this.Write(ConstantBuffer, Data, Offset, Count);
 			await this.SendResponse();
 		}
 
@@ -1131,7 +1169,7 @@ namespace Waher.Networking.HTTP
 			{
 				c = (int)Math.Min(BufSize, Len - Pos);
 				await f.ReadAllAsync(Buf, 0, c);
-				await this.Write(Buf, 0, c);
+				await this.Write(false, Buf, 0, c);
 				Pos += c;
 			}
 
@@ -1241,7 +1279,44 @@ namespace Waher.Networking.HTTP
 		/// Returns binary data in the response.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
-		public async Task Write(byte[] Data)
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Write(byte[] Data)
+		{
+			return this.Write(false, Data);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset into buffer where data to write starts.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Write(byte[] Data, int Offset, int Count)
+		{
+			return this.Write(false, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary data.</param>
+		public Task Write(bool ConstantBuffer, byte[] Data)
+		{
+			return this.Write(ConstantBuffer, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset into buffer where data to write starts.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		public async Task Write(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			DateTime TP;
 
@@ -1251,7 +1326,7 @@ namespace Waher.Networking.HTTP
 					return;
 			}
 
-			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
+			await this.transferEncoding.EncodeAsync(ConstantBuffer, Data, Offset, Count);
 
 			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
@@ -1260,44 +1335,19 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal async Task WriteRawAsync(byte[] Data)
+		internal async Task WriteRawAsync(bool ConstantBuffer, byte[] Data)
 		{
 			if (!(this.responseStream is null))
 			{
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-				await this.responseStream.SendAsync(Data, 0, Data.Length, (Sender, e) =>
+				await this.responseStream.SendAsync(ConstantBuffer, Data, 0, Data.Length, (Sender, e) =>
 				{
 					Result.TrySetResult(true);
 					return Task.CompletedTask;
 				}, null);
 
 				await Result.Task;
-			}
-		}
-
-		/// <summary>
-		/// Returns binary data in the response.
-		/// </summary>
-		/// <param name="Data">Binary data.</param>
-		/// <param name="Offset">Offset into <paramref name="Data"/>.</param>
-		/// <param name="Count">Number of bytes to return.</param>
-		public async Task Write(byte[] Data, int Offset, int Count)
-		{
-			DateTime TP;
-
-			if (this.transferEncoding is null)
-			{
-				if (!await this.StartSendResponse(true))
-					return;
-			}
-
-			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
-
-			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
-			{
-				this.lastPing = TP;
-				this.httpServer.PingRequest(this.httpRequest);
 			}
 		}
 
@@ -1314,7 +1364,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(char value)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(new char[] { value }));
+			return this.Write(true, this.encoding.GetBytes(new char[] { value }));
 		}
 
 		/// <summary>
@@ -1330,7 +1380,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(char[] buffer)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(buffer));
+			return this.Write(true, this.encoding.GetBytes(buffer));
 		}
 
 		/// <summary>
@@ -1346,7 +1396,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(string value)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(value));
+			return this.Write(true, this.encoding.GetBytes(value));
 		}
 
 		/// <summary>
@@ -1367,7 +1417,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(char[] buffer, int index, int count)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(buffer, index, count));
+			return this.Write(true, this.encoding.GetBytes(buffer, index, count));
 		}
 
 		/// <summary>
@@ -1538,7 +1588,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(object value)
 		{
 			if (value is byte[] Bin)
-				return this.Write(Bin);
+				return this.Write(false, Bin);
 			else if (value is string s)
 				return this.Write(s);
 			else if (value is char ch)
@@ -1594,7 +1644,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Task WriteLine()
 		{
-			return this.Write(CRLF);
+			return this.Write(true, CRLF);
 		}
 
 		private static readonly byte[] CRLF = new byte[] { (byte)'\r', (byte)'\n' };

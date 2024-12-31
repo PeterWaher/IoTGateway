@@ -1467,7 +1467,7 @@ namespace Waher.IoTGateway
 			string Html = await Doc.GenerateHTML();
 
 			Response.ContentType = "text/html; charset=utf-8";
-			await Response.Write(System.Text.Encoding.UTF8.GetBytes(Html));
+			await Response.Write(true, System.Text.Encoding.UTF8.GetBytes(Html));
 			await Response.SendResponse();
 		}
 
@@ -2219,16 +2219,16 @@ namespace Waher.IoTGateway
 				{
 					foreach (SystemConfiguration Configuration in configurations)
 					{
-						if (Configuration is IDisposable D)
+						try
 						{
-							try
-							{
+							if (Configuration is IDisposableAsync DAsync)
+								await DAsync.DisposeAsync();
+							else if (Configuration is IDisposable D)
 								D.Dispose();
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
 						}
 					}
 
@@ -2289,8 +2289,11 @@ namespace Waher.IoTGateway
 					xmppClient = null;
 				}
 
-				coapEndpoint?.Dispose();
-				coapEndpoint = null;
+				if (!(coapEndpoint is null))
+				{
+					await coapEndpoint.DisposeAsync();
+					coapEndpoint = null;
+				}
 
 				if (!(webServer is null))
 				{
@@ -2298,7 +2301,9 @@ namespace Waher.IoTGateway
 					{
 						webServer.Remove(Sniffer);
 
-						if (Sniffer is IDisposable Disposable)
+						if (Sniffer is IDisposableAsync DisposableAsync)
+							await DisposableAsync.DisposeAsync();
+						else if (Sniffer is IDisposable Disposable)
 							Disposable.Dispose();
 					}
 
@@ -2541,7 +2546,7 @@ namespace Waher.IoTGateway
 					scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
 					XmppState? State2 = xmppClient?.State;
-					if (State2.HasValue && 
+					if (State2.HasValue &&
 						(State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating) &&
 						!(xmppClient is null))
 					{

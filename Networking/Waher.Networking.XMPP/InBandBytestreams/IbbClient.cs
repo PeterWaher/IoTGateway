@@ -346,7 +346,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				return false;
 			}
 
-			await Input.DataReceived(Bin, Seq);
+			await Input.DataReceived(true, Bin, Seq);
 
 			return true;
 		}

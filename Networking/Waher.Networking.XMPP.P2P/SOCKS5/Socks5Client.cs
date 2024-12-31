@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// 
 	/// SOCKS5 is defined in RFC 1928.
 	/// </summary>
-	public class Socks5Client : CommunicationLayer, IDisposable, IHostReference
+	public class Socks5Client : CommunicationLayer, IDisposableAsync, IHostReference
 	{
 		private BinaryTcpClient client;
 		private Socks5State state = Socks5State.Offline;
@@ -90,7 +90,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				try
 				{
 					await this.SetState(Socks5State.Connecting);
-					await this.Information("Connecting to " + this.host + ":" + this.port.ToString());
+					this.Information("Connecting to " + this.host + ":" + this.port.ToString());
 				}
 				catch (Exception ex)
 				{
@@ -116,7 +116,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				if (this.disposed)
 					return;
 
-				await this.Information("Connected to " + this.host + ":" + this.port.ToString());
+				this.Information("Connected to " + this.host + ":" + this.port.ToString());
 
 				this.state = Socks5State.Initializing;
 				await this.SendPacket(true, new byte[] { 5, 1, 0 });
@@ -139,7 +139,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 
 			if (DoDispose)
-				this.Dispose();
+				await this.DisposeAsync();
 			else
 				await this.OnWriteQueueEmpty.Raise(this, e);
 		}
@@ -154,18 +154,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			return this.SetState(Socks5State.Error);
 		}
 
-		private Task Client_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
+		private Task Client_OnSent(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				return this.TransmitBinary(Buffer, Offset, Count);
-			else
-				return Task.CompletedTask;
+				this.TransmitBinary(ConstantBuffer, Buffer, Offset, Count);
+			
+			return Task.CompletedTask;
 		}
 
-		private async Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task<bool> Client_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(Buffer, Offset, Count);
+				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
 
 			try
 			{
@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (this.state != NewState)
 			{
 				this.state = NewState;
-				await this.Information("State changed to " + this.state.ToString());
+				this.Information("State changed to " + this.state.ToString());
 
 				await this.OnStateChange.Raise(this, EventArgs.Empty);
 			}
@@ -233,15 +233,27 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync()")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			if (!this.disposed)
 			{
 				this.disposed = true;
-				Task _ = this.SetState(Socks5State.Offline);
+				await this.SetState(Socks5State.Offline);
 
-				this.client?.Dispose();
-				this.client = null;
+				if (!(this.client is null))
+				{
+					await this.client.DisposeAsync();
+					this.client = null;
+				}
 			}
 		}
 
@@ -250,7 +262,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		/// <param name="Data">Data</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> Send(byte[] Data)
 		{
 			return this.Send(false, Data);
@@ -259,26 +271,26 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Send binary data.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> Send(bool OneTimeBuffer, byte[] Data)
+		public Task<bool> Send(bool ConstantBuffer, byte[] Data)
 		{
 			if (this.state != Socks5State.Connected)
 				throw new IOException("SOCKS5 connection not open.");
 
-			return this.SendPacket(OneTimeBuffer, Data);
+			return this.SendPacket(ConstantBuffer, Data);
 		}
 
-		private Task<bool> SendPacket(bool OneTimeBuffer, byte[] Data)
+		private Task<bool> SendPacket(bool ConstantBuffer, byte[] Data)
 		{
 			lock (this.synchObj)
 			{
 				this.isWriting = true;
 			}
 
-			return this.client.SendAsync(OneTimeBuffer, Data);
+			return this.client.SendAsync(ConstantBuffer, Data);
 		}
 
 		/// <summary>
@@ -289,18 +301,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Closes the stream when all bytes have been sent.
 		/// </summary>
-		public void CloseWhenDone()
+		public Task CloseWhenDone()
 		{
 			lock (this.synchObj)
 			{
 				if (this.isWriting)
 				{
 					this.closeWhenDone = true;
-					return;
+					return Task.CompletedTask;
 				}
 			}
 
-			this.Dispose();
+			return this.DisposeAsync();
 		}
 
 		private async Task ParseIncoming(byte[] Buffer, int Offset, int Count)
@@ -347,47 +359,47 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						break;
 
 					case 1:
-						await this.Error("General SOCKS server failure.");
+						this.Error("General SOCKS server failure.");
 						await this.ToError();
 						break;
 
 					case 2:
-						await this.Error("Connection not allowed by ruleset.");
+						this.Error("Connection not allowed by ruleset.");
 						await this.ToError();
 						break;
 
 					case 3:
-						await this.Error("Network unreachable.");
+						this.Error("Network unreachable.");
 						await this.ToError();
 						break;
 
 					case 4:
-						await this.Error("Host unreachable.");
+						this.Error("Host unreachable.");
 						await this.ToError();
 						break;
 
 					case 5:
-						await this.Error("Connection refused.");
+						this.Error("Connection refused.");
 						await this.ToError();
 						break;
 
 					case 6:
-						await this.Error("TTL expired.");
+						this.Error("TTL expired.");
 						await this.ToError();
 						break;
 
 					case 7:
-						await this.Error("Command not supported.");
+						this.Error("Command not supported.");
 						await this.ToError();
 						break;
 
 					case 8:
-						await this.Error("Address type not supported.");
+						this.Error("Address type not supported.");
 						await this.ToError();
 						break;
 
 					default:
-						await this.Error("Unrecognized error code returned: " + REP.ToString());
+						this.Error("Unrecognized error code returned: " + REP.ToString());
 						await this.ToError();
 						break;
 				}
@@ -403,7 +415,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					case 1: // IPv4.
 						if (Offset + 4 > c)
 						{
-							await this.Error("Expected more bytes.");
+							this.Error("Expected more bytes.");
 							await this.ToError();
 							return;
 						}
@@ -418,7 +430,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						byte NrBytes = Buffer[Offset++];
 						if (Offset + NrBytes > c)
 						{
-							await this.Error("Expected more bytes.");
+							this.Error("Expected more bytes.");
 							await this.ToError();
 							return;
 						}
@@ -430,7 +442,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					case 4: // IPv6.
 						if (Offset + 16 > c)
 						{
-							await this.Error("Expected more bytes.");
+							this.Error("Expected more bytes.");
 							await this.ToError();
 							return;
 						}
@@ -448,7 +460,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				if (Offset + 2 != c)
 				{
-					await this.Error("Invalid number of bytes received.");
+					this.Error("Invalid number of bytes received.");
 					await this.ToError();
 					return;
 				}
@@ -474,7 +486,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private async Task ToError()
 		{
 			await this.SetState(Socks5State.Error);
-			this.client.Dispose();
+			await this.client.DisposeAsync();
 		}
 
 		private Task Request(Command Command, IPAddress DestinationAddress, int Port)

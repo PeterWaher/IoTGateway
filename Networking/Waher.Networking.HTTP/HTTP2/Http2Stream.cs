@@ -230,12 +230,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Reports data payload received on stream.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Buffer containing data payload.</param>
 		/// <param name="Position">Position into buffer where data payload starts.</param>
 		/// <param name="Count">Number of data bytes.</param>
 		/// <returns>If data was received ok (true), or if data was more than allowed and therefore
 		/// rejected (false).</returns>
-		public async Task<bool> DataReceived(byte[] Buffer, int Position, int Count)
+		public async Task<bool> DataReceived(bool ConstantBuffer, byte[] Buffer, int Position, int Count)
 		{
 			this.dataBytesReceived += Count;
 
@@ -246,7 +248,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 			else if (this.upgradedToWebSocket)
 			{
-				await this.webSocket.WebSocketDataReceived(Buffer, Position, Count);
+				await this.webSocket.WebSocketDataReceived(ConstantBuffer, Buffer, Position, Count);
 				// Ignore web-socket errors.
 				return true;
 			}
@@ -326,16 +328,18 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Tries to write DATA to the remote party. Flow control might restrict the number
 		/// of bytes written.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary data</param>
 		/// <param name="Offset">Offset into buffer where data begins.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Last">If it is the last data to be written for this stream.</param>
 		/// <param name="DataEncoding">Optional encoding, if data is text.</param>
 		/// <returns>Number of bytes written. If negative, request failed.</returns>
-		public async Task<int> TryWriteData(byte[] Data, int Offset, int Count, bool Last,
+		public async Task<int> TryWriteData(bool ConstantBuffer, byte[] Data, int Offset, int Count, bool Last,
 			Encoding DataEncoding)
 		{
-			int NrBytes = await this.connection.TryWriteData(this, Data, Offset, Count, Last, DataEncoding);
+			int NrBytes = await this.connection.TryWriteData(this, ConstantBuffer, Data, Offset, Count, Last, DataEncoding);
 			if (NrBytes < 0)
 				return -1;
 
@@ -351,20 +355,22 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Tries to write all DATA to the remote party. Flow control might require multiple
 		/// frames to be sent to send all data.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary data</param>
 		/// <param name="Offset">Offset into buffer where data begins.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Last">If it is the last data to be written for this stream.</param>
 		/// <param name="DataEncoding">Optional encoding, if data is text.</param>
 		/// <returns>If successful in sending all data.</returns>
-		public async Task<bool> TryWriteAllData(byte[] Data, int Offset, int Count, bool Last,
+		public async Task<bool> TryWriteAllData(bool ConstantBuffer, byte[] Data, int Offset, int Count, bool Last,
 			Encoding DataEncoding)
 		{
 			int NrWritten;
 
 			while (Count > 0)
 			{
-				NrWritten = await this.TryWriteData(Data, Offset, Count, Last, DataEncoding);
+				NrWritten = await this.TryWriteData(ConstantBuffer, Data, Offset, Count, Last, DataEncoding);
 				if (NrWritten < 0)
 					return false;
 

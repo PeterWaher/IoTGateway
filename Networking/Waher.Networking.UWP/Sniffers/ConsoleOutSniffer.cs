@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.Sniffers.Model;
 using Waher.Runtime.Console;
 
 namespace Waher.Networking.Sniffers
@@ -45,7 +46,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Outputs sniffed data to the Console Output, serialized by <see cref="ConsoleOut"/>.
 	/// </summary>
-	public class ConsoleOutSniffer : SnifferBase, IDisposable
+	public class ConsoleOutSniffer : SnifferBase
 	{
 		private const int TabWidth = 8;
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
@@ -75,72 +76,46 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// Called when text has been transmitted.
+		/// Processes a text transmission event.
 		/// </summary>
-		/// <param name="Text">Text</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task TransmitText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxText Event)
 		{
-			this.Output(Timestamp, Text, ConsoleColor.Black, ConsoleColor.White);
+			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Black, ConsoleColor.White);
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Called when text has been received.
+		/// Processes a text reception event.
 		/// </summary>
-		/// <param name="Text">Text</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task ReceiveText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxText Event)
 		{
-			this.Output(Timestamp, Text, ConsoleColor.White, ConsoleColor.DarkBlue);
+			this.Output(Event.Timestamp, Event.Text, ConsoleColor.White, ConsoleColor.DarkBlue);
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Called when binary data has been transmitted.
+		/// Processes a binary transmission event.
 		/// </summary>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxBinary Event)
 		{
-			return this.BinaryOutput(Timestamp, Data, 0, Data.Length, ConsoleColor.Black, ConsoleColor.White);
+			this.BinaryOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, ConsoleColor.Black, ConsoleColor.White);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Called when binary data has been transmitted.
+		/// Processes a binary reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
-		/// <param name="Count">Number of bytes transmitted.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxBinary Event)
 		{
-			return this.BinaryOutput(Timestamp, Data, Offset, Count, ConsoleColor.Black, ConsoleColor.White);
+			this.BinaryOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, ConsoleColor.White, ConsoleColor.DarkBlue);
+			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
-		{
-			return this.BinaryOutput(Timestamp, Data, 0, Data.Length, ConsoleColor.White, ConsoleColor.DarkBlue);
-		}
-
-		/// <summary>
-		/// Called when binary data has been received.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		/// <param name="Offset">Offset into buffer where received data begins.</param>
-		/// <param name="Count">Number of bytes received.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
-		{
-			return this.BinaryOutput(Timestamp, Data, Offset, Count, ConsoleColor.White, ConsoleColor.DarkBlue);
-		}
-
-		private Task BinaryOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, ConsoleColor Fg, ConsoleColor Bg)
+		private void BinaryOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, ConsoleColor Fg, ConsoleColor Bg)
 		{
 			switch (this.binaryPresentationMethod)
 			{
@@ -178,51 +153,45 @@ namespace Waher.Networking.Sniffers
 					this.Output(Timestamp, "<" + Count.ToString() + " bytes>", Fg, Bg);
 					break;
 			}
+		}
 
+		/// <summary>
+		/// Processes an information event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferInformation Event)
+		{
+			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of something.
+		/// Processes a warning event.
 		/// </summary>
-		/// <param name="Comment">Comment.</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task Information(DateTime Timestamp, string Comment)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferWarning Event)
 		{
-			this.Output(Timestamp, Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
+			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Black, ConsoleColor.Yellow);
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of a warning state.
+		/// Processes an error event.
 		/// </summary>
-		/// <param name="Warning">Warning.</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task Warning(DateTime Timestamp, string Warning)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferError Event)
 		{
-			this.Output(Timestamp, Warning, ConsoleColor.Black, ConsoleColor.Yellow);
+			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Yellow, ConsoleColor.Red);
 			return Task.CompletedTask;
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an error state.
+		/// Processes an exception event.
 		/// </summary>
-		/// <param name="Error">Error.</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task Error(DateTime Timestamp, string Error)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferException Event)
 		{
-			this.Output(Timestamp, Error, ConsoleColor.Yellow, ConsoleColor.Red);
-			return Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Exception">Exception.</param>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		public override Task Exception(DateTime Timestamp, string Exception)
-		{
-			this.Output(Timestamp, Exception, ConsoleColor.White, ConsoleColor.DarkRed);
+			this.Output(Event.Timestamp, Event.Text, ConsoleColor.White, ConsoleColor.DarkRed);
 			return Task.CompletedTask;
 		}
 
@@ -292,12 +261,5 @@ namespace Waher.Networking.Sniffers
 		}
 
 		internal static readonly char[] CRLF = new char[] { '\r', '\n' };
-
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public virtual void Dispose()
-		{
-		}
 	}
 }

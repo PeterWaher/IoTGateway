@@ -100,10 +100,10 @@ namespace Waher.Networking.Sniffers
 				if (this.deleteAfterDays < int.MaxValue)
 				{
 					string FolderName = Path.GetDirectoryName(s);
-				if (string.IsNullOrEmpty(FolderName))
-					FolderName = ".";
+					if (string.IsNullOrEmpty(FolderName))
+						FolderName = ".";
 
-				string[] Files = Directory.GetFiles(FolderName, "*.*");
+					string[] Files = Directory.GetFiles(FolderName, "*.*");
 
 					foreach (string FileName in Files)
 					{

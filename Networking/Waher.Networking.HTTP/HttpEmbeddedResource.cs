@@ -122,7 +122,7 @@ namespace Waher.Networking.HTTP
 						if (i <= 0)
 							throw new Exception("Unexpected end of stream.");
 
-						await Response.Write(Buffer, 0, i);
+						await Response.Write(true, Buffer, 0, i);
 						Pos += i;
 					}
 				}

@@ -548,7 +548,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 
 				if (!(e.Data is null))
-					await this.BinaryDataReceived(State2, true, e.Data);
+					await this.BinaryDataReceived(State2, true, e.ConstantBuffer, e.Data);
 			}
 		}
 
@@ -556,14 +556,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			ReadoutState State2 = (ReadoutState)e.State;
 
-			return this.BinaryDataReceived(State2, e.Last, e.Data);
+			return this.BinaryDataReceived(State2, e.Last, e.ConstantBuffer, e.Data);
 		}
 
-		private async Task BinaryDataReceived(ReadoutState State2, bool Last, byte[] Data)
+		private async Task BinaryDataReceived(ReadoutState State2, bool Last, bool ConstantBuffer, byte[] Data)
 		{
 			try
 			{
-				await State2.Response.Write(Data);
+				await State2.Response.Write(ConstantBuffer, Data);
 			}
 			catch (Exception)
 			{

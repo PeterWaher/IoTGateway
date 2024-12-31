@@ -211,9 +211,9 @@ namespace Waher.Script.Lab
 
 				return Last;
 			}
-			else if (Ans.AssociatedObjectValue is ObjectMatrix M && !(M.ColumnNames is null))
+			else if (Ans.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames is not null)
 			{
-				StringBuilder Markdown = new StringBuilder();
+				StringBuilder Markdown = new();
 
 				foreach (string s2 in M.ColumnNames)
 				{
@@ -237,9 +237,9 @@ namespace Waher.Script.Lab
 						Markdown.Append("| ");
 
 						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (!(Item is null))
+						if (Item is not null)
 						{
-							if (!(Item is string s2))
+							if (Item is not string s2)
 								s2 = Expression.ToString(Item);
 
 							s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
@@ -253,7 +253,7 @@ namespace Waher.Script.Lab
 				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), GetMarkdownSettings());
 				string XAML = await Doc.GenerateXAML(GetXamlSettings());
 
-				TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
+				TaskCompletionSource<UIElement> Result = new();
 
 				this.Dispatcher.Invoke(() =>
 				{
@@ -285,7 +285,7 @@ namespace Waher.Script.Lab
 
 		private Task<TextBlock> AddTextBlock(UIElement ScriptBlock, string s, Color cl, FontWeight FontWeight, UIElement ResultBlock)
 		{
-			TaskCompletionSource<TextBlock> Result = new TaskCompletionSource<TextBlock>();
+			TaskCompletionSource<TextBlock> Result = new();
 
 			this.Dispatcher.Invoke(() =>
 			{
@@ -340,7 +340,7 @@ namespace Waher.Script.Lab
 
 		private Task<UIElement> AddImageBlock(TextBlock ScriptBlock, PixelInformation Pixels, Graph Graph, object[] States, UIElement ResultBlock)
 		{
-			TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
+			TaskCompletionSource<UIElement> Result = new();
 
 			this.Dispatcher.Invoke(() =>
 			{
@@ -349,7 +349,7 @@ namespace Waher.Script.Lab
 					BitmapImage BitmapImage;
 					byte[] Bin = Pixels.EncodeAsPng();
 
-					using (MemoryStream ms = new MemoryStream(Bin))
+					using (MemoryStream ms = new(Bin))
 					{
 						BitmapImage = new BitmapImage();
 						BitmapImage.BeginInit();
@@ -402,7 +402,7 @@ namespace Waher.Script.Lab
 				Point P = e.GetPosition(ImageBlock);
 				string Script;
 
-				if (ImageBlock.Tag is Tuple<byte[], int, int, Graph, object[]> Image && !(Image.Item4 is null) && !(Image.Item5 is null))
+				if (ImageBlock.Tag is Tuple<byte[], int, int, Graph, object[]> Image && Image.Item4 is not null && Image.Item5 is not null)
 				{
 					double X = ((double)P.X) * Image.Item2 / ImageBlock.ActualWidth;
 					double Y = ((double)P.Y) * Image.Item3 / ImageBlock.ActualHeight;
@@ -419,7 +419,7 @@ namespace Waher.Script.Lab
 			{
 				BitmapImage Image = (BitmapImage)ImageBlock.Source;
 
-				SaveFileDialog Dialog = new SaveFileDialog()
+				SaveFileDialog Dialog = new()
 				{
 					Title = "Save Image",
 					DefaultExt = ImageCodec.FileExtensionPng,
@@ -430,46 +430,25 @@ namespace Waher.Script.Lab
 				bool? Result = Dialog.ShowDialog();
 				if (Result.HasValue && Result.Value)
 				{
-					BitmapEncoder Encoder;
-
 					string Extension = System.IO.Path.GetExtension(Dialog.FileName).ToLower();
-					if (Extension.StartsWith("."))
-						Extension = Extension.Substring(1);
+					if (Extension.StartsWith('.'))
+						Extension = Extension[1..];
 
-					switch (Extension)
+					BitmapEncoder Encoder = Extension switch
 					{
-						case ImageCodec.FileExtensionJpg:
-						case "jpeg":
-							Encoder = new JpegBitmapEncoder();
-							break;
-
-						case ImageCodec.FileExtensionBmp:
-							Encoder = new BmpBitmapEncoder();
-							break;
-
-						case ImageCodec.FileExtensionGif:
-							Encoder = new GifBitmapEncoder();
-							break;
-
-						case ImageCodec.FileExtensionTiff:
-						case ".tiff":
-							Encoder = new TiffBitmapEncoder();
-							break;
-
-						case ImageCodec.FileExtensionPng:
-						default:
-							Encoder = new PngBitmapEncoder();
-							break;
-					}
+						ImageCodec.FileExtensionJpg or "jpeg" => new JpegBitmapEncoder(),
+						ImageCodec.FileExtensionBmp => new BmpBitmapEncoder(),
+						ImageCodec.FileExtensionGif => new GifBitmapEncoder(),
+						ImageCodec.FileExtensionTiff or ".tiff" => new TiffBitmapEncoder(),
+						_ => new PngBitmapEncoder(),
+					};
 
 					try
 					{
 						Encoder.Frames.Add(BitmapFrame.Create(Image));
 
-						using (FileStream File = new FileStream(Dialog.FileName, System.IO.FileMode.Create))
-						{
-							Encoder.Save(File);
-						}
+						using FileStream File = new(Dialog.FileName, System.IO.FileMode.Create);
+						Encoder.Save(File);
 					}
 					catch (Exception ex)
 					{
@@ -492,23 +471,23 @@ namespace Waher.Script.Lab
 			try
 			{
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (!(Value is null) && Value is int L)
+				if (Value is not null && Value is int L)
 					this.Left = L;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (!(Value is null) && Value is int T)
+				if (Value is not null && Value is int T)
 					this.Top = T;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (!(Value is null) && Value is int W)
+				if (Value is not null && Value is int W)
 					this.Width = W;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (!(Value is null) && Value is int H)
+				if (Value is not null && Value is int H)
 					this.Height = H;
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (!(Value is null) && Value is string s)
+				if (Value is not null && Value is string s)
 					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), s);
 			}
 			catch (Exception ex)
@@ -518,7 +497,7 @@ namespace Waher.Script.Lab
 			}
 		}
 
-		private void Window_Closing(object Sender, System.ComponentModel.CancelEventArgs e)
+		private async void Window_Closing(object Sender, System.ComponentModel.CancelEventArgs e)
 		{
 			Registry.SetValue(registryKey, "WindowLeft", (int)this.Left, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowTop", (int)this.Top, RegistryValueKind.DWord);
@@ -526,7 +505,7 @@ namespace Waher.Script.Lab
 			Registry.SetValue(registryKey, "WindowHeight", (int)this.Height, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowState", this.WindowState.ToString(), RegistryValueKind.String);
 
-			Log.Terminate();
+			await Log.TerminateAsync();
 		}
 	}
 }

@@ -58,7 +58,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					if (i != await Request.DataStream.ReadAsync(Buf, 0, BufSize))
 						throw new IOException("Unexpected end of file.");
 
-					await Response.Write(Buf, 0, i);
+					await Response.Write(false, Buf, 0, i);
 					c -= i;
 				}
 
@@ -158,8 +158,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					}
 				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000), "Data not returned.");
 		}
 
 		[TestMethod]
@@ -230,8 +230,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					}
 				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 120000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 120000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 120000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 120000), "Data not returned.");
 		}
 
 		[TestMethod]

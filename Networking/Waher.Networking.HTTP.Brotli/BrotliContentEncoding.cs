@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Runtime.Inventory;
@@ -115,6 +116,7 @@ namespace Waher.Networking.HTTP.Brotli
 						{
 							scheduler?.Dispose();
 							scheduler = null;
+							return Task.CompletedTask;
 						};
 					}
 				}

@@ -47,10 +47,13 @@ namespace Waher.Content.Markdown.Test
 		}
 
 		[AssemblyCleanup]
-		public static void AssemblyCleanup()
+		public static async Task AssemblyCleanup()
 		{
-			filesProvider?.Dispose();
-			filesProvider = null;
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 		}
 
 		private static async Task DoTest(string MarkdownFileName, string PlainTextFileName)
@@ -59,7 +62,7 @@ namespace Waher.Content.Markdown.Test
 			string ExpectedText = await Resources.ReadAllTextAsync("PlainText/" + PlainTextFileName);
 			Emoji1LocalFiles Emoji1LocalFiles = new(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
-			MarkdownSettings Settings = new(Emoji1LocalFiles, true, new Variables())
+			MarkdownSettings Settings = new(Emoji1LocalFiles, true, [])
 			{
 				HttpxProxy = "/HttpxProxy/%URL%"
 			};

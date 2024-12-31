@@ -531,7 +531,7 @@ namespace Waher.Networking.HTTP
 
 					await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
 
-					await Response.Write(Bin);
+					await Response.Write(true, Bin);
 				}
 				else
 					await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);

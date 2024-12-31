@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 
@@ -13,7 +12,7 @@ namespace Waher.Networking
 	/// </summary>
 	/// <param name="Text">Text</param>
 	/// <return>Text, possibly modified.</return>
-	public delegate Task<string> TextSnifferEvent(string Text);
+	public delegate string TextSnifferEvent(string Text);
 
 	/// <summary>
 	/// Simple base class for classes implementing communication protocols.
@@ -137,100 +136,116 @@ namespace Waher.Networking
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data)
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data)
 		{
-			return this.ReceiveBinary(DateTime.Now, Data);
+			this.ReceiveBinary(DateTime.Now, ConstantBuffer, Data);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.ReceiveBinary(Timestamp, Data);
+					Sniffer.ReceiveBinary(Timestamp, ConstantBuffer, Data);
 			}
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public Task ReceiveBinary(byte[] Data, int Offset, int Count)
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			return this.ReceiveBinary(DateTime.Now, Data, Offset, Count);
+			this.ReceiveBinary(DateTime.Now, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
-		public async Task ReceiveBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.ReceiveBinary(Timestamp, Data, Offset, Count);
+					Sniffer.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 			}
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data)
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data)
 		{
-			return this.TransmitBinary(DateTime.Now, Data);
+			this.TransmitBinary(DateTime.Now, ConstantBuffer, Data);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public async Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.TransmitBinary(Timestamp, Data);
+					Sniffer.TransmitBinary(Timestamp, ConstantBuffer, Data);
 			}
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public Task TransmitBinary(byte[] Data, int Offset, int Count)
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			return this.TransmitBinary(DateTime.Now, Data, Offset, Count);
+			this.TransmitBinary(DateTime.Now, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
 		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
 		/// <param name="Count">Number of bytes transmitted.</param>
-		public async Task TransmitBinary(DateTime Timestamp, byte[] Data, int Offset, int Count)
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.TransmitBinary(Timestamp, Data, Offset, Count);
+					Sniffer.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 			}
 		}
 
@@ -238,9 +253,9 @@ namespace Waher.Networking
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(string Text)
+		public void ReceiveText(string Text)
 		{
-			return this.ReceiveText(DateTime.Now, Text);
+			this.ReceiveText(DateTime.Now, Text);
 		}
 
 		/// <summary>
@@ -248,27 +263,27 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public async Task ReceiveText(DateTime Timestamp, string Text)
+		public void ReceiveText(DateTime Timestamp, string Text)
 		{
 			if (this.hasSniffers)
 			{
-				Text = await this.Transform(this.OnReceiveText, Text);
+				Text = this.Transform(this.OnReceiveText, Text);
 
 				if (!string.IsNullOrEmpty(Text))
 				{
 					foreach (ISniffer Sniffer in this.staticList)
-						await Sniffer.ReceiveText(Timestamp, Text);
+						Sniffer.ReceiveText(Timestamp, Text);
 				}
 			}
 		}
 
-		private async Task<string> Transform(TextSnifferEvent Callback, string s)
+		private string Transform(TextSnifferEvent Callback, string s)
 		{
 			if (!(Callback is null))
 			{
 				try
 				{
-					return await Callback(s);
+					return Callback(s);
 				}
 				catch (Exception ex)
 				{
@@ -288,9 +303,9 @@ namespace Waher.Networking
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(string Text)
+		public void TransmitText(string Text)
 		{
-			return this.TransmitText(DateTime.Now, Text);
+			this.TransmitText(DateTime.Now, Text);
 		}
 
 		/// <summary>
@@ -298,23 +313,23 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public async Task TransmitText(DateTime Timestamp, string Text)
+		public void TransmitText(DateTime Timestamp, string Text)
 		{
 			if (this.hasSniffers)
 			{
-				Text = await this.Transform(this.OnTransmitText, Text);
+				Text = this.Transform(this.OnTransmitText, Text);
 
 				if (!string.IsNullOrEmpty(Text))
 				{
 					if (Text == " ")
 					{
 						foreach (ISniffer Sniffer in this.staticList)
-							await Sniffer.Information(Timestamp, "Heart beat");
+							Sniffer.Information(Timestamp, "Heart beat");
 					}
 					else
 					{
 						foreach (ISniffer Sniffer in this.staticList)
-							await Sniffer.TransmitText(Timestamp, Text);
+							Sniffer.TransmitText(Timestamp, Text);
 					}
 				}
 			}
@@ -329,9 +344,9 @@ namespace Waher.Networking
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(string Comment)
+		public void Information(string Comment)
 		{
-			return this.Information(DateTime.Now, Comment);
+			this.Information(DateTime.Now, Comment);
 		}
 
 		/// <summary>
@@ -339,16 +354,16 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public async Task Information(DateTime Timestamp, string Comment)
+		public void Information(DateTime Timestamp, string Comment)
 		{
 			if (this.hasSniffers)
 			{
-				Comment = await this.Transform(this.OnInformation, Comment);
+				Comment = this.Transform(this.OnInformation, Comment);
 
 				if (!string.IsNullOrEmpty(Comment))
 				{
 					foreach (ISniffer Sniffer in this.staticList)
-						await Sniffer.Information(Timestamp, Comment);
+						Sniffer.Information(Timestamp, Comment);
 				}
 			}
 		}
@@ -362,9 +377,9 @@ namespace Waher.Networking
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(string Warning)
+		public void Warning(string Warning)
 		{
-			return this.Warning(DateTime.Now, Warning);
+			this.Warning(DateTime.Now, Warning);
 		}
 
 		/// <summary>
@@ -372,16 +387,16 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public async Task Warning(DateTime Timestamp, string Warning)
+		public void Warning(DateTime Timestamp, string Warning)
 		{
 			if (this.hasSniffers)
 			{
-				Warning = await this.Transform(this.OnWarning, Warning);
+				Warning = this.Transform(this.OnWarning, Warning);
 
 				if (!string.IsNullOrEmpty(Warning))
 				{
 					foreach (ISniffer Sniffer in this.staticList)
-						await Sniffer.Warning(Timestamp, Warning);
+						Sniffer.Warning(Timestamp, Warning);
 				}
 			}
 		}
@@ -395,9 +410,9 @@ namespace Waher.Networking
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public Task Error(string Error)
+		public void Error(string Error)
 		{
-			return this.Error(DateTime.Now, Error);
+			this.Error(DateTime.Now, Error);
 		}
 
 		/// <summary>
@@ -405,12 +420,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public async Task Error(DateTime Timestamp, string Error)
+		public void Error(DateTime Timestamp, string Error)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.Error(Timestamp, Error);
+					Sniffer.Error(Timestamp, Error);
 			}
 		}
 
@@ -418,9 +433,9 @@ namespace Waher.Networking
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(Exception Exception)
+		public void Exception(Exception Exception)
 		{
-			return this.Exception(DateTime.Now, Exception);
+			this.Exception(DateTime.Now, Exception);
 		}
 
 		/// <summary>
@@ -428,12 +443,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public virtual async Task Exception(DateTime Timestamp, Exception Exception)
+		public virtual void Exception(DateTime Timestamp, Exception Exception)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.Exception(Timestamp, Exception);
+					Sniffer.Exception(Timestamp, Exception);
 			}
 		}
 
@@ -441,9 +456,9 @@ namespace Waher.Networking
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(string Exception)
+		public void Exception(string Exception)
 		{
-			return this.Exception(DateTime.Now, Exception);
+			this.Exception(DateTime.Now, Exception);
 		}
 
 		/// <summary>
@@ -451,12 +466,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public virtual async Task Exception(DateTime Timestamp, string Exception)
+		public virtual void Exception(DateTime Timestamp, string Exception)
 		{
 			if (this.hasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.staticList)
-					await Sniffer.Exception(Timestamp, Exception);
+					Sniffer.Exception(Timestamp, Exception);
 			}
 		}
 

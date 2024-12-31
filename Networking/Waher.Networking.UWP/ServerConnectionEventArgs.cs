@@ -39,7 +39,7 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Data">Data to send.</param>
 		/// <returns>If data was sent.</returns>
-		[Obsolete("Use an overload with a OneTimeBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(params byte[] Data)
 		{
 			return this.SendAsync(false, Data);
@@ -48,13 +48,13 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends data back to the client.
 		/// </summary>
-		/// <param name="OneTimeBuffer">If the buffer is used only for this call (true),
-		/// or if it will be used for multiple calls with different data (false).</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data to send.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(bool OneTimeBuffer, params byte[] Data)
+		public Task<bool> SendAsync(bool ConstantBuffer, params byte[] Data)
 		{
-			return this.connection.SendAsync(OneTimeBuffer, Data);
+			return this.connection.SendAsync(ConstantBuffer, Data);
 		}
 
 		/// <summary>

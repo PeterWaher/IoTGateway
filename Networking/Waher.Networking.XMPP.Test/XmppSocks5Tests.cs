@@ -18,9 +18,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
 		[TestMethod]
@@ -265,18 +265,16 @@ namespace Waher.Networking.XMPP.Test
 
 			Proxy2.OnOpen += (Sender, e) =>
 			{
-				e.AcceptStream((sender2, e2) =>
+				e.AcceptStream(async (sender2, e2) =>
 				{
 					if (Encoding.ASCII.GetString(e2.Buffer, e2.Offset, e2.Count) == "Hello1")
 					{
 						Done2.Set();
-						e2.Stream.Send(true, Encoding.ASCII.GetBytes("Hello2"));
-						e2.Stream.CloseWhenDone();
+						await e2.Stream.Send(true, Encoding.ASCII.GetBytes("Hello2"));
+						await e2.Stream.CloseWhenDone();
 					}
 					else
 						Error2.Set();
-
-					return Task.CompletedTask;
 
 				}, (sender2, e2) =>
 				{

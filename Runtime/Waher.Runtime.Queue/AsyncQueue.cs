@@ -197,7 +197,7 @@ namespace Waher.Runtime.Queue
 			lock (this.synchObj)
 			{
 				if (this.terminated || this.disposed)
-					throw new ObjectDisposedException("Queue has been terminated.");
+					return Task.FromResult(false);
 
 				if (this.subscribers.First is null)
 				{

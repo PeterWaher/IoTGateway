@@ -67,7 +67,7 @@ namespace Waher.Runtime.Queue
 		public void Queue(T Work)
 		{
 			if (!this.terminating)
-				this.queue?.Forward(Work);
+				this.queue?.Queue(Work);
 		}
 
 		/// <summary>

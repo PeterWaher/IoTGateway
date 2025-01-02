@@ -34,11 +34,18 @@ namespace Waher.Runtime.Queue
 		private class Item
 		{
 			internal T Value { get; }
-			internal TaskCompletionSource<bool> Forwarded = new TaskCompletionSource<bool>();
+			internal TaskCompletionSource<bool> Forwarded;
 
 			internal Item(T Value)
 			{
 				this.Value = Value;
+				this.Forwarded = null;
+			}
+
+			internal Item(T Value, TaskCompletionSource<bool> Forwarded)
+			{
+				this.Value = Value;
+				this.Forwarded = Forwarded;
 			}
 		}
 
@@ -122,7 +129,7 @@ namespace Waher.Runtime.Queue
 		/// <param name="Item">Item to queue.</param>
 		public void Queue(T Item)
 		{
-			this.Forward(Item, false);	// Ignore Task response. Process method is synchronous.
+			this.Queue(Item, false);
 		}
 
 		/// <summary>
@@ -132,7 +139,7 @@ namespace Waher.Runtime.Queue
 		/// <param name="Item">Item to queue.</param>
 		public void QueueLast(T Item)
 		{
-			this.Forward(Item, false);  // Ignore Task response. Process method is synchronous.
+			this.Queue(Item, false);
 		}
 
 		/// <summary>
@@ -142,7 +149,7 @@ namespace Waher.Runtime.Queue
 		/// <param name="Item">Item to queue.</param>
 		public void QueueFirst(T Item)
 		{
-			this.Forward(Item, true);   // Ignore Task response. Process method is synchronous.
+			this.Queue(Item, true);
 		}
 
 		/// <summary>
@@ -153,7 +160,30 @@ namespace Waher.Runtime.Queue
 		/// <param name="First">If item is to be added first in the queue.</param>
 		public void Queue(T Item, bool First)
 		{
-			this.Forward(Item, First);  // Ignore Task response. Process method is synchronous.
+			lock (this.synchObj)
+			{
+				if (this.terminated || this.disposed)
+					return;
+
+				if (this.subscribers.First is null)
+				{
+					Item Record = new Item(Item);
+
+					if (First)
+						this.queue.AddFirst(Record);
+					else
+						this.queue.AddLast(Record);
+
+					this.countItems++;
+				}
+				else
+				{
+					TaskCompletionSource<T> Waiter = this.subscribers.First.Value;
+					this.subscribers.RemoveFirst();
+					this.countSubscribers--;
+					Task.Run(() => Waiter.TrySetResult(Item));	// Ensures waiting logic not interrupting current logic.
+				}
+			}
 		}
 
 		/// <summary>
@@ -201,7 +231,9 @@ namespace Waher.Runtime.Queue
 
 				if (this.subscribers.First is null)
 				{
-					Item Record = new Item(Item);
+					TaskCompletionSource<bool> Forwarded = new TaskCompletionSource<bool>();
+
+					Item Record = new Item(Item, Forwarded);
 
 					if (First)
 						this.queue.AddFirst(Record);
@@ -285,7 +317,7 @@ namespace Waher.Runtime.Queue
 					this.queue.RemoveFirst();
 					this.countItems--;
 
-					Record.Forwarded.TrySetResult(true);
+					Record.Forwarded?.TrySetResult(true);
 
 					if (this.terminated && this.queue.First is null)
 						this.disposed = true;
@@ -340,7 +372,7 @@ namespace Waher.Runtime.Queue
 						this.queue.RemoveFirst();
 						this.countItems--;
 
-						Record.Forwarded.TrySetResult(true);
+						Record.Forwarded?.TrySetResult(true);
 
 						if (this.terminated && this.queue.First is null)
 							this.disposed = true;
@@ -370,7 +402,7 @@ namespace Waher.Runtime.Queue
 				this.terminated = true;
 
 				foreach (Item Record in this.queue)
-					Record.Forwarded.TrySetResult(false);
+					Record.Forwarded?.TrySetResult(false);
 
 				this.queue.Clear();
 				this.countItems = 0;
@@ -401,7 +433,7 @@ namespace Waher.Runtime.Queue
 					this.disposed = true;
 
 					foreach (Item Record in this.queue)
-						Record.Forwarded.TrySetResult(false);
+						Record.Forwarded?.TrySetResult(false);
 
 					this.queue.Clear();
 					this.countItems = 0;

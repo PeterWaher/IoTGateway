@@ -197,7 +197,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected override async Task BeforeWrite()
 		{
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 			string s = GetFileName(this.fileName, TP);
 			this.lastEvent = TP;
 

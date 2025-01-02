@@ -88,7 +88,7 @@ namespace Waher.Networking.Sniffers
 				this.output = null;
 			}
 
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 			string s = XmlFileSniffer.GetFileName(this.fileName, TP);
 
 			if (File.Exists(s))

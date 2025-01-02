@@ -59,13 +59,20 @@ namespace Waher.Networking.HTTP.Test
 					await GetTest(HttpVersion.Version20);
 
 					getTestJited = true;
+
+					await Task.Delay(1000);
 				}
 
 				// Benchmark pass
 
 				TimeSpan Time10 = await GetTest(HttpVersion.Version10);
+				await Task.Delay(1000);
+
 				TimeSpan Time11 = await GetTest(HttpVersion.Version11);
+				await Task.Delay(1000);
+
 				TimeSpan Time20 = await GetTest(HttpVersion.Version20);
+				await Task.Delay(1000);
 
 				Console.Out.WriteLine("|>> GET Benchmark                                      <<||||");
 				Console.Out.WriteLine("|>> Size     <<|>> HTTP 1.0 <<|>> HTTP 1.1 <<|>> HTTP/2   <<|");
@@ -128,13 +135,20 @@ namespace Waher.Networking.HTTP.Test
 				await PutTest(TotalSize, HttpVersion.Version20);
 
 				putTestJited = true;
+
+				await Task.Delay(1000);
 			}
 
 			// Benchmark pass
 
 			TimeSpan Time10 = await PutTest(TotalSize, HttpVersion.Version10);
+			await Task.Delay(1000);
+
 			TimeSpan Time11 = await PutTest(TotalSize, HttpVersion.Version11);
+			await Task.Delay(1000);
+
 			TimeSpan Time20 = await PutTest(TotalSize, HttpVersion.Version20);
+			await Task.Delay(1000);
 
 			Console.Out.WriteLine("|>> PUT Benchmark                                      <<||||");
 			Console.Out.WriteLine("|>> Size     <<|>> HTTP 1.0 <<|>> HTTP 1.1 <<|>> HTTP/2   <<|");

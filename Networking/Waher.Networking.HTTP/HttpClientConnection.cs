@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
@@ -97,244 +96,12 @@ namespace Waher.Networking.HTTP
 			this.server.DataReceived(Count);
 
 			if (this.header is null)
-				return this.BinaryHeaderReceived(ConstantBuffer, Buffer, Offset, Count);
+				return this.BinaryHeader1Received(ConstantBuffer, Buffer, Offset, Count);
 			else
-				return this.BinaryDataReceived(ConstantBuffer, Buffer, Offset, Count);
+				return this.BinaryData1Received(ConstantBuffer, Buffer, Offset, Count);
 		}
 
-		private async Task<bool> Client_OnReceivedHttp2Init(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
-		{
-			if (!(Sender is null))
-				this.server.DataReceived(Count);
-
-			int i, c;
-			byte b;
-
-			c = Offset + Count;
-
-			for (i = Offset; i < c; i++)
-			{
-				b = Buffer[i];
-
-				if (b != http2Preface[this.localSettings.InitStep++])
-				{
-					if (this.HasSniffers && i > Offset)
-						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Buffer, Offset, i - Offset));
-
-					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid HTTP/2 connection preface."), true);
-					return false;
-				}
-
-				if (this.localSettings.InitStep == 6)
-				{
-					this.client.OnReceivedReset(this.Client_OnReceivedHttp2Live);
-
-					if (this.HasSniffers)
-						this.ReceiveText("\r\nSM\r\n");
-
-					if (i + 1 < Count)
-						return await this.Client_OnReceivedHttp2Live(null, ConstantBuffer, Buffer, i + 1, c - i - 1);
-					else
-						return true;
-				}
-			}
-
-			return true;
-		}
-
-		private static readonly char[] http2Preface = new char[] { 'S', 'M', '\r', '\n', '\r', '\n' };
-
-		private async Task<bool> Client_OnReceivedHttp2Live(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
-		{
-			if (!(Sender is null))
-				this.server.DataReceived(Count);
-
-			if (this.HasSniffers)
-				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
-
-			int End = Offset + Count;
-			bool FramesProcessed = false;
-
-			while (Offset < End)
-			{
-				switch (this.http2State)
-				{
-					case 0: // Frame length MSB
-						this.http2FrameLength = Buffer[Offset++];
-						this.http2State++;
-						break;
-
-					case 1: // Frame length, bytes 2 & 3
-					case 2:
-						this.http2FrameLength <<= 8;
-						this.http2FrameLength |= Buffer[Offset++];
-						this.http2State++;
-						break;
-
-					case 3: // Frame type
-						this.http2FrameType = (FrameType)Buffer[Offset++];
-						this.http2State++;
-						break;
-
-					case 4: // Frame flags
-						this.http2FrameFlags = Buffer[Offset++];
-						this.http2State++;
-						break;
-
-					case 5: // Stream ID, MSB
-						this.http2StreamId = Buffer[Offset++] & 127;
-						this.http2State++;
-						break;
-
-					case 6: // Stream ID, bytes 2 & 3
-					case 7:
-						this.http2StreamId <<= 8;
-						this.http2StreamId |= Buffer[Offset++];
-						this.http2State++;
-						break;
-
-					case 8: // Stream ID, byte 4
-						this.http2StreamId <<= 8;
-						this.http2StreamId |= Buffer[Offset++];
-
-						if (this.http2FrameLength == 0)
-						{
-							this.http2State = 0;
-							if (!await this.ProcessHttp2Frame())
-								return false;
-
-							FramesProcessed = true;
-						}
-						else
-						{
-							this.http2FramePos = 0;
-
-							if (this.http2FrameLength > this.localSettings.MaxFrameSize)
-								this.http2State += 2;
-							else
-							{
-								if (this.http2Frame is null)
-									this.http2Frame = new byte[this.localSettings.MaxFrameSize];
-
-								this.http2State++;
-							}
-						}
-						break;
-
-					case 9: // Frame payload
-						int i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
-						Array.Copy(Buffer, Offset, this.http2Frame, this.http2FramePos, i);
-						Offset += i;
-						this.http2FramePos += i;
-
-						if (this.http2FramePos >= this.http2FrameLength)
-						{
-							this.http2State = 0;
-
-							if (!await this.ProcessHttp2Frame())
-								return false;
-
-							FramesProcessed = true;
-						}
-						break;
-
-					case 10:    // Skip Frame payload and return error.
-						i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
-						Offset += i;
-						this.http2FramePos += i;
-
-						if (this.http2FramePos >= this.http2FrameLength)
-						{
-							this.http2State = 0;
-
-							if (!await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Frame too large."))
-								return false;
-						}
-						break;
-
-					default:
-						return false;
-				}
-			}
-
-			if (FramesProcessed)
-				return await this.SendPendingWindowUpdates();
-			else
-				return true;
-		}
-
-		private Task<bool> Client_OnReceivedWebSocket(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
-		{
-			this.server.DataReceived(Count);
-
-			return this.webSocket?.WebSocketDataReceived(ConstantBuffer, Buffer, Offset, Count) ?? Task.FromResult(false);
-		}
-
-		private Task<bool> Client_OnReceivedClosed(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
-		{
-			this.server.DataReceived(Count);
-
-			return Task.FromResult(false);
-		}
-
-		private Task Client_OnError(object Sender, Exception Exception)
-		{
-			return this.DisposeAsync();
-		}
-
-		private Task Client_OnDisconnected(object Sender, EventArgs e)
-		{
-			return this.DisposeAsync();
-		}
-
-		/// <summary>
-		/// Closes the connection and disposes of all resources.
-		/// </summary>
-		[Obsolete("Use the DisposeAsync() method.")]
-		public void Dispose()
-		{
-			this.DisposeAsync().Wait();
-		}
-
-		/// <summary>
-		/// Closes the connection and disposes of all resources.
-		/// </summary>
-		public async Task DisposeAsync()
-		{
-			if (!this.disposed)
-			{
-				this.disposed = true;
-
-				if (!(this.webSocket is null))
-				{
-					await this.webSocket.DisposeAsync();
-					this.webSocket = null;
-				}
-
-				this.headerStream?.Dispose();
-				this.headerStream = null;
-
-				this.dataStream?.Dispose();
-				this.dataStream = null;
-
-				this.client?.DisposeWhenDone();
-				this.client = null;
-
-				this.server.Remove(this);
-
-				this.flowControl?.Dispose();
-				this.flowControl = null;
-			}
-		}
-
-		internal Guid Id => this.id;
-		internal HttpServer Server => this.server;
-		internal bool Disposed => this.disposed;
-		internal BinaryTcpClient Client => this.client;
-		internal bool Encrypted => this.encrypted;
-		internal int Port => this.port;
-
-		private async Task<bool> BinaryHeaderReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
+		private async Task<bool> BinaryHeader1Received(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			string Header;
 			int i, c;
@@ -462,7 +229,7 @@ namespace Waher.Networking.HTTP
 						try
 						{
 							byte[] Bin = Convert.FromBase64String(Http2Settings.Value);
-							if (ConnectionSettings.TryParse(Bin, out ConnectionSettings Settings))
+							if (ConnectionSettings.TryParse(true, Bin, out ConnectionSettings Settings))
 							{
 								this.remoteSettings = Settings;
 								this.localSettings = new ConnectionSettings(
@@ -507,7 +274,7 @@ namespace Waher.Networking.HTTP
 					}
 
 					if (i + 1 < NrRead)
-						return await this.BinaryDataReceived(ConstantBuffer, Data, i + 1, NrRead - i - 1);
+						return await this.BinaryData1Received(ConstantBuffer, Data, i + 1, NrRead - i - 1);
 
 					if (!this.header.HasMessageBody)
 						return await this.RequestReceived();
@@ -539,6 +306,458 @@ namespace Waher.Networking.HTTP
 				return false;
 			}
 		}
+
+		private async Task<bool> BinaryData1Received(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
+		{
+			if (this.dataStream is null)
+			{
+				if (!(this.header.ContentEncoding is null))     // TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
+				{
+					await this.SendResponse(null, null, new HttpException(UnsupportedMediaTypeException.Code,
+						UnsupportedMediaTypeException.StatusMessage, "Content-Encoding not supported."), false);
+					return true;
+				}
+
+				HttpFieldTransferEncoding TransferEncoding = this.header.TransferEncoding;
+				if (!(TransferEncoding is null))
+				{
+					if (TransferEncoding.Value == "chunked")
+					{
+						this.dataStream = new TemporaryStream();
+						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null, false, null);
+					}
+					else
+					{
+						await this.SendResponse(null, null, new HttpException(NotImplementedException.Code,
+							NotImplementedException.StatusMessage, "Transfer encoding not implemented."), false);
+						return true;
+					}
+				}
+				else
+				{
+					HttpFieldContentLength ContentLength = this.header.ContentLength;
+					if (!(ContentLength is null))
+					{
+						long l = ContentLength.ContentLength;
+						if (l < 0)
+						{
+							await this.SendResponse(null, null, new HttpException(BadRequestException.Code,
+								BadRequestException.StatusMessage, "Negative content lengths invalid."), false);
+							return true;
+						}
+
+						if (l <= MaxInmemoryMessageSize)
+							this.dataStream = new MemoryStream((int)l);
+						else
+							this.dataStream = new TemporaryStream();
+
+						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null, false, null);
+					}
+					else
+					{
+						await this.SendResponse(null, null, new HttpException(411, "Length Required",
+							"Content Length required."), true);
+						return false;
+					}
+				}
+			}
+
+			ulong DecodingResponse = await this.transferEncoding.DecodeAsync(ConstantBuffer, Data, Offset, NrRead);
+			int NrAccepted = (int)DecodingResponse;
+			bool Complete = (DecodingResponse & 0x100000000) != 0;
+
+			if (this.HasSniffers)
+			{
+				if (Offset == 0 && NrAccepted == Data.Length)
+				{
+					if (this.rxText)
+						this.ReceiveText(this.rxEncoding.GetString(Data));
+					else
+						this.ReceiveBinary(ConstantBuffer, Data);
+				}
+				else
+				{
+					if (this.rxText)
+						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
+					else
+					{
+						byte[] Data2 = new byte[NrAccepted];
+						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
+						this.ReceiveBinary(true, Data2);
+					}
+				}
+			}
+
+			if (Complete)
+			{
+				if (this.transferEncoding.InvalidEncoding)
+				{
+					await this.SendResponse(null, null, new HttpException(BadRequestException.Code,
+						BadRequestException.StatusMessage, "Invalid transfer encoding."), false);
+					return true;
+				}
+				else if (this.transferEncoding.TransferError)
+				{
+					await this.SendResponse(null, null, new HttpException(InternalServerErrorException.Code,
+						InternalServerErrorException.StatusMessage, "Unable to transfer content to resource."), false);
+					return true;
+				}
+				else
+				{
+					Offset += NrAccepted;
+					NrRead -= NrAccepted;
+
+					if (!await this.RequestReceived())
+						return false;
+
+					if (NrRead > 0)
+						return await this.BinaryHeader1Received(ConstantBuffer, Data, Offset, NrRead);
+					else
+						return true;
+				}
+			}
+			else if (this.dataStream.Position > MaxEntitySize)
+			{
+				this.dataStream.Dispose();
+				this.dataStream = null;
+
+				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large",
+					"Maximum Entity Size: " + MaxEntitySize.ToString()), true);
+				return false;
+			}
+			else
+				return true;
+		}
+
+		private async Task<bool> Client_OnReceivedHttp2Init(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			if (!(Sender is null))
+				this.server.DataReceived(Count);
+
+			int i, c;
+			byte b;
+
+			c = Offset + Count;
+
+			for (i = Offset; i < c; i++)
+			{
+				b = Buffer[i];
+
+				if (b != http2Preface[this.localSettings.InitStep++])
+				{
+					if (this.HasSniffers && i > Offset)
+						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Buffer, Offset, i - Offset));
+
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid HTTP/2 connection preface."), true);
+					return false;
+				}
+
+				if (this.localSettings.InitStep == 6)
+				{
+					this.client.OnReceivedReset(this.Client_OnReceivedHttp2Live);
+
+					if (this.HasSniffers)
+						this.ReceiveText("\r\nSM\r\n");
+
+					if (i + 1 < Count)
+						return await this.Client_OnReceivedHttp2Live(null, ConstantBuffer, Buffer, i + 1, c - i - 1);
+					else
+						return true;
+				}
+			}
+
+			return true;
+		}
+
+		private static readonly char[] http2Preface = new char[] { 'S', 'M', '\r', '\n', '\r', '\n' };
+
+		private async Task<bool> Client_OnReceivedHttp2Live(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			if (!(Sender is null))
+				this.server.DataReceived(Count);
+
+			if (this.HasSniffers)
+				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
+
+			int End = Offset + Count;
+			int i;
+			bool FramesProcessed = false;
+
+			while (Offset < End)
+			{
+				switch (this.http2State)
+				{
+					case 0: // Frame length MSB
+						if (End - Offset >= 9)	// Entire header in buffer
+						{
+							this.http2FrameLength = Buffer[Offset++];
+							this.http2FrameLength <<= 8;
+							this.http2FrameLength |= Buffer[Offset++];
+							this.http2FrameLength <<= 8;
+							this.http2FrameLength |= Buffer[Offset++];
+
+							this.http2FrameType = (FrameType)Buffer[Offset++];
+							this.http2FrameFlags = Buffer[Offset++];
+
+							this.http2StreamId = Buffer[Offset++] & 127;
+							this.http2StreamId <<= 8;
+							this.http2StreamId |= Buffer[Offset++];
+							this.http2StreamId <<= 8;
+							this.http2StreamId |= Buffer[Offset++];
+							this.http2StreamId <<= 8;
+							this.http2StreamId |= Buffer[Offset++];
+
+							if (this.http2FrameLength == 0)
+							{
+								if (!await this.ProcessHttp2Frame(true, emptyFrame, 0, 0))
+									return false;
+
+								FramesProcessed = true;
+							}
+							else
+							{
+								if (this.http2FrameLength > this.localSettings.MaxFrameSize)
+									this.http2State = 10;
+								else
+								{
+									i = End - Offset;
+									if (i > 0)
+									{
+										i = Math.Min(i, this.http2FrameLength);
+
+										if (i >= this.http2FrameLength)
+										{
+											if (!await this.ProcessHttp2Frame(ConstantBuffer, Buffer, Offset, i))
+												return false;
+
+											Offset += i;
+											FramesProcessed = true;
+										}
+										else
+										{
+											if (this.http2Frame is null)
+												this.http2Frame = new byte[this.localSettings.MaxFrameSize];
+
+											Array.Copy(Buffer, Offset, this.http2Frame, 0, i);
+											Offset += i;
+											this.http2FramePos = i;
+											this.http2State = 9;
+										}
+									}
+									else
+									{
+										if (this.http2Frame is null)
+											this.http2Frame = new byte[this.localSettings.MaxFrameSize];
+
+										this.http2State = 9;
+										this.http2FramePos = 0;
+									}
+								}
+							}
+						}
+						else
+						{
+							this.http2FrameLength = Buffer[Offset++];
+							this.http2State++;
+						}
+						break;
+
+					case 1: // Frame length, bytes 2 & 3
+					case 2:
+						this.http2FrameLength <<= 8;
+						this.http2FrameLength |= Buffer[Offset++];
+						this.http2State++;
+						break;
+
+					case 3: // Frame type
+						this.http2FrameType = (FrameType)Buffer[Offset++];
+						this.http2State++;
+						break;
+
+					case 4: // Frame flags
+						this.http2FrameFlags = Buffer[Offset++];
+						this.http2State++;
+						break;
+
+					case 5: // Stream ID, MSB
+						this.http2StreamId = Buffer[Offset++] & 127;
+						this.http2State++;
+						break;
+
+					case 6: // Stream ID, bytes 2 & 3
+					case 7:
+						this.http2StreamId <<= 8;
+						this.http2StreamId |= Buffer[Offset++];
+						this.http2State++;
+						break;
+
+					case 8: // Stream ID, byte 4
+						this.http2StreamId <<= 8;
+						this.http2StreamId |= Buffer[Offset++];
+
+						if (this.http2FrameLength == 0)
+						{
+							this.http2State = 0;
+							if (!await this.ProcessHttp2Frame(true, emptyFrame, 0, 0))
+								return false;
+
+							FramesProcessed = true;
+						}
+						else
+						{
+							if (this.http2FrameLength > this.localSettings.MaxFrameSize)
+								this.http2State += 2;
+							else
+							{
+								i = End - Offset;
+								if (i > 0)
+								{
+									i = Math.Min(i, this.http2FrameLength);
+
+									if (i >= this.http2FrameLength)
+									{
+										if (!await this.ProcessHttp2Frame(ConstantBuffer, Buffer, Offset, i))
+											return false;
+
+										Offset += i;
+										FramesProcessed = true;
+										this.http2State = 0;
+									}
+									else
+									{
+										if (this.http2Frame is null)
+											this.http2Frame = new byte[this.localSettings.MaxFrameSize];
+
+										Array.Copy(Buffer, Offset, this.http2Frame, 0, i);
+										Offset += i;
+										this.http2FramePos = i;
+										this.http2State++;
+									}
+								}
+								else
+								{
+									if (this.http2Frame is null)
+										this.http2Frame = new byte[this.localSettings.MaxFrameSize];
+
+									this.http2State++;
+									this.http2FramePos = 0;
+								}
+							}
+						}
+						break;
+
+					case 9: // Frame payload
+						i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
+						Array.Copy(Buffer, Offset, this.http2Frame, this.http2FramePos, i);
+						Offset += i;
+						this.http2FramePos += i;
+
+						if (this.http2FramePos >= this.http2FrameLength)
+						{
+							this.http2State = 0;
+
+							if (!await this.ProcessHttp2Frame(false, this.http2Frame, 0, this.http2FramePos))
+								return false;
+
+							FramesProcessed = true;
+						}
+						break;
+
+					case 10:    // Skip Frame payload and return error.
+						i = Math.Min(End - Offset, this.http2FrameLength - this.http2FramePos);
+						Offset += i;
+						this.http2FramePos += i;
+
+						if (this.http2FramePos >= this.http2FrameLength)
+						{
+							this.http2State = 0;
+
+							if (!await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Frame too large."))
+								return false;
+						}
+						break;
+
+					default:
+						return false;
+				}
+			}
+
+			if (FramesProcessed)
+				return await this.SendPendingWindowUpdates();
+			else
+				return true;
+		}
+
+		private Task<bool> Client_OnReceivedWebSocket(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			this.server.DataReceived(Count);
+
+			return this.webSocket?.WebSocketDataReceived(ConstantBuffer, Buffer, Offset, Count) ?? Task.FromResult(false);
+		}
+
+		private Task<bool> Client_OnReceivedClosed(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			this.server.DataReceived(Count);
+
+			return Task.FromResult(false);
+		}
+
+		private Task Client_OnError(object Sender, Exception Exception)
+		{
+			return this.DisposeAsync();
+		}
+
+		private Task Client_OnDisconnected(object Sender, EventArgs e)
+		{
+			return this.DisposeAsync();
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		[Obsolete("Use the DisposeAsync() method.")]
+		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// Closes the connection and disposes of all resources.
+		/// </summary>
+		public async Task DisposeAsync()
+		{
+			if (!this.disposed)
+			{
+				this.disposed = true;
+
+				if (!(this.webSocket is null))
+				{
+					await this.webSocket.DisposeAsync();
+					this.webSocket = null;
+				}
+
+				this.headerStream?.Dispose();
+				this.headerStream = null;
+
+				this.dataStream?.Dispose();
+				this.dataStream = null;
+
+				this.client?.DisposeWhenDone();
+				this.client = null;
+
+				this.server.Remove(this);
+
+				this.flowControl?.Dispose();
+				this.flowControl = null;
+			}
+		}
+
+		internal Guid Id => this.id;
+		internal HttpServer Server => this.server;
+		internal bool Disposed => this.disposed;
+		internal BinaryTcpClient Client => this.client;
+		internal bool Encrypted => this.encrypted;
+		internal int Port => this.port;
 
 		private static void AppendFlags(FrameType Type, byte Flags, StringBuilder sb)
 		{
@@ -596,7 +815,9 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task<bool> ProcessHttp2Frame()
+		private static readonly byte[] emptyFrame = Array.Empty<byte>();
+
+		private async Task<bool> ProcessHttp2Frame(bool ConstantBuffer, byte[] FramePayload, int Offset, int Count)
 		{
 			try
 			{
@@ -632,9 +853,9 @@ namespace Waher.Networking.HTTP
 					return true;
 
 				if (this.reader is null)
-					this.reader = new HTTP2.BinaryReader(this.http2Frame, 0, this.http2FrameLength);
+					this.reader = new HTTP2.BinaryReader(ConstantBuffer, FramePayload, Offset, Count);
 				else
-					this.reader.Reset(this.http2Frame, 0, this.http2FrameLength);
+					this.reader.Reset(ConstantBuffer, FramePayload, Offset, Count);
 
 				switch (this.http2FrameType)
 				{
@@ -692,7 +913,7 @@ namespace Waher.Networking.HTTP
 #endif
 						if (DataSize > 0)
 						{
-							if (!await Stream.DataReceived(true, this.reader.Buffer, this.reader.Position, DataSize))
+							if (!await Stream.DataReceived(this.reader.ConstantBuffer, this.reader.Buffer, this.reader.Position, DataSize))
 								return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Not sufficient resources available in stream.");
 
 							this.localSettings.AddPendingIncrement(Stream, DataSize);
@@ -833,7 +1054,7 @@ namespace Waher.Networking.HTTP
 						{
 							byte[] Buf;
 							int Start;
-							int Count;
+							int Count2;
 
 							if (Stream.IsBuildingHeaders)
 							{
@@ -842,20 +1063,20 @@ namespace Waher.Networking.HTTP
 
 								Buf = Stream.FinishBuildingHeaders();
 								Start = 0;
-								Count = Buf.Length;
+								Count2 = Buf.Length;
 							}
 							else
 							{
 								Buf = this.reader.Buffer;
 								Start = this.reader.Position;
-								Count = HeaderSize;
+								Count2 = HeaderSize;
 							}
 
 							bool ResetHeader = true;
 
 							if (this.http2HeaderReader is null)
 							{
-								this.http2HeaderReader = new HeaderReader(Buf, Start, Count,
+								this.http2HeaderReader = new HeaderReader(Buf, Start, Count2,
 									this.localSettings.HeaderTableSize, this.localSettings.MaxHeaderListSize);
 								ResetHeader = false;
 							}
@@ -870,7 +1091,7 @@ namespace Waher.Networking.HTTP
 							try
 							{
 								if (ResetHeader)
-									this.http2HeaderReader.Reset(Buf, Start, Count);
+									this.http2HeaderReader.Reset(Buf, Start, Count2);
 
 								string Cookie = null;   // Ref: §8.1.2.5, RFC 7540
 
@@ -1227,16 +1448,16 @@ namespace Waher.Networking.HTTP
 
 				j = Increment.Stream.StreamId;
 
-				Output.WriteByte(0);				// 4 bytes payload
+				Output.WriteByte(0);                // 4 bytes payload
 				Output.WriteByte(0);
-				Output.WriteByte(4);	
+				Output.WriteByte(4);
 				Output.WriteByte((byte)FrameType.WindowUpdate);
-				Output.WriteByte(0);				// Flags
-				Output.WriteByte((byte)(j >> 24));	// Stream ID
+				Output.WriteByte(0);                // Flags
+				Output.WriteByte((byte)(j >> 24));  // Stream ID
 				Output.WriteByte((byte)(j >> 16));
 				Output.WriteByte((byte)(j >> 8));
 				Output.WriteByte((byte)j);
-				Output.WriteByte((byte)(i >> 24));	// Payload
+				Output.WriteByte((byte)(i >> 24));  // Payload
 				Output.WriteByte((byte)(i >> 16));
 				Output.WriteByte((byte)(i >> 8));
 				Output.WriteByte((byte)i);
@@ -1258,7 +1479,7 @@ namespace Waher.Networking.HTTP
 			Output.WriteByte(4);
 			Output.WriteByte((byte)FrameType.WindowUpdate);
 			Output.WriteByte(0);                // Flags
-			Output.WriteByte(0);				// Stream ID = 0, Connection
+			Output.WriteByte(0);                // Stream ID = 0, Connection
 			Output.WriteByte(0);
 			Output.WriteByte(0);
 			Output.WriteByte(0);
@@ -1558,128 +1779,6 @@ namespace Waher.Networking.HTTP
 				default:
 					return false;
 			}
-		}
-
-		private async Task<bool> BinaryDataReceived(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
-		{
-			if (this.dataStream is null)
-			{
-				if (!(this.header.ContentEncoding is null))     // TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
-				{
-					await this.SendResponse(null, null, new HttpException(UnsupportedMediaTypeException.Code,
-						UnsupportedMediaTypeException.StatusMessage, "Content-Encoding not supported."), false);
-					return true;
-				}
-
-				HttpFieldTransferEncoding TransferEncoding = this.header.TransferEncoding;
-				if (!(TransferEncoding is null))
-				{
-					if (TransferEncoding.Value == "chunked")
-					{
-						this.dataStream = new TemporaryStream();
-						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null, false, null);
-					}
-					else
-					{
-						await this.SendResponse(null, null, new HttpException(NotImplementedException.Code,
-							NotImplementedException.StatusMessage, "Transfer encoding not implemented."), false);
-						return true;
-					}
-				}
-				else
-				{
-					HttpFieldContentLength ContentLength = this.header.ContentLength;
-					if (!(ContentLength is null))
-					{
-						long l = ContentLength.ContentLength;
-						if (l < 0)
-						{
-							await this.SendResponse(null, null, new HttpException(BadRequestException.Code,
-								BadRequestException.StatusMessage, "Negative content lengths invalid."), false);
-							return true;
-						}
-
-						if (l <= MaxInmemoryMessageSize)
-							this.dataStream = new MemoryStream((int)l);
-						else
-							this.dataStream = new TemporaryStream();
-
-						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null, false, null);
-					}
-					else
-					{
-						await this.SendResponse(null, null, new HttpException(411, "Length Required",
-							"Content Length required."), true);
-						return false;
-					}
-				}
-			}
-
-			ulong DecodingResponse = await this.transferEncoding.DecodeAsync(ConstantBuffer, Data, Offset, NrRead);
-			int NrAccepted = (int)DecodingResponse;
-			bool Complete = (DecodingResponse & 0x100000000) != 0;
-
-			if (this.HasSniffers)
-			{
-				if (Offset == 0 && NrAccepted == Data.Length)
-				{
-					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data));
-					else
-						this.ReceiveBinary(ConstantBuffer, Data);
-				}
-				else
-				{
-					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
-					else
-					{
-						byte[] Data2 = new byte[NrAccepted];
-						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
-						this.ReceiveBinary(true, Data2);
-					}
-				}
-			}
-
-			if (Complete)
-			{
-				if (this.transferEncoding.InvalidEncoding)
-				{
-					await this.SendResponse(null, null, new HttpException(BadRequestException.Code,
-						BadRequestException.StatusMessage, "Invalid transfer encoding."), false);
-					return true;
-				}
-				else if (this.transferEncoding.TransferError)
-				{
-					await this.SendResponse(null, null, new HttpException(InternalServerErrorException.Code,
-						InternalServerErrorException.StatusMessage, "Unable to transfer content to resource."), false);
-					return true;
-				}
-				else
-				{
-					Offset += NrAccepted;
-					NrRead -= NrAccepted;
-
-					if (!await this.RequestReceived())
-						return false;
-
-					if (NrRead > 0)
-						return await this.BinaryHeaderReceived(ConstantBuffer, Data, Offset, NrRead);
-					else
-						return true;
-				}
-			}
-			else if (this.dataStream.Position > MaxEntitySize)
-			{
-				this.dataStream.Dispose();
-				this.dataStream = null;
-
-				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large",
-					"Maximum Entity Size: " + MaxEntitySize.ToString()), true);
-				return false;
-			}
-			else
-				return true;
 		}
 
 		private async Task<bool> RequestReceived()

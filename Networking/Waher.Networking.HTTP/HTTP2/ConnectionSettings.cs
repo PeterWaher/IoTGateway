@@ -292,12 +292,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Ref: §6.5.2, RFC 7540
 		/// https://datatracker.ietf.org/doc/html/rfc7540#section-6.5.2
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary data</param>
 		/// <param name="Settings">Settings object, if successful.</param>
 		/// <returns>If able to parse the settings frame.</returns>
-		public static bool TryParse(byte[] Data, out ConnectionSettings Settings)
+		public static bool TryParse(bool ConstantBuffer, byte[] Data, out ConnectionSettings Settings)
 		{
-			return TryParse(Data, 0, Data.Length, out Settings);
+			return TryParse(ConstantBuffer, Data, 0, Data.Length, out Settings);
 		}
 
 		/// <summary>
@@ -306,14 +308,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Ref: §6.5.2, RFC 7540
 		/// https://datatracker.ietf.org/doc/html/rfc7540#section-6.5.2
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary data</param>
 		/// <param name="Offset">Frame starts at this offset.</param>
 		/// <param name="Count">Number of bytes available.</param>
 		/// <param name="Settings">Settings object, if successful.</param>
 		/// <returns>If able to parse the settings frame.</returns>
-		public static bool TryParse(byte[] Data, int Offset, int Count, out ConnectionSettings Settings)
+		public static bool TryParse(bool ConstantBuffer, byte[] Data, int Offset, int Count, out ConnectionSettings Settings)
 		{
-			BinaryReader Reader = new BinaryReader(Data, Offset, Count);
+			BinaryReader Reader = new BinaryReader(ConstantBuffer, Data, Offset, Count);
 			return TryParse(Reader, null, out Settings) is null;
 		}
 

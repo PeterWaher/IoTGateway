@@ -486,7 +486,7 @@ namespace Waher.IoTGateway
 									if (exportExceptions)
 									{
 										exceptionFile.Write("Start of export: ");
-										exceptionFile.WriteLine(DateTime.Now.ToString());
+										exceptionFile.WriteLine(DateTime.UtcNow.ToString());
 
 										AppDomain.CurrentDomain.FirstChanceException += (Sender, e) =>
 										{
@@ -506,7 +506,7 @@ namespace Waher.IoTGateway
 														exceptionFile.WriteLine("null");
 
 													exceptionFile.Write("Time: ");
-													exceptionFile.WriteLine(DateTime.Now.ToString());
+													exceptionFile.WriteLine(DateTime.UtcNow.ToString());
 
 													if (!(e.Exception is null))
 													{
@@ -659,7 +659,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Event Event = new Event(DateTime.Now, EventType.Critical, ex.Message, PersistedEventLog.ObjectID, string.Empty, string.Empty,
+					Event Event = new Event(DateTime.UtcNow, EventType.Critical, ex.Message, PersistedEventLog.ObjectID, string.Empty, string.Empty,
 						EventLevel.Major, string.Empty, ex.Source, Log.CleanStackTrace(ex.StackTrace));
 
 					Event.Avoid(PersistedEventLog);

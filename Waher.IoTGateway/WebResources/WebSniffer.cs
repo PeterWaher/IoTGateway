@@ -20,7 +20,7 @@ namespace Waher.IoTGateway.WebResources
 	public class WebSniffer : SnifferBase, IDisposable
 	{
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
-		private readonly DateTime created = DateTime.Now;
+		private readonly DateTime created = DateTime.UtcNow;
 		private readonly DateTime expires;
 		private readonly ICommunicationLayer comLayer;
 		private readonly string[] privileges;
@@ -47,7 +47,7 @@ namespace Waher.IoTGateway.WebResources
 			string UserVariable, params string[] Privileges)
 			: base()
 		{
-			this.expires = DateTime.Now.Add(MaxLife);
+			this.expires = DateTime.UtcNow.Add(MaxLife);
 			this.comLayer = ComLayer;
 			this.snifferId = SnifferId;
 			this.resource = PageResource;
@@ -89,7 +89,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			try
 			{
-				DateTime Now = DateTime.Now;
+				DateTime Now = DateTime.UtcNow;
 
 				if ((Now - this.tabIdTimestamp).TotalSeconds > 2 || this.tabIds is null || this.tabIds.Length == 0)
 				{
@@ -144,7 +144,7 @@ namespace Waher.IoTGateway.WebResources
 
 		private async Task Close()
 		{
-			await this.Push(DateTime.Now, "Sniffer closed.", "Information", false);
+			await this.Push(DateTime.UtcNow, "Sniffer closed.", "Information", false);
 			this.comLayer.Remove(this);
 			await this.DisposeAsync();
 		}

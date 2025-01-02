@@ -141,7 +141,7 @@ namespace Waher.Networking
 		/// <param name="Data">Binary Data.</param>
 		public void ReceiveBinary(bool ConstantBuffer, byte[] Data)
 		{
-			this.ReceiveBinary(DateTime.Now, ConstantBuffer, Data);
+			this.ReceiveBinary(DateTime.UtcNow, ConstantBuffer, Data);
 		}
 
 		/// <summary>
@@ -170,7 +170,7 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes received.</param>
 		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			this.ReceiveBinary(DateTime.Now, ConstantBuffer, Data, Offset, Count);
+			this.ReceiveBinary(DateTime.UtcNow, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
@@ -199,7 +199,7 @@ namespace Waher.Networking
 		/// <param name="Data">Binary Data.</param>
 		public void TransmitBinary(bool ConstantBuffer, byte[] Data)
 		{
-			this.TransmitBinary(DateTime.Now, ConstantBuffer, Data);
+			this.TransmitBinary(DateTime.UtcNow, ConstantBuffer, Data);
 		}
 
 		/// <summary>
@@ -228,7 +228,7 @@ namespace Waher.Networking
 		/// <param name="Count">Number of bytes transmitted.</param>
 		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			this.TransmitBinary(DateTime.Now, ConstantBuffer, Data, Offset, Count);
+			this.TransmitBinary(DateTime.UtcNow, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
@@ -255,7 +255,7 @@ namespace Waher.Networking
 		/// <param name="Text">Text</param>
 		public void ReceiveText(string Text)
 		{
-			this.ReceiveText(DateTime.Now, Text);
+			this.ReceiveText(DateTime.UtcNow, Text);
 		}
 
 		/// <summary>
@@ -305,7 +305,7 @@ namespace Waher.Networking
 		/// <param name="Text">Text</param>
 		public void TransmitText(string Text)
 		{
-			this.TransmitText(DateTime.Now, Text);
+			this.TransmitText(DateTime.UtcNow, Text);
 		}
 
 		/// <summary>
@@ -346,7 +346,7 @@ namespace Waher.Networking
 		/// <param name="Comment">Comment.</param>
 		public void Information(string Comment)
 		{
-			this.Information(DateTime.Now, Comment);
+			this.Information(DateTime.UtcNow, Comment);
 		}
 
 		/// <summary>
@@ -379,7 +379,7 @@ namespace Waher.Networking
 		/// <param name="Warning">Warning.</param>
 		public void Warning(string Warning)
 		{
-			this.Warning(DateTime.Now, Warning);
+			this.Warning(DateTime.UtcNow, Warning);
 		}
 
 		/// <summary>
@@ -412,7 +412,7 @@ namespace Waher.Networking
 		/// <param name="Error">Error.</param>
 		public void Error(string Error)
 		{
-			this.Error(DateTime.Now, Error);
+			this.Error(DateTime.UtcNow, Error);
 		}
 
 		/// <summary>
@@ -435,7 +435,7 @@ namespace Waher.Networking
 		/// <param name="Exception">Exception.</param>
 		public void Exception(Exception Exception)
 		{
-			this.Exception(DateTime.Now, Exception);
+			this.Exception(DateTime.UtcNow, Exception);
 		}
 
 		/// <summary>
@@ -458,7 +458,7 @@ namespace Waher.Networking
 		/// <param name="Exception">Exception.</param>
 		public void Exception(string Exception)
 		{
-			this.Exception(DateTime.Now, Exception);
+			this.Exception(DateTime.UtcNow, Exception);
 		}
 
 		/// <summary>

@@ -17,7 +17,7 @@ namespace Waher.Events.Statistics
 		/// <param name="InitialCount">Initial count.</param>
 		public Statistic(long InitialCount)
 		{
-			this.first = this.last = DateTime.Now;
+			this.first = this.last = DateTime.UtcNow;
 			this.count = InitialCount;
 		}
 
@@ -27,7 +27,7 @@ namespace Waher.Events.Statistics
 		public void Inc()
 		{
 			this.count++;
-			this.last = DateTime.Now;
+			this.last = DateTime.UtcNow;
 		}
 
 		/// <summary>

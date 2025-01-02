@@ -31,7 +31,7 @@ namespace Waher.Networking.HTTP
 		private bool encodingUsed = false;
 		private DateTimeOffset date = DateTimeOffset.Now;
 		private DateTimeOffset? expires = null;
-		private DateTime lastPing = DateTime.Now;
+		private DateTime lastPing = DateTime.UtcNow;
 		private string server = null;
 		private string contentLanguage = null;
 		private string contentType = null;
@@ -1328,7 +1328,7 @@ namespace Waher.Networking.HTTP
 
 			await this.transferEncoding.EncodeAsync(ConstantBuffer, Data, Offset, Count);
 
-			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
+			if (!(this.httpServer is null) && ((TP = DateTime.UtcNow) - this.lastPing).TotalSeconds >= 1)
 			{
 				this.lastPing = TP;
 				this.httpServer?.PingRequest(this.httpRequest);

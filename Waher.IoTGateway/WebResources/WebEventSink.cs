@@ -13,7 +13,7 @@ namespace Waher.IoTGateway.WebResources
 	/// </summary>
 	public class WebEventSink : EventSink
 	{
-		private readonly DateTime created = DateTime.Now;
+		private readonly DateTime created = DateTime.UtcNow;
 		private readonly DateTime expires;
 		private readonly string[] privileges;
 		private readonly string userVariable;
@@ -33,7 +33,7 @@ namespace Waher.IoTGateway.WebResources
 		public WebEventSink(string SinkId, string PageResource, TimeSpan MaxLife, string UserVariable, params string[] Privileges)
 			: base(SinkId)
 		{
-			this.expires = DateTime.Now.Add(MaxLife);
+			this.expires = DateTime.UtcNow.Add(MaxLife);
 			this.resource = PageResource;
 			this.tabIds = null;
 			this.userVariable = UserVariable;
@@ -48,7 +48,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			try
 			{
-				DateTime Now = DateTime.Now;
+				DateTime Now = DateTime.UtcNow;
 
 				if ((Now - this.tabIdTimestamp).TotalSeconds > 2 || this.tabIds is null || this.tabIds.Length == 0)
 				{

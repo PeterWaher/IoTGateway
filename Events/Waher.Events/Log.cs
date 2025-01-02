@@ -165,7 +165,7 @@ namespace Waher.Events
 							hasReportedErrors = true;
 						}
 
-						Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty,
+						Event Event2 = new Event(DateTime.UtcNow, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty,
 							EventLevel.Major, string.Empty, ex.Source, CleanStackTrace(ex.StackTrace));
 
 						if (!(Event.ToAvoid is null))

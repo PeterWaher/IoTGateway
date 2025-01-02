@@ -92,7 +92,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>If script file needs to be executed.</returns>
 		public static async Task<bool> NeedsExecution(string FileName)
 		{
-			DateTime Timestamp = File.GetLastWriteTime(FileName);
+			DateTime Timestamp = File.GetLastWriteTimeUtc(FileName);
 			DateTime? LastExecuted;
 			Type RuntimeSettings = null;
 			MethodInfo GetAsync;

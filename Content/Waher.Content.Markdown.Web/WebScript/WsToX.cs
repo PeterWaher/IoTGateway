@@ -43,7 +43,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
 		public async Task<bool> ConvertAsync(ConversionState State)
 		{
-			DateTime TP = File.GetLastWriteTime(State.FromFileName);
+			DateTime TP = File.GetLastWriteTimeUtc(State.FromFileName);
 			Expression Exp = null;
 
 			lock (parsed)

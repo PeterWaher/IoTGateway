@@ -277,7 +277,7 @@ namespace Waher.Networking.Sniffers
 
 				foreach (string FileName in Files)
 				{
-					if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+					if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
 					{
 						try
 						{

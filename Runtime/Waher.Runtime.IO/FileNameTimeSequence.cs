@@ -55,6 +55,7 @@ namespace Waher.Runtime.IO
 		private readonly bool usesMinutePlaceholder;
 		private readonly bool usesSecondPlaceholder;
 		private DateTime last = DateTime.MinValue;
+		private bool hasLast = false;
 
 
 		/// <summary>
@@ -249,7 +250,8 @@ namespace Waher.Runtime.IO
 		{
 			DateTime TP = this.utc ? DateTime.UtcNow : DateTime.Now;
 
-			if ((this.usesSecondPlaceholder && this.last.Second != TP.Second) ||
+			if (!this.hasLast ||
+				(this.usesSecondPlaceholder && this.last.Second != TP.Second) ||
 				(this.usesMinutePlaceholder && this.last.Minute != TP.Minute) ||
 				(this.usesHourPlaceholder && this.last.Hour != TP.Hour) ||
 				(this.usesDayPlaceholder && this.last.Day != TP.Day) ||
@@ -257,6 +259,7 @@ namespace Waher.Runtime.IO
 				(this.usesYearPlaceholder && this.last.Year != TP.Year))
 			{
 				this.last = TP;
+				this.hasLast = true;
 
 				FileName = this.fileNamePattern;
 

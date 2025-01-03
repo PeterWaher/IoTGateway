@@ -21143,6 +21143,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.UWP\\Waher.Networking.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.UWP\\Waher.Networking.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.IO\\Waher.Runtime.IO.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.IO\\Waher.Runtime.IO.csproj"
             }
           }
         }

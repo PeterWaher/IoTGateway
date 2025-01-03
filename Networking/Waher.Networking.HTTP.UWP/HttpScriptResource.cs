@@ -160,7 +160,7 @@ namespace Waher.Networking.HTTP
 				IContentConverter Converter = null;
 				string NewContentType = null;
 				int i = ContentType.IndexOf(';');
-				string ContentTypeNoParams = i < 0 ? ContentType : ContentType[..i].TrimEnd();
+				string ContentTypeNoParams = i < 0 ? ContentType : ContentType.Substring(0, i).TrimEnd();
 
 				foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
 				{

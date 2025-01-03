@@ -650,7 +650,7 @@ namespace Waher.Networking.HTTP.WebSockets
 				while (i < c)
 				{
 					int j = Math.Min(i + MaxFrameLength, c);
-					string s = Payload[i..j];
+					string s = Payload.Substring(i, j - i);
 					i = j;
 					await this.Send(s, i < c);
 				}

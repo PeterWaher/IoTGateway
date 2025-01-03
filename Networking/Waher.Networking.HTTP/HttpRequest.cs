@@ -254,8 +254,8 @@ namespace Waher.Networking.HTTP
 
 				int i = s.LastIndexOf(':');
 
-				if (int.TryParse(s[(i + 1)..], out _))
-					return s[..i];
+				if (int.TryParse(s.Substring(i + 1), out _))
+					return s.Substring(0, i);
 				else
 					return s;
 			}

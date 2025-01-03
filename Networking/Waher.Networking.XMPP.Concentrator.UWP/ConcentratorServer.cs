@@ -1161,7 +1161,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
-						OnlyIfDerivedFrom ??= new LinkedList<TypeInfo>();
+						if (OnlyIfDerivedFrom is null)
+							OnlyIfDerivedFrom = new LinkedList<TypeInfo>();
+
 						OnlyIfDerivedFrom.AddLast(T.GetTypeInfo());
 					}
 				}
@@ -1257,7 +1259,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					foreach (Type Interface in TI.ImplementedInterfaces)
 					{
-						Interfaces ??= new SortedDictionary<string, bool>();
+						if (Interfaces is null)
+							Interfaces = new SortedDictionary<string, bool>();
+
 						Interfaces[Interface.FullName] = true;
 					}
 
@@ -1450,7 +1454,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					ThingRef = Node.Parent;
 					Node = ThingRef as INode;
-					Node ??= await Rec.Source.GetNodeAsync(Node.Parent);
+
+					if (Node is null)
+						Node = await Rec.Source.GetNodeAsync(Node.Parent);
 				}
 
 				Xml.Append("</nodeInfos>");
@@ -1570,12 +1576,15 @@ namespace Waher.Networking.XMPP.Concentrator
 				ThingRef = Node.Parent;
 				if (ThingRef is null)
 				{
-					RootNodes ??= new LinkedList<INode>();
+					if (RootNodes is null)
+						RootNodes = new LinkedList<INode>();
+
 					RootNodes.AddLast(Node);
 				}
 				else
 				{
-					NodesPerParent ??= new Dictionary<string, LinkedList<INode>>();
+					if (NodesPerParent is null)
+						NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
 					Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
 					if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
@@ -1658,12 +1667,15 @@ namespace Waher.Networking.XMPP.Concentrator
 				ThingRef = Node.Parent;
 				if (ThingRef is null)
 				{
-					RootNodes ??= new LinkedList<INode>();
+					if (RootNodes is null)
+						RootNodes = new LinkedList<INode>();
+
 					RootNodes.AddLast(Node);
 				}
 				else
 				{
-					NodesPerParent ??= new Dictionary<string, LinkedList<INode>>();
+					if (NodesPerParent is null)
+						NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
 					Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
 					if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
@@ -1814,7 +1826,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					ILifeCycleManagement LifeCycleManagement = Node as ILifeCycleManagement;
 					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
-					Result ??= await Parameters.SetEditableForm(e, Node, Form, true);
+					if (Result is null)
+						Result = await Parameters.SetEditableForm(e, Node, Form, true);
 
 					if (Result.Errors is null)
 					{
@@ -1987,7 +2000,9 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
-						Nodes ??= new LinkedList<Tuple<IDataSource, INode>>();
+						if (Nodes is null)
+							Nodes = new LinkedList<Tuple<IDataSource, INode>>();
+
 						Nodes.AddLast(new Tuple<IDataSource, INode>(Rec.Source, Node));
 						break;
 
@@ -2039,7 +2054,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					ILifeCycleManagement LifeCycleManagement = P.Item2 as ILifeCycleManagement;
 					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
-					Result ??= await Parameters.SetEditableForm(e, P.Item2, Form, true);
+					if (Result is null)
+						Result = await Parameters.SetEditableForm(e, P.Item2, Form, true);
 
 					if (!(Result.Errors is null))
 					{
@@ -3823,7 +3839,8 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					Nodes ??= new LinkedList<INode>();
+					if (Nodes is null)
+						Nodes = new LinkedList<INode>();
 
 					Nodes.AddLast(Node);
 
@@ -4499,7 +4516,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Subscription.Expires <= DateTime.Now)
 			{
-				Rec.ToRemove ??= new LinkedList<string>();
+				if (Rec.ToRemove is null)
+					Rec.ToRemove = new LinkedList<string>();
+
 				Rec.ToRemove.AddLast(Subscription.Jid);
 			}
 			else if ((Subscription.EventTypes & EventType) != 0)

@@ -173,7 +173,7 @@ namespace Waher.Networking.HTTP
 
 				int c = s.Length;
 				if (c > 0 && (s[c - 1] == Path.DirectorySeparatorChar || s[c - 1] == '/' || s[c - 1] == '\\'))
-					s = s[..(c - 1)];
+					s = s.Substring(0, c - 1);
 
 				this.folderPath = s;
 			}
@@ -396,7 +396,7 @@ namespace Waher.Networking.HTTP
 					i = Host.IndexOf(':');
 
 					if (i > 0)
-						Host = Host[..i];
+						Host = Host.Substring(0, i);
 
 					if (ContainsInvalidFileCharacters(Host, false, true))
 					{
@@ -436,8 +436,8 @@ namespace Waher.Networking.HTTP
 
 				i = s2.LastIndexOf('.');
 				if (i > 0 &&
-					File.Exists(s3 = s2[..i]) &&
-					InternetContent.TryGetContentType(s2[(i + 1)..], out ContentType) &&
+					File.Exists(s3 = s2.Substring(0, i)) &&
+					InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
 					(Header?.Accept?.IsAcceptable(ContentType) ?? true))
 				{
 					if (!(Header is null))
@@ -455,8 +455,8 @@ namespace Waher.Networking.HTTP
 
 			i = s2.LastIndexOf('.');
 			if (i > 0 &&
-				File.Exists(s3 = s2[..i]) &&
-				InternetContent.TryGetContentType(s2[(i + 1)..], out ContentType) &&
+				File.Exists(s3 = s2.Substring(0, i)) &&
+				InternetContent.TryGetContentType(s2.Substring(i + 1), out ContentType) &&
 				(Header?.Accept?.IsAcceptable(ContentType) ?? true))
 			{
 				if (!(Header is null))
@@ -485,7 +485,7 @@ namespace Waher.Networking.HTTP
 
 				if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
 				{
-					Folder = this.folderPath + Path.DirectorySeparatorChar + Host[4..];
+					Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
 					if (Directory.Exists(Folder))
 					{
 						this.folders[Host] = Folder;
@@ -496,7 +496,7 @@ namespace Waher.Networking.HTTP
 				int i = Host.IndexOf('.');
 				if (i > 0)
 				{
-					Folder = this.folderPath + Path.DirectorySeparatorChar + Host[..i];
+					Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(0, i);
 					if (Directory.Exists(Folder))
 					{
 						this.folders[Host] = Folder;

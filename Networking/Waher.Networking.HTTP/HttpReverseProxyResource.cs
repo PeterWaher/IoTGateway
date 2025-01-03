@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -332,210 +333,214 @@ namespace Waher.Networking.HTTP
 				HttpClientHandler Handler = WebGetter.GetClientHandler();
 				string s;
 
-				using HttpClient HttpClient = new HttpClient(Handler, true)
+				using (HttpClient HttpClient = new HttpClient(Handler, true)
 				{
 					Timeout = this.timeout
-				};
-				using HttpRequestMessage ProxyRequest = new HttpRequestMessage()
+				})
 				{
-					RequestUri = RemoteUri,
-					Method = new HttpMethod(Request.Header.Method)
-				};
-				if (!(Data is null))
-					ProxyRequest.Content = new ByteArrayContent(Data);
-
-				foreach (HttpField Field in Request.Header)
-				{
-					switch (Field.Key)
+					using (HttpRequestMessage ProxyRequest = new HttpRequestMessage()
 					{
-						case "Accept":
-							if (!ProxyRequest.Headers.Accept.TryParseAdd(Field.Value))
-								throw new InvalidOperationException("Invalid Accept header value: " + Field.Value);
-							break;
-
-						case "Authorization":
-							int i = Field.Value.IndexOf(' ');
-							if (i < 0)
-								ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue(Field.Value);
-							else
-								ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue(Field.Value[..i], Field.Value[(i + 1)..].TrimStart());
-							break;
-
-						case "Cookie":
-							foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Field.Value))
-							{
-								if (this.useSession && P.Key == HttpSessionID && !(Session is null))
-								{
-									if (Session.TryGetVariable(SpacePrefixedHttpSessionID, out Variable v) &&
-										v.ValueObject is Cookie ProxyCookie)
-									{
-										Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(ProxyCookie.Name, ProxyCookie.Value));
-									}
-								}
-								else
-									Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(P.Key, P.Value));
-							}
-							break;
-
-						case "Content-Encoding":
-						case "Content-Length":
-						case "Transfer-Encoding":
-						case "Host":
-						case "Accept-Encoding":
-							// Igore; will be re-coded.
-							break;
-
-						case "Allow":
-						case "Content-Disposition":
-						case "Content-Language":
-						case "Content-Location":
-						case "Content-MD5":
-						case "Content-Range":
-						case "Content-Type":
-						case "Last-Modified":
-							ProxyRequest.Content?.Headers.Add(Field.Key, Field.Value);
-							break;
-
-						default:
-							if (!Field.Key.StartsWith(':'))     // Avoid HTTP/2 pseudo-headers
-								ProxyRequest.Headers.Add(Field.Key, Field.Value);
-							break;
-					}
-				}
-
-				// Forwarded:			https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded
-				// X-Forwarded-Host:	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host
-				// X-Forwarded-For		https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
-				// X-Forwarded-Proto	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
-				// Via					https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Via
-
-				sb.Clear();
-
-				sb.Append("by=");
-				sb.Append(Request.LocalEndPoint);
-
-				sb.Append(";for=");
-				sb.Append(s = Request.RemoteEndPoint);
-
-				if (Request.Header.TryGetHeaderField("X-Forwarded-For", out HttpField ForwardedFor))
-					ProxyRequest.Headers.Add("X-Forwarded-For", s + ", " + ForwardedFor.Value);
-				else
-					ProxyRequest.Headers.Add("X-Forwarded-For", s);
-
-				sb.Append(";proto=http");
-				if (Request.Encrypted)
-				{
-					sb.Append('s');
-					ProxyRequest.Headers.Add("X-Forwarded-Proto", "https");
-				}
-				else
-					ProxyRequest.Headers.Add("X-Forwarded-Proto", "http");
-
-				if (!(Request.Header.Host is null))
-				{
-					sb.Append(";host=");
-					sb.Append(s = Request.Header.Host.Value);
-
-					ProxyRequest.Headers.Add("X-Forwarded-Host", s);
-					ProxyRequest.Headers.Add("Forwarded", sb.ToString());
-
-					sb.Clear();
-
-					sb.Append("HTTP/");
-					sb.Append(CommonTypes.Encode(Request.Header.HttpVersion, 1));
-					sb.Append(' ');
-					sb.Append(s);
-
-					if (Request.Header.TryGetHeaderField("Via", out HttpField Via))
+						RequestUri = RemoteUri,
+						Method = new HttpMethod(Request.Header.Method)
+					})
 					{
-						sb.Append(", ");
-						sb.Append(Via.Value);
-					}
+						if (!(Data is null))
+							ProxyRequest.Content = new ByteArrayContent(Data);
 
-					ProxyRequest.Headers.Add("Via", sb.ToString());
-				}
-				else
-					ProxyRequest.Headers.Add("Forwarded", sb.ToString());
-
-				await this.BeforeForwardRequest.Raise(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response), false);
-
-				HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
-
-				Response.StatusCode = (int)ProxyResponse.StatusCode;
-				Response.StatusMessage = ProxyResponse.ReasonPhrase;
-
-				foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Headers)
-				{
-					switch (Header.Key)
-					{
-						case "Transfer-Encoding":
-						case "X-Content-Type-Options":
-							break;
-
-						case "Set-Cookie":
-							if (!(Session is null))
-							{
-								foreach (string Value in Header.Value)
-								{
-									Cookie Cookie = Cookie.FromSetCookie(Value);
-									if (Cookie is null)
-										continue;
-
-									if (Cookie.Name == HttpSessionID)
-										Session[SpacePrefixedHttpSessionID] = Cookie;
-									else
-										Response.SetCookie(Cookie);
-								}
-							}
-							else
-							{
-								foreach (string Value in Header.Value)
-								{
-									Cookie Cookie = Cookie.FromSetCookie(Value);
-									if (Cookie is null)
-										continue;
-
-									Response.SetCookie(Cookie);
-								}
-							}
-							break;
-
-						default:
-							foreach (string Value in Header.Value)
-								Response.SetHeader(Header.Key, Value);
-							break;
-					}
-				}
-
-				if (!(ProxyResponse.Content is null))
-				{
-					foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Content.Headers)
-					{
-						switch (Header.Key)
+						foreach (HttpField Field in Request.Header)
 						{
-							case "Content-Length":
-							case "Content-Encoding":
-								break;
+							switch (Field.Key)
+							{
+								case "Accept":
+									if (!ProxyRequest.Headers.Accept.TryParseAdd(Field.Value))
+										throw new InvalidOperationException("Invalid Accept header value: " + Field.Value);
+									break;
 
-							default:
-								foreach (string Value in Header.Value)
-									Response.SetHeader(Header.Key, Value);
-								break;
+								case "Authorization":
+									int i = Field.Value.IndexOf(' ');
+									if (i < 0)
+										ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue(Field.Value);
+									else
+										ProxyRequest.Headers.Authorization = new AuthenticationHeaderValue(Field.Value.Substring(0, i), Field.Value.Substring(i + 1).TrimStart());
+									break;
+
+								case "Cookie":
+									foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Field.Value))
+									{
+										if (this.useSession && P.Key == HttpSessionID && !(Session is null))
+										{
+											if (Session.TryGetVariable(SpacePrefixedHttpSessionID, out Variable v) &&
+												v.ValueObject is Cookie ProxyCookie)
+											{
+												Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(ProxyCookie.Name, ProxyCookie.Value));
+											}
+										}
+										else
+											Handler.CookieContainer.Add(ProxyRequest.RequestUri, new System.Net.Cookie(P.Key, P.Value));
+									}
+									break;
+
+								case "Content-Encoding":
+								case "Content-Length":
+								case "Transfer-Encoding":
+								case "Host":
+								case "Accept-Encoding":
+									// Igore; will be re-coded.
+									break;
+
+								case "Allow":
+								case "Content-Disposition":
+								case "Content-Language":
+								case "Content-Location":
+								case "Content-MD5":
+								case "Content-Range":
+								case "Content-Type":
+								case "Last-Modified":
+									ProxyRequest.Content?.Headers.Add(Field.Key, Field.Value);
+									break;
+
+								default:
+									if (!Field.Key.StartsWith(':'))     // Avoid HTTP/2 pseudo-headers
+										ProxyRequest.Headers.Add(Field.Key, Field.Value);
+									break;
+							}
 						}
+
+						// Forwarded:			https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded
+						// X-Forwarded-Host:	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Host
+						// X-Forwarded-For		https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+						// X-Forwarded-Proto	https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
+						// Via					https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Via
+
+						sb.Clear();
+
+						sb.Append("by=");
+						sb.Append(Request.LocalEndPoint);
+
+						sb.Append(";for=");
+						sb.Append(s = Request.RemoteEndPoint);
+
+						if (Request.Header.TryGetHeaderField("X-Forwarded-For", out HttpField ForwardedFor))
+							ProxyRequest.Headers.Add("X-Forwarded-For", s + ", " + ForwardedFor.Value);
+						else
+							ProxyRequest.Headers.Add("X-Forwarded-For", s);
+
+						sb.Append(";proto=http");
+						if (Request.Encrypted)
+						{
+							sb.Append('s');
+							ProxyRequest.Headers.Add("X-Forwarded-Proto", "https");
+						}
+						else
+							ProxyRequest.Headers.Add("X-Forwarded-Proto", "http");
+
+						if (!(Request.Header.Host is null))
+						{
+							sb.Append(";host=");
+							sb.Append(s = Request.Header.Host.Value);
+
+							ProxyRequest.Headers.Add("X-Forwarded-Host", s);
+							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
+
+							sb.Clear();
+
+							sb.Append("HTTP/");
+							sb.Append(CommonTypes.Encode(Request.Header.HttpVersion, 1));
+							sb.Append(' ');
+							sb.Append(s);
+
+							if (Request.Header.TryGetHeaderField("Via", out HttpField Via))
+							{
+								sb.Append(", ");
+								sb.Append(Via.Value);
+							}
+
+							ProxyRequest.Headers.Add("Via", sb.ToString());
+						}
+						else
+							ProxyRequest.Headers.Add("Forwarded", sb.ToString());
+
+						await this.BeforeForwardRequest.Raise(this, new ProxyRequestEventArgs(ProxyRequest, Request, Response), false);
+
+						HttpResponseMessage ProxyResponse = await HttpClient.SendAsync(ProxyRequest);
+
+						Response.StatusCode = (int)ProxyResponse.StatusCode;
+						Response.StatusMessage = ProxyResponse.ReasonPhrase;
+
+						foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Headers)
+						{
+							switch (Header.Key)
+							{
+								case "Transfer-Encoding":
+								case "X-Content-Type-Options":
+									break;
+
+								case "Set-Cookie":
+									if (!(Session is null))
+									{
+										foreach (string Value in Header.Value)
+										{
+											Cookie Cookie = Cookie.FromSetCookie(Value);
+											if (Cookie is null)
+												continue;
+
+											if (Cookie.Name == HttpSessionID)
+												Session[SpacePrefixedHttpSessionID] = Cookie;
+											else
+												Response.SetCookie(Cookie);
+										}
+									}
+									else
+									{
+										foreach (string Value in Header.Value)
+										{
+											Cookie Cookie = Cookie.FromSetCookie(Value);
+											if (Cookie is null)
+												continue;
+
+											Response.SetCookie(Cookie);
+										}
+									}
+									break;
+
+								default:
+									foreach (string Value in Header.Value)
+										Response.SetHeader(Header.Key, Value);
+									break;
+							}
+						}
+
+						if (!(ProxyResponse.Content is null))
+						{
+							foreach (KeyValuePair<string, IEnumerable<string>> Header in ProxyResponse.Content.Headers)
+							{
+								switch (Header.Key)
+								{
+									case "Content-Length":
+									case "Content-Encoding":
+										break;
+
+									default:
+										foreach (string Value in Header.Value)
+											Response.SetHeader(Header.Key, Value);
+										break;
+								}
+							}
+
+							byte[] Bin = await ProxyResponse.Content.ReadAsByteArrayAsync();
+
+							Response.ContentLength = Bin.Length;
+
+							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
+
+							await Response.Write(true, Bin);
+						}
+						else
+							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
+
+						await Response.SendResponse();
 					}
-
-					byte[] Bin = await ProxyResponse.Content.ReadAsByteArrayAsync();
-
-					Response.ContentLength = Bin.Length;
-
-					await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
-
-					await Response.Write(true, Bin);
 				}
-				else
-					await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
-
-				await Response.SendResponse();
 			}
 			catch (HttpException ex)
 			{

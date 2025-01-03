@@ -247,19 +247,20 @@ namespace Waher.Networking.HTTP
 								else
 									this.flowControl = new FlowControlRfc7540(this.remoteSettings);
 
-								using HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
+								using (HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
 									StatusCode = 101,
 									StatusMessage = "Switching Protocols",
 									ContentLength = null,
 									ContentType = null,
 									ContentLanguage = null
-								};
+								})
+								{
+									Response.SetHeader("Upgrade", "h2c");
+									Response.SetHeader("Connection", "Upgrade");
 
-								Response.SetHeader("Upgrade", "h2c");
-								Response.SetHeader("Connection", "Upgrade");
-
-								await Response.SendResponse();
+									await Response.SendResponse();
+								}
 
 								if (i + 1 < NrRead)
 									return await this.Client_OnReceivedHttp2Live(null, ConstantBuffer, Data, i + 1, NrRead - i - 1);
@@ -488,7 +489,7 @@ namespace Waher.Networking.HTTP
 				switch (this.http2State)
 				{
 					case 0: // Frame length MSB
-						if (End - Offset >= 9)	// Entire header in buffer
+						if (End - Offset >= 9)  // Entire header in buffer
 						{
 							this.http2FrameLength = Buffer[Offset++];
 							this.http2FrameLength <<= 8;
@@ -1724,7 +1725,7 @@ namespace Waher.Networking.HTTP
 			if (j < 0)
 				return false;
 
-			string s = ContentType[..j];
+			string s = ContentType.Substring(0, j);
 
 			// TODO: Customizable.
 
@@ -1770,11 +1771,7 @@ namespace Waher.Networking.HTTP
 					}
 
 				case "multipart":
-					return ContentType switch
-					{
-						"multipart/form-data" => true,
-						_ => false,
-					};
+					return ContentType == "multipart/form-data";
 
 				default:
 					return false;

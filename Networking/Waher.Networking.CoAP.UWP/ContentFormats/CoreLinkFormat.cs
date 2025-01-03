@@ -99,7 +99,8 @@ namespace Waher.Networking.CoAP.ContentFormats
 			if (!(Object is LinkDocument Doc))
 				return Task.FromResult(new ContentResponse(new ArgumentException("Object not a CoRE link document.", nameof(Object))));
 
-			Encoding ??= Encoding.UTF8;
+			if (Encoding is null)
+				Encoding = Encoding.UTF8;
 
 			string ContentType = LinkFormatContentType + "; charset=" + Encoding.WebName;
 			byte[] Bin = Encoding.GetBytes(Doc.Text);

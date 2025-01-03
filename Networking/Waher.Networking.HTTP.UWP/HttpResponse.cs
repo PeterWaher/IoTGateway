@@ -318,8 +318,8 @@ namespace Waher.Networking.HTTP
 					break;
 
 				case "etag":
-					if (Value.Length > 1 && Value[0] == '"' && Value[^1] == '"')
-						this.eTag = Value[1..^1];
+					if (Value.Length > 1 && Value[0] == '"' && Value[Value.Length - 1] == '"')
+						this.eTag = Value.Substring(1, Value.Length - 2);
 					else
 						this.eTag = Value;
 					break;
@@ -1156,25 +1156,27 @@ namespace Waher.Networking.HTTP
 		/// <param name="FileRef">File reference.</param>
 		public async Task Return(FileReference FileRef)
 		{
-			using FileStream f = File.OpenRead(FileRef.FileName);
-			long Pos = 0;
-			long Len = f.Length;
-			int BufSize = (int)Math.Min(Len, 65536 * 4);
-			byte[] Buf = new byte[BufSize];
-			int c;
-
-			this.contentType = FileRef.ContentType;
-			this.ContentLength = Len;
-
-			while (Pos < Len)
+			using (FileStream f = File.OpenRead(FileRef.FileName))
 			{
-				c = (int)Math.Min(BufSize, Len - Pos);
-				await f.ReadAllAsync(Buf, 0, c);
-				await this.Write(false, Buf, 0, c);
-				Pos += c;
-			}
+				long Pos = 0;
+				long Len = f.Length;
+				int BufSize = (int)Math.Min(Len, 65536 * 4);
+				byte[] Buf = new byte[BufSize];
+				int c;
 
-			await this.SendResponse();
+				this.contentType = FileRef.ContentType;
+				this.ContentLength = Len;
+
+				while (Pos < Len)
+				{
+					c = (int)Math.Min(BufSize, Len - Pos);
+					await f.ReadAllAsync(Buf, 0, c);
+					await this.Write(false, Buf, 0, c);
+					Pos += c;
+				}
+
+				await this.SendResponse();
+			}
 		}
 
 		private class EncodingResult

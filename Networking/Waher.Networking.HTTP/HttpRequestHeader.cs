@@ -90,14 +90,14 @@ namespace Waher.Networking.HTTP
 			int i = Row.IndexOf(' ');
 			if (i > 0)
 			{
-				this.method = Row[..i].ToUpper();
+				this.method = Row.Substring(0, i).ToUpper();
 
 				int j = Row.LastIndexOf(' ');
 				if (j > 0 && j < Row.Length - 5 && Row.Substring(j + 1, 5) == "HTTP/")
 				{
 					this.SetResource(Row.Substring(i + 1, j - i - 1).Trim(), VanityResources);
-					
-					if (!CommonTypes.TryParse(Row[(j + 6)..], out this.httpVersion))
+
+					if (!CommonTypes.TryParse(Row.Substring(j + 6), out this.httpVersion))
 						this.httpVersion = -1;
 				}
 			}
@@ -117,14 +117,14 @@ namespace Waher.Networking.HTTP
 			int i = this.resource.IndexOf('?');
 			if (i >= 0)
 			{
-				this.queryString = this.resource[(i + 1)..];
-				this.resource = this.resource[..i];
+				this.queryString = this.resource.Substring(i + 1);
+				this.resource = this.resource.Substring(0, i);
 
 				i = this.queryString.IndexOf('#');
 				if (i >= 0)
 				{
-					this.fragment = this.queryString[(i + 1)..];
-					this.queryString = this.queryString[..i];
+					this.fragment = this.queryString.Substring(i + 1);
+					this.queryString = this.queryString.Substring(0, i);
 				}
 
 				this.query = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
@@ -141,8 +141,8 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						Key = Part[..i];
-						Name = Part[(i + 1)..];
+						Key = Part.Substring(0, i);
+						Name = Part.Substring(i + 1);
 						this.query[Key] = Name;
 						Parameters.Add(new KeyValuePair<string, string>(Key, Name));
 					}
@@ -155,8 +155,8 @@ namespace Waher.Networking.HTTP
 				i = this.resource.IndexOf('#');
 				if (i >= 0)
 				{
-					this.fragment = this.resource[(i + 1)..];
-					this.resource = this.resource[..i];
+					this.fragment = this.resource.Substring(i + 1);
+					this.resource = this.resource.Substring(0, i);
 				}
 			}
 		}

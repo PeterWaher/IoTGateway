@@ -31,13 +31,13 @@ using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-    /// <summary>
-    /// Implements an XMPP concentrator server interface.
-    /// 
-    /// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
-    /// https://neuro-foundation.io
-    /// </summary>
-    public class ConcentratorServer : XmppExtension
+	/// <summary>
+	/// Implements an XMPP concentrator server interface.
+	/// 
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
+	/// </summary>
+	public class ConcentratorServer : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0
@@ -2809,7 +2809,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			if (Object is IDisposableAsync DisposableAsync)
 				return DisposableAsync.DisposeAsync();
-			
+
 			if (Object is IDisposable Disposable)
 				Disposable.Dispose();
 

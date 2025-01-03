@@ -489,7 +489,7 @@ namespace Waher.Networking.HTTP
 				switch (this.http2State)
 				{
 					case 0: // Frame length MSB
-						if (End - Offset >= 9)	// Entire header in buffer
+						if (End - Offset >= 9)  // Entire header in buffer
 						{
 							this.http2FrameLength = Buffer[Offset++];
 							this.http2FrameLength <<= 8;

@@ -96,7 +96,7 @@ namespace Waher.Networking.HTTP
 				if (j > 0 && j < Row.Length - 5 && Row.Substring(j + 1, 5) == "HTTP/")
 				{
 					this.SetResource(Row.Substring(i + 1, j - i - 1).Trim(), VanityResources);
-					
+
 					if (!CommonTypes.TryParse(Row.Substring(j + 6), out this.httpVersion))
 						this.httpVersion = -1;
 				}

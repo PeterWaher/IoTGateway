@@ -953,7 +953,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			await this.BeginWriteRaw(true, Frame, true, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
-			this.connection?.TransmitBinary(true,Frame);
+			this.connection?.TransmitBinary(true, Frame);
 		}
 
 		/// <summary>
@@ -1029,7 +1029,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			await this.BeginWriteRaw(true, Frame, false, null, null);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
-			this.connection?.TransmitBinary(true,Frame);
+			this.connection?.TransmitBinary(true, Frame);
 		}
 
 		/// <summary>

@@ -19,7 +19,7 @@ namespace Waher.Script.Test
 	{
 		private static string LoadTextResource(string FileName)
 		{
-			return Files.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
+			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
 		}
 
 		private static TurtleDocument LoadTurtleResource(string FileName)

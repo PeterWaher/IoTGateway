@@ -33,7 +33,7 @@ namespace Waher.Runtime.Console.Worker
 			await System.Console.Out.FlushAsync();
 
 			if (this.terminate)
-				await ConsoleWorker.Terminate();
+				_ = Task.Run(async () => await ConsoleWorker.Terminate());
 
 			this.result.TrySetResult(true);
 		}

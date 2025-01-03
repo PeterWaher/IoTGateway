@@ -262,7 +262,7 @@ namespace Waher.Networking.XMPP
 		private int inputState = 0;
 		private int inputDepth = 0;
 		private int defaultRetryTimeout = 5000;
-		private int defaultNrRetries = 5;
+		private int defaultNrRetries = 0;
 		private int defaultMaxRetryTimeout = int.MaxValue;
 		private int maxAssuredMessagesPendingFromSource = 5;
 		private int maxAssuredMessagesPendingTotal = 100;

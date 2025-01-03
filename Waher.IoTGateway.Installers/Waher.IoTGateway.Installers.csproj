@@ -142,7 +142,12 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\TypeAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Certificates.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\FileNameTimeSequence.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Files.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Resources.cs" />
     <Compile Include=".bak\Waher.Runtime.IO\StreamExtensions.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Strings.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />
     <Compile Include=".bak\Waher.Runtime.Text\Difference.cs" />
@@ -335,7 +340,6 @@
     <Compile Include=".bak\Waher.Content\IFileNameResource.cs" />
     <Compile Include=".bak\Waher.Content\InternetContent.cs" />
     <Compile Include=".bak\Waher.Content\JSON.cs" />
-    <Compile Include=".bak\Waher.Content\Resources.cs" />
     <Compile Include=".bak\Waher.Events\Event.cs" />
     <Compile Include=".bak\Waher.Events\EventLevel.cs" />
     <Compile Include=".bak\Waher.Events\EventSink.cs" />

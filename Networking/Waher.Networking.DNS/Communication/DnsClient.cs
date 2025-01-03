@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Timing;
 

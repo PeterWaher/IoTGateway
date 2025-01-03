@@ -2,7 +2,7 @@
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Security.ChaChaPoly
 {

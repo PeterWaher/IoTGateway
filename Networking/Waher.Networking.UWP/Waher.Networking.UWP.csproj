@@ -176,6 +176,10 @@
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj">
+      <Project>{3b744b26-affc-450d-9d21-0291299c5281}</Project>
+      <Name>Waher.Runtime.IO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj">
       <Project>{1adfb1fd-e9fc-41e0-a3d4-d0db91adcd59}</Project>
       <Name>Waher.Runtime.Queue</Name>

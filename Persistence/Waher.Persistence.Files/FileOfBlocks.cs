@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files

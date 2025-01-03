@@ -523,14 +523,14 @@ namespace Waher.Networking
 						try
 						{
 							this.Warning("Connection rejected from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+
+							await Connection.Client.DisposeAsync();
 						}
 						catch (Exception ex2)
 						{
 							Log.Exception(ex2);
 						}
 					});
-
-					Connection.Client.Dispose();
 				}
 			}
 			catch (SocketException)

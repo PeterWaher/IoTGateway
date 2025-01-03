@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.Sniffers
 {
@@ -197,7 +197,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected override async Task BeforeWrite()
 		{
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 			string s = GetFileName(this.fileName, TP);
 			this.lastEvent = TP;
 
@@ -277,7 +277,7 @@ namespace Waher.Networking.Sniffers
 
 				foreach (string FileName in Files)
 				{
-					if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+					if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
 					{
 						try
 						{

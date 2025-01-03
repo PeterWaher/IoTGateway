@@ -13,24 +13,30 @@ namespace Waher.Networking.HTTP.HTTP2
 		private byte[] buffer;
 		private int bufferSize;
 		private int pos;
+		private bool constantBuffer;
 
 		/// <summary>
 		/// Deserializes binary data
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Input buffer.</param>
-		public BinaryReader(byte[] Buffer)
-			: this(Buffer, 0, Buffer.Length)
+		public BinaryReader(bool ConstantBuffer, byte[] Buffer)
+			: this(ConstantBuffer, Buffer, 0, Buffer.Length)
 		{
 		}
 
 		/// <summary>
 		/// Deserializes binary data
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="Offset">Start reading at this position.</param>
 		/// <param name="Count">Number of bytes to read.</param>
-		public BinaryReader(byte[] Buffer, int Offset, int Count)
+		public BinaryReader(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
+			this.constantBuffer = ConstantBuffer;
 			this.bufferSize = Offset + Count;
 			this.buffer = Buffer;
 			this.pos = Offset;
@@ -47,22 +53,33 @@ namespace Waher.Networking.HTTP.HTTP2
 		public byte[] Buffer => this.buffer;
 
 		/// <summary>
+		/// If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).
+		/// </summary>
+		public bool ConstantBuffer => this.constantBuffer;
+
+		/// <summary>
 		/// Resets the writer for a new header, without clearing the dynamic header table.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Input buffer.</param>
-		public void Reset(byte[] Buffer)
+		public void Reset(bool ConstantBuffer, byte[] Buffer)
 		{
-			this.Reset(Buffer, 0, Buffer.Length);
+			this.Reset(ConstantBuffer, Buffer, 0, Buffer.Length);
 		}
 
 		/// <summary>
 		/// Resets the writer for a new header, without clearing the dynamic header table.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Input buffer.</param>
 		/// <param name="Offset">Start reading at this position.</param>
 		/// <param name="Count">Number of bytes to read.</param>
-		public void Reset(byte[] Buffer, int Offset, int Count)
+		public void Reset(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
+			this.constantBuffer = ConstantBuffer;
 			this.bufferSize = Offset + Count;
 			this.buffer = Buffer;
 			this.pos = Offset;

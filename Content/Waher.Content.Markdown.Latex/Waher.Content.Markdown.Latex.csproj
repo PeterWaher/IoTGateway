@@ -35,6 +35,7 @@ https://waher.se/Markdown.md</Description>
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj" />
   </ItemGroup>

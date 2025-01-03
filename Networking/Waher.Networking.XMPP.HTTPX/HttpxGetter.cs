@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.HTTPX

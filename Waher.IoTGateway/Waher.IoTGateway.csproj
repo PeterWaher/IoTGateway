@@ -380,6 +380,7 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Queue\Waher.Runtime.Queue.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj" />

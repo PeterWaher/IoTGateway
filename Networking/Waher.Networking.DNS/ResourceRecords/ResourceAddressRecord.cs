@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Persistence.Attributes;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.DNS.ResourceRecords
 {

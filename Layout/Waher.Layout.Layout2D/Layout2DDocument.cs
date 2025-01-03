@@ -15,6 +15,7 @@ using Waher.Layout.Layout2D.Model;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Backgrounds;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP.HTTP2;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.WebSockets

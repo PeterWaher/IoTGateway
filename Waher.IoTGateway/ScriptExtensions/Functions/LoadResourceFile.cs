@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;

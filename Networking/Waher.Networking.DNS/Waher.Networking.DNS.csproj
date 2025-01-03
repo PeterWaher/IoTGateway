@@ -36,6 +36,7 @@
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />

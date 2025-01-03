@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
 {

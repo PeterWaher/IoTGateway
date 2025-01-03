@@ -140,9 +140,9 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonKey.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
-    <Compile Include=".bak\Waher.Runtime.Inventory\StreamExtensions.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\TypeAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\StreamExtensions.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />
     <Compile Include=".bak\Waher.Runtime.Text\Difference.cs" />
@@ -733,6 +733,7 @@
   <Import Project="$(WixCATargetsPath)" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Runtime\Waher.Runtime.Inventory\*.cs" "$(ProjectDir).bak\Waher.Runtime.Inventory" /S /Y
+xcopy "$(SolutionDir)Runtime\Waher.Runtime.IO\*.cs" "$(ProjectDir).bak\Waher.Runtime.IO" /S /Y
 xcopy "$(SolutionDir)Runtime\Waher.Runtime.Temporary\*.cs" "$(ProjectDir).bak\Waher.Runtime.Temporary" /S /Y
 xcopy "$(SolutionDir)Runtime\Waher.Runtime.Text\*.cs" "$(ProjectDir).bak\Waher.Runtime.Text" /S /Y
 xcopy "$(SolutionDir)Events\Waher.Events\*.cs" "$(ProjectDir).bak\Waher.Events" /S /Y

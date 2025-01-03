@@ -17,7 +17,7 @@ using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 #if WINDOWS_UWP

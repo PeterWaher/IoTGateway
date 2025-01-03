@@ -62,29 +62,29 @@ namespace Waher.Client.WPF
 	{
 		public const string WindowTitle = "Simple XMPP IoT Client";
 
-		public static RoutedUICommand Add = new RoutedUICommand("Add", "Add", typeof(MainWindow));
-		public static RoutedUICommand Edit = new RoutedUICommand("Edit", "Edit", typeof(MainWindow));
-		public static RoutedUICommand Delete = new RoutedUICommand("Delete", "Delete", typeof(MainWindow));
-		public static RoutedUICommand Copy = new RoutedUICommand("Copy", "Copy", typeof(MainWindow));
-		public static RoutedUICommand Paste = new RoutedUICommand("Paste", "Paste", typeof(MainWindow));
-		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
-		public static RoutedUICommand Refresh = new RoutedUICommand("Refresh", "Refresh", typeof(MainWindow));
-		public static RoutedUICommand Sniff = new RoutedUICommand("Sniff", "Sniff", typeof(MainWindow));
-		public static RoutedUICommand EventLog = new RoutedUICommand("EventLog", "EventLog", typeof(MainWindow));
-		public static RoutedUICommand CloseTab = new RoutedUICommand("Close Tab", "CloseTab", typeof(MainWindow));
-		public static RoutedUICommand Chat = new RoutedUICommand("Chat", "Chat", typeof(MainWindow));
-		public static RoutedUICommand ReadMomentary = new RoutedUICommand("Read Momentary", "ReadMomentary", typeof(MainWindow));
-		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
-		public static RoutedUICommand SubscribeToMomentary = new RoutedUICommand("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
-		public static RoutedUICommand Configure = new RoutedUICommand("Configure", "Configure", typeof(MainWindow));
-		public static RoutedUICommand Search = new RoutedUICommand("Search", "Search", typeof(MainWindow));
-		public static RoutedUICommand Script = new RoutedUICommand("Script", "Script", typeof(MainWindow));
+		public static RoutedUICommand Add = new("Add", "Add", typeof(MainWindow));
+		public static RoutedUICommand Edit = new("Edit", "Edit", typeof(MainWindow));
+		public static RoutedUICommand Delete = new("Delete", "Delete", typeof(MainWindow));
+		public static RoutedUICommand Copy = new("Copy", "Copy", typeof(MainWindow));
+		public static RoutedUICommand Paste = new("Paste", "Paste", typeof(MainWindow));
+		public static RoutedUICommand ConnectTo = new("Connect To", "ConnectTo", typeof(MainWindow));
+		public static RoutedUICommand Refresh = new("Refresh", "Refresh", typeof(MainWindow));
+		public static RoutedUICommand Sniff = new("Sniff", "Sniff", typeof(MainWindow));
+		public static RoutedUICommand EventLog = new("EventLog", "EventLog", typeof(MainWindow));
+		public static RoutedUICommand CloseTab = new("Close Tab", "CloseTab", typeof(MainWindow));
+		public static RoutedUICommand Chat = new("Chat", "Chat", typeof(MainWindow));
+		public static RoutedUICommand ReadMomentary = new("Read Momentary", "ReadMomentary", typeof(MainWindow));
+		public static RoutedUICommand ReadDetailed = new("Read Detailed", "ReadDetailed", typeof(MainWindow));
+		public static RoutedUICommand SubscribeToMomentary = new("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
+		public static RoutedUICommand Configure = new("Configure", "Configure", typeof(MainWindow));
+		public static RoutedUICommand Search = new("Search", "Search", typeof(MainWindow));
+		public static RoutedUICommand Script = new("Script", "Script", typeof(MainWindow));
 
 		internal static MainWindow currentInstance = null;
 		private static string appDataFolder = null;
 		private static FilesProvider databaseProvider = null;
-		private static Scheduler scheduler = new Scheduler();
-		private static readonly LinkedList<GuiUpdateTask> guiUpdateQueue = new LinkedList<GuiUpdateTask>();
+		private static Scheduler scheduler = new();
+		private static readonly LinkedList<GuiUpdateTask> guiUpdateQueue = new();
 
 		public MainWindow()
 		{
@@ -272,12 +272,15 @@ namespace Waher.Client.WPF
 			Registry.SetValue(registryKey, "WindowState", this.WindowState.ToString(), RegistryValueKind.String);
 			Registry.SetValue(registryKey, "FileName", this.MainView.FileName, RegistryValueKind.String);
 
-			Log.Terminate();
+			Log.TerminateAsync().Wait();
 
-			databaseProvider?.Stop()?.Wait();
-			databaseProvider?.Flush()?.Wait();
-			databaseProvider?.Dispose();
-			databaseProvider = null;
+			if (!(databaseProvider is null))
+			{
+				databaseProvider.Stop().Wait();
+				databaseProvider.Flush().Wait();
+				databaseProvider.DisposeAsync().Wait();
+				databaseProvider = null;
+			}
 		}
 
 		private void ConnectTo_Executed(object Sender, ExecutedRoutedEventArgs e)
@@ -643,12 +646,12 @@ namespace Waher.Client.WPF
 			TabItem TabItem = NewTab(Node.Header);
 			this.Tabs.Items.Add(TabItem);
 
-			View = new ChatView(Node, Node is RoomNode);
+			View = new(Node, Node is RoomNode);
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
 
-			Thread T = new Thread(this.FocusChatInput);
+			Thread T = new(this.FocusChatInput);
 			T.Start(View);
 		}
 
@@ -669,7 +672,7 @@ namespace Waher.Client.WPF
 		{
 			try
 			{
-				SortedDictionary<int, int> ByState = new SortedDictionary<int, int>(reverseInt32);
+				SortedDictionary<int, int> ByState = new(reverseInt32);
 				int i = 0;
 				int c = 0;
 
@@ -695,7 +698,7 @@ namespace Waher.Client.WPF
 					this.MainView.ShowStatus(StateToString((XmppState)i));
 				else
 				{
-					StringBuilder sb = new StringBuilder();
+					StringBuilder sb = new();
 					bool First = true;
 
 					foreach (KeyValuePair<int, int> P in ByState)
@@ -750,7 +753,7 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private static readonly ReverseInt32 reverseInt32 = new ReverseInt32();
+		private static readonly ReverseInt32 reverseInt32 = new();
 
 		public Task OnChatMessage(object Sender, MessageEventArgs e)
 		{
@@ -853,7 +856,7 @@ namespace Waher.Client.WPF
 						TabItem TabItem2 = NewTab(FromBareJid);
 						this.Tabs.Items.Add(TabItem2);
 
-						ChatView ChatView = new ChatView(ContactNode, false);
+						ChatView ChatView = new(ContactNode, false);
 						TabItem2.Content = ChatView;
 
 						await ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
@@ -879,7 +882,7 @@ namespace Waher.Client.WPF
 							TabItem TabItem2 = NewTab(FromBareJid);
 							this.Tabs.Items.Add(TabItem2);
 
-							ChatView ChatView = new ChatView(ContactNode, false);
+							ChatView ChatView = new(ContactNode, false);
 							TabItem2.Content = ChatView;
 
 							await ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
@@ -926,7 +929,7 @@ namespace Waher.Client.WPF
 				TabItem TabItem2 = NewTab(Title);
 				this.Tabs.Items.Add(TabItem2);
 
-				ChatView = new ChatView(Node, true);
+				ChatView = new(Node, true);
 				TabItem2.Content = ChatView;
 			}
 
@@ -979,7 +982,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem2 = NewTab(Title);
 			this.Tabs.Items.Add(TabItem2);
 
-			ChatView ChatView2 = new ChatView(Node, true);
+			ChatView ChatView2 = new(Node, true);
 			TabItem2.Content = ChatView2;
 
 			await ChatView2.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
@@ -1000,7 +1003,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem2 = NewTab(Title);
 			this.Tabs.Items.Add(TabItem2);
 
-			ChatView ChatView2 = new ChatView(Node, true);
+			ChatView ChatView2 = new(Node, true);
 			TabItem2.Content = ChatView2;
 		}
 
@@ -1010,7 +1013,7 @@ namespace Waher.Client.WPF
 			{
 				if (Item.Content is ChatView View)
 				{
-					Thread T = new Thread(this.FocusChatInput);
+					Thread T = new(this.FocusChatInput);
 					T.Start(View);
 				}
 			}
@@ -1037,7 +1040,7 @@ namespace Waher.Client.WPF
 				TabItem TabItem = NewTab(Node.Header);
 				this.Tabs.Items.Add(TabItem);
 
-				SensorDataView View = new SensorDataView(Request, Node, false);
+				SensorDataView View = new(Request, Node, false);
 				TabItem.Content = View;
 
 				this.Tabs.SelectedItem = TabItem;
@@ -1069,7 +1072,7 @@ namespace Waher.Client.WPF
 				TabItem TabItem = NewTab(Node.Header);
 				this.Tabs.Items.Add(TabItem);
 
-				SensorDataView View = new SensorDataView(Request, Node, false);
+				SensorDataView View = new(Request, Node, false);
 				TabItem.Content = View;
 
 				this.Tabs.SelectedItem = TabItem;
@@ -1099,7 +1102,7 @@ namespace Waher.Client.WPF
 				if (Node.CanReadSensorData)
 					Request = await Node.StartSensorDataMomentaryReadout();
 				else
-					Request = await Node.SubscribeSensorDataMomentaryReadout(new FieldSubscriptionRule[0]);
+					Request = await Node.SubscribeSensorDataMomentaryReadout([]);
 
 				if (Request is null)
 					return;
@@ -1107,7 +1110,7 @@ namespace Waher.Client.WPF
 				TabItem TabItem = NewTab(Node.Header);
 				this.Tabs.Items.Add(TabItem);
 
-				SensorDataView View = new SensorDataView(Request, Node, true);
+				SensorDataView View = new(Request, Node, true);
 				TabItem.Content = View;
 
 				this.Tabs.SelectedItem = TabItem;
@@ -1202,7 +1205,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = NewTab("Script");
 			this.Tabs.Items.Add(TabItem);
 
-			ScriptView ScriptView = new ScriptView();
+			ScriptView ScriptView = new();
 			TabItem.Content = ScriptView;
 
 			this.Tabs.SelectedItem = TabItem;
@@ -1222,7 +1225,7 @@ namespace Waher.Client.WPF
 			{
 				try
 				{
-					LinkedList<Question> Questions = new LinkedList<Question>();
+					LinkedList<Question> Questions = new();
 					bool Found = Question is null;
 
 					foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(
@@ -1292,7 +1295,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = NewTab("Questions (" + Owner.BareJID + ")");
 			this.Tabs.Items.Add(TabItem);
 
-			QuestionView QuestionView = new QuestionView(Owner, ProvisioningClient);
+			QuestionView QuestionView = new(Owner, ProvisioningClient);
 			TabItem.Content = QuestionView;
 
 			return QuestionView;
@@ -1305,7 +1308,7 @@ namespace Waher.Client.WPF
 
 		internal static TabItem NewTab(string HeaderText, out TextBlock HeaderLabel)
 		{
-			TabItem Result = new TabItem();
+			TabItem Result = new();
 			NewHeader(HeaderText, Result, out HeaderLabel);
 			return Result;
 		}
@@ -1317,12 +1320,12 @@ namespace Waher.Client.WPF
 
 		internal static void NewHeader(string HeaderText, TabItem Tab, out TextBlock HeaderLabel)
 		{
-			StackPanel Header = new StackPanel()
+			StackPanel Header = new()
 			{
 				Orientation = Orientation.Horizontal
 			};
 
-			Image CloseImage = new Image()
+			Image CloseImage = new()
 			{
 				Source = new BitmapImage(new Uri("../Graphics/symbol-delete-icon-gray.png", UriKind.Relative)),
 				Width = 16,
@@ -1420,7 +1423,7 @@ namespace Waher.Client.WPF
 		private static void UpdateGui(GuiDelegateWithParameter Method, string Name, object State)
 		{
 			bool Start;
-			GuiUpdateTask Rec = new GuiUpdateTask()
+			GuiUpdateTask Rec = new()
 			{
 				Method = Method,
 				State = State,

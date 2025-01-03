@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Threading;
 using Waher.Runtime.Temporary;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.XMPP.InBandBytestreams
 {

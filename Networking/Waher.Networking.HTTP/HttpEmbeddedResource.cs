@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
 {

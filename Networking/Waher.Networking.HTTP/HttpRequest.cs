@@ -8,7 +8,7 @@ using Waher.Content;
 using Waher.Content.Binary;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.HTTP2;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
 

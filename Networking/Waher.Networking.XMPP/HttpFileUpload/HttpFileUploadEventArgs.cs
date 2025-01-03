@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.XMPP.HttpFileUpload
 {

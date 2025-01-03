@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
 

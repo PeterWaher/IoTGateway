@@ -88,7 +88,7 @@ namespace Waher.Networking.Sniffers
 				this.output = null;
 			}
 
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 			string s = XmlFileSniffer.GetFileName(this.fileName, TP);
 
 			if (File.Exists(s))
@@ -107,7 +107,7 @@ namespace Waher.Networking.Sniffers
 
 					foreach (string FileName in Files)
 					{
-						if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+						if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
 						{
 							try
 							{

@@ -11,7 +11,6 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Profiling;
-using Waher.Script;
 
 namespace Waher.Persistence.XmlLedger
 {

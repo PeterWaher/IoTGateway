@@ -3,6 +3,7 @@ using System.Reflection;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using System.Threading.Tasks;
 using System.Text;
 

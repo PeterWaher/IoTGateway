@@ -240,7 +240,7 @@ namespace Waher.Networking.HTTP
 			this.sessions.Removed += this.Sessions_Removed;
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout, true);
 			this.currentRequests.Removed += this.CurrentRequests_Removed;
-			this.lastStat = DateTime.Now;
+			this.lastStat = DateTime.UtcNow;
 			this.adaptToNetworkChanges = AdaptToNetworkChanges;
 
 			this.httpPorts = new int[0];
@@ -1852,7 +1852,7 @@ namespace Waher.Networking.HTTP
 		public CommunicationStatistics GetCommunicationStatisticsSinceLast()
 		{
 			CommunicationStatistics Result;
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 
 			lock (this.statSynch)
 			{
@@ -1884,7 +1884,7 @@ namespace Waher.Networking.HTTP
 
 		private class RequestInfo
 		{
-			public DateTime Received = DateTime.Now;
+			public DateTime Received = DateTime.UtcNow;
 			public HttpResource Resource;
 			public string ClientAddress;
 			public string SubPath;

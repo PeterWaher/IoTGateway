@@ -4,8 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
-using Waher.Runtime.Inventory;
-using Waher.Runtime.Temporary;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Latex.Multimedia
 {

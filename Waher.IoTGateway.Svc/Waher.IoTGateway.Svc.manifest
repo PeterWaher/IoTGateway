@@ -453,6 +453,9 @@
 	<Assembly fileName="Waher.Runtime.Inventory.Loader.dll" />
 	<Assembly fileName="Waher.Runtime.Inventory.Loader.pdb" />
 	<Assembly fileName="Waher.Runtime.Inventory.Loader.xml" />
+	<Assembly fileName="Waher.Runtime.IO.dll" />
+	<Assembly fileName="Waher.Runtime.IO.pdb" />
+	<Assembly fileName="Waher.Runtime.IO.xml" />
 	<Assembly fileName="Waher.Runtime.Language.dll" />
 	<Assembly fileName="Waher.Runtime.Language.pdb" />
 	<Assembly fileName="Waher.Runtime.Language.xml" />

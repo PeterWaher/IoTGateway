@@ -665,6 +665,17 @@ namespace Waher.Networking
 		public event EventHandlerAsync OnPaused;
 
 		/// <summary>
+		/// Clears the <see cref="OnPaused"/> event handler.
+		/// </summary>
+		public void OnPausedClear() => this.OnPaused = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnPaused"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnPausedReset(EventHandlerAsync EventHandler) => this.OnPaused = EventHandler;
+
+		/// <summary>
 		/// Method called when the connection has been disconnected.
 		/// </summary>
 		protected virtual Task Disconnected()
@@ -733,14 +744,47 @@ namespace Waher.Networking
 		public event BinaryDataReadEventHandler OnReceived;
 
 		/// <summary>
+		/// Clears the <see cref="OnReceived"/> event handler.
+		/// </summary>
+		public void OnReceivedClear() => this.OnReceived = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnReceived"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnReceivedReset(BinaryDataReadEventHandler EventHandler) => this.OnReceived = EventHandler;
+
+		/// <summary>
 		/// Event raised when an error has occurred.
 		/// </summary>
 		public event EventHandlerAsync<Exception> OnError;
 
 		/// <summary>
+		/// Clears the <see cref="OnError"/> event handler.
+		/// </summary>
+		public void OnErrorClear() => this.OnError = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnError"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnErrorReset(EventHandlerAsync<Exception> EventHandler) => this.OnError = EventHandler;
+
+		/// <summary>
 		/// Event raised when the connection has been disconnected.
 		/// </summary>
 		public event EventHandlerAsync OnDisconnected;
+
+		/// <summary>
+		/// Clears the <see cref="OnDisconnected"/> event handler.
+		/// </summary>
+		public void OnDisconnectedClear() => this.OnDisconnected = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnDisconnected"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnDisconnectedReset(EventHandlerAsync EventHandler) => this.OnDisconnected = EventHandler;
 
 		/// <summary>
 		/// Sends a binary packet.
@@ -1198,6 +1242,17 @@ namespace Waher.Networking
 		public event EventHandlerAsync OnWriteQueueEmpty = null;
 
 		/// <summary>
+		/// Clears the <see cref="OnWriteQueueEmpty"/> event handler.
+		/// </summary>
+		public void OnWriteQueueEmptyClear() => this.OnWriteQueueEmpty = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnWriteQueueEmpty"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnWriteQueueEmptyReset(EventHandlerAsync EventHandler) => this.OnWriteQueueEmpty = EventHandler;
+
+		/// <summary>
 		/// Method called when binary data has been sent.
 		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
@@ -1219,6 +1274,17 @@ namespace Waher.Networking
 		/// Event raised when a packet has been sent.
 		/// </summary>
 		public event BinaryDataWrittenEventHandler OnSent;
+
+		/// <summary>
+		/// Clears the <see cref="OnSent"/> event handler.
+		/// </summary>
+		public void OnSentClear() => this.OnSent = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnSent"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnSentReset(BinaryDataWrittenEventHandler EventHandler) => this.OnSent = EventHandler;
 
 		/// <summary>
 		/// Flushes any pending or intermediate data.

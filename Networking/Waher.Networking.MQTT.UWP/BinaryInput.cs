@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.MQTT
 {

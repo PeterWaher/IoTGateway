@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Binary
 {

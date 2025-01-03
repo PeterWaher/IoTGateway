@@ -32,6 +32,7 @@ Script Syntax: https://waher.se/Script.md#contentRelatedFunctionsWaherScriptCont
     <ProjectReference Include="..\..\Content\Waher.Content.QR\Waher.Content.QR.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />

@@ -12,7 +12,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 using Waher.Security;

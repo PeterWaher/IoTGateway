@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Security;
 
 namespace Waher.IoTGateway.Setup

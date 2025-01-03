@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Security;
 

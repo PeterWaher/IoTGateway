@@ -20,6 +20,7 @@ using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Security.CallStack;
 
 #pragma warning disable CA1416 // Validate platform compatibility
@@ -65,42 +66,44 @@ namespace Waher.IoTGateway.Svc
 				if (e.IsTerminating)
 				{
 					string FileName = Path.Combine(Gateway.AppDataFolder, "UnhandledException.txt");
-					Networking.Sniffers.XmlFileSniffer.MakeUnique(ref FileName);
 
-					using StreamWriter w = File.CreateText(FileName);
-					w.Write("Type: ");
-
-					if (e.ExceptionObject is not null)
-						w.WriteLine(e.ExceptionObject.GetType().FullName);
-					else
-						w.WriteLine("null");
-
-					w.Write("Time: ");
-					w.WriteLine(DateTime.Now.ToString());
-
-					w.WriteLine();
-					if (e.ExceptionObject is Exception ex)
+					if (FileNameTimeSequence.MakeUnique(ref FileName))
 					{
-						while (ex is not null)
-						{
-							w.WriteLine(ex.Message);
-							w.WriteLine();
-							w.WriteLine(Log.CleanStackTrace(ex.StackTrace));
-							w.WriteLine();
+						using StreamWriter w = File.CreateText(FileName);
+						w.Write("Type: ");
 
-							ex = ex.InnerException;
-						}
-					}
-					else
-					{
 						if (e.ExceptionObject is not null)
-							w.WriteLine(e.ExceptionObject.ToString());
+							w.WriteLine(e.ExceptionObject.GetType().FullName);
+						else
+							w.WriteLine("null");
+
+						w.Write("Time: ");
+						w.WriteLine(DateTime.Now.ToString());
 
 						w.WriteLine();
-						w.WriteLine(Log.CleanStackTrace(Environment.StackTrace));
-					}
+						if (e.ExceptionObject is Exception ex)
+						{
+							while (ex is not null)
+							{
+								w.WriteLine(ex.Message);
+								w.WriteLine();
+								w.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+								w.WriteLine();
 
-					w.Flush();
+								ex = ex.InnerException;
+							}
+						}
+						else
+						{
+							if (e.ExceptionObject is not null)
+								w.WriteLine(e.ExceptionObject.ToString());
+
+							w.WriteLine();
+							w.WriteLine(Log.CleanStackTrace(Environment.StackTrace));
+						}
+
+						w.Flush();
+					}
 
 					if (e.ExceptionObject is Exception ex2)
 						Log.Emergency(ex2);

@@ -19,6 +19,7 @@ namespace Waher.Networking.Sniffers
 
 		private readonly MultiReadSingleWriteObject semaphore;
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
+		private DateTime lastEvent = DateTime.MinValue;
 		private bool disposed = false;
 
 		/// <summary>
@@ -32,6 +33,11 @@ namespace Waher.Networking.Sniffers
 			this.output = Output;
 			this.binaryPresentationMethod = BinaryPresentationMethod;
 		}
+
+		/// <summary>
+		/// Timestamp of Last event
+		/// </summary>
+		public DateTime LastEvent => this.lastEvent;
 
 		/// <summary>
 		/// Method is called before writing something to the text file.
@@ -55,6 +61,8 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Event">Sniffer event.</param>
 		public override Task Process(SnifferRxBinary Event)
 		{
+			this.lastEvent = Event.Timestamp;
+
 			return this.HexOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Rx");
 		}
 

@@ -15,9 +15,7 @@ namespace Waher.Networking.Sniffers
 	{
 		private readonly XmlWriterSettings settings;
 		private StreamWriter file;
-		private DateTime lastEvent = DateTime.MinValue;
-		private readonly string fileName;
-		private string lastFileName = null;
+		private readonly FileNameTimeSequence fileSequence;
 		private readonly string transform = null;
 		private readonly int deleteAfterDays;
 
@@ -107,7 +105,7 @@ namespace Waher.Networking.Sniffers
 		{
 			this.file = null;
 			this.output = null;
-			this.fileName = FileName;
+			this.fileSequence = new FileNameTimeSequence(FileName, true);
 			this.transform = Transform;
 			this.deleteAfterDays = DeleteAfterDays;
 
@@ -137,7 +135,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// File Name.
 		/// </summary>
-		public string FileName => this.fileName;
+		public string FileName => this.fileSequence.FileNamePattern;
 
 		/// <summary>
 		/// Transform to use.
@@ -145,63 +143,11 @@ namespace Waher.Networking.Sniffers
 		public string Transform => this.transform;
 
 		/// <summary>
-		/// Timestamp of Last event
-		/// </summary>
-		public DateTime LastEvent => this.lastEvent;
-
-		/// <summary>
-		/// Gets the name of a file, given a file name template.
-		/// </summary>
-		/// <param name="TemplateFileName">File Name template.</param>
-		/// <param name="TP">Timestamp</param>
-		/// <returns>File name</returns>
-		public static string GetFileName(string TemplateFileName, DateTime TP)
-		{
-			return TemplateFileName.
-				Replace("%YEAR%", TP.Year.ToString("D4")).
-				Replace("%MONTH%", TP.Month.ToString("D2")).
-				Replace("%DAY%", TP.Day.ToString("D2")).
-				Replace("%HOUR%", TP.Hour.ToString("D2")).
-				Replace("%MINUTE%", TP.Minute.ToString("D2")).
-				Replace("%SECOND%", TP.Second.ToString("D2"));
-		}
-
-		/// <summary>
-		/// Makes a file name unique.
-		/// </summary>
-		/// <param name="FileName">File name.</param>
-		public static void MakeUnique(ref string FileName)
-		{
-			if (File.Exists(FileName))
-			{
-				int i = FileName.LastIndexOf('.');
-				int j = 2;
-
-				if (i < 0)
-					i = FileName.Length;
-
-				string s;
-
-				do
-				{
-					s = FileName.Insert(i, " (" + (j++).ToString() + ")");
-				}
-				while (File.Exists(s));
-
-				FileName = s;
-			}
-		}
-
-		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
 		protected override async Task BeforeWrite()
 		{
-			DateTime TP = DateTime.UtcNow;
-			string s = GetFileName(this.fileName, TP);
-			this.lastEvent = TP;
-
-			if (!(this.lastFileName is null) && this.lastFileName == s && !(this.file is null) && this.file.BaseStream.CanWrite)
+			if (!this.fileSequence.TryGetNewFileName(out string s))
 				return;
 
 			try
@@ -226,13 +172,9 @@ namespace Waher.Networking.Sniffers
 			this.file = null;
 			this.output = null;
 
-			string s2 = s;
-			MakeUnique(ref s2);
-
 			try
 			{
-				this.file = File.CreateText(s2);
-				this.lastFileName = s;
+				this.file = File.CreateText(s);
 				this.output = XmlWriter.Create(this.file, this.settings);
 			}
 			catch (Exception ex)

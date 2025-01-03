@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Runtime.IO;
 
 namespace Waher.Events.Files
 {
@@ -13,9 +14,8 @@ namespace Waher.Events.Files
 	public class XmlFileEventSink : XmlWriterEventSink
 	{
 		private readonly XmlWriterSettings settings;
+		private readonly FileNameTimeSequence fileSequence;
 		private StreamWriter file;
-		private readonly string fileName;
-		private string lastFileName = null;
 		private readonly string transform = null;
 		private readonly int deleteAfterDays;
 
@@ -105,7 +105,7 @@ namespace Waher.Events.Files
 		{
 			this.file = null;
 			this.output = null;
-			this.fileName = FileName;
+			this.fileSequence = new FileNameTimeSequence(FileName, true);
 			this.transform = Transform;
 			this.deleteAfterDays = DeleteAfterDays;
 
@@ -133,55 +133,11 @@ namespace Waher.Events.Files
 		}
 
 		/// <summary>
-		/// Gets the name of a file, given a file name template.
-		/// </summary>
-		/// <param name="TemplateFileName">File Name template.</param>
-		/// <returns>File name</returns>
-		public static string GetFileName(string TemplateFileName)
-		{
-			DateTime TP = DateTime.Now;
-			return TemplateFileName.
-				Replace("%YEAR%", TP.Year.ToString("D4")).
-				Replace("%MONTH%", TP.Month.ToString("D2")).
-				Replace("%DAY%", TP.Day.ToString("D2")).
-				Replace("%HOUR%", TP.Hour.ToString("D2")).
-				Replace("%MINUTE%", TP.Minute.ToString("D2")).
-				Replace("%SECOND%", TP.Second.ToString("D2"));
-		}
-
-		/// <summary>
-		/// Makes a file name unique.
-		/// </summary>
-		/// <param name="FileName">File name.</param>
-		public static void MakeUnique(ref string FileName)
-		{
-			if (File.Exists(FileName))
-			{
-				int i = FileName.LastIndexOf('.');
-				int j = 2;
-
-				if (i < 0)
-					i = FileName.Length;
-
-				string s;
-
-				do
-				{
-					s = FileName.Insert(i, " (" + (j++).ToString() + ")");
-				}
-				while (File.Exists(s));
-
-				FileName = s;
-			}
-		}
-
-		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
 		protected override async Task BeforeWrite()
 		{
-			string s = GetFileName(this.fileName);
-			if (!(this.lastFileName is null) && this.lastFileName == s && !(this.file is null) && this.file.BaseStream.CanWrite)
+			if (!this.fileSequence.TryGetNewFileName(out string s))
 				return;
 
 			try
@@ -206,11 +162,7 @@ namespace Waher.Events.Files
 			this.file = null;
 			this.output = null;
 
-			string s2 = s;
-
-			MakeUnique(ref s2);
-			this.file = File.CreateText(s2);
-			this.lastFileName = s;
+			this.file = File.CreateText(s);
 
 			this.output = XmlWriter.Create(this.file, this.settings);
 			this.output.WriteStartDocument();

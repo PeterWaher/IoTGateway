@@ -389,7 +389,7 @@ namespace Waher.WebService.Sparql
 					FileName = Path.Combine(Reference.Folder, (++i).ToString());
 					FileName = Path.ChangeExtension(FileName, P.Value);
 
-					await Resources.WriteAllTextAsync(FileName, P.Key);
+					await Runtime.IO.Files.WriteAllTextAsync(FileName, P.Key);
 				}
 
 				await Database.Insert(Reference);
@@ -424,7 +424,7 @@ namespace Waher.WebService.Sparql
 					FileName = Path.Combine(Reference.Folder, (++i).ToString());
 					FileName = Path.ChangeExtension(FileName, P.Value);
 
-					await Resources.WriteAllTextAsync(FileName, P.Key);
+					await Runtime.IO.Files.WriteAllTextAsync(FileName, P.Key);
 				}
 
 				await Database.Update(Reference);

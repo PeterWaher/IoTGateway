@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown
 {
@@ -103,7 +104,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Decoded object.</returns>
 		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 
 			if (BaseUri is null)
 				return new ContentResponse(ContentType, await MarkdownDocument.CreateAsync(s), Data);

@@ -9,13 +9,13 @@
 		<Authors>Peter Waher</Authors>
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
-		<Description>Class library that contains a small set of IO extensions and tools simplifying stream and file management.</Description>
+		<Description>Class library that contains a small set of IO extensions and tools simplifying stream, file, string and certificate management.</Description>
 		<Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
 		<PackageLicenseUrl />
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.IO</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
 		<RepositoryType>GitHub</RepositoryType>
-		<PackageTags>IO extensions streams files</PackageTags>
+		<PackageTags>IO extensions streams files strings certificates</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
 		<AssemblyVersion>1.0.0</AssemblyVersion>
 		<FileVersion>1.0.0</FileVersion>
@@ -39,6 +39,9 @@
 	    <PackagePath></PackagePath>
 	    <Pack>True</Pack>
 	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
 	</ItemGroup>
 
 </Project>

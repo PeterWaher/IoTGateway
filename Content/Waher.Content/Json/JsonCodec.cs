@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content.Json
@@ -93,7 +94,7 @@ namespace Waher.Content.Json
         /// <returns>Decoded object.</returns>
         public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
         {
-            string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+            string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
             return Task.FromResult(new ContentResponse(ContentType, JSON.Parse(s), Data));
         }
 

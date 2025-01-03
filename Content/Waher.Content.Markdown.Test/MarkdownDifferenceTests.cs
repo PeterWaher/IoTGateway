@@ -1,18 +1,19 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Test
 {
 	[TestClass]
 	public class MarkdownDifferenceTests
 	{
-		private async Task Test(string FileName)
+		private static async Task Test(string FileName)
 		{
-			MarkdownSettings Settings = new MarkdownSettings();
+			MarkdownSettings Settings = new();
 
-			string OldMarkdown = await Resources.ReadAllTextAsync("Markdown/Diff/Old/" + FileName);
-			string NewMarkdown = await Resources.ReadAllTextAsync("Markdown/Diff/New/" + FileName);
-			string DiffMarkdown = await Resources.ReadAllTextAsync("Markdown/Diff/Diff/" + FileName);
+			string OldMarkdown = await Files.ReadAllTextAsync("Markdown/Diff/Old/" + FileName);
+			string NewMarkdown = await Files.ReadAllTextAsync("Markdown/Diff/New/" + FileName);
+			string DiffMarkdown = await Files.ReadAllTextAsync("Markdown/Diff/Diff/" + FileName);
 
 			string Result = await MarkdownDocument.Compare(OldMarkdown, NewMarkdown, Settings, true);
 
@@ -22,20 +23,20 @@ namespace Waher.Content.Markdown.Test
 		[TestMethod]
 		public async Task Test_01_SimpleText()
 		{
-			await this.Test("Test_01_Simple.md");
+			await Test("Test_01_Simple.md");
 		}
 
 		[TestMethod]
 		public async Task Test_02_Paragraphs()
 		{
-			await this.Test("Test_02_Paragraphs.md");
+			await Test("Test_02_Paragraphs.md");
 		}
 
 		[TestMethod]
 		[Ignore("Being implemented")]
 		public async Task Test_03_Bullets()
 		{
-			await this.Test("Test_03_Bullets.md");
+			await Test("Test_03_Bullets.md");
 		}
 	}
 }

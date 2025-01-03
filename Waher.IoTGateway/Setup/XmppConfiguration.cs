@@ -23,6 +23,7 @@ using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Security.Users;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -939,7 +940,7 @@ namespace Waher.IoTGateway.Setup
 								else
 									Encoding = InternetContent.GetEncoding(CharSet);
 
-								string XmlResponse = CommonTypes.GetString(Bin, Encoding);
+								string XmlResponse = Strings.GetString(Bin, Encoding);
 								XmlDocument Doc = new XmlDocument()
 								{
 									PreserveWhitespace = true

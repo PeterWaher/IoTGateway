@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Text;
 using Waher.Networking.HTTP.Authentication;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -384,7 +384,7 @@ namespace Waher.Networking.HTTP.Test
 
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
 			string s = Encoding.UTF8.GetString(Data);
-			string s2 = await Resources.ReadAllTextAsync("Data/MultiRangeResponse.txt");
+			string s2 = await Files.ReadAllTextAsync("Data/MultiRangeResponse.txt");
 
 			int i = s.IndexOf("--");
 			int j = s.IndexOf("\r\n", i);

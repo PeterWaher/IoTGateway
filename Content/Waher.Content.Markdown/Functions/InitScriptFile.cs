@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -76,7 +77,7 @@ namespace Waher.Content.Markdown.Functions
 
 			if (await NeedsExecution(Source))
 			{
-				string Script = await Resources.ReadAllTextAsync(Source);
+				string Script = await Files.ReadAllTextAsync(Source);
 				Expression Exp = new Expression(Script, Source);
 
 				return await Exp.Root.EvaluateAsync(Variables);

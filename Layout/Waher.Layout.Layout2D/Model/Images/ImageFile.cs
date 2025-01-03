@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.IO;
 
 namespace Waher.Layout.Layout2D.Model.Images
 {
@@ -93,7 +93,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 			string FileName = await this.fileName.Evaluate(State.Session, string.Empty);
 			if (!string.IsNullOrEmpty(FileName) && File.Exists(FileName))
 			{
-				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
+				byte[] Bin = await Files.ReadAllBytesAsync(FileName);
 				SKBitmap Bitmap = SKBitmap.Decode(Bin);
 				return SKImage.FromBitmap(Bitmap);
 			}

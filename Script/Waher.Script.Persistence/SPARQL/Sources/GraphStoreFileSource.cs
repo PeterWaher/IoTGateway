@@ -70,7 +70,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 				if (string.IsNullOrEmpty(ContentType) || ContentType == BinaryCodec.DefaultContentType)
 					continue;
 
-				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
+				byte[] Bin = await Runtime.IO.Files.ReadAllBytesAsync(FileName);
 				ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Bin, Source);
 				Content.AssertOk();
 

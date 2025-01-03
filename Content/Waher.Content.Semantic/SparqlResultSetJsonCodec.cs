@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Semantic
@@ -73,7 +74,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 			object Obj = JSON.Parse(s);
 
 			if (!(Obj is Dictionary<string, object> Doc))

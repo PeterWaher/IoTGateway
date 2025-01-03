@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown.JavaScript;
 using Waher.Runtime.Console;
-using Waher.Script;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -27,12 +27,12 @@ namespace Waher.Content.Markdown.Test
 		private static async Task DoTest(string MarkdownFileName, string JavaScriptFileName, bool ExecuteJavaScript,
 			string HtmlStartTag, string HtmlEndTag)
 		{
-			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedJavaScript = await Resources.ReadAllTextAsync("JavaScript/" + JavaScriptFileName);
-			string ExpectedHtml = await Resources.ReadAllTextAsync("HTML/" + Path.ChangeExtension(JavaScriptFileName, ".html"));
+			string Markdown = await Files.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
+			string ExpectedJavaScript = await Files.ReadAllTextAsync("JavaScript/" + JavaScriptFileName);
+			string ExpectedHtml = await Files.ReadAllTextAsync("HTML/" + Path.ChangeExtension(JavaScriptFileName, ".html"));
 			Emoji1LocalFiles Emoji1LocalFiles = new(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
-			MarkdownSettings Settings = new(Emoji1LocalFiles, true, new Variables())
+			MarkdownSettings Settings = new(Emoji1LocalFiles, true, [])
 			{
 				HttpxProxy = "/HttpxProxy/%URL%"
 			};
@@ -60,7 +60,7 @@ namespace Waher.Content.Markdown.Test
 				Parsed.AppendBlock(new JsAssertLibrary());
 
 				string JsFileName = Path.ChangeExtension(Path.GetTempFileName(), ".js");
-				await Resources.WriteAllTextAsync(JsFileName, GeneratedJavaScript, System.Text.Encoding.UTF8);
+				await Files.WriteAllTextAsync(JsFileName, GeneratedJavaScript, System.Text.Encoding.UTF8);
 				Parsed.AppendFile(JsFileName);
 
 				string JsonEncoded = Parsed.RunTest("return CreateHTML();");

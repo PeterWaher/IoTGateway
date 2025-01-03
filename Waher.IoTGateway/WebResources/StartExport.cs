@@ -18,6 +18,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Persistence;
 using Waher.Persistence.XmlLedger;
+using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
 
 namespace Waher.IoTGateway.WebResources
@@ -373,7 +374,7 @@ namespace Waher.IoTGateway.WebResources
 						string Xml = Temp.ToString();
 						string ReportFileName = Path.Combine(Path.GetDirectoryName(ExportInfo.FullBackupFileName),
 							"AutoRepair " + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
-						await Resources.WriteAllTextAsync(ReportFileName, Xml);
+						await Files.WriteAllTextAsync(ReportFileName, Xml);
 					}
 
 					SortedDictionary<string, bool> CollectionsToExport = new SortedDictionary<string, bool>();
@@ -527,7 +528,7 @@ namespace Waher.IoTGateway.WebResources
 				//string UmlFileName = Path.ChangeExtension(ExportInfo.FullBackupFileName, "uml");
 				//long UmlFileSize;
 				//
-				//await Resources.WriteAllTextAsync(UmlFileName, Uml);
+				//await Files.WriteAllTextAsync(UmlFileName, Uml);
 				//
 				//using (FileStream fs = File.OpenRead(UmlFileName))
 				//{

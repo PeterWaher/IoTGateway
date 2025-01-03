@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Xml;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Test
 {
@@ -10,7 +11,7 @@ namespace Waher.Content.Test
 	{
 		private static Task<string> Load(string FileName)
 		{
-			return Resources.ReadAllTextAsync("Data\\" + FileName);
+			return Files.ReadAllTextAsync("Data\\" + FileName);
 		}
 
 		[TestMethod]

@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using Waher.Content;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 
 namespace Waher.Utility.RegEx
 {
@@ -55,7 +55,7 @@ namespace Waher.Utility.RegEx
 			XmlWriter Output = null;
 			Encoding Encoding = Encoding.Default;
 			RegexOptions Options = RegexOptions.Compiled;
-			List<string> Paths = new();
+			List<string> Paths = [];
 			string Expression = null;
 			string ReplaceExpression = null;
 			string XmlFileName = null;
@@ -234,10 +234,10 @@ namespace Waher.Utility.RegEx
 				Output?.WriteStartElement("Search", "http://waher.se/schema/RegExMatches.xsd");
 				Output?.WriteStartElement("Files");
 
-				Dictionary<string, bool> FileProcessed = new();
-				Dictionary<string, bool> FileMatches = new();
-				Dictionary<string, bool> FileUpdates = new();
-				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = new();
+				Dictionary<string, bool> FileProcessed = [];
+				Dictionary<string, bool> FileMatches = [];
+				Dictionary<string, bool> FileUpdates = [];
+				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = [];
 
 				foreach (string Path0 in Paths)
 				{
@@ -264,7 +264,7 @@ namespace Waher.Utility.RegEx
 						FileProcessed[FileName] = true;
 
 						byte[] Data = File.ReadAllBytes(FileName);
-						string Text = CommonTypes.GetString(Data, Encoding);
+						string Text = Strings.GetString(Data, Encoding);
 						string Text2 = Text;
 						int Offset = 0;
 
@@ -325,7 +325,7 @@ namespace Waher.Utility.RegEx
 
 									if (!GroupCount.TryGetValue(G.Name, out SortedDictionary<string, int> Counts))
 									{
-										Counts = new SortedDictionary<string, int>();
+										Counts = [];
 										GroupCount[G.Name] = Counts;
 									}
 

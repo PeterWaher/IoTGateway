@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Text;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Multipart
 {
@@ -364,7 +365,7 @@ namespace Waher.Content.Multipart
 					return true;
 
 				case "BASE64":
-					string s = CommonTypes.GetString(Encoded, Encoding.ASCII);
+					string s = Strings.GetString(Encoded, Encoding.ASCII);
 					Decoded = Convert.FromBase64String(s);
 					return true;
 

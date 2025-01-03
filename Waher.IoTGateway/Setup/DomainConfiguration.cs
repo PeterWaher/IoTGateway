@@ -1490,7 +1490,7 @@ namespace Waher.IoTGateway.Setup
 										PemOutput.AppendLine("-----END CERTIFICATE-----");
 
 										CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
-										await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
+										await Runtime.IO.Files.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 
 										await Status.Raise(this, "Generating temporary key file.");
 
@@ -1504,7 +1504,7 @@ namespace Waher.IoTGateway.Setup
 
 										KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
 
-										await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
+										await Runtime.IO.Files.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 									}
 
 									await Status.Raise(this, "Converting to PFX using " + OpenSslFile);
@@ -1540,7 +1540,7 @@ namespace Waher.IoTGateway.Setup
 									await Status.Raise(this, "Loading PFX.");
 
 									CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
-									this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
+									this.pfx = await Runtime.IO.Files.ReadAllBytesAsync(CertFileName2);
 									this.password = Password;
 									this.openSslPath = OpenSslFile;
 

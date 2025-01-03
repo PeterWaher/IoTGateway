@@ -18,6 +18,7 @@ using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Timing;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -511,7 +512,7 @@ namespace Waher.Content.Markdown.GraphViz
 				Output.Append(Info.Hash);
 				Output.AppendLine("\">");
 
-				string Map = await Resources.ReadAllTextAsync(Info.MapFileName);
+				string Map = await Files.ReadAllTextAsync(Info.MapFileName);
 				string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 				int i, c;
 
@@ -574,7 +575,7 @@ namespace Waher.Content.Markdown.GraphViz
 				return null;
 
 			string TxtFileName = FileName + ".txt";
-			await Resources.WriteAllTextAsync(TxtFileName, GraphText, Encoding.Default);
+			await Files.WriteAllTextAsync(TxtFileName, GraphText, Encoding.Default);
 
 			StringBuilder Arguments = new StringBuilder();
 
@@ -648,7 +649,7 @@ namespace Waher.Content.Markdown.GraphViz
 					}
 					else
 					{
-						string Map = await Resources.ReadAllTextAsync(Result.MapFileName);
+						string Map = await Files.ReadAllTextAsync(Result.MapFileName);
 						string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 						if (MapRows.Length <= 2)
 						{
@@ -828,7 +829,7 @@ namespace Waher.Content.Markdown.GraphViz
 			if (Info is null)
 				return null;
 
-			byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
+			byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.FileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{
@@ -853,7 +854,7 @@ namespace Waher.Content.Markdown.GraphViz
 				if (Info is null)
 					return false;
 
-				byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
+				byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.FileName);
 				string ContentType = ImageCodec.ContentTypePng;
 				ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Data, null);
 

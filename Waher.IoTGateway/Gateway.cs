@@ -87,6 +87,7 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway
 {
@@ -1279,7 +1280,7 @@ namespace Waher.IoTGateway
 								{
 									Log.Informational("Importing language file.", FileName);
 
-									Xml = await Resources.ReadAllTextAsync(LanguageFile);
+									Xml = await Files.ReadAllTextAsync(LanguageFile);
 									XmlDocument Doc = new XmlDocument()
 									{
 										PreserveWhitespace = true
@@ -1312,7 +1313,7 @@ namespace Waher.IoTGateway
 					{
 						try
 						{
-							string Msg = await Resources.ReadAllTextAsync(UnhandledException);
+							string Msg = await Files.ReadAllTextAsync(UnhandledException);
 							File.Delete(UnhandledException);
 
 							StringBuilder sb = new StringBuilder();
@@ -1440,7 +1441,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+				Markdown = await Files.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
 			}
 			catch (Exception)
 			{
@@ -1537,7 +1538,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				await Resources.WriteAllTextAsync(appDataFolder + "Ports.txt", sb.ToString());
+				await Files.WriteAllTextAsync(appDataFolder + "Ports.txt", sb.ToString());
 			}
 			catch (Exception ex)
 			{
@@ -4478,7 +4479,7 @@ namespace Waher.IoTGateway
 
 					await Database.Insert(Request);
 
-					Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
+					Markdown = await Files.ReadAllTextAsync(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
 
 					int i = Markdown.IndexOf("~~~~~~");
 					int c = Markdown.Length;
@@ -4780,7 +4781,7 @@ namespace Waher.IoTGateway
 
 					if (Doc is null || TP2 > TP)
 					{
-						Markdown = await Resources.ReadAllTextAsync(FullFileName);
+						Markdown = await Files.ReadAllTextAsync(FullFileName);
 						Settings = new MarkdownSettings(emoji1_24x24, true)
 						{
 							RootFolder = rootFolder,
@@ -4818,7 +4819,7 @@ namespace Waher.IoTGateway
 
 						Encoding ??= System.Text.Encoding.UTF8;
 
-						Markdown = CommonTypes.GetString(Content, Encoding);
+						Markdown = Strings.GetString(Content, Encoding);
 						if (IsText)
 						{
 							MarkdownSettings Settings2 = new MarkdownSettings(null, false);

@@ -60,7 +60,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 
 			try
 			{
-				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
+				byte[] Bin = await Runtime.IO.Files.ReadAllBytesAsync(FileName);
 
 				GenerateMarkdown(Output, Bin, ContentType, Title);
 

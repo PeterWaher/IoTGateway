@@ -17,6 +17,7 @@ using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Security;
@@ -731,7 +732,7 @@ namespace Waher.IoTGateway.Setup
 				string FileName = Path.Combine(Gateway.RootFolder, "Settings", "LegalIdentities.md");
 				if (File.Exists(FileName))
 				{
-					string Markdown = await Resources.ReadAllTextAsync(FileName);
+					string Markdown = await Files.ReadAllTextAsync(FileName);
 					Variables v = HttpServer.CreateVariables();
 					v["Config"] = this;
 

@@ -1679,5 +1679,45 @@ namespace Waher.Runtime.Inventory
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Gets the assembly corresponding to a given resource name.
+		/// </summary>
+		/// <param name="ResourceName">Resource name.</param>
+		/// <returns>Assembly.</returns>
+		/// <exception cref="ArgumentException">If no assembly could be found.</exception>
+		public static Assembly GetAssemblyForResource(string ResourceName)
+		{
+			string[] Parts = ResourceName.Split('.');
+			string ParentNamespace;
+			int i, c;
+			Assembly A;
+
+			if (!IsRootNamespace(Parts[0]))
+				A = null;
+			else
+			{
+				ParentNamespace = Parts[0];
+				i = 1;
+				c = Parts.Length;
+
+				while (i < c)
+				{
+					if (!IsSubNamespace(ParentNamespace, Parts[i]))
+						break;
+
+					ParentNamespace += "." + Parts[i];
+					i++;
+				}
+
+				A = GetFirstAssemblyReferenceInNamespace(ParentNamespace);
+			}
+
+			if (A is null)
+				throw new ArgumentException("Assembly not found for resource " + ResourceName + ".", nameof(ResourceName));
+
+			return A;
+		}
+
 	}
 }

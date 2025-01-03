@@ -127,7 +127,7 @@ namespace Waher.Content.Markdown.GraphViz
                 return false;
             }
 
-            byte[] Data = await Resources.ReadAllBytesAsync(Graph.FileName);
+            byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Graph.FileName);
 
             await State.To.WriteAsync(Data, 0, Data.Length);
 

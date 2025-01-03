@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using Waher.Content;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP.Brotli
 {
@@ -131,9 +131,9 @@ namespace Waher.Networking.HTTP.Brotli
 					if (!string.IsNullOrEmpty(this.compressedFileName))
 					{
 						if (this.pos == 0)
-							await Resources.WriteAllBytesAsync(this.compressedFileName, Data, this.pos, c);
+							await Files.WriteAllBytesAsync(this.compressedFileName, Data, this.pos, c);
 						else
-							await Resources.AppendAllBytesAsync(this.compressedFileName, Data, this.pos, c);
+							await Files.AppendAllBytesAsync(this.compressedFileName, Data, this.pos, c);
 					}
 
 					this.pos += c;

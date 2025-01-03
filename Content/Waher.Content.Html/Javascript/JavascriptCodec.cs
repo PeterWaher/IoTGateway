@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Html.JavaScript
 {
@@ -80,7 +81,7 @@ namespace Waher.Content.Html.JavaScript
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string JavaScript = CommonTypes.GetString(Data, Encoding);
+			string JavaScript = Strings.GetString(Data, Encoding);
 			return Task.FromResult(new ContentResponse(ContentType, new JavaScriptDocument(JavaScript), Data));
 		}
 

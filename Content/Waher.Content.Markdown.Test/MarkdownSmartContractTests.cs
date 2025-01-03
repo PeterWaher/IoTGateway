@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Xml;
 using Waher.Runtime.Console;
-using Waher.Script;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -12,11 +12,11 @@ namespace Waher.Content.Markdown.Test
 	{
 		private static async Task DoTest(string MarkdownFileName, string XamlFileName)
 		{
-			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedText = await Resources.ReadAllTextAsync("SC/" + XamlFileName);
+			string Markdown = await Files.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
+			string ExpectedText = await Files.ReadAllTextAsync("SC/" + XamlFileName);
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
 
-			MarkdownSettings Settings = new(null, true, new Variables());
+			MarkdownSettings Settings = new(null, true, []);
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 			string GeneratedXaml = await Doc.GenerateSmartContractXml(XML.WriterSettings(true, true));

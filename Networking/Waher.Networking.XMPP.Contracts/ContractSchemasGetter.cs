@@ -6,6 +6,7 @@ using Waher.Content;
 using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.Contracts

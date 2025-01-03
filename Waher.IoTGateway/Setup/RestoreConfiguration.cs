@@ -17,6 +17,7 @@ using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;
 using Waher.Runtime.Cache;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
 using Waher.Runtime.Temporary;
 using Waher.Script;
@@ -1934,11 +1935,11 @@ namespace Waher.IoTGateway.Setup
 
 			XslCompiledTransform Xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
 
-			string s = await Resources.ReadAllTextAsync(XmlPath);
+			string s = await Files.ReadAllTextAsync(XmlPath);
 			s = XSL.Transform(s, Xslt);
 			byte[] Bin = WebResources.StartAnalyze.utf8Bom.GetBytes(s);
 
-			await Resources.WriteAllBytesAsync(HtmlPath, Bin);
+			await Files.WriteAllBytesAsync(HtmlPath, Bin);
 
 			ShowStatus(TabID, "Database analysis successfully completed.");
 

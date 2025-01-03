@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
-using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.IO;
 
 namespace Waher.Layout.Layout2D.Model.Images
 {

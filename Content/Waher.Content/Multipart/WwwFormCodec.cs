@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Multipart
 {
@@ -68,7 +69,7 @@ namespace Waher.Content.Multipart
 		{
 			Dictionary<string, string> Form = new Dictionary<string, string>();
 			Dictionary<string, List<string>> Form2 = null;
-			string s = CommonTypes.GetString(Data, Encoding);
+			string s = Strings.GetString(Data, Encoding);
 			string Key, Value;
 			int i;
 

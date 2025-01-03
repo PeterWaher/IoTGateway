@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.Cssx
 {
@@ -69,7 +70,7 @@ namespace Waher.IoTGateway.Cssx
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, System.Text.Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return Task.FromResult(new ContentResponse(ContentType, CommonTypes.GetString(Data, Encoding), Data));
+			return Task.FromResult(new ContentResponse(ContentType, Strings.GetString(Data, Encoding), Data));
 		}
 
 		/// <summary>

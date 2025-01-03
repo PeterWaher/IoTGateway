@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Runtime.IO;
 
 namespace Waher.Events.Files
@@ -173,7 +172,7 @@ namespace Waher.Events.Files
 				{
 					try
 					{
-						byte[] XsltBin = await Resources.ReadAllBytesAsync(this.transform);
+						byte[] XsltBin = await Runtime.IO.Files.ReadAllBytesAsync(this.transform);
 
 						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
 							Convert.ToBase64String(XsltBin) + "\"");

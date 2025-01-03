@@ -114,7 +114,7 @@ namespace Waher.Content.Markdown.Layout2D
             }
             else
             {
-                byte[] Data = await Resources.ReadAllBytesAsync(Graph.FileName);
+                byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Graph.FileName);
 
                 await State.To.WriteAsync(Data, 0, Data.Length);
 

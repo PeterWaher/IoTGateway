@@ -1,12 +1,11 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D.Events;
@@ -113,7 +112,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
 		public static async Task<Layout2DDocument> FromFile(string FileName, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
-			string Xml = await Resources.ReadAllTextAsync(FileName);
+			string Xml = await Files.ReadAllTextAsync(FileName);
 			return await FromXml(Xml, Preprocess, Session, Attachments);
 		}
 
@@ -158,7 +157,7 @@ namespace Waher.Layout.Layout2D
 			byte[] Bin = new byte[c2];
 			Input.ReadAll(Bin, 0, c2);
 
-			string Xml = CommonTypes.GetString(Bin, DefaultEncoding);
+			string Xml = Strings.GetString(Bin, DefaultEncoding);
 
 			return FromXml(Xml, Preprocess, Session, Attachments);
 		}

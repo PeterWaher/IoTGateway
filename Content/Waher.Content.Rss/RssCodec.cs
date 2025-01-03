@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Rss
 {
@@ -136,7 +137,7 @@ namespace Waher.Content.Rss
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string Xml = CommonTypes.GetString(Data, Encoding);
+			string Xml = Strings.GetString(Data, Encoding);
 			XmlDocument Doc = new XmlDocument()
 			{
 				PreserveWhitespace = true

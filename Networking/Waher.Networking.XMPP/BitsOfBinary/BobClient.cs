@@ -2,11 +2,11 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.StanzaErrors;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.XMPP.BitsOfBinary
 {
@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			Xml.Append(Convert.ToBase64String(Data));
 			Xml.Append("</data>");
 
-			await Resources.WriteAllTextAsync(this.GetFileName(Hash), Xml.ToString(), Encoding.ASCII);
+			await Files.WriteAllTextAsync(this.GetFileName(Hash), Xml.ToString(), Encoding.ASCII);
 
 			return Hash;
 		}

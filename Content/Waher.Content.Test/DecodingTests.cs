@@ -11,6 +11,7 @@ using Waher.Content.Multipart;
 using Waher.Content.Test.Encodings;
 using Waher.Content.Xml;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Test
 {
@@ -32,8 +33,8 @@ namespace Waher.Content.Test
 
 		private static async Task<object> DecodeAsync(string FileName)
 		{
-			byte[] Data = await Resources.ReadAllBytesAsync("Data\\" + FileName + ".bin");
-			string ContentType = await Resources.ReadAllTextAsync("Data\\" + FileName + ".txt");
+			byte[] Data = await Files.ReadAllBytesAsync("Data\\" + FileName + ".bin");
+			string ContentType = await Files.ReadAllTextAsync("Data\\" + FileName + ".txt");
 
 			return await InternetContent.DecodeAsync(ContentType, Data, null);
 		}

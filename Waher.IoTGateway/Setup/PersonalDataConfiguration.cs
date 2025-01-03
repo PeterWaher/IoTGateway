@@ -152,7 +152,7 @@ namespace Waher.IoTGateway.Setup
 
 				try
 				{
-					string Markdown = await Resources.ReadAllTextAsync(FileName);
+					string Markdown = await Files.ReadAllTextAsync(FileName);
 					sb.AppendLine(Markdown);
 				}
 				catch (Exception ex)

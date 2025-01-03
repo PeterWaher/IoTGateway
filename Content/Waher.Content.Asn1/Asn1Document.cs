@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Collections.Generic;
 using System.Globalization;
 using Waher.Content.Asn1.Exceptions;
@@ -11,6 +9,7 @@ using Waher.Content.Asn1.Model.Sets;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
 using System.Threading.Tasks;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Asn1
 {
@@ -84,7 +83,7 @@ namespace Waher.Content.Asn1
 		/// <returns>ASN.1 document</returns>
 		public static async Task<Asn1Document> FromFile(string FileName, string[] ImportFolders)
 		{
-			string Text = await Resources.ReadAllTextAsync(FileName);
+			string Text = await Files.ReadAllTextAsync(FileName);
 			return new Asn1Document(Text, FileName, ImportFolders);
 		}
 

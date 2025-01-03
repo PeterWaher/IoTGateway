@@ -7,6 +7,7 @@ using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Semantic
 {
@@ -83,7 +84,7 @@ namespace Waher.Content.Semantic
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 			RdfDocument Parsed = new RdfDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
 			return Task.FromResult(new ContentResponse(ContentType, Parsed, Data));
 		}

@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Persistence.SPARQL;
 
@@ -18,7 +19,7 @@ namespace Waher.Script.Test
 	{
 		private static string LoadTextResource(string FileName)
 		{
-			return Resources.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
+			return Files.LoadResourceAsText(typeof(ScriptSparqlTests).Namespace + ".Sparql." + FileName);
 		}
 
 		private static TurtleDocument LoadTurtleResource(string FileName)
@@ -41,7 +42,7 @@ namespace Waher.Script.Test
 			SparqlResultSet Result = Decoded.Decoded as SparqlResultSet;
 			Assert.IsNotNull(Result);
 
-			return (CommonTypes.GetString(Bin, Encoding.UTF8), Result);
+			return (Strings.GetString(Bin, Encoding.UTF8), Result);
 		}
 
 		private static Expression LoadSparqlExpression(string FileName)

@@ -18,6 +18,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Timing;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -292,7 +293,7 @@ namespace Waher.Content.Markdown.Layout2D
 						Result.Dynamic = LayoutDoc.Dynamic;
 
 						if (!LayoutDoc.Dynamic)
-							await Resources.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
+							await Files.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
 					}
 				}
 			}
@@ -483,7 +484,7 @@ namespace Waher.Content.Markdown.Layout2D
 			if (Info?.FileName is null)
 				return null;
 
-			byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
+			byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.FileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{

@@ -9,11 +9,11 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.IO;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP.Test
@@ -43,7 +43,7 @@ namespace Waher.Networking.HTTP.Test
 						int.MaxValue, BinaryPresentationMethod.ByteCount);
 			}
 
-			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
+			X509Certificate2 Certificate = Certificates.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
 			server = new HttpServer(8081, 8088, Certificate,
 				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
 				xmlSniffer);

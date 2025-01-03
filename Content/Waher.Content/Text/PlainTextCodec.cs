@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Text
 {
@@ -101,7 +102,7 @@ namespace Waher.Content.Text
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return Task.FromResult(new ContentResponse(ContentType, CommonTypes.GetString(Data, Encoding), Data));
+			return Task.FromResult(new ContentResponse(ContentType, Strings.GetString(Data, Encoding), Data));
 		}
 
 		/// <summary>

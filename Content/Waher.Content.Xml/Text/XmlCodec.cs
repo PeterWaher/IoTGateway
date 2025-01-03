@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content.Xml.Text
@@ -109,7 +110,7 @@ namespace Waher.Content.Xml.Text
 			}
 			else
 			{
-				string s = CommonTypes.GetString(Data, Encoding);
+				string s = Strings.GetString(Data, Encoding);
 				Doc.LoadXml(s);
 			}
 

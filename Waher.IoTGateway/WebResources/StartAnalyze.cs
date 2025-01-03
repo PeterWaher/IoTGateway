@@ -12,6 +12,7 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -186,12 +187,12 @@ namespace Waher.IoTGateway.WebResources
 
 				xslt ??= XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
 
-				string s = await Resources.ReadAllTextAsync(FullPath);
+				string s = await Files.ReadAllTextAsync(FullPath);
 				s = XSL.Transform(s, xslt);
 				byte[] Bin = utf8Bom.GetBytes(s);
 
 				string FullPath2 = FullPath[..^4] + ".html";
-				await Resources.WriteAllBytesAsync(FullPath2, Bin);
+				await Files.WriteAllBytesAsync(FullPath2, Bin);
 
 				ExportFormats.ExportFormat.UpdateClientsFileUpdated(FileName[..^4] + ".html", Bin.Length, Created);
 

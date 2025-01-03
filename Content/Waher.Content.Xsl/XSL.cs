@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Xsl;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Xsl
 {
@@ -22,7 +23,7 @@ namespace Waher.Content.Xsl
 		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
 		public static XmlSchema LoadSchema(string ResourceName)
 		{
-			return LoadSchema(ResourceName, Resources.GetAssembly(ResourceName));
+			return LoadSchema(ResourceName, Types.GetAssemblyForResource(ResourceName));
 		}
 
 		/// <summary>
@@ -69,7 +70,7 @@ namespace Waher.Content.Xsl
 		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
 		public static XslCompiledTransform LoadTransform(string ResourceName)
 		{
-			return LoadTransform(ResourceName, Resources.GetAssembly(ResourceName));
+			return LoadTransform(ResourceName, Types.GetAssemblyForResource(ResourceName));
 		}
 
 		/// <summary>

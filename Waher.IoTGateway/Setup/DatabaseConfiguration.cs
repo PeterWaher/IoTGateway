@@ -4,17 +4,18 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
+using Waher.Events;
+using Waher.IoTGateway.Setup.Databases;
+using Waher.IoTGateway.Setup.Databases.Sniffing;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
-using Waher.IoTGateway.Setup.Databases;
-using Waher.IoTGateway.Setup.Databases.Sniffing;
-using Waher.Content.Json;
-using Waher.Events;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -243,7 +244,7 @@ namespace Waher.IoTGateway.Setup
 				ResourceName = Path.Combine(Gateway.RootFolder, ResourceName);
 				if (File.Exists(ResourceName))
 				{
-					string Markdown = await Resources.ReadAllTextAsync(ResourceName);
+					string Markdown = await Files.ReadAllTextAsync(ResourceName);
 					MarkdownSettings Settings = new MarkdownSettings()
 					{
 						Variables = Request.Session

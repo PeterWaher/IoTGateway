@@ -60,7 +60,7 @@ namespace Waher.WebService.Tesseract.Test
 		[DataRow("MRZ.jpg", PageSegmentationMode.SingleUniformBlockOfText, "mrz")]
 		public async Task Test_002_OcrImage(string FileName, PageSegmentationMode? Mode, string Language)
 		{
-			byte[] Bin = await Resources.ReadAllBytesAsync(Path.Combine("Data", FileName));
+			byte[] Bin = await Runtime.IO.Files.ReadAllBytesAsync(Path.Combine("Data", FileName));
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 			TesseractApi Api = new();
 
@@ -83,7 +83,7 @@ namespace Waher.WebService.Tesseract.Test
 		[DataRow("MRZ.jpg", PageSegmentationMode.SingleUniformBlockOfText, "mrz")]
 		public async Task Test_003_ApiTests(string FileName, PageSegmentationMode? Mode, string Language)
 		{
-			byte[] Bin = await Resources.ReadAllBytesAsync(Path.Combine("Data", FileName));
+			byte[] Bin = await Runtime.IO.Files.ReadAllBytesAsync(Path.Combine("Data", FileName));
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 			TesseractApi Api = new();
 

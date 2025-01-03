@@ -257,7 +257,7 @@ namespace Waher.Persistence.XmlLedger
 				{
 					try
 					{
-						byte[] XsltBin = await Resources.ReadAllBytesAsync(this.transform);
+						byte[] XsltBin = await Runtime.IO.Files.ReadAllBytesAsync(this.transform);
 
 						await this.output.WriteProcessingInstructionAsync("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
 							Convert.ToBase64String(XsltBin) + "\"");

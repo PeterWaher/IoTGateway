@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Text;
 using Waher.Networking.HTTP;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -109,7 +110,7 @@ namespace Waher.IoTGateway.WebResources
 				try
 				{
 					string s = ExportFolder + Path.DirectorySeparatorChar + "test.txt";
-					await Resources.WriteAllTextAsync(s, "test");
+					await Files.WriteAllTextAsync(s, "test");
 					File.Delete(s);
 				}
 				catch (Exception)
@@ -148,7 +149,7 @@ namespace Waher.IoTGateway.WebResources
 				try
 				{
 					string s = KeyFolder + Path.DirectorySeparatorChar + "test.txt";
-					await Resources.WriteAllTextAsync(s, "test");
+					await Files.WriteAllTextAsync(s, "test");
 					File.Delete(s);
 				}
 				catch (Exception)

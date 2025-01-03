@@ -99,7 +99,7 @@ namespace Waher.Content.Markdown.PlantUml
                 return false;
             }
 
-            byte[] Data = await Resources.ReadAllBytesAsync(Graph.ImageFileName);
+            byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Graph.ImageFileName);
 
             await State.To.WriteAsync(Data, 0, Data.Length);
 

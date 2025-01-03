@@ -13,6 +13,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Events;
 using Waher.Persistence;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
 using Waher.Script;
 
@@ -283,7 +284,7 @@ namespace Waher.IoTGateway.Setup
 		private async Task<string> RosterItemsHtml(RosterItem[] Contacts, PresenceEventArgs[] SubscriptionRequests)
 		{
 			string FileName = Path.Combine(Gateway.RootFolder, "Settings", "RosterItems.md");
-			string Markdown = await Resources.ReadAllTextAsync(FileName);
+			string Markdown = await Files.ReadAllTextAsync(FileName);
 			Variables v = HttpServer.CreateVariables();
 			v["Contacts"] = Contacts;
 			v["Requests"] = SubscriptionRequests;

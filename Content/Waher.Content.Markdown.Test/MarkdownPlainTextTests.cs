@@ -13,6 +13,7 @@ using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Script.Graphs;
 
@@ -58,8 +59,8 @@ namespace Waher.Content.Markdown.Test
 
 		private static async Task DoTest(string MarkdownFileName, string PlainTextFileName)
 		{
-			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedText = await Resources.ReadAllTextAsync("PlainText/" + PlainTextFileName);
+			string Markdown = await Files.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
+			string ExpectedText = await Files.ReadAllTextAsync("PlainText/" + PlainTextFileName);
 			Emoji1LocalFiles Emoji1LocalFiles = new(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
 			MarkdownSettings Settings = new(Emoji1LocalFiles, true, [])

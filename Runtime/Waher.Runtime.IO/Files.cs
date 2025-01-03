@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Runtime.IO
 {
@@ -73,42 +70,6 @@ namespace Waher.Runtime.IO
 			{
 				fs.Position = fs.Length;
 				await fs.WriteAsync(Data, Offset, Length);
-			}
-		}
-
-		/// <summary>
-		/// Loads a text resource from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <returns>Text content.</returns>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static string LoadResourceAsText(string ResourceName)
-		{
-			return LoadResourceAsText(ResourceName, Types.GetAssemblyForResource(ResourceName));
-		}
-
-		/// <summary>
-		/// Loads a text resource from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="Assembly">Assembly containing the resource.</param>
-		/// <returns>Text content.</returns>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static string LoadResourceAsText(string ResourceName, Assembly Assembly)
-		{
-			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
-			{
-				if (f is null)
-					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
-
-				if (f.Length > int.MaxValue)
-					throw new ArgumentException("Resource size exceeds " + int.MaxValue.ToString() + " bytes.", nameof(ResourceName));
-
-				int Len = (int)f.Length;
-				byte[] Result = new byte[Len];
-				f.ReadAll(Result, 0, Len);
-
-				return Strings.GetString(Result, Encoding.UTF8);
 			}
 		}
 

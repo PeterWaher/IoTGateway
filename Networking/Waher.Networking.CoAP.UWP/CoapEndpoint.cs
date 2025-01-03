@@ -726,7 +726,8 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 15:
-						IncomingMessage.UriQuery ??= new Dictionary<string, string>();
+						if (IncomingMessage.UriQuery is null)
+							IncomingMessage.UriQuery = new Dictionary<string, string>();
 
 						CoapOptionKeyValue Query = (CoapOptionKeyValue)Option;
 
@@ -738,7 +739,8 @@ namespace Waher.Networking.CoAP
 						break;
 
 					case 20:
-						IncomingMessage.LocationQuery ??= new Dictionary<string, string>();
+						if (IncomingMessage.LocationQuery is null)
+							IncomingMessage.LocationQuery = new Dictionary<string, string>();
 
 						Query = (CoapOptionLocationQuery)Option;
 
@@ -965,8 +967,8 @@ namespace Waher.Networking.CoAP
 							if (i < 0)
 								break;
 
-							SubPath = Path[i..] + SubPath;
-							Path = Path[..i];
+							SubPath = Path.Substring(i) + SubPath;
+							Path = Path.Substring(0, i);
 						}
 					}
 
@@ -2012,12 +2014,19 @@ namespace Waher.Networking.CoAP
 
 		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, out bool Encrypted, params CoapOption[] Options)
 		{
-			Encrypted = Uri.Scheme.ToLower() switch
+			switch (Uri.Scheme.ToLower())
 			{
-				"coap" => false,
-				"coaps" => true,
-				_ => throw new ArgumentException("Invalid URI scheme.", nameof(Uri)),
-			};
+				case "coap":
+					Encrypted = false;
+					break;
+
+				case "coaps":
+					Encrypted = true;
+					break;
+
+				default:
+					throw new ArgumentException("Invalid URI scheme.", nameof(Uri));
+			}
 
 			List<CoapOption> Options2 = new List<CoapOption>();
 			int i;
@@ -2045,10 +2054,10 @@ namespace Waher.Networking.CoAP
 
 			string s = Uri.AbsolutePath;
 			if (s.StartsWith("/"))
-				s = s[1..];
+				s = s.Substring(1);
 
 			if (s.EndsWith("/"))
-				s = s[..^1];
+				s = s.Substring(0, s.Length - 1);
 
 			if (!string.IsNullOrEmpty(s))
 			{
@@ -2059,7 +2068,7 @@ namespace Waher.Networking.CoAP
 			s = Uri.Query;
 
 			if (s.StartsWith("?"))
-				s = s[1..];
+				s = s.Substring(1);
 
 			if (!string.IsNullOrEmpty(s))
 			{

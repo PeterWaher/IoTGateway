@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -13,6 +12,7 @@ using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.PEP.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.IO;
 using Waher.Runtime.Settings;
 using Waher.Security;
 

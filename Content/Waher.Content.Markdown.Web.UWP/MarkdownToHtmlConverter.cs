@@ -9,6 +9,7 @@ using Waher.Content.Markdown.Rendering;
 using Waher.Content.Markdown.Web.ScriptExtensions;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
 
@@ -203,7 +204,7 @@ namespace Waher.Content.Markdown.Web
 
 						if (!(LoginFileName is null))
 						{
-							string LoginMarkdown = await Resources.ReadAllTextAsync(LoginFileName);
+							string LoginMarkdown = await Files.ReadAllTextAsync(LoginFileName);
 							MarkdownDocument LoginDoc = await MarkdownDocument.CreateAsync(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
 								LoginUrl.ToString(), typeof(HttpException));
 

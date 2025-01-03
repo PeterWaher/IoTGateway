@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Waher.Content;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 using Waher.Runtime.Text;
 
 namespace Waher.Utility.TextDiff
@@ -221,7 +222,7 @@ namespace Waher.Utility.TextDiff
 		private static string ReadTextFile(string FileName, Encoding DefaultEncoding)
 		{
 			byte[] Data = File.ReadAllBytes(FileName);
-			return CommonTypes.GetString(Data, DefaultEncoding);
+			return Strings.GetString(Data, DefaultEncoding);
 		}
 	}
 }

@@ -20,9 +20,9 @@ https://waher.se/Script.md#3dGraphFunctionsWaherScriptGraphs3d</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing graphs 3D</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.3.0</AssemblyVersion>
-    <FileVersion>2.3.0</FileVersion>
-		<Version>2.3.0</Version>
+    <AssemblyVersion>2.3.1</AssemblyVersion>
+    <FileVersion>2.3.1</FileVersion>
+		<Version>2.3.1</Version>
 		<FileUpgradeFlags>40</FileUpgradeFlags>
 		<UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Graphs3D\</UpgradeBackupLocation>
 		<OldToolsVersion>2.0</OldToolsVersion>

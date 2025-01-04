@@ -119,7 +119,7 @@ namespace Waher.Content.Markdown.Web
 					{
 						HttpRequestHeader RequestHeader = Request.Header;
 						Variables Variables = State.Session;
-						string Header = Markdown[..i];
+						string Header = Markdown.Substring(0, i);
 						string Parameter;
 
 						foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
@@ -127,7 +127,7 @@ namespace Waher.Content.Markdown.Web
 							if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
 								continue;
 
-							Parameter = Row[10..].Trim();
+							Parameter = Row.Substring(10).Trim();
 							if (RequestHeader.TryGetQueryParameter(Parameter, out string Value))
 							{
 								Value = System.Net.WebUtility.UrlDecode(Value);

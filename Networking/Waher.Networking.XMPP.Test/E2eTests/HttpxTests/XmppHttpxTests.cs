@@ -149,9 +149,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					if (e.Last)
 					{
-						object Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
+						ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
 
-						if (Decoded is string s && s == "World" && e.State.Equals(Nr))
+						if (!Decoded.HasError && Decoded.Decoded is string s && s == "World" && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();
@@ -221,9 +221,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					if (e.Last)
 					{
-						object Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
+						ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
 
-						if (Decoded is string s && s == Message && e.State.Equals(Nr))
+						if (!Decoded.HasError && Decoded.Decoded is string s && s == Message && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();

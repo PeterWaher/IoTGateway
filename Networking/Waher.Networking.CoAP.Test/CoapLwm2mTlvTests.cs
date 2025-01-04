@@ -321,10 +321,12 @@ namespace Waher.Networking.CoAP.Test
 				0x6f, 0xc1, 0x0b, 0x01, 0xc1, 0x0c, 0x00
 			};
 
-			object Decoded = await InternetContent.DecodeAsync(TlvDecoder.ContentType, Tlv, null);
-			Assert.IsNotNull(Decoded);
+			ContentResponse Decoded = await InternetContent.DecodeAsync(TlvDecoder.ContentType, Tlv, null);
+			Decoded.AssertOk();
 
-			TlvRecord[] Records = Decoded as TlvRecord[];
+			Assert.IsNotNull(Decoded.Decoded);
+
+			TlvRecord[] Records = Decoded.Decoded as TlvRecord[];
 			Assert.IsNotNull(Records);
 
 			foreach (TlvRecord Record in Records)

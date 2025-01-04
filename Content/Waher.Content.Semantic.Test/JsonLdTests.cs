@@ -190,8 +190,10 @@ namespace Waher.Content.Semantic.Test
 			BaseUri ??= new Uri("https://www.w3.org/TR/json-ld/" + FileName);
 
 			byte[] Data = Resources.LoadResource(typeof(JsonLdTests).Namespace + ".Data.JsonLd." + GetResourceName(FileName));
-			object Decoded = await InternetContent.DecodeAsync("application/ld+json", Data, BaseUri);
-			if (Decoded is JsonLdDocument Parsed)
+			ContentResponse Decoded = await InternetContent.DecodeAsync("application/ld+json", Data, BaseUri);
+			Decoded.AssertOk();
+
+			if (Decoded.Decoded is JsonLdDocument Parsed)
 				return Parsed;
 			else
 				throw new Exception("Unable to decode JSON-LD document.");
@@ -212,8 +214,10 @@ namespace Waher.Content.Semantic.Test
 			BaseUri ??= new Uri("https://www.w3.org/TR/json-ld/" + FileName);
 
 			byte[] Data = Resources.LoadResource(typeof(TurtleTests).Namespace + ".Data.JsonLd." + GetResourceName(FileName));
-			object Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
-			if (Decoded is not TurtleDocument Parsed)
+			ContentResponse Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
+			Decoded.AssertOk();
+
+			if (Decoded.Decoded is not TurtleDocument Parsed)
 				throw new Exception("Unable to decode Turtle document.");
 
 			return Parsed;

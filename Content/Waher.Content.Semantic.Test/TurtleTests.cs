@@ -145,8 +145,10 @@ namespace Waher.Content.Semantic.Test
 		private static async Task<TurtleDocument> LoadTurtleDocument(string FileName, Uri? BaseUri)
 		{
 			byte[] Data = Resources.LoadResource(typeof(TurtleTests).Namespace + ".Data.Turtle." + FileName);
-			object Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
-			if (Decoded is not TurtleDocument Parsed)
+			ContentResponse Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
+			Decoded.AssertOk();
+
+			if (Decoded.Decoded is not TurtleDocument Parsed)
 				throw new Exception("Unable to decode Turtle document.");
 
 			return Parsed;

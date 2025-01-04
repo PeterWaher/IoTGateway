@@ -36,7 +36,10 @@ namespace Waher.Content.Test
 			byte[] Data = await Files.ReadAllBytesAsync("Data\\" + FileName + ".bin");
 			string ContentType = await Files.ReadAllTextAsync("Data\\" + FileName + ".txt");
 
-			return await InternetContent.DecodeAsync(ContentType, Data, null);
+			ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
+			Decoded.AssertOk();
+
+			return Decoded.Decoded;
 		}
 
 		[TestMethod]

@@ -44,10 +44,11 @@ namespace Waher.Content.Rss.Test
 			Assert.IsTrue(InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType));
 			byte[] Data = await File.ReadAllBytesAsync(Path.Combine(Environment.CurrentDirectory, "Data", FileName));
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
-			Assert.IsNotNull(Decoded);
+			ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
+			Decoded.AssertOk();
+			Assert.IsNotNull(Decoded.Decoded);
 
-			RssDocument? Doc = Decoded as RssDocument;
+			RssDocument? Doc = Decoded.Decoded as RssDocument;
 			Assert.IsNotNull(Doc);
 
 			Assert.AreEqual(Version, Doc.Version);

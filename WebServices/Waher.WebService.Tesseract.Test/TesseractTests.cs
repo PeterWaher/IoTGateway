@@ -121,8 +121,10 @@ namespace Waher.WebService.Tesseract.Test
 				Bin = await Response.Content.ReadAsByteArrayAsync();
 				ContentType = Response.Content.Headers.ContentType.ToString();
 
-				object Obj = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
-				string Text = Obj as string;
+				ContentResponse Obj = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
+				Obj.AssertOk();
+
+				string Text = Obj.Decoded as string;
 
 				Assert.IsNotNull(Text, "Unexpected response.");
 

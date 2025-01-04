@@ -4795,7 +4795,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
 		public Task SetPresence(Availability Availability, params KeyValuePair<string, string>[] Status)
 		{
-			return this.SetPresence(Availability, null, Status);
+			return this.SetPresence(Availability, null, null, Status);
 		}
 
 		/// <summary>
@@ -4806,7 +4806,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback, object State, params KeyValuePair<string, string>[] Status)
+		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback, 
+			object State, params KeyValuePair<string, string>[] Status)
 		{
 			this.currentAvailability = Availability;
 			this.customPresenceStatus = Status;
@@ -4890,7 +4891,7 @@ namespace Waher.Networking.XMPP
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;
-			}, Status);
+			}, null, Status);
 
 			await Result.Task;
 		}

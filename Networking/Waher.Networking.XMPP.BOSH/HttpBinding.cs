@@ -495,6 +495,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// Sends a text packet.
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
+		/// <returns>If data was sent.</returns>
 		public override Task<bool> SendAsync(string Packet)
 		{
 			return this.SendAsync(Packet, null, null);
@@ -506,10 +507,21 @@ namespace Waher.Networking.XMPP.BOSH
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		/// <returns>If data was sent.</returns>
+		public override Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			if (this.terminated)
-				return false;
+				return Task.FromResult(false);
+
+			this.Send(Packet, DeliveryCallback, State);
+
+			return Task.FromResult(true);
+		}
+
+		private async void Send(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		{
+			if (this.terminated)
+				return;
 
 			try
 			{
@@ -566,7 +578,7 @@ namespace Waher.Networking.XMPP.BOSH
 									}
 								}
 
-								return true;
+								return;
 							}
 
 							this.active[ClientIndex] = true;
@@ -659,7 +671,7 @@ namespace Waher.Networking.XMPP.BOSH
 					{
 						ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
 						await this.bindingInterface?.ConnectionError(Temp.Error);
-						return true;
+						return;
 					}
 
 					lock (this.httpClients)
@@ -719,12 +731,14 @@ namespace Waher.Networking.XMPP.BOSH
 					}
 				}
 			}
+			catch (TaskCanceledException)
+			{
+				return;
+			}
 			catch (Exception ex)
 			{
 				await this.bindingInterface?.ConnectionError(ex);
 			}
-
-			return true;
 		}
 
 		private Task<bool> BodyReceived(string Xml, bool First)

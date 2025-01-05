@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Runtime.ExceptionServices;
 using Waher.Content.Xml;
 using Waher.Runtime.Console;
 
@@ -92,14 +93,14 @@ namespace Waher.Content.Test
 				{
 					this.Test_02_Overflow(XML.Encode(TP1), XML.Encode(TP2), Diff.ToString());
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
 					ConsoleOut.WriteLine(i.ToString());
 					ConsoleOut.WriteLine(XML.Encode(TP1));
 					ConsoleOut.WriteLine(XML.Encode(TP2));
 					ConsoleOut.WriteLine(Diff.ToString());
 
-					Assert.Fail("Error. See console output.");
+					ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 			}
 		}
@@ -126,16 +127,9 @@ namespace Waher.Content.Test
 			Assert.AreEqual(ParsedExpected, Estimate);
 
 			DateTime Check = ParsedTP1 + Estimate;
-			Assert.AreEqual(ParsedTP2.Year, Check.Year, "Year mismatch.");
-			Assert.AreEqual(ParsedTP2.Month, Check.Month, "Month mismatch.");
-			Assert.AreEqual(ParsedTP2.Day, Check.Day, "Day mismatch.");
-			Assert.AreEqual(ParsedTP2.Hour, Check.Hour, "Hour mismatch.");
-			Assert.AreEqual(ParsedTP2.Minute, Check.Minute, "Minute mismatch.");
-			Assert.AreEqual(ParsedTP2.Second, Check.Second, "Second mismatch.");
-
+			TimeSpan TS = ParsedTP2.Subtract(Check);
+			Assert.IsTrue(TS.TotalMilliseconds < 1);
 			// Round-off errors may result in a 1 ms diff.
-			int MsDiff = Math.Abs(ParsedTP2.Millisecond - Check.Millisecond);
-			Assert.IsTrue(MsDiff <= 1, "Millisecond mismatch.");
 		}
 	}
 }

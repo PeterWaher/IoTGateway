@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.Networking.Modbus.UWP")]
-[assembly: AssemblyCopyright("Copyright © Waher Data AB 2022-2024. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2022-2025. All rights reserved.")]
 [assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 

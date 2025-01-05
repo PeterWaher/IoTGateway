@@ -1,4 +1,4 @@
-﻿Title: Copyright
+Title: Copyright
 Description: Copyright statement
 Date: 2016-02-09
 Author: Peter Waher
@@ -60,6 +60,6 @@ goods or services; loss of use, data, or profits; or business interruption) howe
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
 
-The **IoT Gateway** is (c) [Waher Data AB](http://waher.se/) 2016-2024. All rights reserved.
+The **IoT Gateway** is (c) [Waher Data AB](http://waher.se/) 2016-2025. All rights reserved.
  
 [![](/Images/logo-WaherDataAB-300x58.png)](http://waher.se/)

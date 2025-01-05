@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -47,7 +47,7 @@
 		<Description>A WPF client for managing XMPP IoT devices.</Description>
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
-		<Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
+		<Copyright>Copyright © Waher Data AB 2015-2025. All rights reserved.</Copyright>
 		<SignAssembly>False</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>

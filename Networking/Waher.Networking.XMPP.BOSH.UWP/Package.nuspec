@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.BOSH.UWP</id>
@@ -16,7 +16,7 @@
 XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH)
 XEP-0206: XMPP Over BOSH
 </description>
-    <copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2018-2025. All rights reserved.</copyright>
     <tags>networking communication xmpp bosh http</tags>
     <dependencies>
 			<dependency id="Waher.Content" version="3.0.0"/>

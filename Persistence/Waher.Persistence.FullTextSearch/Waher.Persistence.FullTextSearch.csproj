@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Library that provides full-text-search capabilities to the data you persist using the Waher.Persistence library, regardless of what database provider you use. The full-text-search engine can both index objects, through their class definitions, objects generated ex-nihilo through the script engine, or content available in files. Architecture is pluggable, and you can extend the tokenization process by providing cusrtom tokenizers for different classes and file types.</Description>
-    <Copyright>Copyright © Waher Data AB 2022-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2022-2025. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.FullTextSearch</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

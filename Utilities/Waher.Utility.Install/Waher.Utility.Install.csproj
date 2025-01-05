@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Command-line tool that helps you install pluggable modules into the IoT Gateway.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.Install</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>

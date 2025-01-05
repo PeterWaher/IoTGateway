@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.UWP</id>
@@ -44,7 +44,7 @@ XEP-0377: Spam Reporting
 
 Support for other extensions is provided by separate nuget packages. See: https://waher.se/IoTGateway/Libraries.md#networking
 </summary>
-    <copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</copyright>
+    <copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</copyright>
     <tags>networking communication xmpp uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="3.0.0"/>

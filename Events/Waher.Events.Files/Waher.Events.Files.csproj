@@ -6,7 +6,7 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Implements event sinks that output incoming events to files.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>

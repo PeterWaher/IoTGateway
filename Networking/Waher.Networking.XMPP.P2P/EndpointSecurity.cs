@@ -525,9 +525,7 @@ namespace Waher.Networking.XMPP.P2P
 
 					if (!(Endpoint is null))
 					{
-						if (Endpoints is null)
-							Endpoints = new List<IE2eEndpoint>();
-
+						Endpoints ??= new List<IE2eEndpoint>();
 						Endpoints.Add(Endpoint);
 					}
 				}
@@ -772,8 +770,8 @@ namespace Waher.Networking.XMPP.P2P
 			}
 			else
 			{
-				Namespace = EndpointReference.Substring(0, i).Replace("urn:ieee:", "urn:nf:");
-				LocalName = EndpointReference.Substring(i + 1);
+				Namespace = EndpointReference[..i].Replace("urn:ieee:", "urn:nf:");
+				LocalName = EndpointReference[(i + 1)..];
 			}
 
 			foreach (IE2eEndpoint Endpoint in Endpoints)
@@ -972,12 +970,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			string Xml = Cipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
 			if (Xml is null)
-			{
-				if (SniffE2eInfo)
-					Client.Error("Unable to decrypt message.");
-				
 				return null;
-			}
 
 			if (SniffE2eInfo)
 				Client.Information(Xml);
@@ -1005,10 +998,7 @@ namespace Waher.Networking.XMPP.P2P
 			XmppClient Client = Sender as XmppClient;
 			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
 			if (T is null)
-			{
-				Client.Error("Unable to decrypt or verify message.");
 				return Task.CompletedTask;
-			}
 
 			string Xml = T.Item1;
 			string EndpointReference = T.Item2;
@@ -1209,7 +1199,6 @@ namespace Waher.Networking.XMPP.P2P
 			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
 			if (T is null)
 			{
-				Client.Error("Unable to decrypt or verify request.");
 				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
 				return;
 			}
@@ -1248,7 +1237,6 @@ namespace Waher.Networking.XMPP.P2P
 			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
 			if (T is null)
 			{
-				Client.Error("Unable to decrypt or verify request.");
 				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
 				return;
 			}

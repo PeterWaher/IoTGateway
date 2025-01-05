@@ -53,13 +53,13 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <exception cref="ArgumentException">If algorithm is not recognized.</exception>
 		public static IE2eSymmetricCipher Create(SymmetricCipherAlgorithms Algorithm)
 		{
-			switch (Algorithm)
+			return Algorithm switch
 			{
-				case SymmetricCipherAlgorithms.Aes256: return new Aes256();
-				case SymmetricCipherAlgorithms.ChaCha20: return new ChaCha20();
-				case SymmetricCipherAlgorithms.AeadChaCha20Poly1305: return new AeadChaCha20Poly1305();
-				default: throw new ArgumentException("Unrecognized algorithm: " + Algorithm.ToString(), nameof(Algorithm));
-			}
+				SymmetricCipherAlgorithms.Aes256 => new Aes256(),
+				SymmetricCipherAlgorithms.ChaCha20 => new ChaCha20(),
+				SymmetricCipherAlgorithms.AeadChaCha20Poly1305 => new AeadChaCha20Poly1305(),
+				_ => throw new ArgumentException("Unrecognized algorithm: " + Algorithm.ToString(), nameof(Algorithm)),
+			};
 		}
 
 		/// <summary>
@@ -541,83 +541,82 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		/// <param name="Receiver">Remote endpoint performing the decryption.</param>
 		public virtual async Task Encrypt(string Id, string Type, string From, string To, uint Counter, Stream Data, Stream Encrypted, IE2eEndpoint Sender, IE2eEndpoint Receiver)
 		{
-			using (TemporaryStream TempEncrypted = new TemporaryStream())
+			using TemporaryStream TempEncrypted = new TemporaryStream();
+
+			byte[] EncryptedKey;
+			byte[] Key;
+			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+			byte[] Signature;
+			long i;
+			int k, l;
+
+			if (Sender.SupportsSharedSecrets)
 			{
-				byte[] EncryptedKey;
-				byte[] Key;
-				byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-				byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
-				byte[] Signature;
-				long i;
-				int k, l;
-
-				if (Sender.SupportsSharedSecrets)
-				{
-					Key = Sender.GetSharedSecret(Receiver);
-					EncryptedKey = null;
-					l = 0;
-				}
-				else
-				{
-					Key = this.GenerateKey();
-					EncryptedKey = Receiver.EncryptSecret(Key);
-					l = EncryptedKey.Length;
-				}
-
-				await this.Encrypt(Data, TempEncrypted, Key, IV, AssociatedData);
-				i = TempEncrypted.Length;
-
-				if (i > uint.MaxValue)
-					throw new NotSupportedException("Too large.");
-
-				if (Sender.SupportsSignatures)
-				{
-					Data.Position = 0;
-					Signature = Sender.Sign(Data);
-					k = Signature.Length;
-				}
-				else
-				{
-					k = 0;
-					Signature = null;
-				}
-
-				if (k > 0)
-				{
-					if (k < 128)
-						Encrypted.WriteByte((byte)k);
-					else
-					{
-						Encrypted.WriteByte((byte)(k | 128));
-						Encrypted.WriteByte((byte)(k >> 7));
-					}
-				}
-
-				if (l > 0)
-				{
-					Encrypted.WriteByte((byte)l);
-					Encrypted.WriteByte((byte)(l >> 8));
-				}
-
-				Encrypted.WriteByte((byte)i);
-				Encrypted.WriteByte((byte)(i >> 8));
-				Encrypted.WriteByte((byte)(i >> 16));
-				Encrypted.WriteByte((byte)(i >> 24));
-
-				Encrypted.WriteByte((byte)Counter);
-				Encrypted.WriteByte((byte)(Counter >> 8));
-				Encrypted.WriteByte((byte)(Counter >> 16));
-				Encrypted.WriteByte((byte)(Counter >> 24));
-
-				if (k > 0)
-					await Encrypted.WriteAsync(Signature, 0, k);
-
-				if (l > 0)
-					await Encrypted.WriteAsync(EncryptedKey, 0, l);
-
-				TempEncrypted.Position = 0;
-				await TempEncrypted.CopyToAsync(Encrypted);
+				Key = Sender.GetSharedSecret(Receiver);
+				EncryptedKey = null;
+				l = 0;
 			}
+			else
+			{
+				Key = this.GenerateKey();
+				EncryptedKey = Receiver.EncryptSecret(Key);
+				l = EncryptedKey.Length;
+			}
+
+			await this.Encrypt(Data, TempEncrypted, Key, IV, AssociatedData);
+			i = TempEncrypted.Length;
+
+			if (i > uint.MaxValue)
+				throw new NotSupportedException("Too large.");
+
+			if (Sender.SupportsSignatures)
+			{
+				Data.Position = 0;
+				Signature = Sender.Sign(Data);
+				k = Signature.Length;
+			}
+			else
+			{
+				k = 0;
+				Signature = null;
+			}
+
+			if (k > 0)
+			{
+				if (k < 128)
+					Encrypted.WriteByte((byte)k);
+				else
+				{
+					Encrypted.WriteByte((byte)(k | 128));
+					Encrypted.WriteByte((byte)(k >> 7));
+				}
+			}
+
+			if (l > 0)
+			{
+				Encrypted.WriteByte((byte)l);
+				Encrypted.WriteByte((byte)(l >> 8));
+			}
+
+			Encrypted.WriteByte((byte)i);
+			Encrypted.WriteByte((byte)(i >> 8));
+			Encrypted.WriteByte((byte)(i >> 16));
+			Encrypted.WriteByte((byte)(i >> 24));
+
+			Encrypted.WriteByte((byte)Counter);
+			Encrypted.WriteByte((byte)(Counter >> 8));
+			Encrypted.WriteByte((byte)(Counter >> 16));
+			Encrypted.WriteByte((byte)(Counter >> 24));
+
+			if (k > 0)
+				await Encrypted.WriteAsync(Signature, 0, k);
+
+			if (l > 0)
+				await Encrypted.WriteAsync(EncryptedKey, 0, l);
+
+			TempEncrypted.Position = 0;
+			await TempEncrypted.CopyToAsync(Encrypted);
 		}
 
 		/// <summary>
@@ -690,36 +689,73 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 					return null;
 			}
 
-			using (TemporaryStream Encrypted = new TemporaryStream())
+			using TemporaryStream Encrypted = new TemporaryStream();
+
+			await Crypto.CopyAsync(Data, Encrypted, DataLen);
+
+			if (EncryptedKey is null)
+				Key = Receiver.GetSharedSecret(Sender);
+			else
+				Key = Receiver.DecryptSecret(EncryptedKey);
+
+			byte[] IV = this.GetIV(Id, Type, From, To, Counter);
+			byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
+			Stream Decrypted = null;
+
+			try
 			{
-				await Crypto.CopyAsync(Data, Encrypted, DataLen);
+				Encrypted.Position = 0;
+				Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-				if (EncryptedKey is null)
-					Key = Receiver.GetSharedSecret(Sender);
-				else
-					Key = Receiver.DecryptSecret(EncryptedKey);
+				if (!(Decrypted is null))
+				{
+					Decrypted.Position = 0;
 
-				byte[] IV = this.GetIV(Id, Type, From, To, Counter);
-				byte[] AssociatedData = this.AuthenticatedEncryption ? Encoding.UTF8.GetBytes(From) : null;
-				Stream Decrypted = null;
+					if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+						(!Sender.SupportsSignatures && SignatureLen == 0))
+					{
+						return Decrypted;
+					}
 
+					Decrypted.Dispose();
+					Decrypted = null;
+				}
+			}
+			catch (Exception)
+			{
+				// Invalid key
+
+				Decrypted?.Dispose();
+				Decrypted = null;
+			}
+
+			if (!(Receiver.Previous is null))
+			{
 				try
 				{
-					Encrypted.Position = 0;
-					Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
+					if (EncryptedKey is null)
+						Key = Receiver.Previous.GetSharedSecret(Sender);
+					else
+						Key = Receiver.Previous.DecryptSecret(EncryptedKey);
 
-					if (!(Decrypted is null))
+					if (!(Key is null))
 					{
-						Decrypted.Position = 0;
+						Encrypted.Position = 0;
+						Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-						if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-							(!Sender.SupportsSignatures && SignatureLen == 0))
+						if (!(Decrypted is null))
 						{
-							return Decrypted;
-						}
+							Decrypted.Position = 0;
 
-						Decrypted.Dispose();
-						Decrypted = null;
+							if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
+								(!Sender.SupportsSignatures && SignatureLen == 0))
+							{
+								return Decrypted;
+							}
+
+							Decrypted.Dispose();
+							Decrypted = null;
+						}
 					}
 				}
 				catch (Exception)
@@ -729,47 +765,9 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 					Decrypted?.Dispose();
 					Decrypted = null;
 				}
-
-				if (!(Receiver.Previous is null))
-				{
-					try
-					{
-						if (EncryptedKey is null)
-							Key = Receiver.Previous.GetSharedSecret(Sender);
-						else
-							Key = Receiver.Previous.DecryptSecret(EncryptedKey);
-
-						if (!(Key is null))
-						{
-							Encrypted.Position = 0;
-							Decrypted = await this.Decrypt(Encrypted, Key, IV, AssociatedData);
-
-							if (!(Decrypted is null))
-							{
-								Decrypted.Position = 0;
-
-								if ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
-									(!Sender.SupportsSignatures && SignatureLen == 0))
-								{
-									return Decrypted;
-								}
-
-								Decrypted.Dispose();
-								Decrypted = null;
-							}
-						}
-					}
-					catch (Exception)
-					{
-						// Invalid key
-
-						Decrypted?.Dispose();
-						Decrypted = null;
-					}
-				}
-
-				return null;
 			}
+
+			return null;
 		}
 
 

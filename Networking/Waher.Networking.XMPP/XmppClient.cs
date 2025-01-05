@@ -3792,11 +3792,11 @@ namespace Waher.Networking.XMPP
 		/// <returns>Error element.</returns>
 		public string ExceptionToXmppXml(Exception ex)
 		{
+			this.Error(ex.Message);
+
 			StringBuilder Xml = new StringBuilder();
 			if (ex is StanzaExceptionException ex2)
 			{
-				this.Exception(ex2);
-
 				Xml.Append("<error type='");
 				Xml.Append(ex2.ErrorType);
 				Xml.Append("'><");
@@ -3809,8 +3809,6 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				this.Exception(ex);
-
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>");
 				Xml.Append(XML.Encode(ex.Message));

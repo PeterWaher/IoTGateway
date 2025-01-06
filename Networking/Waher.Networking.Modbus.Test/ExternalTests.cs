@@ -68,11 +68,8 @@ namespace Waher.Networking.Modbus.Test
 		{
 			//await RuntimeSettings.SetAsync("ModbusGateway.Host", ENTER IP ADDRESS HERE);
 
-			host = await RuntimeSettings.GetAsync("ModbusGateway.Host", string.Empty);
+			host = await RuntimeSettings.GetAsync("ModbusGateway.Host", "lab.tagroot.io");
 			port = (int)await RuntimeSettings.GetAsync("ModbusGateway.Port", ModbusTcpClient.DefaultPort);
-
-			if (string.IsNullOrEmpty(host))
-				throw new Exception("Modbus host not configured. Configure host name, without checking in, using RuntimeSettings.SetAsync");
 		}
 
 		[TestMethod]

@@ -131,7 +131,24 @@ namespace Waher.Networking.Cluster.Test
 		[TestMethod]
 		public async Task Test_03_LargeMessage()
 		{
-			await this.TestUnacknowledgedMessage(new string('x', 1000000));
+			// Due to packages lost, retry this multiple times to see that the function works
+
+			int i;
+
+			for (i = 0; i < 1000; i++)
+			{
+				try
+				{
+					await this.TestUnacknowledgedMessage(new string('x', 1000000));
+					return;
+				}
+				catch (Exception)
+				{
+					// Try again.
+				}
+			}
+
+			Assert.Fail("Unable to send large message unacknowledged.");
 		}
 
 		[TestMethod]

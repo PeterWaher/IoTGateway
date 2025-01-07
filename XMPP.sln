@@ -1,0 +1,157 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking", "Networking\Waher.Networking\Waher.Networking.csproj", "{2C033A77-2C4C-4AA9-9422-BE12AEC1DD32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP", "Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj", "{FBADDABC-6890-4044-8708-CCF504AE3475}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Test", "Networking\Waher.Networking.XMPP.Test\Waher.Networking.XMPP.Test.csproj", "{BEF2C900-BEE7-4FE7-8053-9DBAD5CB619D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.P2P", "Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj", "{3055F1D1-086C-455C-B566-587EA3420E11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Avatar", "Networking\Waher.Networking.XMPP.Avatar\Waher.Networking.XMPP.Avatar.csproj", "{AE2E16D9-F843-4209-81C1-7C87C3FDEC09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.BOSH", "Networking\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj", "{56F0FB4A-167A-4ACD-9D5D-DD65C278BF3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Chat", "Networking\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj", "{240D14E7-7E57-42B7-B227-0D4DCC85F682}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Concentrator", "Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj", "{5C88686E-0774-4123-A518-2E4FA8FE1DD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Contracts", "Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj", "{D21BC61B-3B7B-4BAB-8D26-23E475B6D11F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Control", "Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj", "{0D9CA7D7-997C-4E06-A80B-88A89CE1341A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.HTTPX", "Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj", "{F8F35D45-91B8-4F9E-8170-344A6C228093}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Interoperability", "Networking\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj", "{FC69F024-81B2-45C9-9DEB-7A3A5516069D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Mail", "Networking\Waher.Networking.XMPP.Mail\Waher.Networking.XMPP.Mail.csproj", "{626D7DC6-94E1-431C-BD82-020834A74B4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.MUC", "Networking\Waher.Networking.XMPP.MUC\Waher.Networking.XMPP.MUC.csproj", "{59FF8C83-3116-46B4-B7F7-0C4FADC74061}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.PEP", "Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj", "{BC6C19D0-4770-41FF-A9D5-E93FF12A0F30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Provisioning", "Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj", "{926F8552-0303-45B7-9957-7E2AC26204BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.PubSub", "Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj", "{909C608C-FE86-4BD4-8DB1-786152C99C55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Push", "Networking\Waher.Networking.XMPP.Push\Waher.Networking.XMPP.Push.csproj", "{483436A3-5606-4044-BC4A-90CB8C419FCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.RDP", "Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.csproj", "{BCBAE367-C085-47C9-844C-E1A70FF02656}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Sensor", "Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj", "{7DA0B2C9-266B-4A29-BA86-F3522C0579BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Software", "Networking\Waher.Networking.XMPP.Software\Waher.Networking.XMPP.Software.csproj", "{C98D9F7C-650F-4DEE-AA39-6C3FAC6767BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Synchronization", "Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj", "{CB76176F-EB61-4BBD-BBEE-7E5BD49FA498}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.WebSocket", "Networking\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj", "{820DC0B7-3997-48DD-A92A-03660A5BDEE8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C033A77-2C4C-4AA9-9422-BE12AEC1DD32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C033A77-2C4C-4AA9-9422-BE12AEC1DD32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C033A77-2C4C-4AA9-9422-BE12AEC1DD32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C033A77-2C4C-4AA9-9422-BE12AEC1DD32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBADDABC-6890-4044-8708-CCF504AE3475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBADDABC-6890-4044-8708-CCF504AE3475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBADDABC-6890-4044-8708-CCF504AE3475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBADDABC-6890-4044-8708-CCF504AE3475}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEF2C900-BEE7-4FE7-8053-9DBAD5CB619D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF2C900-BEE7-4FE7-8053-9DBAD5CB619D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF2C900-BEE7-4FE7-8053-9DBAD5CB619D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF2C900-BEE7-4FE7-8053-9DBAD5CB619D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3055F1D1-086C-455C-B566-587EA3420E11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3055F1D1-086C-455C-B566-587EA3420E11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3055F1D1-086C-455C-B566-587EA3420E11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3055F1D1-086C-455C-B566-587EA3420E11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE2E16D9-F843-4209-81C1-7C87C3FDEC09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE2E16D9-F843-4209-81C1-7C87C3FDEC09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE2E16D9-F843-4209-81C1-7C87C3FDEC09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE2E16D9-F843-4209-81C1-7C87C3FDEC09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F0FB4A-167A-4ACD-9D5D-DD65C278BF3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F0FB4A-167A-4ACD-9D5D-DD65C278BF3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56F0FB4A-167A-4ACD-9D5D-DD65C278BF3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56F0FB4A-167A-4ACD-9D5D-DD65C278BF3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{240D14E7-7E57-42B7-B227-0D4DCC85F682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{240D14E7-7E57-42B7-B227-0D4DCC85F682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{240D14E7-7E57-42B7-B227-0D4DCC85F682}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{240D14E7-7E57-42B7-B227-0D4DCC85F682}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C88686E-0774-4123-A518-2E4FA8FE1DD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C88686E-0774-4123-A518-2E4FA8FE1DD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C88686E-0774-4123-A518-2E4FA8FE1DD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C88686E-0774-4123-A518-2E4FA8FE1DD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D21BC61B-3B7B-4BAB-8D26-23E475B6D11F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D21BC61B-3B7B-4BAB-8D26-23E475B6D11F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D21BC61B-3B7B-4BAB-8D26-23E475B6D11F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D21BC61B-3B7B-4BAB-8D26-23E475B6D11F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D9CA7D7-997C-4E06-A80B-88A89CE1341A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D9CA7D7-997C-4E06-A80B-88A89CE1341A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D9CA7D7-997C-4E06-A80B-88A89CE1341A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D9CA7D7-997C-4E06-A80B-88A89CE1341A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8F35D45-91B8-4F9E-8170-344A6C228093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8F35D45-91B8-4F9E-8170-344A6C228093}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8F35D45-91B8-4F9E-8170-344A6C228093}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8F35D45-91B8-4F9E-8170-344A6C228093}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC69F024-81B2-45C9-9DEB-7A3A5516069D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC69F024-81B2-45C9-9DEB-7A3A5516069D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC69F024-81B2-45C9-9DEB-7A3A5516069D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC69F024-81B2-45C9-9DEB-7A3A5516069D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{626D7DC6-94E1-431C-BD82-020834A74B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{626D7DC6-94E1-431C-BD82-020834A74B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{626D7DC6-94E1-431C-BD82-020834A74B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{626D7DC6-94E1-431C-BD82-020834A74B4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59FF8C83-3116-46B4-B7F7-0C4FADC74061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59FF8C83-3116-46B4-B7F7-0C4FADC74061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59FF8C83-3116-46B4-B7F7-0C4FADC74061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59FF8C83-3116-46B4-B7F7-0C4FADC74061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC6C19D0-4770-41FF-A9D5-E93FF12A0F30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC6C19D0-4770-41FF-A9D5-E93FF12A0F30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC6C19D0-4770-41FF-A9D5-E93FF12A0F30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC6C19D0-4770-41FF-A9D5-E93FF12A0F30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{926F8552-0303-45B7-9957-7E2AC26204BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{926F8552-0303-45B7-9957-7E2AC26204BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{926F8552-0303-45B7-9957-7E2AC26204BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{926F8552-0303-45B7-9957-7E2AC26204BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{909C608C-FE86-4BD4-8DB1-786152C99C55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{909C608C-FE86-4BD4-8DB1-786152C99C55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{909C608C-FE86-4BD4-8DB1-786152C99C55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{909C608C-FE86-4BD4-8DB1-786152C99C55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{483436A3-5606-4044-BC4A-90CB8C419FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{483436A3-5606-4044-BC4A-90CB8C419FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{483436A3-5606-4044-BC4A-90CB8C419FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{483436A3-5606-4044-BC4A-90CB8C419FCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCBAE367-C085-47C9-844C-E1A70FF02656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCBAE367-C085-47C9-844C-E1A70FF02656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCBAE367-C085-47C9-844C-E1A70FF02656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCBAE367-C085-47C9-844C-E1A70FF02656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DA0B2C9-266B-4A29-BA86-F3522C0579BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DA0B2C9-266B-4A29-BA86-F3522C0579BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DA0B2C9-266B-4A29-BA86-F3522C0579BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DA0B2C9-266B-4A29-BA86-F3522C0579BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C98D9F7C-650F-4DEE-AA39-6C3FAC6767BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C98D9F7C-650F-4DEE-AA39-6C3FAC6767BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C98D9F7C-650F-4DEE-AA39-6C3FAC6767BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C98D9F7C-650F-4DEE-AA39-6C3FAC6767BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB76176F-EB61-4BBD-BBEE-7E5BD49FA498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB76176F-EB61-4BBD-BBEE-7E5BD49FA498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB76176F-EB61-4BBD-BBEE-7E5BD49FA498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB76176F-EB61-4BBD-BBEE-7E5BD49FA498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{820DC0B7-3997-48DD-A92A-03660A5BDEE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{820DC0B7-3997-48DD-A92A-03660A5BDEE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{820DC0B7-3997-48DD-A92A-03660A5BDEE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{820DC0B7-3997-48DD-A92A-03660A5BDEE8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11714F57-A9A7-4D2D-A6FE-A3F73F10F1F8}
+	EndGlobalSection
+EndGlobal

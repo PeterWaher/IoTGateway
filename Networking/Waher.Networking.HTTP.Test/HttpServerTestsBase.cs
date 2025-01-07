@@ -43,7 +43,7 @@ namespace Waher.Networking.HTTP.Test
 			if (UseConsoleSniffer)
 				server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
-			server.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, true, false, false);
+			server.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, false, false);
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate (object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{

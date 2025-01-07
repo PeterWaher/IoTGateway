@@ -997,7 +997,7 @@ namespace Waher.IoTGateway
 				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
 				// to avoid congestion.
 
-				webServer.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, true, false, true);
+				webServer.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, false, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);

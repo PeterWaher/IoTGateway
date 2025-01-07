@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -40,7 +41,7 @@ namespace Waher.Networking.XMPP.Test
 			if (xmlSniffer1 is null)
 			{
 				File.Delete("XMPP1.xml");
-				xmlSniffer1 = xmlSniffer1 = new XmlFileSniffer("XMPP1.xml",
+				xmlSniffer1 = new XmlFileSniffer("XMPP1.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 						int.MaxValue, BinaryPresentationMethod.Base64);
 			}
@@ -48,7 +49,7 @@ namespace Waher.Networking.XMPP.Test
 			if (xmlSniffer2 is null)
 			{
 				File.Delete("XMPP2.xml");
-				xmlSniffer2 = xmlSniffer2 = new XmlFileSniffer("XMPP2.xml",
+				xmlSniffer2 = new XmlFileSniffer("XMPP2.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 						int.MaxValue, BinaryPresentationMethod.Base64);
 			}
@@ -56,13 +57,13 @@ namespace Waher.Networking.XMPP.Test
 
 		public static async Task DisposeSnifferAndLog()
 		{
-			if (!(xmlSniffer1 is null))
+			if (xmlSniffer1 is not null)
 			{
 				await xmlSniffer1.DisposeAsync();
 				xmlSniffer1 = null;
 			}
 
-			if (!(xmlSniffer2 is null))
+			if (xmlSniffer2 is not null)
 			{
 				await xmlSniffer2.DisposeAsync();
 				xmlSniffer2 = null;
@@ -237,12 +238,12 @@ namespace Waher.Networking.XMPP.Test
 
 		private int Wait1(int Timeout)
 		{
-			return WaitHandle.WaitAny(new WaitHandle[] { this.connected1, this.error1, this.offline1 }, Timeout);
+			return WaitHandle.WaitAny([this.connected1, this.error1, this.offline1], Timeout);
 		}
 
 		private int Wait2(int Timeout)
 		{
-			return WaitHandle.WaitAny(new WaitHandle[] { this.connected2, this.error2, this.offline2 }, Timeout);
+			return WaitHandle.WaitAny([this.connected2, this.error2, this.offline2], Timeout);
 		}
 
 		private void WaitConnected1(int Timeout)
@@ -281,6 +282,8 @@ namespace Waher.Networking.XMPP.Test
 
 		public virtual async Task DisposeClients()
 		{
+			await ConsoleOut.FlushAsync();
+
 			if (this.client1 is not null)
 			{
 				this.client1.Information("Stopping test, client 1...");

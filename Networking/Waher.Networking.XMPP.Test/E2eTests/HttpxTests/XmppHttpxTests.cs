@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Content.Text;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
@@ -64,6 +65,9 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 				await Response.SendResponse();
 			});
+
+			this.endpoints1 = this.GenerateEndpoints(new Aes256());
+			this.endpoints2 = this.GenerateEndpoints(new Aes256());
 
 			await this.ConnectClients();
 		}

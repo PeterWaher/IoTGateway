@@ -272,8 +272,6 @@ namespace Waher.Networking.XMPP.HTTPX
 		public async Task Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
 			Stream DataStream, EventHandlerAsync<HttpxResponseEventArgs> Callback, EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback, object State)
 		{
-			// TODO: Local IP & port for quick P2P response (TLS).
-
 			StringBuilder Xml = new StringBuilder();
 			ResponseState ResponseState = new ResponseState()
 			{

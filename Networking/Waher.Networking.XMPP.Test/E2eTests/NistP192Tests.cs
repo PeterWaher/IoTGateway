@@ -19,9 +19,11 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 			await DisposeSnifferAndLog();
 		}
 
-		public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
+		public override int SecurityStrength => 96;
+
+		public override IE2eEndpoint[] GenerateEndpoints(IE2eSymmetricCipher Cipher)
         {
-            return new NistP192Endpoint(Cipher);
+            return [new NistP192Endpoint(Cipher)];
         }
 
     }

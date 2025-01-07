@@ -1111,7 +1111,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (e.Ok)
 					{
-						LocalKey = this.LocalEndpoint.GetLocalKey(e.Key);
+						LocalKey = this.LocalEndpoint.FindLocalEndpoint(e.Key);
 						if (LocalKey is null)
 							e.Ok = false;
 					}
@@ -1778,7 +1778,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (State?.PublicKey is null)
 				return false;
 
-			IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
+			IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
 
 			return !(Endpoint is null);
 		}
@@ -1808,7 +1808,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
 					continue;
 
-				IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
+				IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
 				if (Endpoint is null)
 					continue;
 
@@ -1828,7 +1828,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				HaveStates = true;
 
-				IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
+				IE2eEndpoint Endpoint = this.LocalEndpoint.FindLocalEndpoint(State.PublicKey);
 				if (Endpoint is null)
 					continue;
 

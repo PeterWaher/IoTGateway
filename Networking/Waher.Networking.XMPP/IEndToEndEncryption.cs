@@ -36,6 +36,11 @@ namespace Waher.Networking.XMPP
 	public interface IEndToEndEncryption : IDisposable
 	{
 		/// <summary>
+		/// ID of <see cref="IEndToEndEncryption"/> instance.
+		/// </summary>
+		Guid InstanceId { get; }
+
+		/// <summary>
 		/// Tries to get a symmetric cipher from a reference.
 		/// </summary>
 		/// <param name="LocalName">Local Name</param>

@@ -1,11 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
-using Waher.Networking.XMPP.P2P.E2E;
 
-namespace Waher.Networking.XMPP.Test.E2eTests
+namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
     [TestClass]
-    public class Curve448Tests : XmppE2eTests
+    public class EphemeralTests : XmppHttpxTests
 	{
 		[ClassInitialize]
 		public static void ClassInitialize(TestContext _)
@@ -18,11 +17,12 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		{
 			await DisposeSnifferAndLog();
 		}
-		public override int SecurityStrength => 224;
+
+		public override int SecurityStrength => 128;
 
 		public override IE2eEndpoint[] GenerateEndpoints(IE2eSymmetricCipher Cipher)
         {
-            return [new Curve448Endpoint(Cipher)];
+            return null;
         }
 
     }

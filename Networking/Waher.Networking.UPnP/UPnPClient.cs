@@ -85,7 +85,11 @@ namespace Waher.Networking.UPnP
 					Outgoing.MulticastLoopback = false;
 					Outgoing.Ttl = 30;
 					Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
-					Outgoing.JoinMulticastGroup(MulticastAddress);
+
+					if (IsMulticastAddress(MulticastAddress))
+						Outgoing.JoinMulticastGroup(MulticastAddress);
+					else
+						this.Warning("Address provided is not a multi-cast address.");
 
 					IPEndPoint EP = new IPEndPoint(MulticastAddress, ssdpPort);
 					lock (this.ssdpOutgoing)
@@ -126,7 +130,11 @@ namespace Waher.Networking.UPnP
 								MulticastLoopback = false
 							};
 
-							Incoming.JoinMulticastGroup(MulticastAddress);
+							if (IsMulticastAddress(MulticastAddress))
+								Incoming.JoinMulticastGroup(MulticastAddress);
+							else
+								this.Warning("Address provided is not a multi-cast address.");
+
 							this.BeginReceiveIncoming(Incoming);
 
 							lock (this.ssdpIncoming)

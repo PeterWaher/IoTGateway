@@ -18,10 +18,6 @@ using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
 using Waher.Security;
-#if WINDOWS_UWP
-using Windows.Networking;
-using Windows.Networking.Connectivity;
-#endif
 
 namespace Waher.Networking.Cluster
 {
@@ -71,7 +67,7 @@ namespace Waher.Networking.Cluster
 		/// <param name="SharedSecret">Shared secret. Used to encrypt and decrypt communication. Secret is hashed before being fed to AES.</param>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public ClusterEndpoint(IPAddress MulticastAddress, int Port, byte[] SharedSecret, params ISniffer[] Sniffers)
-			: base(true, Sniffers)
+			: base(false, Sniffers)
 		{
 			ClusterUdpClient ClusterUdpClient;
 			UdpClient Client;
@@ -110,26 +106,6 @@ namespace Waher.Networking.Cluster
 				this.internalScheduler = true;
 			}
 
-#if WINDOWS_UWP
-			foreach (HostName HostName in NetworkInformation.GetHostNames())
-			{
-				if (HostName.IPInformation is null)
-					continue;
-
-				foreach (ConnectionProfile Profile in NetworkInformation.GetConnectionProfiles())
-				{
-					if (Profile.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.None)
-						continue;
-
-					if (Profile.NetworkAdapter.NetworkAdapterId != HostName.IPInformation.NetworkAdapter.NetworkAdapterId)
-						continue;
-
-					if (!IPAddress.TryParse(HostName.CanonicalName, out IPAddress Address))
-						continue;
-
-					AddressFamily AddressFamily = Address.AddressFamily;
-					bool IsLoopback = IPAddress.IsLoopback(Address);
-#else
 			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
 			{
 				if (Interface.OperationalStatus != OperationalStatus.Up)
@@ -148,7 +124,7 @@ namespace Waher.Networking.Cluster
 					IPAddress Address = UnicastAddress.Address;
 					AddressFamily AddressFamily = Address.AddressFamily;
 					bool IsLoopback = Interface.NetworkInterfaceType == NetworkInterfaceType.Loopback;
-#endif
+
 					if (Address.AddressFamily != MulticastAddress.AddressFamily)
 						continue;
 
@@ -162,21 +138,30 @@ namespace Waher.Networking.Cluster
 							{
 								//DontFragment = true,
 								ExclusiveAddressUse = true,
-								MulticastLoopback = false,
+								MulticastLoopback = true,
 								EnableBroadcast = true,
 								Ttl = 30
 							};
 
+							this.Information("Binding to " + Address);
+
 							Client.Client.Bind(new IPEndPoint(Address, 0));
 
-							try
+							if (IsMulticastAddress(MulticastAddress) && Interface.SupportsMulticast)
 							{
-								Client.JoinMulticastGroup(MulticastAddress);
+								this.Information("Joining Multicast address " + MulticastAddress);
+
+								try
+								{
+									Client.JoinMulticastGroup(MulticastAddress);
+								}
+								catch (Exception ex)
+								{
+									Log.Exception(ex);
+								}
 							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
+							else
+								this.Warning("Address provided is not a multi-cast address.");
 						}
 						catch (NotSupportedException)
 						{
@@ -222,6 +207,7 @@ namespace Waher.Networking.Cluster
 						ClusterUdpClient.BeginReceive();
 
 						this.incoming.AddLast(ClusterUdpClient);
+						this.endpoints = null;
 					}
 				}
 			}
@@ -230,15 +216,30 @@ namespace Waher.Networking.Cluster
 			{
 				Client = new UdpClient(Port, MulticastAddress.AddressFamily)
 				{
-					MulticastLoopback = false
+					MulticastLoopback = true
 				};
 
-				Client.JoinMulticastGroup(MulticastAddress);
+				if (IsMulticastAddress(MulticastAddress))
+				{
+					this.Information("Joining Multicast address " + MulticastAddress);
+
+					try
+					{
+						Client.JoinMulticastGroup(MulticastAddress);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
+				else
+					this.Warning("Address provided is not a multi-cast address.");
 
 				ClusterUdpClient = new ClusterUdpClient(this, Client, null);
 				ClusterUdpClient.BeginReceive();
 
 				this.incoming.AddLast(ClusterUdpClient);
+				this.endpoints = null;
 			}
 			catch (Exception)
 			{
@@ -251,18 +252,29 @@ namespace Waher.Networking.Cluster
 		/// <summary>
 		/// IP endpoints listening on.
 		/// </summary>
-		public IEnumerable<IPEndPoint> Endpoints
+		public IPEndPoint[] Endpoints
 		{
 			get
 			{
-				LinkedList<IPEndPoint> Result = new LinkedList<IPEndPoint>();
+				if (this.endpoints is null)
+				{
+					List<IPEndPoint> Result = new List<IPEndPoint>();
+					LinkedListNode<ClusterUdpClient> Loop = this.incoming.First;
 
-				foreach (ClusterUdpClient Client in this.incoming)
-					Result.AddLast(Client.EndPoint);
+					while (!(Loop is null))
+					{
+						Result.Add(Loop.Value.EndPoint);
+						Loop = Loop.Next;
+					}
 
-				return Result;
+					this.endpoints = Result.ToArray();
+				}
+
+				return this.endpoints;
 			}
 		}
+
+		private IPEndPoint[] endpoints = null;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -288,9 +300,7 @@ namespace Waher.Networking.Cluster
 					{
 						if (Info.Locked)
 						{
-							if (ToRelease is null)
-								ToRelease = new LinkedList<string>();
-
+							ToRelease ??= new LinkedList<string>();
 							ToRelease.AddLast(Info.Resource);
 						}
 					}
@@ -357,16 +367,20 @@ namespace Waher.Networking.Cluster
 
 		private void Clear(LinkedList<ClusterUdpClient> Clients)
 		{
-			foreach (ClusterUdpClient Client in Clients)
+			LinkedListNode<ClusterUdpClient> Loop = Clients.First;
+
+			while (!(Loop is null))
 			{
 				try
 				{
-					Client.Dispose();
+					Loop.Value.Dispose();
 				}
 				catch (Exception)
 				{
 					// Ignore
 				}
+
+				Loop = Loop.Next;
 			}
 
 			Clients.Clear();
@@ -479,11 +493,9 @@ namespace Waher.Networking.Cluster
 		/// <returns>Binary representation</returns>
 		public byte[] Serialize(object Object)
 		{
-			using (Serializer Output = new Serializer())
-			{
-				rootObject.Serialize(Output, Object);
-				return Output.ToArray();
-			}
+			using Serializer Output = new Serializer();
+			rootObject.Serialize(Output, Object);
+			return Output.ToArray();
 		}
 
 		/// <summary>
@@ -494,10 +506,8 @@ namespace Waher.Networking.Cluster
 		/// <exception cref="KeyNotFoundException">If the corresponding type, or any of the embedded properties, could not be found.</exception>
 		public object Deserialize(byte[] Data)
 		{
-			using (Deserializer Input = new Deserializer(Data))
-			{
-				return rootObject.Deserialize(Input, typeof(object));
-			}
+			using Deserializer Input = new Deserializer(Data);
+			return rootObject.Deserialize(Input, typeof(object));
 		}
 
 		internal async void DataReceived(bool ConstantBuffer, byte[] Data, IPEndPoint From)
@@ -509,238 +519,266 @@ namespace Waher.Networking.Cluster
 
 				this.ReceiveBinary(ConstantBuffer, Data);
 
-				using (Deserializer Input = new Deserializer(Data))
+				using Deserializer Input = new Deserializer(Data);
+				byte Command = Input.ReadByte();
+
+				switch (Command)
 				{
-					byte Command = Input.ReadByte();
+					case 0: // Unacknowledged message
+						object Object = rootObject.Deserialize(Input, typeof(object));
 
-					switch (Command)
-					{
-						case 0: // Unacknowledged message
-							object Object = rootObject.Deserialize(Input, typeof(object));
-							if (Object is IClusterMessage Message)
+						if (this.HasSniffers)
+							this.Information("Unacknowledged message received: " + Object.GetType().FullName);
+
+						if (Object is IClusterMessage Message)
+						{
+							await Message.MessageReceived(this, From);
+
+							await this.OnMessageReceived.Raise(this, new ClusterMessageEventArgs(Message));
+						}
+						else
+							this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+						break;
+
+					case 1: // Acknowledged message
+						Guid Id = Input.ReadGuid();
+						string s = Id.ToString();
+						ulong Len = Input.ReadVarUInt64();
+						bool Skip = false;
+
+						while (Len > 0)
+						{
+							string Address = new IPAddress(Input.ReadBinary()).ToString();
+							int Port = Input.ReadUInt16();
+
+							if (this.IsEndpoint(this.outgoing, Address, Port) ||
+								this.IsEndpoint(this.incoming, Address, Port))
 							{
-								await Message.MessageReceived(this, From);
-
-								await this.OnMessageReceived.Raise(this, new ClusterMessageEventArgs(Message));
-							}
-							else
-								this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
-							break;
-
-						case 1: // Acknowledged message
-							Guid Id = Input.ReadGuid();
-							string s = Id.ToString();
-							ulong Len = Input.ReadVarUInt64();
-							bool Skip = false;
-
-							while (Len > 0)
-							{
-								string Address = new IPAddress(Input.ReadBinary()).ToString();
-								int Port = Input.ReadUInt16();
-
-								if (this.IsEndpoint(this.outgoing, Address, Port) ||
-									this.IsEndpoint(this.incoming, Address, Port))
-								{
-									Skip = true;
-									break;
-								}
-
-								Len--;
-							}
-
-							if (Skip)
+								Skip = true;
 								break;
-
-							if (!this.currentStatus.TryGetValue(s, out object Obj) ||
-								!(Obj is bool Ack))
-							{
-								Object = rootObject.Deserialize(Input, typeof(object));
-								if (!((Message = Object as IClusterMessage) is null))
-								{
-									try
-									{
-										Ack = await Message.MessageReceived(this, From);
-
-										await this.OnMessageReceived.Raise(this, new ClusterMessageEventArgs(Message));
-									}
-									catch (Exception ex)
-									{
-										this.Exception(ex);
-										Log.Exception(ex);
-										Ack = false;
-									}
-
-									this.currentStatus[s] = Ack;
-								}
-								else
-								{
-									this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
-									Ack = false;
-								}
 							}
 
-							using (Serializer Output = new Serializer())
-							{
-								Output.WriteByte(Ack ? (byte)2 : (byte)3);
-								Output.WriteGuid(Id);
+							Len--;
+						}
 
-								this.Transmit(true, Output.ToArray(), From);
-							}
+						if (Skip)
 							break;
 
-						case 2: // ACK
-						case 3: // NACK
-							Id = Input.ReadGuid();
-							s = Id.ToString();
+						if (!this.currentStatus.TryGetValue(s, out object Obj) ||
+							!(Obj is bool Ack))
+						{
+							Object = rootObject.Deserialize(Input, typeof(object));
 
-							if (this.currentStatus.TryGetValue(s, out Obj) &&
-								Obj is MessageStatus MessageStatus)
+							if (this.HasSniffers)
+								this.Information("Acknowledged message received: " + Object.GetType().FullName);
+
+							if (!((Message = Object as IClusterMessage) is null))
 							{
-								lock (MessageStatus.Acknowledged)
-								{
-									MessageStatus.Acknowledged[From] = (Command == 2);
-								}
-
-								EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
-
-								if (MessageStatus.IsComplete(CurrentStatus))
-								{
-									this.currentStatus.Remove(s);
-									this.scheduler.Remove(MessageStatus.Timeout);
-
-									await MessageStatus.Callback.Raise(this, new ClusterMessageAckEventArgs(
-										MessageStatus.Message, MessageStatus.GetResponses(CurrentStatus),
-										MessageStatus.State));
-								}
-							}
-							break;
-
-						case 4: // Command
-							Id = Input.ReadGuid();
-							s = Id.ToString();
-							Len = Input.ReadVarUInt64();
-							Skip = false;
-
-							while (Len > 0)
-							{
-								string Address = new IPAddress(Input.ReadBinary()).ToString();
-								int Port = Input.ReadUInt16();
-
-								if (this.IsEndpoint(this.outgoing, Address, Port) ||
-									this.IsEndpoint(this.incoming, Address, Port))
-								{
-									Skip = true;
-									break;
-								}
-
-								Len--;
-							}
-
-							if (Skip)
-								break;
-
-							if (!this.currentStatus.TryGetValue(s, out Obj))
-							{
-								Object = rootObject.Deserialize(Input, typeof(object));
-								if (Object is IClusterCommand ClusterCommand)
-								{
-									try
-									{
-										Obj = await ClusterCommand.Execute(this, From);
-										this.currentStatus[s] = Obj;
-									}
-									catch (Exception ex)
-									{
-										Obj = ex;
-									}
-								}
-								else
-									Obj = new Exception("Non-command object received in command: " + Object?.GetType()?.FullName);
-							}
-
-							using (Serializer Output = new Serializer())
-							{
-								if (Obj is Exception ex)
-								{
-									ex = Log.UnnestException(ex);
-
-									Output.WriteByte(6);
-									Output.WriteGuid(Id);
-									Output.WriteString(ex.Message);
-									Output.WriteString(ex.GetType().FullName);
-								}
-								else
-								{
-									Output.WriteByte(5);
-									Output.WriteGuid(Id);
-									rootObject.Serialize(Output, Obj);
-								}
-
-								this.Transmit(true, Output.ToArray(), From);
-							}
-							break;
-
-						case 5: // Command Response
-							Id = Input.ReadGuid();
-							s = Id.ToString();
-
-							if (this.currentStatus.TryGetValue(s, out Obj) &&
-								Obj is CommandStatusBase CommandStatus)
-							{
-								Object = rootObject.Deserialize(Input, typeof(object));
-
-								CommandStatus.AddResponse(From, Object);
-
-								EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
-
-								if (CommandStatus.IsComplete(CurrentStatus))
-								{
-									this.currentStatus.Remove(s);
-									this.scheduler.Remove(CommandStatus.Timeout);
-
-									await CommandStatus.RaiseResponseEvent(CurrentStatus);
-								}
-							}
-							break;
-
-						case 6: // Command Exception
-							Id = Input.ReadGuid();
-							s = Id.ToString();
-
-							if (this.currentStatus.TryGetValue(s, out Obj) &&
-								Obj is CommandStatusBase CommandStatus2)
-							{
-								string ExceptionMessage = Input.ReadString();
-								string ExceptionType = Input.ReadString();
-								Exception ex;
-
 								try
 								{
-									Type T = Types.GetType(ExceptionType);
-									if (T is null)
-										ex = new Exception(ExceptionMessage);
-									else
-										ex = (Exception)Activator.CreateInstance(T, ExceptionMessage);
+									Ack = await Message.MessageReceived(this, From);
+
+									await this.OnMessageReceived.Raise(this, new ClusterMessageEventArgs(Message));
 								}
-								catch (Exception)
+								catch (Exception ex)
 								{
-									ex = new Exception(ExceptionMessage);
+									this.Exception(ex);
+									Log.Exception(ex);
+									Ack = false;
 								}
 
-								CommandStatus2.AddError(From, ex);
+								this.currentStatus[s] = Ack;
+							}
+							else
+							{
+								this.Error("Non-message object received in message: " + Object?.GetType()?.FullName);
+								Ack = false;
+							}
+						}
 
-								EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+						using (Serializer Output = new Serializer())
+						{
+							Output.WriteByte(Ack ? (byte)2 : (byte)3);
+							Output.WriteGuid(Id);
 
-								if (CommandStatus2.IsComplete(CurrentStatus))
+							if (this.HasSniffers)
+								this.Information("Sending " + (Ack ? "ACK" : "NACK") + " to " + From.ToString());
+
+							this.Transmit(true, Output.ToArray(), From);
+						}
+						break;
+
+					case 2: // ACK
+					case 3: // NACK
+						Id = Input.ReadGuid();
+						s = Id.ToString();
+
+						if (this.HasSniffers)
+							this.Information(Command == 2 ? "ACK received" : "NACK received");
+
+						if (this.currentStatus.TryGetValue(s, out Obj) &&
+							Obj is MessageStatus MessageStatus)
+						{
+							lock (MessageStatus.Acknowledged)
+							{
+								MessageStatus.Acknowledged[From] = (Command == 2);
+							}
+
+							EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+							if (MessageStatus.IsComplete(CurrentStatus))
+							{
+								this.currentStatus.Remove(s);
+								this.scheduler.Remove(MessageStatus.Timeout);
+
+								await MessageStatus.Callback.Raise(this, new ClusterMessageAckEventArgs(
+									MessageStatus.Message, MessageStatus.GetResponses(CurrentStatus),
+									MessageStatus.State));
+							}
+						}
+						else if (this.HasSniffers)
+							this.Warning("Response discarded. No status found for endpoing " + s);
+						break;
+
+					case 4: // Command
+						Id = Input.ReadGuid();
+						s = Id.ToString();
+						Len = Input.ReadVarUInt64();
+						Skip = false;
+
+						while (Len > 0)
+						{
+							string Address = new IPAddress(Input.ReadBinary()).ToString();
+							int Port = Input.ReadUInt16();
+
+							if (this.IsEndpoint(this.outgoing, Address, Port) ||
+								this.IsEndpoint(this.incoming, Address, Port))
+							{
+								Skip = true;
+								break;
+							}
+
+							Len--;
+						}
+
+						if (Skip)
+							break;
+
+						if (!this.currentStatus.TryGetValue(s, out Obj))
+						{
+							Object = rootObject.Deserialize(Input, typeof(object));
+
+							if (this.HasSniffers)
+								this.Information("Command received: " + Object.GetType().FullName);
+
+							if (Object is IClusterCommand ClusterCommand)
+							{
+								try
 								{
-									this.currentStatus.Remove(s);
-									this.scheduler.Remove(CommandStatus2.Timeout);
-
-									await CommandStatus2.RaiseResponseEvent(CurrentStatus);
+									Obj = await ClusterCommand.Execute(this, From);
+									this.currentStatus[s] = Obj;
+								}
+								catch (Exception ex)
+								{
+									Obj = ex;
 								}
 							}
-							break;
-					}
+							else
+								Obj = new Exception("Non-command object received in command: " + Object?.GetType()?.FullName);
+						}
+
+						using (Serializer Output = new Serializer())
+						{
+							if (Obj is Exception ex)
+							{
+								ex = Log.UnnestException(ex);
+
+								Output.WriteByte(6);
+								Output.WriteGuid(Id);
+								Output.WriteString(ex.Message);
+								Output.WriteString(ex.GetType().FullName);
+							}
+							else
+							{
+								Output.WriteByte(5);
+								Output.WriteGuid(Id);
+								rootObject.Serialize(Output, Obj);
+							}
+
+							this.Transmit(true, Output.ToArray(), From);
+						}
+						break;
+
+					case 5: // Command Response
+						Id = Input.ReadGuid();
+						s = Id.ToString();
+
+						if (this.currentStatus.TryGetValue(s, out Obj) &&
+							Obj is CommandStatusBase CommandStatus)
+						{
+							Object = rootObject.Deserialize(Input, typeof(object));
+
+							if (this.HasSniffers)
+								this.Information("Command Response received: " + Object.GetType().FullName);
+
+							CommandStatus.AddResponse(From, Object);
+
+							EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+							if (CommandStatus.IsComplete(CurrentStatus))
+							{
+								this.currentStatus.Remove(s);
+								this.scheduler.Remove(CommandStatus.Timeout);
+
+								await CommandStatus.RaiseResponseEvent(CurrentStatus);
+							}
+						}
+						break;
+
+					case 6: // Command Exception
+						Id = Input.ReadGuid();
+						s = Id.ToString();
+
+						if (this.currentStatus.TryGetValue(s, out Obj) &&
+							Obj is CommandStatusBase CommandStatus2)
+						{
+							string ExceptionMessage = Input.ReadString();
+							string ExceptionType = Input.ReadString();
+							Exception ex;
+
+							try
+							{
+								Type T = Types.GetType(ExceptionType);
+								if (T is null)
+									ex = new Exception(ExceptionMessage);
+								else
+									ex = (Exception)Activator.CreateInstance(T, ExceptionMessage);
+							}
+							catch (Exception)
+							{
+								ex = new Exception(ExceptionMessage);
+							}
+
+							if (this.HasSniffers)
+								this.Error(ex.Message);
+
+							CommandStatus2.AddError(From, ex);
+
+							EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
+
+							if (CommandStatus2.IsComplete(CurrentStatus))
+							{
+								this.currentStatus.Remove(s);
+								this.scheduler.Remove(CommandStatus2.Timeout);
+
+								await CommandStatus2.RaiseResponseEvent(CurrentStatus);
+							}
+						}
+						break;
+
+					default:
+						this.Error("Invalid command received.");
+						break;
 				}
 			}
 			catch (Exception ex)
@@ -750,11 +788,28 @@ namespace Waher.Networking.Cluster
 			}
 		}
 
+		internal bool IsEcho(IPEndPoint Endpoint)
+		{
+			LinkedListNode<ClusterUdpClient> Loop = this.outgoing.First;
+
+			while (Loop != null)
+			{
+				if (Endpoint.Equals(Loop.Value.EndPoint))
+					return true;
+
+				Loop = Loop.Next;
+			}
+
+			return false;
+		}
+
 		private bool IsEndpoint(LinkedList<ClusterUdpClient> Clients, string Address, int Port)
 		{
-			foreach (ClusterUdpClient Client in Clients)
+			LinkedListNode<ClusterUdpClient> Loop = Clients.First;
+
+			while (!(Loop is null))
 			{
-				if (Client.IsEndpoint(Address, Port))
+				if (Loop.Value.IsEndpoint(Address, Port))
 					return true;
 			}
 
@@ -770,23 +825,41 @@ namespace Waher.Networking.Cluster
 		{
 			this.TransmitBinary(ConstantBuffer, Message);
 
-			foreach (ClusterUdpClient Client in this.outgoing)
-				Client.BeginTransmit(ConstantBuffer, Message, Destination);
+			LinkedListNode<ClusterUdpClient> Loop = this.outgoing.First;
+
+			while (!(Loop is null))
+			{
+				Loop.Value.BeginTransmit(ConstantBuffer, Message, Destination);
+				Loop = Loop.Next;
+			}
 		}
 
 		/// <summary>
 		/// Sends an unacknowledged message ("at most once")
 		/// </summary>
 		/// <param name="Message">Message object</param>
-		public async Task SendMessageUnacknowledged(IClusterMessage Message)
+		public Task SendMessageUnacknowledged(IClusterMessage Message)
 		{
+			return this.SendMessageUnacknowledged(Message, this.destination);
+		}
+
+		/// <summary>
+		/// Sends an unacknowledged message ("at most once")
+		/// </summary>
+		/// <param name="Message">Message object</param>
+		/// <param name="Destination">Send the message to this endpoint.</param>
+		public async Task SendMessageUnacknowledged(IClusterMessage Message, IPEndPoint Destination)
+		{
+			if (this.HasSniffers)
+				this.Information("Sending unacknowledged message: " + Message.GetType().FullName);
+
 			Serializer Output = new Serializer();
 
 			try
 			{
 				Output.WriteByte(0);    // Unacknowledged message.
 				rootObject.Serialize(Output, Message);
-				this.Transmit(true, Output.ToArray(), this.destination);
+				this.Transmit(true, Output.ToArray(), Destination);
 			}
 			catch (Exception ex)
 			{
@@ -807,9 +880,25 @@ namespace Waher.Networking.Cluster
 		/// <param name="Message">Message to send using acknowledged service.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public async Task SendMessageAcknowledged(IClusterMessage Message,
+		public Task SendMessageAcknowledged(IClusterMessage Message,
 			EventHandlerAsync<ClusterMessageAckEventArgs> Callback, object State)
 		{
+			return this.SendMessageAcknowledged(Message, this.destination, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a message using acknowledged service. ("at least once")
+		/// </summary>
+		/// <param name="Message">Message to send using acknowledged service.</param>
+		/// <param name="Destination">Send the message to this endpoint.</param>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async Task SendMessageAcknowledged(IClusterMessage Message, IPEndPoint Destination,
+			EventHandlerAsync<ClusterMessageAckEventArgs> Callback, object State)
+		{
+			if (this.HasSniffers)
+				this.Information("Sending acknowledged message: " + Message.GetType().FullName);
+
 			Serializer Output = new Serializer();
 			Guid Id = Guid.NewGuid();
 			string s = Id.ToString();
@@ -830,6 +919,7 @@ namespace Waher.Networking.Cluster
 					Id = Id,
 					Message = Message,
 					MessageBinary = Bin,
+					Destination = Destination,
 					Callback = Callback,
 					State = State,
 					TimeLimit = Now.AddSeconds(30)
@@ -839,13 +929,13 @@ namespace Waher.Networking.Cluster
 
 				Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
 
-				this.Transmit(true, Bin, this.destination);
+				this.Transmit(true, Bin, Destination);
 
 				EndpointStatus[] CurrentStatus = this.GetRemoteStatuses();
 
 				if (Rec.IsComplete(CurrentStatus))
 				{
-					this.currentStatus.Remove(Rec.Id.ToString());
+					this.currentStatus.Remove(s);
 					this.scheduler.Remove(Rec.Timeout);
 
 					await Rec.Callback.Raise(this, new ClusterMessageAckEventArgs(
@@ -884,27 +974,25 @@ namespace Waher.Networking.Cluster
 				}
 				else
 				{
-					using (Serializer Output = new Serializer())
+					using Serializer Output = new Serializer();
+					Output.WriteByte(1);        // Acknowledged message.
+					Output.WriteGuid(Rec.Id);
+
+					lock (Rec.Acknowledged)
 					{
-						Output.WriteByte(1);        // Acknowledged message.
-						Output.WriteGuid(Rec.Id);
+						Output.WriteVarUInt64((uint)Rec.Acknowledged.Count);   // Endpoints to skip
 
-						lock (Rec.Acknowledged)
+						foreach (IPEndPoint Endpoint in Rec.Acknowledged.Keys)
 						{
-							Output.WriteVarUInt64((uint)Rec.Acknowledged.Count);   // Endpoints to skip
-
-							foreach (IPEndPoint Endpoint in Rec.Acknowledged.Keys)
-							{
-								Output.WriteBinary(Endpoint.Address.GetAddressBytes());
-								Output.WriteUInt16((ushort)Endpoint.Port);
-							}
+							Output.WriteBinary(Endpoint.Address.GetAddressBytes());
+							Output.WriteUInt16((ushort)Endpoint.Port);
 						}
-
-						Output.WriteRaw(Rec.MessageBinary, 18, Rec.MessageBinary.Length - 18);
-
-						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
-						this.Transmit(true, Output.ToArray(), this.destination);
 					}
+
+					Output.WriteRaw(Rec.MessageBinary, 18, Rec.MessageBinary.Length - 18);
+
+					Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendAcknowledgedMessage, Rec);
+					this.Transmit(true, Output.ToArray(), Rec.Destination);
 				}
 			}
 			catch (Exception ex)
@@ -917,11 +1005,21 @@ namespace Waher.Networking.Cluster
 		/// Sends a message using acknowledged service.
 		/// </summary>
 		/// <param name="Message">Message to send using acknowledged service.</param>
-		public async Task<EndpointAcknowledgement[]> SendMessageAcknowledgedAsync(IClusterMessage Message)
+		public Task<EndpointAcknowledgement[]> SendMessageAcknowledgedAsync(IClusterMessage Message)
+		{
+			return this.SendMessageAcknowledgedAsync(Message, this.destination);
+		}
+
+		/// <summary>
+		/// Sends a message using acknowledged service.
+		/// </summary>
+		/// <param name="Message">Message to send using acknowledged service.</param>
+		/// <param name="Destination">Send the message to this endpoint.</param>
+		public async Task<EndpointAcknowledgement[]> SendMessageAcknowledgedAsync(IClusterMessage Message, IPEndPoint Destination)
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			await this.SendMessageAcknowledged(Message, (Sender, e) =>
+			await this.SendMessageAcknowledged(Message, Destination, (Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -936,7 +1034,20 @@ namespace Waher.Networking.Cluster
 		/// <param name="Message">Message to send using acknowledged service.</param>
 		/// <param name="Callback">Method to call when responses have been returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public async Task SendMessageAssured(IClusterMessage Message,
+		public Task SendMessageAssured(IClusterMessage Message,
+			EventHandlerAsync<ClusterMessageAckEventArgs> Callback, object State)
+		{
+			return this.SendMessageAssured(Message, this.destination, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a message using assured service. ("exactly once")
+		/// </summary>
+		/// <param name="Message">Message to send using acknowledged service.</param>
+		/// <param name="Destination">Send the message to this endpoint.</param>
+		/// <param name="Callback">Method to call when responses have been returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async Task SendMessageAssured(IClusterMessage Message, IPEndPoint Destination,
 			EventHandlerAsync<ClusterMessageAckEventArgs> Callback, object State)
 		{
 			Guid MessageId = Guid.NewGuid();
@@ -945,12 +1056,12 @@ namespace Waher.Networking.Cluster
 			{
 				MessageID = MessageId,
 				Message = Message
-			}, async (Sender, e) =>
+			}, Destination, async (Sender, e) =>
 			{
 				await this.SendMessageAcknowledged(new Deliver()
 				{
 					MessageID = MessageId
-				}, async (sender2, e2) =>
+				}, Destination, async (sender2, e2) =>
 				{
 					await Callback.Raise(this, new ClusterMessageAckEventArgs(Message, e2.Responses, State));
 				}, null);
@@ -961,11 +1072,21 @@ namespace Waher.Networking.Cluster
 		/// Sends a message using assured service. ("exactly once")
 		/// </summary>
 		/// <param name="Message">Message to send using acknowledged service.</param>
-		public async Task<EndpointAcknowledgement[]> SendMessageAssuredAsync(IClusterMessage Message)
+		public Task<EndpointAcknowledgement[]> SendMessageAssuredAsync(IClusterMessage Message)
+		{
+			return this.SendMessageAssuredAsync(Message, this.destination);
+		}
+
+		/// <summary>
+		/// Sends a message using assured service. ("exactly once")
+		/// </summary>
+		/// <param name="Message">Message to send using acknowledged service.</param>
+		/// <param name="Destination">Send the message to this endpoint.</param>
+		public async Task<EndpointAcknowledgement[]> SendMessageAssuredAsync(IClusterMessage Message, IPEndPoint Destination)
 		{
 			TaskCompletionSource<EndpointAcknowledgement[]> Result = new TaskCompletionSource<EndpointAcknowledgement[]>();
 
-			await this.SendMessageAssured(Message, (Sender, e) =>
+			await this.SendMessageAssured(Message, Destination, (Sender, e) =>
 			{
 				Result.TrySetResult(e.Responses);
 				return Task.CompletedTask;
@@ -974,7 +1095,12 @@ namespace Waher.Networking.Cluster
 			return await Result.Task;
 		}
 
-		private async void SendAlive(object _)
+		private void SendAlive(object _)
+		{
+			Task.Run(() => this.SendAlive(this.destination));
+		}
+
+		private async Task SendAlive(IPEndPoint Destination)
 		{
 			try
 			{
@@ -987,7 +1113,7 @@ namespace Waher.Networking.Cluster
 				await this.SendMessageUnacknowledged(new Alive()
 				{
 					Status = this.localStatus
-				});
+				}, Destination);
 			}
 			catch (Exception ex)
 			{
@@ -1036,18 +1162,35 @@ namespace Waher.Networking.Cluster
 		/// <param name="Status">Status object.</param>
 		public async void AddRemoteStatus(IPEndPoint Endpoint, object Status)
 		{
-			bool New;
-
-			lock (this.remoteStatus)
+			try
 			{
-				New = !this.remoteStatus.ContainsKey(Endpoint);
-				this.remoteStatus[Endpoint] = Status;
+				bool New;
+
+				lock (this.remoteStatus)
+				{
+					New = !this.remoteStatus.ContainsKey(Endpoint);
+					this.remoteStatus[Endpoint] = Status;
+				}
+
+				if (New)
+				{
+					await this.SendAlive(Endpoint);
+
+					if (this.HasSniffers)
+						this.Information("New remote endpoint: " + Endpoint.ToString());
+
+					await this.EndpointOnline.Raise(this, new ClusterEndpointEventArgs(Endpoint));
+				}
+				else
+					this.Information("Remote endpoint status updated: " + Endpoint.ToString());
+
+				await this.EndpointStatus.Raise(this, new ClusterEndpointStatusEventArgs(Endpoint, Status));
 			}
-
-			if (New)
-				await this.EndpointOnline.Raise(this, new ClusterEndpointEventArgs(Endpoint));
-
-			await this.EndpointStatus.Raise(this, new ClusterEndpointStatusEventArgs(Endpoint, Status));
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+				this.Exception(ex);
+			}
 		}
 
 		/// <summary>
@@ -1065,7 +1208,12 @@ namespace Waher.Networking.Cluster
 			}
 
 			if (Removed)
+			{
+				if (this.HasSniffers)
+					this.Warning("Remote endpoint removed: " + Endpoint.ToString());
+
 				await this.EndpointOffline.Raise(this, new ClusterEndpointEventArgs(Endpoint));
+			}
 
 			return Removed;
 		}
@@ -1133,12 +1281,20 @@ namespace Waher.Networking.Cluster
 		private async Task CurrentStatus_Removed(object Sender, CacheItemEventArgs<string, object> e)
 		{
 			if (e.Value is IPEndPoint RemoteEndpoint)
+			{
+				if (this.HasSniffers)
+					this.Warning("Remote endpoint dropped: " + RemoteEndpoint.ToString());
+
 				await this.RemoveRemoteStatus(RemoteEndpoint);
+			}
 			else if (e.Value is MessageStatus MessageStatus)
 			{
 				if (e.Reason != RemovedReason.Manual)
 				{
 					this.scheduler.Remove(MessageStatus.Timeout);
+
+					if (this.HasSniffers)
+						this.Warning("Timeout: " + MessageStatus.Message.GetType().FullName);
 
 					await MessageStatus.Callback.Raise(this, new ClusterMessageAckEventArgs(
 						MessageStatus.Message, MessageStatus.GetResponses(this.GetRemoteStatuses()),
@@ -1203,6 +1359,7 @@ namespace Waher.Networking.Cluster
 				Rec = new CommandStatus<ResponseType>()
 				{
 					Id = Id,
+					IdStr = s,
 					Command = Command,
 					CommandBinary = Bin,
 					TimeLimit = Now.AddSeconds(30),
@@ -1220,7 +1377,7 @@ namespace Waher.Networking.Cluster
 
 				if (Rec.IsComplete(CurrentStatus))
 				{
-					this.currentStatus.Remove(Rec.Id.ToString());
+					this.currentStatus.Remove(Rec.IdStr);
 					this.scheduler.Remove(Rec.Timeout);
 
 					await Rec.Callback.Raise(this, new ClusterResponseEventArgs<ResponseType>(
@@ -1251,7 +1408,7 @@ namespace Waher.Networking.Cluster
 
 				if (Rec.IsComplete(CurrentStatus) || Now >= Rec.TimeLimit)
 				{
-					this.currentStatus.Remove(Rec.Id.ToString());
+					this.currentStatus.Remove(Rec.IdStr);
 					this.scheduler.Remove(Rec.Timeout);
 
 					await Rec.Callback.Raise(this, new ClusterResponseEventArgs<ResponseType>(
@@ -1259,27 +1416,26 @@ namespace Waher.Networking.Cluster
 				}
 				else
 				{
-					using (Serializer Output = new Serializer())
+					using Serializer Output = new Serializer();
+
+					Output.WriteByte(4);        // Command.
+					Output.WriteGuid(Rec.Id);
+
+					lock (Rec.Responses)
 					{
-						Output.WriteByte(4);        // Command.
-						Output.WriteGuid(Rec.Id);
+						Output.WriteVarUInt64((uint)Rec.Responses.Count);   // Endpoints to skip
 
-						lock (Rec.Responses)
+						foreach (IPEndPoint Endpoint in Rec.Responses.Keys)
 						{
-							Output.WriteVarUInt64((uint)Rec.Responses.Count);   // Endpoints to skip
-
-							foreach (IPEndPoint Endpoint in Rec.Responses.Keys)
-							{
-								Output.WriteBinary(Endpoint.Address.GetAddressBytes());
-								Output.WriteUInt16((ushort)Endpoint.Port);
-							}
+							Output.WriteBinary(Endpoint.Address.GetAddressBytes());
+							Output.WriteUInt16((ushort)Endpoint.Port);
 						}
-
-						Output.WriteRaw(Rec.CommandBinary, 18, Rec.CommandBinary.Length - 18);
-
-						Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
-						this.Transmit(true, Output.ToArray(), this.destination);
 					}
+
+					Output.WriteRaw(Rec.CommandBinary, 18, Rec.CommandBinary.Length - 18);
+
+					Rec.Timeout = this.scheduler.Add(Now.AddSeconds(2), this.ResendCommand<ResponseType>, Rec);
+					this.Transmit(true, Output.ToArray(), this.destination);
 				}
 			}
 			catch (Exception ex)

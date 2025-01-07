@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace Waher.Networking.Cluster.Test
 		internal static readonly IPAddress clusterAddress = IPAddress.Parse("239.255.0.0");
 		private ClusterEndpoint endpoint1 = null;
 		private ClusterEndpoint endpoint2 = null;
+		private XmlFileSniffer xmlSniffer1 = null;
+		private XmlFileSniffer xmlSniffer2 = null;
+
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
@@ -27,25 +31,30 @@ namespace Waher.Networking.Cluster.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.endpoint1 = new ClusterEndpoint(clusterAddress, 12345, "UnitTest",
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
-			this.endpoint1.GetStatus += (Sender, e) => 
-			{ 
+			File.Delete("Cluster1.xml");
+			this.xmlSniffer1 = new XmlFileSniffer("Cluster1.xml",
+				@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+				int.MaxValue, BinaryPresentationMethod.Hexadecimal);
+
+			this.endpoint1 = new ClusterEndpoint(clusterAddress, 12345, "UnitTest", this.xmlSniffer1,
+				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
+			this.endpoint1.GetStatus += (Sender, e) =>
+			{
 				e.Status = 1;
 				return Task.CompletedTask;
 			};
 
-			foreach (IPEndPoint Endpoint in this.endpoint1.Endpoints)
+			File.Delete("Cluster2.xml");
+			this.xmlSniffer2 = new XmlFileSniffer("Cluster2.xml",
+					@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+					int.MaxValue, BinaryPresentationMethod.Hexadecimal);
+
+			this.endpoint2 = new ClusterEndpoint(clusterAddress, 12345, "UnitTest", this.xmlSniffer2);
+			this.endpoint2.GetStatus += (Sender, e) =>
 			{
-				this.endpoint2 = new ClusterEndpoint(Endpoint.Address, Endpoint.Port, "UnitTest");
-				this.endpoint2.GetStatus += (Sender, e) =>
-				{
-					e.Status = 2;
-					return Task.CompletedTask;
-				};
-				this.endpoint2.AddRemoteStatus(Endpoint, null);
-				break;
-			}
+				e.Status = 2;
+				return Task.CompletedTask;
+			};
 		}
 
 		[TestCleanup]
@@ -61,6 +70,18 @@ namespace Waher.Networking.Cluster.Test
 			{
 				await this.endpoint2.DisposeAsync();
 				this.endpoint2 = null;
+			}
+
+			if (this.xmlSniffer1 is not null)
+			{
+				await this.xmlSniffer1.DisposeAsync();
+				this.xmlSniffer1 = null;
+			}
+
+			if (this.xmlSniffer2 is not null)
+			{
+				await this.xmlSniffer2.DisposeAsync();
+				this.xmlSniffer2 = null;
 			}
 		}
 
@@ -98,7 +119,7 @@ namespace Waher.Networking.Cluster.Test
 
 			await this.endpoint2.SendMessageUnacknowledged(Msg);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 		}
 
 		[TestMethod]
@@ -186,8 +207,8 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 1);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 20000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 20000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 20000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 20000));
 		}
 
 		[TestMethod]
@@ -239,7 +260,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 9);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 		}
 
 		[TestMethod]
@@ -270,7 +291,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 10);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 		}
 
 		[TestMethod]
@@ -324,8 +345,8 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 1);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 20000));
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 20000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 20000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 20000));
 		}
 
 		[TestMethod]
@@ -380,7 +401,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 16);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000));
 		}
 
 		[TestMethod]
@@ -406,7 +427,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 17.1);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000));
 
 			this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
@@ -423,7 +444,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 17.2);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000));
 		}
 
 		[TestMethod]
@@ -449,7 +470,7 @@ namespace Waher.Networking.Cluster.Test
 				return Task.CompletedTask;
 			}, 18.1);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000));
 
 			await this.endpoint2.Lock("Resource", 2000, (Sender, e) =>
 			{
@@ -468,7 +489,7 @@ namespace Waher.Networking.Cluster.Test
 
 			await this.endpoint2.Release("Resource");
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000));
 		}
 
 	}

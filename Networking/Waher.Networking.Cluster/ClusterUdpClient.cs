@@ -44,7 +44,7 @@ namespace Waher.Networking.Cluster
 			if (!(this.client.Client.LocalEndPoint is IPEndPoint EndPoint))
 				return false;
 
-			return (EndPoint.Address.ToString() == AddressString && EndPoint.Port == Port);
+			return EndPoint.Address.ToString() == AddressString && EndPoint.Port == Port;
 		}
 
 		public void Dispose()
@@ -68,20 +68,37 @@ namespace Waher.Networking.Cluster
 					if (this.disposed)
 						return;
 
-					this.endpoint.Information(Data.Buffer.Length.ToString() + " bytes received. (" + DateTime.Now.TimeOfDay.ToString() + ")");
+					IPEndPoint From = Data.RemoteEndPoint;
 
+					if (this.endpoint.IsEcho(From))
+					{
+						if (this.endpoint.HasSniffers)
+							this.endpoint.Information("Echo received from " + From.ToString());
+
+						continue;
+					}
+					
 					try
 					{
 						byte[] Datagram = Data.Buffer;
 						int i, c = Datagram.Length - 12;
 
+						if (this.endpoint.HasSniffers)
+							this.endpoint.Information(Datagram.Length.ToString() + " bytes received from " + From.ToString());
+
 						if (c <= 0 || (c & 15) != 0)
+						{
+							this.endpoint.Error("Invalid packet length.");
 							continue;
+						}
 
 						long Ticks = BitConverter.ToInt64(Datagram, 0);
 						DateTime TP = new DateTime(Ticks, DateTimeKind.Utc);
-						if ((DateTime.UtcNow - TP).TotalSeconds >= 10)  // Margin for unsynchronized clocks.
+						if (Math.Abs((DateTime.UtcNow - TP).TotalSeconds) >= 10)  // Margin for unsynchronized clocks.
+						{
+							this.endpoint.Error("Clock not synchronized. Ignoring packet.");
 							continue;
+						}
 
 						Array.Copy(Datagram, 0, this.ivRx, 0, 8);
 						Array.Copy(Datagram, 8, this.ivRx, 12, 4);
@@ -97,61 +114,60 @@ namespace Waher.Networking.Cluster
 
 						int Padding = this.ivRx[14] >> 4;
 
-						using (ICryptoTransform Decryptor = this.endpoint.aes.CreateDecryptor(this.endpoint.key, this.ivRx))
+						using ICryptoTransform Decryptor = this.endpoint.aes.CreateDecryptor(this.endpoint.key, this.ivRx);
+						byte[] Decrypted = Decryptor.TransformFinalBlock(Datagram, 12, Datagram.Length - 12);
+
+						using HMACSHA1 HMAC = new HMACSHA1(A);
+						c = Decrypted.Length - 20 - Padding;
+
+						byte[] MAC = HMAC.ComputeHash(Decrypted, 20, c);
+
+						for (i = 0; i < 20; i++)
 						{
-							byte[] Decrypted = Decryptor.TransformFinalBlock(Datagram, 12, Datagram.Length - 12);
+							if (MAC[i] != Decrypted[i])
+								break;
+						}
 
-							using (HMACSHA1 HMAC = new HMACSHA1(A))
+						if (i < 20)
+						{
+							this.endpoint.Error("MAC invalid.");
+							continue;
+						}
+
+						byte[] Received = new byte[c];
+						Array.Copy(Decrypted, 20, Received, 0, c);
+
+						if (LastFragment && FragmentNr == 0)
+							this.endpoint.DataReceived(true, Received, Data.RemoteEndPoint);
+						else
+						{
+							string Key = Data.RemoteEndPoint.ToString() + " " + Ticks.ToString();
+
+							if (!this.endpoint.currentStatus.TryGetValue(Key, out object Obj) ||
+								!(Obj is Fragments Fragments))
 							{
-								c = Decrypted.Length - 20 - Padding;
-
-								byte[] MAC = HMAC.ComputeHash(Decrypted, 20, c);
-
-								for (i = 0; i < 20; i++)
+								Fragments = new Fragments()
 								{
-									if (MAC[i] != Decrypted[i])
-										break;
-								}
+									Source = Data.RemoteEndPoint,
+									Timestamp = Ticks
+								};
 
-								if (i < 20)
-									continue;
+								this.endpoint.currentStatus[Key] = Fragments;
+							}
 
-								byte[] Received = new byte[c];
-								Array.Copy(Decrypted, 20, Received, 0, c);
+							Fragments.Parts[FragmentNr] = Received;
 
-								if (LastFragment && FragmentNr == 0)
-									this.endpoint.DataReceived(true, Received, Data.RemoteEndPoint);
-								else
-								{
-									string Key = Data.RemoteEndPoint.ToString() + " " + Ticks.ToString();
+							if (LastFragment)
+							{
+								Fragments.Done = true;
+								Fragments.NrParts = FragmentNr + 1;
+							}
 
-									if (!this.endpoint.currentStatus.TryGetValue(Key, out object Obj) ||
-										!(Obj is Fragments Fragments))
-									{
-										Fragments = new Fragments()
-										{
-											Source = Data.RemoteEndPoint,
-											Timestamp = Ticks
-										};
-
-										this.endpoint.currentStatus[Key] = Fragments;
-									}
-
-									Fragments.Parts[FragmentNr] = Received;
-
-									if (LastFragment)
-									{
-										Fragments.Done = true;
-										Fragments.NrParts = FragmentNr + 1;
-									}
-
-									if (Fragments.Done &&
-										Fragments.NrParts == Fragments.Parts.Count)
-									{
-										this.endpoint.currentStatus.Remove(Key);
-										this.endpoint.DataReceived(true, Fragments.ToByteArray(), Fragments.Source);
-									}
-								}
+							if (Fragments.Done &&
+								Fragments.NrParts == Fragments.Parts.Count)
+							{
+								this.endpoint.currentStatus.Remove(Key);
+								this.endpoint.DataReceived(true, Fragments.ToByteArray(), Fragments.Source);
 							}
 						}
 					}
@@ -163,6 +179,10 @@ namespace Waher.Networking.Cluster
 				}
 			}
 			catch (ObjectDisposedException)
+			{
+				// Closed.
+			}
+			catch (SocketException)
 			{
 				// Closed.
 			}
@@ -243,6 +263,12 @@ namespace Waher.Networking.Cluster
 						if (++this.ivTx[15] == 0)
 							++this.ivTx[14];
 
+						if (this.endpoint.HasSniffers)
+						{
+							this.endpoint.Information("Transmitting " + Datagram.Length.ToString() + " bytes to " +
+								Destination + " from " + this.EndPoint);
+						}
+
 						await this.client.SendAsync(Datagram, Datagram.Length, Destination);
 
 						if (this.disposed)
@@ -266,7 +292,7 @@ namespace Waher.Networking.Cluster
 			}
 			catch (Exception ex)
 			{
-				this.endpoint.Exception(ex);
+				this.endpoint.Exception(ex.Message + " (" + this.EndPoint + ")");
 
 				lock (this.outputQueue)
 				{

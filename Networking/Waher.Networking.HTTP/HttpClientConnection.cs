@@ -237,7 +237,7 @@ namespace Waher.Networking.HTTP
 									this.server.Http2MaxFrameSize,
 									this.server.Http2MaxConcurrentStreams,
 									this.server.Http2HeaderTableSize,
-									this.server.Http2EnablePush,
+									this.server.Http2EnablePush && this.remoteSettings.EnablePush,
 									this.server.Http2NoRfc7540Priorities || this.remoteSettings.NoRfc7540Priorities);
 
 								this.client.OnReceivedReset(this.Client_OnReceivedHttp2Live);
@@ -1236,6 +1236,7 @@ namespace Waher.Networking.HTTP
 							if (Error.HasValue)
 								return await this.ReturnHttp2Error(Error.Value, 0, "Invalid settings received.");
 
+							this.localSettings.EnablePush &= this.remoteSettings.EnablePush;
 							this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
 
 							if (this.flowControl is null)

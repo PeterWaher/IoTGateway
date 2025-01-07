@@ -1034,13 +1034,16 @@ namespace Waher.Persistence.Files
 		/// <param name="FileId">Internal file ID.</param>
 		internal void RemoveBlocks(int FileId)
 		{
-			long Min = this.GetBlockKey(FileId, 0);
-			long Max = this.GetBlockKey(FileId, uint.MaxValue);
-
-			foreach (long Key in this.blocks.GetKeys())
+			if (!(this.blocks is null))
 			{
-				if (Key >= Min && Key <= Max)
-					this.blocks.Remove(Key);
+				long Min = this.GetBlockKey(FileId, 0);
+				long Max = this.GetBlockKey(FileId, uint.MaxValue);
+
+				foreach (long Key in this.blocks.GetKeys())
+				{
+					if (Key >= Min && Key <= Max)
+						this.blocks.Remove(Key);
+				}
 			}
 		}
 

@@ -5,6 +5,15 @@ using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.Test
 {
+	/// <summary>
+	/// Performs HTTP/2 tests.
+	/// 
+	/// For a comprehensive set of tests for HTTP/2, use the h2spec tool:
+	/// https://github.com/summerwind/h2spec
+	/// 
+	/// Other testing tools are also available:
+	/// https://github.com/httpwg/wiki/wiki/HTTP-Testing-Resources
+	/// </summary>
 	[TestClass]
 	public class Http20ServerTests : HttpServerTests
 	{

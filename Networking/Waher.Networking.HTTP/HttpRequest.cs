@@ -137,7 +137,10 @@ namespace Waher.Networking.HTTP
 		{
 			byte[] Data = await this.ReadDataAsync();
 			if (Data is null)
-				return null;
+			{
+				Data = Array.Empty<byte>();
+				return new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
+			}
 
 			HttpFieldContentType ContentType = this.header.ContentType;
 			if (ContentType is null)

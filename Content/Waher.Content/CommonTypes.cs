@@ -710,7 +710,7 @@ namespace Waher.Content
 					break;
 			}
 
-			Output.Append(Timestamp.Day.ToString());
+			Output.Append(Timestamp.Day.ToString("D2"));
 			Output.Append(' ');
 
 			switch (Timestamp.Month)
@@ -765,7 +765,7 @@ namespace Waher.Content
 			}
 
 			Output.Append(' ');
-			Output.Append(Timestamp.Year.ToString());
+			Output.Append(Timestamp.Year.ToString("D4"));
 
 			Output.Append(' ');
 			Output.Append(Timestamp.Hour.ToString("D2"));

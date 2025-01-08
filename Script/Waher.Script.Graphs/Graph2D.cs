@@ -45,6 +45,14 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Base class for two-dimensional graphs.
 		/// </summary>
+		public Graph2D()
+			: this(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// Base class for two-dimensional graphs.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public Graph2D(Variables Variables)
 			: this(Variables, null, null)
@@ -1349,7 +1357,7 @@ namespace Waher.Script.Graphs
 							break;
 
 						case "Painter":
-							this.painters.AddLast((IPainter2D)Activator.CreateInstance(Types.GetType(E.InnerText)));
+							this.painters.AddLast((IPainter2D)Types.Instantiate(Types.GetType(E.InnerText)));
 							break;
 					}
 				}

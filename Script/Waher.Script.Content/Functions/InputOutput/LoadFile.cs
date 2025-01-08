@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -89,7 +90,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 			{
 				using (FileStream fs = File.OpenRead(FileName))
 				{
-					Bin = await this.LoadBin(fs);
+					Bin = await fs.ReadAllAsync();
 				}
 			}
 			catch (IOException)
@@ -101,7 +102,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 				{
 					using (FileStream fs = File.OpenRead(TempFileName))
 					{
-						Bin = await this.LoadBin(fs);
+						Bin = await fs.ReadAllAsync();
 					}
 				}
 				finally
@@ -113,28 +114,6 @@ namespace Waher.Script.Content.Functions.InputOutput
 			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
 
 			return Expression.Encapsulate(Decoded);
-		}
-
-		private async Task<byte[]> LoadBin(FileStream fs)
-		{
-			long l = fs.Length;
-			if (l > int.MaxValue)
-				throw new ScriptRuntimeException("File too large.", this);
-
-			int Len = (int)l;
-			byte[] Bin = new byte[Len];
-			int Pos = 0;
-
-			while (Pos < Len)
-			{
-				int i = await fs.ReadAsync(Bin, Pos, Len - Pos);
-				if (i < 0)
-					throw new ScriptRuntimeException("Unexpected end of file.", this);
-
-				Pos += i;
-			}
-
-			return Bin;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -8,14 +8,14 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library providing a simple HTTP(S) server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol.</Description>
+    <Description>Class library providing a simple HTTP(S) server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol. Supports HTTP/1.1 and HTTP/2.</Description>
     <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP</PackageProjectUrl>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication server web http https websockets</PackageTags>
+    <PackageTags>networking communication server web http https websockets http2</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <FileVersion>3.0.0</FileVersion>

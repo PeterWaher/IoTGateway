@@ -1,0 +1,1 @@
+﻿..\Waher.Utility.GenManifest\bin\Debug\net8.0\Waher.Utility.GenManifest.exe -a bin\Release\PublishOutput\win-x86 -o Waher.Utility.Install.manifest

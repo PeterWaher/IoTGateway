@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security
 {
@@ -10,6 +12,16 @@ namespace Waher.Security
 	/// </summary>
 	public static class Crypto
 	{
+		/// <summary>
+		/// TLS 1.2 &amp; 1.3
+		/// </summary>
+		public const SslProtocols SecureTls = (SslProtocols)((int)SslProtocols.Tls12 | 12288 /* TLS 1.3 */);
+
+		/// <summary>
+		/// TLS 1.0, 1.1, 1.2 &amp; 1.3
+		/// </summary>
+		public const SslProtocols TlsOnly = (SslProtocols)((int)SslProtocols.Tls | (int)SslProtocols.Tls11 | (int)SslProtocols.Tls12 | 12288 /* TLS 1.3 */);
+
 		/// <summary>
 		/// Transforms a stream of data.
 		/// </summary>
@@ -44,8 +56,7 @@ namespace Waher.Security
 			while (l > 0)
 			{
 				j = (int)Math.Min(BufferSize, l);
-				if (await Source.ReadAsync(Input, 0, j) != j)
-					throw new IOException("Unexpected end of file.");
+				await Source.ReadAllAsync(Input, 0, j);
 
 				l -= j;
 				if (l <= 0)
@@ -80,7 +91,7 @@ namespace Waher.Security
 					if (DataLen < BufSize)
 						BufSize = (int)DataLen;
 
-					if (await From.ReadAsync(Buffer, 0, BufSize) != BufSize)
+					if (await From.TryReadAllAsync(Buffer, 0, BufSize) != BufSize)
 						return false;
 
 					await To.WriteAsync(Buffer, 0, BufSize);

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 
@@ -322,22 +323,8 @@ namespace Waher.Networking.HTTP
 
 				if (Request.HasData)
 				{
-					int c = (int)Request.DataStream.Length;
 					Request.DataStream.Position = 0;
-
-					int i = 0;
-					int j;
-
-					Data = new byte[c];
-
-					while (i < c)
-					{
-						j = await Request.DataStream.ReadAsync(Data, i, c - i);
-						if (j <= 0)
-							throw new IOException("Unexpected end of stream.");
-
-						i += j;
-					}
+					Data = await Request.DataStream.ReadAllAsync();
 				}
 				else
 					Data = null;

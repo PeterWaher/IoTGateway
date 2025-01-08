@@ -48,7 +48,7 @@ namespace Waher.Security.ACME
 					AllowAutoRedirect = true,
 					AutomaticDecompression = (DecompressionMethods)(-1),     // All
 					CheckCertificateRevocationList = true,
-					SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
+					SslProtocols = Crypto.SecureTls
 				}, true);
 			}
 			catch (PlatformNotSupportedException)

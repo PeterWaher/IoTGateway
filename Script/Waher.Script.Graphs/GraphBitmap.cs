@@ -16,6 +16,14 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Handles bitmap-based graphs.
 		/// </summary>
+		public GraphBitmap()
+			: this(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// Handles bitmap-based graphs.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public GraphBitmap(Variables Variables)
 			: this(Variables, null, null)

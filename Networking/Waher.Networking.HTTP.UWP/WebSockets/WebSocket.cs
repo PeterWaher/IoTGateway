@@ -412,7 +412,7 @@ namespace Waher.Networking.HTTP.WebSockets
 										if (this.payloadLen > 2)
 										{
 											byte[] Bin = new byte[this.payloadLen - 2];
-											await this.payload.ReadAllAsync(Bin, 0, this.payloadLen - 2);
+											await this.payload.ReadAllAsync(Bin);
 											Reason = Encoding.UTF8.GetString(Bin);
 										}
 									}

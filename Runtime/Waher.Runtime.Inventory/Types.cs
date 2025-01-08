@@ -1103,14 +1103,14 @@ namespace Waher.Runtime.Inventory
 
 				try
 				{
-					InterfaceType Enumerator = (InterfaceType)Instantiate(T2);
-					Grade Grade = Enumerator.Supports(Object);
+					InterfaceType Candidate = (InterfaceType)Instantiate(T2);
+					Grade Grade = Candidate.Supports(Object);
 					if (Grade > BestGrade)
 					{
 						if (Grade == Grade.Perfect)
-							return Enumerator;
+							return Candidate;
 
-						Best = Enumerator;
+						Best = Candidate;
 						BestGrade = Grade;
 					}
 				}
@@ -1124,7 +1124,21 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
-		/// Finds the best interface for a certain task.
+		/// Finds interfaces that support a a certain task, ordered by reverse order of support.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			return FindSupport<InterfaceType, ObjectType>(Object, Grade.Barely, GetTypesImplementingInterface(typeof(InterfaceType)));
+		}
+
+		/// <summary>
+		/// Finds interfaces that support a a certain task, ordered by reverse order of support.
 		/// </summary>
 		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
 		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
@@ -1139,7 +1153,7 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
-		/// Finds the best interface for a certain task.
+		/// Finds interfaces that support a a certain task, ordered by reverse order of support.
 		/// </summary>
 		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
 		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
@@ -1151,7 +1165,7 @@ namespace Waher.Runtime.Inventory
 		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport, Type[] Interfaces)
 			where InterfaceType : IProcessingSupport<ObjectType>
 		{
-			List<InterfaceType> Result = new List<InterfaceType>();
+			List<KeyValuePair<InterfaceType, Grade>> Found = new List<KeyValuePair<InterfaceType, Grade>>();
 			TypeInfo TI;
 
 			foreach (Type T2 in Interfaces)
@@ -1162,15 +1176,31 @@ namespace Waher.Runtime.Inventory
 
 				try
 				{
-					InterfaceType Enumerator = (InterfaceType)Instantiate(T2);
-					if (Enumerator.Supports(Object) >= MinSupport)
-						Result.Add(Enumerator);
+					InterfaceType Candidate = (InterfaceType)Instantiate(T2);
+					Grade Support = Candidate.Supports(Object);
+
+					if (Support >= MinSupport)
+						Found.Add(new KeyValuePair<InterfaceType, Grade>(Candidate, Support));
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
 			}
+
+			Found.Sort((x, y) =>
+			{
+				int i = x.Value.CompareTo(y.Value);
+				if (i != 0)
+					return i;
+
+				return x.Key.GetType().FullName.CompareTo(y.Key.GetType().FullName);
+			});
+
+			List<InterfaceType> Result = new List<InterfaceType>();
+
+			foreach (KeyValuePair<InterfaceType, Grade> P in Found)
+				Result.Add(P.Key);
 
 			return Result.ToArray();
 		}

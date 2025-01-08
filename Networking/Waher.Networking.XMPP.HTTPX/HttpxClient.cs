@@ -327,11 +327,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (DataStream.Length < this.maxChunkSize)
 				{
-					int c = (int)DataStream.Length;
-					byte[] Data = new byte[c];
-
 					DataStream.Position = 0;
-					await DataStream.ReadAllAsync(Data, 0, c);
+					byte[] Data = await DataStream.ReadAllAsync();
 
 					Xml.Append("<data><base64>");
 					Xml.Append(Convert.ToBase64String(Data));
@@ -624,8 +621,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								BufSize = (int)Count;
 							}
 
-							if (BufSize != await Data.ReadAsync(Buf, 0, BufSize))
-								throw new IOException("Unexpected end of file.");
+							await Data.ReadAllAsync(Buf, 0, BufSize);
 
 							Count -= BufSize;
 

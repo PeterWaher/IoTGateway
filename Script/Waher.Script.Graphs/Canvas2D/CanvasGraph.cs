@@ -23,6 +23,14 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <summary>
 		/// Canvas graph. Permits custom drawing from scrupt.
 		/// </summary>
+		public CanvasGraph()
+			: this(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// Canvas graph. Permits custom drawing from scrupt.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public CanvasGraph(Variables Variables)
 			: this(Variables, null, null)
@@ -300,7 +308,7 @@ namespace Waher.Script.Graphs.Canvas2D
 					if (T is null)
 						continue;
 
-					if (!(Activator.CreateInstance(T) is CanvasOperation Op))
+					if (!(Types.Instantiate(T) is CanvasOperation Op))
 						continue;
 
 					await Op.ImportGraph(E, Variables);

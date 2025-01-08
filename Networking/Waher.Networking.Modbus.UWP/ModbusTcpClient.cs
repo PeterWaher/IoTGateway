@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Waher.Networking.Modbus.Exceptions;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Threading;
+using Waher.Security;
 
 namespace Waher.Networking.Modbus
 {
@@ -88,7 +89,7 @@ namespace Waher.Networking.Modbus
 			{
 				try
 				{
-					await Result.tcpClient.UpgradeToTlsAsClient(SslProtocols.Tls12);
+					await Result.tcpClient.UpgradeToTlsAsClient(Crypto.SecureTls);
 				}
 				catch (Exception ex)
 				{

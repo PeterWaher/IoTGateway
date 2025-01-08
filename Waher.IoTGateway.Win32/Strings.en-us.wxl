@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-	<String Id="ButtonText_Yes">&amp;Yes</String>
-	<String Id="ButtonText_No">&amp;No</String>
-	<String Id="ButtonText_OK">&amp;OK</String>
-	<String Id="ButtonText_Cancel">&amp;Cancel</String>
+﻿<WixLocalization Culture="en-us" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+	<String Id="ButtonText_Yes" Value="&amp;Yes" />
+	<String Id="ButtonText_No" Value="&amp;No" />
+	<String Id="ButtonText_OK" Value="&amp;OK" />
+	<String Id="ButtonText_Cancel" Value="&amp;Cancel" />
 </WixLocalization>

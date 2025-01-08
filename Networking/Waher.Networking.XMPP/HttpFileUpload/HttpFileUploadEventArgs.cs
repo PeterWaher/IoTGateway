@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.HttpFileUpload
 {
@@ -153,9 +154,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 						if (Buffer is null || Buffer.Length != c)
 							Buffer = new byte[c];
 
-						int i = await Content.ReadAsync(Buffer, 0, c);
-						if (i != c)
-							throw new IOException("Unexpected end of file");
+						await Content.ReadAllAsync(Buffer, 0, c);
 
 						HttpContent Body = new ByteArrayContent(Buffer);
 

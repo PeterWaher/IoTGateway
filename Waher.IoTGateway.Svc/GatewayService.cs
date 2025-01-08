@@ -12,7 +12,7 @@ using Waher.Events;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 using Waher.Persistence;
-using Waher.Runtime.Console;
+using Waher.Runtime.Inventory;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 
@@ -68,6 +68,7 @@ namespace Waher.IoTGateway.Svc
 					try
 					{
 						Started = Gateway.Start(false, true, Program.InstanceName).Result;
+						Types.SetModuleParameter("SERVICE_NAME", this.ServiceName);
 					}
 					finally
 					{
@@ -221,11 +222,11 @@ namespace Waher.IoTGateway.Svc
 		protected override void OnSessionChange(SessionChangeDescription ChangeDescription)
 		{
 			int SessionId = ChangeDescription.SessionId;
-			List<KeyValuePair<string, object>> Tags = new()
-			{
+			List<KeyValuePair<string, object>> Tags =
+			[
 				new("SessionId", SessionId),
 				new("Domain", Gateway.Domain?.Value ?? "N/A")
-			};
+			];
 
 			AddWtsUserName(Tags, SessionId);
 			AddWtsName(Tags, "Initial Program", SessionId, WtsInfoClass.WTSInitialProgram);
@@ -298,14 +299,14 @@ namespace Waher.IoTGateway.Svc
 			}
 
 			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain))
-				Log.Notice(Message, Tags.ToArray());
+				Log.Notice(Message, [.. Tags]);
 			else
 			{
 				if ((Setup.NotificationConfiguration.Instance.Addresses?.Length ?? 0) == 0)
-					Log.Alert(Message, Tags.ToArray());
+					Log.Alert(Message, [.. Tags]);
 				else
 				{
-					Log.Notice(Message, Tags.ToArray());
+					Log.Notice(Message, [.. Tags]);
 
 					StringBuilder Markdown = new();
 
@@ -398,8 +399,8 @@ namespace Waher.IoTGateway.Svc
 			return Result;
 		}
 
-		private static readonly char[] specialCharactersToEscape = new char[]
-		{
+		private static readonly char[] specialCharactersToEscape =
+		[
 			'\x00',
 			'\x01',
 			'\x02',
@@ -431,9 +432,9 @@ namespace Waher.IoTGateway.Svc
 			'\x1d',
 			'\x1e',
 			'\x1f'
-		};
-		private static readonly string[] specialCharacterEscapes = new string[]
-		{
+		];
+		private static readonly string[] specialCharacterEscapes =
+		[
 			"<NUL>",	// '\x00',
 			"<SOH>",	// '\x01',
 			"<STX>",	// '\x02',
@@ -465,7 +466,7 @@ namespace Waher.IoTGateway.Svc
 			"<GS>",		// '\x1d',
 			"<RS>",		// '\x1e',
 			"<US>"		// '\x1f'
-		};
+		];
 
 
 		protected override void OnShutdown()
@@ -500,9 +501,16 @@ namespace Waher.IoTGateway.Svc
 				Ledger.Provider.Flush().Wait();
 		}
 
-		protected override void OnCustomCommand(int command)
+		protected override async void OnCustomCommand(int command)
 		{
-			Gateway.ExecuteServiceCommand(command);
+			try
+			{
+				await Gateway.ExecuteServiceCommand(command);
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
 		}
 	}
 }

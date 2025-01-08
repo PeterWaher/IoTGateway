@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
 	<Assembly fileName="clretwrc.dll"/>
 	<Assembly fileName="clrgc.dll"/>
@@ -42,6 +42,8 @@
 	<Assembly fileName="System.Diagnostics.Contracts.dll"/>
 	<Assembly fileName="System.Diagnostics.Debug.dll"/>
 	<Assembly fileName="System.Diagnostics.DiagnosticSource.dll"/>
+	<Assembly fileName="System.Diagnostics.EventLog.dll"/>
+	<Assembly fileName="System.Diagnostics.EventLog.Messages.dll"/>
 	<Assembly fileName="System.Diagnostics.FileVersionInfo.dll"/>
 	<Assembly fileName="System.Diagnostics.Process.dll"/>
 	<Assembly fileName="System.Diagnostics.StackTrace.dll"/>
@@ -150,6 +152,7 @@
 	<Assembly fileName="System.Security.SecureString.dll"/>
 	<Assembly fileName="System.ServiceModel.Web.dll"/>
 	<Assembly fileName="System.ServiceProcess.dll"/>
+	<Assembly fileName="System.ServiceProcess.ServiceController.dll"/>
 	<Assembly fileName="System.Text.Encoding.CodePages.dll"/>
 	<Assembly fileName="System.Text.Encoding.dll"/>
 	<Assembly fileName="System.Text.Encoding.Extensions.dll"/>
@@ -208,7 +211,7 @@
 	<Assembly fileName="Waher.Runtime.Temporary.dll"/>
 	<Assembly fileName="Waher.Runtime.Temporary.pdb"/>
 	<Assembly fileName="Waher.Runtime.Temporary.xml"/>
-	<Assembly fileName="Waher.Runtime.Text.dll"	/>
+	<Assembly fileName="Waher.Runtime.Text.dll"/>
 	<Assembly fileName="Waher.Runtime.Text.pdb"/>
 	<Assembly fileName="Waher.Runtime.Text.xml"/>
 	<Assembly fileName="Waher.Script.dll"/>

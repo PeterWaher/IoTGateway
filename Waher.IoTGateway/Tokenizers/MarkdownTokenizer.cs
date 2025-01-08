@@ -2,7 +2,9 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Rendering;
 using Waher.Persistence.FullTextSearch;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Tokenizers;
@@ -74,7 +76,11 @@ namespace Waher.IoTGateway.Tokenizers
 			Append(sb, Doc.Subtitle);
 			Append(sb, Doc.Title);
 
-			await Doc.GeneratePlainText(sb);
+			using (TextRenderer Renderer = new TextRenderer(sb))
+			{
+				await Renderer.RenderDocument(Doc, true);
+			}
+
 			StringTokenizer.Tokenize(sb.ToString(), Process);
 		}
 

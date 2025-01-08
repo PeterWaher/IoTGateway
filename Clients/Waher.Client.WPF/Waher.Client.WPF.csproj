@@ -1,962 +1,345 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{7E4AFEC9-19CF-4356-A212-EFFB29F8CC32}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Client.WPF</RootNamespace>
-    <AssemblyName>Waher.Client.WPF</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://waher.se/Downloads/IoTClient/</InstallUrl>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
-    <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Configure.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>76518A29D2DDB20C1A5725F5B32B0E5CA84B6521</ManifestCertificateThumbprint>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>Waher.Client.WPF_1_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="ICSharpCode.AvalonEdit, Version=6.3.0.90, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\AvalonEdit.6.3.0.90\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>
-    </Reference>
-    <Reference Include="SkiaSharp, Version=2.88.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SkiaSharp.2.88.9\lib\net462\SkiaSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Buffers.4.6.0\lib\net462\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.FileSystem, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Memory, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Memory.4.6.0\lib\net462\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Numerics.Vectors.4.6.0\lib\net462\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.6.1.0\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Extensions, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.Extensions.4.3.1\lib\net462\System.Runtime.Extensions.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.XmlDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Xml.XmlDocument.4.3.0\lib\net46\System.Xml.XmlDocument.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.XPath, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Xml.XPath.4.3.0\lib\net46\System.Xml.XPath.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.XPath.XmlDocument, Version=4.7.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Xml.XPath.XmlDocument.4.7.0\lib\net462\System.Xml.XPath.XmlDocument.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Controls\Logs\LogItem.cs" />
-    <Compile Include="Controls\Logs\LogSink.cs" />
-    <Compile Include="Controls\QueryResultView.xaml.cs">
-      <DependentUpon>QueryResultView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ChatView.xaml.cs">
-      <DependentUpon>ChatView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Chat\ChatItem.cs" />
-    <Compile Include="Controls\ConnectionView.xaml.cs">
-      <DependentUpon>ConnectionView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Questions\CanControlQuestion.cs" />
-    <Compile Include="Controls\Questions\NodeQuestion.cs" />
-    <Compile Include="Controls\Questions\CanReadQuestion.cs" />
-    <Compile Include="Controls\Questions\IsFriendQuestion.cs" />
-    <Compile Include="Controls\Questions\Question.cs" />
-    <Compile Include="Controls\Report\ReportObject.cs" />
-    <Compile Include="Controls\Report\ReportTableCompleted.cs" />
-    <Compile Include="Controls\Report\ReportSectionCompleted.cs" />
-    <Compile Include="Controls\Report\ReportTableRecords.cs" />
-    <Compile Include="Controls\Report\ReportTableCreated.cs" />
-    <Compile Include="Controls\Report\ReportSectionCreated.cs" />
-    <Compile Include="Controls\Report\ReportEvent.cs" />
-    <Compile Include="Controls\Report\ReportElement.cs" />
-    <Compile Include="Controls\Script\PrintOutput.cs" />
-    <Compile Include="Controls\SearchResultView.xaml.cs">
-      <DependentUpon>SearchResultView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SensorDataView.xaml.cs">
-      <DependentUpon>SensorDataView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SensorData\ErrorItem.cs" />
-    <Compile Include="Controls\SensorData\FieldItem.cs" />
-    <Compile Include="Controls\ScriptView.xaml.cs">
-      <DependentUpon>ScriptView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\QuestionView.xaml.cs">
-      <DependentUpon>QuestionView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\LogView.xaml.cs">
-      <DependentUpon>LogView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\RemoteDesktopView.xaml.cs">
-      <DependentUpon>RemoteDesktopView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\SnifferView.xaml.cs">
-      <DependentUpon>SnifferView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Sniffers\SniffItem.cs" />
-    <Compile Include="Controls\Sniffers\TabSniffer.cs" />
-    <Compile Include="Dialogs\AvalonExtensions\NonScrollingTextEditor.cs" />
-    <Compile Include="Dialogs\Muc\BanOccupantForm.xaml.cs">
-      <DependentUpon>BanOccupantForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\OccupantPrivilegesForm.xaml.cs">
-      <DependentUpon>OccupantPrivilegesForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\RoomInvitationReceivedForm.xaml.cs">
-      <DependentUpon>RoomInvitationReceivedForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\ChangeSubjectForm.xaml.cs">
-      <DependentUpon>ChangeSubjectForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\OccupantListForm.xaml.cs">
-      <DependentUpon>OccupantListForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\SendRoomInvitationForm.xaml.cs">
-      <DependentUpon>SendRoomInvitationForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\DestroyRoomForm.xaml.cs">
-      <DependentUpon>DestroyRoomForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Muc\EnterRoomForm.xaml.cs">
-      <DependentUpon>EnterRoomForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ChangePasswordForm.xaml.cs">
-      <DependentUpon>ChangePasswordForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Legal\LegalIdentityForm.xaml.cs">
-      <DependentUpon>LegalIdentityForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\IoT\SelectItemDialog.xaml.cs">
-      <DependentUpon>SelectItemDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\IoT\ClaimDeviceForm.xaml.cs">
-      <DependentUpon>ClaimDeviceForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\IoT\SearchForThingsDialog.xaml.cs">
-      <DependentUpon>SearchForThingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ParameterDialog.xaml.cs">
-      <DependentUpon>ParameterDialog.xaml</DependentUpon>
-    </Compile>
-    <Page Include="Controls\QueryResultView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\ChatView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\ConnectionView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\SearchResultView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\SensorDataView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\ScriptView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\QuestionView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\LogView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\RemoteDesktopView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Controls\SnifferView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\Muc\BanOccupantForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\OccupantPrivilegesForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\RoomInvitationReceivedForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\ChangeSubjectForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\OccupantListForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\SendRoomInvitationForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\DestroyRoomForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Muc\EnterRoomForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\ChangePasswordForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Legal\LegalIdentityForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\IoT\SelectItemDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\IoT\ClaimDeviceForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\ConnectToForm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\AddContactForm.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\IoT\SearchForThingsDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\ParameterDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\PubSub\AddAffiliateForm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\PubSub\AffiliationsForm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\Xmpp\IqResultFrom.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Xmpp\IqFrom.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\Xmpp\MessageForm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controls\ITabView.cs" />
-    <Compile Include="Dialogs\PubSub\AddAffiliateForm.xaml.cs">
-      <DependentUpon>AddAffiliateForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\PubSub\AffiliationItem.cs" />
-    <Compile Include="Dialogs\PubSub\AffiliationsForm.xaml.cs">
-      <DependentUpon>AffiliationsForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Xmpp\IqResultFrom.xaml.cs">
-      <DependentUpon>IqResultFrom.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Xmpp\IqFrom.xaml.cs">
-      <DependentUpon>IqFrom.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Xmpp\MessageForm.xaml.cs">
-      <DependentUpon>MessageForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Model\ColorableItem.cs" />
-    <Compile Include="Dialogs\ConnectToForm.xaml.cs">
-      <DependentUpon>ConnectToForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\AddContactForm.xaml.cs">
-      <DependentUpon>AddContactForm.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Model\DisplayableParameters.cs" />
-    <Compile Include="Model\EventLog.cs" />
-    <Compile Include="Model\IMenuAggregator.cs" />
-    <Compile Include="Model\Legal\LegalService.cs" />
-    <Compile Include="Model\Muc\MucService.cs" />
-    <Compile Include="Model\Muc\OccupantNode.cs" />
-    <Compile Include="Model\Muc\RoomNode.cs" />
-    <Compile Include="Model\PubSub\PubSubItem.cs" />
-    <Compile Include="Model\PubSub\PubSubNode.cs" />
-    <Compile Include="Model\PubSub\PubSubService.cs" />
-    <Compile Include="Model\XmppNode.cs" />
-    <Compile Include="Model\XmppComponent.cs" />
-    <Compile Include="Model\Connections.cs" />
-    <Compile Include="Model\Loading.cs" />
-    <Compile Include="Model\Concentrator\Node.cs" />
-    <Compile Include="Model\Concentrator\DataSource.cs" />
-    <Compile Include="Model\Provisioning\ThingRegistry.cs" />
-    <Compile Include="Model\Concentrator\XmppConcentrator.cs" />
-    <Compile Include="Model\Things\XmppActuator.cs" />
-    <Compile Include="Model\XmppOther.cs" />
-    <Compile Include="Model\Things\XmppSensor.cs" />
-    <Compile Include="Model\SelectableItem.cs" />
-    <Compile Include="Model\TreeNode.cs" />
-    <Compile Include="Model\XmppAccountNode.cs" />
-    <Compile Include="Model\XmppContact.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="app.config" />
-    <EmbeddedResource Include="Dialogs\AvalonExtensions\Markdown.xshd" />
-    <EmbeddedResource Include="Dialogs\AvalonExtensions\CSS.xshd" />
-    <EmbeddedResource Include="Dialogs\AvalonExtensions\HTML.xshd" />
-    <EmbeddedResource Include="Dialogs\AvalonExtensions\JavaScript.xshd" />
-    <EmbeddedResource Include="Dialogs\AvalonExtensions\JSON.xshd" />
-    <EmbeddedResource Include="Dialogs\AvalonExtensions\XML.xshd" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <AppDesigner Include="Properties\" />
-    <EmbeddedResource Include="Schema\ClientConnections.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\Sniff.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\Chat.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\sensor-data.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\SensorData.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include="README.md" />
-    <EmbeddedResource Include="Schema\SearchResult.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\Script.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\EventOutput.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\Report.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <None Include="Waher.Client.WPF_1_TemporaryKey.pfx" />
-    <None Include="Waher.Client.WPF_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\open_document_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\new_document_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\save_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\favorites_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
-      <Project>{2d8576c7-fb84-4f23-8475-4432042d8f15}</Project>
-      <Name>Waher.Content.Emoji.Emoji1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
-      <Name>Waher.Content.Emoji</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Html\Waher.Content.Html.csproj">
-      <Project>{1a5ce219-e61b-4cf4-91ef-dbcc18a7fbc0}</Project>
-      <Name>Waher.Content.Html</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj">
-      <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
-      <Name>Waher.Content.Images</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.csproj">
-      <Project>{4c105fae-978c-4c5a-9115-458f841c80d4}</Project>
-      <Name>Waher.Content.Markdown.Consolidation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj">
-      <Project>{a799d295-4eb2-4754-b0ff-455a881ff491}</Project>
-      <Name>Waher.Content.Markdown.GraphViz</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.csproj">
-      <Project>{d6097310-d483-4f55-bf6d-503dbd31a584}</Project>
-      <Name>Waher.Content.Markdown.Layout2D</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj">
-      <Project>{82808905-5784-4a02-b137-a47b0142a46e}</Project>
-      <Name>Waher.Content.Markdown.PlantUml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj">
-      <Project>{c342d6f2-8f1c-4bcb-acb8-ba0c9f5e9de9}</Project>
-      <Name>Waher.Content.Markdown.Wpf</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
-      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
-      <Name>Waher.Content.Markdown</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.QR\Waher.Content.QR.csproj">
-      <Project>{822e04e4-79fa-43e1-bdfc-775ee47236e7}</Project>
-      <Name>Waher.Content.QR</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Rss\Waher.Content.Rss.csproj">
-      <Project>{ea40f54d-525f-452e-b0c7-0d281e866030}</Project>
-      <Name>Waher.Content.Rss</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj">
-      <Project>{2eb59799-b2b0-4550-85e7-75ca4f208071}</Project>
-      <Name>Waher.Content.Semantic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj">
-      <Project>{0179c5ca-dadb-4c1f-b219-44b9ab8380b4}</Project>
-      <Name>Waher.Content.SystemFiles</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
-      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
-      <Name>Waher.Content.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj">
-      <Project>{9525e41e-9c40-4f55-bada-ee8a6bab1062}</Project>
-      <Name>Waher.Content.Xsl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
-      <Project>{f3789e37-22a3-4103-9281-0e0ce193690e}</Project>
-      <Name>Waher.Events.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj">
-      <Project>{05a6ff8e-2db8-487f-9302-5d35deccc9d5}</Project>
-      <Name>Waher.Layout.Layout2D</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj">
-      <Project>{18dac659-05a0-4f9d-b14e-a43eb733a84c}</Project>
-      <Name>Waher.Networking.PeerToPeer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.SASL\Waher.Networking.SASL.csproj">
-      <Project>{c23a7907-417a-40d0-82aa-b430b7f6b7c2}</Project>
-      <Name>Waher.Networking.SASL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.SMTP\Waher.Networking.SMTP.csproj">
-      <Project>{185e0e6c-fb6b-4156-8ea8-f742abeb26a4}</Project>
-      <Name>Waher.Networking.SMTP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj">
-      <Project>{3c8f09ed-99ae-425b-891f-74235a0bbb08}</Project>
-      <Name>Waher.Networking.XMPP.BOSH</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
-      <Project>{adf456c6-dc01-460f-9270-dfa4385b92e0}</Project>
-      <Name>Waher.Networking.XMPP.Concentrator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj">
-      <Project>{20cc1df7-d057-4dbe-814c-2ebddd40d82d}</Project>
-      <Name>Waher.Networking.XMPP.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
-      <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
-      <Name>Waher.Networking.XMPP.Control</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.MUC\Waher.Networking.XMPP.MUC.csproj">
-      <Project>{85e71d65-82a7-41ca-baf9-d86e22b47c45}</Project>
-      <Name>Waher.Networking.XMPP.MUC</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj">
-      <Project>{97c157a3-b902-4c4b-8722-821be36a939e}</Project>
-      <Name>Waher.Networking.XMPP.P2P</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj">
-      <Project>{2e9216fa-4e3d-4ed8-80a0-3557a7aa4481}</Project>
-      <Name>Waher.Networking.XMPP.PEP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
-      <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
-      <Name>Waher.Networking.XMPP.Provisioning</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj">
-      <Project>{e7bbcd12-29c4-4272-a972-6c28f8905c34}</Project>
-      <Name>Waher.Networking.XMPP.PubSub</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.csproj">
-      <Project>{cc09fdc7-bcbc-4285-ad1b-731d442bc693}</Project>
-      <Name>Waher.Networking.XMPP.RDP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
-      <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
-      <Name>Waher.Networking.XMPP.Sensor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj">
-      <Project>{e4112366-6d17-4b03-8127-0b62c0d42370}</Project>
-      <Name>Waher.Networking.XMPP.Synchronization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj">
-      <Project>{1846ad1f-9ec3-43ea-a1ce-ce79557f3ff6}</Project>
-      <Name>Waher.Networking.XMPP.WebSocket</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
-      <Name>Waher.Networking.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj">
-      <Project>{8b1029cc-299f-4325-baf7-782b06f53c94}</Project>
-      <Name>Waher.Persistence.FilesLW</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj">
-      <Project>{56867025-b65d-43d4-b914-9c7cf9a42bc0}</Project>
-      <Name>Waher.Persistence.FullTextSearch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
-      <Project>{d096df31-9837-4267-bd65-7c48f1d788d2}</Project>
-      <Name>Waher.Persistence.Serialization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
-      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
-      <Name>Waher.Persistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
-      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
-      <Name>Waher.Runtime.Inventory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
-      <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
-      <Name>Waher.Runtime.Settings</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
-      <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
-      <Name>Waher.Runtime.Timing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj">
-      <Project>{6055882c-4fbb-4336-98e2-fa7594d6f143}</Project>
-      <Name>Waher.Script.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj">
-      <Project>{ec208ca9-1bd1-4492-879d-0f1f818f2729}</Project>
-      <Name>Waher.Script.Cryptography</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj">
-      <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>
-      <Name>Waher.Script.Fractals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.csproj">
-      <Project>{fbdb82df-f638-49f2-94c9-c49153f8a776}</Project>
-      <Name>Waher.Script.FullTextSearch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj">
-      <Project>{a0be2c7f-2272-468c-8b4a-05a246d5aaf3}</Project>
-      <Name>Waher.Script.Graphs3D</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
-      <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
-      <Name>Waher.Script.Graphs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Networking\Waher.Script.Networking.csproj">
-      <Project>{7101894b-d43a-46b2-948f-19a888eab92a}</Project>
-      <Name>Waher.Script.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
-      <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
-      <Name>Waher.Script.Persistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
-      <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
-      <Name>Waher.Script.Statistics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.System\Waher.Script.System.csproj">
-      <Project>{50acc169-770c-4471-ab6b-7186064b0f12}</Project>
-      <Name>Waher.Script.System</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Threading\Waher.Script.Threading.csproj">
-      <Project>{1244e2b8-2574-444e-8def-d85f7beeb00d}</Project>
-      <Name>Waher.Script.Threading</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj">
-      <Project>{ad578b08-0e8d-47e6-a748-b53fd2702582}</Project>
-      <Name>Waher.Script.XmlDSig</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj">
-      <Project>{68152abc-72bc-450f-8e08-da9638f8dee4}</Project>
-      <Name>Waher.Script.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
-      <Name>Waher.Script</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj">
-      <Project>{1c6cf422-5565-43e1-842b-9fd610bd9a67}</Project>
-      <Name>Waher.Security.EllipticCurves</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
-      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
-      <Name>Waher.Things</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Away.png" />
-    <Resource Include="Graphics\Chat.png" />
-    <Resource Include="Graphics\Offline.png" />
-    <Resource Include="Graphics\Online.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\delete_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Add.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\new_document_16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\open_document_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\save_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\favorites_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\refresh_document_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\refresh_document_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\print_preview_lined_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\print_preview_lined_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\search_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\search_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\SniffToHTML.xslt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\history_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\history_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\ChatToHTML.xslt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\SensorDataToHTML.xslt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Spy-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\DoNotDisturb.png" />
-    <Resource Include="Graphics\ExtendedAway.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\rss-feed-icon_16.png" />
-    <Resource Include="Graphics\rss-feed-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Settings-icon_16.png" />
-    <Resource Include="Graphics\Settings-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Chat-icon_16.png" />
-    <Resource Include="Graphics\Chat-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Configure.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\folder-yellow-icon.png" />
-    <Resource Include="Graphics\folder-yellow-open-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\App-miscellaneous-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\hourglass-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Database-icon_16.png" />
-    <Resource Include="Graphics\Database-icon_32.png" />
-    <Resource Include="Graphics\server-components-icon_16.png" />
-    <Resource Include="Graphics\server-components-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\SearchResultToHTML.xslt">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\pi.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\ScriptToHTML.xslt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Safe-icon_16.png" />
-    <Resource Include="Graphics\Safe-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Recycle-Bin-empty-icon_16.png" />
-    <Resource Include="Graphics\Recycle-Bin-empty-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Both.png" />
-    <Resource Include="Graphics\From.png" />
-    <Resource Include="Graphics\None.png" />
-    <Resource Include="Graphics\To.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\renew-icon_16.png" />
-    <Resource Include="Graphics\renew-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Transfer-icon_16.png" />
-    <Resource Include="Graphics\Transfer-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\symbol-delete-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\symbol-delete-icon-gray.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Properties-icon_16.png" />
-    <Resource Include="Graphics\Properties-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Places-user-identity-icon_16.png" />
-    <Resource Include="Graphics\Places-user-identity-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\log_16.png" />
-    <Resource Include="Graphics\log_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\EventXmlToHtml.xslt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\justice-balance-icon_16.png" />
-    <Resource Include="Graphics\justice-balance-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\App-edit-icon_16.png" />
-    <Resource Include="Graphics\App-edit-icon_32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\folder-blue-icon.png" />
-    <Resource Include="Graphics\folder-blue-open-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Transforms\ReportToHTML.xslt" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\Amitjakhu-Drip-Clipboard.16.png" />
-    <Resource Include="Graphics\Amitjakhu-Drip-Clipboard.32.png" />
-    <Resource Include="Graphics\Amitjakhu-Drip-Copy.16.png" />
-    <Resource Include="Graphics\Amitjakhu-Drip-Copy.32.png" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\SkiaSharp.NativeAssets.macOS.2.88.9\build\net462\SkiaSharp.NativeAssets.macOS.targets" Condition="Exists('..\..\packages\SkiaSharp.NativeAssets.macOS.2.88.9\build\net462\SkiaSharp.NativeAssets.macOS.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\SkiaSharp.NativeAssets.macOS.2.88.9\build\net462\SkiaSharp.NativeAssets.macOS.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SkiaSharp.NativeAssets.macOS.2.88.9\build\net462\SkiaSharp.NativeAssets.macOS.targets'))" />
-    <Error Condition="!Exists('..\..\packages\SkiaSharp.NativeAssets.Win32.2.88.9\build\net462\SkiaSharp.NativeAssets.Win32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SkiaSharp.NativeAssets.Win32.2.88.9\build\net462\SkiaSharp.NativeAssets.Win32.targets'))" />
-  </Target>
-  <Import Project="..\..\packages\SkiaSharp.NativeAssets.Win32.2.88.9\build\net462\SkiaSharp.NativeAssets.Win32.targets" Condition="Exists('..\..\packages\SkiaSharp.NativeAssets.Win32.2.88.9\build\net462\SkiaSharp.NativeAssets.Win32.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
+		<IsWebBootstrapper>true</IsWebBootstrapper>
+		<PublishUrl>publish\</PublishUrl>
+		<Install>true</Install>
+		<InstallFrom>Web</InstallFrom>
+		<UpdateEnabled>true</UpdateEnabled>
+		<UpdateMode>Foreground</UpdateMode>
+		<UpdateInterval>7</UpdateInterval>
+		<UpdateIntervalUnits>Days</UpdateIntervalUnits>
+		<UpdatePeriodically>false</UpdatePeriodically>
+		<UpdateRequired>false</UpdateRequired>
+		<MapFileExtensions>true</MapFileExtensions>
+		<InstallUrl>https://waher.se/Downloads/IoTClient/</InstallUrl>
+		<CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+		<WebPage>publish.htm</WebPage>
+		<ApplicationRevision>2</ApplicationRevision>
+		<ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+		<UseApplicationTrust>false</UseApplicationTrust>
+		<PublishWizardCompleted>true</PublishWizardCompleted>
+		<BootstrapperEnabled>true</BootstrapperEnabled>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+	</PropertyGroup>
+	<PropertyGroup>
+		<ApplicationIcon>Configure.ico</ApplicationIcon>
+	</PropertyGroup>
+	<PropertyGroup>
+		<ManifestCertificateThumbprint>76518A29D2DDB20C1A5725F5B32B0E5CA84B6521</ManifestCertificateThumbprint>
+	</PropertyGroup>
+	<PropertyGroup>
+		<ManifestKeyFile>Waher.Client.WPF_1_TemporaryKey.pfx</ManifestKeyFile>
+	</PropertyGroup>
+	<PropertyGroup>
+		<GenerateManifests>true</GenerateManifests>
+	</PropertyGroup>
+	<PropertyGroup>
+		<SignManifests>true</SignManifests>
+		<Title>Simple IoT Client</Title>
+		<Description>A WPF client for managing XMPP IoT devices.</Description>
+		<Company>Waher Data AB</Company>
+		<Product>Waher.IoTGateway</Product>
+		<Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Dialogs\AvalonExtensions\Markdown.xshd" />
+		<EmbeddedResource Include="Dialogs\AvalonExtensions\CSS.xshd" />
+		<EmbeddedResource Include="Dialogs\AvalonExtensions\HTML.xshd" />
+		<EmbeddedResource Include="Dialogs\AvalonExtensions\JavaScript.xshd" />
+		<EmbeddedResource Include="Dialogs\AvalonExtensions\JSON.xshd" />
+		<EmbeddedResource Include="Dialogs\AvalonExtensions\XML.xshd" />
+		<EmbeddedResource Include="Schema\ClientConnections.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\Sniff.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\Chat.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\sensor-data.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\SensorData.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\SearchResult.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\Script.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\EventOutput.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Schema\Report.xsd">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\open_document_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\new_document_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\save_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\favorites_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Html\Waher.Content.Html.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Markdown.Consolidation\Waher.Content.Markdown.Consolidation.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Markdown.GraphViz\Waher.Content.Markdown.GraphViz.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Markdown.Layout2D\Waher.Content.Markdown.Layout2D.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Markdown.Wpf\Waher.Content.Markdown.Wpf.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.QR\Waher.Content.QR.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Rss\Waher.Content.Rss.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Semantic\Waher.Content.Semantic.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
+		<ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+		<ProjectReference Include="..\..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj" />
+		<ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+		<ProjectReference Include="..\..\Layout\Waher.Layout.Layout2D\Waher.Layout.Layout2D.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.SASL\Waher.Networking.SASL.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.SMTP\Waher.Networking.SMTP.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.BOSH\Waher.Networking.XMPP.BOSH.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.MUC\Waher.Networking.XMPP.MUC.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.PubSub\Waher.Networking.XMPP.PubSub.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Synchronization\Waher.Networking.XMPP.Synchronization.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.WebSocket\Waher.Networking.XMPP.WebSocket.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+		<ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
+		<ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj" />
+		<ProjectReference Include="..\..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
+		<ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj" />
+		<ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Networking\Waher.Script.Networking.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.System\Waher.Script.System.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Threading\Waher.Script.Threading.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj" />
+		<ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+		<ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
+		<ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+		<ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Away.png" />
+		<Resource Include="Graphics\Chat.png" />
+		<Resource Include="Graphics\Offline.png" />
+		<Resource Include="Graphics\Online.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\delete_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Add.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\new_document_16.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\open_document_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\save_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\favorites_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\refresh_document_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\refresh_document_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\print_preview_lined_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\print_preview_lined_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\search_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\search_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\SniffToHTML.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\history_32_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\history_16_h.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\ChatToHTML.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\SensorDataToHTML.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Spy-icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\DoNotDisturb.png" />
+		<Resource Include="Graphics\ExtendedAway.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\rss-feed-icon_16.png" />
+		<Resource Include="Graphics\rss-feed-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Settings-icon_16.png" />
+		<Resource Include="Graphics\Settings-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Chat-icon_16.png" />
+		<Resource Include="Graphics\Chat-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Configure.ico" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\folder-yellow-icon.png" />
+		<Resource Include="Graphics\folder-yellow-open-icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\App-miscellaneous-icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\hourglass-icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Database-icon_16.png" />
+		<Resource Include="Graphics\Database-icon_32.png" />
+		<Resource Include="Graphics\server-components-icon_16.png" />
+		<Resource Include="Graphics\server-components-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\SearchResultToHTML.xslt">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\pi.ico" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\ScriptToHTML.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Safe-icon_16.png" />
+		<Resource Include="Graphics\Safe-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Recycle-Bin-empty-icon_16.png" />
+		<Resource Include="Graphics\Recycle-Bin-empty-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Both.png" />
+		<Resource Include="Graphics\From.png" />
+		<Resource Include="Graphics\None.png" />
+		<Resource Include="Graphics\To.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\renew-icon_16.png" />
+		<Resource Include="Graphics\renew-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Transfer-icon_16.png" />
+		<Resource Include="Graphics\Transfer-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\symbol-delete-icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\symbol-delete-icon-gray.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Properties-icon_16.png" />
+		<Resource Include="Graphics\Properties-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Places-user-identity-icon_16.png" />
+		<Resource Include="Graphics\Places-user-identity-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\log_16.png" />
+		<Resource Include="Graphics\log_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\EventXmlToHtml.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\justice-balance-icon_16.png" />
+		<Resource Include="Graphics\justice-balance-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\App-edit-icon_16.png" />
+		<Resource Include="Graphics\App-edit-icon_32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\folder-blue-icon.png" />
+		<Resource Include="Graphics\folder-blue-open-icon.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Transforms\ReportToHTML.xslt" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="Graphics\Amitjakhu-Drip-Clipboard.16.png" />
+		<Resource Include="Graphics\Amitjakhu-Drip-Clipboard.32.png" />
+		<Resource Include="Graphics\Amitjakhu-Drip-Copy.16.png" />
+		<Resource Include="Graphics\Amitjakhu-Drip-Copy.32.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
+		<PackageReference Include="SkiaSharp" Version="2.88.9" />
+		<PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.9" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.9" />
+		<PackageReference Include="System.ComponentModel.Composition" Version="9.0.0" />
+		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+		<PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+	</ItemGroup>
 </Project>

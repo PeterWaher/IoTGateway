@@ -43,12 +43,7 @@ namespace Waher.Content.Binary
 			{
 				using (FileStream f = File.OpenRead(Ref.FileName))
 				{
-					if (f.Length > int.MaxValue)
-						throw new OutOfMemoryException("File too large.");
-
-					byte[] Bin = new byte[f.Length];
-					await f.ReadAsync(Bin, 0, (int)f.Length);
-
+					byte[] Bin = await f.ReadAllAsync();
 					return new KeyValuePair<byte[], string>(Bin, Ref.ContentType);
 				}
 			}

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Security.SHA3
+﻿namespace Waher.Security.SHA3
 {
 	/// <summary>
 	/// Implements the SHA3 RawSHAKE128 extendable-output functions, as defined in 

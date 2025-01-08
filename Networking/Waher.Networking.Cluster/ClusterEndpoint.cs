@@ -727,7 +727,7 @@ namespace Waher.Networking.Cluster
 									if (T is null)
 										ex = new Exception(ExceptionMessage);
 									else
-										ex = (Exception)Activator.CreateInstance(T, ExceptionMessage);
+										ex = (Exception)Types.Instantiate(T, ExceptionMessage);
 								}
 								catch (Exception)
 								{

@@ -1,25 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
-		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-	<Bundle Name="IoT Gateway Setup"
-          Version="1.0"
-          Manufacturer="Waher Data AB"
-          UpgradeCode="01a50176-5f9c-4eba-888c-7812302375c1"
-          DisableModify="yes"
-          DisableRepair="yes">
-		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
-		</BootstrapperApplicationRef>
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" 
+		 xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" 
+		 xmlns:netfx="http://wixtoolset.org/schemas/v4/wxs/netfx">
+	<Bundle Name="IoT Gateway Setup" Version="1.0" Manufacturer="Waher Data AB" UpgradeCode="01a50176-5f9c-4eba-888c-7812302375c1" DisableModify="yes">
+		<BootstrapperApplication>
+			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes" Theme="rtfLicense" />
+		</BootstrapperApplication>
+		<netfx:DotNetCoreSearch RuntimeType="core" MajorVersion="8" Platform="x64" Variable="DOTNETCOREVERSION" />
 		<Chain>
-			<PackageGroupRef Id="NetFx462Web"/>
+			<ExePackage Id="DotNetCore" DetectCondition="DOTNETCOREVERSION &gt;= &quot;8.0.11&quot;" Permanent="yes" Vital="yes"
+									InstallArguments="dotnet-runtime-8.0.11-win-x64.exe /install /quiet /norestart" 
+									RepairArguments="dotnet-runtime-8.0.11-win-x64.exe /repair /quiet /norestart" 
+									UninstallArguments="dotnet-runtime-8.0.11-win-x64.exe /uninstall /quiet /norestart">
+				<ExePackagePayload Name="dotnet-runtime-8.0.11-win-x64.exe" SourceFile="..\..\dotnet-runtime-8.0.11-win-x64.exe" />
+			</ExePackage>
 			<!--<MsiPackage SourceFile="C:\Downloads\graphviz-2.38.msi" DisplayName="GraphViz 2.38" Description="Renders diagrams." DisplayInternalUI="yes"/>-->
-			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
-										  DisplayInternalUI="yes">
-				<MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
-				<MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
-				<MsiProperty Name="OPENBROWSER" Value="yes"/>
+			<MsiPackage SourceFile="..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
+									bal:DisplayInternalUICondition="1">
+				<MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service" />
+				<MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway." />
+				<MsiProperty Name="OPENBROWSER" Value="yes" />
 			</MsiPackage>
 		</Chain>
 	</Bundle>

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Xml;
@@ -61,6 +62,8 @@ namespace Waher.Utility.Install
 	///                      operation. If the gateway does not stop within this period of
 	///                      time, the operation fails. (Default=60000)
 	/// -co                  If only content (content only) should be installed.
+	/// -sn SERVICE_NAME     If provided, the utility will attempt to start the service with
+	///                      the given service name before exiting.
 	/// -?                   Help.
 	/// 
 	/// Note: Alternating -p and -k attributes can be used to process multiple packages in
@@ -91,6 +94,7 @@ namespace Waher.Utility.Install
 				string DockerFile = null;
 				string Key = string.Empty;
 				string Suffix = string.Empty;
+				string ServiceName = string.Empty;
 				int i = 0;
 				int c = args.Length;
 				int? Timeout = null;
@@ -189,6 +193,16 @@ namespace Waher.Utility.Install
 								throw new Exception("Only one instance allowed.");
 							break;
 
+						case "-sn":
+							if (i >= c)
+								throw new Exception("Missing service name.");
+
+							if (string.IsNullOrEmpty(ServiceName))
+								ServiceName = args[i++];
+							else
+								throw new Exception("Only one service name allowed.");
+							break;
+
 						case "-w":
 							if (i >= c)
 								throw new Exception("Missing wait time.");
@@ -277,6 +291,9 @@ namespace Waher.Utility.Install
 					ConsoleOut.WriteLine("                     operation. If the gateway does not stop within this period of");
 					ConsoleOut.WriteLine("                     time, the operation fails. (Default=60000)");
 					ConsoleOut.WriteLine("-co                  If only content (content only) should be installed.");
+					ConsoleOut.WriteLine("-sn SERVICE_NAME     If provided, the utility will attempt to start the service with");
+					ConsoleOut.WriteLine("                     the given service name before exiting.");
+
 					ConsoleOut.WriteLine("-?                   Help.");
 					ConsoleOut.WriteLine();
 					ConsoleOut.WriteLine("Note: Alternating -p and -k attributes can be used to process multiple packages in");
@@ -389,6 +406,9 @@ namespace Waher.Utility.Install
 					DockerOutput.Flush();
 				}
 
+				if (!string.IsNullOrEmpty(ServiceName))
+					StartService(ServiceName);
+
 				return 0;
 			}
 			catch (Exception ex)
@@ -403,6 +423,14 @@ namespace Waher.Utility.Install
 				ConsoleOut.Flush(true);
 				Log.Terminate();
 			}
+		}
+
+		public static void StartService(string ServiceName)
+		{
+#pragma warning disable CA1416 // Validate platform compatibility
+			ServiceController service = new(ServiceName);
+			service.Start();
+#pragma warning restore CA1416 // Validate platform compatibility
 		}
 
 		public static AssemblyName GetAssemblyName(string ServerApplication)
@@ -1334,7 +1362,7 @@ namespace Waher.Utility.Install
 				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, 
+		public static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder,
 			bool ContentOnly, bool ServerExists)
 		{
 			if (string.IsNullOrEmpty(PackageFile))
@@ -1345,7 +1373,7 @@ namespace Waher.Utility.Install
 			InstallPackage(PackageFile, fs, Key, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(string FileName, Stream Encrypted, string Key, string ServerApplication, 
+		public static void InstallPackage(string FileName, Stream Encrypted, string Key, string ServerApplication,
 			string ProgramDataFolder, bool ContentOnly, bool ServerExists)
 		{
 			string LocalName = Path.GetFileName(FileName);
@@ -1369,7 +1397,7 @@ namespace Waher.Utility.Install
 			InstallPackage(Decrypted, ServerApplication, ProgramDataFolder, ContentOnly, ServerExists);
 		}
 
-		public static void InstallPackage(Stream Decrypted, string ServerApplication, string ProgramDataFolder, 
+		public static void InstallPackage(Stream Decrypted, string ServerApplication, string ProgramDataFolder,
 			bool ContentOnly, bool ServerExists)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -1954,7 +1982,7 @@ namespace Waher.Utility.Install
 		/// <param name="ServerApplication">Path to server application inside Docker container.</param>
 		/// <param name="ContentOnly">If only content files should be copied.</param>
 		/// <param name="ExcludeCategories">Any categories that should be exluded.</param>
-		public static void GenerateDockerInstructions(string ManifestFile, StreamWriter DockerOutput, 
+		public static void GenerateDockerInstructions(string ManifestFile, StreamWriter DockerOutput,
 			string ProgramDataFolder, string ServerApplication, bool ContentOnly, Dictionary<string, bool> ExcludeCategories)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -2033,7 +2061,7 @@ namespace Waher.Utility.Install
 			DockerOutput.WriteLine("\"");
 		}
 
-		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent, 
+		private static void CopyContent(string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent,
 			StreamWriter DockerOutput, Dictionary<string, bool> ExcludeCategories)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)

@@ -13,7 +13,6 @@ using Waher.Content.Binary;
 using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -1131,10 +1130,8 @@ namespace Waher.IoTGateway.Setup
 
 					if (!Ok)
 					{
-						using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
-						{
-							Parameters = RSA.ExportParameters(true);
-						}
+						using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams);
+						Parameters = RSA.ExportParameters(true);
 					}
 				}
 				catch (CryptographicException ex)
@@ -1143,420 +1140,406 @@ namespace Waher.IoTGateway.Setup
 						"\". Was the database created using another user?", ex);
 				}
 
-				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
+				using AcmeClient Client = new AcmeClient(new Uri(URL), Parameters);
+				await Status.Raise(this, "Connecting to directory.");
+
+				AcmeDirectory AcmeDirectory = await Client.GetDirectory();
+
+				if (AcmeDirectory.ExternalAccountRequired)
+					await Status.Raise(this, "An external account is required.");
+
+				if (!(AcmeDirectory.TermsOfService is null))
 				{
-					await Status.Raise(this, "Connecting to directory.");
+					URL = AcmeDirectory.TermsOfService.ToString();
+					await Status.Raise(this, "Terms of service available on: " + URL);
+					await TermsOfService.Raise(this, URL);
 
-					AcmeDirectory AcmeDirectory = await Client.GetDirectory();
+					this.urlToS = URL;
 
-					if (AcmeDirectory.ExternalAccountRequired)
-						await Status.Raise(this, "An external account is required.");
-
-					if (!(AcmeDirectory.TermsOfService is null))
+					if (!this.acceptToS)
 					{
-						URL = AcmeDirectory.TermsOfService.ToString();
-						await Status.Raise(this, "Terms of service available on: " + URL);
-						await TermsOfService.Raise(this, URL);
+						string Msg = "You need to accept the terms of service.";
 
-						this.urlToS = URL;
+						if (EnvironmentSetup)
+							this.LogEnvironmentError(Msg, GATEWAY_ACME_ACCEPT_TOS, this.acceptToS);
 
-						if (!this.acceptToS)
+						return Msg;
+					}
+				}
+
+				if (!(AcmeDirectory.Website is null))
+					await Status.Raise(this, "Web site available on: " + AcmeDirectory.Website.ToString());
+
+				await Status.Raise(this, "Getting account.");
+
+				List<string> Names = new List<string>();
+
+				if (!string.IsNullOrEmpty(this.domain))
+					Names.Add(this.domain);
+
+				if (!(this.alternativeDomains is null))
+				{
+					foreach (string Name in this.alternativeDomains)
+					{
+						if (!Names.Contains(Name))
+							Names.Add(Name);
+					}
+				}
+				string[] DomainNames = Names.ToArray();
+
+				AcmeAccount Account;
+
+				try
+				{
+					Account = await Client.GetAccount();
+
+					await Status.Raise(this, "Account found.");
+					await Status.Raise(this, "Created: " + Account.CreatedAt.ToString());
+					await Status.Raise(this, "Initial IP: " + Account.InitialIp);
+					await Status.Raise(this, "Status: " + Account.Status.ToString());
+
+					if (string.IsNullOrEmpty(this.contactEMail))
+					{
+						if (!(Account.Contact is null) && Account.Contact.Length != 0)
 						{
-							string Msg = "You need to accept the terms of service.";
+							await Status.Raise(this, "Updating contact URIs in account.");
+							Account = await Account.Update(new string[0]);
+							await Status.Raise(this, "Account updated.");
+						}
+					}
+					else
+					{
+						if (Account.Contact is null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
+						{
+							await Status.Raise(this, "Updating contact URIs in account.");
+							Account = await Account.Update(new string[] { "mailto:" + this.contactEMail });
+							await Status.Raise(this, "Account updated.");
+						}
+					}
+				}
+				catch (AcmeAccountDoesNotExistException)
+				{
+					await Status.Raise(this, "Account not found.");
+					await Status.Raise(this, "Creating account.");
 
-							if (EnvironmentSetup)
-								this.LogEnvironmentError(Msg, GATEWAY_ACME_ACCEPT_TOS, this.acceptToS);
+					Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? new string[0] : new string[] { "mailto:" + this.contactEMail },
+						this.acceptToS);
 
-							return Msg;
+					await Status.Raise(this, "Account created.");
+					await Status.Raise(this, "Status: " + Account.Status.ToString());
+				}
+
+				await Status.Raise(this, "Generating new key.");
+				await Account.NewKey();
+
+				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
+				{
+					RSA.ImportParameters(Client.ExportAccountKey(true));
+				}
+
+				await Status.Raise(this, "New key generated.");
+
+				await Status.Raise(this, "Creating order.");
+				AcmeOrder Order;
+
+				try
+				{
+					Order = await Account.OrderCertificate(DomainNames, null, null);
+				}
+				catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+				{
+					await Task.Delay(5000);
+					await Status.Raise(this, "Retrying.");
+					Order = await Account.OrderCertificate(DomainNames, null, null);
+				}
+
+				await Status.Raise(this, "Order created.");
+
+				AcmeAuthorization[] Authorizations;
+
+				await Status.Raise(this, "Getting authorizations.");
+				try
+				{
+					Authorizations = await Order.GetAuthorizations();
+				}
+				catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+				{
+					await Task.Delay(5000);
+					await Status.Raise(this, "Retrying.");
+					Authorizations = await Order.GetAuthorizations();
+				}
+
+				foreach (AcmeAuthorization Authorization in Authorizations)
+				{
+					await Status.Raise(this, "Processing authorization for " + Authorization.Value);
+
+					AcmeChallenge Challenge;
+					bool Acknowledged = false;
+					int Index = 1;
+					int NrChallenges = Authorization.Challenges.Length;
+
+					for (Index = 1; Index <= NrChallenges; Index++)
+					{
+						Challenge = Authorization.Challenges[Index - 1];
+
+						if (Challenge is AcmeHttpChallenge HttpChallenge)
+						{
+							this.challenge = "/" + HttpChallenge.Token;
+							this.token = HttpChallenge.KeyAuthorization;
+
+							await Status.Raise(this, "Acknowleding challenge.");
+
+							string Msg = await this.CheckDynamicIp(Authorization.Value, EnvironmentSetup, Status);
+							if (string.IsNullOrEmpty(Msg))
+							{
+								Challenge = await HttpChallenge.AcknowledgeChallenge();
+								await Status.Raise(this, "Challenge acknowledged: " + Challenge.Status.ToString());
+
+								Acknowledged = true;
+							}
+							else
+								return Msg;
 						}
 					}
 
-					if (!(AcmeDirectory.Website is null))
-						await Status.Raise(this, "Web site available on: " + AcmeDirectory.Website.ToString());
-
-					await Status.Raise(this, "Getting account.");
-
-					List<string> Names = new List<string>();
-
-					if (!string.IsNullOrEmpty(this.domain))
-						Names.Add(this.domain);
-
-					if (!(this.alternativeDomains is null))
+					if (!Acknowledged)
 					{
-						foreach (string Name in this.alternativeDomains)
-						{
-							if (!Names.Contains(Name))
-								Names.Add(Name);
-						}
-					}
-					string[] DomainNames = Names.ToArray();
+						string Msg = "No automated method found to respond to any of the authorization challenges.";
 
-					AcmeAccount Account;
+						if (EnvironmentSetup)
+							this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
+
+						return Msg;
+					}
+
+					AcmeAuthorization Authorization2 = Authorization;
+
+					do
+					{
+						await Status.Raise(this, "Waiting to poll authorization status.");
+						await Task.Delay(5000);
+
+						await Status.Raise(this, "Polling authorization.");
+						Authorization2 = await Authorization2.Poll();
+
+						await Status.Raise(this, "Authorization polled: " + Authorization2.Status.ToString());
+					}
+					while (Authorization2.Status == AcmeAuthorizationStatus.pending);
+
+					if (Authorization2.Status != AcmeAuthorizationStatus.valid)
+					{
+						throw Authorization2.Status switch
+						{
+							AcmeAuthorizationStatus.deactivated => new Exception("Authorization deactivated."),
+							AcmeAuthorizationStatus.expired => new Exception("Authorization expired."),
+							AcmeAuthorizationStatus.invalid => new Exception("Authorization invalid."),
+							AcmeAuthorizationStatus.revoked => new Exception("Authorization revoked."),
+							_ => new Exception("Authorization not validated."),
+						};
+					}
+				}
+
+				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))   // TODO: Make configurable
+				{
+					await Status.Raise(this, "Finalizing order.");
+
+					SignatureAlgorithm SignAlg = new RsaSha256(RSA);
+
+					Order = await Order.FinalizeOrder(new Security.PKCS.CertificateRequest(SignAlg)
+					{
+						CommonName = this.domain,
+						SubjectAlternativeNames = DomainNames,
+						EMailAddress = this.contactEMail
+					});
+
+					await Status.Raise(this, "Order finalized: " + Order.Status.ToString());
+
+					if (Order.Status != AcmeOrderStatus.valid)
+					{
+						throw Order.Status switch
+						{
+							AcmeOrderStatus.invalid => new Exception("Order invalid."),
+							_ => new Exception("Unable to validate order."),
+						};
+					}
+
+					if (Order.Certificate is null)
+						throw new Exception("No certificate URI provided.");
+
+					await Status.Raise(this, "Downloading certificate.");
+
+					X509Certificate2[] Certificates = await Order.DownloadCertificate();
+					X509Certificate2 Certificate = Certificates[0];
+
+					await Status.Raise(this, "Exporting certificate.");
+
+					this.certificate = Certificate.Export(X509ContentType.Cert);
+					this.privateKey = RSA.ExportCspBlob(true);
+					this.pfx = null;
+					this.password = string.Empty;
+
+					await Status.Raise(this, "Adding private key.");
 
 					try
 					{
-						Account = await Client.GetAccount();
+						Certificate.PrivateKey = RSA;
+					}
+					catch (PlatformNotSupportedException)
+					{
+						await Status.Raise(this, "Platform does not support adding of private key.");
+						await Status.Raise(this, "Searching for OpenSSL on machine.");
 
-						await Status.Raise(this, "Account found.");
-						await Status.Raise(this, "Created: " + Account.CreatedAt.ToString());
-						await Status.Raise(this, "Initial IP: " + Account.InitialIp);
-						await Status.Raise(this, "Status: " + Account.Status.ToString());
+						string[] Files;
+						string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
+						string CertFileName = null;
+						string CertFileName2 = null;
+						string KeyFileName = null;
 
-						if (string.IsNullOrEmpty(this.contactEMail))
+						if (string.IsNullOrEmpty(this.openSslPath) || !File.Exists(this.openSslPath))
 						{
-							if (!(Account.Contact is null) && Account.Contact.Length != 0)
-							{
-								await Status.Raise(this, "Updating contact URIs in account.");
-								Account = await Account.Update(new string[0]);
-								await Status.Raise(this, "Account updated.");
-							}
+							string[] Folders = Gateway.GetFolders(new Environment.SpecialFolder[]
+								{
+										Environment.SpecialFolder.ProgramFiles,
+										Environment.SpecialFolder.ProgramFilesX86
+								},
+								Path.DirectorySeparatorChar + "OpenSSL-Win32",
+								Path.DirectorySeparatorChar + "OpenSSL-Win64");
+
+							Files = Gateway.FindFiles(Folders, "openssl.exe", 2, int.MaxValue);
 						}
 						else
-						{
-							if (Account.Contact is null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
-							{
-								await Status.Raise(this, "Updating contact URIs in account.");
-								Account = await Account.Update(new string[] { "mailto:" + this.contactEMail });
-								await Status.Raise(this, "Account updated.");
-							}
-						}
-					}
-					catch (AcmeAccountDoesNotExistException)
-					{
-						await Status.Raise(this, "Account not found.");
-						await Status.Raise(this, "Creating account.");
-
-						Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? new string[0] : new string[] { "mailto:" + this.contactEMail },
-							this.acceptToS);
-
-						await Status.Raise(this, "Account created.");
-						await Status.Raise(this, "Status: " + Account.Status.ToString());
-					}
-
-					await Status.Raise(this, "Generating new key.");
-					await Account.NewKey();
-
-					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
-					{
-						RSA.ImportParameters(Client.ExportAccountKey(true));
-					}
-
-					await Status.Raise(this, "New key generated.");
-
-					await Status.Raise(this, "Creating order.");
-					AcmeOrder Order;
-
-					try
-					{
-						Order = await Account.OrderCertificate(DomainNames, null, null);
-					}
-					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
-					{
-						await Task.Delay(5000);
-						await Status.Raise(this, "Retrying.");
-						Order = await Account.OrderCertificate(DomainNames, null, null);
-					}
-
-					await Status.Raise(this, "Order created.");
-
-					AcmeAuthorization[] Authorizations;
-
-					await Status.Raise(this, "Getting authorizations.");
-					try
-					{
-						Authorizations = await Order.GetAuthorizations();
-					}
-					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
-					{
-						await Task.Delay(5000);
-						await Status.Raise(this, "Retrying.");
-						Authorizations = await Order.GetAuthorizations();
-					}
-
-					foreach (AcmeAuthorization Authorization in Authorizations)
-					{
-						await Status.Raise(this, "Processing authorization for " + Authorization.Value);
-
-						AcmeChallenge Challenge;
-						bool Acknowledged = false;
-						int Index = 1;
-						int NrChallenges = Authorization.Challenges.Length;
-
-						for (Index = 1; Index <= NrChallenges; Index++)
-						{
-							Challenge = Authorization.Challenges[Index - 1];
-
-							if (Challenge is AcmeHttpChallenge HttpChallenge)
-							{
-								this.challenge = "/" + HttpChallenge.Token;
-								this.token = HttpChallenge.KeyAuthorization;
-
-								await Status.Raise(this, "Acknowleding challenge.");
-
-								string Msg = await this.CheckDynamicIp(Authorization.Value, EnvironmentSetup, Status);
-								if (string.IsNullOrEmpty(Msg))
-								{
-									Challenge = await HttpChallenge.AcknowledgeChallenge();
-									await Status.Raise(this, "Challenge acknowledged: " + Challenge.Status.ToString());
-
-									Acknowledged = true;
-								}
-								else
-									return Msg;
-							}
-						}
-
-						if (!Acknowledged)
-						{
-							string Msg = "No automated method found to respond to any of the authorization challenges.";
-
-							if (EnvironmentSetup)
-								this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
-
-							return Msg;
-						}
-
-						AcmeAuthorization Authorization2 = Authorization;
-
-						do
-						{
-							await Status.Raise(this, "Waiting to poll authorization status.");
-							await Task.Delay(5000);
-
-							await Status.Raise(this, "Polling authorization.");
-							Authorization2 = await Authorization2.Poll();
-
-							await Status.Raise(this, "Authorization polled: " + Authorization2.Status.ToString());
-						}
-						while (Authorization2.Status == AcmeAuthorizationStatus.pending);
-
-						if (Authorization2.Status != AcmeAuthorizationStatus.valid)
-						{
-							switch (Authorization2.Status)
-							{
-								case AcmeAuthorizationStatus.deactivated:
-									throw new Exception("Authorization deactivated.");
-
-								case AcmeAuthorizationStatus.expired:
-									throw new Exception("Authorization expired.");
-
-								case AcmeAuthorizationStatus.invalid:
-									throw new Exception("Authorization invalid.");
-
-								case AcmeAuthorizationStatus.revoked:
-									throw new Exception("Authorization revoked.");
-
-								default:
-									throw new Exception("Authorization not validated.");
-							}
-						}
-					}
-
-					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))   // TODO: Make configurable
-					{
-						await Status.Raise(this, "Finalizing order.");
-
-						SignatureAlgorithm SignAlg = new RsaSha256(RSA);
-
-						Order = await Order.FinalizeOrder(new CertificateRequest(SignAlg)
-						{
-							CommonName = this.domain,
-							SubjectAlternativeNames = DomainNames,
-							EMailAddress = this.contactEMail
-						});
-
-						await Status.Raise(this, "Order finalized: " + Order.Status.ToString());
-
-						if (Order.Status != AcmeOrderStatus.valid)
-						{
-							switch (Order.Status)
-							{
-								case AcmeOrderStatus.invalid:
-									throw new Exception("Order invalid.");
-
-								default:
-									throw new Exception("Unable to validate order.");
-							}
-						}
-
-						if (Order.Certificate is null)
-							throw new Exception("No certificate URI provided.");
-
-						await Status.Raise(this, "Downloading certificate.");
-
-						X509Certificate2[] Certificates = await Order.DownloadCertificate();
-						X509Certificate2 Certificate = Certificates[0];
-
-						await Status.Raise(this, "Exporting certificate.");
-
-						this.certificate = Certificate.Export(X509ContentType.Cert);
-						this.privateKey = RSA.ExportCspBlob(true);
-						this.pfx = null;
-						this.password = string.Empty;
-
-						await Status.Raise(this, "Adding private key.");
+							Files = new string[] { this.openSslPath };
 
 						try
 						{
-							Certificate.PrivateKey = RSA;
-						}
-						catch (PlatformNotSupportedException)
-						{
-							await Status.Raise(this, "Platform does not support adding of private key.");
-							await Status.Raise(this, "Searching for OpenSSL on machine.");
-
-							string[] Files;
-							string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
-							string CertFileName = null;
-							string CertFileName2 = null;
-							string KeyFileName = null;
-
-							if (string.IsNullOrEmpty(this.openSslPath) || !File.Exists(this.openSslPath))
+							if (Files.Length == 0)
 							{
-								string[] Folders = Gateway.GetFolders(new Environment.SpecialFolder[]
-									{
-										Environment.SpecialFolder.ProgramFiles,
-										Environment.SpecialFolder.ProgramFilesX86
-									},
-									Path.DirectorySeparatorChar + "OpenSSL-Win32",
-									Path.DirectorySeparatorChar + "OpenSSL-Win64");
+								string Msg = "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.";
 
-								Files = Gateway.FindFiles(Folders, "openssl.exe", 2, int.MaxValue);
+								if (EnvironmentSetup)
+									this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
+
+								return Msg;
 							}
 							else
-								Files = new string[] { this.openSslPath };
-
-							try
 							{
-								if (Files.Length == 0)
+								foreach (string OpenSslFile in Files)
 								{
-									string Msg = "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.";
+									if (CertFileName is null)
+									{
+										await Status.Raise(this, "Generating temporary certificate file.");
+
+										StringBuilder PemOutput = new StringBuilder();
+										byte[] Bin = Certificate.Export(X509ContentType.Cert);
+
+										PemOutput.AppendLine("-----BEGIN CERTIFICATE-----");
+										PemOutput.AppendLine(Convert.ToBase64String(Bin, Base64FormattingOptions.InsertLineBreaks));
+										PemOutput.AppendLine("-----END CERTIFICATE-----");
+
+										CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
+										await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
+
+										await Status.Raise(this, "Generating temporary key file.");
+
+										DerEncoder KeyOutput = new DerEncoder();
+										SignAlg.ExportPrivateKey(KeyOutput);
+
+										PemOutput.Clear();
+										PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
+										PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
+										PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
+
+										KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
+
+										await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
+									}
+
+									await Status.Raise(this, "Converting to PFX using " + OpenSslFile);
+
+									Process P = new Process()
+									{
+										StartInfo = new ProcessStartInfo()
+										{
+											FileName = OpenSslFile,
+											Arguments = "pkcs12 -nodes -export -out Certificate.pfx -inkey Certificate.key -in Certificate.pem -password pass:" + Password,
+											UseShellExecute = false,
+											RedirectStandardError = true,
+											RedirectStandardOutput = true,
+											WorkingDirectory = Gateway.AppDataFolder,
+											CreateNoWindow = true,
+											WindowStyle = ProcessWindowStyle.Hidden
+										}
+									};
+
+									P.Start();
+
+									if (!P.WaitForExit(60000) || P.ExitCode != 0)
+									{
+										if (!P.StandardOutput.EndOfStream)
+											await Status.Raise(this, "Output: " + P.StandardOutput.ReadToEnd());
+
+										if (!P.StandardError.EndOfStream)
+											await Status.Raise(this, "Error: " + P.StandardError.ReadToEnd());
+
+										continue;
+									}
+
+									await Status.Raise(this, "Loading PFX.");
+
+									CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
+									this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
+									this.password = Password;
+									this.openSslPath = OpenSslFile;
+
+									await Status.Raise(this, "PFX successfully generated using OpenSSL.");
+									break;
+								}
+
+								if (this.pfx is null)
+								{
+									this.openSslPath = string.Empty;
+
+									string Msg = "Unable to convert to PFX using OpenSSL.";
 
 									if (EnvironmentSetup)
 										this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
 
 									return Msg;
 								}
-								else
-								{
-									foreach (string OpenSslFile in Files)
-									{
-										if (CertFileName is null)
-										{
-											await Status.Raise(this, "Generating temporary certificate file.");
-
-											StringBuilder PemOutput = new StringBuilder();
-											byte[] Bin = Certificate.Export(X509ContentType.Cert);
-
-											PemOutput.AppendLine("-----BEGIN CERTIFICATE-----");
-											PemOutput.AppendLine(Convert.ToBase64String(Bin, Base64FormattingOptions.InsertLineBreaks));
-											PemOutput.AppendLine("-----END CERTIFICATE-----");
-
-											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
-											await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
-
-											await Status.Raise(this, "Generating temporary key file.");
-
-											DerEncoder KeyOutput = new DerEncoder();
-											SignAlg.ExportPrivateKey(KeyOutput);
-
-											PemOutput.Clear();
-											PemOutput.AppendLine("-----BEGIN RSA PRIVATE KEY-----");
-											PemOutput.AppendLine(Convert.ToBase64String(KeyOutput.ToArray(), Base64FormattingOptions.InsertLineBreaks));
-											PemOutput.AppendLine("-----END RSA PRIVATE KEY-----");
-
-											KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
-
-											await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
-										}
-
-										await Status.Raise(this, "Converting to PFX using " + OpenSslFile);
-
-										Process P = new Process()
-										{
-											StartInfo = new ProcessStartInfo()
-											{
-												FileName = OpenSslFile,
-												Arguments = "pkcs12 -nodes -export -out Certificate.pfx -inkey Certificate.key -in Certificate.pem -password pass:" + Password,
-												UseShellExecute = false,
-												RedirectStandardError = true,
-												RedirectStandardOutput = true,
-												WorkingDirectory = Gateway.AppDataFolder,
-												CreateNoWindow = true,
-												WindowStyle = ProcessWindowStyle.Hidden
-											}
-										};
-
-										P.Start();
-
-										if (!P.WaitForExit(60000) || P.ExitCode != 0)
-										{
-											if (!P.StandardOutput.EndOfStream)
-												await Status.Raise(this, "Output: " + P.StandardOutput.ReadToEnd());
-
-											if (!P.StandardError.EndOfStream)
-												await Status.Raise(this, "Error: " + P.StandardError.ReadToEnd());
-
-											continue;
-										}
-
-										await Status.Raise(this, "Loading PFX.");
-
-										CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
-										this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
-										this.password = Password;
-										this.openSslPath = OpenSslFile;
-
-										await Status.Raise(this, "PFX successfully generated using OpenSSL.");
-										break;
-									}
-
-									if (this.pfx is null)
-									{
-										this.openSslPath = string.Empty;
-
-										string Msg = "Unable to convert to PFX using OpenSSL.";
-
-										if (EnvironmentSetup)
-											this.LogEnvironmentError(Msg, GATEWAY_ENCRYPTION, this.useEncryption);
-
-										return Msg;
-									}
-								}
-							}
-							finally
-							{
-								if (!(CertFileName is null) && File.Exists(CertFileName))
-								{
-									await Status.Raise(this, "Deleting temporary certificate file.");
-									File.Delete(CertFileName);
-								}
-
-								if (!(KeyFileName is null) && File.Exists(KeyFileName))
-								{
-									await Status.Raise(this, "Deleting temporary key file.");
-									File.Delete(KeyFileName);
-								}
-
-								if (!(CertFileName2 is null) && File.Exists(CertFileName2))
-								{
-									await Status.Raise(this, "Deleting temporary pfx file.");
-									File.Delete(CertFileName2);
-								}
 							}
 						}
+						finally
+						{
+							if (!(CertFileName is null) && File.Exists(CertFileName))
+							{
+								await Status.Raise(this, "Deleting temporary certificate file.");
+								File.Delete(CertFileName);
+							}
 
+							if (!(KeyFileName is null) && File.Exists(KeyFileName))
+							{
+								await Status.Raise(this, "Deleting temporary key file.");
+								File.Delete(KeyFileName);
+							}
 
-						if (this.Step < 2)
-							this.Step = 2;
-
-						this.Updated = DateTime.Now;
-						await Database.Update(this);
-
-						await Gateway.UpdateCertificate(this);
-
-						return null;
+							if (!(CertFileName2 is null) && File.Exists(CertFileName2))
+							{
+								await Status.Raise(this, "Deleting temporary pfx file.");
+								File.Delete(CertFileName2);
+							}
+						}
 					}
+
+
+					if (this.Step < 2)
+						this.Step = 2;
+
+					this.Updated = DateTime.Now;
+					await Database.Update(this);
+
+					await Gateway.UpdateCertificate(this);
+
+					return null;
 				}
 			}
 			catch (Exception ex)

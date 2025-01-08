@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
+using Waher.Security;
 
 namespace Waher.Content.Getters
 {
@@ -131,7 +132,7 @@ namespace Waher.Content.Getters
 
 			try
 			{
-				Handler.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+				Handler.SslProtocols = Crypto.TlsOnly;
 			}
 			catch (PlatformNotSupportedException)
 			{

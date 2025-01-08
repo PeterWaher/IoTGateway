@@ -324,12 +324,12 @@ namespace Waher.IoTGateway.Svc
 					Log.Informational("Installing service.");
 
 					InstallService(ServiceName, InstanceName, DisplayName, Description, StartType, Immediate,
-						new ServiceFailureActions(TimeSpan.FromDays(1), null, null, new ScAction[]
-						{
+						new ServiceFailureActions(TimeSpan.FromDays(1), null, null,
+						[
 							new() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
 							new() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(15) },
 							new() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromHours(1) }
-						}), Credentials);
+						]), Credentials);
 
 					return 0;
 				}

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Waher.Events;
+﻿using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.XMPP;
 using Waher.Networking.Sniffers;

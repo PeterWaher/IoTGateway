@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 
@@ -116,16 +117,8 @@ namespace Waher.Networking.HTTP
 			if (this.dataStream is null)
 				return null;
 
-			long l = this.dataStream.Length;
-			if (l > int.MaxValue)
-				throw new OutOfMemoryException("Data object too large for in-memory decoding.");
-
-			int Len = (int)l;
-			byte[] Data = new byte[Len];
 			this.dataStream.Position = 0;
-			await this.dataStream.ReadAsync(Data, 0, Len);
-
-			return Data;
+			return await this.dataStream.ReadAllAsync();
 		}
 
 		/// <summary>

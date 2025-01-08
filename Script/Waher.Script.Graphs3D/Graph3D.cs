@@ -56,6 +56,14 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Base class for three-dimensional graphs.
 		/// </summary>
+		public Graph3D()
+			: this(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// Base class for three-dimensional graphs.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public Graph3D(Variables Variables)
 			: this(Variables, null, null)
@@ -1717,7 +1725,7 @@ namespace Waher.Script.Graphs3D
 							break;
 
 						case "Painter":
-							this.painters.AddLast((IPainter3D)Activator.CreateInstance(Types.GetType(E.InnerText)));
+							this.painters.AddLast((IPainter3D)Types.Instantiate(Types.GetType(E.InnerText)));
 							break;
 					}
 				}

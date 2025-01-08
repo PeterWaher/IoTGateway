@@ -32,7 +32,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <summary>
 		/// If script is evaluated for this type of code block.
 		/// </summary>
-		public bool EvaluatesScript => true;
+		public bool EvaluatesScript => false;	// Embedded script is tested to use only safe script, such as constants and constructs with constants.
 
 		/// <summary>
 		/// Is called on the object when an instance of the element has been created in a document.
@@ -76,7 +76,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			Type T = Types.GetType(TypeName)
 				?? throw new Exception("Type not recognized: " + TypeName);
 
-			Graph G = (Graph)Activator.CreateInstance(T);
+			Graph G = (Graph)Types.Instantiate(T);
 			G.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)

@@ -9,10 +9,17 @@ using Waher.Events;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Runtime;
+using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Sets;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators.Assignments;
+using Waher.Script.Operators.Membership;
+using Waher.Script.Operators;
 using Waher.Script.Units;
+using System.Reflection;
+using Waher.Script.Graphs.Functions.Colors;
 
 namespace Waher.Script.Graphs
 {
@@ -119,6 +126,14 @@ namespace Waher.Script.Graphs
 
 		private readonly GraphSettings settings;
 		private bool sameScale = false;
+
+		/// <summary>
+		/// Base class for graphs.
+		/// </summary>
+		public Graph()
+			: this(new Variables())
+		{
+		}
 
 		/// <summary>
 		/// Base class for graphs.
@@ -1585,7 +1600,49 @@ namespace Waher.Script.Graphs
 		public static async Task<IElement> ParseAsync(string s, Variables Variables)
 		{
 			Expression Exp = new Expression(s);
+			string ScriptAssemblyName = typeof(Expression).Assembly.FullName;
+			string GraphAssemblyName = typeof(Graph).Assembly.FullName;
+			ScriptNode Prohibited = null;
 			IElement Result;
+
+			bool Safe = Exp.ForAll((ScriptNode Node, out ScriptNode NewNode, object State) =>
+			{
+				NewNode = null;
+
+				if (Node is ConstantElement || Node is Color)
+					return true;
+
+				string AssemblyName = Node.GetType().Assembly.FullName;
+
+				if (AssemblyName != ScriptAssemblyName && AssemblyName != GraphAssemblyName)
+				{
+					Prohibited = Node;
+					return false;
+				}
+
+				if ((Node is NamedMember) ||
+					(Node is NamedMemberAssignment) ||
+					(Node is LambdaDefinition) ||
+					Node is NamedMethodCall ||
+					Node is DynamicFunctionCall ||
+					Node is DynamicMember ||
+					Node is DynamicIndex ||
+					Node is Create ||
+					Node is Destroy ||
+					Node is Error ||
+					Node is ImplicitPrint ||
+					Node is Function)
+				{
+					Prohibited = Node;
+					return false;
+				}
+
+				return true;
+
+			}, null, SearchMethod.TreeOrder);
+
+			if (!Safe)
+				throw new UnauthorizedAccessException("Expression not permitted: " + Prohibited?.SubExpression);
 
 			try
 			{

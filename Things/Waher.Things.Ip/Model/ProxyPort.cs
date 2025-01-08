@@ -13,6 +13,7 @@ using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
+using Waher.Security;
 using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
 
@@ -198,7 +199,7 @@ namespace Waher.Things.Ip.Model
 								}
 
 								if (this.tls)
-									await Outgoing.UpgradeToTlsAsClient(Certificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, this.trustServer);
+									await Outgoing.UpgradeToTlsAsClient(Certificate, Crypto.TlsOnly, this.trustServer);
 							}
 							catch (Exception ex)
 							{
@@ -293,7 +294,7 @@ namespace Waher.Things.Ip.Model
 				{
 					await this.Information("Switching to TLS.");
 
-					await Incoming.UpgradeToTlsAsServer(Certificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, ClientCertificates.Optional);
+					await Incoming.UpgradeToTlsAsServer(Certificate, Crypto.SecureTls, ClientCertificates.Optional);
 
 					if (this.authorizedAccess)
 					{

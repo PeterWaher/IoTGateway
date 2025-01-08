@@ -696,7 +696,7 @@ namespace Waher.Networking.XMPP
 #if WINDOWS_UWP
 							await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
-							await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
+							await this.client.UpgradeToTlsAsClient(this.clientCertificate, Crypto.SecureTls, this.trustServer);
 #endif
 							this.upgradeToTls = false;
 							this.client.Continue();
@@ -3401,7 +3401,7 @@ namespace Waher.Networking.XMPP
 #if WINDOWS_UWP
 					await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
 #else
-					await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
+					await this.client.UpgradeToTlsAsClient(this.clientCertificate, Crypto.SecureTls, this.trustServer);
 #endif
 					bool SendStream = !this.performingQuickLogin;
 

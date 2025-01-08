@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.Sniffers
 {
@@ -304,16 +305,7 @@ namespace Waher.Networking.Sniffers
 		{
 			using (FileStream fs = File.OpenRead(FileName))
 			{
-				long l = fs.Length;
-				if (l > int.MaxValue)
-					throw new NotSupportedException("File too large.");
-
-				int Len = (int)l;
-				byte[] Bin = new byte[Len];
-
-				await fs.ReadAsync(Bin, 0, Len);
-
-				return Bin;
+				return await fs.ReadAllAsync();
 			}
 		}
 

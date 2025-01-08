@@ -2,6 +2,7 @@
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security.ChaChaPoly
 {
@@ -108,8 +109,7 @@ namespace Waher.Security.ChaChaPoly
             while (i < c)
             {
                 j = (int)Math.Min(c - i, 16);
-                if (j != await Data.ReadAsync(Bin, 0, j))
-                    throw new IOException("Unexpected end of file.");
+                await Data.ReadAllAsync(Bin, 0, j);
 
                 i += j;
                 Bin[j++] = 1;

@@ -131,5 +131,21 @@ namespace Waher.Content.Test
 			Assert.IsTrue(TS.TotalMilliseconds < 1);
 			// Round-off errors may result in a 1 ms diff.
 		}
+
+		[DataTestMethod]
+		[DataRow("PT100M", "PT1H", 1)]
+		[DataRow("P1Y", "PT1H", 1)]
+		[DataRow("P1M", "PT1H", 1)]
+		[DataRow("P1D", "PT1H", 1)]
+		[DataRow("PT1H", "PT1H", 0)]
+		[DataRow("PT1M", "PT1H", -1)]
+		[DataRow("PT1S", "PT1H", -1)]
+		public void Test_07_CompareTo(string s1, string s2, int Sign)
+		{
+			Duration D1 = Duration.Parse(s1);
+			Duration D2 = Duration.Parse(s2);
+
+			Assert.AreEqual(Sign, D1.CompareTo(D2));
+		}
 	}
 }

@@ -64,6 +64,7 @@
     <Compile Include=".bak\Waher.Content\ContentResponse.cs" />
     <Compile Include=".bak\Waher.Content\ContentStreamResponse.cs" />
     <Compile Include=".bak\Waher.Content\ConversionState.cs" />
+    <Compile Include=".bak\Waher.Content\ICodecProgress.cs" />
     <Compile Include=".bak\Waher.Content\IContentDeleter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentHeader.cs" />

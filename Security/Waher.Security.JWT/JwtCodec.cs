@@ -44,9 +44,10 @@ namespace Waher.Security.JWT
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		///	<param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
-			KeyValuePair<string, string>[] Fields, Uri BaseUri)
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			string Token = (Encoding ?? Encoding.ASCII).GetString(Data);
 			return Task.FromResult(new ContentResponse(ContentType, new JwtToken(Token), Data));
@@ -117,9 +118,10 @@ namespace Waher.Security.JWT
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is JwtToken Token))
 				return Task.FromResult(new ContentResponse(new ArgumentException("Object not a JWT token.", nameof(Object))));

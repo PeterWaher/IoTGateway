@@ -43,8 +43,9 @@ namespace Waher.IoTGateway.Cssx
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			string Cssx;
 

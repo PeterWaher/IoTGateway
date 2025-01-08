@@ -77,7 +77,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 			if (InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType) &&
 				InternetContent.Encodes(Obj, out Grade _, out IContentEncoder Encoder, ContentType))
 			{
-				Content = await Encoder.EncodeAsync(Obj, System.Text.Encoding.UTF8, ContentType);
+				Content = await Encoder.EncodeAsync(Obj, System.Text.Encoding.UTF8, null, ContentType);
 			}
 			else
 				Content = await InternetContent.EncodeAsync(Obj, System.Text.Encoding.UTF8);

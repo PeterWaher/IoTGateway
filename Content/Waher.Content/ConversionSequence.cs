@@ -28,7 +28,7 @@ namespace Waher.Content
 		public string[] ToContentTypes => new string[] { this.to };
 		public Grade ConversionGrade => this.conversionGrade;
 
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			Stream Intermediate = null;
 			Stream Intermediate2 = null;
@@ -49,7 +49,7 @@ namespace Waher.Content
 						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName, State.LocalResourceName, 
 							State.URL, State.ToContentType, State.To, State.Session, State.PossibleContentTypes);
 
-						if (await this.sequence[i].Value.ConvertAsync(State2))
+						if (await this.sequence[i].Value.ConvertAsync(State2, Progress))
 							Dynamic = true;
 
 						if (State2.HasError)
@@ -72,7 +72,7 @@ namespace Waher.Content
 						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName,
 							State.LocalResourceName, State.URL, ToType, Intermediate2, State.Session);
 
-						if (await this.sequence[i].Value.ConvertAsync(State2))
+						if (await this.sequence[i].Value.ConvertAsync(State2, Progress))
 							Dynamic = true;
 
 						if (State2.HasError)

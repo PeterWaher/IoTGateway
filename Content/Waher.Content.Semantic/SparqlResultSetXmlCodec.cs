@@ -72,8 +72,10 @@ namespace Waher.Content.Semantic
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 			SparqlResultSet Parsed = new SparqlResultSet(s, BaseUri);
@@ -119,9 +121,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;

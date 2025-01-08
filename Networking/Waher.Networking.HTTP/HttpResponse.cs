@@ -48,6 +48,7 @@ namespace Waher.Networking.HTTP
 
 		private TransferEncoding transferEncoding = null;
 		private IBinaryTransmission responseStream;
+		private ICodecProgress progress;
 		private readonly TransferEncoding desiredTransferEncoding = null;
 		private readonly HttpServer httpServer;
 		private readonly HttpRequest httpRequest;
@@ -237,6 +238,15 @@ namespace Waher.Networking.HTTP
 				this.AssertHeaderOpen();
 				this.onlyHeader = value;
 			}
+		}
+
+		/// <summary>
+		/// Optional progress reporting of encoding/decoding. Can be null.
+		/// </summary>
+		public ICodecProgress Progress
+		{
+			get => this.progress;
+			internal set => this.progress = value;
 		}
 
 		/// <summary>
@@ -1245,7 +1255,7 @@ namespace Waher.Networking.HTTP
 
 							if (!(Best is null))
 							{
-								P = await Best.EncodeAsync(Object, this.encoding, ContentType, BestContentType);
+								P = await Best.EncodeAsync(Object, this.encoding, this.progress, ContentType, BestContentType);
 								this.encodingUsed |= P.ContentType.StartsWith("text/");
 								Data = P.Encoded;
 								ContentType = P.ContentType;
@@ -1256,7 +1266,7 @@ namespace Waher.Networking.HTTP
 						case 3: // Top & Sub Type, and parameters
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
 							{
-								P = await Encoder.EncodeAsync(Object, this.encoding, ContentType, Rec.Item);
+								P = await Encoder.EncodeAsync(Object, this.encoding, this.progress, ContentType, Rec.Item);
 								this.encodingUsed |= P.ContentType.StartsWith("text/");
 								Data = P.Encoded;
 								ContentType = P.ContentType;

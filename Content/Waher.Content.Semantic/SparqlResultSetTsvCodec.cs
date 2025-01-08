@@ -71,9 +71,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			string Text;
 

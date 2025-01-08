@@ -317,10 +317,24 @@ namespace Waher.Content
 		/// <returns>Encoded object, and Content Type of encoding. Includes information about any text encodings used.</returns>
 		public static Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
+			return EncodeAsync(Object, Encoding, null, AcceptedContentTypes);
+		}
+
+		/// <summary>
+		/// Encodes an object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object, and Content Type of encoding. Includes information about any text encodings used.</returns>
+		public static Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding,
+			ICodecProgress Progress, params string[] AcceptedContentTypes)
+		{
 			if (!Encodes(Object, out Grade _, out IContentEncoder Encoder, AcceptedContentTypes))
 				return Task.FromResult(new ContentResponse(new ArgumentException("No encoder found to encode objects of type " + (Object?.GetType()?.FullName) + ".", nameof(Object))));
 
-			return Encoder.EncodeAsync(Object, Encoding);
+			return Encoder.EncodeAsync(Object, Encoding, Progress);
 		}
 
 		/// <summary>
@@ -541,10 +555,26 @@ namespace Waher.Content
 		/// <returns>Decoded object.</returns>
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
+			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, null);
+		}
+
+		/// <summary>
+		/// Decodes an object.
+		/// </summary>
+		/// <param name="ContentType">Internet Content Type.</param>
+		/// <param name="Data">Encoded object.</param>
+		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
+		/// <returns>Decoded object.</returns>
+		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, 
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
+		{
 			if (!Decodes(ContentType, out Grade _, out IContentDecoder Decoder))
 				return Task.FromResult(new ContentResponse(new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", nameof(ContentType))));
 
-			return Decoder.DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri);
+			return Decoder.DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
 		}
 
 		/// <summary>
@@ -569,6 +599,20 @@ namespace Waher.Content
 		/// <returns>Decoded object.</returns>
 		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Uri BaseUri)
 		{
+			return DecodeAsync(ContentType, Data, BaseUri, null);
+		}
+
+		/// <summary>
+		/// Decodes an object.
+		/// </summary>
+		/// <param name="ContentType">Internet Content Type.</param>
+		/// <param name="Data">Encoded object.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
+		/// <returns>Decoded object.</returns>
+		public static Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Uri BaseUri,
+			ICodecProgress Progress)
+		{
 			Encoding Encoding = null;
 			KeyValuePair<string, string>[] Fields;
 			int i;
@@ -588,7 +632,7 @@ namespace Waher.Content
 			else
 				Fields = new KeyValuePair<string, string>[0];
 
-			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri);
+			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
 		}
 
 		/// <summary>

@@ -101,15 +101,27 @@ namespace Waher.Content.Markdown
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
+			MarkdownSettings Settings = new MarkdownSettings()
+			{
+				Progress = Progress
+			};
+			MarkdownDocument Doc;
 
 			if (BaseUri is null)
-				return new ContentResponse(ContentType, await MarkdownDocument.CreateAsync(s), Data);
+				Doc = await MarkdownDocument.CreateAsync(s, Settings);
 			else
-				return new ContentResponse(ContentType, await MarkdownDocument.CreateAsync(s, new MarkdownSettings(), string.Empty, string.Empty, BaseUri.ToString()), Data);
+			{
+				Doc = await MarkdownDocument.CreateAsync(s, Settings,
+					string.Empty, string.Empty, BaseUri.ToString());
+			}
+
+			return new ContentResponse(ContentType, Doc, Data);
 		}
 
 		/// <summary>
@@ -126,7 +138,7 @@ namespace Waher.Content.Markdown
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (allowEncoding && Object is MarkdownDocument && 
+			else if (allowEncoding && Object is MarkdownDocument &&
 				InternetContent.IsAccepted(contentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
@@ -144,9 +156,10 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			string Markdown;
 

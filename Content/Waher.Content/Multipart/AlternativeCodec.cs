@@ -67,12 +67,14 @@ namespace Waher.Content.Multipart
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
-			Exception Error = await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
+			Exception Error = await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri, Progress);
 
 			if (Error is null)
 				return new ContentResponse(ContentType, new ContentAlternatives(List.ToArray()), Data);
@@ -147,9 +149,11 @@ namespace Waher.Content.Multipart
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding,
+			ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Object is ContentAlternatives Alternatives &&
 				InternetContent.IsAccepted(contentTypes, AcceptedContentTypes))
@@ -157,7 +161,7 @@ namespace Waher.Content.Multipart
 				string Boundary = Guid.NewGuid().ToString();
 				string ContentType = AlternativeCodec.ContentType + "; boundary=\"" + Boundary + "\"";
 				return new ContentResponse(ContentType, Object,
-					await FormDataDecoder.Encode(Alternatives.Content, Boundary));
+					await FormDataDecoder.Encode(Alternatives.Content, Boundary, Progress));
 			}
 			else
 				return new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object)));

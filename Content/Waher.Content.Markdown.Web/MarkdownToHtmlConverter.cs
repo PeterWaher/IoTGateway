@@ -88,8 +88,9 @@ namespace Waher.Content.Markdown.Web
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			if (State is null)
 				return true;
@@ -148,7 +149,8 @@ namespace Waher.Content.Markdown.Web
 			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, State.Session)
 			{
 				RootFolder = rootFolder,
-				ResourceMap = Request.Server
+				ResourceMap = Request.Server,
+				Progress = Progress
 			};
 
 			if (!string.IsNullOrEmpty(bareJid))

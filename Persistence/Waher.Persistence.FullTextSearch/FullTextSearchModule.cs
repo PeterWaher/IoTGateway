@@ -1088,7 +1088,7 @@ namespace Waher.Persistence.FullTextSearch
 					await synchObj.EndWrite();
 				}
 
-				queryCache.Clear();
+				queryCache?.Clear();
 
 				await Search.RaiseObjectRemovedFromIndex(this, new ObjectReferenceEventArgs(Ref));
 			}

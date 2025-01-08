@@ -463,7 +463,22 @@ namespace Waher.Networking.HTTP
 					if (i + 1 < Count)
 						return await this.Client_OnReceivedHttp2Live(null, ConstantBuffer, Buffer, i + 1, c - i - 1);
 					else
+					{
+						if (!this.localSettings.AcknowledgedOrSent)
+						{
+							this.localSettings.AcknowledgedOrSent = true;
+
+							StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
+
+							if (!await this.SendHttp2Frame(FrameType.Settings, 0, false, 0, null, this.localSettings.ToArray(sb)))
+								return false;
+
+							if (!(sb is null))
+								this.TransmitText(sb.ToString().Trim());
+						}
+
 						return true;
+					}
 				}
 			}
 

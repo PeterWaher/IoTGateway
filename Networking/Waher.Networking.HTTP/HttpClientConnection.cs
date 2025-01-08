@@ -954,8 +954,11 @@ namespace Waher.Networking.HTTP
 									this.localSettings.MaxHeaderListSize);
 							}
 
-							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+								Stream.InputDataStream, Stream))
+							{
 								return false;
+							}
 						}
 						break;
 
@@ -1022,10 +1025,10 @@ namespace Waher.Networking.HTTP
 							if (Priority)
 							{
 								StreamIdDependency = this.reader.NextUInt32();
+
 								Exclusive = (StreamIdDependency & 0x80000000) != 0;
 								StreamIdDependency &= 0x7fffffff;
 								Weight = this.reader.NextByte();
-
 #if INFO_IN_SNIFFERS
 								if (this.HasSniffers)
 								{
@@ -1042,6 +1045,8 @@ namespace Waher.Networking.HTTP
 									this.Information(sb.ToString());
 								}
 #endif
+								if (StreamIdDependency == this.http2StreamId)
+									return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Dependency unto itself prohibited.");
 							}
 						}
 						else
@@ -1183,9 +1188,12 @@ namespace Waher.Networking.HTTP
 								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
 									this.localSettings.MaxHeaderListSize);
 							}
-
-							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+							
+							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+								Stream.InputDataStream, Stream))
+							{
 								return false;
+							}
 						}
 						else if (EndHeaders && Stream.Headers.Method == "CONNECT")
 						{
@@ -1205,8 +1213,11 @@ namespace Waher.Networking.HTTP
 									this.localSettings.MaxHeaderListSize);
 							}
 
-							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+								Stream.InputDataStream, Stream))
+							{
 								return false;
+							}
 						}
 						break;
 
@@ -1221,6 +1232,9 @@ namespace Waher.Networking.HTTP
 						Exclusive = (StreamIdDependency & 0x80000000) != 0;
 						Weight = this.reader.NextByte();
 						StreamIdDependency &= 0x7fffffff;
+
+						if (StreamIdDependency == this.http2StreamId)
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Dependency unto itself prohibited.");
 
 						if (this.flowControl is FlowControlRfc7540 FlowControlRfc7540 &&
 							this.flowControl.TryGetStream(this.http2StreamId, out Stream))
@@ -1326,8 +1340,7 @@ namespace Waher.Networking.HTTP
 						break;
 
 					case FrameType.PushPromise:
-						// TODO: process frame and return response.
-						break;
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Client not allowed to send push promises");
 
 					case FrameType.Ping:
 						if (this.http2StreamId != 0)
@@ -1418,10 +1431,13 @@ namespace Waher.Networking.HTTP
 								this.Information(sb.ToString());
 							}
 #endif
-							if (this.flowControl is null ||
-								this.flowControl.ReleaseStreamResources(this.http2StreamId, (int)Increment) < 0)
+							switch (this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment) ?? -1)
 							{
-								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
+								case -1:
+									return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
+
+								case -2:
+									return await this.ReturnHttp2Error(Http2Error.FlowControlError, this.http2StreamId, "Window size overflow.");
 							}
 						}
 						break;
@@ -1653,6 +1669,7 @@ namespace Waher.Networking.HTTP
 
 				this.client?.OnReceivedReset(this.Client_OnReceivedClosed);
 
+				this.CloseConnection();
 				return false;
 			}
 			else

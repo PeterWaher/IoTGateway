@@ -7,12 +7,6 @@ namespace Waher.Networking.HTTP.Test
 {
 	/// <summary>
 	/// Performs HTTP/2 tests.
-	/// 
-	/// For a comprehensive set of tests for HTTP/2, use the h2spec tool:
-	/// https://github.com/summerwind/h2spec
-	/// 
-	/// Other testing tools are also available:
-	/// https://github.com/httpwg/wiki/wiki/HTTP-Testing-Resources
 	/// </summary>
 	[TestClass]
 	public class Http20ServerTests : HttpServerTests
@@ -20,13 +14,13 @@ namespace Waher.Networking.HTTP.Test
 		[ClassInitialize]
 		public new static void ClassInitialize(TestContext _)
 		{
-			HttpServerTests.ClassInitialize(_);
+			HttpServerTestsBase.ClassInitialize(_);
 		}
 
 		[ClassCleanup]
 		public new static async Task ClassCleanup()
 		{
-			await HttpServerTests.ClassCleanup();
+			await HttpServerTestsBase.ClassCleanup();
 		}
 
 		public override Version ProtocolVersion => HttpVersion.Version20;

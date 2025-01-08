@@ -105,13 +105,16 @@ of projects, making it easier to work with different aspects of the gateway, or 
 
 | Solution File | Description |
 |:--------------|:------------|
-| `IoTGateway.sln`     | Main repository. Contains references to all gateway projects, for most platforms. |
+| `IoTGateway.sln`     | Main repository. Contains references to all gateway projects, for most platforms.        |
 | `IoTGatewayCore.sln` | Solution file that contains core repositories only (i.e. .NET Standard and .NET Core projects). Can be compiled using VS Code on multiple platforms. |
-| `Content.sln`        | Contains Content-related repositories, and their dependecies.                     |
-| `Layout.sln`         | Contains Layout-related repositories, and their dependecies.                      |
-| `Persistence.sln`    | Contains Persistence-related repositories, and their dependecies.                 |
-| `Runtime.sln`        | Contains Runtime-related repositories, and their dependecies.                     |
-| `Script.sln`         | Contains Script-related repositories, and their dependecies.                      |
+| `Cluster.sln`        | Contains repositories related to the cluster networking library, and their dependecies.  |
+| `Content.sln`        | Contains Content-related repositories, and their dependecies.                            |
+| `HTTP.sln`           | Contains repositories related to the HTTP networking library, and their dependecies.     |
+| `Layout.sln`         | Contains Layout-related repositories, and their dependecies.                             |
+| `Persistence.sln`    | Contains Persistence-related repositories, and their dependecies.                        |
+| `Runtime.sln`        | Contains Runtime-related repositories, and their dependecies.                            |
+| `Script.sln`         | Contains Script-related repositories, and their dependecies.                             |
+| `XMPP.sln`           | Contains repositories related to the XMPP networking libraries, and their dependecies.   |
 
 
 IoT Gateway
@@ -322,16 +325,17 @@ The [Networking](Networking) folder contains libraries that manage different asp
 
 The folder also contains the following unit test projects:
 
-| Project                            | Type          | Project description |
-|------------------------------------|---------------|---------------------|
-| **Waher.Networking.Cluster.Test**  | .NET 8.0 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
-| **Waher.Networking.CoAP.Test**     | .NET 8.0 | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
-| **Waher.Networking.DNS.Test**      | .NET 8.0 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
-| **Waher.Networking.HTTP.Test**     | .NET 8.0 | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
-| **Waher.Networking.Modbus.Test**   | .NET 8.0 | The [Waher.Networking.Modbus.Test](Networking/Waher.Networking.Modbus.Test) project contains unit-tests for the [Waher.Networking.Modbus](Networking/Waher.Networking.Modbus) library. |
-| **Waher.Networking.MQTT.Test**     | .NET 8.0 | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
-| **Waher.Networking.WHOIS.Test**    | .NET 8.0 | The [Waher.Networking.WHOIS.Test](Networking/Waher.Networking.WHOIS.Test) project contains unit-tests for the [Waher.Networking.WHOIS](Networking/Waher.Networking.WHOIS) library. |
-| **Waher.Networking.XMPP.Test**     | .NET 8.0 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
+| Project                              | Type          | Project description |
+|--------------------------------------|---------------|---------------------|
+| **Waher.Networking.Cluster.Test**    | .NET 8.0 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
+| **Waher.Networking.CoAP.Test**       | .NET 8.0 | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
+| **Waher.Networking.DNS.Test**        | .NET 8.0 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |
+| **Waher.Networking.HTTP.Test**       | .NET 8.0 | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
+| **Waher.Networking.HTTP.TestServer** | .NET 8.0 | The [Waher.Networking.HTTP.TestServer](Networking/Waher.Networking.HTTP.TestServer) project is a console application that hosts a simple web server using the [Waher.Networking.HTTP](Networking/Waher.Networking.CoAP) library, for testing purposes using external unit test tools, such as the [h2spec](https://github.com/summerwind/h2spec) tool and [similar](https://github.com/httpwg/wiki/wiki/HTTP-Testing-Resources). |
+| **Waher.Networking.Modbus.Test**     | .NET 8.0 | The [Waher.Networking.Modbus.Test](Networking/Waher.Networking.Modbus.Test) project contains unit-tests for the [Waher.Networking.Modbus](Networking/Waher.Networking.Modbus) library. |
+| **Waher.Networking.MQTT.Test**       | .NET 8.0 | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
+| **Waher.Networking.WHOIS.Test**      | .NET 8.0 | The [Waher.Networking.WHOIS.Test](Networking/Waher.Networking.WHOIS.Test) project contains unit-tests for the [Waher.Networking.WHOIS](Networking/Waher.Networking.WHOIS) library. |
+| **Waher.Networking.XMPP.Test**       | .NET 8.0 | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
 Persistence
 ----------------------

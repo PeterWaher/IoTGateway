@@ -213,6 +213,22 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
+		private void RecalculateChildWindows()
+		{
+			if (!(this.childNodes is null) && this.totalChildWeights > 0)
+			{
+				LinkedListNode<PriorityNodeRfc7540> Loop = this.childNodes.First;
+				PriorityNodeRfc7540 Child;
+
+				while (!(Loop is null))
+				{
+					Child = Loop.Value;
+					Child.SetNewWindowSize((int)(this.windowSize0 * this.ResourceFraction * Child.weight / this.totalChildWeights), false);
+					Loop = Loop.Next;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Requests resources from the available pool of resources in the tree.
 		/// </summary>
@@ -270,7 +286,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			int NewSize = this.windowSize + Resources;
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
-				return -1;
+				return -2;
 
 			this.windowSize = NewSize;
 
@@ -333,6 +349,30 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.TriggerPendingIfAvailbleDown(ref Resources);
 
 			return NewSize;
+		}
+
+		/// <summary>
+		/// Sets a new window size.
+		/// </summary>
+		/// <param name="WindowSize">Window size</param>
+		/// <param name="Trigger">If pending streams should be triggered.</param>
+		public void SetNewWindowSize(int WindowSize, bool Trigger)
+		{
+			int Diff = WindowSize - this.windowSize0;
+			this.windowSize0 = WindowSize;
+			this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
+			this.windowSize += Diff;
+
+			this.RecalculateChildWindows();
+
+			if (Trigger)
+			{
+				if (!(this.root is null))
+					WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
+
+				if (WindowSize > 0)
+					this.TriggerPendingIfAvailbleDown(ref WindowSize);
+			}
 		}
 
 		private void TriggerPendingIfAvailbleDown(ref int Resources)

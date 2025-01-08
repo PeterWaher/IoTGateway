@@ -1,10 +1,10 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Content.Emoji;
 using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;

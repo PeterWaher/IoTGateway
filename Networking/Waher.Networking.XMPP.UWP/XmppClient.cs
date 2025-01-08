@@ -3792,11 +3792,11 @@ namespace Waher.Networking.XMPP
 		/// <returns>Error element.</returns>
 		public string ExceptionToXmppXml(Exception ex)
 		{
+			this.Error(ex.Message);
+
 			StringBuilder Xml = new StringBuilder();
 			if (ex is StanzaExceptionException ex2)
 			{
-				this.Exception(ex2);
-
 				Xml.Append("<error type='");
 				Xml.Append(ex2.ErrorType);
 				Xml.Append("'><");
@@ -3809,8 +3809,6 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				this.Exception(ex);
-
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>");
 				Xml.Append(XML.Encode(ex.Message));
@@ -4795,7 +4793,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
 		public Task SetPresence(Availability Availability, params KeyValuePair<string, string>[] Status)
 		{
-			return this.SetPresence(Availability, null, Status);
+			return this.SetPresence(Availability, null, null, Status);
 		}
 
 		/// <summary>
@@ -4806,7 +4804,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Method to call when stanza has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
-		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback, object State, params KeyValuePair<string, string>[] Status)
+		public async Task SetPresence(Availability Availability, EventHandlerAsync<DeliveryEventArgs> Callback, 
+			object State, params KeyValuePair<string, string>[] Status)
 		{
 			this.currentAvailability = Availability;
 			this.customPresenceStatus = Status;
@@ -4890,7 +4889,7 @@ namespace Waher.Networking.XMPP
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;
-			}, Status);
+			}, null, Status);
 
 			await Result.Task;
 		}

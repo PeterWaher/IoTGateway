@@ -29,9 +29,13 @@ namespace Waher.Networking.HTTP.HTTP2
 		public const int DefaultHttp2HeaderTableSize = 4096;
 
 		/// <summary>
-		/// Default Enable Push Promises for an HTTP/2 connection (true).
+		/// Default Enable Push Promises for an HTTP/2 connection (false).
 		/// </summary>
-		public const bool DefaultHttp2EnablePush = true;
+		/// <remarks>
+		/// Notes on why Push is disabled by default in many HTTP/2 implementations:
+		/// https://groups.google.com/a/chromium.org/g/blink-dev/c/K3rYLvmQUBY/m/vOWBKZGoAQAJ
+		/// </remarks>
+		public const bool DefaultHttp2EnablePush = false;
 
 		/// <summary>
 		/// Default Enable Connect Protocol over HTTP/2 (true).

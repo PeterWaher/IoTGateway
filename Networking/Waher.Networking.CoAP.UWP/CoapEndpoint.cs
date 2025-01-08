@@ -300,7 +300,12 @@ namespace Waher.Networking.CoAP
 							Outgoing.Client.Bind(new IPEndPoint(Address, 0));
 
 							if (!Encrypted)
-								Outgoing.JoinMulticastGroup(MulticastAddress);
+							{
+								if (IsMulticastAddress(MulticastAddress))
+									Outgoing.JoinMulticastGroup(MulticastAddress);
+								else
+									this.Warning("Address provided is not a multi-cast address.");
+							}
 
 							IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
 							ClientBase OutgoingClient;
@@ -390,7 +395,10 @@ namespace Waher.Networking.CoAP
 										MulticastLoopback = false
 									};
 
-									Incoming.JoinMulticastGroup(MulticastAddress);
+									if (IsMulticastAddress(MulticastAddress))
+										Incoming.JoinMulticastGroup(MulticastAddress);
+									else
+										this.Warning("Address provided is not a multi-cast address.");
 
 									IncomingClient = new IncomingUdpClient()
 									{

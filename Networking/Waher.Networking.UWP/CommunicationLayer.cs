@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -533,6 +535,28 @@ namespace Waher.Networking
 			"DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS", "GS",
 			"RS", "US"
 		};
+
+		/// <summary>
+		/// Checks if an IP Address is a multi-cast address or not.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <returns>If the IP Address represents a multi-cast address.</returns>
+		public static bool IsMulticastAddress(IPAddress Address)
+		{
+			switch (Address.AddressFamily)
+			{
+				case AddressFamily.InterNetwork:
+					byte[] Bin = Address.GetAddressBytes();
+					return Bin[0] >= 224 && Bin[0] <= 239;
+
+				case AddressFamily.InterNetworkV6:
+					Bin = Address.GetAddressBytes();
+					return Bin[0] == 0xff;
+
+				default:
+					return false;
+			}
+		}
 
 	}
 }

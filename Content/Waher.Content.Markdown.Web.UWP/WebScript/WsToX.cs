@@ -40,8 +40,9 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			DateTime TP = File.GetLastWriteTimeUtc(State.FromFileName);
 			Expression Exp = null;
@@ -98,7 +99,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 					}
 				}
 
-				ContentResponse P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
+				ContentResponse P = await Encoder.EncodeAsync(Result, Encoding.UTF8, Progress, State.ToContentType);
 				await State.To.WriteAsync(P.Encoded, 0, P.Encoded.Length);
 				State.ToContentType = P.ContentType;
 			}

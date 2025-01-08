@@ -261,7 +261,7 @@ namespace Waher.Networking.HTTP
 						ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, this.ResourceName,
 							Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
 
-						if (await Converter.ConvertAsync(State))
+						if (await Converter.ConvertAsync(State, Response.Progress))
 							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 
 						if (State.HasError)

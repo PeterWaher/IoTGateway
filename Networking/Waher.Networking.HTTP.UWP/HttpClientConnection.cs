@@ -237,7 +237,7 @@ namespace Waher.Networking.HTTP
 									this.server.Http2MaxFrameSize,
 									this.server.Http2MaxConcurrentStreams,
 									this.server.Http2HeaderTableSize,
-									this.server.Http2EnablePush,
+									this.server.Http2EnablePush && this.remoteSettings.EnablePush,
 									this.server.Http2NoRfc7540Priorities || this.remoteSettings.NoRfc7540Priorities);
 
 								this.client.OnReceivedReset(this.Client_OnReceivedHttp2Live);
@@ -1196,7 +1196,13 @@ namespace Waher.Networking.HTTP
 							return await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Expected exactly 4 bytes of data.");
 
 						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
-						this.LogError(Error.Value, "Client reset the stream.", false);
+
+						string s = "Client reset the stream.";
+
+						if (this.reader.BytesLeft > 0)
+							s += " (" + Encoding.UTF8.GetString(this.reader.NextBytes()) + ")";
+
+						this.LogError(Error.Value, s, false);
 
 						this.flowControl.RemoveStream(this.http2StreamId);
 						break;
@@ -1230,6 +1236,7 @@ namespace Waher.Networking.HTTP
 							if (Error.HasValue)
 								return await this.ReturnHttp2Error(Error.Value, 0, "Invalid settings received.");
 
+							this.localSettings.EnablePush &= this.remoteSettings.EnablePush;
 							this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
 
 							if (this.flowControl is null)
@@ -1287,7 +1294,13 @@ namespace Waher.Networking.HTTP
 
 						this.http2LastPermittedStreamId = (int)(this.reader.NextUInt32() & 0x7fffffff);
 						Error = (Http2Error)this.reader.NextUInt32();
-						this.LogError(Error.Value, "Client requested connection to close.", true);
+
+						s = "Client requested connection to close.";
+
+						if (this.reader.BytesLeft > 0)
+							s += " (" + Encoding.UTF8.GetString(this.reader.NextBytes()) + ")";
+
+						this.LogError(Error.Value, s, true);
 
 						this.flowControl?.GoingAway(this.http2LastPermittedStreamId);
 						break;
@@ -1364,7 +1377,8 @@ namespace Waher.Networking.HTTP
 							StreamIdDependency = this.reader.NextUInt32();
 							StreamIdDependency &= 0x7fffffff;
 
-							string s = this.reader.NextString(Encoding.ASCII);
+							s = this.reader.NextString(Encoding.ASCII);
+
 							int? Rfc9218Priority = null;
 							bool? Rfc9218Incremental = null;
 

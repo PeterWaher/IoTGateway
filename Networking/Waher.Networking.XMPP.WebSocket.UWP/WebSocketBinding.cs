@@ -466,10 +466,20 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		public override Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			if (this.terminated)
-				return false;
+				return Task.FromResult(false);
+
+			this.Send(Packet, DeliveryCallback, State);
+
+			return Task.FromResult(true);
+		}
+
+		private async void Send(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		{ 
+			if (this.terminated)
+				return;
 
 			if (Packet is null)
 				throw new ArgumentException("Null payloads not allowed.", nameof(Packet));
@@ -495,7 +505,7 @@ namespace Waher.Networking.XMPP.WebSocket
 						this.xmppClient.Information("Outbound stanza queued.");
 
 					this.queue.AddLast(new KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>(Packet, DeliveryCallback));
-					return true;
+					return;
 				}
 				else
 					this.writing = true;
@@ -551,8 +561,6 @@ namespace Waher.Networking.XMPP.WebSocket
 
 				await this.bindingInterface.ConnectionError(ex);
 			}
-
-			return true;
 		}
 
 		private Task<bool> FragmentReceived(string Xml)

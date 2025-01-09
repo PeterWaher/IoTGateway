@@ -62,6 +62,8 @@ namespace Waher.Networking.HTTP
 		private int http2LastCreatedStreamId = 0;
 		private int http2LastPermittedStreamId = int.MaxValue;
 		private int http2FramePos = 0;
+		private int http2BuildingHeadersOnStream = 0;
+		private int http2InitialMaxFrameSize = int.MaxValue;
 		private FrameType http2FrameType = 0;
 		private ConnectionSettings localSettings = null;
 		private ConnectionSettings remoteSettings = null;
@@ -173,7 +175,12 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				if (this.header.HttpVersion < 1)
+				if (this.header.HttpVersion < 0)
+				{
+					await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Invalid connection preface");
+					return false;
+				}
+				else if (this.header.HttpVersion < 1)
 				{
 					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported",
 						"At least HTTP Version 1.0 is required."), true);
@@ -232,6 +239,7 @@ namespace Waher.Networking.HTTP
 							if (ConnectionSettings.TryParse(true, Bin, out ConnectionSettings Settings))
 							{
 								this.remoteSettings = Settings;
+								this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
 								this.localSettings = new ConnectionSettings(
 									this.server.Http2InitialWindowSize,
 									this.server.Http2MaxFrameSize,
@@ -463,7 +471,22 @@ namespace Waher.Networking.HTTP
 					if (i + 1 < Count)
 						return await this.Client_OnReceivedHttp2Live(null, ConstantBuffer, Buffer, i + 1, c - i - 1);
 					else
+					{
+						if (!this.localSettings.AcknowledgedOrSent)
+						{
+							this.localSettings.AcknowledgedOrSent = true;
+
+							StringBuilder sb = this.HasSniffers ? new StringBuilder() : null;
+
+							if (!await this.SendHttp2Frame(FrameType.Settings, 0, false, 0, null, this.localSettings.ToArray(sb)))
+								return false;
+
+							if (!(sb is null))
+								this.TransmitText(sb.ToString().Trim());
+						}
+
 						return true;
+					}
 				}
 			}
 
@@ -858,6 +881,9 @@ namespace Waher.Networking.HTTP
 				else
 					this.reader.Reset(ConstantBuffer, FramePayload, Offset, Count);
 
+				if (this.http2BuildingHeadersOnStream > 0 && this.http2FrameType != FrameType.Continuation)
+					return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Expected continuation frame.");
+
 				switch (this.http2FrameType)
 				{
 					case FrameType.Data:
@@ -876,7 +902,10 @@ namespace Waher.Networking.HTTP
 							if (this.HasSniffers)
 								this.Information(sb.ToString());
 #endif
-							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream not under flow control.");
+							if (this.http2StreamId <= this.http2LastCreatedStreamId)
+								return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream no longer under flow control.");
+							else
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
 						}
 
 						if (Stream.State != StreamState.Open)
@@ -917,6 +946,9 @@ namespace Waher.Networking.HTTP
 							if (!await Stream.DataReceived(this.reader.ConstantBuffer, this.reader.Buffer, this.reader.Position, DataSize))
 								return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Not sufficient resources available in stream.");
 
+							if (Stream.DataBytesReceived > (Stream.ContentLength ?? long.MaxValue))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Data exceeds Content-Length.");
+
 							this.localSettings.AddPendingIncrement(Stream, DataSize);
 						}
 
@@ -930,8 +962,11 @@ namespace Waher.Networking.HTTP
 									this.localSettings.MaxHeaderListSize);
 							}
 
-							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+								Stream.InputDataStream, Stream))
+							{
 								return false;
+							}
 						}
 						break;
 
@@ -940,21 +975,36 @@ namespace Waher.Networking.HTTP
 						if (this.http2StreamId == 0)
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream is 0");
 
+						if ((this.http2StreamId & 1) == 0)
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Client can only use odd numbered stream IDs.");
+
 						bool StreamCreated = false;
 
 						if (this.http2FrameType == FrameType.Headers)
 						{
+							if (this.http2BuildingHeadersOnStream != 0)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Headers for stream " + this.http2BuildingHeadersOnStream.ToString() + " not ended.");
+
 							if (!this.flowControl.TryGetStream(this.http2StreamId, out Stream))
 							{
 								if (this.http2StreamId < this.http2LastCreatedStreamId)
-									return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream ID too small.");
+									return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream no longer under flow control.");
+								else if (this.http2StreamId == this.http2LastCreatedStreamId)
+									return await this.ReturnHttp2Error(Http2Error.StreamClosed, 0, "Stream no longer under flow control.");
 
 								Stream = new Http2Stream(this.http2StreamId, this);
 								StreamCreated = true;
+								this.http2BuildingHeadersOnStream = this.http2StreamId;
 							}
 						}
-						else if (!this.flowControl.TryGetStream(this.http2StreamId, out Stream))
-							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream not under flow control.");
+						else
+						{
+							if (this.http2StreamId != this.http2BuildingHeadersOnStream)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Building headers on stream " + this.http2BuildingHeadersOnStream.ToString());
+
+							if (!this.flowControl.TryGetStream(this.http2StreamId, out Stream))
+								return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream not under flow control.");
+						}
 
 						if (Stream.State == StreamState.Idle)
 							Stream.State = StreamState.Open;
@@ -963,9 +1013,10 @@ namespace Waher.Networking.HTTP
 							if (this.http2FrameType != FrameType.Continuation)
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Headers not expected.");
 						}
-						else
+						else if (Stream.State != StreamState.HalfClosedRemote || this.http2FrameType != FrameType.Continuation)
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream state: " + Stream.State.ToString());
 
+						string s;
 						bool EndHeaders = (this.http2FrameFlags & 4) != 0;
 						uint StreamIdDependency = 0;    // Root
 						byte Weight = 16;               // Default weight, §5.3.5 RFC 7540
@@ -983,10 +1034,10 @@ namespace Waher.Networking.HTTP
 							if (Priority)
 							{
 								StreamIdDependency = this.reader.NextUInt32();
+
 								Exclusive = (StreamIdDependency & 0x80000000) != 0;
 								StreamIdDependency &= 0x7fffffff;
 								Weight = this.reader.NextByte();
-
 #if INFO_IN_SNIFFERS
 								if (this.HasSniffers)
 								{
@@ -1003,6 +1054,8 @@ namespace Waher.Networking.HTTP
 									this.Information(sb.ToString());
 								}
 #endif
+								if (StreamIdDependency == this.http2StreamId)
+									return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Dependency unto itself prohibited.");
 							}
 						}
 						else
@@ -1057,6 +1110,8 @@ namespace Waher.Networking.HTTP
 							int Start;
 							int Count2;
 
+							this.http2BuildingHeadersOnStream = 0;
+
 							if (Stream.IsBuildingHeaders)
 							{
 								if (!Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize))
@@ -1099,7 +1154,7 @@ namespace Waher.Networking.HTTP
 								while (this.http2HeaderReader.HasMore)
 								{
 									if (!this.http2HeaderReader.ReadHeader(out string HeaderName, out string HeaderValue, out _))
-										return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Unable to decode headers.");
+										return await this.ReturnHttp2Error(Http2Error.CompressionError, 0, "Unable to decode headers.");
 
 									if (this.HasSniffers)
 									{
@@ -1116,11 +1171,19 @@ namespace Waher.Networking.HTTP
 											Cookie += "; " + HeaderValue;
 									}
 									else
-										Stream.AddParsedHeader(HeaderName, HeaderValue);
+									{
+										s = Stream.AddParsedHeader(HeaderName, HeaderValue);
+										if (!(s is null))
+											return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, s);
+									}
 								}
 
 								if (!string.IsNullOrEmpty(Cookie))
-									Stream.AddParsedHeader("cookie", Cookie);
+								{
+									s = Stream.AddParsedHeader("cookie", Cookie);
+									if (!(s is null))
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, s);
+								}
 							}
 							finally
 							{
@@ -1133,6 +1196,18 @@ namespace Waher.Networking.HTTP
 						else if (!Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize))
 							return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Headers too large.");
 
+						if (EndHeaders)
+						{
+							if (string.IsNullOrEmpty(Stream.Headers?.Method))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Missing method.");
+
+							if (string.IsNullOrEmpty(Stream.Headers.UriScheme))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Missing scheme.");
+
+							if (string.IsNullOrEmpty(Stream.Headers.ResourcePart))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Missing path.");
+						}
+
 						if (EndStream)
 						{
 							Stream.State = StreamState.HalfClosedRemote;
@@ -1143,13 +1218,23 @@ namespace Waher.Networking.HTTP
 									this.localSettings.MaxHeaderListSize);
 							}
 
-							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
-								return false;
+							if (EndHeaders)
+							{
+								if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+									return false;
+							}
+						}
+						else if (this.http2FrameType == FrameType.Continuation)
+						{
+							if (EndHeaders)
+							{
+								if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+									return false;
+							}
 						}
 						else if (EndHeaders && Stream.Headers.Method == "CONNECT")
 						{
-							if (!Stream.Headers.TryGetHeaderField(":protocol", out HttpField Protocol) ||
-								Protocol.Value != "websocket" ||
+							if (Stream.Protocol != "websocket" ||
 								!this.server.TryGetResource(Stream.Headers.Resource, out HttpResource Resource, out string SubPath) ||
 								!(Resource is WebSocketListener WebSocketListener) ||
 								(!string.IsNullOrEmpty(SubPath) && !Resource.HandlesSubPaths))
@@ -1164,8 +1249,11 @@ namespace Waher.Networking.HTTP
 									this.localSettings.MaxHeaderListSize);
 							}
 
-							if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+								Stream.InputDataStream, Stream))
+							{
 								return false;
+							}
 						}
 						break;
 
@@ -1181,9 +1269,15 @@ namespace Waher.Networking.HTTP
 						Weight = this.reader.NextByte();
 						StreamIdDependency &= 0x7fffffff;
 
+						if (StreamIdDependency == this.http2StreamId)
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Dependency unto itself prohibited.");
+
 						if (this.flowControl is FlowControlRfc7540 FlowControlRfc7540 &&
 							this.flowControl.TryGetStream(this.http2StreamId, out Stream))
 						{
+							if (Stream.Headers is null)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Priority frame sent on stream where headers have not been completed.");
+
 							FlowControlRfc7540.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
 						}
 						break;
@@ -1197,14 +1291,18 @@ namespace Waher.Networking.HTTP
 
 						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
 
-						string s = "Client reset the stream.";
+						s = "Client reset the stream.";
 
 						if (this.reader.BytesLeft > 0)
 							s += " (" + Encoding.UTF8.GetString(this.reader.NextBytes()) + ")";
 
 						this.LogError(Error.Value, s, false);
 
-						this.flowControl.RemoveStream(this.http2StreamId);
+						if (!this.flowControl.RemoveStream(this.http2StreamId))
+							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
+
+						if (this.http2StreamId == this.http2BuildingHeadersOnStream)
+							this.http2BuildingHeadersOnStream = 0;
 						break;
 
 					case FrameType.Settings:
@@ -1217,6 +1315,17 @@ namespace Waher.Networking.HTTP
 						{
 							if (this.http2FrameLength > 0)
 								return await this.ReturnHttp2Error(Http2Error.FrameSizeError, 0, "Expected no data in ACK frame.");
+
+							if (!(this.remoteSettings is null))
+								break;
+
+#if INFO_IN_SNIFFERS
+							sb?.Clear();
+#else
+							sb = new StringBuilder();
+#endif
+							this.remoteSettings = new ConnectionSettings();
+							this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
 						}
 						else
 						{
@@ -1236,40 +1345,44 @@ namespace Waher.Networking.HTTP
 							if (Error.HasValue)
 								return await this.ReturnHttp2Error(Error.Value, 0, "Invalid settings received.");
 
+							if (this.http2InitialMaxFrameSize == int.MaxValue)
+								this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
+							else if (this.remoteSettings.MaxFrameSize < this.http2InitialMaxFrameSize)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Maximum frame size cannot be less than originally stated.");
+
 							this.localSettings.EnablePush &= this.remoteSettings.EnablePush;
 							this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
+						}
 
-							if (this.flowControl is null)
-							{
-								if (this.localSettings.NoRfc7540Priorities)
-									this.flowControl = new FlowControlRfc9218(this.remoteSettings);
-								else
-									this.flowControl = new FlowControlRfc7540(this.remoteSettings);
-							}
+						if (this.flowControl is null)
+						{
+							if (this.localSettings.NoRfc7540Priorities)
+								this.flowControl = new FlowControlRfc9218(this.remoteSettings);
 							else
-								this.flowControl.UpdateSettings(this.remoteSettings);
+								this.flowControl = new FlowControlRfc7540(this.remoteSettings);
+						}
+						else
+							this.flowControl.UpdateSettings(this.remoteSettings);
 
-							if (this.localSettings.AcknowledgedOrSent)
-							{
-								if (!await this.SendHttp2Frame(FrameType.Settings, 1, false, 0, null))   // Ack
-									return false;
-							}
-							else
-							{
-								this.localSettings.AcknowledgedOrSent = true;
+						if (this.localSettings.AcknowledgedOrSent)
+						{
+							if (!await this.SendHttp2Frame(FrameType.Settings, 1, false, 0, null))   // Ack
+								return false;
+						}
+						else
+						{
+							this.localSettings.AcknowledgedOrSent = true;
 
-								if (!await this.SendHttp2Frame(FrameType.Settings, 0, false, 0, null, this.localSettings.ToArray(sb)))
-									return false;
+							if (!await this.SendHttp2Frame(FrameType.Settings, 0, false, 0, null, this.localSettings.ToArray(sb)))
+								return false;
 
-								if (!(sb is null))
-									this.TransmitText(sb.ToString().Trim());
-							}
+							if (!(sb is null))
+								this.TransmitText(sb.ToString().Trim());
 						}
 						break;
 
 					case FrameType.PushPromise:
-						// TODO: process frame and return response.
-						break;
+						return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Client not allowed to send push promises");
 
 					case FrameType.Ping:
 						if (this.http2StreamId != 0)
@@ -1360,8 +1473,14 @@ namespace Waher.Networking.HTTP
 								this.Information(sb.ToString());
 							}
 #endif
-							this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment);
-							// Ignore returning error if stream has been removed.
+							switch (this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment) ?? -1)
+							{
+								case -1:
+									return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
+
+								case -2:
+									return await this.ReturnHttp2Error(Http2Error.FlowControlError, this.http2StreamId, "Window size overflow.");
+							}
 						}
 						break;
 
@@ -1418,7 +1537,7 @@ namespace Waher.Networking.HTTP
 						break;
 
 					default:
-						return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Unrecognized Frame Type.");
+						return await this.SendHttp2Frame(FrameType.Ping, 1, false, 0, null, new byte[8]);
 				}
 
 				return true;
@@ -1574,18 +1693,25 @@ namespace Waher.Networking.HTTP
 
 			if (ConnectionError)
 			{
-				await this.SendHttp2Frame(FrameType.GoAway, 0, false, 0, null,
-					(byte)(this.http2LastCreatedStreamId >> 24),
-					(byte)(this.http2LastCreatedStreamId >> 16),
-					(byte)(this.http2LastCreatedStreamId >> 8),
-					(byte)this.http2LastCreatedStreamId,
-					(byte)(i >> 24),
-					(byte)(i >> 16),
-					(byte)(i >> 8),
-					(byte)i);
+				byte[] ReasonBin = Encoding.UTF8.GetBytes(Reason);
+				int c = ReasonBin.Length;
+				byte[] Payload = new byte[c + 8];
 
-				this.client.OnReceivedReset(this.Client_OnReceivedClosed);
+				Payload[0] = (byte)(this.http2LastCreatedStreamId >> 24);
+				Payload[1] = (byte)(this.http2LastCreatedStreamId >> 16);
+				Payload[2] = (byte)(this.http2LastCreatedStreamId >> 8);
+				Payload[3] = (byte)this.http2LastCreatedStreamId;
+				Payload[4] = (byte)(i >> 24);
+				Payload[5] = (byte)(i >> 16);
+				Payload[6] = (byte)(i >> 8);
+				Payload[7] = (byte)i;
+				Array.Copy(ReasonBin, 0, Payload, 8, c);
 
+				await this.SendHttp2Frame(FrameType.GoAway, 0, false, 0, null, Payload);
+
+				this.client?.OnReceivedReset(this.Client_OnReceivedClosed);
+
+				this.CloseConnection();
 				return false;
 			}
 			else

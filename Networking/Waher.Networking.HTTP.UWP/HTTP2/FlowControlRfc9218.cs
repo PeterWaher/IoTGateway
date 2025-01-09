@@ -52,7 +52,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Settings">Connection settings.</param>
 		public void UpdateSettings(ConnectionSettings Settings)
 		{
+			int WindowSizeDiff = Settings.InitialWindowSize - this.settings.InitialWindowSize;
+
 			this.settings = Settings;
+
+			if (WindowSizeDiff != 0)
+			{
+				lock (this.synchObj)
+				{
+					this.root.SetNewWindowSize(this.settings.InitialWindowSize);
+				}
+			}
 		}
 
 		/// <summary>

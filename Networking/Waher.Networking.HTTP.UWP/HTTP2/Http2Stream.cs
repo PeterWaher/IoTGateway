@@ -21,13 +21,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		private TemporaryStream inputDataStream = null;
 		private StreamState state = StreamState.Idle;
 		private WebSocket webSocket = null;
+		private string protocol = null;
 		private int rfc9218Priority = 3;
 		private bool rfc9218Incremental = false;
 		private bool upgradedToWebSocket = false;
 		private int headerBytesReceived = 0;
 		private long dataBytesReceived = 0;
 		private long dataBytesTransmitted = 0;
+		private long? contentLength = null;
 		private int dataInputWindowSize;
+		private bool regularHeaderFieldsReported = false;
 
 		/// <summary>
 		/// HTTP/2 stream, for testing purposes.
@@ -111,6 +114,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		public bool UpgradedToWebSocket => this.upgradedToWebSocket;
 
 		/// <summary>
+		/// Value of protocol pseudo-header.
+		/// </summary>
+		public string Protocol => this.protocol;
+
+		/// <summary>
 		/// Priority, as defined in RFC 9218
 		/// </summary>
 		public int Rfc9218Priority
@@ -179,14 +187,33 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Name">Name</param>
 		/// <param name="Value">Value</param>
-		public void AddParsedHeader(string Name, string Value)
+		/// <returns>Error message, if invalid.</returns>
+		public string AddParsedHeader(string Name, string Value)
 		{
 			if (this.headers is null)
 				this.headers = new HttpRequestHeader(2.0);
 
+			if (string.IsNullOrEmpty(Name))
+				return "Empty header.";
+
+			bool IsPseudoHeader = Name[0] == ':';
+			if (IsPseudoHeader)
+			{
+				if (this.regularHeaderFieldsReported)
+					return "Pseudo-header fields cannot appear after regular header fields";
+			}
+			else
+				this.regularHeaderFieldsReported = true;
+
+			if (Name.ToLower() != Name)
+				return "Header not in lower-case";
+
 			switch (Name)
 			{
 				case ":method":
+					if (!string.IsNullOrEmpty(this.headers.Method))
+						return "Method defined multiple times.";
+
 					this.headers.Method = Value;
 					break;
 
@@ -195,12 +222,31 @@ namespace Waher.Networking.HTTP.HTTP2
 					break;
 
 				case ":path":
+					if (string.IsNullOrEmpty(Value))
+						return "Empty path.";
+
+					if (!string.IsNullOrEmpty(this.headers.ResourcePart))
+						return "Path defined multiple times.";
+
 					this.headers.SetResource(Value, this.connection.Server.VanityResources);
 					break;
 
 				case ":scheme":
+					if (!string.IsNullOrEmpty(this.headers.UriScheme))
+						return "Scheme defined multiple times.";
+
 					this.headers.UriScheme = Value;
 					break;
+
+				case ":protocol":
+					if (!string.IsNullOrEmpty(this.protocol))
+						return "Protocol defined multiple times.";
+
+					this.protocol = Value;
+					break;
+
+				case ":status":
+					return "Status is a response header field.";
 
 				case "priority":
 					this.headers.AddField(Name, Value, true);
@@ -221,10 +267,29 @@ namespace Waher.Networking.HTTP.HTTP2
 					}
 					break;
 
+				case "connection":
+				case "proxy-connection":
+				case "keep-alive":
+				case "transfer-encoding":
+				case "upgrade":
+					return "Connection-specific header fields prohibited.";
+
+				case "te":
+					if (Value != "trailers")
+						return "Invalid TE header field value: " + Value;
+
+					this.headers.AddField(Name, Value, true);
+					return null;
+
 				default:
+					if (IsPseudoHeader)
+						return "Unknown pseudo-header: " + Name;
+
 					this.headers.AddField(Name, Value, true);
 					break;
 			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -259,6 +324,24 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				await this.inputDataStream.WriteAsync(Buffer, Position, Count);
 				return true;
+			}
+		}
+
+		/// <summary>
+		/// Content-Length in <see cref="Headers"/>, if any.
+		/// </summary>
+		public long? ContentLength
+		{
+			get
+			{
+				if (!this.contentLength.HasValue &&
+					!(this.headers?.ContentLength is null) &&
+					long.TryParse(this.headers.ContentLength.Value, out long Length))
+				{
+					this.contentLength = Length;
+				}
+
+				return this.contentLength;
 			}
 		}
 

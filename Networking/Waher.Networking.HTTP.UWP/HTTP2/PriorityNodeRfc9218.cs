@@ -99,7 +99,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			int NewSize = this.windowSize + Resources;
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
-				return -1;
+				return -2;
 
 			this.windowSize = NewSize;
 
@@ -153,6 +153,26 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.windowSize0 = NewSize;
 
 			return NewSize;
+		}
+
+		/// <summary>
+		/// Sets a new window size.
+		/// </summary>
+		/// <param name="WindowSize">Window size</param>
+		public void SetNewWindowSize(int WindowSize)
+		{
+			int Diff = WindowSize - this.windowSize0;
+			this.windowSize0 = WindowSize;
+			this.windowSize += Diff;
+
+			if (!(this.root is null))
+				WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
+
+			if (!(this.root is null))
+				WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
+
+			if (WindowSize > 0)
+				this.TriggerPending(ref WindowSize);
 		}
 
 		/// <summary>

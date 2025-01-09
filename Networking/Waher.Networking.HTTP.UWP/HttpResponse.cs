@@ -30,7 +30,7 @@ namespace Waher.Networking.HTTP
 		private readonly Encoding encoding = Encoding.UTF8;
 		private readonly Http2Stream http2Stream;
 		private bool encodingUsed = false;
-		private DateTimeOffset date = DateTimeOffset.Now;
+		private DateTimeOffset date = DateTimeOffset.UtcNow;
 		private DateTimeOffset? expires = null;
 		private DateTime lastPing = DateTime.UtcNow;
 		private string server = null;

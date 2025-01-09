@@ -1,8 +1,4 @@
-﻿*
-{
-    box-sizing: border-box;
-}
-
+﻿
 h1, h2, h3, h4, h5, h6
 {
     word-wrap: break-word;
@@ -262,13 +258,11 @@ html body fieldset
         display:block;
         position:absolute;
         margin: 0;
-        margin-left:-1px;
         padding: 0;
     }
 
     #native-header nav ul > li > a
     {
-        width: 100%;
         text-align: left;
     }
 
@@ -307,17 +301,14 @@ html body fieldset
     #native-header li > ul
     {
         margin-inline-start: 0;
+        margin-left: 0;
+        overflow-y: auto;
+        direction:rtl; 
     }
     
     #native-header li > ul > li > ul[expanded]
     {
         display: block;
-    }
-
-    #native-header li > ul 
-    {
-        overflow-y: auto;
-        direction:rtl; 
     }
 
     #native-header li > ul > li > ul
@@ -443,5 +434,4 @@ html body fieldset
         display: block;
         margin: auto;
     }
-
 }

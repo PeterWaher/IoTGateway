@@ -1028,12 +1028,12 @@ abbr:hover::after
     
     /* region Header */
 
-    nav li > ul > li:hover
+    nav li > ul > li:hover > a
     {
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(0,0,0,0.75);
     }
 
-    nav li > ul > li
+    nav li > ul > li > a
     {
         display: block;
         text-align: center;

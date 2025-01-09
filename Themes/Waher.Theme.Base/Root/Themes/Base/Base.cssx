@@ -1,4 +1,9 @@
-﻿
+﻿*
+{
+    box-sizing: border-box;
+}
+
+
 h1, h2, h3, h4, h5, h6
 {
     word-wrap: break-word;
@@ -266,10 +271,17 @@ html body fieldset
         text-align: left;
     }
 
-    #native-header li > ul > li
+    #native-header nav li > ul > li:hover
+    {
+        background-color: transparent;
+    }
+
+
+    #native-header nav li > ul > li
     {
         display: flex;
         flex-direction: row-reverse;
+        background-color: transparent;
         position: relative;
         overflow: visible;
         border-bottom: none;

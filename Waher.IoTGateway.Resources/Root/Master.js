@@ -1,8 +1,13 @@
 function NativeHeader() {
     const header = document.getElementById("native-header");
-    let indentation = 0
     Array.from(header.children[0].children[1].getElementsByTagName("ul")).forEach(subMenu => {
+        let topSubmenue = subMenu
         const sibling = subMenu.nextElementSibling || subMenu.previousElementSibling;
+
+        while(topSubmenue.parentElement.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav")
+        {
+            topSubmenue = topSubmenue.parentElement.parentElement
+        }
 
         // if link dose not go anywhere, expand on click
         sibling.addEventListener("click", event => {
@@ -13,34 +18,96 @@ function NativeHeader() {
             }
         })
 
-        const transformed = []
-
         // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
-            indentation += subMenu.parentElement.clientWidth
+            // to use this you "need" a mouse
+            if (!matchMedia('(pointer:fine)').matches)
+                return
+
             subMenu.setAttribute("expanded", "")
+            
+            //set set max height to prevent vertical overflow
+            if (subMenu.offsetHeight + subMenu.offsetTop > window.innerHeight)
+            {
+                subMenu.style.height = `${window.innerHeight - subMenu.offsetTop - 300}px`
+            }
 
+            // if overflowing to the righ, offset the top submenue to the left to not
+            if (topSubmenue.clientWidth + topSubmenue.offsetLeft > window.innerWidth)
+            {
+                topSubmenue.style.right = "0px"
+
+            }
+
+            // normalise list item width
+            const textElements = []
             maxWidth = 0
-
             for (let i = 0; i < subMenu.children.length; i++) {
                 const child = subMenu.children[i]
                 const textElement = Array.from(child.children).find(c => c.tagName.toLocaleLowerCase() === "a")
                 if (textElement) {
                     maxWidth = Math.max(maxWidth, textElement.clientWidth)
+                    textElements.push(textElement)
+                }
+            }
+            textElements.forEach(el => el.style.width = `${maxWidth}px`)
+
+            // offset sibling elements (underneeth) to position over to not have gaps between list items
+            const offsetParentsSiblings = (listItem) => {
+                const text = listItem.children[0]
+                const siblingHeightOffset = listItem.clientHeight - text.clientHeight
+    
+                let listItemSibling = listItem.nextElementSibling
+                while (listItemSibling)
+                {
+                    listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
+                    listItemSibling = listItemSibling.nextElementSibling
                 }
             }
 
-            console.log(maxWidth)
-
-            //subMenu.style.width = maxWidth + "px"
+            let listItem = subMenu.parentElement
+            while(true)
+            {
+                offsetParentsSiblings(listItem)
+                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav")
+                    listItem = listItem.parentElement.parentElement
+                else
+                    break
+            }
         })
 
+        
         // close submenu
         subMenu.parentElement.addEventListener("mouseleave", () => {
+            // to use this you "need" a mouse
+            if (!matchMedia('(pointer:fine)').matches)
+                return
+            
             subMenu.removeAttribute("expanded")
-            transformed.forEach(element => {
-                element.style.transform = ""
-            })
+            
+            // re-offset siblings to fill the space the closing of the submenue created
+            const offsetParentsSiblings = (listItem) => {
+                const text = listItem.children[0]
+                const siblingHeightOffset = listItem.clientHeight - text.clientHeight
+    
+                let listItemSibling = listItem.nextElementSibling
+                while (listItemSibling)
+                {
+                    listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
+                    listItemSibling = listItemSibling.nextElementSibling
+                }
+            }
+
+            let listItem = subMenu.parentElement
+            while(true)
+            {
+                subMenu.style.height = ""
+                offsetParentsSiblings(listItem)
+                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav")
+                    listItem = listItem.parentElement.parentElement
+                else
+                    break
+            }
         })
     })
 

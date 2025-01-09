@@ -63,6 +63,7 @@ namespace Waher.Networking.HTTP
 		private int http2LastPermittedStreamId = int.MaxValue;
 		private int http2FramePos = 0;
 		private int http2BuildingHeadersOnStream = 0;
+		private int http2InitialMaxFrameSize = int.MaxValue;
 		private FrameType http2FrameType = 0;
 		private ConnectionSettings localSettings = null;
 		private ConnectionSettings remoteSettings = null;
@@ -238,6 +239,7 @@ namespace Waher.Networking.HTTP
 							if (ConnectionSettings.TryParse(true, Bin, out ConnectionSettings Settings))
 							{
 								this.remoteSettings = Settings;
+								this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
 								this.localSettings = new ConnectionSettings(
 									this.server.Http2InitialWindowSize,
 									this.server.Http2MaxFrameSize,
@@ -879,6 +881,9 @@ namespace Waher.Networking.HTTP
 				else
 					this.reader.Reset(ConstantBuffer, FramePayload, Offset, Count);
 
+				if (this.http2BuildingHeadersOnStream > 0 && this.http2FrameType != FrameType.Continuation)
+					return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Expected continuation frame.");
+
 				switch (this.http2FrameType)
 				{
 					case FrameType.Data:
@@ -940,6 +945,9 @@ namespace Waher.Networking.HTTP
 						{
 							if (!await Stream.DataReceived(this.reader.ConstantBuffer, this.reader.Buffer, this.reader.Position, DataSize))
 								return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Not sufficient resources available in stream.");
+
+							if (Stream.DataBytesReceived > (Stream.ContentLength ?? long.MaxValue))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Data exceeds Content-Length.");
 
 							this.localSettings.AddPendingIncrement(Stream, DataSize);
 						}
@@ -1005,9 +1013,10 @@ namespace Waher.Networking.HTTP
 							if (this.http2FrameType != FrameType.Continuation)
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Headers not expected.");
 						}
-						else
+						else if (Stream.State != StreamState.HalfClosedRemote || this.http2FrameType != FrameType.Continuation)
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream state: " + Stream.State.ToString());
 
+						string s;
 						bool EndHeaders = (this.http2FrameFlags & 4) != 0;
 						uint StreamIdDependency = 0;    // Root
 						byte Weight = 16;               // Default weight, §5.3.5 RFC 7540
@@ -1162,11 +1171,19 @@ namespace Waher.Networking.HTTP
 											Cookie += "; " + HeaderValue;
 									}
 									else
-										Stream.AddParsedHeader(HeaderName, HeaderValue);
+									{
+										s = Stream.AddParsedHeader(HeaderName, HeaderValue);
+										if (!(s is null))
+											return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, s);
+									}
 								}
 
 								if (!string.IsNullOrEmpty(Cookie))
-									Stream.AddParsedHeader("cookie", Cookie);
+								{
+									s = Stream.AddParsedHeader("cookie", Cookie);
+									if (!(s is null))
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, s);
+								}
 							}
 							finally
 							{
@@ -1179,6 +1196,18 @@ namespace Waher.Networking.HTTP
 						else if (!Stream.BuildHeaders(this.reader.Buffer, this.reader.Position, HeaderSize))
 							return await this.ReturnHttp2Error(Http2Error.EnhanceYourCalm, this.http2StreamId, "Headers too large.");
 
+						if (EndHeaders)
+						{
+							if (string.IsNullOrEmpty(Stream.Headers?.Method))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Missing method.");
+
+							if (string.IsNullOrEmpty(Stream.Headers.UriScheme))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Missing scheme.");
+
+							if (string.IsNullOrEmpty(Stream.Headers.ResourcePart))
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Missing path.");
+						}
+
 						if (EndStream)
 						{
 							Stream.State = StreamState.HalfClosedRemote;
@@ -1188,17 +1217,24 @@ namespace Waher.Networking.HTTP
 								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
 									this.localSettings.MaxHeaderListSize);
 							}
-							
-							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
-								Stream.InputDataStream, Stream))
+
+							if (EndHeaders)
 							{
-								return false;
+								if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+									return false;
+							}
+						}
+						else if (this.http2FrameType == FrameType.Continuation)
+						{
+							if (EndHeaders)
+							{
+								if (!await this.RequestReceived(Stream.Headers, Stream.InputDataStream, Stream))
+									return false;
 							}
 						}
 						else if (EndHeaders && Stream.Headers.Method == "CONNECT")
 						{
-							if (!Stream.Headers.TryGetHeaderField(":protocol", out HttpField Protocol) ||
-								Protocol.Value != "websocket" ||
+							if (Stream.Protocol != "websocket" ||
 								!this.server.TryGetResource(Stream.Headers.Resource, out HttpResource Resource, out string SubPath) ||
 								!(Resource is WebSocketListener WebSocketListener) ||
 								(!string.IsNullOrEmpty(SubPath) && !Resource.HandlesSubPaths))
@@ -1255,7 +1291,7 @@ namespace Waher.Networking.HTTP
 
 						Http2Error? Error = (Http2Error)this.reader.NextUInt32();
 
-						string s = "Client reset the stream.";
+						s = "Client reset the stream.";
 
 						if (this.reader.BytesLeft > 0)
 							s += " (" + Encoding.UTF8.GetString(this.reader.NextBytes()) + ")";
@@ -1289,6 +1325,7 @@ namespace Waher.Networking.HTTP
 							sb = new StringBuilder();
 #endif
 							this.remoteSettings = new ConnectionSettings();
+							this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
 						}
 						else
 						{
@@ -1307,6 +1344,11 @@ namespace Waher.Networking.HTTP
 
 							if (Error.HasValue)
 								return await this.ReturnHttp2Error(Error.Value, 0, "Invalid settings received.");
+
+							if (this.http2InitialMaxFrameSize == int.MaxValue)
+								this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
+							else if (this.remoteSettings.MaxFrameSize < this.http2InitialMaxFrameSize)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Maximum frame size cannot be less than originally stated.");
 
 							this.localSettings.EnablePush &= this.remoteSettings.EnablePush;
 							this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;

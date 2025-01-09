@@ -32,7 +32,15 @@ internal class Program
 	/// Waher.Networking.HTTP.TestServer.exe -http 8081
 	/// 
 	/// h2spec command-line arguments:
+	/// 
 	/// h2spec.exe http2 -h 127.0.0.1 -p 8081 -P /Hello --strict
+	/// h2spec.exe http2 -h 127.0.0.1 -p 8081 -P /Hello
+	/// 
+	/// h2spec.exe hpack -h 127.0.0.1 -p 8081 -P /Hello --strict
+	/// h2spec.exe hpack -h 127.0.0.1 -p 8081 -P /Hello
+	/// 
+	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello --strict
+	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello
 	/// </example>
 	/// <param name="args">Command-line arguments.</param>
 	private static void Main(string[] args)

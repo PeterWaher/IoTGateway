@@ -1,5 +1,6 @@
 function NativeHeader() {
     const header = document.getElementById("native-header");
+    let count = 0
     Array.from(header.children[0].children[1].getElementsByTagName("ul")).forEach(subMenu => {
         let topSubmenue = subMenu
         const sibling = subMenu.nextElementSibling || subMenu.previousElementSibling;
@@ -20,6 +21,7 @@ function NativeHeader() {
 
         // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
+            count++
             // to use this you "need" a mouse
             if (!matchMedia('(pointer:fine)').matches)
                 return
@@ -29,14 +31,13 @@ function NativeHeader() {
             //set set max height to prevent vertical overflow
             if (subMenu.offsetHeight + subMenu.offsetTop > window.innerHeight)
             {
-                subMenu.style.height = `${window.innerHeight - subMenu.offsetTop - 300}px`
+                subMenu.style.height = `${window.innerHeight - subMenu.offsetTop}px`
             }
 
             // if overflowing to the righ, offset the top submenue to the left to not
             if (topSubmenue.clientWidth + topSubmenue.offsetLeft > window.innerWidth)
             {
-                topSubmenue.style.right = "0px"
-
+                topSubmenue.style.left = `${window.innerWidth - topSubmenue.clientWidth}px`
             }
 
             // normalise list item width
@@ -79,11 +80,18 @@ function NativeHeader() {
         
         // close submenu
         subMenu.parentElement.addEventListener("mouseleave", () => {
+            count--
+            
+            if (count < 1)
+            {
+                topSubmenue.style.left = ""
+            }
             // to use this you "need" a mouse
             if (!matchMedia('(pointer:fine)').matches)
                 return
             
             subMenu.removeAttribute("expanded")
+
             
             // re-offset siblings to fill the space the closing of the submenue created
             const offsetParentsSiblings = (listItem) => {

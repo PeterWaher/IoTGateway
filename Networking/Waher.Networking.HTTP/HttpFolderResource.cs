@@ -709,10 +709,6 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			// force invalidate cache
-			Rec.IsDynamic = true;
-			Rec.ETag = "";
-
 			return Rec;
 		}
 

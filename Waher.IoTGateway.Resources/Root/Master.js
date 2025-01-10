@@ -47,7 +47,7 @@ function NativeHeader() {
                 const child = subMenu.children[i]
                 const textElement = Array.from(child.children).find(c => c.tagName.toLocaleLowerCase() === "a")
                 if (textElement) {
-                    maxWidth = Math.max(maxWidth, textElement.clientWidth)
+                    maxWidth = Math.max(maxWidth, textElement.offsetWidth)
                     textElements.push(textElement)
                 }
             }
@@ -56,7 +56,7 @@ function NativeHeader() {
             // offset sibling elements (underneeth) to position over to not have gaps between list items
             const offsetParentsSiblings = (listItem) => {
                 const text = listItem.children[0]
-                const siblingHeightOffset = listItem.clientHeight - text.clientHeight
+                const siblingHeightOffset = listItem.offsetHeight - text.offsetHeight
     
                 let listItemSibling = listItem.nextElementSibling
                 while (listItemSibling)
@@ -96,7 +96,7 @@ function NativeHeader() {
             // re-offset siblings to fill the space the closing of the submenue created
             const offsetParentsSiblings = (listItem) => {
                 const text = listItem.children[0]
-                const siblingHeightOffset = listItem.clientHeight - text.clientHeight
+                const siblingHeightOffset = listItem.offsetHeight - text.offsetHeight
     
                 let listItemSibling = listItem.nextElementSibling
                 while (listItemSibling)

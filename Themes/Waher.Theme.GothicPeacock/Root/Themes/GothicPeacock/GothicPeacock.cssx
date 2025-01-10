@@ -1011,12 +1011,12 @@ abbr:hover::after
     
     /* region Header */
 
-    nav li > ul > li:hover
+    nav li > ul > li > a:hover
     {
         background-color: rgba(0,0,0,0.5);
     }
 
-    nav li > ul > li
+    nav li > ul > li > a
     {
         display: block;
         text-align: center;
@@ -1024,7 +1024,7 @@ abbr:hover::after
         color: ¤MenuTextColor¤;
     }
 
-    nav li > ul > li
+    nav li > ul > li > a
     {
         border-left: 1px solid rgba(255,255,255,0.7);
         border-bottom: 1px solid rgba(255,255,255,0.7);

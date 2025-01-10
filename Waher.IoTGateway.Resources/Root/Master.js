@@ -35,9 +35,9 @@ function NativeHeader() {
             }
 
             // if overflowing to the righ, offset the top submenue to the left to not
-            if (topSubmenue.clientWidth + topSubmenue.offsetLeft > window.innerWidth)
+            if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth)
             {
-                topSubmenue.style.left = `${window.innerWidth - topSubmenue.clientWidth}px`
+                topSubmenue.style.left = `${window.innerWidth - topSubmenue.offsetWidth}px`
             }
 
             // normalise list item width

@@ -979,6 +979,7 @@ namespace Waher.Networking.HTTP
 							return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Client can only use odd numbered stream IDs.");
 
 						bool StreamCreated = false;
+						bool ResetHeader = true;
 
 						if (this.http2FrameType == FrameType.Headers)
 						{
@@ -1009,10 +1010,7 @@ namespace Waher.Networking.HTTP
 						if (Stream.State == StreamState.Idle)
 							Stream.State = StreamState.Open;
 						else if (Stream.State == StreamState.Open)
-						{
-							if (this.http2FrameType != FrameType.Continuation)
-								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Headers not expected.");
-						}
+							ResetHeader = false;
 						else if (Stream.State != StreamState.HalfClosedRemote || this.http2FrameType != FrameType.Continuation)
 							return await this.ReturnHttp2Error(Http2Error.StreamClosed, this.http2StreamId, "Stream state: " + Stream.State.ToString());
 
@@ -1128,14 +1126,14 @@ namespace Waher.Networking.HTTP
 								Count2 = HeaderSize;
 							}
 
-							bool ResetHeader = true;
-
 							if (this.http2HeaderReader is null)
 							{
 								this.http2HeaderReader = new HeaderReader(Buf, Start, Count2,
 									this.localSettings.HeaderTableSize, this.localSettings.MaxHeaderListSize);
 								ResetHeader = false;
 							}
+							else
+								this.http2HeaderReader.Reset(Buf, Start, Count2);
 #if INFO_IN_SNIFFERS
 							sb?.Clear();
 #else

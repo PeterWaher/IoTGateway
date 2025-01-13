@@ -5,8 +5,7 @@ function NativeHeader() {
         let topSubmenue = subMenu
         const sibling = subMenu.nextElementSibling || subMenu.previousElementSibling;
 
-        while(topSubmenue.parentElement.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav")
-        {
+        while (topSubmenue.parentElement.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
             topSubmenue = topSubmenue.parentElement.parentElement
         }
 
@@ -27,16 +26,15 @@ function NativeHeader() {
                 return
 
             subMenu.setAttribute("expanded", "")
-            
+
             //set set max height to prevent vertical overflow
-            if (subMenu.offsetHeight + subMenu.offsetTop > window.innerHeight)
-            {
+            if (subMenu.offsetHeight + subMenu.offsetTop > window.innerHeight) {
                 subMenu.style.height = `${window.innerHeight - subMenu.offsetTop}px`
             }
 
             // if overflowing to the righ, offset the top submenue to the left to not
-            if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth)
-            {
+            if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth) {
+                console.log(1)
                 topSubmenue.style.left = `${window.innerWidth - topSubmenue.offsetWidth}px`
             }
 
@@ -57,62 +55,58 @@ function NativeHeader() {
             const offsetParentsSiblings = (listItem) => {
                 const text = listItem.children[0]
                 const siblingHeightOffset = listItem.offsetHeight - text.offsetHeight
-    
+
                 let listItemSibling = listItem.nextElementSibling
-                while (listItemSibling)
-                {
+                while (listItemSibling) {
                     listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
                     listItemSibling = listItemSibling.nextElementSibling
                 }
             }
 
             let listItem = subMenu.parentElement
-            while(true)
-            {
-                offsetParentsSiblings(listItem)
-                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav")
+            while (true) {
+                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
+                    offsetParentsSiblings(listItem)
                     listItem = listItem.parentElement.parentElement
+                }
                 else
                     break
             }
         })
 
-        
         // close submenu
         subMenu.parentElement.addEventListener("mouseleave", () => {
             count--
-            
-            if (count < 1)
-            {
+
+            if (count < 1) {
                 topSubmenue.style.left = ""
             }
             // to use this you "need" a mouse
             if (!matchMedia('(pointer:fine)').matches)
                 return
-            
+
             subMenu.removeAttribute("expanded")
 
-            
+
             // re-offset siblings to fill the space the closing of the submenue created
             const offsetParentsSiblings = (listItem) => {
                 const text = listItem.children[0]
                 const siblingHeightOffset = listItem.offsetHeight - text.offsetHeight
-    
+
                 let listItemSibling = listItem.nextElementSibling
-                while (listItemSibling)
-                {
+                while (listItemSibling) {
                     listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
                     listItemSibling = listItemSibling.nextElementSibling
                 }
             }
 
             let listItem = subMenu.parentElement
-            while(true)
-            {
+            while (true) {
                 subMenu.style.height = ""
-                offsetParentsSiblings(listItem)
-                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav")
+                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
+                    offsetParentsSiblings(listItem)
                     listItem = listItem.parentElement.parentElement
+                }
                 else
                     break
             }

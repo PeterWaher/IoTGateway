@@ -498,7 +498,8 @@ namespace Waher.IoTGateway.Svc
 
 			try
 			{
-				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int Len) && Len > 1)
+				if (Win32.WTSQuerySessionInformation(IntPtr.Zero, SessionId, InfoClass, out IntPtr Buffer, out int Len) &&
+					Buffer != IntPtr.Zero && Len > 1)
 				{
 					try
 					{

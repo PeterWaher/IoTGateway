@@ -261,7 +261,7 @@ html body fieldset
     #native-header nav > ul > li:hover > ul
     {
         display:block;
-        position:absolute;
+        position:fixed;
         margin: 0;
         padding: 0;
     }
@@ -275,7 +275,6 @@ html body fieldset
     {
         background-color: transparent;
     }
-
 
     #native-header nav li > ul > li
     {

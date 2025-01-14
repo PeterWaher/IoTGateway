@@ -91,6 +91,13 @@ namespace Waher.Networking.Sniffers
 		{
 			if (!ConstantBuffer)
 			{
+				if (Count > 0x100000)   // Avoid cloning buffers > 1 MB
+				{
+					this.processor?.Queue(new SnifferRxText(Timestamp, "<" + Count.ToString() +
+						" bytes received>", this));
+					return;
+				}
+
 				Data = CloneSection(Data, Offset, Count);
 				Offset = 0;
 			}
@@ -161,6 +168,13 @@ namespace Waher.Networking.Sniffers
 		{
 			if (!ConstantBuffer)
 			{
+				if (Count > 0x100000)   // Avoid cloning buffers > 1 MB
+				{
+					this.processor?.Queue(new SnifferRxText(Timestamp, "<" + Count.ToString() +
+						" bytes transmitted>", this));
+					return;
+				}
+
 				Data = CloneSection(Data, Offset, Count);
 				Offset = 0;
 			}

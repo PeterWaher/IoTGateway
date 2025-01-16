@@ -959,7 +959,7 @@ namespace Waher.Networking.HTTP
 							if (this.http2HeaderWriter is null)
 							{
 								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
-									this.localSettings.MaxHeaderListSize);
+									this.localSettings.HeaderTableSize);
 							}
 
 							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
@@ -1099,8 +1099,14 @@ namespace Waher.Networking.HTTP
 							}
 #endif
 						}
-						else if (Priority && this.flowControl is FlowControlRfc7540 FlowControlRfc7540_2)
-							FlowControlRfc7540_2.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
+						else
+						{
+							if (Priority && this.flowControl is FlowControlRfc7540 FlowControlRfc7540_2)
+								FlowControlRfc7540_2.UpdatePriority(Stream, Weight, (int)StreamIdDependency, Exclusive);
+
+							if (EndHeaders && !EndStream && this.http2FrameType == FrameType.Headers)
+								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Second headers frame on stream lacks END_STREAM.");
+						}
 
 						if (EndHeaders)
 						{
@@ -1129,7 +1135,7 @@ namespace Waher.Networking.HTTP
 							if (this.http2HeaderReader is null)
 							{
 								this.http2HeaderReader = new HeaderReader(Buf, Start, Count2,
-									this.localSettings.HeaderTableSize, this.localSettings.MaxHeaderListSize);
+									this.localSettings.HeaderTableSize, this.localSettings.HeaderTableSize);
 								ResetHeader = false;
 							}
 							else
@@ -1213,7 +1219,7 @@ namespace Waher.Networking.HTTP
 							if (this.http2HeaderWriter is null)
 							{
 								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
-									this.localSettings.MaxHeaderListSize);
+									this.localSettings.HeaderTableSize);
 							}
 
 							if (EndHeaders)
@@ -1244,7 +1250,7 @@ namespace Waher.Networking.HTTP
 							if (this.http2HeaderWriter is null)
 							{
 								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
-									this.localSettings.MaxHeaderListSize);
+									this.localSettings.HeaderTableSize);
 							}
 
 							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),

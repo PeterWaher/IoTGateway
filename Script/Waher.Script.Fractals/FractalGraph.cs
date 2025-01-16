@@ -34,6 +34,14 @@ namespace Waher.Script.Fractals
 		/// <summary>
 		/// Defines a clickable fractal graph in the complex plane.
 		/// </summary>
+		public FractalGraph()
+			: base(new Variables())
+		{
+		}
+
+		/// <summary>
+		/// Defines a clickable fractal graph in the complex plane.
+		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
 		public FractalGraph(Variables Variables)
 			: base(Variables)

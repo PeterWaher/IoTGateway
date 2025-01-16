@@ -94,8 +94,7 @@ namespace Waher.Content.Markdown.Consolidation
 
 			foreach (MarkdownElement E in Markdown.Elements)
 			{
-				if (First is null)
-					First = E;
+				First ??= E;
 
 				i++;
 				IsTable |= E is Table;
@@ -154,7 +153,7 @@ namespace Waher.Content.Markdown.Consolidation
 										Result.type = DocumentType.SingleXml;
 									else
 									{
-										Result.graph = (Graph)Activator.CreateInstance(Result.graphType);
+										Result.graph = (Graph)Types.Instantiate(Result.graphType);
 										Result.graph.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
 
 										foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
@@ -214,7 +213,7 @@ namespace Waher.Content.Markdown.Consolidation
 				return (i < j && IsNumeric(s.Substring(i + 1, j - i - 1)));
 			}
 			else if (s.Length > 2 && s.StartsWith("`") && s.EndsWith("`"))
-				return IsNumeric(s.Substring(1, s.Length - 2));
+				return IsNumeric(s[1..^1]);
 			else
 				return CommonTypes.TryParse(s, out double _);
 		}

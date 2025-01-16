@@ -94,7 +94,7 @@ namespace Waher.Networking.Cluster.Serialization
 				Info.sorted = Sorted;
 			}
 
-			object Result = Activator.CreateInstance(Info.Type);
+			object Result = Types.Instantiate(Info.Type);
 			string PropertyName = Input.ReadString();
 
 			while (!string.IsNullOrEmpty(PropertyName))

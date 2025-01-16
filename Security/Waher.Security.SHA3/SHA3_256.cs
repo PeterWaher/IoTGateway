@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Security.SHA3
+﻿namespace Waher.Security.SHA3
 {
 	/// <summary>
 	/// Implements the SHA3-256 hash function, as defined in section 6.1

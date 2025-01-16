@@ -1451,7 +1451,7 @@ namespace Waher.Script.Test
 		{
 			await Test(
 				"ToStr(i):=i<10?\"0\"+i:i;" +
-				"insert into WebUsers select UserName, Password from [foreach i in 2..10 do {UserName:\"User\"+ToStr(i),Password:\"Pwd\"+ToStr(i)}]);" +
+				"insert into WebUsers select UserName, Password from [foreach i in 2..10 do {UserName:\"User\"+ToStr(i),Password:\"Pwd\"+ToStr(i)}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User02\" and UserName<=\"User10\" order by UserName",
 				[
 					[ "User02", "Pwd02" ],
@@ -1470,7 +1470,7 @@ namespace Waher.Script.Test
 		public async Task INSERT_Test_03_INSERT_SELECT_Objects()
 		{
 			await Test(
-				"insert into WebUsers select * from [foreach i in 11..20 do {UserName:\"User\"+i,Password:\"Pwd\"+i}]);" +
+				"insert into WebUsers select * from [foreach i in 11..20 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User11\" and UserName<=\"User20\" order by UserName",
 				[
 					[ "User11", "Pwd11" ],
@@ -1502,9 +1502,9 @@ namespace Waher.Script.Test
 		{
 			await Test(
 				"insert into WebUsers objects "+
-				"{UserName:\"User22\",Password:\"Pwd22\"]," +
-				"{UserName:\"User23\",Password:\"Pwd23\"]," +
-				"{UserName:\"User24\",Password:\"Pwd24\"};" +
+				"[{UserName:\"User22\",Password:\"Pwd22\"}," +
+				"{UserName:\"User23\",Password:\"Pwd23\"}," +
+				"{UserName:\"User24\",Password:\"Pwd24\"}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User22\" and UserName<=\"User24\" order by UserName",
 				[
 					[ "User22", "Pwd22" ],
@@ -1517,7 +1517,7 @@ namespace Waher.Script.Test
 		public async Task INSERT_Test_06_INSERT_OBJECTS_2()
 		{
 			await Test(
-				"insert into WebUsers objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}]);" +
+				"insert into WebUsers objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User25\" and UserName<=\"User27\" order by UserName",
 				[
 					[ "User25", "Pwd25" ],
@@ -1566,7 +1566,7 @@ namespace Waher.Script.Test
 		public async Task RECORD_Test_03_DEFAULT_OBJECTS_2()
 		{
 			await Test(
-				"record into WebUsers objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}]);",
+				"record into WebUsers objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];",
 				3);
 		}
 
@@ -1593,7 +1593,7 @@ namespace Waher.Script.Test
 		public async Task RECORD_Test_06_NEW_OBJECTS_2()
 		{
 			await Test(
-				"record into WebUsers new objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}]);",
+				"record into WebUsers new objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];",
 				3);
 		}
 
@@ -1620,7 +1620,7 @@ namespace Waher.Script.Test
 		public async Task RECORD_Test_09_UPDATE_OBJECTS_2()
 		{
 			await Test(
-				"record into WebUsers update objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}]);",
+				"record into WebUsers update objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];",
 				3);
 		}
 
@@ -1647,7 +1647,7 @@ namespace Waher.Script.Test
 		public async Task RECORD_Test_12_DELETE_OBJECTS_2()
 		{
 			await Test(
-				"record into WebUsers delete objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}]);",
+				"record into WebUsers delete objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];",
 				3);
 		}
 

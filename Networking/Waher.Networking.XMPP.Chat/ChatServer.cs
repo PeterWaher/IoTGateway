@@ -277,18 +277,21 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			if (N is HtmlElement E)
 			{
+				if (E.HasPrefix)
+					return;
+
 				Output.Append('<');
-				Output.Append(E.Name);
+				Output.Append(E.LocalName);
 
 				if (E.HasAttributes)
 				{
 					foreach (HtmlAttribute Attr in E.Attributes)
 					{
-						if (Attr.Name.IndexOf(':') >= 0)
+						if (Attr.HasPrefix)
 							continue;
 
 						Output.Append(' ');
-						Output.Append(Attr.Name);
+						Output.Append(Attr.LocalName);
 						Output.Append("=\"");
 						Output.Append(XML.HtmlAttributeEncode(Attr.Value));
 						Output.Append('"');
@@ -303,7 +306,7 @@ namespace Waher.Networking.XMPP.Chat
 						XmlEncode(N2, Output);
 
 					Output.Append("</");
-					Output.Append(E.Name);
+					Output.Append(E.LocalName);
 					Output.Append('>');
 				}
 				else if (E.IsEmptyElement)
@@ -311,7 +314,7 @@ namespace Waher.Networking.XMPP.Chat
 				else
 				{
 					Output.Append("></");
-					Output.Append(E.Name);
+					Output.Append(E.LocalName);
 					Output.Append('>');
 				}
 			}

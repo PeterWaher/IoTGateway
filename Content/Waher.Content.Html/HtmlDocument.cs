@@ -662,7 +662,7 @@ namespace Waher.Content.Html
 								if (CurrentElement.EndPosition < Pos)
 									CurrentElement.EndPosition = Pos;
 
-								if (CurrentElement.Name == s)
+								if (CurrentElement.FullName == s)
 								{
 									CurrentElement = CurrentElement.Parent as HtmlElement;
 									CurrentElementIsScript = CurrentElement is Elements.Script;
@@ -671,14 +671,14 @@ namespace Waher.Content.Html
 								{
 									HtmlElement Loop = CurrentElement.Parent as HtmlElement;
 
-									while (!(Loop is null) && Loop.Name != s)
+									while (!(Loop is null) && Loop.FullName != s)
 										Loop = Loop.Parent as HtmlElement;
 
 									if (!(Loop is null))
 									{
 										Loop = CurrentElement.Parent as HtmlElement;
 
-										while (!(Loop is null) && Loop.Name != s)
+										while (!(Loop is null) && Loop.FullName != s)
 										{
 											if (Loop.EndPosition < Pos)
 												Loop.EndPosition = Pos;
@@ -2029,7 +2029,7 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public void Export(XmlWriter Output)
 		{
-			this.root?.Export(Output);
+			this.root?.Export(Output, new Dictionary<string, string>());
 		}
 
         /// <summary>

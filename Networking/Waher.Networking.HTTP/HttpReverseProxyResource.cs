@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Getters;
 using Waher.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
 
@@ -400,7 +400,8 @@ namespace Waher.Networking.HTTP
 									break;
 
 								default:
-									ProxyRequest.Headers.Add(Field.Key, Field.Value);
+									if (!Field.Key.StartsWith(':'))     // Avoid HTTP/2 pseudo-headers
+										ProxyRequest.Headers.Add(Field.Key, Field.Value);
 									break;
 							}
 						}
@@ -496,7 +497,7 @@ namespace Waher.Networking.HTTP
 											Cookie Cookie = Cookie.FromSetCookie(Value);
 											if (Cookie is null)
 												continue;
-											
+
 											Response.SetCookie(Cookie);
 										}
 									}
@@ -532,7 +533,7 @@ namespace Waher.Networking.HTTP
 
 							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);
 
-							await Response.Write(Bin);
+							await Response.Write(true, Bin);
 						}
 						else
 							await this.BeforeForwardResponse.Raise(this, new ProxyResponseEventArgs(ProxyResponse, Request, Response), false);

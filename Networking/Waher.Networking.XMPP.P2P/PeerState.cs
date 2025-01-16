@@ -92,9 +92,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void AddCallback(EventHandlerAsync<PeerConnectionEventArgs> Callback, object State)
 		{
-			if (this.callbacks is null)
-				this.callbacks = new LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>>();
-
+			this.callbacks ??= new LinkedList<KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>>();
 			this.callbacks.AddLast(new KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object>(Callback, State));
 		}
 
@@ -135,17 +133,19 @@ namespace Waher.Networking.XMPP.P2P
 		/// Data received from a peer.
 		/// </summary>
 		/// <param name="Sender">Sender of event</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte read.</param>
 		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		public async Task<bool> Peer_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		public async Task<bool> Peer_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			string s = this.encoding.GetString(Buffer, Offset, Count);
 
 			this.lastActivity = DateTime.Now;
 			if (this.xmppClient is null)
-				await this.parent.ReceiveText(s);
+				this.parent.ReceiveText(s);
 
 			return await this.ParseIncoming(s);
 		}
@@ -617,7 +617,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.inputState = -1;
 			this.state = XmppState.Error;
 
-			this.CallCallbacks();
+			await this.CallCallbacks();
 
 			if (!(this.peer is null))
 			{
@@ -632,7 +632,7 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				int i = Xml.IndexOf("?>");
 				if (i >= 0)
-					Xml = Xml.Substring(i + 2).TrimStart();
+					Xml = Xml[(i + 2)..].TrimStart();
 
 				this.streamHeader = Xml;
 
@@ -640,7 +640,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (i < 0)
 					this.streamFooter = "</stream>";
 				else
-					this.streamFooter = "</" + Xml.Substring(1, i - 1) + ":stream>";
+					this.streamFooter = "</" + Xml[1..i] + ":stream>";
 
 				XmlDocument Doc = new XmlDocument()
 				{
@@ -674,7 +674,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					await this.parent.Exception(ex);
+					this.parent.Exception(ex);
 
 					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>" +
 						"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + XML.Encode(ex.Message) +
@@ -702,16 +702,16 @@ namespace Waher.Networking.XMPP.P2P
 					SendFromAddress = true
 				};
 
-				await this.parent.PeerAuthenticated(this);
+				this.parent.PeerAuthenticated(this);
 				await this.parent.NewXmppClient(this.xmppClient, this.parentFullJid, this.remoteFullJid);
 
 				this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
 
-				this.CallCallbacks();
+				await this.CallCallbacks();
 			}
 			catch (Exception ex)
 			{
-				await this.parent.Exception(ex);
+				this.parent.Exception(ex);
 				await this.ToError();
 			}
 		}
@@ -721,7 +721,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.state = NewState;
 
 			if (NewState == XmppState.Connected)
-				this.CallCallbacks();
+				await this.CallCallbacks();
 			else if (NewState == XmppState.Error || NewState == XmppState.Offline)
 			{
 				this.parent?.PeerClosed(this);
@@ -732,7 +732,7 @@ namespace Waher.Networking.XMPP.P2P
 					this.xmppClient = null;
 				}
 
-				this.CallCallbacks();
+				await this.CallCallbacks();
 			}
 		}
 
@@ -795,21 +795,12 @@ namespace Waher.Networking.XMPP.P2P
 			this.callbacks = null;
 		}
 
-		internal void CallCallbacks()
+		internal async Task CallCallbacks()
 		{
 			if (!(this.callbacks is null))
 			{
 				foreach (KeyValuePair<EventHandlerAsync<PeerConnectionEventArgs>, object> P in this.callbacks)
-				{
-					try
-					{
-						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parentFullJid, this.remoteFullJid));
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+					await P.Key.Raise(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parentFullJid, this.remoteFullJid));
 
 				this.callbacks = null;
 			}
@@ -841,14 +832,16 @@ namespace Waher.Networking.XMPP.P2P
 			return Result;
 		}
 
-		private async Task Peer_OnClosed(object Sender, EventArgs e)
+		private Task Peer_OnClosed(object Sender, EventArgs e)
 		{
-			await this.parent.PeerClosed(this);
+			this.parent.PeerClosed(this);
 			this.parent = null;
 			this.peer = null;
 
 			if (!(this.callbacks is null))
-				this.CallCallbacks();
+				return this.CallCallbacks();
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -885,7 +878,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		private async Task Peer_OnSent(object Sender, byte[] Buffer, int Offset, int Count)
+		private async Task Peer_OnSent(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			TextEventHandler h = this.OnSent;
 			if (!(h is null))
@@ -923,7 +916,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(this.peer is null))
 			{
-				this.peer.SendTcp(Data, Callback, State);
+				this.peer.SendTcp(true, Data, Callback, State);
 				this.lastActivity = DateTime.Now;
 			}
 
@@ -934,16 +927,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		[Obsolete("Use DisposeAsync()")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>

@@ -10,10 +10,10 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	public class GameDataEventArgs : EventArgs
 	{
-		private Player fromPlayer;
-		private PeerConnection connection;
-		private byte[] packet;
-		private BinaryInput data;
+		private readonly Player fromPlayer;
+		private readonly PeerConnection connection;
+		private readonly byte[] packet;
+		private readonly BinaryInput data;
 
 		internal GameDataEventArgs(Player FromPlayer, PeerConnection Connection, byte[] Packet)
 		{

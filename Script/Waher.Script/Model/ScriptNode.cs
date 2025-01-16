@@ -422,10 +422,31 @@ namespace Waher.Script.Model
 
 				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
 				Result = PI?.GetMethod?.Invoke(Task, null);
+
+				if (!(Result is null))
+				{
+					Type T = Result.GetType();
+
+					if (VoidTaskResultType is null)
+					{
+						if (T.FullName == "System.Threading.Tasks.VoidTaskResult")
+						{
+							VoidTaskResultType = T;
+							Result = null;
+						}
+					}
+					else
+					{
+						if (T == VoidTaskResultType)
+							Result = null;
+					}
+				}
 			}
 
 			return Result;
 		}
+
+		private static Type VoidTaskResultType = null;
 
 		/// <summary>
 		/// Checks if <paramref name="Result"/> is an asynchronous results. If so, blocks the current thread until the result
@@ -441,6 +462,25 @@ namespace Waher.Script.Model
 
 				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
 				Result = PI?.GetMethod?.Invoke(Task, null);
+
+				if (!(Result is null))
+				{
+					Type T = Result.GetType();
+
+					if (VoidTaskResultType is null)
+					{
+						if (T.FullName == "System.Threading.Tasks.VoidTaskResult")
+						{
+							VoidTaskResultType = T;
+							Result = null;
+						}
+					}
+					else
+					{
+						if (T == VoidTaskResultType)
+							Result = null;
+					}
+				}
 			}
 
 			return Result;

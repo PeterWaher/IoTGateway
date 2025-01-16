@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Text;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Multipart
 {
@@ -32,7 +33,9 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ContentType };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -67,15 +70,19 @@ namespace Waher.Content.Multipart
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			Dictionary<string, object> Form = new Dictionary<string, object>();
 
-			await Decode(Data, Fields, Form, null, BaseUri);
+			Exception Error = await Decode(Data, Fields, Form, null, BaseUri, Progress);
 
-			return Form;
+			if (Error is null)
+				return new ContentResponse(ContentType, Form, Data);
+			else
+				return new ContentResponse(Error);
 		}
 
 		/// <summary>
@@ -86,8 +93,10 @@ namespace Waher.Content.Multipart
 		/// <param name="Form">Resulting Form, or null if not of interest.</param>
 		/// <param name="List">Decoded embedded objects will be added to this list.</param>
 		/// <param name="BaseUri">Bare URI</param>
-		public static async Task Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
-			List<EmbeddedContent> List, Uri BaseUri)
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
+		/// <returns>Null if successful, exception object if not.</returns>
+		public static async Task<Exception> Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
+			List<EmbeddedContent> List, Uri BaseUri, ICodecProgress Progress)
 		{
 			string Boundary = null;
 
@@ -104,8 +113,9 @@ namespace Waher.Content.Multipart
 			}
 
 			if (string.IsNullOrEmpty(Boundary))
-				throw new Exception("No boundary defined.");
+				return new Exception("No boundary defined.");
 
+			Exception Error;
 			byte[] BoundaryBin = Encoding.ASCII.GetBytes(Boundary);
 			int Start = 0;
 			int i = 0;
@@ -124,7 +134,9 @@ namespace Waher.Content.Multipart
 
 				if (j == d)
 				{
-					await AddPart(Data, Start, i, false, Form, List, BaseUri);
+					Error = await AddPart(Data, Start, i, false, Form, List, BaseUri, Progress);
+					if (!(Error is null))
+						return Error;
 
 					i += d;
 					while (i < c && Data[i] <= 32)
@@ -137,11 +149,17 @@ namespace Waher.Content.Multipart
 			}
 
 			if (Start < c)
-				await AddPart(Data, Start, c, true, Form, List, BaseUri);
+			{
+				Error = await AddPart(Data, Start, c, true, Form, List, BaseUri, Progress);
+				if (!(Error is null))
+					return Error;
+			}
+
+			return null;
 		}
 
-		private static async Task AddPart(byte[] Data, int Start, int i, bool Last,
-			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri)
+		private static async Task<Exception> AddPart(byte[] Data, int Start, int i, bool Last,
+			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri, ICodecProgress Progress)
 		{
 			int j, k, l, m;
 			int Max = i - 3;
@@ -153,7 +171,7 @@ namespace Waher.Content.Multipart
 			}
 
 			if (j == Start)
-				return;
+				return null;
 
 			if (j < i)
 			{
@@ -168,7 +186,7 @@ namespace Waher.Content.Multipart
 
 				int NrBytes = i - j - 4 - k;
 				if (NrBytes < 0 || (NrBytes == 0 && Last))
-					return;
+					return null;
 
 				string Header = Encoding.ASCII.GetString(Data, Start, j - Start);
 				string Key, Value;
@@ -264,12 +282,16 @@ namespace Waher.Content.Multipart
 					if (TryTransferDecode(Data2, EmbeddedContent.TransferEncoding, out Data2))
 						EmbeddedContent.TransferDecoded = Data2;
 					else
-						throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
+						return new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
 				}
 
 				try
 				{
-					EmbeddedContent.Decoded = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri);
+					ContentResponse Item = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri, Progress);
+					if (Item.HasError)
+						EmbeddedContent.Decoded = Data2;
+					else
+						EmbeddedContent.Decoded = Item.Decoded;
 				}
 				catch (Exception)
 				{
@@ -290,6 +312,8 @@ namespace Waher.Content.Multipart
 
 				List?.Add(EmbeddedContent);
 			}
+
+			return null;
 		}
 
 		private static void ParseContentFields(string s, EmbeddedContent EmbeddedContent)
@@ -344,7 +368,7 @@ namespace Waher.Content.Multipart
 					return true;
 
 				case "BASE64":
-					string s = CommonTypes.GetString(Encoded, Encoding.ASCII);
+					string s = Strings.GetString(Encoded, Encoding.ASCII);
 					Decoded = Convert.FromBase64String(s);
 					return true;
 
@@ -451,12 +475,14 @@ namespace Waher.Content.Multipart
 		/// Encodes multi-part form data
 		/// </summary>
 		/// <param name="Content">Form fields.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Encoded multi-part form data, together with Content-Type.</returns>
-		public static async Task<KeyValuePair<byte[], string>> Encode(IEnumerable<EmbeddedContent> Content)
+		public static async Task<KeyValuePair<byte[], string>> Encode(IEnumerable<EmbeddedContent> Content,
+			ICodecProgress Progress)
 		{
 			string Boundary = Guid.NewGuid().ToString();
 			string ContentType = FormDataDecoder.ContentType + "; boundary=\"" + Boundary + "\"";
-			return new KeyValuePair<byte[], string>(await Encode(Content, Boundary), ContentType);
+			return new KeyValuePair<byte[], string>(await Encode(Content, Boundary, Progress), ContentType);
 		}
 
 		/// <summary>
@@ -464,8 +490,10 @@ namespace Waher.Content.Multipart
 		/// </summary>
 		/// <param name="Content">Multi-part content.</param>
 		/// <param name="Boundary">Boundary to use.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Encoded multi-part content.</returns>
-		public static async Task<byte[]> Encode(IEnumerable<EmbeddedContent> Content, string Boundary)
+		public static async Task<byte[]> Encode(IEnumerable<EmbeddedContent> Content, string Boundary,
+			ICodecProgress Progress)
 		{
 			using (MemoryStream ms = new MemoryStream())
 			{

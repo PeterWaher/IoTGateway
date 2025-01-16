@@ -37,12 +37,12 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
 			if (sink is not null)
 			{
 				Log.Unregister(sink);
-				sink.Dispose();
+				await sink.DisposeAsync();
 				sink = null;
 			}
 		}

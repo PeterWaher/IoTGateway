@@ -377,9 +377,15 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 														{
 															string ContentType = XML.Attribute(E3, "contentType");
 															byte[] Bin = Convert.FromBase64String(E3.InnerText);
-															object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
+															ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
 
-															Record.Add(Decoded);
+															if (Decoded.HasError)
+															{
+																await this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, Decoded.Error.Message, e);
+																Record.Add(null);
+															}
+															else
+																Record.Add(Decoded.Decoded);
 														}
 														catch (Exception ex)
 														{
@@ -407,9 +413,12 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 								{
 									string ContentType = XML.Attribute(E, "contentType");
 									byte[] Bin = Convert.FromBase64String(E.InnerText);
-									object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
+									ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
 
-									await this.NewObject(Decoded, Bin, ContentType, e);
+									if (Decoded.HasError)
+										await this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, Decoded.Error.Message, e);
+									else
+										await this.NewObject(Decoded, Bin, ContentType, e);
 								}
 								catch (Exception ex)
 								{

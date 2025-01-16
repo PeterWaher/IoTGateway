@@ -189,9 +189,11 @@ namespace Waher.Content.Multipart
 
 			if (this.transferDecoded is null)
 			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(this.decoded, Encoding.UTF8);
-				this.transferDecoded = P.Key;
-				this.contentType = P.Value;
+				ContentResponse P = await InternetContent.EncodeAsync(this.decoded, Encoding.UTF8);
+				P.AssertOk();
+
+				this.transferDecoded = P.Encoded;
+				this.contentType = P.ContentType;
 				this.raw = null;
 			}
 

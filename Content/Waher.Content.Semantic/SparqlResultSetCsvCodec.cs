@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
@@ -72,9 +71,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			string Text;
 
@@ -103,12 +103,12 @@ namespace Waher.Content.Semantic
 				Text = CSV.Encode(Records);
 			}
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = CsvCodec.CsvContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		private static string ElementToString(IElement E)

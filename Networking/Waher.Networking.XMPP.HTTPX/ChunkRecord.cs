@@ -4,7 +4,7 @@ using Waher.Events;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
-	internal abstract class ChunkRecord : IDisposable
+	internal abstract class ChunkRecord : IDisposableAsync
 	{
 		private int id = 0;
 
@@ -13,21 +13,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		public abstract Task DisposeAsync();
 
-		internal abstract Task<bool> ChunkReceived(int Nr, bool Last, byte[] Data);
+		internal abstract Task<bool> ChunkReceived(int Nr, bool Last, bool ConstantBuffer, byte[] Data);
 		internal abstract Task Fail(string Message);
 
 		internal int NextId()

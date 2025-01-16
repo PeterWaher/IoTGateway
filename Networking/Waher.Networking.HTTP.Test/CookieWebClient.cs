@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Net;
-using Waher.Content;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Security;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.Test
 {
-	internal class CookieWebClient : WebClient
+	internal class CookieWebClient(Version ProtocolVersion) : IDisposable
 	{
-		private CookieContainer cookies = new();
+		private readonly Version protocolVersion = ProtocolVersion;
+		private readonly CookieContainer cookies = new();
+		private NetworkCredential credentials = null;
 		private DateTime? ifModifiedSince = null;
 		private DateTime? ifUnmodifiedSince = null;
 		private string accept = null;
 
-		public CookieWebClient()
-			: base()
+		public void Dispose()
 		{
 		}
 
@@ -37,49 +41,81 @@ namespace Waher.Networking.HTTP.Test
 		public CookieContainer Cookies
 		{
 			get => this.cookies;
-			set => this.cookies = value;
 		}
 
-		protected override WebRequest GetWebRequest(Uri Address)
+		public NetworkCredential Credentials
 		{
-			WebRequest r = base.GetWebRequest(Address);
+			get => this.credentials;
+			set => this.credentials = value;
+		}
 
-			if (r is HttpWebRequest request)
+		public async Task<byte[]> DownloadData(string Url)
+		{
+			using HttpClient Client = this.GetClient();
+			HttpRequestMessage Request = this.GetRequest(HttpMethod.Get, Url);
+			HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+			return await Response.Content.ReadAsByteArrayAsync();
+		}
+
+		private HttpClient GetClient()
+		{
+			SocketsHttpHandler Handler = new()
 			{
-				request.CookieContainer = this.cookies;
+				Credentials = this.credentials,
+				CookieContainer = this.cookies,
+				AllowAutoRedirect = true,
+				UseCookies = true,
+				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+				InitialHttp2StreamWindowSize = 65535,
+				ConnectTimeout = TimeSpan.FromSeconds(10),
+				SslOptions = new SslClientAuthenticationOptions()
+				{
+					RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+				}
+			};
 
-				if (this.ifModifiedSince.HasValue)
-					request.IfModifiedSince = this.ifModifiedSince.Value;
+			HttpClient Client = new(Handler)
+			{
+				DefaultRequestVersion = this.protocolVersion,
+				DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact,
+				Timeout = TimeSpan.FromSeconds(240)
+			};
 
-				if (this.ifUnmodifiedSince.HasValue)
-					request.Headers.Set("If-Unmodified-Since", CommonTypes.EncodeRfc822(this.ifUnmodifiedSince.Value));
+			Client.DefaultRequestHeaders.ConnectionClose = false;
 
-				if (!string.IsNullOrEmpty(this.accept))
-					request.Accept = this.accept;
-			}
-
-			return r;
+			return Client;
 		}
 
-		protected override WebResponse GetWebResponse(WebRequest Request, IAsyncResult ar)
+		private HttpRequestMessage GetRequest(HttpMethod Method, string Url)
 		{
-			WebResponse Response = base.GetWebResponse(Request, ar);
-			this.CopyCookies(Response);
-			return Response;
+			HttpRequestMessage Request = new(Method, Url)
+			{
+				Version = this.protocolVersion,
+				VersionPolicy = HttpVersionPolicy.RequestVersionExact
+			};
+
+			if (this.ifModifiedSince.HasValue)
+				Request.Headers.IfModifiedSince = this.ifModifiedSince.Value;
+
+			if (this.ifUnmodifiedSince.HasValue)
+				Request.Headers.IfUnmodifiedSince = this.ifUnmodifiedSince.Value;
+
+			if (!string.IsNullOrEmpty(this.accept))
+				Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(this.accept));
+
+			return Request;
 		}
 
-		protected override WebResponse GetWebResponse(WebRequest Request)
+		public async Task<byte[]> UploadData(string Url, HttpMethod Method, byte[] Data)
 		{
-			WebResponse Response = base.GetWebResponse(Request);
-			this.CopyCookies(Response);
-			return Response;
-		}
+			using HttpClient Client = this.GetClient();
+			HttpRequestMessage Request = this.GetRequest(Method, Url);
+			Request.Content = new ByteArrayContent(Data);
 
-		private void CopyCookies(WebResponse Response)
-		{
-			if (Response is HttpWebResponse WebResponse)
-				this.cookies.Add(WebResponse.Cookies);
+			HttpResponseMessage Response = await Client.SendAsync(Request);
+			Response.EnsureSuccessStatusCode();
+			return await Response.Content.ReadAsByteArrayAsync();
 		}
-
 	}
 }

@@ -11,6 +11,7 @@ CSS: MarkdownLab.css
 UserVariable: User
 Privilege: Admin.Lab.Markdown
 Privilege: Admin.Lab.Script
+AllowScriptTag: 1
 Login: /Login.md
 
 <div id="Lab">

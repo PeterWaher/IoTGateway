@@ -10,16 +10,16 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Contains classes and tools for working with Public Key Cryptography Standards (PKCS).</Description>
-    <Copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.PKCS</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Security PKCS PKI PFX DER ASN.1</PackageTags>
-    <AssemblyVersion>0.0.9</AssemblyVersion>
-    <FileVersion>0.0.9</FileVersion>
-    <Version>0.0.9</Version>
+    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <FileVersion>0.1.0</FileVersion>
+    <Version>0.1.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

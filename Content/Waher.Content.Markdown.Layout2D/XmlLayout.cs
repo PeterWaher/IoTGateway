@@ -1,10 +1,10 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Content.Emoji;
 using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;
@@ -18,6 +18,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Timing;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -78,6 +79,7 @@ namespace Waher.Content.Markdown.Layout2D
 					{
 						scheduler?.Dispose();
 						scheduler = null;
+						return Task.CompletedTask;
 					};
 				}
 			}
@@ -291,7 +293,7 @@ namespace Waher.Content.Markdown.Layout2D
 						Result.Dynamic = LayoutDoc.Dynamic;
 
 						if (!LayoutDoc.Dynamic)
-							await Resources.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
+							await Files.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
 					}
 				}
 			}
@@ -482,7 +484,7 @@ namespace Waher.Content.Markdown.Layout2D
 			if (Info?.FileName is null)
 				return null;
 
-			byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
+			byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.FileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{

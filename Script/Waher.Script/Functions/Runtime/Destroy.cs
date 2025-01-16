@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -42,35 +43,20 @@ namespace Waher.Script.Functions.Runtime
         /// </summary>
         public override string[] Aliases => new string[] { "delete" };
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
         {
-            IElement Element;
-
-            if (!string.IsNullOrEmpty(this.variableName))
-            {
-				if (Variables.TryGetVariable(this.variableName, out Variable v))
-				{
-					Variables.Remove(this.variableName);
-					Element = v.ValueElement;
-				}
-				else
-					Element = null;
-			}
-            else
-                Element = this.Argument.Evaluate(Variables);
-
-            if (!(Element is null))
-            {
-				if (Element.AssociatedObjectValue is IDisposable D)
-					D.Dispose();
-			}
-
-            return ObjectValue.Null;
+            return this.EvaluateAsync(Variables).Result;
         }
 
         /// <summary>
@@ -97,7 +83,11 @@ namespace Waher.Script.Functions.Runtime
 
             if (!(Element is null))
             {
-                if (Element.AssociatedObjectValue is IDisposable D)
+                object Obj = Element.AssociatedObjectValue;
+
+				if (Obj is IDisposableAsync DAsync)
+					await DAsync.DisposeAsync();
+				else if (Obj is IDisposable D)
                     D.Dispose();
             }
 

@@ -90,7 +90,7 @@ namespace Waher.IoTGateway.WebResources
 
                 Response.ContentLength = Content.Length;
                 
-                await Response.Write(Content);
+                await Response.Write(true, Content);
             }
         }
     }

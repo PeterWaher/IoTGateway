@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -108,7 +109,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			if (!File.Exists(FileName))
 			{
-				await Resources.WriteAllBytesAsync(FileName, BinaryImage);
+				await Files.WriteAllBytesAsync(FileName, BinaryImage);
 
 				lock (synchObject)
 				{
@@ -128,7 +129,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		private static Dictionary<string, bool> temporaryFiles = null;
 		private readonly static object synchObject = new object();
 
-		private static void CurrentDomain_ProcessExit(object Sender, EventArgs e)
+		private static Task CurrentDomain_ProcessExit(object Sender, EventArgs e)
 		{
 			lock (synchObject)
 			{
@@ -149,6 +150,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					temporaryFiles.Clear();
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }

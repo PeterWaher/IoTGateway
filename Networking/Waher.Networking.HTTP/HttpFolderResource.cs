@@ -532,14 +532,19 @@ namespace Waher.Networking.HTTP
 				CacheRec Rec;
 
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+				if (Rec is null)
+				{
+					await Response.SendResponse(new NotModifiedException());
+					return;
+				}
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				if (AcceptableResponse is null || Response.ResponseSent)
+					return;
+
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
-
-				if (Response.ResponseSent)
-					return;
 
 				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified,
 					Response, Request, this.defaultResponseHeaders);
@@ -697,14 +702,14 @@ namespace Waher.Networking.HTTP
 				if (!(Header.IfNoneMatch is null))
 				{
 					if (Header.IfNoneMatch.Value == Rec.ETag)
-						throw new NotModifiedException();
+						return null;
 				}
 				else if (!(Header.IfModifiedSince is null))
 				{
 					if ((Limit = Header.IfModifiedSince.Timestamp).HasValue &&
 						LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 					{
-						throw new NotModifiedException();
+						return null;
 					}
 				}
 			}
@@ -917,14 +922,22 @@ namespace Waher.Networking.HTTP
 							ConversionState State = new ConversionState(ContentType, f, FullPath, ResourceName,
 								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
 
-							if (await Converter.ConvertAsync(State))
+							if (await Converter.ConvertAsync(State, Response.Progress))
 							{
 								NewContentType = State.ToContentType;
 								Result.Dynamic = true;
 							}
 
-							Result.ContentType = NewContentType;
-							Ok = true;
+							if (State.HasError)
+							{
+								await Response.SendResponse(State.Error);
+								return null;
+							}
+							else
+							{
+								Result.ContentType = NewContentType;
+								Ok = true;
+							}
 						}
 						finally
 						{
@@ -949,13 +962,24 @@ namespace Waher.Networking.HTTP
 				}
 
 				if (!Acceptable)
-					throw new NotAcceptableException();
+				{
+					await Response.SendResponse(new NotAcceptableException());
+					return null;
+				}
 			}
+
+			bool Protected;
 
 			lock (protectedContentTypes)
 			{
-				if (protectedContentTypes.TryGetValue(ContentType, out bool Protected) && Protected)
-					throw new ForbiddenException("Resource is protected.");
+				if (!protectedContentTypes.TryGetValue(ContentType, out Protected))
+					Protected = false;
+			}
+
+			if (Protected)
+			{
+				await Response.SendResponse(new ForbiddenException("Resource is protected."));
+				return null;
 			}
 
 			return Result;
@@ -993,7 +1017,7 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								await this.Response.Write(this.Buffer, 0, NrRead);
+								await this.Response.Write(false, this.Buffer, 0, NrRead);
 								this.BytesLeft -= NrRead;
 							}
 						}
@@ -1104,14 +1128,19 @@ namespace Waher.Networking.HTTP
 				}
 
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+				if (Rec is null)
+				{
+					await Response.SendResponse(new NotModifiedException());
+					return;
+				}
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				if (AcceptableResponse is null || Response.ResponseSent)
+					return;
+
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
-
-				if (Response.ResponseSent)
-					return;
 
 				ReadProgress Progress = new ReadProgress()
 				{
@@ -1229,7 +1258,10 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, false, out bool _);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No data in " + Request.Header.Method + " request.");
+			{
+				await Response.SendResponse(new BadRequestException("No data in " + Request.Header.Method + " request."));
+				return;
+			}
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))
@@ -1282,7 +1314,10 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, false, out bool Exists);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No data in " + Request.Header.Method + " request.");
+			{
+				await Response.SendResponse(new BadRequestException("No data in " + Request.Header.Method + " request."));
+				return;
+			}
 
 			if (!Exists)
 			{
@@ -1337,7 +1372,10 @@ namespace Waher.Networking.HTTP
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);
 			else
-				throw new NotFoundException("File not found: " + Request.SubPath);
+			{
+				await Response.SendResponse(new NotFoundException("File not found: " + Request.SubPath));
+				return;
+			}
 
 			await Response.SendResponse();
 			await Response.DisposeAsync();
@@ -1404,14 +1442,24 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			Variables Session = Request.Session
-				?? throw new MethodNotAllowedException(this.AllowedMethods);
+			Variables Session = Request.Session;
+			if (Session is null)
+			{
+				await Response.SendResponse(new MethodNotAllowedException(this.AllowedMethods));
+				return;
+			}
 
 			string Referer = Request.Header.Referer?.Value;
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError)
+			{
+				await Response.SendResponse(Content.Error);
+				return;
+			}
 
 			Session[" LastPost "] = new PostedInformation()
 			{
-				DecodedContent = Expression.Encapsulate(await Request.DecodeDataAsync()),
+				DecodedContent = Expression.Encapsulate(Content.Decoded),
 				Resource = Request.SubPath,
 				Referer = Referer
 			};
@@ -1420,10 +1468,11 @@ namespace Waher.Networking.HTTP
 				Uri.TryCreate(Referer, UriKind.RelativeOrAbsolute, out Uri RefererUri) &&
 				string.Compare(Request.SubPath, RefererUri.AbsolutePath, true) == 0)
 			{
-				throw new SeeOtherException(Referer);  // PRG pattern.
+				await Response.SendResponse(new SeeOtherException(Referer));  // PRG pattern.
+				return;
 			}
-			else
-				await this.GET(Request, Response);
+
+			await this.GET(Request, Response);
 		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
-using Waher.Runtime.Temporary;
 
 namespace Waher.Content
 {
@@ -37,7 +36,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		Task<object> GetAsync(Uri Uri, X509Certificate Certificate, 
+		Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, 
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers);
 
@@ -50,7 +49,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
-		Task<object> GetAsync(Uri Uri, X509Certificate Certificate,
+		Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
@@ -62,7 +61,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
@@ -74,7 +73,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 	}
 }

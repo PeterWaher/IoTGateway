@@ -13,7 +13,7 @@
 
     <Description>Contains unit tests for the Waher.Security.ACME library.</Description>
 
-    <Copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2025. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

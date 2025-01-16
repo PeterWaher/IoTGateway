@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Events
 {
@@ -1131,8 +1132,18 @@ namespace Waher.Events
 		/// <summary>
 		/// <see cref="IDisposable.Dispose()"/>
 		/// </summary>
-		public virtual void Dispose()
+		[Obsolete("Use DisposeAsync() instead.")]
+		public void Dispose()
 		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync()"/>
+		/// </summary>
+		public virtual Task DisposeAsync()
+		{
+			return Task.CompletedTask;
 		}
 	}
 }

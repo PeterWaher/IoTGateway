@@ -51,12 +51,12 @@ namespace Waher.Events.Files
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
 			this.disposed = true;
-
 			this.DisposeOutput();
-			base.Dispose();
+
+			return base.DisposeAsync();
 		}
 
 		/// <summary>

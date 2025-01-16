@@ -9,15 +9,17 @@ using Waher.Content.Text;
 using Waher.Events;
 using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Networking.HTTP.HTTP2;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// Represets a response of an HTTP client request.
 	/// </summary>
-	public class HttpResponse : IDisposable
+	public class HttpResponse : IDisposableAsync
 	{
 		private const int DefaultChunkSize = 32768;
 
@@ -26,10 +28,11 @@ namespace Waher.Networking.HTTP
 		private LinkedList<Cookie> cookies = null;
 		private List<string> challenges = null;
 		private readonly Encoding encoding = Encoding.UTF8;
+		private readonly Http2Stream http2Stream;
 		private bool encodingUsed = false;
-		private DateTimeOffset date = DateTimeOffset.Now;
+		private DateTimeOffset date = DateTimeOffset.UtcNow;
 		private DateTimeOffset? expires = null;
-		private DateTime lastPing = DateTime.Now;
+		private DateTime lastPing = DateTime.UtcNow;
 		private string server = null;
 		private string contentLanguage = null;
 		private string contentType = null;
@@ -45,6 +48,7 @@ namespace Waher.Networking.HTTP
 
 		private TransferEncoding transferEncoding = null;
 		private IBinaryTransmission responseStream;
+		private ICodecProgress progress;
 		private readonly TransferEncoding desiredTransferEncoding = null;
 		private readonly HttpServer httpServer;
 		private readonly HttpRequest httpRequest;
@@ -58,6 +62,7 @@ namespace Waher.Networking.HTTP
 			this.clientConnection = null;
 			this.httpServer = null;
 			this.httpRequest = null;
+			this.http2Stream = null;
 		}
 
 		/// <summary>
@@ -69,10 +74,11 @@ namespace Waher.Networking.HTTP
 		public HttpResponse(TransferEncoding TransferEncoding, HttpServer HttpServer, HttpRequest Request)
 		{
 			this.responseStream = null;
-			this.clientConnection = null;
+			this.clientConnection = Request?.clientConnection;
 			this.desiredTransferEncoding = TransferEncoding;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
+			this.http2Stream = Request?.Http2Stream;
 
 			if (!(Request is null))
 			{
@@ -99,6 +105,7 @@ namespace Waher.Networking.HTTP
 			this.clientConnection = ClientConnection;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
+			this.http2Stream = Request?.Http2Stream;
 
 			if (!(Request is null))
 				Request.Response = this;
@@ -234,6 +241,15 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Optional progress reporting of encoding/decoding. Can be null.
+		/// </summary>
+		public ICodecProgress Progress
+		{
+			get => this.progress;
+			internal set => this.progress = value;
+		}
+
+		/// <summary>
 		/// Corresponding HTTP Request
 		/// </summary>
 		public HttpRequest Request => this.httpRequest;
@@ -316,6 +332,13 @@ namespace Waher.Networking.HTTP
 						this.eTag = Value.Substring(1, Value.Length - 2);
 					else
 						this.eTag = Value;
+					break;
+
+				case "set-cookie":
+					if (this.cookies is null)
+						this.cookies = new LinkedList<Cookie>();
+
+					this.cookies.AddLast(Cookie.FromSetCookie(Value));
 					break;
 
 				default:
@@ -439,16 +462,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		[Obsolete("Use the DisposeAsync() method.")]
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			this.DisposeAsync().Wait();
 		}
 
 		/// <summary>
@@ -525,6 +541,11 @@ namespace Waher.Networking.HTTP
 		public BinaryTcpClient ClientConnection => this.clientConnection?.Client;
 
 		/// <summary>
+		/// Internal HTTP Client connection
+		/// </summary>
+		internal HttpClientConnection InternalClientConnection => this.clientConnection;
+
+		/// <summary>
 		/// If the response contains any WWW-Authenticate challenges.
 		/// </summary>
 		public bool HasChallenges => !(this.challenges is null);
@@ -541,7 +562,11 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Transfer encoding in response.
 		/// </summary>
-		public TransferEncoding TransferEncoding => this.transferEncoding ?? this.desiredTransferEncoding;
+		public TransferEncoding TransferEncoding
+		{
+			get => this.transferEncoding ?? this.desiredTransferEncoding;
+			internal set => this.transferEncoding = value;
+		}
 
 		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
@@ -683,7 +708,7 @@ namespace Waher.Networking.HTTP
 						this.ContentType = string.IsNullOrEmpty(ContentType) ? BinaryCodec.DefaultContentType : ContentType;
 						this.ContentLength = Content.Length;
 
-						await this.Write(Content);
+						await this.Write(true, Content);
 					}
 
 					await this.SendResponse();
@@ -696,113 +721,133 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task StartSendResponse(bool ExpectContent)
+		internal async Task<bool> StartSendResponse(bool ExpectContent)
 		{
 			if (this.transferEncoding is null)
 			{
-				if (this.desiredTransferEncoding is null)
+				if (this.http2Stream is null)
 				{
-					StringBuilder Output = new StringBuilder();
-
-					Output.Append("HTTP/1.1 ");
-					Output.Append(this.statusCode.ToString());
-					Output.Append(' ');
-					Output.Append(this.statusMessage);
-
-					Output.Append("\r\nDate: ");
-					Output.Append(CommonTypes.EncodeRfc822(this.date));
-
-					if (this.expires.HasValue)
+					if (this.desiredTransferEncoding is null)
 					{
-						Output.Append("\r\nExpires: ");
-						Output.Append(CommonTypes.EncodeRfc822(this.expires.Value));
-					}
+						StringBuilder Output = new StringBuilder();
 
-					if (!string.IsNullOrEmpty(this.server))
-					{
-						Output.Append("\r\nServer: ");
-						Output.Append(this.server);
-					}
-					else if (!string.IsNullOrEmpty(this.httpServer?.Name))
-					{
-						Output.Append("\r\nServer: ");
-						Output.Append(this.httpServer.Name);
-					}
+						Output.Append("HTTP/1.1 ");
+						Output.Append(this.statusCode.ToString());
+						Output.Append(' ');
+						Output.Append(this.statusMessage);
 
-					if (!string.IsNullOrEmpty(this.contentLanguage))
-					{
-						Output.Append("\r\nContent-Language: ");
-						Output.Append(this.contentLanguage);
-					}
+						Output.Append("\r\nDate: ");
+						Output.Append(CommonTypes.EncodeRfc822(this.date));
 
-					if (!string.IsNullOrEmpty(this.contentType))
-					{
-						Output.Append("\r\nContent-Type: ");
-						Output.Append(this.contentType);
-
-						if (!this.encodingUsed && this.contentType.StartsWith("text/"))
-							this.encodingUsed = true;
-
-						if (this.encodingUsed && !this.contentType.Contains("charset="))
+						if (this.expires.HasValue)
 						{
-							Output.Append("; charset=");
-							Output.Append(this.encoding.WebName);
-							this.txText = true;
+							Output.Append("\r\nExpires: ");
+							Output.Append(CommonTypes.EncodeRfc822(this.expires.Value));
 						}
-						else if (this.clientConnection?.HasSniffers ?? false)
-							this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
-						else
-							this.txText = false;
 
-						Output.Append("\r\nX-Content-Type-Options: nosniff");
-					}
-
-					if ((ExpectContent || this.contentLength.HasValue) &&
-						((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
-					{
-						throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
-
-						// When message bodies are required:
-						// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
-					}
-
-					IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
-					bool TxText = ContentEncoding is null && this.txText;
-
-					if (this.contentLength.HasValue && ContentEncoding is null)
-					{
-						Output.Append("\r\nContent-Length: ");
-						Output.Append(this.contentLength.Value.ToString());
-
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
-							this.contentLength.Value, this.clientConnection, TxText, this.encoding);
-					}
-					else if (ExpectContent)
-					{
-						if (!(ContentEncoding is null) &&
-							(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
-							(string.IsNullOrEmpty(this.contentType) ||
-							!(this.contentType.StartsWith("image/") ||
-							this.contentType.StartsWith("audio/") ||
-							this.contentType.StartsWith("video/") ||
-							this.contentType == BinaryCodec.DefaultContentType)))
+						if (!string.IsNullOrEmpty(this.server))
 						{
-							Output.Append("\r\nContent-Encoding: ");
-							Output.Append(ContentEncoding.Label);
+							Output.Append("\r\nServer: ");
+							Output.Append(this.server);
+						}
+						else if (!string.IsNullOrEmpty(this.httpServer?.Name))
+						{
+							Output.Append("\r\nServer: ");
+							Output.Append(this.httpServer.Name);
+						}
 
-							FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+						Output.Append("\r\nAlt-Svc: h2");
+						if (!this.clientConnection.Encrypted)
+							Output.Append('c');
+						Output.Append("=\":");
+						Output.Append(this.clientConnection.Port.ToString());
+						Output.Append("\"; ma=3600");
 
-							if (PrecompressedFile?.Exists ?? false)
+						if (!string.IsNullOrEmpty(this.contentLanguage))
+						{
+							Output.Append("\r\nContent-Language: ");
+							Output.Append(this.contentLanguage);
+						}
+
+						if (!string.IsNullOrEmpty(this.contentType))
+						{
+							Output.Append("\r\nContent-Type: ");
+							Output.Append(this.contentType);
+
+							if (!this.encodingUsed && this.contentType.StartsWith("text/"))
+								this.encodingUsed = true;
+
+							if (this.encodingUsed && !this.contentType.Contains("charset="))
 							{
-								TxText = false;
+								Output.Append("; charset=");
+								Output.Append(this.encoding.WebName);
+								this.txText = true;
+							}
+							else if (this.clientConnection?.HasSniffers ?? false)
+								this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
+							else
+								this.txText = false;
 
-								Output.Append("\r\nContent-Length: ");
-								Output.Append(PrecompressedFile.Length.ToString());
+							Output.Append("\r\nX-Content-Type-Options: nosniff");
+						}
 
-								this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
-									PrecompressedFile.Length, this.clientConnection, TxText, this.encoding);
+						if ((ExpectContent || this.contentLength.HasValue) &&
+							((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
+						{
+							throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
 
-								this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+							// When message bodies are required:
+							// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
+						}
+
+						IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+						bool TxText = ContentEncoding is null && this.txText;
+
+						if (this.contentLength.HasValue && ContentEncoding is null)
+						{
+							Output.Append("\r\nContent-Length: ");
+							Output.Append(this.contentLength.Value.ToString());
+
+							this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
+								this.contentLength.Value, this.clientConnection, TxText, this.encoding);
+						}
+						else if (ExpectContent)
+						{
+							if (!(ContentEncoding is null) &&
+								(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
+								(string.IsNullOrEmpty(this.contentType) ||
+								!(this.contentType.StartsWith("image/") ||
+								this.contentType.StartsWith("audio/") ||
+								this.contentType.StartsWith("video/") ||
+								this.contentType == BinaryCodec.DefaultContentType)))
+							{
+								Output.Append("\r\nContent-Encoding: ");
+								Output.Append(ContentEncoding.Label);
+
+								FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+
+								if (PrecompressedFile?.Exists ?? false)
+								{
+									TxText = false;
+
+									Output.Append("\r\nContent-Length: ");
+									Output.Append(PrecompressedFile.Length.ToString());
+
+									this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
+										PrecompressedFile.Length, this.clientConnection, TxText, this.encoding);
+
+									this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+								}
+								else
+								{
+									Output.Append("\r\nTransfer-Encoding: chunked");
+
+									this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
+										DefaultChunkSize, this.clientConnection, TxText, this.encoding);
+
+									this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
+										this.contentLength.HasValue ? this.eTag : null);
+								}
 							}
 							else
 							{
@@ -810,81 +855,221 @@ namespace Waher.Networking.HTTP
 
 								this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
 									DefaultChunkSize, this.clientConnection, TxText, this.encoding);
-
-								this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
-									this.contentLength.HasValue ? this.eTag : null);
 							}
 						}
 						else
 						{
-							Output.Append("\r\nTransfer-Encoding: chunked");
+							if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
+								Output.Append("\r\nContent-Length: 0");
 
-							this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
-								DefaultChunkSize, this.clientConnection, TxText, this.encoding);
+							this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0,
+								this.clientConnection, TxText, this.encoding);
 						}
+
+						if (!(this.challenges is null))
+						{
+							foreach (string Challenge in this.challenges)
+							{
+								Output.Append("\r\nWWW-Authenticate: ");
+								Output.Append(Challenge);
+							}
+						}
+
+						if (!string.IsNullOrEmpty(this.eTag))
+						{
+							Output.Append("\r\nETag: ");
+							Output.Append(this.eTag);
+						}
+
+						if (!(this.customHeaders is null))
+						{
+							foreach (KeyValuePair<string, string> P in this.customHeaders)
+							{
+								Output.Append("\r\n");
+								Output.Append(P.Key);
+								Output.Append(": ");
+								Output.Append(P.Value);
+							}
+						}
+
+						if (!(this.cookies is null))
+						{
+							foreach (Cookie Cookie in this.cookies)
+							{
+								Output.Append("\r\nSet-Cookie: ");
+								Output.Append(Cookie.ToString());
+							}
+						}
+
+						Output.Append("\r\n\r\n");
+
+						string Header = Output.ToString();
+						byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
+
+						if (this.responseStream is null || this.clientConnection.Disposed)
+							return false;
+
+						this.responseStream?.SendAsync(true, HeaderBin, 0, HeaderBin.Length);
+						this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+
+						if (this.clientConnection.HasSniffers)
+							this.clientConnection.TransmitText(Header);
 					}
 					else
 					{
-						if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
-							Output.Append("\r\nContent-Length: 0");
-
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0,
-							this.clientConnection, TxText, this.encoding);
+						this.transferEncoding = this.desiredTransferEncoding;
+						await this.transferEncoding.BeforeContentAsync(this, ExpectContent);
 					}
-
-					if (!(this.challenges is null))
-					{
-						foreach (string Challenge in this.challenges)
-						{
-							Output.Append("\r\nWWW-Authenticate: ");
-							Output.Append(Challenge);
-						}
-					}
-
-					if (!string.IsNullOrEmpty(this.eTag))
-					{
-						Output.Append("\r\nETag: ");
-						Output.Append(this.eTag);
-					}
-
-					if (!(this.customHeaders is null))
-					{
-						foreach (KeyValuePair<string, string> P in this.customHeaders)
-						{
-							Output.Append("\r\n");
-							Output.Append(P.Key);
-							Output.Append(": ");
-							Output.Append(P.Value);
-						}
-					}
-
-					if (!(this.cookies is null))
-					{
-						foreach (Cookie Cookie in this.cookies)
-						{
-							Output.Append("\r\nSet-Cookie: ");
-							Output.Append(Cookie.ToString());
-						}
-					}
-
-					Output.Append("\r\n\r\n");
-
-					string Header = Output.ToString();
-					byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
-
-					if (this.responseStream is null || this.clientConnection.Disposed)
-						return;
-
-					this.responseStream?.SendAsync(HeaderBin, 0, HeaderBin.Length);
-					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
-					await this.clientConnection.TransmitText(Header);
 				}
 				else
 				{
-					this.transferEncoding = this.desiredTransferEncoding;
-					await this.transferEncoding.BeforeContentAsync(this, ExpectContent);
+					if (!this.clientConnection.IsStreamOpen(this.http2Stream.StreamId))
+						return false;
+
+					bool LeaveOpen = this.http2Stream.UpgradedToWebSocket;
+					Http2TransferEncoding Http2TransferEncoding = new Http2TransferEncoding(this.http2Stream, this.contentLength, LeaveOpen);
+					this.transferEncoding = Http2TransferEncoding;
+
+					HeaderWriter w = this.http2Stream.Connection.HttpHeaderWriter;
+					StringBuilder sb = this.clientConnection.HasSniffers ? new StringBuilder() : null;
+
+					byte[] HeaderBin;
+
+					if (!await w.TryLock(10000))
+						return await this.clientConnection.ReturnHttp2Error(Http2Error.InternalError, 0, "Unable to get access to HTTP/2 header reader.");
+
+					try
+					{
+						w.Reset(sb);
+						w.WriteHeader(":status", this.statusCode.ToString(), IndexMode.Indexed, true);
+						w.WriteHeader("date", CommonTypes.EncodeRfc822(this.date), IndexMode.NotIndexed, true);
+
+						if (this.expires.HasValue)
+							w.WriteHeader("expires", CommonTypes.EncodeRfc822(this.expires.Value), IndexMode.NotIndexed, true);
+
+						if (!string.IsNullOrEmpty(this.server))
+							w.WriteHeader("server", this.server, IndexMode.Indexed, true);
+						else if (!string.IsNullOrEmpty(this.httpServer?.Name))
+							w.WriteHeader("server", this.httpServer.Name, IndexMode.Indexed, true);
+
+						if (!string.IsNullOrEmpty(this.contentLanguage))
+							w.WriteHeader("content-language", this.contentLanguage, IndexMode.Indexed, true);
+
+						if (!string.IsNullOrEmpty(this.contentType))
+						{
+							string s = this.contentType;
+
+							if (!this.encodingUsed && s.StartsWith("text/"))
+								this.encodingUsed = true;
+
+							if (this.encodingUsed && !s.Contains("charset="))
+							{
+								s += "; charset=" + this.encoding.WebName;
+								this.txText = true;
+							}
+							else if (this.clientConnection?.HasSniffers ?? false)
+								this.txText = HttpClientConnection.IsSniffableTextType(s);
+							else
+								this.txText = false;
+
+							w.WriteHeader("content-type", s, IndexMode.Indexed, true);
+							w.WriteHeader("x-content-type-options", "nosniff", IndexMode.Indexed, true);
+						}
+
+						if ((ExpectContent || this.contentLength.HasValue) &&
+							((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
+						{
+							throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
+
+							// When message bodies are required:
+							// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
+						}
+
+						IContentEncoding ContentEncoding = this.httpRequest?.Header?.AcceptEncoding?.TryGetBestContentEncoder(this.contentLength.HasValue ? this.eTag : null);
+
+						if (ContentEncoding is null && this.txText)
+							Http2TransferEncoding.DataEncoding = this.encoding;
+
+						if (this.contentLength.HasValue && ContentEncoding is null)
+							w.WriteHeader("content-length", this.contentLength.Value.ToString(), IndexMode.NotIndexed, true);
+						else if (ExpectContent)
+						{
+							if (!(ContentEncoding is null) &&
+								(!this.contentLength.HasValue || (this.contentLength.Value >= 128 && this.contentLength.Value < 128 * 1024 * 1024)) &&
+								(string.IsNullOrEmpty(this.contentType) ||
+								!(this.contentType.StartsWith("image/") ||
+								this.contentType.StartsWith("audio/") ||
+								this.contentType.StartsWith("video/") ||
+								this.contentType == BinaryCodec.DefaultContentType)))
+							{
+								w.WriteHeader("content-encoding", ContentEncoding.Label, IndexMode.Indexed, true);
+
+								FileInfo PrecompressedFile = ContentEncoding.TryGetPrecompressedFile(this.contentLength.HasValue ? this.eTag : null);
+
+								if (PrecompressedFile?.Exists ?? false)
+								{
+									Http2TransferEncoding.DataEncoding = null;
+
+									w.WriteHeader("content-length", PrecompressedFile.Length.ToString(), IndexMode.NotIndexed, true);
+									Http2TransferEncoding.ContentLength = PrecompressedFile.Length;
+
+									this.transferEncoding = new PrecompressedFileReturner(PrecompressedFile, this.transferEncoding);
+								}
+								else
+								{
+									this.transferEncoding = ContentEncoding.GetEncoder(this.transferEncoding, this.contentLength,
+										this.contentLength.HasValue ? this.eTag : null);
+								}
+							}
+						}
+						else
+						{
+							if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
+								w.WriteHeader("content-length", "0", IndexMode.Indexed, true);
+						}
+
+						if (!(this.challenges is null))
+						{
+							foreach (string Challenge in this.challenges)
+								w.WriteHeader("www-authenticate", Challenge, IndexMode.NotIndexed, true);
+						}
+
+						if (!string.IsNullOrEmpty(this.eTag))
+							w.WriteHeader("etag", this.eTag, IndexMode.NotIndexed, true);
+
+						if (!(this.customHeaders is null))
+						{
+							foreach (KeyValuePair<string, string> P in this.customHeaders)
+								w.WriteHeaderCheckCookie(P.Key.ToLower(), P.Value, IndexMode.NotIndexed, true);
+						}
+
+						if (!(this.cookies is null))
+						{
+							foreach (Cookie Cookie in this.cookies)
+								w.WriteHeader("set-cookie", Cookie.ToString(), IndexMode.NotIndexed, true);
+						}
+
+						HeaderBin = w.ToArray();
+					}
+					finally
+					{
+						w.Release();
+					}
+
+					if (this.clientConnection.Disposed)
+						return false;
+
+					if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
+						return false;
+
+					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
+
+					if (!(sb is null))
+						this.clientConnection.TransmitText(sb.ToString());
 				}
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -910,7 +1095,7 @@ namespace Waher.Networking.HTTP
 					this.ContentType = Result.ContentType;
 					this.ContentLength = Result.Data.Length;
 
-					await this.Write(Result.Data);
+					await this.Write(true, Result.Data);
 				}
 
 				await this.SendResponse();
@@ -921,12 +1106,57 @@ namespace Waher.Networking.HTTP
 		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
 		/// that returns a response to the client.
 		/// </summary>
-		public async Task Return(string ContentType, byte[] Data)
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="Data">Data buffer.</param>
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Return(string ContentType, byte[] Data)
+		{
+			return this.Return(ContentType, false, Data);
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="Data">Data buffer.</param>
+		/// <param name="Offset">Offset into buffer where data to return begins.</param>
+		/// <param name="Count">Number of bytes to return.</param>
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Return(string ContentType, byte[] Data, int Offset, int Count)
+		{
+			return this.Return(ContentType, false, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Data buffer.</param>
+		public Task Return(string ContentType, bool ConstantBuffer, byte[] Data)
+		{
+			return this.Return(ContentType, ConstantBuffer, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Returns an encoded object to the client. This method can only be called once per response, and only as the only method 
+		/// that returns a response to the client.
+		/// </summary>
+		/// <param name="ContentType">Internet Content-Type of binary data.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Data buffer.</param>
+		/// <param name="Offset">Offset into buffer where data to return begins.</param>
+		/// <param name="Count">Number of bytes to return.</param>
+		public async Task Return(string ContentType, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			this.ContentType = ContentType;
-			this.ContentLength = Data.Length;
+			this.ContentLength = Count;
 
-			await this.Write(Data);
+			await this.Write(ConstantBuffer, Data, Offset, Count);
 			await this.SendResponse();
 		}
 
@@ -951,7 +1181,7 @@ namespace Waher.Networking.HTTP
 				{
 					c = (int)Math.Min(BufSize, Len - Pos);
 					await f.ReadAllAsync(Buf, 0, c);
-					await this.Write(Buf, 0, c);
+					await this.Write(false, Buf, 0, c);
 					Pos += c;
 				}
 
@@ -971,13 +1201,16 @@ namespace Waher.Networking.HTTP
 
 			if (Accept is null)
 			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
-				this.encodingUsed |= P.Value.StartsWith("text/");
+				ContentResponse P = await InternetContent.EncodeAsync(Object, this.encoding);
+				if (P.HasError)
+					return null;
+
+				this.encodingUsed |= P.ContentType.StartsWith("text/");
 
 				return new EncodingResult()
 				{
-					Data = P.Key,
-					ContentType = P.Value
+					Data = P.Encoded,
+					ContentType = P.ContentType
 				};
 			}
 			else
@@ -990,10 +1223,13 @@ namespace Waher.Networking.HTTP
 					switch (Rec.Detail)
 					{
 						case 0: // Wildcard
-							KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
-							this.encodingUsed |= P.Value.StartsWith("text/");
-							Data = P.Key;
-							ContentType = P.Value;
+							ContentResponse P = await InternetContent.EncodeAsync(Object, this.encoding);
+							if (P.HasError)
+								return null;
+
+							this.encodingUsed |= P.ContentType.StartsWith("text/");
+							Data = P.Encoded;
+							ContentType = P.ContentType;
 							break;
 
 						case 1: // Top Type only
@@ -1019,10 +1255,10 @@ namespace Waher.Networking.HTTP
 
 							if (!(Best is null))
 							{
-								P = await Best.EncodeAsync(Object, this.encoding, ContentType, BestContentType);
-								this.encodingUsed |= P.Value.StartsWith("text/");
-								Data = P.Key;
-								ContentType = P.Value;
+								P = await Best.EncodeAsync(Object, this.encoding, this.progress, ContentType, BestContentType);
+								this.encodingUsed |= P.ContentType.StartsWith("text/");
+								Data = P.Encoded;
+								ContentType = P.ContentType;
 							}
 							break;
 
@@ -1030,10 +1266,10 @@ namespace Waher.Networking.HTTP
 						case 3: // Top & Sub Type, and parameters
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
 							{
-								P = await Encoder.EncodeAsync(Object, this.encoding, ContentType, Rec.Item);
-								this.encodingUsed |= P.Value.StartsWith("text/");
-								Data = P.Key;
-								ContentType = P.Value;
+								P = await Encoder.EncodeAsync(Object, this.encoding, this.progress, ContentType, Rec.Item);
+								this.encodingUsed |= P.ContentType.StartsWith("text/");
+								Data = P.Encoded;
+								ContentType = P.ContentType;
 							}
 							break;
 					}
@@ -1056,57 +1292,75 @@ namespace Waher.Networking.HTTP
 		/// Returns binary data in the response.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
-		public async Task Write(byte[] Data)
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Write(byte[] Data)
 		{
-			DateTime TP;
-
-			if (this.transferEncoding is null)
-				await this.StartSendResponse(true);
-
-			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
-
-			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
-			{
-				this.lastPing = TP;
-				this.httpServer?.PingRequest(this.httpRequest);
-			}
-		}
-
-		internal async Task WriteRawAsync(byte[] Data)
-		{
-			if (!(this.responseStream is null))
-			{
-				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-
-				await this.responseStream.SendAsync(Data, 0, Data.Length, (Sender, e) =>
-				{
-					Result.TrySetResult(true);
-					return Task.CompletedTask;
-				}, null);
-
-				await Result.Task;
-			}
+			return this.Write(false, Data);
 		}
 
 		/// <summary>
 		/// Returns binary data in the response.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
-		/// <param name="Offset">Offset into <paramref name="Data"/>.</param>
-		/// <param name="Count">Number of bytes to return.</param>
-		public async Task Write(byte[] Data, int Offset, int Count)
+		/// <param name="Offset">Offset into buffer where data to write starts.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		[Obsolete("Use overload with ConstantBuffer argument, for performance.")]
+		public Task Write(byte[] Data, int Offset, int Count)
+		{
+			return this.Write(false, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary data.</param>
+		public Task Write(bool ConstantBuffer, byte[] Data)
+		{
+			return this.Write(ConstantBuffer, Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset into buffer where data to write starts.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		public async Task Write(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			DateTime TP;
 
 			if (this.transferEncoding is null)
-				await this.StartSendResponse(true);
+			{
+				if (!await this.StartSendResponse(true))
+					return;
+			}
 
-			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
+			await this.transferEncoding.EncodeAsync(ConstantBuffer, Data, Offset, Count);
 
-			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
+			if (!(this.httpServer is null) && ((TP = DateTime.UtcNow) - this.lastPing).TotalSeconds >= 1)
 			{
 				this.lastPing = TP;
-				this.httpServer.PingRequest(this.httpRequest);
+				this.httpServer?.PingRequest(this.httpRequest);
+			}
+		}
+
+		internal async Task WriteRawAsync(bool ConstantBuffer, byte[] Data)
+		{
+			if (!(this.responseStream is null))
+			{
+				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+				await this.responseStream.SendAsync(ConstantBuffer, Data, 0, Data.Length, (Sender, e) =>
+				{
+					Result.TrySetResult(true);
+					return Task.CompletedTask;
+				}, null);
+
+				await Result.Task;
 			}
 		}
 
@@ -1123,7 +1377,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(char value)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(new char[] { value }));
+			return this.Write(true, this.encoding.GetBytes(new char[] { value }));
 		}
 
 		/// <summary>
@@ -1139,7 +1393,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(char[] buffer)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(buffer));
+			return this.Write(true, this.encoding.GetBytes(buffer));
 		}
 
 		/// <summary>
@@ -1155,7 +1409,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(string value)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(value));
+			return this.Write(true, this.encoding.GetBytes(value));
 		}
 
 		/// <summary>
@@ -1176,7 +1430,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(char[] buffer, int index, int count)
 		{
 			this.encodingUsed = true;
-			return this.Write(this.encoding.GetBytes(buffer, index, count));
+			return this.Write(true, this.encoding.GetBytes(buffer, index, count));
 		}
 
 		/// <summary>
@@ -1347,7 +1601,7 @@ namespace Waher.Networking.HTTP
 		public Task Write(object value)
 		{
 			if (value is byte[] Bin)
-				return this.Write(Bin);
+				return this.Write(false, Bin);
 			else if (value is string s)
 				return this.Write(s);
 			else if (value is char ch)
@@ -1403,7 +1657,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Task WriteLine()
 		{
-			return this.Write(CRLF);
+			return this.Write(true, CRLF);
 		}
 
 		private static readonly byte[] CRLF = new byte[] { (byte)'\r', (byte)'\n' };

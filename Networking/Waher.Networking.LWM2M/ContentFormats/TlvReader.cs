@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.LWM2M.ContentFormats
 {

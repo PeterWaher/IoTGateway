@@ -74,11 +74,14 @@ namespace Waher.Networking.XMPP.P2P
 		private static Type[] e2eTypes = null;
 		private static bool e2eTypesLocked = false;
 
-		private readonly Dictionary<string, IE2eEndpoint[]> contacts;
+		private readonly Dictionary<string, RemoteEndpoints> contacts;
 		private XmppClient client;
 		private readonly XmppServerlessMessaging serverlessMessaging;
-		private IE2eEndpoint[] oldKeys = null;
-		private IE2eEndpoint[] keys = null;
+		private Dictionary<string, IE2eEndpoint> oldKeys = null;
+		private Dictionary<string, IE2eEndpoint> keys = null;
+		private IE2eEndpoint[] oldKeysSorted = null;
+		private IE2eEndpoint[] keysSorted = null;
+		private readonly Guid instanceId = Guid.NewGuid();
 		private readonly UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private readonly object synchObject = new object();
 		private readonly int securityStrength;
@@ -86,6 +89,12 @@ namespace Waher.Networking.XMPP.P2P
 		private Aes256 aes = new Aes256();
 		private AeadChaCha20Poly1305 acp = new AeadChaCha20Poly1305();
 		private ChaCha20 cha = new ChaCha20();
+
+		private class RemoteEndpoints
+		{
+			public Dictionary<string, IE2eEndpoint> ByFqn;
+			public IE2eEndpoint Default;
+		}
 
 		/// <summary>
 		/// Class managing end-to-end encryption.
@@ -133,18 +142,21 @@ namespace Waher.Networking.XMPP.P2P
 			this.securityStrength = SecurityStrength;
 			this.client = Client;
 			this.serverlessMessaging = ServerlessMessaging;
-			this.contacts = new Dictionary<string, IE2eEndpoint[]>(StringComparer.CurrentCultureIgnoreCase);
+			this.contacts = new Dictionary<string, RemoteEndpoints>(StringComparer.CurrentCultureIgnoreCase);
 
-			if (!(LocalEndpoints is null))
+			if (LocalEndpoints is null)
 			{
-				this.keys = LocalEndpoints;
-				this.ephemeralKeys = false;
-			}
-			else
-			{
-				this.keys = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
+				LocalEndpoints = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
 				this.ephemeralKeys = true;
 			}
+			else
+				this.ephemeralKeys = false;
+
+			this.keys = new Dictionary<string, IE2eEndpoint>();
+			this.keysSorted = null;
+
+			foreach (IE2eEndpoint Endpoint in LocalEndpoints)
+				this.keys[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
 
 			if (!(this.client is null))
 			{
@@ -153,6 +165,30 @@ namespace Waher.Networking.XMPP.P2P
 				this.client.OnStateChanged += this.Client_OnStateChanged;
 				this.client.OnPresence += this.Client_OnPresence;
 				this.client.CustomPresenceXml += this.Client_CustomPresenceXml;
+			}
+		}
+
+		/// <summary>
+		/// Current keys.
+		/// </summary>
+		internal IE2eEndpoint[] Keys
+		{
+			get
+			{
+				this.keysSorted ??= SortedArray(this.keys);
+				return this.keysSorted;
+			}
+		}
+
+		/// <summary>
+		/// Previous keys.
+		/// </summary>
+		internal IE2eEndpoint[] OldKeys
+		{
+			get
+			{
+				this.oldKeysSorted ??= SortedArray(this.oldKeys);
+				return this.oldKeysSorted;
 			}
 		}
 
@@ -291,6 +327,11 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// ID of <see cref="IEndToEndEncryption"/> instance.
+		/// </summary>
+		public Guid InstanceId => this.instanceId;
+
+		/// <summary>
 		/// Sets allowed cipers in endpoint security.
 		/// </summary>
 		/// <param name="CipherTypes">Allowed cipher types. null=all types allowed.</param>
@@ -361,24 +402,26 @@ namespace Waher.Networking.XMPP.P2P
 				this.client = null;
 			}
 
-			if (!(this.oldKeys is null))
+			lock (this.synchObject)
 			{
-				foreach (IE2eEndpoint E2e in this.oldKeys)
-					E2e.Dispose();
-			}
+				if (!(this.oldKeys is null))
+				{
+					foreach (IE2eEndpoint E2e in this.OldKeys)
+						E2e.Dispose();
+				}
 
-			if (!(this.keys is null))
-			{
-				foreach (IE2eEndpoint E2e in this.keys)
-					E2e.Dispose();
-
+				if (!(this.keys is null))
+				{
+					foreach (IE2eEndpoint E2e in this.Keys)
+						E2e.Dispose();
+				}
 			}
 
 			lock (this.contacts)
 			{
-				foreach (IE2eEndpoint[] Endpoints in this.contacts.Values)
+				foreach (RemoteEndpoints Endpoints in this.contacts.Values)
 				{
-					foreach (IE2eEndpoint Endpoint in Endpoints)
+					foreach (IE2eEndpoint Endpoint in Endpoints.ByFqn.Values)
 						Endpoint.Dispose();
 				}
 
@@ -410,9 +453,10 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			lock (this.synchObject)
 			{
-				IE2eEndpoint[] Keys = this.oldKeys;
+				IE2eEndpoint[] Keys = this.OldKeys;
 
 				this.oldKeys = this.keys;
+				this.oldKeysSorted = this.keysSorted;
 
 				if (!(Keys is null))
 				{
@@ -420,17 +464,18 @@ namespace Waher.Networking.XMPP.P2P
 						E2e.Dispose();
 				}
 
-				int i, c = this.keys.Length;
-				Keys = new IE2eEndpoint[c];
+				Dictionary<string, IE2eEndpoint>  NewKeys = new Dictionary<string, IE2eEndpoint>();
 
-				for (i = 0; i < c; i++)
+				foreach (KeyValuePair<string, IE2eEndpoint> P in this.keys)
 				{
-					Keys[i] = this.keys[i].Create(this.securityStrength);
-					Keys[i].Previous = this.keys[i];
-					this.keys[i].Previous = null;
+					IE2eEndpoint NewKey = P.Value.Create(this.securityStrength);
+					NewKey.Previous = P.Value;
+					P.Value.Previous = null;
+					NewKeys[P.Key] = NewKey;
 				}
 
-				this.keys = Keys;
+				this.keys = NewKeys;
+				this.keysSorted = null;
 			}
 		}
 
@@ -512,10 +557,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// Parses a set of E2E keys from XML.
 		/// </summary>
 		/// <param name="E2E">E2E element.</param>
+		/// <param name="SecurityStrength">Desired security strength.</param>
 		/// <returns>List of E2E keys.</returns>
-		public static List<IE2eEndpoint> ParseE2eKeys(XmlElement E2E)
+		public static Dictionary<string, IE2eEndpoint> ParseE2eKeys(XmlElement E2E, int SecurityStrength)
 		{
-			List<IE2eEndpoint> Endpoints = null;
+			Dictionary<string, IE2eEndpoint> Endpoints = null;
 
 			foreach (XmlNode N in E2E.ChildNodes)
 			{
@@ -523,12 +569,10 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					IE2eEndpoint Endpoint = ParseE2eKey(E);
 
-					if (!(Endpoint is null))
+					if (!(Endpoint is null) && Endpoint.SecurityStrength >= SecurityStrength)
 					{
-						if (Endpoints is null)
-							Endpoints = new List<IE2eEndpoint>();
-
-						Endpoints.Add(Endpoint);
+						Endpoints ??= new Dictionary<string, IE2eEndpoint>();
+						Endpoints[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
 					}
 				}
 			}
@@ -559,12 +603,10 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			try
 			{
-				List<IE2eEndpoint> Endpoints = null;
-				IE2eEndpoint[] OldEndpoints = null;
-				int i;
+				Dictionary<string, IE2eEndpoint> Endpoints = null;
 
 				if (!(E2E is null))
-					Endpoints = ParseE2eKeys(E2E);
+					Endpoints = ParseE2eKeys(E2E, this.securityStrength);
 
 				if (Endpoints is null)
 				{
@@ -572,42 +614,22 @@ namespace Waher.Networking.XMPP.P2P
 					return false;
 				}
 
-				Endpoints.Sort((e1, e2) =>
-				{
-					int Diff = e2.SecurityStrength - e1.SecurityStrength;
-					if (Diff != 0)
-						return Diff;
-
-					return e1.Score - e2.Score;
-				});
-
-				i = 0;
-				int j, c = Endpoints.Count;
-
-				for (j = 1; j < c; j++)
-				{
-					if (Endpoints[j].SecurityStrength >= this.securityStrength)
-						i = j;
-				}
-
-				if (i != 0)
-				{
-					IE2eEndpoint Temp = Endpoints[i];
-					Endpoints.RemoveAt(i);
-					Endpoints.Insert(0, Temp);
-				}
+				RemoteEndpoints OldEndpoints;
 
 				lock (this.contacts)
 				{
 					if (!this.contacts.TryGetValue(FullJID, out OldEndpoints))
 						OldEndpoints = null;
 
-					this.contacts[FullJID] = Endpoints.ToArray();
+					this.contacts[FullJID] = new RemoteEndpoints()
+					{
+						ByFqn = Endpoints
+					};
 				}
 
 				if (!(OldEndpoints is null))
 				{
-					foreach (IE2eEndpoint Endpoint in OldEndpoints)
+					foreach (IE2eEndpoint Endpoint in OldEndpoints.ByFqn.Values)
 						Endpoint.Dispose();
 				}
 
@@ -627,17 +649,17 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If E2E information was found and removed.</returns>
 		public bool RemovePeerPkiInfo(string FullJID)
 		{
-			IE2eEndpoint[] List;
+			RemoteEndpoints Keys;
 
 			lock (this.contacts)
 			{
-				if (!this.contacts.TryGetValue(FullJID, out List))
+				if (!this.contacts.TryGetValue(FullJID, out Keys))
 					return false;
 				else
 					this.contacts.Remove(FullJID);
 			}
 
-			foreach (IE2eEndpoint Endpoint in List)
+			foreach (IE2eEndpoint Endpoint in Keys.ByFqn.Values)
 				Endpoint.Dispose();
 
 			return true;
@@ -665,8 +687,8 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			lock (this.contacts)
 			{
-				if (this.contacts.TryGetValue(FullJid, out IE2eEndpoint[] Endpoints))
-					return Endpoints;
+				if (this.contacts.TryGetValue(FullJid, out RemoteEndpoints Endpoints))
+					return SortedArray(Endpoints.ByFqn);
 			}
 
 			if (string.Compare(FullJid, this.client.BareJID) == 0)
@@ -681,10 +703,48 @@ namespace Waher.Networking.XMPP.P2P
 				};
 				Doc.LoadXml(Xml.ToString());
 
-				return ParseE2eKeys(Doc.DocumentElement)?.ToArray() ?? new IE2eEndpoint[0];
+				return SortedArray(ParseE2eKeys(Doc.DocumentElement, this.securityStrength) ?? new Dictionary<string, IE2eEndpoint>());
 			}
 
 			return new E2eEndpoint[0];
+		}
+
+		private static IE2eEndpoint[] SortedArray(Dictionary<string, IE2eEndpoint> Endpoints)
+		{
+			int c = Endpoints?.Count ?? 0;
+			IE2eEndpoint[] Result = new IE2eEndpoint[c];
+
+			if (c > 0)
+			{
+				Endpoints.Values.CopyTo(Result, 0);
+
+				Array.Sort(Result, (ep1, ep2) =>
+				{
+					int Diff = (ep2.Safe ? 1 : 0) - (ep1.Safe ? 1 : 0);
+					if (Diff != 0)
+						return Diff;
+
+					Diff = ep2.SecurityStrength - ep1.SecurityStrength;
+					if (Diff != 0)
+						return Diff;
+
+					Diff = (ep1.Slow ? 1 : 0) - (ep2.Slow ? 1 : 0);
+					if (Diff != 0)
+						return Diff;
+
+					Diff = (ep2.SupportsSignatures ? 1 : 0) - (ep1.SupportsSignatures ? 1 : 0);
+					if (Diff != 0)
+						return Diff;
+
+					Diff = (ep2.SupportsSharedSecrets ? 1 : 0) - (ep1.SupportsSharedSecrets ? 1 : 0);
+					if (Diff != 0)
+						return Diff;
+
+					return ep2.Score - ep1.Score;
+				});
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -749,40 +809,65 @@ namespace Waher.Networking.XMPP.P2P
 
 		private IE2eEndpoint FindRemoteEndpoint(string RemoteJid, string EndpointReference)
 		{
-			IE2eEndpoint[] Endpoints;
-
 			lock (this.contacts)
 			{
-				if (!this.contacts.TryGetValue(RemoteJid, out Endpoints))
+				if (!this.contacts.TryGetValue(RemoteJid, out RemoteEndpoints Endpoints))
+					return null;
+
+				if (EndpointReference is null)
+				{
+					if (Endpoints.Default is null)
+					{
+						IE2eEndpoint[] Ordered = SortedArray(Endpoints.ByFqn);
+						IE2eEndpoint LastSafeAndFastAndSignaturesAndSharedSecrets = null;
+						IE2eEndpoint LastSafeAndFastAndSignatures = null;
+						IE2eEndpoint LastSafeAndFast = null;
+						IE2eEndpoint LastSafe = null;
+
+						if (Ordered.Length == 0)
+							return null;
+
+						foreach (IE2eEndpoint Endpoint in Ordered)
+						{
+							if (Endpoint.Safe)
+							{
+								LastSafe = Endpoint;
+
+								if (!Endpoint.Slow)
+								{
+									LastSafeAndFast = Endpoint;
+
+									if (Endpoint.SupportsSignatures)
+									{
+										LastSafeAndFastAndSignatures = Endpoint;
+
+										if (Endpoint.SupportsSharedSecrets)
+											LastSafeAndFastAndSignaturesAndSharedSecrets = Endpoint;
+									}
+								}
+							}
+						}
+
+						Endpoints.Default = 
+							LastSafeAndFastAndSignaturesAndSharedSecrets ??
+							LastSafeAndFastAndSignatures ?? 
+							LastSafeAndFast ?? LastSafe ?? 
+							Ordered[0];
+					}
+
+					return Endpoints.Default;
+				}
+
+				if (EndpointReference.IndexOf('#') < 0)
+					EndpointReference = IoTHarmonizationE2ECurrent + "#" + EndpointReference;
+				else
+					EndpointReference = EndpointReference.Replace("urn:ieee:", "urn:nf:");
+
+				if (Endpoints.ByFqn.TryGetValue(EndpointReference, out IE2eEndpoint Selected))
+					return Selected;
+				else
 					return null;
 			}
-
-			if (EndpointReference is null)
-				return Endpoints[0];
-
-			string Namespace;
-			string LocalName;
-			int i;
-
-			i = EndpointReference.IndexOf('#');
-			if (i < 0)
-			{
-				LocalName = EndpointReference;
-				Namespace = IoTHarmonizationE2ECurrent;
-			}
-			else
-			{
-				Namespace = EndpointReference.Substring(0, i).Replace("urn:ieee:", "urn:nf:");
-				LocalName = EndpointReference.Substring(i + 1);
-			}
-
-			foreach (IE2eEndpoint Endpoint in Endpoints)
-			{
-				if (Endpoint.LocalName == LocalName && Endpoint.Namespace == Namespace)
-					return Endpoint;
-			}
-
-			return null;
 		}
 
 		/// <summary>
@@ -851,14 +936,14 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DataXml">XML data</param>
 		/// <param name="Xml">Output</param>
 		/// <returns>If E2E information was available and encryption was possible.</returns>
-		public virtual async Task<bool> Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
+		public virtual bool Encrypt(XmppClient Client, string Id, string Type, string From, string To, string DataXml, StringBuilder Xml)
 		{
 			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
 			IE2eEndpoint RemoteEndpoint = this.FindRemoteEndpoint(To, null);
 			if (RemoteEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Warning("Remote E2E endpoint not found. Unable to encrypt message.");
+					Client.Warning("Remote E2E endpoint not found. Unable to encrypt message.");
 
 				return false;
 			}
@@ -867,7 +952,7 @@ namespace Waher.Networking.XMPP.P2P
 			if (LocalEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Warning("Local E2E endpoint matching remote endpoint not found. Unable to encrypt message.");
+					Client.Warning("Local E2E endpoint matching remote endpoint not found. Unable to encrypt message.");
 
 				return false;
 			}
@@ -877,25 +962,19 @@ namespace Waher.Networking.XMPP.P2P
 			bool Result = LocalEndpoint.DefaultSymmetricCipher.Encrypt(Id, Type, From, To, Counter, Data, Xml, LocalEndpoint, RemoteEndpoint);
 
 			if (SniffE2eInfo)
-				await Client.Information(DataXml);
+				Client.Information(DataXml);
 
 			return Result;
 		}
 
-		private IE2eEndpoint FindLocalEndpoint(IE2eEndpoint RemoteEndpoint)
+		/// <summary>
+		/// Returns the local endpoint that matches a given remote endpoint.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		/// <returns>Matching key, or null if none found.</returns>
+		public IE2eEndpoint FindLocalEndpoint(IE2eEndpoint RemoteEndpoint)
 		{
-			IE2eEndpoint[] Endpoints = this.keys;
-			int c = Endpoints.Length;
-			int i;
-			Type T = RemoteEndpoint.GetType();
-
-			for (i = 0; i < c; i++)
-			{
-				if (Endpoints[i].GetType() == T)
-					return Endpoints[i];
-			}
-
-			return null;
+			return this.FindLocalEndpoint(RemoteEndpoint.LocalName, RemoteEndpoint.Namespace);
 		}
 
 		/// <summary>
@@ -905,7 +984,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Matching key, or null if none found.</returns>
 		public IE2eEndpoint FindLocalEndpoint(string KeyName)
 		{
-			return this.FindLocalEndpoint(KeyName, string.Empty);
+			return this.FindLocalEndpoint(KeyName, IoTHarmonizationE2ECurrent);
 		}
 
 		/// <summary>
@@ -916,16 +995,52 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Matching key, or null if none found.</returns>
 		public IE2eEndpoint FindLocalEndpoint(string KeyName, string KeyNamespace)
 		{
-			IE2eEndpoint[] Endpoints = this.keys;
-			int c = Endpoints.Length;
-			int i;
+			if (this.keys?.TryGetValue(KeyNamespace + "#" + KeyName, out IE2eEndpoint Result) ?? false)
+				return Result;
+			else
+				return null;
+		}
 
-			for (i = 0; i < c; i++)
+		/// <summary>
+		/// Returns the local endpoint that matches a given type.
+		/// </summary>
+		/// <param name="KeyType">Type of key to get.</param>
+		/// <returns>Key, if found, or null if not.</returns>
+		public IE2eEndpoint FindLocalEndpoint(Type KeyType)
+		{
+			lock (this.synchObject)
 			{
-				if (Endpoints[i].LocalName == KeyName &&
-					(Endpoints[i].Namespace == KeyNamespace || string.IsNullOrEmpty(KeyNamespace)))
+				foreach (IE2eEndpoint Endpoint in this.Keys)
 				{
-					return Endpoints[i];
+					if (Endpoint.GetType() == KeyType)
+						return Endpoint;
+				}
+
+				if (!typeof(IE2eEndpoint).GetTypeInfo().IsAssignableFrom(KeyType.GetTypeInfo()))
+					throw new ArgumentException("Not assignable from " + typeof(IE2eEndpoint).FullName, nameof(KeyType));
+
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Returns the local endpoint that matches a given public key.
+		/// </summary>
+		/// <param name="PublicKey">Public key</param>
+		/// <returns>Key, if found, or null if not.</returns>
+		public IE2eEndpoint FindLocalEndpoint(byte[] PublicKey)
+		{
+			if (PublicKey is null)
+				return null;
+
+			string s = Convert.ToBase64String(PublicKey);
+
+			lock (this.synchObject)
+			{
+				foreach (IE2eEndpoint Endpoint in this.Keys)
+				{
+					if (Endpoint.PublicKeyBase64 == s)
+						return Endpoint;
 				}
 			}
 
@@ -943,7 +1058,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="E2eElement">Encrypted XML data</param>
 		/// <param name="SymmetricCipher">Type of symmetric cipher to use to decrypt content.</param>
 		/// <returns>Decrypted XML, together with an endpoint reference, if successful, null otherwise..</returns>
-		public virtual async Task<Tuple<string, string>> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
+		public virtual Tuple<string, string> Decrypt(XmppClient Client, string Id, string Type, string From, string To, XmlElement E2eElement,
 			IE2eSymmetricCipher SymmetricCipher)
 		{
 			bool SniffE2eInfo = Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b;
@@ -952,7 +1067,7 @@ namespace Waher.Networking.XMPP.P2P
 			if (RemoteEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Error("Remote E2E endpoint not found. Unable to decrypt message.");
+					Client.Error("Remote E2E endpoint not found. Unable to decrypt message.");
 
 				return null;
 			}
@@ -961,8 +1076,8 @@ namespace Waher.Networking.XMPP.P2P
 			if (LocalEndpoint is null)
 			{
 				if (SniffE2eInfo)
-					await Client.Error("Local E2E endpoint matching remote endpoint not found. Unable to decrypt message.");
-				
+					Client.Error("Local E2E endpoint matching remote endpoint not found. Unable to decrypt message.");
+
 				return null;
 			}
 
@@ -972,15 +1087,10 @@ namespace Waher.Networking.XMPP.P2P
 
 			string Xml = Cipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
 			if (Xml is null)
-			{
-				if (SniffE2eInfo)
-					await Client.Error("Unable to decrypt message.");
-				
 				return null;
-			}
 
 			if (SniffE2eInfo)
-				await Client.Information(Xml);
+				Client.Information(Xml);
 
 			return new Tuple<string, string>(Xml, EndpointReference);
 		}
@@ -1000,15 +1110,12 @@ namespace Waher.Networking.XMPP.P2P
 			return this.E2eMessageHandler(Sender, e, this.cha);
 		}
 
-		private async Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
+		private Task E2eMessageHandler(object Sender, MessageEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
+			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.Message.GetAttribute("type"), e.From, e.To, e.Content, Cipher);
 			if (T is null)
-			{
-				await Client.Error("Unable to decrypt or verify message.");
-				return;
-			}
+				return Task.CompletedTask;
 
 			string Xml = T.Item1;
 			string EndpointReference = T.Item2;
@@ -1029,6 +1136,8 @@ namespace Waher.Networking.XMPP.P2P
 			};
 
 			Client.ProcessMessage(e2);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -1069,10 +1178,10 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!(Cipher is null))
 			{
-				Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
+				Tuple<string, string> T = this.Decrypt(Client, e.Id, e.Response.GetAttribute("type"), e.From, e.To, E, Cipher);
 				if (T is null)
 				{
-					await Client.Error("Unable to decrypt or verify response.");
+					Client.Error("Unable to decrypt or verify response.");
 					return;
 				}
 
@@ -1204,10 +1313,9 @@ namespace Waher.Networking.XMPP.P2P
 		private async Task E2eIqGetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
+			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
 			if (T is null)
 			{
-				await Client.Error("Unable to decrypt or verify request.");
 				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
 				return;
 			}
@@ -1243,10 +1351,9 @@ namespace Waher.Networking.XMPP.P2P
 		private async Task E2eIqSetHandler(object Sender, IqEventArgs e, IE2eSymmetricCipher Cipher)
 		{
 			XmppClient Client = Sender as XmppClient;
-			Tuple<string, string> T = await this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
+			Tuple<string, string> T = this.Decrypt(Client, e.Id, e.IQ.GetAttribute("type"), e.From, e.To, e.Query, Cipher);
 			if (T is null)
 			{
-				await Client.Error("Unable to decrypt or verify request.");
 				await e.IqError(new ForbiddenException("Unable to decrypt or verify message.", e.IQ));
 				return;
 			}
@@ -1386,7 +1493,7 @@ namespace Waher.Networking.XMPP.P2P
 			string MessageXml = Xml.ToString();
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To, MessageXml, Encrypted))
+			if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, To, MessageXml, Encrypted))
 			{
 				MessageXml = Encrypted.ToString();
 
@@ -1406,7 +1513,7 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						Encrypted.Clear();
 
-						if (await this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From, MessageXml, Encrypted))
+						if (this.Encrypt(Client, Id, string.Empty, this.client.FullJID, e.From, MessageXml, Encrypted))
 						{
 							await Client.SendMessage(QoS, MessageType.Normal, Id, e.From, Encrypted.ToString(), string.Empty,
 								string.Empty, string.Empty, string.Empty, string.Empty, DeliveryCallback, State);
@@ -1602,7 +1709,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="DeliveryCallback">Optional callback called when request has been sent.</param>
 		/// <returns>ID of IQ stanza.</returns>
 		public Task<uint> SendIqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml,
-			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, 
+			EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries,
 			EventHandlerAsync<DeliveryEventArgs> DeliveryCallback)
 		{
 			return this.SendIq(Client, E2ETransmission, null, To, Xml, "get", Callback, State, RetryTimeout, NrRetries, false,
@@ -1731,10 +1838,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Id">Id attribute</param>
 		/// <param name="To">To attribute</param>
 		/// <param name="ex">Exception object</param>
-		public async Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
+		public Task SendIqError(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To,
 			Exception ex)
 		{
-			await this.SendIqError(Client, E2ETransmission, Id, To, await Client.ExceptionToXmppXml(ex));
+			return this.SendIqError(Client, E2ETransmission, Id, To, Client.ExceptionToXmppXml(ex));
 		}
 
 		/// <summary>
@@ -1762,7 +1869,7 @@ namespace Waher.Networking.XMPP.P2P
 			string Type, EventHandlerAsync<IqResultEventArgs> Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
 			int MaxRetryTimeout, bool PkiSynchronized)
 		{
-			return this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State, RetryTimeout, NrRetries, DropOff, 
+			return this.SendIq(Client, E2ETransmission, Id, To, Xml, Type, Callback, State, RetryTimeout, NrRetries, DropOff,
 				MaxRetryTimeout, PkiSynchronized, null);
 		}
 
@@ -1800,7 +1907,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			StringBuilder Encrypted = new StringBuilder();
 
-			if (await this.Encrypt(Client, Id, Type, this.client.FullJID, To, Xml, Encrypted))
+			if (this.Encrypt(Client, Id, Type, this.client.FullJID, To, Xml, Encrypted))
 			{
 				string XmlEnc = Encrypted.ToString();
 
@@ -1961,14 +2068,17 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Xml">XML Output.</param>
 		public void AppendE2eInfo(StringBuilder Xml)
 		{
-			Xml.Append("<e2e xmlns=\"");
-			Xml.Append(IoTHarmonizationE2ECurrent);
-			Xml.Append("\">");
+			lock (this.synchObject)
+			{
+				Xml.Append("<e2e xmlns=\"");
+				Xml.Append(IoTHarmonizationE2ECurrent);
+				Xml.Append("\">");
 
-			foreach (IE2eEndpoint E2e in this.keys)
-				E2e.ToXml(Xml, IoTHarmonizationE2ECurrent);
+				foreach (IE2eEndpoint E2e in this.Keys)
+					E2e.ToXml(Xml, IoTHarmonizationE2ECurrent);
 
-			Xml.Append("</e2e>");
+				Xml.Append("</e2e>");
+			}
 		}
 
 		/// <summary>
@@ -2160,54 +2270,10 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public event EventHandlerAsync<PeerSynchronizedEventArgs> PeerUpdated = null;
 
-		/// <summary>
-		/// Gets the local key of a given type.
-		/// </summary>
-		/// <param name="Key">Get key of same type.</param>
-		/// <returns>Key, if found, or null if not.</returns>
-		public IE2eEndpoint GetLocalKey(IE2eEndpoint Key)
+		/// <inheritdoc/>
+		public override string ToString()
 		{
-			return this.GetLocalKey(Key.GetType());
-		}
-
-		/// <summary>
-		/// Gets the local key of a given type.
-		/// </summary>
-		/// <param name="KeyType">Type of key to get.</param>
-		/// <returns>Key, if found, or null if not.</returns>
-		public IE2eEndpoint GetLocalKey(Type KeyType)
-		{
-			foreach (IE2eEndpoint Endpoint in this.keys)
-			{
-				if (Endpoint.GetType() == KeyType)
-					return Endpoint;
-			}
-
-			if (!typeof(IE2eEndpoint).GetTypeInfo().IsAssignableFrom(KeyType.GetTypeInfo()))
-				throw new ArgumentException("Not assignable from " + typeof(IE2eEndpoint).FullName, nameof(KeyType));
-
-			return null;
-		}
-
-		/// <summary>
-		/// Gets the local key with a given public key.
-		/// </summary>
-		/// <param name="PublicKey">Public key</param>
-		/// <returns>Key, if found, or null if not.</returns>
-		public IE2eEndpoint GetLocalKey(byte[] PublicKey)
-		{
-			if (PublicKey is null)
-				return null;
-
-			string s = Convert.ToBase64String(PublicKey);
-
-			foreach (IE2eEndpoint Endpoint in this.keys)
-			{
-				if (Endpoint.PublicKeyBase64 == s)
-					return Endpoint;
-			}
-
-			return null;
+			return this.instanceId.ToString();
 		}
 
 	}

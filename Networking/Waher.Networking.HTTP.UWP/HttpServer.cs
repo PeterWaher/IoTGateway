@@ -26,13 +26,14 @@ using Waher.Networking.HTTP.Vanity;
 using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
+using Waher.Networking.HTTP.HTTP2;
 
 namespace Waher.Networking.HTTP
 {
-    /// <summary>
-    /// Implements an HTTP server.
-    /// </summary>
-    public class HttpServer : CommunicationLayer, IDisposable, IResourceMap
+	/// <summary>
+	/// Implements an HTTP server.
+	/// </summary>
+	public class HttpServer : CommunicationLayer, IDisposable, IResourceMap
 	{
 		/// <summary>
 		/// Default HTTP Port (80).
@@ -100,6 +101,16 @@ namespace Waher.Networking.HTTP
 		private bool closed = false;
 #endif
 		private bool adaptToNetworkChanges;
+
+		// HTTP/2 default settings
+
+		private int http2InitialWindowSize = ConnectionSettings.DefaultHttp2InitialWindowSize;
+		private int http2MaxFrameSize = ConnectionSettings.DefaultHttp2MaxFrameSize;
+		private int http2MaxConcurrentStreams = ConnectionSettings.DefaultHttp2MaxConcurrentStreams;
+		private int http2HeaderTableSize = ConnectionSettings.DefaultHttp2HeaderTableSize;
+		private bool http2EnablePush = ConnectionSettings.DefaultHttp2EnablePush;
+		private bool http2SettingsLocked = false;
+		private bool http2NoRfc7540Priorities = false;
 
 		#region Constructors
 
@@ -229,7 +240,7 @@ namespace Waher.Networking.HTTP
 			this.sessions.Removed += this.Sessions_Removed;
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout, true);
 			this.currentRequests.Removed += this.CurrentRequests_Removed;
-			this.lastStat = DateTime.Now;
+			this.lastStat = DateTime.UtcNow;
 			this.adaptToNetworkChanges = AdaptToNetworkChanges;
 
 			this.httpPorts = new int[0];
@@ -491,7 +502,7 @@ namespace Waher.Networking.HTTP
 									{
 										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
 										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, false, ClientCertificates.NotUsed, false);
+										Task T = this.ListenForIncomingConnections(Listener, false, HttpPort, ClientCertificates.NotUsed, false);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
 									}
@@ -596,7 +607,7 @@ namespace Waher.Networking.HTTP
 
 										Listener = new TcpListener(DesiredEndpoint);
 										Listener.Start(DefaultConnectionBacklog);
-										Task T = this.ListenForIncomingConnections(Listener, true, ClientCertificates, TrustCertificates);
+										Task T = this.ListenForIncomingConnections(Listener, true, HttpsPort, ClientCertificates, TrustCertificates);
 
 										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
 									}
@@ -921,10 +932,71 @@ namespace Waher.Networking.HTTP
 
 		#endregion
 
+		#region HTTP/2 Properties
+
+		/// <summary>
+		/// HTTP/2: Initial window size.
+		/// </summary>
+		public int Http2InitialWindowSize => this.http2InitialWindowSize;
+
+		/// <summary>
+		/// HTTP/2: Maximum frame size.
+		/// </summary>
+		public int Http2MaxFrameSize => this.http2MaxFrameSize;
+
+		/// <summary>
+		/// HTTP/2: Maximum number of concurrent streams.
+		/// </summary>
+		public int Http2MaxConcurrentStreams => this.http2MaxConcurrentStreams;
+
+		/// <summary>
+		/// HTTP/2: Header table size.
+		/// </summary>
+		public int Http2HeaderTableSize => this.http2HeaderTableSize;
+
+		/// <summary>
+		/// HTTP/2: If push promises are enabled.
+		/// </summary>
+		public bool Http2EnablePush => this.http2EnablePush;
+
+		/// <summary>
+		/// HTTP/2: If RFC 7540 priorities are obsoleted, as defined in RFC 9218:
+		/// https://www.rfc-editor.org/rfc/rfc9218.html
+		/// </summary>
+		public bool Http2NoRfc7540Priorities => this.http2NoRfc7540Priorities;
+
+		/// <summary>
+		/// HTTP/2 connection settings (SETTINGS).
+		/// </summary>
+		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="MaxFrameSize">Maximum frame size.</param>
+		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
+		/// <param name="HeaderTableSize">Header table size.</param>
+		/// <param name="EnablePush">If push promises are enabled.</param>
+		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
+		/// <param name="Lock">If settings are to be locked.</param>
+		public void SetHttp2ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
+			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
+			bool NoRfc7540Priorities, bool Lock)
+		{
+			if (this.http2SettingsLocked)
+				throw new InvalidOperationException("HTTP/2 settings locked.");
+
+			this.http2InitialWindowSize = InitialWindowSize;
+			this.http2MaxFrameSize = MaxFrameSize;
+			this.http2MaxConcurrentStreams = MaxConcurrentStreams;
+			this.http2HeaderTableSize = HeaderTableSize;
+			this.http2EnablePush = EnablePush;
+			this.http2NoRfc7540Priorities = NoRfc7540Priorities;
+			this.http2SettingsLocked = Lock;
+		}
+
+		#endregion
+
 		#region Connections
 
 #if WINDOWS_UWP
-		private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+		private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
 		{
 			try
 			{
@@ -936,11 +1008,14 @@ namespace Waher.Networking.HTTP
 					return;
 				}
 
-				await this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+				this.Information("Connection accepted from " + Client.Information.RemoteAddress.ToString() + ":" + Client.Information.RemotePort + ".");
+
+				if (!int.TryParse(sender.Information.LocalPort, out int Port))
+					Port = this.httpPorts[0];
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 				BinaryTcpClient.Bind(true);
-				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
+				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
 				BinaryTcpClient.Continue();
 
 				lock (this.connections)
@@ -961,7 +1036,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 #else
-		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls, ClientCertificates ClientCertificates,
+		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls, int Port, ClientCertificates ClientCertificates,
 			bool TrustCertificates)
 		{
 			try
@@ -1001,18 +1076,18 @@ namespace Waher.Networking.HTTP
 
 						if (!(Client is null))
 						{
-							await this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 							BinaryTcpClient.Bind(true);
 
 							if (Tls)
 							{
-								Task _ = this.SwitchToTls(BinaryTcpClient, ClientCertificates, TrustCertificates);
+								Task _ = this.SwitchToTls(BinaryTcpClient, ClientCertificates, TrustCertificates, Port);
 							}
 							else
 							{
-								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
+								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
 								BinaryTcpClient.Continue();
 
 								lock (this.connections)
@@ -1066,7 +1141,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private async Task SwitchToTls(BinaryTcpClient Client, ClientCertificates ClientCertificates, bool TrustCertificates)
+		private async Task SwitchToTls(BinaryTcpClient Client, ClientCertificates ClientCertificates, bool TrustCertificates, int Port)
 		{
 			string RemoteIpEndpoint;
 			EndPoint EP = Client.Client.Client.RemoteEndPoint;
@@ -1082,25 +1157,32 @@ namespace Waher.Networking.HTTP
 				{
 					if (this.HasSniffers)
 					{
-						await this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
+						this.Information("Switching to TLS. (Client Certificates: " + ClientCertificates.ToString() +
 							", Trust Certificates: " + TrustCertificates.ToString() + ")");
 					}
 
-					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls, 
-						ClientCertificates, null, TrustCertificates, "http/1.1");
+					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
+						ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
 
 					if (this.HasSniffers)
 					{
-						await this.Information("TLS established" +
-							". Cipher Strength: " + Client.CipherStrength.ToString() +
-							", Hash Strength: " + Client.HashStrength.ToString() +
-							", Key Exchange Strength: " + Client.KeyExchangeStrength.ToString());
+						StringBuilder sb = new StringBuilder();
+
+						sb.Append("TLS established");
+						sb.Append(". Cipher Strength: ");
+						sb.Append(Client.CipherStrength.ToString());
+						sb.Append(", Hash Strength: ");
+						sb.Append(Client.HashStrength.ToString());
+						sb.Append(", Key Exchange Strength: ");
+						sb.Append(Client.KeyExchangeStrength.ToString());
+
+						this.Information(sb.ToString());
 
 						if (!(Client.RemoteCertificate is null))
 						{
 							if (this.HasSniffers)
 							{
-								StringBuilder sb = new StringBuilder();
+								sb.Clear();
 
 								sb.Append("Remote Certificate received. Valid: ");
 								sb.Append(Client.RemoteCertificateValid.ToString());
@@ -1113,12 +1195,12 @@ namespace Waher.Networking.HTTP
 								sb.Append(", Hash: ");
 								sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetCertHash()));
 
-								await this.Information(sb.ToString());
+								this.Information(sb.ToString());
 							}
 						}
 					}
 
-					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
+					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, Port, this.Sniffers);
 
 					if (this.HasSniffers)
 					{
@@ -1135,28 +1217,43 @@ namespace Waher.Networking.HTTP
 				}
 				catch (AuthenticationException ex)
 				{
+					if (this.HasSniffers)
+						this.Exception(ex);
+
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
-				catch (SocketException)
+				catch (SocketException ex)
 				{
-					Client.Dispose();
+					if (this.HasSniffers)
+						this.Exception(ex);
+
+					await Client.DisposeAsync();
 				}
 				catch (Win32Exception ex)
 				{
+					if (this.HasSniffers)
+						this.Exception(ex);
+
 					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
 				}
-				catch (IOException)
+				catch (IOException ex)
 				{
-					Client.Dispose();
+					if (this.HasSniffers)
+						this.Exception(ex);
+
+					await Client.DisposeAsync();
 				}
 				catch (Exception ex)
 				{
-					Client.Dispose();
+					if (this.HasSniffers)
+						this.Exception(ex);
+
+					await Client.DisposeAsync();
 					Log.Exception(ex);
 				}
 			}
 			else
-				Client.Dispose();
+				await Client.DisposeAsync();
 		}
 
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
@@ -1164,7 +1261,7 @@ namespace Waher.Networking.HTTP
 			Exception ex2 = Log.UnnestException(ex);
 			await Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
 
-			Client.Dispose();
+			await Client.DisposeAsync();
 		}
 #endif
 
@@ -1755,7 +1852,7 @@ namespace Waher.Networking.HTTP
 		public CommunicationStatistics GetCommunicationStatisticsSinceLast()
 		{
 			CommunicationStatistics Result;
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 
 			lock (this.statSynch)
 			{
@@ -1787,7 +1884,7 @@ namespace Waher.Networking.HTTP
 
 		private class RequestInfo
 		{
-			public DateTime Received = DateTime.Now;
+			public DateTime Received = DateTime.UtcNow;
 			public HttpResource Resource;
 			public string ClientAddress;
 			public string SubPath;

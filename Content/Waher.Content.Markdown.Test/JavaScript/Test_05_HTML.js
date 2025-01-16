@@ -37,7 +37,7 @@ function CreateHTML(Args)
 		"</p>\r\n",
 		"<p>",
 		"&copy;",
-		" Waher Data AB 2016-2024. All rights reserved.",
+		" Waher Data AB 2016-2025. All rights reserved.",
 		"</p>\r\n",
 		"<p>",
 		"AT",

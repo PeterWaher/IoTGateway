@@ -462,10 +462,8 @@ namespace Waher.Content
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			return (reference + this).GetHashCode();
+			return (JSON.UnixEpoch + this).GetHashCode();
 		}
-
-		private static readonly System.DateTime reference = new System.DateTime(2000, 1, 1);
 
 		/// <inheritdoc/>
 		public override string ToString()

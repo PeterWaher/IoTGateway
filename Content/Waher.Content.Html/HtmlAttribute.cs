@@ -10,7 +10,10 @@ namespace Waher.Content.Html
 	public class HtmlAttribute : HtmlNode
 	{
 		private LinkedList<HtmlNode> segments = null;
-		private readonly string name;
+		private readonly string fullName;
+		private readonly string localName;
+		private readonly string prefix;
+		private readonly bool hasPrefix;
 		private string @value;
 
 		/// <summary>
@@ -26,7 +29,8 @@ namespace Waher.Content.Html
 			int EndPosition, string Name, string Value)
 			: base(Document, Parent, StartPosition, EndPosition)
 		{
-			this.name = Name;
+			SplitName(Name, out this.prefix, out this.localName, out this.hasPrefix);
+			this.fullName = Name;
 			this.@value = Value;
 			this.segments = null;
 		}
@@ -43,7 +47,8 @@ namespace Waher.Content.Html
 			int EndPosition, string Name)
 			: base(Document, Parent, StartPosition, EndPosition)
 		{
-			this.name = Name;
+			SplitName(Name, out this.prefix, out this.localName, out this.hasPrefix);
+			this.fullName = Name;
 			this.@value = null;
 			this.segments = null;
 		}
@@ -56,10 +61,12 @@ namespace Waher.Content.Html
 		/// <param name="StartPosition">Start position.</param>
 		/// <param name="Name">Attribute name.</param>
 		/// <param name="Value">Attribute value.</param>
-		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition, string Name, string Value)
+		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition,
+			string Name, string Value)
 			: base(Document, Parent, StartPosition)
 		{
-			this.name = Name;
+			SplitName(Name, out this.prefix, out this.localName, out this.hasPrefix);
+			this.fullName = Name;
 			this.@value = Value;
 			this.segments = null;
 		}
@@ -74,15 +81,31 @@ namespace Waher.Content.Html
 		public HtmlAttribute(HtmlDocument Document, HtmlElement Parent, int StartPosition, string Name)
 			: base(Document, Parent, StartPosition)
 		{
-			this.name = Name;
+			SplitName(Name, out this.prefix, out this.localName, out this.hasPrefix);
+			this.fullName = Name;
 			this.@value = null;
 			this.segments = null;
 		}
 
 		/// <summary>
-		/// Attribute name.
+		/// Attribute full name (including prefix).
 		/// </summary>
-		public string Name => this.name;
+		public string FullName => this.fullName;
+
+		/// <summary>
+		/// Attribute local name.
+		/// </summary>
+		public string LocalName => this.localName;
+
+		/// <summary>
+		/// Attribute prefix.
+		/// </summary>
+		public string Prefix => this.prefix;
+
+		/// <summary>
+		/// If the attribute has a prefix.
+		/// </summary>
+		public bool HasPrefix => this.hasPrefix;
 
 		internal void Add(HtmlNode Segment)
 		{
@@ -93,10 +116,7 @@ namespace Waher.Content.Html
 			this.@value = null;
 		}
 
-		internal bool HasSegments
-		{
-			get { return !(this.segments is null); }
-		}
+		internal bool HasSegments => !(this.segments is null);
 
 		/// <summary>
 		/// Attribute value.
@@ -133,23 +153,26 @@ namespace Waher.Content.Html
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return this.name + "=" + this.Value;
+			if (this.hasPrefix)
+				return this.prefix + ":" + this.localName + "=" + this.Value;
+			else
+				return this.localName + "=" + this.Value;
 		}
 
 		/// <summary>
 		/// Exports the HTML document to XML.
 		/// </summary>
 		/// <param name="Output">XML Output</param>
-		public override void Export(XmlWriter Output)
+		/// <param name="Namespaces">Namespaces defined, by prefix.</param>
+		public override void Export(XmlWriter Output, Dictionary<string, string> Namespaces)
 		{
-			int i = this.name.IndexOf(':');
-			if (i < 0)
-				Output.WriteAttributeString(this.name, this.@value);
-			else
+			if (this.hasPrefix)
 			{
-				Output.WriteAttributeString(this.name.Substring(0, i),
-					this.name.Substring(i + 1), string.Empty, this.@value);
+				if (Namespaces.TryGetValue(this.prefix, out string Namespace))
+					Output.WriteAttributeString(this.prefix, this.localName, Namespace, this.@value);
 			}
+			else
+				Output.WriteAttributeString(this.localName, this.@value);
 		}
 
 		/// <summary>
@@ -157,12 +180,12 @@ namespace Waher.Content.Html
 		/// </summary>
 		/// <param name="Output">XML Output</param>
 		public override void Export(StringBuilder Output)
-        {
-            Output.Append(' ');
-            Output.Append(this.name);
-            Output.Append("=\"");
-            Output.Append(Xml.XML.Encode(this.@value));
-            Output.Append('"');
-        }
-    }
+		{
+			Output.Append(' ');
+			Output.Append(this.fullName);
+			Output.Append("=\"");
+			Output.Append(Xml.XML.Encode(this.@value));
+			Output.Append('"');
+		}
+	}
 }

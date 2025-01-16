@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP", "Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj", "{541672B7-E0BD-45A5-8603-D87C66008BB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Brotli", "Networking\Waher.Networking.HTTP.Brotli\Waher.Networking.HTTP.Brotli.csproj", "{A4C072CA-815A-4749-9B6B-F6F7303E6B94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Test", "Networking\Waher.Networking.HTTP.Test\Waher.Networking.HTTP.Test.csproj", "{67A769C9-E09A-4DB8-B5A7-C5D9EC48F608}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.TestServer", "Networking\Waher.Networking.HTTP.TestServer\Waher.Networking.HTTP.TestServer.csproj", "{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{541672B7-E0BD-45A5-8603-D87C66008BB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{541672B7-E0BD-45A5-8603-D87C66008BB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{541672B7-E0BD-45A5-8603-D87C66008BB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{541672B7-E0BD-45A5-8603-D87C66008BB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4C072CA-815A-4749-9B6B-F6F7303E6B94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4C072CA-815A-4749-9B6B-F6F7303E6B94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4C072CA-815A-4749-9B6B-F6F7303E6B94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4C072CA-815A-4749-9B6B-F6F7303E6B94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67A769C9-E09A-4DB8-B5A7-C5D9EC48F608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67A769C9-E09A-4DB8-B5A7-C5D9EC48F608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67A769C9-E09A-4DB8-B5A7-C5D9EC48F608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67A769C9-E09A-4DB8-B5A7-C5D9EC48F608}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A6F554A-711F-4815-B933-7A0E4EDDA1AA}
+	EndGlobalSection
+EndGlobal

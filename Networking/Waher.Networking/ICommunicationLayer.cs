@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 
@@ -49,53 +48,103 @@ namespace Waher.Networking
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		Task ReceiveBinary(byte[] Data);
+		void ReceiveBinary(bool ConstantBuffer, byte[] Data);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		Task ReceiveBinary(DateTime Timestamp, byte[] Data);
+		void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		Task TransmitBinary(byte[] Data);
+		void TransmitBinary(bool ConstantBuffer, byte[] Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		Task TransmitBinary(DateTime Timestamp, byte[] Data);
+		void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		Task ReceiveText(string Text);
+		void ReceiveText(string Text);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		Task ReceiveText(DateTime Timestamp, string Text);
+		void ReceiveText(DateTime Timestamp, string Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		Task TransmitText(string Text);
+		void TransmitText(string Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		Task TransmitText(DateTime Timestamp, string Text);
+		void TransmitText(DateTime Timestamp, string Text);
 	}
 }

@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.Test
 	/// https://datatracker.ietf.org/doc/html/rfc7541
 	/// </summary>
 	[TestClass]
-	public class Http2HeaderSerializationTests
+	public class Http20HeaderSerializationTests
 	{
 		/// <summary>
 		/// C.1.1.  Example 1: Encoding 10 Using a 5-Bit Prefix
@@ -95,13 +95,13 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(1U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(55U, d.DynamicHeaderSize);
+				Assert.AreEqual(55, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(1, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(55U, Rec.Length);
+				Assert.AreEqual(55, Rec.Length);
 				Assert.AreEqual("custom-key", Rec.Header.Header);
 				Assert.AreEqual("custom-header", Rec.Value);
 			}
@@ -131,7 +131,7 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(0U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(0U, d.DynamicHeaderSize);
+				Assert.AreEqual(0, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(0, Records.Length);
@@ -162,7 +162,7 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(0U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(0U, d.DynamicHeaderSize);
+				Assert.AreEqual(0, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(0, Records.Length);
@@ -193,7 +193,7 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(0U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(0U, d.DynamicHeaderSize);
+				Assert.AreEqual(0, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(0, Records.Length);
@@ -230,13 +230,13 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(1U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(57U, d.DynamicHeaderSize);
+				Assert.AreEqual(57, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(1, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(57U, Rec.Length);
+				Assert.AreEqual(57, Rec.Length);
 				Assert.AreEqual(":authority", Rec.Header.Header);
 				Assert.AreEqual("www.example.com", Rec.Value);
 			}
@@ -289,18 +289,18 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(2U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(110U, d.DynamicHeaderSize);
+				Assert.AreEqual(110, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(2, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(53U, Rec.Length);
+				Assert.AreEqual(53, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("no-cache", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(57U, Rec.Length);
+				Assert.AreEqual(57, Rec.Length);
 				Assert.AreEqual(":authority", Rec.Header.Header);
 				Assert.AreEqual("www.example.com", Rec.Value);
 			}
@@ -361,23 +361,23 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(3U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(164U, d.DynamicHeaderSize);
+				Assert.AreEqual(164, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(3, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(54U, Rec.Length);
+				Assert.AreEqual(54, Rec.Length);
 				Assert.AreEqual("custom-key", Rec.Header.Header);
 				Assert.AreEqual("custom-value", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(53U, Rec.Length);
+				Assert.AreEqual(53, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("no-cache", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(57U, Rec.Length);
+				Assert.AreEqual(57, Rec.Length);
 				Assert.AreEqual(":authority", Rec.Header.Header);
 				Assert.AreEqual("www.example.com", Rec.Value);
 			}
@@ -422,13 +422,13 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(1U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(57U, d.DynamicHeaderSize);
+				Assert.AreEqual(57, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(1, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(57U, Rec.Length);
+				Assert.AreEqual(57, Rec.Length);
 				Assert.AreEqual(":authority", Rec.Header.Header);
 				Assert.AreEqual("www.example.com", Rec.Value);
 			}
@@ -473,18 +473,18 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(2U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(110U, d.DynamicHeaderSize);
+				Assert.AreEqual(110, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(2, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(53U, Rec.Length);
+				Assert.AreEqual(53, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("no-cache", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(57U, Rec.Length);
+				Assert.AreEqual(57, Rec.Length);
 				Assert.AreEqual(":authority", Rec.Header.Header);
 				Assert.AreEqual("www.example.com", Rec.Value);
 			}
@@ -536,23 +536,23 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(3U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(164U, d.DynamicHeaderSize);
+				Assert.AreEqual(164, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(3, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(54U, Rec.Length);
+				Assert.AreEqual(54, Rec.Length);
 				Assert.AreEqual("custom-key", Rec.Header.Header);
 				Assert.AreEqual("custom-value", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(53U, Rec.Length);
+				Assert.AreEqual(53, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("no-cache", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(57U, Rec.Length);
+				Assert.AreEqual(57, Rec.Length);
 				Assert.AreEqual(":authority", Rec.Header.Header);
 				Assert.AreEqual("www.example.com", Rec.Value);
 			}
@@ -588,28 +588,28 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(4U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(222U, d.DynamicHeaderSize);
+				Assert.AreEqual(222, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(4, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(63U, Rec.Length);
+				Assert.AreEqual(63, Rec.Length);
 				Assert.AreEqual("location", Rec.Header.Header);
 				Assert.AreEqual("https://www.example.com", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(65U, Rec.Length);
+				Assert.AreEqual(65, Rec.Length);
 				Assert.AreEqual("date", Rec.Header.Header);
 				Assert.AreEqual("Mon, 21 Oct 2013 20:13:21 GMT", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(52U, Rec.Length);
+				Assert.AreEqual(52, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("private", Rec.Value);
 
 				Rec = Records[3];
-				Assert.AreEqual(42U, Rec.Length);
+				Assert.AreEqual(42, Rec.Length);
 				Assert.AreEqual(":status", Rec.Header.Header);
 				Assert.AreEqual("302", Rec.Value);
 			}
@@ -660,28 +660,28 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(4U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(222U, d.DynamicHeaderSize);
+				Assert.AreEqual(222, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(4, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(42U, Rec.Length);
+				Assert.AreEqual(42, Rec.Length);
 				Assert.AreEqual(":status", Rec.Header.Header);
 				Assert.AreEqual("307", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(63U, Rec.Length);
+				Assert.AreEqual(63, Rec.Length);
 				Assert.AreEqual("location", Rec.Header.Header);
 				Assert.AreEqual("https://www.example.com", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(65U, Rec.Length);
+				Assert.AreEqual(65, Rec.Length);
 				Assert.AreEqual("date", Rec.Header.Header);
 				Assert.AreEqual("Mon, 21 Oct 2013 20:13:21 GMT", Rec.Value);
 
 				Rec = Records[3];
-				Assert.AreEqual(52U, Rec.Length);
+				Assert.AreEqual(52, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("private", Rec.Value);
 			}
@@ -742,23 +742,23 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(3U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(215U, d.DynamicHeaderSize);
+				Assert.AreEqual(215, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(3, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(98U, Rec.Length);
+				Assert.AreEqual(98, Rec.Length);
 				Assert.AreEqual("set-cookie", Rec.Header.Header);
 				Assert.AreEqual("foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(52U, Rec.Length);
+				Assert.AreEqual(52, Rec.Length);
 				Assert.AreEqual("content-encoding", Rec.Header.Header);
 				Assert.AreEqual("gzip", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(65U, Rec.Length);
+				Assert.AreEqual(65, Rec.Length);
 				Assert.AreEqual("date", Rec.Header.Header);
 				Assert.AreEqual("Mon, 21 Oct 2013 20:13:22 GMT", Rec.Value);
 			}
@@ -804,28 +804,28 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(4U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(222U, d.DynamicHeaderSize);
+				Assert.AreEqual(222, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(4, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(63U, Rec.Length);
+				Assert.AreEqual(63, Rec.Length);
 				Assert.AreEqual("location", Rec.Header.Header);
 				Assert.AreEqual("https://www.example.com", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(65U, Rec.Length);
+				Assert.AreEqual(65, Rec.Length);
 				Assert.AreEqual("date", Rec.Header.Header);
 				Assert.AreEqual("Mon, 21 Oct 2013 20:13:21 GMT", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(52U, Rec.Length);
+				Assert.AreEqual(52, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("private", Rec.Value);
 
 				Rec = Records[3];
-				Assert.AreEqual(42U, Rec.Length);
+				Assert.AreEqual(42, Rec.Length);
 				Assert.AreEqual(":status", Rec.Header.Header);
 				Assert.AreEqual("302", Rec.Value);
 			}
@@ -868,28 +868,28 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(4U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(222U, d.DynamicHeaderSize);
+				Assert.AreEqual(222, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(4, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(42U, Rec.Length);
+				Assert.AreEqual(42, Rec.Length);
 				Assert.AreEqual(":status", Rec.Header.Header);
 				Assert.AreEqual("307", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(63U, Rec.Length);
+				Assert.AreEqual(63, Rec.Length);
 				Assert.AreEqual("location", Rec.Header.Header);
 				Assert.AreEqual("https://www.example.com", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(65U, Rec.Length);
+				Assert.AreEqual(65, Rec.Length);
 				Assert.AreEqual("date", Rec.Header.Header);
 				Assert.AreEqual("Mon, 21 Oct 2013 20:13:21 GMT", Rec.Value);
 
 				Rec = Records[3];
-				Assert.AreEqual(52U, Rec.Length);
+				Assert.AreEqual(52, Rec.Length);
 				Assert.AreEqual("cache-control", Rec.Header.Header);
 				Assert.AreEqual("private", Rec.Value);
 			}
@@ -942,23 +942,23 @@ namespace Waher.Networking.HTTP.Test
 			foreach (DynamicHeaders d in new DynamicHeaders[] { w, r })
 			{
 				Assert.AreEqual(3U, d.NrDynamicHeaderRecords);
-				Assert.AreEqual(215U, d.DynamicHeaderSize);
+				Assert.AreEqual(215, d.DynamicHeaderSize);
 
 				DynamicRecord[] Records = d.GetDynamicRecords();
 				Assert.AreEqual(3, Records.Length);
 
 				DynamicRecord Rec = Records[0];
-				Assert.AreEqual(98U, Rec.Length);
+				Assert.AreEqual(98, Rec.Length);
 				Assert.AreEqual("set-cookie", Rec.Header.Header);
 				Assert.AreEqual("foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1", Rec.Value);
 
 				Rec = Records[1];
-				Assert.AreEqual(52U, Rec.Length);
+				Assert.AreEqual(52, Rec.Length);
 				Assert.AreEqual("content-encoding", Rec.Header.Header);
 				Assert.AreEqual("gzip", Rec.Value);
 
 				Rec = Records[2];
-				Assert.AreEqual(65U, Rec.Length);
+				Assert.AreEqual(65, Rec.Length);
 				Assert.AreEqual("date", Rec.Header.Header);
 				Assert.AreEqual("Mon, 21 Oct 2013 20:13:22 GMT", Rec.Value);
 			}

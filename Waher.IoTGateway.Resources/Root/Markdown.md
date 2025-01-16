@@ -2062,7 +2062,7 @@ Script in Markdown can be processed in three different ways:
 1. **Inline processing**: The script is evaluated as part of rendering, and the result presented in the place of the script.
 2. **Pre-processing**: Script is evaluated prior to rendering the page for display. This allows script to modify the structure of the
 Markdown document.
-3. **Asynchronous processing*: Long-running script can be run asynchronously. This means the page is rendered and returned to the client.
+3. **Asynchronous processing**: Long-running script can be run asynchronously. This means the page is rendered and returned to the client.
 When the script is evaluated, it is returned to the client, which inserts it in the place of the script.
 
 ### Inline script
@@ -2194,7 +2194,7 @@ result loaded to the client. You can use the `preview` function to display a par
     Start:=Now;
     foreach x in 1..60 do
     (
-        System.Threading.Thread.Sleep(1000);
+        Sleep(1000);
         CPU:=join(CPU,(PerformanceCounterValue("Processor","_Total","% Processor Time") ??? Uniform(0,100)));
         TP:=join(TP,Now.Subtract(Start).TotalSeconds);
         preview(PlotCPU(TP,CPU))
@@ -2231,7 +2231,7 @@ CPU:=[];
 Start:=Now;
 foreach x in 1..60 do
 (
-    System.Threading.Thread.Sleep(1000);
+    Sleep(1000);
     CPU:=join(CPU,(PerformanceCounterValue("Processor","_Total","% Processor Time") ??? Uniform(0,100)));
     TP:=join(TP,Now.Subtract(Start).TotalSeconds);
     preview(PlotCPU(TP,CPU))
@@ -2312,11 +2312,11 @@ for all script on the server, if accessed through the `Global` variables collect
 
 Example:
 
-	This page has been viewed {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the server was last restarted.
+	This page has been viewed {Global.NrTimesMarkdownLoaded:=exists(Global.NrTimesMarkdownLoaded) ? Global.NrTimesMarkdownLoaded+1 : 1} times since the server was last restarted.
 
 This becomes:
 
-This page has been viewed {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the server was last restarted.
+This page has been viewed {Global.NrTimesMarkdownLoaded:=exists(Global.NrTimesMarkdownLoaded) ? Global.NrTimesMarkdownLoaded+1 : 1} times since the server was last restarted.
 
 **Note**: If the count does not increment when the page is loaded or refreshed, it means you're receiving a cached result. You can control
 page cache rules using [Metadata tags](#metadata).
@@ -2329,11 +2329,11 @@ temporary information related to the current page.
 
 Example:
 
-	This page has been viewed {Page.NrTimesMarkdownLoaded:=try Page.NrTimesMarkdownLoaded+1 catch 1} times since you last navigated to this page.
+	This page has been viewed {Page.NrTimesMarkdownLoaded:=exists(Page.NrTimesMarkdownLoaded) ? Page.NrTimesMarkdownLoaded+1 : 1} times since you last navigated to this page.
 
 This becomes:
 
-This page has been viewed {Page.NrTimesMarkdownLoaded:=try Page.NrTimesMarkdownLoaded+1 catch 1} times since you last navigated to this page.
+This page has been viewed {Page.NrTimesMarkdownLoaded:=exists(Page.NrTimesMarkdownLoaded) ? Page.NrTimesMarkdownLoaded+1 : 1} times since you last navigated to this page.
 
 ### Current request
 

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -89,7 +89,7 @@ namespace Waher.Content.Markdown.Functions
 			else
 				IncludeHeaders = false;
 
-			string Markdown = await Resources.ReadAllTextAsync(FileName);
+			string Markdown = await Files.ReadAllTextAsync(FileName);
 			MarkdownSettings Settings = new MarkdownSettings()
 			{
 				Variables = Variables,

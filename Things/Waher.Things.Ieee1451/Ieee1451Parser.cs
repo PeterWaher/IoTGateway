@@ -19,7 +19,7 @@ namespace Waher.Things.Ieee1451
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <returns>Message object, if able to parse the message, null otherwise.</returns>
-		public static Task<Message> TryParseMessage(byte[] Data)
+		public static Message TryParseMessage(byte[] Data)
 		{
 			return TryParseMessage(Data, null);
 		}
@@ -30,7 +30,7 @@ namespace Waher.Things.Ieee1451
 		/// <param name="Data">Binary data.</param>
 		/// <param name="ComLayer">Sniffable interface on which the message was received.</param>
 		/// <returns>Message object, if able to parse the message, null otherwise.</returns>
-		public static async Task<Message> TryParseMessage(byte[] Data, ICommunicationLayer ComLayer)
+		public static Message TryParseMessage(byte[] Data, ICommunicationLayer ComLayer)
 		{
 			NetworkServiceType NetworkServiceType = 0;
 			MessageType MessageType = 0;
@@ -55,7 +55,7 @@ namespace Waher.Things.Ieee1451
 						if (b < 1 || b > 4)
 						{
 							if (ComLayer?.HasSniffers ?? false)
-								await ComLayer.Error("Invalid Network Service Type: " + b.ToString());
+								ComLayer.Error("Invalid Network Service Type: " + b.ToString());
 
 							return null;
 						}
@@ -68,7 +68,7 @@ namespace Waher.Things.Ieee1451
 						if (b < 1 || b > 10)
 						{
 							if (ComLayer?.HasSniffers ?? false)
-								await ComLayer.Error("Invalid Discovery Service: " + b.ToString());
+								ComLayer.Error("Invalid Discovery Service: " + b.ToString());
 
 							return null;
 						}
@@ -81,7 +81,7 @@ namespace Waher.Things.Ieee1451
 						if (b < 1 || b > 20)
 						{
 							if (ComLayer?.HasSniffers ?? false)
-								await ComLayer.Error("Invalid Transducer Access Service: " + b.ToString());
+								ComLayer.Error("Invalid Transducer Access Service: " + b.ToString());
 
 							return null;
 						}
@@ -94,7 +94,7 @@ namespace Waher.Things.Ieee1451
 						if (b < 1 || b > 4)
 						{
 							if (ComLayer?.HasSniffers ?? false)
-								await ComLayer.Error("Invalid TEDS Access Service: " + b.ToString());
+								ComLayer.Error("Invalid TEDS Access Service: " + b.ToString());
 
 							return null;
 						}
@@ -107,7 +107,7 @@ namespace Waher.Things.Ieee1451
 						if (b < 1 || b > 12)
 						{
 							if (ComLayer?.HasSniffers ?? false)
-								await ComLayer.Error("Invalid Event Notification Service: " + b.ToString());
+								ComLayer.Error("Invalid Event Notification Service: " + b.ToString());
 
 							return null;
 						}
@@ -134,7 +134,7 @@ namespace Waher.Things.Ieee1451
 						if (TailLength < 0)
 						{
 							if (ComLayer?.HasSniffers ?? false)
-								await ComLayer.Error("Missing data bytes.");
+								ComLayer.Error("Missing data bytes.");
 
 							return null;
 						}
@@ -175,7 +175,7 @@ namespace Waher.Things.Ieee1451
 					case 10:
 					default:
 						if (ComLayer?.HasSniffers ?? false)
-							await ComLayer.Error("Invalid Parsing State: " + State.ToString());
+							ComLayer.Error("Invalid Parsing State: " + State.ToString());
 
 						return null;
 				}
@@ -184,7 +184,7 @@ namespace Waher.Things.Ieee1451
 			if (State != 10)
 			{
 				if (ComLayer?.HasSniffers ?? false)
-					await ComLayer.Error("Unexpected end of message.");
+					ComLayer.Error("Unexpected end of message.");
 
 				return null;
 			}
@@ -194,7 +194,7 @@ namespace Waher.Things.Ieee1451
 				case NetworkServiceType.DiscoveryServices:
 					if (ComLayer?.HasSniffers ?? false)
 					{
-						await ComLayer.Information(nameof(DiscoveryMessage) + "(" + NetworkServiceType.ToString() + "," +
+						ComLayer.Information(nameof(DiscoveryMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((DiscoveryService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +
 							Hashes.BinaryToString(Body, true) + ")");
 					}
@@ -204,7 +204,7 @@ namespace Waher.Things.Ieee1451
 				case NetworkServiceType.TransducerAccessServices:
 					if (ComLayer?.HasSniffers ?? false)
 					{
-						await ComLayer.Information(nameof(TransducerAccessMessage) + "(" + NetworkServiceType.ToString() + "," +
+						ComLayer.Information(nameof(TransducerAccessMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((TransducerAccessService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +
 							Hashes.BinaryToString(Body, true) + ")");
 					}
@@ -214,7 +214,7 @@ namespace Waher.Things.Ieee1451
 				case NetworkServiceType.TedsAccessServices:
 					if (ComLayer?.HasSniffers ?? false)
 					{
-						await ComLayer.Information(nameof(TedsAccessMessage) + "(" + NetworkServiceType.ToString() + "," +
+						ComLayer.Information(nameof(TedsAccessMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((TedsAccessService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +
 							Hashes.BinaryToString(Body, true) + ")");
 					}
@@ -224,7 +224,7 @@ namespace Waher.Things.Ieee1451
 				case NetworkServiceType.EventNotificationServices:
 					if (ComLayer?.HasSniffers ?? false)
 					{
-						await ComLayer.Information(nameof(EventNotificationMessage) + "(" + NetworkServiceType.ToString() + "," +
+						ComLayer.Information(nameof(EventNotificationMessage) + "(" + NetworkServiceType.ToString() + "," +
 							((EventNotificationService)NetworkServiceId).ToString() + "," + MessageType.ToString() + "," +
 							Hashes.BinaryToString(Body, true) + ")");
 					}
@@ -233,7 +233,7 @@ namespace Waher.Things.Ieee1451
 
 				default:
 					if (ComLayer?.HasSniffers ?? false)
-						await ComLayer.Error("Unsupported Network Service Type: " + NetworkServiceType.ToString());
+						ComLayer.Error("Unsupported Network Service Type: " + NetworkServiceType.ToString());
 
 					return null;
 			}

@@ -57,7 +57,7 @@ namespace Waher.Runtime.Text
 				{
 					Processed[i] = true;
 
-					if (b2 = (P.i2 < c2))
+					if (b2 = P.i2 < c2)
 					{
 						if (!Processed[i + c1p])
 						{

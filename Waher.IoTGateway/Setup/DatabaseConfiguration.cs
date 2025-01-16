@@ -4,17 +4,18 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Html;
+using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Content.Text;
+using Waher.Events;
+using Waher.IoTGateway.Setup.Databases;
+using Waher.IoTGateway.Setup.Databases.Sniffing;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
-using Waher.IoTGateway.Setup.Databases;
-using Waher.IoTGateway.Setup.Databases.Sniffing;
-using Waher.Content.Json;
-using Waher.Events;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -84,9 +85,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				if (this.sniffableDatabase is null)
-					this.sniffableDatabase = new SniffableDatabase();
-
+				this.sniffableDatabase ??= new SniffableDatabase();
 				return this.sniffableDatabase;
 			}
 		}
@@ -98,9 +97,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				if (this.sniffableLedger is null)
-					this.sniffableLedger = new SniffableLedger();
-
+				this.sniffableLedger ??= new SniffableLedger();
 				return this.sniffableLedger;
 			}
 		}
@@ -193,17 +190,30 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string PluginName))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string PluginName))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			Type PluginType = Types.GetType(PluginName)
-				?? throw new NotFoundException("Database plugin not found: " + PluginName);
+			Type PluginType = Types.GetType(PluginName);
+			if (PluginType is null)
+			{
+				await Response.SendResponse(new NotFoundException("Database plugin not found: " + PluginName));
+				return;
+			}
 
 			if (!(Types.Instantiate(PluginType) is IDatabasePlugin Plugin))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (this.databasePluginName != PluginName)
 			{
@@ -228,13 +238,13 @@ namespace Waher.IoTGateway.Setup
 			if (!string.IsNullOrEmpty(ResourceName))
 			{
 				if (ResourceName.StartsWith("/"))
-					ResourceName = ResourceName.Substring(1);
+					ResourceName = ResourceName[1..];
 
 				ResourceName = ResourceName.Replace('/', Path.DirectorySeparatorChar);
 				ResourceName = Path.Combine(Gateway.RootFolder, ResourceName);
 				if (File.Exists(ResourceName))
 				{
-					string Markdown = await Resources.ReadAllTextAsync(ResourceName);
+					string Markdown = await Files.ReadAllTextAsync(ResourceName);
 					MarkdownSettings Settings = new MarkdownSettings()
 					{
 						Variables = Request.Session
@@ -261,13 +271,19 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Form))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Form))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Form.TryGetValue("save", out Obj) ||
+			if (!Form.TryGetValue("save", out object Obj) ||
 				!(Obj is bool Save) ||
 				!Form.TryGetValue("Plugin", out Obj) ||
 				!(Obj is string PluginName) ||
@@ -275,7 +291,8 @@ namespace Waher.IoTGateway.Setup
 				this.databasePlugin is null ||
 				this.databasePluginSettings is null)
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			await this.databasePlugin.Test(Form, Save, this.databasePluginSettings);

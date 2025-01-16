@@ -2,13 +2,15 @@
 using System.Reflection;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Events;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Objects
 {
     /// <summary>
     /// Object value.
     /// </summary>
-    public sealed class ObjectValue : Element, IDisposable
+    public sealed class ObjectValue : Element, IDisposableAsync
     {
         private static readonly ObjectValues associatedSet = new ObjectValues();
 
@@ -117,12 +119,23 @@ namespace Waher.Script.Objects
 			}
 		}
 
-        /// <summary>
-        /// <see cref="IDisposable.Dispose"/>
-        /// </summary>
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
-            if (this.value is IDisposable D)
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
+		{
+			if (this.value is IDisposableAsync DAsync)
+				await DAsync.DisposeAsync();
+			else if (this.value is IDisposable D)
                 D.Dispose();
 		}
 	}

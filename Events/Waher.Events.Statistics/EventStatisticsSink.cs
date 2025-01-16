@@ -26,7 +26,7 @@ namespace Waher.Events.Statistics
 		public EventStatisticsSink(string ObjectID)
 			: base(ObjectID)
 		{
-			this.lastStat = DateTime.Now;
+			this.lastStat = DateTime.UtcNow;
 		}
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Waher.Events.Statistics
 		public EventStatistics GetStatisticsSinceLast()
 		{
 			EventStatistics Result;
-			DateTime TP = DateTime.Now;
+			DateTime TP = DateTime.UtcNow;
 
 			lock (this.synchObj)
 			{

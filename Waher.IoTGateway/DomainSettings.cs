@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
+using Waher.Runtime.IO;
 using Waher.Runtime.Settings;
 
 namespace Waher.IoTGateway
@@ -253,7 +254,7 @@ namespace Waher.IoTGateway
 
             int i = Host.LastIndexOf(':');
             if (i > 0)
-                Host = Host.Substring(0, i);
+				Host = Host[..i];
 
             if (Gateway.IsDomain(Host, true) && !Gateway.IsDomain(Host, false))
                 return Host;
@@ -532,7 +533,7 @@ namespace Waher.IoTGateway
             if (!string.IsNullOrEmpty(Content))
                 return Content;
 
-            return await Resources.ReadAllTextAsync(FileName);
+            return await Files.ReadAllTextAsync(FileName);
         }
 
         /// <summary>
@@ -575,7 +576,7 @@ namespace Waher.IoTGateway
                 }
             }
 
-            return await Resources.ReadAllBytesAsync(FileName);
+            return await Runtime.IO.Files.ReadAllBytesAsync(FileName);
         }
 
         /// <summary>

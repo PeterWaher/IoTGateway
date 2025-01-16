@@ -34,7 +34,7 @@ XEP-0363: HTTP File Upload
 XEP-0377: Spam Reporting
 
 Support for other extensions is provided by separate nuget packages. See: https://waher.se/IoTGateway/Libraries.md#networking</Description>
-    <Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2025. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -45,9 +45,9 @@ Support for other extensions is provided by separate nuget packages. See: https:
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.0.0</AssemblyVersion>
-    <FileVersion>4.0.0</FileVersion>
-    <Version>4.0.0</Version>
+    <AssemblyVersion>4.1.0</AssemblyVersion>
+    <FileVersion>4.1.0</FileVersion>
+    <Version>4.1.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -69,6 +69,7 @@ Support for other extensions is provided by separate nuget packages. See: https:
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />

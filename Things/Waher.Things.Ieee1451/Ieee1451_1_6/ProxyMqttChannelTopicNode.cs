@@ -203,7 +203,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// returned.
 		/// </summary>
 		/// <param name="Actor">Actor</param>
-		/// <returns></returns>
+		/// <returns>Read fields, if successful.</returns>
 		public async Task<Field[]> TryReadSensor(string Actor)
 		{
 			try
@@ -335,7 +335,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 				(ushort)this.ChannelId, StringValue, MainField.Timestamp, ToSniffer);
 
 			if (!(ToSniffer is null))
-				await BrokerNode.Information(ToSniffer.ToString());
+				BrokerNode.Information(ToSniffer.ToString());
 
 			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 		}
@@ -439,7 +439,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 
 			if (!(ToSniffer is null))
-				await BrokerNode.Information(ToSniffer.ToString());
+				BrokerNode.Information(ToSniffer.ToString());
 
 			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 		}

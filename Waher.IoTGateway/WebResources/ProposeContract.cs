@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Xml;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content;
+using Waher.Content.Markdown.Web.ScriptExtensions;
+using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Script;
-using Waher.Networking.HTTP.ScriptExtensions;
-using System.Text;
-using Waher.Content.Xml;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -53,24 +54,46 @@ namespace Waher.IoTGateway.WebResources
 				Gateway.AssertUserAuthenticated(Request, "Admin.Legal.ProposeContract");
 
 				if (Gateway.ContractsClient is null)
-					throw new NotSupportedException("Proposing new contracts not permitted. Broker does not support smart contracts.");
+				{
+					await Response.SendResponse(new NotSupportedException("Proposing new contracts not permitted. Broker does not support smart contracts."));
+					return;
+				}
 
 				if (!Request.HasData)
-					throw new BadRequestException("No data in post.");
+				{
+					await Response.SendResponse(new BadRequestException("No data in post."));
+					return;
+				}
 
 				Variables PageVariables = Page.GetPageVariables(Request.Session, "/ProposeContract.md");
-				object Posted = await Request.DecodeDataAsync();
-
-				if (Posted is XmlDocument Doc)
+				ContentResponse Posted = await Request.DecodeDataAsync();
+				
+				if (Posted.HasError)
 				{
-					ParsedContract ParsedContract = await Contract.Parse(Doc, Gateway.ContractsClient)
-						?? throw new BadRequestException("Unable to parse contract.");
+					await Response.SendResponse(Posted.Error);
+					return;
+				}
+
+				if (Posted.Decoded is XmlDocument Doc)
+				{
+					ParsedContract ParsedContract = await Contract.Parse(Doc, Gateway.ContractsClient);
+					if (ParsedContract?.Contract is null)
+					{
+						await Response.SendResponse(new BadRequestException("Unable to parse contract."));
+						return;
+					}
 
 					if (ParsedContract.HasStatus)
-						throw new ForbiddenException("Contract must not have a status section.");
+					{
+						await Response.SendResponse(new ForbiddenException("Contract must not have a status section."));
+						return;
+					}
 
 					if (!ParsedContract.ParametersValid && ParsedContract.Contract.PartsMode != ContractParts.TemplateOnly)
-						throw new BadRequestException("Contract parameter values not valid.");
+					{
+						await Response.SendResponse(new BadRequestException("Contract parameter values not valid."));
+						return;
+					}
 
 					StringBuilder sb = new StringBuilder();
 
@@ -86,12 +109,13 @@ namespace Waher.IoTGateway.WebResources
 
 					PageVariables["Contract"] = ParsedContract.Contract;
 				}
-				else if (Posted is bool Command)
+				else if (Posted.Decoded is bool Command)
 				{
 					if (!PageVariables.TryGetVariable("Contract", out Variable v) ||
 						!(v.ValueObject is Contract Contract))
 					{
-						throw new BadRequestException("No smart contract uploaded.");
+						await Response.SendResponse(new BadRequestException("No smart contract uploaded."));
+						return;
 					}
 
 					if (Command)
@@ -106,7 +130,10 @@ namespace Waher.IoTGateway.WebResources
 						PageVariables.Remove("Contract");
 				}
 				else
-					throw new UnsupportedMediaTypeException("Invalid type of posted data.");
+				{
+					await Response.SendResponse(new UnsupportedMediaTypeException("Invalid type of posted data."));
+					return;
+				}
 			}
 			catch (XmlException ex)
 			{

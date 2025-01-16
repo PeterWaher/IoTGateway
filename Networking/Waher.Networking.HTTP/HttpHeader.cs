@@ -27,6 +27,13 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Contains information about all fields in an HTTP header.
 		/// </summary>
+		public HttpHeader()
+		{
+		}
+
+		/// <summary>
+		/// Contains information about all fields in an HTTP header.
+		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
 		/// <param name="VanityResources">Registered vanity resources.</param>
 		public HttpHeader(string Header, VanityResources VanityResources)
@@ -61,6 +68,19 @@ namespace Waher.Networking.HTTP
 					this.fields[KeyLower] = Field;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Adds a field to the header.
+		/// </summary>
+		/// <param name="Key">Header key (or name).</param>
+		/// <param name="Value">Header value.</param>
+		/// <param name="IsLower">If <paramref name="Key"/> is lowercase already.</param>
+		public void AddField(string Key, string Value, bool IsLower)
+		{
+			string s = IsLower ? Key : Key.ToLower();
+			HttpField Field = this.ParseField(s, Key, Value);
+			this.fields[s] = Field;
 		}
 
 		/// <summary>
@@ -126,7 +146,7 @@ namespace Waher.Networking.HTTP
 				case "transfer-encoding": return this.transferEncoding = new HttpFieldTransferEncoding(Key, Value);
 				case "via": return this.via = new HttpFieldVia(Key, Value);
 				default: return new HttpField(Key, Value);
-			}
+			};
 		}
 
 		#region ICollection<HttpField>

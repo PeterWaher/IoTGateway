@@ -197,7 +197,7 @@ namespace Waher.Events.Files
 				return false;
 			}
 
-			DateTime Timestamp = XML.Attribute(Xml, "timestamp", DateTime.Now);
+			DateTime Timestamp = XML.Attribute(Xml, "timestamp", DateTime.UtcNow);
 			EventLevel Level = XML.Attribute(Xml, "level", EventLevel.Minor);
 			string EventId = XML.Attribute(Xml, "id");
 			string Object = XML.Attribute(Xml, "object");

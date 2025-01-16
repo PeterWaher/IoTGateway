@@ -70,9 +70,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			string Html;
 
@@ -103,12 +104,12 @@ namespace Waher.Content.Semantic
 			else if (Object is bool b)
 				Html = CommonTypes.Encode(b);
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object)));
 
 			byte[] Bin = Encoding.GetBytes(Html);
 			string ContentType = HtmlCodec.HtmlContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return new KeyValuePair<byte[], string>(Bin, ContentType);
+			return new ContentResponse(ContentType, Object, Bin);
 		}
 
 		/// <summary>

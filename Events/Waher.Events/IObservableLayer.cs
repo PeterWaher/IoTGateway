@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Events
 {
@@ -18,65 +17,65 @@ namespace Waher.Events
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		Task Information(string Comment);
+		void Information(string Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		Task Information(DateTime Timestamp, string Comment);
+		void Information(DateTime Timestamp, string Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		Task Warning(string Warning);
+		void Warning(string Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		Task Warning(DateTime Timestamp, string Warning);
+		void Warning(DateTime Timestamp, string Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		Task Error(string Error);
+		void Error(string Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		Task Error(DateTime Timestamp, string Error);
+		void Error(DateTime Timestamp, string Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		Task Exception(string Exception);
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		Task Exception(DateTime Timestamp, string Exception);
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Exception">Exception.</param>
-		Task Exception(Exception Exception);
+		void Exception(string Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		Task Exception(DateTime Timestamp, Exception Exception);
+		void Exception(DateTime Timestamp, string Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		void Exception(Exception Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		void Exception(DateTime Timestamp, Exception Exception);
 	}
 }

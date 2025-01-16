@@ -552,7 +552,16 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.master?.Dispose();
 			this.master = null;
@@ -576,8 +585,11 @@ namespace Waher.Persistence.Files
 			this.blocks?.Dispose();
 			this.blocks = null;
 
-			this.serializers?.Dispose();
-			this.serializers = null;
+			if (!(this.serializers is null))
+			{
+				await this.serializers.DisposeAsync();
+				this.serializers = null;
+			}
 
 			this.WriteTimestamp("Stop.txt");
 		}
@@ -1022,13 +1034,16 @@ namespace Waher.Persistence.Files
 		/// <param name="FileId">Internal file ID.</param>
 		internal void RemoveBlocks(int FileId)
 		{
-			long Min = this.GetBlockKey(FileId, 0);
-			long Max = this.GetBlockKey(FileId, uint.MaxValue);
-
-			foreach (long Key in this.blocks.GetKeys())
+			if (!(this.blocks is null))
 			{
-				if (Key >= Min && Key <= Max)
-					this.blocks.Remove(Key);
+				long Min = this.GetBlockKey(FileId, 0);
+				long Max = this.GetBlockKey(FileId, uint.MaxValue);
+
+				foreach (long Key in this.blocks.GetKeys())
+				{
+					if (Key >= Min && Key <= Max)
+						this.blocks.Remove(Key);
+				}
 			}
 		}
 
@@ -1083,7 +1098,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Block">Block.</param>
 		internal void AddBlockToCache(int FileId, uint BlockIndex, byte[] Block)
 		{
-			this.blocks.Add(this.GetBlockKey(FileId, BlockIndex), Block);
+			this.blocks?.Add(this.GetBlockKey(FileId, BlockIndex), Block);
 		}
 
 		/// <summary>
@@ -4141,7 +4156,7 @@ namespace Waher.Persistence.Files
 			while (await this.SaveUnsaved(First))
 				First = false;
 
-			this.Dispose();
+			await this.DisposeAsync();
 		}
 
 		/// <summary>

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Console;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -40,7 +41,7 @@ namespace Waher.Networking.XMPP.Test
 			if (xmlSniffer1 is null)
 			{
 				File.Delete("XMPP1.xml");
-				xmlSniffer1 = xmlSniffer1 = new XmlFileSniffer("XMPP1.xml",
+				xmlSniffer1 = new XmlFileSniffer("XMPP1.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 						int.MaxValue, BinaryPresentationMethod.Base64);
 			}
@@ -48,24 +49,30 @@ namespace Waher.Networking.XMPP.Test
 			if (xmlSniffer2 is null)
 			{
 				File.Delete("XMPP2.xml");
-				xmlSniffer2 = xmlSniffer2 = new XmlFileSniffer("XMPP2.xml",
+				xmlSniffer2 = new XmlFileSniffer("XMPP2.xml",
 						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 						int.MaxValue, BinaryPresentationMethod.Base64);
 			}
 		}
 
-		public static void DisposeSnifferAndLog()
+		public static async Task DisposeSnifferAndLog()
 		{
-			xmlSniffer1?.Dispose();
-			xmlSniffer1 = null;
+			if (xmlSniffer1 is not null)
+			{
+				await xmlSniffer1.DisposeAsync();
+				xmlSniffer1 = null;
+			}
 
-			xmlSniffer2?.Dispose();
-			xmlSniffer2 = null;
+			if (xmlSniffer2 is not null)
+			{
+				await xmlSniffer2.DisposeAsync();
+				xmlSniffer2 = null;
+			}
 
 			if (sink is not null)
 			{
 				Log.Unregister(sink);
-				sink.Dispose();
+				await sink.DisposeAsync();
 				sink = null;
 			}
 		}
@@ -97,7 +104,7 @@ namespace Waher.Networking.XMPP.Test
             this.client1.OnConnectionError += this.Client_OnConnectionError1;
 			this.client1.OnError += this.Client_OnError1;
 			this.client1.OnStateChanged += this.Client_OnStateChanged1;
-			await this.client1.Information("Starting test, client 1...");
+			this.client1.Information("Starting test, client 1...");
 
 			this.PrepareClient1(this.client1);
 
@@ -119,7 +126,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.OnConnectionError += this.Client_OnConnectionError2;
 			this.client2.OnError += this.Client_OnError2;
 			this.client2.OnStateChanged += this.Client_OnStateChanged2;
-			await this.client2.Information("Starting test, client 2...");
+			this.client2.Information("Starting test, client 2...");
 
 			this.PrepareClient2(this.client2);
 			
@@ -231,12 +238,12 @@ namespace Waher.Networking.XMPP.Test
 
 		private int Wait1(int Timeout)
 		{
-			return WaitHandle.WaitAny(new WaitHandle[] { this.connected1, this.error1, this.offline1 }, Timeout);
+			return WaitHandle.WaitAny([this.connected1, this.error1, this.offline1], Timeout);
 		}
 
 		private int Wait2(int Timeout)
 		{
-			return WaitHandle.WaitAny(new WaitHandle[] { this.connected2, this.error2, this.offline2 }, Timeout);
+			return WaitHandle.WaitAny([this.connected2, this.error2, this.offline2], Timeout);
 		}
 
 		private void WaitConnected1(int Timeout)
@@ -275,16 +282,18 @@ namespace Waher.Networking.XMPP.Test
 
 		public virtual async Task DisposeClients()
 		{
+			await ConsoleOut.FlushAsync();
+
 			if (this.client1 is not null)
 			{
-				await this.client1.Information("Stopping test, client 1...");
+				this.client1.Information("Stopping test, client 1...");
 				await this.client1.OfflineAndDisposeAsync(false);
 				this.client1 = null;
 			}
 
 			if (this.client2 is not null)
 			{
-				await this.client2.Information("Stopping test, client 2...");
+				this.client2.Information("Stopping test, client 2...");
 				await this.client2.OfflineAndDisposeAsync(false);
 				this.client2 = null;
 			}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -73,7 +74,11 @@ namespace Waher.Things.Modbus
 		/// Adds a sniffer
 		/// </summary>
 		/// <param name="Sniffer">Sniffer</param>
-		public void Add(ISniffer Sniffer) => this.sniffers.Add(Sniffer);
+		public void Add(ISniffer Sniffer)
+		{
+			if (!this.sniffers.Contains(Sniffer))
+				this.sniffers.Add(Sniffer);
+		}
 
 		/// <summary>
 		/// Adds a range of sniffers
@@ -103,119 +108,169 @@ namespace Waher.Things.Modbus
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data) => this.sniffers.ReceiveBinary(Data);
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data) => this.sniffers.ReceiveBinary(ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.sniffers.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data) => this.sniffers.TransmitBinary(Data);
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data) => this.sniffers.TransmitBinary(ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.sniffers.TransmitBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(string Text) => this.sniffers.ReceiveText(Text);
+		public void ReceiveText(string Text) => this.sniffers.ReceiveText(Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(string Text) => this.sniffers.TransmitText(Text);
+		public void TransmitText(string Text) => this.sniffers.TransmitText(Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(string Comment) => this.sniffers.Information(Comment);
+		public void Information(string Comment) => this.sniffers.Information(Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(string Warning) => this.sniffers.Warning(Warning);
+		public void Warning(string Warning) => this.sniffers.Warning(Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public Task Error(string Error) => this.sniffers.Error(Error);
+		public void Error(string Error) => this.sniffers.Error(Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(Exception Exception) => this.sniffers.Exception(Exception);
+		public void Exception(Exception Exception) => this.sniffers.Exception(Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(string Exception) => this.sniffers.Exception(Exception);
+		public void Exception(string Exception) => this.sniffers.Exception(Exception);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.sniffers.ReceiveBinary(Timestamp, Data);
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.sniffers.ReceiveBinary(Timestamp, ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.sniffers.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.sniffers.TransmitBinary(Timestamp, Data);
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.sniffers.TransmitBinary(Timestamp, ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.sniffers.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(DateTime Timestamp, string Text) => this.sniffers.ReceiveText(Timestamp, Text);
+		public void ReceiveText(DateTime Timestamp, string Text) => this.sniffers.ReceiveText(Timestamp, Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(DateTime Timestamp, string Text) => this.sniffers.TransmitText(Timestamp, Text);
+		public void TransmitText(DateTime Timestamp, string Text) => this.sniffers.TransmitText(Timestamp, Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(DateTime Timestamp, string Comment) => this.sniffers.Information(Timestamp, Comment);
+		public void Information(DateTime Timestamp, string Comment) => this.sniffers.Information(Timestamp, Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(DateTime Timestamp, string Warning) => this.sniffers.Warning(Timestamp, Warning);
+		public void Warning(DateTime Timestamp, string Warning) => this.sniffers.Warning(Timestamp, Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public Task Error(DateTime Timestamp, string Error) => this.sniffers.Error(Timestamp, Error);
+		public void Error(DateTime Timestamp, string Error) => this.sniffers.Error(Timestamp, Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, string Exception) => this.sniffers.Exception(Timestamp, Exception);
+		public void Exception(DateTime Timestamp, string Exception) => this.sniffers.Exception(Timestamp, Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, Exception Exception) => this.sniffers.Exception(Timestamp, Exception);
+		public void Exception(DateTime Timestamp, Exception Exception) => this.sniffers.Exception(Timestamp, Exception);
 
 		#endregion
 

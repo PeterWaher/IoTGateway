@@ -15,14 +15,16 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		public override void PrepareClient1(XmppClient Client)
         {
             base.PrepareClient1(Client);
-            this.endpointSecurity1 = new EndpointSecurity(this.client1, 128, this.endpoints1);
+            this.endpointSecurity1 = new EndpointSecurity(this.client1, this.SecurityStrength, this.endpoints1);
         }
 
         public override void PrepareClient2(XmppClient Client)
         {
             base.PrepareClient2(Client);
-            this.endpointSecurity2 = new EndpointSecurity(this.client2, 128, this.endpoints2);
+            this.endpointSecurity2 = new EndpointSecurity(this.client2, this.SecurityStrength, this.endpoints2);
         }
+
+        public abstract int SecurityStrength { get; }
 
         public override async Task ConnectClients()
         {
@@ -59,10 +61,10 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 
                 From.RequestPresenceSubscription(To.BareJID);
 
-                Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
+                Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 10000));
             }
         }
 
-        public abstract IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher);
+        public abstract IE2eEndpoint[] GenerateEndpoints(IE2eSymmetricCipher Cipher);
     }
 }

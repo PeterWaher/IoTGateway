@@ -88,7 +88,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					byte[] Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, this.EntityName, ToSniffer);
 
 					if (!(ToSniffer is null))
-						await BrokerNode.Information(ToSniffer.ToString());
+						BrokerNode.Information(ToSniffer.ToString());
 
 					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 					break;
@@ -113,7 +113,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					Response = DiscoveryMessage.SerializeResponse(0, this.NcapIdBinary, TimIds.ToArray(), Names.ToArray(), ToSniffer);
 
 					if (!(ToSniffer is null))
-						await BrokerNode.Information(ToSniffer.ToString());
+						BrokerNode.Information(ToSniffer.ToString());
 
 					await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 					break;
@@ -179,7 +179,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 
 			if (!(ToSniffer is null))
-				await BrokerNode.Information(ToSniffer.ToString());
+				BrokerNode.Information(ToSniffer.ToString());
 
 			await Broker.Publish(Topic, MqttQualityOfService.AtLeastOnce, false, Response);
 		}

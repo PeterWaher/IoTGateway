@@ -43,8 +43,9 @@ namespace Waher.IoTGateway.Cssx
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			string Cssx;
 
@@ -53,7 +54,9 @@ namespace Waher.IoTGateway.Cssx
 				Cssx = await rd.ReadToEndAsync();
 			}
 
-			string Css = await Convert(Cssx, State.Session, State.FromFileName);
+			string Css = await Convert(Cssx, State, State.FromFileName);
+			if (State.HasError)
+				return false;
 
 			byte[] Data = Utf8WithBOM.GetBytes(Css);
 			await State.To.WriteAsync(Data, 0, Data.Length);
@@ -66,12 +69,12 @@ namespace Waher.IoTGateway.Cssx
 		/// Converts CSSX to CSS, using the current theme
 		/// </summary>
 		/// <param name="Cssx">CSSX</param>
-		/// <param name="Session">Current session</param>
+		/// <param name="State">Conversion state.</param>
 		/// <param name="FileName">Source file name.</param>
 		/// <returns>CSS</returns>
-		public static Task<string> Convert(string Cssx, Variables Session, string FileName)
+		public static Task<string> Convert(string Cssx, ConversionState State, string FileName)
 		{
-			return Convert(Cssx, Session, FileName, true);
+			return Convert(Cssx, State, State.Session, FileName, true);
 		}
 
 		/// <summary>
@@ -80,15 +83,38 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="Cssx">CSSX</param>
 		/// <param name="Session">Current session</param>
 		/// <param name="FileName">Source file name.</param>
+		/// <returns>CSS</returns>
+		public static Task<string> Convert(string Cssx, Variables Session, string FileName)
+		{
+			return Convert(Cssx, null, Session, FileName, true);
+		}
+
+		/// <summary>
+		/// Converts CSSX to CSS, using the current theme
+		/// </summary>
+		/// <param name="Cssx">CSSX</param>
+		/// <param name="State">Conversion state, if available.</param>
+		/// <param name="Session">Current session</param>
+		/// <param name="FileName">Source file name.</param>
 		/// <param name="LockSession">If the session should be locked (true),
 		/// or if the caller has already locked the session (false).</param>
 		/// <returns>CSS</returns>
-		internal static async Task<string> Convert(string Cssx, Variables Session, string FileName, bool LockSession)
+		internal static async Task<string> Convert(string Cssx, ConversionState State, Variables Session, string FileName, bool LockSession)
 		{
 			bool Pushed = false;
 
 			if (Session is null)
-				throw new ArgumentNullException("No session defined.", nameof(Session));
+			{
+				Exception ex = new ArgumentNullException("No session defined.", nameof(Session));
+
+				if (State is null)
+					throw ex;
+				else
+				{
+					State.Error = ex;
+					return null;
+				}
+			}
 
 			if (LockSession)
 				await Session.LockAsync();
@@ -118,7 +144,7 @@ namespace Waher.IoTGateway.Cssx
 						break;
 
 					if (j > i)
-						Result.Append(Cssx.Substring(i, j - i));
+						Result.Append(Cssx[i..j]);
 
 					k = Cssx.IndexOf('¤', j + 1);
 					if (k < 0)
@@ -159,7 +185,7 @@ namespace Waher.IoTGateway.Cssx
 				}
 
 				if (i < c)
-					Result.Append(Cssx.Substring(i));
+					Result.Append(Cssx[i..]);
 
 				return Result.ToString();
 			}

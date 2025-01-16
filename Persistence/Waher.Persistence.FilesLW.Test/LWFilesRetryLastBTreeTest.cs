@@ -69,13 +69,13 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			ConsoleOut.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
 			if (this.provider is not null)
 			{
-				this.provider.Dispose();
+				await this.provider.DisposeAsync();
 				this.provider = null;
 				this.file = null;
 			}

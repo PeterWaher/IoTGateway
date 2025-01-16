@@ -14,7 +14,7 @@
 XEP-0124: Bidirectional-streams Over Synchronous HTTP (BOSH)
 XEP-0206: XMPP Over BOSH
 </Description>
-    <Copyright>Copyright © Waher Data AB 2018-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2018-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.BOSH</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
@@ -22,9 +22,9 @@ XEP-0206: XMPP Over BOSH
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp bosh http</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.0.0</AssemblyVersion>
-    <FileVersion>3.0.0</FileVersion>
-    <Version>3.0.0</Version>
+    <AssemblyVersion>3.1.0</AssemblyVersion>
+    <FileVersion>3.1.0</FileVersion>
+    <Version>3.1.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

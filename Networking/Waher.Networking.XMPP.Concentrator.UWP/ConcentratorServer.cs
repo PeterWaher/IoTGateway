@@ -31,13 +31,13 @@ using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-    /// <summary>
-    /// Implements an XMPP concentrator server interface.
-    /// 
-    /// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
-    /// https://neuro-foundation.io
-    /// </summary>
-    public class ConcentratorServer : XmppExtension
+	/// <summary>
+	/// Implements an XMPP concentrator server interface.
+	/// 
+	/// The interface is defined in the Neuro-Foundation XMPP IoT extensions:
+	/// https://neuro-foundation.io
+	/// </summary>
+	public class ConcentratorServer : XmppExtension
 	{
 		/// <summary>
 		/// urn:ieee:iot:concentrator:1.0
@@ -1454,6 +1454,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					ThingRef = Node.Parent;
 					Node = ThingRef as INode;
+
 					if (Node is null)
 						Node = await Rec.Source.GetNodeAsync(Node.Parent);
 				}
@@ -2804,10 +2805,15 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private static void DisposeObject(object Object)
+		private static Task DisposeObject(object Object)
 		{
+			if (Object is IDisposableAsync DisposableAsync)
+				return DisposableAsync.DisposeAsync();
+
 			if (Object is IDisposable Disposable)
 				Disposable.Dispose();
+
+			return Task.CompletedTask;
 		}
 
 		private async Task ExecuteNodeCommandHandler(object Sender, IqEventArgs e)
@@ -2875,7 +2881,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						if (!(Result.Errors is null))
 						{
-							DisposeObject(Command);
+							await DisposeObject(Command);
 
 							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
 							await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
@@ -2891,7 +2897,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					finally
 					{
 						if (Command.Type != CommandType.Simple)
-							DisposeObject(Command);
+							await DisposeObject(Command);
 					}
 
 					await e.IqResult(string.Empty);
@@ -2957,7 +2963,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (!(Result.Errors is null))
 					{
-						DisposeObject(Command);
+						await DisposeObject(Command);
 						await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 						return;
 					}
@@ -2966,7 +2972,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (!this.RegisterQuery(Query))
 					{
-						DisposeObject(Command);
+						await DisposeObject(Command);
 						await e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
 						return;
 					}
@@ -3007,7 +3013,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					finally
 					{
-						DisposeObject(Command);
+						await DisposeObject(Command);
 					}
 				}
 			}
@@ -3416,13 +3422,22 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						try
 						{
-							KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
+							ContentResponse Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
 
-							Xml.Append("<base64 contentType='");
-							Xml.Append(XML.Encode(Encoded.Value));
-							Xml.Append("'>");
-							Xml.Append(Convert.ToBase64String(Encoded.Key));
-							Xml.Append("</base64>");
+							if (Encoded.HasError)
+							{
+								Xml.Append("<string>");
+								Xml.Append(XML.Encode(Encoded.Error.Message));
+								Xml.Append("</string>");
+							}
+							else
+							{
+								Xml.Append("<base64 contentType='");
+								Xml.Append(XML.Encode(Encoded.ContentType));
+								Xml.Append("'>");
+								Xml.Append(Convert.ToBase64String(Encoded.Encoded));
+								Xml.Append("</base64>");
+							}
 						}
 						catch (Exception ex)
 						{
@@ -3448,15 +3463,28 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-			KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(e.Object, Encoding.UTF8);
+			ContentResponse Encoded = await InternetContent.EncodeAsync(e.Object, Encoding.UTF8);
 
 			this.StartQueryProgress(Xml, e);
 
-			Xml.Append("<newObject contentType='");
-			Xml.Append(XML.Encode(Encoded.Value));
-			Xml.Append("'>");
-			Xml.Append(Convert.ToBase64String(Encoded.Key));
-			Xml.Append("</newObject>");
+			if (Encoded.HasError)
+			{
+				Xml.Append("<queryMessage type='");
+				Xml.Append(QueryEventType.Exception.ToString());
+				Xml.Append("' level='");
+				Xml.Append(QueryEventLevel.Medium.ToString());
+				Xml.Append("'>");
+				Xml.Append(XML.Encode(Encoded.Error.Message));
+				Xml.Append("</queryMessage>");
+			}
+			else
+			{
+				Xml.Append("<newObject contentType='");
+				Xml.Append(XML.Encode(Encoded.ContentType));
+				Xml.Append("'>");
+				Xml.Append(Convert.ToBase64String(Encoded.Encoded));
+				Xml.Append("</newObject>");
+			}
 
 			this.EndQueryProgress(Xml);
 
@@ -3878,7 +3906,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (!(Result.Errors is null))
 				{
-					DisposeObject(Command);
+					await DisposeObject(Command);
 					await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					return;
 				}
@@ -3914,7 +3942,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			if (Command.Type != CommandType.Simple)
-				DisposeObject(Command);
+				await DisposeObject(Command);
 
 			Xml.Append("</partialExecution>");
 
@@ -4031,7 +4059,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (!(Result.Errors is null))
 			{
-				DisposeObject(Command);
+				await DisposeObject(Command);
 				await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 				return;
 			}
@@ -4048,7 +4076,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (Query is null)
 			{
-				DisposeObject(Command);
+				await DisposeObject(Command);
 				await e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
 				return;
 			}
@@ -4109,7 +4137,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await Query.Abort();
 			}
 
-			DisposeObject(Command);
+			await DisposeObject(Command);
 
 			Xml.Append("</partialExecution>");
 

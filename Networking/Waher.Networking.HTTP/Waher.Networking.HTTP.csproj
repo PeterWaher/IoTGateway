@@ -9,7 +9,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Class library providing a simple HTTP(S) server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges. Supports the WebSocket protocol. Supports HTTP/1.1 and HTTP/2.</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP</PackageProjectUrl>
     <PackageIconUrl />
@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication server web http https websockets http2</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>3.0.0</AssemblyVersion>
-    <FileVersion>3.0.0</FileVersion>
-    <Version>3.0.0</Version>
+    <AssemblyVersion>4.0.0</AssemblyVersion>
+    <FileVersion>4.0.0</FileVersion>
+    <Version>4.0.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.HTTP\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -41,6 +41,7 @@
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Text\Waher.Runtime.Text.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />

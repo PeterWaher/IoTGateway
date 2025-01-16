@@ -107,532 +107,107 @@ namespace Waher.Content.Images.Test
 		// Sample images used from this repository, downloaded in parallel to the IoT Gateway repository:
 		// https://github.com/ianare/exif-samples
 
-		[TestMethod]
-		public void Test_JPEG_01()
-		{
-			TestImage(jpgFiles, 01, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_02()
-		{
-			TestImage(jpgFiles, 02, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_03()
-		{
-			TestImage(jpgFiles, 03, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_04()
-		{
-			TestImage(jpgFiles, 04, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_05()
-		{
-			TestImage(jpgFiles, 05, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_06()
-		{
-			TestImage(jpgFiles, 06, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_07()
-		{
-			TestImage(jpgFiles, 07, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_08()
-		{
-			TestImage(jpgFiles, 08, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_09()
-		{
-			TestImage(jpgFiles, 09, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_10()
-		{
-			TestImage(jpgFiles, 10, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_11()
-		{
-			TestImage(jpgFiles, 11, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_12()
-		{
-			TestImage(jpgFiles, 12, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_13()
-		{
-			TestImage(jpgFiles, 13, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_14()
-		{
-			TestImage(jpgFiles, 14, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_15()
-		{
-			TestImage(jpgFiles, 15, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_16()
-		{
-			TestImage(jpgFiles, 16, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_17()
-		{
-			TestImage(jpgFiles, 17, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_18()
-		{
-			TestImage(jpgFiles, 18, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_19()
-		{
-			TestImage(jpgFiles, 19, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_20()
-		{
-			TestImage(jpgFiles, 20, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_21()
-		{
-			TestImage(jpgFiles, 21, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_22()
-		{
-			TestImage(jpgFiles, 22, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_23()
-		{
-			TestImage(jpgFiles, 23, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_24()
-		{
-			TestImage(jpgFiles, 24, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_25()
-		{
-			TestImage(jpgFiles, 25, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_26()
-		{
-			TestImage(jpgFiles, 26, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_27()
-		{
-			TestImage(jpgFiles, 27, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_28()
-		{
-			TestImage(jpgFiles, 28, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_29()
-		{
-			TestImage(jpgFiles, 29, false);    // No EXIF
-		}
-
-		[TestMethod]
-		public void Test_JPEG_30()
-		{
-			TestImage(jpgFiles, 30, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_31()
-		{
-			TestImage(jpgFiles, 31, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_32()
-		{
-			TestImage(jpgFiles, 32, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_33()
-		{
-			TestImage(jpgFiles, 33, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_34()
-		{
-			TestImage(jpgFiles, 34, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_35()
-		{
-			TestImage(jpgFiles, 35, false);    // No EXIF
-		}
-
-		[TestMethod]
-		public void Test_JPEG_36()
-		{
-			TestImage(jpgFiles, 36, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_37()
-		{
-			TestImage(jpgFiles, 37, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_38()
-		{
-			TestImage(jpgFiles, 38, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_39()
-		{
-			TestImage(jpgFiles, 39, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_40()
-		{
-			TestImage(jpgFiles, 40, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_41()
-		{
-			TestImage(jpgFiles, 41, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_42()
-		{
-			TestImage(jpgFiles, 42, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_43()
-		{
-			TestImage(jpgFiles, 43, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_44()
-		{
-			TestImage(jpgFiles, 44, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_45()
-		{
-			TestImage(jpgFiles, 45, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_46()
-		{
-			TestImage(jpgFiles, 46, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_47()
-		{
-			TestImage(jpgFiles, 47, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_48()
-		{
-			TestImage(jpgFiles, 48, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_49()
-		{
-			TestImage(jpgFiles, 49, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_50()
-		{
-			TestImage(jpgFiles, 50, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_51()
-		{
-			TestImage(jpgFiles, 51, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_52()
-		{
-			TestImage(jpgFiles, 52, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_53()
-		{
-			TestImage(jpgFiles, 53, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_54()
-		{
-			TestImage(jpgFiles, 54, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_55()
-		{
-			TestImage(jpgFiles, 55, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_56()
-		{
-			TestImage(jpgFiles, 56, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_57()
-		{
-			TestImage(jpgFiles, 57, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_58()
-		{
-			TestImage(jpgFiles, 58, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_59()
-		{
-			TestImage(jpgFiles, 59, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_60()
-		{
-			TestImage(jpgFiles, 60, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_61()
-		{
-			TestImage(jpgFiles, 61, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_62()
-		{
-			TestImage(jpgFiles, 62, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_63()
-		{
-			TestImage(jpgFiles, 63, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_64()
-		{
-			TestImage(jpgFiles, 64, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_65()
-		{
-			TestImage(jpgFiles, 65, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_66()
-		{
-			TestImage(jpgFiles, 66, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_67()
-		{
-			TestImage(jpgFiles, 67, false);    // Backwards offset
-		}
-
-		[TestMethod]
-		public void Test_JPEG_68()
-		{
-			TestImage(jpgFiles, 68, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_69()
-		{
-			TestImage(jpgFiles, 69, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_70()
-		{
-			TestImage(jpgFiles, 70, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_71()
-		{
-			TestImage(jpgFiles, 71, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_72()
-		{
-			TestImage(jpgFiles, 72, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_73()
-		{
-			TestImage(jpgFiles, 73, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_74()
-		{
-			TestImage(jpgFiles, 74, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_75()
-		{
-			TestImage(jpgFiles, 75, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_76()
-		{
-			TestImage(jpgFiles, 76, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_77()
-		{
-			TestImage(jpgFiles, 77, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_78()
-		{
-			TestImage(jpgFiles, 78, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_79()
-		{
-			TestImage(jpgFiles, 79, true);
-		}
-
-		[TestMethod]
-		public void Test_JPEG_80()
-		{
-			TestImage(jpgFiles, 80, false);    // No EXIF
-		}
-
-		[TestMethod]
-		public void Test_JPEG_81()
-		{
-			TestImage(jpgFiles, 81, true);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_01()
-		{
-			TestImage(invalidJpgFiles, 01, false);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_02()
-		{
-			TestImage(invalidJpgFiles, 02, false);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_03()
-		{
-			TestImage(invalidJpgFiles, 03, false);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_04()
-		{
-			TestImage(invalidJpgFiles, 04, false);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_05()
-		{
-			TestImage(invalidJpgFiles, 05, false);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_06()
-		{
-			TestImage(invalidJpgFiles, 06, false);
-		}
-
-		[TestMethod]
-		public void Test_Invalid_JPEG_07()
-		{
-			TestImage(invalidJpgFiles, 07, false);
+		[DataTestMethod]
+		[DataRow(01, true)]
+		[DataRow(02, true)]
+		[DataRow(03, true)]
+		[DataRow(04, true)]
+		[DataRow(05, true)]
+		[DataRow(06, true)]
+		[DataRow(07, true)]
+		[DataRow(08, true)]
+		[DataRow(09, true)]
+		[DataRow(10, true)]
+		[DataRow(11, true)]
+		[DataRow(12, true)]
+		[DataRow(13, true)]
+		[DataRow(14, true)]
+		[DataRow(15, true)]
+		[DataRow(16, true)]
+		[DataRow(17, true)]
+		[DataRow(18, true)]
+		[DataRow(19, true)]
+		[DataRow(20, true)]
+		[DataRow(21, true)]
+		[DataRow(22, true)]
+		[DataRow(23, true)]
+		[DataRow(24, true)]
+		[DataRow(25, true)]
+		[DataRow(26, true)]
+		[DataRow(27, true)]
+		[DataRow(28, true)]
+		[DataRow(29, false)]    // No EXIF
+		[DataRow(30, true)]
+		[DataRow(31, true)]
+		[DataRow(32, true)]
+		[DataRow(33, true)]
+		[DataRow(34, true)]
+		[DataRow(35, false)]    // No EXIF
+		[DataRow(35, true)]
+		[DataRow(36, true)]
+		[DataRow(37, true)]
+		[DataRow(38, true)]
+		[DataRow(39, true)]
+		[DataRow(40, true)]
+		[DataRow(41, true)]
+		[DataRow(42, true)]
+		[DataRow(43, true)]
+		[DataRow(44, true)]
+		[DataRow(45, true)]
+		[DataRow(46, true)]
+		[DataRow(47, true)]
+		[DataRow(48, true)]
+		[DataRow(49, true)]
+		[DataRow(50, true)]
+		[DataRow(51, true)]
+		[DataRow(52, true)]
+		[DataRow(53, true)]
+		[DataRow(54, true)]
+		[DataRow(55, true)]
+		[DataRow(56, true)]
+		[DataRow(57, true)]
+		[DataRow(58, true)]
+		[DataRow(59, true)]
+		[DataRow(60, true)]
+		[DataRow(61, true)]
+		[DataRow(62, true)]
+		[DataRow(63, true)]
+		[DataRow(64, true)]
+		[DataRow(65, true)]
+		[DataRow(66, true)]
+		[DataRow(67, false)]    // Backwards offset
+		[DataRow(68, true)]
+		[DataRow(69, true)]
+		[DataRow(70, true)]
+		[DataRow(71, true)]
+		[DataRow(72, true)]
+		[DataRow(73, true)]
+		[DataRow(74, true)]
+		[DataRow(75, true)]
+		[DataRow(76, true)]
+		[DataRow(77, true)]
+		[DataRow(78, true)]
+		[DataRow(79, true)]
+		[DataRow(80, false)]    // No EXIF
+		[DataRow(81, true)]
+		[Ignore]
+		public void Test_Valid_JPEG(int Index, bool ExpectedResult)
+		{
+			TestImage(jpgFiles, Index, ExpectedResult);
+		}
+
+		[DataTestMethod]
+		[DataRow(01)]
+		[DataRow(02)]
+		[DataRow(03)]
+		[DataRow(04)]
+		[DataRow(05)]
+		[DataRow(06)]
+		[DataRow(07)]
+		[Ignore]
+		public void Test_Invalid_JPEG(int Index)
+		{
+			TestImage(invalidJpgFiles, Index, false);
 		}
 
 		[TestMethod]

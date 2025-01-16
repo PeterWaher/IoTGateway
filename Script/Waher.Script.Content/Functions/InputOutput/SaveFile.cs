@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -71,26 +72,22 @@ namespace Waher.Script.Content.Functions.InputOutput
 			if (Obj is Graph G)
 				Obj = G.CreatePixels();
 
-			byte[] Bin = null;
+			ContentResponse Content;
 
 			if (InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType) &&
 				InternetContent.Encodes(Obj, out Grade _, out IContentEncoder Encoder, ContentType))
 			{
-				KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Obj, System.Text.Encoding.UTF8, ContentType);
-				Bin = P.Key;
-				ContentType = P.Value;
+				Content = await Encoder.EncodeAsync(Obj, System.Text.Encoding.UTF8, null, ContentType);
 			}
+			else
+				Content = await InternetContent.EncodeAsync(Obj, System.Text.Encoding.UTF8);
 
-			if (Bin is null)
-			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Obj, System.Text.Encoding.UTF8);
-				Bin = P.Key;
-				ContentType = P.Value;
-			}
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
 
 			using (FileStream fs = File.Create(FileName))
 			{
-				await fs.WriteAsync(Bin, 0, Bin.Length);
+				await fs.WriteAsync(Content.Encoded, 0, Content.Encoded.Length);
 			}
 
 			return new StringValue(ContentType);

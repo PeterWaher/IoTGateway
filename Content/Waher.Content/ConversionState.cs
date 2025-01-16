@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Waher.Script;
 
 namespace Waher.Content
@@ -84,5 +85,15 @@ namespace Waher.Content
 		/// Can be null if there are no alternatives.
 		/// </summary>
 		public string[] PossibleContentTypes { get; }
+
+		/// <summary>
+		/// Error response, in case conversion should return an error.
+		/// </summary>
+		public Exception Error { get; set; }
+
+		/// <summary>
+		/// If an error should be returned.
+		/// </summary>
+		public bool HasError => !(this.Error is null);
 	}
 }

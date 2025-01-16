@@ -76,8 +76,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			string ContentType;
-			byte[] Bin;
+			ContentResponse Content;
 
 			if (Arguments.Length > 1)
 			{
@@ -90,18 +89,12 @@ namespace Waher.Script.Content.Functions.Encoding
 				for (i = 0; i < c; i++)
 					AcceptedTypes[i] = (await WaitPossibleTask(A.GetValue(i)))?.ToString();
 
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8, AcceptedTypes);
-				Bin = P.Key;
-				ContentType = P.Value;
+				Content = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8, AcceptedTypes);
 			}
 			else
-			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8);
-				Bin = P.Key;
-				ContentType = P.Value;
-			}
+				Content = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8);
 
-			return new ObjectVector(new ObjectValue(Bin), new StringValue(ContentType));
+			return new ObjectVector(new ObjectValue(Content.Encoded), new StringValue(Content.ContentType));
 		}
 
 	}

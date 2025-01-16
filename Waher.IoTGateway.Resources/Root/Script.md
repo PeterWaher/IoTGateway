@@ -291,7 +291,7 @@ greater-than comparison of the variable `x` with `10`.
 
 ##### Subsets
 
-Subsets can be creted by allowing the expression in the implicit set definition to be a simple variable reference belonging to a superset, 
+Subsets can be created by allowing the expression in the implicit set definition to be a simple variable reference belonging to a superset, 
 and then allowing the conditions in the definition to limit the elements belonging to the subset. Examples:
 
 	S:={x in Z:x>10}

@@ -11,7 +11,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
@@ -88,6 +87,7 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway
 {
@@ -381,9 +381,7 @@ namespace Waher.IoTGateway
 								break;
 
 							case "DefaultPage":
-								if (defaultPageByHostName is null)
-									defaultPageByHostName = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
-
+								defaultPageByHostName ??= new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 								defaultPageByHostName[XML.Attribute(E, "host")] = E.InnerText;
 								break;
 
@@ -399,9 +397,7 @@ namespace Waher.IoTGateway
 										ClientCertificates ClientCertificatesPort = XML.Attribute(E2, "clientCertificates", ClientCertificates);
 										bool TrustClientCertificatesPort = XML.Attribute(E2, "trustCertificates", TrustClientCertificates);
 
-										if (PortSpecificMTlsSettings is null)
-											PortSpecificMTlsSettings = new Dictionary<int, KeyValuePair<ClientCertificates, bool>>();
-
+										PortSpecificMTlsSettings ??= new Dictionary<int, KeyValuePair<ClientCertificates, bool>>();
 										PortSpecificMTlsSettings[PortNumber] = new KeyValuePair<ClientCertificates, bool>(ClientCertificatesPort, TrustClientCertificatesPort);
 									}
 								}
@@ -466,17 +462,22 @@ namespace Waher.IoTGateway
 
 									do
 									{
+										Now = DateTime.Now;
+
 										exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
 											" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
 
 										try
 										{
-											exceptionFile = File.CreateText(exceptionFileName);
+											if (!File.Exists(exceptionFileName))
+												exceptionFile = File.CreateText(exceptionFileName);
+											else
+												await Task.Delay(1000);
 										}
 										catch (IOException)
 										{
 											exceptionFile = null;
-											Thread.Sleep(1000);
+											await Task.Delay(1000);
 										}
 									}
 									while (exceptionFile is null && --MaxTries > 0);
@@ -486,7 +487,7 @@ namespace Waher.IoTGateway
 									if (exportExceptions)
 									{
 										exceptionFile.Write("Start of export: ");
-										exceptionFile.WriteLine(DateTime.Now.ToString());
+										exceptionFile.WriteLine(DateTime.UtcNow.ToString());
 
 										AppDomain.CurrentDomain.FirstChanceException += (Sender, e) =>
 										{
@@ -506,7 +507,7 @@ namespace Waher.IoTGateway
 														exceptionFile.WriteLine("null");
 
 													exceptionFile.Write("Time: ");
-													exceptionFile.WriteLine(DateTime.Now.ToString());
+													exceptionFile.WriteLine(DateTime.UtcNow.ToString());
 
 													if (!(e.Exception is null))
 													{
@@ -659,7 +660,7 @@ namespace Waher.IoTGateway
 				}
 				catch (Exception ex)
 				{
-					Event Event = new Event(DateTime.Now, EventType.Critical, ex.Message, PersistedEventLog.ObjectID, string.Empty, string.Empty,
+					Event Event = new Event(DateTime.UtcNow, EventType.Critical, ex.Message, PersistedEventLog.ObjectID, string.Empty, string.Empty,
 						EventLevel.Major, string.Empty, ex.Source, Log.CleanStackTrace(ex.StackTrace));
 
 					Event.Avoid(PersistedEventLog);
@@ -667,14 +668,11 @@ namespace Waher.IoTGateway
 					Log.Event(Event);
 				}
 
-				if (loginAuditor is null)
-				{
-					loginAuditor = new LoginAuditor("Login Auditor",
-						new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
-						new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
-						new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
-						new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
-				}
+				loginAuditor ??= new LoginAuditor("Login Auditor",
+					new LoginInterval(5, TimeSpan.FromHours(1)),    // Maximum 5 failed login attempts in an hour
+					new LoginInterval(2, TimeSpan.FromDays(1)),     // Maximum 2x5 failed login attempts in a day
+					new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
+					new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
 
 				Log.Register(loginAuditor);
 
@@ -720,9 +718,7 @@ namespace Waher.IoTGateway
 								await SystemConfiguration.MakeCompleted();
 								await Database.Update(SystemConfiguration);
 
-								if (NewConfigurations is null)
-									NewConfigurations = new LinkedList<SystemConfiguration>();
-
+								NewConfigurations ??= new LinkedList<SystemConfiguration>();
 								NewConfigurations.AddLast(SystemConfiguration);
 								continue;
 							}
@@ -732,9 +728,7 @@ namespace Waher.IoTGateway
 								await SystemConfiguration.MakeCompleted();
 								await Database.Update(SystemConfiguration);
 
-								if (NewConfigurations is null)
-									NewConfigurations = new LinkedList<SystemConfiguration>();
-
+								NewConfigurations ??= new LinkedList<SystemConfiguration>();
 								NewConfigurations.AddLast(SystemConfiguration);
 								continue;
 							}
@@ -761,9 +755,7 @@ namespace Waher.IoTGateway
 							await SystemConfiguration.MakeCompleted();
 							await Database.Update(SystemConfiguration);
 
-							if (NewConfigurations is null)
-								NewConfigurations = new LinkedList<SystemConfiguration>();
-
+							NewConfigurations ??= new LinkedList<SystemConfiguration>();
 							NewConfigurations.AddLast(SystemConfiguration);
 							continue;
 						}
@@ -773,9 +765,7 @@ namespace Waher.IoTGateway
 							await SystemConfiguration.MakeCompleted();
 							await Database.Update(SystemConfiguration);
 
-							if (NewConfigurations is null)
-								NewConfigurations = new LinkedList<SystemConfiguration>();
-
+							NewConfigurations ??= new LinkedList<SystemConfiguration>();
 							NewConfigurations.AddLast(SystemConfiguration);
 							continue;
 						}
@@ -1003,6 +993,11 @@ namespace Waher.IoTGateway
 						}
 					}
 				}
+
+				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
+				// to avoid congestion.
+
+				webServer.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, false, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
@@ -1276,7 +1271,7 @@ namespace Waher.IoTGateway
 							{
 								FileName = LanguageFile;
 								if (FileName.StartsWith(BinaryFolder))
-									FileName = FileName.Substring(BinaryFolder.Length);
+									FileName = FileName[BinaryFolder.Length..];
 
 								DateTime LastWriteTime = File.GetLastWriteTime(LanguageFile);
 								DateTime LastImportedTime = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
@@ -1285,7 +1280,7 @@ namespace Waher.IoTGateway
 								{
 									Log.Informational("Importing language file.", FileName);
 
-									Xml = await Resources.ReadAllTextAsync(LanguageFile);
+									Xml = await Files.ReadAllTextAsync(LanguageFile);
 									XmlDocument Doc = new XmlDocument()
 									{
 										PreserveWhitespace = true
@@ -1318,7 +1313,7 @@ namespace Waher.IoTGateway
 					{
 						try
 						{
-							string Msg = await Resources.ReadAllTextAsync(UnhandledException);
+							string Msg = await Files.ReadAllTextAsync(UnhandledException);
 							File.Delete(UnhandledException);
 
 							StringBuilder sb = new StringBuilder();
@@ -1446,7 +1441,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
+				Markdown = await Files.ReadAllTextAsync(Path.Combine(rootFolder, "Starting.md"));
 			}
 			catch (Exception)
 			{
@@ -1473,16 +1468,16 @@ namespace Waher.IoTGateway
 			string Html = await Doc.GenerateHTML();
 
 			Response.ContentType = "text/html; charset=utf-8";
-			await Response.Write(System.Text.Encoding.UTF8.GetBytes(Html));
+			await Response.Write(true, System.Text.Encoding.UTF8.GetBytes(Html));
 			await Response.SendResponse();
 		}
 
 		private static Task GoToDefaultPage(HttpRequest Request, HttpResponse Response)
 		{
 			if (TryGetDefaultPage(Request, out string DefaultPage))
-				throw new TemporaryRedirectException(DefaultPage);
+				return Response.SendResponse(new TemporaryRedirectException(DefaultPage));
 			else
-				throw new NotFoundException("No default page defined.");
+				return Response.SendResponse(new NotFoundException("No default page defined."));
 		}
 
 		private class ModuleStartOrder : IComparer<IModule>
@@ -1543,7 +1538,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				await Resources.WriteAllTextAsync(appDataFolder + "Ports.txt", sb.ToString());
+				await Files.WriteAllTextAsync(appDataFolder + "Ports.txt", sb.ToString());
 			}
 			catch (Exception ex)
 			{
@@ -1783,7 +1778,7 @@ namespace Waher.IoTGateway
 				string s = xmppCredentials.Events;
 				int i = s.IndexOf('.');
 				if (i > 0)
-					s = s.Substring(i + 1);
+					s = s[(i + 1)..];
 
 				if (!IsDomain(s, true))
 				{
@@ -1880,9 +1875,7 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				if (Configuration.UseEncryption &&
-					!(Configuration.Certificate is null) &&
-					!(Configuration.PrivateKey is null))
+				if (Configuration.UseEncryption && Configuration.HasCertificate)
 				{
 					await UpdateCertificate(Configuration);
 
@@ -2227,16 +2220,16 @@ namespace Waher.IoTGateway
 				{
 					foreach (SystemConfiguration Configuration in configurations)
 					{
-						if (Configuration is IDisposable D)
+						try
 						{
-							try
-							{
+							if (Configuration is IDisposableAsync DAsync)
+								await DAsync.DisposeAsync();
+							else if (Configuration is IDisposable D)
 								D.Dispose();
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
 						}
 					}
 
@@ -2297,8 +2290,11 @@ namespace Waher.IoTGateway
 					xmppClient = null;
 				}
 
-				coapEndpoint?.Dispose();
-				coapEndpoint = null;
+				if (!(coapEndpoint is null))
+				{
+					await coapEndpoint.DisposeAsync();
+					coapEndpoint = null;
+				}
 
 				if (!(webServer is null))
 				{
@@ -2306,7 +2302,9 @@ namespace Waher.IoTGateway
 					{
 						webServer.Remove(Sniffer);
 
-						if (Sniffer is IDisposable Disposable)
+						if (Sniffer is IDisposableAsync DisposableAsync)
+							await DisposableAsync.DisposeAsync();
+						else if (Sniffer is IDisposable Disposable)
 							Disposable.Dispose();
 					}
 
@@ -2485,7 +2483,7 @@ namespace Waher.IoTGateway
 			if (defaultPageByHostName.TryGetValue(Host, out DefaultPage))
 				return true;
 
-			if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase) && defaultPageByHostName.TryGetValue(Host.Substring(4), out DefaultPage))
+			if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase) && defaultPageByHostName.TryGetValue(Host[4..], out DefaultPage))
 				return true;
 
 			if (defaultPageByHostName.TryGetValue(string.Empty, out DefaultPage))
@@ -2549,7 +2547,7 @@ namespace Waher.IoTGateway
 					scheduler.Add(DateTime.Now.AddMinutes(1), CheckConnection, null);
 
 					XmppState? State2 = xmppClient?.State;
-					if (State2.HasValue && 
+					if (State2.HasValue &&
 						(State2 == XmppState.Offline || State2 == XmppState.Error || State2 == XmppState.Authenticating) &&
 						!(xmppClient is null))
 					{
@@ -2625,7 +2623,19 @@ namespace Waher.IoTGateway
 		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
 		/// </summary>
 		/// <param name="Request">Web request</param>
-		public static void CheckLocalLogin(HttpRequest Request)
+		public static Task CheckLocalLogin(HttpRequest Request)
+		{
+			return CheckLocalLogin(Request, Request.Response, true);
+		}
+
+		/// <summary>
+		/// Checks if a web request comes from the local host in the current session. If so, the user is automatically logged in.
+		/// </summary>
+		/// <param name="Request">Web request</param>
+		/// <param name="Response">Response object.</param>
+		/// <param name="ThrowRedirection">If the redirection should be thrown as an Exception (true),
+		/// or written as a response directly (false).</param>
+		public static async Task CheckLocalLogin(HttpRequest Request, HttpResponse Response, bool ThrowRedirection)
 		{
 			Profiler Profiler = new Profiler();
 			Profiler.Start();
@@ -2661,7 +2671,7 @@ namespace Waher.IoTGateway
 					LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",
 						string.Empty, Request.RemoteEndPoint, "Web");
 
-					Login.DoLogin(Request, From);
+					await Login.DoLogin(Request, Response, From, ThrowRedirection);
 					return;
 				}
 
@@ -2669,7 +2679,7 @@ namespace Waher.IoTGateway
 					Log.Debug("Checking for local login from: " + RemoteEndpoint);
 
 				i = RemoteEndpoint.LastIndexOf(':');
-				if (i < 0 || !int.TryParse(RemoteEndpoint.Substring(i + 1), out int Port))
+				if (i < 0 || !int.TryParse(RemoteEndpoint[(i + 1)..], out int Port))
 				{
 					if (DoLog)
 						Log.Debug("Invalid port number: " + RemoteEndpoint);
@@ -2677,7 +2687,7 @@ namespace Waher.IoTGateway
 					return;
 				}
 
-				if (!IPAddress.TryParse(RemoteEndpoint.Substring(0, i), out IPAddress Address))
+				if (!IPAddress.TryParse(RemoteEndpoint[..i], out IPAddress Address))
 				{
 					if (DoLog)
 						Log.Debug("Invalid IP Address: " + RemoteEndpoint);
@@ -2698,7 +2708,7 @@ namespace Waher.IoTGateway
 #endif
 				{
 					LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-					Login.DoLogin(Request, From);
+					await Login.DoLogin(Request, Response, From, ThrowRedirection);
 					return;
 				}
 
@@ -2738,121 +2748,119 @@ namespace Waher.IoTGateway
 							return;
 					}
 
-					using (Process Proc = new Process())
+					using Process Proc = new Process();
+					ProcessStartInfo StartInfo = new ProcessStartInfo()
 					{
-						ProcessStartInfo StartInfo = new ProcessStartInfo()
-						{
-							FileName = FileName,
-							Arguments = Arguments,
-							WindowStyle = ProcessWindowStyle.Hidden,
-							UseShellExecute = false,
-							RedirectStandardInput = true,
-							RedirectStandardOutput = true,
-							RedirectStandardError = true
-						};
+						FileName = FileName,
+						Arguments = Arguments,
+						WindowStyle = ProcessWindowStyle.Hidden,
+						UseShellExecute = false,
+						RedirectStandardInput = true,
+						RedirectStandardOutput = true,
+						RedirectStandardError = true
+					};
 
-						DateTime Start = DateTime.Now;
+					DateTime Start = DateTime.Now;
 
-						Proc.StartInfo = StartInfo;
-						Proc.Start();
+					Proc.StartInfo = StartInfo;
+					Proc.Start();
 
-						if (WaitForExit)
-						{
-							Proc.WaitForExit(5000);
-							if (!Proc.HasExited)
-								return;
-						}
+					if (WaitForExit)
+					{
+						Proc.WaitForExit(5000);
+						if (!Proc.HasExited)
+							return;
+					}
 
-						string Output = Proc.StandardOutput.ReadToEnd();
-						DateTime Return = DateTime.Now;
+					string Output = Proc.StandardOutput.ReadToEnd();
+					DateTime Return = DateTime.Now;
 
-						Thread.Interval(Start, Return, "Shell");
+					Thread.Interval(Start, Return, "Shell");
+
+					if (DoLog)
+						Log.Debug("Netstat output:\r\n\r\n" + Output);
+
+					if (Proc.ExitCode != 0)
+					{
+						Thread.Exception(new Exception("Exit code: " + Proc.ExitCode.ToString()));
 
 						if (DoLog)
-							Log.Debug("Netstat output:\r\n\r\n" + Output);
+							Log.Debug("Netstat exit code: " + Proc.ExitCode.ToString());
 
-						if (Proc.ExitCode != 0)
+						return;
+					}
+
+					string[] Rows = Output.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+
+					foreach (string Row in Rows)
+					{
+						string[] Tokens = Regex.Split(Row, @"\s+");
+
+						switch (Environment.OSVersion.Platform)
 						{
-							Thread.Exception(new Exception("Exit code: " + Proc.ExitCode.ToString()));
-
-							if (DoLog)
-								Log.Debug("Netstat exit code: " + Proc.ExitCode.ToString());
-
-							return;
-						}
-
-						string[] Rows = Output.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
-
-						foreach (string Row in Rows)
-						{
-							string[] Tokens = Regex.Split(Row, @"\s+");
-
-							switch (Environment.OSVersion.Platform)
-							{
-								case PlatformID.Win32S:
-								case PlatformID.Win32Windows:
-								case PlatformID.Win32NT:
-								case PlatformID.WinCE:
-									if (Tokens.Length < 6)
-										break;
-
-									if (Tokens[1] != "TCP")
-										break;
-
-									if (!SameEndpoint(Tokens[2], RemoteEndpoint))
-										break;
-
-									if (Tokens[4] != "ESTABLISHED")
-										break;
-
-									if (!int.TryParse(Tokens[5], out int PID))
-										break;
-
-									Process P = Process.GetProcessById(PID);
-									int CurrentSession = WTSGetActiveConsoleSessionId();
-
-									if (P.SessionId == CurrentSession)
-									{
-										LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-										Login.DoLogin(Request, From);
-										return;
-									}
+							case PlatformID.Win32S:
+							case PlatformID.Win32Windows:
+							case PlatformID.Win32NT:
+							case PlatformID.WinCE:
+								if (Tokens.Length < 6)
 									break;
 
-								case PlatformID.Unix:
-								case PlatformID.MacOSX:
-									if (Tokens.Length < 9)
-										break;
-
-									if (Tokens[0] != "tcp4" && Tokens[0] != "tcp6")
-										break;
-
-									if (!SameEndpoint(Tokens[4], RemoteEndpoint))
-										break;
-
-									if (Tokens[5] != "ESTABLISHED")
-										break;
-
-									if (!int.TryParse(Tokens[8], out PID))
-										break;
-
-									P = Process.GetProcessById(PID);
-									CurrentSession = Process.GetCurrentProcess().SessionId;
-
-									if (P.SessionId == CurrentSession)
-									{
-										LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
-										Login.DoLogin(Request, From);
-										return;
-									}
+								if (Tokens[1] != "TCP")
 									break;
 
-								default:
-									if (DoLog)
-										Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
+								if (!SameEndpoint(Tokens[2], RemoteEndpoint))
+									break;
 
+								if (Tokens[4] != "ESTABLISHED")
+									break;
+
+								if (!int.TryParse(Tokens[5], out int PID))
+									break;
+
+								Process P = Process.GetProcessById(PID);
+								int CurrentSession = WTSGetActiveConsoleSessionId();
+
+								if (P.SessionId == CurrentSession)
+								{
+									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									await Login.DoLogin(Request, Response, From, ThrowRedirection);
 									return;
-							}
+								}
+								break;
+
+							case PlatformID.Unix:
+							case PlatformID.MacOSX:
+								if (Tokens.Length < 9)
+									break;
+
+								if (Tokens[0] != "tcp4" && Tokens[0] != "tcp6")
+									break;
+
+								if (!SameEndpoint(Tokens[4], RemoteEndpoint))
+									break;
+
+								if (Tokens[5] != "ESTABLISHED")
+									break;
+
+								if (!int.TryParse(Tokens[8], out PID))
+									break;
+
+								P = Process.GetProcessById(PID);
+								CurrentSession = Process.GetCurrentProcess().SessionId;
+
+								if (P.SessionId == CurrentSession)
+								{
+									LoginAuditor.Success("Local user logged in.", string.Empty, Request.RemoteEndPoint, "Web");
+									await Login.DoLogin(Request, Response, From, ThrowRedirection);
+									return;
+								}
+								break;
+
+							default:
+								if (DoLog)
+									Log.Debug("No local login: Unsupported operating system: " + Environment.OSVersion.Platform.ToString());
+
+								return;
 						}
 					}
 				}
@@ -2905,20 +2913,20 @@ namespace Waher.IoTGateway
 					if (i < 0)
 						break;
 
-					if (!int.TryParse(EP1.Substring(i + 1), out int Port1))
+					if (!int.TryParse(EP1[(i + 1)..], out int Port1))
 						break;
 
-					if (!IPAddress.TryParse(EP1.Substring(0, i), out IPAddress Addr1))
+					if (!IPAddress.TryParse(EP1[..i], out IPAddress Addr1))
 						break;
 
 					i = EP2.LastIndexOf(':');
 					if (i < 0)
 						break;
 
-					if (!int.TryParse(EP2.Substring(i + 1), out int Port2) || Port1 != Port2)
+					if (!int.TryParse(EP2[(i + 1)..], out int Port2) || Port1 != Port2)
 						break;
 
-					if (!IPAddress.TryParse(EP2.Substring(0, i), out IPAddress Addr2))
+					if (!IPAddress.TryParse(EP2[..i], out IPAddress Addr2))
 						break;
 
 					string s1 = Addr1.ToString();
@@ -2944,7 +2952,7 @@ namespace Waher.IoTGateway
 			string s = Request.Header.Host?.Value ?? string.Empty;
 			int i = s.IndexOf(':');
 			if (i > 0)
-				s = s.Substring(0, i);
+				s = s[..i];
 
 			if (string.Compare(s, "localhost", true) != 0)
 			{
@@ -4217,13 +4225,11 @@ namespace Waher.IoTGateway
 						switch (Addr.AddressFamily)
 						{
 							case System.Net.Sockets.AddressFamily.InterNetwork:
-								if (IP4 is null)
-									IP4 = Addr;
+								IP4 ??= Addr;
 								break;
 
 							case System.Net.Sockets.AddressFamily.InterNetworkV6:
-								if (IP6 is null)
-									IP6 = Addr;
+								IP6 ??= Addr;
 								break;
 						}
 					}
@@ -4473,7 +4479,7 @@ namespace Waher.IoTGateway
 
 					await Database.Insert(Request);
 
-					Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
+					Markdown = await Files.ReadAllTextAsync(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
 
 					int i = Markdown.IndexOf("~~~~~~");
 					int c = Markdown.Length;
@@ -4484,12 +4490,12 @@ namespace Waher.IoTGateway
 						while (i < c && Markdown[i] == '~')
 							i++;
 
-						Markdown = Markdown.Substring(i).TrimStart();
+						Markdown = Markdown[i..].TrimStart();
 					}
 
 					i = Markdown.IndexOf("~~~~~~");
 					if (i > 0)
-						Markdown = Markdown.Substring(0, i).TrimEnd();
+						Markdown = Markdown[..i].TrimEnd();
 
 					Variables Variables = HttpServer.CreateVariables();
 					Variables["RequestId"] = Request.ObjectId;
@@ -4775,7 +4781,7 @@ namespace Waher.IoTGateway
 
 					if (Doc is null || TP2 > TP)
 					{
-						Markdown = await Resources.ReadAllTextAsync(FullFileName);
+						Markdown = await Files.ReadAllTextAsync(FullFileName);
 						Settings = new MarkdownSettings(emoji1_24x24, true)
 						{
 							RootFolder = rootFolder,
@@ -4802,7 +4808,7 @@ namespace Waher.IoTGateway
 
 						if (i > 0)
 						{
-							KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType.Substring(i + 1).TrimStart());
+							KeyValuePair<string, string>[] Fields = CommonTypes.ParseFieldValues(ContentType[(i + 1)..].TrimStart());
 
 							foreach (KeyValuePair<string, string> Field in Fields)
 							{
@@ -4811,10 +4817,9 @@ namespace Waher.IoTGateway
 							}
 						}
 
-						if (Encoding is null)
-							Encoding = System.Text.Encoding.UTF8;
+						Encoding ??= System.Text.Encoding.UTF8;
 
-						Markdown = CommonTypes.GetString(Content, Encoding);
+						Markdown = Strings.GetString(Content, Encoding);
 						if (IsText)
 						{
 							MarkdownSettings Settings2 = new MarkdownSettings(null, false);
@@ -4914,7 +4919,7 @@ namespace Waher.IoTGateway
 			string Resource = Request.Header.ResourcePart;
 			int i = Resource.IndexOfAny(new char[] { '?', '#' });
 			if (i > 0)
-				Resource = Resource.Substring(0, i);
+				Resource = Resource[..i];
 
 			return AddWebSniffer(SnifferId, Resource, MaxLife, BinaryPresentationMethod, ComLayer, UserVariable, Privileges);
 		}
@@ -4983,7 +4988,7 @@ namespace Waher.IoTGateway
 			string Resource = Request.Header.ResourcePart;
 			int i = Resource.IndexOfAny(new char[] { '?', '#' });
 			if (i > 0)
-				Resource = Resource.Substring(0, i);
+				Resource = Resource[..i];
 
 			AddWebEventSink(SinkId, Resource, MaxLife, UserVariable, Privileges);
 		}
@@ -5109,7 +5114,7 @@ namespace Waher.IoTGateway
 					continue;
 				}
 
-				string ResourceName = Setting.Key.Substring(23);
+				string ResourceName = Setting.Key[23..];
 				string ReferenceFileName;
 				int i;
 				Expression Exp;
@@ -5119,8 +5124,8 @@ namespace Waher.IoTGateway
 					ReferenceFileName = string.Empty;
 				else
 				{
-					ReferenceFileName = Value.Substring(0, i);
-					Value = Value.Substring(i + 5);
+					ReferenceFileName = Value[..i];
+					Value = Value[(i + 5)..];
 				}
 
 				try

@@ -1646,42 +1646,42 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							case "rxBin":
 								byte[] Bin = Convert.FromBase64String(E.InnerText);
-								await Sniffer.ReceiveBinary(Timestamp, Bin);
+								Sniffer.ReceiveBinary(Timestamp, true, Bin);
 								break;
 
 							case "txBin":
 								Bin = Convert.FromBase64String(E.InnerText);
-								await Sniffer.TransmitBinary(Timestamp, Bin);
+								Sniffer.TransmitBinary(Timestamp, true, Bin);
 								break;
 
 							case "rx":
 								string s = E.InnerText;
-								await Sniffer.ReceiveText(Timestamp, s);
+								Sniffer.ReceiveText(Timestamp, s);
 								break;
 
 							case "tx":
 								s = E.InnerText;
-								await Sniffer.TransmitText(Timestamp, s);
+								Sniffer.TransmitText(Timestamp, s);
 								break;
 
 							case "info":
 								s = E.InnerText;
-								await Sniffer.Information(Timestamp, s);
+								Sniffer.Information(Timestamp, s);
 								break;
 
 							case "warning":
 								s = E.InnerText;
-								await Sniffer.Warning(Timestamp, s);
+								Sniffer.Warning(Timestamp, s);
 								break;
 
 							case "error":
 								s = E.InnerText;
-								await Sniffer.Error(Timestamp, s);
+								Sniffer.Error(Timestamp, s);
 								break;
 
 							case "exception":
 								s = E.InnerText;
-								await Sniffer.Exception(Timestamp, s);
+								Sniffer.Exception(Timestamp, s);
 								break;
 
 							case "expired":
@@ -1690,17 +1690,17 @@ namespace Waher.Networking.XMPP.Concentrator
 									this.sniffers.Remove(SnifferId);
 								}
 
-								await Sniffer.Information(Timestamp, "Remote sniffer expired.");
+								Sniffer.Information(Timestamp, "Remote sniffer expired.");
 								break;
 
 							default:
-								await Sniffer.Error("Unrecognized sniffer event received: " + E.OuterXml);
+								Sniffer.Error("Unrecognized sniffer event received: " + E.OuterXml);
 								break;
 						}
 					}
 					catch (Exception)
 					{
-						await Sniffer.Error(Timestamp, "Badly encoded sniffer data was received: " + E.OuterXml);
+						Sniffer.Error(Timestamp, "Badly encoded sniffer data was received: " + E.OuterXml);
 					}
 				}
 			}

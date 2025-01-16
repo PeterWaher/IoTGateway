@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Waher.Runtime.IO;
 
 namespace Waher.Events.Files
 {
@@ -9,7 +10,7 @@ namespace Waher.Events.Files
 	public class TextFileEventSink : TextWriterEventSink
 	{
 		private StreamWriter file;
-		private readonly string fileName;
+		private readonly FileNameTimeSequence fileSequence;
 		private readonly int deleteAfterDays;
 
 		/// <summary>
@@ -54,7 +55,7 @@ namespace Waher.Events.Files
 		{
 			this.file = null;
 			this.output = null;
-			this.fileName = FileName;
+			this.fileSequence = new FileNameTimeSequence(FileName, true);
 			this.deleteAfterDays = DeleteAfterDays;
 
 			string FolderName = Path.GetDirectoryName(FileName);
@@ -71,62 +72,46 @@ namespace Waher.Events.Files
 		/// </summary>
 		protected override void BeforeWrite()
 		{
-			if (!(this.file is null))
-			{
-				try
-				{
-					this.file?.Dispose();
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
+			if (!this.fileSequence.TryGetNewFileName(out string s))
+				return;
 
-				this.file = null;
-				this.output = null;
+			try
+			{
+				this.file?.Dispose();
+			}
+			catch (Exception)
+			{
+				// Ignore
 			}
 
-			string s = XmlFileEventSink.GetFileName(this.fileName);
+			this.file = null;
+			this.output = null;
 
-			if (File.Exists(s))
-				this.output = this.file = File.AppendText(s);
-			else
+			this.output = this.file = File.CreateText(s);
+
+			if (this.deleteAfterDays < int.MaxValue)
 			{
-				this.output = this.file = File.CreateText(s);
+				string FolderName = Path.GetDirectoryName(s);
+				if (string.IsNullOrEmpty(FolderName))
+					FolderName = ".";
 
-				if (this.deleteAfterDays < int.MaxValue)
+				string[] Files = Directory.GetFiles(FolderName, "*.*");
+
+				foreach (string FileName in Files)
 				{
-					string FolderName = Path.GetDirectoryName(s);
-					if (string.IsNullOrEmpty(FolderName))
-						FolderName = ".";
-
-					string[] Files = Directory.GetFiles(FolderName, "*.*");
-
-					foreach (string FileName in Files)
+					if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(FileName)).TotalDays >= this.deleteAfterDays)
 					{
-						if ((DateTime.Now - File.GetLastWriteTime(FileName)).TotalDays >= this.deleteAfterDays)
+						try
 						{
-							try
-							{
-								File.Delete(FileName);
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
+							File.Delete(FileName);
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
 						}
 					}
 				}
 			}
-		}
-
-		/// <summary>
-		/// Method is called after writing something to the text file.
-		/// </summary>
-		protected override void AfterWrite()
-		{
-			this.file.Dispose();
-			this.file = null;
 		}
 
 		/// <summary>

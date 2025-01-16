@@ -56,15 +56,15 @@ namespace Waher.Events.WindowsEventLog
 		/// <summary>
 		/// <see cref="IDisposable.Dispose()"/>
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
-			base.Dispose();
-
 			if (this.eventLog != IntPtr.Zero)
 			{
 				Win32.DeregisterEventSource(this.eventLog);
 				this.eventLog = IntPtr.Zero;
 			}
+
+			return base.DisposeAsync();
 		}
 
 		/// <inheritdoc/>

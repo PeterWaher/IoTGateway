@@ -394,7 +394,7 @@ namespace Waher.Networking.XMPP.Software
 		{
 			if (string.Compare(e.From, this.componentAddress, true) != 0)
 			{
-				await this.client.Warning("Discarding package notification. Expected source: " + this.componentAddress + ". Actual source: " + e.From);
+				this.client.Warning("Discarding package notification. Expected source: " + this.componentAddress + ". Actual source: " + e.From);
 				return;
 			}
 

@@ -99,7 +99,7 @@ namespace Waher.Networking.SASL
 				return null;
 			}
 
-			await Connection.SetUserIdentity(UserName);
+			Connection.SetUserIdentity(UserName);
 
 			byte[] HMAC = this.HMAC(Encoding.UTF8.GetBytes(Account.Password), Nonce);
 			string Cram2 = HEX(HMAC);

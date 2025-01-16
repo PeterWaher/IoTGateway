@@ -19,6 +19,7 @@ using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Text;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -340,7 +341,7 @@ namespace Waher.Content.Markdown
 
 							try
 							{
-								Script = await Resources.ReadAllTextAsync(FileName2);
+								Script = await Files.ReadAllTextAsync(FileName2);
 
 								if (!IsDynamic)
 								{
@@ -5204,7 +5205,7 @@ namespace Waher.Content.Markdown
 				else
 					FileName = MasterMetaValue;
 
-				string MarkdownText = await Resources.ReadAllTextAsync(FileName);
+				string MarkdownText = await Files.ReadAllTextAsync(FileName);
 				this.master = await CreateAsync(MarkdownText, this.settings);
 				this.master.fileName = FileName;
 				this.master.syntaxHighlighting |= this.syntaxHighlighting;

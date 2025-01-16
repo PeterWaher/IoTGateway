@@ -77,7 +77,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog()
+			SaveFileDialog Dialog = new()
 			{
 				AddExtension = true,
 				CheckPathExists = true,
@@ -95,7 +95,7 @@ namespace Waher.Client.WPF.Controls
 				{
 					if (Dialog.FilterIndex == 2)
 					{
-						StringBuilder Xml = new StringBuilder();
+						StringBuilder Xml = new();
 						using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(true, true)))
 						{
 							this.SaveAsXml(w);
@@ -107,13 +107,10 @@ namespace Waher.Client.WPF.Controls
 					}
 					else
 					{
-						using (FileStream f = File.Create(Dialog.FileName))
-						{
-							using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
-							{
-								this.SaveAsXml(w);
-							}
-						}
+						using FileStream f = File.Create(Dialog.FileName);
+						using XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false));
+						
+						this.SaveAsXml(w);
 					}
 				}
 				catch (Exception ex)
@@ -137,7 +134,7 @@ namespace Waher.Client.WPF.Controls
 				w.WriteStartElement(Item.Type.ToString());
 				w.WriteAttributeString("timestamp", XML.Encode(Item.Timestamp));
 
-				if (!(Item.Data is null))
+				if (Item.Data is not null)
 					w.WriteValue(Convert.ToBase64String(Item.Data));
 				else
 					w.WriteValue(Item.Message);
@@ -153,7 +150,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog()
+				OpenFileDialog Dialog = new()
 				{
 					AddExtension = true,
 					CheckFileExists = true,
@@ -169,7 +166,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (Result.HasValue && Result.Value)
 				{
-					XmlDocument Xml = new XmlDocument()
+					XmlDocument Xml = new()
 					{
 						PreserveWhitespace = true
 					};
@@ -267,7 +264,7 @@ namespace Waher.Client.WPF.Controls
 				if (IsData)
 				{
 					Data = Convert.FromBase64String(E.InnerText);
-					Message = TabSniffer.HexToString(Data);
+					Message = TabSniffer.HexToString(Data, 0, Data.Length);
 				}
 				else
 				{

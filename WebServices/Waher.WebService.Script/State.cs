@@ -485,13 +485,12 @@ namespace Waher.WebService.Script
 								}
 								else if (Item is MarkdownElement Element)
 								{
-									using (HtmlRenderer Renderer = new HtmlRenderer(Html, new HtmlSettings()
+									using HtmlRenderer Renderer = new HtmlRenderer(Html, new HtmlSettings()
 									{
 										XmlEntitiesOnly = true
-									}))
-									{
-										await Element.Render(Renderer);
-									}
+									});
+
+									await Element.Render(Renderer);
 								}
 								else
 									Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
@@ -543,7 +542,7 @@ namespace Waher.WebService.Script
 				this.response.ContentType = "text/html; charset=utf-8";
 				this.response.ContentLength = Bin.Length;   // To avoid chunked transfer.
 				this.response.SetHeader("X-More", More ? "1" : "0");
-				await this.response.Write(Bin);
+				await this.response.Write(true, Bin);
 				await this.response.SendResponse();
 				await this.response.DisposeAsync();
 			}

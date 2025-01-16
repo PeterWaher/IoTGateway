@@ -43,7 +43,7 @@ namespace Waher.Networking.CoAP.Test
 			{
 				CoapResource[] Resources = this.coapClient.GetRegisteredResources();
 
-				this.coapClient.Dispose();
+				await this.coapClient.DisposeAsync();
 				this.coapClient = null;
 
 				Assert.AreEqual(1, Resources.Length, "There are resources still registered on the CoAP client.");

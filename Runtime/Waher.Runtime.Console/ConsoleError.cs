@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Console.Worker;
+using Waher.Runtime.Queue;
 
 namespace Waher.Runtime.Console
 {
@@ -34,7 +35,7 @@ namespace Waher.Runtime.Console
 		public static void Write(string value)
 		{
 			if (!string.IsNullOrEmpty(value))
-				ConsoleWorker.Queue(new ConsoleErrorWriteString(value));
+				ConsoleWorker.Forward(new ConsoleErrorWriteString(value));
 		}
 
 		/// <summary>
@@ -54,7 +55,7 @@ namespace Waher.Runtime.Console
 		/// <param name="BackgroundColor">Optional Background Color to use.</param>
 		public static void Write(CustomWriter Writer, ConsoleColor? ForegroundColor, ConsoleColor? BackgroundColor)
 		{
-			ConsoleWorker.Queue(new ConsoleErrorCustomWriter(Writer, ForegroundColor, BackgroundColor));
+			ConsoleWorker.Forward(new ConsoleErrorCustomWriter(Writer, ForegroundColor, BackgroundColor));
 		}
 
 		/// <summary>
@@ -221,7 +222,7 @@ namespace Waher.Runtime.Console
 			{
 				WorkItem Item = new ConsoleErrorWriteString(value.ToString());
 
-				if (!await ConsoleWorker.Queue(Item))
+				if (!await ConsoleWorker.Forward(Item))
 					return;
 
 				await Item.Wait();
@@ -276,7 +277,7 @@ namespace Waher.Runtime.Console
 		{
 			WorkItem Item = new ConsoleErrorCustomAsyncWriter(Writer, ForegroundColor, BackgroundColor);
 
-			if (!await ConsoleWorker.Queue(Item))
+			if (!await ConsoleWorker.Forward(Item))
 				return;
 
 			await Item.Wait();
@@ -296,7 +297,7 @@ namespace Waher.Runtime.Console
 		/// <param name="value">Value to be written.</param>
 		public static void WriteLine(string value)
 		{
-			ConsoleWorker.Queue(new ConsoleErrorWriteLineString(value));
+			ConsoleWorker.Forward(new ConsoleErrorWriteLineString(value));
 		}
 
 		/// <summary>
@@ -461,7 +462,7 @@ namespace Waher.Runtime.Console
 		{
 			WorkItem Item = new ConsoleErrorWriteLineString(value ?? string.Empty);
 
-			if (!await ConsoleWorker.Queue(Item))
+			if (!await ConsoleWorker.Forward(Item))
 				return;
 
 			await Item.Wait();
@@ -509,7 +510,7 @@ namespace Waher.Runtime.Console
 		/// </summary>
 		public static void Beep()
 		{
-			ConsoleWorker.Queue(new ConsoleBeep());
+			ConsoleWorker.Forward(new ConsoleBeep());
 		}
 
 		/// <summary>

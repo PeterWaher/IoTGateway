@@ -25,9 +25,9 @@ namespace Waher.Events.Pipe.Test
 		}
 
 		[AssemblyCleanup]
-		public static void AssemblyCleanup()
+		public static async Task AssemblyCleanup()
 		{
-			Log.Terminate();
+			await Log.TerminateAsync();
 		}
 
 		[ClassInitialize]
@@ -45,12 +45,12 @@ namespace Waher.Events.Pipe.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
 			if (eventSink is not null)
 			{
 				Log.Unregister(eventSink);
-				eventSink.Dispose();
+				await eventSink.DisposeAsync();
 				eventSink = null;
 			}
 
@@ -66,13 +66,13 @@ namespace Waher.Events.Pipe.Test
 
 		private static Task EventListener_EventReceived(object Sender, EventEventArgs e)
 		{
-			eventsReceived?.Add(e.Event);
+			eventsReceived?.Queue(e.Event);
 			return Task.CompletedTask;
 		}
 
 		private static Task EventListener_CustomFragmentReceived(object Sender, CustomFragmentEventArgs e)
 		{
-			customFragmentsReceived?.Add(e.Fragment);
+			customFragmentsReceived?.Queue(e.Fragment);
 			return Task.CompletedTask;
 		}
 

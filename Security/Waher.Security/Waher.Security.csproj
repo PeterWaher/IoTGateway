@@ -9,7 +9,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
@@ -18,9 +18,9 @@
     <PackageTags>security users hashes</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.11</AssemblyVersion>
-    <FileVersion>1.0.11</FileVersion>
-    <Version>1.0.11</Version>
+    <AssemblyVersion>1.0.12</AssemblyVersion>
+    <FileVersion>1.0.12</FileVersion>
+    <Version>1.0.12</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Security\Waher.Security\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -46,5 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
   </ItemGroup>
 </Project>

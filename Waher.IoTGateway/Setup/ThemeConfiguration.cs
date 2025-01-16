@@ -230,18 +230,30 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string ThemeId))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string ThemeId))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!themeDefinitions.TryGetValue(ThemeId, out ThemeDefinition Def))
-				throw new NotFoundException("Theme not found: " + ThemeId);
+			{
+				await Response.SendResponse(new NotFoundException("Theme not found: " + ThemeId));
+				return;
+			}
 
 			string Host = DomainSettings.IsAlternativeDomain(Request.Host);
 			if (string.IsNullOrEmpty(Host))

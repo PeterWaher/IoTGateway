@@ -130,7 +130,32 @@
     <Compile Include="ContentEncodings\PrecompressedFileReturner.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="Exceptions\Redirections\PermanentRedirectException.cs" />
+    <Compile Include="HTTP2\BinaryReader.cs" />
+    <Compile Include="HTTP2\BinaryWriter.cs" />
+    <Compile Include="HTTP2\ConnectionSettings.cs" />
+    <Compile Include="HTTP2\DynamicHeader.cs" />
+    <Compile Include="HTTP2\DynamicHeaders.cs" />
+    <Compile Include="HTTP2\DynamicRecord.cs" />
+    <Compile Include="HTTP2\FlowControlRfc7540.cs" />
+    <Compile Include="HTTP2\FlowControlRfc9218.cs" />
+    <Compile Include="HTTP2\FrameType.cs" />
+    <Compile Include="HTTP2\HeaderReader.cs" />
+    <Compile Include="HTTP2\HeaderWriter.cs" />
+    <Compile Include="HTTP2\Http2Error.cs" />
+    <Compile Include="HTTP2\Http2Stream.cs" />
+    <Compile Include="HTTP2\HuffmanDecoding.cs" />
+    <Compile Include="HTTP2\HuffmanEncoding.cs" />
+    <Compile Include="HTTP2\IFlowControl.cs" />
+    <Compile Include="HTTP2\IndexMode.cs" />
+    <Compile Include="HTTP2\IPriorityNode.cs" />
+    <Compile Include="HTTP2\PendingRequest.cs" />
+    <Compile Include="HTTP2\PriorityNodeRfc7540.cs" />
+    <Compile Include="HTTP2\PriorityNodeRfc9218.cs" />
+    <Compile Include="HTTP2\PrioritySettings.cs" />
+    <Compile Include="HTTP2\StaticRecord.cs" />
+    <Compile Include="HTTP2\StreamState.cs" />
     <Compile Include="HttpRedirectionResource.cs" />
+    <Compile Include="Interfaces\IHttpConnectMethod.cs" />
     <Compile Include="ProxyRequestEventArgs.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />
@@ -264,6 +289,7 @@
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateMutualTls.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateSession.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\Authorize.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\EphemeralUser.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\BadGateway.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\GatewayTimeout.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\InsufficientStorage.cs" />
@@ -278,6 +304,7 @@
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
+    <Compile Include="TransferEncodings\Http2TransferEncoding.cs" />
     <Compile Include="TransferEncodings\InternalTransfer.cs" />
     <Compile Include="Vanity\VanityResources.cs" />
     <Compile Include="WebSockets\WebSocket.cs" />
@@ -313,6 +340,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj">
+      <Project>{3b744b26-affc-450d-9d21-0291299c5281}</Project>
+      <Name>Waher.Runtime.IO</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj">
       <Project>{9641a3ba-2873-4e87-9302-dbaa950d9ca0}</Project>
@@ -355,6 +386,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ClientErrors\*.
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\Redirections\*.cs" "$(ProjectDir)Exceptions\Redirections" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.cs" "$(ProjectDir)Exceptions\ServerErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HTTP2\*.cs" "$(ProjectDir)HTTP2" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\*.cs" "$(ProjectDir)ScriptExtensions" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\*.cs" "$(ProjectDir)ScriptExtensions\Functions" /Y

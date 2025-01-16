@@ -1006,7 +1006,16 @@ namespace Waher.IoTGateway.Installers
 
 				if (ToTP >= FromTP)
 				{
-					Session.Log("Skipping file. Destination folder contains newer version: " + From);
+					string Msg;
+
+					if (ToTP > FromTP)
+						Msg = "newer version";
+					else
+						Msg = "same version";
+
+					Msg = "Skipping file. Destination folder contains " + Msg + ": " + From;
+
+					Session.Log(Msg);
 					Copy1 = false;
 				}
 			}
@@ -1028,7 +1037,16 @@ namespace Waher.IoTGateway.Installers
 
 					if (ToTP >= FromTP)
 					{
-						Session.Log("Skipping file. Destination folder contains newer version: " + From);
+						string Msg;
+
+						if (ToTP > FromTP)
+							Msg = "newer version";
+						else
+							Msg = "same version";
+
+						Msg = "Skipping file. Destination folder contains " + Msg + ": " + From;
+
+						Session.Log(Msg);
 						Copy2 = false;
 					}
 				}

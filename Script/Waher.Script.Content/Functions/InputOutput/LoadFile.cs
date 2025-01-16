@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -111,9 +111,13 @@ namespace Waher.Script.Content.Functions.InputOutput
 				}
 			}
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
+			ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Bin, new Uri(FileName));
 
-			return Expression.Encapsulate(Decoded);
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
+
+			return Expression.Encapsulate(Content.Decoded);
+
 		}
 	}
 }

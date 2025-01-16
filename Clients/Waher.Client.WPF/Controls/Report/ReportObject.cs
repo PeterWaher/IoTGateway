@@ -9,24 +9,18 @@ namespace Waher.Client.WPF.Controls.Report
 	/// <summary>
 	/// Contains information about a report object.
 	/// </summary>
-	public class ReportObject : ReportElement
+	/// <remarks>
+	/// Contains information about a report object.
+	/// </remarks>
+	/// <param name="Object">Decoded Object</param>
+	/// <param name="Binary">Binary representation</param>
+	/// <param name="ContentType">Content-Type</param>
+	public class ReportObject(object Object, byte[] Binary, string ContentType) 
+		: ReportElement
 	{
-		private readonly object @object;
-		private readonly byte[] binary;
-		private readonly string contentType;
-
-		/// <summary>
-		/// Contains information about a report object.
-		/// </summary>
-		/// <param name="Object">Decoded Object</param>
-		/// <param name="Binary">Binary representation</param>
-		/// <param name="ContentType">Content-Type</param>
-		public ReportObject(object Object, byte[] Binary, string ContentType)
-		{
-			this.@object = Object;
-			this.binary = Binary;
-			this.contentType = ContentType;
-		}
+		private readonly object @object = Object;
+		private readonly byte[] binary = Binary;
+		private readonly string contentType = ContentType;
 
 		/// <summary>
 		/// Contains information about a report object.
@@ -36,9 +30,10 @@ namespace Waher.Client.WPF.Controls.Report
 		{
 			byte[] Binary = Convert.FromBase64String(Xml.InnerText);
 			string ContentType = XML.Attribute(Xml, "contentType");
-			object Object = await InternetContent.DecodeAsync(ContentType, Binary, null);
+			ContentResponse Object = await InternetContent.DecodeAsync(ContentType, Binary, null);
+			Object.AssertOk();
 
-			return new ReportObject(Object, Binary, ContentType);
+			return new ReportObject(Object.Decoded, Binary, ContentType);
 		}
 
 		/// <summary>

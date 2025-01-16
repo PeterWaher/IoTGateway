@@ -48,12 +48,15 @@ namespace Waher.Events.Socket
 		/// <summary>
 		/// <see cref="IDisposable.Dispose()"/>
 		/// </summary>
-		public override void Dispose()
+		public override async Task DisposeAsync()
 		{
-			base.Dispose();
+			await base.DisposeAsync();
 
-			this.client?.Dispose();
-			this.client = null;
+			if (!(this.client is null))
+			{
+				await this.client.DisposeAsync();
+				this.client = null;
+			}
 		}
 
 		/// <summary>
@@ -180,8 +183,11 @@ namespace Waher.Events.Socket
 				{
 					if (this.client is null || !this.client.Connected)
 					{
-						this.client?.Dispose();
-						this.client = null;
+						if (!(this.client is null))
+						{
+							await this.client.DisposeAsync();
+							this.client = null;
+						}
 
 						this.client = new BinaryTcpClient(false, this.sniffers);
 
@@ -212,7 +218,7 @@ namespace Waher.Events.Socket
 						}
 					}
 
-					if (!await this.client.SendAsync(Bin))
+					if (!await this.client.SendAsync(true, Bin))
 					{
 						Event Event = new Event(EventType.Error, "Unable to sent event to event recipient.", this.ObjectID,
 							string.Empty, string.Empty, EventLevel.Major, string.Empty, string.Empty, string.Empty);
@@ -231,7 +237,7 @@ namespace Waher.Events.Socket
 			}
 			catch (Exception ex)
 			{
-				Event Event = new Event(EventType.Critical, ex, this.ObjectID, string.Empty, string.Empty, EventLevel.Major, 
+				Event Event = new Event(EventType.Critical, ex, this.ObjectID, string.Empty, string.Empty, EventLevel.Major,
 					string.Empty, string.Empty);
 
 				Event.Avoid(this);
@@ -252,9 +258,9 @@ namespace Waher.Events.Socket
 			return Task.CompletedTask;
 		}
 
-		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private Task<bool> Client_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
-			return Task.FromResult(true);	// Ignore incoming communication.
+			return Task.FromResult(true);   // Ignore incoming communication.
 		}
 
 		private Task Client_OnDisconnected(object Sender, EventArgs e)

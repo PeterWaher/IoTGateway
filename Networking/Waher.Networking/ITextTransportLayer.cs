@@ -15,7 +15,7 @@ namespace Waher.Networking
 	/// <summary>
 	/// Interface for text transport layers.
 	/// </summary>
-	public interface ITextTransportLayer : IDisposable
+	public interface ITextTransportLayer : IDisposableAsync
 	{
 		/// <summary>
 		/// Sends a text packet.

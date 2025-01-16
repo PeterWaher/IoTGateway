@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
 		/// unmanaged resources.
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
 			this.disposed = true;
 			this.terminated = true;
@@ -110,6 +110,8 @@ namespace Waher.Networking.XMPP.WebSocket
 
 			this.webSocketClient?.Dispose();
 			this.webSocketClient = null;
+
+			return Task.CompletedTask;
 		}
 
 		private async Task<bool> RaiseOnSent(string Payload)
@@ -178,7 +180,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				// TODO: this.xmppClient.TrustServer
 
 				if (this.xmppClient.HasSniffers)
-					await this.xmppClient.Information("Initiating session.");
+					this.xmppClient.Information("Initiating session.");
 
 				await this.SendAsync("<?");
 
@@ -416,7 +418,7 @@ namespace Waher.Networking.XMPP.WebSocket
 			string s = Encoding.UTF8.GetString(this.inputBuffer.Array, 0, Count);
 
 			if (this.xmppClient.HasSniffers)
-				await this.xmppClient.ReceiveText(s);
+				this.xmppClient.ReceiveText(s);
 
 			if (Response.EndOfMessage)
 				return s;
@@ -433,7 +435,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				sb.Append(s);
 
 				if (this.xmppClient.HasSniffers)
-					await this.xmppClient.ReceiveText(s);
+					this.xmppClient.ReceiveText(s);
 			}
 			while (!Response.EndOfMessage && !this.disposed);
 
@@ -464,10 +466,20 @@ namespace Waher.Networking.XMPP.WebSocket
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		public override Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			if (this.terminated)
-				return false;
+				return Task.FromResult(false);
+
+			this.Send(Packet, DeliveryCallback, State);
+
+			return Task.FromResult(true);
+		}
+
+		private async void Send(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		{ 
+			if (this.terminated)
+				return;
 
 			if (Packet is null)
 				throw new ArgumentException("Null payloads not allowed.", nameof(Packet));
@@ -490,15 +502,10 @@ namespace Waher.Networking.XMPP.WebSocket
 				if (this.writing)
 				{
 					if (this.xmppClient?.HasSniffers ?? false)
-					{
-						Task.Run(() =>
-						{
-							return this.xmppClient.Information("Outbound stanza queued.");
-						});
-					}
+						this.xmppClient.Information("Outbound stanza queued.");
 
 					this.queue.AddLast(new KeyValuePair<string, EventHandlerAsync<DeliveryEventArgs>>(Packet, DeliveryCallback));
-					return true;
+					return;
 				}
 				else
 					this.writing = true;
@@ -511,7 +518,7 @@ namespace Waher.Networking.XMPP.WebSocket
 				while (!(Packet is null) && !this.disposed)
 				{
 					if (HasSniffers && !(this.xmppClient is null))
-						await this.xmppClient.TransmitText(Packet);
+						this.xmppClient.TransmitText(Packet);
 
 					ArraySegment<byte> Buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(Packet));
 
@@ -554,8 +561,6 @@ namespace Waher.Networking.XMPP.WebSocket
 
 				await this.bindingInterface.ConnectionError(ex);
 			}
-
-			return true;
 		}
 
 		private Task<bool> FragmentReceived(string Xml)

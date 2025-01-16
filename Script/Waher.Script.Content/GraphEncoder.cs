@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -24,7 +23,9 @@ namespace Waher.Script.Content
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ImageCodec.ContentTypePng };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ImageCodec.ContentTypePng };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -40,7 +41,8 @@ namespace Waher.Script.Content
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if ((Object is Graph || Object is PixelInformation) && InternetContent.IsAccepted(ImageCodec.ContentTypePng, AcceptedContentTypes))
+			if ((Object is Graph || Object is PixelInformation) && 
+				InternetContent.IsAccepted(ImageCodec.ContentTypePng, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;
@@ -57,20 +59,20 @@ namespace Waher.Script.Content
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is PixelInformation Pixels))
 			{
 				if (Object is Graph G)
 					Pixels = G.CreatePixels();
 				else
-					throw new ArgumentException("Object not PixelInformation or Graph.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Object not PixelInformation or Graph.", nameof(Object))));
 			}
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Pixels.EncodeAsPng(), ImageCodec.ContentTypePng));
+			return Task.FromResult(new ContentResponse(ImageCodec.ContentTypePng, Object, Pixels.EncodeAsPng()));
 		}
 
 		/// <summary>

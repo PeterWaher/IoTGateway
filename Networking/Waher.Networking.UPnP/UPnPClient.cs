@@ -13,11 +13,11 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.UPnP
 {
-    /// <summary>
-    /// Implements support for the UPnP protocol, as described in:
-    /// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
-    /// </summary>
-    public class UPnPClient : CommunicationLayer, IDisposable
+	/// <summary>
+	/// Implements support for the UPnP protocol, as described in:
+	/// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
+	/// </summary>
+	public class UPnPClient : CommunicationLayer, IDisposableAsync
 	{
 		private const int ssdpPort = 1900;
 		private const int defaultMaximumSearchTimeSeconds = 10;
@@ -85,7 +85,11 @@ namespace Waher.Networking.UPnP
 					Outgoing.MulticastLoopback = false;
 					Outgoing.Ttl = 30;
 					Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
-					Outgoing.JoinMulticastGroup(MulticastAddress);
+
+					if (IsMulticastAddress(MulticastAddress))
+						Outgoing.JoinMulticastGroup(MulticastAddress);
+					else
+						this.Warning("Address provided is not a multi-cast address.");
 
 					IPEndPoint EP = new IPEndPoint(MulticastAddress, ssdpPort);
 					lock (this.ssdpOutgoing)
@@ -126,7 +130,11 @@ namespace Waher.Networking.UPnP
 								MulticastLoopback = false
 							};
 
-							Incoming.JoinMulticastGroup(MulticastAddress);
+							if (IsMulticastAddress(MulticastAddress))
+								Incoming.JoinMulticastGroup(MulticastAddress);
+							else
+								this.Warning("Address provided is not a multi-cast address.");
+
 							this.BeginReceiveIncoming(Incoming);
 
 							lock (this.ssdpIncoming)
@@ -154,14 +162,14 @@ namespace Waher.Networking.UPnP
 						return;
 
 					byte[] Packet = Data.Buffer;
-					await this.ReceiveBinary(Packet);
+					this.ReceiveBinary(true, Packet);
 
 					try
 					{
 						string Header = Encoding.ASCII.GetString(Packet);
 						UPnPHeaders Headers = new UPnPHeaders(Header);
 
-						await this.ReceiveText(Header);
+						this.ReceiveText(Header);
 
 						if (Headers.Direction == HttpDirection.Response &&
 							Headers.HttpVersion >= 1.0 &&
@@ -191,7 +199,7 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 		}
 
@@ -235,7 +243,7 @@ namespace Waher.Networking.UPnP
 						return;
 
 					byte[] Packet = Data.Buffer;
-					await this.ReceiveBinary(Packet);
+					this.ReceiveBinary(true, Packet);
 
 					if (this.disposed)
 						return;
@@ -245,7 +253,7 @@ namespace Waher.Networking.UPnP
 						string Header = Encoding.ASCII.GetString(Packet);
 						UPnPHeaders Headers = new UPnPHeaders(Header);
 
-						await this.ReceiveText(Header);
+						this.ReceiveText(Header);
 
 						if (!(Data.RemoteEndPoint is null) &&
 							Headers.Direction == HttpDirection.Request &&
@@ -266,7 +274,7 @@ namespace Waher.Networking.UPnP
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 		}
 
@@ -361,7 +369,7 @@ namespace Waher.Networking.UPnP
 
 			try
 			{
-				await this.TransmitText(Text);
+				this.TransmitText(Text);
 				await Client.SendAsync(Packet, Packet.Length, Destination);
 			}
 			catch (Exception ex)
@@ -383,7 +391,16 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.disposed = true;
 
@@ -413,16 +430,16 @@ namespace Waher.Networking.UPnP
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
-				if (Sniffer is IDisposable Disposable)
+				try
 				{
-					try
-					{
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
 						Disposable.Dispose();
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 			}
 		}

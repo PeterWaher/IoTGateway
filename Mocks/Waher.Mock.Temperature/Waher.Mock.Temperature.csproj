@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,7 +9,7 @@
     <Description>Mock temperature sensor.</Description>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2015-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2015-2025. All rights reserved.</Copyright>
   </PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">

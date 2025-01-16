@@ -13,24 +13,24 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		public async Task Test_01_Message_AES()
 		{
 			await this.Test_Message(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) });
+				this.GenerateEndpoints(new Aes256()),
+				this.GenerateEndpoints(new Aes256()));
 		}
 
 		[TestMethod]
 		public async Task Test_02_Message_ChaCha20()
 		{
 			await this.Test_Message(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) });
+				this.GenerateEndpoints(new ChaCha20()),
+				this.GenerateEndpoints(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public async Task Test_03_Message_AEAD_ChaCha20_Poly1305()
 		{
 			await this.Test_Message(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) });
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()),
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()));
 		}
 
 		private async Task Test_Message(IE2eEndpoint[] Endpoints1, IE2eEndpoint[] Endpoints2)
@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 					"<test/>", "Test message", "Subject", "en", string.Empty, string.Empty,
 					null, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 2000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 2000));
 			}
 			finally
 			{
@@ -74,24 +74,24 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		public Task Test_04_IQ_Get_AES()
 		{
 			return this.Test_IQ_Get(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) });
+				this.GenerateEndpoints(new Aes256()),
+				this.GenerateEndpoints(new Aes256()));
 		}
 
 		[TestMethod]
 		public Task Test_05_IQ_Get_ChaCha20()
 		{
 			return this.Test_IQ_Get(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) });
+				this.GenerateEndpoints(new ChaCha20()),
+				this.GenerateEndpoints(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public Task Test_06_IQ_Get_AEAD_ChaCha20_Poly1305()
 		{
 			return this.Test_IQ_Get(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) });
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()),
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()));
 		}
 
 		private Task Test_IQ_Get(IE2eEndpoint[] Endpoints1, IE2eEndpoint[] Endpoints2)
@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						await e.IqResult("<test xmlns='testns'>World</test>");
 					}
 					else
-						throw new StanzaErrors.BadRequestException("Bad request", e.IQ);
+						await e.IqError(new StanzaErrors.BadRequestException("Bad request", e.IQ));
 				}, true);
 
 				await this.endpointSecurity1.SendIqGet(this.client1, E2ETransmission.AssertE2E,
@@ -146,7 +146,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						return Task.CompletedTask;
 					}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 2000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 2000));
 			}
 			finally
 			{
@@ -161,24 +161,24 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		public Task Test_07_IQ_Set_AES()
 		{
 			return this.Test_IQ_Set(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) });
+				this.GenerateEndpoints(new Aes256()),
+				this.GenerateEndpoints(new Aes256()));
 		}
 
 		[TestMethod]
 		public Task Test_08_IQ_Set_ChaCha20()
 		{
 			return this.Test_IQ_Set(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) });
+				this.GenerateEndpoints(new ChaCha20()),
+				this.GenerateEndpoints(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public Task Test_09_IQ_Set_AEAD_ChaCha20_Poly1305()
 		{
 			return this.Test_IQ_Set(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) });
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()),
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()));
 		}
 
 		private async Task Test_IQ_Set(IE2eEndpoint[] Endpoints1, IE2eEndpoint[] Endpoints2)
@@ -203,7 +203,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						await e.IqResult("<test xmlns='testns'>World</test>");
 					}
 					else
-						throw new StanzaErrors.BadRequestException("Bad request", e.IQ);
+						await e.IqError(new StanzaErrors.BadRequestException("Bad request", e.IQ));
 				}, true);
 
 				await this.endpointSecurity1.SendIqSet(this.client1, E2ETransmission.AssertE2E,
@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 						return Task.CompletedTask;
 					}, null);
 
-				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 2000));
+				Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 2000));
 			}
 			finally
 			{
@@ -241,24 +241,24 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		public Task Test_10_IQ_Error_AES()
 		{
 			return this.Test_IQ_Error(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new Aes256()) });
+				this.GenerateEndpoints(new Aes256()),
+				this.GenerateEndpoints(new Aes256()));
 		}
 
 		[TestMethod]
 		public Task Test_11_IQ_Error_ChaCha20()
 		{
 			return this.Test_IQ_Error(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new ChaCha20()) });
+				this.GenerateEndpoints(new ChaCha20()),
+				this.GenerateEndpoints(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public Task Test_12_IQ_Error_AEAD_ChaCha20_Poly1305()
 		{
 			return this.Test_IQ_Error(
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) },
-				new IE2eEndpoint[] { this.GenerateEndpoint(new AeadChaCha20Poly1305()) });
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()),
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()));
 		}
 
 		private Task Test_IQ_Error(IE2eEndpoint[] Endpoints1, IE2eEndpoint[] Endpoints2)
@@ -269,26 +269,35 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[TestMethod]
 		public void Test_13_Binary_AES()
 		{
-			Test_Binary(this.GenerateEndpoint(new Aes256()),
-				this.GenerateEndpoint(new Aes256()));
+			Test_Binary(
+				this.GenerateEndpoints(new Aes256()),
+				this.GenerateEndpoints(new Aes256()));
 		}
 
 		[TestMethod]
 		public void Test_14_Binary_ChaCha20()
 		{
-			Test_Binary(this.GenerateEndpoint(new ChaCha20()),
-				this.GenerateEndpoint(new ChaCha20()));
+			Test_Binary(
+				this.GenerateEndpoints(new ChaCha20()),
+				this.GenerateEndpoints(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public void Test_15_Binary_AEAD_ChaCha20_Poly1305()
 		{
-			Test_Binary(this.GenerateEndpoint(new AeadChaCha20Poly1305()),
-				this.GenerateEndpoint(new AeadChaCha20Poly1305()));
+			Test_Binary(
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()),
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()));
 		}
 
-		private static void Test_Binary(IE2eEndpoint Endpoint1, IE2eEndpoint Endpoint2)
+		private static void Test_Binary(IE2eEndpoint[] Endpoints1, IE2eEndpoint[] Endpoints2)
 		{
+			if (Endpoints1 is null || Endpoints2 is null)
+				return;
+
+			IE2eEndpoint Endpoint1 = Endpoints1[0];
+			IE2eEndpoint Endpoint2 = Endpoints2[0];
+
 			byte[] Data = new byte[1024];
 			using (RandomNumberGenerator Rnd = RandomNumberGenerator.Create())
 			{
@@ -312,26 +321,35 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		[TestMethod]
 		public Task Test_16_Stream_AES()
 		{
-			return Test_Stream(this.GenerateEndpoint(new Aes256()),
-				this.GenerateEndpoint(new Aes256()));
+			return Test_Stream(
+				this.GenerateEndpoints(new Aes256()),
+				this.GenerateEndpoints(new Aes256()));
 		}
 
 		[TestMethod]
 		public Task Test_17_Stream_ChaCha20()
 		{
-			return Test_Stream(this.GenerateEndpoint(new ChaCha20()),
-				this.GenerateEndpoint(new ChaCha20()));
+			return Test_Stream(
+				this.GenerateEndpoints(new ChaCha20()),
+				this.GenerateEndpoints(new ChaCha20()));
 		}
 
 		[TestMethod]
 		public Task Test_18_Stream_AEAD_ChaCha20_Poly1305()
 		{
-			return Test_Stream(this.GenerateEndpoint(new AeadChaCha20Poly1305()),
-				this.GenerateEndpoint(new AeadChaCha20Poly1305()));
+			return Test_Stream(
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()),
+				this.GenerateEndpoints(new AeadChaCha20Poly1305()));
 		}
 
-		private static async Task Test_Stream(IE2eEndpoint Endpoint1, IE2eEndpoint Endpoint2)
+		private static async Task Test_Stream(IE2eEndpoint[] Endpoints1, IE2eEndpoint[] Endpoints2)
 		{
+			if (Endpoints1 is null || Endpoints2 is null)
+				return;
+
+			IE2eEndpoint Endpoint1 = Endpoints1[0];
+			IE2eEndpoint Endpoint2 = Endpoints2[0];
+
 			MemoryStream Data = new();
 			byte[] Temp = new byte[1024];
 			byte[] Temp2 = new byte[1024];

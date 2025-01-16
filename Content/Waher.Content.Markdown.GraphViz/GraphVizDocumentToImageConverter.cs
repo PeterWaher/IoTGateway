@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Images;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -45,12 +44,13 @@ namespace Waher.Content.Markdown.GraphViz
         /// </summary>
         public virtual Grade ConversionGrade => Grade.Excellent;
 
-        /// <summary>
-        /// Performs the actual conversion.
-        /// </summary>
-        /// <param name="State">State of the current conversion.</param>
-        /// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-        public async Task<bool> ConvertAsync(ConversionState State)
+		/// <summary>
+		/// Performs the actual conversion.
+		/// </summary>
+		/// <param name="State">State of the current conversion.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
+		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
         {
             string GraphDescription;
 
@@ -123,9 +123,12 @@ namespace Waher.Content.Markdown.GraphViz
                 State.ToContentType = ImageCodec.ContentTypePng;
             }
             else
-                throw new Exception("Unable to convert document from " + State.FromContentType + " to " + State.ToContentType);
+            {
+                State.Error = new Exception("Unable to convert document from " + State.FromContentType + " to " + State.ToContentType);
+                return false;
+            }
 
-            byte[] Data = await Resources.ReadAllBytesAsync(Graph.FileName);
+            byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Graph.FileName);
 
             await State.To.WriteAsync(Data, 0, Data.Length);
 

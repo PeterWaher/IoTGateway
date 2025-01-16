@@ -152,7 +152,7 @@ namespace Waher.IoTGateway.Setup
 
 				try
 				{
-					string Markdown = await Resources.ReadAllTextAsync(FileName);
+					string Markdown = await Files.ReadAllTextAsync(FileName);
 					sb.AppendLine(Markdown);
 				}
 				catch (Exception ex)
@@ -197,18 +197,30 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("consent", out Obj) || !(Obj is bool Consent))
-				throw new BadRequestException();
+			if (!Parameters.TryGetValue("consent", out object Obj) || !(Obj is bool Consent))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (this.consented != Consent)
 			{

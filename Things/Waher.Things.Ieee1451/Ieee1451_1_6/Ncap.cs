@@ -51,7 +51,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 		/// <returns>Data processing result</returns>
 		public async Task<DataProcessingResult> DataReported(MqttTopic Topic, MqttContent Content, byte[] Data)
 		{
-			Message Message = await Ieee1451Parser.TryParseMessage(Data, Topic is null ? null : Content.CommunicationLayer);
+			Message Message = Ieee1451Parser.TryParseMessage(Data, Topic is null ? null : Content.CommunicationLayer);
 			if (Message is null)
 				return this.firstMessage ? DataProcessingResult.Incompatible : DataProcessingResult.Processed;
 
@@ -97,7 +97,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 						break;
 				}
 
-				await Message.LogInformationToSniffer();
+				Message.LogInformationToSniffer();
 			}
 			catch (Exception ex)
 			{
@@ -137,7 +137,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			}
 			else if (Message is TedsAccessMessage TedsAccessMessage)
 			{
-				(ushort ErrorCode, Teds Teds) = await TedsAccessMessage.TryParseTeds(true);
+				TedsAccessMessage.TryParseTeds(true, out ushort ErrorCode, out Teds Teds);
 				if (!(Teds is null))
 				{
 					await RemoveErrorAsync(This, "TedsResponseError");
@@ -191,7 +191,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 									byte[] Request = DiscoveryMessage.SerializeRequest(NcapEntity.Channel.NcapId, ToSniffer);
 
 									if (!(ToSniffer is null))
-										await BrokerNode.Information(ToSniffer.ToString());
+										BrokerNode.Information(ToSniffer.ToString());
 
 									await Broker.Publish(This.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 								}
@@ -234,7 +234,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 										byte[] Request = DiscoveryMessage.SerializeRequest(TimEntities.Channel.NcapId, TimEntities.Identities[i], ToSniffer);
 
 										if (!(ToSniffer is null))
-											await BrokerNode.Information(ToSniffer.ToString());
+											BrokerNode.Information(ToSniffer.ToString());
 
 										await Broker.Publish(This.Topic.FullTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 									}

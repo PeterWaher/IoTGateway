@@ -396,13 +396,14 @@ namespace Waher.Content.Semantic
 				{
 					try
 					{
-						object Obj = await InternetContent.GetAsync(ContextUri,
+						ContentResponse Content = await InternetContent.GetAsync(ContextUri,
 							new KeyValuePair<string, string>("Accept", JsonLdCodec.DefaultContentType),
 							new KeyValuePair<string, string>("If-Modified-Since", CommonTypes.EncodeRfc822(P2.Key)));
 
-						if (Obj is JsonLdDocument ContextDoc &&
+						if (!Content.HasError &&
+							Content.Decoded is JsonLdDocument ContextDoc &&
 							ContextDoc.parsedJson is Dictionary<string, object> ContextObj2 &&
-							ContextObj2.TryGetValue("@context", out Obj) &&
+							ContextObj2.TryGetValue("@context", out object Obj) &&
 							Obj is Dictionary<string, object> ContextObj3)
 						{
 							Context = new JsonLdContext(ContextObj3, BaseUri);
@@ -419,12 +420,13 @@ namespace Waher.Content.Semantic
 				}
 				else
 				{
-					object Obj = await InternetContent.GetAsync(ContextUri,
+					ContentResponse Content = await InternetContent.GetAsync(ContextUri,
 						new KeyValuePair<string, string>("Accept", JsonLdCodec.DefaultContentType));
 
-					if (Obj is JsonLdDocument ContextDoc &&
+					if (!Content.HasError &&
+						Content.Decoded is JsonLdDocument ContextDoc &&
 						ContextDoc.parsedJson is Dictionary<string, object> ContextObj2 &&
-						ContextObj2.TryGetValue("@context", out Obj) &&
+						ContextObj2.TryGetValue("@context", out object Obj) &&
 						Obj is Dictionary<string, object> ContextObj3)
 					{
 						Context = new JsonLdContext(ContextObj3, BaseUri);

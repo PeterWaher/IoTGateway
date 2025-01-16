@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using Waher.Content;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 
 namespace Waher.Utility.RegEx
 {
@@ -41,13 +41,13 @@ namespace Waher.Utility.RegEx
 		/// </summary>
 		/// <example>
 		/// Updating copyright statements in csproj, nuspec and cs files:
-		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.csproj" -p "C:\My Projects\IoTGateway\*.cs" -p "C:\My Projects\IoTGateway\*.nuspec" -f "Copyright (©|\([cC]\)) (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\1.xml" -s -o -n -r "Copyright © ${Name} ${From}-2024"
+		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.csproj" -p "C:\My Projects\IoTGateway\*.cs" -p "C:\My Projects\IoTGateway\*.nuspec" -f "Copyright (©|\([cC]\)) (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Temp\1.xml" -s -o -n -r "Copyright © ${Name} ${From}-2025"
 		/// 
 		/// Updating copyright statements in markdown files:
-		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.md" -f "\([cC]\) \[(?'Name'Waher( *\w+)*)\]\((?'Url'[^)\n]*)\)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\2.xml" -s -o -n -r "(c) [${Name}](${Url}) ${From}-2024"
+		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.md" -f "\([cC]\) \[(?'Name'Waher( *\w+)*)\]\((?'Url'[^)\n]*)\)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Temp\2.xml" -s -o -n -r "(c) [${Name}](${Url}) ${From}-2025"
 		/// 
 		/// Updating copyright statements in RTF files:
-		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.rtf" -f "\\'a9 (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\3.xml" -s -o -n -r "\'a9 ${Name} ${From}-2024"
+		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.rtf" -f "\\'a9 (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Temp\3.xml" -s -o -n -r "\'a9 ${Name} ${From}-2025"
 		/// </example>
 		static int Main(string[] args)
 		{
@@ -55,7 +55,7 @@ namespace Waher.Utility.RegEx
 			XmlWriter Output = null;
 			Encoding Encoding = Encoding.Default;
 			RegexOptions Options = RegexOptions.Compiled;
-			List<string> Paths = new();
+			List<string> Paths = [];
 			string Expression = null;
 			string ReplaceExpression = null;
 			string XmlFileName = null;
@@ -234,10 +234,10 @@ namespace Waher.Utility.RegEx
 				Output?.WriteStartElement("Search", "http://waher.se/schema/RegExMatches.xsd");
 				Output?.WriteStartElement("Files");
 
-				Dictionary<string, bool> FileProcessed = new();
-				Dictionary<string, bool> FileMatches = new();
-				Dictionary<string, bool> FileUpdates = new();
-				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = new();
+				Dictionary<string, bool> FileProcessed = [];
+				Dictionary<string, bool> FileMatches = [];
+				Dictionary<string, bool> FileUpdates = [];
+				SortedDictionary<string, SortedDictionary<string, int>> GroupCount = [];
 
 				foreach (string Path0 in Paths)
 				{
@@ -264,7 +264,7 @@ namespace Waher.Utility.RegEx
 						FileProcessed[FileName] = true;
 
 						byte[] Data = File.ReadAllBytes(FileName);
-						string Text = CommonTypes.GetString(Data, Encoding);
+						string Text = Strings.GetString(Data, Encoding);
 						string Text2 = Text;
 						int Offset = 0;
 
@@ -325,7 +325,7 @@ namespace Waher.Utility.RegEx
 
 									if (!GroupCount.TryGetValue(G.Name, out SortedDictionary<string, int> Counts))
 									{
-										Counts = new SortedDictionary<string, int>();
+										Counts = [];
 										GroupCount[G.Name] = Counts;
 									}
 

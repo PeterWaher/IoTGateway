@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Content.Html;
 using Waher.Content.Markdown.Rendering;
+using Waher.Content.Markdown.Web.ScriptExtensions;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
 
@@ -87,8 +88,9 @@ namespace Waher.Content.Markdown.Web
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			if (State is null)
 				return true;
@@ -147,7 +149,8 @@ namespace Waher.Content.Markdown.Web
 			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, State.Session)
 			{
 				RootFolder = rootFolder,
-				ResourceMap = Request.Server
+				ResourceMap = Request.Server,
+				Progress = Progress
 			};
 
 			if (!string.IsNullOrEmpty(bareJid))
@@ -203,7 +206,7 @@ namespace Waher.Content.Markdown.Web
 
 						if (!(LoginFileName is null))
 						{
-							string LoginMarkdown = await Resources.ReadAllTextAsync(LoginFileName);
+							string LoginMarkdown = await Files.ReadAllTextAsync(LoginFileName);
 							MarkdownDocument LoginDoc = await MarkdownDocument.CreateAsync(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
 								LoginUrl.ToString(), typeof(HttpException));
 
@@ -263,16 +266,21 @@ namespace Waher.Content.Markdown.Web
 							else
 								Location.Append(System.Net.WebUtility.UrlEncode(State.URL));
 
-							throw new TemporaryRedirectException(Location.ToString());
+							State.Error = new TemporaryRedirectException(Location.ToString());
+							return false;
 						}
 					}
 
-					throw ForbiddenException.AccessDenied(State.FromFileName, User2?.UserName ?? User?.ToString() ?? string.Empty,
+					State.Error = ForbiddenException.AccessDenied(State.FromFileName, User2?.UserName ?? User?.ToString() ?? string.Empty,
 						MissingPrivilege);
+					return false;
 				}
 
 				if (User is null)
-					throw ForbiddenException.AccessDenied(State.FromFileName, string.Empty, string.Empty);
+				{
+					State.Error = ForbiddenException.AccessDenied(State.FromFileName, string.Empty, string.Empty);
+					return false;
+				}
 
 				State.Session[" User "] = User;
 			}

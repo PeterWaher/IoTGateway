@@ -117,10 +117,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			try
 			{
-				object Result = await InternetContent.GetAsync(new Uri(URL),
+				ContentResponse Result = await InternetContent.GetAsync(new Uri(URL),
 					new KeyValuePair<string, string>("Accept", "image/*"));
 
-				if (Result is SKImage Image)
+				if (!Result.HasError && Result.Decoded is SKImage Image)
 				{
 					this.image = Image;
 					this.Document.RaiseUpdated(this);

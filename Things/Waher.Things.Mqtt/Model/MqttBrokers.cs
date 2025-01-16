@@ -40,8 +40,25 @@ namespace Waher.Things.Mqtt.Model
 		}
 
 		/// <summary>
-		/// TODO
+		/// Gets an MQTT Broker object, if available in the cache.
 		/// </summary>
+		/// <returns>MQTT Broker connection object, or null if none in the cache.</returns>
+		public static MqttBroker GetCachedBroker(string Key)
+		{
+			lock (brokers)
+			{
+				if (brokers.TryGetValue(Key, out MqttBroker Broker))
+					return Broker;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets an MQTT Broker object, according to connection parameters. If one is not
+		/// in memory, one is created and cached.
+		/// </summary>
+		/// <returns>MQTT Broker connection object.</returns>
 		public static async Task<MqttBroker> GetBroker(MqttBrokerNode Node, string Key, string Host, int Port, bool Tls, bool TrustServer,
 			string UserName, string Password, string ConnectionSubscription, string WillTopic, string WillData, bool WillRetain, 
 			MqttQualityOfService WillQoS)

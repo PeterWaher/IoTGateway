@@ -8,18 +8,19 @@ using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
+using Waher.Networking.Sniffers.Model;
 using Waher.Runtime.Cache;
 using Waher.Security;
 
 namespace Waher.IoTGateway.WebResources
 {
-    /// <summary>
-    /// Sending sniffer events to the corresponding web page(s).
-    /// </summary>
-    public class WebSniffer : SnifferBase, IDisposable
+	/// <summary>
+	/// Sending sniffer events to the corresponding web page(s).
+	/// </summary>
+	public class WebSniffer : SnifferBase, IDisposable
 	{
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
-		private readonly DateTime created = DateTime.Now;
+		private readonly DateTime created = DateTime.UtcNow;
 		private readonly DateTime expires;
 		private readonly ICommunicationLayer comLayer;
 		private readonly string[] privileges;
@@ -46,7 +47,7 @@ namespace Waher.IoTGateway.WebResources
 			string UserVariable, params string[] Privileges)
 			: base()
 		{
-			this.expires = DateTime.Now.Add(MaxLife);
+			this.expires = DateTime.UtcNow.Add(MaxLife);
 			this.comLayer = ComLayer;
 			this.snifferId = SnifferId;
 			this.resource = PageResource;
@@ -62,13 +63,13 @@ namespace Waher.IoTGateway.WebResources
 				this.outgoing = null;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public virtual void Dispose()
+		/// <inheritdoc/>
+		public override Task DisposeAsync()
 		{
 			this.outgoing?.Dispose();
 			this.outgoing = null;
+
+			return base.DisposeAsync();
 		}
 
 		/// <summary>
@@ -88,7 +89,7 @@ namespace Waher.IoTGateway.WebResources
 		{
 			try
 			{
-				DateTime Now = DateTime.Now;
+				DateTime Now = DateTime.UtcNow;
 
 				if ((Now - this.tabIdTimestamp).TotalSeconds > 2 || this.tabIds is null || this.tabIds.Length == 0)
 				{
@@ -143,20 +144,20 @@ namespace Waher.IoTGateway.WebResources
 
 		private async Task Close()
 		{
-			await this.Push(DateTime.Now, "Sniffer closed.", "Information", false);
+			await this.Push(DateTime.UtcNow, "Sniffer closed.", "Information", false);
 			this.comLayer.Remove(this);
-			this.Dispose();
+			await this.DisposeAsync();
 		}
 
-		private Task Process(DateTime Timestamp, byte[] Data, string Function)
+		private Task Process(DateTime Timestamp, byte[] Data, int Offset, int Count, string Function)
 		{
 			if (Timestamp >= this.expires)
 				return this.Close();
 			else
-				return this.Push(Timestamp, this.HexOutput(Data), Function, true);
+				return this.Push(Timestamp, this.HexOutput(Data, Offset, Count), Function, true);
 		}
 
-		private string HexOutput(byte[] Data)
+		private string HexOutput(byte[] Data, int Offset, int Count)
 		{
 			switch (this.binaryPresentationMethod)
 			{
@@ -164,9 +165,12 @@ namespace Waher.IoTGateway.WebResources
 					StringBuilder sb = new StringBuilder();
 					int i = 0;
 					bool First = true;
+					byte b;
 
-					foreach (byte b in Data)
+					while (Count-- > 0)
 					{
+						b = Data[Offset++];
+
 						if (i > 0)
 							sb.Append(' ');
 						else if (First)
@@ -191,83 +195,75 @@ namespace Waher.IoTGateway.WebResources
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an error state.
+		/// Processes an error event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Error">Error.</param>
-		public override Task Error(DateTime Timestamp, string Error)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferError Event)
 		{
-			return this.Process(Timestamp, Error, "Error");
+			return this.Process(Event.Timestamp, Event.Text, "Error");
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an exception state.
+		/// Processes an exception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		public override Task Exception(DateTime Timestamp, string Exception)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferException Event)
 		{
-			return this.Process(Timestamp, Exception, "Exception");
+			return this.Process(Event.Timestamp, Event.Text, "Exception");
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of something.
+		/// Processes an information event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Comment">Comment.</param>
-		public override Task Information(DateTime Timestamp, string Comment)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferInformation Event)
 		{
-			return this.Process(Timestamp, Comment, "Information");
+			return this.Process(Event.Timestamp, Event.Text, "Information");
 		}
 
 		/// <summary>
-		/// Called when binary data has been received.
+		/// Processes a binary reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxBinary Event)
 		{
-			return this.Process(Timestamp, Data, "Rx");
+			return this.Process(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Rx");
 		}
 
 		/// <summary>
-		/// Called when text has been received.
+		/// Processes a text reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public override Task ReceiveText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxText Event)
 		{
-			return this.Process(Timestamp, Text, "Rx");
+			return this.Process(Event.Timestamp, Event.Text, "Rx");
 		}
 
 		/// <summary>
-		/// Called when binary data has been transmitted.
+		/// Processes a binary transmission event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxBinary Event)
 		{
-			return this.Process(Timestamp, Data, "Tx");
+			return this.Process(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Tx");
 		}
 
 		/// <summary>
-		/// Called when text has been transmitted.
+		/// Processes a text transmission event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public override Task TransmitText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxText Event)
 		{
-			return this.Process(Timestamp, Text, "Tx");
+			return this.Process(Event.Timestamp, Event.Text, "Tx");
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of a warning state.
+		/// Processes a warning event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Warning">Warning.</param>
-		public override Task Warning(DateTime Timestamp, string Warning)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferWarning Event)
 		{
-			return this.Process(Timestamp, Warning, "Warning");
+			return this.Process(Event.Timestamp, Event.Text, "Warning");
 		}
 
 	}

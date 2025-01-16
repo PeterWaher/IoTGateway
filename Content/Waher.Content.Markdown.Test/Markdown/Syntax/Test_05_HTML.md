@@ -12,7 +12,7 @@
 
 This is an example of <b>bold text</b>.
 
-&copy; Waher Data AB 2016-2024. All rights reserved.
+&copy; Waher Data AB 2016-2025. All rights reserved.
 
 AT&T
 

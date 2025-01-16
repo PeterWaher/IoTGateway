@@ -28,24 +28,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -61,16 +49,21 @@ namespace Waher.IoTGateway.WebResources
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session is null)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
+			ContentResponse Content = await Request.DecodeDataAsync();
 			string From;
 
-			if (!(Obj is Dictionary<string, string> Form) ||
+			if (Content.HasError ||
+				!(Content.Decoded is Dictionary<string, string> Form) ||
 				!Form.TryGetValue("UserName", out string UserName) ||
 				!Form.TryGetValue("Password", out string Password))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			if (Request.Session.TryGetVariable("from", out Variable v))
@@ -94,7 +87,8 @@ namespace Waher.IoTGateway.WebResources
 					sb.Append(") has been blocked from the system.");
 
 					Request.Session["LoginError"] = sb.ToString();
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.TemporarilyBlocked:
 					sb = new StringBuilder();
@@ -119,41 +113,52 @@ namespace Waher.IoTGateway.WebResources
 					sb.Append(Request.RemoteEndPoint);
 
 					Request.Session["LoginError"] = sb.ToString();
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.NoPassword:
 					Request.Session["LoginError"] = "No password provided.";
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.InvalidCredentials:
 				default:
 					Request.Session["LoginError"] = "Invalid login credentials provided.";
-					throw new SeeOtherException(Request.Header.Referer.Value);
+					await Response.SendResponse(new SeeOtherException(Request.Header.Referer.Value));
+					return;
 
 				case LoginResultType.Success:
-					DoLogin(Request, From, Result.User);
+					await DoLogin(Request, Response, From, Result.User, false);
 					break;
 			}
 		}
 
-		internal static void DoLogin(HttpRequest Request, string From, User User)
+		internal static Task DoLogin(HttpRequest Request, HttpResponse Response, 
+			string From, User User, bool ThrowRedirection)
 		{
-			DoLogin(Request, From, false, User);
+			return DoLogin(Request, Response, From, false, User, ThrowRedirection);
 		}
 
-		internal static void DoLogin(HttpRequest Request, string From)
+		internal static Task DoLogin(HttpRequest Request, HttpResponse Response, 
+			string From, bool ThrowRedirection)
 		{
-			DoLogin(Request, From, true, new InternalUser());
+			return DoLogin(Request, Response, From, true, new InternalUser(), ThrowRedirection);
 		}
 
-		private static void DoLogin(HttpRequest Request, string From, bool AutoLogin, IUser User)
+		private static async Task DoLogin(HttpRequest Request, HttpResponse Response, 
+			string From, bool AutoLogin, IUser User, bool ThrowRedirection)
 		{
 			Request.Session["User"] = User;
 			Request.Session[" AutoLogin "] = AutoLogin;
 			Request.Session.Remove("LoginError");
 
 			if (!string.IsNullOrEmpty(From))
-				throw new SeeOtherException(From);
+			{
+				if (ThrowRedirection)
+					throw new SeeOtherException(From);
+				else
+					await Response.SendResponse(new SeeOtherException(From));
+			}
 		}
 
 		private class InternalUser : IUserWithClaims, IRequestOrigin
@@ -190,12 +195,12 @@ namespace Waher.IoTGateway.WebResources
 				string OsVersion = Environment.OSVersion.Version.ToString();
 
 				if (OsName.EndsWith(OsVersion))
-					OsName = OsName.Substring(0, OsName.Length - OsVersion.Length).TrimEnd();
+					OsName = OsName[..^OsVersion.Length].TrimEnd();
 
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.HardwareName, Environment.MachineName));
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareName, OsName));
 				Claims.Add(new KeyValuePair<string, object>(JwtClaims.SoftwareVersion, OsVersion));
-				
+
 				return Task.FromResult<IEnumerable<KeyValuePair<string, object>>>(Claims);
 			}
 

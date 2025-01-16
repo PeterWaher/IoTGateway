@@ -2,9 +2,8 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Markdown.Contracts;
 
-namespace Waher.Content.Markdown.Rendering.CodeContent
+namespace Waher.Content.Markdown.Contracts.CodeContent
 {
 	/// <summary>
 	/// Base64-encoded image content.
@@ -38,9 +37,9 @@ namespace Waher.Content.Markdown.Rendering.CodeContent
 				string Base64 = GetImageBase64(Rows);
 				byte[] Bin = Convert.FromBase64String(Base64);
 
-				object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
+				ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Bin, null);
 
-				if (!(Decoded is SKImage Image))
+				if (Decoded.HasError || !(Decoded.Decoded is SKImage Image))
 					return false;
 
 				Output.WriteStartElement("imageStandalone");

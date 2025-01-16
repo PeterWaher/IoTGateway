@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Queue;
 
@@ -10,94 +9,46 @@ namespace Waher.Runtime.Console.Worker
 	/// </summary>
 	public static class ConsoleWorker
 	{
-		private static AsyncQueue<WorkItem> queue = new AsyncQueue<WorkItem>();
-		private static bool terminating = false;
-		private static bool terminated = false;
+		private static AsyncProcessor<WorkItem> worker = new AsyncProcessor<WorkItem>(1);
 
 		static ConsoleWorker()
 		{
 			Log.Terminating += Log_Terminating;
-			Task.Run(() => PerformWork());
 		}
 
-		private static void Log_Terminating(object Sender, System.EventArgs e)
+		private static async Task Log_Terminating(object Sender, System.EventArgs e)
 		{
-			Terminate();
+			await Terminate();
 			Log.Terminating -= Log_Terminating;
 		}
 
-		internal static void Terminate()
+		internal static async Task Terminate()
 		{
-			terminating = true;
-			queue?.Dispose();
-			queue = null;
+			if (!(worker is null))
+			{
+				await worker.DisposeAsync();
+				worker = null;
+			}
 		}
 
 		/// <summary>
-		/// Queues a work item.
+		/// Forwards a work item for processing.
 		/// </summary>
 		/// <param name="Work">Item to process.</param>
 		/// <returns>If item was forwarded for processing (true), or if it was discarded (false).</returns>
-		public static Task<bool> Queue(WorkItem Work)
+		public static Task<bool> Forward(WorkItem Work)
 		{
-			if (!terminating)
-				return queue?.Add(Work) ?? Task.FromResult(false);
-			else
-				return Task.FromResult(false);
+			return worker?.Forward(Work) ?? Task.FromResult(false);
 		}
 
 		/// <summary>
 		/// If the console worker is being terminated.
 		/// </summary>
-		public static bool Terminating => terminating;
+		public static bool Terminating => worker?.Terminating ?? true;
 
 		/// <summary>
 		/// If the console worker has been terminated.
 		/// </summary>
-		public static bool Terminated => terminated;
-
-		/// <summary>
-		/// Performs console operations.
-		/// </summary>
-		private static async void PerformWork()
-		{
-			try
-			{
-				WorkItem Item;
-
-				while (!((Item = await (queue?.Wait() ?? Task.FromResult<WorkItem>(null))) is null))
-				{
-					try
-					{
-						await Item.Execute();
-						Item.Processed(true);
-					}
-					catch (Exception ex)
-					{
-						Item.Processed(false);
-						ex = Log.UnnestException(ex);
-
-						Event Event = new Event(Log.GetEventType(ex), ex, string.Empty, string.Empty, string.Empty, EventLevel.Minor,
-							string.Empty, string.Empty);
-
-						foreach (IEventSink Sink in Log.Sinks)
-						{
-							if (Sink.GetType().FullName.Contains(".Console"))
-								Event.Avoid(Sink);
-						}
-
-						Log.Event(Event);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
-			finally
-			{
-				terminated = true;
-			}
-		}
+		public static bool Terminated => worker?.Terminated ?? true;
 	}
 }

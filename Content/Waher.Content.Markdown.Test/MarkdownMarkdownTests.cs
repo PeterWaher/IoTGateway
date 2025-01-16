@@ -2,8 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
-using Waher.Script;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -12,11 +12,11 @@ namespace Waher.Content.Markdown.Test
 	{
 		private static async Task DoTest(string MarkdownFileName)
 		{
-			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedText = await Resources.ReadAllTextAsync("Markdown/Generated/" + MarkdownFileName);
+			string Markdown = await Files.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
+			string ExpectedText = await Files.ReadAllTextAsync("Markdown/Generated/" + MarkdownFileName);
 			Emoji1LocalFiles Emoji1LocalFiles = new(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
-			MarkdownSettings Settings = new(Emoji1LocalFiles, true, new Variables())
+			MarkdownSettings Settings = new(Emoji1LocalFiles, true, [])
 			{
 				HttpxProxy = "/HttpxProxy/%URL%"
 			};

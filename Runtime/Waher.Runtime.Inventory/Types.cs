@@ -316,9 +316,9 @@ namespace Waher.Runtime.Inventory
 		/// </summary>
 		public static event EventHandler OnInvalidated = null;
 
-		private static void OnProcessExit(object Sender, EventArgs e)
+		private static Task OnProcessExit(object Sender, EventArgs e)
 		{
-			StopAllModules();
+			return StopAllModules();
 		}
 
 		/// <summary>
@@ -382,7 +382,7 @@ namespace Waher.Runtime.Inventory
 					moduleParameters.Clear();
 				}
 
-				SingletonAttribute.Clear();
+				await SingletonAttribute.Clear();
 			}
 		}
 
@@ -1144,6 +1144,20 @@ namespace Waher.Runtime.Inventory
 		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
 		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
 		/// <param name="Object">Object with features to process.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			return FindSupport<InterfaceType, ObjectType>(Object, Grade.Barely);
+		}
+
+		/// <summary>
+		/// Finds the best interface for a certain task.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
 		/// <param name="MinSupport">Minimum support required.</param>
 		/// <returns>Best interface, if found, null otherwise.</returns>
 		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport)
@@ -1695,5 +1709,45 @@ namespace Waher.Runtime.Inventory
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Gets the assembly corresponding to a given resource name.
+		/// </summary>
+		/// <param name="ResourceName">Resource name.</param>
+		/// <returns>Assembly.</returns>
+		/// <exception cref="ArgumentException">If no assembly could be found.</exception>
+		public static Assembly GetAssemblyForResource(string ResourceName)
+		{
+			string[] Parts = ResourceName.Split('.');
+			string ParentNamespace;
+			int i, c;
+			Assembly A;
+
+			if (!IsRootNamespace(Parts[0]))
+				A = null;
+			else
+			{
+				ParentNamespace = Parts[0];
+				i = 1;
+				c = Parts.Length;
+
+				while (i < c)
+				{
+					if (!IsSubNamespace(ParentNamespace, Parts[i]))
+						break;
+
+					ParentNamespace += "." + Parts[i];
+					i++;
+				}
+
+				A = GetFirstAssemblyReferenceInNamespace(ParentNamespace);
+			}
+
+			if (A is null)
+				throw new ArgumentException("Assembly not found for resource " + ResourceName + ".", nameof(ResourceName));
+
+			return A;
+		}
+
 	}
 }

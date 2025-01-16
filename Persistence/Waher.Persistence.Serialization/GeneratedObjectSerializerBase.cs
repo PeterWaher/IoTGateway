@@ -1181,9 +1181,13 @@ namespace Waher.Persistence.Serialization
 
 					uint ElementDataType = Reader.ReadBits(6);
 					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
+					object Item;
 
 					for (i = 0; i < c; i++)
-						Result.SetValue(await S.Deserialize(Reader, ElementDataTypeN, true), i);
+					{
+						Item = await S.Deserialize(Reader, ElementDataTypeN, true);
+						Result.SetValue(Item, i);
+					}
 
 					return Result;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Content.Text
@@ -67,12 +68,13 @@ namespace Waher.Content.Text
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, 
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			string s = CommonTypes.GetString(Data, Encoding);
-			return Task.FromResult<object>(TSV.Parse(s));
+			string s = Strings.GetString(Data, Encoding);
+			return Task.FromResult(new ContentResponse(ContentType, TSV.Parse(s), Data));
 		}
 
 
@@ -143,10 +145,11 @@ namespace Waher.Content.Text
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding,
+			ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			string Tsv;
 
@@ -155,12 +158,12 @@ namespace Waher.Content.Text
 			else if (Object is IMatrix M)
 				Tsv = TSV.Encode(M);
 			else
-				throw new ArgumentException("Unable to encode as TSV.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode as TSV.", nameof(Object))));
 
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Tsv), "text/tab-separated-values"));
+			return Task.FromResult(new ContentResponse("text/tab-separated-values", Object, Encoding.GetBytes(Tsv)));
 		}
 	}
 }

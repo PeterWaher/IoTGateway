@@ -186,7 +186,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 					if (!string.IsNullOrEmpty(this.cid))
 					{
-						this.Document.DisposeContent(this.cid);
+						await this.Document.DisposeContent(this.cid);
 						this.cid = null;
 					}
 

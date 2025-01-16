@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
@@ -30,48 +29,110 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data)
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data)
 		{
-			return this.comLayer.ReceiveBinary(Data);
+			this.comLayer.ReceiveBinary(ConstantBuffer, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
+		{
+			this.comLayer.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
 		{
-			return this.comLayer.ReceiveBinary(Timestamp, Data);
+			this.comLayer.ReceiveBinary(Timestamp, ConstantBuffer, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
+		{
+			this.comLayer.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data)
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data)
 		{
-			return this.comLayer.TransmitBinary(Data);
+			this.comLayer.TransmitBinary(ConstantBuffer, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
+		{
+			this.comLayer.TransmitBinary(ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data)
 		{
-			return this.comLayer.TransmitBinary(Timestamp, Data);
+			this.comLayer.TransmitBinary(Timestamp, ConstantBuffer, Data);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
+		{
+			this.comLayer.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 		}
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(string Text)
+		public void ReceiveText(string Text)
 		{
-			return this.comLayer.ReceiveText(Text);
+			this.comLayer.ReceiveText(Text);
 		}
 
 		/// <summary>
@@ -79,18 +140,18 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(DateTime Timestamp, string Text)
+		public void ReceiveText(DateTime Timestamp, string Text)
 		{
-			return this.comLayer.ReceiveText(Timestamp, Text);
+			this.comLayer.ReceiveText(Timestamp, Text);
 		}
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(string Text)
+		public void TransmitText(string Text)
 		{
-			return this.comLayer.TransmitText(Text);
+			this.comLayer.TransmitText(Text);
 		}
 
 		/// <summary>
@@ -98,18 +159,18 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(DateTime Timestamp, string Text)
+		public void TransmitText(DateTime Timestamp, string Text)
 		{
-			return this.comLayer.TransmitText(Timestamp, Text);
+			this.comLayer.TransmitText(Timestamp, Text);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(string Comment)
+		public void Information(string Comment)
 		{
-			return this.comLayer.Information(Comment);
+			this.comLayer.Information(Comment);
 		}
 
 		/// <summary>
@@ -117,18 +178,18 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(DateTime Timestamp, string Comment)
+		public void Information(DateTime Timestamp, string Comment)
 		{
-			return this.comLayer.Information(Timestamp, Comment);
+			this.comLayer.Information(Timestamp, Comment);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(string Warning)
+		public void Warning(string Warning)
 		{
-			return this.comLayer.Warning(Warning);
+			this.comLayer.Warning(Warning);
 		}
 
 		/// <summary>
@@ -136,18 +197,18 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(DateTime Timestamp, string Warning)
+		public void Warning(DateTime Timestamp, string Warning)
 		{
-			return this.comLayer.Warning(Timestamp, Warning);
+			this.comLayer.Warning(Timestamp, Warning);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public Task Error(string Error)
+		public void Error(string Error)
 		{
-			return this.comLayer.Error(Error);
+			this.comLayer.Error(Error);
 		}
 
 		/// <summary>
@@ -155,37 +216,18 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public Task Error(DateTime Timestamp, string Error)
+		public void Error(DateTime Timestamp, string Error)
 		{
-			return this.comLayer.Error(Timestamp, Error);
+			this.comLayer.Error(Timestamp, Error);
 		}
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(string Exception)
+		public void Exception(string Exception)
 		{
-			return this.comLayer.Exception(Exception);
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, string Exception)
-		{
-			return this.comLayer.Exception(Timestamp, Exception);
-		}
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Exception">Exception.</param>
-		public Task Exception(Exception Exception)
-		{
-			return this.comLayer.Exception(Exception);
+			this.comLayer.Exception(Exception);
 		}
 
 		/// <summary>
@@ -193,9 +235,28 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, Exception Exception)
+		public void Exception(DateTime Timestamp, string Exception)
 		{
-			return this.comLayer.Exception(Timestamp, Exception);
+			this.comLayer.Exception(Timestamp, Exception);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(Exception Exception)
+		{
+			this.comLayer.Exception(Exception);
+		}
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		public void Exception(DateTime Timestamp, Exception Exception)
+		{
+			this.comLayer.Exception(Timestamp, Exception);
 		}
 	}
 }

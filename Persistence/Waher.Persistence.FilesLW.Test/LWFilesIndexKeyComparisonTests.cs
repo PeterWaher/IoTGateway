@@ -28,11 +28,11 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
 			if (provider is not null)
 			{
-				provider.Dispose();
+				await provider.DisposeAsync();
 				provider = null;
 			}
 		}
@@ -40,7 +40,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void DBFiles_Index_KeyComparison_Test_01_NumericalFields()
 		{
-			object[,] Values = this.GetNumberValues();
+			object[,] Values = GetNumberValues();
 			int x, y;
 			int Rows = Values.GetLength(0);
 			int Columns = Values.GetLength(1);
@@ -62,18 +62,18 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void DBFiles_Index_KeyComparison_Test_02_Serialized_NumericalFields()
 		{
-			object[,] Values = this.GetNumberValues();
+			object[,] Values = GetNumberValues();
 			int x, y;
 			int Rows = Values.GetLength(0);
 			int Columns = Values.GetLength(1);
-			IndexRecords Records = new IndexRecords(string.Empty, Encoding.UTF8, 1000, "Field");
+			IndexRecords Records = new(string.Empty, Encoding.UTF8, 1000, "Field");
 
 			for (y = 0; y < Rows; y++)
 			{
 				for (x = 0; x < Columns; x++)
 				{
-					BinarySerializer xWriter = new BinarySerializer(string.Empty, Encoding.UTF8);
-					BinarySerializer yWriter = new BinarySerializer(string.Empty, Encoding.UTF8);
+					BinarySerializer xWriter = new(string.Empty, Encoding.UTF8);
+					BinarySerializer yWriter = new(string.Empty, Encoding.UTF8);
 
 					object xValue = Values[y, x];
 					object yValue = Values[x, y];
@@ -96,7 +96,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 		}
 
-		private object[,] GetNumberValues()
+		private static object[,] GetNumberValues()
 		{
 			return new object[,]
 			{

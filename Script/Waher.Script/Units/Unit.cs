@@ -466,7 +466,7 @@ namespace Waher.Script.Units
 		/// </summary>
 		/// <param name="Unit2">Second unit.</param>
 		/// <param name="CheckPrefix"></param>
-		/// <returns></returns>
+		/// <returns>If units are equal.</returns>
 		public bool Equals(Unit Unit2, bool CheckPrefix)
 		{
 			if (CheckPrefix && this.prefix != Unit2.prefix)

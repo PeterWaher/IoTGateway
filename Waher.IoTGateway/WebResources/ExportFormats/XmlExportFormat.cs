@@ -7,7 +7,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.XmlLedger;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.WebResources.ExportFormats
 {

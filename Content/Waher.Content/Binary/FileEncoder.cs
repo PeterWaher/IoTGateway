@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Binary
 {
@@ -34,21 +34,22 @@ namespace Waher.Content.Binary
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding,
+			ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Object is FileReference Ref)
 			{
 				using (FileStream f = File.OpenRead(Ref.FileName))
 				{
 					byte[] Bin = await f.ReadAllAsync();
-					return new KeyValuePair<byte[], string>(Bin, Ref.ContentType);
+					return new ContentResponse(Ref.ContentType, Object, Bin);
 				}
 			}
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object)));
 		}
 
 		/// <summary>

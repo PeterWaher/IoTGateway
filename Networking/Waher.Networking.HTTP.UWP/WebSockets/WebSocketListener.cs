@@ -2,7 +2,11 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.HTTP.HTTP2;
 using Waher.Security;
+#if WINDOWS_UWP
+using Windows.Networking.Sockets;
+#endif
 
 namespace Waher.Networking.HTTP.WebSockets
 {
@@ -10,7 +14,7 @@ namespace Waher.Networking.HTTP.WebSockets
 	/// HTTP resource implementing the WebSocket Protocol as defined in RFC 6455:
 	/// https://tools.ietf.org/html/rfc6455
 	/// </summary>
-	public class WebSocketListener : HttpSynchronousResource, IHttpGetMethod, IDisposable
+	public class WebSocketListener : HttpSynchronousResource, IHttpGetMethod, IHttpConnectMethod, IDisposable
 	{
 		private readonly string[] subProtocols;
 		private readonly int maximumTextPayloadSize;
@@ -63,6 +67,11 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// If the GET method is allowed.
 		/// </summary>
 		public bool AllowsGET => true;
+
+		/// <summary>
+		/// If the CONNECT method is allowed.
+		/// </summary>
+		public bool AllowsCONNECT => true;
 
 		/// <summary>
 		/// Maximum text payload size.
@@ -161,6 +170,73 @@ namespace Waher.Networking.HTTP.WebSockets
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
 
 			Request.clientConnection.Upgrade(Socket);
+
+			await Response.SendResponse();
+
+			await this.Connected.Raise(this, new WebSocketEventArgs(Socket));
+		}
+
+		/// <summary>
+		/// Executes the CONNECT method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task CONNECT(HttpRequest Request, HttpResponse Response)
+		{
+			string WebSocketProtocol = null;
+			int? WebSocketVersion;
+			int i;
+
+			Http2Stream Stream = Request.Http2Stream
+				?? throw new ForbiddenException("Expected HTTP/2 or later.");
+
+			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Protocol", out HttpField Field))
+			{
+				string[] Options = Field.Value.Split(',');
+
+				foreach (string Option in Options)
+				{
+					i = Array.IndexOf(this.subProtocols, Option.Trim().ToLower());
+					if (i >= 0)
+					{
+						WebSocketProtocol = this.subProtocols[i];
+						break;
+					}
+				}
+
+				if (WebSocketProtocol is null)
+					throw new NotSupportedException();
+			}
+
+			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Version", out Field) &&
+				int.TryParse(Field.Value, out i))
+			{
+				if (i < 13)
+					throw new PreconditionFailedException();
+
+				WebSocketVersion = i;
+			}
+			else
+				throw new BadRequestException("Sec-WebSocket-Version header field missing.");
+
+			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Extensions", out Field))
+			{
+				// TODO: §9.1
+			}
+
+			WebSocket Socket = new WebSocket(this, Stream, Request, Response);
+
+			EventHandlerAsync<WebSocketEventArgs> Accept = this.Accept;
+			if (!(Accept is null))
+				await Accept.Invoke(this, new WebSocketEventArgs(Socket));  // Allow event handler to throw exception
+
+			Response.StatusCode = 200;
+
+			if (!(WebSocketProtocol is null))
+				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
+
+			Stream.Upgrade(Socket);
 
 			await Response.SendResponse();
 

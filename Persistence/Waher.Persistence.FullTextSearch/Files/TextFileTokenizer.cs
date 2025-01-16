@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Waher.Content;
+﻿using System.Threading.Tasks;
 using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Runtime.Inventory;
 
@@ -39,7 +36,7 @@ namespace Waher.Persistence.FullTextSearch.Files
 		/// <param name="Process">Current tokenization process.</param>
 		public async Task Tokenize(FileReference Reference, TokenizationProcess Process)
 		{
-			string Text = await Resources.ReadAllTextAsync(Reference.FileName);
+			string Text = await Runtime.IO.Files.ReadAllTextAsync(Reference.FileName);
 			StringTokenizer.Tokenize(Text, Process);
 		}
 	}

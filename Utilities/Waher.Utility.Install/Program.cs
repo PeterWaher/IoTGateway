@@ -421,7 +421,7 @@ namespace Waher.Utility.Install
 			finally
 			{
 				ConsoleOut.Flush(true);
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			}
 		}
 
@@ -665,11 +665,23 @@ namespace Waher.Utility.Install
 
 				if (ToTP >= FromTP)
 				{
-					Log.Warning("Skipping file. Destination folder contains newer version: " + From,
-						new KeyValuePair<string, object>("FromTP", FromTP),
-						new KeyValuePair<string, object>("ToTP", ToTP),
-						new KeyValuePair<string, object>("From", From),
-						new KeyValuePair<string, object>("To", To));
+					if (ToTP > FromTP)
+					{
+						Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+							new KeyValuePair<string, object>("FromTP", FromTP),
+							new KeyValuePair<string, object>("ToTP", ToTP),
+							new KeyValuePair<string, object>("From", From),
+							new KeyValuePair<string, object>("To", To));
+					}
+					else
+					{
+						Log.Notice("Skipping file. Destination folder contains same version: " + From,
+							new KeyValuePair<string, object>("FromTP", FromTP),
+							new KeyValuePair<string, object>("ToTP", ToTP),
+							new KeyValuePair<string, object>("From", From),
+							new KeyValuePair<string, object>("To", To));
+					}
+
 					Copy1 = false;
 				}
 			}
@@ -691,12 +703,25 @@ namespace Waher.Utility.Install
 
 					if (ToTP >= FromTP)
 					{
-						Log.Warning("Skipping file. Destination folder contains newer version: " + From,
-							string.Empty, string.Empty, "FileSkip",
-							new KeyValuePair<string, object>("FromTP", FromTP),
-							new KeyValuePair<string, object>("ToTP", ToTP),
-							new KeyValuePair<string, object>("From", From),
-							new KeyValuePair<string, object>("To", To2));
+						if (ToTP > FromTP)
+						{
+							Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+								string.Empty, string.Empty, "FileSkip",
+								new KeyValuePair<string, object>("FromTP", FromTP),
+								new KeyValuePair<string, object>("ToTP", ToTP),
+								new KeyValuePair<string, object>("From", From),
+								new KeyValuePair<string, object>("To", To2));
+						}
+						else
+						{
+							Log.Notice("Skipping file. Destination folder contains same version: " + From,
+								string.Empty, string.Empty, "FileSkip",
+								new KeyValuePair<string, object>("FromTP", FromTP),
+								new KeyValuePair<string, object>("ToTP", ToTP),
+								new KeyValuePair<string, object>("From", From),
+								new KeyValuePair<string, object>("To", To2));
+						}
+
 						Copy2 = false;
 					}
 				}

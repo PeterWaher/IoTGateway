@@ -189,12 +189,12 @@ namespace Waher.Utility.RunScript
 			finally
 			{
 				ConsoleOut.Flush(true);
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 
 				if (FilesProvider is not null)
 				{
 					FilesProvider.Stop().Wait();
-					FilesProvider?.Dispose();
+					FilesProvider?.DisposeAsync().Wait();
 				}
 			}
 		}

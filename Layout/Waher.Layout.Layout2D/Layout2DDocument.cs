@@ -1,12 +1,11 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D.Events;
@@ -15,6 +14,7 @@ using Waher.Layout.Layout2D.Model;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Backgrounds;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D
@@ -22,7 +22,7 @@ namespace Waher.Layout.Layout2D
 	/// <summary>
 	/// Contains a 2D layout document.
 	/// </summary>
-	public class Layout2DDocument : IDisposable
+	public class Layout2DDocument : IDisposableAsync
 	{
 		/// <summary>
 		/// Layout2D
@@ -112,7 +112,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
 		public static async Task<Layout2DDocument> FromFile(string FileName, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
-			string Xml = await Resources.ReadAllTextAsync(FileName);
+			string Xml = await Files.ReadAllTextAsync(FileName);
 			return await FromXml(Xml, Preprocess, Session, Attachments);
 		}
 
@@ -157,7 +157,7 @@ namespace Waher.Layout.Layout2D
 			byte[] Bin = new byte[c2];
 			Input.ReadAll(Bin, 0, c2);
 
-			string Xml = CommonTypes.GetString(Bin, DefaultEncoding);
+			string Xml = Strings.GetString(Bin, DefaultEncoding);
 
 			return FromXml(Xml, Preprocess, Session, Attachments);
 		}
@@ -297,13 +297,24 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.root?.Dispose();
 
 			foreach (object Attachment in this.attachments.Values)
 			{
-				if (Attachment is IDisposable Disposable)
+				if (Attachment is IDisposableAsync DisposableAsync)
+					await DisposableAsync.DisposeAsync();
+				else if (Attachment is IDisposable Disposable)
 					Disposable.Dispose();
 			}
 		}
@@ -532,13 +543,15 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="ContentId">Content ID</param>
 		/// <returns>If content with the corresponding ID was found and disposed.</returns>
-		public bool DisposeContent(string ContentId)
+		public async Task<bool> DisposeContent(string ContentId)
 		{
 			if (this.attachments.TryGetValue(ContentId, out object Obj))
 			{
 				this.attachments.Remove(ContentId);
 
-				if (Obj is IDisposable Disposable)
+				if (Obj is IDisposableAsync DisposableAsync)
+					await DisposableAsync.DisposeAsync();
+				else if (Obj is IDisposable Disposable)
 					Disposable.Dispose();
 
 				return true;
@@ -572,9 +585,9 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="ContentId">Content ID</param>
 		/// <param name="Content">Content</param>
-		public void AddContent(string ContentId, object Content)
+		public async Task AddContent(string ContentId, object Content)
 		{
-			this.DisposeContent(ContentId);
+			await this.DisposeContent(ContentId);
 			this.attachments[ContentId] = Content;
 		}
 

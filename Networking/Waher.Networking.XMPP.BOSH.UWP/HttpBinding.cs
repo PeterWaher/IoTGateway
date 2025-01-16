@@ -149,7 +149,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
 		/// unmanaged resources.
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
 			this.disposed = true;
 			this.xmppClient = null;
@@ -162,6 +162,8 @@ namespace Waher.Networking.XMPP.BOSH
 
 				this.httpClients = Array.Empty<HttpClient>();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private async Task<bool> RaiseOnSent(string Payload)
@@ -273,8 +275,8 @@ namespace Waher.Networking.XMPP.BOSH
 
 				if (this.xmppClient.HasSniffers)
 				{
-					await this.xmppClient.Information("Initiating session.");
-					await this.xmppClient.TransmitText(s);
+					this.xmppClient.Information("Initiating session.");
+					this.xmppClient.TransmitText(s);
 				}
 
 				HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, XmlCodec.DefaultContentType);
@@ -285,7 +287,11 @@ namespace Waher.Networking.XMPP.BOSH
 				HttpResponseMessage Response = await this.httpClients[0].PostAsync(this.url, Content);
 
 				if (!Response.IsSuccessStatusCode)
-					await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
+				{
+					ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
+					await this.bindingInterface.ConnectionError(Temp.Error);
+					return;
+				}
 
 				Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
 				XmlElement Body;
@@ -302,7 +308,7 @@ namespace Waher.Networking.XMPP.BOSH
 				string XmlResponse = Encoding.GetString(Bin);
 
 				if (this.xmppClient.HasSniffers)
-					await this.xmppClient.ReceiveText(XmlResponse);
+					this.xmppClient.ReceiveText(XmlResponse);
 
 				ResponseXml = new XmlDocument()
 				{
@@ -489,6 +495,7 @@ namespace Waher.Networking.XMPP.BOSH
 		/// Sends a text packet.
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
+		/// <returns>If data was sent.</returns>
 		public override Task<bool> SendAsync(string Packet)
 		{
 			return this.SendAsync(Packet, null, null);
@@ -500,10 +507,21 @@ namespace Waher.Networking.XMPP.BOSH
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public override async Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		/// <returns>If data was sent.</returns>
+		public override Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
 		{
 			if (this.terminated)
-				return false;
+				return Task.FromResult(false);
+
+			this.Send(Packet, DeliveryCallback, State);
+
+			return Task.FromResult(true);
+		}
+
+		private async void Send(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State)
+		{
+			if (this.terminated)
+				return;
 
 			try
 			{
@@ -539,12 +557,7 @@ namespace Waher.Networking.XMPP.BOSH
 								if (!string.IsNullOrEmpty(Packet))
 								{
 									if (this.xmppClient?.HasSniffers ?? false)
-									{
-										Task.Run(() =>
-										{
-											return this.xmppClient.Information("Outbound stanza queued.");
-										});
-									}
+										this.xmppClient.Information("Outbound stanza queued.");
 
 									this.outputQueue.AddLast(new OutputRec()
 									{
@@ -565,7 +578,7 @@ namespace Waher.Networking.XMPP.BOSH
 									}
 								}
 
-								return true;
+								return;
 							}
 
 							this.active[ClientIndex] = true;
@@ -646,7 +659,7 @@ namespace Waher.Networking.XMPP.BOSH
 						break;
 
 					if (HasSniffers && !(this.xmppClient is null))
-						await this.xmppClient.TransmitText(s);
+						this.xmppClient.TransmitText(s);
 
 					HttpContent Content = new StringContent(s, System.Text.Encoding.UTF8, XmlCodec.DefaultContentType);
 
@@ -655,7 +668,11 @@ namespace Waher.Networking.XMPP.BOSH
 					HttpResponseMessage Response = await this.httpClients[ClientIndex].PostAsync(this.url, Content);
 
 					if (!Response.IsSuccessStatusCode)
-						await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
+					{
+						ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
+						await this.bindingInterface?.ConnectionError(Temp.Error);
+						return;
+					}
 
 					lock (this.httpClients)
 					{
@@ -700,7 +717,7 @@ namespace Waher.Networking.XMPP.BOSH
 					string XmlResponse = Encoding.GetString(Bin).Trim();
 
 					if (this.xmppClient.HasSniffers)
-						await this.xmppClient.ReceiveText(XmlResponse);
+						this.xmppClient.ReceiveText(XmlResponse);
 
 					await this.BodyReceived(XmlResponse, false);
 				}
@@ -714,12 +731,14 @@ namespace Waher.Networking.XMPP.BOSH
 					}
 				}
 			}
+			catch (TaskCanceledException)
+			{
+				return;
+			}
 			catch (Exception ex)
 			{
 				await this.bindingInterface?.ConnectionError(ex);
 			}
-
-			return true;
 		}
 
 		private Task<bool> BodyReceived(string Xml, bool First)

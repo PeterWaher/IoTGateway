@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.Cssx
 {
@@ -66,11 +67,12 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, System.Text.Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, System.Text.Encoding Encoding, 
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			return Task.FromResult<object>(CommonTypes.GetString(Data, Encoding));
+			return Task.FromResult(new ContentResponse(ContentType, Strings.GetString(Data, Encoding), Data));
 		}
 
 		/// <summary>

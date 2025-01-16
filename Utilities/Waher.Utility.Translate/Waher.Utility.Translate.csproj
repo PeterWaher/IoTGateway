@@ -7,7 +7,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Command-line tool that helps translating resource strings from one language to another. It uses an internal database to check for updates, and performs translations only of new or updated strings accordingly.</Description>
-    <Copyright>Copyright © Waher Data AB 2022-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2022-2025. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.Translate</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>

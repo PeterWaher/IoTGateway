@@ -275,11 +275,11 @@ namespace Waher.Utility.Translate
 				Namespace ToNamespace = ToLanguage.GetNamespaceAsync(Namespace).Result
 					?? ToLanguage.CreateNamespaceAsync(Namespace).Result;
 
-				List<TranslationItem> ToTranslate = new();
-				List<string> StringIds = new();
+				List<TranslationItem> ToTranslate = [];
+				List<string> StringIds = [];
 				XmlComment FromComment = null;
 				XmlElement FromSchema = null;
-				List<KeyValuePair<string, string>> Headers = new();
+				List<KeyValuePair<string, string>> Headers = [];
 
 				foreach (XmlNode N in From.DocumentElement.ChildNodes)
 				{
@@ -335,7 +335,7 @@ namespace Waher.Utility.Translate
 				{
 					ConsoleOut.WriteLine("Translating " + c.ToString() + " strings.");
 
-					List<Dictionary<string, object>> Req = new();
+					List<Dictionary<string, object>> Req = [];
 
 					foreach (TranslationItem Item in ToTranslate)
 						Req.Add(new Dictionary<string, object>() { { "Text", Item.From.Value } });
@@ -347,13 +347,14 @@ namespace Waher.Utility.Translate
 					Url.Append("&to=");
 					Url.Append(TranslationLanguage);
 
-					object Resp = InternetContent.PostAsync(new Uri(Url.ToString()), Req.ToArray(),
+					ContentResponse Resp = InternetContent.PostAsync(new Uri(Url.ToString()), Req.ToArray(),
 						new KeyValuePair<string, string>("Ocp-Apim-Subscription-Key", TranslationKey)).Result;
+					Resp.AssertOk();
 
-					if (Resp is not Array A)
+					if (Resp.Decoded is not Array A)
 						throw new Exception("Unexpected reponse returned.");
 
-					List<string> Response = new();
+					List<string> Response = [];
 
 					foreach (object Item in A)
 					{

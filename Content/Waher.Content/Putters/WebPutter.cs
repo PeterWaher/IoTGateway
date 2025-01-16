@@ -59,7 +59,7 @@ namespace Waher.Content.Putters
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public override async Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+		public override async Task<ContentBinaryResponse> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, 
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
 			params KeyValuePair<string, string>[] Headers)
 		{

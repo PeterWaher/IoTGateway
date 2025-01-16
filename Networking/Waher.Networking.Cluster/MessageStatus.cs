@@ -13,6 +13,7 @@ namespace Waher.Networking.Cluster
 		public Guid Id;
 		public Dictionary<IPEndPoint, bool?> Acknowledged = new Dictionary<IPEndPoint, bool?>();
 		public IClusterMessage Message;
+		public IPEndPoint Destination;
 		public byte[] MessageBinary;
 		public DateTime Timeout;
 		public DateTime TimeLimit;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Content.Markdown.Consolidation
@@ -7,7 +6,7 @@ namespace Waher.Content.Markdown.Consolidation
 	/// <summary>
 	/// Interface for consolidators.
 	/// </summary>
-	public interface IConsolidator : IDisposable
+	public interface IConsolidator : IDisposableAsync
 	{
 		/// <summary>
 		/// Consolidated sources.

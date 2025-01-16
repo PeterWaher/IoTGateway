@@ -18,6 +18,7 @@ using Waher.Runtime.Timing;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.DTLS;
+using Waher.Content.Binary;
 #if WINDOWS_UWP
 using Windows.Networking;
 using Windows.Networking.Connectivity;
@@ -25,11 +26,11 @@ using Windows.Networking.Connectivity;
 
 namespace Waher.Networking.CoAP
 {
-    /// <summary>
-    /// CoAP client. CoAP is defined in RFC7252:
-    /// https://tools.ietf.org/html/rfc7252
-    /// </summary>
-    public class CoapEndpoint : CommunicationLayer, IDisposable
+	/// <summary>
+	/// CoAP client. CoAP is defined in RFC7252:
+	/// https://tools.ietf.org/html/rfc7252
+	/// </summary>
+	public class CoapEndpoint : CommunicationLayer, IDisposableAsync
 	{
 		/// <summary>
 		/// Default CoAP port = 5683
@@ -299,7 +300,12 @@ namespace Waher.Networking.CoAP
 							Outgoing.Client.Bind(new IPEndPoint(Address, 0));
 
 							if (!Encrypted)
-								Outgoing.JoinMulticastGroup(MulticastAddress);
+							{
+								if (IsMulticastAddress(MulticastAddress))
+									Outgoing.JoinMulticastGroup(MulticastAddress);
+								else
+									this.Warning("Address provided is not a multi-cast address.");
+							}
 
 							IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
 							ClientBase OutgoingClient;
@@ -389,7 +395,10 @@ namespace Waher.Networking.CoAP
 										MulticastLoopback = false
 									};
 
-									Incoming.JoinMulticastGroup(MulticastAddress);
+									if (IsMulticastAddress(MulticastAddress))
+										Incoming.JoinMulticastGroup(MulticastAddress);
+									else
+										this.Warning("Address provided is not a multi-cast address.");
 
 									IncomingClient = new IncomingUdpClient()
 									{
@@ -419,7 +428,16 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 			this.scheduler?.Dispose();
 			this.scheduler = null;
@@ -454,16 +472,16 @@ namespace Waher.Networking.CoAP
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
-				if (Sniffer is IDisposable Disposable)
+				try
 				{
-					try
-					{
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
 						Disposable.Dispose();
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
 				}
 			}
 		}
@@ -477,7 +495,7 @@ namespace Waher.Networking.CoAP
 		{
 			if (Packet.Length < 4)
 			{
-				await this.Error("Datagram too short.");
+				this.Error("Datagram too short.");
 				return;
 			}
 
@@ -485,7 +503,7 @@ namespace Waher.Networking.CoAP
 			int TokenLength = b & 15;
 			if (TokenLength > 8)
 			{
-				await this.Error("Invalid token length.");
+				this.Error("Invalid token length.");
 				return;
 			}
 
@@ -494,7 +512,7 @@ namespace Waher.Networking.CoAP
 			b >>= 2;
 			if (b != 1)
 			{
-				await this.Error("Unrecognized version.");
+				this.Error("Unrecognized version.");
 				return;
 			}
 
@@ -512,7 +530,7 @@ namespace Waher.Networking.CoAP
 			{
 				if (Pos >= Len)
 				{
-					await this.Error("Unexpected end of packet.");
+					this.Error("Unexpected end of packet.");
 					return;
 				}
 
@@ -543,7 +561,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -553,7 +571,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + 1 >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -564,7 +582,7 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Delta == 15)
 					{
-						await this.Error("Invalid delta-value.");
+						this.Error("Invalid delta-value.");
 						return;
 					}
 
@@ -572,7 +590,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -582,7 +600,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + 1 >= Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -593,7 +611,7 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Length == 15)
 					{
-						await this.Error("Invalid length-value.");
+						this.Error("Invalid length-value.");
 						return;
 					}
 
@@ -603,7 +621,7 @@ namespace Waher.Networking.CoAP
 					{
 						if (Pos + Length > Len)
 						{
-							await this.Error("Unexpected end of packet.");
+							this.Error("Unexpected end of packet.");
 							return;
 						}
 
@@ -622,7 +640,7 @@ namespace Waher.Networking.CoAP
 						}
 						catch (Exception ex)
 						{
-							await this.Exception(ex);
+							this.Exception(ex);
 
 							if (Option.Critical)
 								return;
@@ -661,7 +679,7 @@ namespace Waher.Networking.CoAP
 						ulong l = ((CoapOptionObserve)Option).Value;
 						if (l < 0 || l > 0xffffff)
 						{
-							await this.Error("Invalid observe value.");
+							this.Error("Invalid observe value.");
 							return;
 						}
 
@@ -672,7 +690,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionUriPort)Option).Value;
 						if (l < 0 || l > ushort.MaxValue)
 						{
-							await this.Error("Invalid port number.");
+							this.Error("Invalid port number.");
 							return;
 						}
 
@@ -697,7 +715,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionContentFormat)Option).Value;
 						if (l < 0 || l > ushort.MaxValue)
 						{
-							await this.Error("Invalid content format.");
+							this.Error("Invalid content format.");
 							return;
 						}
 
@@ -708,7 +726,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionMaxAge)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							await this.Error("Invalid max age.");
+							this.Error("Invalid max age.");
 							return;
 						}
 
@@ -749,7 +767,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionSize2)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							await this.Error("Invalid size2.");
+							this.Error("Invalid size2.");
 							return;
 						}
 
@@ -760,7 +778,7 @@ namespace Waher.Networking.CoAP
 						l = ((CoapOptionSize1)Option).Value;
 						if (l < 0 || l > uint.MaxValue)
 						{
-							await this.Error("Invalid size1.");
+							this.Error("Invalid size1.");
 							return;
 						}
 
@@ -1585,7 +1603,7 @@ namespace Waher.Networking.CoAP
 							Result.Add(Options[j]);
 					}
 				}
-				else 
+				else
 					Result?.Add(Option);
 			}
 
@@ -1905,7 +1923,7 @@ namespace Waher.Networking.CoAP
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		[Obsolete("Use DecodeAsync for better asynchronous performance.")]
-		public static object Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
+		public static ContentResponse Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
 			return DecodeAsync(ContentFormat, Payload, BaseUri).Result;
 		}
@@ -1917,12 +1935,12 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Payload.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		public static async Task<object> DecodeAsync(int ContentFormat, byte[] Payload, Uri BaseUri)
+		public static async Task<ContentResponse> DecodeAsync(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
 			if (contentFormatsByCode.TryGetValue(ContentFormat, out ICoapContentFormat Format))
 				return await InternetContent.DecodeAsync(Format.ContentType, Payload, BaseUri);
 			else
-				return Payload;
+				return new ContentResponse(BinaryCodec.DefaultContentType, Payload, Payload);
 		}
 
 		/// <summary>
@@ -1946,12 +1964,12 @@ namespace Waher.Networking.CoAP
 		/// <returns>Decoded object and Content format of encoded content..</returns>
 		public static async Task<KeyValuePair<byte[], int>> EncodeAsync(object Payload)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Payload, Encoding.UTF8);
+			ContentResponse P = await InternetContent.EncodeAsync(Payload, Encoding.UTF8);
 
-			if (contentFormatsByContentType.TryGetValue(P.Value, out ICoapContentFormat Format))
-				return new KeyValuePair<byte[], int>(P.Key, Format.ContentFormat);
+			if (contentFormatsByContentType.TryGetValue(P.ContentType, out ICoapContentFormat Format))
+				return new KeyValuePair<byte[], int>(P.Encoded, Format.ContentFormat);
 			else
-				throw new Exception("Unable to encode content of type " + P.Value);
+				throw new Exception("Unable to encode content of type " + P.ContentType);
 		}
 
 		private async Task<IPEndPoint> GetIPEndPoint(string Destination, int Port, EventHandlerAsync<CoapResponseEventArgs> Callback, object State)

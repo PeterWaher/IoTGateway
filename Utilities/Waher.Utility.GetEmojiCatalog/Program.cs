@@ -77,7 +77,7 @@ namespace Waher.Utility.GetEmojiCatalog
 			finally
 			{
 				ConsoleOut.Flush(true);
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			}
 		}
 	}

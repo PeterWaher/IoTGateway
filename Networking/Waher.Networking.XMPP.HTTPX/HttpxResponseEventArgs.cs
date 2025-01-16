@@ -13,6 +13,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private readonly double version;
 		private readonly int statusCode;
 		private readonly bool hasData;
+		private readonly bool constantBuffer;
 		private readonly byte[] data;
 
 		/// <summary>
@@ -25,9 +26,12 @@ namespace Waher.Networking.XMPP.HTTPX
 		///	<param name="StatusCode">HTTP Status Code.</param>
 		///	<param name="StatusMessage">HTTP Status Message.</param>
 		///	<param name="HasData">If the response has data.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		///	<param name="Data">Any binary data directly available in the response.</param>
 		public HttpxResponseEventArgs(IqResultEventArgs e, HttpResponse Response, object State, 
-			double Version, int StatusCode, string StatusMessage, bool HasData, byte[] Data)
+			double Version, int StatusCode, string StatusMessage, bool HasData, bool ConstantBuffer, 
+			byte[] Data)
 			: base(e)
 		{
 			this.response = Response;
@@ -36,6 +40,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.statusCode = StatusCode;
 			this.statusMessage = StatusMessage;
 			this.hasData = HasData;
+			this.constantBuffer = ConstantBuffer;
 			this.data = Data;
 		}
 
@@ -63,6 +68,12 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// If the response has data.
 		/// </summary>
 		public bool HasData => this.hasData;
+
+		/// <summary>
+		/// If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).
+		/// </summary>
+		public bool ConstantBuffer => this.constantBuffer;
 
 		/// <summary>
 		/// Any binary data directly available in the response. If <see cref="HasData"/>=true and <see cref="Data"/>=null,

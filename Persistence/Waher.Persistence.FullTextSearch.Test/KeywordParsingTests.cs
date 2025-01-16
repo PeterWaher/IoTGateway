@@ -36,12 +36,14 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[AssemblyCleanup]
 		public static async Task AssemblyCleanup()
 		{
-			Log.Terminate();
-
+			await Log.TerminateAsync();
 			await Types.StopAllModules();
 
-			filesProvider?.Dispose();
-			filesProvider = null;
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 		}
 
 		[TestMethod]

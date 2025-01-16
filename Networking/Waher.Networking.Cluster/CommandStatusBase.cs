@@ -10,6 +10,7 @@ namespace Waher.Networking.Cluster
 	internal abstract class CommandStatusBase
 	{
 		public Guid Id;
+		public string IdStr;
 		public IClusterCommand Command;
 		public byte[] CommandBinary;
 		public DateTime Timeout;

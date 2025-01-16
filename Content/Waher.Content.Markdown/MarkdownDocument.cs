@@ -314,11 +314,8 @@ namespace Waher.Content.Markdown
 			Variables Variables = Settings.Variables;
 			Expression Exp;
 			string Script, s2;
-			object Result;
 			int i, j;
 			bool IsDynamic = false;
-			bool UsesImplicitPrint = false;
-			bool HasImplicitPrint = false;
 
 			if (!string.IsNullOrEmpty(FileName))
 			{
@@ -370,15 +367,31 @@ namespace Waher.Content.Markdown
 			}
 
 			i = Markdown.IndexOf("{{");
+			if (i < 0)
+				return new KeyValuePair<string, bool>(Markdown, IsDynamic);
+
+			StringBuilder Transformed = new StringBuilder();
+			int From = 0;
+			bool UsesImplicitPrint = false;
+			bool HasImplicitPrint = false;
+			object Result;
 
 			while (i >= 0)
 			{
 				j = Markdown.IndexOf("}}", i + 2);
 				if (j < 0)
-					break;
+				{
+					if (From == 0)
+						return new KeyValuePair<string, bool>(Markdown, IsDynamic);
+					else
+						break;
+				}
 
+				if (i > From)
+					Transformed.Append(Markdown.Substring(From, i - From));
+
+				From = j + 2;
 				Script = Markdown.Substring(i + 2, j - i - 2);
-				Markdown = Markdown.Remove(i, j - i + 2);
 
 				try
 				{
@@ -437,9 +450,7 @@ namespace Waher.Content.Markdown
 				{
 					ex = Log.UnnestException(ex);
 
-					StringBuilder sb = new StringBuilder();
-
-					sb.AppendLine("<font class=\"error\">");
+					Transformed.AppendLine("<font class=\"error\">");
 
 					if (ex is AggregateException ex2)
 					{
@@ -449,9 +460,9 @@ namespace Waher.Content.Markdown
 
 							Log.Exception(ex3, FileName);
 
-							sb.Append("<p>");
-							sb.Append(XML.HtmlValueEncode(ex3.Message));
-							sb.AppendLine("</p>");
+							Transformed.Append("<p>");
+							Transformed.Append(XML.HtmlValueEncode(ex3.Message));
+							Transformed.AppendLine("</p>");
 						}
 					}
 					else
@@ -460,12 +471,12 @@ namespace Waher.Content.Markdown
 
 						Log.Exception(ex, FileName);
 
-						sb.AppendLine(XML.HtmlValueEncode(ex.Message));
+						Transformed.AppendLine(XML.HtmlValueEncode(ex.Message));
 					}
 
-					sb.AppendLine("</font>");
+					Transformed.AppendLine("</font>");
 
-					Result = sb.ToString();
+					Result = null;
 				}
 
 				if (!(Result is null))
@@ -473,19 +484,21 @@ namespace Waher.Content.Markdown
 					if (!(Result is string s3))
 						s3 = await PrintMarkdown(Result, Variables);
 
-					Markdown = Markdown.Insert(i, s3);
-					i += s3.Length;
+					Transformed.Append(s3);
 				}
 
-				i = Markdown.IndexOf("{{", i);
+				i = Markdown.IndexOf("{{", From);
 			}
 
-			return new KeyValuePair<string, bool>(Markdown, IsDynamic);
+			if (From < Markdown.Length)
+				Transformed.Append(Markdown.Substring(From));
+
+			return new KeyValuePair<string, bool>(Transformed.ToString(), IsDynamic);
 		}
 
 		private static async Task<string> PrintMarkdown(object Value, Variables Variables)
 		{
-			if (Value is null)
+			if (Expression.IsNullOrVoid(Value))
 				return string.Empty;
 
 			if (Value.GetType().GetTypeInfo().IsValueType || Value is string)

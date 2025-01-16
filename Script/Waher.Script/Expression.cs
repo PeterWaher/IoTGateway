@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Numerics;
-using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -28,7 +29,6 @@ using Waher.Script.Operators.Vectors;
 using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
-using System.Threading.Tasks;
 
 namespace Waher.Script
 {
@@ -4397,37 +4397,50 @@ namespace Waher.Script
 		[Obsolete("Use the TransformAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public static string Transform(string s, string StartDelimiter, string StopDelimiter, Variables Variables, string Source)
 		{
-			Expression Exp;
-			string Script, s2;
-			object Result;
 			int i = s.IndexOf(StartDelimiter);
+			if (i < 0)
+				return s;
+
+			StringBuilder Transformed = new StringBuilder();
+			Expression Exp;
+			string Script;
+			object Result;
 			int j;
 			int StartLen = StartDelimiter.Length;
 			int StopLen = StopDelimiter.Length;
+			int From = 0;
 
 			while (i >= 0)
 			{
 				j = s.IndexOf(StopDelimiter, i + StartLen);
 				if (j < 0)
-					break;
+				{
+					if (From == 0)
+						return s;
+					else
+						break;
+				}
+
+				if (i > From)
+					Transformed.Append(s.Substring(From, i - From));
+
+				From = j + StopLen;
 
 				Script = s.Substring(i + StartLen, j - i - StartLen);
-				s = s.Remove(i, j - i + StopLen);
 
 				Exp = new Expression(Script, Source);
 				Result = Exp.Evaluate(Variables);
 
-				if (!(Result is null))
-				{
-					s2 = Result.ToString();
-					s = s.Insert(i, s2);
-					i += s2.Length;
-				}
+				if (!IsNullOrVoid(Result))
+					Transformed.Append(Result.ToString());
 
-				i = s.IndexOf(StartDelimiter, i);
+				i = s.IndexOf(StartDelimiter, From);
 			}
 
-			return s;
+			if (From < s.Length)
+				Transformed.Append(s.Substring(From));
+
+			return Transformed.ToString();
 		}
 
 		/// <summary>
@@ -4454,39 +4467,90 @@ namespace Waher.Script
 		/// <returns>Transformed string.</returns>
 		public static async Task<string> TransformAsync(string s, string StartDelimiter, string StopDelimiter, Variables Variables, string Source)
 		{
+			int i = s.IndexOf(StartDelimiter);
+			if (i < 0)
+				return s;
+
+			StringBuilder Transformed = new StringBuilder();
 			ValuePrinter Printer = Variables.Printer;
 			Expression Exp;
-			string Script, s2;
+			string Script;
 			object Result;
-			int i = s.IndexOf(StartDelimiter);
 			int j;
 			int StartLen = StartDelimiter.Length;
 			int StopLen = StopDelimiter.Length;
+			int From = 0;
 
 			while (i >= 0)
 			{
 				j = s.IndexOf(StopDelimiter, i + StartLen);
 				if (j < 0)
-					break;
+				{
+					if (From == 0)
+						return s;
+					else
+						break;
+				}
+
+				if (i > From)
+					Transformed.Append(s.Substring(From, i - From));
+
+				From = j + StopLen;
 
 				Script = s.Substring(i + StartLen, j - i - StartLen);
-				s = s.Remove(i, j - i + StopLen);
 
 				Exp = new Expression(Script, Source);
 				Result = await Exp.EvaluateAsync(Variables);
 
-				if (!(Result is null))
-				{
-					s2 = Printer is null ? Result.ToString() : await Printer(Result, Variables);
-					s = s.Insert(i, s2);
-					i += s2.Length;
-				}
+				if (!IsNullOrVoid(Result))
+					Transformed.Append(Printer is null ? Result.ToString() : await Printer(Result, Variables));
 
-				i = s.IndexOf(StartDelimiter, i);
+				i = s.IndexOf(StartDelimiter, From);
 			}
 
-			return s;
+			if (From < s.Length)
+				Transformed.Append(s.Substring(From));
+
+			return Transformed.ToString();
 		}
+
+		/// <summary>
+		/// Checks if a result object value is equal to null or void 
+		/// (i.e. its type equal to System.Threading.Tasks.VoidTaskResult).
+		/// </summary>
+		/// <param name="Result">Result object.</param>
+		/// <returns>If value is null or void.</returns>
+		public static bool IsNullOrVoid(object Result)
+		{
+			if (Result is null)
+				return true;
+			else
+				return IsVoid(Result.GetType());
+		}
+
+		/// <summary>
+		/// Checks if a result object type is equal to void 
+		/// (i.e. its type equal to System.Threading.Tasks.VoidTaskResult).
+		/// </summary>
+		/// <param name="ResultType">Result type.</param>
+		/// <returns>If type is void.</returns>
+		public static bool IsVoid(Type ResultType)
+		{
+			if (VoidTaskResultType is null)
+			{
+				if (ResultType.FullName == "System.Threading.Tasks.VoidTaskResult")
+				{
+					VoidTaskResultType = ResultType;
+					return true;
+				}
+				else
+					return false;
+			}
+			else
+				return ResultType == VoidTaskResultType;
+		}
+
+		private static Type VoidTaskResultType = null;
 
 		/// <summary>
 		/// Converts a value to a string, that can be parsed as part of an expression.

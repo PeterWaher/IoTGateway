@@ -52,11 +52,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			int WindowSizeDiff = Size - this.lastRemoteInitialWindowSize;
 			this.lastRemoteInitialWindowSize = Size;
 
-			if (WindowSizeDiff > 0)
+			if (WindowSizeDiff != 0)
 			{
 				lock (this.synchObj)
 				{
-					this.root.SetNewWindowSize(Size);
+					this.root.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size);
 				}
 			}
 		}

@@ -34,7 +34,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public PriorityNodeRfc7540(PriorityNodeRfc7540 DependentNode, PriorityNodeRfc7540 Root, Http2Stream Stream, byte Weight,
 			FlowControlRfc7540 FlowControl)
 		{
-			ConnectionSettings Settings = FlowControl.RemoteSettings;
+			ConnectionSettings Settings = Stream is null ? FlowControl.LocalSettings : FlowControl.RemoteSettings;
 
 			this.dependentOn = DependentNode;
 			this.root = Root;
@@ -213,7 +213,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
-		private void RecalculateChildWindows()
+		private void RecalculateChildWindows(int ConnectionWindowSize, int StreamWindowSize)
 		{
 			if (!(this.childNodes is null) && this.totalChildWeights > 0)
 			{
@@ -223,7 +223,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				while (!(Loop is null))
 				{
 					Child = Loop.Value;
-					Child.SetNewWindowSize((int)(this.windowSize0 * this.ResourceFraction * Child.weight / this.totalChildWeights), false);
+					Child.SetNewWindowSize(ConnectionWindowSize, (int)(StreamWindowSize * this.ResourceFraction * Child.weight / this.totalChildWeights), false);
 					Loop = Loop.Next;
 				}
 			}
@@ -354,16 +354,18 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Sets a new window size.
 		/// </summary>
-		/// <param name="WindowSize">Window size</param>
+		/// <param name="ConnectionWindowSize">Connection Window size</param>
+		/// <param name="StreamWindowSize">Stream Window size</param>
 		/// <param name="Trigger">If pending streams should be triggered.</param>
-		public void SetNewWindowSize(int WindowSize, bool Trigger)
+		public void SetNewWindowSize(int ConnectionWindowSize, int StreamWindowSize, bool Trigger)
 		{
+			int WindowSize = this.Stream is null ? ConnectionWindowSize : StreamWindowSize;
 			int Diff = WindowSize - this.windowSize0;
 			this.windowSize0 = WindowSize;
 			this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			this.windowSize += Diff;
 
-			this.RecalculateChildWindows();
+			this.RecalculateChildWindows(ConnectionWindowSize, StreamWindowSize);
 
 			if (Trigger)
 			{

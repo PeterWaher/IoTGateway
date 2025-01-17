@@ -8,14 +8,14 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// Class that manages HTTP/2 flow control using simplified absolute priorities,
 	/// as defined in RFC 9218.
 	/// </summary>
-	public class FlowControlRfc9218 : IFlowControl
+	public class FlowControlRfc9218 : FlowControlConnection
 	{
 		private readonly LinkedList<PriorityNodeRfc9218>[] priorities = new LinkedList<PriorityNodeRfc9218>[8];
 		private readonly Dictionary<int, StreamRec> streams = new Dictionary<int, StreamRec>();
 		private readonly PriorityNodeRfc9218 root;
 		private readonly object synchObj = new object();
-		private ConnectionSettings settings;
 		private int lastNodeStreamId = -1;
+		private int lastInitialWindowSize = 0;
 		private StreamRec lastRec = null;
 		private bool disposed = false;
 
@@ -29,17 +29,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Class that manages HTTP/2 flow control using trees of priorty nodes.
 		/// </summary>
-		/// <param name="Settings">Connection settings.</param>
-		public FlowControlRfc9218(ConnectionSettings Settings)
+		/// <param name="LocalSettings">Local Connection settings.</param>
+		/// <param name="RemoteSettings">Remote Connection settings.</param>
+		public FlowControlRfc9218(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings)
+			: base(LocalSettings, RemoteSettings)
 		{
-			this.settings = Settings;
 			this.root = new PriorityNodeRfc9218(null, this);
+			this.lastInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
-
-		/// <summary>
-		/// Connection settings.
-		/// </summary>
-		public ConnectionSettings Settings => this.settings;
 
 		/// <summary>
 		/// Root node.
@@ -47,20 +44,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		public PriorityNodeRfc9218 Root => this.root;
 
 		/// <summary>
-		/// Updates remote settings.
+		/// Called when connection settings have been updated.
 		/// </summary>
-		/// <param name="Settings">Connection settings.</param>
-		public void UpdateSettings(ConnectionSettings Settings)
+		public override void RemoteSettingsUpdated()
 		{
-			int WindowSizeDiff = Settings.InitialWindowSize - this.settings.InitialWindowSize;
-
-			this.settings = Settings;
+			int Size = this.RemoteSettings.InitialWindowSize;
+			int WindowSizeDiff = Size - this.lastInitialWindowSize;
+			this.lastInitialWindowSize = Size;
 
 			if (WindowSizeDiff != 0)
 			{
 				lock (this.synchObj)
 				{
-					this.root.SetNewWindowSize(this.settings.InitialWindowSize);
+					this.root.SetNewWindowSize(this.RemoteSettings.InitialWindowSize);
 				}
 			}
 		}
@@ -100,7 +96,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Stream">Stream object, if found.</param>
 		/// <returns>If a stream object was found with the corresponding ID.</returns>
-		public bool TryGetStream(int StreamId, out Http2Stream Stream)
+		public override bool TryGetStream(int StreamId, out Http2Stream Stream)
 		{
 			if (this.disposed)
 			{
@@ -133,7 +129,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>Size of window associated with stream. Negative = error</returns>
 		public int AddStreamForTest(int StreamId, int Rfc9218Priority, bool Rfc9218Incremental)
 		{
-			return this.AddStreamForTest(StreamId, this.settings, Rfc9218Priority, Rfc9218Incremental);
+			return this.AddStreamForTest(StreamId, this.RemoteSettings, Rfc9218Priority, Rfc9218Incremental);
 		}
 
 		/// <summary>
@@ -176,14 +172,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive)
+		public override int AddStream(Http2Stream Stream, byte Weight, int StreamIdDependency, bool Exclusive)
 		{
 			if (this.disposed)
 				return -1;
 
 			lock (this.synchObj)
 			{
-				if (this.streams.Count >= this.settings.MaxConcurrentStreams)
+				if (this.streams.Count >= this.RemoteSettings.MaxConcurrentStreams)
 					return -1;
 
 				int Priority = Stream.Rfc9218Priority;
@@ -264,7 +260,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Stream">Stream to remove.</param>
 		/// <returns>If the stream could be found, and was removed.</returns>
-		public bool RemoveStream(Http2Stream Stream)
+		public override bool RemoveStream(Http2Stream Stream)
 		{
 			return this.RemoveStream(Stream.StreamId);
 		}
@@ -274,7 +270,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream to remove.</param>
 		/// <returns>If the stream could be found, and was removed.</returns>
-		public bool RemoveStream(int StreamId)
+		public override bool RemoveStream(int StreamId)
 		{
 			if (this.disposed)
 				return false;
@@ -316,7 +312,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="RequestedResources">Amount of resources.</param>
 		/// <returns>Amount of resources granted. If negative, the stream is no
 		/// longer controlled (i.e. it has been removed and/or closed).</returns>
-		public Task<int> RequestResources(int StreamId, int RequestedResources)
+		public override Task<int> RequestResources(int StreamId, int RequestedResources)
 		{
 			return this.RequestResources(StreamId, RequestedResources, null);
 		}
@@ -358,7 +354,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
-		public int ReleaseStreamResources(int StreamId, int Resources)
+		public override int ReleaseStreamResources(int StreamId, int Resources)
 		{
 			if (this.disposed)
 				return -1;
@@ -385,7 +381,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
-		public int ReleaseConnectionResources(int Resources)
+		public override int ReleaseConnectionResources(int Resources)
 		{
 			if (this.disposed)
 				return -1;
@@ -394,8 +390,8 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				int Available = this.root.ReleaseConnectionResources(Resources);
 
-				if (Available > this.settings.ConnectionWindowSize)
-					this.settings.ConnectionWindowSize = Available;
+				if (Available > this.ConnectionWindowSize)
+					this.ConnectionWindowSize = Available;
 
 				int Left = Available;
 				for (int i = 0; i < 8; i++)
@@ -422,7 +418,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Disposes the object and terminates all tasks.
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
 			if (!this.disposed)
 			{
@@ -445,7 +441,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// can be closed.
 		/// </summary>
 		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
-		public void GoingAway(int LastPermittedStreamId)
+		public override void GoingAway(int LastPermittedStreamId)
 		{
 			lock (this.synchObj)
 			{

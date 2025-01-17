@@ -236,7 +236,9 @@ namespace Waher.Networking.HTTP
 						try
 						{
 							byte[] Bin = Convert.FromBase64String(Http2Settings.Value);
-							if (ConnectionSettings.TryParse(true, Bin, out ConnectionSettings Settings))
+							ConnectionSettings Settings = null;
+
+							if (ConnectionSettings.TryParse(true, Bin, ref Settings))
 							{
 								this.remoteSettings = Settings;
 								this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
@@ -251,9 +253,9 @@ namespace Waher.Networking.HTTP
 								this.client.OnReceivedReset(this.Client_OnReceivedHttp2Live);
 
 								if (this.localSettings.NoRfc7540Priorities)
-									this.flowControl = new FlowControlRfc9218(this.remoteSettings);
+									this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings);
 								else
-									this.flowControl = new FlowControlRfc7540(this.remoteSettings);
+									this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings);
 
 								using (HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
@@ -949,7 +951,7 @@ namespace Waher.Networking.HTTP
 							if (Stream.DataBytesReceived > (Stream.ContentLength ?? long.MaxValue))
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, "Data exceeds Content-Length.");
 
-							this.localSettings.AddPendingIncrement(Stream, DataSize);
+							this.flowControl.AddPendingIncrement(Stream, DataSize);
 						}
 
 						if (EndStream)
@@ -1338,7 +1340,7 @@ namespace Waher.Networking.HTTP
 #else
 							sb = new StringBuilder();
 #endif
-							Error = ConnectionSettings.TryParse(this.reader, sb, out this.remoteSettings);
+							Error = ConnectionSettings.TryParse(this.reader, sb, ref this.remoteSettings);
 
 							if (!(sb is null))
 							{
@@ -1361,12 +1363,12 @@ namespace Waher.Networking.HTTP
 						if (this.flowControl is null)
 						{
 							if (this.localSettings.NoRfc7540Priorities)
-								this.flowControl = new FlowControlRfc9218(this.remoteSettings);
+								this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings);
 							else
-								this.flowControl = new FlowControlRfc7540(this.remoteSettings);
+								this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings);
 						}
-						else
-							this.flowControl.UpdateSettings(this.remoteSettings);
+						//else
+						//	this.flowControl.RemoteSettingsUpdated();
 
 						if (this.localSettings.AcknowledgedOrSent)
 						{
@@ -1557,7 +1559,7 @@ namespace Waher.Networking.HTTP
 
 		private async Task<bool> SendPendingWindowUpdates()
 		{
-			if (!this.localSettings.HasPendingIncrements)
+			if (this.flowControl is null || !this.flowControl.HasPendingIncrements)
 				return true;
 
 			MemoryStream Output = null;
@@ -1565,7 +1567,7 @@ namespace Waher.Networking.HTTP
 			int Total = 0;
 			int i, j;
 
-			foreach (ConnectionSettings.PendingWindowIncrement Increment in this.localSettings.GetPendingIncrements())
+			foreach (PendingWindowIncrement Increment in this.flowControl.GetPendingIncrements())
 			{
 				if (Output is null)
 				{

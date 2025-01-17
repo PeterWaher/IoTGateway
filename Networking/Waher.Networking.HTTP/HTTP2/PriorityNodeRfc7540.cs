@@ -34,7 +34,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public PriorityNodeRfc7540(PriorityNodeRfc7540 DependentNode, PriorityNodeRfc7540 Root, Http2Stream Stream, byte Weight,
 			FlowControlRfc7540 FlowControl)
 		{
-			ConnectionSettings Settings = FlowControl.Settings;
+			ConnectionSettings Settings = FlowControl.RemoteSettings;
 
 			this.dependentOn = DependentNode;
 			this.root = Root;

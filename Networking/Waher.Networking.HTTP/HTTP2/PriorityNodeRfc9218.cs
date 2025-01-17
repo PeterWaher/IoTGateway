@@ -24,7 +24,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="FlowControl">Flow control object.</param>
 		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl)
 		{
-			ConnectionSettings Settings = FlowControl.Settings;
+			ConnectionSettings Settings = FlowControl.RemoteSettings;
 
 			this.Stream = Stream;
 			this.root = FlowControl.Root;

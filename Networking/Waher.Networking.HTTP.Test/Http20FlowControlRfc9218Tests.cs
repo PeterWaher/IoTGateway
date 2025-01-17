@@ -15,8 +15,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_01_BasicFlowControl()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -39,8 +40,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_02_SiblingStreams()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 			FlowControl.AddStreamForTest(3, 3, false);
@@ -87,8 +89,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_03_Cancellation()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -117,8 +120,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_04_ReleaseStreamResources()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -149,8 +153,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_05_ReleaseConnectionResources()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -182,8 +187,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_06_ReleaseResources()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -211,8 +217,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_07_MaxFrameSize()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -232,8 +239,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_08_AsymmetricSiblingStreams()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 			FlowControl.AddStreamForTest(3, 0, false);
@@ -292,8 +300,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_09_RemoveStream()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -318,8 +327,9 @@ namespace Waher.Networking.HTTP.Test
 		[TestMethod]
 		public async Task Test_10_ResourcesAndRemovedStreams()
 		{
-			ConnectionSettings Settings = new();
-			using FlowControlRfc9218 FlowControl = new(Settings);
+			ConnectionSettings LocalSettings = new();
+			ConnectionSettings RemoteSettings = new();
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 			FlowControl.AddStreamForTest(3, 3, false);

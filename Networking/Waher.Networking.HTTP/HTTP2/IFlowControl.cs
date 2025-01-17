@@ -9,15 +9,19 @@ namespace Waher.Networking.HTTP.HTTP2
 	public interface IFlowControl : IDisposable
 	{
 		/// <summary>
-		/// Connection settings.
+		/// Local Connection settings.
 		/// </summary>
-		ConnectionSettings Settings { get; }
+		ConnectionSettings LocalSettings { get; }
 
 		/// <summary>
-		/// Updates remote settings.
+		/// Remote Connection settings.
 		/// </summary>
-		/// <param name="Settings">Connection settings.</param>
-		void UpdateSettings(ConnectionSettings Settings);
+		ConnectionSettings RemoteSettings { get; }
+
+		/// <summary>
+		/// Called when remote connection settings have been updated.
+		/// </summary>
+		void RemoteSettingsUpdated();
 
 		/// <summary>
 		/// Tries to get a stream, given its associated Stream ID.
@@ -74,6 +78,24 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
 		int ReleaseConnectionResources(int Resources);
+
+		/// <summary>
+		/// Adds a pending window size increment
+		/// </summary>
+		/// <param name="Stream">Stream</param>
+		/// <param name="NrBytes">Size of increment, in number of bytes.</param>
+		void AddPendingIncrement(Http2Stream Stream, int NrBytes);
+
+		/// <summary>
+		/// If the connection has pending window size increments.
+		/// </summary>
+		bool HasPendingIncrements { get; }
+
+		/// <summary>
+		/// Gets available pending window size increments.
+		/// </summary>
+		/// <returns>Array of increments.</returns>
+		PendingWindowIncrement[] GetPendingIncrements();
 
 		/// <summary>
 		/// Connection is being terminated. Streams above <paramref name="LastPermittedStreamId"/>

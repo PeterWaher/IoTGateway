@@ -1,4 +1,4 @@
-﻿//#define INFO_IN_SNIFFERS
+﻿#define INFO_IN_SNIFFERS	// TODO: Remove
 
 using System;
 using System.Collections.Generic;
@@ -1367,8 +1367,8 @@ namespace Waher.Networking.HTTP
 							else
 								this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings);
 						}
-						//else
-						//	this.flowControl.RemoteSettingsUpdated();
+						else
+							this.flowControl.RemoteSettingsUpdated();
 
 						if (this.localSettings.AcknowledgedOrSent)
 						{

@@ -15,7 +15,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly PriorityNodeRfc9218 root;
 		private readonly object synchObj = new object();
 		private int lastNodeStreamId = -1;
-		private int lastInitialWindowSize = 0;
+		private int lastRemoteInitialWindowSize = 0;
 		private StreamRec lastRec = null;
 		private bool disposed = false;
 
@@ -35,7 +35,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			: base(LocalSettings, RemoteSettings)
 		{
 			this.root = new PriorityNodeRfc9218(null, this);
-			this.lastInitialWindowSize = this.RemoteSettings.InitialWindowSize;
+			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
 
 		/// <summary>
@@ -49,14 +49,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		public override void RemoteSettingsUpdated()
 		{
 			int Size = this.RemoteSettings.InitialWindowSize;
-			int WindowSizeDiff = Size - this.lastInitialWindowSize;
-			this.lastInitialWindowSize = Size;
+			int WindowSizeDiff = Size - this.lastRemoteInitialWindowSize;
+			this.lastRemoteInitialWindowSize = Size;
 
-			if (WindowSizeDiff != 0)
+			if (WindowSizeDiff > 0)
 			{
 				lock (this.synchObj)
 				{
-					this.root.SetNewWindowSize(this.RemoteSettings.InitialWindowSize);
+					this.root.SetNewWindowSize(Size);
 				}
 			}
 		}

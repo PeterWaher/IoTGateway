@@ -363,7 +363,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Bit)    // Header & Value in index.
 			{
-				if (!this.ReadInteger(out Index))
+				if (!this.ReadInteger(out Index) || Index == 0)
 				{
 					Header = Value = null;
 					Mode = IndexMode.NotIndexed;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -11,7 +12,7 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// <summary>
 	/// HTTP/2 stream
 	/// </summary>
-	public class Http2Stream
+	public class Http2Stream : ICodecProgress
 	{
 		private readonly int streamId;
 		private readonly HttpClientConnection connection;
@@ -469,6 +470,141 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.webSocket = WebSocket;
 			this.upgradedToWebSocket = true;
 			this.state = StreamState.Open;
+		}
+
+		/// <summary>
+		/// Reports an early hint of a resource the recipient may need to
+		/// process, in order to be able to process the current content item
+		/// being processed.
+		/// 
+		/// For more information:
+		/// https://datatracker.ietf.org/doc/html/rfc8297
+		/// https://datatracker.ietf.org/doc/html/rfc8288
+		/// https://www.iana.org/assignments/link-relations/link-relations.xhtml
+		/// https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel
+		/// </summary>
+		/// <param name="Resource">Referenced resource.</param>
+		/// <param name="Relation">Resource relation to the current content item
+		/// being processed.</param>
+		/// <param name="AdditionalParameters">Additional parameters that might
+		/// be of interest. Array may be null.</param>
+		public Task EarlyHint(string Resource, string Relation,
+			params KeyValuePair<string, string>[] AdditionalParameters)
+		{
+			if (this.earlyHintsSent is null)
+				this.earlyHintsSent = new Dictionary<string, EarlyHintRec>();
+
+			if (this.earlyHintsSent.ContainsKey(Resource))
+				return Task.CompletedTask;
+
+			if (this.earlyHintsReported is null)
+				this.earlyHintsReported = new Dictionary<string, EarlyHintRec>();
+
+			this.earlyHintsReported[Resource] = new EarlyHintRec()
+			{
+				Relation = Relation,
+				AdditionalParameters = AdditionalParameters
+			};
+
+			if (++this.nrHeaderHintsToSend >= 10)
+				return this.SendReportedEarlyHints();
+			else
+				return Task.CompletedTask;
+		}
+
+		private Dictionary<string, EarlyHintRec> earlyHintsReported = null;
+		private Dictionary<string, EarlyHintRec> earlyHintsSent = null;
+		private int nrHeaderHintsToSend = 0;
+
+		private class EarlyHintRec
+		{
+			public string Relation;
+			public KeyValuePair<string, string>[] AdditionalParameters;
+		}
+
+		/// <summary>
+		/// Called when the header has been processed.
+		/// </summary>
+		public Task HeaderProcessed()
+		{
+			return this.SendReportedEarlyHints();
+		}
+
+		/// <summary>
+		/// Called when the body has been processed.
+		/// </summary>
+		public Task BodyProcessed()
+		{
+			return this.SendReportedEarlyHints();
+		}
+
+		private async Task SendReportedEarlyHints()
+		{
+			if (this.nrHeaderHintsToSend > 0)
+			{
+				this.nrHeaderHintsToSend = 0;
+
+				HeaderWriter w = this.connection.HttpHeaderWriter;
+
+				if (await w.TryLock(1000))
+				{
+					byte[] HeaderBin;
+					StringBuilder sb;
+
+					try
+					{
+						StringBuilder Value = null;
+
+						sb = this.connection.HasSniffers ? new StringBuilder() : null;
+
+						w.Reset(sb);
+						w.WriteHeader(":status", "103", IndexMode.Indexed, true);
+
+						foreach (KeyValuePair<string, EarlyHintRec> P in this.earlyHintsReported)
+						{
+							this.earlyHintsSent[P.Key] = P.Value;
+
+							if (Value is null)
+								Value = new StringBuilder();
+							else
+								Value.Clear();
+
+							Value.Append('<');
+							Value.Append(P.Key);
+							Value.Append(">; rel=preload");
+
+							foreach (KeyValuePair<string, string> P2 in P.Value.AdditionalParameters)
+							{
+								Value.Append("; ");
+								Value.Append(P2.Key);
+								Value.Append('=');
+								Value.Append(P2.Value);
+							}
+
+							w.WriteHeader("link", Value.ToString(), IndexMode.NotIndexed, true);
+						}
+
+						HeaderBin = w.ToArray();
+					}
+					finally
+					{
+						w.Release();
+					}
+
+					this.earlyHintsReported.Clear();
+
+					if (this.connection.Disposed)
+						return;
+
+					if (!await this.WriteHeaders(HeaderBin, true))
+						return;
+
+					this.connection.Server.DataTransmitted(HeaderBin.Length);
+
+					if (!(sb is null))
+						this.connection.TransmitText(sb.ToString());
+				}
+			}
 		}
 	}
 }

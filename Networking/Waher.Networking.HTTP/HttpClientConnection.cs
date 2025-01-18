@@ -2248,7 +2248,11 @@ namespace Waher.Networking.HTTP
 				else
 #endif
 				{
-					Response = new HttpResponse(this.client, this, this.server, Request);
+					Response = new HttpResponse(this.client, this, this.server, Request)
+					{
+						Progress = Request.Http2Stream
+					};
+
 					await Resource.Execute(this.server, Request, Response);
 				}
 			}

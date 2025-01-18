@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Content
 {
@@ -23,8 +24,17 @@ namespace Waher.Content
 		/// being processed.</param>
 		/// <param name="AdditionalParameters">Additional parameters that might
 		/// be of interest. Array may be null.</param>
-		/// <returns></returns>
-		string EarlyHint(string Resource, string Relation, 
+		Task EarlyHint(string Resource, string Relation, 
 			params KeyValuePair<string, string>[] AdditionalParameters);
+
+		/// <summary>
+		/// Called when the header has been processed.
+		/// </summary>
+		Task HeaderProcessed();
+
+		/// <summary>
+		/// Called when the body has been processed.
+		/// </summary>
+		Task BodyProcessed();
 	}
 }

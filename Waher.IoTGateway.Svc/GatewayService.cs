@@ -424,19 +424,35 @@ namespace Waher.IoTGateway.Svc
 					if (Len < 10)
 						return AddressFamily;
 
-					byte[] Bin = new byte[4];
-					Marshal.Copy(Buffer, Bin, 6, 4);
+					byte[] Bin;
 
-					return new IPAddress(Bin).ToString();
+					try
+					{
+						Bin = new byte[4];
+						Marshal.Copy(Buffer, Bin, 6, 4);
+
+						return new IPAddress(Bin).ToString();
+					}
+					catch (Exception)
+					{
+						return AddressFamily;
+					}
 
 				case AddressFamily.InterNetworkV6:
 					if (Len < 20)
 						return AddressFamily;
 
-					Bin = new byte[16];
-					Marshal.Copy(Buffer, Bin, 4, 16);
-
-					return new IPAddress(Bin).ToString();
+					try
+					{
+						Bin = new byte[16];
+						Marshal.Copy(Buffer, Bin, 4, 16);
+					
+						return new IPAddress(Bin).ToString();
+					}
+					catch (Exception)
+					{
+						return AddressFamily;
+					}
 
 				default:
 					return AddressFamily;

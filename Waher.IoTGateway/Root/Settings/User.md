@@ -34,6 +34,15 @@ if exists(Posted) then
 		Item.UserName:=Posted.UserName;
 	);
 
+	if exists(Posted.LegalId) then
+		Item.LegalId:=Posted.LegalId;
+
+	if exists(Posted.PersonalNumber) then
+		Item.PersonalNumber:=Posted.PersonalNumber;
+
+	if exists(Posted.Country) then
+		Item.Country:=Posted.Country;
+
 	if (Posted.Password!=Item.PasswordHash) then
 	(
 		if empty(Posted.Password) then BadRequest("Passwords must not be empty.");
@@ -93,6 +102,21 @@ empty(Item.UserName) ? "Add new user" : Item.UserName
 <input type="text" id="UserName" name="UserName" value="((Item.UserName))" autofocus required/>
 </p>
 [[}}
+
+<p>
+<label for="LegalId">Legal ID:</label>  
+<input type="text" id="LegalId" name="LegalId" value="{{Item.LegalId}}"/>
+</p>
+
+<p>
+<label for="PersonalNumber">Personal Number:</label>  
+<input type="text" id="PersonalNumber" name="PersonalNumber" value="{{Item.PersonalNumber}}"/>
+</p>
+
+<p>
+<label for="Country">Country Code:</label>  
+<input type="text" id="Country" name="Country" value="{{Item.Country}}"/>
+</p>
 
 <p>
 <label for="Password">Password:</label>  

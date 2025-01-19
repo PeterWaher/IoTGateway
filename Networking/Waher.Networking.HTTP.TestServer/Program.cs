@@ -1,5 +1,7 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using Waher.Content;
+using Waher.Content.Markdown;
+using Waher.Content.Markdown.Web;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP;
@@ -44,6 +46,18 @@ internal class Program
 	/// 
 	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello
 	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello --strict
+	/// 
+	/// h2spec.exe -h 127.0.0.1 -p 8081 -P /Hello.md
+	/// h2spec.exe -h 127.0.0.1 -p 8081 -P /Hello.md --strict
+	/// 
+	/// h2spec.exe http2 -h 127.0.0.1 -p 8081 -P /Hello.md
+	/// h2spec.exe http2 -h 127.0.0.1 -p 8081 -P /Hello.md --strict
+	/// 
+	/// h2spec.exe hpack -h 127.0.0.1 -p 8081 -P /Hello.md
+	/// h2spec.exe hpack -h 127.0.0.1 -p 8081 -P /Hello.md --strict
+	/// 
+	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello.md
+	/// h2spec.exe generic -h 127.0.0.1 -p 8081 -P /Hello.md --strict
 	/// </example>
 	/// <param name="args">Command-line arguments.</param>
 	private static void Main(string[] args)
@@ -129,7 +143,9 @@ internal class Program
 			Types.Initialize(
 				typeof(HttpServer).Assembly,
 				typeof(Log).Assembly,
-				typeof(InternetContent).Assembly);
+				typeof(InternetContent).Assembly,
+				typeof(MarkdownDocument).Assembly,
+				typeof(MarkdownToHtmlConverter).Assembly);
 
 			Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.PadWithSpaces);
 
@@ -146,9 +162,36 @@ internal class Program
 				WebServer = new HttpServer([HttpPort], [HttpsPort], Certificate, Sniffer);
 			}
 
-			WebServer.Register("/Hello", 
-				(req, resp) => resp.Write("Hello World."),
-				(req, resp) => resp.Write("Hello World."));
+			static Task Hello(HttpRequest Request, HttpResponse Response)
+			{
+				Response.ContentType = "text/plain";
+				return Response.Write("Hello World.");
+			};
+
+			static async Task HelloMarkdown(HttpRequest Request, HttpResponse Response)
+			{
+				string Markdown = "Title: Hello World\r\nCSS: Hello.css\r\n\r\nHello **World**.";
+				MarkdownSettings Settings = new()
+				{
+					Progress = Request.Http2Stream
+				};
+
+				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
+				string Html = await Doc.GenerateHTML();
+
+				Response.ContentType = "text/html";
+				await Response.Write(Html);
+			};
+
+			static Task HelloStyles(HttpRequest Request, HttpResponse Response)
+			{
+				Response.ContentType = "text/css";
+				return Response.Write("body\r\n{\r\nbackground-color:yellow\r\n}");
+			};
+
+			WebServer.Register("/Hello", Hello, Hello);
+			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
+			WebServer.Register("/Hello.css", HelloStyles);
 
 			Log.Informational("Press CTRL+C to quit.");
 

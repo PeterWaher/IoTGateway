@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Test"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.TestServer", "Networking\Waher.Networking.HTTP.TestServer\Waher.Networking.HTTP.TestServer.csproj", "{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown", "Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj", "{001D2629-E970-4B3D-B046-860203CAA447}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Web", "Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj", "{72F260A4-A731-48C8-8B97-14376F514B32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content", "Content\Waher.Content\Waher.Content.csproj", "{7F1DBF5C-AD2F-4577-A78C-71340EBCA9C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +39,18 @@ Global
 		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFE69A27-BE38-42E4-AAC7-3A00D1C5FA05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{001D2629-E970-4B3D-B046-860203CAA447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{001D2629-E970-4B3D-B046-860203CAA447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{001D2629-E970-4B3D-B046-860203CAA447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{001D2629-E970-4B3D-B046-860203CAA447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72F260A4-A731-48C8-8B97-14376F514B32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F260A4-A731-48C8-8B97-14376F514B32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F260A4-A731-48C8-8B97-14376F514B32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F260A4-A731-48C8-8B97-14376F514B32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F1DBF5C-AD2F-4577-A78C-71340EBCA9C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F1DBF5C-AD2F-4577-A78C-71340EBCA9C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F1DBF5C-AD2F-4577-A78C-71340EBCA9C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F1DBF5C-AD2F-4577-A78C-71340EBCA9C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

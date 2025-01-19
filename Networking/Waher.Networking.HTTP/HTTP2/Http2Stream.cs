@@ -585,19 +585,19 @@ namespace Waher.Networking.HTTP.HTTP2
 						}
 
 						HeaderBin = w.ToArray();
+
+						this.earlyHintsReported.Clear();
+
+						if (this.connection.Disposed)
+							return;
+
+						if (!await this.WriteHeaders(HeaderBin, true))
+							return;
 					}
 					finally
 					{
 						w.Release();
 					}
-
-					this.earlyHintsReported.Clear();
-
-					if (this.connection.Disposed)
-						return;
-
-					if (!await this.WriteHeaders(HeaderBin, true))
-						return;
 
 					this.connection.Server.DataTransmitted(HeaderBin.Length);
 

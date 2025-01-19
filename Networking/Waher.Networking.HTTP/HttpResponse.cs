@@ -1050,17 +1050,17 @@ namespace Waher.Networking.HTTP
 						}
 
 						HeaderBin = w.ToArray();
+
+						if (this.clientConnection.Disposed)
+							return false;
+
+						if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
+							return false;
 					}
 					finally
 					{
 						w.Release();
 					}
-
-					if (this.clientConnection.Disposed)
-						return false;
-
-					if (!await this.http2Stream.WriteHeaders(HeaderBin, ExpectContent || LeaveOpen))
-						return false;
 
 					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 

@@ -2008,6 +2008,7 @@
 						<File Id="GraphStore.md" Name="GraphStore.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.md" />
 						<File Id="GraphStore.ws" Name="GraphStore.ws" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.ws" />
 						<File Id="Index.md" Name="Index.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Index.md" />
+						<File Id="Login.js" Name="Login.js" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.js" />
 						<File Id="Login.md" Name="Login.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.md" />
 						<File Id="Markdown.md" Name="Markdown.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md" />
 						<File Id="MarkdownEditor.cssx" Name="MarkdownEditor.cssx" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.cssx" />
@@ -2044,6 +2045,7 @@
 						<RemoveFile Id="RemoveGraphStore.md" Name="GraphStore.md" On="uninstall" />
 						<RemoveFile Id="RemoveGraphStore.ws" Name="GraphStore.ws" On="uninstall" />
 						<RemoveFile Id="RemoveIndex.md" Name="Index.md" On="uninstall" />
+						<RemoveFile Id="RemoveLogin.js" Name="Login.js" On="uninstall" />
 						<RemoveFile Id="RemoveLogin.md" Name="Login.md" On="uninstall" />
 						<RemoveFile Id="RemoveMarkdown.md" Name="Markdown.md" On="uninstall" />
 						<RemoveFile Id="RemoveMarkdownEditor.cssx" Name="MarkdownEditor.cssx" On="uninstall" />

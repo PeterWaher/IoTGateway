@@ -871,6 +871,7 @@
 		<Content fileName="GraphStore.md"/>
 		<Content fileName="GraphStore.ws"/>
 		<Content fileName='Index.md'/>
+		<Content fileName='Login.js'/>
 		<Content fileName='Login.md'/>
 		<Content fileName='Markdown.md'/>
 		<Content fileName="MarkdownEditor.cssx"/>

@@ -212,7 +212,6 @@ table, th, td
 table 
 {
     display: block;
-    overflow-x: auto;
     max-width: 100%;
     width: fit-content;
     border-radius: 8px;

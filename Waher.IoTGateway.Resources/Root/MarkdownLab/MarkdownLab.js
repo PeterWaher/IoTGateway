@@ -1,21 +1,3 @@
-var EditTimer = null;
-
-function MarkdownKeyDown(Control, Event)
-{
-	InitEditTimer();
-	return MarkdownEditorKeyDown(Control, Event);
-}
-
-function InitEditTimer()
-{
-	var TextArea = document.getElementById("Markdown");
-	var Timeout = TextArea.getAttribute("data-previewtimer") ? 1000 : 500;
-
-	if (EditTimer)
-		window.clearTimeout(EditTimer);
-
-	EditTimer = window.setTimeout(UpdateHtml, Timeout);
-}
 
 function FormatButtonClicked(Button)
 {

@@ -15,10 +15,7 @@ Login: /Login.md
 
 <div id="Lab">
 <section id="MarkdownSection">
-<div id="MarkdownDiv">
 ![](/MarkdownEditor.md)
-<textarea id="Markdown" autofocus="autofocus" wrap="hard" onkeydown="return MarkdownKeyDown(this,event);" oninput="InitEditTimer()"></textarea>
-</div>
 </section>
 
 <section id="HtmlSection">

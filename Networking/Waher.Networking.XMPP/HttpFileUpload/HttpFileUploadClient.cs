@@ -290,7 +290,11 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				HttpFileUploadEventArgs e2;
 
 				if (this.maxFileSize.HasValue)
-					e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, (int)Math.Min(this.maxFileSize.Value, HttpFileUploadEventArgs.DefaultMaxChunkSize), this.client.Sniffers);
+				{
+					e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders,
+						(int)Math.Min(this.maxFileSize.Value, HttpFileUploadEventArgs.DefaultMaxChunkSize),
+						this.client.Sniffers);
+				}
 				else
 					e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, this.client.Sniffers);
 

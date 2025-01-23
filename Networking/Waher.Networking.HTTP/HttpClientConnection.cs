@@ -785,6 +785,7 @@ namespace Waher.Networking.HTTP
 		internal bool Encrypted => this.encrypted;
 		internal int Port => this.port;
 
+#if INFO_IN_SNIFFERS
 		private static void AppendFlags(FrameType Type, byte Flags, StringBuilder sb)
 		{
 			switch (Type)
@@ -840,6 +841,7 @@ namespace Waher.Networking.HTTP
 					break;
 			}
 		}
+#endif
 
 		private static readonly byte[] emptyFrame = Array.Empty<byte>();
 
@@ -2138,6 +2140,8 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
+					this.server.RequestReceived(Request, this.client.Client.Client.RemoteEndPoint.ToString(), null, Request.Header.Resource);
+
 					await this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
 					Result = true;
 				}
@@ -2404,10 +2408,38 @@ namespace Waher.Networking.HTTP
 					Response.SetHeader("Connection", "close");
 				}
 
-				if (ex is null)
-					await Response.SendResponse();
+				if (Request.Http2Stream is null)
+				{
+					if (ex is null)
+						await Response.SendResponse();
+					else
+						await Response.SendResponse(ex);
+				}
 				else
-					await Response.SendResponse(ex);
+				{
+					bool DisposeResponse2 = DisposeResponse;
+					DisposeResponse = false;
+
+					Task _ = Task.Run(async () =>
+					{
+						try
+						{
+							if (ex is null)
+								await Response.SendResponse();
+							else
+								await Response.SendResponse(ex);
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
+						finally
+						{
+							if (DisposeResponse2)
+								await Response.DisposeAsync();
+						}
+					});
+				}
 			}
 			finally
 			{

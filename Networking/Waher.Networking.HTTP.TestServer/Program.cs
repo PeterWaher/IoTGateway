@@ -22,6 +22,13 @@ internal class Program
 	/// To run tests over HTTPS
 	/// 
 	/// Test-server command-line arguments:
+	/// -http PORT          Port number for HTTP
+	/// -http2 PORT         Port number for HTTPS
+	/// -cert FILENAME      Certificate file name.
+	/// -pwd PASSWORD       Certificate password, if any.
+	/// -no7540prio         No RFC 7540 priorities, in accordance with RFC 9218
+	/// 
+	/// Example:
 	/// Waher.Networking.HTTP.TestServer.exe -http 8081 -https 8088 -cert CERTIFICATE_FILENAME
 	/// 
 	/// h2spec command-line arguments:
@@ -66,12 +73,15 @@ internal class Program
 		HttpServer? WebServer = null;
 		ConsoleOutSniffer? Sniffer = null;
 		string s;
+		string? CertFileName = null;
+		string? CertPassword = null;
 		int HttpPort = 0;
 		int HttpsPort = 0;
 		int i = 0;
 		int c = args.Length;
 		bool Help = false;
 		bool Terminating = false;
+		bool No7540prio = false;
 
 		try
 		{
@@ -109,10 +119,24 @@ internal class Program
 						if (i >= c)
 							throw new Exception("Missing Certificate file name.");
 
-						if (Certificate is not null)
-							throw new Exception("Certificate already defined.");
+						if (!string.IsNullOrEmpty(CertFileName))
+							throw new Exception("Certificate file name already defined.");
 
-						Certificate = new X509Certificate2(args[i++]);
+						CertFileName = args[i++];
+						break;
+
+					case "-pwd":
+						if (i >= c)
+							throw new Exception("Missing Certificate password.");
+
+						if (!string.IsNullOrEmpty(CertPassword))
+							throw new Exception("Certificate password already defined.");
+
+						CertPassword = args[i++];
+						break;
+
+					case "-no7540prio":
+						No7540prio = true;
 						break;
 
 					case "-?":
@@ -130,6 +154,14 @@ internal class Program
 				ConsoleOut.WriteLine("-https PORT_NUMBER   The port number to use for encrypted HTTPS connections.");
 				ConsoleOut.WriteLine("-?                   Help.");
 				return;
+			}
+
+			if (!string.IsNullOrEmpty(CertFileName))
+			{
+				if (string.IsNullOrEmpty(CertPassword))
+					Certificate = new X509Certificate2(CertFileName);
+				else
+					Certificate = new X509Certificate2(CertFileName, CertPassword);
 			}
 
 			if (HttpPort == 0)
@@ -161,6 +193,8 @@ internal class Program
 
 				WebServer = new HttpServer([HttpPort], [HttpsPort], Certificate, Sniffer);
 			}
+
+			WebServer.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, No7540prio, true);
 
 			static Task Hello(HttpRequest Request, HttpResponse Response)
 			{

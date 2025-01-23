@@ -369,6 +369,12 @@ namespace Waher.IoTGateway
 				ClientCertificates ClientCertificates = ClientCertificates.NotUsed;
 				bool TrustClientCertificates = false;
 				Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificMTlsSettings = null;
+				bool Http2Enabled = true;
+				int Http2InitialWindowSize = 2500000;
+				int Http2MaxFrameSize = 16384;
+				int Http2MaxConcurrentStreams = 100;
+				int Http2HeaderTableSize = 8192;
+				bool Http2NoRfc7540Priorities = false;
 
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
@@ -401,6 +407,15 @@ namespace Waher.IoTGateway
 										PortSpecificMTlsSettings[PortNumber] = new KeyValuePair<ClientCertificates, bool>(ClientCertificatesPort, TrustClientCertificatesPort);
 									}
 								}
+								break;
+
+							case "Http2Settings":
+								Http2Enabled = XML.Attribute(E, "enabled", Http2Enabled);
+								Http2InitialWindowSize = XML.Attribute(E, "initialWindowSize", Http2InitialWindowSize);
+								Http2MaxFrameSize = XML.Attribute(E, "maxFrameSize", Http2MaxFrameSize);
+								Http2MaxConcurrentStreams = XML.Attribute(E, "maxConcurrentStreams", Http2MaxConcurrentStreams);
+								Http2HeaderTableSize = XML.Attribute(E, "headerTableSize", Http2HeaderTableSize);
+								Http2NoRfc7540Priorities = XML.Attribute(E, "noRfc7540Priorities", Http2NoRfc7540Priorities);
 								break;
 
 							case "ContentEncodings":
@@ -997,7 +1012,9 @@ namespace Waher.IoTGateway
 				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
 				// to avoid congestion.
 
-				webServer.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, false, true);
+				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialWindowSize,
+					Http2MaxFrameSize, Http2MaxConcurrentStreams, Http2HeaderTableSize,
+					false, Http2NoRfc7540Priorities, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);

@@ -160,18 +160,25 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="ConnectionWindowSize">Connection Window size</param>
 		/// <param name="StreamWindowSize">Stream Window size</param>
-		public void SetNewWindowSize(int ConnectionWindowSize, int StreamWindowSize)
+		/// <param name="Trigger">If pending streams should be triggered.</param>
+		public void SetNewWindowSize(int ConnectionWindowSize, int StreamWindowSize, bool Trigger)
 		{
 			int WindowSize = this.Stream is null ? ConnectionWindowSize : StreamWindowSize;
 			int Diff = WindowSize - this.windowSize0;
 			this.windowSize0 = WindowSize;
 			this.windowSize += Diff;
 
-			if (!(this.root is null))
-				WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
+			if (Trigger)
+			{
+				if (!(this.root is null))
+					WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
 
-			if (WindowSize > 0)
-				this.TriggerPending(ref WindowSize);
+				if (this.windowSize > 0)
+				{
+					WindowSize = this.windowSize;
+					this.TriggerPending(ref WindowSize);
+				}
+			}
 		}
 
 		/// <summary>

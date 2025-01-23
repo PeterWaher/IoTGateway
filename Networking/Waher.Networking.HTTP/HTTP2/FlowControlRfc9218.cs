@@ -56,7 +56,16 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				lock (this.synchObj)
 				{
-					this.root.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size);
+					this.root.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size, false);
+
+					foreach (LinkedList<PriorityNodeRfc9218> Nodes in this.priorities)
+					{
+						if (!(Nodes is null))
+						{
+							foreach (PriorityNodeRfc9218 Node in Nodes)
+								Node.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size, true);
+						}
+					}
 				}
 			}
 		}

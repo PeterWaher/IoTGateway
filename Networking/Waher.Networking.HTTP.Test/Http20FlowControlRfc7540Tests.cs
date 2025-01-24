@@ -21,13 +21,13 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node));
 			Assert.AreEqual(0, Node.AvailableResources);
@@ -47,15 +47,15 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(2767, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(2767, await FlowControl.RequestResources(3, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
 			Assert.AreEqual(0, Node1.AvailableResources);
@@ -81,16 +81,16 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(5, 16, 3, false);
 			FlowControl.AddStreamForTest(7, 16, 3, false);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(5, 10000));
-			Assert.AreEqual(6384, await FlowControl.RequestResources(5, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(5, 10000, null));
+			Assert.AreEqual(6384, await FlowControl.RequestResources(5, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000));
-			Assert.AreEqual(6383, await FlowControl.RequestResources(7, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000, null));
+			Assert.AreEqual(6383, await FlowControl.RequestResources(7, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
 			Assert.AreEqual(0, Node1.AvailableResources);
@@ -121,13 +121,13 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			DateTime Start = DateTime.Now;
 			CancellationTokenSource Cancel = new();
@@ -152,13 +152,13 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.AreEqual(10000, FlowControl.ReleaseStreamResources(1, 10000));
 
@@ -185,13 +185,13 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.AreEqual(10000, FlowControl.ReleaseConnectionResources(10000));
 
@@ -219,18 +219,18 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.AreEqual(10000, FlowControl.ReleaseStreamResources(1, 10000));
 			Assert.AreEqual(10000, FlowControl.ReleaseConnectionResources(10000));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node));
 			Assert.AreEqual(0, Node.AvailableResources);
@@ -249,10 +249,10 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(16384, await FlowControl.RequestResources(1, 20000));
-			Assert.AreEqual(16384, await FlowControl.RequestResources(1, 20000));
-			Assert.AreEqual(16384, await FlowControl.RequestResources(1, 20000));
-			Assert.AreEqual(16383, await FlowControl.RequestResources(1, 20000));
+			Assert.AreEqual(16384, await FlowControl.RequestResources(1, 20000, null));
+			Assert.AreEqual(16384, await FlowControl.RequestResources(1, 20000, null));
+			Assert.AreEqual(16384, await FlowControl.RequestResources(1, 20000, null));
+			Assert.AreEqual(16383, await FlowControl.RequestResources(1, 20000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node));
 			Assert.AreEqual(0, Node.AvailableResources);
@@ -272,14 +272,14 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(1, 10, 0, false);
 			FlowControl.AddStreamForTest(3, 30, 0, false);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(6384, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(6384, await FlowControl.RequestResources(1, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(9151, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(9151, await FlowControl.RequestResources(3, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
 			Assert.AreEqual(0, Node1.AvailableResources);
@@ -305,16 +305,16 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(5, 10, 3, false);
 			FlowControl.AddStreamForTest(7, 30, 3, false);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(6384, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(6384, await FlowControl.RequestResources(1, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(5, 10000));
-			Assert.AreEqual(2288, await FlowControl.RequestResources(5, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(5, 10000, null));
+			Assert.AreEqual(2288, await FlowControl.RequestResources(5, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000));
-			Assert.AreEqual(6863, await FlowControl.RequestResources(7, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(7, 10000, null));
+			Assert.AreEqual(6863, await FlowControl.RequestResources(7, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node1));
 			Assert.AreEqual(0, Node1.AvailableResources);
@@ -345,18 +345,18 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			DateTime Start = DateTime.Now;
 			_ = Task.Delay(1000).ContinueWith((_) => FlowControl.RemoveStream(1));
 
-			Assert.AreEqual(-1, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(-1, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.IsTrue(DateTime.Now.Subtract(Start).TotalSeconds >= 1);
 
@@ -373,8 +373,8 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
 
 			FlowControl.RemoveStream(1);
 
@@ -399,24 +399,24 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(2768, await FlowControl.RequestResources(1, 10000, null));
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(2767, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(2767, await FlowControl.RequestResources(3, 10000, null));
 
 			FlowControl.ReleaseConnectionResources(32768);
 			FlowControl.ReleaseStreamResources(1, 32768);
 			FlowControl.RemoveStream(1);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
-			Assert.AreEqual(2768, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
+			Assert.AreEqual(2768, await FlowControl.RequestResources(3, 10000, null));
 
 			Assert.IsFalse(FlowControl.TryGetPriorityNode(1, out _));
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(3, out PriorityNodeRfc7540 Node2));
@@ -437,13 +437,13 @@ namespace Waher.Networking.HTTP.Test
 
 			FlowControl.AddStreamForTest(1, 16, 0, true);
 
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000));
-			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(1, 10000, null));
+			Assert.AreEqual(5535, await FlowControl.RequestResources(1, 10000, null));
 
 			Assert.IsTrue(FlowControl.TryGetPriorityNode(1, out PriorityNodeRfc7540 Node));
 			Assert.AreEqual(0, Node.AvailableResources);
@@ -463,7 +463,7 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(1, 255, 0, true);  // .md
 			
 			// 1: TX, D4200, ES
-			Assert.AreEqual(4200, await FlowControl.RequestResources(1, 4200));
+			Assert.AreEqual(4200, await FlowControl.RequestResources(1, 4200, null));
 			Assert.IsTrue(FlowControl.RemoveStream(1));
 
 			FlowControl.AddStreamForTest(3, 255, 0, true);  // .cssx
@@ -471,16 +471,16 @@ namespace Waher.Networking.HTTP.Test
 			FlowControl.AddStreamForTest(7, 182, 5, true);  // .png
 
 			// 7: TX, EH, D16384, D1732 ES
-			Assert.AreEqual(16384, await FlowControl.RequestResources(7, 18116));
-			Assert.AreEqual(1732, await FlowControl.RequestResources(7, 1732));
+			Assert.AreEqual(16384, await FlowControl.RequestResources(7, 18116, null));
+			Assert.AreEqual(1732, await FlowControl.RequestResources(7, 1732, null));
 			Assert.IsTrue(FlowControl.RemoveStream(7));
 
 			// 5: TX, EH, D2165 ES
-			Assert.AreEqual(2165, await FlowControl.RequestResources(5, 2165));
+			Assert.AreEqual(2165, await FlowControl.RequestResources(5, 2165, null));
 			Assert.IsTrue(FlowControl.RemoveStream(5));
 
 			// 3: TX, EH
-			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000));
+			Assert.AreEqual(10000, await FlowControl.RequestResources(3, 10000, null));
 			Assert.IsTrue(FlowControl.RemoveStream(3));
 		}
 

@@ -265,6 +265,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				HuffmanDecoding Loop = huffmanDecodingRoot;
 				int StringPos = 0;
 				int i;
+				int BitLen = 0;
 
 				while (this.pos < EndPos)
 				{
@@ -280,6 +281,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					{
 						Loop = (this.current & 0x80) == 0 ? Loop.Zero : Loop.One;
 						this.current <<= 1;
+						BitLen++;
 
 						if (Loop is null)
 						{
@@ -289,6 +291,12 @@ namespace Waher.Networking.HTTP.HTTP2
 
 						if (Loop.LeafNode)
 						{
+							if (Loop.PartOfEoS)
+							{
+								Value = null;
+								return false;
+							}
+
 							if (StringPos >= this.stringBufferLen)
 							{
 								Array.Resize(ref this.stringBuffer, this.stringBufferLen + 128);
@@ -297,11 +305,18 @@ namespace Waher.Networking.HTTP.HTTP2
 
 							this.stringBuffer[StringPos++] = Loop.Value.Value;
 							Loop = huffmanDecodingRoot;
+							BitLen = 0;
 						}
 					}
 				}
 
 				if (!Loop.PartOfEoS)
+				{
+					Value = null;
+					return false;
+				}
+
+				if (BitLen > 7)
 				{
 					Value = null;
 					return false;
@@ -348,7 +363,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (Bit)    // Header & Value in index.
 			{
-				if (!this.ReadInteger(out Index))
+				if (!this.ReadInteger(out Index) || Index == 0)
 				{
 					Header = Value = null;
 					Mode = IndexMode.NotIndexed;
@@ -402,7 +417,8 @@ namespace Waher.Networking.HTTP.HTTP2
 
 					if (Bit)    // Dynamic Table Size Update
 					{
-						if (!this.ReadInteger(out Index) || Index > (ulong)this.maxDynamicHeaderSizeLimit)
+						if (!this.ReadInteger(out Index) || 
+							Index > (ulong)this.maxDynamicHeaderSizeLimit)
 						{
 							Header = Value = null;
 							Mode = IndexMode.NotIndexed;

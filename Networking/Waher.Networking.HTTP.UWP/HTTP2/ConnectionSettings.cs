@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -48,8 +47,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		public const bool DefaultNoRfc7540Priorities = false;
 
-		private long connectionWindowSize;
-		private long connectionBytesCommunicated = 0;
 		private int headerTableSize;
 		private int maxConcurrentStreams;
 		private int initialWindowSize;
@@ -59,15 +56,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		private bool noRfc7540Priorities;
 		private bool enableConnectProtocol;
 
-		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
-		private bool hasPendingIncrements = false;
-
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		public ConnectionSettings()
 		{
-			this.connectionWindowSize = DefaultHttp2InitialWindowSize;
 			this.initialWindowSize = DefaultHttp2InitialWindowSize;
 			this.maxFrameSize = DefaultHttp2MaxFrameSize;
 			this.maxConcurrentStreams = DefaultHttp2MaxConcurrentStreams;
@@ -90,7 +83,6 @@ namespace Waher.Networking.HTTP.HTTP2
 			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
 			bool NoRfc7540Priorities)
 		{
-			this.connectionWindowSize = InitialWindowSize;
 			this.initialWindowSize = InitialWindowSize;
 			this.maxFrameSize = MaxFrameSize;
 			this.maxConcurrentStreams = MaxConcurrentStreams;
@@ -98,12 +90,6 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.enablePush = EnablePush;
 			this.noRfc7540Priorities |= NoRfc7540Priorities;
 			this.enableConnectProtocol = DefaultHttp2EnableConnectProtocol;
-		}
-
-		internal class PendingWindowIncrement
-		{
-			public Http2Stream Stream;
-			public int NrBytes;
 		}
 
 		/// <summary>
@@ -167,7 +153,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 		/// <summary>
 		/// SETTINGS_INITIAL_WINDOW_SIZE (0x4):  Indicates the sender's initial
-		/// window size(in octets) for stream-level flow control.The
+		/// window size (in octets) for stream-level flow control. The
 		/// initial value is 2^16-1 (65,535) octets.
 		/// 
 		/// This setting affects the window size of all streams (see
@@ -247,50 +233,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal bool AcknowledgedOrSent = false;
 
 		/// <summary>
-		/// If the connection has pending window size increments.
-		/// </summary>
-		internal bool HasPendingIncrements => this.hasPendingIncrements;
-
-		/// <summary>
-		/// Gets available pending window size increments.
-		/// </summary>
-		/// <returns>Array of increments.</returns>
-		internal PendingWindowIncrement[] GetPendingIncrements()
-		{
-			PendingWindowIncrement[] Result = this.pendingIncrements.ToArray();
-			this.pendingIncrements.Clear();
-			this.hasPendingIncrements = false;
-			return Result;
-		}
-
-		/// <summary>
-		/// Adds a pending window size increment
-		/// </summary>
-		/// <param name="Stream">Stream</param>
-		/// <param name="NrBytes">Size of increment, in number of bytes.</param>
-		internal void AddPendingIncrement(Http2Stream Stream, int NrBytes)
-		{
-			int StreamId = Stream.StreamId;
-
-			foreach (PendingWindowIncrement Increment in this.pendingIncrements)
-			{
-				if (Increment.Stream.StreamId == StreamId)
-				{
-					Increment.NrBytes += NrBytes;
-					return;
-				}
-			}
-
-			this.pendingIncrements.Add(new PendingWindowIncrement()
-			{
-				Stream = Stream,
-				NrBytes = NrBytes
-			});
-
-			this.hasPendingIncrements = true;
-		}
-
-		/// <summary>
 		/// Tries to parse a SETTINGS fame.
 		/// 
 		/// Ref: §6.5.2, RFC 7540
@@ -301,9 +243,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Data">Binary data</param>
 		/// <param name="Settings">Settings object, if successful.</param>
 		/// <returns>If able to parse the settings frame.</returns>
-		public static bool TryParse(bool ConstantBuffer, byte[] Data, out ConnectionSettings Settings)
+		public static bool TryParse(bool ConstantBuffer, byte[] Data, ref ConnectionSettings Settings)
 		{
-			return TryParse(ConstantBuffer, Data, 0, Data.Length, out Settings);
+			return TryParse(ConstantBuffer, Data, 0, Data.Length, ref Settings);
 		}
 
 		/// <summary>
@@ -319,10 +261,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Count">Number of bytes available.</param>
 		/// <param name="Settings">Settings object, if successful.</param>
 		/// <returns>If able to parse the settings frame.</returns>
-		public static bool TryParse(bool ConstantBuffer, byte[] Data, int Offset, int Count, out ConnectionSettings Settings)
+		public static bool TryParse(bool ConstantBuffer, byte[] Data, int Offset, int Count, ref ConnectionSettings Settings)
 		{
 			BinaryReader Reader = new BinaryReader(ConstantBuffer, Data, Offset, Count);
-			return TryParse(Reader, null, out Settings) is null;
+			return TryParse(Reader, null, ref Settings) is null;
 		}
 
 		/// <summary>
@@ -335,9 +277,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="SnifferOutput">Optional sniffer output.</param>
 		/// <param name="Settings">Settings object, if successful.</param>
 		/// <returns>Null, if able to parse the settings frame, otherwise the corresponding error to return.</returns>
-		public static Http2Error? TryParse(BinaryReader Reader, StringBuilder SnifferOutput, out ConnectionSettings Settings)
+		public static Http2Error? TryParse(BinaryReader Reader, StringBuilder SnifferOutput, ref ConnectionSettings Settings)
 		{
-			Settings = new ConnectionSettings();
+			if (Settings is null)
+				Settings = new ConnectionSettings();
 
 			while (Reader.HasMore)
 			{
@@ -479,42 +422,5 @@ namespace Waher.Networking.HTTP.HTTP2
 			return w.ToArray();
 		}
 
-		/// <summary>
-		/// Sets the window size increment for stream, modified using the WINDOW_UPDATE
-		/// frame.
-		/// </summary>
-		/// <returns>If increment was valid.</returns>
-		public bool SetWindowSizeIncrementLocked(int Increment)
-		{
-			if (Increment <= 0 || Increment > int.MaxValue - 1)
-				return false;
-
-			long Size = this.InitialWindowSize + Increment;
-
-			if (Size < 0 || Size > int.MaxValue - 1)
-				return false;
-
-			this.connectionWindowSize = Size;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Number of data bytes sent over the connection
-		/// </summary>
-		/// <param name="Increment">Increment</param>
-		public void DataBytesSentLocked(int Increment)
-		{
-			this.connectionBytesCommunicated += Increment;
-		}
-
-		/// <summary>
-		/// Connection window size
-		/// </summary>
-		public int ConnectionWindowSize
-		{
-			get => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
-			internal set => this.connectionWindowSize = this.connectionBytesCommunicated + value;
-		}
 	}
 }

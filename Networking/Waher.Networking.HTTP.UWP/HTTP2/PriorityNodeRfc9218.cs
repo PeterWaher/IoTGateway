@@ -24,7 +24,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="FlowControl">Flow control object.</param>
 		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl)
 		{
-			ConnectionSettings Settings = FlowControl.Settings;
+			ConnectionSettings Settings = Stream is null ? FlowControl.LocalSettings : FlowControl.RemoteSettings;
 
 			this.Stream = Stream;
 			this.root = FlowControl.Root;
@@ -158,21 +158,27 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Sets a new window size.
 		/// </summary>
-		/// <param name="WindowSize">Window size</param>
-		public void SetNewWindowSize(int WindowSize)
+		/// <param name="ConnectionWindowSize">Connection Window size</param>
+		/// <param name="StreamWindowSize">Stream Window size</param>
+		/// <param name="Trigger">If pending streams should be triggered.</param>
+		public void SetNewWindowSize(int ConnectionWindowSize, int StreamWindowSize, bool Trigger)
 		{
+			int WindowSize = this.Stream is null ? ConnectionWindowSize : StreamWindowSize;
 			int Diff = WindowSize - this.windowSize0;
 			this.windowSize0 = WindowSize;
 			this.windowSize += Diff;
 
-			if (!(this.root is null))
-				WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
+			if (Trigger)
+			{
+				if (!(this.root is null))
+					WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
 
-			if (!(this.root is null))
-				WindowSize = Math.Min(this.root.AvailableResources, WindowSize);
-
-			if (WindowSize > 0)
-				this.TriggerPending(ref WindowSize);
+				if (this.windowSize > 0)
+				{
+					WindowSize = this.windowSize;
+					this.TriggerPending(ref WindowSize);
+				}
+			}
 		}
 
 		/// <summary>

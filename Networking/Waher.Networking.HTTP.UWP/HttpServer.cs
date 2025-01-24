@@ -109,6 +109,7 @@ namespace Waher.Networking.HTTP
 		private int http2MaxConcurrentStreams = ConnectionSettings.DefaultHttp2MaxConcurrentStreams;
 		private int http2HeaderTableSize = ConnectionSettings.DefaultHttp2HeaderTableSize;
 		private bool http2EnablePush = ConnectionSettings.DefaultHttp2EnablePush;
+		private bool http2Enabled = true;
 		private bool http2SettingsLocked = false;
 		private bool http2NoRfc7540Priorities = false;
 
@@ -935,6 +936,11 @@ namespace Waher.Networking.HTTP
 		#region HTTP/2 Properties
 
 		/// <summary>
+		/// HTTP/2: Enabled or not.
+		/// </summary>
+		public bool Http2Enabled => this.http2Enabled;
+
+		/// <summary>
 		/// HTTP/2: Initial window size.
 		/// </summary>
 		public int Http2InitialWindowSize => this.http2InitialWindowSize;
@@ -979,9 +985,29 @@ namespace Waher.Networking.HTTP
 			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
 			bool NoRfc7540Priorities, bool Lock)
 		{
+			this.SetHttp2ConnectionSettings(true, InitialWindowSize, MaxFrameSize, MaxConcurrentStreams,
+				HeaderTableSize, EnablePush, NoRfc7540Priorities, Lock);
+		}
+
+		/// <summary>
+		/// HTTP/2 connection settings (SETTINGS).
+		/// </summary>
+		/// <param name="Http2Enabled">If HTTP/2 is enabled or not.</param>
+		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="MaxFrameSize">Maximum frame size.</param>
+		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
+		/// <param name="HeaderTableSize">Header table size.</param>
+		/// <param name="EnablePush">If push promises are enabled.</param>
+		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
+		/// <param name="Lock">If settings are to be locked.</param>
+		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialWindowSize,
+			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
+			bool NoRfc7540Priorities, bool Lock)
+		{
 			if (this.http2SettingsLocked)
 				throw new InvalidOperationException("HTTP/2 settings locked.");
 
+			this.http2Enabled = Http2Enabled;
 			this.http2InitialWindowSize = InitialWindowSize;
 			this.http2MaxFrameSize = MaxFrameSize;
 			this.http2MaxConcurrentStreams = MaxConcurrentStreams;
@@ -1161,8 +1187,16 @@ namespace Waher.Networking.HTTP
 							", Trust Certificates: " + TrustCertificates.ToString() + ")");
 					}
 
-					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
-						ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
+					if (this.http2Enabled)
+					{
+						await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
+							ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
+					}
+					else
+					{
+						await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
+							ClientCertificates, null, TrustCertificates, "http/1.1");
+					}
 
 					if (this.HasSniffers)
 					{

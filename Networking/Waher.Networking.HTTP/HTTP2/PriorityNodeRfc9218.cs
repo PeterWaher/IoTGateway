@@ -46,20 +46,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Requests resources from the available pool of resources in the tree.
 		/// </summary>
 		/// <param name="RequestedResources">Requested amount of resources.</param>
-		/// <returns>Number of resources granted.</returns>
-		public Task<int> RequestAvailableResources(int RequestedResources)
-		{
-			return this.RequestAvailableResources(RequestedResources, null);
-		}
-
-		/// <summary>
-		/// Requests resources from the available pool of resources in the tree.
-		/// </summary>
-		/// <param name="RequestedResources">Requested amount of resources.</param>
-		/// <param name="CancelToken">Optional cancel token</param>
+		/// <param name="CancellationToken">Optional Cancellation token</param>
 		/// <returns>Number of resources granted.</returns>
 		public Task<int> RequestAvailableResources(int RequestedResources,
-			CancellationToken? CancelToken)
+			CancellationToken? CancellationToken)
 		{
 			int Available = Math.Min(RequestedResources, this.AvailableResources);
 			Available = Math.Min(Available, this.root.AvailableResources);
@@ -73,8 +63,8 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.pendingRequests.AddLast(Request);
 
-				if (CancelToken.HasValue)
-					CancelToken.Value.Register(() => Request.Request.TrySetException(new OperationCanceledException()));
+				if (CancellationToken.HasValue)
+					CancellationToken.Value.Register(() => Request.Request.TrySetException(new OperationCanceledException()));
 
 				return Request.Request.Task;
 			}

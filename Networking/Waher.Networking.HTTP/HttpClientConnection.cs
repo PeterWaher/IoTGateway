@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
@@ -42,6 +43,7 @@ namespace Waher.Networking.HTTP
 		private Stream dataStream = null;
 		private TransferEncoding transferEncoding = null;
 		private readonly HttpServer server;
+		private readonly CancellationToken cancellationToken;
 		private BinaryTcpClient client;
 		private HttpRequestHeader header = null;
 		private WebSocket webSocket = null;
@@ -85,6 +87,11 @@ namespace Waher.Networking.HTTP
 		{
 			this.server = Server;
 			this.client = Client;
+#if WINDOWS_UWP
+			this.cancellationToken = null;
+#else
+			this.cancellationToken = Client.CancellationToken;
+#endif
 			this.encrypted = Encrypted;
 			this.port = Port;
 
@@ -1770,7 +1777,7 @@ namespace Waher.Networking.HTTP
 			if (this.flowControl is null)
 				return -1;
 
-			int NrBytes = await this.flowControl.RequestResources(StreamId, Count);
+			int NrBytes = await this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
 			if (NrBytes <= 0)
 				return NrBytes;
 			else if (NrBytes < Count)

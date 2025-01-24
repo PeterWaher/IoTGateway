@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -79,9 +80,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream requesting resources.</param>
 		/// <param name="RequestedResources">Amount of resources.</param>
+		/// <param name="CancellationToken">Optional Cancellation token.</param>
 		/// <returns>Amount of resources granted. If negative, the stream is no
 		/// longer controlled (i.e. it has been removed and/or closed).</returns>
-		public abstract Task<int> RequestResources(int StreamId, int RequestedResources);
+		public abstract Task<int> RequestResources(int StreamId, int RequestedResources, CancellationToken? CancellationToken);
 
 		/// <summary>
 		/// Releases stream resources back to the stream.

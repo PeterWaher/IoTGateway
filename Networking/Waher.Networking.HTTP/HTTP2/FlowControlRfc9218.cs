@@ -319,23 +319,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">ID of stream requesting resources.</param>
 		/// <param name="RequestedResources">Amount of resources.</param>
+		/// <param name="CancellationToken">Optional Cancellation token</param>
 		/// <returns>Amount of resources granted. If negative, the stream is no
 		/// longer controlled (i.e. it has been removed and/or closed).</returns>
-		public override Task<int> RequestResources(int StreamId, int RequestedResources)
-		{
-			return this.RequestResources(StreamId, RequestedResources, null);
-		}
-
-		/// <summary>
-		/// Requests resources for a stream.
-		/// </summary>
-		/// <param name="StreamId">ID of stream requesting resources.</param>
-		/// <param name="RequestedResources">Amount of resources.</param>
-		/// <param name="CancelToken">Optional cancel token</param>
-		/// <returns>Amount of resources granted. If negative, the stream is no
-		/// longer controlled (i.e. it has been removed and/or closed).</returns>
-		public Task<int> RequestResources(int StreamId, int RequestedResources,
-			CancellationToken? CancelToken)
+		public override Task<int> RequestResources(int StreamId, int RequestedResources,
+			CancellationToken? CancellationToken)
 		{
 			if (this.disposed)
 				return Task.FromResult(-1);
@@ -353,7 +341,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					this.lastNodeStreamId = StreamId;
 				}
 
-				return this.lastRec.Node.RequestAvailableResources(RequestedResources, CancelToken);
+				return this.lastRec.Node.RequestAvailableResources(RequestedResources, CancellationToken);
 			}
 		}
 

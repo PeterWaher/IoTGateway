@@ -305,6 +305,13 @@ namespace Waher.Networking
 		/// </summary>
 		public bool Connected => this.connected && !this.disposing && !this.disposed;
 
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Cancellation token for the connection.
+		/// </summary>
+		public CancellationToken CancellationToken => this.cancelReading.Token;
+#endif
+
 		private void PreConnect()
 		{
 			lock (this.synchObj)

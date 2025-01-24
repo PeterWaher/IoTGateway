@@ -397,7 +397,7 @@ namespace Waher.Networking.Sniffers
 
 				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace));
 
-				if (Inner is null)
+				if (Inner?.First is null)
 					Exception = null;
 				else
 				{

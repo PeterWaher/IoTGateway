@@ -340,8 +340,6 @@ namespace Waher.Networking.Sniffers
 				{
 					Exception = Inner.First.Value;
 					Inner.RemoveFirst();
-					if (Inner.First is null)
-						Inner = null;
 				}
 			}
 		}

@@ -296,6 +296,17 @@ namespace Waher.Things.Mqtt
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count)
+		{
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.ReceiveBinary(Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -317,6 +328,17 @@ namespace Waher.Things.Mqtt
 			MqttBroker Broker = this.GetCachedBroker();
 			MqttClient Client = Broker?.Client;
 			Client?.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count)
+		{
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.TransmitBinary(Count);
 		}
 
 		/// <summary>
@@ -426,6 +448,18 @@ namespace Waher.Things.Mqtt
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count)
+		{
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.ReceiveBinary(Timestamp, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -448,6 +482,18 @@ namespace Waher.Things.Mqtt
 			MqttBroker Broker = this.GetCachedBroker();
 			MqttClient Client = Broker?.Client;
 			Client?.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count)
+		{
+			MqttBroker Broker = this.GetCachedBroker();
+			MqttClient Client = Broker?.Client;
+			Client?.TransmitBinary(Timestamp, Count);
 		}
 
 		/// <summary>

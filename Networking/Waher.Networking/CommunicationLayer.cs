@@ -109,10 +109,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Registered sniffers.
 		/// </summary>
-		public ISniffer[] Sniffers
-		{
-			get { return (ISniffer[])this.staticList?.Clone(); }
-		}
+		public ISniffer[] Sniffers => (ISniffer[])this.staticList?.Clone();
 
 		/// <summary>
 		/// If there are sniffers registered on the object.
@@ -133,6 +130,29 @@ namespace Waher.Networking
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return this.staticList.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count)
+		{
+			this.ReceiveBinary(DateTime.UtcNow, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count)
+		{
+			if (this.hasSniffers)
+			{
+				foreach (ISniffer Sniffer in this.staticList)
+					Sniffer.ReceiveBinary(Timestamp, Count);
+			}
 		}
 
 		/// <summary>
@@ -190,6 +210,29 @@ namespace Waher.Networking
 			{
 				foreach (ISniffer Sniffer in this.staticList)
 					Sniffer.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
+			}
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count)
+		{
+			this.TransmitBinary(DateTime.UtcNow, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count)
+		{
+			if (this.hasSniffers)
+			{
+				foreach (ISniffer Sniffer in this.staticList)
+					Sniffer.TransmitBinary(Timestamp, Count);
 			}
 		}
 

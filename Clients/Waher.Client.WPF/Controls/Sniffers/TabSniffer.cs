@@ -20,6 +20,8 @@ namespace Waher.Client.WPF.Controls.Sniffers
 			set => this.snifferId = value;
 		}
 
+		public override BinaryPresentationMethod BinaryPresentationMethod => BinaryPresentationMethod.Hexadecimal;
+
 		public override Task Process(SnifferRxBinary Event)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.DataReceived, HexToString(Event.Data, Event.Offset, Event.Count), 
@@ -32,30 +34,36 @@ namespace Waher.Client.WPF.Controls.Sniffers
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.DataTransmitted, HexToString(Event.Data, Event.Offset, Event.Count), 
 				CloneSection(Event.Data, Event.Offset, Event.Count), Colors.Black, Colors.White));
+			
 			return Task.CompletedTask;
 		}
 
 		internal static string HexToString(byte[] Data, int Offset, int Count)
 		{
-			StringBuilder Output = new();
-			int i = 0;
-			byte b;
-
-			while (Count-- > 0)
+			if (Data is null)
+				return "<" + Count.ToString() + " bytes>";
+			else
 			{
-				b = Data[Offset++];
+				StringBuilder Output = new();
+				int i = 0;
+				byte b;
 
-				if (i > 0)
-					Output.Append(' ');
+				while (Count-- > 0)
+				{
+					b = Data[Offset++];
 
-				Output.Append(b.ToString("X2"));
+					if (i > 0)
+						Output.Append(' ');
 
-				i = (i + 1) & 31;
-				if (i == 0)
-					Output.AppendLine();
+					Output.Append(b.ToString("X2"));
+
+					i = (i + 1) & 31;
+					if (i == 0)
+						Output.AppendLine();
+				}
+
+				return Output.ToString().TrimEnd();
 			}
-
-			return Output.ToString().TrimEnd();
 		}
 
 		public override Task Process(SnifferRxText Event)

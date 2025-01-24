@@ -68,6 +68,11 @@ namespace Waher.Networking.XMPP
 		public string Namespace => this.@namespace;
 
 		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => BinaryPresentationMethod.Hexadecimal;
+
+		/// <summary>
 		/// If the sniffer has expired.
 		/// </summary>
 		/// <param name="Now"></param>
@@ -99,9 +104,18 @@ namespace Waher.Networking.XMPP
 
 			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
-			Xml.Append("<rxBin>");
-			Xml.Append(Convert.ToBase64String(Event.Data, Event.Offset, Event.Count));
-			Xml.Append("</rxBin>");
+			if (Event.HasData)
+			{
+				Xml.Append("<rxBin>");
+				Xml.Append(Convert.ToBase64String(Event.Data, Event.Offset, Event.Count));
+				Xml.Append("</rxBin>");
+			}
+			else
+			{
+				Xml.Append("<rx>&lt;");
+				Xml.Append(Event.Count.ToString());
+				Xml.Append(" bytes.&gt;</rx>");
+			}
 
 			return this.Send(Xml);
 		}
@@ -138,9 +152,18 @@ namespace Waher.Networking.XMPP
 
 			StringBuilder Xml = this.GetHeader(Event.Timestamp);
 
-			Xml.Append("<txBin>");
-			Xml.Append(Convert.ToBase64String(Event.Data, Event.Offset, Event.Count));
-			Xml.Append("</txBin>");
+			if (Event.HasData)
+			{
+				Xml.Append("<txBin>");
+				Xml.Append(Convert.ToBase64String(Event.Data, Event.Offset, Event.Count));
+				Xml.Append("</txBin>");
+			}
+			else
+			{
+				Xml.Append("<tx>&lt;");
+				Xml.Append(Event.Count.ToString());
+				Xml.Append(" bytes.&gt;</tx>");
+			}
 
 			return this.Send(Xml);
 		}

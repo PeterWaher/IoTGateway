@@ -34,6 +34,11 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => BinaryPresentationMethod.Hexadecimal;
+
+		/// <summary>
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>

@@ -1777,7 +1777,27 @@ namespace Waher.Networking.HTTP
 			if (this.flowControl is null)
 				return -1;
 
-			int NrBytes = await this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+			int NrBytes;
+
+#if INFO_IN_SNIFFERS
+			if (this.HasSniffers)
+			{
+				Task<int> T = this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+
+				if (!T.IsCompleted)
+				{
+					this.Information("Output paused for stream " + StreamId.ToString());
+					NrBytes = await T;
+					this.Information("Output resumed for stream " + StreamId.ToString());
+				}
+				else
+					NrBytes = await T;
+			}
+			else
+				NrBytes = await this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+#else
+			NrBytes = await this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+#endif
 			if (NrBytes <= 0)
 				return NrBytes;
 			else if (NrBytes < Count)

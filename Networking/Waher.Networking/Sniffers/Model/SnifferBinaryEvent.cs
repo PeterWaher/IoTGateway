@@ -10,6 +10,22 @@ namespace Waher.Networking.Sniffers.Model
 		private readonly byte[] data;
 		private readonly int offset;
 		private readonly int count;
+		private readonly bool hasData;
+
+		/// <summary>
+		/// Base class for binary-based sniffer events.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes</param>
+		/// <param name="Processor">Sniff event processor</param>
+		public SnifferBinaryEvent(DateTime Timestamp, int Count, ISniffEventProcessor Processor)
+			: base(Timestamp, Processor)
+		{
+			this.data = null;
+			this.offset = 0;
+			this.count = Count;
+			this.hasData = false;
+		}
 
 		/// <summary>
 		/// Base class for binary-based sniffer events.
@@ -25,7 +41,14 @@ namespace Waher.Networking.Sniffers.Model
 			this.data = Data;
 			this.offset = Offset;
 			this.count = Count;
+			this.hasData = true;
 		}
+
+		/// <summary>
+		/// If binary data is available in the event (true), or if only the
+		/// <see cref="Count"/> property is available, for information.
+		/// </summary>
+		public bool HasData => this.hasData;
 
 		/// <summary>
 		/// Data

@@ -13,6 +13,17 @@ namespace Waher.Networking.Sniffers.Model
 		/// Represents a sniffer binary transmission event.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes</param>
+		/// <param name="Processor">Sniff event processor</param>
+		public SnifferTxBinary(DateTime Timestamp, int Count, ISniffEventProcessor Processor)
+			: base(Timestamp, Count, Processor)
+		{
+		}
+
+		/// <summary>
+		/// Represents a sniffer binary transmission event.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Data.</param>
 		/// <param name="Offset">Offset into array.</param>
 		/// <param name="Count">Number of bytes</param>
@@ -38,18 +49,19 @@ namespace Waher.Networking.Sniffers.Model
 		/// <param name="Sniffer">Sniffer.</param>
 		public override void Replay(ISniffer Sniffer)
 		{
-			Sniffer.TransmitBinary(this.Timestamp, true, this.Data, this.Offset, this.Count);
+			if (this.HasData)
+				Sniffer.TransmitBinary(this.Timestamp, true, this.Data, this.Offset, this.Count);
+			else
+				Sniffer.TransmitBinary(this.Timestamp, this.Count);
 		}
 
 		/// <inheritdoc/>
 		public override string ToString()
         {
-            int Len = this.Data?.Length ?? 0;
-
-            if (Len == 1)
+            if (this.Count == 1)
                 return "TX: (1 byte)";
             else
-                return "TX: (" + Len.ToString() + " bytes)";
+                return "TX: (" + this.Count.ToString() + " bytes)";
         }
     }
 }

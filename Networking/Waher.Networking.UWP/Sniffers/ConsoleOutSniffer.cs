@@ -7,43 +7,6 @@ using Waher.Runtime.Console;
 namespace Waher.Networking.Sniffers
 {
 	/// <summary>
-	/// How binary data is to be presented.
-	/// </summary>
-	public enum BinaryPresentationMethod
-	{
-		/// <summary>
-		/// Has hexadecimal strings.
-		/// </summary>
-		Hexadecimal,
-
-		/// <summary>
-		/// Has base64 strings.
-		/// </summary>
-		Base64,
-
-		/// <summary>
-		/// Has simple byte counts.
-		/// </summary>
-		ByteCount
-	}
-
-	/// <summary>
-	/// Type of line ending.
-	/// </summary>
-	public enum LineEnding
-	{
-		/// <summary>
-		/// Pad with spaces until next rows. Makes sure line is colored properly.
-		/// </summary>
-		PadWithSpaces,
-
-		/// <summary>
-		/// End with new line characters. Is easier to read in a text editor.
-		/// </summary>
-		NewLine
-	}
-
-	/// <summary>
 	/// Outputs sniffed data to the Console Output, serialized by <see cref="ConsoleOut"/>.
 	/// </summary>
 	public class ConsoleOutSniffer : SnifferBase
@@ -74,6 +37,11 @@ namespace Waher.Networking.Sniffers
 			get => this.includeTimestamp;
 			set => this.includeTimestamp = value;
 		}
+
+		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => this.binaryPresentationMethod;
 
 		/// <summary>
 		/// Processes a text transmission event.
@@ -117,7 +85,7 @@ namespace Waher.Networking.Sniffers
 
 		private void BinaryOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, ConsoleColor Fg, ConsoleColor Bg)
 		{
-			switch (this.binaryPresentationMethod)
+			switch (Data is null ? BinaryPresentationMethod.ByteCount : this.binaryPresentationMethod)
 			{
 				case BinaryPresentationMethod.Hexadecimal:
 					StringBuilder Row = new StringBuilder();

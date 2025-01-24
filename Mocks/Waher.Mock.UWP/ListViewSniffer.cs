@@ -31,6 +31,11 @@ namespace Waher.Mock
 		public ListView ListView => this.listView;
 
 		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => BinaryPresentationMethod.Hexadecimal;
+
+		/// <summary>
 		/// Maximum number of items in the list view.
 		/// </summary>
 		public int MaxItems
@@ -77,25 +82,30 @@ namespace Waher.Mock
 
 		internal static string HexToString(byte[] Data, int Offset, int Count)
 		{
-			StringBuilder Output = new StringBuilder();
-			int i = 0;
-			byte b;
-
-			while (Count > 0)
+			if (Data is null)
+				return "<" + Count.ToString() + " bytes>";
+			else
 			{
-				b = Data[Offset++];
+				StringBuilder Output = new StringBuilder();
+				int i = 0;
+				byte b;
 
-				if (i > 0)
-					Output.Append(' ');
+				while (Count > 0)
+				{
+					b = Data[Offset++];
 
-				Output.Append(b.ToString("X2"));
+					if (i > 0)
+						Output.Append(' ');
 
-				i = (i + 1) & 31;
-				if (i == 0)
-					Output.AppendLine();
+					Output.Append(b.ToString("X2"));
+
+					i = (i + 1) & 31;
+					if (i == 0)
+						Output.AppendLine();
+				}
+
+				return Output.ToString().TrimEnd();
 			}
-
-			return Output.ToString().TrimEnd();
 		}
 
 		/// <summary>

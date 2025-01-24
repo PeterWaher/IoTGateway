@@ -11,6 +11,19 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		void ReceiveBinary(int Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		void ReceiveBinary(DateTime Timestamp, int Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -45,6 +58,19 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
 		void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		void TransmitBinary(int Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		void TransmitBinary(DateTime Timestamp, int Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.

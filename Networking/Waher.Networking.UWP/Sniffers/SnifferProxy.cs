@@ -29,6 +29,15 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count)
+		{
+			this.comLayer.ReceiveBinary(Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -48,6 +57,16 @@ namespace Waher.Networking.Sniffers
 		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			this.comLayer.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count)
+		{
+			this.comLayer.ReceiveBinary(Timestamp, Count);
 		}
 
 		/// <summary>
@@ -79,6 +98,15 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count)
+		{
+			this.comLayer.TransmitBinary(Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -98,6 +126,16 @@ namespace Waher.Networking.Sniffers
 		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
 			this.comLayer.TransmitBinary(ConstantBuffer, Data, Offset, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count)
+		{
+			this.comLayer.TransmitBinary(Timestamp, Count);
 		}
 
 		/// <summary>

@@ -13,13 +13,20 @@ namespace Waher.Networking.Sniffers
 	public abstract class SnifferBase : ISniffer, ISniffEventProcessor, IDisposableAsync
 	{
 		private AsyncProcessor<SnifferEvent> processor = new AsyncProcessor<SnifferEvent>(1);
+		private readonly bool onlyBinaryCount;
 
 		/// <summary>
 		/// Abstract base class for sniffers. Implements default method overloads.
 		/// </summary>
 		public SnifferBase()
 		{
+			this.onlyBinaryCount = this.BinaryPresentationMethod == BinaryPresentationMethod.ByteCount;
 		}
+
+		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public abstract BinaryPresentationMethod BinaryPresentationMethod { get; }
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -40,6 +47,30 @@ namespace Waher.Networking.Sniffers
 				await this.processor.DisposeAsync();
 				this.processor = null;
 			}
+		}
+
+		/// <summary>
+		/// Number of items in queue.
+		/// </summary>
+		public int QueueSize => this.processor?.QueueSize ?? 0;
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count)
+		{
+			this.ReceiveBinary(DateTime.UtcNow, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count)
+		{
+			this.processor?.Queue(new SnifferRxBinary(Timestamp, Count, this));
 		}
 
 		/// <summary>
@@ -89,20 +120,24 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Count">Number of bytes received.</param>
 		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			if (!ConstantBuffer)
+			if (this.onlyBinaryCount)
+				this.processor?.Queue(new SnifferRxBinary(Timestamp, Count, this));
+			else
 			{
-				if (Count > 0x100000)   // Avoid cloning buffers > 1 MB
+				if (!ConstantBuffer)
 				{
-					this.processor?.Queue(new SnifferRxText(Timestamp, "<" + Count.ToString() +
-						" bytes received>", this));
-					return;
+					if (Count > 0x100000)   // Avoid cloning buffers > 1 MB
+					{
+						this.processor?.Queue(new SnifferRxBinary(Timestamp, Count, this));
+						return;
+					}
+
+					Data = CloneSection(Data, Offset, Count);
+					Offset = 0;
 				}
 
-				Data = CloneSection(Data, Offset, Count);
-				Offset = 0;
+				this.processor?.Queue(new SnifferRxBinary(Timestamp, Data, Offset, Count, this));
 			}
-
-			this.processor?.Queue(new SnifferRxBinary(Timestamp, Data, Offset, Count, this));
 		}
 
 		/// <summary>
@@ -114,9 +149,33 @@ namespace Waher.Networking.Sniffers
 		/// <returns>Cloned section.</returns>
 		public static byte[] CloneSection(byte[] Data, int Offset, int Count)
 		{
-			byte[] Data2 = new byte[Count];
-			Array.Copy(Data, Offset, Data2, 0, Count);
-			return Data2;
+			if (Data is null)
+				return null;
+			else
+			{
+				byte[] Data2 = new byte[Count];
+				Array.Copy(Data, Offset, Data2, 0, Count);
+				return Data2;
+			}
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count)
+		{
+			this.TransmitBinary(DateTime.UtcNow, Count);
+		}
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count)
+		{
+			this.processor?.Queue(new SnifferTxBinary(Timestamp, Count, this));
 		}
 
 		/// <summary>
@@ -166,20 +225,24 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Count">Number of bytes transmitted.</param>
 		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count)
 		{
-			if (!ConstantBuffer)
+			if (this.onlyBinaryCount)
+				this.processor?.Queue(new SnifferTxBinary(Timestamp, Count, this));
+			else
 			{
-				if (Count > 0x100000)   // Avoid cloning buffers > 1 MB
+				if (!ConstantBuffer)
 				{
-					this.processor?.Queue(new SnifferRxText(Timestamp, "<" + Count.ToString() +
-						" bytes transmitted>", this));
-					return;
+					if (Count > 0x100000)   // Avoid cloning buffers > 1 MB
+					{
+						this.processor?.Queue(new SnifferTxBinary(Timestamp, Count, this));
+						return;
+					}
+
+					Data = CloneSection(Data, Offset, Count);
+					Offset = 0;
 				}
 
-				Data = CloneSection(Data, Offset, Count);
-				Offset = 0;
+				this.processor?.Queue(new SnifferTxBinary(Timestamp, Data, Offset, Count, this));
 			}
-
-			this.processor?.Queue(new SnifferTxBinary(Timestamp, Data, Offset, Count, this));
 		}
 
 		/// <summary>
@@ -340,8 +403,6 @@ namespace Waher.Networking.Sniffers
 				{
 					Exception = Inner.First.Value;
 					Inner.RemoveFirst();
-					if (Inner.First is null)
-						Inner = null;
 				}
 			}
 		}

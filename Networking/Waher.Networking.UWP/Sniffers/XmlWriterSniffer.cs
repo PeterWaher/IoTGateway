@@ -40,6 +40,11 @@ namespace Waher.Networking.Sniffers
 		public DateTime LastEvent => this.lastEvent;
 
 		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => this.binaryPresentationMethod;
+
+		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
 		protected virtual Task BeforeWrite()
@@ -82,7 +87,7 @@ namespace Waher.Networking.Sniffers
 						this.output.WriteStartElement(TagName);
 						this.output.WriteAttributeString("timestamp", Encode(Timestamp));
 
-						switch (this.binaryPresentationMethod)
+						switch (Data is null ? BinaryPresentationMethod.ByteCount : this.binaryPresentationMethod)
 						{
 							case BinaryPresentationMethod.Hexadecimal:
 								StringBuilder sb = new StringBuilder();

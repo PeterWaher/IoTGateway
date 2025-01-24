@@ -159,6 +159,12 @@ namespace Waher.Networking.Modbus
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count) => this.server?.ReceiveBinary(Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -173,6 +179,12 @@ namespace Waher.Networking.Modbus
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
 		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.server?.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count) => this.server?.TransmitBinary(Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
@@ -238,6 +250,13 @@ namespace Waher.Networking.Modbus
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count) => this.server?.ReceiveBinary(Timestamp, Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
 		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
@@ -253,6 +272,13 @@ namespace Waher.Networking.Modbus
 		/// <param name="Offset">Offset into buffer where received data begins.</param>
 		/// <param name="Count">Number of bytes received.</param>
 		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.server?.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count) => this.server?.TransmitBinary(Timestamp, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.

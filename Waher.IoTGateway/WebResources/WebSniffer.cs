@@ -77,6 +77,11 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		public string SnifferId => this.snifferId;
 
+		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => this.binaryPresentationMethod;
+
 		private Task Process(DateTime Timestamp, string Message, string Function)
 		{
 			if (Timestamp >= this.expires)
@@ -159,7 +164,7 @@ namespace Waher.IoTGateway.WebResources
 
 		private string HexOutput(byte[] Data, int Offset, int Count)
 		{
-			switch (this.binaryPresentationMethod)
+			switch (Data is null ? BinaryPresentationMethod.ByteCount : this.binaryPresentationMethod)
 			{
 				case BinaryPresentationMethod.Hexadecimal:
 					StringBuilder sb = new StringBuilder();

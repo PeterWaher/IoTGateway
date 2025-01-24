@@ -23,17 +23,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Requests resources from the available pool of resources in the tree.
 		/// </summary>
 		/// <param name="RequestedResources">Requested amount of resources.</param>
-		/// <returns>Number of resources granted.</returns>
-		Task<int> RequestAvailableResources(int RequestedResources);
-
-		/// <summary>
-		/// Requests resources from the available pool of resources in the tree.
-		/// </summary>
-		/// <param name="RequestedResources">Requested amount of resources.</param>
-		/// <param name="CancelToken">Optional cancel token</param>
+		/// <param name="CancellationToken">Optional Cancellation token</param>
 		/// <returns>Number of resources granted.</returns>
 		Task<int> RequestAvailableResources(int RequestedResources,
-			CancellationToken? CancelToken);
+			CancellationToken? CancellationToken);
 
 		/// <summary>
 		/// Releases stream resources back to the stream.

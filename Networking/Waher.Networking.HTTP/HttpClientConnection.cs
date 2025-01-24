@@ -208,7 +208,7 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				if (this.header.Method == "PRI")
+				if (this.header.Method == "PRI" && this.server.Http2Enabled)
 				{
 					this.client.OnReceivedReset(this.Client_OnReceivedHttp2Init);
 
@@ -229,6 +229,7 @@ namespace Waher.Networking.HTTP
 				{
 					if (!(this.header.Upgrade is null) &&
 						this.header.Upgrade.Value == "h2c" &&
+						this.server.Http2Enabled &&
 						!(this.header.Connection is null) &&
 						this.header.Connection.Value.StartsWith("Upgrade") &&
 						this.header.TryGetHeaderField("HTTP2-Settings", out HttpField Http2Settings))

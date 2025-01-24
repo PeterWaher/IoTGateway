@@ -1187,8 +1187,16 @@ namespace Waher.Networking.HTTP
 							", Trust Certificates: " + TrustCertificates.ToString() + ")");
 					}
 
-					await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
-						ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
+					if (this.http2Enabled)
+					{
+						await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
+							ClientCertificates, null, TrustCertificates, "h2", "http/1.1");
+					}
+					else
+					{
+						await Client.UpgradeToTlsAsServer(this.serverCertificate, Crypto.SecureTls,
+							ClientCertificates, null, TrustCertificates, "http/1.1");
+					}
 
 					if (this.HasSniffers)
 					{

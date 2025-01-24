@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			this.totalChildWeights -= Child.Weight;
 
-			if (this.childNodes.First is null)
+			if (this.childNodes?.First is null)
 				this.childNodes = null;
 			else
 				this.RecalculateChildFractions();

@@ -1492,7 +1492,9 @@ namespace Waher.Networking.HTTP
 							switch (this.flowControl?.ReleaseStreamResources(this.http2StreamId, (int)Increment) ?? -1)
 							{
 								case -1:
-									return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
+									if (this.http2StreamId > this.http2LastCreatedStreamId)
+										return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Stream not under flow control.");
+									break;
 
 								case -2:
 									return await this.ReturnHttp2Error(Http2Error.FlowControlError, this.http2StreamId, "Window size overflow.");

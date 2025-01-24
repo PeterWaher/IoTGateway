@@ -43,6 +43,11 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// Number of items in queue.
+		/// </summary>
+		public int QueueSize => this.processor?.QueueSize ?? 0;
+
+		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),

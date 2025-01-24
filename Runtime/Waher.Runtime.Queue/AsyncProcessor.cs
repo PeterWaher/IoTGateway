@@ -94,6 +94,11 @@ namespace Waher.Runtime.Queue
 		public bool Terminated => this.terminated;
 
 		/// <summary>
+		/// Number of items in queue.
+		/// </summary>
+		public int QueueSize => this.queue?.CountItems ?? 0;
+
+		/// <summary>
 		/// Performs console operations.
 		/// </summary>
 		private async Task PerformWork()

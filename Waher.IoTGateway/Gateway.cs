@@ -375,6 +375,7 @@ namespace Waher.IoTGateway
 				int Http2MaxConcurrentStreams = 100;
 				int Http2HeaderTableSize = 8192;
 				bool Http2NoRfc7540Priorities = false;
+				bool Http2Profiling = false;
 
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
@@ -416,6 +417,7 @@ namespace Waher.IoTGateway
 								Http2MaxConcurrentStreams = XML.Attribute(E, "maxConcurrentStreams", Http2MaxConcurrentStreams);
 								Http2HeaderTableSize = XML.Attribute(E, "headerTableSize", Http2HeaderTableSize);
 								Http2NoRfc7540Priorities = XML.Attribute(E, "noRfc7540Priorities", Http2NoRfc7540Priorities);
+								Http2Profiling = XML.Attribute(E, "profiling", Http2Profiling);
 								break;
 
 							case "ContentEncodings":
@@ -1014,7 +1016,9 @@ namespace Waher.IoTGateway
 
 				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialWindowSize,
 					Http2MaxFrameSize, Http2MaxConcurrentStreams, Http2HeaderTableSize,
-					false, Http2NoRfc7540Priorities, true);
+					false, Http2NoRfc7540Priorities, Http2Profiling, true);
+
+				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
 
 				Types.SetModuleParameter("HTTP", webServer);
 				Types.SetModuleParameter("X509", certificate);
@@ -5286,6 +5290,65 @@ namespace Waher.IoTGateway
 				return false;
 			}
 		}
+
+		#endregion
+
+		#region Profiling
+
+		private static async Task WebServer_ConnectionProfiled(object Sender, Profiler Profiler)
+		{
+			try
+			{
+				DateTime Now = DateTime.UtcNow;
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("Profiling ");
+				sb.Append(Now.Year.ToString("D4"));
+				sb.Append('-');
+				sb.Append(Now.Month.ToString("D2"));
+				sb.Append('-');
+				sb.Append(Now.Day.ToString("D2"));
+				sb.Append('T');
+				sb.Append(Now.Hour.ToString("D2"));
+				sb.Append('_');
+				sb.Append(Now.Minute.ToString("D2"));
+				sb.Append('_');
+				sb.Append(Now.Second.ToString("D2"));
+				sb.Append('_');
+				sb.Append(Now.Millisecond.ToString("D3"));
+				sb.Append(".uml");
+
+				string Folder = Path.Combine(appDataFolder, "HTTP");
+
+				if (!httpProfilingFolderChecked)
+				{
+					if (!Directory.Exists(Folder))
+						Directory.CreateDirectory(Folder);
+
+					httpProfilingFolderChecked = true;
+				}
+
+				string FileName = Path.Combine(Folder, sb.ToString());
+				string Uml = Profiler.ExportPlantUml(TimeUnit.Seconds);
+
+				await Files.WriteAllTextAsync(FileName, Uml);
+
+				StringBuilder Markdown = new StringBuilder();
+
+				Markdown.AppendLine("```uml");
+				Markdown.AppendLine(Uml.TrimEnd());
+				Markdown.AppendLine("```");
+
+				await SendNotification(Markdown.ToString());
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+				httpProfilingFolderChecked = false;
+			}
+		}
+
+		private static bool httpProfilingFolderChecked = false;
 
 		#endregion
 	}

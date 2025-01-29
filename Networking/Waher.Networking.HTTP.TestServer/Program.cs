@@ -8,6 +8,8 @@ using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
+using Waher.Runtime.Profiling;
 
 internal class Program
 {
@@ -194,7 +196,18 @@ internal class Program
 				WebServer = new HttpServer([HttpPort], [HttpsPort], Certificate, Sniffer);
 			}
 
-			WebServer.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, No7540prio, true);
+			int ProfilerIndex = 0;
+
+			WebServer.SetHttp2ConnectionSettings(true, 2500000, 16384, 100, 8192, false, No7540prio, true, true);
+			WebServer.ConnectionProfiled += (Sender, Profiler) =>
+			{
+				if (!Directory.Exists("Profiler"))
+					Directory.CreateDirectory("Profiler");
+
+				string Uml = Profiler.ExportPlantUml(TimeUnit.Seconds);
+				string FileName = Path.Combine("Profiler", (++ProfilerIndex).ToString() + ".uml");
+				return Files.WriteAllTextAsync(FileName, Uml);
+			};
 
 			static Task Hello(HttpRequest Request, HttpResponse Response)
 			{

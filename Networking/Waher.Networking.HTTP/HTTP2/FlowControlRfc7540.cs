@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -14,6 +15,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly Dictionary<int, PriorityNodeRfc7540> nodes = new Dictionary<int, PriorityNodeRfc7540>();
 		private readonly object synchObj = new object();
 		private readonly PriorityNodeRfc7540 root;
+		private readonly Profiler profiler;
+		private readonly bool hasProfiler;
 		private int lastNodeStreamId = -1;
 		private int lastRemoteInitialWindowSize = 0;
 		private PriorityNodeRfc7540 lastNode = null;
@@ -24,10 +27,23 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="LocalSettings">Local Connection settings.</param>
 		/// <param name="RemoteSettings">Remote Connection settings.</param>
-		public FlowControlRfc7540(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings)
+		/// <param name="Profiler">Connection profiler.</param>
+		public FlowControlRfc7540(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
+			Profiler Profiler)
 			: base(LocalSettings, RemoteSettings)
 		{
-			this.root = new PriorityNodeRfc7540(null, null, null, 1, this);
+			this.profiler = Profiler;
+			this.hasProfiler = !(Profiler is null);
+
+			if (Profiler is null)
+				this.root = new PriorityNodeRfc7540(null, null, null, 1, this, null, null);
+			else
+			{
+				this.root = new PriorityNodeRfc7540(null, null, null, 1, this,
+					HttpClientConnection.CreateProfilerWindowThread(Profiler, 0),
+					HttpClientConnection.CreateProfilerDataThread(Profiler, 0));
+			}
+
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
 
@@ -70,8 +86,22 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				return this.nodes.TryGetValue(StreamId, out Node);
+				if (StreamId != this.lastNodeStreamId)
+				{
+					if (!this.nodes.TryGetValue(StreamId, out this.lastNode))
+					{
+						this.lastNodeStreamId = 0;
+						Node = null;
+						return false;
+					}
+
+					this.lastNodeStreamId = StreamId;
+				}
+
+				Node = this.lastNode;
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -82,24 +112,15 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If a stream object was found with the corresponding ID.</returns>
 		public override bool TryGetStream(int StreamId, out Http2Stream Stream)
 		{
-			if (this.disposed)
+			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc7540 Node))
+			{
+				Stream = Node.Stream;
+				return true;
+			}
+			else
 			{
 				Stream = null;
 				return false;
-			}
-
-			lock (this.synchObj)
-			{
-				if (this.nodes.TryGetValue(StreamId, out PriorityNodeRfc7540 Node))
-				{
-					Stream = Node.Stream;
-					return true;
-				}
-				else
-				{
-					Stream = null;
-					return false;
-				}
 			}
 		}
 
@@ -204,7 +225,14 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 				else
 				{
-					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this);
+					if (this.hasProfiler)
+					{
+						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this,
+							HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId),
+							HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId));
+					}
+					else
+						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, null, null);
 
 					if (Exclusive && !(DependentOn is null))
 						this.MoveChildrenLocked(DependentOn, Node);
@@ -277,6 +305,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the stream could be found, and was removed.</returns>
 		public override bool RemoveStream(Http2Stream Stream)
 		{
+			Stream.State = StreamState.Closed;
 			return this.RemoveStream(Stream.StreamId);
 		}
 
@@ -457,6 +486,21 @@ namespace Waher.Networking.HTTP.HTTP2
 					foreach (int StreamId in ToRemove)
 						this.RemoveStreamLocked(StreamId);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Sets the data label of a profiler thread, if available.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Label">Label to set.</param>
+		public override void SetProfilerDataLabel(int StreamId, string Label)
+		{
+			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc7540 Node))
+			{
+				ProfilerThread Thread = Node.DataThread;
+				if (!(Thread is null))
+					Thread.Label = Thread.Label + " (" + Label + ")";
 			}
 		}
 

@@ -345,6 +345,10 @@
       <Project>{3b744b26-affc-450d-9d21-0291299c5281}</Project>
       <Name>Waher.Runtime.IO</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj">
+      <Project>{add58298-121f-4c09-b4eb-6b90f8acd803}</Project>
+      <Name>Waher.Runtime.Profiling</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj">
       <Project>{9641a3ba-2873-4e87-9302-dbaa950d9ca0}</Project>
       <Name>Waher.Runtime.Temporary</Name>

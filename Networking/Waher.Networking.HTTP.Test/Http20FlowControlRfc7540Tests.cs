@@ -17,7 +17,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -42,7 +42,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
@@ -74,7 +74,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
@@ -117,7 +117,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -148,7 +148,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -181,7 +181,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -215,7 +215,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -245,7 +245,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -267,7 +267,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 10, 0, false);
 			FlowControl.AddStreamForTest(3, 30, 0, false);
@@ -298,7 +298,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 10, 0, false);
 			FlowControl.AddStreamForTest(3, 30, 0, false);
@@ -341,7 +341,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 
@@ -368,7 +368,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
@@ -394,7 +394,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1);
 			FlowControl.AddStreamForTest(3);
@@ -433,7 +433,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 16, 0, true);
 
@@ -458,7 +458,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc7540 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 255, 0, true);  // .md
 			

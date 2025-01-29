@@ -36,7 +36,12 @@ namespace Waher.Runtime.Profiling
 		/// <summary>
 		/// Documents the change of an analog input through sampled values.
 		/// </summary>
-		Analog
+		Analog,
+
+		/// <summary>
+		/// Documents the change of an analog input through sampled delta-values.
+		/// </summary>
+		AnalogDelta
 	}
 
 	/// <summary>
@@ -48,9 +53,12 @@ namespace Waher.Runtime.Profiling
 		private readonly List<ProfilerEvent> events = new List<ProfilerEvent>();
 		private readonly string name;
 		private readonly int order;
+		private readonly bool sampleDelta;
 		private readonly ProfilerThreadType type;
 		private readonly Profiler profiler;
 		private readonly ProfilerThread parent;
+		private string label;
+		private double lastSample = 0;
 		private long? startedAt = null;
 		private long? stoppedAt = null;
 
@@ -63,11 +71,12 @@ namespace Waher.Runtime.Profiling
 		/// <param name="Profiler">Profiler reference.</param>
 		public ProfilerThread(string Name, int Order, ProfilerThreadType Type, Profiler Profiler)
 		{
-			this.name = Name;
+			this.name = this.label = Name;
 			this.order = Order;
 			this.type = Type;
 			this.profiler = Profiler;
 			this.parent = null;
+			this.sampleDelta = Type == ProfilerThreadType.AnalogDelta;
 		}
 
 		/// <summary>
@@ -79,17 +88,28 @@ namespace Waher.Runtime.Profiling
 		/// <param name="Parent">Parent thread.</param>
 		public ProfilerThread(string Name, int Order, ProfilerThreadType Type, ProfilerThread Parent)
 		{
-			this.name = Name;
+			this.name = this.label = Name;
 			this.order = Order;
 			this.type = Type;
 			this.parent = Parent;
 			this.profiler = this.parent.Profiler;
+			this.sampleDelta = Type == ProfilerThreadType.AnalogDelta;
 		}
 
 		/// <summary>
 		/// Name of thread.
 		/// </summary>
 		public string Name => this.name;
+
+		/// <summary>
+		/// Displayable label, equal to the name by default, but can be set later
+		/// during the profiling stage.
+		/// </summary>
+		public string Label
+		{
+			get => this.label;
+			set => this.label = value;
+		}
 
 		/// <summary>
 		/// Order created.
@@ -149,7 +169,15 @@ namespace Waher.Runtime.Profiling
 		/// <param name="Sample">New sample value.</param>
 		public void NewSample(double Sample)
 		{
-			this.events.Add(new NewSample(this.profiler.ElapsedTicks, Sample, this));
+			if (this.sampleDelta)
+			{
+				Sample += this.lastSample;
+				this.events.Add(new NewSample(this.profiler.ElapsedTicks, Sample, this));
+				this.lastSample = Sample;
+			}
+			else
+				this.events.Add(new NewSample(this.profiler.ElapsedTicks, Sample, this));
+
 		}
 
 		/// <summary>
@@ -265,6 +293,7 @@ namespace Waher.Runtime.Profiling
 		{
 			Output.WriteStartElement("Thread");
 			Output.WriteAttributeString("name", this.name);
+			Output.WriteAttributeString("label", this.label);
 			Output.WriteAttributeString("type", this.type.ToString());
 
 			Output.WriteStartElement("Events");
@@ -303,6 +332,7 @@ namespace Waher.Runtime.Profiling
 					break;
 
 				case ProfilerThreadType.Analog:
+				case ProfilerThreadType.AnalogDelta:
 					Output.Append("analog \"");
 					break;
 
@@ -313,7 +343,7 @@ namespace Waher.Runtime.Profiling
 					break;
 			}
 
-			Output.Append(this.name);
+			Output.Append(this.label);
 			Output.Append("\" as T");
 			Output.AppendLine(this.order.ToString());
 
@@ -352,7 +382,7 @@ namespace Waher.Runtime.Profiling
 
 			foreach (ProfilerThread Thread in this.subThreads)
 				Thread.ExportPlantUmlEvents(States);
-			
+
 			if (this.startedAt.HasValue && this.stoppedAt.HasValue)
 			{
 				StringBuilder Output = States.Summary;
@@ -362,7 +392,7 @@ namespace Waher.Runtime.Profiling
 
 				Output.Append(this.Key);
 				Output.Append('@');
-					
+
 				Time = this.profiler.ToTime(this.startedAt.Value, this, States.TimeUnit);
 				Output.Append(Time.Key.ToString("F0").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
 

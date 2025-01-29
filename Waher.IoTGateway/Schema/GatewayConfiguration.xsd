@@ -119,6 +119,11 @@
 								<xs:documentation>If stream priorities, as defined in HTTP/2 RFC 7540, should not be used, in favour of priorities, as defined in RFC 9218 (used in HTTP/3).</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
+						<xs:attribute name="profiling" type="xs:boolean" use="optional" default="false">
+							<xs:annotation>
+								<xs:documentation>If profiling should be enabled to analyse HTTP/2 performance.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Database">

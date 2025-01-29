@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -13,6 +14,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly PriorityNodeRfc9218 root;
 		private LinkedList<PendingRequest> pendingRequests = null;
 		private readonly int maxFrameSize;
+		private readonly ProfilerThread windowThread;
+		private readonly ProfilerThread dataThread;
+		private readonly bool hasProfiler;
 		private int windowSize0;
 		private int windowSize;
 		private bool disposed = false;
@@ -22,7 +26,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Stream">Corresponding HTTP/2 stream.</param>
 		/// <param name="FlowControl">Flow control object.</param>
-		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl)
+		/// <param name="WindowThread">Profiler thread for corresponding stream window, if any.</param>
+		/// <param name="DataThread">Profiler thread for corresonding data transferred, if any.</param>
+		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl,
+			ProfilerThread WindowThread, ProfilerThread DataThread)
 		{
 			ConnectionSettings Settings = Stream is null ? FlowControl.LocalSettings : FlowControl.RemoteSettings;
 
@@ -30,12 +37,28 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.root = FlowControl.Root;
 			this.windowSize = this.windowSize0 = Settings.InitialWindowSize;
 			this.maxFrameSize = Settings.MaxFrameSize;
+			this.windowThread = WindowThread;
+			this.dataThread = DataThread;
+			this.hasProfiler = !(this.windowThread is null);
+
+			this.windowThread?.NewSample(this.windowSize);
+			this.dataThread?.NewSample(0);
 		}
 
 		/// <summary>
 		/// Corresponding HTTP/2 stream.
 		/// </summary>
 		public Http2Stream Stream { get; }
+
+		/// <summary>
+		/// Window Profiler thread, if any.
+		/// </summary>
+		public ProfilerThread WindowThread => this.windowThread;
+
+		/// <summary>
+		/// Window Data thread, if any.
+		/// </summary>
+		public ProfilerThread DataThread => this.dataThread;
 
 		/// <summary>
 		/// Currently available resources
@@ -76,6 +99,13 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.windowSize -= Available;
 				this.root.windowSize -= Available;
 
+				if (this.hasProfiler)
+				{
+					this.windowThread?.NewSample(this.windowSize);
+					this.root.windowThread?.NewSample(this.root.windowSize);
+					this.dataThread?.NewSample(Available);
+				}
+
 				return Task.FromResult(Available);
 			}
 		}
@@ -95,6 +125,8 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (NewSize > this.windowSize0)
 				this.windowSize0 = NewSize;
+
+			this.windowThread?.NewSample(NewSize);
 
 			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
@@ -121,6 +153,13 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.windowSize -= i;
 				this.root.windowSize -= i;
+
+				if (this.hasProfiler)
+				{
+					this.windowThread?.NewSample(this.windowSize);
+					this.root.windowThread?.NewSample(this.root.windowSize);
+				}
+
 				Loop.Value.Request.TrySetResult(i);
 				Resources -= i;
 			}
@@ -142,6 +181,8 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize > this.windowSize0)
 				this.windowSize0 = NewSize;
 
+			this.windowThread?.NewSample(this.windowSize);
+
 			return NewSize;
 		}
 
@@ -157,6 +198,8 @@ namespace Waher.Networking.HTTP.HTTP2
 			int Diff = WindowSize - this.windowSize0;
 			this.windowSize0 = WindowSize;
 			this.windowSize += Diff;
+
+			this.windowThread?.NewSample(this.windowSize);
 
 			if (Trigger)
 			{
@@ -192,6 +235,12 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				if (!(this.Stream is null))
 					this.Stream.State = StreamState.Closed;
+
+				this.windowThread?.Idle();
+				this.windowThread?.Stop();
+				
+				this.dataThread?.Idle();
+				this.dataThread?.Stop();
 			}
 		}
 	}

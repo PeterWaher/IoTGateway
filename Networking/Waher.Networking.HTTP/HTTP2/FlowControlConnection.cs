@@ -193,5 +193,12 @@ namespace Waher.Networking.HTTP.HTTP2
 			get => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
 			internal set => this.connectionWindowSize = this.connectionBytesCommunicated + value;
 		}
+
+		/// <summary>
+		/// Sets the data label of a profiler thread, if available.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Label">Label to set.</param>
+		public abstract void SetProfilerDataLabel(int StreamId, string Label);
 	}
 }

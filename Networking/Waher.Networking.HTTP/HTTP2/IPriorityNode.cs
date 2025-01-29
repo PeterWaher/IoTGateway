@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -41,5 +42,15 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
 		int ReleaseConnectionResources(int Resources);
+
+		/// <summary>
+		/// Window Profiler thread, if any.
+		/// </summary>
+		ProfilerThread WindowThread { get; }
+
+		/// <summary>
+		/// Window Data thread, if any.
+		/// </summary>
+		ProfilerThread DataThread { get; }
 	}
 }

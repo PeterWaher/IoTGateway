@@ -17,7 +17,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -42,7 +42,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 			FlowControl.AddStreamForTest(3, 3, false);
@@ -91,7 +91,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -122,7 +122,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -155,7 +155,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -219,7 +219,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -241,7 +241,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 			FlowControl.AddStreamForTest(3, 0, false);
@@ -302,7 +302,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 
@@ -329,7 +329,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			ConnectionSettings LocalSettings = new();
 			ConnectionSettings RemoteSettings = new();
-			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings);
+			using FlowControlRfc9218 FlowControl = new(LocalSettings, RemoteSettings, null);
 
 			FlowControl.AddStreamForTest(1, 3, false);
 			FlowControl.AddStreamForTest(3, 3, false);

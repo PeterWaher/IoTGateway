@@ -156,6 +156,22 @@ namespace Waher.Runtime.Profiling
 		}
 
 		/// <summary>
+		/// Tries to get an existing profiler thread. If none is available, null is returned.
+		/// </summary>
+		/// <param name="Name">Name of profiler thread.</param>
+		/// <returns>Profiler thread reference, if exists, null otherwise.</returns>
+		public ProfilerThread TryGetThread(string Name)
+		{
+			lock (this.threads)
+			{
+				if (this.threadsByName.TryGetValue(Name, out ProfilerThread Result))
+					return Result;
+
+				return null;
+			}
+		}
+
+		/// <summary>
 		/// Creates a new profiler thread.
 		/// </summary>
 		/// <param name="Name">Name of profiler thread.</param>
@@ -602,16 +618,25 @@ namespace Waher.Runtime.Profiling
 					StepSize /= 2;
 
 				if (StepSize < 1)
+				{
+					if (TimeUnit != TimeUnit.DynamicPerProfiling &&
+						TimeUnit != TimeUnit.DynamicPerEvent &&
+						TimeUnit != TimeUnit.DynamicPerThread)
+					{
+						break;
+					}
+
 					this.timeScale *= 1e-3;
+				}
 			}
 			while (StepSize < 1 && StepSize > 0);
 
-			StepSize = Math.Floor(StepSize);
-			NrSteps = (int)Math.Floor(TimeSpan / StepSize);
-			int PixelsPerStep = NrSteps > 0 ? GoalWidth / NrSteps : 0;
+			StepSize = Math.Ceiling(StepSize);
+			NrSteps = Math.Max(1, (int)Math.Floor(TimeSpan / StepSize));
+			int PixelsPerStep = Math.Max(1, GoalWidth / NrSteps);
 
 			Output.Append("scale ");
-			Output.Append(StepSize.ToString("F0"));
+			Output.Append(Math.Ceiling(StepSize).ToString("F0"));
 			Output.Append(" as ");
 			Output.Append(PixelsPerStep);
 			Output.AppendLine(" pixels");

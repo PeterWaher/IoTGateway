@@ -1,4 +1,4 @@
-﻿#define INFO_IN_SNIFFERS    // TODO: Remove                   
+﻿//#define INFO_IN_SNIFFERS
 
 using System;
 using System.Collections.Generic;

@@ -315,7 +315,11 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			}
 
-			this.windowThread?.NewSample(NewSize);
+			if (this.hasProfiler)
+			{
+				this.windowThread.Event("StreamWindowUpdate");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
@@ -373,7 +377,11 @@ namespace Waher.Networking.HTTP.HTTP2
 				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			}
 
-			this.windowThread?.NewSample(this.windowSize);
+			if (this.hasProfiler)
+			{
+				this.windowThread.Event("ConnectionWindowUpdate");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			Resources = NewSize;
 			this.TriggerPendingIfAvailbleDown(ref Resources);
@@ -395,7 +403,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
 			this.windowSize += Diff;
 
-			this.windowThread?.NewSample(this.windowSize);
+			if (this.hasProfiler)
+			{
+				this.windowThread.Event("Settings");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			this.RecalculateChildWindows(ConnectionWindowSize, StreamWindowSize);
 

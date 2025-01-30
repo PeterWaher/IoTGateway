@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Profiling;
@@ -41,7 +42,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				this.root = new PriorityNodeRfc7540(null, null, null, 1, this,
 					HttpClientConnection.CreateProfilerWindowThread(Profiler, 0),
-					HttpClientConnection.CreateProfilerDataThread(Profiler, 0));
+					null);
 			}
 
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
@@ -227,9 +228,10 @@ namespace Waher.Networking.HTTP.HTTP2
 				{
 					if (this.hasProfiler)
 					{
-						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this,
-							HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId),
-							HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId));
+						ProfilerThread DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId);
+						ProfilerThread WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId);
+
+						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, WindowThread, DataThread);
 					}
 					else
 						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, null, null);
@@ -500,7 +502,18 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				ProfilerThread Thread = Node.DataThread;
 				if (!(Thread is null))
-					Thread.Label = Thread.Label + " (" + Label + ")";
+				{
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append(Thread.Label);
+					sb.Append(", Dependency: ");
+					sb.Append(Node.Parent.WindowThread.Label);
+					sb.Append(" (");
+					sb.Append(Label);
+					sb.Append(")");
+
+					Thread.Label = sb.ToString();
+				}
 			}
 		}
 

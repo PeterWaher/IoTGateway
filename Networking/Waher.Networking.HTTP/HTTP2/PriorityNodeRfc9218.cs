@@ -126,7 +126,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize > this.windowSize0)
 				this.windowSize0 = NewSize;
 
-			this.windowThread?.NewSample(NewSize);
+			if (this.hasProfiler)
+			{
+				this.windowThread.Event("StreamWindowUpdate");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
@@ -181,7 +185,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize > this.windowSize0)
 				this.windowSize0 = NewSize;
 
-			this.windowThread?.NewSample(this.windowSize);
+			if (this.hasProfiler)
+			{
+				this.windowThread.Event("ConnectionWindowUpdate");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			return NewSize;
 		}
@@ -199,7 +207,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.windowSize0 = WindowSize;
 			this.windowSize += Diff;
 
-			this.windowThread?.NewSample(this.windowSize);
+			if (this.hasProfiler)
+			{
+				this.windowThread.Event("Settings");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			if (Trigger)
 			{

@@ -48,7 +48,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				this.root = new PriorityNodeRfc9218(null, this,
 					HttpClientConnection.CreateProfilerWindowThread(Profiler, 0),
-					HttpClientConnection.CreateProfilerDataThread(Profiler, 0));
+					null);
 			}
 
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
@@ -225,9 +225,10 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				if (this.hasProfiler)
 				{
-					Node = new PriorityNodeRfc9218(Stream, this,
-						HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId),
-						HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId));
+					ProfilerThread DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId);
+					ProfilerThread WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId);
+
+					Node = new PriorityNodeRfc9218(Stream, this, WindowThread, DataThread);
 				}
 				else
 					Node = new PriorityNodeRfc9218(Stream, this, null, null);

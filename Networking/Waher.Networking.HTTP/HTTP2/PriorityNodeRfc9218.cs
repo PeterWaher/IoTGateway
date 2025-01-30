@@ -248,9 +248,11 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!(this.Stream is null))
 					this.Stream.State = StreamState.Closed;
 
+				this.windowThread?.NewSample(this.windowSize);
 				this.windowThread?.Idle();
 				this.windowThread?.Stop();
-				
+
+				this.DataThread?.NewSample(0);
 				this.dataThread?.Idle();
 				this.dataThread?.Stop();
 			}

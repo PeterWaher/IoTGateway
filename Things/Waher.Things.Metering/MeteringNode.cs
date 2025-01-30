@@ -276,7 +276,7 @@ namespace Waher.Things.Metering
 					NodeId = this.objectId
 				};
 
-				await Database.InsertLazy(Msg);
+				await Database.Insert(Msg);
 			}
 
 			switch (Type)

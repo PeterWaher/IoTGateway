@@ -347,7 +347,7 @@ namespace Waher.Things.Metering
 
 		internal static async Task NewEvent(SourceEvent Event)
 		{
-			await Database.InsertLazy(Event);
+			await Database.Insert(Event);
 			await (instance?.OnEvent?.Raise(instance, Event) ?? Task.CompletedTask);
 		}
 

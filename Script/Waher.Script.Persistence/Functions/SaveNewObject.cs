@@ -58,7 +58,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
-			await Database.InsertLazy(Argument.AssociatedObjectValue);
+			await Database.Insert(Argument.AssociatedObjectValue);
 			return Argument;
 		}
 

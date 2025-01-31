@@ -229,9 +229,12 @@ namespace Waher.IoTGateway.Svc
 		/// <inheritdoc/>
 		protected override void OnSessionChange(SessionChangeDescription ChangeDescription)
 		{
+			DateTime Now = DateTime.UtcNow;
 			int SessionId = ChangeDescription.SessionId;
 			List<KeyValuePair<string, object>> Tags =
 			[
+				new("Date", Now.ToShortDateString()),
+				new("Time", Now.ToLongTimeString() + "Z"),
 				new("SessionId", SessionId),
 				new("Domain", Gateway.Domain?.Value ?? "N/A")
 			];
@@ -446,7 +449,7 @@ namespace Waher.IoTGateway.Svc
 					{
 						Bin = new byte[16];
 						Marshal.Copy(Buffer, Bin, 4, 16);
-					
+
 						return new IPAddress(Bin).ToString();
 					}
 					catch (Exception)

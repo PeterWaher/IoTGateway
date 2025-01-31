@@ -14,27 +14,39 @@ namespace Waher.Networking.HTTP.Test
 		private static bool getTestJited = false;
 		private static bool putTestJited = false;
 
-		[ClassInitialize]
-		public new static void ClassInitialize(TestContext _)
+		[TestCleanup]
+		public Task TestCleanup()
 		{
-			HttpServerTests.ClassInitialize(false);
-		}
-
-		[ClassCleanup]
-		public new static async Task ClassCleanup()
-		{
-			await HttpServerTests.ClassCleanup();
+			return this.Cleanup();
 		}
 
 		[DataTestMethod]
-		[DataRow(100000)]
-		[DataRow(1000000)]
-		[DataRow(10000000)]
-		[DataRow(100000000)]
-		[DataRow(1000000000)]
-		public async Task Test_01_GET_Chunked(int TotalSize)
+		[DataRow("HTTP_Benchmark_01_100000.xml", false, false, false, 100000)]
+		[DataRow("HTTP_Benchmark_01_1000000.xml", false, false, false, 1000000)]
+		[DataRow("HTTP_Benchmark_01_10000000.xml", false, false, false, 10000000)]
+		[DataRow("HTTP_Benchmark_01_100000000.xml", false, false, false, 100000000)]
+		[DataRow("HTTP_Benchmark_01_1000000000.xml", false, false, false, 1000000000)]
+		[DataRow("HTTP_Benchmark_01_deflate_100000.xml", true, false, false, 100000)]
+		[DataRow("HTTP_Benchmark_01_deflate_1000000.xml", true, false, false, 1000000)]
+		[DataRow("HTTP_Benchmark_01_deflate_10000000.xml", true, false, false, 10000000)]
+		[DataRow("HTTP_Benchmark_01_deflate_100000000.xml", true, false, false, 100000000)]
+		[DataRow("HTTP_Benchmark_01_deflate_1000000000.xml", true, false, false, 1000000000)]
+		[DataRow("HTTP_Benchmark_01_gzip_100000.xml", false, true, false, 100000)]
+		[DataRow("HTTP_Benchmark_01_gzip_1000000.xml", false, true, false, 1000000)]
+		[DataRow("HTTP_Benchmark_01_gzip_10000000.xml", false, true, false, 10000000)]
+		[DataRow("HTTP_Benchmark_01_gzip_100000000.xml", false, true, false, 100000000)]
+		[DataRow("HTTP_Benchmark_01_gzip_1000000000.xml", false, true, false, 1000000000)]
+		[DataRow("HTTP_Benchmark_01_br_100000.xml", false, false, true, 100000)]
+		[DataRow("HTTP_Benchmark_01_br_1000000.xml", false, false, true, 1000000)]
+		[DataRow("HTTP_Benchmark_01_br_10000000.xml", false, false, true, 10000000)]
+		[DataRow("HTTP_Benchmark_01_br_100000000.xml", false, false, true, 100000000)]
+		[DataRow("HTTP_Benchmark_01_br_1000000000.xml", false, false, true, 1000000000)]
+		public async Task Test_01_GET_Chunked(string SnifferFileName,
+			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int TotalSize)
 		{
-			HttpResource Resource = server.Register("/test01.txt", async (req, resp) =>
+			this.Setup(false, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+
+			HttpResource Resource = this.server.Register("/test01.txt", async (req, resp) =>
 			{
 				int i = 0;
 				int j;
@@ -93,7 +105,7 @@ namespace Waher.Networking.HTTP.Test
 			}
 			finally
 			{
-				server.Unregister(Resource);
+				this.server.Unregister(Resource);
 			}
 		}
 
@@ -116,15 +128,33 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(100000)]
-		[DataRow(1000000)]
-		[DataRow(10000000)]
-		[DataRow(100000000)]
-		[DataRow(1000000000)]
-		public async Task Test_02_PUT(int TotalSize)
+		[DataRow("HTTP_Benchmark_02_100000.xml", false, false, false, 100000)]
+		[DataRow("HTTP_Benchmark_02_1000000.xml", false, false, false, 1000000)]
+		[DataRow("HTTP_Benchmark_02_10000000.xml", false, false, false, 10000000)]
+		[DataRow("HTTP_Benchmark_02_100000000.xml", false, false, false, 100000000)]
+		[DataRow("HTTP_Benchmark_02_1000000000.xml", false, false, false, 1000000000)]
+		[DataRow("HTTP_Benchmark_02_deflate_100000.xml", true, false, false, 100000)]
+		[DataRow("HTTP_Benchmark_02_deflate_1000000.xml", true, false, false, 1000000)]
+		[DataRow("HTTP_Benchmark_02_deflate_10000000.xml", true, false, false, 10000000)]
+		[DataRow("HTTP_Benchmark_02_deflate_100000000.xml", true, false, false, 100000000)]
+		[DataRow("HTTP_Benchmark_02_deflate_1000000000.xml", true, false, false, 1000000000)]
+		[DataRow("HTTP_Benchmark_02_gzip_100000.xml", false, true, false, 100000)]
+		[DataRow("HTTP_Benchmark_02_gzip_1000000.xml", false, true, false, 1000000)]
+		[DataRow("HTTP_Benchmark_02_gzip_10000000.xml", false, true, false, 10000000)]
+		[DataRow("HTTP_Benchmark_02_gzip_100000000.xml", false, true, false, 100000000)]
+		[DataRow("HTTP_Benchmark_02_gzip_1000000000.xml", false, true, false, 1000000000)]
+		[DataRow("HTTP_Benchmark_02_br_100000.xml", false, false, true, 100000)]
+		[DataRow("HTTP_Benchmark_02_br_1000000.xml", false, false, true, 1000000)]
+		[DataRow("HTTP_Benchmark_02_br_10000000.xml", false, false, true, 10000000)]
+		[DataRow("HTTP_Benchmark_02_br_100000000.xml", false, false, true, 100000000)]
+		[DataRow("HTTP_Benchmark_02_br_1000000000.xml", false, false, true, 1000000000)]
+		public async Task Test_02_PUT(string SnifferFileName,
+			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int TotalSize)
 		{
-			if (!server.TryGetResource("/Test02", false, out _, out _))
-				server.Register(new HttpFolderResource("/Test02", "Data", true, false, true, false));
+			this.Setup(false, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+
+			if (!this.server.TryGetResource("/Test02", false, out _, out _))
+				this.server.Register(new HttpFolderResource("/Test02", "Data", true, false, true, false));
 
 			if (!putTestJited)
 			{

@@ -1,11 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.HTTP.Brotli;
+using Waher.Networking.HTTP.ContentEncodings;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
 using Waher.Security;
@@ -14,36 +16,47 @@ namespace Waher.Networking.HTTP.Test
 {
 	public abstract class HttpServerTestsBase : IUserSource
 	{
-		protected static HttpServer server;
-		private static ConsoleEventSink sink = null;
-		private static XmlFileSniffer xmlSniffer = null;
+		protected HttpServer server;
+		private ConsoleEventSink sink = null;
+		private XmlFileSniffer xmlSniffer = null;
 
-		[ClassInitialize]
-		public static void ClassInitialize(TestContext _)
+		protected void Setup(bool UseConsoleSniffer, string SnifferFileName, bool NoRfc7540Priorities,
+			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
-			ClassInitialize(true);
-		}
+			this.sink = new ConsoleEventSink();
+			Log.Register(this.sink);
 
-		public static void ClassInitialize(bool UseConsoleSniffer)
-		{
-			sink = new ConsoleEventSink();
-			Log.Register(sink);
-
-			if (xmlSniffer is null)
+			if (this.xmlSniffer is null)
 			{
-				File.Delete("HTTP.xml");
-				xmlSniffer = new XmlFileSniffer("HTTP.xml",
+				if (!Directory.Exists("Sniffers"))
+					Directory.CreateDirectory("Sniffers");
+
+				SnifferFileName = Path.Combine("Sniffers", SnifferFileName);
+
+				File.Delete(SnifferFileName);
+				this.xmlSniffer = new XmlFileSniffer(SnifferFileName,
 					@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
 					int.MaxValue, BinaryPresentationMethod.ByteCount);
 			}
 
 			X509Certificate2 Certificate = Certificates.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
-			server = new HttpServer(8081, 8088, Certificate, xmlSniffer);
+			this.server = new HttpServer(8081, 8088, Certificate, this.xmlSniffer);
 
 			if (UseConsoleSniffer)
-				server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
+				this.server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
-			server.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, false, false);
+			this.server.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, NoRfc7540Priorities, false);
+
+			DeflateContentEncoding DeflateContentEncoding = new();
+			DeflateContentEncoding.ConfigureSupport(SupportDeflate, SupportDeflate);
+
+			GZipContentEncoding GZipContentEncoding = new();
+			GZipContentEncoding.ConfigureSupport(SupportGZip, SupportGZip);
+
+			BrotliContentEncoding BrotliContentEncoding = new();
+			BrotliContentEncoding.ConfigureSupport(SupportBrotli, SupportBrotli);
+
+			HttpFieldAcceptEncoding.ContentEncodingsReconfigured();
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate (object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{
@@ -51,23 +64,22 @@ namespace Waher.Networking.HTTP.Test
 			};
 		}
 
-		[ClassCleanup]
-		public static async Task ClassCleanup()
+		protected async Task Cleanup()
 		{
-			server?.Dispose();
-			server = null;
+			this.server?.Dispose();
+			this.server = null;
 
-			if (xmlSniffer is not null)
+			if (this.xmlSniffer is not null)
 			{
-				await xmlSniffer.DisposeAsync();
-				xmlSniffer = null;
+				await this.xmlSniffer.DisposeAsync();
+				this.xmlSniffer = null;
 			}
 
-			if (sink is not null)
+			if (this.sink is not null)
 			{
-				Log.Unregister(sink);
-				await sink.DisposeAsync();
-				sink = null;
+				Log.Unregister(this.sink);
+				await this.sink.DisposeAsync();
+				this.sink = null;
 			}
 		}
 

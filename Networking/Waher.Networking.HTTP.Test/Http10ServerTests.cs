@@ -8,16 +8,10 @@ namespace Waher.Networking.HTTP.Test
 	[TestClass]
 	public class Http10ServerTests : HttpServerTests
 	{
-		[ClassInitialize]
-		public new static void ClassInitialize(TestContext _)
+		[TestCleanup]
+		public Task TestCleanup()
 		{
-			HttpServerTests.ClassInitialize(_);
-		}
-
-		[ClassCleanup]
-		public new static async Task ClassCleanup()
-		{
-			await HttpServerTests.ClassCleanup();
+			return this.Cleanup();
 		}
 
 		public override Version ProtocolVersion => HttpVersion.Version10;

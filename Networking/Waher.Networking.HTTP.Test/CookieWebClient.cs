@@ -66,7 +66,7 @@ namespace Waher.Networking.HTTP.Test
 				CookieContainer = this.cookies,
 				AllowAutoRedirect = true,
 				UseCookies = true,
-				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
 				InitialHttp2StreamWindowSize = 65535,
 				ConnectTimeout = TimeSpan.FromSeconds(10),
 				SslOptions = new SslClientAuthenticationOptions()

@@ -17,7 +17,7 @@ namespace Waher.Networking.HTTP.Test
 		[ClassCleanup]
 		public new static async Task ClassCleanup()
 		{
-			await HttpServerTests.ClassCleanup();
+			await WebSocketTests.ClassCleanup();
 		}
 
 		public override Version ProtocolVersion => HttpVersion.Version20;

@@ -5,6 +5,8 @@ using Waher.Content.Markdown.Web;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.Brotli;
+using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
@@ -29,9 +31,12 @@ internal class Program
 	/// -cert FILENAME      Certificate file name.
 	/// -pwd PASSWORD       Certificate password, if any.
 	/// -no7540prio         No RFC 7540 priorities, in accordance with RFC 9218
+	/// -deflate            Permit deflate encoding
+	/// -gzip               Permit gzip encoding
+	/// -br                 Permit br encoding
 	/// 
 	/// Example:
-	/// Waher.Networking.HTTP.TestServer.exe -http 8081 -https 8088 -cert CERTIFICATE_FILENAME
+	/// Waher.Networking.HTTP.TestServer.exe -http 8081 -https 8088 -cert CERTIFICATE_FILENAME -deflate
 	/// 
 	/// h2spec command-line arguments:
 	/// h2spec.exe http2 -h 127.0.0.1 -p 8088 -P /Hello -t -k --strict
@@ -141,6 +146,21 @@ internal class Program
 						No7540prio = true;
 						break;
 
+					case "-deflate":
+						DeflateContentEncoding DeflateContentEncoding = new();
+						DeflateContentEncoding.ConfigureSupport(true, true);
+						break;
+
+					case "-gzip":
+						GZipContentEncoding GZipContentEncoding = new();
+						GZipContentEncoding.ConfigureSupport(true, true);
+						break;
+
+					case "-br":
+						BrotliContentEncoding BrotliContentEncoding = new();
+						BrotliContentEncoding.ConfigureSupport(true, true);
+						break;
+
 					case "-?":
 						Help = true;
 						break;
@@ -154,6 +174,12 @@ internal class Program
 			{
 				ConsoleOut.WriteLine("-http PORT_NUMBER    The port number to use for unencrypted HTTP connections.");
 				ConsoleOut.WriteLine("-https PORT_NUMBER   The port number to use for encrypted HTTPS connections.");
+				ConsoleOut.WriteLine("-cert FILENAME       Certificate file name.");
+				ConsoleOut.WriteLine("-pwd PASSWORD        Certificate password, if any.");
+				ConsoleOut.WriteLine("-no7540prio          No RFC 7540 priorities, in accordance with RFC 9218");
+				ConsoleOut.WriteLine("-deflate             Permit deflate encoding");
+				ConsoleOut.WriteLine("-gzip                Permit gzip encoding");
+				ConsoleOut.WriteLine("-br                  Permit br encoding");
 				ConsoleOut.WriteLine("-?                   Help.");
 				return;
 			}
@@ -176,6 +202,7 @@ internal class Program
 
 			Types.Initialize(
 				typeof(HttpServer).Assembly,
+				typeof(BrotliContentEncoding).Assembly,
 				typeof(Log).Assembly,
 				typeof(InternetContent).Assembly,
 				typeof(MarkdownDocument).Assembly,

@@ -2,7 +2,7 @@
   "profiles": {
     "Waher.Networking.HTTP.TestServer": {
       "commandName": "Project",
-      "commandLineArgs": "-http 8081 -no7540prio"
+      "commandLineArgs": "-http 8081 -no7540prio -deflate\r\n"
     }
   }
 }

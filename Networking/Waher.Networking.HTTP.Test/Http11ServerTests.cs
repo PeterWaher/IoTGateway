@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Networking.HTTP.Brotli;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -13,22 +14,18 @@ namespace Waher.Networking.HTTP.Test
 		public static void AssemblyInitialize(TestContext _)
 		{
 			Runtime.Inventory.Types.Initialize(
+				typeof(HttpServer).Assembly,
+				typeof(BrotliContentEncoding).Assembly,
 				typeof(HttpServerTests).Assembly,
 				typeof(Script.Expression).Assembly,
 				typeof(Content.Images.ImageCodec).Assembly,
 				typeof(CommonTypes).Assembly);
 		}
 
-		[ClassInitialize]
-		public new static void ClassInitialize(TestContext _)
+		[TestCleanup]
+		public Task TestCleanup()
 		{
-			HttpServerTests.ClassInitialize(_);
-		}
-
-		[ClassCleanup]
-		public new static async Task ClassCleanup()
-		{
-			await HttpServerTests.ClassCleanup();
+			return this.Cleanup();
 		}
 
 		public override Version ProtocolVersion => HttpVersion.Version11;

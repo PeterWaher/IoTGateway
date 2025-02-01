@@ -107,10 +107,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		void GoingAway(int LastPermittedStreamId);
 
 		/// <summary>
-		/// Sets the data label of a profiler thread, if available.
+		/// Sets the stream label of a profiler thread, if available.
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Label">Label to set.</param>
-		void SetProfilerDataLabel(int StreamId, string Label);
+		void SetProfilerStreamLabel(int StreamId, string Label);
 	}
 }

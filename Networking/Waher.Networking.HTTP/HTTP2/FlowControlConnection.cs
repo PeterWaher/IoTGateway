@@ -195,10 +195,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Sets the data label of a profiler thread, if available.
+		/// Sets the stream label of a profiler thread, if available.
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Label">Label to set.</param>
-		public abstract void SetProfilerDataLabel(int StreamId, string Label);
+		public abstract void SetProfilerStreamLabel(int StreamId, string Label);
 	}
 }

@@ -477,34 +477,37 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Sets the data label of a profiler thread, if available.
+		/// Sets the stream label of a profiler thread, if available.
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Label">Label to set.</param>
-		public override void SetProfilerDataLabel(int StreamId, string Label)
+		public override void SetProfilerStreamLabel(int StreamId, string Label)
 		{
 			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc7540 Node))
 			{
-				ProfilerThread Thread = Node.DataThread;
-				if (Thread is null)
+				if (Node.DataThread is null)
 				{
-					Node.DataThread = Thread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
+					Node.DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
 					Node.WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, StreamId);
 
 					Node.WindowThread.NewSample(Node.WindowSize);
 					Node.DataThread.NewSample(0);
 				}
 
-				StringBuilder sb = new StringBuilder();
+				ProfilerThread Thread = Node.Stream.StreamThread;
+				if (!(Thread is null))
+				{
+					StringBuilder sb = new StringBuilder();
 
-				sb.Append(Thread.Label);
-				sb.Append(", Dependency: ");
-				sb.Append(Node.Parent.WindowThread.Label);
-				sb.Append(" (");
-				sb.Append(Label);
-				sb.Append(")");
+					sb.Append(Thread.Label);
+					sb.Append(", Dependency: ");
+					sb.Append(Node.Parent.WindowThread.Label);
+					sb.Append(" (");
+					sb.Append(Label);
+					sb.Append(")");
 
-				Thread.Label = sb.ToString();
+					Thread.Label = sb.ToString();
+				}
 			}
 		}
 

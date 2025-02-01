@@ -1217,7 +1217,7 @@ namespace Waher.Networking.HTTP
 											return await this.ReturnHttp2Error(Http2Error.ProtocolError, this.http2StreamId, s, StreamThread);
 
 										if (this.http2Profiling && HeaderName == ":path")
-											this.flowControl.SetProfilerDataLabel(this.http2StreamId, HeaderValue);
+											this.flowControl.SetProfilerStreamLabel(this.http2StreamId, HeaderValue);
 									}
 								}
 

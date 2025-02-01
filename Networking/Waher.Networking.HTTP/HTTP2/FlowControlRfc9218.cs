@@ -486,25 +486,26 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Sets the data label of a profiler thread, if available.
+		/// Sets the stream label of a profiler thread, if available.
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Label">Label to set.</param>
-		public override void SetProfilerDataLabel(int StreamId, string Label)
+		public override void SetProfilerStreamLabel(int StreamId, string Label)
 		{
 			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc9218 Node))
 			{
-				ProfilerThread Thread = Node.DataThread;
-				if (Thread is null)
+				if (Node.DataThread is null)
 				{
-					Node.DataThread = Thread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
+					Node.DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
 					Node.WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, StreamId);
 
 					Node.WindowThread.NewSample(Node.WindowSize);
 					Node.DataThread.NewSample(0);
 				}
 
-				Thread.Label = Thread.Label + " (" + Label + ")";
+				ProfilerThread Thread = Node.Stream.StreamThread;
+				if (!(Thread is null))
+					Thread.Label = Thread.Label + " (" + Label + ")";
 			}
 		}
 

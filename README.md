@@ -698,6 +698,6 @@ To set an environment variable in mac OS, you can follow this procedure:
 
 ### Running IoT Gateway
 
-You have to have the correct .NET Core framework installed on your machine to run the gateway: [Download .NET 6](https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0). 
+You have to have the correct .NET Core framework installed on your machine to run the gateway: [Download .NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0). 
 
 When the gateway starts up, it reads the `gateway.config` file from the program data folder (see above) corresponding to the instance, if available. If not available, it reads the one provided in the build. This file contains information about what ports to open for different protocols, and any web folders to use. Review the file and its corresponding XML schema to get acquainted with options available. To modify this file, copy the file (if one does not exist) from the build output to the program data folder, and edit it there. Then restart the gateway.

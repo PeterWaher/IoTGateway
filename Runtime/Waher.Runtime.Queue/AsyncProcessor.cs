@@ -28,9 +28,10 @@ namespace Waher.Runtime.Queue
 				throw new ArgumentException("Number of processors must be positive.", nameof(NrProcessors));
 
 			List<Task> Processors = new List<Task>();
+			int i;
 
-			while (NrProcessors-- > 0)
-				Processors.Add(this.PerformWork());
+			for (i = 0; i < NrProcessors; i++)
+				Processors.Add(this.PerformWork(i));
 
 			this.processors = Processors.ToArray();
 		}
@@ -57,6 +58,14 @@ namespace Waher.Runtime.Queue
 			this.queue?.Dispose();
 			this.queue = null;
 			this.terminated = true;
+		}
+
+		/// <summary>
+		/// Closes the processor for new items, but continues to process queued items.
+		/// </summary>
+		public void CloseForTermination()
+		{
+			this.terminating = true;
 		}
 
 		/// <summary>
@@ -101,7 +110,8 @@ namespace Waher.Runtime.Queue
 		/// <summary>
 		/// Performs console operations.
 		/// </summary>
-		private async Task PerformWork()
+		/// <param name="ProcessorIndex">Index of processor.</param>
+		private async Task PerformWork(int ProcessorIndex)
 		{
 			try
 			{
@@ -109,11 +119,26 @@ namespace Waher.Runtime.Queue
 				T Item;
 				Task<T> Task;
 
-				while (!this.terminating)
+				while (true)
 				{
 					Task = this.queue?.Wait(Cancel);
 					if (Task is null)
 						break;
+
+					if (!Task.IsCompleted)
+					{
+						if (!(this.OnIdle is null))
+						{
+							try
+							{
+								await this.OnIdle.Raise(this, new ProcessorEventArgs(ProcessorIndex));
+							}
+							catch (Exception ex)
+							{
+								Log.Exception(ex);
+							}
+						}
+					}
 
 					Item = await Task;
 					if (Item is null)
@@ -134,6 +159,39 @@ namespace Waher.Runtime.Queue
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the processor becomes idle. It can be raised multiple
+		/// times if more than one processor is used, once for each processor becoming idle.
+		/// </summary>
+		public event EventHandlerAsync<ProcessorEventArgs> OnIdle;
+
+		/// <summary>
+		/// Waits until the processor becomes idle.
+		/// </summary>
+		public async Task WaitUntilIdle()
+		{
+			TaskCompletionSource<bool> Idle = new TaskCompletionSource<bool>();
+
+			Task OnIdle(object Sender, EventArgs e)
+			{
+				Idle.TrySetResult(true);
+				return Task.CompletedTask;
+			};
+
+			this.OnIdle += OnIdle;
+			try
+			{
+				if (this.queue.CountItems == 0)
+					return;
+
+				await Idle.Task;
+			}
+			finally
+			{
+				this.OnIdle -= OnIdle;
 			}
 		}
 	}

@@ -42,14 +42,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.profiler = Profiler;
 			this.hasProfiler = !(Profiler is null);
 
-			if (Profiler is null)
-				this.root = new PriorityNodeRfc9218(null, this, null, null);
-			else
-			{
-				this.root = new PriorityNodeRfc9218(null, this,
-					HttpClientConnection.CreateProfilerWindowThread(Profiler, 0),
-					null);
-			}
+			this.root = new PriorityNodeRfc9218(null, this, this.hasProfiler);
 
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
@@ -221,17 +214,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Priority < 0 || Priority > 7)
 					Priority = 3;
 
-				PriorityNodeRfc9218 Node;
-
-				if (this.hasProfiler)
-				{
-					ProfilerThread DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId);
-					ProfilerThread WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId);
-
-					Node = new PriorityNodeRfc9218(Stream, this, WindowThread, DataThread);
-				}
-				else
-					Node = new PriorityNodeRfc9218(Stream, this, null, null);
+				PriorityNodeRfc9218 Node = new PriorityNodeRfc9218(Stream, this, this.hasProfiler);
 
 				StreamRec Rec = new StreamRec()
 				{
@@ -512,8 +495,16 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc9218 Node))
 			{
 				ProfilerThread Thread = Node.DataThread;
-				if (!(Thread is null))
-					Thread.Label = Thread.Label + " (" + Label + ")";
+				if (Thread is null)
+				{
+					Node.DataThread = Thread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
+					Node.WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, StreamId);
+
+					Node.WindowThread.NewSample(Node.WindowSize);
+					Node.DataThread.NewSample(0);
+				}
+
+				Thread.Label = Thread.Label + " (" + Label + ")";
 			}
 		}
 

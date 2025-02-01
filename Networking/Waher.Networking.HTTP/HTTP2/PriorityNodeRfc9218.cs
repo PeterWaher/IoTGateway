@@ -13,9 +13,9 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly PriorityNodeRfc9218 root;
 		private LinkedList<PendingRequest> pendingRequests = null;
+		private ProfilerThread windowThread;
+		private ProfilerThread dataThread;
 		private readonly int maxFrameSize;
-		private readonly ProfilerThread windowThread;
-		private readonly ProfilerThread dataThread;
 		private readonly bool hasProfiler;
 		private int windowSize0;
 		private int windowSize;
@@ -26,10 +26,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Stream">Corresponding HTTP/2 stream.</param>
 		/// <param name="FlowControl">Flow control object.</param>
-		/// <param name="WindowThread">Profiler thread for corresponding stream window, if any.</param>
-		/// <param name="DataThread">Profiler thread for corresonding data transferred, if any.</param>
-		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl,
-			ProfilerThread WindowThread, ProfilerThread DataThread)
+		/// <param name="HasProfiler">If the node is being profiled.</param>
+		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl, bool HasProfiler)
 		{
 			ConnectionSettings Settings = Stream is null ? FlowControl.LocalSettings : FlowControl.RemoteSettings;
 
@@ -37,9 +35,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.root = FlowControl.Root;
 			this.windowSize = this.windowSize0 = Settings.InitialWindowSize;
 			this.maxFrameSize = Settings.MaxFrameSize;
-			this.windowThread = WindowThread;
-			this.dataThread = DataThread;
-			this.hasProfiler = !(this.windowThread is null);
+			this.hasProfiler = HasProfiler;
 
 			this.windowThread?.NewSample(this.windowSize);
 			this.dataThread?.NewSample(0);
@@ -51,14 +47,27 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Http2Stream Stream { get; }
 
 		/// <summary>
+		/// Window Size
+		/// </summary>
+		public int WindowSize => this.windowSize;
+
+		/// <summary>
 		/// Window Profiler thread, if any.
 		/// </summary>
-		public ProfilerThread WindowThread => this.windowThread;
+		public ProfilerThread WindowThread 
+		{ 
+			get => this.windowThread;
+			internal set => this.windowThread = value;
+		}
 
 		/// <summary>
 		/// Window Data thread, if any.
 		/// </summary>
-		public ProfilerThread DataThread => this.dataThread;
+		public ProfilerThread DataThread 
+		{
+			get => this.dataThread;
+			internal set => this.dataThread = value;
+		}
 
 		/// <summary>
 		/// Currently available resources

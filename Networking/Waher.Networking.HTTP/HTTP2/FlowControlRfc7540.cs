@@ -36,14 +36,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.profiler = Profiler;
 			this.hasProfiler = !(Profiler is null);
 
-			if (Profiler is null)
-				this.root = new PriorityNodeRfc7540(null, null, null, 1, this, null, null);
-			else
-			{
-				this.root = new PriorityNodeRfc7540(null, null, null, 1, this,
-					HttpClientConnection.CreateProfilerWindowThread(Profiler, 0),
-					null);
-			}
+			this.root = new PriorityNodeRfc7540(null, null, null, 1, this, this.hasProfiler);
 
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
@@ -226,15 +219,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 				else
 				{
-					if (this.hasProfiler)
-					{
-						ProfilerThread DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, Stream.StreamId);
-						ProfilerThread WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, Stream.StreamId);
-
-						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, WindowThread, DataThread);
-					}
-					else
-						Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, null, null);
+					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, this.hasProfiler);
 
 					if (Exclusive && !(DependentOn is null))
 						this.MoveChildrenLocked(DependentOn, Node);
@@ -501,19 +486,25 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc7540 Node))
 			{
 				ProfilerThread Thread = Node.DataThread;
-				if (!(Thread is null))
+				if (Thread is null)
 				{
-					StringBuilder sb = new StringBuilder();
+					Node.DataThread = Thread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
+					Node.WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, StreamId);
 
-					sb.Append(Thread.Label);
-					sb.Append(", Dependency: ");
-					sb.Append(Node.Parent.WindowThread.Label);
-					sb.Append(" (");
-					sb.Append(Label);
-					sb.Append(")");
-
-					Thread.Label = sb.ToString();
+					Node.WindowThread.NewSample(Node.WindowSize);
+					Node.DataThread.NewSample(0);
 				}
+
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(Thread.Label);
+				sb.Append(", Dependency: ");
+				sb.Append(Node.Parent.WindowThread.Label);
+				sb.Append(" (");
+				sb.Append(Label);
+				sb.Append(")");
+
+				Thread.Label = sb.ToString();
 			}
 		}
 

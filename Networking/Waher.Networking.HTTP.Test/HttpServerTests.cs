@@ -17,11 +17,15 @@ namespace Waher.Networking.HTTP.Test
 		public abstract Version ProtocolVersion { get; }
 
 		[DataTestMethod]
-		[DataRow("HTTP_01.xml", false, false, false)]
-		[DataRow("HTTP_01_deflate.xml", true, false, false)]
-		[DataRow("HTTP_01_gzip.xml", false, true, false)]
-		[DataRow("HTTP_01_br.xml", false, false, true)]
-		public async Task Test_01_GET_HTTP_ContentLength(string SnifferFileName,
+		[DataRow("HTTP_01_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_01_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_01_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_01_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_01_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_01_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_01_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_01_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_01_GET_HTTP_ContentLength(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -34,27 +38,47 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_02_100000.xml", false, false, false, 100000)]
-		[DataRow("HTTP_02_1000000.xml", false, false, false, 1000000)]
-		[DataRow("HTTP_02_10000000.xml", false, false, false, 10000000)]
-		[DataRow("HTTP_02_100000000.xml", false, false, false, 100000000)]
-		[DataRow("HTTP_02_1000000000.xml", false, false, false, 1000000000)]
-		[DataRow("HTTP_02_100000_deflate.xml", true, false, false, 100000)]
-		[DataRow("HTTP_02_1000000_deflate.xml", true, false, false, 1000000)]
-		[DataRow("HTTP_02_10000000_deflate.xml", true, false, false, 10000000)]
-		[DataRow("HTTP_02_100000000_deflate.xml", true, false, false, 100000000)]
-		[DataRow("HTTP_02_1000000000_deflate.xml", true, false, false, 1000000000)]
-		[DataRow("HTTP_02_100000_gzip.xml", false, true, false, 100000)]
-		[DataRow("HTTP_02_1000000_gzip.xml", false, true, false, 1000000)]
-		[DataRow("HTTP_02_10000000_gzip.xml", false, true, false, 10000000)]
-		[DataRow("HTTP_02_100000000_gzip.xml", false, true, false, 100000000)]
-		[DataRow("HTTP_02_1000000000_gzip.xml", false, true, false, 1000000000)]
-		[DataRow("HTTP_02_100000_br.xml", false, false, true, 100000)]
-		[DataRow("HTTP_02_1000000_br.xml", false, false, true, 1000000)]
-		[DataRow("HTTP_02_10000000_br.xml", false, false, true, 10000000)]
-		[DataRow("HTTP_02_100000000_br.xml", false, false, true, 100000000)]
-		[DataRow("HTTP_02_1000000000_br.xml", false, false, true, 1000000000)]
-		public async Task Test_02_GET_HTTP_Chunked(string SnifferFileName,
+		[DataRow("HTTP_02_100000_rfc7540.xml", false, false, false, false, 100000)]
+		[DataRow("HTTP_02_1000000_rfc7540.xml", false, false, false, false, 1000000)]
+		[DataRow("HTTP_02_10000000_rfc7540.xml", false, false, false, false, 10000000)]
+		[DataRow("HTTP_02_100000000_rfc7540.xml", false, false, false, false, 100000000)]
+		[DataRow("HTTP_02_1000000000_rfc7540.xml", false, false, false, false, 1000000000)]
+		[DataRow("HTTP_02_100000_deflate_rfc7540.xml", false, true, false, false, 100000)]
+		[DataRow("HTTP_02_1000000_deflate_rfc7540.xml", false, true, false, false, 1000000)]
+		[DataRow("HTTP_02_10000000_deflate_rfc7540.xml", false, true, false, false, 10000000)]
+		[DataRow("HTTP_02_100000000_deflate_rfc7540.xml", false, true, false, false, 100000000)]
+		[DataRow("HTTP_02_1000000000_deflate_rfc7540.xml", false, true, false, false, 1000000000)]
+		[DataRow("HTTP_02_100000_gzip_rfc7540.xml", false, false, true, false, 100000)]
+		[DataRow("HTTP_02_1000000_gzip_rfc7540.xml", false, false, true, false, 1000000)]
+		[DataRow("HTTP_02_10000000_gzip_rfc7540.xml", false, false, true, false, 10000000)]
+		[DataRow("HTTP_02_100000000_gzip_rfc7540.xml", false, false, true, false, 100000000)]
+		[DataRow("HTTP_02_1000000000_gzip_rfc7540.xml", false, false, true, false, 1000000000)]
+		[DataRow("HTTP_02_100000_br_rfc7540.xml", false, false, false, true, 100000)]
+		[DataRow("HTTP_02_1000000_br_rfc7540.xml", false, false, false, true, 1000000)]
+		[DataRow("HTTP_02_10000000_br_rfc7540.xml", false, false, false, true, 10000000)]
+		[DataRow("HTTP_02_100000000_br_rfc7540.xml", false, false, false, true, 100000000)]
+		[DataRow("HTTP_02_1000000000_br_rfc7540.xml", false, false, false, true, 1000000000)]
+		[DataRow("HTTP_02_100000_rfc9218.xml", true, false, false, false, 100000)]
+		[DataRow("HTTP_02_1000000_rfc9218.xml", true, false, false, false, 1000000)]
+		[DataRow("HTTP_02_10000000_rfc9218.xml", true, false, false, false, 10000000)]
+		[DataRow("HTTP_02_100000000_rfc9218.xml", true, false, false, false, 100000000)]
+		[DataRow("HTTP_02_1000000000_rfc9218.xml", true, false, false, false, 1000000000)]
+		[DataRow("HTTP_02_100000_deflate_rfc9218.xml", true, true, false, false, 100000)]
+		[DataRow("HTTP_02_1000000_deflate_rfc9218.xml", true, true, false, false, 1000000)]
+		[DataRow("HTTP_02_10000000_deflate_rfc9218.xml", true, true, false, false, 10000000)]
+		[DataRow("HTTP_02_100000000_deflate_rfc9218.xml", true, true, false, false, 100000000)]
+		[DataRow("HTTP_02_1000000000_deflate_rfc9218.xml", true, true, false, false, 1000000000)]
+		[DataRow("HTTP_02_100000_gzip_rfc9218.xml", true, false, true, false, 100000)]
+		[DataRow("HTTP_02_1000000_gzip_rfc9218.xml", true, false, true, false, 1000000)]
+		[DataRow("HTTP_02_10000000_gzip_rfc9218.xml", true, false, true, false, 10000000)]
+		[DataRow("HTTP_02_100000000_gzip_rfc9218.xml", true, false, true, false, 100000000)]
+		[DataRow("HTTP_02_1000000000_gzip_rfc9218.xml", true, false, true, false, 1000000000)]
+		[DataRow("HTTP_02_100000_br_rfc9218.xml", true, false, false, true, 100000)]
+		[DataRow("HTTP_02_1000000_br_rfc9218.xml", true, false, false, true, 1000000)]
+		[DataRow("HTTP_02_10000000_br_rfc9218.xml", true, false, false, true, 10000000)]
+		[DataRow("HTTP_02_100000000_br_rfc9218.xml", true, false, false, true, 100000000)]
+		[DataRow("HTTP_02_1000000000_br_rfc9218.xml", true, false, false, true, 1000000000)]
+		public async Task Test_02_GET_HTTP_Chunked(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int TotalSize)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -87,11 +111,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_03.xml", false, false, false)]
-		[DataRow("HTTP_03_deflate.xml", true, false, false)]
-		[DataRow("HTTP_03_gzip.xml", false, true, false)]
-		[DataRow("HTTP_03_br.xml", false, false, true)]
-		public async Task Test_03_GET_HTTP_Encoding(string SnifferFileName,
+		[DataRow("HTTP_03_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_03_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_03_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_03_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_03_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_03_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_03_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_03_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_03_GET_HTTP_Encoding(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -108,11 +136,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_04.xml", false, false, false)]
-		[DataRow("HTTP_04_deflate.xml", true, false, false)]
-		[DataRow("HTTP_04_gzip.xml", false, true, false)]
-		[DataRow("HTTP_04_br.xml", false, false, true)]
-		public async Task Test_04_GET_HTTPS(string SnifferFileName,
+		[DataRow("HTTP_04_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_04_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_04_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_04_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_04_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_04_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_04_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_04_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_04_GET_HTTPS(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -125,11 +157,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_05.xml", false, false, false)]
-		[DataRow("HTTP_05_deflate.xml", true, false, false)]
-		[DataRow("HTTP_05_gzip.xml", false, true, false)]
-		[DataRow("HTTP_05_br.xml", false, false, true)]
-		public async Task Test_05_Authentication_Basic(string SnifferFileName,
+		[DataRow("HTTP_05_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_05_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_05_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_05_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_05_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_05_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_05_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_05_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_05_Authentication_Basic(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -143,11 +179,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_06.xml", false, false, false)]
-		[DataRow("HTTP_06_deflate.xml", true, false, false)]
-		[DataRow("HTTP_06_gzip.xml", false, true, false)]
-		[DataRow("HTTP_06_br.xml", false, false, true)]
-		public async Task Test_06_Authentication_Digest(string SnifferFileName,
+		[DataRow("HTTP_06_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_06_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_06_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_06_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_06_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_06_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_06_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_06_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_06_Authentication_Digest(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -161,11 +201,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_07.xml", false, false, false)]
-		[DataRow("HTTP_07_deflate.xml", true, false, false)]
-		[DataRow("HTTP_07_gzip.xml", false, true, false)]
-		[DataRow("HTTP_07_br.xml", false, false, true)]
-		public async Task Test_07_EmbeddedResource(string SnifferFileName,
+		[DataRow("HTTP_07_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_07_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_07_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_07_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_07_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_07_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_07_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_07_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_07_EmbeddedResource(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -179,11 +223,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_08.xml", false, false, false)]
-		[DataRow("HTTP_08_deflate.xml", true, false, false)]
-		[DataRow("HTTP_08_gzip.xml", false, true, false)]
-		[DataRow("HTTP_08_br.xml", false, false, true)]
-		public async Task Test_08_FolderResource_GET(string SnifferFileName,
+		[DataRow("HTTP_08_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_08_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_08_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_08_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_08_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_08_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_08_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_08_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_08_FolderResource_GET(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -197,19 +245,31 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_09__10_kB_1024.xml", false, false, false, 10 * 1024)]            // 10 kB	(k=1024)
-		[DataRow("HTTP_09_100_kB_1024.xml", false, false, false, 100 * 1024)]           // 100 kB	(k=1024)
-		[DataRow("HTTP_09___1_MB_1024.xml", false, false, false, 1024 * 1024)]          // 1 MB		(k=1024)
-		[DataRow("HTTP_09__10_MB_1024.xml", false, false, false, 10 * 1024 * 1024)]     // 10 MB	(k=1024)
-		[DataRow("HTTP_09_100_MB_1024.xml", false, false, false, 100 * 1024 * 1024)]    // 100 MB	(k=1024)
-		[DataRow("HTTP_09_500_MB_1024.xml", false, false, false, 500 * 1024 * 1024)]    // 500 MB	(k=1024)
-		[DataRow("HTTP_09__10_kB_1000.xml", false, false, false, 10 * 1000)]            // 10 kB	(k=1000)
-		[DataRow("HTTP_09_100_kB_1000.xml", false, false, false, 100 * 1000)]           // 100 kB	(k=1000)
-		[DataRow("HTTP_09___1_MB_1000.xml", false, false, false, 1000 * 1000)]          // 1 MB		(k=1000)
-		[DataRow("HTTP_09__10_MB_1000.xml", false, false, false, 10 * 1000 * 1000)]     // 10 MB	(k=1000)
-		[DataRow("HTTP_09_100_MB_1000.xml", false, false, false, 100 * 1000 * 1000)]    // 100 MB	(k=1000)
-		[DataRow("HTTP_09_500_MB_1000.xml", false, false, false, 500 * 1000 * 1000)]    // 500 MB	(k=1000)
-		public async Task Test_09_FolderResource_PUT_File(string SnifferFileName,
+		[DataRow("HTTP_09__10_kB_1024_rfc7540.xml", false, false, false, false, 10 * 1024)]            // 10 kB	(k=1024)
+		[DataRow("HTTP_09_100_kB_1024_rfc7540.xml", false, false, false, false, 100 * 1024)]           // 100 kB	(k=1024)
+		[DataRow("HTTP_09___1_MB_1024_rfc7540.xml", false, false, false, false, 1024 * 1024)]          // 1 MB		(k=1024)
+		[DataRow("HTTP_09__10_MB_1024_rfc7540.xml", false, false, false, false, 10 * 1024 * 1024)]     // 10 MB	(k=1024)
+		[DataRow("HTTP_09_100_MB_1024_rfc7540.xml", false, false, false, false, 100 * 1024 * 1024)]    // 100 MB	(k=1024)
+		[DataRow("HTTP_09_500_MB_1024_rfc7540.xml", false, false, false, false, 500 * 1024 * 1024)]    // 500 MB	(k=1024)
+		[DataRow("HTTP_09__10_kB_1000_rfc7540.xml", false, false, false, false, 10 * 1000)]            // 10 kB	(k=1000)
+		[DataRow("HTTP_09_100_kB_1000_rfc7540.xml", false, false, false, false, 100 * 1000)]           // 100 kB	(k=1000)
+		[DataRow("HTTP_09___1_MB_1000_rfc7540.xml", false, false, false, false, 1000 * 1000)]          // 1 MB		(k=1000)
+		[DataRow("HTTP_09__10_MB_1000_rfc7540.xml", false, false, false, false, 10 * 1000 * 1000)]     // 10 MB	(k=1000)
+		[DataRow("HTTP_09_100_MB_1000_rfc7540.xml", false, false, false, false, 100 * 1000 * 1000)]    // 100 MB	(k=1000)
+		[DataRow("HTTP_09_500_MB_1000_rfc7540.xml", false, false, false, false, 500 * 1000 * 1000)]    // 500 MB	(k=1000)
+		[DataRow("HTTP_09__10_kB_1024_rfc9218.xml", true, false, false, false, 10 * 1024)]            // 10 kB	(k=1024)
+		[DataRow("HTTP_09_100_kB_1024_rfc9218.xml", true, false, false, false, 100 * 1024)]           // 100 kB	(k=1024)
+		[DataRow("HTTP_09___1_MB_1024_rfc9218.xml", true, false, false, false, 1024 * 1024)]          // 1 MB		(k=1024)
+		[DataRow("HTTP_09__10_MB_1024_rfc9218.xml", true, false, false, false, 10 * 1024 * 1024)]     // 10 MB	(k=1024)
+		[DataRow("HTTP_09_100_MB_1024_rfc9218.xml", true, false, false, false, 100 * 1024 * 1024)]    // 100 MB	(k=1024)
+		[DataRow("HTTP_09_500_MB_1024_rfc9218.xml", true, false, false, false, 500 * 1024 * 1024)]    // 500 MB	(k=1024)
+		[DataRow("HTTP_09__10_kB_1000_rfc9218.xml", true, false, false, false, 10 * 1000)]            // 10 kB	(k=1000)
+		[DataRow("HTTP_09_100_kB_1000_rfc9218.xml", true, false, false, false, 100 * 1000)]           // 100 kB	(k=1000)
+		[DataRow("HTTP_09___1_MB_1000_rfc9218.xml", true, false, false, false, 1000 * 1000)]          // 1 MB		(k=1000)
+		[DataRow("HTTP_09__10_MB_1000_rfc9218.xml", true, false, false, false, 10 * 1000 * 1000)]     // 10 MB	(k=1000)
+		[DataRow("HTTP_09_100_MB_1000_rfc9218.xml", true, false, false, false, 100 * 1000 * 1000)]    // 100 MB	(k=1000)
+		[DataRow("HTTP_09_500_MB_1000_rfc9218.xml", true, false, false, false, 500 * 1000 * 1000)]    // 500 MB	(k=1000)
+		public async Task Test_09_FolderResource_PUT_File(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int FileSize)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -294,11 +354,15 @@ namespace Waher.Networking.HTTP.Test
 
 		[DataTestMethod]
 		[ExpectedException(typeof(HttpRequestException))]
-		[DataRow("HTTP_10.xml", false, false, false)]
-		[DataRow("HTTP_10_deflate.xml", true, false, false)]
-		[DataRow("HTTP_10_gzip.xml", false, true, false)]
-		[DataRow("HTTP_10_br.xml", false, false, true)]
-		public async Task Test_10_FolderResource_PUT_File_NotAllowed(string SnifferFileName,
+		[DataRow("HTTP_10_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_10_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_10_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_10_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_10_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_10_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_10_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_10_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_10_FolderResource_PUT_File_NotAllowed(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -310,11 +374,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_11.xml", false, false, false)]
-		[DataRow("HTTP_11_deflate.xml", true, false, false)]
-		[DataRow("HTTP_11_gzip.xml", false, true, false)]
-		[DataRow("HTTP_11_br.xml", false, false, true)]
-		public async Task Test_11_FolderResource_DELETE_File(string SnifferFileName,
+		[DataRow("HTTP_11_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_11_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_11_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_11_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_11_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_11_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_11_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_11_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_11_FolderResource_DELETE_File(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -329,11 +397,15 @@ namespace Waher.Networking.HTTP.Test
 
 		[DataTestMethod]
 		[ExpectedException(typeof(HttpRequestException))]
-		[DataRow("HTTP_12.xml", false, false, false)]
-		[DataRow("HTTP_12_deflate.xml", true, false, false)]
-		[DataRow("HTTP_12_gzip.xml", false, true, false)]
-		[DataRow("HTTP_12_br.xml", false, false, true)]
-		public async Task Test_12_FolderResource_DELETE_File_NotAllowed(string SnifferFileName,
+		[DataRow("HTTP_12_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_12_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_12_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_12_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_12_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_12_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_12_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_12_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_12_FolderResource_DELETE_File_NotAllowed(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -347,11 +419,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_13.xml", false, false, false)]
-		[DataRow("HTTP_13_deflate.xml", true, false, false)]
-		[DataRow("HTTP_13_gzip.xml", false, true, false)]
-		[DataRow("HTTP_13_br.xml", false, false, true)]
-		public async Task Test_13_FolderResource_PUT_CreateFolder(string SnifferFileName,
+		[DataRow("HTTP_13_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_13_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_13_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_13_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_13_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_13_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_13_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_13_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_13_FolderResource_PUT_CreateFolder(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -369,11 +445,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_14.xml", false, false, false)]
-		[DataRow("HTTP_14_deflate.xml", true, false, false)]
-		[DataRow("HTTP_14_gzip.xml", false, true, false)]
-		[DataRow("HTTP_14_br.xml", false, false, true)]
-		public async Task Test_14_FolderResource_DELETE_Folder(string SnifferFileName,
+		[DataRow("HTTP_14_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_14_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_14_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_14_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_14_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_14_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_14_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_14_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_14_FolderResource_DELETE_Folder(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -387,11 +467,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_15.xml", false, false, false)]
-		[DataRow("HTTP_15_deflate.xml", true, false, false)]
-		[DataRow("HTTP_15_gzip.xml", false, true, false)]
-		[DataRow("HTTP_15_br.xml", false, false, true)]
-		public async Task Test_15_GET_Single_Closed_Range(string SnifferFileName,
+		[DataRow("HTTP_15_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_15_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_15_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_15_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_15_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_15_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_15_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_15_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_15_GET_Single_Closed_Range(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -416,11 +500,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_16.xml", false, false, false)]
-		[DataRow("HTTP_16_deflate.xml", true, false, false)]
-		[DataRow("HTTP_16_gzip.xml", false, true, false)]
-		[DataRow("HTTP_16_br.xml", false, false, true)]
-		public async Task Test_16_GET_Single_Open_Range1(string SnifferFileName,
+		[DataRow("HTTP_16_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_16_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_16_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_16_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_16_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_16_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_16_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_16_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_16_GET_Single_Open_Range1(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -445,11 +533,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_17.xml", false, false, false)]
-		[DataRow("HTTP_17_deflate.xml", true, false, false)]
-		[DataRow("HTTP_17_gzip.xml", false, true, false)]
-		[DataRow("HTTP_17_br.xml", false, false, true)]
-		public async Task Test_17_GET_Single_Open_Range2(string SnifferFileName,
+		[DataRow("HTTP_17_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_17_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_17_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_17_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_17_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_17_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_17_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_17_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_17_GET_Single_Open_Range2(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -474,11 +566,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_18.xml", false, false, false)]
-		[DataRow("HTTP_18_deflate.xml", true, false, false)]
-		[DataRow("HTTP_18_gzip.xml", false, true, false)]
-		[DataRow("HTTP_18_br.xml", false, false, true)]
-		public async Task Test_18_GET_MultipleRanges(string SnifferFileName,
+		[DataRow("HTTP_18_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_18_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_18_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_18_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_18_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_18_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_18_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_18_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_18_GET_MultipleRanges(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -509,11 +605,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_19.xml", false, false, false)]
-		[DataRow("HTTP_19_deflate.xml", true, false, false)]
-		[DataRow("HTTP_19_gzip.xml", false, true, false)]
-		[DataRow("HTTP_19_br.xml", false, false, true)]
-		public async Task Test_19_PUT_Range(string SnifferFileName,
+		[DataRow("HTTP_19_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_19_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_19_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_19_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_19_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_19_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_19_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_19_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_19_PUT_Range(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -563,11 +663,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_20.xml", false, false, false)]
-		[DataRow("HTTP_20_deflate.xml", true, false, false)]
-		[DataRow("HTTP_20_gzip.xml", false, true, false)]
-		[DataRow("HTTP_20_br.xml", false, false, true)]
-		public async Task Test_20_PATCH_Range(string SnifferFileName,
+		[DataRow("HTTP_20_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_20_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_20_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_20_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_20_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_20_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_20_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_20_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_20_PATCH_Range(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -617,11 +721,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_21.xml", false, false, false)]
-		[DataRow("HTTP_21_deflate.xml", true, false, false)]
-		[DataRow("HTTP_21_gzip.xml", false, true, false)]
-		[DataRow("HTTP_21_br.xml", false, false, true)]
-		public async Task Test_21_HEAD(string SnifferFileName,
+		[DataRow("HTTP_21_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_21_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_21_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_21_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_21_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_21_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_21_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_21_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_21_HEAD(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -649,11 +757,15 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_22.xml", false, false, false)]
-		[DataRow("HTTP_22_deflate.xml", true, false, false)]
-		[DataRow("HTTP_22_gzip.xml", false, true, false)]
-		[DataRow("HTTP_22_br.xml", false, false, true)]
-		public async Task Test_22_Cookies(string SnifferFileName,
+		[DataRow("HTTP_22_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_22_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_22_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_22_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_22_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_22_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_22_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_22_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_22_Cookies(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
@@ -683,15 +795,19 @@ namespace Waher.Networking.HTTP.Test
 
 		[DataTestMethod]
 		[ExpectedException(typeof(HttpRequestException))]
-		[DataRow("HTTP_23.xml", false, false, false)]
-		[DataRow("HTTP_23_deflate.xml", true, false, false)]
-		[DataRow("HTTP_23_gzip.xml", false, true, false)]
-		[DataRow("HTTP_23_br.xml", false, false, true)]
-		public async Task Test_23_Conditional_GET_IfModifiedSince_1(string SnifferFileName,
+		[DataRow("HTTP_23_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_23_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_23_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_23_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_23_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_23_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_23_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_23_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_23_Conditional_GET_IfModifiedSince_1(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
 			this.server.Register(new HttpFolderResource("/Test23", "Data", false, false, true, false));
@@ -702,15 +818,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_24.xml", false, false, false)]
-		[DataRow("HTTP_24_deflate.xml", true, false, false)]
-		[DataRow("HTTP_24_gzip.xml", false, true, false)]
-		[DataRow("HTTP_24_br.xml", false, false, true)]
-		public async Task Test_24_Conditional_GET_IfModifiedSince_2(string SnifferFileName,
+		[DataRow("HTTP_24_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_24_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_24_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_24_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_24_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_24_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_24_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_24_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_24_Conditional_GET_IfModifiedSince_2(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-			
+
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
 			this.server.Register(new HttpFolderResource("/Test24", "Data", false, false, true, false));
@@ -725,15 +845,19 @@ namespace Waher.Networking.HTTP.Test
 
 		[DataTestMethod]
 		[ExpectedException(typeof(HttpRequestException))]
-		[DataRow("HTTP_25.xml", false, false, false)]
-		[DataRow("HTTP_25_deflate.xml", true, false, false)]
-		[DataRow("HTTP_25_gzip.xml", false, true, false)]
-		[DataRow("HTTP_25_br.xml", false, false, true)]
-		public async Task Test_25_Conditional_PUT_IfUnmodifiedSince_1(string SnifferFileName,
+		[DataRow("HTTP_25_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_25_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_25_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_25_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_25_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_25_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_25_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_25_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_25_Conditional_PUT_IfUnmodifiedSince_1(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
 			this.server.Register(new HttpFolderResource("/Test25", "Data", true, false, true, false));
@@ -746,15 +870,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_26.xml", false, false, false)]
-		[DataRow("HTTP_26_deflate.xml", true, false, false)]
-		[DataRow("HTTP_26_gzip.xml", false, true, false)]
-		[DataRow("HTTP_26_br.xml", false, false, true)]
-		public async Task Test_26_Conditional_PUT_IfUnmodifiedSince_2(string SnifferFileName,
+		[DataRow("HTTP_26_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_26_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_26_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_26_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_26_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_26_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_26_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_26_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_26_Conditional_PUT_IfUnmodifiedSince_2(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
 			this.server.Register(new HttpFolderResource("/Test26", "Data", true, false, true, false));
@@ -768,15 +896,19 @@ namespace Waher.Networking.HTTP.Test
 
 		[DataTestMethod]
 		[ExpectedException(typeof(HttpRequestException))]
-		[DataRow("HTTP_27.xml", false, false, false)]
-		[DataRow("HTTP_27_deflate.xml", true, false, false)]
-		[DataRow("HTTP_27_gzip.xml", false, true, false)]
-		[DataRow("HTTP_27_br.xml", false, false, true)]
-		public async Task Test_27_NotAcceptable(string SnifferFileName,
+		[DataRow("HTTP_27_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_27_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_27_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_27_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_27_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_27_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_27_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_27_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_27_NotAcceptable(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			this.server.Register(new HttpFolderResource("/Test27", "Data", false, false, true, false));
 
 			using CookieWebClient Client = new(this.ProtocolVersion);
@@ -785,15 +917,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_28.xml", false, false, false)]
-		[DataRow("HTTP_28_deflate.xml", true, false, false)]
-		[DataRow("HTTP_28_gzip.xml", false, true, false)]
-		[DataRow("HTTP_28_br.xml", false, false, true)]
-		public async Task Test_28_Content_Conversion(string SnifferFileName,
+		[DataRow("HTTP_28_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_28_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_28_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_28_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_28_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_28_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_28_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_28_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_28_Content_Conversion(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			HttpFolderResource Resource = new("/Test28", "Data", false, false, true, false);
 			Resource.AllowTypeConversion(PlainTextCodec.DefaultContentType, "text/x-test1", "text/x-test2", "text/x-test3");
 
@@ -809,15 +945,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_29.xml", false, false, false)]
-		[DataRow("HTTP_29_deflate.xml", true, false, false)]
-		[DataRow("HTTP_29_gzip.xml", false, true, false)]
-		[DataRow("HTTP_29_br.xml", false, false, true)]
-		public async Task Test_29_ReverseProxy(string SnifferFileName,
+		[DataRow("HTTP_29_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_29_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_29_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_29_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_29_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_29_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_29_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_29_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_29_ReverseProxy(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			this.server.Register("/Remote/test29.txt", (req, resp) => resp.Return("hej på dej"));
 			this.server.Register(new HttpReverseProxyResource("/Proxy29", "localhost", 8081, "/Remote", false, TimeSpan.FromSeconds(10)));
 
@@ -828,15 +968,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_30.xml", false, false, false)]
-		[DataRow("HTTP_30_deflate.xml", true, false, false)]
-		[DataRow("HTTP_30_gzip.xml", false, true, false)]
-		[DataRow("HTTP_30_br.xml", false, false, true)]
-		public async Task Test_30_ReverseProxy_WithQuery(string SnifferFileName,
+		[DataRow("HTTP_30_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_30_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_30_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_30_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_30_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_30_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_30_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_30_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_30_ReverseProxy_WithQuery(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			this.server.Register("/Remote/test30.txt", async (req, resp) =>
 			{
 				if (!req.Header.TryGetQueryParameter("A", out string A))
@@ -862,15 +1006,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_31.xml", false, false, false)]
-		[DataRow("HTTP_31_deflate.xml", true, false, false)]
-		[DataRow("HTTP_31_gzip.xml", false, true, false)]
-		[DataRow("HTTP_31_br.xml", false, false, true)]
-		public async Task Test_31_ReverseProxy_Cookies(string SnifferFileName,
+		[DataRow("HTTP_31_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_31_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_31_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_31_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_31_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_31_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_31_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_31_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_31_ReverseProxy_Cookies(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			this.server.Register("/Remote/test31/SetA", null, async (req, resp) =>
 			{
 				req.Session["A"] = (await req.DecodeDataAsync()).Decoded;
@@ -933,15 +1081,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_32.xml", false, false, false)]
-		[DataRow("HTTP_32_deflate.xml", true, false, false)]
-		[DataRow("HTTP_32_gzip.xml", false, true, false)]
-		[DataRow("HTTP_32_br.xml", false, false, true)]
-		public async Task Test_32_TemporaryRedirect(string SnifferFileName,
+		[DataRow("HTTP_32_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_32_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_32_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_32_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_32_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_32_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_32_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_32_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_32_TemporaryRedirect(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			this.server.Register("/New32/test.txt", (req, resp) => resp.Return("hej på dej"));
 			this.server.Register(new HttpRedirectionResource("/Old32", "/New32", true, false));
 
@@ -952,15 +1104,19 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("HTTP_33.xml", false, false, false)]
-		[DataRow("HTTP_33_deflate.xml", true, false, false)]
-		[DataRow("HTTP_33_gzip.xml", false, true, false)]
-		[DataRow("HTTP_33_br.xml", false, false, true)]
-		public async Task Test_33_PermanentRedirect(string SnifferFileName,
+		[DataRow("HTTP_33_rfc7540.xml", false, false, false, false)]
+		[DataRow("HTTP_33_deflate_rfc7540.xml", false, true, false, false)]
+		[DataRow("HTTP_33_gzip_rfc7540.xml", false, false, true, false)]
+		[DataRow("HTTP_33_br_rfc7540.xml", false, false, false, true)]
+		[DataRow("HTTP_33_rfc9218.xml", true, false, false, false)]
+		[DataRow("HTTP_33_deflate_rfc9218.xml", true, true, false, false)]
+		[DataRow("HTTP_33_gzip_rfc9218.xml", true, false, true, false)]
+		[DataRow("HTTP_33_br_rfc9218.xml", true, false, false, true)]
+		public async Task Test_33_PermanentRedirect(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli)
 		{
 			this.Setup(true, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
-		
+
 			this.server.Register("/New33/test.txt", (req, resp) => resp.Return("hej på dej"));
 			this.server.Register(new HttpRedirectionResource("/Old33", "/New33", true, true));
 

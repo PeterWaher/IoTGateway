@@ -17,7 +17,6 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly object synchObj = new object();
 		private readonly PriorityNodeRfc7540 root;
 		private readonly Profiler profiler;
-		private readonly bool hasProfiler;
 		private int lastNodeStreamId = -1;
 		private int lastRemoteInitialWindowSize = 0;
 		private PriorityNodeRfc7540 lastNode = null;
@@ -31,12 +30,24 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Profiler">Connection profiler.</param>
 		public FlowControlRfc7540(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
 			Profiler Profiler)
-			: base(LocalSettings, RemoteSettings)
+			: this(LocalSettings, RemoteSettings, null, Profiler)
+		{ 
+		}
+
+		/// <summary>
+		/// Class that manages HTTP/2 flow control using trees of priorty nodes.
+		/// </summary>
+		/// <param name="LocalSettings">Local Connection settings.</param>
+		/// <param name="RemoteSettings">Remote Connection settings.</param>
+		/// <param name="Connection">HTTP/2 connection object.</param>
+		/// <param name="Profiler">Connection profiler.</param>
+		internal FlowControlRfc7540(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
+			HttpClientConnection Connection, Profiler Profiler)
+			: base(LocalSettings, RemoteSettings, Connection)
 		{
 			this.profiler = Profiler;
-			this.hasProfiler = !(Profiler is null);
-
-			this.root = new PriorityNodeRfc7540(null, null, null, 1, this, this.hasProfiler);
+			this.root = new PriorityNodeRfc7540(null, null, null, 1, this, this.profiler);
+			this.root.CheckProfilerThreads();
 
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
@@ -219,7 +230,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 				else
 				{
-					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, this.hasProfiler);
+					Node = new PriorityNodeRfc7540(null, this.root, Stream, Weight, this, this.profiler);
 
 					if (Exclusive && !(DependentOn is null))
 						this.MoveChildrenLocked(DependentOn, Node);
@@ -485,14 +496,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc7540 Node))
 			{
-				if (Node.DataThread is null)
-				{
-					Node.DataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, StreamId);
-					Node.WindowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, StreamId);
-
-					Node.WindowThread.NewSample(Node.WindowSize);
-					Node.DataThread.NewSample(0);
-				}
+				Node.CheckProfilerThreads();
 
 				ProfilerThread Thread = Node.Stream.StreamThread;
 				if (!(Thread is null))

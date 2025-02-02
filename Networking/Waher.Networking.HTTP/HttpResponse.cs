@@ -500,24 +500,26 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Clears all buffers for the current writer and causes any buffered data to be written to the underlying stream.
 		/// </summary>
+		/// <param name="EndOfData">If no more data is expected.</param>
 		/// <exception cref="ObjectDisposedException">The current writer is closed.</exception>
 		/// <exception cref="IOException">An I/O error has occurred.</exception>
 		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
-		public Task Flush()
+		public Task Flush(bool EndOfData)
 		{
-			return this.transferEncoding?.FlushAsync() ?? Task.CompletedTask;
+			return this.transferEncoding?.FlushAsync(EndOfData) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Asynchronously clears all buffers for the current writer and causes any buffered data to be written to the underlying device.
 		/// </summary>
+		/// <param name="EndOfData">If no more data is expected.</param>
 		/// <returns>A task that represents the asynchronous flush operation.</returns>
 		/// <exception cref="ObjectDisposedException">The text writer is disposed.</exception>
 		/// <exception cref="InvalidOperationException">The writer is currently in use by a previous write operation.</exception>
 		[Obsolete("Use Flush() method instead.")]
-		public Task FlushAsync()
+		public Task FlushAsync(bool EndOfData)
 		{
-			return this.Flush();
+			return this.Flush(EndOfData);
 		}
 
 		/// <summary>
@@ -1339,7 +1341,7 @@ namespace Waher.Networking.HTTP
 					return;
 			}
 
-			await this.transferEncoding.EncodeAsync(ConstantBuffer, Data, Offset, Count);
+			await this.transferEncoding.EncodeAsync(ConstantBuffer, Data, Offset, Count, false);
 
 			if (!(this.httpServer is null) && ((TP = DateTime.UtcNow) - this.lastPing).TotalSeconds >= 1)
 			{

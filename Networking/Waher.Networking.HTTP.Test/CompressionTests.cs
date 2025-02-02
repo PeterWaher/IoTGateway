@@ -56,8 +56,8 @@ namespace Waher.Networking.HTTP.Test
 
 			Profiler.NewState("Compress");
 
-			await Compressor.EncodeAsync(true, Data, 0, Data.Length);
-			await Compressor.FlushAsync();
+			await Compressor.EncodeAsync(true, Data, 0, Data.Length, true);
+			await Compressor.FlushAsync(true);
 
 			Profiler.NewState("Result");
 
@@ -180,8 +180,8 @@ namespace Waher.Networking.HTTP.Test
 			InternalTransfer TransferEncoding = new(Result);
 			TransferEncoding Compressor = ContentEncoding.GetEncoder(TransferEncoding, Data.Length, null);
 
-			await Compressor.EncodeAsync(true, Data, 0, Data.Length);
-			await Compressor.FlushAsync();
+			await Compressor.EncodeAsync(true, Data, 0, Data.Length, true);
+			await Compressor.FlushAsync(true);
 
 			byte[] Compressed = Result.ToArray();
 			double TicksPerMs = 1000.0 * (Watch.ElapsedTicks - StartTicks) / Stopwatch.Frequency;

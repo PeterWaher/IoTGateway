@@ -1070,7 +1070,7 @@ namespace Waher.Networking.HTTP
 						if (!this.Response.HeaderSent)
 							await this.Response.SendResponse(ex);
 						else
-							await this.Response.Flush();
+							await this.Response.Flush(true);
 
 						await this.Response.DisposeAsync();
 						this.Response = null;

@@ -90,7 +90,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			if (this.ended)
 				return true;
@@ -99,7 +100,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				this.dataEncoding = null;
 
 			this.contentTransmitted += NrBytes;
-			this.ended = this.contentLength.HasValue && this.contentTransmitted >= this.contentLength.Value;
+			this.ended = (this.contentLength.HasValue && this.contentTransmitted >= this.contentLength.Value) || LastData;
 
 			int NrToWrite;
 			int NrWritten;
@@ -138,7 +139,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						else
 							this.pos = 0;
 					}
-					
+
 					NrWritten = NrToWrite;
 				}
 
@@ -152,8 +153,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override async Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override async Task<bool> FlushAsync(bool EndOfData)
 		{
+			if (EndOfData)
+				this.ended = true;
+
 			if (this.pos > 0)
 			{
 				int i = 0;
@@ -170,6 +175,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				this.pos = 0;
 			}
+			else if (this.stream.State != StreamState.Closed)
+			{
+				if (!await this.clientConnection.SendHttp2Frame(FrameType.Data, 1, false, this.stream.StreamId, this.stream, Array.Empty<byte>()))
+					return false;
+
+				this.stream.State = StreamState.Closed;
+			}
 
 			return true;
 		}
@@ -185,10 +197,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					this.ended = true;
 			}
 
-			if (this.pos > 0)
-				return await this.FlushAsync();
-			else
-				return true;
+			return await this.FlushAsync(true);
 		}
 	}
 }

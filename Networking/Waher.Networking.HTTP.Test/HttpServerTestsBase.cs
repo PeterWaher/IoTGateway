@@ -26,18 +26,15 @@ namespace Waher.Networking.HTTP.Test
 			this.sink = new ConsoleEventSink();
 			Log.Register(this.sink);
 
-			if (this.xmlSniffer is null)
-			{
-				if (!Directory.Exists("Sniffers"))
-					Directory.CreateDirectory("Sniffers");
+			if (!Directory.Exists("Sniffers"))
+				Directory.CreateDirectory("Sniffers");
 
-				SnifferFileName = Path.Combine("Sniffers", SnifferFileName);
+			SnifferFileName = Path.Combine("Sniffers", SnifferFileName);
 
-				File.Delete(SnifferFileName);
-				this.xmlSniffer = new XmlFileSniffer(SnifferFileName,
-					@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
-					int.MaxValue, BinaryPresentationMethod.ByteCount);
-			}
+			File.Delete(SnifferFileName);
+			this.xmlSniffer = new XmlFileSniffer(SnifferFileName,
+				@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+				int.MaxValue, BinaryPresentationMethod.ByteCount);
 
 			X509Certificate2 Certificate = Certificates.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
 			this.server = new HttpServer(8081, 8088, Certificate, this.xmlSniffer);
@@ -45,7 +42,13 @@ namespace Waher.Networking.HTTP.Test
 			if (UseConsoleSniffer)
 				this.server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
-			this.server.SetHttp2ConnectionSettings(2500000, 16384, 100, 8192, false, NoRfc7540Priorities, false);
+			this.server.SetHttp2ConnectionSettings(true, 2500000, 16384, 100, 8192, false, NoRfc7540Priorities, true, false);
+
+			this.server.ConnectionProfiled += async (sender, e) =>
+			{
+				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, ".uml"),
+					e.ExportPlantUml(Runtime.Profiling.TimeUnit.MilliSeconds));
+			};
 
 			DeflateContentEncoding DeflateContentEncoding = new();
 			DeflateContentEncoding.ConfigureSupport(SupportDeflate, SupportDeflate);

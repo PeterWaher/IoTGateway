@@ -270,9 +270,9 @@ namespace Waher.Networking.HTTP
 								this.client.OnReceivedReset(this.Client_OnReceivedHttp2Live);
 
 								if (this.localSettings.NoRfc7540Priorities)
-									this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings, this.http2Profiler);
+									this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings, this, this.http2Profiler);
 								else
-									this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings, this.http2Profiler);
+									this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings, this, this.http2Profiler);
 
 								using (HttpResponse Response = new HttpResponse(this.client, this, this.server, null)
 								{
@@ -1401,9 +1401,9 @@ namespace Waher.Networking.HTTP
 						if (this.flowControl is null)
 						{
 							if (this.localSettings.NoRfc7540Priorities)
-								this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings, this.http2Profiler);
+								this.flowControl = new FlowControlRfc9218(this.localSettings, this.remoteSettings, this, this.http2Profiler);
 							else
-								this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings, this.http2Profiler);
+								this.flowControl = new FlowControlRfc7540(this.localSettings, this.remoteSettings, this, this.http2Profiler);
 						}
 						else
 							this.flowControl.RemoteSettingsUpdated();

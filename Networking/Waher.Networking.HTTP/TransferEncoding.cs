@@ -89,12 +89,14 @@ namespace Waher.Networking.HTTP
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public abstract Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes);
+		/// <param name="LastData">If no more data is expected.</param>
+		public abstract Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData);
 
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public abstract Task<bool> FlushAsync();
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public abstract Task<bool> FlushAsync(bool EndOfData);
 
 		/// <summary>
 		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.

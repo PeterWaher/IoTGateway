@@ -360,7 +360,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			throw new NotSupportedException();   // Will not be called.
 		}
 
-		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int NrBytes)
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int NrBytes, bool LastData)
 		{
 			this.AssertNotCancelled();
 
@@ -497,7 +497,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			return Task.CompletedTask;
 		}
 
-		public override async Task<bool> FlushAsync()
+		public override async Task<bool> FlushAsync(bool EndOfData)
 		{
 			await this.ReturnResponse();
 

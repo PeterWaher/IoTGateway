@@ -76,7 +76,8 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			if (NrBytes > 0)
 			{
@@ -96,7 +97,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 					if (this.bytesLeft <= 0)
 					{
 						this.finished = true;
-						await this.FlushAsync();
+						await this.FlushAsync(LastData);
 					}
 				}
 				else
@@ -109,7 +110,8 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override async Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override async Task<bool> FlushAsync(bool EndOfData)
 		{
 			if (this.dataWritten)
 			{
@@ -121,12 +123,12 @@ namespace Waher.Networking.HTTP.ContentEncodings
 				if (this.pos < c)
 				{
 					c -= this.pos;
-					if (!await this.uncompressedStream.EncodeAsync(true, Data, this.pos, c))
+					if (!await this.uncompressedStream.EncodeAsync(true, Data, this.pos, c, EndOfData))
 						return false;
 					this.pos += c;
 				}
 
-				return await this.uncompressedStream.FlushAsync();
+				return await this.uncompressedStream.FlushAsync(EndOfData);
 			}
 
 			return true;
@@ -137,7 +139,7 @@ namespace Waher.Networking.HTTP.ContentEncodings
 		/// </summary>
 		public override async Task<bool> ContentSentAsync()
 		{
-			await this.FlushAsync();
+			await this.FlushAsync(true);
 			return await this.uncompressedStream.ContentSentAsync();
 		}
 

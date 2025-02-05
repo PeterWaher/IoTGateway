@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.WebSockets;
+using Waher.Runtime.Profiling;
 using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -16,6 +16,7 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly int streamId;
 		private readonly HttpClientConnection connection;
+		private readonly ProfilerThread streamThread;
 		private readonly int headerInputWindowSize;
 		private HttpRequestHeader headers = null;
 		private MemoryStream buildingHeaders = null;
@@ -42,6 +43,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.streamId = StreamId;
 			this.connection = null;
+			this.streamThread = null;
 			this.dataInputWindowSize = Settings.InitialWindowSize;
 			this.headerInputWindowSize = Settings.MaxHeaderListSize;
 		}
@@ -51,12 +53,16 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Connection">Connection</param>
-		internal Http2Stream(int StreamId, HttpClientConnection Connection)
+		/// <param name="StreamThread">Profiler Thread for stream, if available.</param>
+		internal Http2Stream(int StreamId, HttpClientConnection Connection, ProfilerThread StreamThread)
 		{
 			this.streamId = StreamId;
 			this.connection = Connection;
+			this.streamThread = StreamThread;
 			this.dataInputWindowSize = this.connection.LocalSettings.InitialWindowSize;
 			this.headerInputWindowSize = Connection.LocalSettings.MaxHeaderListSize;
+
+			this.streamThread?.NewState(this.state.ToString());
 		}
 
 		/// <summary>
@@ -110,6 +116,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal HttpClientConnection Connection => this.connection;
 
 		/// <summary>
+		/// Profiler thread for stream, if available.
+		/// </summary>
+		internal ProfilerThread StreamThread => this.streamThread;
+
+		/// <summary>
 		/// If the stream has been upgraded to a web-socket.
 		/// </summary>
 		public bool UpgradedToWebSocket => this.upgradedToWebSocket;
@@ -143,7 +154,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		public StreamState State
 		{
 			get => this.state;
-			internal set => this.state = value;
+			internal set
+			{
+				this.state = value;
+				this.streamThread?.NewState(this.state.ToString());
+			}
 		}
 
 		/// <summary>
@@ -158,7 +173,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.headerBytesReceived += Count;
 			if (this.headerBytesReceived < 0 || this.headerBytesReceived > this.headerInputWindowSize)
 			{
-				this.state = StreamState.Closed;
+				this.State = StreamState.Closed;
 				return false;
 			}
 			else
@@ -309,7 +324,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			if (this.dataBytesReceived > this.dataInputWindowSize)
 			{
-				this.state = StreamState.Closed;
+				this.State = StreamState.Closed;
 				return false;
 			}
 			else if (this.upgradedToWebSocket)
@@ -371,7 +386,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		public async Task<bool> WriteHeaders(byte[] Headers, bool ExpectData)
 		{
 			if (this.state == StreamState.Idle)
-				this.state = StreamState.Open;
+				this.State = StreamState.Open;
 
 			int MaxFrameSize = this.connection.RemoteSettings.MaxFrameSize;
 			byte Flags = (byte)(ExpectData ? 0 : 1);    // END_STREAM
@@ -430,7 +445,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.dataBytesTransmitted += NrBytes;
 
 			if (Last && NrBytes == Count)
-				this.state = StreamState.Closed;
+				this.State = StreamState.Closed;
 
 			return NrBytes;
 		}
@@ -469,7 +484,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.webSocket = WebSocket;
 			this.upgradedToWebSocket = true;
-			this.state = StreamState.Open;
+			this.State = StreamState.Open;
 		}
 
 		/// <summary>

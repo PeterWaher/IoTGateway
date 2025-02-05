@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -11,8 +12,13 @@ namespace Waher.Networking.HTTP.HTTP2
 	public class PriorityNodeRfc9218 : IPriorityNode
 	{
 		private readonly PriorityNodeRfc9218 root;
+		private readonly Profiler profiler;
+		private readonly HttpClientConnection connection;
 		private LinkedList<PendingRequest> pendingRequests = null;
+		private ProfilerThread windowThread;
+		private ProfilerThread dataThread;
 		private readonly int maxFrameSize;
+		private readonly bool hasProfiler;
 		private int windowSize0;
 		private int windowSize;
 		private bool disposed = false;
@@ -22,7 +28,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="Stream">Corresponding HTTP/2 stream.</param>
 		/// <param name="FlowControl">Flow control object.</param>
-		public PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl)
+		/// <param name="Profiler">Profiler, if any</param>
+		internal PriorityNodeRfc9218(Http2Stream Stream, FlowControlRfc9218 FlowControl, 
+			Profiler Profiler)
 		{
 			ConnectionSettings Settings = Stream is null ? FlowControl.LocalSettings : FlowControl.RemoteSettings;
 
@@ -30,6 +38,9 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.root = FlowControl.Root;
 			this.windowSize = this.windowSize0 = Settings.InitialWindowSize;
 			this.maxFrameSize = Settings.MaxFrameSize;
+			this.profiler = Profiler;
+			this.hasProfiler = !(this.profiler is null);
+			this.connection = FlowControl.Connection;
 		}
 
 		/// <summary>
@@ -38,9 +49,29 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Http2Stream Stream { get; }
 
 		/// <summary>
+		/// Window Size
+		/// </summary>
+		public int WindowSize => this.windowSize;
+
+		/// <summary>
+		/// Window Profiler thread, if any.
+		/// </summary>
+		public ProfilerThread WindowThread => this.windowThread;
+
+		/// <summary>
+		/// Window Data thread, if any.
+		/// </summary>
+		public ProfilerThread DataThread => this.dataThread;
+
+		/// <summary>
 		/// Currently available resources
 		/// </summary>
 		public int AvailableResources => this.windowSize;
+
+		/// <summary>
+		/// HTTP/2 client connection object.
+		/// </summary>
+		internal HttpClientConnection Connection => this.connection;
 
 		/// <summary>
 		/// Requests resources from the available pool of resources in the tree.
@@ -60,7 +91,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				if (this.pendingRequests is null)
 					this.pendingRequests = new LinkedList<PendingRequest>();
-
+				
 				this.pendingRequests.AddLast(Request);
 
 				if (CancellationToken.HasValue)
@@ -75,6 +106,16 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.windowSize -= Available;
 				this.root.windowSize -= Available;
+
+				if (this.hasProfiler)
+				{
+					if (this.windowThread is null)
+						this.CheckProfilerThreads();
+
+					this.windowThread.NewSample(this.windowSize);
+					this.root.windowThread.NewSample(this.root.windowSize);
+					this.dataThread.NewSample(Available);
+				}
 
 				return Task.FromResult(Available);
 			}
@@ -96,14 +137,24 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize > this.windowSize0)
 				this.windowSize0 = NewSize;
 
+			if (this.hasProfiler)
+			{
+				if (this.windowThread is null)
+					this.CheckProfilerThreads();
+
+				this.windowThread.Event("StreamWindowUpdate");
+				this.windowThread.NewSample(this.windowSize);
+			}
+
 			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
 
-			return NewSize;
+			return this.windowSize;
 		}
 
 		internal void TriggerPending(ref int Resources)
 		{
+			LinkedList<KeyValuePair<int, PendingRequest>> ToRelease = null;
 			LinkedListNode<PendingRequest> Loop;
 			int i;
 
@@ -121,8 +172,28 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.windowSize -= i;
 				this.root.windowSize -= i;
-				Loop.Value.Request.TrySetResult(i);
+
+				if (this.hasProfiler)
+				{
+					if (this.windowThread is null)
+						this.CheckProfilerThreads();
+
+					this.windowThread.NewSample(this.windowSize);
+					this.root.windowThread.NewSample(this.root.windowSize);
+				}
+
+				if (ToRelease is null)
+					ToRelease = new LinkedList<KeyValuePair<int, PendingRequest>>();
+
+				ToRelease.AddLast(new KeyValuePair<int, PendingRequest>(i, Loop.Value));
+
 				Resources -= i;
+			}
+
+			if (!(ToRelease is null))
+			{
+				foreach (KeyValuePair<int, PendingRequest> P in ToRelease)
+					P.Value.Request.TrySetResult(P.Key);
 			}
 		}
 
@@ -142,6 +213,15 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize > this.windowSize0)
 				this.windowSize0 = NewSize;
 
+			if (this.hasProfiler)
+			{
+				if (this.windowThread is null)
+					this.CheckProfilerThreads();
+
+				this.windowThread.Event("ConnectionWindowUpdate");
+				this.windowThread.NewSample(this.windowSize);
+			}
+
 			return NewSize;
 		}
 
@@ -157,6 +237,15 @@ namespace Waher.Networking.HTTP.HTTP2
 			int Diff = WindowSize - this.windowSize0;
 			this.windowSize0 = WindowSize;
 			this.windowSize += Diff;
+
+			if (this.hasProfiler)
+			{
+				if (this.windowThread is null)
+					this.CheckProfilerThreads();
+
+				this.windowThread.Event("Settings");
+				this.windowThread.NewSample(this.windowSize);
+			}
 
 			if (Trigger)
 			{
@@ -192,6 +281,38 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				if (!(this.Stream is null))
 					this.Stream.State = StreamState.Closed;
+
+				if (this.hasProfiler)
+				{
+					this.windowThread?.NewSample(this.windowSize);
+					this.windowThread?.Idle();
+					this.windowThread?.Stop();
+
+					this.dataThread?.NewSample(0);
+					this.dataThread?.Idle();
+					this.dataThread?.Stop();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Checks the node has the corresponding profiler threads created.
+		/// </summary>
+		public void CheckProfilerThreads()
+		{
+			if (this.hasProfiler)
+			{
+				if (this.dataThread is null && !(this.Stream is null))
+				{
+					this.dataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, this.Stream.StreamId);
+					this.dataThread.NewSample(0);
+				}
+
+				if (this.windowThread is null)
+				{
+					this.windowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, this.Stream?.StreamId ?? 0);
+					this.windowThread.NewSample(this.windowSize);
+				}
 			}
 		}
 	}

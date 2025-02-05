@@ -12,6 +12,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly List<PendingWindowIncrement> pendingIncrements = new List<PendingWindowIncrement>();
 		private readonly ConnectionSettings localSettings;
 		private readonly ConnectionSettings remoteSettings;
+		private readonly HttpClientConnection connection;
 		private long connectionWindowSize;
 		private long connectionBytesCommunicated = 0;
 		private bool hasPendingIncrements = false;
@@ -22,10 +23,23 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="LocalSettings">Local Connection settings.</param>
 		/// <param name="RemoteSettings">Remote Connection settings.</param>
 		public FlowControlConnection(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings)
+			: this(LocalSettings, RemoteSettings, null)
+		{
+		}
+
+		/// <summary>
+		/// Manages connection-level flow control.
+		/// </summary>
+		/// <param name="LocalSettings">Local Connection settings.</param>
+		/// <param name="RemoteSettings">Remote Connection settings.</param>
+		/// <param name="Connection">HTTP/2 connection object.</param>
+		internal FlowControlConnection(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
+			HttpClientConnection Connection)
 		{
 			this.localSettings = LocalSettings;
 			this.remoteSettings = RemoteSettings;
 			this.connectionWindowSize = LocalSettings.InitialWindowSize;
+			this.connection = Connection;
 		}
 
 		/// <summary>
@@ -37,6 +51,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Remote Connection settings.
 		/// </summary>
 		public ConnectionSettings RemoteSettings => this.remoteSettings;
+
+		/// <summary>
+		/// HTTP/2 client connection object.
+		/// </summary>
+		internal HttpClientConnection Connection => this.connection;
 
 		/// <summary>
 		/// Called when connection settings have been updated.
@@ -193,5 +212,12 @@ namespace Waher.Networking.HTTP.HTTP2
 			get => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
 			internal set => this.connectionWindowSize = this.connectionBytesCommunicated + value;
 		}
+
+		/// <summary>
+		/// Sets the stream label of a profiler thread, if available.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Label">Label to set.</param>
+		public abstract void SetProfilerStreamLabel(int StreamId, string Label);
 	}
 }

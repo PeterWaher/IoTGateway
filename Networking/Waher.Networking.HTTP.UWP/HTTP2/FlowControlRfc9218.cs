@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
 {
@@ -13,6 +14,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly LinkedList<PriorityNodeRfc9218>[] priorities = new LinkedList<PriorityNodeRfc9218>[8];
 		private readonly Dictionary<int, StreamRec> streams = new Dictionary<int, StreamRec>();
 		private readonly PriorityNodeRfc9218 root;
+		private readonly Profiler profiler;
 		private readonly object synchObj = new object();
 		private int lastNodeStreamId = -1;
 		private int lastRemoteInitialWindowSize = 0;
@@ -31,10 +33,28 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="LocalSettings">Local Connection settings.</param>
 		/// <param name="RemoteSettings">Remote Connection settings.</param>
-		public FlowControlRfc9218(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings)
-			: base(LocalSettings, RemoteSettings)
+		/// <param name="Profiler">Connection profiler.</param>
+		public FlowControlRfc9218(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
+			Profiler Profiler)
+			: this(LocalSettings, RemoteSettings, null, Profiler)
 		{
-			this.root = new PriorityNodeRfc9218(null, this);
+		}
+
+		/// <summary>
+		/// Class that manages HTTP/2 flow control using trees of priorty nodes.
+		/// </summary>
+		/// <param name="LocalSettings">Local Connection settings.</param>
+		/// <param name="RemoteSettings">Remote Connection settings.</param>
+		/// <param name="Connection">HTTP/2 connection object.</param>
+		/// <param name="Profiler">Connection profiler.</param>
+		internal FlowControlRfc9218(ConnectionSettings LocalSettings, ConnectionSettings RemoteSettings,
+			HttpClientConnection Connection, Profiler Profiler)
+			: base(LocalSettings, RemoteSettings, Connection)
+		{
+			this.profiler = Profiler;
+			this.root = new PriorityNodeRfc9218(null, this, this.profiler);
+			this.root.CheckProfilerThreads();
+
 			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
 		}
 
@@ -86,17 +106,22 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (this.streams.TryGetValue(StreamId, out StreamRec Rec))
+				if (StreamId != this.lastNodeStreamId)
 				{
-					Node = Rec.Node;
-					return true;
+					if (!this.streams.TryGetValue(StreamId, out this.lastRec))
+					{
+						this.lastNodeStreamId = 0;
+						Node = null;
+						return false;
+					}
+
+					this.lastNodeStreamId = StreamId;
 				}
-				else
-				{
-					Node = null;
-					return false;
-				}
+
+				Node = this.lastRec.Node;
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -115,17 +140,22 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				if (this.streams.TryGetValue(StreamId, out StreamRec Rec))
+				if (StreamId != this.lastNodeStreamId)
 				{
-					Stream = Rec.Stream;
-					return true;
+					if (!this.streams.TryGetValue(StreamId, out this.lastRec))
+					{
+						this.lastNodeStreamId = 0;
+						Stream = null;
+						return false;
+					}
+
+					this.lastNodeStreamId = StreamId;
 				}
-				else
-				{
-					Stream = null;
-					return false;
-				}
+
+				Stream = this.lastRec.Stream;
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -195,10 +225,12 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Priority < 0 || Priority > 7)
 					Priority = 3;
 
+				PriorityNodeRfc9218 Node = new PriorityNodeRfc9218(Stream, this, this.profiler);
+
 				StreamRec Rec = new StreamRec()
 				{
 					Stream = Stream,
-					Node = new PriorityNodeRfc9218(Stream, this),
+					Node = Node,
 					Priority = Priority
 				};
 
@@ -271,6 +303,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the stream could be found, and was removed.</returns>
 		public override bool RemoveStream(Http2Stream Stream)
 		{
+			Stream.State = StreamState.Closed;
 			return this.RemoveStream(Stream.StreamId);
 		}
 
@@ -460,6 +493,23 @@ namespace Waher.Networking.HTTP.HTTP2
 					foreach (int StreamId in ToRemove)
 						this.RemoveStreamLocked(StreamId);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Sets the stream label of a profiler thread, if available.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Label">Label to set.</param>
+		public override void SetProfilerStreamLabel(int StreamId, string Label)
+		{
+			if (this.TryGetPriorityNode(StreamId, out PriorityNodeRfc9218 Node))
+			{
+				Node.CheckProfilerThreads();
+
+				ProfilerThread Thread = Node.Stream.StreamThread;
+				if (!(Thread is null))
+					Thread.Label = Thread.Label + " (" + Label + ")";
 			}
 		}
 

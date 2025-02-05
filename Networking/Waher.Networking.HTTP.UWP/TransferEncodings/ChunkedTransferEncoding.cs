@@ -178,7 +178,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			int NrLeft;
 
@@ -252,7 +253,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override Task<bool> FlushAsync(bool EndOfData)
 		{
 			if (this.pos > 0)
 				return this.WriteChunk(true);

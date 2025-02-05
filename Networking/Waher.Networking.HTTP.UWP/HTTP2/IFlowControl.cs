@@ -105,5 +105,12 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		/// <param name="LastPermittedStreamId">Last permitted stream ID.</param>
 		void GoingAway(int LastPermittedStreamId);
+
+		/// <summary>
+		/// Sets the stream label of a profiler thread, if available.
+		/// </summary>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Label">Label to set.</param>
+		void SetProfilerStreamLabel(int StreamId, string Label);
 	}
 }

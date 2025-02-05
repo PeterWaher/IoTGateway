@@ -44,6 +44,8 @@ namespace Waher.Networking.Sniffers
 		{
 			if (!(this.processor is null))
 			{
+				this.processor.CloseForTermination();
+				await this.processor.WaitUntilIdle();
 				await this.processor.DisposeAsync();
 				this.processor = null;
 			}
@@ -405,6 +407,14 @@ namespace Waher.Networking.Sniffers
 					Inner.RemoveFirst();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Waits until pending sniffer events have been processed.
+		/// </summary>
+		public async Task FlushAsync()
+		{
+			await this.processor.WaitUntilIdle();
 		}
 
 		#region ISniffEventProcessor

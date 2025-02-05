@@ -27,6 +27,7 @@ using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP
 {
@@ -112,6 +113,7 @@ namespace Waher.Networking.HTTP
 		private bool http2Enabled = true;
 		private bool http2SettingsLocked = false;
 		private bool http2NoRfc7540Priorities = false;
+		private bool http2Profiling = false;
 
 		#region Constructors
 
@@ -1004,6 +1006,27 @@ namespace Waher.Networking.HTTP
 			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
 			bool NoRfc7540Priorities, bool Lock)
 		{
+			this.SetHttp2ConnectionSettings(Http2Enabled, InitialWindowSize, MaxFrameSize, 
+				MaxConcurrentStreams, HeaderTableSize, EnablePush, NoRfc7540Priorities, 
+				false, Lock);
+		}
+
+		/// <summary>
+		/// HTTP/2 connection settings (SETTINGS).
+		/// </summary>
+		/// <param name="Http2Enabled">If HTTP/2 is enabled or not.</param>
+		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="MaxFrameSize">Maximum frame size.</param>
+		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
+		/// <param name="HeaderTableSize">Header table size.</param>
+		/// <param name="EnablePush">If push promises are enabled.</param>
+		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
+		/// <param name="Profiling">Enables HTTP/2 connection profiling for performance analysis.</param>
+		/// <param name="Lock">If settings are to be locked.</param>
+		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialWindowSize,
+			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
+			bool NoRfc7540Priorities, bool Profiling, bool Lock)
+		{
 			if (this.http2SettingsLocked)
 				throw new InvalidOperationException("HTTP/2 settings locked.");
 
@@ -1014,8 +1037,14 @@ namespace Waher.Networking.HTTP
 			this.http2HeaderTableSize = HeaderTableSize;
 			this.http2EnablePush = EnablePush;
 			this.http2NoRfc7540Priorities = NoRfc7540Priorities;
+			this.http2Profiling = Profiling;
 			this.http2SettingsLocked = Lock;
 		}
+
+		/// <summary>
+		/// Event raised when an HTTP/2 connection profile has been completed.
+		/// </summary>
+		public event EventHandlerAsync<Profiler> ConnectionProfiled;
 
 		#endregion
 
@@ -1041,7 +1070,7 @@ namespace Waher.Networking.HTTP
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 				BinaryTcpClient.Bind(true);
-				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
+				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, this.Sniffers);
 				BinaryTcpClient.Continue();
 
 				lock (this.connections)
@@ -1113,7 +1142,7 @@ namespace Waher.Networking.HTTP
 							}
 							else
 							{
-								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
+								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, this.Sniffers);
 								BinaryTcpClient.Continue();
 
 								lock (this.connections)
@@ -1234,7 +1263,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, Port, this.Sniffers);
+					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, Port, this.http2Profiling, this.Sniffers);
 
 					if (this.HasSniffers)
 					{
@@ -1299,12 +1328,19 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-		internal bool Remove(HttpClientConnection Connection)
+		internal async Task<bool> Remove(HttpClientConnection Connection, Profiler ConnectionProfiler)
 		{
+			bool Result;
+
 			lock (this.connections)
 			{
-				return this.connections.Remove(Connection.Id);
+				Result = this.connections.Remove(Connection.Id);
 			}
+
+			if (!(ConnectionProfiler is null))
+				await this.ConnectionProfiled.Raise(this, ConnectionProfiler);
+
+			return Result;
 		}
 
 		internal HttpClientConnection[] GetConnections()
@@ -1840,8 +1876,11 @@ namespace Waher.Networking.HTTP
 				if (!(Resource is null))
 					this.IncLocked(Resource.ResourceName, this.callsPerResource);
 
-				if (!((UserAgent = Request.Header.UserAgent) is null))
+				if (!((UserAgent = Request.Header.UserAgent) is null) &&
+					!string.IsNullOrEmpty(UserAgent.Value))
+				{
 					this.IncLocked(UserAgent.Value, this.callsPerUserAgent);
+				}
 
 				if (!((From = Request.Header.From) is null))
 					this.IncLocked(From.Value, this.callsPerFrom);

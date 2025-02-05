@@ -19,9 +19,9 @@
       <dependency id="Waher.Content.Xml" version="3.0.0"/>
       <dependency id="Waher.Events" version="1.4.0"/>
       <dependency id="Waher.Networking.UWP" version="4.0.0"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="4.1.0"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="4.1.1"/>
 			<dependency id="Waher.Runtime.Console" version="1.1.0"/>
-			<dependency id="Waher.Runtime.Queue" version="3.0.0"/>
+			<dependency id="Waher.Runtime.Queue" version="3.0.1"/>
 		</dependencies>
   </metadata>
   <files>

@@ -1070,7 +1070,7 @@ namespace Waher.Networking.HTTP
 
 				BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 				BinaryTcpClient.Bind(true);
-				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.Sniffers);
+				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, Port, this.http2Profiling, this.Sniffers);
 				BinaryTcpClient.Continue();
 
 				lock (this.connections)

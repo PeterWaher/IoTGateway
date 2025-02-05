@@ -91,7 +91,7 @@ namespace Waher.Networking.HTTP
 			this.server = Server;
 			this.client = Client;
 #if WINDOWS_UWP
-			this.cancellationToken = null;
+			this.cancellationToken = CancellationToken.None;
 #else
 			this.cancellationToken = Client.CancellationToken;
 #endif
@@ -2251,7 +2251,12 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
+#if WINDOWS_UWP
+					this.server.RequestReceived(Request, this.client.Client.Information.RemoteAddress.ToString() + ":" + 
+						this.client.Client.Information.RemotePort, null, Request.Header.Resource);
+#else
 					this.server.RequestReceived(Request, this.client.Client.Client.RemoteEndPoint.ToString(), null, Request.Header.Resource);
+#endif
 
 					await this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
 					Result = true;

@@ -136,6 +136,7 @@
     <Compile Include="HTTP2\DynamicHeader.cs" />
     <Compile Include="HTTP2\DynamicHeaders.cs" />
     <Compile Include="HTTP2\DynamicRecord.cs" />
+    <Compile Include="HTTP2\FlowControlConnection.cs" />
     <Compile Include="HTTP2\FlowControlRfc7540.cs" />
     <Compile Include="HTTP2\FlowControlRfc9218.cs" />
     <Compile Include="HTTP2\FrameType.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="HTTP2\IndexMode.cs" />
     <Compile Include="HTTP2\IPriorityNode.cs" />
     <Compile Include="HTTP2\PendingRequest.cs" />
+    <Compile Include="HTTP2\PendingWindowIncrement.cs" />
     <Compile Include="HTTP2\PriorityNodeRfc7540.cs" />
     <Compile Include="HTTP2\PriorityNodeRfc9218.cs" />
     <Compile Include="HTTP2\PrioritySettings.cs" />

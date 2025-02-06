@@ -4500,7 +4500,7 @@ namespace Waher.IoTGateway
 
 					await Database.Insert(Request);
 
-					Markdown = await Files.ReadAllTextAsync(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
+					Markdown = await Files.ReadAllTextAsync(Path.Combine(rootFolder, "SignatureRequest.md"));
 
 					int i = Markdown.IndexOf("~~~~~~");
 					int c = Markdown.Length;

@@ -75,8 +75,6 @@
     <None Remove="Root\Settings\Roster.js" />
     <None Remove="Root\Settings\Roster.md" />
     <None Remove="Root\Settings\RosterItems.md" />
-    <None Remove="Root\Settings\SignatureRequest.js" />
-    <None Remove="Root\Settings\SignatureRequest.md" />
     <None Remove="Root\Settings\Theme.js" />
     <None Remove="Root\Settings\Theme.md" />
     <None Remove="Root\Settings\User.md" />

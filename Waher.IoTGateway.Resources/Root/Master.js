@@ -121,9 +121,95 @@ function NativeHeader() {
     }
 }
 
+function Popup() {
+    const popupStack = [];
+
+    function PopStack(args) {
+        popupStack.pop().OnPop(args)
+        DisplayPopup()
+    }
+
+    function DisplayPopup() {
+        if (popupStack.length) {
+            document.getElementById("native-popup-container").innerHTML = popupStack[popupStack.length - 1].html
+        }
+        else {
+            document.getElementById("native-popup-container").innerHTML = ""
+        }
+    }
+
+    async function Popup(html) {
+        return new Promise((resolve, reject) => {
+            popupStack.push({
+                html: html,
+                OnPop: (args) => resolve(args),
+            })
+            DisplayPopup()
+        })
+    }
+    async function Alert(message) {
+        const html = CreateHTMLAlertPopup({ Message: `<p>${message}</p>`});
+        await Popup(html);
+    }
+    function AlertOk() {
+        PopStack()
+    }
+
+    async function Confirm(message) {
+        const html = CreateHTMLConfirmPopup({ Message: `<p>${message}</p>`});
+        return await Popup(html);
+    }
+
+    function ConfirmYes() {
+        PopStack(true)
+    }
+    function ConfirmNo() {
+        PopStack(false)
+    }
+
+    async function Prompt(message) {
+        const html = CreateHTMLPromptPopup({ Message: `<p>${message}</p>`});
+        return await Popup(html);
+    }
+
+    async function PromptSubmit(value) {
+        PopStack(value)
+    }
+
+    return {
+        Alert,
+        AlertOk,
+        Confirm,
+        ConfirmYes,
+        ConfirmNo,
+        Prompt,
+        PromptSubmit,
+    }
+}
+
+let popup;
 let nativeHeader;
+
+async function Test() {
+    while (true) {
+        const input = await popup.Prompt("name a color")
+        const confirm = await popup.Confirm(`is you favorite color is ${input}?`)
+
+        if (confirm) {
+            await popup.Alert("good choise")
+            break
+        } else {
+            await popup.Alert("let´s try again?")
+        }
+    }
+}
 
 window.addEventListener("load", () => {
     nativeHeader = NativeHeader();
-})
+    popup = Popup()
 
+    popup.Alert(`Exception in thread "main" java.lang.NullPointerException
+        at com.example.myproject.Book.getTitle(Book.java:16)
+        at com.example.myproject.Author.getBookTitles(Author.java:25)
+        at com.example.myproject.Bootstrap.main(Bootstrap.java:14)`)
+})

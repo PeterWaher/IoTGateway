@@ -45,6 +45,19 @@ main
     z-index:2;
 }
 
+/* #region Popups */
+
+#native-popup-container
+{
+    position: fixed;
+    background: ¤BackgroundColor¤;
+    padding: 1rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* #endregion Popups */
 
 /*#region Footnotes*/
 

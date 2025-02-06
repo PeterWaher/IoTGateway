@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
@@ -90,6 +91,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
+		/// <exception cref="GenericException">Annotated exception. Inner exception determines the cause.</exception>
 		/// <returns>Decoded object.</returns>
 		public async Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
@@ -121,6 +123,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ConflictException">If an approved presence subscription with the remote entity does not exist.</exception>
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
+		/// <exception cref="GenericException">Annotated exception. Inner exception determines the cause.</exception>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
@@ -141,6 +144,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="ConflictException">If an approved presence subscription with the remote entity does not exist.</exception>
 		/// <exception cref="ServiceUnavailableException">If the remote entity is not online.</exception>
 		/// <exception cref="TimeoutException">If the request times out.</exception>
+		/// <exception cref="GenericException">Annotated exception. Inner exception determines the cause.</exception>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
@@ -273,7 +277,10 @@ namespace Waher.Networking.XMPP.HTTPX
 							State.Done.TrySetResult(true);
 					}
 					else
-						State.Done.TrySetException(e.StanzaError ?? new Exception("Unable to get resource."));
+					{
+						State.Done.TrySetException((Exception)e.StanzaError ??
+							new GenericException("Unable to get resource.", null, Uri.OriginalString));
+					}
 
 				}, async (Sender, e) =>
 				{
@@ -284,7 +291,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}, State, Headers2.ToArray());
 
 				if (!await State.Done.Task)
-					return new ContentStreamResponse(new TimeoutException("Request timed out."));
+					return new ContentStreamResponse(new GenericException(new TimeoutException("Request timed out."), null, Uri.OriginalString));
 
 				Timer.Dispose();
 				Timer = null;

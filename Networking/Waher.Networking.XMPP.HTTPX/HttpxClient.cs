@@ -411,7 +411,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 
 			Task _ = Task.Delay(10000).ContinueWith((_2) =>
-				StanzaSent.TrySetException(new TimeoutException("Unable to send HTTPX request.")));
+				StanzaSent.TrySetException(new GenericException(new TimeoutException("Unable to send HTTPX request."), null, To)));
 
 			await StanzaSent.Task;  // By waiting for request to have been sent, E2E synchronization has already been performed, if necessary.
 		}
@@ -438,7 +438,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 
 			Task _ = Task.Delay(10000).ContinueWith((_2) =>
-				StanzaSent.TrySetException(new TimeoutException("Unable to send HTTPX data chunk.")));
+				StanzaSent.TrySetException(new GenericException(new TimeoutException("Unable to send HTTPX data chunk."), null, To)));
 
 			await StanzaSent.Task;  // By waiting for chunk to have been sent, transmission is throttled to the network bandwidth.
 		}

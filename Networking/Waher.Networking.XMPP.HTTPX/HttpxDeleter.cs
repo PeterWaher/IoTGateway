@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Deleters;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 
@@ -71,6 +72,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
+		/// <exception cref="GenericException">Annotated exception. Inner exception determines the cause.</exception>
 		public override async Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
@@ -183,7 +185,10 @@ namespace Waher.Networking.XMPP.HTTPX
 								State.Done.TrySetResult(true);
 						}
 						else
-							State.Done.TrySetException(e.StanzaError ?? new Exception("Unable to get resource."));
+						{
+							State.Done.TrySetException((Exception)e.StanzaError ??
+									new GenericException("Unable to delete resource.", null, Uri.OriginalString));
+						}
 
 					}, async (Sender, e) =>
 					{
@@ -196,7 +201,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					}, State);
 
 				if (!await State.Done.Task)
-					return new ContentResponse(new TimeoutException("Request timed out."));
+					return new ContentResponse(new GenericException(new TimeoutException("Request timed out."), null, Uri.OriginalString));
 
 				Timer.Dispose();
 				Timer = null;

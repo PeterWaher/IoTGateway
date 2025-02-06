@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content;
+using Waher.Content.Getters;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
@@ -427,7 +427,7 @@ namespace Waher.Networking.XMPP.Software
 			}
 			catch (Exception ex)
 			{
-				Log.Exception(ex);
+				Log.Exception(ex, PackageInfo.FileName);
 			}
 		}
 
@@ -436,7 +436,7 @@ namespace Waher.Networking.XMPP.Software
 		/// </summary>
 		/// <param name="PackageInfo">Information about the software package.</param>
 		/// <returns>Filename of downloaded file.</returns>
-		/// <exception cref="IOException">If package no longer exists, or is not acceissible, and therefore could not be downloaded.</exception>
+		/// <exception cref="GenericException">If package no longer exists, or is not acceissible, and therefore could not be downloaded.</exception>
 		public async Task<string> DownloadPackageAsync(Package PackageInfo)
 		{
 			string FileName = Path.Combine(this.packageFolder, PackageInfo.FileName);
@@ -444,40 +444,49 @@ namespace Waher.Networking.XMPP.Software
 
 			while (true)
 			{
-				HttpStatusCode StatusCode;
+				string ErrorMessage;
+				int StatusCode;
 
 				try
 				{
-					using (HttpClient WebClient = new HttpClient())
-					{
-						using (HttpResponseMessage Response = await WebClient.GetAsync(PackageInfo.Url, HttpCompletionOption.ResponseHeadersRead))
-						{
-							if (Response.IsSuccessStatusCode)
-							{
-								using (Stream Input = await Response.Content.ReadAsStreamAsync())
-								{
-									using (Stream Output = File.Create(FileName))
-									{
-										await Input.CopyToAsync(Output);
-									}
-								}
+					ContentStreamResponse Content = await InternetContent.GetTempStreamAsync(new Uri(PackageInfo.Url), 120000);
 
-								return FileName;
-							}
-							else
-								StatusCode = Response.StatusCode;
-						}
+					if (Content.HasError)
+					{
+						if (Content.Error is WebException ex)
+							StatusCode = (int)ex.StatusCode;
+						else
+							StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+
+						ErrorMessage = Content.Error.Message;
+					}
+					else
+					{
+						using Stream Output = File.Create(FileName);
+
+						Content.Encoded.Position = 0;
+						await Content.Encoded.CopyToAsync(Output);
+
+						return FileName;
 					}
 				}
-				catch (Exception)
+				catch (WebException ex)
 				{
-					StatusCode = HttpStatusCode.InternalServerError;
+					StatusCode = (int)ex.StatusCode;
+					ErrorMessage = ex.Message;
+				}
+				catch (Exception ex)
+				{
+					StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+					ErrorMessage = ex.Message;
 				}
 
-				if ((int)StatusCode < 500)
+				if (StatusCode < 500)
 				{
-					throw new IOException("Unable to download new package from server. HTTP Status Code returned: " +
-						  StatusCode.ToString() + " (" + ((int)StatusCode).ToString() + ")");
+					throw new GenericException("Unable to download new package from server.", 
+						null, PackageInfo.FileName, null, null, null, null, null,
+						new KeyValuePair<string, object>("Status Code", StatusCode),
+						new KeyValuePair<string, object>("Message", ErrorMessage));
 				}
 
 				int MsDelay;

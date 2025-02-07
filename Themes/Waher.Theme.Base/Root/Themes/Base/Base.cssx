@@ -57,6 +57,12 @@ main
     transform: translate(-50%, -50%);
 }
 
+#native-popup-container > *
+{
+    margin: 0;
+    padding: 0;
+}
+
 /* #endregion Popups */
 
 /*#region Footnotes*/

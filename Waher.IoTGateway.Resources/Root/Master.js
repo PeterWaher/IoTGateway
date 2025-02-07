@@ -190,26 +190,9 @@ function Popup() {
 let popup;
 let nativeHeader;
 
-async function Test() {
-    while (true) {
-        const input = await popup.Prompt("name a color")
-        const confirm = await popup.Confirm(`is you favorite color is ${input}?`)
-
-        if (confirm) {
-            await popup.Alert("good choise")
-            break
-        } else {
-            await popup.Alert("let´s try again?")
-        }
-    }
-}
-
 window.addEventListener("load", () => {
     nativeHeader = NativeHeader();
     popup = Popup()
 
-    popup.Alert(`Exception in thread "main" java.lang.NullPointerException
-        at com.example.myproject.Book.getTitle(Book.java:16)
-        at com.example.myproject.Author.getBookTitles(Author.java:25)
-        at com.example.myproject.Bootstrap.main(Bootstrap.java:14)`)
+    popup.Alert("Backup folder settings have been successfully updated.")
 })

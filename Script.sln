@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Graphs", "Scri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Graphs3D", "Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj", "{17DA1F77-0C07-42CA-9380-06B6863A3592}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Lab", "Script\Waher.Script.Lab\Waher.Script.Lab.csproj", "{180B5740-925E-4C81-845E-B058610D8FB9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Lab", "Clients\Waher.Script.Lab\Waher.Script.Lab.csproj", "{180B5740-925E-4C81-845E-B058610D8FB9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Persistence", "Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj", "{32436B57-CF60-4267-99D8-9C5A87BA4018}"
 EndProject

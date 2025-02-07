@@ -1,14 +1,10 @@
-﻿function LoadMore(Button, Offset, MaxCount, LegalDomain)
-{
+﻿function LoadMore(Button, Offset, MaxCount, LegalDomain) {
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function ()
-	{
-		if (xhttp.readyState === 4)
-		{
+	xhttp.onreadystatechange = function () {
+		if (xhttp.readyState === 4) {
 			Button.removeAttribute("data-scroll");
 
-			if (xhttp.status === 200)
-			{
+			if (xhttp.status === 200) {
 				var Response = JSON.parse(xhttp.responseText);
 				var i, c = Response.length;
 
@@ -18,10 +14,8 @@
 
 				var Table = Loop;
 				Loop = Loop.firstChild;
-				while (Loop)
-				{
-					if (Loop.tagName == "TBODY")
-					{
+				while (Loop) {
+					if (Loop.tagName == "TBODY") {
 						Table = Loop;
 						Loop = Loop.firstChild;
 					}
@@ -29,8 +23,7 @@
 						Loop = Loop.nextSibling;
 				}
 
-				for (i = 0; i < c; i++)
-				{
+				for (i = 0; i < c; i++) {
 					var Ref = Response[i];
 
 					var Tr = document.createElement("TR");
@@ -76,8 +69,7 @@
 					Td.setAttribute("style", "text-align:center");
 					Tr.appendChild(Td);
 
-					if (Ref.canDelete)
-					{
+					if (Ref.canDelete) {
 						var Button = document.createElement("BUTTON");
 						Button.setAttribute("type", "button");
 						Button.setAttribute("class", "negButtonSm");
@@ -107,55 +99,46 @@
 	));
 }
 
-function UploadFile()
-{
+function UploadFile() {
 	var Method = document.getElementById("Method").value;
-	if (!Method)
-	{
-		window.alert("Upload method not selected.");
+	if (!Method) {
+		Popup.Alert("Upload method not selected.");
 		return;
 	}
 
 	var GraphUri = document.getElementById("GraphUri").value;
-	if (!GraphUri)
-	{
-		window.alert("Graph URI cannot be empty.");
+	if (!GraphUri) {
+		Popup.Alert("Graph URI cannot be empty.");
 		return;
 	}
 
-	try
-	{
+	try {
 		new URL(GraphUri);
 	}
-	catch (e)
-	{
-		window.alert("Graph URI must be a URI: " + e);
+	catch (e) {
+		Popup.Alert("Graph URI must be a URI: " + e);
 		return;
 	}
 
 	var ContractFileSelector = document.getElementById("GraphFile");
 	var Files = ContractFileSelector.files;
 
-	if (Files.length !== 1)
-	{
-		window.alert("Select one graph file to upload.");
+	if (Files.length !== 1) {
+		Popup.Alert("Select one graph file to upload.");
 		return;
 	}
 
 	var File = Files[0];
 	var Reader = new FileReader();
 
-	Reader.addEventListener('load', (event) =>
-	{
+	Reader.addEventListener('load', (event) => {
 		var xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function ()
-		{
-			if (xhttp.readyState === 4)
-			{
+		xhttp.onreadystatechange = function () {
+			if (xhttp.readyState === 4) {
 				if (xhttp.status >= 200 && xhttp.status < 300)
 					window.location.reload(false);
 				else
-					window.alert(xhttp.responseText);
+					Popup.Alert(xhttp.responseText);
 			}
 		};
 
@@ -167,31 +150,25 @@ function UploadFile()
 	Reader.readAsText(File);
 }
 
-function DeleteGraph(Control,GraphUri)
-{
+function DeleteGraph(Control, GraphUri) {
 	if (!window.confirm("Are you sure you want to delete the graph <" + GraphUri + ">?"))
 		return;
 
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function ()
-	{
-		if (xhttp.readyState === 4)
-		{
-			if (xhttp.status >= 200 && xhttp.status < 300)
-			{
-				try
-				{
+	xhttp.onreadystatechange = function () {
+		if (xhttp.readyState === 4) {
+			if (xhttp.status >= 200 && xhttp.status < 300) {
+				try {
 					var Td = Control.parentNode;
 					var Tr = Td.parentNode;
 					Tr.parentNode.removeChild(Tr);
 				}
-				catch
-				{
+				catch {
 					window.location.reload(false);
 				}
 			}
 			else
-				window.alert(xhttp.responseText);
+				Popup.Alert(xhttp.responseText);
 		}
 	};
 
@@ -199,15 +176,12 @@ function DeleteGraph(Control,GraphUri)
 	xhttp.send();
 }
 
-window.onscroll = function ()
-{
+window.onscroll = function () {
 	var Button = document.getElementById("LoadMoreButton");
 
-	if (Button)
-	{
+	if (Button) {
 		var Rect = Button.getBoundingClientRect();
-		if (Rect.top <= window.innerHeight * 2)
-		{
+		if (Rect.top <= window.innerHeight * 2) {
 			var Scroll = Button.getAttribute("data-scroll");
 			if (Scroll !== "x")
 				Button.click();

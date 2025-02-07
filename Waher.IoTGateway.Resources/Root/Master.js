@@ -121,7 +121,7 @@ function NativeHeader() {
     }
 }
 
-function Popup() {
+function PopupHandler() {
     const popupStack = [];
 
     function PopStack(args) {
@@ -148,7 +148,7 @@ function Popup() {
         })
     }
     async function Alert(message) {
-        const html = CreateHTMLAlertPopup({ Message: `<p>${message}</p>`});
+        const html = CreateHTMLAlertPopup({ Message: `<p>${message}</p>` });
         await Popup(html);
     }
     function AlertOk() {
@@ -156,7 +156,7 @@ function Popup() {
     }
 
     async function Confirm(message) {
-        const html = CreateHTMLConfirmPopup({ Message: `<p>${message}</p>`});
+        const html = CreateHTMLConfirmPopup({ Message: `<p>${message}</p>` });
         return await Popup(html);
     }
 
@@ -168,7 +168,7 @@ function Popup() {
     }
 
     async function Prompt(message) {
-        const html = CreateHTMLPromptPopup({ Message: `<p>${message}</p>`});
+        const html = CreateHTMLPromptPopup({ Message: `<p>${message}</p>` });
         return await Popup(html);
     }
 
@@ -187,12 +187,10 @@ function Popup() {
     }
 }
 
-let popup;
+let Popup;
 let nativeHeader;
 
 window.addEventListener("load", () => {
     nativeHeader = NativeHeader();
-    popup = Popup()
-
-    popup.Alert("Backup folder settings have been successfully updated.")
+    Popup = PopupHandler()
 })

@@ -255,12 +255,7 @@ namespace Waher.Networking.HTTP
 				if (string.IsNullOrEmpty(s))
 					return s;
 
-				int i = s.LastIndexOf(':');
-
-				if (int.TryParse(s.Substring(i + 1), out _))
-					return s.Substring(0, i);
-				else
-					return s;
+				return s.RemovePortNumber();
 			}
 		}
 

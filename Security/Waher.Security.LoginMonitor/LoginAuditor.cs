@@ -8,6 +8,7 @@ using Waher.Networking.WHOIS;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Security.LoginMonitor
 {
@@ -93,20 +94,6 @@ namespace Waher.Security.LoginMonitor
 			return string.Empty;
 		}
 
-		private static string RemovePort(string s)
-		{
-			int i = s.LastIndexOf(':');
-			if (i < 0)
-				return s;
-
-			string s2 = s.Substring(0, i);
-
-			if (int.TryParse(s.Substring(i + 1), out int _) && IPAddress.TryParse(s2, out IPAddress _))
-				return s2;
-			else
-				return s;
-		}
-
 		/// <summary>
 		/// Gets an annotated Remote endpoint state object, if one is available.
 		/// </summary>
@@ -125,7 +112,7 @@ namespace Waher.Security.LoginMonitor
 		/// <returns>Annotated state object, if available. Null otherwise.</returns>
 		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint, bool CreateNew)
 		{
-			string s = RemovePort(RemoteEndpoint);
+			string s = RemoteEndpoint.RemovePortNumber();
 			RemoteEndpoint EP = await this.GetStateObject(s, string.Empty, CreateNew);
 			if (EP is null)
 				return null;
@@ -146,7 +133,7 @@ namespace Waher.Security.LoginMonitor
 		{
 			RemoteEndpoint EP;
 
-			RemoteEndpoint = RemovePort(RemoteEndpoint);
+			RemoteEndpoint = RemoteEndpoint.RemovePortNumber();
 
 			lock (this.states)
 			{
@@ -539,7 +526,7 @@ namespace Waher.Security.LoginMonitor
 			if (Auditor is null)
 				return;
 
-			string s = RemovePort(RemoteEndpoint);
+			string s = RemoteEndpoint.RemovePortNumber();
 			RemoteEndpoint EP = await Auditor.GetStateObject(s, Protocol, false);
 			if (EP is null)
 				return;

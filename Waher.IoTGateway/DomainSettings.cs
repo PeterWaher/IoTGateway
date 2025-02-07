@@ -252,9 +252,7 @@ namespace Waher.IoTGateway
             if (string.IsNullOrEmpty(Host))
                 return null;
 
-            int i = Host.LastIndexOf(':');
-            if (i > 0)
-				Host = Host[..i];
+            Host = Host.RemovePortNumber();
 
             if (Gateway.IsDomain(Host, true) && !Gateway.IsDomain(Host, false))
                 return Host;

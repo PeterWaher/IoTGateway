@@ -2970,10 +2970,7 @@ namespace Waher.IoTGateway
 			if (Address.Equals(ipv4Local) || Address.Equals(ipv6Local))
 				return true;
 
-			string s = Request.Header.Host?.Value ?? string.Empty;
-			int i = s.IndexOf(':');
-			if (i > 0)
-				s = s[..i];
+			string s = Request.Header.Host?.Value.RemovePortNumber() ?? string.Empty;
 
 			if (string.Compare(s, "localhost", true) != 0)
 			{

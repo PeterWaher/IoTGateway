@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -13,6 +12,7 @@ using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Timing;
 using Waher.Security;
@@ -403,11 +403,11 @@ namespace Waher.WebService.Tesseract
 				ResultFileName = FileName + ".txt";
 
 				if (!(imagesFolder is null) && File.Exists(ResultFileName))
-					return await Resources.ReadAllTextAsync(ResultFileName);
+					return await Files.ReadAllTextAsync(ResultFileName);
 				else
 				{
 					if (!string.IsNullOrEmpty(imagesFolder))
-						await Resources.WriteAllBytesAsync(FileName, Image);
+						await Files.WriteAllBytesAsync(FileName, Image);
 
 					StringBuilder Arguments = new StringBuilder();
 
@@ -469,7 +469,7 @@ namespace Waher.WebService.Tesseract
 							}
 							else
 							{
-								string Result = await Resources.ReadAllTextAsync(ResultFileName);
+								string Result = await Files.ReadAllTextAsync(ResultFileName);
 								ResultSource.TrySetResult(Result);
 							}
 						}

@@ -30,7 +30,9 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ContentType };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -65,13 +67,17 @@ namespace Waher.Content.Multipart
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
-			await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
+			Exception Error = await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri, Progress);
+			if (!(Error is null))
+				return new ContentResponse(Error);
+
 			string Type = string.Empty;
 
 			foreach (KeyValuePair<string, string> P in Fields)
@@ -84,7 +90,7 @@ namespace Waher.Content.Multipart
 				}
 			}
 
-			return new RelatedContent(List.ToArray(), Type);
+			return new ContentResponse(ContentType, new RelatedContent(List.ToArray(), Type), Data);
 		}
 
 		/// <summary>
@@ -137,7 +143,7 @@ namespace Waher.Content.Multipart
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
 			if (Object is RelatedContent &&
-				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(contentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;
@@ -154,20 +160,21 @@ namespace Waher.Content.Multipart
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding,
+			ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Object is RelatedContent Related &&
-				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(contentTypes, AcceptedContentTypes))
 			{
 				string Boundary = Guid.NewGuid().ToString();
 				string ContentType = RelatedCodec.ContentType + "; boundary=\"" + Boundary + "\"; type=\"" + Related.Type.Replace("\"", "\\\"") + "\"";
-				return new KeyValuePair<byte[], string>(await FormDataDecoder.Encode(Related.Content, Boundary), ContentType);
+				return new ContentResponse(ContentType, Object, await FormDataDecoder.Encode(Related.Content, Boundary, Progress));
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				return new ContentResponse(new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object)));
 		}
 	}
 }

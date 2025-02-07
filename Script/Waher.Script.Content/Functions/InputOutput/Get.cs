@@ -90,7 +90,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
 			List<KeyValuePair<string, string>> HeaderList = null;
-			object Result;
+			ContentResponse Content;
 
 			if (Arguments.Length > 1)
 				HeaderList = GetHeaders(Arguments[1].AssociatedObjectValue, this);
@@ -100,12 +100,15 @@ namespace Waher.Script.Content.Functions.InputOutput
 				if (!(Arguments[2].AssociatedObjectValue is X509Certificate Certificate))
 					throw new ScriptRuntimeException("Expected X.509 certificate in third argument.", this);
 
-				Result = await InternetContent.GetAsync(Url, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Content = await InternetContent.GetAsync(Url, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 			}
 			else
-				Result = await InternetContent.GetAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Content = await InternetContent.GetAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 
-			return Expression.Encapsulate(Result);
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
+
+			return Expression.Encapsulate(Content.Decoded);
 		}
 
 		internal static List<KeyValuePair<string, string>> GetHeaders(object Arg, ScriptNode Node)

@@ -102,12 +102,12 @@ namespace Waher.Events.Persistence
 		}
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose()"/>
+		/// <see cref="IDisposableAsync.DisposeAsync()"/>
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
 			this.TurnOffDailyPurge();
-			base.Dispose();
+			return base.DisposeAsync();
 		}
 
 		private async void DoCleanup(object P)
@@ -290,7 +290,7 @@ namespace Waher.Events.Persistence
 			if (string.IsNullOrEmpty(PersistedEvent.Facility))
 				PersistedEvent.Facility = this.defaultFacility;
 
-			await Database.InsertLazy(PersistedEvent);
+			await Database.Insert(PersistedEvent);
 		}
 
 		/// <summary>

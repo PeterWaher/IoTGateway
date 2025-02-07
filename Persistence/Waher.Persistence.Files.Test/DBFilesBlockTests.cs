@@ -36,11 +36,11 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
 			if (provider is not null)
 			{
-				provider.Dispose();
+				await provider.DisposeAsync();
 				provider = null;
 			}
 

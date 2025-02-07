@@ -7,7 +7,7 @@
     <Description>Class library that adds functions to the script engine for executing script in a threaded environmet. This includes parallel execution, as well as protected serialized execution.
 
 Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptThreading</Description>
-    <Copyright>Copyright © Waher Data AB 2022-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2022-2025. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Threading</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>

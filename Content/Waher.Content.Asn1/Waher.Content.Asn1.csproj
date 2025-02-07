@@ -9,7 +9,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Implements a simple ASN.1 (Abstract Syntax Notation One) parser. The library supports generation of C# code from ASN.1 schemas. Encoding/Decoding schemes supported: BER, CER, DER.</Description>
-    <Copyright>Copyright © Waher Data AB 2019-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2019-2025. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Asn1</PackageProjectUrl>
     <PackageIconUrl />
@@ -39,6 +39,7 @@
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
   </ItemGroup>

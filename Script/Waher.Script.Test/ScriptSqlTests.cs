@@ -58,8 +58,11 @@ namespace Waher.Script.Test
 		{
 			await Types.StopAllModules();
 
-			filesProvider?.Dispose();
-			filesProvider = null;
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 		}
 
 		[ClassInitialize]
@@ -118,7 +121,7 @@ namespace Waher.Script.Test
 
 		private static async Task Test(string Script, object[][] ExpectedOutput)
 		{
-			Variables v = new();
+			Variables v = [];
 			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
 			ConsoleOut.WriteLine(Expression.ToString(Obj));
@@ -151,7 +154,7 @@ namespace Waher.Script.Test
 
 		private static async Task Test(string Script, double ExpectedOutput)
 		{
-			Variables v = new();
+			Variables v = [];
 			Expression Exp = new(Script);
 			object Obj = await Exp.EvaluateAsync(v);
 			Assert.AreEqual(ExpectedOutput, Obj);
@@ -164,652 +167,594 @@ namespace Waher.Script.Test
 		public async Task SELECT_Test_01_Orders()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Orders",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_02_Orders_Typed()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_03_Customers()
 		{
 			await Test("Select CustomerID, CustomerName, ContactName, Country from Customers",
-				new object[][]
-				{
-					new object[] { 1d, "P1", "CP1", "C1" },
-					new object[] { 2d, "P2", "CP2", "C2" },
-					new object[] { 3d, "P3", "CP3", "C2" }
-				});
+				[
+					[1d, "P1", "CP1", "C1"],
+					[2d, "P2", "CP2", "C2"],
+					[3d, "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_04_Customers_Typed()
 		{
 			await Test("Select CustomerID, CustomerName, ContactName, Country from Waher.Script.Test.Data.Customer as Customers",
-				new object[][]
-				{
-					new object[] { 1d, "P1", "CP1", "C1" },
-					new object[] { 2d, "P2", "CP2", "C2" },
-					new object[] { 3d, "P3", "CP3", "C2" }
-				});
+				[
+					[1d, "P1", "CP1", "C1"],
+					[2d, "P2", "CP2", "C2"],
+					[3d, "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_05_INNER_JOIN()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_06_INNER_JOIN_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders inner join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_07_LEFT_OUTER_JOIN()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_08_LEFT_OUTER_JOIN_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_09_LEFT_OUTER_JOIN_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_10_LEFT_OUTER_JOIN_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_11_RIGHT_OUTER_JOIN()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_12_RIGHT_OUTER_JOIN_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_13_RIGHT_OUTER_JOIN_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_14_RIGHT_OUTER_JOIN_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_15_FULL_OUTER_JOIN()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null],
+					[null, null, "P1", "CP1", "C1"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_16_FULL_OUTER_JOIN_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null],
+					[null, null, "P1", "CP1", "C1"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_17_FULL_OUTER_JOIN_3()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null],
+					[null, null, "P1", "CP1", "C1"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_18_FULL_OUTER_JOIN_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null],
+					[null, null, "P1", "CP1", "C1"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_19_FULL_OUTER_JOIN_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null],
+					[null, null, "P1", "CP1", "C1"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_20_FULL_OUTER_JOIN_Typed_3()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null],
+					[null, null, "P1", "CP1", "C1"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_21_CROSS_JOIN()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_22_CROSS_JOIN_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2"],
+					[2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1"],
+					[2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1"],
+					[3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2"],
+					[3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_23_CROSS_JOIN_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers where Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_24_CROSS_JOIN_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2"],
+					[2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1"],
+					[2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1"],
+					[3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2"],
+					[3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_25_Orders_WHERE()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Orders where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[2d, 3d, new DateTime(2020, 5, 1)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_26_Orders_WHERE_Typed()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order as Orders where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[2d, 3d, new DateTime(2020, 5, 1)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_27_Customers_WHERE()
 		{
 			await Test("Select CustomerID, CustomerName, ContactName, Country from Customers where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 2d, "P2", "CP2", "C2" }
-				});
+				[
+					[2d, "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_28_Customers_WHERE_Typed()
 		{
 			await Test("Select CustomerID, CustomerName, ContactName, Country from Waher.Script.Test.Data.Customer as Customers where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 2d, "P2", "CP2", "C2" }
-				});
+				[
+					[2d, "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_29_INNER_JOIN_WHERE()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_30_INNER_JOIN_WHERE_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders inner join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_31_LEFT_OUTER_JOIN_WHERE()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_32_LEFT_OUTER_JOIN_WHERE_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID where Orders.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_33_LEFT_OUTER_JOIN_WHERE_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_34_LEFT_OUTER_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where Orders.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_35_RIGHT_OUTER_JOIN_WHERE()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_36_RIGHT_OUTER_JOIN_WHERE_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID where Customers.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_37_RIGHT_OUTER_JOIN_WHERE_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_38_RIGHT_OUTER_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where Customers.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_39_FULL_OUTER_JOIN_WHERE()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_40_FULL_OUTER_JOIN_WHERE_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_41_FULL_OUTER_JOIN_3_WHERE()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_42_FULL_OUTER_JOIN_WHERE_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_43_FULL_OUTER_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_44_FULL_OUTER_JOIN_3_WHERE_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_45_CROSS_JOIN_WHERE()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID and OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_46_CROSS_JOIN_WHERE_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" }
-				});
+				[
+					[2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1"],
+					[2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_47_CROSS_JOIN_WHERE_Typed()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers where Orders.CustomerID=Customers.CustomerID and OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_48_CROSS_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers where Orders.OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" }
-				});
+				[
+					[2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1"],
+					[2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_49_SELF_JOIN()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Orders o1 inner join Orders o2 on o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)],
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_50_SELF_JOIN_2()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Orders o1, Orders o2 where o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)],
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_51_SELF_JOIN_Typed()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Waher.Script.Test.Data.Order o1 inner join Waher.Script.Test.Data.Order o2 on o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)],
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_52_SELF_JOIN_Typed_2()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Waher.Script.Test.Data.Order o1, Waher.Script.Test.Data.Order o2 where o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)],
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_53_JOIN_3_SOURCES()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Orders o1 inner join Orders o2 on o1.OrderID=o2.CustomerID inner join Orders o3 on o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_54_JOIN_3_SOURCES_2()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Orders o1, Orders o2, Orders o3 where o1.OrderID=o2.CustomerID and o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_55_JOIN_3_SOURCES_Typed()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Waher.Script.Test.Data.Order o1 inner join Waher.Script.Test.Data.Order o2 on o1.OrderID=o2.CustomerID inner join Waher.Script.Test.Data.Order o3 on o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_56_JOIN_3_SOURCES_Typed_2()
 		{
 			await Test("Select o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Waher.Script.Test.Data.Order o1, Waher.Script.Test.Data.Order o2, Waher.Script.Test.Data.Order o3 where o1.OrderID=o2.CustomerID and o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_57_Custom_Filters()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Orders where (OrderID & 1)=1",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_58_Custom_Filters_Typed()
 		{
 			await Test("Select OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order where (OrderID & 1)=1",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
 		}
 
 		[TestMethod]
@@ -820,16 +765,15 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select B, Sum(A) from Collection1 group by B",
-				new object[][]
-				{
-					new object[] { 0d, 714264285d },
-					new object[] { 1d, 714278571d },
-					new object[] { 2d, 714292857d },
-					new object[] { 3d, 714307143d },
-					new object[] { 4d, 714321429d },
-					new object[] { 5d, 714235715d },
-					new object[] { 6d, 714250000d }
-				});
+				[
+					[0d, 714264285d],
+					[1d, 714278571d],
+					[2d, 714292857d],
+					[3d, 714307143d],
+					[4d, 714321429d],
+					[5d, 714235715d],
+					[6d, 714250000d]
+				]);
 		}
 
 		[TestMethod]
@@ -840,16 +784,15 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select B, Sum(A) from Collection1 group by B order by B",
-				new object[][]
-				{
-					new object[] { 0d, 714264285d },
-					new object[] { 1d, 714278571d },
-					new object[] { 2d, 714292857d },
-					new object[] { 3d, 714307143d },
-					new object[] { 4d, 714321429d },
-					new object[] { 5d, 714235715d },
-					new object[] { 6d, 714250000d }
-				});
+				[
+					[0d, 714264285d],
+					[1d, 714278571d],
+					[2d, 714292857d],
+					[3d, 714307143d],
+					[4d, 714321429d],
+					[5d, 714235715d],
+					[6d, 714250000d]
+				]);
 		}
 
 		#endregion
@@ -860,652 +803,594 @@ namespace Waher.Script.Test
 		public async Task SELECT_Test_GENERIC_01_Orders()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Orders",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_02_Orders_Typed()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[1d, 2d, new DateTime(2020, 4, 30)],
+					[2d, 3d, new DateTime(2020, 5, 1)],
+					[3d, 4d, new DateTime(2020, 5, 2)]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_03_Customers()
 		{
 			await Test("Select generic CustomerID, CustomerName, ContactName, Country from Customers",
-				new object[][]
-				{
-					new object[] { 1d, "P1", "CP1", "C1" },
-					new object[] { 2d, "P2", "CP2", "C2" },
-					new object[] { 3d, "P3", "CP3", "C2" }
-				});
+				[
+					[1d, "P1", "CP1", "C1"],
+					[2d, "P2", "CP2", "C2"],
+					[3d, "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_04_Customers_Typed()
 		{
 			await Test("Select generic CustomerID, CustomerName, ContactName, Country from Waher.Script.Test.Data.Customer as Customers",
-				new object[][]
-				{
-					new object[] { 1d, "P1", "CP1", "C1" },
-					new object[] { 2d, "P2", "CP2", "C2" },
-					new object[] { 3d, "P3", "CP3", "C2" }
-				});
+				[
+					[1d, "P1", "CP1", "C1"],
+					[2d, "P2", "CP2", "C2"],
+					[3d, "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_05_INNER_JOIN()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_06_INNER_JOIN_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders inner join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_07_LEFT_OUTER_JOIN()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_08_LEFT_OUTER_JOIN_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_09_LEFT_OUTER_JOIN_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_10_LEFT_OUTER_JOIN_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null }
-				});
+				[
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"],
+					[3d, new DateTime(2020, 5, 02), null, null, null]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_11_RIGHT_OUTER_JOIN()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_12_RIGHT_OUTER_JOIN_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_13_RIGHT_OUTER_JOIN_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_14_RIGHT_OUTER_JOIN_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { null, null, "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[null, null, "P1", "CP1", "C1"],
+					[1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2"],
+					[2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2"]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_15_FULL_OUTER_JOIN()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 02), null, null, null ],
+					[ null, null, "P1", "CP1", "C1" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_16_FULL_OUTER_JOIN_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 02), null, null, null ],
+					[ null, null, "P1", "CP1", "C1" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_17_FULL_OUTER_JOIN_3()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 02), null, null, null ],
+					[ null, null, "P1", "CP1", "C1" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_18_FULL_OUTER_JOIN_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 02), null, null, null ],
+					[ null, null, "P1", "CP1", "C1" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_19_FULL_OUTER_JOIN_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 02), null, null, null ],
+					[ null, null, "P1", "CP1", "C1" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_20_FULL_OUTER_JOIN_Typed_3()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 02), null, null, null },
-					new object[] { null, null, "P1", "CP1", "C1" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 02), null, null, null ],
+					[ null, null, "P1", "CP1", "C1" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_21_CROSS_JOIN()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_22_CROSS_JOIN_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" ],
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" ],
+					[ 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" ],
+					[ 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" ],
+					[ 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" ],
+					[ 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_23_CROSS_JOIN_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers where Orders.CustomerID=Customers.CustomerID",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_24_CROSS_JOIN_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" },
-					new object[] { 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" },
-					new object[] { 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P1", "CP1", "C1" ],
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ],
+					[ 1d, new DateTime(2020, 4, 30), "P3", "CP3", "C2" ],
+					[ 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" ],
+					[ 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" ],
+					[ 3d, new DateTime(2020, 5, 2), "P1", "CP1", "C1" ],
+					[ 3d, new DateTime(2020, 5, 2), "P2", "CP2", "C2" ],
+					[ 3d, new DateTime(2020, 5, 2), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_25_Orders_WHERE()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Orders where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[ 2d, 3d, new DateTime(2020, 5, 1) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_26_Orders_WHERE_Typed()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order as Orders where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[ 2d, 3d, new DateTime(2020, 5, 1) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_27_Customers_WHERE()
 		{
 			await Test("Select generic CustomerID, CustomerName, ContactName, Country from Customers where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 2d, "P2", "CP2", "C2" }
-				});
+				[
+					[ 2d, "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_28_Customers_WHERE_Typed()
 		{
 			await Test("Select generic CustomerID, CustomerName, ContactName, Country from Waher.Script.Test.Data.Customer as Customers where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 2d, "P2", "CP2", "C2" }
-				});
+				[
+					[ 2d, "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_29_INNER_JOIN_WHERE()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders inner join Customers on Orders.CustomerID=Customers.CustomerID where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_30_INNER_JOIN_WHERE_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders inner join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_31_LEFT_OUTER_JOIN_WHERE()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_32_LEFT_OUTER_JOIN_WHERE_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders left join Customers on Orders.CustomerID=Customers.CustomerID where Orders.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_33_LEFT_OUTER_JOIN_WHERE_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_34_LEFT_OUTER_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders left join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where Orders.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_35_RIGHT_OUTER_JOIN_WHERE()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_36_RIGHT_OUTER_JOIN_WHERE_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders right join Customers on Orders.CustomerID=Customers.CustomerID where Customers.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_37_RIGHT_OUTER_JOIN_WHERE_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_38_RIGHT_OUTER_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders right join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where Customers.CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_39_FULL_OUTER_JOIN_WHERE()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_40_FULL_OUTER_JOIN_WHERE_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders full join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_41_FULL_OUTER_JOIN_3_WHERE()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders outer join Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_42_FULL_OUTER_JOIN_WHERE_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_43_FULL_OUTER_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders full join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_44_FULL_OUTER_JOIN_3_WHERE_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders outer join Waher.Script.Test.Data.Customer as Customers on Orders.CustomerID=Customers.CustomerID where CustomerID=2",
-				new object[][]
-				{
-					new object[] { 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" }
-				});
+				[
+					[ 1d, new DateTime(2020, 4, 30), "P2", "CP2", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_45_CROSS_JOIN_WHERE()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.CustomerID=Customers.CustomerID and OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_46_CROSS_JOIN_WHERE_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Orders, Customers where Orders.OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" }
-				});
+				[
+					[ 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" ],
+					[ 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_47_CROSS_JOIN_WHERE_Typed()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers where Orders.CustomerID=Customers.CustomerID and OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" }
-				});
+				[
+					[ 2d, new DateTime(2020, 5, 01), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_48_CROSS_JOIN_WHERE_Typed_2()
 		{
 			await Test("Select generic Orders.OrderID, Orders.OrderDate, Customers.CustomerName, Customers.ContactName, Customers.Country from Waher.Script.Test.Data.Order as Orders, Waher.Script.Test.Data.Customer as Customers where Orders.OrderID=2",
-				new object[][]
-				{
-					new object[] { 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" },
-					new object[] { 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" }
-				});
+				[
+					[ 2d, new DateTime(2020, 5, 1), "P1", "CP1", "C1" ],
+					[ 2d, new DateTime(2020, 5, 1), "P2", "CP2", "C2" ],
+					[ 2d, new DateTime(2020, 5, 1), "P3", "CP3", "C2" ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_49_SELF_JOIN()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Orders o1 inner join Orders o2 on o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[ 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ],
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_50_SELF_JOIN_2()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Orders o1, Orders o2 where o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[ 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ],
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_51_SELF_JOIN_Typed()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Waher.Script.Test.Data.Order o1 inner join Waher.Script.Test.Data.Order o2 on o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[ 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ],
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_52_SELF_JOIN_Typed_2()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate from Waher.Script.Test.Data.Order o1, Waher.Script.Test.Data.Order o2 where o1.OrderID=o2.CustomerID",
-				new object[][]
-				{
-					new object[] { 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) }
-				});
+				[
+					[ 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ],
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_53_JOIN_3_SOURCES()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Orders o1 inner join Orders o2 on o1.OrderID=o2.CustomerID inner join Orders o3 on o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_54_JOIN_3_SOURCES_2()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Orders o1, Orders o2, Orders o3 where o1.OrderID=o2.CustomerID and o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_55_JOIN_3_SOURCES_Typed()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Waher.Script.Test.Data.Order o1 inner join Waher.Script.Test.Data.Order o2 on o1.OrderID=o2.CustomerID inner join Waher.Script.Test.Data.Order o3 on o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_56_JOIN_3_SOURCES_Typed_2()
 		{
 			await Test("Select generic o1.OrderID, o1.CustomerID, o1.OrderDate, o2.OrderID, o2.CustomerID, o2.OrderDate, o3.OrderID, o3.CustomerID, o3.OrderDate from Waher.Script.Test.Data.Order o1, Waher.Script.Test.Data.Order o2, Waher.Script.Test.Data.Order o3 where o1.OrderID=o2.CustomerID and o2.OrderID=o3.CustomerID",
-				new object[][]
-				{
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) }
-				});
+				[
+					[ 3d, 4d, new DateTime(2020, 5, 2), 2d, 3d, new DateTime(2020, 5, 1), 1d, 2d, new DateTime(2020, 4, 30) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_57_Custom_Filters()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Orders where (OrderID & 1)=1",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[ 1d, 2d, new DateTime(2020, 4, 30) ],
+					[ 3d, 4d, new DateTime(2020, 5, 2) ]
+				]);
 		}
 
 		[TestMethod]
 		public async Task SELECT_Test_GENERIC_58_Custom_Filters_Typed()
 		{
 			await Test("Select generic OrderID, CustomerID, OrderDate from Waher.Script.Test.Data.Order where (OrderID & 1)=1",
-				new object[][]
-				{
-					new object[] { 1d, 2d, new DateTime(2020, 4, 30) },
-					new object[] { 3d, 4d, new DateTime(2020, 5, 2) }
-				});
+				[
+					[ 1d, 2d, new DateTime(2020, 4, 30) ],
+					[ 3d, 4d, new DateTime(2020, 5, 2) ]
+				]);
 		}
 
 		[TestMethod]
@@ -1516,16 +1401,15 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select B, Sum(A) from Collection1 group by B",
-				new object[][]
-				{
-					new object[] { 0d, 714264285d },
-					new object[] { 1d, 714278571d },
-					new object[] { 2d, 714292857d },
-					new object[] { 3d, 714307143d },
-					new object[] { 4d, 714321429d },
-					new object[] { 5d, 714235715d },
-					new object[] { 6d, 714250000d }
-				});
+				[
+					[ 0d, 714264285d ],
+					[ 1d, 714278571d ],
+					[ 2d, 714292857d ],
+					[ 3d, 714307143d ],
+					[ 4d, 714321429d ],
+					[ 5d, 714235715d ],
+					[ 6d, 714250000d ]
+				]);
 		}
 
 		[TestMethod]
@@ -1536,16 +1420,15 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into Collection1 objects {foreach i in 0..99999 do {A:i,B:i MOD 7}};" +
 				"select B, Sum(A) from Collection1 group by B order by B",
-				new object[][]
-				{
-					new object[] { 0d, 714264285d },
-					new object[] { 1d, 714278571d },
-					new object[] { 2d, 714292857d },
-					new object[] { 3d, 714307143d },
-					new object[] { 4d, 714321429d },
-					new object[] { 5d, 714235715d },
-					new object[] { 6d, 714250000d }
-				});
+				[
+					[ 0d, 714264285d ],
+					[ 1d, 714278571d ],
+					[ 2d, 714292857d ],
+					[ 3d, 714307143d ],
+					[ 4d, 714321429d ],
+					[ 5d, 714235715d ],
+					[ 6d, 714250000d ]
+				]);
 		}
 
 		#endregion
@@ -1558,10 +1441,9 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into WebUsers (UserName, Password) values (\"User01\", \"Pwd01\");"+
 				"select UserName, Password from WebUsers where UserName=\"User01\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User01", "Pwd01" }
-				});
+				[
+					[ "User01", "Pwd01" ]
+				]);
 		}
 
 		[TestMethod]
@@ -1571,18 +1453,17 @@ namespace Waher.Script.Test
 				"ToStr(i):=i<10?\"0\"+i:i;" +
 				"insert into WebUsers select UserName, Password from [foreach i in 2..10 do {UserName:\"User\"+ToStr(i),Password:\"Pwd\"+ToStr(i)}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User02\" and UserName<=\"User10\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User02", "Pwd02" },
-					new object[] { "User03", "Pwd03" },
-					new object[] { "User04", "Pwd04" },
-					new object[] { "User05", "Pwd05" },
-					new object[] { "User06", "Pwd06" },
-					new object[] { "User07", "Pwd07" },
-					new object[] { "User08", "Pwd08" },
-					new object[] { "User09", "Pwd09" },
-					new object[] { "User10", "Pwd10" }
-				});
+				[
+					[ "User02", "Pwd02" ],
+					[ "User03", "Pwd03" ],
+					[ "User04", "Pwd04" ],
+					[ "User05", "Pwd05" ],
+					[ "User06", "Pwd06" ],
+					[ "User07", "Pwd07" ],
+					[ "User08", "Pwd08" ],
+					[ "User09", "Pwd09" ],
+					[ "User10", "Pwd10" ]
+				]);
 		}
 
 		[TestMethod]
@@ -1591,19 +1472,18 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into WebUsers select * from [foreach i in 11..20 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User11\" and UserName<=\"User20\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User11", "Pwd11" },
-					new object[] { "User12", "Pwd12" },
-					new object[] { "User13", "Pwd13" },
-					new object[] { "User14", "Pwd14" },
-					new object[] { "User15", "Pwd15" },
-					new object[] { "User16", "Pwd16" },
-					new object[] { "User17", "Pwd17" },
-					new object[] { "User18", "Pwd18" },
-					new object[] { "User19", "Pwd19" },
-					new object[] { "User20", "Pwd20" }
-				});
+				[
+					[ "User11", "Pwd11" ],
+					[ "User12", "Pwd12" ],
+					[ "User13", "Pwd13" ],
+					[ "User14", "Pwd14" ],
+					[ "User15", "Pwd15" ],
+					[ "User16", "Pwd16" ],
+					[ "User17", "Pwd17" ],
+					[ "User18", "Pwd18" ],
+					[ "User19", "Pwd19" ],
+					[ "User20", "Pwd20" ]
+				]);
 		}
 
 		[TestMethod]
@@ -1612,10 +1492,9 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into WebUsers object {UserName:\"User21\",Password:\"Pwd21\"};" +
 				"select UserName, Password from WebUsers where UserName=\"User21\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User21", "Pwd21" }
-				});
+				[
+					[ "User21", "Pwd21" ]
+				]);
 		}
 
 		[TestMethod]
@@ -1623,16 +1502,15 @@ namespace Waher.Script.Test
 		{
 			await Test(
 				"insert into WebUsers objects "+
-				"{UserName:\"User22\",Password:\"Pwd22\"}," +
+				"[{UserName:\"User22\",Password:\"Pwd22\"}," +
 				"{UserName:\"User23\",Password:\"Pwd23\"}," +
-				"{UserName:\"User24\",Password:\"Pwd24\"};" +
+				"{UserName:\"User24\",Password:\"Pwd24\"}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User22\" and UserName<=\"User24\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User22", "Pwd22" },
-					new object[] { "User23", "Pwd23" },
-					new object[] { "User24", "Pwd24" }
-				});
+				[
+					[ "User22", "Pwd22" ],
+					[ "User23", "Pwd23" ],
+					[ "User24", "Pwd24" ]
+				]);
 		}
 
 		[TestMethod]
@@ -1641,12 +1519,11 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into WebUsers objects [foreach i in 25..27 do {UserName:\"User\"+i,Password:\"Pwd\"+i}];" +
 				"select UserName, Password from WebUsers where UserName>=\"User25\" and UserName<=\"User27\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User25", "Pwd25" },
-					new object[] { "User26", "Pwd26" },
-					new object[] { "User27", "Pwd27" }
-				});
+				[
+					[ "User25", "Pwd25" ],
+					[ "User26", "Pwd26" ],
+					[ "User27", "Pwd27" ]
+				]);
 		}
 
 		[TestMethod]
@@ -1655,12 +1532,11 @@ namespace Waher.Script.Test
 			await Test(
 				"insert into WebUsers objects {foreach i in 28..30 do {UserName:\"User\"+i,Password:\"Pwd\"+i}};" +
 				"select UserName, Password from WebUsers where UserName>=\"User28\" and UserName<=\"User30\" order by UserName",
-				new object[][]
-				{
-					new object[] { "User28", "Pwd28" },
-					new object[] { "User29", "Pwd29" },
-					new object[] { "User30", "Pwd30" }
-				});
+				[
+					[ "User28", "Pwd28" ],
+					[ "User29", "Pwd29" ],
+					[ "User30", "Pwd30" ]
+				]);
 		}
 
 		#endregion

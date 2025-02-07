@@ -70,14 +70,17 @@ namespace Waher.Script.Content.Functions.Encoding
 
 		private async Task<IElement> DoDecodeAsync(byte[] Data, string ContentType, System.Text.Encoding Encoding)
 		{
-			object Decoded;
+			ContentResponse Content;
 
 			if (Encoding is null)
-				Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
+				Content = await InternetContent.DecodeAsync(ContentType, Data, null);
 			else
-				Decoded = await InternetContent.DecodeAsync(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
+				Content = await InternetContent.DecodeAsync(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
 
-			if (Decoded is string[][] Records)
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
+
+			if (Content.Decoded is string[][] Records)
 			{
 				int Rows = Records.Length;
 				int MaxCols = 0;
@@ -127,7 +130,7 @@ namespace Waher.Script.Content.Functions.Encoding
 				return Operators.Matrices.MatrixDefinition.Encapsulate(Elements, Rows, MaxCols, this);
 			}
 			else
-				return Expression.Encapsulate(Decoded);
+				return Expression.Encapsulate(Content.Decoded);
 		}
 
 		/// <summary>

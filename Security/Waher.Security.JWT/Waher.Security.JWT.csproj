@@ -9,7 +9,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Helps applications with the creation and validation of Java Web Tokens (JWT), as defined in RFC 7519. Includes OpenID claims.</Description>
-    <Copyright>Copyright © Waher Data AB 2017-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.JWT</PackageProjectUrl>
     <PackageIconUrl />
@@ -20,9 +20,9 @@
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Security\Waher.Security.JWT\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <AssemblyVersion>1.4.3</AssemblyVersion>
-    <FileVersion>1.4.3</FileVersion>
-    <Version>1.4.3</Version>
+    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <FileVersion>1.5.0</FileVersion>
+    <Version>1.5.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

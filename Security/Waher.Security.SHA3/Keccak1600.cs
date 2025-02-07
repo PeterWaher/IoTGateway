@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Security.SHA3
 {

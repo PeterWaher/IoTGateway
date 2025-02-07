@@ -84,6 +84,48 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="Http2Settings" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Specifies HTTP/2-specific settings for the web server.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="enabled" type="xs:boolean" use="optional" default="true">
+							<xs:annotation>
+								<xs:documentation>If HTTP/2 is enabled or not.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="initialWindowSize" type="xs:int" use="optional" default="2500000">
+							<xs:annotation>
+								<xs:documentation>Initial Window Size, in bytes.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="maxFrameSize" type="xs:int" use="optional" default="16384">
+							<xs:annotation>
+								<xs:documentation>Maximum Frame Size, in bytes.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="maxConcurrentStreams" type="xs:int" use="optional" default="100">
+							<xs:annotation>
+								<xs:documentation>Maximum number of concurrent streams.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="headerTableSize" type="xs:int" use="optional" default="8192">
+							<xs:annotation>
+								<xs:documentation>Dynamic Header Table Size, in bytes.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="noRfc7540Priorities" type="xs:boolean" use="optional" default="false">
+							<xs:annotation>
+								<xs:documentation>If stream priorities, as defined in HTTP/2 RFC 7540, should not be used, in favour of priorities, as defined in RFC 9218 (used in HTTP/3).</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="profiling" type="xs:boolean" use="optional" default="false">
+							<xs:annotation>
+								<xs:documentation>If profiling should be enabled to analyse HTTP/2 performance.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="Database">
 					<xs:annotation>
 						<xs:documentation>Defines the use of a local file-based object database.</xs:documentation>

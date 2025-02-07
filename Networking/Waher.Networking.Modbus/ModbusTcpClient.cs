@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
-using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.Modbus.Exceptions;
@@ -161,25 +160,26 @@ namespace Waher.Networking.Modbus
 
 		private Task TcpClient_OnError(object Sender, Exception Exception)
 		{
-			return this.Error(Exception.Message);
+			this.Error(Exception.Message);
+			return Task.CompletedTask;
 		}
 
-		private async Task<string> TcpClient_OnWarning(string Text)
+		private string TcpClient_OnWarning(string Text)
 		{
-			await this.Warning(Text);
+			this.Warning(Text);
 			return Text;
 		}
 
-		private async Task<string> TcpClient_OnInformation(string Text)
+		private string TcpClient_OnInformation(string Text)
 		{
-			await this.Information(Text);
+			this.Information(Text);
 			return Text;
 		}
 
-		private async Task<bool> TcpClient_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
+		private Task<bool> TcpClient_OnReceived(object Sender, bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.HasSniffers)
-				await this.ReceiveBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
+				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
 
 			int i;
 			byte b;
@@ -248,7 +248,7 @@ namespace Waher.Networking.Modbus
 				}
 			}
 
-			return true;
+			return Task.FromResult(true);
 		}
 
 		private void ProcessIncomingPacket()
@@ -346,8 +346,8 @@ namespace Waher.Networking.Modbus
 			{
 				byte[] Bin = Req.Request.ToArray();
 
-				await this.tcpClient.SendAsync(Bin);
-				await this.TransmitBinary(Bin);
+				await this.tcpClient.SendAsync(true, Bin);
+				this.TransmitBinary(true, Bin);
 
 				Task<ModbusResponse> Result = Req.Handle.Task;
 				Task Timeout = Task.Delay(this.timeoutMs);

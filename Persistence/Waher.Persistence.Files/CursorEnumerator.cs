@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Persistence.Files
 {
@@ -15,7 +16,7 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// Cursor enumerator
 	/// </summary>
-	public class CursorEnumerator<T> : IAsyncEnumerator<T>
+	public class CursorEnumerator<T> : IAsyncEnumerator<T>, IDisposableAsync
 	{
 		private readonly int timeoutMilliseconds;
 		private readonly GetNewCursorCallback<T> resetFunction;
@@ -59,9 +60,20 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
-			if (this.cursor is IDisposable Disposable)
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
+		{
+			if (this.cursor is IDisposableAsync DisposableAsync)
+				await DisposableAsync.DisposeAsync();
+			else if (this.cursor is IDisposable Disposable)
 				Disposable.Dispose();
 		}
 

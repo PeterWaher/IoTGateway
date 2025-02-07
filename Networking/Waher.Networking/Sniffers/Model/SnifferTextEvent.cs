@@ -14,8 +14,9 @@ namespace Waher.Networking.Sniffers.Model
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text.</param>
-		public SnifferTextEvent(DateTime Timestamp, string Text)
-			: base(Timestamp)
+		/// <param name="Processor">Sniff event processor</param>
+		public SnifferTextEvent(DateTime Timestamp, string Text, ISniffEventProcessor Processor)
+			: base(Timestamp, Processor)
 		{
 			this.text = Text;
 		}

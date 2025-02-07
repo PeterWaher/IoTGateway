@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Security
 {

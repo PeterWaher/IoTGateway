@@ -12,14 +12,14 @@ Script Syntax:
 https://waher.se/Script.md#paletteGenerationFunctionsWaherScriptFractals</Description>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
-    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageIconUrl></PackageIconUrl>
     <PackageTags>script fractals</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.2.1</AssemblyVersion>
-    <FileVersion>2.2.1</FileVersion>
-    <Version>2.2.1</Version>
+    <AssemblyVersion>2.2.2</AssemblyVersion>
+    <FileVersion>2.2.2</FileVersion>
+    <Version>2.2.2</Version>
     <Product>Waher.IoTGateway</Product>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Fractals</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

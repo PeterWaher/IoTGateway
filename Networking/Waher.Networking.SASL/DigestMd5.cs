@@ -185,7 +185,7 @@ namespace Waher.Networking.SASL
 				return null;
 			}
 
-			await Connection.SetUserIdentity(UserName);
+			Connection.SetUserIdentity(UserName);
 
 			byte[] HPass = this.H(CONCAT(Account.UserName, ":", Realm, ":", Account.Password));
 			byte[] A1;

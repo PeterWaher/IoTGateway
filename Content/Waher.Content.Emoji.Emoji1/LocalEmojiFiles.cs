@@ -309,7 +309,7 @@ namespace Waher.Content.Emoji.Emoji1
 				Output.Append(";base64,");
 
 				string FileName = this.GetFileName(Emoji);
-				byte[] Data = await Resources.ReadAllBytesAsync(FileName);
+				byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(FileName);
 
 				Output.Append(Convert.ToBase64String(Data));
 

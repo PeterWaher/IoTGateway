@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
-using Waher.Networking;
 using Waher.Networking.MQTT;
+using Waher.Runtime.IO;
 
 namespace Waher.Events.MQTT
 {
@@ -44,7 +44,7 @@ namespace Waher.Events.MQTT
 
 		private async Task Client_OnContentReceived(object Sender, MqttContent Content)
 		{
-			string Xml = CommonTypes.GetString(Content.Data, System.Text.Encoding.UTF8);
+			string Xml = Strings.GetString(Content.Data, System.Text.Encoding.UTF8);
 			XmlDocument Doc = new XmlDocument()
 			{
 				PreserveWhitespace = true

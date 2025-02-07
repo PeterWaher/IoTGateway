@@ -36,7 +36,7 @@ namespace Waher.Networking.CoAP.Transport
 					if (this.disposed)
 						return;
 
-					await this.Endpoint.ReceiveBinary(Data.Buffer);
+					this.Endpoint.ReceiveBinary(true, Data.Buffer);
 
 					try
 					{
@@ -54,7 +54,7 @@ namespace Waher.Networking.CoAP.Transport
 			}
 			catch (Exception ex)
 			{
-				await this.Endpoint.Exception(ex);
+				this.Endpoint.Exception(ex);
 			}
 		}
 
@@ -78,7 +78,7 @@ namespace Waher.Networking.CoAP.Transport
 			{
 				while (!(Message is null))
 				{
-					await this.Endpoint.TransmitBinary(Message.encoded);
+					this.Endpoint.TransmitBinary(true, Message.encoded);
 
 					await this.Client.SendAsync(Message.encoded, Message.encoded.Length, Message.destination);
 
@@ -102,7 +102,7 @@ namespace Waher.Networking.CoAP.Transport
 			}
 			catch (Exception ex)
 			{
-				await this.Endpoint.Exception(ex);
+				this.Endpoint.Exception(ex);
 			}
 		}
 

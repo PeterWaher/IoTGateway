@@ -28,6 +28,5 @@
 		/// <param name="FileName">File name, if found.</param>
 		/// <returns>If the resource points to a file.</returns>
 		bool TryGetFileName(string LocalUrl, bool MustExist, out string FileName);
-
 	}
 }

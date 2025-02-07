@@ -143,9 +143,15 @@ namespace Waher.Networking.HTTP
 				return;
 			}
 
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Result, Encoding.UTF8);
-			byte[] Binary = P.Key;
-			string ContentType = P.Value;
+			ContentResponse P = await InternetContent.EncodeAsync(Result, Encoding.UTF8);
+			if (P.HasError)
+			{
+				await Response.SendResponse(P.Error);
+				return;
+			}
+
+			byte[] Binary = P.Encoded;
+			string ContentType = P.ContentType;
 
 			bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
 
@@ -255,8 +261,14 @@ namespace Waher.Networking.HTTP
 						ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, this.ResourceName,
 							Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
 
-						if (await Converter.ConvertAsync(State))
+						if (await Converter.ConvertAsync(State, Response.Progress))
 							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+
+						if (State.HasError)
+						{
+							await Response.SendResponse(State.Error);
+							return;
+						}
 
 						NewContentType = State.ToContentType;
 						ContentType = NewContentType;
@@ -272,9 +284,12 @@ namespace Waher.Networking.HTTP
 			}
 
 			if (!Acceptable)
-				throw new NotAcceptableException();
+			{
+				await Response.SendResponse(new NotAcceptableException());
+				return;
+			}
 
-			await Response.Return(ContentType, Binary);
+			await Response.Return(ContentType, true, Binary);
 		}
 	}
 }

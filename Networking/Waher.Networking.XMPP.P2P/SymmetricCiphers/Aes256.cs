@@ -105,10 +105,9 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 
 			lock (this.aes)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV))
-				{
-					Encrypted = Aes.TransformFinalBlock(Encrypted, 0, Encrypted.Length);
-				}
+				using ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV);
+				
+				Encrypted = Aes.TransformFinalBlock(Encrypted, 0, Encrypted.Length);
 			}
 
 			return Encrypted;
@@ -126,10 +125,9 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 		{
 			lock (this.aes)
 			{
-				using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
-				{
-					Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
-				}
+				using ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV);
+				
+				Data = Aes.TransformFinalBlock(Data, 0, Data.Length);
 			}
 
 			return base.Decrypt(Data, Key, IV, AssociatedData);

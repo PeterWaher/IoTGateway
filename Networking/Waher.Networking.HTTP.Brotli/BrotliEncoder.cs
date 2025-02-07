@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using Waher.Content;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP.Brotli
 {
@@ -57,6 +57,8 @@ namespace Waher.Networking.HTTP.Brotli
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
@@ -65,7 +67,7 @@ namespace Waher.Networking.HTTP.Brotli
 		/// Bit 32: If decoding has completed.
 		/// Bit 33: If transmission to underlying stream failed.
 		/// </returns>
-		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
+		public override Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			return Task.FromResult(0x100000000UL);  // TODO: Support Content-Encoding in POST, PUT and PATCH, etc.
 		}
@@ -73,10 +75,13 @@ namespace Waher.Networking.HTTP.Brotli
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			if (NrBytes > 0)
 			{
@@ -96,7 +101,7 @@ namespace Waher.Networking.HTTP.Brotli
 					if (this.bytesLeft <= 0)
 					{
 						this.finished = true;
-						await this.FlushAsync();
+						await this.FlushAsync(LastData);
 					}
 				}
 				else
@@ -109,7 +114,8 @@ namespace Waher.Networking.HTTP.Brotli
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override async Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override async Task<bool> FlushAsync(bool EndOfData)
 		{
 			if (this.dataWritten)
 			{
@@ -121,21 +127,21 @@ namespace Waher.Networking.HTTP.Brotli
 				if (this.pos < c)
 				{
 					c -= this.pos;
-					if (!await this.uncompressedStream!.EncodeAsync(Data, this.pos, c))
+					if (!await this.uncompressedStream!.EncodeAsync(true, Data, this.pos, c, EndOfData))
 						return false;
 
 					if (!string.IsNullOrEmpty(this.compressedFileName))
 					{
 						if (this.pos == 0)
-							await Resources.WriteAllBytesAsync(this.compressedFileName, Data, this.pos, c);
+							await Files.WriteAllBytesAsync(this.compressedFileName, Data, this.pos, c);
 						else
-							await Resources.AppendAllBytesAsync(this.compressedFileName, Data, this.pos, c);
+							await Files.AppendAllBytesAsync(this.compressedFileName, Data, this.pos, c);
 					}
 
 					this.pos += c;
 				}
 
-				return await this.uncompressedStream!.FlushAsync();
+				return await this.uncompressedStream!.FlushAsync(EndOfData);
 			}
 
 			return true;
@@ -146,7 +152,7 @@ namespace Waher.Networking.HTTP.Brotli
 		/// </summary>
 		public override async Task<bool> ContentSentAsync()
 		{
-			await this.FlushAsync();
+			await this.FlushAsync(true);
 			return await this.uncompressedStream!.ContentSentAsync();
 		}
 

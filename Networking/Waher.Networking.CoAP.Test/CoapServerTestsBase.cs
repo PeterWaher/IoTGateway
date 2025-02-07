@@ -275,31 +275,33 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			try
 			{
-				Cleanup(ref this.client);
+				this.client = await Cleanup(this.client);
 			}
 			finally
 			{
-				Cleanup(ref this.server);
+				this.server = await Cleanup(this.server);
 			}
 		}
 
-		private static void Cleanup(ref CoapEndpoint Client)
+		private static async Task<CoapEndpoint> Cleanup(CoapEndpoint Client)
 		{
 			if (Client is not null)
 			{
 				ulong[] Tokens = Client.GetActiveTokens();
 				ushort[] MessageIDs = Client.GetActiveMessageIDs();
 
-				Client.Dispose();
+				await Client.DisposeAsync();
 				Client = null;
 
 				Assert.AreEqual(0, Tokens.Length, "There are tokens that have not been unregistered properly.");
 				Assert.AreEqual(0, MessageIDs.Length, "There are message IDs that have not been unregistered properly.");
 			}
+
+			return Client;
 		}
 
 		protected async Task<object> Get(string Uri, params CoapOption[] Options)

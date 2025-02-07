@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Waher.Runtime.Inventory
+namespace Waher.Runtime.IO
 {
 	/// <summary>
 	/// Static class that extends the <see cref="Stream"/> class with secured buffer operations.

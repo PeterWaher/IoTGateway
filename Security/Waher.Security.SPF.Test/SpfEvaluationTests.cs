@@ -1,17 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.Net;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.DNS;
-using Waher.Networking.DNS.Communication;
-using Waher.Networking.DNS.Enumerations;
-using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Files;
-using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 
@@ -23,7 +17,7 @@ namespace Waher.Security.SPF.Test
 		private static FilesProvider filesProvider = null;
 
 		[AssemblyInitialize]
-		public static async Task AssemblyInitialize(TestContext Context)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(Database).Assembly,
@@ -36,10 +30,13 @@ namespace Waher.Security.SPF.Test
 		}
 
 		[AssemblyCleanup]
-		public static void AssemblyCleanup()
+		public static async Task AssemblyCleanup()
 		{
-			filesProvider?.Dispose();
-			filesProvider = null;
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 		}
 
 		[TestMethod]
@@ -54,7 +51,7 @@ namespace Waher.Security.SPF.Test
 		[TestMethod]
 		public async Task Test_02_SPF_Evaluation_2()
 		{
-			await this.TestSpfString("v=spf1 include:_spf.google.com ~all",
+			await TestSpfString("v=spf1 include:_spf.google.com ~all",
 				"mobilgirot.com", "testaccount@mobilgirot.com",
 				IPAddress.Parse("209.85.221.49"), "mail-wr1-f49.google.com",
                 "cybercity.online");
@@ -63,13 +60,13 @@ namespace Waher.Security.SPF.Test
 		[TestMethod]
 		public async Task Test_03_SPF_Evaluation_3()
 		{
-			await this.TestSpfString("v=spf1 ptr:yahoo.com ~all",
+			await TestSpfString("v=spf1 ptr:yahoo.com ~all",
 				"att.net", "testaccount@att.net",
 				IPAddress.Parse("74.6.128.85"), "sonic312-23.consmr.mail.bf2.yahoo.com",
                 "cybercity.online");
 		}
 
-		private async Task TestSpfString(string SpfString, string Domain,
+		private static async Task TestSpfString(string SpfString, string Domain,
 			string Sender, IPAddress Address, string CallerHost, string Host)
 		{
 			KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(

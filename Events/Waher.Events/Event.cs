@@ -67,7 +67,7 @@ namespace Waher.Events
 		public Event(EventType Type, string Message, string Object, string Actor, string EventId, EventLevel Level, string Facility, string Module,
 			string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			this.timestamp = DateTime.Now;
+			this.timestamp = DateTime.UtcNow;
 			this.type = Type;
 			this.message = Message;
 			this.obj = Object;
@@ -97,7 +97,7 @@ namespace Waher.Events
 		{
 			string s;
 
-			this.timestamp = DateTime.Now;
+			this.timestamp = DateTime.UtcNow;
 			this.type = Exception is IEventType Tp && Tp.Type.HasValue ? Tp.Type.Value : Type;
 			this.message = Exception.Message;
 			this.obj = Exception is IEventObject Obj && !string.IsNullOrEmpty(s = Obj.Object) ? s : Object;

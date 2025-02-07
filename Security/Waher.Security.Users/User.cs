@@ -16,6 +16,8 @@ namespace Waher.Security.Users
 	[CollectionName("Users")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("UserName")]
+	[Index("LegalId")]
+	[Index("PersonalNumber", "Country")]
 	[ArchivingTime]
 	public class User : IUserWithClaims, IRequestOrigin
 	{
@@ -26,6 +28,9 @@ namespace Waher.Security.Users
 		private string userName = string.Empty;
 		private string passwordHash = string.Empty;
 		private string[] roleIds = null;
+		private string legalId = string.Empty;
+		private string personalNumber = string.Empty;
+		private string country = string.Empty;
 		private Role[] roles = null;
 		private UserMetaData[] metaData = null;
 
@@ -85,6 +90,33 @@ namespace Waher.Security.Users
 		}
 
 		/// <summary>
+		/// Legal ID associated with account.
+		/// </summary>
+		public string LegalId
+		{
+			get => this.legalId;
+			set => this.legalId = value;
+		}
+
+		/// <summary>
+		/// Personal Number associated with account.
+		/// </summary>
+		public string PersonalNumber
+		{
+			get => this.personalNumber;
+			set => this.personalNumber = value;
+		}
+
+		/// <summary>
+		/// Country associated with account.
+		/// </summary>
+		public string Country
+		{
+			get => this.country;
+			set => this.country = value;
+		}
+
+		/// <summary>
 		/// Password Hash
 		/// </summary>
 		public string PasswordHash
@@ -110,7 +142,7 @@ namespace Waher.Security.Users
 			{
 				string[] Ids = this.roleIds;
 				int i, c = Ids?.Length ?? 0;
-				
+
 				Roles = new Role[c];
 				for (i = 0; i < c; i++)
 					Roles[i] = await Security.Users.Roles.GetRole(Ids[i]);

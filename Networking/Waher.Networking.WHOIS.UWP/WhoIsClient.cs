@@ -107,13 +107,13 @@ namespace Waher.Networking.WHOIS
 		/// Disposes of the object. The underlying <see cref="TcpClient"/> is either disposed directly, or when asynchronous
 		/// operations have ceased.
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
-			base.Dispose();
-
 			this.received.Dispose();
 			this.closed.Dispose();
 			this.receivedText.Clear();
+		
+			return base.DisposeAsync();
 		}
 
 		/// <summary>

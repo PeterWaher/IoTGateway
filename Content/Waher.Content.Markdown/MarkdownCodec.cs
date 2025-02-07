@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown
 {
@@ -53,7 +54,9 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[] { ContentType };
+		public string[] ContentTypes => contentTypes;
+
+		private static readonly string[] contentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -98,16 +101,27 @@ namespace Waher.Content.Markdown
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
+			MarkdownSettings Settings = new MarkdownSettings()
+			{
+				Progress = Progress
+			};
+			MarkdownDocument Doc;
 
 			if (BaseUri is null)
-				return await MarkdownDocument.CreateAsync(s);
+				Doc = await MarkdownDocument.CreateAsync(s, Settings);
 			else
-				return await MarkdownDocument.CreateAsync(s, new MarkdownSettings(), string.Empty, string.Empty, BaseUri.ToString());
+			{
+				Doc = await MarkdownDocument.CreateAsync(s, Settings,
+					string.Empty, string.Empty, BaseUri.ToString());
+			}
+
+			return new ContentResponse(ContentType, Doc, Data);
 		}
 
 		/// <summary>
@@ -119,12 +133,13 @@ namespace Waher.Content.Markdown
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is MarkdownContent && InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
+			if (Object is MarkdownContent && InternetContent.IsAccepted(contentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (allowEncoding && Object is MarkdownDocument && InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
+			else if (allowEncoding && Object is MarkdownDocument &&
+				InternetContent.IsAccepted(contentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -141,10 +156,10 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
-		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			string Markdown;
 
@@ -153,7 +168,7 @@ namespace Waher.Content.Markdown
 			else if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
 				Markdown = await MarkdownDocument.GenerateMarkdown(true);
 			else
-				throw new ArgumentException("Object not a markdown document.", nameof(Object));
+				return new ContentResponse(new ArgumentException("Object not a markdown document.", nameof(Object)));
 
 			string ContentType;
 			byte[] Bin;
@@ -169,7 +184,7 @@ namespace Waher.Content.Markdown
 				Bin = Encoding.GetBytes(Markdown);
 			}
 
-			return new KeyValuePair<byte[], string>(Bin, ContentType);
+			return new ContentResponse(ContentType, Object, Bin);
 		}
 
 		/// <summary>

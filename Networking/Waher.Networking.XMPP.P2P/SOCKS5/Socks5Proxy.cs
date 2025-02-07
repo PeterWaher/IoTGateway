@@ -336,7 +336,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 					case Socks5State.Error:
 					case Socks5State.Offline:
-						this.stream?.Dispose();
+						if (!(this.stream is null))
+							await this.stream.DisposeAsync();
+
 						await this.proxy.Callback(this.callback, this.state, false, null, this.streamId);
 						this.callback = null;
 						break;
@@ -400,7 +402,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				await this.Callback(Rec.callback, Rec.state, true, Rec.stream, Rec.streamId);
 			else
 			{
-				Rec.stream.Dispose();
+				await Rec.stream.DisposeAsync();
 				await this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
 			}
 
@@ -520,7 +522,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					if (Client.State == Socks5State.Error)
 						await State.eventargs.IqError(new BadRequestException("Unable to establish a SOCKS5 connection.", State.eventargs.IQ));
 
-					Client.Dispose();
+					await Client.DisposeAsync();
 
 					lock (this.streams)
 					{

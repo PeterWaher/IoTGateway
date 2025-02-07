@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Content.Text;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 
 namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 {
@@ -58,12 +59,15 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					if (i != await Request.DataStream.ReadAsync(Buf, 0, BufSize))
 						throw new IOException("Unexpected end of file.");
 
-					await Response.Write(Buf, 0, i);
+					await Response.Write(false, Buf, 0, i);
 					c -= i;
 				}
 
 				await Response.SendResponse();
 			});
+
+			this.endpoints1 = this.GenerateEndpoints(new Aes256());
+			this.endpoints2 = this.GenerateEndpoints(new Aes256());
 
 			await this.ConnectClients();
 		}
@@ -149,17 +153,17 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					if (e.Last)
 					{
-						object Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
+						ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
 
-						if (Decoded is string s && s == "World" && e.State.Equals(Nr))
+						if (!Decoded.HasError && Decoded.Decoded is string s && s == "World" && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();
 					}
 				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 5000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 5000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 5000), "Data not returned.");
 		}
 
 		[TestMethod]
@@ -221,17 +225,17 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					if (e.Last)
 					{
-						object Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
+						ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
 
-						if (Decoded is string s && s == Message && e.State.Equals(Nr))
+						if (!Decoded.HasError && Decoded.Decoded is string s && s == Message && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();
 					}
 				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 120000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 120000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 120000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 120000), "Data not returned.");
 		}
 
 		[TestMethod]

@@ -4,7 +4,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking;
 using Waher.Networking.WHOIS;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -137,7 +136,7 @@ namespace Waher.Security.LoginMonitor
 					EP.WhoIs = await WhoIsClient.Query(Address);
 
 				await EP.Annotate();
-				await Database.UpdateLazy(EP);
+				await Database.Update(EP);
 			}
 
 			return EP;
@@ -200,9 +199,9 @@ namespace Waher.Security.LoginMonitor
 			}
 
 			if (Created)
-				await Database.InsertLazy(EP);
+				await Database.Insert(EP);
 			else if (Updated)
-				await Database.UpdateLazy(EP);
+				await Database.Update(EP);
 
 			return EP;
 		}
@@ -224,7 +223,7 @@ namespace Waher.Security.LoginMonitor
 			EP.LastProtocol = Protocol;
 			EP.Reset(false);
 
-			await Database.UpdateLazy(EP);
+			await Database.Update(EP);
 		}
 
 		/// <summary>
@@ -281,7 +280,7 @@ namespace Waher.Security.LoginMonitor
 				}
 			}
 
-			await Database.UpdateLazy(EP);
+			await Database.Update(EP);
 
 			return EP.Blocked;
 		}
@@ -355,7 +354,7 @@ namespace Waher.Security.LoginMonitor
 
 				Log.Alert(sb.ToString(), EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major, Tags);
 
-				await Database.UpdateLazy(EP);
+				await Database.Update(EP);
 			}
 		}
 
@@ -438,7 +437,12 @@ namespace Waher.Security.LoginMonitor
 
 			EP.Reset(true);
 
-			await Database.UpdateLazy(EP);
+			await Database.Update(EP);
+
+			lock (tlsHackEndpoints)
+			{
+				tlsHackEndpoints.Remove(RemoteEndpoint);
+			}
 		}
 
 		/// <summary>

@@ -24,12 +24,23 @@ namespace Waher.Networking.XMPP
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting
 		/// unmanaged resources.
 		/// </summary>
-		public abstract void Dispose();
+		[Obsolete("Use DisposeAsync() instead")]
+		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting
+		/// unmanaged resources.
+		/// </summary>
+		public abstract Task DisposeAsync();
 
 		/// <summary>
 		/// Sends a text packet.
 		/// </summary>
 		/// <param name="Packet">Text packet.</param>
+		/// <returns>If data was sent.</returns>
 		public abstract Task<bool> SendAsync(string Packet);
 
 		/// <summary>
@@ -38,6 +49,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Packet">Text packet.</param>
 		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
 		public abstract Task<bool> SendAsync(string Packet, EventHandlerAsync<DeliveryEventArgs> DeliveryCallback, object State);
 
 		/// <summary>

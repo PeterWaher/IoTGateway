@@ -8,15 +8,15 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Publishes nodes that permit you to define sensors and actuators using script.</Description>
-    <Copyright>Copyright © Waher Data AB 2023-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2023-2025. All rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Things/Waher.Things.Script</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Script</PackageTags>
-    <AssemblyVersion>2.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
-		<Version>2.0.0</Version>
+    <AssemblyVersion>2.1.0</AssemblyVersion>
+    <FileVersion>2.1.0</FileVersion>
+		<Version>2.1.0</Version>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>

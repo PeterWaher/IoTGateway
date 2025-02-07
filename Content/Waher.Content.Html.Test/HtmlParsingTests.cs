@@ -30,12 +30,18 @@ namespace Waher.Content.Html.Test
 
 			HttpResponseMessage Response = await Client.GetAsync(Url);
 			if (!Response.IsSuccessStatusCode)
-				await Getters.WebGetter.ProcessResponse(Response, new Uri(Url));
+			{
+				ContentResponse Temp = await Getters.WebGetter.ProcessResponse(Response, new Uri(Url));
+				Temp.AssertOk();
+			}
 
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType.ToString();
 
-			HtmlDocument Doc = await InternetContent.DecodeAsync(ContentType, Data, new Uri(Url)) as HtmlDocument;
+			ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Data, new Uri(Url));
+			Content.AssertOk();
+
+			HtmlDocument Doc = Content.Decoded as HtmlDocument;
 			Assert.IsNotNull(Doc);
 
 			Assert.IsNotNull(Doc.Root);
@@ -44,10 +50,10 @@ namespace Waher.Content.Html.Test
 			Assert.IsNotNull(Doc.Body);
 			Assert.IsNotNull(Doc.Title);
 
-			List<HtmlNode> Todo = new()
-			{
+			List<HtmlNode> Todo =
+			[
 				Doc.Root
-			};
+			];
 
 			string s;
 			HtmlNode N;

@@ -23,6 +23,7 @@ namespace Waher.Content.Markdown
 		private Variables variables;
 		private AuthorizeExpression authorizeExpression;
 		private IResourceMap resourceMap = null;
+		private ICodecProgress progress;
 		private bool parseMetaData;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
@@ -222,6 +223,15 @@ namespace Waher.Content.Markdown
 		{
 			get => this.resourceMap;
 			set => this.resourceMap = value;
+		}
+
+		/// <summary>
+		/// Optional progress reporting of encoding/decoding. Can be null.
+		/// </summary>
+		public ICodecProgress Progress
+		{
+			get => this.progress;
+			set => this.progress = value;
 		}
 
 		/// <summary>

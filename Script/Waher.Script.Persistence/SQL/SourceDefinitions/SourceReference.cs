@@ -90,8 +90,18 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				Obj = E.AssociatedObjectValue;
 			}
 
-			if (Obj is Type T)
-				return new TypeSource(T, Alias);
+			if (Obj is IDataSource DataSource)
+				return DataSource;
+			else if(Obj is Type T)
+			{
+				if (!typeof(IDataSource).IsAssignableFrom(T))
+					return new TypeSource(T, Alias);
+
+				ConstructorInfo CI = Types.GetDefaultConstructor(T)
+					?? throw new ScriptRuntimeException("Type lacks default constructor: " + T.FullName, Source);
+
+				return (IDataSource)CI.Invoke(Types.NoParameters);
+			}
 			else if (Obj is string s)
 				return new CollectionSource(s, Alias);
 			else if (E is ObjectMatrix OM && OM.HasColumnNames)
@@ -102,8 +112,6 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				return new XmlSource(Name, Alias, Doc, Source);
 			else if (Obj is XmlNode N)
 				return new XmlSource(Name, Alias, N, Source);
-			else if (Obj is IDataSource DataSource)
-				return DataSource;
 
 			throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);
 		}

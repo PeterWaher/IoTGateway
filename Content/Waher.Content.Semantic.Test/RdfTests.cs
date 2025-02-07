@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Semantic.Test
 {
@@ -314,10 +315,11 @@ namespace Waher.Content.Semantic.Test
 
 		private static async Task Print(RdfDocument Parsed)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
-			Assert.AreEqual("application/rdf+xml; charset=utf-8", P.Value);
+			ContentResponse P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
+			P.AssertOk();
+			Assert.AreEqual("application/rdf+xml; charset=utf-8", P.ContentType);
 
-			byte[] Data = P.Key;
+			byte[] Data = P.Encoded;
 			string s = Encoding.UTF8.GetString(Data);
 
 			Console.Out.WriteLine(s);
@@ -332,8 +334,10 @@ namespace Waher.Content.Semantic.Test
 			BaseUri ??= new Uri("http://www.w3.org/2000/10/rdf-tests/rdfcore/" + FileName);
 
 			byte[] Data = Resources.LoadResource(typeof(RdfTests).Namespace + ".Data.Rdf." + GetResourceName(FileName));
-			object Decoded = await InternetContent.DecodeAsync("application/rdf+xml", Data, BaseUri);
-			if (Decoded is not RdfDocument Parsed)
+			ContentResponse Decoded = await InternetContent.DecodeAsync("application/rdf+xml", Data, BaseUri);
+			Decoded.AssertOk();
+
+			if (Decoded.Decoded is not RdfDocument Parsed)
 				throw new Exception("Unable to decode RDF document.");
 
 			return Parsed;
@@ -354,8 +358,10 @@ namespace Waher.Content.Semantic.Test
 			BaseUri ??= new Uri("http://www.w3.org/2000/10/rdf-tests/rdfcore/" + FileName);
 
 			byte[] Data = Resources.LoadResource(typeof(TurtleTests).Namespace + ".Data.Rdf." + GetResourceName(FileName));
-			object Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
-			if (Decoded is not TurtleDocument Parsed)
+			ContentResponse Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
+			Decoded.AssertOk();
+
+			if (Decoded.Decoded is not TurtleDocument Parsed)
 				throw new Exception("Unable to decode Turtle document.");
 
 			return Parsed;

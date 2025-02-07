@@ -4,6 +4,7 @@
 	<Folder name="Root">
 		<Content fileName="Copyright.md"/>
 		<Content fileName="Events.js"/>
+		<Content fileName="Login.js"/>
 		<Content fileName="Login.md"/>
 		<Content fileName="ProposeContract.js"/>
 		<Content fileName="ProposeContract.md"/>

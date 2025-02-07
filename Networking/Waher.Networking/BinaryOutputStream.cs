@@ -40,47 +40,55 @@ namespace Waher.Networking
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Packet)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, null, null);
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, null, null);
 		}
 
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Packet">Binary packet.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, Callback, State);
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, Callback, State);
 		}
 
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte written.</param>
 		/// <param name="Count">Number of bytes written.</param>
 		/// <returns>If data was sent.</returns>
-		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count)
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
-			return this.SendAsync(Buffer, Offset, Count, null, null);
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, null, null);
 		}
 
 		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			await this.output.WriteAsync(Buffer, Offset, Count);
 

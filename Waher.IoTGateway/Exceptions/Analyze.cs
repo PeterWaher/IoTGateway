@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using Waher.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.Exceptions
 {

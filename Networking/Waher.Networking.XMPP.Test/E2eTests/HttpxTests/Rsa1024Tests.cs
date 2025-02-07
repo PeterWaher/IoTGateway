@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP.P2P.E2E;
 
@@ -14,16 +15,18 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
-		public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
+		public override int SecurityStrength => 80;
+
+		public override IE2eEndpoint[] GenerateEndpoints(IE2eSymmetricCipher Cipher)
         {
-            RSA RSA = RSACryptoServiceProvider.Create();
+            RSA RSA = RSA.Create();
             RSA.KeySize = 1024;
-            return new RsaEndpoint(RSA, Cipher);
+            return [new RsaEndpoint(RSA, Cipher)];
         }
 
     }

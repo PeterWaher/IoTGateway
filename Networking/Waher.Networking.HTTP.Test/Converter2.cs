@@ -16,7 +16,7 @@ namespace Waher.Networking.HTTP.Test
 		public string[] ToContentTypes => new string[] { "text/x-test2" };
 		public Grade ConversionGrade => Grade.Ok;
 
-		public async Task<bool> ConvertAsync(ConversionState State)
+		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
 		{
 			byte[] Data = new byte[State.From.Length];
 			await State.From.ReadAsync(Data, 0, (int)State.From.Length);

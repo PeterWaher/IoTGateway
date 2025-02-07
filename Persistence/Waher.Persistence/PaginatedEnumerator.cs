@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Persistence
 {
@@ -9,7 +10,7 @@ namespace Waher.Persistence
 	/// Paginated object enumerator.
 	/// </summary>
 	/// <typeparam name="T">Type of object being enumerated.</typeparam>
-	public class PaginatedEnumerator<T> : IAsyncEnumerator<T>
+	public class PaginatedEnumerator<T> : IAsyncEnumerator<T>, IDisposableAsync
 		where T : class
 	{
 		private readonly IPage<T> firstPage;
@@ -53,12 +54,26 @@ namespace Waher.Persistence
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync() instead.")]
 		public void Dispose()
 		{
-			if (this.currentPage is IDisposable Disposable)
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
+		{
+			if (this.currentPage is IDisposableAsync DisposableAsync)
+				await DisposableAsync.DisposeAsync();
+			else if (this.currentPage is IDisposable Disposable)
 				Disposable.Dispose();
 
-			this.currentPageEnumerator.Dispose();
+			if (this.currentPageEnumerator is IDisposableAsync DisposableAsync2)
+				await DisposableAsync2.DisposeAsync();
+			else
+				this.currentPageEnumerator.Dispose();
 		}
 
 		/// <summary>

@@ -96,11 +96,15 @@ namespace Waher.IoTGateway
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (string.IsNullOrEmpty(Request.SubPath))
-				throw new BadRequestException("Sub-path missing.");
+			{
+				await Response.SendResponse(new BadRequestException("Sub-path missing."));
+				return;
+			}
 
-			string Id = Request.SubPath.Substring(1);
+			string Id = Request.SubPath[1..];
 			string ContentType;
 			byte[] Content;
+			bool ConstantBuffer;
 			bool More;
 
 			lock (requestsByContentID)
@@ -114,12 +118,14 @@ namespace Waher.IoTGateway
 					}
 
 					More = Queue.More;
+					ConstantBuffer = Queue.ConstantBuffer;
 					Content = Queue.Content;
 					ContentType = Queue.ContentType;
 
 					if (More)
 					{
 						Queue.More = false;
+						Queue.ConstantBuffer = false;
 						Queue.Content = null;
 						Queue.ContentType = null;
 					}
@@ -141,7 +147,7 @@ namespace Waher.IoTGateway
 
 			Response.SetHeader("X-More", More ? "1" : "0");
 			Response.ContentType = ContentType;
-			await Response.Write(Content, 0, Content.Length);
+			await Response.Write(ConstantBuffer, Content, 0, Content.Length);
 			await Response.SendResponse();
 		}
 
@@ -154,17 +160,26 @@ namespace Waher.IoTGateway
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session is null)
-				throw new BadRequestException("POST request missing data.");
+			{
+				await Response.SendResponse(new BadRequestException("POST request missing data."));
+				return;
+			}
 
 			// TODO: Check User authenticated
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is string Location))
-				throw new BadRequestException("Expected location.");
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string Location))
+			{
+				await Response.SendResponse(new BadRequestException("Expected location."));
+				return;
+			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException("Expected X-TabID header.");
+			{
+				await Response.SendResponse(new BadRequestException("Expected X-TabID header."));
+				return;
+			}
 
 			TabQueue Queue = Register(Request, Response, null, Location, TabID);
 			StringBuilder Json = null;
@@ -174,7 +189,10 @@ namespace Waher.IoTGateway
 			Response.ContentType = JsonCodec.DefaultContentType;
 
 			if (!await Queue.SyncObj.TryBeginWrite(10000))
-				throw new InternalServerErrorException("Unable to get access to queue.");
+			{
+				await Response.SendResponse(new InternalServerErrorException("Unable to get access to queue."));
+				return;
+			}
 
 			try
 			{
@@ -226,7 +244,7 @@ namespace Waher.IoTGateway
 			{
 				s = Uri.Query;
 				if (s.StartsWith("?"))
-					s = s.Substring(1);
+					s = s[1..];
 
 				string[] Parts = s.Split('&');
 				Query = new (string, string, string)[Parts.Length];
@@ -239,8 +257,8 @@ namespace Waher.IoTGateway
 						Query[j++] = (Part, string.Empty, string.Empty);
 					else
 					{
-						string s2 = Part.Substring(i + 1);
-						Query[j++] = (Part.Substring(0, i), s2, System.Net.WebUtility.UrlDecode(s2));
+						string s2 = Part[(i + 1)..];
+						Query[j++] = (Part[..i], s2, System.Net.WebUtility.UrlDecode(s2));
 					}
 				}
 			}
@@ -635,10 +653,13 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Id">Content ID</param>
 		/// <param name="ContentType">Content-Type of result.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Result">Binary encoding of result.</param>
-		public static Task ReportAsynchronousResult(string Id, string ContentType, byte[] Result)
+		public static Task ReportAsynchronousResult(string Id, string ContentType,
+			bool ConstantBuffer, byte[] Result)
 		{
-			return ReportAsynchronousResult(Id, ContentType, Result, false);
+			return ReportAsynchronousResult(Id, ContentType, ConstantBuffer, Result, false);
 		}
 
 		/// <summary>
@@ -646,9 +667,12 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Id">Content ID</param>
 		/// <param name="ContentType">Content-Type of result.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Result">Binary encoding of result.</param>
 		/// <param name="More">If more responses for this ID is expected.</param>
-		public static async Task ReportAsynchronousResult(string Id, string ContentType, byte[] Result, bool More)
+		public static async Task ReportAsynchronousResult(string Id, string ContentType, 
+			bool ConstantBuffer, byte[] Result, bool More)
 		{
 			try
 			{
@@ -661,6 +685,7 @@ namespace Waher.IoTGateway
 						if (Queue.Response is null)
 						{
 							Queue.ContentType = ContentType;
+							Queue.ConstantBuffer = ConstantBuffer;
 							Queue.Content = Result;
 							Queue.More = More;
 							return;
@@ -678,6 +703,7 @@ namespace Waher.IoTGateway
 						Queue = new ContentQueue(Id)
 						{
 							ContentType = ContentType,
+							ConstantBuffer = ConstantBuffer,
 							Content = Result,
 							More = More
 						};
@@ -689,7 +715,7 @@ namespace Waher.IoTGateway
 
 				Response.SetHeader("X-More", More ? "1" : "0");
 				Response.ContentType = ContentType;
-				await Response.Write(Result, 0, Result.Length);
+				await Response.Write(ConstantBuffer, Result, 0, Result.Length);
 				await Response.SendResponse();
 			}
 			catch (Exception)
@@ -1304,6 +1330,7 @@ namespace Waher.IoTGateway
 			public string ContentID;
 			public string ContentType;
 			public HttpResponse Response = null;
+			public bool ConstantBuffer;
 			public byte[] Content = null;
 			public bool More = false;
 
@@ -1393,8 +1420,7 @@ namespace Waher.IoTGateway
 
 				string s = Json.ToString();
 
-				if (TabIDs is null)
-					TabIDs = eventsByTabID.GetKeys();
+				TabIDs ??= eventsByTabID.GetKeys();
 
 				foreach (string TabID in TabIDs)
 				{

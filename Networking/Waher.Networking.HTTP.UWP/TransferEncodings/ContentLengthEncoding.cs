@@ -10,8 +10,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	public class ContentLengthEncoding : TransferEncoding
 	{
 		private readonly Encoding textEncoding;
-		private readonly bool txText;
 		private long bytesLeft;
+		private bool txText;
 
 		/// <summary>
 		/// Encodes content using a content length.
@@ -33,6 +33,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
@@ -41,10 +43,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// Bit 32: If decoding has completed.
 		/// Bit 33: If transmission to underlying stream failed.
 		/// </returns>
-		public override async Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
+		public override async Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			ulong NrAccepted;
-			if (this.output is null || !await this.output.SendAsync(Data, Offset, NrRead))
+
+			if (this.output is null || !await this.output.SendAsync(ConstantBuffer, Data, Offset, NrRead))
 				this.transferError = true;
 
 			if (NrRead >= this.bytesLeft)
@@ -67,10 +70,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			if (!(this.clientConnection is null))
 			{
@@ -78,23 +84,12 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				if (this.clientConnection.HasSniffers)
 				{
-					if (Offset == 0 && c == Data.Length)
-					{
-						if (this.txText)
-							await this.clientConnection.TransmitText(this.textEncoding.GetString(Data));
-						else
-							await this.clientConnection.TransmitBinary(Data);
-					}
+					if (this.txText && c < 1000)
+						this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
 					else
 					{
-						if (this.txText)
-							await this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
-						else
-						{
-							byte[] Data2 = new byte[c];
-							Array.Copy(Data, Offset, Data2, 0, c);
-							await this.clientConnection.TransmitBinary(Data2);
-						}
+						this.clientConnection.TransmitBinary(ConstantBuffer, Data, Offset, c);
+						this.txText = false;
 					}
 				}
 
@@ -103,7 +98,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 			if (this.bytesLeft <= NrBytes)
 			{
-				if (this.output is null || !await this.output.SendAsync(Data, Offset, (int)this.bytesLeft))
+				if (this.output is null || !await this.output.SendAsync(ConstantBuffer, Data, Offset, (int)this.bytesLeft))
 					return false;
 
 				NrBytes -= (int)this.bytesLeft;
@@ -114,7 +109,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 			else
 			{
-				if (this.output is null || !await this.output.SendAsync(Data, Offset, NrBytes))
+				if (this.output is null || !await this.output.SendAsync(ConstantBuffer, Data, Offset, NrBytes))
 					return false;
 
 				this.bytesLeft -= NrBytes;
@@ -126,7 +121,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override Task<bool> FlushAsync(bool EndOfData)
 		{
 			return this.output?.FlushAsync() ?? Task.FromResult(false);
 		}

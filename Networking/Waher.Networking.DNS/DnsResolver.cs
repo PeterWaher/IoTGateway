@@ -391,7 +391,7 @@ namespace Waher.Networking.DNS
 
 					if (!(Response is null) && (Response.Expires <= DateTime.Now || Response.Raw is null))
 					{
-						await Database.DeleteLazy(Response);
+						await Database.Delete(Response);
 						Response = null;
 					}
 				}
@@ -485,7 +485,7 @@ namespace Waher.Networking.DNS
 					Thread?.NewState("Store");
 					try
 					{
-						await Database.InsertLazy(Response);
+						await Database.Insert(Response);
 					}
 					catch (Exception ex)
 					{

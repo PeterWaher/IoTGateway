@@ -70,7 +70,7 @@ namespace Waher.Content.Html
 					{
 						foreach (HtmlAttribute Attr in Meta.Attributes)
 						{
-							switch (Attr.Name)
+							switch (Attr.FullName)
 							{
 								case "property":
 								case "name":

@@ -30,9 +30,9 @@ namespace Waher.Service.PcSensor
 	/// </summary>
 	public class Program
 	{
-		private static XmppCredentials credentials;
-		private static ThingRegistryClient thingRegistryClient = null;
-		private static string ownerJid = null;
+		private static XmppCredentials? credentials;
+		private static ThingRegistryClient? thingRegistryClient = null;
+		private static string? ownerJid = null;
 		private static bool registered = false;
 
 		public static void Main(string[] _)
@@ -61,225 +61,202 @@ namespace Waher.Service.PcSensor
 					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
 					typeof(Program).Assembly);
 
-				using (XmppClient Client = new XmppClient(credentials, "en", typeof(Program).Assembly))
+				using XmppClient Client = new(credentials, "en", typeof(Program).Assembly);
+				
+				if (credentials.Sniffer)
+					Client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces));
+
+				if (!string.IsNullOrEmpty(credentials.Events))
+					Log.Register(new XmppEventSink("XMPP Event Sink", Client, credentials.Events, false));
+
+				if (!string.IsNullOrEmpty(credentials.ThingRegistry))
 				{
-					if (credentials.Sniffer)
-						Client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces));
+					thingRegistryClient = new ThingRegistryClient(Client, credentials.ThingRegistry);
 
-					if (!string.IsNullOrEmpty(credentials.Events))
-						Log.Register(new XmppEventSink("XMPP Event Sink", Client, credentials.Events, false));
-
-					if (!string.IsNullOrEmpty(credentials.ThingRegistry))
+					thingRegistryClient.Claimed += (Sender, e) =>
 					{
-						thingRegistryClient = new ThingRegistryClient(Client, credentials.ThingRegistry);
+						ownerJid = e.JID;
+						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+						return Task.CompletedTask;
+					};
 
-						thingRegistryClient.Claimed += (Sender, e) =>
-						{
-							ownerJid = e.JID;
-							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
-							return Task.CompletedTask;
-						};
-
-						thingRegistryClient.Disowned += (Sender, e) =>
-						{
-							Log.Informational("Thing has been disowned.", ownerJid);
-							ownerJid = string.Empty;
-							Register();
-							return Task.CompletedTask;
-						};
-
-						thingRegistryClient.Removed += (Sender, e) =>
-						{
-							Log.Informational("Thing has been removed from the public registry.", ownerJid);
-							return Task.CompletedTask;
-						};
-					}
-
-					ProvisioningClient ProvisioningClient = null;
-					if (!string.IsNullOrEmpty(credentials.Provisioning))
-						ProvisioningClient = new ProvisioningClient(Client, credentials.Provisioning);
-
-					Timer ConnectionTimer = new Timer((P) =>
+					thingRegistryClient.Disowned += async (Sender, e) =>
 					{
-						if (Client.State == XmppState.Offline || Client.State == XmppState.Error || Client.State == XmppState.Authenticating)
+						Log.Informational("Thing has been disowned.", ownerJid);
+						ownerJid = string.Empty;
+						await Register();
+					};
+
+					thingRegistryClient.Removed += (Sender, e) =>
+					{
+						Log.Informational("Thing has been removed from the public registry.", ownerJid);
+						return Task.CompletedTask;
+					};
+				}
+
+				ProvisioningClient? ProvisioningClient = null;
+				if (!string.IsNullOrEmpty(credentials.Provisioning))
+					ProvisioningClient = new ProvisioningClient(Client, credentials.Provisioning);
+
+				Timer ConnectionTimer = new(async (P) =>
+				{
+					if (Client.State == XmppState.Offline || Client.State == XmppState.Error || Client.State == XmppState.Authenticating)
+					{
+						try
 						{
-							try
-							{
-								Client.Reconnect();
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
+							await Client.Reconnect();
 						}
-					}, null, 60000, 60000);
-
-					bool Connected = false;
-					bool ImmediateReconnect;
-
-					Client.OnStateChanged += (sender, NewState) =>
-					{
-						switch (NewState)
+						catch (Exception ex)
 						{
-							case XmppState.Connected:
-								Connected = true;
-
-								if (!registered && !(thingRegistryClient is null))
-									Register();
-								break;
-
-							case XmppState.Offline:
-								ImmediateReconnect = Connected;
-								Connected = false;
-
-								if (ImmediateReconnect)
-									Client.Reconnect();
-								break;
-						}
-
-						return Task.CompletedTask;
-					};
-
-					Client.OnPresenceSubscribe += (Sender, e) =>
-					{
-						e.Accept();     // TODO: Provisioning
-
-						RosterItem Item = Client.GetRosterItem(e.FromBareJID);
-						if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-							Client.RequestPresenceSubscription(e.FromBareJID);
-
-						Client.SetPresence(Availability.Chat);
-
-						return Task.CompletedTask;
-					};
-
-					Client.OnPresenceUnsubscribe += (Sender, e) =>
-					{
-						e.Accept();
-						return Task.CompletedTask;
-					};
-
-					Client.OnRosterItemUpdated += (Sender, e) =>
-					{
-						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
-							Client.RemoveRosterItem(e.BareJid);
-
-						return Task.CompletedTask;
-					};
-
-					SortedDictionary<string, string[]> CategoryIncluded = new SortedDictionary<string, string[]>();
-
-					List<string> Instances = new List<string>();
-					XmlDocument Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.Load("categories.xml");
-
-					XSL.Validate("categories.xml", Doc, "Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd",
-						XSL.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));
-
-					foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
-					{
-						if (N.LocalName == "Category")
-						{
-							XmlElement E = (XmlElement)N;
-							string Name = XML.Attribute(E, "name");
-							bool Include = XML.Attribute(E, "include", false);
-
-							if (Include)
-							{
-								Instances.Clear();
-
-								foreach (XmlNode N2 in N.ChildNodes)
-								{
-									if (N2.LocalName == "Instance")
-									{
-										E = (XmlElement)N2;
-										Instances.Add(XML.Attribute(E, "name"));
-									}
-								}
-
-								CategoryIncluded[Name] = Instances.ToArray();
-							}
-							else
-								CategoryIncluded[Name] = null;
+							Log.Exception(ex);
 						}
 					}
+				}, null, 60000, 60000);
 
-					SensorServer SensorServer = new SensorServer(Client, ProvisioningClient, false);
-					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
+				bool Connected = false;
+				bool ImmediateReconnect;
+
+				Client.OnStateChanged += async (sender, NewState) =>
+				{
+					switch (NewState)
 					{
-						Log.Informational("Readout requested", string.Empty, Request.Actor);
+						case XmppState.Connected:
+							Connected = true;
 
-						List<Field> Fields = new List<Field>();
-						DateTime Now = DateTime.Now;
+							if (!registered && thingRegistryClient is not null)
+								await Register();
+							break;
 
-						Fields.Add(new StringField(ThingReference.Empty, Now, "Machine Name", Environment.MachineName, FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new StringField(ThingReference.Empty, Now, "OS Platform", Environment.OSVersion.Platform.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new StringField(ThingReference.Empty, Now, "OS Service Pack", Environment.OSVersion.ServicePack, FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new StringField(ThingReference.Empty, Now, "OS Version", Environment.OSVersion.VersionString, FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new Int32Field(ThingReference.Empty, Now, "Processor Count", Environment.ProcessorCount, FieldType.Status, FieldQoS.AutomaticReadout));
+						case XmppState.Offline:
+							ImmediateReconnect = Connected;
+							Connected = false;
 
-						string[] InstanceNames;
-						string FieldName;
-						string Unit;
-						double Value;
-						byte NrDec;
-						bool Updated = false;
+							if (ImmediateReconnect)
+								await Client.Reconnect();
+							break;
+					}
+				};
 
-						foreach (PerformanceCounterCategory Category in PerformanceCounterCategory.GetCategories())
+				Client.OnPresenceSubscribe += async (Sender, e) =>
+				{
+					await e.Accept();     // TODO: Provisioning
+
+					RosterItem Item = Client.GetRosterItem(e.FromBareJID);
+					if (Item is null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						await Client.RequestPresenceSubscription(e.FromBareJID);
+
+					await Client.SetPresence(Availability.Chat);
+				};
+
+				Client.OnPresenceUnsubscribe += async (Sender, e) =>
+				{
+					await e.Accept();
+				};
+
+				Client.OnRosterItemUpdated += (Sender, e) =>
+				{
+					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
+						Client.RemoveRosterItem(e.BareJid);
+
+					return Task.CompletedTask;
+				};
+
+				SortedDictionary<string, string[]?> CategoryIncluded = [];
+
+				List<string> Instances = [];
+				XmlDocument Doc = new()
+				{
+					PreserveWhitespace = true
+				};
+				Doc.Load("categories.xml");
+
+				XSL.Validate("categories.xml", Doc, "Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd",
+					XSL.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));
+
+				foreach (XmlNode N in Doc.DocumentElement!.ChildNodes)
+				{
+					if (N.LocalName == "Category")
+					{
+						XmlElement E = (XmlElement)N;
+						string Name = XML.Attribute(E, "name");
+						bool Include = XML.Attribute(E, "include", false);
+
+						if (Include)
 						{
-							FieldName = Category.CategoryName;
-							lock (CategoryIncluded)
+							Instances.Clear();
+
+							foreach (XmlNode N2 in N.ChildNodes)
 							{
-								if (CategoryIncluded.TryGetValue(FieldName, out InstanceNames))
+								if (N2.LocalName == "Instance")
 								{
-									if (InstanceNames is null)
-										continue;
+									E = (XmlElement)N2;
+									Instances.Add(XML.Attribute(E, "name"));
 								}
-								else
-								{
-									CategoryIncluded[FieldName] = null;
-									Updated = true;
+							}
+
+							CategoryIncluded[Name] = [.. Instances];
+						}
+						else
+							CategoryIncluded[Name] = null;
+					}
+				}
+
+				SensorServer SensorServer = new(Client, ProvisioningClient, false);
+				SensorServer.OnExecuteReadoutRequest += async (Sender, Request) =>
+				{
+					Log.Informational("Readout requested", string.Empty, Request.Actor);
+
+					List<Field> Fields = [];
+					DateTime Now = DateTime.Now;
+
+					Fields.Add(new StringField(ThingReference.Empty, Now, "Machine Name", Environment.MachineName, FieldType.Identity, FieldQoS.AutomaticReadout));
+					Fields.Add(new StringField(ThingReference.Empty, Now, "OS Platform", Environment.OSVersion.Platform.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout));
+					Fields.Add(new StringField(ThingReference.Empty, Now, "OS Service Pack", Environment.OSVersion.ServicePack, FieldType.Identity, FieldQoS.AutomaticReadout));
+					Fields.Add(new StringField(ThingReference.Empty, Now, "OS Version", Environment.OSVersion.VersionString, FieldType.Identity, FieldQoS.AutomaticReadout));
+					Fields.Add(new Int32Field(ThingReference.Empty, Now, "Processor Count", Environment.ProcessorCount, FieldType.Status, FieldQoS.AutomaticReadout));
+
+					string[] InstanceNames;
+					string FieldName;
+					string Unit;
+					double Value;
+					byte NrDec;
+					bool Updated = false;
+
+					foreach (PerformanceCounterCategory Category in PerformanceCounterCategory.GetCategories())
+					{
+						FieldName = Category.CategoryName;
+
+						lock (CategoryIncluded)
+						{
+							if (CategoryIncluded.TryGetValue(FieldName, out InstanceNames))
+							{
+								if (InstanceNames is null)
 									continue;
-								}
-							}
-
-							if (Category.CategoryType == PerformanceCounterCategoryType.MultiInstance)
-							{
-								foreach (string InstanceName in Category.GetInstanceNames())
-								{
-									if (InstanceNames.Length > 0 && Array.IndexOf<string>(InstanceNames, InstanceName) < 0)
-										continue;
-
-									foreach (PerformanceCounter Counter in Category.GetCounters(InstanceName))
-									{
-										FieldName = Category.CategoryName + ", " + InstanceName + ", " + Counter.CounterName;
-										Value = Counter.NextValue();
-										GetUnitPrecision(ref FieldName, Value, out NrDec, out Unit);
-
-										if (Fields.Count >= 100)
-										{
-											Request.ReportFields(false, Fields);
-											Fields.Clear();
-										}
-
-										Fields.Add(new QuantityField(ThingReference.Empty, Now, FieldName, Value, NrDec, Unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
-									}
-								}
 							}
 							else
 							{
-								foreach (PerformanceCounter Counter in Category.GetCounters())
+								CategoryIncluded[FieldName] = null;
+								Updated = true;
+								continue;
+							}
+						}
+
+						if (Category.CategoryType == PerformanceCounterCategoryType.MultiInstance)
+						{
+							foreach (string InstanceName in Category.GetInstanceNames())
+							{
+								if (InstanceNames.Length > 0 && Array.IndexOf<string>(InstanceNames, InstanceName) < 0)
+									continue;
+
+								foreach (PerformanceCounter Counter in Category.GetCounters(InstanceName))
 								{
-									FieldName = Category.CategoryName + ", " + Counter.CounterName;
+									FieldName = Category.CategoryName + ", " + InstanceName + ", " + Counter.CounterName;
 									Value = Counter.NextValue();
 									GetUnitPrecision(ref FieldName, Value, out NrDec, out Unit);
 
 									if (Fields.Count >= 100)
 									{
-										Request.ReportFields(false, Fields);
+										await Request.ReportFields(false, Fields);
 										Fields.Clear();
 									}
 
@@ -287,56 +264,68 @@ namespace Waher.Service.PcSensor
 								}
 							}
 						}
-
-						Request.ReportFields(true, Fields);
-
-						if (Updated)
+						else
 						{
-							using (StreamWriter s = File.CreateText("categories.xml"))
+							foreach (PerformanceCounter Counter in Category.GetCounters())
 							{
-								using (XmlWriter w = XmlWriter.Create(s, XML.WriterSettings(true, false)))
+								FieldName = Category.CategoryName + ", " + Counter.CounterName;
+								Value = Counter.NextValue();
+								GetUnitPrecision(ref FieldName, Value, out NrDec, out Unit);
+
+								if (Fields.Count >= 100)
 								{
-									w.WriteStartElement("Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd");
-
-									lock (CategoryIncluded)
-									{
-										foreach (KeyValuePair<string, string[]> P in CategoryIncluded)
-										{
-											w.WriteStartElement("Category");
-											w.WriteAttributeString("name", P.Key);
-											w.WriteAttributeString("include", CommonTypes.Encode(!(P.Value is null)));
-
-											if (!(P.Value is null))
-											{
-												foreach (string InstanceName in P.Value)
-												{
-													w.WriteStartElement("Instance");
-													w.WriteAttributeString("name", P.Key);
-													w.WriteEndElement();
-												}
-											}
-
-											w.WriteEndElement();
-										}
-									}
-
-									w.WriteEndElement();
-									w.Flush();
+									await Request.ReportFields(false, Fields);
+									Fields.Clear();
 								}
+
+								Fields.Add(new QuantityField(ThingReference.Empty, Now, FieldName, Value, NrDec, Unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
 							}
 						}
-					
-						return Task.CompletedTask;
-					};
+					}
 
-					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
-					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ProvisioningClient);
+					await Request.ReportFields(true, Fields);
 
-					Client.Connect();
+					if (Updated)
+					{
+						using StreamWriter s = File.CreateText("categories.xml");
+						using XmlWriter w = XmlWriter.Create(s, XML.WriterSettings(true, false));
+						
+						w.WriteStartElement("Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd");
 
-					while (true)
-						Thread.Sleep(1000);
-				}
+						lock (CategoryIncluded)
+						{
+							foreach (KeyValuePair<string, string[]?> P in CategoryIncluded)
+							{
+								w.WriteStartElement("Category");
+								w.WriteAttributeString("name", P.Key);
+								w.WriteAttributeString("include", CommonTypes.Encode(P.Value is not null));
+
+								if (P.Value is not null)
+								{
+									foreach (string InstanceName in P.Value)
+									{
+										w.WriteStartElement("Instance");
+										w.WriteAttributeString("name", P.Key);
+										w.WriteEndElement();
+									}
+								}
+
+								w.WriteEndElement();
+							}
+						}
+
+						w.WriteEndElement();
+						w.Flush();
+					}
+				};
+
+				BobClient BobClient = new(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
+				ChatServer ChatServer = new(Client, BobClient, SensorServer, ProvisioningClient);
+
+				Client.Connect();
+
+				while (true)
+					Thread.Sleep(1000);
 			}
 			catch (Exception ex)
 			{
@@ -345,7 +334,7 @@ namespace Waher.Service.PcSensor
 			}
 			finally
 			{
-				Log.Terminate();
+				Log.TerminateAsync().Wait();
 			}
 		}
 
@@ -363,9 +352,9 @@ namespace Waher.Service.PcSensor
 			if (M.Success)
 			{
 				Unit = M.Groups["Unit"].Value;
-				if (Unit.StartsWith("/"))
+				if (Unit.StartsWith('/'))
 					Unit = "1" + Unit;
-				else if (Unit.StartsWith("%"))
+				else if (Unit.StartsWith('%'))
 					Unit = "%";
 
 				switch (Unit.ToLower())
@@ -400,25 +389,28 @@ namespace Waher.Service.PcSensor
 				Unit = string.Empty;
 		}
 
-		private static readonly Regex hasUnit = new Regex(@"([(](?'Unit'\w+(/\w+)?)[)]|(?'Unit'/s(ec)?|bytes?|kilobytes?|megabytes?|gigabytes?|B|KB|MB|GB|%[\w\s]*))$",
+		private static readonly Regex hasUnit = new(@"([(](?'Unit'\w+(/\w+)?)[)]|(?'Unit'/s(ec)?|bytes?|kilobytes?|megabytes?|gigabytes?|B|KB|MB|GB|%[\w\s]*))$",
 			RegexOptions.Singleline | RegexOptions.Compiled);
 
-		private static void Register()
+		private static async Task Register()
 		{
+			if (thingRegistryClient is null)
+				return;
+
 			string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
-			MetaDataTag[] MetaData = new MetaDataTag[]
-			{
+			MetaDataTag[] MetaData =
+			[
 				new MetaDataStringTag("KEY", Key),
 				new MetaDataStringTag("CLASS", "PC"),
 				new MetaDataStringTag("MAN", "waher.se"),
 				new MetaDataStringTag("MODEL", "Waher.Service.PcSensor"),
 				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Services/Waher.Service.PcSensor"),
 				new MetaDataNumericTag("V",1.0)
-			};
+			];
 
-			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+			await thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
 			{
 				if (e2.Ok)
 				{

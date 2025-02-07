@@ -521,66 +521,66 @@ namespace Waher.Things.Queries
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(string Comment) => this.LogMessage(QueryEventType.Information, QueryEventLevel.Minor, Comment);
+		public void Information(string Comment) => this.LogMessage(QueryEventType.Information, QueryEventLevel.Minor, Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(string Warning) => this.LogMessage(QueryEventType.Warning, QueryEventLevel.Minor, Warning);
+		public void Warning(string Warning) => this.LogMessage(QueryEventType.Warning, QueryEventLevel.Minor, Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public Task Error(string Error) => this.LogMessage(QueryEventType.Error, QueryEventLevel.Minor, Error);
+		public void Error(string Error) => this.LogMessage(QueryEventType.Error, QueryEventLevel.Minor, Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
+		public void Exception(Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
+		public void Exception(string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(DateTime Timestamp, string Comment) => this.LogMessage(QueryEventType.Information, QueryEventLevel.Minor, Comment);
+		public void Information(DateTime Timestamp, string Comment) => this.LogMessage(QueryEventType.Information, QueryEventLevel.Minor, Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(DateTime Timestamp, string Warning) => this.LogMessage(QueryEventType.Warning, QueryEventLevel.Minor, Warning);
+		public void Warning(DateTime Timestamp, string Warning) => this.LogMessage(QueryEventType.Warning, QueryEventLevel.Minor, Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public Task Error(DateTime Timestamp, string Error) => this.LogMessage(QueryEventType.Error, QueryEventLevel.Minor, Error);
+		public void Error(DateTime Timestamp, string Error) => this.LogMessage(QueryEventType.Error, QueryEventLevel.Minor, Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
+		public void Exception(DateTime Timestamp, string Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
+		public void Exception(DateTime Timestamp, Exception Exception) => this.LogMessage(QueryEventType.Exception, QueryEventLevel.Minor, Exception.Message);
 
 		#endregion
 	}

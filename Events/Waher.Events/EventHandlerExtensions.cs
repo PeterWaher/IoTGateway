@@ -185,7 +185,7 @@ namespace Waher.Events
 		/// <param name="EventHandler">Event handler, or null if not defined.</param>
 		/// <param name="Sender">Sender of events.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender)
+		public static bool Raise(this EventHandler EventHandler, IObservableLayer Sender)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty, Sender?.DecoupledEvents ?? false);
 		}
@@ -198,7 +198,7 @@ namespace Waher.Events
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender, bool Decoupled)
+		public static bool Raise(this EventHandler EventHandler, IObservableLayer Sender, bool Decoupled)
 		{
 			return Raise(EventHandler, Sender, EventArgs.Empty, Decoupled);
 		}
@@ -210,7 +210,7 @@ namespace Waher.Events
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender, EventArgs e)
+		public static bool Raise(this EventHandler EventHandler, IObservableLayer Sender, EventArgs e)
 		{
 			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
@@ -224,13 +224,13 @@ namespace Waher.Events
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise(this EventHandler EventHandler, IObservableLayer Sender, EventArgs e, bool Decoupled)
+		public static bool Raise(this EventHandler EventHandler, IObservableLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(e);
+				Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
-				Task _ = Task.Run(async () =>
+				Task _ = Task.Run(() =>
 				{
 					try
 					{
@@ -244,7 +244,7 @@ namespace Waher.Events
 						{
 							try
 							{
-								await Sender.Exception(ex);
+								Sender.Exception(ex);
 							}
 							catch (Exception ex2)
 							{
@@ -265,10 +265,7 @@ namespace Waher.Events
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-
-					if (!(Sender is null))
-						await Sender.Exception(ex);
-
+					Sender?.Exception(ex);
 					return false;
 				}
 			}
@@ -281,25 +278,20 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Sender">Sender of event.</param>
 		/// <param name="e">Event arguments.</param>
-		private static Task NoEventHandlerWarning(this IObservableLayer Sender, object e)
+		private static void NoEventHandlerWarning(this IObservableLayer Sender, object e)
 		{
 			if (Sender is null)
-				return Task.CompletedTask;
+				return;
 
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("No event handler registered (");
-
-			if (Sender is null)
-				sb.Append("null sender");
-			else
-				sb.Append(Sender.GetType().FullName);
-
+			sb.Append(Sender.GetType().FullName);
 			sb.Append(", ");
 			sb.Append(e.GetType().FullName);
 			sb.Append(")");
 
-			return Sender.Warning(sb.ToString());
+			Sender.Warning(sb.ToString());
 		}
 
 		/// <summary>
@@ -309,7 +301,7 @@ namespace Waher.Events
 		/// <param name="Sender">Sender of events.</param>
 		/// <param name="e">Event arguments.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static Task<bool> Raise<T>(this EventHandler<T> EventHandler, IObservableLayer Sender, T e)
+		public static bool Raise<T>(this EventHandler<T> EventHandler, IObservableLayer Sender, T e)
 		{
 			return EventHandler.Raise(Sender, e, Sender?.DecoupledEvents ?? false);
 		}
@@ -323,13 +315,13 @@ namespace Waher.Events
 		/// <param name="Decoupled">If the event is decoupled, i.e. executed
 		/// in parallel with the source that raised it.</param>
 		/// <returns>If event handler was processed or null (true), or if an exception was thrown and logged (false).</returns>
-		public static async Task<bool> Raise<T>(this EventHandler<T> EventHandler, IObservableLayer Sender, T e, bool Decoupled)
+		public static bool Raise<T>(this EventHandler<T> EventHandler, IObservableLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(e);
+				Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
-				Task _ = Task.Run(async () =>
+				Task _ = Task.Run(() =>
 				{
 					try
 					{
@@ -343,7 +335,7 @@ namespace Waher.Events
 						{
 							try
 							{
-								await Sender.Exception(ex);
+								Sender.Exception(ex);
 							}
 							catch (Exception ex2)
 							{
@@ -364,10 +356,7 @@ namespace Waher.Events
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-
-					if (!(Sender is null))
-						await Sender.Exception(ex);
-
+					Sender?.Exception(ex);
 					return false;
 				}
 			}
@@ -567,7 +556,7 @@ namespace Waher.Events
 		public static async Task<bool> Raise(this EventHandlerAsync EventHandler, IObservableLayer Sender, EventArgs e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(e);
+				Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
 				Task _ = Task.Run(async () =>
@@ -584,7 +573,7 @@ namespace Waher.Events
 						{
 							try
 							{
-								await Sender.Exception(ex);
+								Sender.Exception(ex);
 							}
 							catch (Exception ex2)
 							{
@@ -605,10 +594,7 @@ namespace Waher.Events
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-
-					if (!(Sender is null))
-						await Sender.Exception(ex);
-
+					Sender?.Exception(ex);
 					return false;
 				}
 			}
@@ -640,7 +626,7 @@ namespace Waher.Events
 		public static async Task<bool> Raise<T>(this EventHandlerAsync<T> EventHandler, IObservableLayer Sender, T e, bool Decoupled)
 		{
 			if (EventHandler is null)
-				await Sender.NoEventHandlerWarning(e);
+				Sender.NoEventHandlerWarning(e);
 			else if (Decoupled)
 			{
 				Task _ = Task.Run(async () =>
@@ -657,7 +643,7 @@ namespace Waher.Events
 						{
 							try
 							{
-								await Sender.Exception(ex);
+								Sender.Exception(ex);
 							}
 							catch (Exception ex2)
 							{
@@ -678,10 +664,7 @@ namespace Waher.Events
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
-
-					if (!(Sender is null))
-						await Sender.Exception(ex);
-
+					Sender?.Exception(ex);
 					return false;
 				}
 			}

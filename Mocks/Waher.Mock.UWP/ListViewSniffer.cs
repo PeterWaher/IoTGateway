@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
+using Waher.Networking.Sniffers.Model;
 using Windows.UI;
 using Windows.UI.Xaml.Controls;
 
@@ -30,6 +31,11 @@ namespace Waher.Mock
 		public ListView ListView => this.listView;
 
 		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => BinaryPresentationMethod.Hexadecimal;
+
+		/// <summary>
 		/// Maximum number of items in the list view.
 		/// </summary>
 		public int MaxItems
@@ -53,103 +59,107 @@ namespace Waher.Mock
 		}
 
 		/// <summary>
-		/// Called when binary data has been received.
+		/// Processes a binary reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxBinary Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.DataReceived, 
+				HexToString(Event.Data, Event.Offset, Event.Count), 
+				CloneSection(Event.Data, Event.Offset, Event.Count), Colors.White, Colors.Navy));
 		}
 
 		/// <summary>
-		/// Called when binary data has been transmitted.
+		/// Processes a binary transmission event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Data">Binary Data.</param>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxBinary Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.DataTransmitted, 
+				HexToString(Event.Data, Event.Offset, Event.Count), 
+				CloneSection(Event.Data, Event.Offset, Event.Count), Colors.Black, Colors.White));
 		}
 
-		internal static string HexToString(byte[] Data)
+		internal static string HexToString(byte[] Data, int Offset, int Count)
 		{
-			StringBuilder Output = new StringBuilder();
-			int i = 0;
-
-			foreach (byte b in Data)
+			if (Data is null)
+				return "<" + Count.ToString() + " bytes>";
+			else
 			{
-				if (i > 0)
-					Output.Append(' ');
+				StringBuilder Output = new StringBuilder();
+				int i = 0;
+				byte b;
 
-				Output.Append(b.ToString("X2"));
+				while (Count > 0)
+				{
+					b = Data[Offset++];
 
-				i = (i + 1) & 31;
-				if (i == 0)
-					Output.AppendLine();
+					if (i > 0)
+						Output.Append(' ');
+
+					Output.Append(b.ToString("X2"));
+
+					i = (i + 1) & 31;
+					if (i == 0)
+						Output.AppendLine();
+				}
+
+				return Output.ToString().TrimEnd();
 			}
-
-			return Output.ToString().TrimEnd();
 		}
 
 		/// <summary>
-		/// Called when text has been received.
+		/// Processes a text reception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public override Task ReceiveText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxText Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.TextReceived, Event.Text, null, Colors.White, Colors.Navy));
 		}
 
 		/// <summary>
-		/// Called when text has been transmitted.
+		/// Processes a text transmission event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Text">Text</param>
-		public override Task TransmitText(DateTime Timestamp, string Text)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxText Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.TextTransmitted, Event.Text, null, Colors.Black, Colors.White));
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of something.
+		/// Processes an information event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Comment">Comment.</param>
-		public override Task Information(DateTime Timestamp, string Comment)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferInformation Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Text, null, Colors.Yellow, Colors.DarkGreen));
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of a warning state.
+		/// Processes a warning event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Warning">Warning.</param>
-		public override Task Warning(DateTime Timestamp, string Warning)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferWarning Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Warning, Event.Text, null, Colors.Black, Colors.Yellow));
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an error state.
+		/// Processes an error event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Error">Error.</param>
-		public override Task Error(DateTime Timestamp, string Error)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferError Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.Error, Error, null, Colors.White, Colors.Red));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Error, Event.Text, null, Colors.White, Colors.Red));
 		}
 
 		/// <summary>
-		/// Called to inform the viewer of an exception state.
+		/// Processes an exception event.
 		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		public override Task Exception(DateTime Timestamp, string Exception)
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferException Event)
 		{
-			return this.Add(new SniffItem(Timestamp, SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
+			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Exception, Event.Text, null, Colors.White, Colors.DarkRed));
 		}
 	}
 }

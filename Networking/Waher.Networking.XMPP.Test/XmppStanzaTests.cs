@@ -16,9 +16,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
 		[TestMethod]
@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Test
 				TaskCompletionSource<bool> Done = new();
 				this.client1.OnPresence += (Sender, e) =>
 				{
-					if (e.From == this.client2.FullJID && e.Availability == Availability.Chat)
+					if (e.From == this.client2?.FullJID && e.Availability == Availability.Chat)
 						Done.TrySetResult(true);
 
 					return Task.CompletedTask;

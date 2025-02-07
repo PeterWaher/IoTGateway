@@ -44,10 +44,11 @@ namespace Waher.Content.Rss.Test
 			Assert.IsTrue(InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType));
 			byte[] Data = await File.ReadAllBytesAsync(Path.Combine(Environment.CurrentDirectory, "Data", FileName));
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
-			Assert.IsNotNull(Decoded);
+			ContentResponse Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
+			Decoded.AssertOk();
+			Assert.IsNotNull(Decoded.Decoded);
 
-			RssDocument? Doc = Decoded as RssDocument;
+			RssDocument? Doc = Decoded.Decoded as RssDocument;
 			Assert.IsNotNull(Doc);
 
 			Assert.AreEqual(Version, Doc.Version);
@@ -97,9 +98,10 @@ namespace Waher.Content.Rss.Test
 			Xml.Load(Path.Combine(Environment.CurrentDirectory, "Data", FileName));
 			RssDocument Doc = new(Xml, null);
 
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Doc, Encoding.UTF8);
-			byte[] Data = P.Key;
-			string ContentType = P.Value;
+			ContentResponse P = await InternetContent.EncodeAsync(Doc, Encoding.UTF8);
+			P.AssertOk();
+			byte[] Data = P.Encoded;
+			string ContentType = P.ContentType;
 
 			Assert.IsNotNull(Data);
 			Assert.AreEqual("application/rss+xml; charset=utf-8", ContentType);

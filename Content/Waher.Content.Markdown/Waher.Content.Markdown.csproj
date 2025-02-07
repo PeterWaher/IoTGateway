@@ -12,17 +12,17 @@
 
 For a description of the Markdown flavour supported by the parser, see:
 https://waher.se/Markdown.md</Description>
-    <Copyright>Copyright © Waher Data AB 2016-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown Parser Text HTML Difference History</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>4.0.0</AssemblyVersion>
-    <FileVersion>4.0.0</FileVersion>
+    <AssemblyVersion>5.1.0</AssemblyVersion>
+    <FileVersion>5.1.0</FileVersion>
+    <Version>5.1.0</Version>
     <PackageIconUrl />
-    <Version>4.0.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

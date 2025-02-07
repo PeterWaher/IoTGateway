@@ -19,7 +19,7 @@ namespace Waher.IoTGateway.Svc
 		/// <returns>Dictionary of cateogry records</returns>
 		private static Dictionary<string, CategoryRec> GetCategories()
 		{
-			Dictionary<string, CategoryRec> Result = new();
+			Dictionary<string, CategoryRec> Result = [];
 
 			foreach (PerformanceCounterCategory Category in PerformanceCounterCategory.GetCategories())
 			{
@@ -95,7 +95,7 @@ namespace Waher.IoTGateway.Svc
 		public static PerformanceCounter[] GetCounters(string CategoryName)
 		{
 			if (!categories.TryGetValue(CategoryName, out CategoryRec Rec))
-				return System.Array.Empty<PerformanceCounter>();
+				return [];
 
 			Rec.Counters ??= Rec.Category.GetCounters();
 
@@ -134,7 +134,7 @@ namespace Waher.IoTGateway.Svc
 			{
 				Rec.Counters ??= Rec.Category.GetCounters();
 
-				Dictionary<string, PerformanceCounter> ByName = new();
+				Dictionary<string, PerformanceCounter> ByName = [];
 
 				foreach (PerformanceCounter Counter in Rec.Counters)
 					ByName[Counter.CounterName] = Counter;
@@ -168,7 +168,7 @@ namespace Waher.IoTGateway.Svc
 		public static string[] GetInstanceNames(string CategoryName)
 		{
 			if (!categories.TryGetValue(CategoryName, out CategoryRec Rec))
-				return System.Array.Empty<string>();
+				return [];
 
 			Rec.InstanceNames ??= Rec.Category.GetInstanceNames();
 
@@ -184,11 +184,11 @@ namespace Waher.IoTGateway.Svc
 		public static PerformanceCounter[] GetCounters(string CategoryName, string InstanceName)
 		{
 			if (!categories.TryGetValue(CategoryName, out CategoryRec CategoryRec))
-				return System.Array.Empty<PerformanceCounter>();
+				return [];
 
 			if (CategoryRec.Instances is null)
 			{
-				Dictionary<string, InstanceRec> Instances = new();
+				Dictionary<string, InstanceRec> Instances = [];
 
 				CategoryRec.InstanceNames ??= CategoryRec.Category.GetInstanceNames();
 
@@ -204,7 +204,7 @@ namespace Waher.IoTGateway.Svc
 			}
 
 			if (!CategoryRec.Instances.TryGetValue(InstanceName, out InstanceRec InstanceRec))
-				return System.Array.Empty<PerformanceCounter>();
+				return [];
 
 			return InstanceRec.Counters;
 		}
@@ -213,6 +213,7 @@ namespace Waher.IoTGateway.Svc
 		/// Gets available performance counter names, given their category and instance names.
 		/// </summary>
 		/// <param name="CategoryName">Category name</param>
+		/// <param name="InstanceName">Name of service instance.</param>
 		/// <returns>Available performance counters</returns>
 		public static string[] GetCounterNames(string CategoryName, string InstanceName)
 		{
@@ -240,7 +241,7 @@ namespace Waher.IoTGateway.Svc
 
 			if (CategoryRec.Instances is null)
 			{
-				Dictionary<string, InstanceRec> Instances = new();
+				Dictionary<string, InstanceRec> Instances = [];
 
 				CategoryRec.InstanceNames ??= CategoryRec.Category.GetInstanceNames();
 
@@ -262,7 +263,7 @@ namespace Waher.IoTGateway.Svc
 			{
 				InstanceRec.Counters ??= CategoryRec.Category.GetCounters(InstanceName);
 
-				Dictionary<string, PerformanceCounter> ByName = new();
+				Dictionary<string, PerformanceCounter> ByName = [];
 
 				foreach (PerformanceCounter Counter in InstanceRec.Counters)
 					ByName[Counter.CounterName] = Counter;

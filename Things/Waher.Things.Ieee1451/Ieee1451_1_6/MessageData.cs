@@ -214,7 +214,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 					break;
 			}
 
-			Message Message = await Ieee1451Parser.TryParseMessage(Data, Content.CommunicationLayer);
+			Message Message = Ieee1451Parser.TryParseMessage(Data, Content.CommunicationLayer);
 			if (Message is null)
 				return DataProcessingResult.Processed;
 
@@ -264,7 +264,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (!Result.IsCompleted)
 			{
 				if (!(ToSniffer is null))
-					await BrokerNode.Information(ToSniffer.ToString());
+					BrokerNode.Information(ToSniffer.ToString());
 
 				await Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 			}
@@ -299,7 +299,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 			if (!Result.IsCompleted)
 			{
 				if (!(ToSniffer is null))
-					await BrokerNode.Information(ToSniffer.ToString());
+					BrokerNode.Information(ToSniffer.ToString());
 
 				await Broker.Publish(this.communicationTopic, MqttQualityOfService.AtLeastOnce, false, Request);
 			}
@@ -321,7 +321,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_1_6
 
 			TedsAccessMessage TedsMessage = await this.RequestTEDS(Code, TimeoutMilliseconds, 0);   // Do not use cached message. Force readout.
 
-			(ushort ErrorCode, Teds Teds) = await TedsMessage.TryParseTeds();
+			TedsMessage.TryParseTeds(out ushort ErrorCode, out Teds Teds);
 			if (!(Teds is null))
 			{
 				if (ErrorCode != 0)

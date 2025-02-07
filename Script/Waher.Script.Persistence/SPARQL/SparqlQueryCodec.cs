@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Script.Persistence.SPARQL
 {
@@ -68,16 +69,18 @@ namespace Waher.Script.Persistence.SPARQL
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 			Expression Exp = new Expression(s, BaseUri?.AbsolutePath);
 
 			if (!(Exp.Root is SparqlQuery Query))
-				throw new Exception("Invalid SPARQL query.");
-
-			return Task.FromResult<object>(Query);
+				return Task.FromResult(new ContentResponse(new Exception("Invalid SPARQL query.")));
+			else
+				return Task.FromResult(new ContentResponse(ContentType, Query, Data));
 		}
 
 		/// <summary>
@@ -114,9 +117,10 @@ namespace Waher.Script.Persistence.SPARQL
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
@@ -126,14 +130,14 @@ namespace Waher.Script.Persistence.SPARQL
 				if (Object is Expression Exp && Exp.Root is SparqlQuery Query2)
 					Query = Query2;
 				else
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 			}
 
 			string Text = JSON.Encode(Query.SubExpression, false);
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = SparqlQueryContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		/// <summary>

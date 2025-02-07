@@ -60,7 +60,7 @@ namespace Waher.WebService.Tesseract.Test
 		[DataRow("MRZ.jpg", PageSegmentationMode.SingleUniformBlockOfText, "mrz")]
 		public async Task Test_002_OcrImage(string FileName, PageSegmentationMode? Mode, string Language)
 		{
-			byte[] Bin = await Resources.ReadAllBytesAsync(Path.Combine("Data", FileName));
+			byte[] Bin = await Runtime.IO.Files.ReadAllBytesAsync(Path.Combine("Data", FileName));
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 			TesseractApi Api = new();
 
@@ -83,7 +83,7 @@ namespace Waher.WebService.Tesseract.Test
 		[DataRow("MRZ.jpg", PageSegmentationMode.SingleUniformBlockOfText, "mrz")]
 		public async Task Test_003_ApiTests(string FileName, PageSegmentationMode? Mode, string Language)
 		{
-			byte[] Bin = await Resources.ReadAllBytesAsync(Path.Combine("Data", FileName));
+			byte[] Bin = await Runtime.IO.Files.ReadAllBytesAsync(Path.Combine("Data", FileName));
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FileName));
 			TesseractApi Api = new();
 
@@ -121,8 +121,10 @@ namespace Waher.WebService.Tesseract.Test
 				Bin = await Response.Content.ReadAsByteArrayAsync();
 				ContentType = Response.Content.Headers.ContentType.ToString();
 
-				object Obj = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
-				string Text = Obj as string;
+				ContentResponse Obj = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
+				Obj.AssertOk();
+
+				string Text = Obj.Decoded as string;
 
 				Assert.IsNotNull(Text, "Unexpected response.");
 

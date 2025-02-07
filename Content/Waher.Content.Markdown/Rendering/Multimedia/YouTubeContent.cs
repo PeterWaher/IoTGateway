@@ -71,5 +71,15 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 				}
 			}
 		}
+
+		/// <summary>
+		/// Reports a resource for preloading.
+		/// </summary>
+		/// <param name="Progress">Progress reporting interface.</param>
+		/// <param name="Items">Multi-media items.</param>
+		public Task Preload(ICodecProgress Progress, MultimediaItem[] Items)
+		{
+			return Task.CompletedTask;
+		}
 	}
 }

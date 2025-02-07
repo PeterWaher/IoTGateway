@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Test
 {
@@ -16,9 +18,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public new static void ClassCleanup()
+		public new static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
 		public override XmppCredentials GetCredentials1()

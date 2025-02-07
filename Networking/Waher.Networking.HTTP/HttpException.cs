@@ -128,13 +128,13 @@ namespace Waher.Networking.HTTP
 				case 226: return "IM Used";
 
 				// Redirections
-				case 300:return "Multiple Choices";
+				case 300: return "Multiple Choices";
 				case MovedPermanentlyException.Code: return MovedPermanentlyException.StatusMessage;
 				case FoundException.Code: return FoundException.StatusMessage;
 				case SeeOtherException.Code: return SeeOtherException.StatusMessage;
 				case NotModifiedException.Code: return NotModifiedException.StatusMessage;
 				case UseProxyException.Code: return UseProxyException.StatusMessage;
-				case 306:return "unused";
+				case 306: return "unused";
 				case TemporaryRedirectException.Code: return TemporaryRedirectException.StatusMessage;
 				case PermanentRedirectException.Code: return PermanentRedirectException.StatusMessage;
 
@@ -173,7 +173,7 @@ namespace Waher.Networking.HTTP
 				case VariantAlsoNegotiatesException.Code: return VariantAlsoNegotiatesException.StatusMessage;
 
 				default: return "Error";
-			}
+			};
 		}
 
 		/// <summary>
@@ -229,7 +229,12 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				HttpFieldContentType ContentType = new HttpFieldContentType("Content-Type", this.contentType);
-				this.contentObject = await InternetContent.DecodeAsync(ContentType.Type, this.content, ContentType.Encoding, null, null);
+				ContentResponse Content = await InternetContent.DecodeAsync(ContentType.Type, this.content, ContentType.Encoding, null, null);
+
+				if (Content.HasError)
+					this.contentObject = this.content;
+				else
+					this.contentObject = Content.Decoded;
 			}
 			catch (Exception)
 			{

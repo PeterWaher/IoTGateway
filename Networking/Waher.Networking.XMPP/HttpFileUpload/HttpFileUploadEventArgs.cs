@@ -4,9 +4,10 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.XMPP.HttpFileUpload
 {
@@ -173,14 +174,17 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 								Content = Body
 							})
 						{
-							await this.LogSent(HttpClient, this.PutUrl, Body, "PATCH");
+							this.LogSent(HttpClient, this.PutUrl, Body, "PATCH");
 
 							HttpResponseMessage Response = await HttpClient.SendAsync(RequestMessage);
 
-							await this.LogReceived(Response);
+							this.LogReceived(Response);
 
 							if (!Response.IsSuccessStatusCode)
-								await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+							{
+								ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+								Temp.AssertOk();
+							}
 						}
 
 						Pos += c;
@@ -209,21 +213,24 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				}
 
 				Content.Headers.Add("Content-Type", ContentType);
-				await this.LogSent(HttpClient, this.PutUrl, Content, "PUT");
+				this.LogSent(HttpClient, this.PutUrl, Content, "PUT");
 
 				HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Content);
 
-				await this.LogReceived(Response);
+				this.LogReceived(Response);
 
 				if (!Response.IsSuccessStatusCode)
-					await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+				{
+					ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
+					Temp.AssertOk();
+				}
 
 				if (Response.StatusCode != System.Net.HttpStatusCode.Created)
 					throw new IOException("Unexpected response.");
 			}
 		}
 
-		private async Task LogSent(HttpClient Client, string PutUrl, HttpContent Content, string Method)
+		private void LogSent(HttpClient Client, string PutUrl, HttpContent Content, string Method)
 		{
 			if (!this.hasSniffers)
 				return;
@@ -263,10 +270,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			string Msg = sb.ToString();
 
 			foreach (ISniffer Sniffer in this.sniffers)
-				await Sniffer.TransmitText(Msg);
+				Sniffer.TransmitText(Msg);
 		}
 
-		private async Task LogReceived(HttpResponseMessage Response)
+		private void LogReceived(HttpResponseMessage Response)
 		{
 			if (!this.hasSniffers)
 				return;
@@ -295,7 +302,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			string Msg = sb.ToString();
 
 			foreach (ISniffer Sniffer in this.sniffers)
-				await Sniffer.ReceiveText(Msg);
+				Sniffer.ReceiveText(Msg);
 		}
 
 	}

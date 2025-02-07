@@ -23,6 +23,7 @@ using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Security;
 using Waher.Security.Users;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -466,57 +467,108 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("host", out Obj) || !(Obj is string HostName))
-				throw new BadRequestException();
+			if (!Parameters.TryGetValue("host", out object Obj) || !(Obj is string HostName))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("port", out Obj) || !(Obj is int Port) || Port < 1 || Port > 65535)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("boshUrl", out Obj) || !(Obj is string BoshUrl))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("wsUrl", out Obj) || !(Obj is string WsUrl))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("customBinding", out Obj) || !(Obj is bool CustomBinding))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("trustServer", out Obj) || !(Obj is bool TrustServer))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("insecureMechanisms", out Obj) || !(Obj is bool InsecureMechanisms))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("storePassword", out Obj) || !(Obj is bool StorePasswordInsteadOfHash))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("sniffer", out Obj) || !(Obj is bool Sniffer))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("transport", out Obj) || !(Obj is string s2) || !Enum.TryParse(s2, out XmppTransportMethod Method))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("account", out Obj) || !(Obj is string Account))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("password", out Obj) || !(Obj is string Password))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("createAccount", out Obj) || !(Obj is bool CreateAccount))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("accountName", out Obj) || !(Obj is string AccountName))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			this.host = HostName;
 			this.port = Port;
@@ -856,7 +908,7 @@ namespace Waher.IoTGateway.Setup
 								await ClientEvents.PushEvent(new string[] { TabID }, "ShowCustomProperties", "{\"visible\":true}", true, "User");
 							}
 
-							using (HttpClient HttpClient = new HttpClient(new HttpClientHandler()
+							using HttpClient HttpClient = new HttpClient(new HttpClientHandler()
 							{
 #if !NETFW
 								ServerCertificateCustomValidationCallback = this.RemoteCertificateValidationCallback,
@@ -866,88 +918,90 @@ namespace Waher.IoTGateway.Setup
 							})
 							{
 								Timeout = TimeSpan.FromMilliseconds(60000)
-							})
+							};
+
+							try
 							{
-								try
+								Uri Uri = new Uri("http://" + this.host + "/.well-known/host-meta");
+								HttpResponseMessage Response = await HttpClient.GetAsync(Uri);
+								if (!Response.IsSuccessStatusCode)
 								{
-									Uri Uri = new Uri("http://" + this.host + "/.well-known/host-meta");
-									HttpResponseMessage Response = await HttpClient.GetAsync(Uri);
-									if (!Response.IsSuccessStatusCode)
-										await Content.Getters.WebGetter.ProcessResponse(Response, Uri);
+									ContentResponse Temp = await Content.Getters.WebGetter.ProcessResponse(Response, Uri);
+									Temp.AssertOk();
+								}
 
-									Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
-									byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-									string CharSet = Response.Content.Headers.ContentType.CharSet;
-									System.Text.Encoding Encoding;
+								Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
+								byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
+								string CharSet = Response.Content.Headers.ContentType.CharSet;
+								System.Text.Encoding Encoding;
 
-									if (string.IsNullOrEmpty(CharSet))
-										Encoding = System.Text.Encoding.UTF8;
-									else
-										Encoding = InternetContent.GetEncoding(CharSet);
+								if (string.IsNullOrEmpty(CharSet))
+									Encoding = System.Text.Encoding.UTF8;
+								else
+									Encoding = InternetContent.GetEncoding(CharSet);
 
-									string XmlResponse = CommonTypes.GetString(Bin, Encoding);
-									XmlDocument Doc = new XmlDocument()
+								string XmlResponse = Strings.GetString(Bin, Encoding);
+								XmlDocument Doc = new XmlDocument()
+								{
+									PreserveWhitespace = true
+								};
+								Doc.LoadXml(XmlResponse);
+
+								if (!(Doc.DocumentElement is null) && Doc.DocumentElement.LocalName == "XRD")
+								{
+									string BoshUrl = null;
+									string WsUrl = null;
+
+									foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 									{
-										PreserveWhitespace = true
-									};
-									Doc.LoadXml(XmlResponse);
-
-									if (!(Doc.DocumentElement is null) && Doc.DocumentElement.LocalName == "XRD")
-									{
-										string BoshUrl = null;
-										string WsUrl = null;
-
-										foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+										if (N is XmlElement E && E.LocalName == "Link")
 										{
-											if (N is XmlElement E && E.LocalName == "Link")
+											switch (XML.Attribute(E, "rel"))
 											{
-												switch (XML.Attribute(E, "rel"))
-												{
-													case "urn:xmpp:alt-connections:xbosh":
-														BoshUrl = XML.Attribute(E, "href");
-														break;
+												case "urn:xmpp:alt-connections:xbosh":
+													BoshUrl = XML.Attribute(E, "href");
+													break;
 
-													case "urn:xmpp:alt-connections:websocket":
-														WsUrl = XML.Attribute(E, "href");
-														break;
-												}
+												case "urn:xmpp:alt-connections:websocket":
+													WsUrl = XML.Attribute(E, "href");
+													break;
 											}
 										}
+									}
 
-										if (!string.IsNullOrEmpty(WsUrl))
-										{
-											this.wsUrl = WsUrl;
-											this.transportMethod = XmppTransportMethod.WS;
+									if (!string.IsNullOrEmpty(WsUrl))
+									{
+										this.wsUrl = WsUrl;
+										this.transportMethod = XmppTransportMethod.WS;
 
-											if (!string.IsNullOrEmpty(TabID))
-												await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true, "User");
+										if (!string.IsNullOrEmpty(TabID))
+											await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"WS\"}", true, "User");
 
-											this.Connect(TabID);
+										this.Connect(TabID);
 
-											return;
-										}
-										else if (!string.IsNullOrEmpty(BoshUrl))
-										{
-											this.boshUrl = BoshUrl;
-											this.transportMethod = XmppTransportMethod.BOSH;
+										return;
+									}
+									else if (!string.IsNullOrEmpty(BoshUrl))
+									{
+										this.boshUrl = BoshUrl;
+										this.transportMethod = XmppTransportMethod.BOSH;
 
-											if (!string.IsNullOrEmpty(TabID))
-												await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"BOSH\"}", true, "User");
+										if (!string.IsNullOrEmpty(TabID))
+											await ClientEvents.PushEvent(new string[] { TabID }, "ShowTransport", "{\"method\":\"BOSH\"}", true, "User");
 
-											this.Connect(TabID);
+										this.Connect(TabID);
 
-											return;
-										}
+										return;
 									}
 								}
-								catch (Exception)
-								{
-									// Ignore.
-								}
-
-								Msg = "No alternative binding methods found.";
-								Error = true;
 							}
+							catch (Exception)
+							{
+								// Ignore.
+							}
+
+							Msg = "No alternative binding methods found.";
+							Error = true;
 						}
 						else
 						{

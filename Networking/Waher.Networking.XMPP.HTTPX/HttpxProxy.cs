@@ -198,7 +198,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				string Url = Request.SubPath;
 				if (Url.StartsWith("/"))
-					Url = Url.Substring(1);
+					Url = Url[1..];
 
 				if (!Url.StartsWith("httpx://", StringComparison.OrdinalIgnoreCase))
 					throw new BadRequestException("Invalid URI. Must use httpx URI scheme.");
@@ -207,8 +207,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (i < 0)
 					throw new BadRequestException("Invalid URI.");
 
-				string BareJID = Url.Substring(8, i - 8);
-				string LocalUrl = Url.Substring(i);
+				string BareJID = Url[8..i];
+				string LocalUrl = Url[i..];
 
 				IHttpxCachedResource CachedResource;
 
@@ -219,7 +219,10 @@ namespace Waher.Networking.XMPP.HTTPX
 						if (!(Request.Header.IfNoneMatch is null))
 						{
 							if (!(CachedResource.ETag is null) && Request.Header.IfNoneMatch.Value == CachedResource.ETag)
-								throw new NotModifiedException();
+							{
+								await Response.SendResponse(new NotModifiedException());
+								return;
+							}
 						}
 						else if (!(Request.Header.IfModifiedSince is null))
 						{
@@ -228,7 +231,8 @@ namespace Waher.Networking.XMPP.HTTPX
 							if ((Limit = Request.Header.IfModifiedSince.Timestamp).HasValue &&
 								HttpFolderResource.LessOrEqual(CachedResource.LastModified.UtcDateTime, Limit.Value.ToUniversalTime()))
 							{
-								throw new NotModifiedException();
+								await Response.SendResponse(new NotModifiedException());
+								return;
 							}
 						}
 
@@ -441,10 +445,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			int i = s.IndexOf('.');
 			if (i > 0)
 			{
-				s = s.Substring(i + 1);
+				s = s[(i + 1)..];
 				i = s.IndexOfAny(new char[] { '?', '#' });
 				if (i > 0)
-					s = s.Substring(0, i);
+					s = s[..i];
 
 				if (this.httpxCache.CanCache(BareJID, LocalUrl, InternetContent.GetContentType(s)))
 				{
@@ -544,7 +548,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 
 				if (!(e.Data is null))
-					await this.BinaryDataReceived(State2, true, e.Data);
+					await this.BinaryDataReceived(State2, true, e.ConstantBuffer, e.Data);
 			}
 		}
 
@@ -552,14 +556,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			ReadoutState State2 = (ReadoutState)e.State;
 
-			return this.BinaryDataReceived(State2, e.Last, e.Data);
+			return this.BinaryDataReceived(State2, e.Last, e.ConstantBuffer, e.Data);
 		}
 
-		private async Task BinaryDataReceived(ReadoutState State2, bool Last, byte[] Data)
+		private async Task BinaryDataReceived(ReadoutState State2, bool Last, bool ConstantBuffer, byte[] Data)
 		{
 			try
 			{
-				await State2.Response.Write(Data);
+				await State2.Response.Write(ConstantBuffer, Data);
 			}
 			catch (Exception)
 			{
@@ -653,7 +657,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							while (j < c && (ch = s[j]) >= '0' && ch <= '9')
 								j++;
 
-							if (j > i && int.TryParse(s.Substring(i, j - i), out j))
+							if (j > i && int.TryParse(s[i..j], out j))
 								this.Expires = DateTimeOffset.UtcNow.AddSeconds(j);
 						}
 					}

@@ -378,7 +378,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 			catch (Exception ex)
 			{
-				Client.Dispose();
+				await Client.DisposeAsync();
 				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 

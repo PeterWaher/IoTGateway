@@ -205,6 +205,9 @@
 	<Assembly fileName="Waher.Runtime.Inventory.dll"/>
 	<Assembly fileName="Waher.Runtime.Inventory.pdb"/>
 	<Assembly fileName="Waher.Runtime.Inventory.xml"/>
+	<Assembly fileName="Waher.Runtime.IO.dll"/>
+	<Assembly fileName="Waher.Runtime.IO.pdb"/>
+	<Assembly fileName="Waher.Runtime.IO.xml"/>
 	<Assembly fileName="Waher.Runtime.Queue.dll"/>
 	<Assembly fileName="Waher.Runtime.Queue.pdb"/>
 	<Assembly fileName="Waher.Runtime.Queue.xml"/>

@@ -65,14 +65,17 @@ namespace Waher.Events.Pipe
 		public NamedPipeClientStream Pipe => this.pipe;
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose()"/>
+		/// <see cref="IDisposableAsync.DisposeAsync()"/>
 		/// </summary>
-		public override void Dispose()
+		public override Task DisposeAsync()
 		{
-			base.Dispose();
+			if (!(this.pipe is null))
+			{
+				this.pipe?.Dispose();
+				this.pipe = null;
+			}
 
-			this.pipe?.Dispose();
-			this.pipe = null;
+			return base.DisposeAsync();
 		}
 
 		/// <summary>

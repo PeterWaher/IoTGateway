@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Manages a sensor data client request.
 	/// </summary>
-	public class SensorDataSubscriptionRequest : SensorDataClientRequest, IDisposable
+	public class SensorDataSubscriptionRequest : SensorDataClientRequest, IDisposableAsync
 	{
 		private readonly FieldSubscriptionRule[] fieldRules;
 		private readonly Duration? minInterval;

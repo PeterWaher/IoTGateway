@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Waher.Networking.XMPP.P2P
+﻿namespace Waher.Networking.XMPP.P2P
 {
 	/// <summary>
 	/// Contains information about peer addresses.

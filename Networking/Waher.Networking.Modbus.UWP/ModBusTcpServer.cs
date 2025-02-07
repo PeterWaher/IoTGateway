@@ -159,119 +159,195 @@ namespace Waher.Networking.Modbus
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(int Count) => this.server?.ReceiveBinary(Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(byte[] Data) => this.server?.ReceiveBinary(Data) ?? Task.CompletedTask;
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data) => this.server?.ReceiveBinary(ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.server?.ReceiveBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(int Count) => this.server?.TransmitBinary(Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(byte[] Data) => this.server?.TransmitBinary(Data) ?? Task.CompletedTask;
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data) => this.server?.TransmitBinary(ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.server?.TransmitBinary(ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(string Text) => this.server?.ReceiveText(Text) ?? Task.CompletedTask;
+		public void ReceiveText(string Text) => this.server?.ReceiveText(Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(string Text) => this.server?.TransmitText(Text) ?? Task.CompletedTask;
+		public void TransmitText(string Text) => this.server?.TransmitText(Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(string Comment) => this.server?.Information(Comment) ?? Task.CompletedTask;
+		public void Information(string Comment) => this.server?.Information(Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(string Warning) => this.server?.Warning(Warning) ?? Task.CompletedTask;
+		public void Warning(string Warning) => this.server?.Warning(Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		public Task Error(string Error) => this.server?.Error(Error) ?? Task.CompletedTask;
+		public void Error(string Error) => this.server?.Error(Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(Exception Exception) => this.server?.Exception(Exception) ?? Task.CompletedTask;
+		public void Exception(Exception Exception) => this.server?.Exception(Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(string Exception) => this.server?.Exception(Exception) ?? Task.CompletedTask;
+		public void Exception(string Exception) => this.server?.Exception(Exception);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, int Count) => this.server?.ReceiveBinary(Timestamp, Count);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task ReceiveBinary(DateTime Timestamp, byte[] Data) => this.server?.ReceiveBinary(Timestamp, Data) ?? Task.CompletedTask;
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.server?.ReceiveBinary(Timestamp, ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where received data begins.</param>
+		/// <param name="Count">Number of bytes received.</param>
+		public void ReceiveBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.server?.ReceiveBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, int Count) => this.server?.TransmitBinary(Timestamp, Count);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Binary Data.</param>
-		public Task TransmitBinary(DateTime Timestamp, byte[] Data) => this.server?.TransmitBinary(Timestamp, Data) ?? Task.CompletedTask;
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data) => this.server?.TransmitBinary(Timestamp, ConstantBuffer, Data);
+
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Data">Binary Data.</param>
+		/// <param name="Offset">Offset into buffer where transmitted data begins.</param>
+		/// <param name="Count">Number of bytes transmitted.</param>
+		public void TransmitBinary(DateTime Timestamp, bool ConstantBuffer, byte[] Data, int Offset, int Count) => this.server?.TransmitBinary(Timestamp, ConstantBuffer, Data, Offset, Count);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task ReceiveText(DateTime Timestamp, string Text) => this.server?.ReceiveText(Timestamp, Text) ?? Task.CompletedTask;
+		public void ReceiveText(DateTime Timestamp, string Text) => this.server?.ReceiveText(Timestamp, Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public Task TransmitText(DateTime Timestamp, string Text) => this.server?.TransmitText(Timestamp, Text) ?? Task.CompletedTask;
+		public void TransmitText(DateTime Timestamp, string Text) => this.server?.TransmitText(Timestamp, Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public Task Information(DateTime Timestamp, string Comment) => this.server?.Information(Timestamp, Comment) ?? Task.CompletedTask;
+		public void Information(DateTime Timestamp, string Comment) => this.server?.Information(Timestamp, Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public Task Warning(DateTime Timestamp, string Warning) => this.server?.Warning(Timestamp, Warning) ?? Task.CompletedTask;
+		public void Warning(DateTime Timestamp, string Warning) => this.server?.Warning(Timestamp, Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public Task Error(DateTime Timestamp, string Error) => this.server?.Error(Timestamp, Error) ?? Task.CompletedTask;
+		public void Error(DateTime Timestamp, string Error) => this.server?.Error(Timestamp, Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, string Exception) => this.server?.Exception(Timestamp, Exception) ?? Task.CompletedTask;
+		public void Exception(DateTime Timestamp, string Exception) => this.server?.Exception(Timestamp, Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public Task Exception(DateTime Timestamp, Exception Exception) => this.server?.Exception(Timestamp, Exception) ?? Task.CompletedTask;
+		public void Exception(DateTime Timestamp, Exception Exception) => this.server?.Exception(Timestamp, Exception);
 
 		#endregion
 
@@ -319,7 +395,7 @@ namespace Waher.Networking.Modbus
 		{
 			if (this.HasSniffers)
 			{
-				await this.Information("ReadCoils(" + e.UnitAddress.ToString() + "," +
+				this.Information("ReadCoils(" + e.UnitAddress.ToString() + "," +
 					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
 			}
 
@@ -335,7 +411,7 @@ namespace Waher.Networking.Modbus
 		{
 			if (this.HasSniffers)
 			{
-				await this.Information("ReadInputDiscretes(" + e.UnitAddress.ToString() + "," +
+				this.Information("ReadInputDiscretes(" + e.UnitAddress.ToString() + "," +
 					e.ReferenceNr.ToString() + "," + e.NrBits.ToString() + ")");
 			}
 
@@ -351,7 +427,7 @@ namespace Waher.Networking.Modbus
 		{
 			if (this.HasSniffers)
 			{
-				await this.Information("ReadMultipleRegisters(" + e.UnitAddress.ToString() + "," +
+				this.Information("ReadMultipleRegisters(" + e.UnitAddress.ToString() + "," +
 					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
 			}
 
@@ -367,7 +443,7 @@ namespace Waher.Networking.Modbus
 		{
 			if (this.HasSniffers)
 			{
-				await this.Information("ReadInputRegisters(" + e.UnitAddress.ToString() + "," +
+				this.Information("ReadInputRegisters(" + e.UnitAddress.ToString() + "," +
 					e.ReferenceNr.ToString() + "," + e.NrWords.ToString() + ")");
 			}
 
@@ -383,7 +459,7 @@ namespace Waher.Networking.Modbus
 		{
 			if (this.HasSniffers)
 			{
-				await this.Information("WriteCoil(" + e.UnitAddress.ToString() + "," +
+				this.Information("WriteCoil(" + e.UnitAddress.ToString() + "," +
 					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
 			}
 
@@ -399,7 +475,7 @@ namespace Waher.Networking.Modbus
 		{
 			if (this.HasSniffers)
 			{
-				await this.Information("WriteRegister(" + e.UnitAddress.ToString() + "," +
+				this.Information("WriteRegister(" + e.UnitAddress.ToString() + "," +
 					e.ReferenceNr.ToString() + "," + e.Value.ToString() + ")");
 			}
 

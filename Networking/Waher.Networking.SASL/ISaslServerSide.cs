@@ -65,7 +65,7 @@ namespace Waher.Networking.SASL
 		/// Sets the identity of the user.
 		/// </summary>
 		/// <param name="UserName">Name of user.</param>
-		Task SetUserIdentity(CaseInsensitiveString UserName);
+		void SetUserIdentity(CaseInsensitiveString UserName);
 
 		/// <summary>
 		/// Reports the SASL error: Not Authorized

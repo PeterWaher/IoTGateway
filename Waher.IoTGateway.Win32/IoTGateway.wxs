@@ -682,6 +682,7 @@
 						<File Id="Waher.Runtime.Counters.dll" Name="Waher.Runtime.Counters.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Inventory.dll" Name="Waher.Runtime.Inventory.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Inventory.Loader.dll" Name="Waher.Runtime.Inventory.Loader.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.dll" Vital="yes" />
+						<File Id="Waher.Runtime.IO.dll" Name="Waher.Runtime.IO.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.IO.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Language.dll" Name="Waher.Runtime.Language.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Profiling.dll" Name="Waher.Runtime.Profiling.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Profiling.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Queue.dll" Name="Waher.Runtime.Queue.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.dll" Vital="yes" />
@@ -825,6 +826,7 @@
 						<RemoveFile Id="RemoveWaher.Runtime.Counters.dll" Name="Waher.Runtime.Counters.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Inventory.dll" Name="Waher.Runtime.Inventory.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Inventory.Loader.dll" Name="Waher.Runtime.Inventory.Loader.dll" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Runtime.IO.dll" Name="Waher.Runtime.IO.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Language.dll" Name="Waher.Runtime.Language.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Profiling.dll" Name="Waher.Runtime.Profiling.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Queue.dll" Name="Waher.Runtime.Queue.dll" On="uninstall" />
@@ -964,6 +966,7 @@
 						<File Id="Waher.Runtime.Counters.pdb" Name="Waher.Runtime.Counters.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.pdb" Vital="yes" />
 						<File Id="Waher.Runtime.Inventory.pdb" Name="Waher.Runtime.Inventory.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.pdb" Vital="yes" />
 						<File Id="Waher.Runtime.Inventory.Loader.pdb" Name="Waher.Runtime.Inventory.Loader.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.pdb" Vital="yes" />
+						<File Id="Waher.Runtime.IO.pdb" Name="Waher.Runtime.IO.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.IO.pdb" Vital="yes" />
 						<File Id="Waher.Runtime.Language.pdb" Name="Waher.Runtime.Language.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.pdb" Vital="yes" />
 						<File Id="Waher.Runtime.Profiling.pdb" Name="Waher.Runtime.Profiling.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Profiling.pdb" Vital="yes" />
 						<File Id="Waher.Runtime.Queue.pdb" Name="Waher.Runtime.Queue.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.pdb" Vital="yes" />
@@ -1095,6 +1098,7 @@
 						<RemoveFile Id="RemoveWaher.Runtime.Counters.pdb" Name="Waher.Runtime.Counters.pdb" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Inventory.pdb" Name="Waher.Runtime.Inventory.pdb" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Inventory.Loader.pdb" Name="Waher.Runtime.Inventory.Loader.pdb" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Runtime.IO.pdb" Name="Waher.Runtime.IO.pdb" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Language.pdb" Name="Waher.Runtime.Language.pdb" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Profiling.pdb" Name="Waher.Runtime.Profiling.pdb" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Queue.pdb" Name="Waher.Runtime.Queue.pdb" On="uninstall" />
@@ -1228,6 +1232,7 @@
 						<File Id="Waher.Runtime.Counters.xml" Name="Waher.Runtime.Counters.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.xml" Vital="yes" />
 						<File Id="Waher.Runtime.Inventory.xml" Name="Waher.Runtime.Inventory.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.xml" Vital="yes" />
 						<File Id="Waher.Runtime.Inventory.Loader.xml" Name="Waher.Runtime.Inventory.Loader.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.xml" Vital="yes" />
+						<File Id="Waher.Runtime.IO.xml" Name="Waher.Runtime.IO.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.IO.xml" Vital="yes" />
 						<File Id="Waher.Runtime.Language.xml" Name="Waher.Runtime.Language.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.xml" Vital="yes" />
 						<File Id="Waher.Runtime.Profiling.xml" Name="Waher.Runtime.Profiling.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Profiling.xml" Vital="yes" />
 						<File Id="Waher.Runtime.Queue.xml" Name="Waher.Runtime.Queue.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Queue.xml" Vital="yes" />
@@ -1359,6 +1364,7 @@
 						<RemoveFile Id="RemoveWaher.Runtime.Counters.xml" Name="Waher.Runtime.Counters.xml" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Inventory.xml" Name="Waher.Runtime.Inventory.xml" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Inventory.Loader.xml" Name="Waher.Runtime.Inventory.Loader.xml" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Runtime.IO.xml" Name="Waher.Runtime.IO.xml" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Language.xml" Name="Waher.Runtime.Language.xml" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Profiling.xml" Name="Waher.Runtime.Profiling.xml" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Queue.xml" Name="Waher.Runtime.Queue.xml" On="uninstall" />
@@ -2002,6 +2008,7 @@
 						<File Id="GraphStore.md" Name="GraphStore.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.md" />
 						<File Id="GraphStore.ws" Name="GraphStore.ws" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphStore.ws" />
 						<File Id="Index.md" Name="Index.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Index.md" />
+						<File Id="Login.js" Name="Login.js" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.js" />
 						<File Id="Login.md" Name="Login.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Login.md" />
 						<File Id="Markdown.md" Name="Markdown.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Markdown.md" />
 						<File Id="MarkdownEditor.cssx" Name="MarkdownEditor.cssx" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownEditor.cssx" />
@@ -2038,6 +2045,7 @@
 						<RemoveFile Id="RemoveGraphStore.md" Name="GraphStore.md" On="uninstall" />
 						<RemoveFile Id="RemoveGraphStore.ws" Name="GraphStore.ws" On="uninstall" />
 						<RemoveFile Id="RemoveIndex.md" Name="Index.md" On="uninstall" />
+						<RemoveFile Id="RemoveLogin.js" Name="Login.js" On="uninstall" />
 						<RemoveFile Id="RemoveLogin.md" Name="Login.md" On="uninstall" />
 						<RemoveFile Id="RemoveMarkdown.md" Name="Markdown.md" On="uninstall" />
 						<RemoveFile Id="RemoveMarkdownEditor.cssx" Name="MarkdownEditor.cssx" On="uninstall" />

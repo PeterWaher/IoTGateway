@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Content.Images.Exif;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Images
 {

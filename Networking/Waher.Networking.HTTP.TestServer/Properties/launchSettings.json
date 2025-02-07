@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Networking.HTTP.TestServer": {
+      "commandName": "Project",
+      "commandLineArgs": "-http 8081 -no7540prio -deflate -gzip -br\r\n"
+    }
+  }
+}

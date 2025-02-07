@@ -63,15 +63,15 @@ namespace Waher.Networking.Sniffers
 			this.output = null;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public virtual void Dispose()
+		/// <inheritdoc/>
+		public override Task DisposeAsync()
 		{
 			this.disposed = true;
 
 			this.DisposeOutput();
 			this.disposed = true;
+
+			return base.DisposeAsync();
 		}
 	}
 }

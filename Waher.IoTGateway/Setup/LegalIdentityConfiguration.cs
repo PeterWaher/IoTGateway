@@ -11,13 +11,13 @@ using Waher.Content.Json;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.IoTGateway.Setup.Legal;
-using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Security;
@@ -732,7 +732,7 @@ namespace Waher.IoTGateway.Setup
 				string FileName = Path.Combine(Gateway.RootFolder, "Settings", "LegalIdentities.md");
 				if (File.Exists(FileName))
 				{
-					string Markdown = await Resources.ReadAllTextAsync(FileName);
+					string Markdown = await Files.ReadAllTextAsync(FileName);
 					Variables v = HttpServer.CreateVariables();
 					v["Config"] = this;
 
@@ -869,13 +869,19 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("protectWithPassword", out Obj) || !(Obj is bool ProtectWithPassword) ||
+			if (!Parameters.TryGetValue("protectWithPassword", out object Obj) || !(Obj is bool ProtectWithPassword) ||
 				!Parameters.TryGetValue("password", out Obj) || !(Obj is string Password) ||
 				!Parameters.TryGetValue("password2", out Obj) || !(Obj is string Password2) ||
 				!Parameters.TryGetValue("firstName", out Obj) || !(Obj is string FirstName) ||
@@ -904,16 +910,23 @@ namespace Waher.IoTGateway.Setup
 				!Parameters.TryGetValue("orgRegion", out Obj) || !(Obj is string OrgRegion) ||
 				!Parameters.TryGetValue("orgCountry", out Obj) || !(Obj is string OrgCountry))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			if (ProtectWithPassword)
 			{
 				if (string.IsNullOrEmpty(Password))
-					throw new BadRequestException("Enter a password and try again.");
+				{
+					await Response.SendResponse(new BadRequestException("Enter a password and try again."));
+					return;
+				}
 
 				if (Password != Password2)
-					throw new BadRequestException("Passwords do not match. Retype, and try again.");
+				{
+					await Response.SendResponse(new BadRequestException("Passwords do not match. Retype, and try again."));
+					return;
+				}
 			}
 
 			List<AlternativeField> AlternativeFields = new List<AlternativeField>();
@@ -951,7 +964,8 @@ namespace Waher.IoTGateway.Setup
 						case "ORGCITY":
 						case "ORGREGION":
 						case "ORGCOUNTRY":
-							throw new BadRequestException("The following alternative field name is not allowed: " + P.Key);
+							await Response.SendResponse(new BadRequestException("The following alternative field name is not allowed: " + P.Key));
+							return;
 
 						default:
 							AlternativeFields.Add(new AlternativeField(P.Key, P.Value.ToString()));
@@ -962,12 +976,18 @@ namespace Waher.IoTGateway.Setup
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!string.IsNullOrEmpty(BirthDateStr))
 			{
 				if (!DateTime.TryParse(BirthDateStr, out DateTime BirthDate))
-					throw new BadRequestException("Invalid birth date.");
+				{
+					await Response.SendResponse(new BadRequestException("Invalid birth date."));
+					return;
+				}
 
 				this.birthDate = BirthDate;
 			}
@@ -1210,45 +1230,73 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException("No content.");
+			{
+				await Response.SendResponse(new BadRequestException("No content."));
+				return;
+			}
 
 			string Password;
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new UnsupportedMediaTypeException("Invalid content.");
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new UnsupportedMediaTypeException("Invalid content."));
+				return;
+			}
 
-			if (!Parameters.TryGetValue("requestId", out Obj) || !(Obj is string RequestId) ||
+			if (!Parameters.TryGetValue("requestId", out object Obj) || !(Obj is string RequestId) ||
 				!Parameters.TryGetValue("sign", out Obj) || !(Obj is bool Sign) ||
 				!Parameters.TryGetValue("protect", out Obj) || !(Obj is bool Protect))
 			{
-				throw new BadRequestException("Invalid request.");
+				await Response.SendResponse(new BadRequestException("Invalid request."));
+				return;
 			}
 
 			if (Protect)
 			{
 				if (!Parameters.TryGetValue("password", out Obj) || !(Obj is string s))
-					throw new BadRequestException("No password.");
+				{
+					await Response.SendResponse(new BadRequestException("No password."));
+					return;
+				}
 
 				Password = s;
 			}
 			else
 				Password = string.Empty;
 
-			ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId) ?? throw new NotFoundException("Content Signature Request not found.");
+			ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId);
+			if (SignatureRequest is null)
+			{
+				await Response.SendResponse(new NotFoundException("Content Signature Request not found."));
+				return;
+			}
+
 			if (SignatureRequest.Signed.HasValue)
-				throw new BadRequestException("Contract has already been signed.");
+			{
+				await Response.SendResponse(new BadRequestException("Contract has already been signed."));
+				return;
+			}
 
 			if (Protect)
 			{
 				if (!HasApprovedLegalIdentities)
-					throw new BadRequestException("No approved legal identity found with which to sign the contract.");
+				{
+					await Response.SendResponse(new BadRequestException("No approved legal identity found with which to sign the contract."));
+					return;
+				}
 
 				string Id = this.GetPasswordLegalId(Password);
 				if (string.IsNullOrEmpty(Id))
-					throw new BadRequestException("Invalid password.");
+				{
+					await Response.SendResponse(new BadRequestException("Invalid password."));
+					return;
+				}
 			}
 			else if (this.protectWithPassword)
-				throw new BadRequestException("Legal identities protected with password.");
+			{
+				await Response.SendResponse(new BadRequestException("Legal identities protected with password."));
+				return;
+			}
 
 			if (Sign)
 			{

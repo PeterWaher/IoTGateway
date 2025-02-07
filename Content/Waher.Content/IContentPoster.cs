@@ -37,7 +37,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
+		Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers);
 
@@ -51,7 +51,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
+		Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
@@ -65,7 +65,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, 
+		Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, 
 			string ContentType, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers);
@@ -81,7 +81,7 @@ namespace Waher.Content
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, 
+		Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, 
 			string ContentType, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers);

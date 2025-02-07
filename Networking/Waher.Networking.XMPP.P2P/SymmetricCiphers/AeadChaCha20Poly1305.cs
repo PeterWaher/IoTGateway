@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
-using Waher.Script.Functions.Scalar;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SymmetricCiphers

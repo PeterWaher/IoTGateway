@@ -12,7 +12,7 @@ https://waher.se/Script.md#3dGraphFunctionsWaherScriptGraphs3d</Description>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Copyright>Copyright © Waher Data AB 2017-2024. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2017-2025. All rights reserved.</Copyright>
     <PackageLicenseUrl />
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Graphs3D</PackageProjectUrl>
     <PackageIconUrl />
@@ -20,9 +20,9 @@ https://waher.se/Script.md#3dGraphFunctionsWaherScriptGraphs3d</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing graphs 3D</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.3.0</AssemblyVersion>
-    <FileVersion>2.3.0</FileVersion>
-		<Version>2.3.0</Version>
+    <AssemblyVersion>2.3.1</AssemblyVersion>
+    <FileVersion>2.3.1</FileVersion>
+		<Version>2.3.1</Version>
 		<FileUpgradeFlags>40</FileUpgradeFlags>
 		<UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Graphs3D\</UpgradeBackupLocation>
 		<OldToolsVersion>2.0</OldToolsVersion>

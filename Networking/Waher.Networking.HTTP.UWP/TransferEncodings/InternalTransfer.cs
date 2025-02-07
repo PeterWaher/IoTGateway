@@ -67,6 +67,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
@@ -75,7 +77,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// Bit 32: If decoding has completed.
 		/// Bit 33: If transmission to underlying stream failed.
 		/// </returns>
-		public override Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
+		public override Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			return Task.FromResult<ulong>(0);
 		}
@@ -83,10 +85,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			this.ms.Write(Data, Offset, NrBytes);
 			return Task.FromResult(true);
@@ -95,7 +100,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override Task<bool> FlushAsync(bool EndOfData)
 		{
 			this.ms.Flush();
 			return Task.FromResult(true);

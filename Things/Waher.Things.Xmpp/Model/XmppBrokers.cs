@@ -37,6 +37,22 @@ namespace Waher.Things.Xmpp.Model
 		}
 
 		/// <summary>
+		/// Gets an XMPP broker object instance, if available in the cache.
+		/// </summary>
+		/// <param name="Key">Key</param>
+		/// <returns>XMPP broker object instance, or null if none in the cache.</returns>
+		public static XmppBroker GetCachedBroker(string Key)
+		{
+			lock (brokers)
+			{
+				if (brokers.TryGetValue(Key, out XmppBroker Broker))
+					return Broker;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// Gets an XMPP broker object instance.
 		/// </summary>
 		/// <param name="Node">XMPP Broker node.</param>

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Semantic
@@ -70,17 +71,19 @@ namespace Waher.Content.Semantic
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 			object Obj = JSON.Parse(s);
 
 			if (!(Obj is Dictionary<string, object> Doc))
-				throw new Exception("Unable to decode JSON.");
+				return Task.FromResult(new ContentResponse(new Exception("Unable to decode JSON.")));
 
 			SparqlResultSet Parsed = new SparqlResultSet(Doc, BaseUri);
-			return Task.FromResult<object>(Parsed);
+			return Task.FromResult(new ContentResponse(ContentType, Parsed, Data));
 		}
 
 		/// <summary>
@@ -122,9 +125,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
@@ -142,13 +146,13 @@ namespace Waher.Content.Semantic
 			else if (Object is bool b)
 				ResultObj = this.EncodeAsync(b);
 			else
-				throw new ArgumentException("Unable to encode object.", nameof(Object));
+				return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 			string Text = JSON.Encode(ResultObj, Pretty);
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = SparqlResultSetContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		private Dictionary<string, object> EncodeAsync(SparqlResultSet Result)

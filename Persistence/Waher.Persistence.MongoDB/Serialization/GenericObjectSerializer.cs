@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 
 namespace Waher.Persistence.MongoDB.Serialization
 {
@@ -198,10 +196,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 						if (this.returnTypedObjects && !string.IsNullOrEmpty(TypeName))
 						{
-							Type DesiredType = Types.GetType(TypeName);
-							if (DesiredType is null)
-								DesiredType = typeof(GenericObject);
-							
+							Type DesiredType = Types.GetType(TypeName)
+								?? typeof(GenericObject);
+
 							if (DesiredType != typeof(GenericObject))
 							{
 								IObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);

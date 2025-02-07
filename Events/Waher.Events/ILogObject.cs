@@ -6,7 +6,7 @@ namespace Waher.Events
 	/// <summary>
 	/// Interface for objects that can log events.
 	/// </summary>
-	public interface ILogObject : IDisposable
+	public interface ILogObject : IDisposableAsync
 	{
 		/// <summary>
 		/// Object ID, used when logging events.

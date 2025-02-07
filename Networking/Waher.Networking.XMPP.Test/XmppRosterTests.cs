@@ -14,9 +14,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
 		[TestMethod]
@@ -114,7 +114,7 @@ namespace Waher.Networking.XMPP.Test
 
 			await this.client1.RequestPresenceSubscription("wpfclient@cybercity.online");
 
-			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");
+			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed. Make sure the remote client is running and responds to the presence subscription.");
 		}
 
 	}

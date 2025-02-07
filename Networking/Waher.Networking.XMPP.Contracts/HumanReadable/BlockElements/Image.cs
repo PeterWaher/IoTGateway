@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Events;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 {
@@ -89,11 +90,15 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 
 			try
 			{
-				object Obj = await InternetContent.DecodeAsync(this.contentType, this.Data, null);
-				if (Obj is null)
+				ContentResponse Content = await InternetContent.DecodeAsync(this.contentType, this.Data, null);
+				if (Content.HasError)
 					return this;
 
-				if (Obj is IDisposable Disposable)
+				object Obj = Content.Decoded;
+
+				if (Obj is IDisposableAsync DisposableAsync)
+					await DisposableAsync.DisposeAsync();
+				else if (Obj is IDisposable Disposable)
 					Disposable.Dispose();
 
 				return null;

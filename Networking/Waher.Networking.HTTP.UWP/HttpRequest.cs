@@ -5,8 +5,10 @@ using System.Security.Cryptography.X509Certificates;
 #endif
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Networking.HTTP.HeaderFields;
-using Waher.Runtime.Inventory;
+using Waher.Networking.HTTP.HTTP2;
+using Waher.Runtime.IO;
 using Waher.Script;
 using Waher.Security;
 
@@ -22,6 +24,7 @@ namespace Waher.Networking.HTTP
 		private readonly HttpServer server;
 		private readonly string remoteEndPoint;
 		private readonly string localEndPoint;
+		private readonly Http2Stream http2Stream;
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
@@ -42,7 +45,22 @@ namespace Waher.Networking.HTTP
 		/// <param name="LocalEndPoint">Local end-point.</param>
 		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
 			string LocalEndPoint)
-			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false, null)
+		{
+		}
+
+		/// <summary>
+		/// Represents an HTTP request.
+		/// </summary>
+		/// <param name="Server">HTTP Server receiving the request.</param>
+		/// <param name="Header">HTTP Request header.</param>
+		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
+		/// <param name="RemoteEndPoint">Remote end-point.</param>
+		/// <param name="LocalEndPoint">Local end-point.</param>
+		/// <param name="Http2Stream">HTTP/2 stream</param>
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
+			string LocalEndPoint, Http2Stream Http2Stream)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, false, Http2Stream)
 		{
 		}
 
@@ -57,6 +75,22 @@ namespace Waher.Networking.HTTP
 		/// <param name="DefaultEncrypted">If underlying transport is encrypted by default.</param>
 		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
 			string LocalEndPoint, bool DefaultEncrypted)
+			: this(Server, Header, Data, RemoteEndPoint, LocalEndPoint, DefaultEncrypted, null)
+		{
+		}
+
+		/// <summary>
+		/// Represents an HTTP request.
+		/// </summary>
+		/// <param name="Server">HTTP Server receiving the request.</param>
+		/// <param name="Header">HTTP Request header.</param>
+		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
+		/// <param name="RemoteEndPoint">Remote end-point.</param>
+		/// <param name="LocalEndPoint">Local end-point.</param>
+		/// <param name="DefaultEncrypted">If underlying transport is encrypted by default.</param>
+		/// <param name="Http2Stream">HTTP/2 stream</param>
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint,
+			string LocalEndPoint, bool DefaultEncrypted, Http2Stream Http2Stream)
 		{
 			this.server = Server;
 			this.header = Header;
@@ -64,6 +98,7 @@ namespace Waher.Networking.HTTP
 			this.remoteEndPoint = RemoteEndPoint;
 			this.localEndPoint = LocalEndPoint;
 			this.defaultEncrypted = DefaultEncrypted;
+			this.http2Stream = Http2Stream;
 
 			if (!(this.dataStream is null))
 				this.dataStream.Position = 0;
@@ -80,11 +115,16 @@ namespace Waher.Networking.HTTP
 		public HttpServer Server => this.server;
 
 		/// <summary>
+		/// HTTP/2 stream
+		/// </summary>
+		public Http2Stream Http2Stream => this.http2Stream;
+
+		/// <summary>
 		/// Decodes data sent in request.
 		/// </summary>
 		/// <returns>Decoded data.</returns>
 		[Obsolete("Use DecodeDataAsync() instead, for better performance processing asynchronous elements in parallel environments.")]
-		public object DecodeData()
+		public ContentResponse DecodeData()
 		{
 			return this.DecodeDataAsync().Result;
 		}
@@ -93,15 +133,18 @@ namespace Waher.Networking.HTTP
 		/// Decodes data sent in request.
 		/// </summary>
 		/// <returns>Decoded data.</returns>
-		public async Task<object> DecodeDataAsync()
+		public async Task<ContentResponse> DecodeDataAsync()
 		{
 			byte[] Data = await this.ReadDataAsync();
 			if (Data is null)
-				return null;
+			{
+				Data = Array.Empty<byte>();
+				return new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
+			}
 
 			HttpFieldContentType ContentType = this.header.ContentType;
 			if (ContentType is null)
-				return Data;
+				return new ContentResponse(BinaryCodec.DefaultContentType, Data, Data);
 
 			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
 				new Uri(this.header.GetURL(false, false)));

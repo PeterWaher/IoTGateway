@@ -19,5 +19,12 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Document">Markdown document containing element.</param>
 		Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, 
 			MarkdownDocument Document);
+
+		/// <summary>
+		/// Reports a resource for preloading.
+		/// </summary>
+		/// <param name="Progress">Progress reporting interface.</param>
+		/// <param name="Items">Multi-media items.</param>
+		Task Preload(ICodecProgress Progress, MultimediaItem[] Items);
 	}
 }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Html;
 using Waher.Persistence.FullTextSearch;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.Tokenizers
 {
@@ -114,7 +114,7 @@ namespace Waher.IoTGateway.Tokenizers
 		/// <param name="Process">Current tokenization process.</param>
 		public async Task Tokenize(FileReference Reference, TokenizationProcess Process)
 		{
-			string Text = await Resources.ReadAllTextAsync(Reference.FileName);
+			string Text = await Files.ReadAllTextAsync(Reference.FileName);
 			HtmlDocument Doc = new HtmlDocument(Text);
 
 			await Tokenize(Doc, Process);

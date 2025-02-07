@@ -5,37 +5,48 @@ using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 
 namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 {
-	/// <inheritdoc />
 	/// <summary>
 	/// A managed class that holds data referring to a <see cref="T:DasMulli.Win32.ServiceUtils.ServiceFailureActionsInfo" /> class which has unmanaged resources
 	/// </summary>
-	public class ServiceFailureActions : IEquatable<ServiceFailureActions>
+	/// <param name="resetPeriod">Reset period</param>
+	/// <param name="rebootMessage">Reboot message</param>
+	/// <param name="restartCommand">Restart command</param>
+	/// <param name="actions">Actions</param>
+	public class ServiceFailureActions(TimeSpan resetPeriod, string rebootMessage,
+		string restartCommand, IReadOnlyCollection<ScAction> actions) 
+		: IEquatable<ServiceFailureActions>
 	{
-		public TimeSpan ResetPeriod { get; }
-		public string RebootMessage { get; }
-		public string RestartCommand { get; }
-		public IReadOnlyCollection<ScAction> Actions { get; }
+		/// <summary>
+		/// Reset period
+		/// </summary>
+		public TimeSpan ResetPeriod { get; } = resetPeriod;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ServiceFailureActions"/> class.
+		/// Reboot message
 		/// </summary>
-		public ServiceFailureActions(TimeSpan resetPeriod, string rebootMessage, string restartCommand, IReadOnlyCollection<ScAction> actions)
-		{
-			ResetPeriod = resetPeriod;
-			RebootMessage = rebootMessage;
-			RestartCommand = restartCommand;
-			Actions = actions;
-		}
+		public string RebootMessage { get; } = rebootMessage;
 
+		/// <summary>
+		/// Restart command
+		/// </summary>
+		public string RestartCommand { get; } = restartCommand;
+
+		/// <summary>
+		/// Actions
+		/// </summary>
+		public IReadOnlyCollection<ScAction> Actions { get; } = actions;
+
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is null)
 				return false;
 
-			return obj is ServiceFailureActions && Equals((ServiceFailureActions)obj);
+			return obj is ServiceFailureActions Typed && this.Equals(Typed);
 		}
 
 
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int h1 = this.ResetPeriod.GetHashCode();
@@ -55,13 +66,17 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 			return h1;
 		}
 
-		public bool Equals(ServiceFailureActions other)
+		/// <summary>
+		/// Compares the instance with another.
+		/// </summary>
+		/// <param name="Other">Other instance</param>
+		/// <returns>If they are equal</returns>
+		public bool Equals(ServiceFailureActions Other)
 		{
-			if (other is null)
-			{
+			if (Other is null)
 				return false;
-			}
-			return this.GetHashCode() == other.GetHashCode();
+
+			return this.GetHashCode() == Other.GetHashCode();
 		}
 	}
 }

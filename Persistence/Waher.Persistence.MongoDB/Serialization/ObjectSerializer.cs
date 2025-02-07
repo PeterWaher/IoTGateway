@@ -211,7 +211,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t{");
 			CSharp.AppendLine("\t\tprivate readonly MongoDBProvider provider;");
 
-			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 			{
 				if (!((FI = Member as FieldInfo) is null))
 				{
@@ -446,7 +446,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\tthis.provider = Provider;");
 
 
-			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 			{
 				if (!((FI = Member as FieldInfo) is null))
 				{
@@ -589,7 +589,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				CSharp.AppendLine("\t\t\t\tswitch (FieldName)");
 				CSharp.AppendLine("\t\t\t\t{");
 
-				foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+				foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 				{
 					if (!((FI = Member as FieldInfo) is null))
 					{
@@ -1305,7 +1305,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t{");
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tObjectId " + MemberName + "ObjectId = Reader.ReadObjectId();");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + GenericParameterName(MemberType) + "> " + MemberName + "Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(" + MemberName + "ObjectId);");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + GenericParameterName(MemberType) + "> " + MemberName + "Task = this.provider.TryLoadObject<" + GenericParameterName(MemberType) + ">(" + MemberName + "ObjectId);");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!" + MemberName + "Task.Wait(10000))");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
 										CSharp.AppendLine();
@@ -1603,7 +1603,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\tType T = UntypedValue?.GetType();");
 			CSharp.AppendLine("\t\t\tif (!(T is null) && T != typeof(" + this.type.FullName + "))");
 			CSharp.AppendLine("\t\t\t{");
-			CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer = this.context.GetObjectSerializer(T);");
+			CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer = this.provider.GetObjectSerializer(T);");
 			CSharp.AppendLine("\t\t\t\tSerializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue);");
 			CSharp.AppendLine("\t\t\t\treturn;");
 			CSharp.AppendLine("\t\t\t}");
@@ -1635,7 +1635,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					break;
 			}
 
-			foreach (MemberInfo Member in this.typeInfo.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			foreach (MemberInfo Member in this.typeInfo.GetMembers(BindingFlags.Public | BindingFlags.Instance))
 			{
 				if (!((FI = Member as FieldInfo) is null))
 				{
@@ -1943,11 +1943,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t{");
 
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tType T = Item.GetType();");
+									CSharp.AppendLine("\t\tType IT = Item.GetType();");
 									CSharp.AppendLine("\t\tIObjectSerializer S;");
 									CSharp.AppendLine();
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tS = this.provider.GetObjectSerializer(T);");
+									CSharp.AppendLine("\t\tS = this.provider.GetObjectSerializer(IT);");
 									CSharp.AppendLine();
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\tS.Serialize(Writer, true, true, Item);");

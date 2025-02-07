@@ -10,11 +10,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	public class ChunkedTransferEncoding : TransferEncoding
 	{
 		private readonly Encoding textEncoding;
-		private readonly bool txText;
 		private readonly byte[] chunk;
 		private int state = 0;
 		private int chunkSize = 0;
 		private int pos;
+		private bool txText;
 
 		/// <summary>
 		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
@@ -54,6 +54,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data has been received that needs to be decoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrRead">Number of bytes read.</param>
@@ -62,7 +64,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// Bit 32: If decoding has completed.
 		/// Bit 33: If transmission to underlying stream failed.
 		/// </returns>
-		public override async Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
+		public override async Task<ulong> DecodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrRead)
 		{
 			int i, j, c;
 			byte b;
@@ -131,7 +133,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					case 4:     // Data
 						if (i + this.chunkSize <= c)
 						{
-							if (this.output is null || !await this.output.SendAsync(Data, i, this.chunkSize))
+							if (this.output is null || !await this.output.SendAsync(ConstantBuffer, Data, i, this.chunkSize))
 								this.transferError = true;
 
 							this.clientConnection?.Server.DataTransmitted(this.chunkSize);
@@ -143,7 +145,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						else
 						{
 							j = c - i;
-							if (this.output is null || !await this.output.SendAsync(Data, i, j))
+							if (this.output is null || !await this.output.SendAsync(ConstantBuffer, Data, i, j))
 								this.transferError = true;
 
 							this.clientConnection?.Server.DataTransmitted(j);
@@ -171,10 +173,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Is called when new binary data is to be sent and needs to be encoded.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Data">Data buffer.</param>
 		/// <param name="Offset">Offset where binary data begins.</param>
 		/// <param name="NrBytes">Number of bytes to encode.</param>
-		public override async Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
+		/// <param name="LastData">If no more data is expected.</param>
+		public override async Task<bool> EncodeAsync(bool ConstantBuffer, byte[] Data, int Offset, int NrBytes, bool LastData)
 		{
 			int NrLeft;
 
@@ -219,7 +224,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			Chunk[Len] = (byte)'\r';
 			Chunk[Len + 1] = (byte)'\n';
 
-			await this.output.SendAsync(Chunk, 0, Len + 2);
+			await this.output.SendAsync(true, Chunk, 0, Len + 2);
 
 			if (Flush)
 				await this.output.FlushAsync();
@@ -230,10 +235,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				if (this.clientConnection.HasSniffers)
 				{
-					if (this.txText)
-						await this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
+					if (this.txText && this.pos < 1000)
+						this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
 					else
-						await this.clientConnection.TransmitBinary(Chunk);
+					{
+						this.clientConnection.TransmitBinary(true, Chunk);
+						this.txText = false;
+					}
 				}
 			}
 
@@ -245,7 +253,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		public override Task<bool> FlushAsync()
+		/// <param name="EndOfData">If no more data is expected.</param>
+		public override Task<bool> FlushAsync(bool EndOfData)
 		{
 			if (this.pos > 0)
 				return this.WriteChunk(true);
@@ -268,7 +277,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 
 			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
-			await this.output.SendAsync(Chunk, 0, 5);
+			await this.output.SendAsync(true, Chunk, 0, 5);
 			if (!await this.output.FlushAsync())
 				return false;
 
@@ -277,7 +286,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				this.clientConnection.Server.DataTransmitted(5);
 
 				if (this.clientConnection.HasSniffers && !this.txText)
-					await this.clientConnection.TransmitBinary(Chunk);
+					this.clientConnection.TransmitBinary(true, Chunk);
 			}
 
 			return true;

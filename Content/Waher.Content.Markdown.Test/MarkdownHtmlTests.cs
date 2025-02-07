@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 using Waher.Runtime.Text;
-using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
 {
@@ -16,11 +16,11 @@ namespace Waher.Content.Markdown.Test
 	{
 		private static async Task DoTest(string MarkdownFileName, string HtmlFileName)
 		{
-			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedHtml = await Resources.ReadAllTextAsync("HTML/" + HtmlFileName);
+			string Markdown = await Files.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
+			string ExpectedHtml = await Files.ReadAllTextAsync("HTML/" + HtmlFileName);
 			Emoji1LocalFiles Emoji1LocalFiles = new(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
-			MarkdownSettings Settings = new(Emoji1LocalFiles, true, new Variables())
+			MarkdownSettings Settings = new(Emoji1LocalFiles, true, [])
 			{
 				HttpxProxy = "/HttpxProxy/%URL%"
 			};

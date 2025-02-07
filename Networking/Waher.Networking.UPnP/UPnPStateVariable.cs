@@ -421,8 +421,10 @@ namespace Waher.Networking.UPnP
 				return Bin;
 			else
 			{
-				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Value, Encoding.UTF8);
-				return P.Key;
+				ContentResponse P = await InternetContent.EncodeAsync(Value, Encoding.UTF8);
+				P.AssertOk();
+
+				return P.Encoded;
 			}
 		}
 	}

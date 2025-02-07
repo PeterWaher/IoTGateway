@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Timing;
 
@@ -43,6 +44,7 @@ namespace Waher.Networking.DNS.Communication
 		private class Rec
 		{
 			public ushort ID;
+			public bool ConstantBuffer;
 			public byte[] Output;
 			public IPEndPoint Destination;
 			public EventHandlerAsync<DnsMessageEventArgs> Callback;
@@ -78,11 +80,13 @@ namespace Waher.Networking.DNS.Communication
 		/// Sends a message to a DNS server.
 		/// </summary>
 		/// <param name="ID">Message ID</param>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Message">Encoded message</param>
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
 		/// <param name="Callback">method to call when a response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		protected async Task BeginTransmit(ushort ID, byte[] Message, IPEndPoint Destination,
+		protected async Task BeginTransmit(ushort ID, bool ConstantBuffer, byte[] Message, IPEndPoint Destination,
 			EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
 			if (this.disposed)
@@ -93,6 +97,7 @@ namespace Waher.Networking.DNS.Communication
 				Rec Rec = new Rec()
 				{
 					ID = ID,
+					ConstantBuffer = ConstantBuffer,
 					Output = Message,
 					Destination = Destination,
 					Callback = Callback,
@@ -123,9 +128,9 @@ namespace Waher.Networking.DNS.Communication
 				while (!(Message is null))
 				{
 					this.thread?.Event("Tx");
-					await this.TransmitBinary(Message);
+					this.TransmitBinary(ConstantBuffer, Message);
 
-					await this.SendAsync(Message, Destination);
+					await this.SendAsync(ConstantBuffer, Message, Destination);
 
 					if (this.disposed)
 						return;
@@ -150,16 +155,18 @@ namespace Waher.Networking.DNS.Communication
 			{
 				ex = Log.UnnestException(ex);
 				this.thread?.Exception(ex);
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 		}
 
 		/// <summary>
 		/// Sends a message to a destination.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Message">Message</param>
 		/// <param name="Destination">Destination. If null, default destination is assumed.</param>
-		protected abstract Task SendAsync(byte[] Message, IPEndPoint Destination);
+		protected abstract Task SendAsync(bool ConstantBuffer, byte[] Message, IPEndPoint Destination);
 
 		private Task CheckRetry(object P)
 		{
@@ -171,7 +178,7 @@ namespace Waher.Networking.DNS.Communication
 					return Task.CompletedTask;
 			}
 
-			return this.BeginTransmit(Rec.ID, Rec.Output, Rec.Destination, Rec.Callback, Rec.State);
+			return this.BeginTransmit(Rec.ID, Rec.ConstantBuffer, Rec.Output, Rec.Destination, Rec.Callback, Rec.State);
 		}
 
 		/// <summary>
@@ -253,44 +260,42 @@ namespace Waher.Networking.DNS.Communication
 		public Task SendRequest(OpCode OpCode, bool Recursive, Question[] Questions,
 			IPEndPoint Destination, EventHandlerAsync<DnsMessageEventArgs> Callback, object State)
 		{
-			using (MemoryStream Request = new MemoryStream())
+			using MemoryStream Request = new MemoryStream();
+			ushort ID = DnsResolver.NextID;
+
+			WriteUInt16(ID, Request);
+
+			byte b = (byte)((int)OpCode << 3);
+			if (Recursive)
+				b |= 1;
+
+			Request.WriteByte(b);
+			Request.WriteByte((byte)RCode.NoError);
+
+			int c = Questions.Length;
+			if (c == 0)
+				throw new ArgumentException("No questions included in request.", nameof(Questions));
+
+			if (c > ushort.MaxValue)
+				throw new ArgumentException("Too many questions in request.", nameof(Questions));
+
+			WriteUInt16((ushort)c, Request);    // Query Count
+			WriteUInt16(0, Request);            // Answer Count
+			WriteUInt16(0, Request);            // Authoritative Count
+			WriteUInt16(0, Request);            // Additional Count
+
+			Dictionary<string, ushort> NamePositions = new Dictionary<string, ushort>();
+
+			foreach (Question Q in Questions)
 			{
-				ushort ID = DnsResolver.NextID;
-
-				WriteUInt16(ID, Request);
-
-				byte b = (byte)((int)OpCode << 3);
-				if (Recursive)
-					b |= 1;
-
-				Request.WriteByte(b);
-				Request.WriteByte((byte)RCode.NoError);
-
-				int c = Questions.Length;
-				if (c == 0)
-					throw new ArgumentException("No questions included in request.", nameof(Questions));
-
-				if (c > ushort.MaxValue)
-					throw new ArgumentException("Too many questions in request.", nameof(Questions));
-
-				WriteUInt16((ushort)c, Request);    // Query Count
-				WriteUInt16(0, Request);            // Answer Count
-				WriteUInt16(0, Request);            // Authoritative Count
-				WriteUInt16(0, Request);            // Additional Count
-
-				Dictionary<string, ushort> NamePositions = new Dictionary<string, ushort>();
-
-				foreach (Question Q in Questions)
-				{
-					WriteName(Q.QNAME, Request, NamePositions);
-					WriteUInt16((ushort)Q.QTYPE, Request);
-					WriteUInt16((ushort)Q.QCLASS, Request);
-				}
-
-				byte[] Packet = Request.ToArray();
-
-				return this.BeginTransmit(ID, Packet, Destination, Callback, State);
+				WriteName(Q.QNAME, Request, NamePositions);
+				WriteUInt16((ushort)Q.QTYPE, Request);
+				WriteUInt16((ushort)Q.QCLASS, Request);
 			}
+
+			byte[] Packet = Request.ToArray();
+
+			return this.BeginTransmit(ID, true, Packet, Destination, Callback, State);
 		}
 
 		/// <summary>
@@ -514,9 +519,8 @@ namespace Waher.Networking.DNS.Communication
 			List<ResourceRecord> Result = new List<ResourceRecord>();
 			ResourceRecord Rec;
 
-			while (Count > 0)
+			while (Count-- > 0)
 			{
-				Count--;
 				Rec = ResourceRecord.Create(Data);
 
 				if (!(Rec is null))

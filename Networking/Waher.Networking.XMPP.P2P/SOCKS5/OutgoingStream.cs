@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 
@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 
 				this.isWriting = true;
-				await this.client.Send(Block);
+				await this.client.Send(true, Block);
 			}
 
 			this.flush = false;
@@ -319,8 +319,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private async Task SendClose()
 		{
 			this.client.OnWriteQueueEmpty -= this.WriteQueueEmpty;
-			await this.client.Send(new byte[] { 0, 0 });
-			this.client.CloseWhenDone();
+			await this.client.Send(true, new byte[] { 0, 0 });
+			await this.client.CloseWhenDone();
 			this.Dispose();
 		}
 

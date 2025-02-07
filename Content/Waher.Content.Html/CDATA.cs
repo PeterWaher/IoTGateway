@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
@@ -35,8 +34,9 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Exports the HTML document to XML.
 		/// </summary>
+		/// <param name="Namespaces">Namespaces defined, by prefix.</param>
 		/// <param name="Output">XML Output</param>
-		public override void Export(XmlWriter Output)
+		public override void Export(XmlWriter Output, Dictionary<string, string> Namespaces)
 		{
 			Output.WriteCData(this.content);
 		}

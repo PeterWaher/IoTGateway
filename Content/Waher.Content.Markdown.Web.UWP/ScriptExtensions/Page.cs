@@ -1,8 +1,10 @@
-﻿using Waher.Script;
+﻿using System;
+using Waher.Networking.HTTP;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
-namespace Waher.Networking.HTTP.ScriptExtensions
+namespace Waher.Content.Markdown.Web.ScriptExtensions
 {
 	/// <summary>
 	/// Page-local variables.
@@ -47,16 +49,26 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 
 			IElement Result = v.ValueElement;
 
-			if (!Variables.TryGetVariable(Page.LastPageVariableName, out v) ||
+			if (!Variables.TryGetVariable(LastPageVariableName, out v) ||
 				!(v.ValueObject is string Url) ||
 				!Variables.TryGetVariable("Request", out v) ||
-				!(v.ValueObject is HttpRequest Request) ||
-				string.Compare(Url, Request.Header.ResourcePart, true) != 0)
+				!(v.ValueObject is HttpRequest Request))
 			{
 				return null;
 			}
 
-			return Result;
+			if (string.Compare(Url, Request.Header.ResourcePart, true) == 0)
+				return Result;
+
+			if (!(Request.Header.Referer is null) &&
+				Uri.TryCreate(Request.Header.Referer.Value, UriKind.Absolute, out Uri Referer) &&
+				string.Compare(Referer.Host, Request.Host, true) == 0 &&
+				string.Compare(Referer.PathAndQuery, Url, true) == 0)
+			{
+				return Result;
+			}
+
+			return null;
 		}
 
 		/// <summary>

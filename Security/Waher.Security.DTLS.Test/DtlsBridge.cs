@@ -19,13 +19,13 @@ namespace Waher.Security.DTLS.Test
 
 		public event DataReceivedEventHandler PacketReceived;
 
-		public async Task SendPacket(byte[] Packet, object RemoteEndpoint)
+		public async Task SendPacket(bool ConstantBuffer, byte[] Packet, object RemoteEndpoint)
 		{
 			if (this.remoteBridge is not null)
 			{
 				DataReceivedEventHandler h = this.remoteBridge.PacketReceived;
 				if (h is not null)
-					await h(Packet, RemoteEndpoint);
+					await h(ConstantBuffer, Packet, RemoteEndpoint);
 			}
 		}
 	}

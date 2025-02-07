@@ -102,7 +102,7 @@ namespace Waher.Networking.SASL
                 return null;
             }
 
-			await Connection.SetUserIdentity(UserName);
+			Connection.SetUserIdentity(UserName);
 
 			if (Password == Account.Password)
 			{
@@ -140,20 +140,18 @@ namespace Waher.Networking.SASL
 		/// <returns>If authentication was successful or not. If null is returned, the mechanism did not perform authentication.</returns>
 		public override async Task<bool?> Authenticate(string UserName, string Password, ISaslClientSide Connection)
 		{
-			using (MemoryStream ms = new MemoryStream())
-			{
-				byte[] Bin = Encoding.UTF8.GetBytes(UserName);
-				ms.Write(Bin, 0, Bin.Length);
-				ms.WriteByte(0);
+			using MemoryStream ms = new MemoryStream();
+			byte[] Bin = Encoding.UTF8.GetBytes(UserName);
+			ms.Write(Bin, 0, Bin.Length);
+			ms.WriteByte(0);
 
-				ms.Write(Bin, 0, Bin.Length);
-				ms.WriteByte(0);
+			ms.Write(Bin, 0, Bin.Length);
+			ms.WriteByte(0);
 
-				Bin = Encoding.UTF8.GetBytes(Password);
-				ms.Write(Bin, 0, Bin.Length);
+			Bin = Encoding.UTF8.GetBytes(Password);
+			ms.Write(Bin, 0, Bin.Length);
 
-				await Connection.Initiate(this, Convert.ToBase64String(ms.ToArray()));
-			}
+			await Connection.Initiate(this, Convert.ToBase64String(ms.ToArray()));
 
 			return true;
 		}

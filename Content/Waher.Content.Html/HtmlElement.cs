@@ -12,8 +12,12 @@ namespace Waher.Content.Html
 	{
 		private Dictionary<string, HtmlAttribute> attributesByName = null;
 		private LinkedList<HtmlAttribute> attributes = null;
+		private Dictionary<string, HtmlAttribute> namespacesByPrefix = null;
 		private LinkedList<HtmlNode> children = null;
-		private readonly string name;
+		private readonly string fullName;
+		private readonly string localName;
+		private readonly string prefix;
+		private readonly bool hasPrefix;
 		private string @namespace;
 
 		/// <summary>
@@ -26,14 +30,30 @@ namespace Waher.Content.Html
 		public HtmlElement(HtmlDocument Document, HtmlElement Parent, int StartPosition, string Name)
 			: base(Document, Parent, StartPosition)
 		{
-			this.name = Name;
+			SplitName(Name, out this.prefix, out this.localName, out this.hasPrefix);
+			this.fullName = Name;
 			this.@namespace = null;
 		}
 
 		/// <summary>
-		/// Tag name.
+		/// Element full name (including prefix).
 		/// </summary>
-		public string Name => this.name;
+		public string FullName => this.fullName;
+
+		/// <summary>
+		/// Element local name.
+		/// </summary>
+		public string LocalName => this.localName;
+
+		/// <summary>
+		/// Element prefix.
+		/// </summary>
+		public string Prefix => this.prefix;
+
+		/// <summary>
+		/// If the element has a prefix.
+		/// </summary>
+		public bool HasPrefix => this.hasPrefix;
 
 		/// <summary>
 		/// Namespace, if provided, null if not.
@@ -50,10 +70,17 @@ namespace Waher.Content.Html
 
 		internal void AddAttribute(HtmlAttribute Attribute)
 		{
-			if (Attribute.Name == "xmlns")
+			if (!Attribute.HasPrefix && Attribute.LocalName == "xmlns")
 			{
 				if (string.IsNullOrEmpty(this.@namespace))
 					this.@namespace = Attribute.Value;
+			}
+			else if (Attribute.HasPrefix && Attribute.Prefix == "xmlns")
+			{
+				if (this.namespacesByPrefix is null)
+					this.namespacesByPrefix = new Dictionary<string, HtmlAttribute>();
+
+				this.namespacesByPrefix[Attribute.LocalName] = Attribute;
 			}
 			else
 			{
@@ -63,10 +90,10 @@ namespace Waher.Content.Html
 					this.attributesByName = new Dictionary<string, HtmlAttribute>(StringComparer.OrdinalIgnoreCase);
 				}
 
-				if (!this.attributesByName.ContainsKey(Attribute.Name))
+				if (!this.attributesByName.ContainsKey(Attribute.FullName))
 				{
 					this.attributes.AddLast(Attribute);
-					this.attributesByName[Attribute.Name] = Attribute;
+					this.attributesByName[Attribute.FullName] = Attribute;
 				}
 			}
 		}
@@ -208,42 +235,86 @@ namespace Waher.Content.Html
 		/// Exports the HTML document to XML.
 		/// </summary>
 		/// <param name="Output">XML Output</param>
-		public override void Export(XmlWriter Output)
+		/// <param name="Namespaces">Namespaces defined, by prefix.</param>
+		public override void Export(XmlWriter Output, Dictionary<string, string> Namespaces)
 		{
-			if (this.@namespace is null)
-				Output.WriteStartElement(this.name);
+			LinkedList<KeyValuePair<string, string>> NamespaceBak = null;
+
+			if (!(this.namespacesByPrefix is null))
+			{
+				foreach (KeyValuePair<string, HtmlAttribute> P in this.namespacesByPrefix)
+				{
+					if (Namespaces.TryGetValue(P.Key, out string s))
+					{
+						if (NamespaceBak is null)
+							NamespaceBak = new LinkedList<KeyValuePair<string, string>>();
+
+						NamespaceBak.AddLast(new KeyValuePair<string, string>(P.Key, s));
+					}
+
+					Namespaces[P.Key] = P.Value.Value;
+				}
+			}
+
+			if (this.hasPrefix)
+			{
+				if (Namespaces.TryGetValue(this.prefix, out string s))
+					Output.WriteStartElement(this.prefix, this.localName, s);
+				else
+					Output.WriteStartElement(this.prefix, this.localName, this.@namespace);
+			}
+			else if (this.@namespace is null)
+				Output.WriteStartElement(this.localName);
 			else
-				Output.WriteStartElement(this.name, this.@namespace);
+				Output.WriteStartElement(this.localName, this.@namespace);
+
+			if (!(this.attributes is null))
+			{
+				foreach (HtmlAttribute Attr in this.attributes)
+					Attr.Export(Output, Namespaces);
+			}
+
+			if (!(this.namespacesByPrefix is null))
+			{
+				foreach (KeyValuePair<string, HtmlAttribute> P in this.namespacesByPrefix)
+					P.Value.Export(Output, Namespaces);
+			}
+
+			if (!(this.children is null))
+			{
+				foreach (HtmlNode Child in this.children)
+					Child.Export(Output, Namespaces);
+			}
+
+			Output.WriteEndElement();
+
+			if (!(this.namespacesByPrefix is null))
+			{
+				foreach (KeyValuePair<string, HtmlAttribute> P in this.namespacesByPrefix)
+					Namespaces.Remove(P.Key);
+			}
+
+			if (!(NamespaceBak is null))
+			{
+				foreach (KeyValuePair<string, string> P in NamespaceBak)
+					Namespaces[P.Key] = P.Value;
+			}
+		}
+
+		/// <summary>
+		/// Exports the HTML document to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		public override void Export(StringBuilder Output)
+		{
+			Output.Append('<');
+			Output.Append(this.fullName);
 
 			if (!(this.attributes is null))
 			{
 				foreach (HtmlAttribute Attr in this.attributes)
 					Attr.Export(Output);
 			}
-
-			if (!(this.children is null))
-			{
-				foreach (HtmlNode Child in this.children)
-					Child.Export(Output);
-			}
-
-			Output.WriteEndElement();
-		}
-
-        /// <summary>
-        /// Exports the HTML document to XML.
-        /// </summary>
-        /// <param name="Output">XML Output</param>
-        public override void Export(StringBuilder Output)
-        {
-            Output.Append('<');
-            Output.Append(this.name);
-
-            if (!(this.attributes is null))
-            {
-                foreach (HtmlAttribute Attr in this.attributes)
-                    Attr.Export(Output);
-            }
 
 			if (!(this.@namespace is null))
 			{
@@ -252,25 +323,31 @@ namespace Waher.Content.Html
 				Output.Append('"');
 			}
 
-            if (this.children is null)
-                Output.Append("/>");
-            else
-            {
-                Output.Append('>');
+			if (!(this.namespacesByPrefix is null))
+			{
+				foreach (KeyValuePair<string, HtmlAttribute> P in this.namespacesByPrefix)
+					P.Value.Export(Output);
+			}
 
-                foreach (HtmlNode Child in this.children)
-                    Child.Export(Output);
+			if (this.children is null)
+				Output.Append("/>");
+			else
+			{
+				Output.Append('>');
 
-                Output.Append("</");
-                Output.Append(this.name);
-                Output.Append('>');
-            }
-        }
+				foreach (HtmlNode Child in this.children)
+					Child.Export(Output);
 
-        /// <summary>
-        /// If the element is an empty element.
-        /// </summary>
-        public virtual bool IsEmptyElement => false;
+				Output.Append("</");
+				Output.Append(this.fullName);
+				Output.Append('>');
+			}
+		}
+
+		/// <summary>
+		/// If the element is an empty element.
+		/// </summary>
+		public virtual bool IsEmptyElement => false;
 
 		/// <summary>
 		/// If the element has an attribute with a given (case-insensitive) name.
@@ -279,15 +356,26 @@ namespace Waher.Content.Html
 		/// <returns>If such an attribute exists.</returns>
 		public bool HasAttribute(string Name)
 		{
-			if (Name == "xmlns")
-				return !(this.@namespace is null);
+			if (Name.StartsWith("xmlns"))
+			{
+				if (Name == "xmlns")
+					return !(this.@namespace is null);
+
+				if (Name.Length > 6 && Name[5] == ':')
+				{
+					if (this.namespacesByPrefix is null)
+						return false;
+
+					return this.namespacesByPrefix.ContainsKey(Name.Substring(6));
+				}
+			}
 
 			if (this.attributes is null)
 				return false;
 
 			foreach (HtmlAttribute Attr in this.attributes)
 			{
-				if (string.Compare(Attr.Name, Name, true) == 0)
+				if (string.Compare(Attr.FullName, Name, true) == 0)
 					return true;
 			}
 
@@ -301,19 +389,30 @@ namespace Waher.Content.Html
 		/// <returns>Attribute value.</returns>
 		public string GetAttribute(string Name)
 		{
-			if (Name == "xmlns")
-				return this.@namespace;
-
-			if (this.attributes is null)
-				return string.Empty;
-
-			foreach (HtmlAttribute Attr in this.attributes)
+			if (Name.StartsWith("xmlns"))
 			{
-				if (string.Compare(Attr.Name, Name, true) == 0)
-					return Attr.Value;
+				if (Name == "xmlns")
+					return this.@namespace;
+
+				if (Name.Length > 6 && Name[5] == ':')
+				{
+					if (this.namespacesByPrefix is null)
+						return string.Empty;
+
+					if (this.namespacesByPrefix.TryGetValue(Name.Substring(6), out HtmlAttribute NsAttr))
+						return NsAttr.Value;
+					else
+						return string.Empty;
+				}
 			}
 
-			return string.Empty;
+			if (this.attributesByName is null)
+				return string.Empty;
+
+			if (this.attributesByName.TryGetValue(Name, out HtmlAttribute Attr))
+				return Attr.Value;
+			else
+				return string.Empty;
 		}
 	}
 }

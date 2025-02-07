@@ -44,6 +44,7 @@ namespace Waher.Networking.HTTP
 		private readonly IHttpDeleteMethod delete;
 		private readonly IHttpOptionsMethod options;
 		private readonly IHttpTraceMethod trace;
+		private readonly IHttpConnectMethod connect;
 		private readonly string resourceName;
 		private HttpServer[] serversStatic = new HttpServer[0];
 
@@ -65,6 +66,7 @@ namespace Waher.Networking.HTTP
 			this.delete = this as IHttpDeleteMethod;
 			this.options = this;
 			this.trace = this as IHttpTraceMethod;
+			this.connect = this as IHttpConnectMethod;
 
 			List<string> Methods = new List<string>();
 
@@ -91,6 +93,9 @@ namespace Waher.Networking.HTTP
 
 			if (!(this.trace is null) && this.trace.AllowsTRACE)
 				Methods.Add("TRACE");
+
+			if (!(this.connect is null) && this.connect.AllowsCONNECT)
+				Methods.Add("CONNECT");
 
 			this.allowedMethods = Methods.ToArray();
 		}
@@ -469,6 +474,13 @@ namespace Waher.Networking.HTTP
 						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						await this.trace.TRACE(Request, Response);
+					break;
+
+				case "CONNECT":
+					if (this.connect is null)
+						throw new MethodNotAllowedException(this.allowedMethods);
+					else
+						await this.connect.CONNECT(Request, Response);
 					break;
 
 				default:

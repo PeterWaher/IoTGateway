@@ -3,6 +3,7 @@ using System;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -106,7 +107,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				}
 			}
 
-			string MarkdownText = await Resources.ReadAllTextAsync(FileName);
+			string MarkdownText = await Files.ReadAllTextAsync(FileName);
 			MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Settings, FileName, string.Empty, ParentURL);
 			Markdown.Master = Document;
 

@@ -21,9 +21,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
 		public override async Task ConnectClients()
@@ -39,12 +39,12 @@ namespace Waher.Networking.XMPP.Test
 			Log.Register(this.sink);
 		}
 
-		public override Task DisposeClients()
+		public override async Task DisposeClients()
 		{
 			if (this.sink is not null)
 			{
 				Log.Unregister(this.sink);
-				this.sink.Dispose();
+				await this.sink.DisposeAsync();
 				this.sink = null;
 			}
 
@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP.Test
 				this.receptor = null;
 			}
 
-			return base.DisposeClients();
+			await base.DisposeClients();
 		}
 
 		[TestMethod]

@@ -450,6 +450,5 @@ namespace Waher.Script.Model
 		/// Empty Script Node
 		/// </summary>
 		public static readonly ScriptNode EmptyNode = new ConstantElement(ObjectValue.Null, 0, 0, new Expression("null"));
-
 	}
 }

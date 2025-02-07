@@ -215,7 +215,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		private static readonly char[] crlf = new char[] { '\r', '\n' };
 
 		/// <summary>
-		/// Drops the collection from the source.
+		/// Drops the collection specified by the source.
 		/// </summary>
 		public Task DropCollection()
 		{

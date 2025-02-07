@@ -68,9 +68,11 @@ namespace Waher.Script.Networking.Functions
 			Uri Uri = WhoIsClient.RdapUri(IP)
 				?? throw new ScriptRuntimeException("RDAP URI not available for " + IP.ToString(), this);
 
-			object Result = await InternetContent.GetAsync(Uri);
+			ContentResponse Content = await InternetContent.GetAsync(Uri);
+			if (Content.HasError)
+				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);
 
-			return new ObjectValue(Result);
+			return new ObjectValue(Content.Decoded);
 		}
 
 		/// <summary>

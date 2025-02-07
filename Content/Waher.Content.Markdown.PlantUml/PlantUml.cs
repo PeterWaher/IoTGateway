@@ -18,6 +18,7 @@ using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Runtime.Timing;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -87,6 +88,7 @@ namespace Waher.Content.Markdown.PlantUml
 						{
 							scheduler?.Dispose();
 							scheduler = null;
+							return Task.CompletedTask;
 						};
 					}
 				}
@@ -470,7 +472,7 @@ namespace Waher.Content.Markdown.PlantUml
 
 			Result.TxtFileName = Result.BaseFileName + ".txt";
 			if (!File.Exists(Result.TxtFileName))
-				await Resources.WriteAllTextAsync(Result.TxtFileName, Graph, Encoding.UTF8);
+				await Files.WriteAllTextAsync(Result.TxtFileName, Graph, Encoding.UTF8);
 
 			switch (Type)
 			{
@@ -640,7 +642,7 @@ namespace Waher.Content.Markdown.PlantUml
 			if (Info is null)
 				return null;
 
-			byte[] Data = await Resources.ReadAllBytesAsync(Info.ImageFileName);
+			byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.ImageFileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{
@@ -665,10 +667,11 @@ namespace Waher.Content.Markdown.PlantUml
 				if (Info is null)
 					return false;
 
-				byte[] Data = await Resources.ReadAllBytesAsync(Info.ImageFileName);
+				byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.ImageFileName);
 				string ContentType = ImageCodec.ContentTypePng;
+				ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Data, null);
 
-				if (!(await InternetContent.DecodeAsync(ContentType, Data, null) is SKImage Image))
+				if (Content.HasError || !(Content.Decoded is SKImage Image))
 					return false;
 
 				XmlWriter Output = Renderer.XmlOutput;

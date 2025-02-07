@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Text;
 using Waher.Events;
-using Waher.Networking.HTTP;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -24,24 +25,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -59,10 +48,17 @@ namespace Waher.IoTGateway.WebResources
 			Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!(await Request.DecodeDataAsync() is string FileName))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is string FileName))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			string Dir;
 
@@ -72,11 +68,17 @@ namespace Waher.IoTGateway.WebResources
 				Dir = await Export.GetFullExportFolderAsync();
 
 			if (!Directory.Exists(Dir))
-				throw new NotFoundException("Folder not found: " + Dir);
+			{
+				await Response.SendResponse(new NotFoundException("Folder not found: " + Dir));
+				return;
+			}
 
 			string FullFileName = Dir + Path.DirectorySeparatorChar + FileName;
 			if (!File.Exists(FullFileName))
-				throw new NotFoundException("File not found: " + FullFileName);
+			{
+				await Response.SendResponse(new NotFoundException("File not found: " + FullFileName));
+				return;
+			}
 
 			File.Delete(FullFileName);
 

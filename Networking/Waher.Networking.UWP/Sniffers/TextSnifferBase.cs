@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.Sniffers
 {
@@ -31,11 +33,16 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// How the sniffer handles binary data.
+		/// </summary>
+		public override BinaryPresentationMethod BinaryPresentationMethod => this.binaryPresentationMethod;
+
+		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
 		protected virtual Task BeforeWrite()
 		{
-			return Task.CompletedTask;  // Do nothing by default.
+			return Task.CompletedTask;	// Do nothing by default.
 		}
 
 		/// <summary>
@@ -43,16 +50,16 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected virtual Task AfterWrite()
 		{
-			return Task.CompletedTask;  // Do nothing by default.
+			return Task.CompletedTask;	// Do nothing by default.
 		}
 
-		/// <inheritdoc/>
-		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <summary>
+		/// Processes a binary reception event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxBinary Event)
 		{
-			if (Data.Length > 0)
-				return this.HexOutput(Data, this.Prefix(Timestamp, "Rx"));
-			else
-				return Task.CompletedTask;
+			return this.HexOutput(Event.Data, Event.Offset, Event.Count, this.Prefix(Event.Timestamp, "Rx"));
 		}
 
 		private string Prefix(DateTime Timestamp, string Type)
@@ -63,19 +70,22 @@ namespace Waher.Networking.Sniffers
 				return Type + ": ";
 		}
 
-		private async Task HexOutput(byte[] Data, string RowPrefix)
+		private async Task HexOutput(byte[] Data, int Offset, int Count, string RowPrefix)
 		{
 			await this.BeforeWrite();
 			try
 			{
-				switch (this.binaryPresentationMethod)
+				switch (Data is null ? BinaryPresentationMethod.ByteCount : this.binaryPresentationMethod)
 				{
 					case BinaryPresentationMethod.Hexadecimal:
 						StringBuilder sb = new StringBuilder();
 						int i = 0;
+						byte b;
 
-						foreach (byte b in Data)
+						while (Count-- > 0)
 						{
+							b = Data[Offset++];
+
 							if (i == 0)
 								sb.Append(RowPrefix);
 							else
@@ -96,11 +106,11 @@ namespace Waher.Networking.Sniffers
 						break;
 
 					case BinaryPresentationMethod.Base64:
-						await this.WriteLine(RowPrefix + Convert.ToBase64String(Data));
+						await this.WriteLine(RowPrefix + Convert.ToBase64String(Data, Offset, Count));
 						break;
 
 					case BinaryPresentationMethod.ByteCount:
-						await this.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
+						await this.WriteLine(RowPrefix + "<" + Count.ToString() + " bytes>");
 						break;
 				}
 			}
@@ -110,19 +120,22 @@ namespace Waher.Networking.Sniffers
 			}
 		}
 
-		/// <inheritdoc/>
-		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <summary>
+		/// Processes a binary transmission event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxBinary Event)
 		{
-			if (Data.Length > 0)
-				return this.HexOutput(Data, this.Prefix(Timestamp, "Tx"));
-			else
-				return Task.CompletedTask;
+			return this.HexOutput(Event.Data, Event.Offset, Event.Count, this.Prefix(Event.Timestamp, "Tx"));
 		}
 
-		/// <inheritdoc/>
-		public override Task ReceiveText(DateTime Timestamp, string Text)
+		/// <summary>
+		/// Processes a text reception event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferRxText Event)
 		{
-			return this.WriteLine(this.Prefix(Timestamp, "Rx") + Text);
+			return this.WriteLine(this.Prefix(Event.Timestamp, "Rx") + Event.Text);
 		}
 
 		/// <summary>
@@ -131,34 +144,49 @@ namespace Waher.Networking.Sniffers
 		/// <param name="s">String to write.</param>
 		protected abstract Task WriteLine(string s);
 
-		/// <inheritdoc/>
-		public override Task TransmitText(DateTime Timestamp, string Text)
+		/// <summary>
+		/// Processes a text transmission event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferTxText Event)
 		{
-			return this.WriteLine(this.Prefix(Timestamp, "Tx") + Text);
+			return this.WriteLine(this.Prefix(Event.Timestamp, "Tx") + Event.Text);
 		}
 
-		/// <inheritdoc/>
-		public override Task Information(DateTime Timestamp, string Comment)
+		/// <summary>
+		/// Processes an information event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferInformation Event)
 		{
-			return this.WriteLine(this.Prefix(Timestamp, "Info") + Comment);
+			return this.WriteLine(this.Prefix(Event.Timestamp, "Info") + Event.Text);
 		}
 
-		/// <inheritdoc/>
-		public override Task Warning(DateTime Timestamp, string Warning)
+		/// <summary>
+		/// Processes a warning event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferWarning Event)
 		{
-			return this.WriteLine(this.Prefix(Timestamp, "Warning") + Warning);
+			return this.WriteLine(this.Prefix(Event.Timestamp, "Warning") + Event.Text);
 		}
 
-		/// <inheritdoc/>
-		public override Task Error(DateTime Timestamp, string Error)
+		/// <summary>
+		/// Processes an error event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferError Event)
 		{
-			return this.WriteLine(this.Prefix(Timestamp, "Error") + Error);
+			return this.WriteLine(this.Prefix(Event.Timestamp, "Error") + Event.Text);
 		}
 
-		/// <inheritdoc/>
-		public override Task Exception(DateTime Timestamp, string Exception)
+		/// <summary>
+		/// Processes an exception event.
+		/// </summary>
+		/// <param name="Event">Sniffer event.</param>
+		public override Task Process(SnifferException Event)
 		{
-			return this.WriteLine(this.Prefix(Timestamp, "Exception") + Exception);
+			return this.WriteLine(this.Prefix(Event.Timestamp, "Exception") + Event.Text);
 		}
 	}
 }

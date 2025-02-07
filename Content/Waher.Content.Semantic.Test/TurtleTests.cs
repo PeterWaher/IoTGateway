@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Semantic.Test
 {
@@ -131,10 +132,11 @@ namespace Waher.Content.Semantic.Test
 
 		internal static async Task Print(TurtleDocument Parsed)
 		{
-			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
-			Assert.AreEqual("text/turtle; charset=utf-8", P.Value);
+			ContentResponse P = await InternetContent.EncodeAsync(Parsed, Encoding.UTF8);
+			P.AssertOk();
+			Assert.AreEqual("text/turtle; charset=utf-8", P.ContentType);
 
-			byte[] Data = P.Key;
+			byte[] Data = P.Encoded;
 			string s = Encoding.UTF8.GetString(Data);
 
 			Console.Out.WriteLine(s);
@@ -143,8 +145,10 @@ namespace Waher.Content.Semantic.Test
 		private static async Task<TurtleDocument> LoadTurtleDocument(string FileName, Uri? BaseUri)
 		{
 			byte[] Data = Resources.LoadResource(typeof(TurtleTests).Namespace + ".Data.Turtle." + FileName);
-			object Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
-			if (Decoded is not TurtleDocument Parsed)
+			ContentResponse Decoded = await InternetContent.DecodeAsync("text/turtle", Data, BaseUri);
+			Decoded.AssertOk();
+
+			if (Decoded.Decoded is not TurtleDocument Parsed)
 				throw new Exception("Unable to decode Turtle document.");
 
 			return Parsed;

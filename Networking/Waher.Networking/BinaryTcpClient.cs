@@ -29,7 +29,7 @@ namespace Waher.Networking
 	/// safe, making sure it can be disposed, even during an active connection attempt. Outgoing data is queued and transmitted in the
 	/// permitted pace.
 	/// </summary>
-	public class BinaryTcpClient : CommunicationLayer, IDisposable, IBinaryTransportLayer
+	public class BinaryTcpClient : CommunicationLayer, IDisposableAsync, IBinaryTransportLayer
 	{
 		private const int BufferSize = 65536;
 
@@ -305,6 +305,13 @@ namespace Waher.Networking
 		/// </summary>
 		public bool Connected => this.connected && !this.disposing && !this.disposed;
 
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Cancellation token for the connection.
+		/// </summary>
+		public CancellationToken CancellationToken => this.cancelReading.Token;
+#endif
+
 		private void PreConnect()
 		{
 			lock (this.synchObj)
@@ -327,6 +334,8 @@ namespace Waher.Networking
 
 		private bool PostConnect(bool Paused)
 		{
+			bool Disposing = false;
+
 			lock (this.synchObj)
 			{
 				this.connecting = false;
@@ -335,12 +344,26 @@ namespace Waher.Networking
 					return false;
 
 				if (this.disposing)
-				{
-					this.DoDisposeLocked();
-					return false;
-				}
+					Disposing = true;
 				else
 					this.connected = true;
+			}
+
+			if (Disposing)
+			{
+				Task.Run(async () =>
+				{
+					try
+					{
+						await this.DoDisposeAsyncLocked();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				});
+
+				return false;
 			}
 
 #if WINDOWS_UWP
@@ -368,63 +391,98 @@ namespace Waher.Networking
 				}
 			}
 
-			this.Dispose();
+			Task.Run(() =>
+			{
+				try
+				{
+					this.DisposeAsync();
+				}
+				catch (Exception ex)
+				{
+					Log.Exception(ex);
+				}
+			});
 		}
 
 		/// <summary>
 		/// Disposes of the object. The underlying <see cref="TcpClient"/> is either disposed directly, or when asynchronous
 		/// operations have ceased.
 		/// </summary>
-		public virtual void Dispose()
+		[Obsolete("Use DisposeAsync() instead.")]
+		public void Dispose()
+		{
+			Task.Run(() => this.DisposeAsync());
+		}
+
+		/// <summary>
+		/// Disposes of the object asynchronously. The underlying <see cref="TcpClient"/> is 
+		/// either disposed directly, or when asynchronous operations have ceased.
+		/// </summary>
+		public virtual Task DisposeAsync()
 		{
 #if WINDOWS_UWP
 			bool Cancel;
+			bool DoDispose = false;
 
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
-					return;
+					return Task.CompletedTask;
 
 				if (Cancel = this.connecting || this.reading || this.sending)
 					this.disposing = true;
 				else
-					this.DoDisposeLocked();
+					DoDispose = true;
 			}
 
 			if (Cancel)
 			{
 				IAsyncAction _ = this.client.CancelIOAsync();
 			}
+
+			if (DoDispose)
+				return this.DoDisposeAsyncLocked();
+			else
+				return Task.CompletedTask;
 		}
 #else
+			bool DelayedDispose;
+
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.disposing)
-					return;
+					return Task.CompletedTask;
 
 				if (this.connecting || this.reading || this.sending)
 				{
 					this.disposing = true;
 					this.cancelReading.Cancel();
 					NetworkingModule.UnregisterToken(this.id);
-					Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
-					return;
+					DelayedDispose = true;
 				}
-
-				this.DoDisposeLocked();
+				else
+					DelayedDispose = false;
 			}
+
+			if (DelayedDispose)
+			{
+				Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
+				return Task.CompletedTask;
+			}
+			else
+				return this.DoDisposeAsyncLocked();
 		}
 
 		private Task AbortRead(object P)
 		{
-			if (!this.disposed)
-				this.DoDisposeLocked();
-
-			return Task.CompletedTask;
+			if (this.disposed)
+				return Task.CompletedTask;
+			else
+				return this.DoDisposeAsyncLocked();
 		}
 #endif
 
-		private void DoDisposeLocked()
+		private async Task DoDisposeAsyncLocked()
 		{
 			this.disposed = true;
 			this.connecting = false;
@@ -461,7 +519,9 @@ namespace Waher.Networking
 				{
 					this.Remove(Sniffer);
 
-					if (Sniffer is IDisposable Disposable)
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
 						Disposable.Dispose();
 				}
 			}
@@ -493,11 +553,8 @@ namespace Waher.Networking
 		{
 			lock (this.synchObj)
 			{
-				if (this.disposing || this.disposed)
+				if (this.disposing || this.disposed || this.reading)
 					return;
-
-				if (this.reading)
-					throw new InvalidOperationException("Already in a reading state.");
 
 				this.reading = true;
 			}
@@ -561,23 +618,25 @@ namespace Waher.Networking
 					try
 					{
 #if WINDOWS_UWP
-						Continue = await this.BinaryDataReceived(Packet, 0, NrRead);
+						Continue = await this.BinaryDataReceived(false, Packet, 0, NrRead);
 #else
-						Continue = await this.BinaryDataReceived(this.buffer, 0, NrRead);
+						Continue = await this.BinaryDataReceived(false, this.buffer, 0, NrRead);
 #endif
 					}
 					catch (Exception ex)
 					{
-						await this.Exception(ex);
+						this.Exception(ex);
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				await this.Exception(ex);
+				this.Exception(ex);
 			}
 			finally
 			{
+				bool Disposing = false;
+
 				lock (this.synchObj)
 				{
 					this.reading = false;
@@ -596,8 +655,11 @@ namespace Waher.Networking
 					}
 
 					if (this.disposing && !this.sending)
-						this.DoDisposeLocked();
+						Disposing = true;
 				}
+
+				if (Disposing)
+					await this.DoDisposeAsyncLocked();
 			}
 
 			if (!Continue && !this.disposed && !this.disposing)
@@ -610,6 +672,17 @@ namespace Waher.Networking
 		public event EventHandlerAsync OnPaused;
 
 		/// <summary>
+		/// Clears the <see cref="OnPaused"/> event handler.
+		/// </summary>
+		public void OnPausedClear() => this.OnPaused = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnPaused"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnPausedReset(EventHandlerAsync EventHandler) => this.OnPaused = EventHandler;
+
+		/// <summary>
 		/// Method called when the connection has been disconnected.
 		/// </summary>
 		protected virtual Task Disconnected()
@@ -620,38 +693,23 @@ namespace Waher.Networking
 		/// <summary>
 		/// Method called when binary data has been received.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte read.</param>
 		/// <param name="Count">Number of bytes read.</param>
 		/// <returns>If the process should be continued.</returns>
-		protected virtual async Task<bool> BinaryDataReceived(byte[] Buffer, int Offset, int Count)
+		protected virtual async Task<bool> BinaryDataReceived(bool ConstantBuffer,
+			byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				await this.ReceiveBinary(ToArray(Buffer, Offset, Count));
+				this.ReceiveBinary(ConstantBuffer, Buffer, Offset, Count);
 
 			BinaryDataReadEventHandler h = this.OnReceived;
 			if (h is null)
 				return true;
 			else
-				return await h(this, Buffer, Offset, Count);
-		}
-
-		/// <summary>
-		/// Converts a binary subset of a buffer into an array.
-		/// </summary>
-		/// <param name="Buffer">Binary Data Buffer</param>
-		/// <param name="Offset">Start index of first byte read.</param>
-		/// <param name="Count">Number of bytes read.</param>
-		/// <returns>Array</returns>
-		public static byte[] ToArray(byte[] Buffer, int Offset, int Count)
-		{
-			if (Offset == 0 && Count == Buffer.Length)
-				return Buffer;
-
-			byte[] Result = new byte[Count];
-			Array.Copy(Buffer, Offset, Result, 0, Count);
-
-			return Result;
+				return await h(this, ConstantBuffer, Buffer, Offset, Count);
 		}
 
 		/// <summary>
@@ -659,16 +717,31 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="ex">Exception</param>
-		public override async Task Exception(DateTime Timestamp, Exception ex)
+		public override void Exception(DateTime Timestamp, Exception ex)
 		{
 			try
 			{
-				await base.Exception(Timestamp, ex);
-				await this.OnError.Raise(this, ex);
+				base.Exception(Timestamp, ex);
 			}
 			catch (Exception ex2)
 			{
 				Log.Exception(ex2);
+			}
+
+			EventHandlerAsync<Exception> h = this.OnError;
+			if (!(h is null))
+			{
+				Task.Run(async () =>
+				{
+					try
+					{
+						await this.OnError.Raise(this, ex);
+					}
+					catch (Exception ex2)
+					{
+						Log.Exception(ex2);
+					}
+				});
 			}
 		}
 
@@ -678,9 +751,31 @@ namespace Waher.Networking
 		public event BinaryDataReadEventHandler OnReceived;
 
 		/// <summary>
+		/// Clears the <see cref="OnReceived"/> event handler.
+		/// </summary>
+		public void OnReceivedClear() => this.OnReceived = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnReceived"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnReceivedReset(BinaryDataReadEventHandler EventHandler) => this.OnReceived = EventHandler;
+
+		/// <summary>
 		/// Event raised when an error has occurred.
 		/// </summary>
 		public event EventHandlerAsync<Exception> OnError;
+
+		/// <summary>
+		/// Clears the <see cref="OnError"/> event handler.
+		/// </summary>
+		public void OnErrorClear() => this.OnError = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnError"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnErrorReset(EventHandlerAsync<Exception> EventHandler) => this.OnError = EventHandler;
 
 		/// <summary>
 		/// Event raised when the connection has been disconnected.
@@ -688,13 +783,62 @@ namespace Waher.Networking
 		public event EventHandlerAsync OnDisconnected;
 
 		/// <summary>
+		/// Clears the <see cref="OnDisconnected"/> event handler.
+		/// </summary>
+		public void OnDisconnectedClear() => this.OnDisconnected = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnDisconnected"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnDisconnectedReset(EventHandlerAsync EventHandler) => this.OnDisconnected = EventHandler;
+
+		/// <summary>
 		/// Sends a binary packet.
 		/// </summary>
 		/// <param name="Packet">Binary packet.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, null, null);
+			return this.SendAsync(false, Packet, 0, Packet.Length, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet)
+		{
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Packet, bool Priority)
+		{
+			return this.SendAsync(false, Packet, 0, Packet.Length, Priority, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, bool Priority)
+		{
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, Priority, null, null);
 		}
 
 		/// <summary>
@@ -704,9 +848,53 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
-			return this.SendAsync(Packet, 0, Packet.Length, Callback, State);
+			return this.SendAsync(false, Packet, 0, Packet.Length, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(false, Packet, 0, Packet.Length, Priority, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Packet">Binary packet.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Packet, bool Priority, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(ConstantBuffer, Packet, 0, Packet.Length, Priority, Callback, State);
 		}
 
 		/// <summary>
@@ -716,9 +904,53 @@ namespace Waher.Networking
 		/// <param name="Offset">Start index of first byte to write.</param>
 		/// <param name="Count">Number of bytes to write.</param>
 		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
 		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count)
 		{
-			return this.SendAsync(Buffer, Offset, Count, null, null);
+			return this.SendAsync(false, Buffer, Offset, Count, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
+		{
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, false, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority)
+		{
+			return this.SendAsync(false, Buffer, Offset, Count, Priority, null, null);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority)
+		{
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, Priority, null, null);
 		}
 
 		/// <summary>
@@ -730,15 +962,68 @@ namespace Waher.Networking
 		/// <param name="Callback">Method to call when packet has been sent.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <returns>If data was sent.</returns>
-		public async Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(false, Buffer, Offset, Count, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(ConstantBuffer, Buffer, Offset, Count, false, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		[Obsolete("Use an overload with a ConstantBuffer argument. This increases performance, as the buffer will not be unnecessarily cloned if queued.")]
+		public Task<bool> SendAsync(byte[] Buffer, int Offset, int Count, bool Priority,
+			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		{
+			return this.SendAsync(false, Buffer, Offset, Count, Priority, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a binary packet.
+		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
+		/// <param name="Buffer">Binary Data Buffer</param>
+		/// <param name="Offset">Start index of first byte to write.</param>
+		/// <param name="Count">Number of bytes to write.</param>
+		/// <param name="Priority">If packet should be sent before any waiting in the queue.</param>
+		/// <param name="Callback">Method to call when packet has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <returns>If data was sent.</returns>
+		public async Task<bool> SendAsync(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
+			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.BeginSend(Buffer, Offset, Count, Result, Callback, State, true);
+			await this.BeginSend(ConstantBuffer, Buffer, Offset, Count, Priority, Result, Callback, State, true);
 			return await Result.Task;
 		}
 
-		private async Task BeginSend(byte[] Buffer, int Offset, int Count, TaskCompletionSource<bool> Task,
-			EventHandlerAsync<DeliveryEventArgs> Callback, object State, bool CheckSending)
+		private async Task BeginSend(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
+			TaskCompletionSource<bool> Task, EventHandlerAsync<DeliveryEventArgs> Callback,
+			object State, bool CheckSending)
 		{
 			if (Buffer is null)
 				throw new ArgumentException("Cannot be null.", nameof(Buffer));
@@ -763,6 +1048,7 @@ namespace Waher.Networking
 			if (Count < 0 || Offset + Count > c)
 				throw new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count));
 
+			bool DoDispose = false;
 			try
 			{
 #if WINDOWS_UWP
@@ -789,15 +1075,28 @@ namespace Waher.Networking
 
 							if (this.sending)
 							{
-								byte[] Packet = new byte[Count];
-								Array.Copy(Buffer, Offset, Packet, 0, Count);
-								this.queue.AddLast(new Rec()
+								byte[] Packet;
+
+								if (ConstantBuffer && Offset == 0 && Count == Buffer.Length)
+									Packet = Buffer;
+								else
+								{
+									Packet = new byte[Count];
+									Array.Copy(Buffer, Offset, Packet, 0, Count);
+								}
+
+								Rec Item = new Rec()
 								{
 									Data = Packet,
 									Callback = Callback,
 									State = State,
 									Task = Task
-								});
+								};
+
+								if (Priority)
+									this.queue.AddFirst(Item);
+								else
+									this.queue.AddLast(Item);
 								return;
 							}
 
@@ -812,7 +1111,7 @@ namespace Waher.Networking
 								this.EmptyIdleQueueLocked();
 
 								if (this.disposing && !this.reading)
-									this.DoDisposeLocked();
+									DoDispose = true;
 
 								break;
 							}
@@ -827,6 +1126,7 @@ namespace Waher.Networking
 								Callback = Rec.Callback;
 								State = Rec.State;
 								Task = Rec.Task;
+								ConstantBuffer = true;
 							}
 						}
 
@@ -846,7 +1146,7 @@ namespace Waher.Networking
 #if WINDOWS_UWP
 					if (Offset > 0 || Count < c)
 					{
-						Buffer = ToArray(Buffer, Offset, Count);
+						Buffer = SnifferBase.CloneSection(Buffer, Offset, Count);
 						Offset = 0;
 						Count = c;
 					}
@@ -859,11 +1159,11 @@ namespace Waher.Networking
 
 					try
 					{
-						await this.BinaryDataSent(Buffer, Offset, Count);
+						await this.BinaryDataSent(ConstantBuffer, Buffer, Offset, Count);
 					}
 					catch (Exception ex)
 					{
-						await this.Exception(ex);
+						this.Exception(ex);
 					}
 
 					Task.TrySetResult(true);
@@ -883,7 +1183,7 @@ namespace Waher.Networking
 #endif
 					if (this.disposeWhenDone)
 					{
-						this.Dispose();
+						await this.DisposeAsync();
 						return;
 					}
 
@@ -892,8 +1192,6 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
-				bool DoDispose;
-
 				lock (this.synchObj)
 				{
 					this.sending = false;
@@ -901,12 +1199,25 @@ namespace Waher.Networking
 
 					this.EmptyIdleQueueLocked();
 
-					if (DoDispose = this.disposing && !this.reading)
-						this.DoDisposeLocked();
+					DoDispose = this.disposing && !this.reading;
 				}
 
 				if (!DoDispose)
-					await this.Exception(ex);
+					this.Exception(ex);
+			}
+			finally
+			{
+				if (DoDispose)
+				{
+					try
+					{
+						await this.DoDisposeAsyncLocked();
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
 			}
 		}
 
@@ -938,25 +1249,49 @@ namespace Waher.Networking
 		public event EventHandlerAsync OnWriteQueueEmpty = null;
 
 		/// <summary>
+		/// Clears the <see cref="OnWriteQueueEmpty"/> event handler.
+		/// </summary>
+		public void OnWriteQueueEmptyClear() => this.OnWriteQueueEmpty = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnWriteQueueEmpty"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnWriteQueueEmptyReset(EventHandlerAsync EventHandler) => this.OnWriteQueueEmpty = EventHandler;
+
+		/// <summary>
 		/// Method called when binary data has been sent.
 		/// </summary>
+		/// <param name="ConstantBuffer">If the contents of the buffer remains constant (true),
+		/// or if the contents in the buffer may change after the call (false).</param>
 		/// <param name="Buffer">Binary Data Buffer</param>
 		/// <param name="Offset">Start index of first byte written.</param>
 		/// <param name="Count">Number of bytes written.</param>
-		protected virtual async Task BinaryDataSent(byte[] Buffer, int Offset, int Count)
+		protected virtual async Task BinaryDataSent(bool ConstantBuffer, byte[] Buffer, int Offset, int Count)
 		{
 			if (this.sniffBinary && this.HasSniffers)
-				await this.TransmitBinary(ToArray(Buffer, Offset, Count));
+				this.TransmitBinary(ConstantBuffer, Buffer, Offset, Count);
 
 			BinaryDataWrittenEventHandler h = this.OnSent;
 			if (!(h is null))
-				await h(this, Buffer, Offset, Count);
+				await h(this, ConstantBuffer, Buffer, Offset, Count);
 		}
 
 		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
 		public event BinaryDataWrittenEventHandler OnSent;
+
+		/// <summary>
+		/// Clears the <see cref="OnSent"/> event handler.
+		/// </summary>
+		public void OnSentClear() => this.OnSent = null;
+
+		/// <summary>
+		/// Resets the <see cref="OnSent"/> event handler.
+		/// </summary>
+		/// <param name="EventHandler">Event handler to set.</param>
+		public void OnSentReset(BinaryDataWrittenEventHandler EventHandler) => this.OnSent = EventHandler;
 
 		/// <summary>
 		/// Flushes any pending or intermediate data.
@@ -1059,14 +1394,24 @@ namespace Waher.Networking
 		/// </summary>
 		public Certificate RemoteCertificate => this.remoteCertificate;
 #else
-
 		/// <summary>
 		/// Upgrades a client connection to TLS.
 		/// </summary>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsClient(null, Protocols, null, false, this.hostName);
+			return this.UpgradeToTlsAsClient(Protocols, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(SslProtocols Protocols, params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, null, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1076,7 +1421,20 @@ namespace Waher.Networking
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		public Task UpgradeToTlsAsClient(SslProtocols Protocols, RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false, this.hostName);
+			return this.UpgradeToTlsAsClient(Protocols, CertificateValidationCheck, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(SslProtocols Protocols, RemoteCertificateValidationCallback CertificateValidationCheck,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(null, Protocols, CertificateValidationCheck, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1086,7 +1444,20 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1098,7 +1469,22 @@ namespace Waher.Networking
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, false, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1109,7 +1495,21 @@ namespace Waher.Networking
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols, bool TrustRemoteEndpoint)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustRemoteEndpoint, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, TrustRemoteEndpoint, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols, bool TrustRemoteEndpoint,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, null, TrustRemoteEndpoint, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1122,7 +1522,23 @@ namespace Waher.Networking
 		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
 		{
-			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, this.hostName);
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint,
+			params string[] AlpnProtocols)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols, CertificateValidationCheck, TrustRemoteEndpoint, this.hostName, AlpnProtocols);
 		}
 
 		/// <summary>
@@ -1133,8 +1549,27 @@ namespace Waher.Networking
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
 		/// <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
-		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+		public Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
 			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint, string DomainName)
+		{
+			return this.UpgradeToTlsAsClient(ClientCertificate, Protocols,
+				CertificateValidationCheck, TrustRemoteEndpoint, DomainName,
+				Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a client connection to TLS.
+		/// </summary>
+		/// <param name="ClientCertificate">Optional client certificate. Can be null.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		/// <param name="DomainName">The domain name to validate certifictes for. By default, this is the same as the host name.</param>
+		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
+		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
+		public async Task UpgradeToTlsAsClient(X509Certificate ClientCertificate, SslProtocols Protocols,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint, string DomainName,
+			params string[] AlpnProtocols)
 		{
 			lock (this.synchObj)
 			{
@@ -1164,11 +1599,29 @@ namespace Waher.Networking
 					};
 				}
 
+				SslClientAuthenticationOptions Options = new SslClientAuthenticationOptions()
+				{
+					AllowRenegotiation = false,
+					ApplicationProtocols = null,
+					CertificateRevocationCheckMode = X509RevocationMode.Online,
+					ClientCertificates = ClientCertificates,
+					EnabledSslProtocols = Protocols,
+					EncryptionPolicy = EncryptionPolicy.RequireEncryption,
+					TargetHost = this.domainName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString()
+				};
+
+				if (!(AlpnProtocols is null) && AlpnProtocols.Length > 0)
+				{
+					Options.ApplicationProtocols = new List<SslApplicationProtocol>();
+
+					foreach (string AlpnProtocol in AlpnProtocols)
+						Options.ApplicationProtocols.Add(new SslApplicationProtocol(AlpnProtocol));
+				}
+
 				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateRequired);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsClientAsync(this.domainName ?? ((IPEndPoint)this.Client.Client.RemoteEndPoint).Address.ToString(),
-					ClientCertificates, Protocols, true);
+				await SslStream.AuthenticateAsClientAsync(Options, CancellationToken.None);
 			}
 			finally
 			{
@@ -1222,17 +1675,14 @@ namespace Waher.Networking
 				}
 				catch (Exception ex)
 				{
-					Task.Run(async () =>
+					try
 					{
-						try
-						{
-							await this.Exception(ex);
-						}
-						catch (Exception ex2)
-						{
-							Log.Exception(ex2);
-						}
-					});
+						this.Exception(ex);
+					}
+					catch (Exception ex2)
+					{
+						Log.Exception(ex2);
+					}
 
 					Result = false;
 				}
@@ -1299,20 +1749,17 @@ namespace Waher.Networking
 						SniffMsg.Append("BASE64(Cert): ");
 						SniffMsg.Append(Base64);
 
-						Task.Run(async () =>
+						try
 						{
-							try
-							{
-								if (this.trustRemoteEndpoint)
-									await this.Information(SniffMsg.ToString());
-								else
-									await this.Warning(SniffMsg.ToString());
-							}
-							catch (Exception ex2)
-							{
-								Log.Exception(ex2);
-							}
-						});
+							if (this.trustRemoteEndpoint)
+								this.Information(SniffMsg.ToString());
+							else
+								this.Warning(SniffMsg.ToString());
+						}
+						catch (Exception ex2)
+						{
+							Log.Exception(ex2);
+						}
 					}
 				}
 				else
@@ -1345,6 +1792,15 @@ namespace Waher.Networking
 		/// Upgrades a server connection to TLS.
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
 		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, params string[] AlpnProtocols)
@@ -1357,11 +1813,32 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
 		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, params string[] AlpnProtocols)
 		{
 			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates.Optional, null, false, AlpnProtocols);
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -1384,12 +1861,40 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
+			RemoteCertificateValidationCallback CertificateValidationCheck)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, CertificateValidationCheck, Array.Empty<string>());
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="AlpnProtocols">TLS Application-Layer Protocol Negotiation (ALPN) Protocol IDs
 		/// https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
 			RemoteCertificateValidationCallback CertificateValidationCheck, params string[] AlpnProtocols)
 		{
 			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, CertificateValidationCheck, false, AlpnProtocols);
+		}
+
+		/// <summary>
+		/// Upgrades a server connection to TLS.
+		/// </summary>
+		/// <param name="ServerCertificate">Server certificate.</param>
+		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
+		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
+			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
+		{
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates,
+				CertificateValidationCheck, TrustRemoteEndpoint, Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -1429,7 +1934,7 @@ namespace Waher.Networking
 					ApplicationProtocols = null,
 					CertificateRevocationCheckMode = X509RevocationMode.Online,
 					ClientCertificateRequired = false,
-					EnabledSslProtocols = Crypto.SecureTls,
+					EnabledSslProtocols = Protocols,
 					EncryptionPolicy = EncryptionPolicy.RequireEncryption,
 					ServerCertificate = ServerCertificate
 				};

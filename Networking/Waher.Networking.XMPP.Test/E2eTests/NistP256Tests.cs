@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.P2P.E2E;
 
 namespace Waher.Networking.XMPP.Test.E2eTests
@@ -13,14 +14,16 @@ namespace Waher.Networking.XMPP.Test.E2eTests
 		}
 
 		[ClassCleanup]
-		public static void ClassCleanup()
+		public static async Task ClassCleanup()
 		{
-			DisposeSnifferAndLog();
+			await DisposeSnifferAndLog();
 		}
 
-		public override IE2eEndpoint GenerateEndpoint(IE2eSymmetricCipher Cipher)
+		public override int SecurityStrength => 128;
+
+		public override IE2eEndpoint[] GenerateEndpoints(IE2eSymmetricCipher Cipher)
         {
-            return new NistP256Endpoint(Cipher);
+            return [new NistP256Endpoint(Cipher)];
         }
 
     }

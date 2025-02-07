@@ -164,7 +164,10 @@ namespace Waher.Security.ACME
 			HttpResponseMessage Response = await this.httpClient.SendAsync(Request);
 
 			if (!Response.IsSuccessStatusCode)
-				await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
+			{
+				ContentResponse Temp = await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
+				Temp.AssertOk();
+			}
 
 			if (Response.Headers.TryGetValues("Replay-Nonce", out IEnumerable<string> Values))
 			{
@@ -726,7 +729,10 @@ namespace Waher.Security.ACME
 			HttpResponseMessage Response = await this.HttpPost(CertificateLocation, AccountLocation, ContentType, null);
 
 			if (!Response.IsSuccessStatusCode)
-				await Content.Getters.WebGetter.ProcessResponse(Response, AccountLocation);
+			{
+				ContentResponse Temp = await Waher.Content.Getters.WebGetter.ProcessResponse(Response, AccountLocation);
+				Temp.AssertOk();
+			}
 
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 
@@ -739,8 +745,10 @@ namespace Waher.Security.ACME
 				}
 			}
 
-			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, CertificateLocation);
-			if (!(Decoded is X509Certificate2[] Certificates))
+			ContentResponse Content = await InternetContent.DecodeAsync(ContentType, Bin, CertificateLocation);
+			Content.AssertOk();
+
+			if (!(Content.Decoded is X509Certificate2[] Certificates))
 				throw new Exception("Unexpected response returned. Content-Type: " + ContentType);
 
 			return Certificates;

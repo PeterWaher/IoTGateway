@@ -60,7 +60,11 @@
     <Compile Include=".bak\Waher.Content\Binary\EncodedObject.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileReference.cs" />
+    <Compile Include=".bak\Waher.Content\ContentBinaryResponse.cs" />
+    <Compile Include=".bak\Waher.Content\ContentResponse.cs" />
+    <Compile Include=".bak\Waher.Content\ContentStreamResponse.cs" />
     <Compile Include=".bak\Waher.Content\ConversionState.cs" />
+    <Compile Include=".bak\Waher.Content\ICodecProgress.cs" />
     <Compile Include=".bak\Waher.Content\IContentDeleter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentHeader.cs" />
@@ -114,7 +118,9 @@
     <Compile Include=".bak\Waher.Content\TSV.cs" />
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />
     <Compile Include=".bak\Waher.Events\DebugEventSink.cs" />
+    <Compile Include=".bak\Waher.Events\EventHandlerExtensions.cs" />
     <Compile Include=".bak\Waher.Events\GenericException.cs" />
+    <Compile Include=".bak\Waher.Events\IDisposableAsync.cs" />
     <Compile Include=".bak\Waher.Events\IEventActor.cs" />
     <Compile Include=".bak\Waher.Events\IEventFacility.cs" />
     <Compile Include=".bak\Waher.Events\IEventId.cs" />
@@ -123,6 +129,7 @@
     <Compile Include=".bak\Waher.Events\IEventObject.cs" />
     <Compile Include=".bak\Waher.Events\IEventTags.cs" />
     <Compile Include=".bak\Waher.Events\IEventType.cs" />
+    <Compile Include=".bak\Waher.Events\IObservableLayer.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\DefaultImplementationAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\DependencyOrder.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Grade.cs" />
@@ -134,9 +141,14 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonKey.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
-    <Compile Include=".bak\Waher.Runtime.Inventory\StreamExtensions.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\TypeAliasAttribute.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Certificates.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\FileNameTimeSequence.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Files.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Resources.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\StreamExtensions.cs" />
+    <Compile Include=".bak\Waher.Runtime.IO\Strings.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />
     <Compile Include=".bak\Waher.Runtime.Text\Difference.cs" />
@@ -329,7 +341,6 @@
     <Compile Include=".bak\Waher.Content\IFileNameResource.cs" />
     <Compile Include=".bak\Waher.Content\InternetContent.cs" />
     <Compile Include=".bak\Waher.Content\JSON.cs" />
-    <Compile Include=".bak\Waher.Content\Resources.cs" />
     <Compile Include=".bak\Waher.Events\Event.cs" />
     <Compile Include=".bak\Waher.Events\EventLevel.cs" />
     <Compile Include=".bak\Waher.Events\EventSink.cs" />
@@ -727,6 +738,7 @@
   <Import Project="$(WixCATargetsPath)" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Runtime\Waher.Runtime.Inventory\*.cs" "$(ProjectDir).bak\Waher.Runtime.Inventory" /S /Y
+xcopy "$(SolutionDir)Runtime\Waher.Runtime.IO\*.cs" "$(ProjectDir).bak\Waher.Runtime.IO" /S /Y
 xcopy "$(SolutionDir)Runtime\Waher.Runtime.Temporary\*.cs" "$(ProjectDir).bak\Waher.Runtime.Temporary" /S /Y
 xcopy "$(SolutionDir)Runtime\Waher.Runtime.Text\*.cs" "$(ProjectDir).bak\Waher.Runtime.Text" /S /Y
 xcopy "$(SolutionDir)Events\Waher.Events\*.cs" "$(ProjectDir).bak\Waher.Events" /S /Y

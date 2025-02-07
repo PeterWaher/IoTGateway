@@ -46,14 +46,20 @@ namespace Waher.IoTGateway.WebResources
 			Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
+			ContentResponse Content = await Request.DecodeDataAsync();
 
-			if (!(Obj is Dictionary<string, object> Form))
-				throw new BadRequestException();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Form))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Form.TryGetValue("AutomaticBackups", out Obj) || !CommonTypes.TryParse(Obj.ToString().Trim(), out bool AutomaticBackups))
+			if (!Form.TryGetValue("AutomaticBackups", out object Obj) || !CommonTypes.TryParse(Obj.ToString().Trim(), out bool AutomaticBackups))
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";

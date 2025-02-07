@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Posters;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 
@@ -73,7 +74,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
-		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
+		/// <exception cref="GenericException">Annotated exception. Inner exception determines the cause.</exception>
+		public override async Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
 			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
 			params KeyValuePair<string, string>[] Headers)
 		{
@@ -85,7 +87,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Types.TryGetModuleParameter("HTTPX", out object Obj) && Obj is HttpxProxy Proxy)
 			{
 				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
-					throw new InvalidOperationException("Service is being shut down.");
+					return new ContentBinaryResponse(new InvalidOperationException("Service is being shut down."));
 
 				GetClientResponse Rec = await Proxy.GetClientAsync(Uri);
 
@@ -97,10 +99,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
 			{
 				if (XmppClient.Disposed)
-					throw new InvalidOperationException("Service is being shut down.");
+					return new ContentBinaryResponse(new InvalidOperationException("Service is being shut down."));
 
 				if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
-					throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
+					return new ContentBinaryResponse(new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client."));
 
 				HttpxClient = HttpxClient2;
 
@@ -113,9 +115,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					RosterItem Item = XmppClient.GetRosterItem(BareJid);
 
 					if (Item is null)
-						throw new ConflictException("No approved presence subscription with " + BareJid + ".");
+						return new ContentBinaryResponse(new ConflictException("No approved presence subscription with " + BareJid + "."));
 					else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
-						throw new ServiceUnavailableException(BareJid + " is not online.");
+						return new ContentBinaryResponse(new ServiceUnavailableException(BareJid + " is not online."));
 					else
 						FullJid = Item.LastPresenceFullJid;
 				}
@@ -123,7 +125,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				LocalUrl = Uri.PathAndQuery + Uri.Fragment;
 			}
 			else
-				throw new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered.");
+				return new ContentBinaryResponse(new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered."));
 
 			List<HttpField> Headers2 = new List<HttpField>();
 			bool HasContentType = false;
@@ -184,8 +186,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							if (e.HasData)
 							{
-								if (State.Data is null)
-									State.Data = new MemoryStream();
+								State.Data ??= new MemoryStream();
 
 								if (!(e.Data is null))
 								{
@@ -197,12 +198,14 @@ namespace Waher.Networking.XMPP.HTTPX
 								State.Done.TrySetResult(true);
 						}
 						else
-							State.Done.TrySetException(e.StanzaError ?? new Exception("Unable to get resource."));
+						{
+							State.Done.TrySetException((Exception)e.StanzaError ?? 
+								new GenericException("Unable to post resource.", null, Uri.OriginalString));
+						}
 
 					}, async (Sender, e) =>
 					{
-						if (State.Data is null)
-							State.Data = new MemoryStream();
+						State.Data ??= new MemoryStream();
 
 						await State.Data.WriteAsync(e.Data, 0, e.Data.Length);
 						if (e.Last)
@@ -211,20 +214,20 @@ namespace Waher.Networking.XMPP.HTTPX
 					}, State);
 
 				if (!await State.Done.Task)
-					throw new TimeoutException("Request timed out.");
+					return new ContentBinaryResponse(new GenericException(new TimeoutException("Request timed out."), null, Uri.OriginalString));
 
 				Timer.Dispose();
 				Timer = null;
 
 				if (State.StatusCode >= 200 && State.StatusCode < 300)
-					return new KeyValuePair<byte[], string>(State.Data?.ToArray(), State.HttpResponse?.ContentType);
+					return new ContentBinaryResponse(State.HttpResponse?.ContentType, State.Data?.ToArray());
 				else
 				{
 					ContentType = string.Empty;
 					EncodedData = State.Data?.ToArray();
 
-					throw HttpxGetter.GetExceptionObject(State.StatusCode, State.StatusMessage,
-						State.HttpResponse, EncodedData, ContentType);
+					return new ContentBinaryResponse(HttpxGetter.GetExceptionObject(State.StatusCode, State.StatusMessage,
+						State.HttpResponse, EncodedData, ContentType));
 				}
 			}
 			finally

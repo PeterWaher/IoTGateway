@@ -10,10 +10,10 @@ using Waher.Things.Metering;
 
 namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 {
-    /// <summary>
-    /// IEEE 1451.0 TEDS Access Message
-    /// </summary>
-    public class TedsAccessMessage : Message
+	/// <summary>
+	/// IEEE 1451.0 TEDS Access Message
+	/// </summary>
+	public class TedsAccessMessage : Message
 	{
 		private Teds data;
 		private ushort errorCode;
@@ -47,24 +47,29 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// <summary>
 		/// Tries to parse a TEDS from the message.
 		/// </summary>
-		/// <returns>Error Code and parsed TEDS. If not able to parse TEDS, null is returned for the TEDS component.</returns>
-		public Task<(ushort ErrorCode, Teds Teds)> TryParseTeds()
+		/// <param name="ErrorCode">Error Code. May include error code if failing to parse TEDS.</param>
+		/// <param name="Teds">Parsed TEDS. If not able to parse TEDS, null is returned.</param>
+		/// <returns>If able to parse TEDS.</returns>
+		public bool TryParseTeds(out ushort ErrorCode, out Teds Teds)
 		{
-			return this.TryParseTeds(true);
+			return this.TryParseTeds(true, out ErrorCode, out Teds);
 		}
 
 		/// <summary>
 		/// Tries to parse a TEDS from the message.
 		/// </summary>
 		/// <param name="CheckChecksum">If checksum should be checked.</param>
-		/// <returns>Error Code and parsed TEDS. If not able to parse TEDS, null is returned for the TEDS component.</returns>
-		public async Task<(ushort ErrorCode, Teds Teds)> TryParseTeds(bool CheckChecksum)
+		/// <param name="ErrorCode">Error Code. May include error code if failing to parse TEDS.</param>
+		/// <param name="Teds">Parsed TEDS. If not able to parse TEDS, null is returned.</param>
+		/// <returns>If able to parse TEDS.</returns>
+		public bool TryParseTeds(bool CheckChecksum, out ushort ErrorCode, out Teds Teds)
 		{
 			if (!(this.data is null))
-				return (this.errorCode, this.data);
-
-			ushort ErrorCode;
-			Teds Teds;
+			{
+				ErrorCode = this.errorCode;
+				Teds = this.data;
+				return true;
+			}
 
 			try
 			{
@@ -78,11 +83,17 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				int Start = this.Position;
 				uint Len = this.NextUInt32(nameof(Len));
 				if (Len < 2)
-					return (ErrorCode, null);
+				{
+					Teds = null;
+					return false;
+				}
 
 				Len -= 2;
 				if (Len > int.MaxValue)
-					return (ErrorCode, null);
+				{
+					Teds = null;
+					return false;
+				}
 
 				byte[] Data = this.NextUInt8Array(nameof(Data), (int)Len);
 				ushort CheckSum = 0;
@@ -94,7 +105,10 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 				ushort CheckSum2 = this.NextUInt16(nameof(CheckSum));
 				if (CheckChecksum && CheckSum != CheckSum2)
-					return (ErrorCode, null);
+				{
+					Teds = null;
+					return false;
+				}
 
 				Binary TedsBlock = new Binary(Data, this.ComLayer, true);
 				ParsingState State = new ParsingState();
@@ -103,16 +117,18 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 				this.errorCode = ErrorCode;
 
 				if (this.HasSniffers)
-					await TedsBlock.LogInformationToSniffer();
+					TedsBlock.LogInformationToSniffer();
 
-				return (ErrorCode, Teds);
+				return true;
 			}
 			catch (Exception ex)
 			{
 				if (this.HasSniffers)
-					await this.ComLayer.Exception(ex);
+					this.ComLayer.Exception(ex);
 
-				return (0xffff, null);
+				ErrorCode = 0xffff;
+				Teds = null;
+				return false;
 			}
 		}
 

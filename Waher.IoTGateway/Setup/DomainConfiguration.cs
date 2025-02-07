@@ -362,6 +362,13 @@ namespace Waher.IoTGateway.Setup
 		public bool HasToS => !string.IsNullOrEmpty(this.urlToS);
 
 		/// <summary>
+		/// If the configuration has a certificate.
+		/// </summary>
+		public bool HasCertificate =>
+			(!(this.certificate is null) && !(this.privateKey is null)) ||
+			(!(this.pfx is null) && !(this.password is null));
+
+		/// <summary>
 		/// Resource to be redirected to, to perform the configuration.
 		/// </summary>
 		public override string Resource => "/Settings/Domain.md";
@@ -440,13 +447,19 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName) ||
+			if (!Parameters.TryGetValue("domainName", out object Obj) || !(Obj is string DomainName) ||
 				!Parameters.TryGetValue("dynamicDns", out Obj) || !(Obj is bool DynamicDns) ||
 				!Parameters.TryGetValue("dynDnsTemplate", out Obj) || !(Obj is string DynDnsTemplate) ||
 				!Parameters.TryGetValue("checkIpScript", out Obj) || !(Obj is string CheckIpScript) ||
@@ -455,11 +468,15 @@ namespace Waher.IoTGateway.Setup
 				!Parameters.TryGetValue("dynDnsPassword", out Obj) || !(Obj is string DynDnsPassword) ||
 				!Parameters.TryGetValue("dynDnsInterval", out Obj) || !(Obj is int DynDnsInterval))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			if (string.Compare(DomainName, "localhost", true) == 0)
-				throw new BadRequestException("localhost is not a valid domain name.");
+			{
+				await Response.SendResponse(new BadRequestException("localhost is not a valid domain name."));
+				return;
+			}
 
 			List<string> AlternativeNames = new List<string>();
 			int Index = 0;
@@ -467,7 +484,10 @@ namespace Waher.IoTGateway.Setup
 			while (Parameters.TryGetValue("altDomainName" + Index.ToString(), out Obj) && Obj is string AltDomainName && !string.IsNullOrEmpty(AltDomainName))
 			{
 				if (string.Compare(AltDomainName, "localhost", true) == 0)
-					throw new BadRequestException("localhost is not a valid domain name.");
+				{
+					await Response.SendResponse(new BadRequestException("localhost is not a valid domain name."));
+					return;
+				}
 
 				AlternativeNames.Add(AltDomainName);
 				Index++;
@@ -476,14 +496,20 @@ namespace Waher.IoTGateway.Setup
 			if (Parameters.TryGetValue("altDomainName", out Obj) && Obj is string AltDomainName2 && !string.IsNullOrEmpty(AltDomainName2))
 			{
 				if (string.Compare(AltDomainName2, "localhost", true) == 0)
-					throw new BadRequestException("localhost is not a valid domain name.");
+				{
+					await Response.SendResponse(new BadRequestException("localhost is not a valid domain name."));
+					return;
+				}
 
 				AlternativeNames.Add(AltDomainName2);
 			}
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			this.dynamicDns = DynamicDns;
 			this.dynDnsTemplate = DynDnsTemplate;
@@ -813,26 +839,47 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("useEncryption", out Obj) || !(Obj is bool UseEncryption))
-				throw new BadRequestException();
+			if (!Parameters.TryGetValue("useEncryption", out object Obj) || !(Obj is bool UseEncryption))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("customCA", out Obj) || !(Obj is bool CustomCA))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("acmeDirectory", out Obj) || !(Obj is string AcmeDirectory))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("contactEMail", out Obj) || !(Obj is string ContactEMail))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("acceptToS", out Obj) || !(Obj is bool AcceptToS))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			if (!Parameters.TryGetValue("domainName", out Obj) || !(Obj is string DomainName) ||
 				!Parameters.TryGetValue("dynamicDns", out Obj) || !(Obj is bool DynamicDns) ||
@@ -842,8 +889,11 @@ namespace Waher.IoTGateway.Setup
 				!Parameters.TryGetValue("dynDnsAccount", out Obj) || !(Obj is string DynDnsAccount) ||
 				!Parameters.TryGetValue("dynDnsPassword", out Obj) || !(Obj is string DynDnsPassword) ||
 				!Parameters.TryGetValue("dynDnsInterval", out Obj) || !(Obj is int DynDnsInterval))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
 
+			}
 			List<string> AlternativeNames = new List<string>();
 			int Index = 0;
 
@@ -858,7 +908,10 @@ namespace Waher.IoTGateway.Setup
 
 			string TabID = Request.Header["X-TabID"];
 			if (string.IsNullOrEmpty(TabID))
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
 			this.dynamicDns = DynamicDns;
 			this.dynDnsTemplate = DynDnsTemplate;
@@ -1437,7 +1490,7 @@ namespace Waher.IoTGateway.Setup
 										PemOutput.AppendLine("-----END CERTIFICATE-----");
 
 										CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
-										await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
+										await Runtime.IO.Files.WriteAllTextAsync(CertFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 
 										await Status.Raise(this, "Generating temporary key file.");
 
@@ -1451,7 +1504,7 @@ namespace Waher.IoTGateway.Setup
 
 										KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
 
-										await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
+										await Runtime.IO.Files.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), System.Text.Encoding.ASCII);
 									}
 
 									await Status.Raise(this, "Converting to PFX using " + OpenSslFile);
@@ -1487,7 +1540,7 @@ namespace Waher.IoTGateway.Setup
 									await Status.Raise(this, "Loading PFX.");
 
 									CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
-									this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
+									this.pfx = await Runtime.IO.Files.ReadAllBytesAsync(CertFileName2);
 									this.password = Password;
 									this.openSslPath = OpenSslFile;
 
@@ -1559,14 +1612,18 @@ namespace Waher.IoTGateway.Setup
 			}
 		}
 
-		private Task AcmeChallenge(HttpRequest Request, HttpResponse Response)
+		private async Task AcmeChallenge(HttpRequest Request, HttpResponse Response)
 		{
 			if (Request.SubPath != this.challenge)
-				throw new NotFoundException("ACME Challenge not found.");
+			{
+				await Response.SendResponse(new NotFoundException("ACME Challenge not found."));
+				return;
+			}
 
 			Response.StatusCode = 200;
 			Response.ContentType = BinaryCodec.DefaultContentType;
-			return Response.Write(System.Text.Encoding.ASCII.GetBytes(this.token));
+			
+			await Response.Write(true, System.Text.Encoding.ASCII.GetBytes(this.token));
 		}
 
 		private async Task SaveNames(HttpRequest Request, HttpResponse Response)
@@ -1574,18 +1631,25 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (!(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("humanReadableName", out Obj) ||
+			if (!Parameters.TryGetValue("humanReadableName", out object Obj) ||
 				!(Obj is string HumanReadableName) ||
 				!Parameters.TryGetValue("humanReadableNameLanguage", out Obj) ||
 				!(Obj is string HumanReadableNameLanguage))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			List<AlternativeField> LocalizedNames = new List<AlternativeField>();
@@ -1597,10 +1661,16 @@ namespace Waher.IoTGateway.Setup
 				Obj is string NameLocalized)
 			{
 				if (string.IsNullOrEmpty(NameLanguage))
-					throw new BadRequestException("Language cannot be empty.");
+				{
+					await Response.SendResponse(new BadRequestException("Language cannot be empty."));
+					return;
+				}
 
 				if (string.IsNullOrEmpty(NameLocalized))
-					throw new BadRequestException("Localized name cannot be empty.");
+				{
+					await Response.SendResponse(new BadRequestException("Localized name cannot be empty."));
+					return;
+				}
 
 				LocalizedNames.Add(new AlternativeField(NameLanguage, NameLocalized));
 				Index++;
@@ -1619,18 +1689,25 @@ namespace Waher.IoTGateway.Setup
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
-				throw new BadRequestException();
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			object Obj = await Request.DecodeDataAsync();
-			if (!(Obj is Dictionary<string, object> Parameters))
-				throw new BadRequestException();
+			ContentResponse Content = await Request.DecodeDataAsync();
+			if (Content.HasError || !(Content.Decoded is Dictionary<string, object> Parameters))
+			{
+				await Response.SendResponse(new BadRequestException());
+				return;
+			}
 
-			if (!Parameters.TryGetValue("humanReadableDescription", out Obj) ||
+			if (!Parameters.TryGetValue("humanReadableDescription", out object Obj) ||
 				!(Obj is string HumanReadableDescription) ||
 				!Parameters.TryGetValue("humanReadableDescriptionLanguage", out Obj) ||
 				!(Obj is string HumanReadableDescriptionLanguage))
 			{
-				throw new BadRequestException();
+				await Response.SendResponse(new BadRequestException());
+				return;
 			}
 
 			List<AlternativeField> LocalizedDescriptions = new List<AlternativeField>();
@@ -1642,10 +1719,16 @@ namespace Waher.IoTGateway.Setup
 				Obj is string DescriptionLocalized)
 			{
 				if (string.IsNullOrEmpty(DescriptionLanguage))
-					throw new BadRequestException("Language cannot be empty.");
+				{
+					await Response.SendResponse(new BadRequestException("Language cannot be empty."));
+					return;
+				}
 
 				if (string.IsNullOrEmpty(DescriptionLocalized))
-					throw new BadRequestException("Localized description cannot be empty.");
+				{
+					await Response.SendResponse(new BadRequestException("Localized description cannot be empty."));
+					return;
+				}
 
 				LocalizedDescriptions.Add(new AlternativeField(DescriptionLanguage, DescriptionLocalized));
 				Index++;

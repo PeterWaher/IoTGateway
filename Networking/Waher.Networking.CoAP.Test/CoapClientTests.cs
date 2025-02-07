@@ -47,10 +47,13 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[AssemblyCleanup]
-		public static void AssemblyCleanup()
+		public static async Task AssemblyCleanup()
 		{
-			filesProvider?.Dispose();
-			filesProvider = null;
+			if (filesProvider is not null)
+			{
+				await filesProvider.DisposeAsync();
+				filesProvider = null;
+			}
 
 			if (consoleEventSink is not null)
 			{
@@ -62,20 +65,20 @@ namespace Waher.Networking.CoAP.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
-				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
+			this.client = new CoapEndpoint([CoapEndpoint.DefaultCoapPort],
+				[CoapEndpoint.DefaultCoapsPort], null, null, false, false,
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine));
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			if (this.client is not null)
 			{
 				ulong[] Tokens = this.client.GetActiveTokens();
 				ushort[] MessageIDs = this.client.GetActiveMessageIDs();
 
-				this.client.Dispose();
+				await this.client.DisposeAsync();
 				this.client = null;
 
 				Assert.AreEqual(0, Tokens.Length, "There are tokens that have not been unregistered properly.");
@@ -105,7 +108,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 			Assert.IsNotNull(Result);
 
 			ConsoleOut.WriteLine(Result.ToString());
@@ -137,7 +140,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 			Assert.IsNotNull(Result);
 
 			Done.Reset();
@@ -153,7 +156,7 @@ namespace Waher.Networking.CoAP.Test
 
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 5000));
 
 			return Result;
 		}
@@ -177,7 +180,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 		}
 
 		private async Task Put(string Uri, byte[] Payload, int BlockSize, params CoapOption[] Options)
@@ -199,7 +202,7 @@ namespace Waher.Networking.CoAP.Test
 					Error.Set();
 			}, null, Options);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done, Error], 30000));
 		}
 
 		// TODO: Test DELETE.

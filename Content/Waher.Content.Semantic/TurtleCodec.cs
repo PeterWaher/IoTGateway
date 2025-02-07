@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 
 namespace Waher.Content.Semantic
 {
@@ -77,12 +78,14 @@ namespace Waher.Content.Semantic
 		/// <param name="Encoding">Encoding</param>
 		/// <param name="Fields">Additional fields</param>
 		/// <param name="BaseUri">Base URI</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Decoded object.</returns>
-		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
+			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
+			string s = Strings.GetString(Data, Encoding ?? Encoding.UTF8);
 			TurtleDocument Parsed = new TurtleDocument(s, BaseUri, "n", BlankNodeIdMode.Guid);
-			return Task.FromResult<object>(Parsed);
+			return Task.FromResult(new ContentResponse(ContentType, Parsed, Data));
 		}
 
 		/// <summary>
@@ -116,9 +119,10 @@ namespace Waher.Content.Semantic
 		/// </summary>
 		/// <param name="Object">Object to encode</param>
 		/// <param name="Encoding">Encoding</param>
+		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <param name="AcceptedContentTypes">Accepted content types.</param>
 		/// <returns>Encoded object.</returns>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public Task<ContentResponse> EncodeAsync(object Object, Encoding Encoding, ICodecProgress Progress, params string[] AcceptedContentTypes)
 		{
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
@@ -130,7 +134,7 @@ namespace Waher.Content.Semantic
 			else
 			{
 				if (!(Object is ISemanticModel Model))
-					throw new ArgumentException("Unable to encode object.", nameof(Object));
+					return Task.FromResult(new ContentResponse(new ArgumentException("Unable to encode object.", nameof(Object))));
 
 				StringBuilder sb = new StringBuilder();
 
@@ -151,7 +155,7 @@ namespace Waher.Content.Semantic
 			byte[] Bin = Encoding.GetBytes(Text);
 			string ContentType = TurtleContentTypes[0] + "; charset=" + Encoding.WebName;
 
-			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new ContentResponse(ContentType, Object, Bin));
 		}
 
 		/// <summary>

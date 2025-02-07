@@ -193,7 +193,8 @@ namespace Waher.Runtime.IO
 			if (s is null)
 				return null;
 
-			int i = s.LastIndexOf(':');
+			int i = s.StartsWith("[") ? s.LastIndexOf("]:") : s.LastIndexOf(':');
+
 			if (i >= 0 && int.TryParse(s.Substring(i + 1), out int j) && j >= 0 && j <= 65535)
 				return s.Substring(0, i);
 			else

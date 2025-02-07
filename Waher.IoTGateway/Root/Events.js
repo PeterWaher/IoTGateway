@@ -293,7 +293,7 @@ function ShowError(xhttp)
 	console.log("Error received: " + xhttp.responseText);
 
 	if (xhttp.responseText.length > 0)
-		window.alert(xhttp.responseText);
+		Popup.Alert(xhttp.responseText);
 }
 
 function CreateGUID()

@@ -13,26 +13,26 @@
 				switch (xhttp.responseText)
 				{
 					case "0":
-						window.alert("Invalid address.");
+						Popup.Alert("Invalid address.");
 						break;
 
 					case "1":
 					case "2":
-						window.alert("Presence subscription sent to " + JID + ".");
+						Popup.Alert("Presence subscription sent to " + JID + ".");
 
 						Input.value = "";
 						Input.focus();
 						break;
 
 					case "3":
-						window.alert("You are already connected to " + JID + ".");
+						Popup.Alert("You are already connected to " + JID + ".");
 
 						Input.value = "";
 						Input.focus();
 						break;
 
 					default:
-						window.alert("Unrecognized response returned from server.");
+						Popup.Alert("Unrecognized response returned from server.");
 						break;
 				}
 			}
@@ -57,7 +57,7 @@ function ConnectToKeyDown(Control, Event)
 		return true;
 }
 
-function RemoveContact(Name, BareJid)
+async function RemoveContact(Name, BareJid)
 {
 	var s = "Are you sure you want to remove " + Name;
 	if (Name.toUpperCase() !== BareJid.toUpperCase())
@@ -65,7 +65,7 @@ function RemoveContact(Name, BareJid)
 
 	s += "?\n\nIf you want to add the contact after having removed it, you need to connect to it again.";
 
-	if (window.confirm(s))
+	if ((await Popup.Confirm(s)))
 	{
 		var xhttp = new XMLHttpRequest();
 		xhttp.open("POST", "/Settings/RemoveContact", true);
@@ -102,9 +102,9 @@ function SubscribeContact(Name, BareJid)
 	xhttp.send(BareJid);
 }
 
-function RenameContact(Name, BareJid)
+async function RenameContact(Name, BareJid)
 {
-	var NewName = window.prompt("What name do you want to assign to " + BareJid + "?", Name);
+	var NewName = await Popup.Prompt("What name do you want to assign to " + BareJid + "?", Name);
 	if (NewName !== null)
 	{
 		var xhttp = new XMLHttpRequest();

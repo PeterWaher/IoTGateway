@@ -150,8 +150,8 @@ function UploadFile() {
 	Reader.readAsText(File);
 }
 
-function DeleteGraph(Control, GraphUri) {
-	if (!window.confirm("Are you sure you want to delete the graph <" + GraphUri + ">?"))
+async function DeleteGraph(Control, GraphUri) {
+	if (!(await Popup.Confirm("Are you sure you want to delete the graph <" + GraphUri + ">?")))
 		return;
 
 	var xhttp = new XMLHttpRequest();

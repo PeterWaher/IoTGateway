@@ -47,6 +47,11 @@ main
 
 /* #region Popups */
 
+#native-popup-container:empty
+{
+    display: none;
+}
+
 #native-popup-container
 {
     position: fixed;

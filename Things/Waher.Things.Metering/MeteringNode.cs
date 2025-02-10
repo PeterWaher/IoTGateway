@@ -52,8 +52,7 @@ namespace Waher.Things.Metering
 		/// <param name="Node">Metering node.</param>
 		public static implicit operator ThingReference(MeteringNode Node)
 		{
-			if (Node.thingReference is null)
-				Node.thingReference = new ThingReference(Node.nodeId, Node.SourceId, Node.Partition);
+			Node.thingReference ??= new ThingReference(Node.nodeId, Node.SourceId, Node.Partition);
 
 			return Node.thingReference;
 		}
@@ -719,10 +718,9 @@ namespace Waher.Things.Metering
 
 				foreach (MeteringNode Child in Children2)
 				{
-					if (this.children is null)
-						this.children = new List<MeteringNode>();
-
+					this.children ??= new List<MeteringNode>();
 					this.children.Add(Child);
+					
 					Child.parent = this;
 				}
 
@@ -806,8 +804,6 @@ namespace Waher.Things.Metering
 				?? await Language.CreateNamespaceAsync(typeof(MeteringNode).Namespace);
 
 			LinkedList<Parameter> Result = new LinkedList<Parameter>();
-			string s;
-
 			Result.AddLast(new StringParameter("NodeId", await Namespace.GetStringAsync(1, "Node ID"), this.nodeId));
 			Result.AddLast(new StringParameter("Type", await Namespace.GetStringAsync(4, "Type"), await this.GetTypeNameAsync(Language)));
 
@@ -829,33 +825,15 @@ namespace Waher.Things.Metering
 				Result.AddLast(new Int32Parameter("NrChildren", await Namespace.GetStringAsync(3, "#Children"), i));
 			}
 
-			switch (this.state)
+			string s = this.state switch
 			{
-				case NodeState.Information:
-					s = await Namespace.GetStringAsync(8, "Information");
-					break;
-
-				case NodeState.WarningUnsigned:
-					s = await Namespace.GetStringAsync(9, "Unsigned Warning");
-					break;
-
-				case NodeState.WarningSigned:
-					s = await Namespace.GetStringAsync(10, "Warning");
-					break;
-
-				case NodeState.ErrorUnsigned:
-					s = await Namespace.GetStringAsync(11, "Unsigned Error");
-					break;
-
-				case NodeState.ErrorSigned:
-					s = await Namespace.GetStringAsync(12, "Error");
-					break;
-
-				case NodeState.None:
-				default:
-					s = null;
-					break;
-			}
+				NodeState.Information => await Namespace.GetStringAsync(8, "Information"),
+				NodeState.WarningUnsigned => await Namespace.GetStringAsync(9, "Unsigned Warning"),
+				NodeState.WarningSigned => await Namespace.GetStringAsync(10, "Warning"),
+				NodeState.ErrorUnsigned => await Namespace.GetStringAsync(11, "Unsigned Error"),
+				NodeState.ErrorSigned => await Namespace.GetStringAsync(12, "Error"),
+				_ => null,
+			};
 
 			if (!string.IsNullOrEmpty(s))
 				Result.AddLast(new StringParameter("State", await Namespace.GetStringAsync(5, "State"), s));

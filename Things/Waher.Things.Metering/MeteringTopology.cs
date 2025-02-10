@@ -50,26 +50,17 @@ namespace Waher.Things.Metering
 		/// <summary>
 		/// ID of data source.
 		/// </summary>
-		string IDataSource.SourceID
-		{
-			get { return SourceID; }
-		}
+		string IDataSource.SourceID => SourceID;
 
 		/// <summary>
 		/// Child sources. If no child sources are available, null is returned.
 		/// </summary>
-		public IEnumerable<IDataSource> ChildSources
-		{
-			get { return null; }
-		}
+		public IEnumerable<IDataSource> ChildSources => null;
 
 		/// <summary>
 		/// If the source has any child sources.
 		/// </summary>
-		public bool HasChildren
-		{
-			get { return false; }
-		}
+		public bool HasChildren => false;
 
 		/// <summary>
 		/// When the source was last updated.

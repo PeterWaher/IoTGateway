@@ -88,6 +88,7 @@ using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Runtime.IO;
+using Waher.Things.SourceEvents;
 
 namespace Waher.IoTGateway
 {
@@ -111,13 +112,6 @@ namespace Waher.IoTGateway
 	/// <param name="MetaData">Defult meta data.</param>
 	/// <returns>Meta data to register.</returns>
 	public delegate Task<MetaDataTag[]> GetRegistryMetaDataEventHandler(MetaDataTag[] MetaData);
-
-	/// <summary>
-	/// Delegate for events requesting an array of data sources.
-	/// </summary>
-	/// <param name="DataSources">Default set of data sources.</param>
-	/// <returns>Data sources to publish.</returns>
-	public delegate Task<IDataSource[]> GetDataSources(params IDataSource[] DataSources);
 
 	/// <summary>
 	/// Static class managing the runtime environment of the IoT Gateway.
@@ -1226,11 +1220,11 @@ namespace Waher.IoTGateway
 					Log.Exception(ex);
 				}
 
-				IDataSource[] Sources;
+				GetDataSourcesEventArgs Sources;
 
 				try
 				{
-					Sources = new IDataSource[] { new MeteringTopology() };
+					Sources = new GetDataSourcesEventArgs(new MeteringTopology());
 				}
 				catch (Exception)
 				{
@@ -1238,22 +1232,21 @@ namespace Waher.IoTGateway
 
 					try
 					{
-						Sources = new IDataSource[] { new MeteringTopology() };
+						Sources = new GetDataSourcesEventArgs(new MeteringTopology());
 					}
 					catch (Exception ex)
 					{
 						Log.Exception(ex);
-						Sources = new IDataSource[0];
+						Sources = new GetDataSourcesEventArgs();
 					}
 				}
 
 				Types.GetLoadedModules();   // Makes sure all modules are instantiated, allowing static constructors to add
 											// appropriate data sources, if necessary.
 
-				if (!(GetDataSources is null))
-					Sources = await GetDataSources(Sources);
+				await GetDataSources.Raise(typeof(Gateway), Sources);
 
-				concentratorServer = await ConcentratorServer.Create(xmppClient, thingRegistryClient, provisioningClient, Sources);
+				concentratorServer = await ConcentratorServer.Create(xmppClient, thingRegistryClient, provisioningClient, Sources.Sources);
 				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient, pepClient);
 
 				Types.SetModuleParameter("Concentrator", concentratorServer);
@@ -2069,7 +2062,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Event raised when the Gateway requires a set of data sources to publish.
 		/// </summary>
-		public static event GetDataSources GetDataSources = null;
+		public static event EventHandlerAsync<GetDataSourcesEventArgs> GetDataSources = null;
 
 		/// <summary>
 		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).

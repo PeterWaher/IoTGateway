@@ -677,6 +677,7 @@
 						<File Id="Waher.Persistence.MongoDB.dll" Name="Waher.Persistence.MongoDB.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.dll" Vital="yes" />
 						<File Id="Waher.Persistence.Serialization.Compiled.dll" Name="Waher.Persistence.Serialization.Compiled.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.dll" Vital="yes" />
 						<File Id="Waher.Persistence.XmlLedger.dll" Name="Waher.Persistence.XmlLedger.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.XmlLedger.dll" Vital="yes" />
+						<File Id="Waher.Reports.dll" Name="Waher.Reports.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Reports.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Cache.dll" Name="Waher.Runtime.Cache.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Console.dll" Name="Waher.Runtime.Console.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Console.dll" Vital="yes" />
 						<File Id="Waher.Runtime.Counters.dll" Name="Waher.Runtime.Counters.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.dll" Vital="yes" />
@@ -821,6 +822,7 @@
 						<RemoveFile Id="RemoveWaher.Persistence.MongoDB.dll" Name="Waher.Persistence.MongoDB.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Persistence.Serialization.Compiled.dll" Name="Waher.Persistence.Serialization.Compiled.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Persistence.XmlLedger.dll" Name="Waher.Persistence.XmlLedger.dll" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Reports.dll" Name="Waher.Reports.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Cache.dll" Name="Waher.Runtime.Cache.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Console.dll" Name="Waher.Runtime.Console.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Runtime.Counters.dll" Name="Waher.Runtime.Counters.dll" On="uninstall" />

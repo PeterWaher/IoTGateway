@@ -89,6 +89,7 @@ using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
+using Waher.Reports;
 
 namespace Waher.IoTGateway
 {
@@ -1221,10 +1222,17 @@ namespace Waher.IoTGateway
 				}
 
 				GetDataSourcesEventArgs Sources;
+				IDataSource[] InitialSources = null;
 
 				try
 				{
-					Sources = new GetDataSourcesEventArgs(new MeteringTopology());
+					InitialSources = new IDataSource[]
+					{
+						new MeteringTopology(),
+						new ReportsDataSource()
+					};
+
+					Sources = new GetDataSourcesEventArgs(InitialSources);
 				}
 				catch (Exception)
 				{
@@ -1232,7 +1240,13 @@ namespace Waher.IoTGateway
 
 					try
 					{
-						Sources = new GetDataSourcesEventArgs(new MeteringTopology());
+						InitialSources ??= new IDataSource[]
+						{
+							new MeteringTopology(),
+							new ReportsDataSource()
+						};
+
+						Sources = new GetDataSourcesEventArgs(InitialSources);
 					}
 					catch (Exception ex)
 					{

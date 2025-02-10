@@ -13,6 +13,7 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Mocks](#mocks)
 * [Networking](#networking)
 * [Persistence](#persistence)
+* [Reports](#reports)
 * [Runtime](#runtime)
 * [Script](#script)
 * [Security](#security)
@@ -364,6 +365,17 @@ The folder also contains the following unit test projects:
 | **Waher.Persistence.FullTextSearch.Test** | .NET 8.0 | The [Waher.Persistence.FullTextSearch.Test](Persistence/Waher.Persistence.FullTextSearch.Test) project contains unit tests for the [Waher.Persistence.FullTextSearch](Persistence/Waher.Persistence.FullTextSearch) project. |
 | **Waher.Persistence.MongoDB.Test**        | .NET 8.0 | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 | **Waher.Persistence.XmlLedger.Test**      | .NET 8.0 | The [Waher.Persistence.XmlLedger.Test](Persistence/Waher.Persistence.XmlLedger.Test) project contains unit tests for the [Waher.Persistence.XmlLedger](Persistence/Waher.Persistence.XmlLedger) project. |
+
+Reports
+----------------------
+
+The [Reports](Reports) folder contains libraries that define an abstraction layer for administrative reports, as well as implementation of reports 
+to administrators can use to get insight into the operation of the gateway. The abstraction layer ties into the harmonized abstraction layer 
+defined by **Waher.Things**.
+
+| Project                   | Type          | Link                                                           | Project description |
+|---------------------------|---------------|----------------------------------------------------------------|---------------------|
+| **Waher.Reports**         | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Reports/)         | The [Waher.Reports](Things/Waher.Reports) project is a class library that provides basic abstraction of reports. |
 
 Runtime
 ----------------------

@@ -122,7 +122,26 @@ function NativeHeader() {
 }
 
 function PopupHandler() {
+    const POPUP_CONTAINER_ID = "native-popup-container"
+    const BACKDROP_ID = "native-backdrop"
+    const PROMPT_INPUT_ID = "native-prompt-input"
+    const KEYCODE_TAB = 9;
+
     const popupStack = [];
+
+    const popupContainer = document.getElementById(POPUP_CONTAINER_ID)
+    popupContainer.tabIndex = "-1"
+    popupContainer.role = "dialog"
+    popupContainer.setAttribute("aria-labelledby", "native-popup-label")
+    popupContainer.setAttribute("aria-describedby", "native-popup-description")
+
+    let focusFunction = null;
+
+    // create backdrop
+    const backdrop = document.createElement("div")
+    backdrop.id = BACKDROP_ID
+    document.body.appendChild(backdrop);
+    HideBackdrop()
 
     function PopStack(args) {
         popupStack.pop().OnPop(args)
@@ -131,11 +150,68 @@ function PopupHandler() {
 
     function DisplayPopup() {
         if (popupStack.length) {
-            document.getElementById("native-popup-container").innerHTML = popupStack[popupStack.length - 1].html
+            popupContainer.innerHTML = popupStack[popupStack.length - 1].html
+            setTimeout(UpdateFocusTrap, 0)
+            ShowBackdrop();
         }
         else {
-            document.getElementById("native-popup-container").innerHTML = ""
+            popupContainer.innerHTML = ""
+            HideBackdrop()
+            setTimeout(RemoveFocusTrap, 0)
         }
+    }
+
+    function UpdateFocusTrap() {
+        const focusableElements = popupContainer.querySelectorAll(
+            `
+            a[href]:not([disabled]),
+            button:not([disabled]),
+            textarea:not([disabled]),
+            input:not([disabled]),
+            select:not([disabled]),
+            [tabindex]:not([tabindex="-1"]),
+            [contenteditable]:not([contenteditable="false"])
+            `
+          );
+        const firstFocusableElement = focusableElements[0];
+        const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+        if (focusFunction !== null)
+            popupContainer.removeEventListener("keydown", focusFunction)
+
+        focusFunction = (e) => {
+            const isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
+            if (!isTabPressed)
+                return;
+
+            if (e.shiftKey) { // focus forward
+                if (document.activeElement === firstFocusableElement) {
+                    lastFocusableElement.focus();
+                    e.preventDefault();
+                }
+            } else { // focus back
+                if (document.activeElement === lastFocusableElement) {
+                    firstFocusableElement.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+
+        popupContainer.addEventListener('keydown', focusFunction)
+    }
+
+    function RemoveFocusTrap() {
+        if (focusFunction !== null)
+            popupContainer.removeEventListener("keydown", focusFunction)
+        focusFunction = null;
+    }
+
+    function ShowBackdrop() {
+        backdrop.style.display = "block"
+    }
+
+    function HideBackdrop() {
+        backdrop.style.display = "none"
     }
 
     async function Popup(html) {
@@ -147,8 +223,15 @@ function PopupHandler() {
             DisplayPopup()
         })
     }
+
+    function Focus() {
+        // have to wait a frame since the container is not visible untill the content is added (the content is set as text so it will have to render before it is available)
+        setTimeout(() => { popupContainer.focus() }, 0)
+    }
+
     async function Alert(message) {
         const html = CreateHTMLAlertPopup({ Message: `<p>${message}</p>` });
+        Focus()
         await Popup(html);
     }
     function AlertOk() {
@@ -157,6 +240,7 @@ function PopupHandler() {
 
     async function Confirm(message) {
         const html = CreateHTMLConfirmPopup({ Message: `<p>${message}</p>` });
+        Focus()
         return await Popup(html);
     }
 
@@ -169,6 +253,9 @@ function PopupHandler() {
 
     async function Prompt(message) {
         const html = CreateHTMLPromptPopup({ Message: `<p>${message}</p>` });
+        setTimeout(() => {
+            document.getElementById(PROMPT_INPUT_ID).focus()
+        }, 0)
         return await Popup(html);
     }
 
@@ -193,4 +280,5 @@ let nativeHeader;
 window.addEventListener("load", () => {
     nativeHeader = NativeHeader();
     Popup = PopupHandler()
+    Popup.Prompt("test")
 })

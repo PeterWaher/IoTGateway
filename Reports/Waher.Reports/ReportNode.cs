@@ -48,12 +48,12 @@ namespace Waher.Reports
 		/// <summary>
 		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
 		/// </summary>
-		public string LocalId => this.nodeId;
+		public virtual string LocalId => this.nodeId;
 
 		/// <summary>
 		/// If provided, an ID for the node, as it would appear or be used in system logs. Can be null, if Log ID equal to Node ID.
 		/// </summary>
-		public string LogId => this.nodeId;
+		public virtual string LogId => this.nodeId;
 
 		/// <summary>
 		/// Gets the type name of the node.

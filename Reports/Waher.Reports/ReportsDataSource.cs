@@ -97,17 +97,44 @@ namespace Waher.Reports
 		/// <returns>If the root node was registered.</returns>
 		public static async Task<bool> RegisterRootNode(ReportNode ReportRoot)
 		{
+			if (!await RegisterReportNode(ReportRoot))
+				return false;
+
 			lock (roots)
 			{
-				if (roots.Contains(ReportRoot))
+				roots.Add(ReportRoot);
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Registers a new report node.
+		/// </summary>
+		/// <param name="ReportNode">Report node.</param>
+		/// <returns>If the root node was registered.</returns>
+		public static async Task<bool> RegisterReportNode(ReportNode ReportNode)
+		{
+			lock (nodes)
+			{
+				if (nodes.ContainsKey(ReportNode.NodeId))
 					return false;
 
-				roots.Add(ReportRoot);
+				nodes[ReportNode.NodeId] = ReportNode;
 				lastChanged = DateTime.UtcNow;
 			}
 
-			await NewEvent(await NodeAdded.FromNode(ReportRoot, 
+			await NewEvent(await NodeAdded.FromNode(ReportNode,
 				await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty, false));
+
+			if (ReportNode.HasChildren)
+			{
+				foreach (INode Child in await ReportNode.ChildNodes)
+				{
+					if (Child is ReportNode ChildReport)
+						await RegisterReportNode(ChildReport);
+				}
+			}
 
 			return true;
 		}

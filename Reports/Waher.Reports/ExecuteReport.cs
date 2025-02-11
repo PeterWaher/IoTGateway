@@ -35,7 +35,7 @@ namespace Waher.Reports
 		/// <summary>
 		/// Type of command.
 		/// </summary>
-		public CommandType Type => CommandType.Parametrized;
+		public CommandType Type => CommandType.Query;
 
 		/// <summary>
 		/// Sort Category, if available.

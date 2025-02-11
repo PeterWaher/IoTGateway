@@ -28,6 +28,7 @@ using Waher.Things.Queries;
 using Waher.Things.SourceEvents;
 using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.Events;
+using Waher.Script.Objects;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -3409,6 +3410,24 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append("<time>");
 						Xml.Append(Element.ToString());
 						Xml.Append("</time>");
+					}
+					else if (Element is PhysicalQuantity Quantity)
+					{
+						Xml.Append("<quantity m='");
+						Xml.Append(CommonTypes.Encode(Quantity.Magnitude));
+						Xml.Append("' u='");
+						Xml.Append(XML.Encode(Quantity.Unit.ToString()));
+						Xml.Append("'/>");
+					}
+					else if (Element is Measurement Measurement)
+					{
+						Xml.Append("<measurement m='");
+						Xml.Append(CommonTypes.Encode(Measurement.Magnitude));
+						Xml.Append("' u='");
+						Xml.Append(XML.Encode(Measurement.Unit.ToString()));
+						Xml.Append("' e='");
+						Xml.Append(CommonTypes.Encode(Measurement.Error));
+						Xml.Append("'/>");
 					}
 					else if (Element is byte[] Bin)
 					{

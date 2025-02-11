@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Waher.Events;
@@ -198,7 +199,7 @@ namespace Waher.Script.Units
 					ch = Pos < Len ? UnitString[Pos++] : (char)0;
 			}
 
-			while (char.IsLetter(ch) || ch == '(' || ch == '°')
+			while (char.IsLetter(ch) || ch == '(' || ch == '°' || ch == '%' || ch == '‰' || ch == '‱' || ch == '1')
 			{
 				if (ch == '(')
 				{
@@ -269,11 +270,46 @@ namespace Waher.Script.Units
 				}
 				else
 				{
-					if (ch == '°')
+					if (char.IsLetter(ch))
+					{
+						do
+						{
+							ch = Pos < Len ? UnitString[Pos++] : (char)0;
+						}
+						while (char.IsLetter(ch));
+					}
+					else if (ch == '°')
+					{
 						ch = Pos < Len ? UnitString[Pos++] : (char)0;
 
-					while (char.IsLetter(ch))
+						while (char.IsLetter(ch))
+							ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					}
+					else if (ch == '%')
+					{
 						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+						if (ch == '0')
+						{
+							ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+							if (ch == '0')
+								ch = Pos < Len ? UnitString[Pos++] : (char)0;
+						}
+					}
+					else if (ch == '‰' || ch == '‱')
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					else if (ch == '1')
+					{
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+						if (char.IsDigit(ch))
+						{
+							Pos -= 2;
+							return false;
+						}
+					}
+					else
+						ch = (char)0;
 
 					if (ch == 0)
 						Name = UnitString.Substring(i, Pos - i);

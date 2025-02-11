@@ -158,5 +158,94 @@ namespace Waher.Script.Test
 			Assert.AreEqual(new Unit(Prefix.Deka,
 				new KeyValuePair<string, int>("l", 1)), Unit);
 		}
+
+		[TestMethod]
+		public void Test_16_Percent()
+		{
+			Unit Unit = Unit.Parse("%");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("%", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_17_Degree()
+		{
+			Unit Unit = Unit.Parse("°");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("°", 1)), Unit);
+
+			Unit = Unit.Parse("deg");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("deg", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_18_PerMille()
+		{
+			Unit Unit = Unit.Parse("‰");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("‰", 1)), Unit);
+
+			Unit = Unit.Parse("%0");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("%0", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_19_PerDixMille()
+		{
+			Unit Unit = Unit.Parse("‱");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("‱", 1)), Unit);
+
+			Unit = Unit.Parse("%00");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("%00", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_20_Radians()
+		{
+			Unit Unit = Unit.Parse("rad");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("rad", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_21_One()
+		{
+			Unit Unit = Unit.Parse("1");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("1", 1)), Unit);
+
+			Unit = Unit.Parse("pcs");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("pcs", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_22_Dozen()
+		{
+			Unit Unit = Unit.Parse("dz");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("dz", 1)), Unit);
+
+			Unit = Unit.Parse("dozen");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("dozen", 1)), Unit);
+		}
+
+		[TestMethod]
+		public void Test_23_Gross()
+		{
+			Unit Unit = Unit.Parse("gr");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("gr", 1)), Unit);
+
+			Unit = Unit.Parse("gross");
+			Assert.AreEqual(new Unit(Prefix.None,
+				new KeyValuePair<string, int>("gross", 1)), Unit);
+		}
+
 	}
 }

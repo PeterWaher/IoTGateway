@@ -189,5 +189,27 @@ namespace Waher.Script.Test
 			Assert.IsTrue(Unit.TryGetCategory(Parsed, out IUnitCategory Category));
 			Assert.AreEqual("Volume", Category.Name);
 		}
+
+		[DataTestMethod]
+		[DataRow("1")]
+		[DataRow("pcs")]
+		[DataRow("dz")]
+		[DataRow("dozen")]
+		[DataRow("gr")]
+		[DataRow("gross")]
+		[DataRow("%")]
+		[DataRow("‰")]
+		[DataRow("‱")]
+		[DataRow("%0")]
+		[DataRow("%00")]
+		[DataRow("°")]
+		[DataRow("rad")]
+		[DataRow("deg")]
+		public void Test_17_Dimensionless(string UnitString)
+		{
+			Unit Parsed = Unit.Parse(UnitString);
+			Assert.IsTrue(Unit.TryGetCategory(Parsed, out IUnitCategory Category));
+			Assert.AreEqual("Dimensionless", Category.Name);
+		}
 	}
 }

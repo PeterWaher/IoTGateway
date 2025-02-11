@@ -2330,16 +2330,9 @@ namespace Waher.Networking.HTTP
 				{
 					StringBuilder Location = new StringBuilder();
 					string s;
-					int i;
 
 					Location.Append("https://");
-
-					s = Header.Host.Value;
-					i = s.IndexOf(':');
-					if (i > 0)
-						s = s[..i];
-
-					Location.Append(s);
+					Location.Append(Header.Host.Value.RemovePortNumber());
 
 					if (!(UpgradePort is null) && UpgradePort.Value != HttpServer.DefaultHttpsPort)
 					{
@@ -2352,13 +2345,13 @@ namespace Waher.Networking.HTTP
 					if (!string.IsNullOrEmpty(s = Header.QueryString))
 					{
 						Location.Append('?');
-						Location.Append(Header.QueryString);
+						Location.Append(s);
 					}
 
 					if (!string.IsNullOrEmpty(s = Header.Fragment))
 					{
 						Location.Append('#');
-						Location.Append(Header.Fragment);
+						Location.Append(s);
 					}
 
 					await this.SendResponse(Request, Response, new HttpException(TemporaryRedirectException.Code, TemporaryRedirectException.StatusMessage,

@@ -418,7 +418,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 									if (Decoded.HasError)
 										await this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, Decoded.Error.Message, e);
 									else
-										await this.NewObject(Decoded, Bin, ContentType, e);
+										await this.NewObject(Decoded.Decoded, Bin, ContentType, e);
 								}
 								catch (Exception ex)
 								{

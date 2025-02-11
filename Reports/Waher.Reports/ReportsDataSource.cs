@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Persistence;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.SourceEvents;
@@ -21,7 +20,7 @@ namespace Waher.Reports
 		public const string SourceID = "Reports";
 
 		private static readonly Dictionary<string, ReportNode> nodes = new Dictionary<string, ReportNode>();
-		private static ReportNode[] roots = null;
+		private static readonly List<ReportNode> roots = new List<ReportNode>();
 		private static ReportsDataSource instance = null;
 		private static DateTime lastChanged = DateTime.UtcNow;
 
@@ -80,7 +79,38 @@ namespace Waher.Reports
 		/// <summary>
 		/// Root node references. If no root nodes are available, null is returned.
 		/// </summary>
-		public IEnumerable<INode> RootNodes => (ReportNode[])roots.Clone();
+		public IEnumerable<INode> RootNodes
+		{
+			get
+			{
+				lock (roots)
+				{
+					return roots.ToArray();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Registers a new report root node.
+		/// </summary>
+		/// <param name="ReportRoot">Report root node.</param>
+		/// <returns>If the root node was registered.</returns>
+		public static async Task<bool> RegisterRootNode(ReportNode ReportRoot)
+		{
+			lock (roots)
+			{
+				if (roots.Contains(ReportRoot))
+					return false;
+
+				roots.Add(ReportRoot);
+				lastChanged = DateTime.UtcNow;
+			}
+
+			await NewEvent(await NodeAdded.FromNode(ReportRoot, 
+				await Translator.GetDefaultLanguageAsync(), RequestOrigin.Empty, false));
+
+			return true;
+		}
 
 		/// <summary>
 		/// Event raised when a data source event has been raised.
@@ -89,7 +119,6 @@ namespace Waher.Reports
 
 		internal static async Task NewEvent(SourceEvent Event)
 		{
-			await Database.Insert(Event);
 			await (instance?.OnEvent?.Raise(instance, Event) ?? Task.CompletedTask);
 		}
 

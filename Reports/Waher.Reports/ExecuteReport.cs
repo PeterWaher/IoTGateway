@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Things;
 using Waher.Things.Queries;
@@ -50,7 +51,10 @@ namespace Waher.Reports
 		/// Gets the name of data source.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
-		public abstract Task<string> GetNameAsync(Language Language);
+		public virtual Task<string> GetNameAsync(Language Language)
+		{
+			return Language.GetStringAsync(typeof(ReportsDataSource), 4, "Execute Report...");
+		}
 
 		/// <summary>
 		/// Gets a confirmation string, if any, of the command. If no confirmation is necessary, null, or the empty string can be returned.
@@ -75,15 +79,18 @@ namespace Waher.Reports
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the command can be executed by the caller.</returns>
-		public Task<bool> CanExecuteAsync(RequestOrigin Caller)
+		public async Task<bool> CanExecuteAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return await this.report.CanViewAsync(Caller);
 		}
 
 		/// <summary>
 		/// Executes the command.
 		/// </summary>
-		public Task ExecuteCommandAsync() => Task.CompletedTask;
+		public Task ExecuteCommandAsync()
+		{
+			throw new NotSupportedException();
+		}
 
 		/// <summary>
 		/// Starts the execution of a query.

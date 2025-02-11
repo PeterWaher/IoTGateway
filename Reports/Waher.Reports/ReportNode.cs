@@ -21,10 +21,13 @@ namespace Waher.Reports
 		/// Abstract base class for report nodes.
 		/// </summary>
 		/// <param name="NodeId">Node ID</param>
+		/// <param name="Parent">Parent Node, or null if a root node.</param>
 		public ReportNode(string NodeId, ReportNode Parent)
 		{
 			this.nodeId = NodeId;
 			this.parent = Parent;
+
+			this.parent?.AddChild(this);
 		}
 
 		/// <summary>
@@ -56,7 +59,10 @@ namespace Waher.Reports
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
-		public abstract Task<string> GetTypeNameAsync(Language Language);
+		public virtual Task<string> GetTypeNameAsync(Language Language)
+		{
+			return Language.GetStringAsync(typeof(ReportsDataSource), 3, "Report");
+		}
 
 		/// <summary>
 		/// If the source has any child sources.
@@ -126,9 +132,9 @@ namespace Waher.Reports
 		/// </summary>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node is visible to the caller.</returns>
-		public Task<bool> CanViewAsync(RequestOrigin Caller)
+		public virtual Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(true);     // TODO: Check user privileges
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -167,9 +173,9 @@ namespace Waher.Reports
 		/// <param name="Language">Language to use.</param>
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>Set of displayable parameters.</returns>
-		public Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		public virtual Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
-			return Task.FromResult<IEnumerable<Parameter>>(null);
+			return Task.FromResult<IEnumerable<Parameter>>(Array.Empty<Parameter>());
 		}
 
 		/// <summary>
@@ -230,6 +236,13 @@ namespace Waher.Reports
 			if (!(Child is ReportNode ReportNode))
 				throw new ArgumentException("Must be a report node.", nameof(Child));
 
+			this.AddChild(ReportNode);
+
+			return Task.CompletedTask;
+		}
+
+		private void AddChild(ReportNode ReportNode)
+		{
 			lock (this.syncObj)
 			{
 				if (this.children is null)
@@ -238,8 +251,6 @@ namespace Waher.Reports
 				if (!this.children.Contains(ReportNode))
 					this.children.Add(ReportNode);
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -269,7 +280,10 @@ namespace Waher.Reports
 		/// <summary>
 		/// Destroys the node. If it is a child to a parent node, it is removed from the parent first.
 		/// </summary>
-		public abstract Task DestroyAsync();
+		public virtual Task DestroyAsync()
+		{
+			return Task.CompletedTask;
+		}
 
 		/// <summary>
 		/// Available command objects. If no commands are available, null is returned.
@@ -278,16 +292,18 @@ namespace Waher.Reports
 
 		private async Task<IEnumerable<ICommand>> GetCommands()
 		{
-			return new ICommand[]
-			{
-				await this.GetExecuteCommand()
-			};
+			ExecuteReport Command = await this.GetExecuteCommand();
+			if (Command is null)
+				return Array.Empty<ICommand>();
+			else
+				return new ICommand[] { Command };
 		}
 
 		/// <summary>
-		/// Gets the command object to execute a report.
+		/// Gets the command object to execute a report. If null is returned, the report
+		/// node is just a group placeholder of sub-reports.
 		/// </summary>
-		/// <returns>Command object.</returns>
+		/// <returns>Command object, or null if node is only a placeholder.</returns>
 		public abstract Task<ExecuteReport> GetExecuteCommand();
 
 	}

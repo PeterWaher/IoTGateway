@@ -3,9 +3,9 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Reports">
 			<String id="1">Reports</String>
-			<String id="2"></String>
-			<String id="3"></String>
-			<String id="4"></String>
+			<String id="2">Report Folder</String>
+			<String id="3">Report</String>
+			<String id="4">Execute Report...</String>
 			<String id="5"></String>
 			<String id="6"></String>
 			<String id="7"></String>

@@ -280,5 +280,4 @@ let nativeHeader;
 window.addEventListener("load", () => {
     nativeHeader = NativeHeader();
     Popup = PopupHandler()
-    Popup.Prompt("test")
 })

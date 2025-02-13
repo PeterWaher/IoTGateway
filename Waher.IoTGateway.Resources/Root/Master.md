@@ -30,4 +30,4 @@ Javascript: /Master.js
 
 </main>
 
-<dialoge id ="native-popup-container"></dialoge>
+<dialog id ="native-popup-container"></dialog>

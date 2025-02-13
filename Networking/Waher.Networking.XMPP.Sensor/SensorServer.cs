@@ -381,7 +381,8 @@ namespace Waher.Networking.XMPP.Sensor
 			RequestOrigin Origin = new RequestOrigin(RequestorBareJid,
 				Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 				Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-				Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries));
+				Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+				null);
 
 			return this.CanReadAsync(Request.Types, Request.Nodes, Request.FieldNames, Origin);
 		}

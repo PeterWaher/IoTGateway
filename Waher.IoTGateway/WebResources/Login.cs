@@ -174,7 +174,7 @@ namespace Waher.IoTGateway.WebResources
 
 			public Task<RequestOrigin> GetOrigin()
 			{
-				return Task.FromResult(new RequestOrigin(Gateway.XmppClient?.BareJID, null, null, null));
+				return Task.FromResult(new RequestOrigin(Gateway.XmppClient?.BareJID, null, null, null, this));
 			}
 
 			public Task<IEnumerable<KeyValuePair<string, object>>> CreateClaims(bool Encrypted)

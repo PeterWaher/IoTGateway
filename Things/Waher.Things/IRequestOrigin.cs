@@ -11,5 +11,12 @@ namespace Waher.Things
 		/// Origin of request.
 		/// </summary>
 		Task<RequestOrigin> GetOrigin();
+
+		/// <summary>
+		/// If the origin has a given privilege.
+		/// </summary>
+		/// <param name="Privilege">Privilege.</param>
+		/// <returns>If the origin has the corresponding privilege.</returns>
+		bool HasPrivilege(string Privilege);
 	}
 }

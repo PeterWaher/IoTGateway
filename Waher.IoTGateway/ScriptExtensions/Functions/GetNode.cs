@@ -206,7 +206,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			else if (Variables.TryGetVariable("User", out v) && v.ValueObject is IRequestOrigin Origin3)
 				return Origin3.GetOrigin();
 			else
-				return Task.FromResult(new RequestOrigin(Gateway.XmppClient.BareJID, null, null, null));
+				return Task.FromResult(new RequestOrigin(Gateway.XmppClient.BareJID, null, null, null, null));
 		}
 
 		/// <summary>

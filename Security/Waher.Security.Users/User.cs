@@ -197,7 +197,7 @@ namespace Waher.Security.Users
 		/// </summary>
 		public Task<RequestOrigin> GetOrigin()
 		{
-			return Task.FromResult(new RequestOrigin(this.userName, null, null, null));
+			return Task.FromResult(new RequestOrigin(this.userName, null, null, null, this));
 		}
 
 		/// <summary>

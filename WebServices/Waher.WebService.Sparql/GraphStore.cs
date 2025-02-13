@@ -131,7 +131,7 @@ namespace Waher.WebService.Sparql
 			if (Request.User is IRequestOrigin RequestOrigin)
 				return RequestOrigin.GetOrigin();
 			else
-				return Task.FromResult(new RequestOrigin(Request.RemoteEndPoint, null, null, null));
+				return Task.FromResult(new RequestOrigin(Request.RemoteEndPoint, null, null, null, null));
 		}
 
 		internal static async Task<ISemanticModel> GetDefaultSource(RequestOrigin Caller)

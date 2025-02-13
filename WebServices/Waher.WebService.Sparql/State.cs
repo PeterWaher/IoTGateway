@@ -122,7 +122,7 @@ namespace Waher.WebService.Sparql
 		public Task<RequestOrigin> GetOrigin()
 		{
 			if (this.origin is null)
-				this.origin = new RequestOrigin(this.request.RemoteEndPoint, null, null, null);
+				this.origin = new RequestOrigin(this.request.RemoteEndPoint, null, null, null, null);
 
 			return Task.FromResult(this.origin);
 		}

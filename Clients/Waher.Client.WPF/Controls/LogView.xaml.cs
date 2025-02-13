@@ -133,7 +133,7 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private static readonly XslCompiledTransform eventsToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.EventXmlToHtml.xslt");
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.EventOutput.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.EventOutput.xsd");
 		private const string logNamespace = "http://waher.se/Schema/EventOutput.xsd";
 		private const string logRoot = "EventOutput";
 

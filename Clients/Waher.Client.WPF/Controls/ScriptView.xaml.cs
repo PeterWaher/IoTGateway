@@ -496,7 +496,7 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private static readonly XslCompiledTransform scriptToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.ScriptToHTML.xslt");
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.Script.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.Script.xsd");
 		private const string scriptNamespace = "http://waher.se/Schema/Script.xsd";
 		private const string scriptRoot = "Script";
 

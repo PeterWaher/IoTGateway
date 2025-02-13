@@ -156,7 +156,7 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private static readonly XslCompiledTransform searchResultToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.SearchResultToHTML.xslt");
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.SearchResult.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.SearchResult.xsd");
 		private const string searchResultNamespace = "http://waher.se/Schema/SearchResult.xsd";
 		private const string searchResultRoot = "SearchResult";
 

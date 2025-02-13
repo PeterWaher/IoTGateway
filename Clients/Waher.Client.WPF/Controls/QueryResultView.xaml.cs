@@ -591,7 +591,7 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private static readonly XslCompiledTransform reportToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.ReportToHTML.xslt");
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.Report.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.Report.xsd");
 		private const string reportNamespace = "http://waher.se/Schema/Report.xsd";
 		private const string reportRoot = "Report";
 

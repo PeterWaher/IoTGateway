@@ -318,8 +318,8 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private static readonly XslCompiledTransform sensorDataToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.SensorDataToHTML.xslt");
-		private static readonly XmlSchema schema1 = XSL.LoadSchema("Waher.Client.WPF.Schema.SensorData.xsd");
-		private static readonly XmlSchema schema2 = XSL.LoadSchema("Waher.Client.WPF.Schema.sensor-data.xsd");
+		private static readonly XmlSchema schema1 = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.SensorData.xsd");
+		private static readonly XmlSchema schema2 = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.sensor-data.xsd");
 		private const string sensorDataNamespace = "http://waher.se/Schema/SensorData.xsd";
 		private const string sensorDataRoot = "SensorData";
 

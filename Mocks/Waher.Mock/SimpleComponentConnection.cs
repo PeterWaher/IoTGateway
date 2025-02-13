@@ -21,7 +21,7 @@ namespace Waher.Mock
 	public class SimpleComponentConfiguration : IHostReference
 	{
 #if !WINDOWS_UWP
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Mock.Schema.SimpleComponentConfiguration.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(SimpleComponentConfiguration).Namespace + ".Schema.SimpleComponentConfiguration.xsd");
 		private const string expectedRootElement = "SimpleComponentConfiguration";
 		private const string expectedNamespace = "http://waher.se/Schema/SimpleComponentConfiguration.xsd";
 #endif

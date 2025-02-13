@@ -38,7 +38,7 @@ namespace Waher.Client.WPF.Controls
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 
-		private readonly Dictionary<string, Consolidator> threads = new Dictionary<string, Consolidator>();
+		private readonly Dictionary<string, Consolidator> threads = [];
 		private readonly TreeNode node;
 		private DateTime timer = DateTime.MinValue;
 		private bool muc;
@@ -175,7 +175,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			MarkdownDocument Markdown;
 
-			if (Message.IndexOf('|') >= 0)
+			if (Message.Contains('|'))
 			{
 				string s;
 				int c = this.ChatListView.Items.Count;
@@ -185,11 +185,11 @@ namespace Waher.Client.WPF.Controls
 					Item.Type == ChatItemType.Transmitted &&
 					string.IsNullOrWhiteSpace(Item.From) &&
 					(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
-					(s = Item.Message).IndexOf('|') >= 0)
+					(s = Item.Message).Contains('|'))
 				{
 					try
 					{
-						if (!s.EndsWith("\n"))
+						if (!s.EndsWith('\n'))
 							s += Environment.NewLine;
 
 						s += Message;
@@ -275,7 +275,7 @@ namespace Waher.Client.WPF.Controls
 
 							Rec.UpdateTP = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(100), async (_) =>
 							{
-								StringBuilder sb = new StringBuilder();
+								StringBuilder sb = new();
 								bool First = true;
 
 								Message = await Consolidation.GenerateMarkdownAsync();
@@ -304,7 +304,7 @@ namespace Waher.Client.WPF.Controls
 									if (Added)
 										Rec.ListViewIndex = this.AddListItem(Rec.Item);
 									else
-										this.ChatListView.Items[Rec.ListViewIndex] = this.CreateItem(Rec.Item);
+										this.ChatListView.Items[Rec.ListViewIndex] = CreateItem(Rec.Item);
 								});
 
 							}, null);
@@ -330,14 +330,14 @@ namespace Waher.Client.WPF.Controls
 
 		private int AddListItem(ChatItem Item)
 		{
-			ListViewItem ListViewItem = this.CreateItem(Item);
+			ListViewItem ListViewItem = CreateItem(Item);
 			int Index = this.ChatListView.Items.Add(ListViewItem);
 			this.ChatListView.ScrollIntoView(ListViewItem);
 
 			return Index;
 		}
 
-		private ListViewItem CreateItem(ChatItem Item)
+		private static ListViewItem CreateItem(ChatItem Item)
 		{
 			return new ListViewItem()
 			{
@@ -354,7 +354,7 @@ namespace Waher.Client.WPF.Controls
 
 			if (IsMarkdown)
 			{
-				if (Message.IndexOf('|') >= 0)
+				if (Message.Contains('|'))
 				{
 					int c = this.ChatListView.Items.Count;
 
@@ -406,7 +406,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object Sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog()
+			SaveFileDialog Dialog = new()
 			{
 				AddExtension = true,
 				CheckPathExists = true,
@@ -424,7 +424,7 @@ namespace Waher.Client.WPF.Controls
 				{
 					if (Dialog.FilterIndex == 2)
 					{
-						StringBuilder Xml = new StringBuilder();
+						StringBuilder Xml = new();
 						using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(true, true)))
 						{
 							this.SaveAsXml(w);
@@ -436,13 +436,10 @@ namespace Waher.Client.WPF.Controls
 					}
 					else
 					{
-						using (FileStream f = File.Create(Dialog.FileName))
-						{
-							using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
-							{
-								this.SaveAsXml(w);
-							}
-						}
+						using FileStream f = File.Create(Dialog.FileName);
+						using XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false));
+						
+						this.SaveAsXml(w);
 					}
 				}
 				catch (Exception ex)
@@ -453,7 +450,7 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private static readonly XslCompiledTransform chatToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.ChatToHTML.xslt");
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.Chat.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(MainWindow).Namespace + ".Schema.Chat.xsd");
 		private const string chatNamespace = "http://waher.se/Schema/Chat.xsd";
 		private const string chatRoot = "Chat";
 
@@ -488,7 +485,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog()
+				OpenFileDialog Dialog = new()
 				{
 					AddExtension = true,
 					CheckFileExists = true,
@@ -504,7 +501,7 @@ namespace Waher.Client.WPF.Controls
 
 				if (Result.HasValue && Result.Value)
 				{
-					XmlDocument Xml = new XmlDocument()
+					XmlDocument Xml = new()
 					{
 						PreserveWhitespace = true
 					};

@@ -43,6 +43,7 @@
 			<Feature Id="DemoSite" Title="Demo Site" Description="Contains content files for a quick startup site." Level="1">
 				<ComponentRef Id="ScriptWebService" />
 				<ComponentRef Id="SparqlWebService" />
+				<ComponentRef Id="ReportsFiles" />
 				<ComponentRef Id="RootFiles" />
 				<ComponentRef Id="AudioFiles" />
 				<ComponentRef Id="ImageFiles" />

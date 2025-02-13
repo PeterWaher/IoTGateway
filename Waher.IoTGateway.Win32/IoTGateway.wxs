@@ -1992,6 +1992,17 @@
 						<RemoveFile Id="RemoveDefault510.md" Name="510.md" On="uninstall" />
 					</Component>
 				</Directory>
+				<Directory Id="REPORTSDIR" Name="Reports">
+					<Component Id="ReportsFiles" Guid="20DC423C-A506-429D-8E14-F90E1030EA9F">
+						<CreateFolder>
+							<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
+						</CreateFolder>
+						<RegistryKey Root="HKLM" Key="Software\[Manufacturer]\[ProductName]">
+							<RegistryValue Type="string" Name="ReportsDir" Value="[REPORTSDIR]" Action="write" />
+						</RegistryKey>
+						<RemoveFolder Id="RemoveReports" On="uninstall" />
+					</Component>
+				</Directory>
 				<Directory Id="ROOTDIR" Name="Root">
 					<Component Id="RootFiles" Guid="FAAC1B8A-39C9-4ABE-996D-0B7688990DC3">
 						<CreateFolder>

@@ -146,6 +146,8 @@
 			<Content fileName="androidstudio.css"/>
 		</Folder>
 	</Folder>
+	<Folder name="Reports">
+	</Folder>
 	<Folder name="Root">
 		<Content fileName="Admin.cssx"/>
 		<Content fileName="Admin.md"/>

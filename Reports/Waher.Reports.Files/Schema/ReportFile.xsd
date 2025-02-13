@@ -9,6 +9,7 @@
 	<xs:element name="Report">
 		<xs:complexType>
 			<xs:sequence>
+				<xs:element name="Privilege" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="Title" type="xs:string"/>
 			</xs:sequence>
 		</xs:complexType>

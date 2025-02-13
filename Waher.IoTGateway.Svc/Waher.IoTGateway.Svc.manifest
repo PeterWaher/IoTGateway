@@ -438,6 +438,9 @@
 	<Assembly fileName="Waher.Persistence.XmlLedger.dll" />
 	<Assembly fileName="Waher.Persistence.XmlLedger.pdb" />
 	<Assembly fileName="Waher.Persistence.XmlLedger.xml" />
+	<Assembly fileName="Waher.Reports.dll" />
+	<Assembly fileName="Waher.Reports.pdb" />
+	<Assembly fileName="Waher.Reports.xml" />
 	<Assembly fileName="Waher.Runtime.Cache.dll" />
 	<Assembly fileName="Waher.Runtime.Cache.pdb" />
 	<Assembly fileName="Waher.Runtime.Cache.xml" />

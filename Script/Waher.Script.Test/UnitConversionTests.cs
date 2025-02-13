@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Script.Operators.Arithmetics;
 using Waher.Script.Units;
 
 namespace Waher.Script.Test
@@ -504,6 +505,77 @@ namespace Waher.Script.Test
 			Assert.IsTrue(Unit.TryConvert(2, DeciLiter, 0, Liter, out x, out NrDec));
 			Assert.AreEqual(0.2, x);
 			Assert.AreEqual(1, NrDec);
+		}
+
+		[TestMethod]
+		public void Test_17_Dimensionless()
+		{
+			Unit One = Unit.Parse("1");
+			Unit Pieces = Unit.Parse("pcs");
+			Unit Dozen1 = Unit.Parse("dz");
+			Unit Dozen2 = Unit.Parse("dozen");
+			Unit Gross1 = Unit.Parse("gr");
+			Unit Gross2 = Unit.Parse("gross");
+			Unit Radians = Unit.Parse("rad");
+			Unit Degrees1 = Unit.Parse("deg");
+			Unit Degrees2 = Unit.Parse("°");
+			Unit Percent = Unit.Parse("%");
+			Unit Permille1 = Unit.Parse("‰");
+			Unit Permille2 = Unit.Parse("%0");
+			Unit Perdixmille1 = Unit.Parse("‱");
+			Unit Perdixmille2 = Unit.Parse("%00");
+
+			Assert.IsTrue(Unit.TryConvert(2, Pieces, 0, One, out double x, out byte NrDec));
+			Assert.AreEqual(2, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Dozen1, 0, One, out x, out NrDec));
+			Assert.AreEqual(24, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Dozen2, 0, One, out x, out NrDec));
+			Assert.AreEqual(24, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Gross1, 0, One, out x, out NrDec));
+			Assert.AreEqual(288, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Gross2, 0, One, out x, out NrDec));
+			Assert.AreEqual(288, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Radians, 0, One, out x, out NrDec));
+			Assert.AreEqual(2, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Degrees1, 0, One, out x, out NrDec));
+			Assert.AreEqual(2 * DegToRad.Scale, x);
+			Assert.AreEqual(2, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Degrees2, 0, One, out x, out NrDec));
+			Assert.AreEqual(2 * DegToRad.Scale, x);
+			Assert.AreEqual(2, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Percent, 0, One, out x, out NrDec));
+			Assert.AreEqual(0.02, x);
+			Assert.AreEqual(2, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Permille1, 0, One, out x, out NrDec));
+			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Permille2, 0, One, out x, out NrDec));
+			Assert.AreEqual(0.002, x);
+			Assert.AreEqual(3, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Perdixmille1, 0, One, out x, out NrDec));
+			Assert.AreEqual(0.0002, x);
+			Assert.AreEqual(4, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, Perdixmille2, 0, One, out x, out NrDec));
+			Assert.AreEqual(0.0002, x);
+			Assert.AreEqual(4, NrDec);
 		}
 
 	}

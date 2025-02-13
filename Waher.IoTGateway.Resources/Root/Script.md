@@ -3631,15 +3631,15 @@ recognized by the script engine. Such units are defined in *base quantities*, wh
 constructors implementing the `Waher.Script.Units.IBaseQuantity` interface. The following tables lists such base quantities as defined by
 the `Waher.Script` library:
 
-| Unit | Meaning |
-|:----:|:--------|
-| m    | Metre |
+| Unit | Meaning  |
+|:----:|:---------|
+| m    | Metre    |
 | Å    | Ångström |
-| inch | Inch |
-| ft   | Feet |
-| foot | Feet |
-| yd   | Yard |
-| yard | Yard |
+| inch | Inch     |
+| ft   | Feet     |
+| foot | Feet     |
+| yd   | Yard     |
+| yard | Yard     |
 | SM   | Statute Mile |
 | NM   | Nautical Mile |
 [Length]
@@ -3665,7 +3665,7 @@ Furthermore, the following length units used in web applications are also recocn
 
 | Unit | Meaning |
 |:----:|:--------|
-| g    | Gram |
+| g    | Gram  |
 | t    | Tonne |
 | u    | Atomic mass unit |
 | lb   | Pound |
@@ -3673,24 +3673,44 @@ Furthermore, the following length units used in web applications are also recocn
 
 | Unit | Meaning |
 |:----:|:--------|
-| s    | Second |
-| min  | Minute |
-| h    | Hour |
-| d    | Day |
-| w    | Week |
+| s    | Second  |
+| min  | Minute  |
+| h    | Hour    |
+| d    | Day     |
+| w    | Week    |
 [Time]
 
 | Unit | Meaning |
 |:----:|:--------|
-| A    | Ampere |
+| A    | Ampere  |
 [Current]
 
-| Unit | Meaning |
-|:----:|:--------|
-| °C, C | Celcius |
-| °F, F | Farenheit |
-| K     | Kelvin |
+| Unit | Meaning    |
+|:----:|:-----------|
+| °C   | Celcius    |
+| °F   | Farenheit  |
+| K    | Kelvin     |
 [Temperature]
+
+A special kind of base unit is also available for dimensionless units:
+
+| Unit  | Meaning     |
+|:-----:|:------------|
+| 1     | One         |
+| pcs   | Pieces      |
+| gr    | Gross       |
+| gross | Gross       |
+| dz    | Dozen       |
+| dozen | Dozen       |
+| rad   | Radians     |
+| deg   | Degrees     |
+| °     | Degrees     |
+| %     | Percent     |
+| ‰     | Permille    |
+| %0    | Permille    |
+| ‱    | Perdixmille |
+| %00   | Perdixmille |
+[Dimensionless]
 
 ### Derived Quantities
 

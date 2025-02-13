@@ -11,7 +11,10 @@ namespace Waher.Script.Operators.Arithmetics
 	/// </summary>
 	public class DegToRad : UnaryDoubleOperator, IDifferentiable
 	{
-		private const double scale = Math.PI / 180;
+		/// <summary>
+		/// PI / 180
+		/// </summary>
+		public const double Scale = Math.PI / 180;
 
 		/// <summary>
 		/// Degrees to radians operator.
@@ -32,7 +35,7 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public override IElement Evaluate(double Operand)
 		{
-			return new DoubleNumber(Operand * scale);
+			return new DoubleNumber(Operand * Scale);
 		}
 
 		/// <summary>

@@ -182,5 +182,23 @@ namespace Waher.Runtime.IO
 		}
 
 		private static Encoding gb18030 = null;
+
+		/// <summary>
+		/// Returns the port number at the end of a string, if found.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <returns>String without port number.</returns>
+		public static string RemovePortNumber(this string s)
+		{
+			if (s is null)
+				return null;
+
+			int i = s.StartsWith("[") ? s.LastIndexOf("]:") : s.LastIndexOf(':');
+
+			if (i >= 0 && int.TryParse(s.Substring(i + 1), out int j) && j >= 0 && j <= 65535)
+				return s.Substring(0, i);
+			else
+				return s;
+		}
 	}
 }

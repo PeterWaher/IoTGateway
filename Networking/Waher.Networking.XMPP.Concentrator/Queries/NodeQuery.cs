@@ -8,6 +8,8 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Threading;
+using Waher.Script.Objects;
+using Waher.Script.Units;
 using Waher.Things.Queries;
 
 namespace Waher.Networking.XMPP.Concentrator.Queries
@@ -372,6 +374,33 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 															Record.Add(null);
 														break;
 
+													case "quantity":
+														double Magnitude = XML.Attribute(E3, "m", 0.0);
+														string QuantityUnit = XML.Attribute(E3, "u", string.Empty);
+
+														if (Unit.TryParse(QuantityUnit, out Unit ParsedUnit))
+															Record.Add(new PhysicalQuantity(Magnitude, ParsedUnit));
+														else
+														{
+															Record.Add(Magnitude);
+															await this.QueryMessage(QueryEventType.Error, QueryEventLevel.Minor, "Unable to parse unit " + QuantityUnit, e);
+														}
+														break;
+
+													case "measurement":
+														Magnitude = XML.Attribute(E3, "m", 0.0);
+														QuantityUnit = XML.Attribute(E3, "u", string.Empty);
+														double Error = XML.Attribute(E3, "e", 0.0);
+
+														if (Unit.TryParse(QuantityUnit, out ParsedUnit))
+															Record.Add(new Measurement(Magnitude, ParsedUnit, Error));
+														else
+														{
+															Record.Add(Magnitude);
+															await this.QueryMessage(QueryEventType.Error, QueryEventLevel.Minor, "Unable to parse unit " + QuantityUnit, e);
+														}
+														break;
+
 													case "base64":
 														try
 														{
@@ -418,7 +447,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 									if (Decoded.HasError)
 										await this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, Decoded.Error.Message, e);
 									else
-										await this.NewObject(Decoded, Bin, ContentType, e);
+										await this.NewObject(Decoded.Decoded, Bin, ContentType, e);
 								}
 								catch (Exception ex)
 								{

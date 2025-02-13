@@ -1289,5 +1289,31 @@ namespace Waher.Script.Test
 			await Test("{'Duration':Duration(x)}:={'Duration':'PT10H30M'};x", new Duration(false, 0, 0, 0, 10, 30, 0));
 		}
 
+		[TestMethod]
+		public async Task Evaluation_Test_63_UnitPrefixes()
+		{
+			await Test("1 hm m", new PhysicalQuantity(1e2, new Unit("m")));
+			await Test("1 km m", new PhysicalQuantity(1e3, new Unit("m")));
+			await Test("1 Mm m", new PhysicalQuantity(1e6, new Unit("m")));
+			await Test("1 Gm m", new PhysicalQuantity(1e9, new Unit("m")));
+			await Test("1 Tm m", new PhysicalQuantity(1e12, new Unit("m")));
+			await Test("1 Pm m", new PhysicalQuantity(1e15, new Unit("m")));
+			await Test("1 Em m", new PhysicalQuantity(1e18, new Unit("m")));
+			await Test("1 Zm m", new PhysicalQuantity(1e21, new Unit("m")));
+			await Test("1 Ym m", new PhysicalQuantity(1e24, new Unit("m")));
+
+			await Test("1 dm m", new PhysicalQuantity(1e-1, new Unit("m")));
+			await Test("1 cm m", new PhysicalQuantity(1e-2, new Unit("m")));
+			await Test("1 mm m", new PhysicalQuantity(1e-3, new Unit("m")));
+			await Test("1 um m", new PhysicalQuantity(1e-6, new Unit("m")));
+			await Test("1 µm m", new PhysicalQuantity(1e-6, new Unit("m")));
+			await Test("1 nm m", new PhysicalQuantity(1e-9, new Unit("m")));
+			await Test("1 pm m", new PhysicalQuantity(1e-12, new Unit("m")));
+			await Test("1 fm m", new PhysicalQuantity(1e-15, new Unit("m")));
+			await Test("1 am m", new PhysicalQuantity(1e-18, new Unit("m")));
+			await Test("1 zm m", new PhysicalQuantity(1e-21, new Unit("m")));
+			await Test("1 ym m", new PhysicalQuantity(1e-24, new Unit("m")));
+		}
+
 	}
 }

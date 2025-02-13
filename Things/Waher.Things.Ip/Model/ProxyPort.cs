@@ -13,6 +13,7 @@ using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Security;
 using Waher.Security.LoginMonitor;
 using Waher.Security.Users;
@@ -327,10 +328,7 @@ namespace Waher.Things.Ip.Model
 								break;
 						}
 
-						string RemoteEndpoint = Incoming.Client.Client.RemoteEndPoint.ToString();
-						int i = RemoteEndpoint.LastIndexOf(':');
-						if (i > 0 && int.TryParse(RemoteEndpoint.Substring(i + 1), out int _))
-							RemoteEndpoint = RemoteEndpoint.Substring(0, i);
+						string RemoteEndpoint = Incoming.Client.Client.RemoteEndPoint.ToString().RemovePortNumber();
 
 						if (User is null)
 						{

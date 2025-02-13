@@ -2880,7 +2880,9 @@ namespace Waher.Script
 						if (char.IsLetter(ch) || char.IsDigit(ch))
 						{
 							this.pos--;
-							return Node;
+
+							if (!this.TryParseUnit(ref Node))	// T might be referencing the T prefix.
+								return Node;
 						}
 						else
 						{
@@ -2888,8 +2890,8 @@ namespace Waher.Script
 								throw new SyntaxException("Null-checked T operator not defined.", this.pos, this.script);
 
 							Node = new Transpose(Node, Start, this.pos - Start, this);
-							break;
 						}
+						break;
 
 					case 'H':
 						this.pos++;
@@ -2944,34 +2946,8 @@ namespace Waher.Script
 
 						if (char.IsLetter(ch))
 						{
-							Bak = this.pos;
-
-							Unit Unit = this.ParseUnit(true);
-							if (Unit is null)
-							{
-								this.pos = Bak;
+							if (!this.TryParseUnit(ref Node))
 								return Node;
-							}
-
-							if (Node is ConstantElement ConstantElement)
-							{
-								IElement C = ConstantElement.Constant;
-
-								if (C.AssociatedObjectValue is double d)
-								{
-									Node = new ConstantElement(new PhysicalQuantity(d, Unit),
-										ConstantElement.Start, this.pos - ConstantElement.Start, this);
-								}
-								else if (C.AssociatedObjectValue is IPhysicalQuantity)
-									Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
-								else
-								{
-									this.pos = Bak;
-									return Node;
-								}
-							}
-							else
-								Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
 						}
 						else
 							return Node;
@@ -2980,6 +2956,42 @@ namespace Waher.Script
 
 				NullCheck = false;
 			}
+		}
+
+		private bool TryParseUnit(ref ScriptNode Node)
+		{
+			int Bak = this.pos;
+
+			Unit Unit = this.ParseUnit(true);
+			if (Unit is null)
+			{
+				this.pos = Bak;
+				return false;
+			}
+
+			int Start = Node.Start;
+
+			if (Node is ConstantElement ConstantElement)
+			{
+				IElement C = ConstantElement.Constant;
+
+				if (C.AssociatedObjectValue is double d)
+				{
+					Node = new ConstantElement(new PhysicalQuantity(d, Unit),
+						ConstantElement.Start, this.pos - ConstantElement.Start, this);
+				}
+				else if (C.AssociatedObjectValue is IPhysicalQuantity)
+					Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
+				else
+				{
+					this.pos = Bak;
+					return false;
+				}
+			}
+			else
+				Node = new SetUnit(Node, Unit, Start, this.pos - Start, this);
+
+			return true;
 		}
 
 		internal Unit ParseUnit(bool PermitPrefix)

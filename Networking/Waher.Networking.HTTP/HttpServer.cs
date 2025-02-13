@@ -28,6 +28,7 @@ using Waher.Script;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.Profiling;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
 {
@@ -1885,14 +1886,7 @@ namespace Waher.Networking.HTTP
 				if (!((From = Request.Header.From) is null))
 					this.IncLocked(From.Value, this.callsPerFrom);
 				else
-				{
-					string s = Request.RemoteEndPoint;
-					int i = s.LastIndexOf(':');
-					if (i > 0)
-						s = s.Substring(0, i);
-
-					this.IncLocked(s, this.callsPerFrom);
-				}
+					this.IncLocked(Request.RemoteEndPoint.RemovePortNumber(), this.callsPerFrom);
 			}
 
 			RequestInfo Info = new RequestInfo()

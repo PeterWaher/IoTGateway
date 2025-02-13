@@ -224,7 +224,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>Set of displayable parameters.</returns>
 		public Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
-			return Task.FromResult<IEnumerable<Parameter>>(new Parameter[0]);
+			return Task.FromResult<IEnumerable<Parameter>>(Array.Empty<Parameter>());
 		}
 
 		/// <summary>

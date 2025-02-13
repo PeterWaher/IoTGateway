@@ -8,6 +8,7 @@ using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;
 using Waher.Script;
+using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
 {
@@ -393,10 +394,7 @@ namespace Waher.Networking.HTTP
 					Host = string.Empty;
 				else
 				{
-					i = Host.IndexOf(':');
-
-					if (i > 0)
-						Host = Host.Substring(0, i);
+					Host = Host.RemovePortNumber();
 
 					if (ContainsInvalidFileCharacters(Host, false, true))
 					{

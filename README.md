@@ -376,7 +376,7 @@ defined by **Waher.Things**.
 | Project                   | Type          | Link                                                           | Project description |
 |---------------------------|---------------|----------------------------------------------------------------|---------------------|
 | **Waher.Reports**         | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Reports/)         | The [Waher.Reports](Things/Waher.Reports) project is a class library that provides basic abstraction of reports. |
-| **Waher.Reports.Files**   | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Reports.Files/)   | The [Waher.Reports.Files](Things/Waher.Reports.Files) project is a class library that publishes file-based reports stored in application data folders. Reports use XML to define structure and script to define logic. |
+| **Waher.Reports.Files**   | .NET Std 2.1  | [NuGet](https://www.nuget.org/packages/Waher.Reports.Files/)   | The [Waher.Reports.Files](Things/Waher.Reports.Files) project is a class library that publishes file-based reports stored in application data folders. Reports use XML to define structure and script to define logic. |
 
 Runtime
 ----------------------

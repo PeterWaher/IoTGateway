@@ -2592,8 +2592,10 @@
 						<File Id="Waher.IoTGateway.en.lng" Name="Waher.IoTGateway.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.en.lng" Vital="yes" KeyPath="yes" />
 						<File Id="Waher.IoTGateway.es.lng" Name="Waher.IoTGateway.es.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.IoTGateway.es.lng" Vital="yes" />
 						<File Id="Waher.Networking.XMPP.Concentrator.en.lng" Name="Waher.Networking.XMPP.Concentrator.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Networking.XMPP.Concentrator.en.lng" />
-						<File Id="Waher.Things.Ieee1451.en.lng" Name="Waher.Things.Ieee1451.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Ieee1451.en.lng" />
+						<File Id="Waher.Reports.en.lng" Name="Waher.Reports.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Reports.en.lng" />
+						<File Id="Waher.Reports.Files.en.lng" Name="Waher.Reports.Files.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Reports.Files.en.lng" />
 						<File Id="Waher.Things.Files.en.lng" Name="Waher.Things.Files.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Files.en.lng" />
+						<File Id="Waher.Things.Ieee1451.en.lng" Name="Waher.Things.Ieee1451.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Ieee1451.en.lng" />
 						<File Id="Waher.Things.IP.en.lng" Name="Waher.Things.IP.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.IP.en.lng" />
 						<File Id="Waher.Things.Metering.en.lng" Name="Waher.Things.Metering.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Metering.en.lng" />
 						<File Id="Waher.Things.Modbus.en.lng" Name="Waher.Things.Modbus.en.lng" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Language\Waher.Things.Modbus.en.lng" />
@@ -2606,8 +2608,10 @@
 						<RemoveFile Id="RemoveWaher.IoTGateway.en.lng" Name="Waher.IoTGateway.en.lng" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.IoTGateway.es.lng" Name="Waher.IoTGateway.es.lng" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Networking.XMPP.Concentrator.en.lng" Name="Waher.Networking.XMPP.Concentrator.en.lng" On="uninstall" />
-						<RemoveFile Id="RemoveWaher.Things.Ieee1451.en.lng" Name="Waher.Things.Ieee1451.en.lng" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Reports.en.lng" Name="Waher.Reports.en.lng" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Reports.Files.en.lng" Name="Waher.Reports.Files.en.lng" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Things.Files.en.lng" Name="Waher.Things.Files.en.lng" On="uninstall" />
+						<RemoveFile Id="RemoveWaher.Things.Ieee1451.en.lng" Name="Waher.Things.Ieee1451.en.lng" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Things.IP.en.lng" Name="Waher.Things.IP.en.lng" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Things.Metering.en.lng" Name="Waher.Things.Metering.en.lng" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Things.Modbus.en.lng" Name="Waher.Things.Modbus.en.lng" On="uninstall" />

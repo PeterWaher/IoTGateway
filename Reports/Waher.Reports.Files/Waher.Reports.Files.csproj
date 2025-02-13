@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -28,6 +28,11 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Content Include="Language\Waher.Reports.Files.en.lng">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
 	  <EmbeddedResource Include="Schema\ReportFile.xsd" />
 	</ItemGroup>
 	<ItemGroup>
@@ -44,6 +49,9 @@
 	  <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
 	  <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
 	  <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+	  <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
+	  <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+	  <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
 	  <ProjectReference Include="..\Waher.Reports\Waher.Reports.csproj" />
 	</ItemGroup>
 

@@ -1,6 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.DataForms;
 using Waher.Reports.Files.Model;
 using Waher.Runtime.Language;
+using Waher.Script;
 using Waher.Things;
 using Waher.Things.Queries;
 
@@ -9,19 +12,22 @@ namespace Waher.Reports.Files.Commands
 	/// <summary>
 	/// Command to execute a report file.
 	/// </summary>
-	public class ExecuteReportFileCommand : ExecuteReport
+	public class ExecuteReportFileCommand : ExecuteReport, IEditableObject
 	{
 		private readonly ReportFile parsedReport;
+		private readonly Variables variables;
 
 		/// <summary>
 		/// Command to execute a report file.
 		/// </summary>
 		/// <param name="Report">Parsed report file.</param>
 		/// <param name="ReportNode">Report node.</param>
-		public ExecuteReportFileCommand(ReportFile Report, ReportNode ReportNode)
+		/// <param name="Variables">Variable value collection.</param>
+		public ExecuteReportFileCommand(ReportFile Report, ReportNode ReportNode, Variables Variables)
 			: base(ReportNode)
 		{
 			this.parsedReport = Report;
+			this.variables = Variables;
 		}
 
 		/// <summary>
@@ -30,7 +36,29 @@ namespace Waher.Reports.Files.Commands
 		/// <returns>Copy of command object.</returns>
 		public override ICommand Copy()
 		{
-			return new ExecuteReportFileCommand(this.parsedReport, this.Report);
+			return new ExecuteReportFileCommand(this.parsedReport, this.Report, this.variables);
+		}
+
+		/// <summary>
+		/// Populates a data form with parameters for the object.
+		/// </summary>
+		/// <param name="Parameters">Data form to host all editable parameters.</param>
+		/// <param name="Language">Current language.</param>
+		public Task PopulateForm(DataForm Parameters, Language Language)
+		{
+			return this.parsedReport.PopulateForm(Parameters, Language, this.variables);
+		}
+
+		/// <summary>
+		/// Sets the parameters of the object, based on contents in the data form.
+		/// </summary>
+		/// <param name="Parameters">Data form with parameter values.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
+		public Task<SetEditableFormResult> SetParameters(DataForm Parameters, Language Language, bool OnlySetChanged)
+		{
+			return this.parsedReport.SetParameters(Parameters, Language, OnlySetChanged, this.variables);
 		}
 
 		/// <summary>
@@ -40,7 +68,7 @@ namespace Waher.Reports.Files.Commands
 		/// <param name="Language">Language to use.</param>
 		public override Task StartQueryExecutionAsync(Query Query, Language Language)
 		{
-			return Task.CompletedTask;	// TODO
+			return Task.CompletedTask;  // TODO
 		}
 	}
 }

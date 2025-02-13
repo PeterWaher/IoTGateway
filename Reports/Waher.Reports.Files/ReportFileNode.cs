@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Reports.Files.Commands;
 using Waher.Reports.Files.Model;
+using Waher.Script;
 using Waher.Things;
 
 namespace Waher.Reports.Files
@@ -71,7 +72,7 @@ namespace Waher.Reports.Files
 			if (Report is null)
 				return Task.FromResult<ExecuteReport>(null);
 
-			ExecuteReportFileCommand Command = new ExecuteReportFileCommand(Report, this);
+			ExecuteReportFileCommand Command = new ExecuteReportFileCommand(Report, this, new Variables());
 			return Task.FromResult<ExecuteReport>(Command);
 		}
 

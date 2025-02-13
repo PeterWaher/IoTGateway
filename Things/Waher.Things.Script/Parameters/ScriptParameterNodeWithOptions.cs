@@ -16,10 +16,10 @@ namespace Waher.Things.Script.Parameters
         {
         }
 
-        /// <summary>
-        /// Optional minimum value allowed.
-        /// </summary>
-        [Page(2, "Script", 100)]
+		/// <summary>
+		/// If only values defined in options are valid values.
+		/// </summary>
+		[Page(2, "Script", 100)]
         [Header(88, "Restrict to options.")]
         [ToolTip(89, "If only values defined in options are valid values.")]
         public bool RestrictToOptions { get; set; }

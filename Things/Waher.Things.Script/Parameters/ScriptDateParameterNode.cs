@@ -1,5 +1,4 @@
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Concentrator;

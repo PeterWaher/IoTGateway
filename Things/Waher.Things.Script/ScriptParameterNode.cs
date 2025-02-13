@@ -21,7 +21,7 @@ namespace Waher.Things.Script
         }
 
         /// <summary>
-        /// Parameter name.
+        /// Parameter page.
         /// </summary>
         [Page(2, "Script", 100)]
         [Header(36, "Page:")]

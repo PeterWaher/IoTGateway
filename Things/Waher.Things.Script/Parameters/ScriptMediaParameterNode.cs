@@ -1,13 +1,10 @@
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
-using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things.Attributes;

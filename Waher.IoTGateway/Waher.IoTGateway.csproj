@@ -377,6 +377,7 @@
     <ProjectReference Include="..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\Reports\Waher.Reports.Files\Waher.Reports.Files.csproj" />
     <ProjectReference Include="..\Reports\Waher.Reports\Waher.Reports.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />

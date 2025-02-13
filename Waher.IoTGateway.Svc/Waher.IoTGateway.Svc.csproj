@@ -114,6 +114,7 @@
     <ProjectReference Include="..\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence.Serialization.Compiled\Waher.Persistence.Serialization.Compiled.csproj" />
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\Reports\Waher.Reports.Files\Waher.Reports.Files.csproj" />
     <ProjectReference Include="..\Reports\Waher.Reports\Waher.Reports.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />

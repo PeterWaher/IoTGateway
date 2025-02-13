@@ -441,6 +441,9 @@
 	<Assembly fileName="Waher.Reports.dll" />
 	<Assembly fileName="Waher.Reports.pdb" />
 	<Assembly fileName="Waher.Reports.xml" />
+	<Assembly fileName="Waher.Reports.Files.dll" />
+	<Assembly fileName="Waher.Reports.Files.pdb" />
+	<Assembly fileName="Waher.Reports.Files.xml" />
 	<Assembly fileName="Waher.Runtime.Cache.dll" />
 	<Assembly fileName="Waher.Runtime.Cache.pdb" />
 	<Assembly fileName="Waher.Runtime.Cache.xml" />

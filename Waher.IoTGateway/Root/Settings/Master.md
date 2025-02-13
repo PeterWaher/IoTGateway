@@ -33,4 +33,4 @@ This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGatewa
 </span>
 </footer>
 
-<dialog id ="native-popup-container"></dialog>
+<div id ="native-popup-container"></div>

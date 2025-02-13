@@ -149,6 +149,8 @@
 	<Folder name="Root">
 		<Content fileName="Admin.cssx"/>
 		<Content fileName="Admin.md"/>
+		<Content fileName="AlertPopup.md"/>
+		<Content fileName="ConfirmPopup.md"/>
 		<Content fileName="Emojis.md"/>
 		<Content fileName="Entities.md"/>
 		<Content fileName="favicon.ico"/>
@@ -164,6 +166,7 @@
 		<Content fileName="Master.md"/>
 		<Content fileName="Prompt.js"/>
 		<Content fileName="Prompt.md"/>
+		<Content fileName="PromptPopup.md"/>
 		<Content fileName="robots.txt"/>
 		<Content fileName="Script.md"/>
 		<Content fileName="ScriptColors.md"/>

@@ -90,6 +90,7 @@ using Waher.Things.SensorData;
 using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
 using Waher.Reports;
+using Waher.Reports.Files;
 
 namespace Waher.IoTGateway
 {
@@ -183,6 +184,7 @@ namespace Waher.IoTGateway
 		private static string appDataFolder;
 		private static string runtimeFolder;
 		private static string rootFolder;
+		private static string reportsFolder;
 		private static string applicationName;
 		private static string exceptionFolder = null;
 		private static string exceptionFileName = null;
@@ -278,6 +280,7 @@ namespace Waher.IoTGateway
 
 				appDataFolder += Path.DirectorySeparatorChar;
 				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
+				reportsFolder = appDataFolder + "Reports" + Path.DirectorySeparatorChar;
 
 				Log.Register(new EventFilter("Alert Filter", new AlertNotifier("Alert Notifier"), EventType.Alert,
 					new CustomEventFilterDelegate((Event) => string.IsNullOrEmpty(Event.Facility))));
@@ -334,6 +337,7 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("AppData", appDataFolder);
 				Types.SetModuleParameter("Runtime", runtimeFolder);
 				Types.SetModuleParameter("Root", rootFolder);
+				Types.SetModuleParameter("Reports", reportsFolder);
 
 				scheduler = new Scheduler();
 
@@ -1254,6 +1258,8 @@ namespace Waher.IoTGateway
 						Sources = new GetDataSourcesEventArgs();
 					}
 				}
+
+				await ReportsDataSource.RegisterRootNode(new ReportFilesFolder(reportsFolder, "Reports", null));
 
 				Types.GetLoadedModules();   // Makes sure all modules are instantiated, allowing static constructors to add
 											// appropriate data sources, if necessary.
@@ -2402,6 +2408,11 @@ namespace Waher.IoTGateway
 		/// Web root folder.
 		/// </summary>
 		public static string RootFolder => rootFolder;
+
+		/// <summary>
+		/// Reports folder.
+		/// </summary>
+		public static string ReportsFolder => reportsFolder;
 
 		/// <summary>
 		/// Root folder resource.

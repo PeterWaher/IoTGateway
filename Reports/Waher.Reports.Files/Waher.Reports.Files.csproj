@@ -28,6 +28,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
+	  <EmbeddedResource Include="Schema\ReportFile.xsd" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Include="..\..\Images\Icon_64x64.png">
 			<Pack>True</Pack>
 			<PackagePath />
@@ -36,6 +39,12 @@
 			<Pack>True</Pack>
 			<PackagePath />
 		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+	  <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
+	  <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+	  <ProjectReference Include="..\Waher.Reports\Waher.Reports.csproj" />
 	</ItemGroup>
 
 </Project>

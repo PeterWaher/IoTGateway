@@ -12,10 +12,10 @@ namespace Waher.Reports
 	/// </summary>
 	public abstract class ReportNode : INode
 	{
-		private readonly string nodeId;
 		private List<ReportNode> children = null;
-		private ReportNode parent;
-		private object syncObj = new object();
+		private readonly string nodeId;
+		private readonly ReportNode parent;
+		private readonly object syncObj = new object();
 
 		/// <summary>
 		/// Abstract base class for report nodes.

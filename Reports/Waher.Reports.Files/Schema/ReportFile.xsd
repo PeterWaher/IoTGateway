@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Theme"
+           targetNamespace="http://waher.se/Schema/ReportFile.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/Schema/ReportFile.xsd"
+           xmlns:mstns="http://waher.se/Schema/ReportFile.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Report">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Title" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

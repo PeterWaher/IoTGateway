@@ -1,4 +1,4 @@
-function NativeHeader() {
+function NativeHeaderHandler() {
     const header = document.getElementById("native-header");
     let count = 0
     Array.from(header.children[0].children[1].getElementsByTagName("ul")).forEach(subMenu => {
@@ -275,9 +275,9 @@ function PopupHandler() {
 }
 
 let Popup;
-let nativeHeader;
+let NativeHeader;
 
 window.addEventListener("load", () => {
-    nativeHeader = NativeHeader();
+    NativeHeader = NativeHeaderHandler();
     Popup = PopupHandler()
 })

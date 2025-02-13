@@ -3,6 +3,7 @@
     box-sizing: border-box;
 }
 
+
 h1, h2, h3, h4, h5, h6
 {
     word-wrap: break-word;
@@ -44,6 +45,51 @@ main
     z-index:2;
 }
 
+/* #region Backdrop */
+#native-backdrop
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: black;
+    opacity: 0.35;
+    z-index: 1000; 
+}
+/* #region Backdrop */
+
+
+/* #region Popups */
+
+#native-popup-container:empty
+{
+    display: none;
+}
+
+#native-popup-container
+{
+    overflow: hidden;
+    position: fixed;
+    background: ¤Alpha(BackgroundColor, 255)¤;
+    width: 20rem;
+    max-width: 90%;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px ¤Blend(BackgroundColor, "black", 0.7)¤ solid;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+}
+
+#native-popup-container > *
+{
+    margin: 0;
+    padding: 0;
+}
+
+/* #endregion Popups */
 
 /*#region Footnotes*/
 
@@ -196,6 +242,7 @@ table
     border-collapse: separate;
     border-width: 0;
     border-spacing:0;
+    overflow-x: auto;
 }
 
 table > colgroup {
@@ -211,7 +258,6 @@ table, th, td
 table 
 {
     display: block;
-    overflow-x: auto;
     max-width: 100%;
     width: fit-content;
     border-radius: 8px;
@@ -260,24 +306,31 @@ html body fieldset
     #native-header nav > ul > li:hover > ul
     {
         display:block;
-        position:absolute;
+        position:fixed;
         margin: 0;
-        margin-left:-1px;
         padding: 0;
     }
 
     #native-header nav ul > li > a
     {
-        width: 100%;
         text-align: left;
     }
 
-    #native-header li > ul > li
+    #native-header nav li > ul > li:hover
+    {
+        background-color: transparent;
+    }
+
+    #native-header nav li > ul > li
     {
         display: flex;
+        flex-direction: row-reverse;
+        background-color: transparent;
         position: relative;
         overflow: visible;
         border-bottom: none;
+        width: fit-content;
+        margin-right: auto;
     }
 
 
@@ -304,25 +357,20 @@ html body fieldset
     #native-header li > ul
     {
         margin-inline-start: 0;
+        margin-left: 0;
+        overflow-y: auto;
+        direction:rtl; 
     }
     
-    #native-header li > ul > li:hover > ul
+    #native-header li > ul > li > ul[expanded]
     {
         display: block;
-    }
-
-    #native-header li > ul 
-    {
-        overflow-x: visible;
     }
 
     #native-header li > ul > li > ul
     {
         padding: 0px;
         display: none;
-        height: 0;
-        position: absolute;
-        left: 100%;
     }
 
     /*#endregion Dropdown*/
@@ -442,5 +490,4 @@ html body fieldset
         display: block;
         margin: auto;
     }
-
 }

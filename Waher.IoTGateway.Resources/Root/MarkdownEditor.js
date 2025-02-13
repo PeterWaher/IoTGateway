@@ -197,13 +197,56 @@ function ClosePreview(TextArea)
 		TextArea.parentNode.removeChild(Prev);
 		TextArea.setAttribute("data-preview", "");
 		TextArea.setAttribute("style", "");
-
 		RaiseOnInput(TextArea);
 	}
 }
 
-function MarkdownEditorPreviewAndEdit(Button)
+
+
+
+
+
+
+
+var EditTimer = null;
+
+function MarkdownKeyDown(Control, Event) {
+	InitEditTimer();
+	return MarkdownEditorKeyDown(Control, Event);
+}
+
+function InitEditTimer() {
+	var TextArea = document.getElementById("MarkdownEditorInput");
+	var Timeout = TextArea.getAttribute("data-previewtimer") ? 1000 : 500;
+
+	if (EditTimer)
+		window.clearTimeout(EditTimer);
+
+	EditTimer = window.setTimeout(UpdateHtml, Timeout);
+}
+
+
+
+
+
+function ToggleSidePreview(on)
 {
+	var Div = GetMarkdownDiv()
+	var prev = Div.hasAttribute("data-preview-side")
+	if (on)
+		Div.setAttribute("data-preview-side", "")
+	else
+		Div.removeAttribute("data-preview-side")
+
+	return prev !== on
+}
+
+function MarkdownEditorBottomPreviewAndEdit(Button)
+{
+	// if the toggle side preview return true it means that the mode is changing so continue on previewing
+	if (ToggleSidePreview(false) && document.getElementsByClassName("MarkdownPreview").length > 0)
+		return;
+
 	var TextArea = GetTextArea(Button, true);
 
 	if (TextArea.getAttribute("data-preview"))
@@ -211,6 +254,22 @@ function MarkdownEditorPreviewAndEdit(Button)
 	else
 		StartPreview(Button, true);
 }
+
+function MarkdownEditorSidePreviewAndEdit(Button) {
+	// if the toggle side preview return true it means that the mode is changing so continue on previewing
+	if (ToggleSidePreview(true) && document.getElementsByClassName("MarkdownPreview").length > 0)
+		return;
+
+	var TextArea = GetTextArea(Button, true);
+
+	if (TextArea.getAttribute("data-preview")) {
+		ToggleSidePreview(false);
+		TextArea.setAttribute("data-preview", "");
+	}
+	else
+		StartPreview(Button, true);
+}
+
 
 function MarkdownEditorPreview(Button)
 {
@@ -260,6 +319,10 @@ function StartPreview(Button, ShowEditor)
 	xhttp.send(TextArea.value);
 }
 
+function GetMarkdownDiv()
+{
+	return document.getElementById("MarkdownDiv")
+}
 function GetTextArea(Button, HidePreview)
 {
 	if (Button.tagName === "TEXTAREA")
@@ -721,7 +784,7 @@ function MarkdownEditorKeyDown(Control, Event)
 				return false;
 
 			case 50:	// ALT+2
-				MarkdownEditorPreviewAndEdit(Control);
+				MarkdownEditorBottomPreviewAndEdit(Control);
 				return false;
 		}
 	}

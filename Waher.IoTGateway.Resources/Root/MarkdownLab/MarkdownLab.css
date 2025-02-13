@@ -5,11 +5,7 @@ div#Lab
 
 section#MarkdownSection
 {
-    min-width:45%;
-}
-
-div#MarkdownDiv 
-{
+    min-width:20%;
 }
 
 textarea

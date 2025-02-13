@@ -204,7 +204,7 @@ function Restore()
 
     if (c + d === 0)
     {
-        window.alert("No files selected.");
+        Popup.Alert("No files selected.");
         return;
     }
 
@@ -216,7 +216,7 @@ function RestoreFinished(Data)
     var Element = document.getElementById("NextButton");
     Element.style.display = Data.ok ? "inline" : "none";
 
-    window.alert(Data.message);
+    Popup.Alert(Data.message);
 }
 
 function HideNext()

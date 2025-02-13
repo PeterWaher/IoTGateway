@@ -1,0 +1,2 @@
+<h2 id="native-popup-label">Confirm</h2>
+<div id="native-popup-description">{Args.Message}</div><div id="native-popup-options"><button OnClick="Popup.ConfirmYes()">Yes</button><button OnClick="Popup.ConfirmNo()">No</button></div>

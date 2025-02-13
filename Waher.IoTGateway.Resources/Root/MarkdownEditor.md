@@ -1,4 +1,5 @@
-﻿<div class="MarkdownEditorToolbar">
+﻿<div id="MarkdownDiv">
+<div class="MarkdownEditorToolbar">
 <button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorBold" onclick="MarkdownEditorBold(this)" title="Bold (CTRL+B)">
 **B**</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorItalic" onclick="MarkdownEditorItalic(this)" title="Italic (CTRL+I)">
 *I*</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorUnderline" onclick="MarkdownEditorUnderline(this)" title="Underline (CTRL+U)">
@@ -45,7 +46,10 @@ __“”__</button><button type="button" tabindex="-1" class="MarkdownEditorButt
 🖼️</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorAbbreviation" onclick="MarkdownEditorAbbreviation(this)" title="Abbreviation (CTRL+R)">
 a.</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorHashTag" onclick="MarkdownEditorHashTag(this)" title="Hash-tag (#)">
 #</button><span class="MarkdownEditorToolbarSeparator">|</span><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorPreview" onclick="MarkdownEditorPreview(this)" title="Preview (ALT+1)">
-👁</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorPreviewAndEdit" onclick="MarkdownEditorPreviewAndEdit(this)" title="Edit and Preview (ALT+2)">
-⌹</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorHelp" onclick="MarkdownEditorHelp(this)" title="Markdown Reference (F1)">
+👁</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorBottomPreviewAndEdit" onclick="MarkdownEditorBottomPreviewAndEdit(this)" title="Edit and Bottom Preview (ALT+2)">
+⌹</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorSidePreviewAndEdit" onclick="MarkdownEditorSidePreviewAndEdit(this)" title="Edit and Side Preview (ALT+2)">
+•|•</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorHelp" onclick="MarkdownEditorHelp(this)" title="Markdown Reference (F1)">
 ?</button>
+</div>
+<textarea id="MarkdownEditorInput" autofocus="autofocus" wrap="hard" onkeydown="return MarkdownKeyDown(this,event);" oninput="InitEditTimer()"></textarea>
 </div>

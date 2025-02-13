@@ -394,7 +394,7 @@ function SaveHumanReadableNames()
         if (xhttp.readyState === 4)
         {
             if (xhttp.status === 200)
-                window.alert("Saved.");
+                Popup.Alert("Saved.");
             else
                 ShowError(xhttp);
         }
@@ -518,7 +518,7 @@ function SaveHumanReadableDescriptions()
         if (xhttp.readyState === 4)
         {
             if (xhttp.status === 200)
-                window.alert("Saved.");
+                Popup.Alert("Saved.");
             else
                 ShowError(xhttp);
         }

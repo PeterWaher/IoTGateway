@@ -985,6 +985,17 @@
   <ItemGroup>
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Root\AlertPopup.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Root\ConfirmPopup.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Root\PromptPopup.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" Condition="'$(OS)'=='Windows_NT'" />
     <Exec Command="xcopy &quot;$(OutDir)Default\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Default&quot; /S /Y" Condition="'$(OS)'=='Windows_NT'" />

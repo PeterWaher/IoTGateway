@@ -127,7 +127,7 @@
 .MarkdownEditorTable:hover > table
 {
 	display:block;
-	position:relative;
+	position:absolute;
 	background-color:¤Toolbar¤;
 	border:1px solid ¤Dark¤;
 }
@@ -196,6 +196,12 @@
 	border-bottom:1px solid ¤Light¤;
 }
 
+
+#MarkdownDiv[data-preview-side] #MarkdownEditorInput
+{
+	width: 50%;
+}
+
 .MarkdownEditorQuote
 {
 }
@@ -255,6 +261,17 @@
 
 .MarkdownEditorPreview
 {
+}
+
+#MarkdownDiv[data-preview-side]
+{
+	display: flex;
+	flex-wrap: wrap;
+}
+
+#MarkdownDiv[data-preview-side] .MarkdownPreview
+{
+	width: 50%;
 }
 
 .MarkdownEditorPreviewAndEdit

@@ -51,7 +51,7 @@ async function ExpandNode(Event, Node)
 
 		if (!(Response instanceof Array))
 		{
-			window.alert("Expected response to be a JSON array.");
+			await Popup.Alert("Expected response to be a JSON array.");
 			return;
 		}
 

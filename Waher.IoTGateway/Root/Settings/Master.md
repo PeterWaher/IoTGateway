@@ -4,6 +4,10 @@ Date: 2018-06-02
 Author: Peter Waher
 Copyright: /Copyright.md
 CSS: {{Theme.CSSX}}
+Javascript: /AlertPopup.md.js
+Javascript: /ConfirmPopup.md.js
+Javascript: /PromptPopup.md.js
+Javascript: /Master.js
 
 <header>
 <nav>
@@ -28,3 +32,5 @@ CSS: {{Theme.CSSX}}
 This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2025. All rights reserved.
 </span>
 </footer>
+
+<dialog id ="native-popup-container"></dialog>

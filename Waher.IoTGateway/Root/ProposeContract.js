@@ -5,7 +5,7 @@
 
 	if (Files.length !== 1)
 	{
-		window.alert("Select one contract to upload.");
+		Popup.Alert("Select one contract to upload.");
 		return;
 	}
 

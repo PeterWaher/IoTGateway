@@ -12,9 +12,9 @@
                     var Signed = JSON.parse(xhttp.responseText);
 
                     if (Signed)
-                        window.alert("Contract successfully signed.");
+                        Popup.Alert("Contract successfully signed.");
                     else
-                        window.alert("Contract rejected. Request has been removed.");
+                        Popup.Alert("Contract rejected. Request has been removed.");
 
                     Ok();
                 }

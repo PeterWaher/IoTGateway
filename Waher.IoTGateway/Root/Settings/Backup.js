@@ -221,7 +221,7 @@ function UpdateExport(Data)
 
 function BackupFailed(Data)
 {
-	alert(Data.message);
+	Popup.Alert(Data.message);
 	DeleteExport(Data.fileName);
 }
 
@@ -256,7 +256,7 @@ function UpdateBackupSettings()
 		if (xhttp.readyState === 4)
 		{
 			if (xhttp.status === 200)
-				window.alert("Backup settings have been successfully updated.");
+				Popup.Alert("Backup settings have been successfully updated.");
 			else
 				ShowError(xhttp);
 		}
@@ -282,7 +282,7 @@ function UpdateBackupFolderSettings()
 		if (xhttp.readyState === 4)
 		{
 			if (xhttp.status === 200)
-				window.alert("Backup folder settings have been successfully updated.");
+				Popup.Alert("Backup folder settings have been successfully updated.");
 			else
 				ShowError(xhttp);
 		}

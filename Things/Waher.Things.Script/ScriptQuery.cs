@@ -113,7 +113,7 @@ namespace Waher.Things.Script
 				Namespace Namespace = await Language.GetNamespaceAsync(typeof(ScriptQuery).Namespace);
 
 				this.values["Query"] = Query;
-				this.values["Language"] = Query;
+				this.values["Language"] = Namespace;
 
 				if (!Query.IsStarted)
 					await Query.Start();

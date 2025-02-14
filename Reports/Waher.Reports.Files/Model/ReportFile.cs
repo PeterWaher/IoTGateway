@@ -618,6 +618,10 @@ namespace Waher.Reports.Files.Model
 						Actions.Add(new Do(E, this));
 						break;
 
+					case "ForEach":
+						Actions.Add(new ForEach(E, this));
+						break;
+
 					case "Try":
 						Actions.Add(new Try(E, this));
 						break;

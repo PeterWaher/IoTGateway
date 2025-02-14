@@ -6,8 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content.Binary;
 using Waher.Content;
+using Waher.Content.Binary;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
@@ -15,20 +15,20 @@ using Waher.Runtime.Language;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings;
+using Waher.Script.Objects;
 using Waher.Security;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
 using Waher.Things.SourceEvents;
-using Waher.Networking.XMPP.Provisioning.Events;
-using Waher.Networking.XMPP.Events;
-using Waher.Script.Objects;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -712,7 +712,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Language;
 		}
 
-		private static RequestOrigin GetTokens(string From, XmlElement E)
+		private async Task<RequestOrigin> GetTokens(string FromBareJid, XmlElement E)
 		{
 			string[] DeviceTokens;
 			string[] ServiceTokens;
@@ -733,7 +733,14 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				UserTokens = null;
 
-			return new RequestOrigin(From, DeviceTokens, ServiceTokens, UserTokens, null);
+			IRequestOrigin Authority;
+
+			if (this.sensorServer is null)
+				Authority = null;
+			else
+				Authority = await this.sensorServer.GetAuthority(FromBareJid);
+
+			return new RequestOrigin(FromBareJid, DeviceTokens, ServiceTokens, UserTokens, Authority);
 		}
 
 		private static ThingReference GetThingReference(XmlElement E)
@@ -751,7 +758,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetAllDataSourcesHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<dataSources xmlns='");
@@ -785,7 +792,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetRootDataSourcesHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<dataSources xmlns='");
@@ -811,7 +818,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetChildDataSourcesHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			string SourceId = XML.Attribute(e.Query, "src");
 			DataSourceRec Rec;
 
@@ -856,7 +863,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task ContainsNodeHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -879,7 +886,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task ContainsNodesHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			StringBuilder Xml = new StringBuilder();
 			ThingReference ThingRef;
 			DataSourceRec Rec;
@@ -1000,7 +1007,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			bool Parameters = XML.Attribute(e.Query, "parameters", false);
 			bool Messages = XML.Attribute(e.Query, "messages", false);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -1072,7 +1079,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			bool Parameters = XML.Attribute(e.Query, "parameters", false);
 			bool Messages = XML.Attribute(e.Query, "messages", false);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			Language Language = await GetLanguage(e.Query);
 			StringBuilder Xml = new StringBuilder();
 			DataSourceRec Rec;
@@ -1132,7 +1139,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Language Language = await GetLanguage(e.Query);
 			bool Parameters = XML.Attribute(e.Query, "parameters", false);
 			bool Messages = XML.Attribute(e.Query, "messages", false);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			string SourceId = XML.Attribute(e.Query, "src");
 			DataSourceRec Rec;
 
@@ -1228,7 +1235,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetNodeInheritanceHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1303,7 +1310,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Language Language = await GetLanguage(e.Query);
 			bool Parameters = XML.Attribute(e.Query, "parameters", false);
 			bool Messages = XML.Attribute(e.Query, "messages", false);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			string SourceId = XML.Attribute(e.Query, "src");
 			DataSourceRec Rec;
 
@@ -1352,7 +1359,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Language Language = await GetLanguage(e.Query);
 			bool Parameters = XML.Attribute(e.Query, "parameters", false);
 			bool Messages = XML.Attribute(e.Query, "messages", false);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1410,7 +1417,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Language Language = await GetLanguage(e.Query);
 			bool Parameters = XML.Attribute(e.Query, "parameters", false);
 			bool Messages = XML.Attribute(e.Query, "messages", false);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			IThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1473,7 +1480,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task MoveNodeUpHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			IThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1504,7 +1511,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task MoveNodeDownHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			IThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1535,7 +1542,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task MoveNodesUpHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			LinkedList<INode> RootNodes = null;
 			Dictionary<string, LinkedList<INode>> NodesPerParent = null;
 			IThingReference ThingRef;
@@ -1625,7 +1632,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task MoveNodesDownHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			LinkedList<INode> RootNodes = null;
 			Dictionary<string, LinkedList<INode>> NodesPerParent = null;
 			IThingReference ThingRef;
@@ -1722,7 +1729,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetNodeParametersForEditHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1756,7 +1763,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task SetNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -1898,7 +1905,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetCommonNodeParametersForEditHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef;
 			DataSourceRec Rec;
 			INode Node;
@@ -1965,7 +1972,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task SetCommonNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			LinkedList<Tuple<IDataSource, INode>> Nodes = null;
 			DataForm Form = null;
 			ThingReference ThingRef;
@@ -2112,7 +2119,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task GetAddableNodeTypesHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2179,7 +2186,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task GetParametersForNewNodeHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2253,7 +2260,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task CreateNewNodeHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2592,7 +2599,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task DestroyNodeHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2647,7 +2654,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task GetNodeCommandsHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2766,7 +2773,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task GetCommandParametersHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2819,7 +2826,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task ExecuteNodeCommandHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -2908,7 +2915,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task ExecuteNodeQueryHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -3057,7 +3064,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task AbortNodeQueryHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -3638,7 +3645,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task GetCommonNodeCommandsHandler(object Sender, IqEventArgs e)
 		{
 			Dictionary<ICommand, bool> CommonCommands = null;
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			Language Language = await GetLanguage(e.Query);
 			ThingReference ThingRef;
 			DataSourceRec Rec;
@@ -3729,7 +3736,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task GetCommonCommandParametersHandler(object Sender, IqEventArgs e)
 		{
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef;
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -3820,7 +3827,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task ExecuteCommonNodeCommandHandler(object Sender, IqEventArgs e)
 		{
 			LinkedList<INode> Nodes = null;
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef;
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -3972,7 +3979,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			LinkedList<INode> Nodes = null;
 			LinkedList<Query> Queries = null;
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef;
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -4167,7 +4174,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			LinkedList<INode> Nodes = null;
 			LinkedList<Query> Queries = null;
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef;
 			Language Language = await GetLanguage(e.Query);
 			DataSourceRec Rec;
@@ -4391,7 +4398,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task RegisterSnifferHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -4441,7 +4448,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task UnregisterSnifferHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			ThingReference ThingRef = GetThingReference(e.Query);
 			DataSourceRec Rec;
 			INode Node;
@@ -4750,7 +4757,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task SubscribeHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			string SourceId = XML.Attribute(e.Query, "src");
 			int TtlSeconds = XML.Attribute(e.Query, "ttl", 0);
 			DataSourceRec Rec;
@@ -4841,7 +4848,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task UnsubscribeHandler(object Sender, IqEventArgs e)
 		{
 			Language Language = await GetLanguage(e.Query);
-			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+			RequestOrigin Caller = await this.GetTokens(e.FromBareJid, e.Query);
 			string SourceId = XML.Attribute(e.Query, "src");
 			DataSourceRec Rec;
 

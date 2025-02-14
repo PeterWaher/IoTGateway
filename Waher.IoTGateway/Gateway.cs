@@ -3226,155 +3226,97 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// XMPP Client connection of gateway.
 		/// </summary>
-		public static XmppClient XmppClient
-		{
-			get { return xmppClient; }
-		}
+		public static XmppClient XmppClient => xmppClient;
 
 		/// <summary>
 		/// XMPP Thing Registry Client.
 		/// </summary>
-		public static ThingRegistryClient ThingRegistryClient
-		{
-			get { return thingRegistryClient; }
-		}
+		public static ThingRegistryClient ThingRegistryClient => thingRegistryClient;
 
 		/// <summary>
 		/// XMPP Provisioning Client.
 		/// </summary>
-		public static ProvisioningClient ProvisioningClient
-		{
-			get { return provisioningClient; }
-		}
+		public static ProvisioningClient ProvisioningClient => provisioningClient;
 
 		/// <summary>
 		/// XMPP Concentrator Server.
 		/// </summary>
-		public static ConcentratorServer ConcentratorServer
-		{
-			get { return concentratorServer; }
-		}
+		public static ConcentratorServer ConcentratorServer => concentratorServer;
 
 		/// <summary>
 		/// XMPP Concentrator Server.
 		/// </summary>
-		public static Networking.XMPP.Avatar.AvatarClient AvatarClient
-		{
-			get { return avatarClient; }
-		}
+		public static Networking.XMPP.Avatar.AvatarClient AvatarClient => avatarClient;
 
 		/// <summary>
 		/// XMPP Sensor Client.
 		/// </summary>
-		public static SensorClient SensorClient
-		{
-			get { return sensorClient; }
-		}
+		public static SensorClient SensorClient => sensorClient;
 
 		/// <summary>
 		/// XMPP Control Client.
 		/// </summary>
-		public static ControlClient ControlClient
-		{
-			get { return controlClient; }
-		}
+		public static ControlClient ControlClient => controlClient;
 
 		/// <summary>
 		/// XMPP Concentrator Client.
 		/// </summary>
-		public static ConcentratorClient ConcentratorClient
-		{
-			get { return concentratorClient; }
-		}
+		public static ConcentratorClient ConcentratorClient => concentratorClient;
 
 		/// <summary>
 		/// XMPP Synchronization Client.
 		/// </summary>
-		public static SynchronizationClient SynchronizationClient
-		{
-			get { return synchronizationClient; }
-		}
+		public static SynchronizationClient SynchronizationClient => synchronizationClient;
 
 		/// <summary>
 		/// XMPP Personal Eventing Protocol (PEP) Client.
 		/// </summary>
-		public static PepClient PepClient
-		{
-			get { return pepClient; }
-		}
+		public static PepClient PepClient => pepClient;
 
 		/// <summary>
 		/// XMPP Multi-User Chat Protocol (MUC) Client.
 		/// </summary>
-		public static MultiUserChatClient MucClient
-		{
-			get { return mucClient; }
-		}
+		public static MultiUserChatClient MucClient => mucClient;
 
 		/// <summary>
 		/// XMPP Publish/Subscribe (PubSub) Client, if such a component is available on the XMPP broker.
 		/// </summary>
-		public static PubSubClient PubSubClient
-		{
-			get { return pepClient.PubSubClient; }
-		}
+		public static PubSubClient PubSubClient => pepClient.PubSubClient;
 
 		/// <summary>
 		/// XMPP Software Updates Client, if such a compoent is available on the XMPP broker.
 		/// </summary>
-		public static SoftwareUpdateClient SoftwareUpdateClient
-		{
-			get { return softwareUpdateClient; }
-		}
+		public static SoftwareUpdateClient SoftwareUpdateClient => softwareUpdateClient;
 
 		/// <summary>
 		/// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.
 		/// </summary>
-		public static MailClient MailClient
-		{
-			get { return mailClient; }
-		}
+		public static MailClient MailClient => mailClient;
 
 		/// <summary>
 		/// HTTP Server
 		/// </summary>
-		public static HttpServer HttpServer
-		{
-			get { return webServer; }
-		}
+		public static HttpServer HttpServer => webServer;
 
 		/// <summary>
 		/// HTTPX Server
 		/// </summary>
-		public static HttpxServer HttpxServer
-		{
-			get { return httpxServer; }
-		}
+		public static HttpxServer HttpxServer => httpxServer;
 
 		/// <summary>
 		/// HTTPX Proxy resource
 		/// </summary>
-		public static HttpxProxy HttpxProxy
-		{
-			get { return httpxProxy; }
-		}
+		public static HttpxProxy HttpxProxy => httpxProxy;
 
 		/// <summary>
 		/// SOCKS5 Proxy
 		/// </summary>
-		public static Socks5Proxy Socks5Proxy
-		{
-			get { return socksProxy; }
-		}
+		public static Socks5Proxy Socks5Proxy => socksProxy;
 
 		/// <summary>
 		/// CoAP Endpoint
 		/// </summary>
-		public static CoapEndpoint CoapEndpoint
-		{
-			get { return coapEndpoint; }
-		}
-
+		public static CoapEndpoint CoapEndpoint => coapEndpoint;
 
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/
 

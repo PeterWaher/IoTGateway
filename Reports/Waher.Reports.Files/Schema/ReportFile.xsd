@@ -18,7 +18,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameter">
-											<xs:attribute name="defaultValue" type="xs:boolean" use="optional"/>
+											<xs:attribute name="default" type="xs:boolean" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -27,8 +27,8 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:string" use="optional"/>
-											<xs:attribute name="alphaChannel" type="xs:boolean" use="optional" default="false"/>
+											<xs:attribute name="default" type="xs:string" use="optional"/>
+											<xs:attribute name="alpha" type="xs:boolean" use="optional" default="false"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -37,7 +37,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:date" use="optional"/>
+											<xs:attribute name="default" type="xs:date" use="optional"/>
 											<xs:attribute name="min" type="xs:date" use="optional"/>
 											<xs:attribute name="max" type="xs:date" use="optional"/>
 										</xs:extension>
@@ -48,7 +48,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:dateTime" use="optional"/>
+											<xs:attribute name="default" type="xs:dateTime" use="optional"/>
 											<xs:attribute name="min" type="xs:dateTime" use="optional"/>
 											<xs:attribute name="max" type="xs:dateTime" use="optional"/>
 										</xs:extension>
@@ -59,19 +59,29 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:double" use="optional"/>
+											<xs:attribute name="default" type="xs:double" use="optional"/>
 											<xs:attribute name="min" type="xs:double" use="optional"/>
 											<xs:attribute name="max" type="xs:double" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="Fixed" type="ReportParameterMultipleValues"/>
+							<xs:element name="Fixed">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="ReportParameter">
+											<xs:sequence>
+												<xs:element name="Value" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+											</xs:sequence>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="Int8">
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:byte" use="optional"/>
+											<xs:attribute name="default" type="xs:byte" use="optional"/>
 											<xs:attribute name="min" type="xs:byte" use="optional"/>
 											<xs:attribute name="max" type="xs:byte" use="optional"/>
 										</xs:extension>
@@ -82,7 +92,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:short" use="optional"/>
+											<xs:attribute name="default" type="xs:short" use="optional"/>
 											<xs:attribute name="min" type="xs:short" use="optional"/>
 											<xs:attribute name="max" type="xs:short" use="optional"/>
 										</xs:extension>
@@ -93,7 +103,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:int" use="optional"/>
+											<xs:attribute name="default" type="xs:int" use="optional"/>
 											<xs:attribute name="min" type="xs:int" use="optional"/>
 											<xs:attribute name="max" type="xs:int" use="optional"/>
 										</xs:extension>
@@ -104,7 +114,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:long" use="optional"/>
+											<xs:attribute name="default" type="xs:long" use="optional"/>
 											<xs:attribute name="min" type="xs:long" use="optional"/>
 											<xs:attribute name="max" type="xs:long" use="optional"/>
 										</xs:extension>
@@ -115,21 +125,12 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+											<xs:attribute name="default" type="xs:string" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="Jids">
-								<xs:complexType>
-									<xs:complexContent>
-										<xs:extension base="ReportParameterWithOptionsAndMultipleDefaultValues">
-											<xs:attribute name="minCount" type="xs:unsignedShort" use="optional"/>
-											<xs:attribute name="maxCount" type="xs:unsignedShort" use="optional"/>
-										</xs:extension>
-									</xs:complexContent>
-								</xs:complexType>
-							</xs:element>
+							<xs:element name="Jids" type="ReportParameterWithOptionsAndDefaultValues"/>
 							<xs:element name="Media">
 								<xs:complexType>
 									<xs:complexContent>
@@ -146,7 +147,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameter">
-											<xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+											<xs:attribute name="default" type="xs:string" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -155,7 +156,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:string" use="optional"/>
+											<xs:attribute name="default" type="xs:string" use="optional"/>
 											<xs:attribute name="pattern" type="xs:string" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
@@ -164,10 +165,8 @@
 							<xs:element name="Text">
 								<xs:complexType>
 									<xs:complexContent>
-										<xs:extension base="ReportParameterWithOptionsAndMultipleDefaultValues">
+										<xs:extension base="ReportParameterWithOptionsAndDefaultValues">
 											<xs:attribute name="contentType" type="xs:string" use="required"/>
-											<xs:attribute name="minCount" type="xs:unsignedShort" use="optional"/>
-											<xs:attribute name="maxCount" type="xs:unsignedShort" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -176,7 +175,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:time" use="optional"/>
+											<xs:attribute name="default" type="xs:time" use="optional"/>
 											<xs:attribute name="min" type="xs:time" use="optional"/>
 											<xs:attribute name="max" type="xs:time" use="optional"/>
 										</xs:extension>
@@ -187,7 +186,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
-											<xs:attribute name="defaultValue" type="xs:anyURI" use="optional"/>
+											<xs:attribute name="default" type="xs:anyURI" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -218,22 +217,14 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:complexType name="ReportParameterMultipleValues" abstract="true">
-		<xs:complexContent>
-			<xs:extension base="ReportParameter">
-				<xs:sequence>
-					<xs:element name="Value" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:complexType name="ReportParameterWithOptionsAndMultipleDefaultValues" abstract="true">
+	<xs:complexType name="ReportParameterWithOptionsAndDefaultValues" abstract="true">
 		<xs:complexContent>
 			<xs:extension base="ReportParameterWithOptions">
 				<xs:sequence>
 					<xs:element name="DefaultValue" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
 				</xs:sequence>
+				<xs:attribute name="minCount" type="xs:unsignedShort" use="optional"/>
+				<xs:attribute name="maxCount" type="xs:unsignedShort" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

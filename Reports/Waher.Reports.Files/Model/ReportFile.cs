@@ -12,7 +12,6 @@ using Waher.Reports.Files.Model.Actions;
 using Waher.Reports.Files.Model.Parameters;
 using Waher.Runtime.Language;
 using Waher.Script;
-using Waher.Things.Queries;
 
 namespace Waher.Reports.Files.Model
 {
@@ -45,7 +44,7 @@ namespace Waher.Reports.Files.Model
 			{
 				PreserveWhitespace = true
 			};
-			Doc.LoadXml(FileName);
+			Doc.Load(FileName);
 
 			XSL.Validate(Path.GetFileName(FileName), Doc, ReportFileLocalName, ReportFileNamespace, schema);
 
@@ -57,18 +56,21 @@ namespace Waher.Reports.Files.Model
 
 			foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 			{
-				switch (N.LocalName)
+				if (!(N is XmlElement E))
+					continue;
+
+				switch (E.LocalName)
 				{
 					case "Title":
-						this.title = N.InnerText;
+						this.title = E.InnerText;
 						break;
 
 					case "Privilege":
-						Privileges.Add(N.InnerText);
+						Privileges.Add(E.InnerText);
 						break;
 
 					case "Parameters":
-						foreach (XmlNode N2 in N.ChildNodes)
+						foreach (XmlNode N2 in E.ChildNodes)
 						{
 							if (!(N2 is XmlElement E2))
 								continue;
@@ -464,7 +466,7 @@ namespace Waher.Reports.Files.Model
 						break;
 
 					default:
-						throw new NotSupportedException("Unrecognized report element: " + N.LocalName);
+						throw new NotSupportedException("Unrecognized report element: " + E.LocalName);
 				}
 			}
 

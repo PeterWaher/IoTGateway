@@ -1259,7 +1259,7 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				await ReportsDataSource.RegisterRootNode(new ReportFilesFolder(reportsFolder, "Reports", null));
+				await ReportsDataSource.RegisterRootNode(new ReportFilesFolder(reportsFolder, "Report Files", null));
 
 				Types.GetLoadedModules();   // Makes sure all modules are instantiated, allowing static constructors to add
 											// appropriate data sources, if necessary.

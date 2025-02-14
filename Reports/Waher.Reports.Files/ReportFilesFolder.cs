@@ -31,12 +31,12 @@ namespace Waher.Reports.Files
 		private void AppendReportFileNodes(string BaseFolder, string Folder, ReportNode Parent)
 		{
 			foreach (string FileName in Directory.GetFiles(Folder, "*.rpx"))
-				new ReportFileNode(FileName, FileName.Substring(BaseFolder.Length + 1), Parent);
+				new ReportFileNode(FileName, FileName[BaseFolder.Length..], Parent);
 
 			foreach (string SubFolder in Directory.GetDirectories(Folder))
 			{
 				this.AppendReportFileNodes(BaseFolder, SubFolder, 
-					new ReportFilesFolder(SubFolder, SubFolder.Substring(BaseFolder.Length + 1), Parent));
+					new ReportFilesFolder(SubFolder, SubFolder[BaseFolder.Length..], Parent));
 			}
 		}
 

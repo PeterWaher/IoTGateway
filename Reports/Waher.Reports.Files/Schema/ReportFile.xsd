@@ -194,6 +194,13 @@
 						</xs:choice>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="Content">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -233,5 +240,156 @@
 		<xs:attribute name="value" type="xs:string" use="required"/>
 		<xs:attribute name="label" type="xs:string" use="required"/>
 	</xs:complexType>
+
+	<xs:group name="ReportActions">
+		<xs:choice>
+			<xs:element name="CreateTable">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Column" minOccurs="1" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="columnId" type="xs:string" use="required"/>
+								<xs:attribute name="header" type="xs:string" use="required"/>
+								<xs:attribute name="dataSourceId" type="xs:string" use="optional"/>
+								<xs:attribute name="partition" type="xs:string" use="optional"/>
+								<xs:attribute name="fgColor" type="xs:string" use="optional"/>
+								<xs:attribute name="bgColor" type="xs:string" use="optional"/>
+								<xs:attribute name="alignment" type="ColumnAlignment" use="optional" default="Left"/>
+								<xs:attribute name="nrDecimals" type="NrDecimals" use="optional"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="tableId" type="xs:string" use="required"/>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TableRecords">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Record" minOccurs="1" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="Element" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="tableId" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="TableComplete">
+				<xs:complexType>
+					<xs:attribute name="tableId" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Script" type="xs:string"/>
+			<xs:element name="Object" type="xs:string"/>
+			<xs:element name="Message">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" type="EventType" use="optional" default="Information"/>
+							<xs:attribute name="level" type="EventLevel" use="optional" default="Minor"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Status" type="xs:string"/>
+			<xs:element name="Section">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="header" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Conditional">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="If" minOccurs="1" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+								</xs:sequence>
+								<xs:attribute name="condition" type="xs:string" use="required"/>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Else" minOccurs="0" maxOccurs="1">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="While">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:sequence>
+							<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:sequence>
+					<xs:attribute name="condition" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Do">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:sequence>
+							<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:sequence>
+					<xs:attribute name="while" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Try">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+						<xs:element name="Catch" minOccurs="0" maxOccurs="1">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="Finally" minOccurs="0" maxOccurs="1">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+
+	<xs:simpleType name="ColumnAlignment">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="Left|Center|Right|\{[^\}]*\}"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="NrDecimals">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d|1{0-5}|\{[^\}]*\}"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="EventType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="Information|Warning|Error|Exception|\{[^\}]*\}"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="EventLevel">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="Minor|Medium|Major|\{[^\}]*\}"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 </xs:schema>

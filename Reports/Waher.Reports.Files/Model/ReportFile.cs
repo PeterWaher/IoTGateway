@@ -8,6 +8,7 @@ using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Reports.Files.Model.Actions;
 using Waher.Reports.Files.Model.Parameters;
 using Waher.Runtime.Language;
 using Waher.Script;
@@ -29,6 +30,7 @@ namespace Waher.Reports.Files.Model
 		private readonly string title;
 		private readonly string[] privileges;
 		private readonly ReportParameter[] parameters;
+		private readonly ReportAction[] content;
 
 		/// <summary>
 		/// Contains a parsed report, as defined in a report file.
@@ -48,6 +50,7 @@ namespace Waher.Reports.Files.Model
 
 			List<ReportParameter> Parameters = new List<ReportParameter>();
 			List<string> Privileges = new List<string>();
+			List<ReportAction> Content = new List<ReportAction>();
 			this.title = string.Empty;
 
 			foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
@@ -98,7 +101,7 @@ namespace Waher.Reports.Files.Model
 									else
 										DefaultStringValue = null;
 
-									Parameters.Add(new ColorParameter(Page, Name, Label, Description, 
+									Parameters.Add(new ColorParameter(Page, Name, Label, Description,
 										Required, RestrictToOptions, Options, DefaultStringValue, AlphaChannel));
 									break;
 
@@ -127,7 +130,7 @@ namespace Waher.Reports.Files.Model
 										MaxDateTimeValue = null;
 
 									Parameters.Add(new DateParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultDateTimeValue, 
+										Required, RestrictToOptions, Options, DefaultDateTimeValue,
 										MinDateTimeValue, MaxDateTimeValue));
 									break;
 
@@ -332,17 +335,17 @@ namespace Waher.Reports.Files.Model
 									break;
 
 								case "Jids":
-									ParseReportParameterWithOptionsAndDefaultValues(E2, 
+									ParseReportParameterWithOptionsAndDefaultValues(E2,
 										out Page, out Name, out Label, out Description, out Required,
 										out RestrictToOptions, out Options, out string[] DefaultValues,
 										out ushort? MinCount, out ushort? MaxCount);
 
-									Parameters.Add(new JidsParameter(Page, Name, Label, Description, Required, 
+									Parameters.Add(new JidsParameter(Page, Name, Label, Description, Required,
 										RestrictToOptions, Options, DefaultValues, MinCount, MaxCount));
 									break;
 
 								case "Media":
-									ParseReportParameter(E2, out Page, out Name, out Label, 
+									ParseReportParameter(E2, out Page, out Name, out Label,
 										out Description, out Required);
 
 									string Url = XML.Attribute(E2, "url");
@@ -453,11 +456,19 @@ namespace Waher.Reports.Files.Model
 							}
 						}
 						break;
+
+					case "Content":
+						this.ParseActions(Content, N);
+						break;
+
+					default:
+						throw new NotSupportedException("Unrecognized report element: " + N.LocalName);
 				}
 			}
 
 			this.privileges = Privileges.ToArray();
 			this.parameters = Parameters.ToArray();
+			this.content = Content.ToArray();
 		}
 
 		private static void ParseReportParameter(XmlElement E, out string Page,
@@ -496,7 +507,7 @@ namespace Waher.Reports.Files.Model
 				}
 			}
 
-			Options=Options2.ToArray();
+			Options = Options2.ToArray();
 		}
 
 		private static void ParseReportParameterWithOptionsAndDefaultValues(XmlElement E, out string Page,
@@ -528,6 +539,106 @@ namespace Waher.Reports.Files.Model
 			DefaultValues = Values.ToArray();
 		}
 
+		internal ReportAction[] ParseActions(XmlNode Container)
+		{
+			List<ReportAction> Actions = new List<ReportAction>();
+			this.ParseActions(Actions, Container, out _, out _);
+			return Actions.ToArray();
+		}
+
+		internal ReportAction[] ParseActions(XmlNode Container,
+			out ReportAction[] Catch, out ReportAction[] Finally)
+		{
+			List<ReportAction> Actions = new List<ReportAction>();
+			this.ParseActions(Actions, Container, out Catch, out Finally);
+			return Actions.ToArray();
+		}
+
+		private void ParseActions(List<ReportAction> Actions, XmlNode Container)
+		{
+			this.ParseActions(Actions, Container, out _, out _);
+		}
+
+		private void ParseActions(List<ReportAction> Actions, XmlNode Container,
+			out ReportAction[] Catch, out ReportAction[] Finally)
+		{
+			List<ReportAction> Catch2 = null;
+			List<ReportAction> Finally2 = null;
+
+			foreach (XmlNode N in Container.ChildNodes)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				switch (E.LocalName)
+				{
+					case "CreateTable":
+						Actions.Add(new CreateTable(E, this));
+						break;
+
+					case "TableRecords":
+						Actions.Add(new TableRecords(E, this));
+						break;
+
+					case "TableComplete":
+						Actions.Add(new TableComplete(E, this));
+						break;
+
+					case "Script":
+						Actions.Add(new ReportScript(E, this));
+						break;
+
+					case "Object":
+						Actions.Add(new ReportObject(E, this));
+						break;
+
+					case "Message":
+						Actions.Add(new Message(E, this));
+						break;
+
+					case "Status":
+						Actions.Add(new Status(E, this));
+						break;
+
+					case "Section":
+						Actions.Add(new Section(E, this));
+						break;
+
+					case "Conditional":
+						Actions.Add(new Conditional(E, this));
+						break;
+
+					case "While":
+						Actions.Add(new While(E, this));
+						break;
+
+					case "Do":
+						Actions.Add(new Do(E, this));
+						break;
+
+					case "Try":
+						Actions.Add(new Try(E, this));
+						break;
+
+					case "Catch":
+						Catch2 ??= new List<ReportAction>();
+						this.ParseActions(Catch2, N);
+						break;
+
+					case "Finally":
+						Finally2 ??= new List<ReportAction>();
+						this.ParseActions(Finally2, N);
+						break;
+
+					default:
+						throw new NotSupportedException("Unrecognized report action: " + E.LocalName);
+				}
+			}
+
+			Catch = Catch2?.ToArray();
+			Finally = Finally2?.ToArray();
+		}
+
 		/// <summary>
 		/// File name of report.
 		/// </summary>
@@ -547,6 +658,11 @@ namespace Waher.Reports.Files.Model
 		/// Report parameters.
 		/// </summary>
 		public ReportParameter[] Parameters => this.parameters;
+
+		/// <summary>
+		/// Content of report.
+		/// </summary>
+		public ReportAction[] Content => this.content;
 
 		/// <summary>
 		/// Populates a data form with parameters for the object.

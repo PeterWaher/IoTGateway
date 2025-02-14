@@ -19,7 +19,6 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 
 		private byte[] data;
 		private string contentType;
-		private string alt;
 		private int width;
 		private int height;
 
@@ -39,15 +38,6 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		{
 			get => this.contentType;
 			set => this.contentType = value;
-		}
-
-		/// <summary>
-		/// Image alternative text.
-		/// </summary>
-		public string AlternativeText
-		{
-			get => this.alt;
-			set => this.alt = value;
 		}
 
 		/// <summary>
@@ -78,9 +68,6 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 				return this;
 
 			if (string.IsNullOrEmpty(this.contentType) || !this.contentType.StartsWith("image/"))
-				return this;
-
-			if (string.IsNullOrEmpty(this.alt))
 				return this;
 
 			if (this.width <= 0 || this.width > MaxSize)

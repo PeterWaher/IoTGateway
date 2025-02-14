@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="Theme"
+<xs:schema id="ReportFile"
            targetNamespace="http://waher.se/Schema/ReportFile.xsd"
            elementFormDefault="qualified"
            xmlns="http://waher.se/Schema/ReportFile.xsd"

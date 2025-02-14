@@ -10,16 +10,15 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Functions.Runtime;
+using Waher.Script.Graphs.Functions.Colors;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Sets;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators;
 using Waher.Script.Operators.Assignments;
 using Waher.Script.Operators.Membership;
-using Waher.Script.Operators;
 using Waher.Script.Units;
-using System.Reflection;
-using Waher.Script.Graphs.Functions.Colors;
 
 namespace Waher.Script.Graphs
 {
@@ -829,7 +828,7 @@ namespace Waher.Script.Graphs
 				return true;
 			else
 			{
-				Color = Graph.DefaultColor;
+				Color = DefaultColor;
 				return (Object is null);
 			}
 		}

@@ -733,7 +733,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			else
 				UserTokens = null;
 
-			return new RequestOrigin(From, DeviceTokens, ServiceTokens, UserTokens);
+			return new RequestOrigin(From, DeviceTokens, ServiceTokens, UserTokens, null);
 		}
 
 		private static ThingReference GetThingReference(XmlElement E)

@@ -25,7 +25,7 @@ namespace Waher.Mock
 	public static class SimpleXmppConfiguration
 	{
 #if !WINDOWS_UWP
-		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema(typeof(SimpleXmppConfiguration).Namespace + ".Schema.SimpleXmppConfiguration.xsd");
 		private const string expectedRootElement = "SimpleXmppConfiguration";
 		private const string expectedNamespace = "http://waher.se/Schema/SimpleXmppConfiguration.xsd";
 #endif

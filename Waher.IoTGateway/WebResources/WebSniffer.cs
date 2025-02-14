@@ -102,7 +102,7 @@ namespace Waher.IoTGateway.WebResources
 					this.tabIdTimestamp = Now;
 				}
 
-				if (this.feedbackCheck && Message.StartsWith("{") && Message.EndsWith("}"))
+				if (this.feedbackCheck && Message.StartsWith('{') && Message.EndsWith('}'))
 				{
 					try
 					{

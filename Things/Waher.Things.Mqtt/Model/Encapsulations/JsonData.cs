@@ -52,7 +52,8 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			string s = Content.DataString;
 
-			if ((s.StartsWith("{") && s.EndsWith("}")) || (s.StartsWith("[") && s.EndsWith("]")))
+			if ((s.StartsWith('{') && s.EndsWith('}')) || 
+				(s.StartsWith('[') && s.EndsWith(']')))
 			{
 				try
 				{

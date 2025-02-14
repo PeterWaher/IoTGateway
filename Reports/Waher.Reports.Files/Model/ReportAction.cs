@@ -1,4 +1,6 @@
-﻿namespace Waher.Reports.Files.Model
+﻿using System.Threading.Tasks;
+
+namespace Waher.Reports.Files.Model
 {
 	/// <summary>
 	/// Abstract base class for report actions.
@@ -20,5 +22,12 @@
 		/// Parsed report containing the report action.
 		/// </summary>
 		public ReportFile Report => this.report;
+
+		/// <summary>
+		/// Executes the report action.
+		/// </summary>
+		/// <param name="State">State of the report execution.</param>
+		/// <returns>If the action was executed.</returns>
+		public abstract Task<bool> Execute(ReportState State);
 	}
 }

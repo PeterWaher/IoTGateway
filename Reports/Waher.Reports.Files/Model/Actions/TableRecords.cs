@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Reports.Model.Attributes;
+using Waher.Things.Queries;
 
 namespace Waher.Reports.Files.Model.Actions
 {
@@ -11,6 +13,7 @@ namespace Waher.Reports.Files.Model.Actions
 	{
 		private readonly ReportStringAttribute tableId;
 		private readonly TableRecord[] records;
+		private readonly int nrRecords;
 
 		/// <summary>
 		/// Reports records to a table.
@@ -31,6 +34,26 @@ namespace Waher.Reports.Files.Model.Actions
 			}
 
 			this.records = TableRecords.ToArray();
+			this.nrRecords = this.records.Length;
+		}
+
+		/// <summary>
+		/// Executes the report action.
+		/// </summary>
+		/// <param name="State">State of the report execution.</param>
+		/// <returns>If the action was executed.</returns>
+		public override async Task<bool> Execute(ReportState State)
+		{
+			string TableId = await this.tableId.Evaluate(State.Variables);
+			Record[] Records = new Record[this.nrRecords];
+			int i;
+
+			for (i=0;i<this.nrRecords;i++)
+				Records[i] = new Record(await this.records[i].Evaluate(State));
+
+			await State.Query.NewRecords(TableId, Records);
+
+			return true;
 		}
 	}
 }

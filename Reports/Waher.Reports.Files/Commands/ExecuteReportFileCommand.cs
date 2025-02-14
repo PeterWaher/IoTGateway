@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Reports.Files.Model;
@@ -66,9 +68,32 @@ namespace Waher.Reports.Files.Commands
 		/// </summary>
 		/// <param name="Query">Query data receptor.</param>
 		/// <param name="Language">Language to use.</param>
-		public override Task StartQueryExecutionAsync(Query Query, Language Language)
+		public override async Task StartQueryExecutionAsync(Query Query, Language Language)
 		{
-			return Task.CompletedTask;  // TODO
+			ReportState State = new ReportState(Query, Language, this.variables,
+				await Language.GetNamespaceAsync(typeof(ReportFileNode).Namespace));
+
+			try
+			{
+				if (!State.Query.IsStarted)
+					await State.Query.Start();
+
+				await Query.SetStatus(await State.ReportFilesNamespace.GetStringAsync(9, "Executing Query..."));
+
+				await this.parsedReport.Execute(State);
+
+				await State.Query.SetStatus(string.Empty);
+			}
+			catch (Exception ex)
+			{
+				await Query.LogMessage(ex);
+				Log.Exception(ex);
+			}
+			finally
+			{
+				if (!Query.IsDone && !Query.IsAborted)
+					await Query.Done();
+			}
 		}
 	}
 }

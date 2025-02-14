@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Reports.Files.Model.Actions
@@ -40,6 +41,25 @@ namespace Waher.Reports.Files.Model.Actions
 			}
 
 			this.conditions = Conditions.ToArray();
+		}
+
+		/// <summary>
+		/// Executes the report action.
+		/// </summary>
+		/// <param name="State">State of the report execution.</param>
+		/// <returns>If the action was executed.</returns>
+		public override async Task<bool> Execute(ReportState State)
+		{
+			foreach (If Condition in this.conditions)
+			{
+				if (await Condition.Execute(State))
+					return true;
+			}
+
+			if (!(this.otherwise is null))
+				await this.otherwise.Execute(State);
+
+			return true;
 		}
 	}
 }

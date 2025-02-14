@@ -46,12 +46,17 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
+	  <PackageReference Include="SkiaSharp" Version="2.88.9" />
+	</ItemGroup>
+	<ItemGroup>
 	  <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
 	  <ProjectReference Include="..\..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
 	  <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
 	  <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
 	  <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
 	  <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
+	  <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+	  <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
 	  <ProjectReference Include="..\Waher.Reports\Waher.Reports.csproj" />
 	</ItemGroup>
 

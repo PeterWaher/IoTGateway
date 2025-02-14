@@ -12,7 +12,7 @@ using Waher.Reports.Files.Model.Actions;
 using Waher.Reports.Files.Model.Parameters;
 using Waher.Runtime.Language;
 using Waher.Script;
-using Waher.Script.Constants;
+using Waher.Things.Queries;
 
 namespace Waher.Reports.Files.Model
 {
@@ -28,6 +28,7 @@ namespace Waher.Reports.Files.Model
 
 		private readonly string fileName;
 		private readonly string title;
+		private readonly string @namespace;
 		private readonly string[] privileges;
 		private readonly ReportParameter[] parameters;
 		private readonly ReportAction[] content;
@@ -52,6 +53,7 @@ namespace Waher.Reports.Files.Model
 			List<string> Privileges = new List<string>();
 			List<ReportAction> Content = new List<ReportAction>();
 			this.title = string.Empty;
+			this.@namespace = XML.Attribute(Doc.DocumentElement, "namespace");
 
 			foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 			{
@@ -703,5 +705,25 @@ namespace Waher.Reports.Files.Model
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Executes the report action.
+		/// </summary>
+		/// <param name="State">State of the report execution.</param>
+		/// <returns>If the action was executed.</returns>
+		public async Task<bool> Execute(ReportState State)
+		{
+			if (string.IsNullOrEmpty(this.@namespace))
+				State.Namespace = await State.Language.GetNamespaceAsync(this.@namespace);
+
+			if (!string.IsNullOrEmpty(this.title))
+				await State.Query.SetTitle(this.title);
+
+			foreach (ReportAction Action in this.content)
+				await Action.Execute(State);
+
+			return true;
+		}
+
 	}
 }

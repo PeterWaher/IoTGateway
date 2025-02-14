@@ -6,7 +6,7 @@ namespace Waher.Reports.Model.Attributes
 	/// <summary>
 	/// Report Byte attribute.
 	/// </summary>
-	public class ReportByteAttribute : ReportAttribute<decimal>
+	public class ReportByteAttribute : ReportAttribute<byte>
 	{
 		/// <summary>
 		/// Report Byte attribute.
@@ -23,7 +23,7 @@ namespace Waher.Reports.Model.Attributes
 		/// </summary>
 		/// <param name="s">Byte representation</param>
 		/// <returns>Parsed value.</returns>
-		public override decimal ParseValue(string s)
+		public override byte ParseValue(string s)
 		{
 			if (byte.TryParse(s, out byte Value))
 				return Value;

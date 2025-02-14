@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
 using Waher.Reports.Model.Attributes;
 
 namespace Waher.Reports.Files.Model.Actions
@@ -19,6 +20,20 @@ namespace Waher.Reports.Files.Model.Actions
 			: base(Report)
 		{
 			this.body = new ReportStringAttribute(Xml, null);
+		}
+
+		/// <summary>
+		/// Executes the report action.
+		/// </summary>
+		/// <param name="State">State of the report execution.</param>
+		/// <returns>If the action was executed.</returns>
+		public override async Task<bool> Execute(ReportState State)
+		{
+			string Body = await this.body.Evaluate(State.Variables);
+
+			await State.Query.SetStatus(Body);
+
+			return true;
 		}
 	}
 }

@@ -202,6 +202,7 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
+			<xs:attribute name="namespace" type="xs:string" use="optional"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -353,6 +354,7 @@
 								<xs:sequence>
 									<xs:group ref="ReportActions" minOccurs="1" maxOccurs="unbounded"/>
 								</xs:sequence>
+								<xs:attribute name="variable" type="xs:string" use="optional" default="ex"/>
 							</xs:complexType>
 						</xs:element>
 						<xs:element name="Finally" minOccurs="0" maxOccurs="1">

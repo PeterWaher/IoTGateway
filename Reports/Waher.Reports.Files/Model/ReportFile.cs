@@ -12,6 +12,7 @@ using Waher.Reports.Files.Model.Actions;
 using Waher.Reports.Files.Model.Parameters;
 using Waher.Runtime.Language;
 using Waher.Script;
+using Waher.Things;
 
 namespace Waher.Reports.Files.Model
 {
@@ -54,7 +55,7 @@ namespace Waher.Reports.Files.Model
 			List<ReportAction> Content = new List<ReportAction>();
 			this.title = string.Empty;
 			this.@namespace = XML.Attribute(Doc.DocumentElement, "namespace");
-			this.origin = XML.Attribute(Doc.DocumentElement, "origin", "origin");
+			this.origin = XML.Attribute(Doc.DocumentElement, "originVariable", "origin");
 
 			foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 			{
@@ -306,8 +307,13 @@ namespace Waher.Reports.Files.Model
 		/// <param name="Parameters">Data form to host all editable parameters.</param>
 		/// <param name="Language">Current language.</param>
 		/// <param name="Variables">Report variables.</param>
-		public async Task PopulateForm(DataForm Parameters, Language Language, Variables Variables)
+		/// <param name="Origin">Origin of request.</param>
+		public async Task PopulateForm(DataForm Parameters, Language Language, 
+			Variables Variables, IRequestOrigin Origin)
 		{
+			if (!string.IsNullOrEmpty(this.origin))
+				Variables[this.origin] = Origin;
+
 			foreach (ReportParameter Parameter in this.parameters)
 				await Parameter.PopulateForm(Parameters, Language, Variables);
 		}
@@ -319,11 +325,15 @@ namespace Waher.Reports.Files.Model
 		/// <param name="Language">Current language.</param>
 		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
 		/// <param name="Variables">Variable values.</param>
+		/// <param name="Origin">Origin of request.</param>
 		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
 		public async Task<SetEditableFormResult> SetParameters(DataForm Parameters, Language Language,
-			bool OnlySetChanged, Variables Variables)
+			bool OnlySetChanged, Variables Variables, IRequestOrigin Origin)
 		{
 			SetEditableFormResult Result = new SetEditableFormResult();
+
+			if (!string.IsNullOrEmpty(this.origin))
+				Variables[this.origin] = Origin;
 
 			foreach (ReportParameter Parameter in this.parameters)
 				await Parameter.SetParameter(Parameters, Language, OnlySetChanged, Variables, Result);

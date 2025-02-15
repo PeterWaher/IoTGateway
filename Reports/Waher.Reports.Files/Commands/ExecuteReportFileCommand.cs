@@ -46,9 +46,10 @@ namespace Waher.Reports.Files.Commands
 		/// </summary>
 		/// <param name="Parameters">Data form to host all editable parameters.</param>
 		/// <param name="Language">Current language.</param>
-		public Task PopulateForm(DataForm Parameters, Language Language)
+		/// <param name="Origin">Origin of request.</param>
+		public Task PopulateForm(DataForm Parameters, Language Language, IRequestOrigin Origin)
 		{
-			return this.parsedReport.PopulateForm(Parameters, Language, this.variables);
+			return this.parsedReport.PopulateForm(Parameters, Language, this.variables, Origin);
 		}
 
 		/// <summary>
@@ -57,10 +58,12 @@ namespace Waher.Reports.Files.Commands
 		/// <param name="Parameters">Data form with parameter values.</param>
 		/// <param name="Language">Current language.</param>
 		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <param name="Origin">Origin of request.</param>
 		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-		public Task<SetEditableFormResult> SetParameters(DataForm Parameters, Language Language, bool OnlySetChanged)
+		public Task<SetEditableFormResult> SetParameters(DataForm Parameters, Language Language, 
+			bool OnlySetChanged, IRequestOrigin Origin)
 		{
-			return this.parsedReport.SetParameters(Parameters, Language, OnlySetChanged, this.variables);
+			return this.parsedReport.SetParameters(Parameters, Language, OnlySetChanged, this.variables, Origin);
 		}
 
 		/// <summary>

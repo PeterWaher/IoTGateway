@@ -1751,7 +1751,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 			else
 			{
-				DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+				DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId, Caller);
 				StringBuilder Xml = new StringBuilder();
 
 				Form.SerializeForm(Xml);
@@ -1835,7 +1835,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
 					if (Result is null)
-						Result = await Parameters.SetEditableForm(e, Node, Form, true);
+						Result = await Parameters.SetEditableForm(e, Node, Form, true, Caller);
 
 					if (Result.Errors is null)
 					{
@@ -1874,7 +1874,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else
 					{
-						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId, Caller);
 						await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 					}
 				}
@@ -1946,10 +1946,10 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				if (Form is null)
-					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId, Caller);
 				else
 				{
-					Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+					Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId, Caller);
 					Parameters.MergeForms(Form, Form2);
 				}
 			}
@@ -2063,7 +2063,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					bool PreProvisioned = !(LifeCycleManagement is null) && LifeCycleManagement.IsProvisioned;
 
 					if (Result is null)
-						Result = await Parameters.SetEditableForm(e, P.Item2, Form, true);
+						Result = await Parameters.SetEditableForm(e, P.Item2, Form, true, Caller);
 
 					if (!(Result.Errors is null))
 					{
@@ -2075,10 +2075,10 @@ namespace Waher.Networking.XMPP.Concentrator
 							Node = NodeRef.Item2;
 
 							if (Form is null)
-								Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+								Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId, Caller);
 							else
 							{
-								Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+								Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId, Caller);
 								Parameters.MergeForms(Form, Form2);
 							}
 						}
@@ -2248,7 +2248,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 
 			DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild,
-				await PresumptiveChild.GetTypeNameAsync(Language));
+				await PresumptiveChild.GetTypeNameAsync(Language), Caller);
 
 			StringBuilder Xml = new StringBuilder();
 
@@ -2344,7 +2344,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
-			SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false);
+			SetEditableFormResult Result = await Parameters.SetEditableForm(e, PresumptiveChild, Form, false, Caller);
 
 			if (Result.Errors is null)
 			{
@@ -2380,7 +2380,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 			else
 			{
-				Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild, await PresumptiveChild.GetTypeNameAsync(Language));
+				Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild, await PresumptiveChild.GetTypeNameAsync(Language), Caller);
 				await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 			}
 		}
@@ -2803,7 +2803,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					await e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
 				else
 				{
-					DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+					DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language), Caller);
 					StringBuilder Xml = new StringBuilder();
 
 					Form.SerializeForm(Xml);
@@ -2885,13 +2885,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 						Command = Command.Copy();
 
-						SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+						SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false, Caller);
 
 						if (!(Result.Errors is null))
 						{
 							await DisposeObject(Command);
 
-							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language), Caller);
 							await e.IqError(this.GetFormErrorsXml(Result.Errors, Form));
 
 							return;
@@ -2967,7 +2967,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Command = Command.Copy();
 
-					SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+					SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false, Caller);
 
 					if (!(Result.Errors is null))
 					{
@@ -3788,7 +3788,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+					Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language), Caller);
 				}
 				else
 				{
@@ -3804,7 +3804,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Command2, await Command2.GetNameAsync(Language));
+					Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Command2, await Command2.GetNameAsync(Language), Caller);
 					Parameters.MergeForms(Form, Form2);
 				}
 			}
@@ -3928,7 +3928,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				Command = Command.Copy();
 
-				SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+				SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false, Caller);
 
 				if (!(Result.Errors is null))
 				{
@@ -4081,7 +4081,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			Command = Command.Copy();
 
-			SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false);
+			SetEditableFormResult Result = await Parameters.SetEditableForm(e, Command, Form, false, Caller);
 
 			if (!(Result.Errors is null))
 			{

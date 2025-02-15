@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
@@ -353,6 +354,11 @@ namespace Waher.Script.Model
 							if (Encapsulation is null)
 								Encapsulation = Argument.Encapsulate;
 						}
+						else if (Argument.AssociatedObjectValue is IEnumerable Enumerable)
+						{
+							Arguments[i] = Operators.Vectors.VectorDefinition.Encapsulate(Enumerable, false, this);
+							e[i] = null;
+						}
 						else
 						{
 							Arguments[i] = Operators.Vectors.VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
@@ -386,6 +392,11 @@ namespace Waher.Script.Model
 							e[i] = ChildElements.GetEnumerator();
 							if (Encapsulation is null)
 								Encapsulation = Operators.LambdaDefinition.EncapsulateToVector;
+						}
+						else if (Argument.AssociatedObjectValue is IEnumerable Enumerable)
+						{
+							Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(Enumerable);
+							e[i] = null;
 						}
 						else
 						{

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
@@ -24,12 +24,27 @@ namespace Waher.Script.Objects.Sets
                 this.elements[E] = true;
         }
 
-        /// <summary>
-        /// Checks if the set contains an element.
-        /// </summary>
-        /// <param name="Element">Element.</param>
-        /// <returns>If the element is contained in the set.</returns>
-        public override bool Contains(IElement Element)
+		/// <summary>
+		/// Represents a finite set.
+		/// </summary>
+		/// <param name="Elements">Elements of set.</param>
+		public FiniteSet(IEnumerable Elements)
+		{
+			this.elements = new Dictionary<IElement, bool>();
+            
+            foreach (object Item in Elements)
+            {
+                IElement E = Expression.Encapsulate(Item);
+				this.elements[E] = true;
+			}
+		}
+
+		/// <summary>
+		/// Checks if the set contains an element.
+		/// </summary>
+		/// <param name="Element">Element.</param>
+		/// <returns>If the element is contained in the set.</returns>
+		public override bool Contains(IElement Element)
         {
             return this.elements.ContainsKey(Element);
         }
@@ -73,13 +88,7 @@ namespace Waher.Script.Objects.Sets
         /// <summary>
         /// An enumeration of child elements. If the element is a scalar, this property will return null.
         /// </summary>
-        public override ICollection<IElement> ChildElements
-        {
-            get
-            {
-                return this.elements.Keys;
-            }
-        }
+        public override ICollection<IElement> ChildElements => this.elements.Keys;
 
         /// <inheritdoc/>
         public override string ToString()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -99,6 +100,23 @@ namespace Waher.Script.Operators.Vectors
 
 				return Encapsulate(Elements2, CanEncapsulateAsMatrix, Node);
 			}
+		}
+
+		/// <summary>
+		/// Encapsulates the elements of a vector.
+		/// </summary>
+		/// <param name="Elements">Vector elements.</param>
+		/// <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated vector (or, in the case on a byte array, an object value containing the binary information as a value).</returns>
+		public static IElement Encapsulate(IEnumerable Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
+		{
+			LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+
+			foreach (object Obj in Elements)
+				Elements2.AddLast(Expression.Encapsulate(Obj));
+
+			return Encapsulate(Elements2, CanEncapsulateAsMatrix, Node);
 		}
 
 		/// <summary>

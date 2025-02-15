@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
@@ -57,6 +57,7 @@ namespace Waher.Script.Operators.Sets
 
             return Encapsulate(Elements);
         }
+
         /// <summary>
         /// Encapsulates the elements of a set.
         /// </summary>
@@ -66,6 +67,16 @@ namespace Waher.Script.Operators.Sets
         {
             return new FiniteSet(Elements);
         }
+
+		/// <summary>
+		/// Encapsulates the elements of a set.
+		/// </summary>
+		/// <param name="Elements">Set elements.</param>
+		/// <returns>Encapsulated set.</returns>
+		public static IElement Encapsulate(IEnumerable Elements)
+		{
+			return new FiniteSet(Elements);
+		}
 
 		/// <summary>
 		/// Performs a pattern match operation.

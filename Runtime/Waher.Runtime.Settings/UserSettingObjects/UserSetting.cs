@@ -1,37 +1,36 @@
-using Waher.Content;
 using Waher.Persistence.Attributes;
 
-namespace Waher.Runtime.Settings.HostSettingObjects
+namespace Waher.Runtime.Settings.UserSettingObjects
 {
 	/// <summary>
-	/// Base abstract class for host settings.
+	/// Base abstract class for user settings.
 	/// </summary>
 	[TypeName(TypeNameSerialization.LocalName)]
-	[CollectionName("HostSettings")]
+	[CollectionName("UserSettings")]
 	[ArchivingTime]		// No Limit
-	[Index("Host", "Key")]
-	[Index("Key", "Host")]
-	public abstract class HostSetting : IHostReference
+	[Index("User", "Key")]
+	[Index("Key", "User")]
+	public abstract class UserSetting
 	{
 		private string objectId = null;
-		private string host = string.Empty;
+		private string user = string.Empty;
 		private string key = string.Empty;
 
 		/// <summary>
-		/// Base abstract class for host settings.
+		/// Base abstract class for user settings.
 		/// </summary>
-		public HostSetting()
+		public UserSetting()
 		{
 		}
 
 		/// <summary>
-		/// Base abstract class for host settings.
+		/// Base abstract class for user settings.
 		/// </summary>
-		/// <param name="Host">Host name.</param>
+		/// <param name="User">User name.</param>
 		/// <param name="Key">Key name.</param>
-		public HostSetting(string Host, string Key)
+		public UserSetting(string User, string Key)
 		{
-			this.host = Host;
+			this.user = User;
 			this.key = Key;
 		}
 
@@ -46,12 +45,12 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		}
 
 		/// <summary>
-		/// Host name.
+		/// User name.
 		/// </summary>
-		public string Host
+		public string User
 		{
-			get => this.host;
-			set => this.host = value;
+			get => this.user;
+			set => this.user = value;
 		}
 
 		/// <summary>

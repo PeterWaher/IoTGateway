@@ -4,21 +4,21 @@ using Waher.Persistence.Attributes;
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
-	/// DateTime setting object.
+	/// DateTime host setting object.
 	/// </summary>
 	public class DateTimeHostSetting : HostSetting
 	{
 		private DateTime value = DateTime.MinValue;
 
 		/// <summary>
-		/// DateTime setting object.
+		/// DateTime host setting object.
 		/// </summary>
 		public DateTimeHostSetting()
 		{
 		}
 
 		/// <summary>
-		/// DateTime setting object.
+		/// DateTime host setting object.
 		/// </summary>
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>

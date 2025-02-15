@@ -1,29 +1,30 @@
+using System;
 using Waher.Persistence.Attributes;
 
-namespace Waher.Runtime.Settings.HostSettingObjects
+namespace Waher.Runtime.Settings.UserSettingObjects
 {
 	/// <summary>
-	/// Object host setting object.
+	/// TimeSpan user setting object.
 	/// </summary>
-	public class ObjectHostSetting : HostSetting
+	public class TimeSpanUserSetting : UserSetting
 	{
-		private object value = null;
+		private TimeSpan value = TimeSpan.MinValue;
 
 		/// <summary>
-		/// String host setting object.
+		/// TimeSpan user setting object.
 		/// </summary>
-		public ObjectHostSetting()
+		public TimeSpanUserSetting()
 		{
 		}
 
 		/// <summary>
-		/// Object host setting object.
+		/// TimeSpan user setting object.
 		/// </summary>
-		/// <param name="Host">Host name.</param>
+		/// <param name="User">User name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public ObjectHostSetting(string Host, string Key, object Value)
-			: base(Host, Key)
+		public TimeSpanUserSetting(string User, string Key, TimeSpan Value)
+			: base(User, Key)
 		{
 			this.value = Value;
 		}
@@ -31,8 +32,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <summary>
 		/// Value.
 		/// </summary>
-		[DefaultValueNull]
-		public object Value
+		[DefaultValueTimeSpanMinValue]
+		public TimeSpan Value
 		{
 			get => this.value;
 			set => this.value = value;

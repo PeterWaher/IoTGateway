@@ -1,29 +1,27 @@
-using Waher.Persistence.Attributes;
-
-namespace Waher.Runtime.Settings.HostSettingObjects
+namespace Waher.Runtime.Settings.UserSettingObjects
 {
 	/// <summary>
-	/// Object host setting object.
+	/// Boolean user setting object.
 	/// </summary>
-	public class ObjectHostSetting : HostSetting
+	public class BooleanUserSetting : UserSetting
 	{
-		private object value = null;
+		private bool value = false;
 
 		/// <summary>
-		/// String host setting object.
+		/// Boolean user setting object.
 		/// </summary>
-		public ObjectHostSetting()
+		public BooleanUserSetting()
 		{
 		}
 
 		/// <summary>
-		/// Object host setting object.
+		/// Boolean user setting object.
 		/// </summary>
-		/// <param name="Host">Host name.</param>
+		/// <param name="User">User name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public ObjectHostSetting(string Host, string Key, object Value)
-			: base(Host, Key)
+		public BooleanUserSetting(string User, string Key, bool Value)
+			: base(User, Key)
 		{
 			this.value = Value;
 		}
@@ -31,8 +29,7 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <summary>
 		/// Value.
 		/// </summary>
-		[DefaultValueNull]
-		public object Value
+		public bool Value
 		{
 			get => this.value;
 			set => this.value = value;

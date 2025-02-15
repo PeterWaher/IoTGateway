@@ -4,6 +4,8 @@ using Waher.Runtime.Settings;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Security;
+using Waher.Things;
 
 namespace Waher.Script.Persistence.Functions
 {
@@ -111,6 +113,29 @@ namespace Waher.Script.Persistence.Functions
 				return null;
 			else
 				throw new ScriptRuntimeException("Expected a host reference, or null.", Node);
+		}
+
+		/// <summary>
+		/// Gets the host name from a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <param name="Node">Script node executing code.</param>
+		/// <returns>Host name.</returns>
+		public static async Task<string> GetUser(object Value, ScriptNode Node)
+		{
+			if (Value is IUser Ref)
+				return Ref.UserName;
+			else if (Value is IRequestOrigin Ref2)
+			{
+				RequestOrigin Origin = await Ref2.GetOrigin();
+				return Origin.From;
+			}
+			else if (Value is string s)
+				return s;
+			else if (Value is null)
+				return null;
+			else
+				throw new ScriptRuntimeException("Expected a user reference, or null.", Node);
 		}
 	}
 }

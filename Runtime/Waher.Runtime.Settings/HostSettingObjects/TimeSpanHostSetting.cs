@@ -4,21 +4,21 @@ using Waher.Persistence.Attributes;
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
-	/// TimeSpan setting object.
+	/// TimeSpan host setting object.
 	/// </summary>
 	public class TimeSpanHostSetting : HostSetting
 	{
 		private TimeSpan value = TimeSpan.MinValue;
 
 		/// <summary>
-		/// TimeSpan setting object.
+		/// TimeSpan host setting object.
 		/// </summary>
 		public TimeSpanHostSetting()
 		{
 		}
 
 		/// <summary>
-		/// TimeSpan setting object.
+		/// TimeSpan host setting object.
 		/// </summary>
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>

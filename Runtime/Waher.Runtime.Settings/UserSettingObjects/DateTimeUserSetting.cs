@@ -1,29 +1,30 @@
+using System;
 using Waher.Persistence.Attributes;
 
-namespace Waher.Runtime.Settings.HostSettingObjects
+namespace Waher.Runtime.Settings.UserSettingObjects
 {
 	/// <summary>
-	/// Object host setting object.
+	/// DateTime user setting object.
 	/// </summary>
-	public class ObjectHostSetting : HostSetting
+	public class DateTimeUserSetting : UserSetting
 	{
-		private object value = null;
+		private DateTime value = DateTime.MinValue;
 
 		/// <summary>
-		/// String host setting object.
+		/// DateTime user setting object.
 		/// </summary>
-		public ObjectHostSetting()
+		public DateTimeUserSetting()
 		{
 		}
 
 		/// <summary>
-		/// Object host setting object.
+		/// DateTime user setting object.
 		/// </summary>
-		/// <param name="Host">Host name.</param>
+		/// <param name="User">User name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public ObjectHostSetting(string Host, string Key, object Value)
-			: base(Host, Key)
+		public DateTimeUserSetting(string User, string Key, DateTime Value)
+			: base(User, Key)
 		{
 			this.value = Value;
 		}
@@ -31,8 +32,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <summary>
 		/// Value.
 		/// </summary>
-		[DefaultValueNull]
-		public object Value
+		[DefaultValueDateTimeMinValue]
+		public DateTime Value
 		{
 			get => this.value;
 			set => this.value = value;

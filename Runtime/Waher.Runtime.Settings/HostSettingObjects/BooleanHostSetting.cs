@@ -1,21 +1,21 @@
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
-	/// Boolean setting object.
+	/// Boolean host setting object.
 	/// </summary>
 	public class BooleanHostSetting : HostSetting
 	{
 		private bool value = false;
 
 		/// <summary>
-		/// Boolean setting object.
+		/// Boolean host setting object.
 		/// </summary>
 		public BooleanHostSetting()
 		{
 		}
 
 		/// <summary>
-		/// Boolean setting object.
+		/// Boolean host setting object.
 		/// </summary>
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>

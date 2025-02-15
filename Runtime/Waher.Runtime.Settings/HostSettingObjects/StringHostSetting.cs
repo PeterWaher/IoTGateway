@@ -3,21 +3,21 @@ using Waher.Persistence.Attributes;
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
-	/// String setting object.
+	/// String host setting object.
 	/// </summary>
 	public class StringHostSetting : HostSetting
 	{
 		private string value = string.Empty;
 
 		/// <summary>
-		/// String setting object.
+		/// String host setting object.
 		/// </summary>
 		public StringHostSetting()
 		{
 		}
 
 		/// <summary>
-		/// String setting object.
+		/// String host setting object.
 		/// </summary>
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>

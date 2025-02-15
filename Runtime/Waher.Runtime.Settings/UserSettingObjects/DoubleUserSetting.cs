@@ -1,29 +1,29 @@
 using Waher.Persistence.Attributes;
 
-namespace Waher.Runtime.Settings.HostSettingObjects
+namespace Waher.Runtime.Settings.UserSettingObjects
 {
 	/// <summary>
-	/// Object host setting object.
+	/// Double user setting object.
 	/// </summary>
-	public class ObjectHostSetting : HostSetting
+	public class DoubleUserSetting : UserSetting
 	{
-		private object value = null;
+		private double value = 0.0;
 
 		/// <summary>
-		/// String host setting object.
+		/// Double user setting object.
 		/// </summary>
-		public ObjectHostSetting()
+		public DoubleUserSetting()
 		{
 		}
 
 		/// <summary>
-		/// Object host setting object.
+		/// Double user setting object.
 		/// </summary>
-		/// <param name="Host">Host name.</param>
+		/// <param name="User">User name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public ObjectHostSetting(string Host, string Key, object Value)
-			: base(Host, Key)
+		public DoubleUserSetting(string User, string Key, double Value)
+			: base(User, Key)
 		{
 			this.value = Value;
 		}
@@ -31,8 +31,8 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		/// <summary>
 		/// Value.
 		/// </summary>
-		[DefaultValueNull]
-		public object Value
+		[DefaultValue(0.0)]
+		public double Value
 		{
 			get => this.value;
 			set => this.value = value;

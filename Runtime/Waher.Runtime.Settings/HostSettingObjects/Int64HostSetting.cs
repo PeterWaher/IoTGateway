@@ -3,21 +3,21 @@ using Waher.Persistence.Attributes;
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
-	/// Int64 setting object.
+	/// Int64 host setting object.
 	/// </summary>
 	public class Int64HostSetting : HostSetting
 	{
 		private long value = 0;
 
 		/// <summary>
-		/// Int64 setting object.
+		/// Int64 host setting object.
 		/// </summary>
 		public Int64HostSetting()
 		{
 		}
 
 		/// <summary>
-		/// Int64 setting object.
+		/// Int64 host setting object.
 		/// </summary>
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>

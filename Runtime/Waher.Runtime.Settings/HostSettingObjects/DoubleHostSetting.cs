@@ -3,21 +3,21 @@ using Waher.Persistence.Attributes;
 namespace Waher.Runtime.Settings.HostSettingObjects
 {
 	/// <summary>
-	/// Double setting object.
+	/// Double host setting object.
 	/// </summary>
 	public class DoubleHostSetting : HostSetting
 	{
 		private double value = 0.0;
 
 		/// <summary>
-		/// Double setting object.
+		/// Double host setting object.
 		/// </summary>
 		public DoubleHostSetting()
 		{
 		}
 
 		/// <summary>
-		/// Double setting object.
+		/// Double host setting object.
 		/// </summary>
 		/// <param name="Host">Host name.</param>
 		/// <param name="Key">Key name.</param>

@@ -2,12 +2,12 @@ using System;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Runtime.Settings.HostSettingObjects
+namespace Waher.Runtime.Settings.UserSettingObjects
 {
 	/// <summary>
-	/// Enumeration host setting object.
+	/// Enumeration user setting object.
 	/// </summary>
-	public class EnumHostSetting : HostSetting
+	public class EnumUserSetting : UserSetting
 	{
 		private Enum value = null;
 		private Type enumType = null;
@@ -15,20 +15,20 @@ namespace Waher.Runtime.Settings.HostSettingObjects
 		private string enumValue = string.Empty;
 
 		/// <summary>
-		/// Enumeration host setting object.
+		/// Enumeration user setting object.
 		/// </summary>
-		public EnumHostSetting()
+		public EnumUserSetting()
 		{
 		}
 
 		/// <summary>
-		/// Enumeration host setting object.
+		/// Enumeration user setting object.
 		/// </summary>
-		/// <param name="Host">Host name.</param>
+		/// <param name="User">User name.</param>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public EnumHostSetting(string Host, string Key, Enum Value)
-			: base(Host, Key)
+		public EnumUserSetting(string User, string Key, Enum Value)
+			: base(User, Key)
 		{
 			this.Value = Value;
 		}

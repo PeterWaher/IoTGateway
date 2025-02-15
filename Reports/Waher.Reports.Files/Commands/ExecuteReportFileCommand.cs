@@ -71,7 +71,8 @@ namespace Waher.Reports.Files.Commands
 		public override async Task StartQueryExecutionAsync(Query Query, Language Language)
 		{
 			ReportState State = new ReportState(Query, Language, this.variables,
-				await Language.GetNamespaceAsync(typeof(ReportFileNode).Namespace));
+				await Language.GetNamespaceAsync(typeof(ReportFileNode).Namespace),
+				Query.Origin);
 
 			try
 			{

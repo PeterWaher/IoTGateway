@@ -12,6 +12,7 @@ namespace Waher.Things.Queries
 	{
 		private readonly INode nodeReference;
 		private readonly Language language;
+		private readonly RequestOrigin origin;
 		private readonly string commandId;
 		private readonly string queryId;
 		private readonly object state;
@@ -36,13 +37,16 @@ namespace Waher.Things.Queries
 		/// <param name="State">State object.</param>
 		/// <param name="Language">Language of query.</param>
 		/// <param name="NodeReference">Node reference.</param>
-		public Query(string CommandId, string QueryId, object State, Language Language, INode NodeReference)
+		/// <param name="Origin">Origin of request to execute the query.</param>
+		public Query(string CommandId, string QueryId, object State, Language Language, 
+			INode NodeReference, RequestOrigin Origin)
 		{
 			this.nodeReference = NodeReference;
 			this.commandId = CommandId;
 			this.queryId = QueryId;
 			this.state = State;
 			this.language = Language;
+			this.origin = Origin;
 		}
 
 		/// <summary>
@@ -69,6 +73,11 @@ namespace Waher.Things.Queries
 		/// Node reference.
 		/// </summary>
 		public INode NodeReference => this.nodeReference;
+
+		/// <summary>
+		/// Origin of request to execute the query.
+		/// </summary>
+		public RequestOrigin Origin => this.origin;
 
 		/// <summary>
 		/// If the query has been started.

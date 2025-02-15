@@ -2976,7 +2976,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					Query Query = new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node);
+					Query Query = new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node, Caller);
 
 					if (!this.RegisterQuery(Query))
 					{
@@ -4025,7 +4025,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					Nodes.AddLast(Node);
-					Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
+					Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node, Caller));
 
 					if (Command is null)
 					{
@@ -4090,7 +4090,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
-			CompoundQuery Query = new CompoundQuery(CommandId, QueryId, new object[] { Sender, e }, Language, Queries);
+			CompoundQuery Query = new CompoundQuery(CommandId, QueryId, new object[] { Sender, e }, Language, Queries, Caller);
 
 			lock (this.synchObject)
 			{
@@ -4219,7 +4219,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					Nodes.AddLast(Node);
-					Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
+					Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node, Caller));
 
 					if (Command is null)
 					{

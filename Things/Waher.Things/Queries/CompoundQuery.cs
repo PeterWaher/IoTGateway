@@ -19,25 +19,27 @@ namespace Waher.Things.Queries
 		/// <param name="State">State object.</param>
 		/// <param name="Language">Language of query.</param>
 		/// <param name="Queries">Queries</param>
-		public CompoundQuery(string CommandId, string QueryId, object State, Language Language, IEnumerable<Query> Queries)
-			: base(CommandId, QueryId, State, Language, null)
+		/// <param name="Origin">Origin of request to execute the query.</param>
+		public CompoundQuery(string CommandId, string QueryId, object State, Language Language, 
+			IEnumerable<Query> Queries, RequestOrigin Origin)
+			: base(CommandId, QueryId, State, Language, null, Origin)
 		{
 			this.queries = Queries;
 
 			foreach (Query Query in this.queries)
 			{
-				Query.OnAborted += Query_OnAborted;
-				Query.OnBeginSection += Query_OnBeginSection;
-				Query.OnDone += Query_OnDone;
-				Query.OnEndSection += Query_OnEndSection;
-				Query.OnMessage += Query_OnMessage;
-				Query.OnNewObject += Query_OnNewObject;
-				Query.OnNewRecords += Query_OnNewRecords;
-				Query.OnNewTable += Query_OnNewTable;
-				Query.OnStarted += Query_OnStarted;
-				Query.OnStatus += Query_OnStatus;
-				Query.OnTableDone += Query_OnTableDone;
-				Query.OnTitle += Query_OnTitle;
+				Query.OnAborted += this.Query_OnAborted;
+				Query.OnBeginSection += this.Query_OnBeginSection;
+				Query.OnDone += this.Query_OnDone;
+				Query.OnEndSection += this.Query_OnEndSection;
+				Query.OnMessage += this.Query_OnMessage;
+				Query.OnNewObject += this.Query_OnNewObject;
+				Query.OnNewRecords += this.Query_OnNewRecords;
+				Query.OnNewTable += this.Query_OnNewTable;
+				Query.OnStarted += this.Query_OnStarted;
+				Query.OnStatus += this.Query_OnStatus;
+				Query.OnTableDone += this.Query_OnTableDone;
+				Query.OnTitle += this.Query_OnTitle;
 			}
 		}
 

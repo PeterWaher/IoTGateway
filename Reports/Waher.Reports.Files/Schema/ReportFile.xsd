@@ -203,6 +203,7 @@
 				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="namespace" type="xs:string" use="optional"/>
+			<xs:attribute name="originVariable" type="xs:string" use="optional" default="origin"/>
 		</xs:complexType>
 	</xs:element>
 

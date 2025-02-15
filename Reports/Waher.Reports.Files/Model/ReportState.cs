@@ -1,5 +1,6 @@
 ﻿using Waher.Runtime.Language;
 using Waher.Script;
+using Waher.Things;
 using Waher.Things.Queries;
 
 namespace Waher.Reports.Files.Model
@@ -16,13 +17,15 @@ namespace Waher.Reports.Files.Model
 		/// <param name="Language">Preferred language.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="ReportFilesNamespace">Language namespace reference for report files.</param>
+		/// <param name="Origin">Origin of request to generate report.</param>
 		public ReportState(Query Query, Language Language, Variables Variables,
-			Namespace ReportFilesNamespace)
+			Namespace ReportFilesNamespace, RequestOrigin Origin)
 		{
 			this.Query = Query;
 			this.Language = Language;
 			this.Variables = Variables;
 			this.ReportFilesNamespace = ReportFilesNamespace;
+			this.Origin = Origin;
 			this.Namespace = null;
 		}
 
@@ -50,5 +53,10 @@ namespace Waher.Reports.Files.Model
 		/// Current set of variables.
 		/// </summary>
 		public Variables Variables { get; }
+
+		/// <summary>
+		/// Origin of request to generate report.
+		/// </summary>
+		public RequestOrigin Origin { get; }
 	}
 }

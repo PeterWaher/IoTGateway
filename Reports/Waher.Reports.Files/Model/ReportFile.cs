@@ -77,384 +77,78 @@ namespace Waher.Reports.Files.Model
 							if (!(N2 is XmlElement E2))
 								continue;
 
-							switch (N2.LocalName)
+							switch (E2.LocalName)
 							{
 								case "Boolean":
-									ParseReportParameter(E2, out string Page, out string Name,
-										out string Label, out string Description, out bool Required);
-
-									bool? DefaultBooleanValue;
-
-									if (E2.HasAttribute("default"))
-										DefaultBooleanValue = XML.Attribute(E2, "default", false);
-									else
-										DefaultBooleanValue = null;
-
-									Parameters.Add(new BooleanParameter(Page, Name, Label,
-										Description, Required, DefaultBooleanValue));
+									Parameters.Add(new BooleanParameter(E2));
 									break;
 
 								case "Color":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out bool RestrictToOptions, out ParameterOption[] Options);
-
-									bool AlphaChannel = XML.Attribute(E2, "alpha", false);
-									string DefaultStringValue;
-
-									if (E2.HasAttribute("default"))
-										DefaultStringValue = XML.Attribute(E2, "default");
-									else
-										DefaultStringValue = null;
-
-									Parameters.Add(new ColorParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultStringValue, AlphaChannel));
+									Parameters.Add(new ColorParameter(E2));
 									break;
 
 								case "Date":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									DateTime? DefaultDateTimeValue;
-									DateTime? MinDateTimeValue;
-									DateTime? MaxDateTimeValue;
-
-									if (E2.HasAttribute("default"))
-										DefaultDateTimeValue = XML.Attribute(E2, "default", DateTime.MinValue);
-									else
-										DefaultDateTimeValue = null;
-
-									if (E2.HasAttribute("min"))
-										MinDateTimeValue = XML.Attribute(E2, "min", DateTime.MinValue);
-									else
-										MinDateTimeValue = null;
-
-									if (E2.HasAttribute("max"))
-										MaxDateTimeValue = XML.Attribute(E2, "max", DateTime.MinValue);
-									else
-										MaxDateTimeValue = null;
-
-									Parameters.Add(new DateParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultDateTimeValue,
-										MinDateTimeValue, MaxDateTimeValue));
+									Parameters.Add(new DateParameter(E2));
 									break;
 
 								case "DateTime":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									if (E2.HasAttribute("default"))
-										DefaultDateTimeValue = XML.Attribute(E2, "default", DateTime.MinValue);
-									else
-										DefaultDateTimeValue = null;
-
-									if (E2.HasAttribute("min"))
-										MinDateTimeValue = XML.Attribute(E2, "min", DateTime.MinValue);
-									else
-										MinDateTimeValue = null;
-
-									if (E2.HasAttribute("max"))
-										MaxDateTimeValue = XML.Attribute(E2, "max", DateTime.MinValue);
-									else
-										MaxDateTimeValue = null;
-
-									Parameters.Add(new DateTimeParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultDateTimeValue,
-										MinDateTimeValue, MaxDateTimeValue));
+									Parameters.Add(new DateTimeParameter(E2));
 									break;
 
 								case "Double":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									double? DefaultDoubleValue;
-									double? MinDoubleValue;
-									double? MaxDoubleValue;
-
-									if (E2.HasAttribute("default"))
-										DefaultDoubleValue = XML.Attribute(E2, "default", Double.MinValue);
-									else
-										DefaultDoubleValue = null;
-
-									if (E2.HasAttribute("min"))
-										MinDoubleValue = XML.Attribute(E2, "min", 0.0);
-									else
-										MinDoubleValue = null;
-
-									if (E2.HasAttribute("max"))
-										MaxDoubleValue = XML.Attribute(E2, "max", 0.0);
-									else
-										MaxDoubleValue = null;
-
-									Parameters.Add(new DoubleParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultDoubleValue,
-										MinDoubleValue, MaxDoubleValue));
+									Parameters.Add(new DoubleParameter(E2));
 									break;
 
 								case "Fixed":
-									ParseReportParameter(E2, out Page, out Name,
-										out Label, out Description, out Required);
-
-									List<string> Values = new List<string>();
-
-									foreach (XmlNode N3 in E2.ChildNodes)
-									{
-										if (N3.LocalName == "Value")
-											Values.Add(N3.InnerText);
-									}
-
-									Parameters.Add(new FixedParameter(Page, Name, Label, Description,
-										Required, Values.ToArray()));
+									Parameters.Add(new FixedParameter(E2));
 									break;
 
 								case "Int8":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									sbyte? DefaultInt8Value;
-									sbyte? MinInt8Value;
-									sbyte? MaxInt8Value;
-
-									if (E2.HasAttribute("default"))
-										DefaultInt8Value = (sbyte)XML.Attribute(E2, "default", 0);
-									else
-										DefaultInt8Value = null;
-
-									if (E2.HasAttribute("min"))
-										MinInt8Value = (sbyte)XML.Attribute(E2, "min", 0);
-									else
-										MinInt8Value = null;
-
-									if (E2.HasAttribute("max"))
-										MaxInt8Value = (sbyte)XML.Attribute(E2, "max", 0);
-									else
-										MaxInt8Value = null;
-
-									Parameters.Add(new Int8Parameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultInt8Value,
-										MinInt8Value, MaxInt8Value));
+									Parameters.Add(new Int8Parameter(E2));
 									break;
 
 								case "Int16":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									short? DefaultInt16Value;
-									short? MinInt16Value;
-									short? MaxInt16Value;
-
-									if (E2.HasAttribute("default"))
-										DefaultInt16Value = (short)XML.Attribute(E2, "default", 0);
-									else
-										DefaultInt16Value = null;
-
-									if (E2.HasAttribute("min"))
-										MinInt16Value = (short)XML.Attribute(E2, "min", 0);
-									else
-										MinInt16Value = null;
-
-									if (E2.HasAttribute("max"))
-										MaxInt16Value = (short)XML.Attribute(E2, "max", 0);
-									else
-										MaxInt16Value = null;
-
-									Parameters.Add(new Int16Parameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultInt16Value,
-										MinInt16Value, MaxInt16Value));
+									Parameters.Add(new Int16Parameter(E2));
 									break;
 
 								case "Int32":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									int? DefaultInt32Value;
-									int? MinInt32Value;
-									int? MaxInt32Value;
-
-									if (E2.HasAttribute("default"))
-										DefaultInt32Value = XML.Attribute(E2, "default", 0);
-									else
-										DefaultInt32Value = null;
-
-									if (E2.HasAttribute("min"))
-										MinInt32Value = XML.Attribute(E2, "min", 0);
-									else
-										MinInt32Value = null;
-
-									if (E2.HasAttribute("max"))
-										MaxInt32Value = XML.Attribute(E2, "max", 0);
-									else
-										MaxInt32Value = null;
-
-									Parameters.Add(new Int32Parameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultInt32Value,
-										MinInt32Value, MaxInt32Value));
+									Parameters.Add(new Int32Parameter(E2));
 									break;
 
 								case "Int64":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									long? DefaultInt64Value;
-									long? MinInt64Value;
-									long? MaxInt64Value;
-
-									if (E2.HasAttribute("default"))
-										DefaultInt64Value = XML.Attribute(E2, "default", 0L);
-									else
-										DefaultInt64Value = null;
-
-									if (E2.HasAttribute("min"))
-										MinInt64Value = XML.Attribute(E2, "min", 0L);
-									else
-										MinInt64Value = null;
-
-									if (E2.HasAttribute("max"))
-										MaxInt64Value = XML.Attribute(E2, "max", 0L);
-									else
-										MaxInt64Value = null;
-
-									Parameters.Add(new Int64Parameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultInt64Value,
-										MinInt64Value, MaxInt64Value));
+									Parameters.Add(new Int64Parameter(E2));
 									break;
 
 								case "Jid":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									if (E2.HasAttribute("default"))
-										DefaultStringValue = XML.Attribute(E2, "default");
-									else
-										DefaultStringValue = null;
-
-									Parameters.Add(new JidParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultStringValue));
+									Parameters.Add(new JidParameter(E2));
 									break;
 
 								case "Jids":
-									ParseReportParameterWithOptionsAndDefaultValues(E2,
-										out Page, out Name, out Label, out Description, out Required,
-										out RestrictToOptions, out Options, out string[] DefaultValues,
-										out ushort? MinCount, out ushort? MaxCount);
-
-									Parameters.Add(new JidsParameter(Page, Name, Label, Description, Required,
-										RestrictToOptions, Options, DefaultValues, MinCount, MaxCount));
+									Parameters.Add(new JidsParameter(E2));
 									break;
 
 								case "Media":
-									ParseReportParameter(E2, out Page, out Name, out Label,
-										out Description, out Required);
-
-									string Url = XML.Attribute(E2, "url");
-									string ContentType = XML.Attribute(E2, "contentType");
-									ushort? Width;
-									ushort? Height;
-
-									if (E2.HasAttribute("width"))
-										Width = (ushort)XML.Attribute(E2, "width", 0);
-									else
-										Width = null;
-
-									if (E2.HasAttribute("height"))
-										Height = (ushort)XML.Attribute(E2, "height", 0);
-									else
-										Height = null;
-
-									Parameters.Add(new MediaParameter(Page, Name, Label, Description, Required,
-										Url, ContentType, Width, Height));
+									Parameters.Add(new MediaParameter(E2));
 									break;
 
 								case "Password":
-									ParseReportParameter(E2, out Page, out Name,
-										out Label, out Description, out Required);
-
-									if (E2.HasAttribute("default"))
-										DefaultStringValue = XML.Attribute(E2, "default");
-									else
-										DefaultStringValue = null;
-
-									Parameters.Add(new PasswordParameter(Page, Name, Label, Description,
-										Required, DefaultStringValue));
+									Parameters.Add(new PasswordParameter(E2));
 									break;
 
 								case "String":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									if (E2.HasAttribute("default"))
-										DefaultStringValue = XML.Attribute(E2, "default");
-									else
-										DefaultStringValue = null;
-
-									string Pattern = XML.Attribute(E2, "pattern");
-
-									Parameters.Add(new StringParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultStringValue, Pattern));
+									Parameters.Add(new StringParameter(E2));
 									break;
 
 								case "Text":
-									ParseReportParameterWithOptionsAndDefaultValues(E2,
-										out Page, out Name, out Label, out Description, out Required,
-										out RestrictToOptions, out Options, out DefaultValues,
-										out MinCount, out MaxCount);
-
-									ContentType = XML.Attribute(E2, "contentType");
-
-									Parameters.Add(new TextParameter(Page, Name, Label, Description, Required,
-										RestrictToOptions, Options, ContentType, DefaultValues, MinCount, MaxCount));
+									Parameters.Add(new TextParameter(E2));
 									break;
 
 								case "Time":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									TimeSpan? DefaultTimeSpanValue;
-									TimeSpan? MinTimeSpanValue;
-									TimeSpan? MaxTimeSpanValue;
-
-									if (E2.HasAttribute("default"))
-										DefaultTimeSpanValue = XML.Attribute(E2, "default", TimeSpan.Zero);
-									else
-										DefaultTimeSpanValue = null;
-
-									if (E2.HasAttribute("min"))
-										MinTimeSpanValue = XML.Attribute(E2, "min", TimeSpan.Zero);
-									else
-										MinTimeSpanValue = null;
-
-									if (E2.HasAttribute("max"))
-										MaxTimeSpanValue = XML.Attribute(E2, "max", TimeSpan.Zero);
-									else
-										MaxTimeSpanValue = null;
-
-									Parameters.Add(new TimeParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultTimeSpanValue,
-										MinTimeSpanValue, MaxTimeSpanValue));
+									Parameters.Add(new TimeParameter(E2));
 									break;
 
 								case "Uri":
-									ParseReportParameterWithOptions(E2, out Page, out Name,
-										out Label, out Description, out Required,
-										out RestrictToOptions, out Options);
-
-									if (E2.HasAttribute("default"))
-										DefaultStringValue = XML.Attribute(E2, "default");
-									else
-										DefaultStringValue = null;
-
-									Parameters.Add(new UriParameter(Page, Name, Label, Description,
-										Required, RestrictToOptions, Options, DefaultStringValue));
+									Parameters.Add(new UriParameter(E2));
 									break;
 
 								default:
@@ -475,74 +169,6 @@ namespace Waher.Reports.Files.Model
 			this.privileges = Privileges.ToArray();
 			this.parameters = Parameters.ToArray();
 			this.content = Content.ToArray();
-		}
-
-		private static void ParseReportParameter(XmlElement E, out string Page,
-			out string Name, out string Label, out string Description, out bool Required)
-		{
-			Page = XML.Attribute(E, "page");
-			Name = XML.Attribute(E, "name");
-			Label = XML.Attribute(E, "label");
-			Description = XML.Attribute(E, "description");
-			Required = XML.Attribute(E, "required", false);
-		}
-
-		private static void ParseReportParameterWithOptions(XmlElement E, out string Page,
-			out string Name, out string Label, out string Description, out bool Required,
-			out bool RestrictToOptions, out ParameterOption[] Options)
-		{
-			ParseReportParameter(E, out Page, out Name, out Label, out Description, out Required);
-
-			RestrictToOptions = XML.Attribute(E, "restrictToOptions", false);
-
-			List<ParameterOption> Options2 = new List<ParameterOption>();
-			string Label2;
-			string Value;
-
-			foreach (XmlNode N in E.ChildNodes)
-			{
-				if (!(N is XmlElement E2))
-					continue;
-
-				if (E2.LocalName == "Option")
-				{
-					Label2 = XML.Attribute(E2, "label");
-					Value = XML.Attribute(E2, "value");
-
-					Options2.Add(new ParameterOption(Label2, Value));
-				}
-			}
-
-			Options = Options2.ToArray();
-		}
-
-		private static void ParseReportParameterWithOptionsAndDefaultValues(XmlElement E, out string Page,
-			out string Name, out string Label, out string Description, out bool Required,
-			out bool RestrictToOptions, out ParameterOption[] Options, out string[] DefaultValues,
-			out ushort? MinCount, out ushort? MaxCount)
-		{
-			ParseReportParameterWithOptions(E, out Page, out Name, out Label, out Description, out Required,
-				out RestrictToOptions, out Options);
-
-			if (E.HasAttribute("minCount"))
-				MinCount = (ushort)XML.Attribute(E, "minCount", 0);
-			else
-				MinCount = null;
-
-			if (E.HasAttribute("maxCount"))
-				MaxCount = (ushort)XML.Attribute(E, "maxCount", 0);
-			else
-				MaxCount = null;
-
-			List<string> Values = new List<string>();
-
-			foreach (XmlNode N in E.ChildNodes)
-			{
-				if (N.LocalName == "DefaultValue")
-					Values.Add(N.InnerText);
-			}
-
-			DefaultValues = Values.ToArray();
 		}
 
 		internal ReportAction[] ParseActions(XmlNode Container)
@@ -679,20 +305,11 @@ namespace Waher.Reports.Files.Model
 		/// </summary>
 		/// <param name="Parameters">Data form to host all editable parameters.</param>
 		/// <param name="Language">Current language.</param>
-		/// <param name="Values">Variable values</param>
-		public async Task PopulateForm(DataForm Parameters, Language Language, Variables Values)
+		/// <param name="Variables">Report variables.</param>
+		public async Task PopulateForm(DataForm Parameters, Language Language, Variables Variables)
 		{
-			object Value;
-
 			foreach (ReportParameter Parameter in this.parameters)
-			{
-				if (Values.TryGetVariable(Parameter.Name, out Variable v))
-					Value = v.ValueObject;
-				else
-					Value = null;
-
-				await Parameter.PopulateForm(Parameters, Language, Value);
-			}
+				await Parameter.PopulateForm(Parameters, Language, Variables);
 		}
 
 		/// <summary>
@@ -701,15 +318,15 @@ namespace Waher.Reports.Files.Model
 		/// <param name="Parameters">Data form with parameter values.</param>
 		/// <param name="Language">Current language.</param>
 		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
-		/// <param name="Values">Variable values.</param>
+		/// <param name="Variables">Variable values.</param>
 		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
 		public async Task<SetEditableFormResult> SetParameters(DataForm Parameters, Language Language,
-			bool OnlySetChanged, Variables Values)
+			bool OnlySetChanged, Variables Variables)
 		{
 			SetEditableFormResult Result = new SetEditableFormResult();
 
 			foreach (ReportParameter Parameter in this.parameters)
-				await Parameter.SetParameter(Parameters, Language, OnlySetChanged, Values, Result);
+				await Parameter.SetParameter(Parameters, Language, OnlySetChanged, Variables, Result);
 
 			return Result;
 		}

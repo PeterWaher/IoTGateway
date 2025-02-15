@@ -18,7 +18,7 @@
 								<xs:complexType>
 									<xs:complexContent>
 										<xs:extension base="ReportParameter">
-											<xs:attribute name="default" type="xs:boolean" use="optional"/>
+											<xs:attribute name="default" type="ScriptableBoolean" use="optional"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -28,7 +28,7 @@
 									<xs:complexContent>
 										<xs:extension base="ReportParameterWithOptions">
 											<xs:attribute name="default" type="xs:string" use="optional"/>
-											<xs:attribute name="alpha" type="xs:boolean" use="optional" default="false"/>
+											<xs:attribute name="alpha" type="ScriptableBoolean" use="optional" default="false"/>
 										</xs:extension>
 									</xs:complexContent>
 								</xs:complexType>
@@ -212,7 +212,7 @@
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="label" type="xs:string" use="required"/>
 		<xs:attribute name="description" type="xs:string" use="required"/>
-		<xs:attribute name="required" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="required" type="ScriptableBoolean" use="optional" default="false"/>
 	</xs:complexType>
 
 	<xs:complexType name="ReportParameterWithOptions" abstract="true">
@@ -406,4 +406,10 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:simpleType name="ScriptableBoolean">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="true|false|\{[^\}]*\}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
 </xs:schema>

@@ -1,4 +1,8 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
+using Waher.Reports.Model.Attributes;
+using Waher.Script;
 
 namespace Waher.Reports.Files.Model.Parameters
 {
@@ -7,46 +11,57 @@ namespace Waher.Reports.Files.Model.Parameters
 	/// </summary>
 	public abstract class ReportParameterWithOptions : ReportParameter
 	{
+		private readonly ReportBooleanAttribute restrictToOptions;
+		private readonly ParameterOption[] options;
+		private readonly int nrOptions;
+
 		/// <summary>
 		/// Represents a parameter with possible options on a command.
 		/// </summary>
-		/// <param name="Page">Parameter Page</param>
-		/// <param name="Name">Parameter name.</param>
-		/// <param name="Label">Parameter label.</param>
-		/// <param name="Description">Parameter description.</param>
-		/// <param name="Required">If parameter is required.</param>
-		/// <param name="RestrictToOptions">If only values defined in options are valid values.</param>
-		/// <param name="Options">Available options</param>
-		public ReportParameterWithOptions(string Page, string Name, string Label, string Description,
-			bool Required, bool RestrictToOptions, ParameterOption[] Options)
-			: base(Page, Name, Label, Description, Required)
+		/// <param name="Xml">XML definition.</param>
+		public ReportParameterWithOptions(XmlElement Xml)
+			: base(Xml)
 		{
-			this.Options = Options;
-			this.RestrictToOptions = RestrictToOptions;
+			this.restrictToOptions = new ReportBooleanAttribute(Xml, "restrictToOptions");
+
+			List<ParameterOption> Options2 = new List<ParameterOption>();
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (!(N is XmlElement E2))
+					continue;
+
+				if (E2.LocalName == "Option")
+					Options2.Add(new ParameterOption(E2));
+			}
+
+			this.options = Options2.ToArray();
+			this.nrOptions = this.options.Length;
 		}
 
 		/// <summary>
-		/// If only values defined in options are valid values.
+		/// Evaluates the attributes of the report parameter with options.
 		/// </summary>
-		public bool RestrictToOptions { get; }
-
-		/// <summary>
-		/// Available options
-		/// </summary>
-		public ParameterOption[] Options { get; }
-
-		/// <summary>
-		/// Gets the options as a collection of label-value pairs.
-		/// </summary>
-		/// <returns>Label-value pairs representing the options.</returns>
-		public KeyValuePair<string, string>[] GetOptionTags()
+		/// <param name="Variables">Report variables.</param>
+		/// <returns>Parameter attributes</returns>
+		public async Task<ReportParameterWithOptionsAttributes> GetReportParameterWithOptionsAttributes(Variables Variables)
 		{
-			KeyValuePair<string, string>[] Result = new KeyValuePair<string, string>[this.Options.Length];
+			ReportParameterAttributes Base = await this.GetReportParameterAttributes(Variables);
+			KeyValuePair<string, string>[] Options = new KeyValuePair<string, string>[this.nrOptions];
 
-			for (int i = 0; i < this.Options.Length; i++)
-				Result[i] = new KeyValuePair<string, string>(this.Options[i].Label, this.Options[i].Value);
+			for (int i = 0; i < this.nrOptions; i++)
+				Options[i] = await this.options[i].GetTag(Variables);
 
-			return Result;
+			return new ReportParameterWithOptionsAttributes()
+			{
+				Page = Base.Page,
+				Name = Base.Name,
+				Label = Base.Label,
+				Description = Base.Description,
+				Required = Base.Required,
+				RestrictToOptions = await this.restrictToOptions.Evaluate(Variables, false),
+				Options = Options 
+			};
 		}
 
 	}

@@ -34,20 +34,10 @@ namespace Waher.Reports.Files.Model.Actions
 		/// <returns>If the action was executed.</returns>
 		public override async Task<bool> Execute(ReportState State)
 		{
-			QueryEventType Type;
-			QueryEventLevel Level;
+			QueryEventType Type = await this.type.Evaluate(State.Variables, QueryEventType.Information);
+			QueryEventLevel Level = await this.level.Evaluate(State.Variables, QueryEventLevel.Minor);
 			string Body = await this.body.Evaluate(State.Variables);
-
-			if (this.type.IsEmpty)
-				Type = QueryEventType.Information;
-			else
-				Type = await this.type.Evaluate(State.Variables);
-
-			if (this.level.IsEmpty)
-				Level = QueryEventLevel.Minor;
-			else
-				Level = await this.level.Evaluate(State.Variables);
-
+			
 			await State.Query.LogMessage(Type, Level, Body);
 
 			return true;

@@ -62,6 +62,21 @@ namespace Waher.Reports.Model.Attributes
 		public abstract T ParseValue(string s);
 
 		/// <summary>
+		/// Evaluates the attribute, if defined, or returns the <paramref name="DefaultValue"/>
+		/// if attribute is not defined.
+		/// </summary>
+		/// <param name="Variables">Available variables.</param>
+		/// <param name="DefaultValue">Default value of attribute.</param>
+		/// <returns>Attribute value.</returns>
+		public Task<T> Evaluate(Variables Variables, T DefaultValue)
+		{
+			if (this.IsEmpty)
+				return Task.FromResult(DefaultValue);
+			else
+				return this.Evaluate(Variables);
+		}
+
+		/// <summary>
 		/// Evaluates the attribute
 		/// </summary>
 		/// <param name="Variables">Available variables.</param>

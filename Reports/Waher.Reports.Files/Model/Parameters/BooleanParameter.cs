@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
@@ -6,94 +8,95 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Reports.Model.Attributes;
 using Waher.Runtime.Language;
 using Waher.Script;
 
 namespace Waher.Reports.Files.Model.Parameters
 {
-    /// <summary>
-    /// Represents a Boolean-valued parameter.
-    /// </summary>
-    public class BooleanParameter : ReportParameter
-    {
+	/// <summary>
+	/// Represents a Boolean-valued parameter.
+	/// </summary>
+	public class BooleanParameter : ReportParameter
+	{
+		private readonly ReportBooleanAttribute defaultValue;
+
 		/// <summary>
 		/// Represents a Boolean-valued parameter.
 		/// </summary>
-		/// <param name="Page">Parameter Page</param>
-		/// <param name="Name">Parameter name.</param>
-		/// <param name="Label">Parameter label.</param>
-		/// <param name="Description">Parameter description.</param>
-		/// <param name="Required">If parameter is required.</param>
-        /// <param name="DefaultValue">Default value of parameter.</param>
-		public BooleanParameter(string Page, string Name, string Label, string Description,
-			bool Required, bool? DefaultValue)
-            : base(Page, Name, Label, Description, Required)
-        {
-            this.DefaultValue = DefaultValue;
+		/// <param name="Xml">XML definition.</param>
+		public BooleanParameter(XmlElement Xml)
+			: base(Xml)
+		{
+			this.defaultValue = new ReportBooleanAttribute(Xml, "default");
 		}
 
-        /// <summary>
-        /// Default parameter value.
-        /// </summary>
-        public bool? DefaultValue { get; }
+		/// <summary>
+		/// Populates a data form with parameters for the object.
+		/// </summary>
+		/// <param name="Parameters">Data form to host all editable parameters.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="Variables">Report variables.</param>
+		public override async Task PopulateForm(DataForm Parameters, Language Language, Variables Variables)
+		{
+			ReportParameterAttributes Attributes = await this.GetReportParameterAttributes(Variables);
+			string[] DefaultValue;
 
-        /// <summary>
-        /// Populates a data form with parameters for the object.
-        /// </summary>
-        /// <param name="Parameters">Data form to host all editable parameters.</param>
-        /// <param name="Language">Current language.</param>
-        /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
-        {
-            BooleanField Field = new BooleanField(Parameters, this.Name, this.Label, this.Required,
-                new string[] { this.DefaultValue.HasValue ? CommonTypes.Encode(this.DefaultValue.Value) : string.Empty }, 
-                null, this.Description, BooleanDataType.Instance, new BasicValidation(), string.Empty, false, false, false);
+			if (this.defaultValue.IsEmpty)
+				DefaultValue = Array.Empty<string>();
+			else
+				DefaultValue = new string[] { CommonTypes.Encode(await this.defaultValue.Evaluate(Variables)) };
 
-            Parameters.Add(Field);
+			BooleanField Field = new BooleanField(Parameters, Attributes.Name, Attributes.Label,
+				Attributes.Required, DefaultValue, null, Attributes.Description, 
+				BooleanDataType.Instance, new BasicValidation(), string.Empty, false, false, false);
 
-            Page Page = Parameters.GetPage(this.Page);
-            Page.Add(Field);
+			Parameters.Add(Field);
 
-            return Task.CompletedTask;
-        }
+			Page Page = Parameters.GetPage(Attributes.Page);
+			Page.Add(Field);
+		}
 
-        /// <summary>
-        /// Sets the parameters of the object, based on contents in the data form.
-        /// </summary>
-        /// <param name="Parameters">Data form with parameter values.</param>
-        /// <param name="Language">Current language.</param>
-        /// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
-        /// <param name="Values">Collection of parameter values.</param>
-        /// <param name="Result">Result set to return to caller.</param>
-        /// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-        public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Values,
-            SetEditableFormResult Result)
-        {
-            Field Field = Parameters[this.Name];
-            if (Field is null)
-            {
-                if (this.Required)
-                    Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
+		/// <summary>
+		/// Sets the parameters of the object, based on contents in the data form.
+		/// </summary>
+		/// <param name="Parameters">Data form with parameter values.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <param name="Variables">Report variables.</param>
+		/// <param name="Result">Result set to return to caller.</param>
+		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
+		public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Variables,
+			SetEditableFormResult Result)
+		{
+			string Name = await this.GetName(Variables);
+			bool Required = await this.IsRequired(Variables);
+			Field Field = Parameters[Name];
 
-                Values[this.Name] = null;
-            }
-            else
-            {
-                string s = Field.ValueString;
+			if (Field is null)
+			{
+				if (Required)
+					Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
 
-                if (string.IsNullOrEmpty(s))
-                {
-                    if (this.Required)
-						Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
+				Variables[Name] = null;
+			}
+			else
+			{
+				string s = Field.ValueString;
 
-					Values[this.Name] = null;
-                }
-                else if (CommonTypes.TryParse(s, out bool Parsed))
-                    Values[this.Name] = Parsed;
-                else
-					Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 2, "Invalid value."));
-            }
-        }
+				if (string.IsNullOrEmpty(s))
+				{
+					if (Required)
+						Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
 
-    }
+					Variables[Name] = null;
+				}
+				else if (CommonTypes.TryParse(s, out bool Parsed))
+					Variables[Name] = Parsed;
+				else
+					Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 2, "Invalid value."));
+			}
+		}
+
+	}
 }

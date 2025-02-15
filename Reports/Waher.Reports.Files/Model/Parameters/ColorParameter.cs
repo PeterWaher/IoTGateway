@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
@@ -6,6 +8,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Reports.Model.Attributes;
 using Waher.Runtime.Language;
 using Waher.Script;
 
@@ -16,88 +19,82 @@ namespace Waher.Reports.Files.Model.Parameters
     /// </summary>
     public class ColorParameter : ReportParameterWithOptions
 	{
+		private readonly ReportStringAttribute defaultValue;
+        private readonly ReportBooleanAttribute alphaChannel;
+
 		/// <summary>
 		/// Represents a color-valued parameter.
 		/// </summary>
-		/// <param name="Page">Parameter Page</param>
-		/// <param name="Name">Parameter name.</param>
-		/// <param name="Label">Parameter label.</param>
-		/// <param name="Description">Parameter description.</param>
-		/// <param name="Required">If parameter is required.</param>
-		/// <param name="RestrictToOptions">If only values defined in options are valid values.</param>
-		/// <param name="Options">Available options</param>
-		/// <param name="DefaultValue">Default value of parameter.</param>
-		/// <param name="AlphaChannel">If editing alpha-channel is enabled.</param>
-		public ColorParameter(string Page, string Name, string Label, string Description,
-			bool Required, bool RestrictToOptions, ParameterOption[] Options, 
-            string DefaultValue, bool AlphaChannel)
-			: base(Page, Name, Label, Description, Required, RestrictToOptions, Options)
+		/// <param name="Xml">XML definition.</param>
+		public ColorParameter(XmlElement Xml)
+			: base(Xml)
 		{
-			this.DefaultValue = DefaultValue;
-			this.AlphaChannel = AlphaChannel;
+            this.defaultValue = new ReportStringAttribute(Xml, "default");
+			this.alphaChannel = new ReportBooleanAttribute(Xml, "alphaChannel");
 		}
 
-        /// <summary>
-        /// Default parameter value.
-        /// </summary>
-        public string DefaultValue { get; }
+		/// <summary>
+		/// Populates a data form with parameters for the object.
+		/// </summary>
+		/// <param name="Parameters">Data form to host all editable parameters.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="Variables">Report variables.</param>
+		public override async Task PopulateForm(DataForm Parameters, Language Language, Variables Variables)
+		{
+			ReportParameterWithOptionsAttributes Attributes = await this.GetReportParameterWithOptionsAttributes(Variables);
+            bool AlphaChannel = await this.alphaChannel.Evaluate(Variables, false);
+			string[] DefaultValue;
 
-        /// <summary>
-        /// If editing alpha-channel is enabled.
-        /// </summary>
-        public bool AlphaChannel { get; }
+			if (this.defaultValue.IsEmpty)
+				DefaultValue = Array.Empty<string>();
+			else
+				DefaultValue = new string[] { await this.defaultValue.Evaluate(Variables) };
 
-        /// <summary>
-        /// Populates a data form with parameters for the object.
-        /// </summary>
-        /// <param name="Parameters">Data form to host all editable parameters.</param>
-        /// <param name="Language">Current language.</param>
-        /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
-        {
-            DataType DataType = this.AlphaChannel ? (DataType)ColorAlphaDataType.Instance : (DataType)ColorDataType.Instance;
+			DataType DataType = AlphaChannel ? (DataType)ColorAlphaDataType.Instance : ColorDataType.Instance;
             Field Field;
 
-            if (this.RestrictToOptions)
+            if (Attributes.RestrictToOptions)
             {
-                Field = new ListSingleField(Parameters, this.Name, this.Label, this.Required,
-                    new string[] { this.DefaultValue }, this.GetOptionTags(), this.Description, DataType, new BasicValidation(),
+                Field = new ListSingleField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
+                    DefaultValue, Attributes.Options, Attributes.Description, DataType, new BasicValidation(),
                     string.Empty, false, false, false);
             }
             else
             {
-                Field = new TextSingleField(Parameters, this.Name, this.Label, this.Required,
-                    new string[] { this.DefaultValue }, this.GetOptionTags(), this.Description, DataType, new BasicValidation(),
+                Field = new TextSingleField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
+                    DefaultValue, Attributes.Options, Attributes.Description, DataType, new BasicValidation(),
                     string.Empty, false, false, false);
             }
 
             Parameters.Add(Field);
 
-            Page Page = Parameters.GetPage(this.Page);
+            Page Page = Parameters.GetPage(Attributes.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Sets the parameters of the object, based on contents in the data form.
-        /// </summary>
-        /// <param name="Parameters">Data form with parameter values.</param>
-        /// <param name="Language">Current language.</param>
-        /// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
-        /// <param name="Values">Collection of parameter values.</param>
-        /// <param name="Result">Result set to return to caller.</param>
-        /// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-        public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Values,
-            SetEditableFormResult Result)
-        {
-            Field Field = Parameters[this.Name];
+		/// <summary>
+		/// Sets the parameters of the object, based on contents in the data form.
+		/// </summary>
+		/// <param name="Parameters">Data form with parameter values.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <param name="Variables">Report variables.</param>
+		/// <param name="Result">Result set to return to caller.</param>
+		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
+		public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Variables,
+			SetEditableFormResult Result)
+		{
+			string Name = await this.GetName(Variables);
+			bool Required = await this.IsRequired(Variables);
+			bool AlphaChannel = await this.alphaChannel.Evaluate(Variables);
+			Field Field = Parameters[Name];
+
             if (Field is null)
             {
-                if (this.Required)
-                    Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
+                if (Required)
+                    Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
 
-                Values[this.Name] = null;
+                Variables[Name] = null;
             }
             else
             {
@@ -105,17 +102,17 @@ namespace Waher.Reports.Files.Model.Parameters
 
                 if (string.IsNullOrEmpty(s))
                 {
-                    if (this.Required)
-						Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
+                    if (Required)
+						Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
 
-					Values[this.Name] = null;
+					Variables[Name] = null;
                 }
-                else if (this.AlphaChannel && ColorAlphaDataType.TryParse(s, out ColorReference Parsed))
-                    Values[this.Name] = Parsed;
-                else if (!this.AlphaChannel && ColorDataType.TryParse(s, out Parsed))
-                    Values[this.Name] = Parsed;
+                else if (AlphaChannel && ColorAlphaDataType.TryParse(s, out ColorReference Parsed))
+                    Variables[Name] = Parsed;
+                else if (!AlphaChannel && ColorDataType.TryParse(s, out Parsed))
+                    Variables[Name] = Parsed;
                 else
-					Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 2, "Invalid value."));
+					Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 2, "Invalid value."));
 			}
 		}
 

@@ -1,6 +1,6 @@
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Content;
+using System.Xml;
 using Waher.Content.Text;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
@@ -8,6 +8,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Reports.Model.Attributes;
 using Waher.Runtime.Language;
 using Waher.Script;
 
@@ -18,130 +19,107 @@ namespace Waher.Reports.Files.Model.Parameters
     /// </summary>
     public class TextParameter : ReportParameterWithOptions
 	{
-        private string contentType;
+		private readonly ReportStringAttribute[] defaultValue;
+		private readonly ReportStringAttribute contentType;
+		private readonly ReportUInt16Attribute minCount;
+		private readonly ReportUInt16Attribute maxCount;
+		private readonly int nrDefaultValues;
 
 		/// <summary>
 		/// Represents a text-valued parameter.
 		/// </summary>
-		/// <param name="Page">Parameter Page</param>
-		/// <param name="Name">Parameter name.</param>
-		/// <param name="Label">Parameter label.</param>
-		/// <param name="Description">Parameter description.</param>
-		/// <param name="Required">If parameter is required.</param>
-		/// <param name="RestrictToOptions">If only values defined in options are valid values.</param>
-		/// <param name="Options">Available options</param>
-		/// <param name="ContentType">Internet Content-Type of text value.</param>
-		/// <param name="DefaultValue">Default value of parameter.</param>
-		/// <param name="MinCount">Minimum number of JIDs.</param>
-		/// <param name="MaxCount">Maximum number of JIDs.</param>
-		public TextParameter(string Page, string Name, string Label, string Description,
-			bool Required, bool RestrictToOptions, ParameterOption[] Options,
-			string ContentType, string[] DefaultValue, ushort? MinCount, ushort? MaxCount)
-			: base(Page, Name, Label, Description, Required, RestrictToOptions, Options)
+		/// <param name="Xml">XML definition.</param>
+		public TextParameter(XmlElement Xml)
+			: base(Xml)
 		{
-            this.ContentType = ContentType;
-			this.DefaultValue = DefaultValue;
-			this.MinCount = MinCount;
-			this.MaxCount = MaxCount;
+			this.contentType = new ReportStringAttribute(Xml, "contentType");
+			this.minCount = new ReportUInt16Attribute(Xml, "minCount");
+			this.maxCount = new ReportUInt16Attribute(Xml, "maxCount");
+
+			List<ReportStringAttribute> DefaultValues = new List<ReportStringAttribute>();
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "DefaultValue")
+					DefaultValues.Add(new ReportStringAttribute(E, null));
+			}
+
+			this.defaultValue = DefaultValues.ToArray();
+			this.nrDefaultValues = this.defaultValue.Length;
 		}
 
-        /// <summary>
-        /// Internet Content-Type of text value.
-        /// </summary>
-        public string ContentType
-        {
-            get => this.contentType;
-            set
-            {
-                if (!string.IsNullOrEmpty(value) && (
-                    !InternetContent.IsAccepted(value, InternetContent.CanDecodeContentTypes) ||
-                    !InternetContent.IsAccepted(value, InternetContent.CanEncodeContentTypes)))
-                {
-                    throw new NotSupportedException("Content-Type not supported.");
-                }
-
-                this.contentType = value;
-            }
-        }
-
-        /// <summary>
-        /// Default parameter value.
-        /// </summary>
-        public string[] DefaultValue { get; }
-
-        /// <summary>
-        /// Minimum amount of JIDs expected.
-        /// </summary>
-        public ushort? MinCount { get; }
-
-        /// <summary>
-        /// Maximum amount of JIDs expected.
-        /// </summary>
-        public ushort? MaxCount { get; }
-
-        /// <summary>
-        /// Gets the Content-Type of the text value of the parameter.
-        /// </summary>
-        /// <returns>Internet Content-Type.</returns>
-        public string GetContentType()
-        {
-            return string.IsNullOrEmpty(this.contentType) ? PlainTextCodec.DefaultContentType : this.contentType;
-        }
-
-        /// <summary>
-        /// Populates a data form with parameters for the object.
-        /// </summary>
-        /// <param name="Parameters">Data form to host all editable parameters.</param>
-        /// <param name="Language">Current language.</param>
-        /// <param name="Value">Value for parameter.</param>
-        public override Task PopulateForm(DataForm Parameters, Language Language, object Value)
-        {
-            ValidationMethod Validation = new BasicValidation();
+		/// <summary>
+		/// Populates a data form with parameters for the object.
+		/// </summary>
+		/// <param name="Parameters">Data form to host all editable parameters.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="Variables">Report variables.</param>
+		public override async Task PopulateForm(DataForm Parameters, Language Language, Variables Variables)
+		{
+			ReportParameterWithOptionsAttributes Attributes = await this.GetReportParameterWithOptionsAttributes(Variables);
+            string ContentType = await this.contentType.Evaluate(Variables, PlainTextCodec.DefaultContentType);
+			ushort? MinCount = this.minCount.IsEmpty ? null : (ushort?)await this.minCount.Evaluate(Variables);
+			ushort? MaxCount = this.maxCount.IsEmpty ? null : (ushort?)await this.maxCount.Evaluate(Variables);
+			ValidationMethod Validation = new BasicValidation();
             Field Field;
 
-            if (this.MinCount.HasValue || this.MaxCount.HasValue)
-                Validation = new ListRangeValidation(Validation, this.MinCount ?? 0, this.MaxCount ?? ushort.MaxValue);
+            if (MinCount.HasValue || MaxCount.HasValue)
+                Validation = new ListRangeValidation(Validation, MinCount ?? 0, MaxCount ?? ushort.MaxValue);
 
-            if (this.RestrictToOptions)
+            if (Attributes.RestrictToOptions)
             {
-                Field = new ListMultiField(Parameters, this.Name, this.Label, this.Required,
-                    this.DefaultValue, this.GetOptionTags(), this.Description, StringDataType.Instance, Validation, string.Empty,
-                    false, false, false);
+                Field = new ListMultiField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
+					await this.GetDefaultValue(Variables), Attributes.Options, Attributes.Description, 
+					StringDataType.Instance, Validation, string.Empty, false, false, false);
             }
             else
             {
-                Field = new TextMultiField(Parameters, this.Name, this.Label, this.Required,
-                    this.DefaultValue, this.GetOptionTags(), this.Description, StringDataType.Instance, Validation, string.Empty,
-                    false, false, false, this.GetContentType());
+                Field = new TextMultiField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
+					await this.GetDefaultValue(Variables), Attributes.Options, Attributes.Description, 
+					StringDataType.Instance, Validation, string.Empty, false, false, false, ContentType);
             }
 
             Parameters.Add(Field);
 
-            Page Page = Parameters.GetPage(this.Page);
+            Page Page = Parameters.GetPage(Attributes.Page);
             Page.Add(Field);
-
-            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Sets the parameters of the object, based on contents in the data form.
-        /// </summary>
-        /// <param name="Parameters">Data form with parameter values.</param>
-        /// <param name="Language">Current language.</param>
-        /// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
-        /// <param name="Values">Collection of parameter values.</param>
-        /// <param name="Result">Result set to return to caller.</param>
-        /// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-        public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Values,
-            SetEditableFormResult Result)
-        {
-            Field Field = Parameters[this.Name];
+		private async Task<string[]> GetDefaultValue(Variables Variables)
+		{
+			string[] DefaultValue = new string[this.nrDefaultValues];
+			int i;
+
+			for (i = 0; i < this.nrDefaultValues; i++)
+				DefaultValue[i] = await this.defaultValue[i].Evaluate(Variables);
+
+			return DefaultValue;
+		}
+
+		/// <summary>
+		/// Sets the parameters of the object, based on contents in the data form.
+		/// </summary>
+		/// <param name="Parameters">Data form with parameter values.</param>
+		/// <param name="Language">Current language.</param>
+		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <param name="Variables">Report variables.</param>
+		/// <param name="Result">Result set to return to caller.</param>
+		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
+		public override async Task SetParameter(DataForm Parameters, Language Language, bool OnlySetChanged, Variables Variables,
+			SetEditableFormResult Result)
+		{
+			string Name = await this.GetName(Variables);
+			bool Required = await this.IsRequired(Variables);
+			ushort? MinCount = this.minCount.IsEmpty ? null : (ushort?)await this.minCount.Evaluate(Variables);
+			ushort? MaxCount = this.maxCount.IsEmpty ? null : (ushort?)await this.maxCount.Evaluate(Variables);
+			Field Field = Parameters[Name];
+
             if (Field is null)
             {
-                if (this.Required)
-                    Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
+                if (Required)
+                    Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
 
-                Values[this.Name] = null;
+                Variables[Name] = null;
             }
             else
             {
@@ -149,19 +127,19 @@ namespace Waher.Reports.Files.Model.Parameters
 
                 if (s is null || s.Length == 0)
                 {
-                    if (this.Required)
-                        Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
+                    if (Required)
+                        Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 1, "Required parameter."));
 
-                    Values[this.Name] = null;
+                    Variables[Name] = null;
                 }
                 else
                 {
-                    Values[this.Name] = s;
+                    Variables[Name] = s;
 
-					if (this.MinCount.HasValue && s.Length < this.MinCount.Value)
-						Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 5, "Too few rows."));
-					else if (this.MaxCount.HasValue && s.Length > this.MaxCount.Value)
-						Result.AddError(this.Name, await Language.GetStringAsync(typeof(ReportFileNode), 6, "Too many rows."));
+					if (MinCount.HasValue && s.Length < MinCount.Value)
+						Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 5, "Too few rows."));
+					else if (MaxCount.HasValue && s.Length > MaxCount.Value)
+						Result.AddError(Name, await Language.GetStringAsync(typeof(ReportFileNode), 6, "Too many rows."));
 				}
 			}
         }

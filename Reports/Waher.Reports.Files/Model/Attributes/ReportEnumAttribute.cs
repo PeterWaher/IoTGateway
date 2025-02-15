@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Xml;
 
 namespace Waher.Reports.Model.Attributes
@@ -29,7 +30,16 @@ namespace Waher.Reports.Model.Attributes
 			if (Enum.TryParse(typeof(T), s, true, out object Result) && Result is T TypedResult)
 				return TypedResult;
 			else
-				throw new ArgumentException("Invalid enumerated value: " + s, nameof(s));
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("Expected a value of type ");
+				sb.Append(typeof(T).FullName);
+				sb.Append(". Invalid enumerated value: ");
+				sb.Append(s);
+
+				throw new ArgumentException(sb.ToString(), nameof(s));
+			}
 		}
 	}
 }

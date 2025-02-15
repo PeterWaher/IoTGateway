@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Script;
+using Waher.Script.Exceptions;
 
 namespace Waher.Reports.Model.Attributes
 {
@@ -77,7 +79,24 @@ namespace Waher.Reports.Model.Attributes
 			}
 
 			if (this.isExpression)
-				return (T)await this.expression.EvaluateAsync(Variables);
+			{
+				object Result = await this.expression.EvaluateAsync(Variables);
+
+				if (Result is T TypedResult)
+					return TypedResult;
+				else
+				{
+					StringBuilder sb = new StringBuilder();
+
+					sb.Append("Expected a value of type ");
+					sb.Append(typeof(T).FullName);
+					sb.Append(" but got a value of type ");
+					sb.Append(Result.GetType().FullName);
+					sb.Append('.');
+
+					throw new ScriptRuntimeException(sb.ToString(), this.expression.Root);
+				}
+			}
 			else
 				return this.constant;
 		}

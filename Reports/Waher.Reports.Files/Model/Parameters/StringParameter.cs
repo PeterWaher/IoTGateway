@@ -61,13 +61,13 @@ namespace Waher.Reports.Files.Model.Parameters
 			if (Attributes.RestrictToOptions)
 			{
 				Field = new ListSingleField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
-					DefaultValue, Attributes.Options, Attributes.Description, ShortDataType.Instance, Validation,
+					DefaultValue, Attributes.Options, Attributes.Description, StringDataType.Instance, Validation,
 					string.Empty, false, false, false);
 			}
 			else
 			{
 				Field = new TextSingleField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
-					DefaultValue, Attributes.Options, Attributes.Description, ShortDataType.Instance, Validation,
+					DefaultValue, Attributes.Options, Attributes.Description, StringDataType.Instance, Validation,
 					string.Empty, false, false, false);
 			}
 

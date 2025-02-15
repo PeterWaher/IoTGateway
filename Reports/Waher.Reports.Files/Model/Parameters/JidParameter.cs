@@ -4,6 +4,7 @@ using System.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -51,13 +52,13 @@ namespace Waher.Reports.Files.Model.Parameters
 			if (Attributes.RestrictToOptions)
 			{
 				Field = new ListSingleField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
-					DefaultValue, Attributes.Options, Attributes.Description, null, new BasicValidation(),
+					DefaultValue, Attributes.Options, Attributes.Description, StringDataType.Instance, new BasicValidation(),
 					string.Empty, false, false, false);
 			}
 			else
 			{
 				Field = new JidSingleField(Parameters, Attributes.Name, Attributes.Label, Attributes.Required,
-					DefaultValue, Attributes.Options, Attributes.Description, null, new BasicValidation(),
+					DefaultValue, Attributes.Options, Attributes.Description, StringDataType.Instance, new BasicValidation(),
 					string.Empty, false, false, false);
 			}
 

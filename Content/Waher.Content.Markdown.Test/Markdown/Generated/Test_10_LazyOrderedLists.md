@@ -59,7 +59,7 @@ To put a code block within a list item, the code block needs to be indented twic
 #.	A list item with a code block\:
 	
 	```
-	<code goes here>
+	[code goes here]
 	```
 	
 

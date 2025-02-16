@@ -3363,7 +3363,7 @@ root element.
 
 The result would be as follows (new-lines and indentation added for readability):
 
-```:xml
+```xml
 <x>
 	<y value="1" sqr="1" />
 	<y value="2" sqr="4" />
@@ -3390,7 +3390,7 @@ Embedded XML and script can be nested to any level. The following example create
 
 The result of this script is as follows. Here, whitespace is included in the script definition above, and is not added afterwards for readability.
 
-```:xml
+```xml
 <MultTable>
 	<x value="1">
 		<y value="1" prod="1" /><y value="2" prod="2" /><y value="3" prod="3" /><y value="4" prod="4" /><y value="5" prod="5" />

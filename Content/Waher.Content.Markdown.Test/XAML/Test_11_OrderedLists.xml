@@ -175,7 +175,7 @@
 		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
 		<StackPanel Grid.Column="1" Grid.Row="0">
 			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">A list item with a code block:</TextBlock>
-			<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">&lt;code goes here&gt;</TextBlock>
+			<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">[code goes here]</TextBlock>
 		</StackPanel>
 	</Grid>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Nested lists:</TextBlock>

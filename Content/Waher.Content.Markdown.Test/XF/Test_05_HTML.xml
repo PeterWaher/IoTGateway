@@ -60,4 +60,61 @@
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">Command</textarea>]]></Label>
 	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[<div>]]></Label>
+	</ContentView>
+	<!--<div>-->
+	<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
+		<Label.FormattedText>
+			<FormattedString>
+				<Span Text="&#xD;&#xA;    " />
+			</FormattedString>
+		</Label.FormattedText>
+	</Label>
+	<!--<p>-->
+	<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
+		<Label.FormattedText>
+			<FormattedString>
+				<Span Text="Indented HTML is permitted, and does not generate a code block" />
+			</FormattedString>
+		</Label.FormattedText>
+	</Label>
+	<!--</p>-->
+	<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
+		<Label.FormattedText>
+			<FormattedString>
+				<Span Text="&#xD;&#xA;" />
+			</FormattedString>
+		</Label.FormattedText>
+	</Label>
+	<!--</div>-->
+	<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
+		<Label.FormattedText>
+			<FormattedString>
+				<Span Text="Can be mixed with " />
+			</FormattedString>
+		</Label.FormattedText>
+	</Label>
+	<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
+		<Label.FormattedText>
+			<FormattedString>
+				<Span Text="Markdown" FontAttributes="Italic" />
+			</FormattedString>
+		</Label.FormattedText>
+	</Label>
+	<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start">
+		<Label.FormattedText>
+			<FormattedString>
+				<Span Text="." />
+			</FormattedString>
+		</Label.FormattedText>
+	</Label>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" HorizontalTextAlignment="Start" TextType="Html"><![CDATA[</div>]]></Label>
+	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="Indentation after end of HTML block with indentation still generates code block." />
+		</StackLayout>
+	</ContentView>
 </StackLayout>

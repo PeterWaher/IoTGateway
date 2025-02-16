@@ -172,7 +172,7 @@ function CreateHTML(Args)
 		"<pre><code class=\"",
 		"nohighlight",
 		"\">",
-		"&lt;code goes here&gt;\r\n",
+		"[code goes here]\r\n",
 		"</code></pre>\r\n",
 		"</li>\r\n",
 		"</ul>\r\n",

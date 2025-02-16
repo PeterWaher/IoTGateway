@@ -129,7 +129,7 @@
 			<text>A list item with a code block:</text>
 		</paragraph>
 		<paragraph>
-			<text>&lt;code goes here&gt;</text>
+			<text>[code goes here]</text>
 		</paragraph>
 	</item>
 </bulletItems>

@@ -22,4 +22,9 @@
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">User Name:<LineBreak /><!--<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="width:20em" />--></TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
 		<!--<textarea id="command" autofocus="autofocus" wrap="hard" onkeydown="return CommandKeyDown(this,event);">-->Command<!--</textarea>--></TextBlock>
-</StackPanel>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<!--<div>-->
+	</TextBlock>
+	<!--<div>-->
+    <!--<p>-->Indented HTML is permitted, and does not generate a code block<!--</p>-->
+<!--</div>-->Can be mixed with <Italic>Markdown</Italic>.<TextBlock TextWrapping="Wrap" Margin="0,5,0,5"><!--</div>--></TextBlock><TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">Indentation after end of HTML block with indentation still generates code block.</TextBlock></StackPanel>

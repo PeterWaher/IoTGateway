@@ -139,7 +139,7 @@
 						<InlineText>A list item with a code block:</InlineText>
 					</Paragraph>
 					<CodeBlock language="" start="0" end="0" indent="0" indentString="">
-						<Row>&lt;code goes here&gt;</Row>
+						<Row>[code goes here]</Row>
 					</CodeBlock>
 				</NestedBlock>
 			</NumberedItem>

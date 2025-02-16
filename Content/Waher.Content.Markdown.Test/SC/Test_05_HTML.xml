@@ -47,3 +47,18 @@
 <paragraph>
 	<text>Command</text>
 </paragraph>
+<paragraph />
+<text>
+    </text>
+<text>Indented HTML is permitted, and does not generate a code block</text>
+<text>
+</text>
+<text>Can be mixed with </text>
+<italic>
+	<text>Markdown</text>
+</italic>
+<text>.</text>
+<paragraph />
+<paragraph>
+	<text>Indentation after end of HTML block with indentation still generates code block.</text>
+</paragraph>

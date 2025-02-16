@@ -613,6 +613,7 @@ namespace Waher.Content.Markdown
 			int Index;
 			int SectionNr = 0;
 			int InitialNrColumns = 1;
+			bool LastHtmlIndent = false;
 			bool HasSections = false;
 
 			for (BlockIndex = StartBlock; BlockIndex <= EndBlock; BlockIndex++)
@@ -621,6 +622,18 @@ namespace Waher.Content.Markdown
 
 				if (Block.Indent > 0)
 				{
+					if (LastHtmlIndent || Block.Rows[Block.Start].StartsWith("<"))    // HTML allowed to indent.
+					{
+						LastHtmlIndent = true;
+						Block.Indent = 0;
+						Content = await this.ParseBlock(Block);
+
+						foreach (MarkdownElement E in Content)
+							Elements.AddLast(E);
+
+						continue;
+					}
+
 					c = Block.Indent;
 					i = BlockIndex + 1;
 					while (i <= EndBlock && (j = Blocks[i].Indent) > 0)
@@ -661,100 +674,105 @@ namespace Waher.Content.Markdown
 					}
 					continue;
 				}
-				else if (Block.IsPrefixedBy("```", false))
+				else
 				{
-					s = Block.Rows[Block.Start];
-					i = 0;
-					foreach (char ch in s)
+					LastHtmlIndent = false;
+
+					if (Block.IsPrefixedBy("```", false))
 					{
-						if (ch == '`')
+						s = Block.Rows[Block.Start];
+						i = 0;
+						foreach (char ch in s)
+						{
+							if (ch == '`')
+								i++;
+							else
+								break;
+						}
+
+						s = s.Substring(0, i);
+
+						i = BlockIndex;
+						while (i <= EndBlock &&
+							(!(Block = Blocks[i]).Rows[Block.End].StartsWith(s) ||
+							(i == BlockIndex && Block.Start == Block.End)))
+						{
 							i++;
-						else
-							break;
-					}
-
-					s = s.Substring(0, i);
-
-					i = BlockIndex;
-					while (i <= EndBlock &&
-						(!(Block = Blocks[i]).Rows[Block.End].StartsWith(s) ||
-						(i == BlockIndex && Block.Start == Block.End)))
-					{
-						i++;
-					}
-
-					List<string> Code = new List<string>();
-					bool Complete = true;
-
-					if (i > EndBlock)
-					{
-						i = EndBlock;
-						Complete = false;
-					}
-
-					for (j = BlockIndex; j <= i; j++)
-					{
-						Block = Blocks[j];
-						if (j == BlockIndex)
-							Index = Block.Start + 1;
-						else
-						{
-							Code.Add(string.Empty);
-							Index = Block.Start;
 						}
 
-						if (j == i && Complete)
-							c = Block.End - 1;
+						List<string> Code = new List<string>();
+						bool Complete = true;
+
+						if (i > EndBlock)
+						{
+							i = EndBlock;
+							Complete = false;
+						}
+
+						for (j = BlockIndex; j <= i; j++)
+						{
+							Block = Blocks[j];
+							if (j == BlockIndex)
+								Index = Block.Start + 1;
+							else
+							{
+								Code.Add(string.Empty);
+								Index = Block.Start;
+							}
+
+							if (j == i && Complete)
+								c = Block.End - 1;
+							else
+								c = Block.End;
+
+							while (Index <= c)
+							{
+								Code.Add(Block.Rows[Index]);
+								Index++;
+							}
+						}
+
+						Block = Blocks[BlockIndex];
+						s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
+
+						CodeBlock CodeBlock;
+
+						if (s.StartsWith("base64", StringComparison.CurrentCultureIgnoreCase))
+						{
+							try
+							{
+								StringBuilder sb = new StringBuilder();
+
+								foreach (string Row in Code)
+									sb.Append(Row);
+
+								byte[] Bin = Convert.FromBase64String(sb.ToString());
+								s2 = Encoding.UTF8.GetString(Bin);
+
+								Rows = s2.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+
+								CodeBlock = new CodeBlock(this, Rows, 0, Rows.Length - 1, 0, s.Substring(6));
+							}
+							catch (Exception)
+							{
+								CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+							}
+						}
 						else
-							c = Block.End;
-
-						while (Index <= c)
-						{
-							Code.Add(Block.Rows[Index]);
-							Index++;
-						}
-					}
-
-					Block = Blocks[BlockIndex];
-					s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
-
-					CodeBlock CodeBlock;
-
-					if (s.StartsWith("base64", StringComparison.CurrentCultureIgnoreCase))
-					{
-						try
-						{
-							StringBuilder sb = new StringBuilder();
-
-							foreach (string Row in Code)
-								sb.Append(Row);
-
-							byte[] Bin = Convert.FromBase64String(sb.ToString());
-							s2 = Encoding.UTF8.GetString(Bin);
-
-							Rows = s2.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
-
-							CodeBlock = new CodeBlock(this, Rows, 0, Rows.Length - 1, 0, s.Substring(6));
-						}
-						catch (Exception)
-						{
 							CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+
+						Elements.AddLast(CodeBlock);
+
+						if (!this.syntaxHighlighting && !string.IsNullOrEmpty(CodeBlock.Language))
+						{
+							ICodeContentHtmlRenderer HtmlRenderer = CodeBlock.CodeContentHandler<ICodeContentHtmlRenderer>();
+							if (HtmlRenderer is null)
+								this.syntaxHighlighting = true;
 						}
+
+						BlockIndex = i;
+						continue;
 					}
-					else
-						CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
-
-					Elements.AddLast(CodeBlock);
-
-					if (!this.syntaxHighlighting && !string.IsNullOrEmpty(CodeBlock.Language))
-					{
-						ICodeContentHtmlRenderer HtmlRenderer = CodeBlock.CodeContentHandler<ICodeContentHtmlRenderer>();
-						if (HtmlRenderer is null)
-							this.syntaxHighlighting = true;
-					}
-
-					BlockIndex = i;
-					continue;
 				}
 
 				if (Block.IsPrefixedBy(">", false))
@@ -898,7 +916,7 @@ namespace Waher.Content.Markdown
 					Elements.AddLast(new HorizontalRule(this, Block.Rows[0]));
 					continue;
 				}
-				else if (Block.End == Block.Start && (IsUnderline(Block.Rows[0], '=', true, false)))
+				else if (Block.End == Block.Start && IsUnderline(Block.Rows[0], '=', true, false))
 				{
 					int NrColumns = Block.Rows[0].Split(whiteSpace, StringSplitOptions.RemoveEmptyEntries).Length;
 					HasSections = true;

@@ -67,6 +67,29 @@
 			<InlineText>Command</InlineText>
 			<Html><![CDATA[</textarea>]]></Html>
 		</HtmlBlock>
+		<HtmlBlock>
+			<Html><![CDATA[<div>]]></Html>
+		</HtmlBlock>
+		<Html><![CDATA[<div>]]></Html>
+		<InlineText>
+    </InlineText>
+		<Html><![CDATA[<p>]]></Html>
+		<InlineText>Indented HTML is permitted, and does not generate a code block</InlineText>
+		<Html><![CDATA[</p>]]></Html>
+		<InlineText>
+</InlineText>
+		<Html><![CDATA[</div>]]></Html>
+		<InlineText>Can be mixed with </InlineText>
+		<Emphasize>
+			<InlineText>Markdown</InlineText>
+		</Emphasize>
+		<InlineText>.</InlineText>
+		<HtmlBlock>
+			<Html><![CDATA[</div>]]></Html>
+		</HtmlBlock>
+		<CodeBlock language="" start="0" end="0" indent="0" indentString="">
+			<Row>Indentation after end of HTML block with indentation still generates code block.</Row>
+		</CodeBlock>
 	</elements>
 	<references />
 </parsedMakdown>

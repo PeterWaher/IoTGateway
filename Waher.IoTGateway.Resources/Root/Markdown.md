@@ -855,6 +855,42 @@ fewer back-ticks compared to the parent block.
 The {{AppName}} provides a pluggable architecture when it comes to rendering code blocks. Depending on the language, the code can be rendered in 
 different ways. The following subsections illustrate such renderings.
 
+#### Indentation of HTML
+
+It is common to indent HTML code, to make it easier to track nesting of HTML elements on the page.
+Since HTML can be embedded into Markdown, it is important to be able to allow such HTML code without
+converting it to code blocks. For this reason, any indented paragraph that starts with a `<` character
+will be treated as indented HTML. Instead of rendering it as a code block, the indentation is simply
+removed, and the contents parsed as normal Markdown. However, if you want to explicitly show HTML in
+a code block, do not use the indentation method. Instead prefix the HTML with <code>\`\`\`html</code>,
+and a <code>\`\`\`</code> at the end.
+
+Example of indented HTML:
+
+```html
+<div style="background-color: #f0f0f0; border: 1px solid #c0c0c0; padding: 10px;">
+
+    <p>
+
+        This is a paragraph of text, written in *Markdown*.
+
+    </p>
+
+</div>
+```
+
+This renders as:
+
+<div style="background-color: #f0f0f0; border: 1px solid #c0c0c0; padding: 10px;">
+
+    <p>
+
+        This is a paragraph of text, written in *Markdown*.
+
+    </p>
+
+</div>
+
 #### 2D Layout diagrams
 
 You can make the Markdown engine transform XML that conforms to the `http://waher.se/Schema/Layout2D.xsd` namespace directly to images,

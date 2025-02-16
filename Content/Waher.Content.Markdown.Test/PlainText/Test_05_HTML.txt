@@ -23,3 +23,11 @@ User Name:
 
 Command
 
+
+
+
+    Indented HTML is permitted, and does not generate a code block
+Can be mixed with Markdown.
+
+Indentation after end of HTML block with indentation still generates code block.
+

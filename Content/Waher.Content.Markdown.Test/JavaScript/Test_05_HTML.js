@@ -64,6 +64,27 @@ function CreateHTML(Args)
 		"<textarea id=\"command\" autofocus=\"autofocus\" wrap=\"hard\" onkeydown=\"return CommandKeyDown(this,event);\">",
 		"Command",
 		"</textarea>",
-		"\r\n"];
+		"\r\n",
+		"<div>",
+		"\r\n",
+		"<div>",
+		"\r\n    ",
+		"<p>",
+		"Indented HTML is permitted, and does not generate a code block",
+		"</p>",
+		"\r\n",
+		"</div>",
+		"Can be mixed with ",
+		"<em>",
+		"Markdown",
+		"</em>",
+		".",
+		"</div>",
+		"\r\n",
+		"<pre><code class=\"",
+		"nohighlight",
+		"\">",
+		"Indentation after end of HTML block with indentation still generates code block.\r\n",
+		"</code></pre>\r\n"];
 	return Segments.join("");
 }

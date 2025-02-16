@@ -43,30 +43,31 @@
 			<Feature Id="DemoSite" Title="Demo Site" Description="Contains content files for a quick startup site." Level="1">
 				<ComponentRef Id="ScriptWebService" />
 				<ComponentRef Id="SparqlWebService" />
-				<ComponentRef Id="ReportsFiles" />
-				<ComponentRef Id="RootFiles" />
-				<ComponentRef Id="AudioFiles" />
-				<ComponentRef Id="ImageFiles" />
-				<ComponentRef Id="ControlFiles" />
-				<ComponentRef Id="SettingsFiles" />
-				<ComponentRef Id="SnifferFiles" />
-				<ComponentRef Id="DatabaseFiles" />
-				<ComponentRef Id="PersonalDataFiles" />
-				<ComponentRef Id="TemplateFiles" />
-				<ComponentRef Id="BaseFiles" />
-				<ComponentRef Id="CactusRoseFiles" />
-				<ComponentRef Id="GothicPeacockFiles" />
-				<ComponentRef Id="Retro64Files" />
-				<ComponentRef Id="SpaceGravelFiles" />
-				<ComponentRef Id="WinterDawnFiles" />
-				<ComponentRef Id="VideoFiles" />
-				<ComponentRef Id="TransformFiles" />
-				<ComponentRef Id="DefaultFiles" />
-				<ComponentRef Id="GraphVizLabFiles" />
-				<ComponentRef Id="GraphVizLabExampleFiles" />
-				<ComponentRef Id="MarkdownLabFiles" />
-				<ComponentRef Id="PlantUmlLabFiles" />
-				<ComponentRef Id="PlantUmlLabExampleFiles" />
+				<ComponentRef Id="ReportsFolder" />
+				<ComponentRef Id="FilesReportsFolder" />
+				<ComponentRef Id="RootFolder" />
+				<ComponentRef Id="AudioFolder" />
+				<ComponentRef Id="ImageFolder" />
+				<ComponentRef Id="ControlFolder" />
+				<ComponentRef Id="SettingsFolder" />
+				<ComponentRef Id="SnifferFolder" />
+				<ComponentRef Id="DatabaseFolder" />
+				<ComponentRef Id="PersonalDataFolder" />
+				<ComponentRef Id="TemplateFolder" />
+				<ComponentRef Id="BaseFolder" />
+				<ComponentRef Id="CactusRoseFolder" />
+				<ComponentRef Id="GothicPeacockFolder" />
+				<ComponentRef Id="Retro64Folder" />
+				<ComponentRef Id="SpaceGravelFolder" />
+				<ComponentRef Id="WinterDawnFolder" />
+				<ComponentRef Id="VideoFolder" />
+				<ComponentRef Id="TransformFolder" />
+				<ComponentRef Id="DefaultFolder" />
+				<ComponentRef Id="GraphVizLabFolder" />
+				<ComponentRef Id="GraphVizLabExampleFolder" />
+				<ComponentRef Id="MarkdownLabFolder" />
+				<ComponentRef Id="PlantUmlLabFolder" />
+				<ComponentRef Id="PlantUmlLabExampleFolder" />
 			</Feature>
 			<Feature Id="Emoji1" Title="Emoji1" Description="Contains emojies from Emoji1." Level="1">
 				<ComponentRef Id="Emoji1Zip" />
@@ -75,7 +76,7 @@
 				<ComponentRef Id="HighlightStyles" />
 				<ComponentRef Id="Highlight.js" />
 			</Feature>
-			<Feature Id="LanguageFiles" Title="Language Files" Description="Contains language files. These allow you to localize the gateway." Level="1">
+			<Feature Id="LanguageFolder" Title="Language Files" Description="Contains language files. These allow you to localize the gateway." Level="1">
 				<ComponentRef Id="English" />
 			</Feature>
 			<Feature Id="Utilities" Title="Utilities" Description="Contains command-line utilities for management of the gateway." Level="1">
@@ -95,28 +96,28 @@
 				<ComponentRef Id="UtilityExtract" />
 				<ComponentRef Id="UtilityGenManifest" />
 			</Feature>
-			<Feature Id="DebugFiles" Title="Debug Files" Description="Provides debug files. This will help debugging, since it provides more information in case something goes wrong." Level="1000">
-				<ComponentRef Id="MainDebugFiles" />
-				<ComponentRef Id="MainCodeDocFiles" />
-				<ComponentRef Id="ScriptWebServiceDebugFiles" />
+			<Feature Id="DebugFolder" Title="Debug Files" Description="Provides debug files. This will help debugging, since it provides more information in case something goes wrong." Level="1000">
+				<ComponentRef Id="MainDebugFolder" />
+				<ComponentRef Id="MainCodeDocFolder" />
+				<ComponentRef Id="ScriptWebServiceDebugFolder" />
 				<ComponentRef Id="ScriptWebServiceCodeDoc" />
-				<ComponentRef Id="SparqlWebServiceDebugFiles" />
+				<ComponentRef Id="SparqlWebServiceDebugFolder" />
 				<ComponentRef Id="SparqlWebServiceCodeDoc" />
-				<ComponentRef Id="UtilityAcmeDebugFiles" />
-				<ComponentRef Id="UtilityAnalyzeClockDebugFiles" />
-				<ComponentRef Id="UtilityAnalyzeDBDebugFiles" />
-				<ComponentRef Id="UtilityAsn1ToCSharpDebugFiles" />
-				<ComponentRef Id="UtilityCspDebugFiles" />
-				<ComponentRef Id="UtilityDeleteDBDebugFiles" />
-				<ComponentRef Id="UtilityInstallDebugFiles" />
-				<ComponentRef Id="UtilityRegExDebugFiles" />
-				<ComponentRef Id="UtilitySignDebugFiles" />
-				<ComponentRef Id="UtilityTextDiffDebugFiles" />
-				<ComponentRef Id="UtilityTransformDebugFiles" />
-				<ComponentRef Id="UtilityTranslateDebugFiles" />
-				<ComponentRef Id="UtilityExStatDebugFiles" />
-				<ComponentRef Id="UtilityExtractDebugFiles" />
-				<ComponentRef Id="UtilityGenManifestDebugFiles" />
+				<ComponentRef Id="UtilityAcmeDebugFolder" />
+				<ComponentRef Id="UtilityAnalyzeClockDebugFolder" />
+				<ComponentRef Id="UtilityAnalyzeDBDebugFolder" />
+				<ComponentRef Id="UtilityAsn1ToCSharpDebugFolder" />
+				<ComponentRef Id="UtilityCspDebugFolder" />
+				<ComponentRef Id="UtilityDeleteDBDebugFolder" />
+				<ComponentRef Id="UtilityInstallDebugFolder" />
+				<ComponentRef Id="UtilityRegExDebugFolder" />
+				<ComponentRef Id="UtilitySignDebugFolder" />
+				<ComponentRef Id="UtilityTextDiffDebugFolder" />
+				<ComponentRef Id="UtilityTransformDebugFolder" />
+				<ComponentRef Id="UtilityTranslateDebugFolder" />
+				<ComponentRef Id="UtilityExStatDebugFolder" />
+				<ComponentRef Id="UtilityExtractDebugFolder" />
+				<ComponentRef Id="UtilityGenManifestDebugFolder" />
 			</Feature>
 		</Feature>
 		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
@@ -892,7 +893,7 @@
 						<RemoveFile Id="RemoveWaher.Things.Virtual.dll" Name="Waher.Things.Virtual.dll" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Things.Xmpp.dll" Name="Waher.Things.Xmpp.dll" On="uninstall" />
 					</Component>
-					<Component Id="MainDebugFiles" Guid="C4322EF9-99EE-44E1-9CD3-B310719D3661">
+					<Component Id="MainDebugFolder" Guid="C4322EF9-99EE-44E1-9CD3-B310719D3661">
 						<File Id="Waher.Content.pdb" Name="Waher.Content.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.pdb" Vital="yes" KeyPath="yes" />
 						<File Id="Waher.Content.Asn1.pdb" Name="Waher.Content.Asn1.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.pdb" Vital="yes" />
 						<File Id="Waher.Content.Dsn.pdb" Name="Waher.Content.Dsn.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Dsn.pdb" Vital="yes" />
@@ -1158,7 +1159,7 @@
 						<RemoveFile Id="RemoveWaher.Things.Virtual.pdb" Name="Waher.Things.Virtual.pdb" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Things.Xmpp.pdb" Name="Waher.Things.Xmpp.pdb" On="uninstall" />
 					</Component>
-					<Component Id="MainCodeDocFiles" Guid="3A09F298-39F6-4DE5-BB99-00F91A0038E1">
+					<Component Id="MainCodeDocFolder" Guid="3A09F298-39F6-4DE5-BB99-00F91A0038E1">
 						<File Id="Waher.Content.xml" Name="Waher.Content.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.xml" Vital="yes" KeyPath="yes" />
 						<File Id="Waher.Content.Asn1.xml" Name="Waher.Content.Asn1.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.xml" Vital="yes" />
 						<File Id="Waher.Content.Dsn.xml" Name="Waher.Content.Dsn.xml" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Dsn.xml" Vital="yes" />
@@ -1432,7 +1433,7 @@
 						<File Id="Waher.WebService.Script.dll" Name="Waher.WebService.Script.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Script.dll" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.WebService.Script.dll" Name="Waher.WebService.Script.dll" On="uninstall" />
 					</Component>
-					<Component Id="ScriptWebServiceDebugFiles" Guid="36A600A0-BBC2-4A4D-AD4D-AFBF52858CDA">
+					<Component Id="ScriptWebServiceDebugFolder" Guid="36A600A0-BBC2-4A4D-AD4D-AFBF52858CDA">
 						<File Id="Waher.WebService.Script.pdb" Name="Waher.WebService.Script.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Script.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.WebService.Script.pdb" Name="Waher.WebService.Script.pdb" On="uninstall" />
 					</Component>
@@ -1444,7 +1445,7 @@
 						<File Id="Waher.WebService.Sparql.dll" Name="Waher.WebService.Sparql.dll" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Sparql.dll" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.WebService.Sparql.dll" Name="Waher.WebService.Sparql.dll" On="uninstall" />
 					</Component>
-					<Component Id="SparqlWebServiceDebugFiles" Guid="86B1D04C-9355-4A49-9D9F-BEC64739CB60">
+					<Component Id="SparqlWebServiceDebugFolder" Guid="86B1D04C-9355-4A49-9D9F-BEC64739CB60">
 						<File Id="Waher.WebService.Sparql.pdb" Name="Waher.WebService.Sparql.pdb" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.WebService.Sparql.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.WebService.Sparql.pdb" Name="Waher.WebService.Sparql.pdb" On="uninstall" />
 					</Component>
@@ -1464,7 +1465,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Install.manifest" Name="Waher.Utility.Install.manifest" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Install.runtimeconfig.json" Name="Waher.Utility.Install.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityInstallDebugFiles" Guid="1DC3539C-A6C7-4351-B899-761A3A506B4A">
+					<Component Id="UtilityInstallDebugFolder" Guid="1DC3539C-A6C7-4351-B899-761A3A506B4A">
 						<File Id="Waher.Utility.Install.pdb" Name="Waher.Utility.Install.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Install.pdb" Name="Waher.Utility.Install.pdb" On="uninstall" />
 					</Component>
@@ -1478,7 +1479,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.RegEx.deps.json" Name="Waher.Utility.RegEx.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.RegEx.runtimeconfig.json" Name="Waher.Utility.RegEx.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityRegExDebugFiles" Guid="B6358806-B8C0-494F-9C82-26A9899340D6">
+					<Component Id="UtilityRegExDebugFolder" Guid="B6358806-B8C0-494F-9C82-26A9899340D6">
 						<File Id="Waher.Utility.RegEx.pdb" Name="Waher.Utility.RegEx.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.RegEx\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.RegEx.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.RegEx.pdb" Name="Waher.Utility.RegEx.pdb" On="uninstall" />
 					</Component>
@@ -1492,7 +1493,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Sign.deps.json" Name="Waher.Utility.Sign.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Sign.runtimeconfig.json" Name="Waher.Utility.Sign.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilitySignDebugFiles" Guid="53B02B7E-98F0-491D-8951-59C1F59EF4EF">
+					<Component Id="UtilitySignDebugFolder" Guid="53B02B7E-98F0-491D-8951-59C1F59EF4EF">
 						<File Id="Waher.Utility.Sign.pdb" Name="Waher.Utility.Sign.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Sign\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Sign.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Sign.pdb" Name="Waher.Utility.Sign.pdb" On="uninstall" />
 					</Component>
@@ -1506,7 +1507,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.AnalyzeClock.deps.json" Name="Waher.Utility.AnalyzeClock.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.AnalyzeClock.runtimeconfig.json" Name="Waher.Utility.AnalyzeClock.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityAnalyzeClockDebugFiles" Guid="131BA401-4C7D-4FE1-96F5-34D873D5BB54">
+					<Component Id="UtilityAnalyzeClockDebugFolder" Guid="131BA401-4C7D-4FE1-96F5-34D873D5BB54">
 						<File Id="Waher.Utility.AnalyzeClock.pdb" Name="Waher.Utility.AnalyzeClock.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.AnalyzeClock\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeClock.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.AnalyzeClock.pdb" Name="Waher.Utility.AnalyzeClock.pdb" On="uninstall" />
 					</Component>
@@ -1520,7 +1521,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.AnalyzeDB.deps.json" Name="Waher.Utility.AnalyzeDB.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.AnalyzeDB.runtimeconfig.json" Name="Waher.Utility.AnalyzeDB.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityAnalyzeDBDebugFiles" Guid="69D1CC1C-7F9A-4712-B8E0-44C56D1886D4">
+					<Component Id="UtilityAnalyzeDBDebugFolder" Guid="69D1CC1C-7F9A-4712-B8E0-44C56D1886D4">
 						<File Id="Waher.Utility.AnalyzeDB.pdb" Name="Waher.Utility.AnalyzeDB.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.AnalyzeDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.AnalyzeDB.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.AnalyzeDB.pdb" Name="Waher.Utility.AnalyzeDB.pdb" On="uninstall" />
 					</Component>
@@ -1534,7 +1535,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Asn1ToCSharp.deps.json" Name="Waher.Utility.Asn1ToCSharp.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Asn1ToCSharp.runtimeconfig.json" Name="Waher.Utility.Asn1ToCSharp.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityAsn1ToCSharpDebugFiles" Guid="F40DE9B1-B431-4B9C-8E9B-954C6E5B054A">
+					<Component Id="UtilityAsn1ToCSharpDebugFolder" Guid="F40DE9B1-B431-4B9C-8E9B-954C6E5B054A">
 						<File Id="Waher.Utility.Asn1ToCSharp.pdb" Name="Waher.Utility.Asn1ToCSharp.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Asn1ToCSharp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Asn1ToCSharp.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Asn1ToCSharp.pdb" Name="Waher.Utility.Asn1ToCSharp.pdb" On="uninstall" />
 					</Component>
@@ -1548,7 +1549,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Csp.deps.json" Name="Waher.Utility.Csp.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Csp.runtimeconfig.json" Name="Waher.Utility.Csp.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityCspDebugFiles" Guid="82EF62F9-E2E4-4A51-8C79-6DA184081ABE">
+					<Component Id="UtilityCspDebugFolder" Guid="82EF62F9-E2E4-4A51-8C79-6DA184081ABE">
 						<File Id="Waher.Utility.Csp.pdb" Name="Waher.Utility.Csp.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Csp\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Csp.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Csp.pdb" Name="Waher.Utility.Csp.pdb" On="uninstall" />
 					</Component>
@@ -1562,7 +1563,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.DeleteDB.deps.json" Name="Waher.Utility.DeleteDB.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.DeleteDB.runtimeconfig.json" Name="Waher.Utility.DeleteDB.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityDeleteDBDebugFiles" Guid="6AEF8EB3-9713-49D1-8CF7-89A2FCB58E4A">
+					<Component Id="UtilityDeleteDBDebugFolder" Guid="6AEF8EB3-9713-49D1-8CF7-89A2FCB58E4A">
 						<File Id="Waher.Utility.DeleteDB.pdb" Name="Waher.Utility.DeleteDB.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.DeleteDB\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.DeleteDB.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.DeleteDB.pdb" Name="Waher.Utility.DeleteDB.pdb" On="uninstall" />
 					</Component>
@@ -1576,7 +1577,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.TextDiff.deps.json" Name="Waher.Utility.TextDiff.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.TextDiff.runtimeconfig.json" Name="Waher.Utility.TextDiff.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityTextDiffDebugFiles" Guid="8BE867CF-F9B0-471A-9130-B82CCABF3BE8">
+					<Component Id="UtilityTextDiffDebugFolder" Guid="8BE867CF-F9B0-471A-9130-B82CCABF3BE8">
 						<File Id="Waher.Utility.TextDiff.pdb" Name="Waher.Utility.TextDiff.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.TextDiff\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.TextDiff.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.TextDiff.pdb" Name="Waher.Utility.TextDiff.pdb" On="uninstall" />
 					</Component>
@@ -1590,7 +1591,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Transform.deps.json" Name="Waher.Utility.Transform.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Transform.runtimeconfig.json" Name="Waher.Utility.Transform.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityTransformDebugFiles" Guid="C5BC42B0-E372-41BB-9D7E-F02DA9C38B4F">
+					<Component Id="UtilityTransformDebugFolder" Guid="C5BC42B0-E372-41BB-9D7E-F02DA9C38B4F">
 						<File Id="Waher.Utility.Transform.pdb" Name="Waher.Utility.Transform.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Transform\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Transform.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Transform.pdb" Name="Waher.Utility.Transform.pdb" On="uninstall" />
 					</Component>
@@ -1604,7 +1605,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Translate.deps.json" Name="Waher.Utility.Translate.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Translate.runtimeconfig.json" Name="Waher.Utility.Translate.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityTranslateDebugFiles" Guid="CF0BFC30-C79E-44A9-BAAD-E0C5706A802B">
+					<Component Id="UtilityTranslateDebugFolder" Guid="CF0BFC30-C79E-44A9-BAAD-E0C5706A802B">
 						<File Id="Waher.Utility.Translate.pdb" Name="Waher.Utility.Translate.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Translate\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Translate.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Translate.pdb" Name="Waher.Utility.Translate.pdb" On="uninstall" />
 					</Component>
@@ -1618,7 +1619,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.ExStat.deps.json" Name="Waher.Utility.ExStat.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.ExStat.runtimeconfig.json" Name="Waher.Utility.ExStat.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityExStatDebugFiles" Guid="CD1F82EC-9ADF-4C76-BBA9-971EE0B32EE2">
+					<Component Id="UtilityExStatDebugFolder" Guid="CD1F82EC-9ADF-4C76-BBA9-971EE0B32EE2">
 						<File Id="Waher.Utility.ExStat.pdb" Name="Waher.Utility.ExStat.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.ExStat\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.ExStat.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.ExStat.pdb" Name="Waher.Utility.ExStat.pdb" On="uninstall" />
 					</Component>
@@ -1632,7 +1633,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.Extract.deps.json" Name="Waher.Utility.Extract.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.Extract.runtimeconfig.json" Name="Waher.Utility.Extract.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityExtractDebugFiles" Guid="3CC734DD-9572-4017-8439-EF04BA07B318">
+					<Component Id="UtilityExtractDebugFolder" Guid="3CC734DD-9572-4017-8439-EF04BA07B318">
 						<File Id="Waher.Utility.Extract.pdb" Name="Waher.Utility.Extract.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Extract\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Extract.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.Extract.pdb" Name="Waher.Utility.Extract.pdb" On="uninstall" />
 					</Component>
@@ -1646,7 +1647,7 @@
 						<RemoveFile Id="RemoveWaher.Utility.GenManifest.deps.json" Name="Waher.Utility.GenManifest.deps.json" On="uninstall" />
 						<RemoveFile Id="RemoveWaher.Utility.GenManifest.runtimeconfig.json" Name="Waher.Utility.GenManifest.runtimeconfig.json" On="uninstall" />
 					</Component>
-					<Component Id="UtilityGenManifestDebugFiles" Guid="A599D6B4-DBCB-4A88-AD75-A7D2AB795BC4">
+					<Component Id="UtilityGenManifestDebugFolder" Guid="A599D6B4-DBCB-4A88-AD75-A7D2AB795BC4">
 						<File Id="Waher.Utility.GenManifest.pdb" Name="Waher.Utility.GenManifest.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.GenManifest\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.GenManifest.pdb" Vital="yes" KeyPath="yes" />
 						<RemoveFile Id="RemoveWaher.Utility.GenManifest.pdb" Name="Waher.Utility.GenManifest.pdb" On="uninstall" />
 					</Component>
@@ -1882,7 +1883,7 @@
 							<RemoveFile Id="RemoveWaher.Utility.Acme.deps.json" Name="Waher.Utility.Acme.deps.json" On="uninstall" />
 							<RemoveFile Id="RemoveWaher.Utility.Acme.runtimeconfig.json" Name="Waher.Utility.Acme.runtimeconfig.json" On="uninstall" />
 						</Component>
-						<Component Id="UtilityAcmeDebugFiles" Guid="9AF24263-A6A4-40B6-9CC1-EE03E0B69E88">
+						<Component Id="UtilityAcmeDebugFolder" Guid="9AF24263-A6A4-40B6-9CC1-EE03E0B69E88">
 							<File Id="Waher.Utility.Acme.pdb" Name="Waher.Utility.Acme.pdb" DiskId="1" Source="..\Utilities\Waher.Utility.Acme\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Acme.pdb" Vital="yes" KeyPath="yes" />
 							<RemoveFile Id="RemoveWaher.Utility.Acme.pdb" Name="Waher.Utility.Acme.pdb" On="uninstall" />
 						</Component>
@@ -1908,7 +1909,7 @@
 					</RegistryKey>
 				</Component>
 				<Directory Id="Default" Name="Default">
-					<Component Id="DefaultFiles" Guid="EB99A294-F810-478D-800E-8688AAE4D940">
+					<Component Id="DefaultFolder" Guid="EB99A294-F810-478D-800E-8688AAE4D940">
 						<CreateFolder>
 							<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 						</CreateFolder>
@@ -1994,7 +1995,7 @@
 					</Component>
 				</Directory>
 				<Directory Id="REPORTSDIR" Name="Reports">
-					<Component Id="ReportsFiles" Guid="20DC423C-A506-429D-8E14-F90E1030EA9F">
+					<Component Id="ReportsFolder" Guid="20DC423C-A506-429D-8E14-F90E1030EA9F">
 						<CreateFolder>
 							<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 						</CreateFolder>
@@ -2003,9 +2004,22 @@
 						</RegistryKey>
 						<RemoveFolder Id="RemoveReports" On="uninstall" />
 					</Component>
+					<Directory Id="FILESREPORTSDIR" Name="Files">
+						<Component Id="FilesReportsFolder" Guid="A7AFAAFF-F2A9-4923-AF80-BFD0A5B4F93B">
+							<CreateFolder>
+								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
+							</CreateFolder>
+							<RegistryKey Root="HKLM" Key="Software\[Manufacturer]\[ProductName]">
+								<RegistryValue Type="string" Name="FilesReportsDir" Value="[FILESREPORTSDIR]" Action="write" />
+							</RegistryKey>
+							<RemoveFolder Id="RemoveFilesReports" On="uninstall" />
+							<File Id="CompareFolders.rpx" Name="CompareFolders.rpx" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Reports\Files\CompareFolders.rpx" KeyPath="yes" />
+							<RemoveFile Id="RemoveCompareFolders.rpx" Name="CompareFolders.rpx" On="uninstall" />
+						</Component>
+					</Directory>
 				</Directory>
 				<Directory Id="ROOTDIR" Name="Root">
-					<Component Id="RootFiles" Guid="FAAC1B8A-39C9-4ABE-996D-0B7688990DC3">
+					<Component Id="RootFolder" Guid="FAAC1B8A-39C9-4ABE-996D-0B7688990DC3">
 						<CreateFolder>
 							<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 						</CreateFolder>
@@ -2095,7 +2109,7 @@
 						<RemoveFile Id="RemoveTargetBlank.js" Name="TargetBlank.js" On="uninstall" />
 					</Component>
 					<Directory Id="Audio" Name="Audio">
-						<Component Id="AudioFiles" Guid="315A0BCE-D9DB-4BF9-B9CE-8E0D400D5A06">
+						<Component Id="AudioFolder" Guid="315A0BCE-D9DB-4BF9-B9CE-8E0D400D5A06">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2107,11 +2121,11 @@
 						</Component>
 					</Directory>
 					<Directory Id="Controls" Name="Controls">
-						<Component Id="ControlFiles" Guid="9C6C1624-B970-4770-9245-798252976610">
+						<Component Id="ControlFolder" Guid="9C6C1624-B970-4770-9245-798252976610">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
-							<RemoveFolder Id="ControlFiles" On="uninstall" />
+							<RemoveFolder Id="RemoveControlFolder" On="uninstall" />
 							<File Id="SimpleTable.script" Name="SimpleTable.script" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTable.script" Vital="yes" KeyPath="yes" />
 							<File Id="SimpleTree.cssx" Name="SimpleTree.cssx" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.cssx" Vital="yes" />
 							<File Id="SimpleTree.js" Name="SimpleTree.js" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.js" Vital="yes" />
@@ -2121,7 +2135,7 @@
 						</Component>
 					</Directory>
 					<Directory Id="GraphVizLab" Name="GraphVizLab">
-						<Component Id="GraphVizLabFiles" Guid="4AFED4EB-8449-4C59-9762-1A9E99679507">
+						<Component Id="GraphVizLabFolder" Guid="4AFED4EB-8449-4C59-9762-1A9E99679507">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2136,7 +2150,7 @@
 							<RemoveFile Id="RemoveGraphVizLabGraph.md" Name="GraphVizLabGraph.md" On="uninstall" />
 						</Component>
 						<Directory Id="GraphVizLabExamples" Name="Examples">
-							<Component Id="GraphVizLabExampleFiles" Guid="DAECB288-AA9F-401B-929D-BBB51743DB98">
+							<Component Id="GraphVizLabExampleFolder" Guid="DAECB288-AA9F-401B-929D-BBB51743DB98">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2147,7 +2161,7 @@
 						</Directory>
 					</Directory>
 					<Directory Id="Images" Name="Images">
-						<Component Id="ImageFiles" Guid="66D950BA-6795-45CA-9943-38F483CA658B">
+						<Component Id="ImageFolder" Guid="66D950BA-6795-45CA-9943-38F483CA658B">
 							<RemoveFolder Id="RemoveImages" On="uninstall" />
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
@@ -2169,7 +2183,7 @@
 						</Component>
 					</Directory>
 					<Directory Id="MarkdownLab" Name="MarkdownLab">
-						<Component Id="MarkdownLabFiles" Guid="05D23AA3-AB3D-4771-9E54-77D49AF3E120">
+						<Component Id="MarkdownLabFolder" Guid="05D23AA3-AB3D-4771-9E54-77D49AF3E120">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2207,7 +2221,7 @@
 						</Component>
 					</Directory>
 					<Directory Id="PlantUmlLab" Name="PlantUmlLab">
-						<Component Id="PlantUmlLabFiles" Guid="48A2AE1F-B266-480C-BCE7-BABAA26F4832">
+						<Component Id="PlantUmlLabFolder" Guid="48A2AE1F-B266-480C-BCE7-BABAA26F4832">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2222,7 +2236,7 @@
 							<RemoveFile Id="RemovePlantUmlLabGraph.md" Name="PlantUmlLabGraph.md" On="uninstall" />
 						</Component>
 						<Directory Id="PlantUmlLabExamples" Name="Examples">
-							<Component Id="PlantUmlLabExampleFiles" Guid="E562C2EF-A8B2-42E6-B8F4-D56D138E702F">
+							<Component Id="PlantUmlLabExampleFolder" Guid="E562C2EF-A8B2-42E6-B8F4-D56D138E702F">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2267,11 +2281,11 @@
 						</Directory>
 					</Directory>
 					<Directory Id="Settings" Name="Settings">
-						<Component Id="SettingsFiles" Guid="13A2665D-91CB-45D3-9739-0236C82065FD">
+						<Component Id="SettingsFolder" Guid="13A2665D-91CB-45D3-9739-0236C82065FD">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
-							<RemoveFolder Id="SettingsFiles" On="uninstall" />
+							<RemoveFolder Id="RemoveSettingsFolder" On="uninstall" />
 							<File Id="Backup.js" Name="Backup.js" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.js" KeyPath="yes" />
 							<File Id="Backup.md" Name="Backup.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\Backup.md" />
 							<File Id="ChangePassword.md" Name="ChangePassword.md" DiskId="1" Source="..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Settings\ChangePassword.md" />
@@ -2350,7 +2364,7 @@
 							<RemoveFile Id="RemoveXMPP.md" Name="XMPP.md" On="uninstall" />
 						</Component>
 						<Directory Id="Database" Name="Database">
-							<Component Id="DatabaseFiles" Guid="1F5D29D1-7E5F-425E-BD02-151A6B117F3D">
+							<Component Id="DatabaseFolder" Guid="1F5D29D1-7E5F-425E-BD02-151A6B117F3D">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2360,7 +2374,7 @@
 							</Component>
 						</Directory>
 						<Directory Id="PersonalData" Name="PersonalData">
-							<Component Id="PersonalDataFiles" Guid="4C73E63A-EA2B-4BE9-9DFA-228538513FA2">
+							<Component Id="PersonalDataFolder" Guid="4C73E63A-EA2B-4BE9-9DFA-228538513FA2">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2381,7 +2395,7 @@
 						</Directory>
 					</Directory>
 					<Directory Id="Sniffers" Name="Sniffers">
-						<Component Id="SnifferFiles" Guid="9B93F989-9F8E-4BB9-9488-6C9B9E602E37">
+						<Component Id="SnifferFolder" Guid="9B93F989-9F8E-4BB9-9488-6C9B9E602E37">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2405,7 +2419,7 @@
 						</Component>
 					</Directory>
 					<Directory Id="Templates" Name="Templates">
-						<Component Id="TemplateFiles" Guid="627A90AF-D6C1-41B1-814A-043B7B626E98">
+						<Component Id="TemplateFolder" Guid="627A90AF-D6C1-41B1-814A-043B7B626E98">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2416,7 +2430,7 @@
 					</Directory>
 					<Directory Id="Themes" Name="Themes">
 						<Directory Id="Base" Name="Base">
-							<Component Id="BaseFiles" Guid="7BA0AC78-EC60-4015-A31C-9DE19E6730A7">
+							<Component Id="BaseFolder" Guid="7BA0AC78-EC60-4015-A31C-9DE19E6730A7">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2426,7 +2440,7 @@
 							</Component>
 						</Directory>
 						<Directory Id="CactusRose" Name="CactusRose">
-							<Component Id="CactusRoseFiles" Guid="3FA99AE1-D6B0-486E-B5E6-8CFC05ECA306">
+							<Component Id="CactusRoseFolder" Guid="3FA99AE1-D6B0-486E-B5E6-8CFC05ECA306">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2454,7 +2468,7 @@
 							</Component>
 						</Directory>
 						<Directory Id="GothicPeacock" Name="GothicPeacock">
-							<Component Id="GothicPeacockFiles" Guid="C00E2CC5-8FBC-4390-B77D-7428A499557A">
+							<Component Id="GothicPeacockFolder" Guid="C00E2CC5-8FBC-4390-B77D-7428A499557A">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2482,7 +2496,7 @@
 							</Component>
 						</Directory>
 						<Directory Id="Retro64" Name="Retro64">
-							<Component Id="Retro64Files" Guid="F380999F-3FEB-4B07-8846-32B1B0811C97">
+							<Component Id="Retro64Folder" Guid="F380999F-3FEB-4B07-8846-32B1B0811C97">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2496,7 +2510,7 @@
 							</Component>
 						</Directory>
 						<Directory Id="SpaceGravel" Name="SpaceGravel">
-							<Component Id="SpaceGravelFiles" Guid="1BBE23EC-09F7-44CE-BB4D-31C91403E8E4">
+							<Component Id="SpaceGravelFolder" Guid="1BBE23EC-09F7-44CE-BB4D-31C91403E8E4">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2514,7 +2528,7 @@
 							</Component>
 						</Directory>
 						<Directory Id="WinterDawn" Name="WinterDawn">
-							<Component Id="WinterDawnFiles" Guid="84D79AA3-B199-43EF-8772-5C38DDF72F2D">
+							<Component Id="WinterDawnFolder" Guid="84D79AA3-B199-43EF-8772-5C38DDF72F2D">
 								<CreateFolder>
 									<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 								</CreateFolder>
@@ -2543,7 +2557,7 @@
 						</Directory>
 					</Directory>
 					<Directory Id="Video" Name="Video">
-						<Component Id="VideoFiles" Guid="B9D37E9B-7288-43E3-87A1-E04E3EEA9BFB">
+						<Component Id="VideoFolder" Guid="B9D37E9B-7288-43E3-87A1-E04E3EEA9BFB">
 							<CreateFolder>
 								<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 							</CreateFolder>
@@ -2562,7 +2576,7 @@
 					</Directory>
 				</Directory>
 				<Directory Id="Transforms" Name="Transforms">
-					<Component Id="TransformFiles" Guid="14F7FAEC-E30A-457A-86A3-B107D7810E19">
+					<Component Id="TransformFolder" Guid="14F7FAEC-E30A-457A-86A3-B107D7810E19">
 						<CreateFolder>
 							<util:PermissionEx GenericAll="yes" User="NT AUTHORITY\LocalService" />
 						</CreateFolder>
@@ -2628,7 +2642,7 @@
 		<StandardDirectory Id="ProgramMenuFolder">
 			<Directory Id="ProgramMenuDir" Name="IoT Gateway 1.0">
 				<Component Id="ProgramMenuDir" Guid="82C7DECC-4B2F-4C9C-87D0-6F35A6ED162C">
-					<RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+					<RemoveFolder Id="RemoveProgramMenuDir" On="uninstall" />
 					<RegistryKey Root="HKCU" Key="Software\[Manufacturer]\[ProductName]">
 						<RegistryValue Type="string" Value="" KeyPath="yes" Action="write" />
 					</RegistryKey>

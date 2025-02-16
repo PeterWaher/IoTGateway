@@ -1,0 +1,255 @@
+<Report xmlns="http://waher.se/Schema/ReportFile.xsd" originVariable="Origin">
+	<Privilege>Admin.Data.Files</Privilege>
+	<Title>Compare Folders</Title>
+	<Parameters>
+		<String name="SourceFolder" label="Source Folder:" description="Path to the source folder."
+						required="true" page="Folders"
+						default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.SourceFolder','')}" />
+		<String name="DestinationFolder" label="Destination Folder:" description="Path to the destination folder."
+						required="true" page="Folders"
+						default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.DestinationFolder','')}"/>
+		<Boolean name="Recursive" label="Include subfolders recursively." description="If checked, all files in all subfolders will be included in the comparison, recursively."
+						 required="false" page="Folders"
+						 default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.Recursive',false)}"/>
+		<Boolean name="ShowAll" label="Show all files found." description="If checked, a separate section with all files found will be displayed."
+						 required="false" page="Folders"
+						 default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.ShowAll',true)}"/>
+		<Boolean name="ShowAdded" label="Show added files found." description="If checked, a separate section with only all the added files will be displayed."
+						 required="false" page="Folders"
+						 default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.ShowAdded',true)}"/>
+		<Boolean name="ShowRemoved" label="Show removed files found." description="If checked, a separate section with only all the removed files will be displayed."
+						 required="false" page="Folders"
+						 default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.ShowRemoved',true)}"/>
+		<Boolean name="ShowChanged" label="Show changed files found." description="If checked, a separate section with only all the changed files will be displayed."
+						 required="false" page="Folders"
+						 default="{GetUserSetting(Origin,'Reports.Files.CompareFolders.ShowChanged',true)}"/>
+	</Parameters>
+	<Content>
+		<Section header="Input">
+			<Script>
+				<![CDATA[
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.SourceFolder',SourceFolder);
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.DestinationFolder',DestinationFolder);
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.Recursive',Recursive);
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.ShowAll',ShowAll);
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.ShowAdded',ShowAdded);
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.ShowRemoved',ShowRemoved);
+				SetUserSetting(Origin,'Reports.Files.CompareFolders.ShowChanged',ShowChanged);
+				]]>
+			</Script>
+			<CreateTable tableId="Input" name="Input Parameters">
+				<Column columnId="Name" alignment="Left" header="Name"/>
+				<Column columnId="Value" alignment="Left" header="Value"/>
+			</CreateTable>
+			<TableRecords tableId="Input">
+				<Record>
+					<Element>Source Folder</Element>
+					<Element>{SourceFolder}</Element>
+				</Record>
+				<Record>
+					<Element>Destination Folder</Element>
+					<Element>{DestinationFolder}</Element>
+				</Record>
+				<Record>
+					<Element>Include subfolders</Element>
+					<Element>{Recursive ? "✓" : ""}</Element>
+				</Record>
+				<Record>
+					<Element>Show all files</Element>
+					<Element>{ShowAll ? "✓" : ""}</Element>
+				</Record>
+				<Record>
+					<Element>Show added files</Element>
+					<Element>{ShowAdded ? "✓" : ""}</Element>
+				</Record>
+				<Record>
+					<Element>Show removed files</Element>
+					<Element>{ShowRemoved ? "✓" : ""}</Element>
+				</Record>
+				<Record>
+					<Element>Show changed files</Element>
+					<Element>{ShowChanged ? "✓" : ""}</Element>
+				</Record>
+			</TableRecords>
+			<TableComplete tableId="Input"/>
+		</Section>
+		<Script>
+			<![CDATA[
+			SrcFiles:={};
+			DestFiles:={};
+			AllFiles:={};
+			AddedFiles:={};
+			RemovedFiles:={};
+			ChangedFiles:={};
+			HasAdded:=false;
+			HasRemoved:=false;
+			HasChanged:=false;
+			Mode:=Recursive ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly;
+			]]>
+		</Script>
+		<Status>Analyzing source folder...</Status>
+		<Script>
+			<![CDATA[
+			foreach FileName in System.IO.Directory.GetFiles(SourceFolder,"*.*",Mode) do
+			(
+				Bin:=LoadFile(FileName,"binary");
+				H:=Base64Encode(Sha2_256(Bin));
+				s:=After(FileName,SourceFolder);
+				if StartsWith(s,"\\") or StartsWith(s,"/") then s:=s.Substring(1);
+				SrcFiles[s]:=H;
+				AllFiles[s]:=true;
+			);
+			]]>
+		</Script>
+		<Status>Analyzing destination folder...</Status>
+		<Script>
+			<![CDATA[
+			foreach FileName in System.IO.Directory.GetFiles(DestinationFolder,"*.*",Mode) do
+			(
+				Bin:=LoadFile(FileName,"binary");
+				H:=Base64Encode(Sha2_256(Bin));
+				s:=After(FileName,DestinationFolder);
+				if StartsWith(s,"\\") or StartsWith(s,"/") then s:=s.Substring(1);
+				DestFiles[s]:=H;
+				AllFiles[s]:=true;
+			);
+			]]>
+		</Script>
+		<Status>Comparing differences...</Status>
+		<Script>
+			<![CDATA[
+			foreach FileName in AllFiles.Keys do
+			(
+				SrcH:=null;
+				InSrc:=SrcFiles.TryGetValue(FileName,SrcH);
+				
+				DstH:=null;
+				InDest:=DestFiles.TryGetValue(FileName,DstH);
+				
+				if InSrc and !InDest then
+				(
+					HasAdded:=true;
+					AddedFiles[FileName]:=true;
+				);
+				
+				if !InSrc and InDest then
+				(
+					HasRemoved:=true;
+					RemovedFiles[FileName]:=true;
+				);
+					
+				if (Changed:=SrcH!=DstH and InSrc and InDest) then
+				(
+					HasChanged:=true;
+					ChangedFiles[FileName]:=true;
+				);
+			);
+			]]>
+		</Script>
+		<Conditional>
+			<If condition="ShowAll">
+				<Section header="All Files">
+					<Conditional>
+						<If condition="AllFiles.Count>0">
+							<CreateTable tableId="AllFiles" name="All Files">
+								<Column columnId="File" alignment="Left" header="File Name"/>
+								<Column columnId="InSource" alignment="Center" header="Src"/>
+								<Column columnId="InDestination" alignment="Center" header="Dest"/>
+								<Column columnId="Changed" alignment="Center" header="Changed"/>
+							</CreateTable>
+							<ForEach variable="FileName" set="Sort(AllFiles.Keys)">
+								<TableRecords tableId="AllFiles">
+									<Record>
+										<Element>{FileName}</Element>
+										<Element>{InSrc ? "✓" : ""}</Element>
+										<Element>{InDest ? "✓" : ""}</Element>
+										<Element>{Changed ? "✓" : ""}</Element>
+									</Record>
+								</TableRecords>
+							</ForEach>
+							<TableComplete tableId="AllFiles"/>
+						</If>
+						<Else>
+							<Object>No files found.</Object>
+						</Else>
+					</Conditional>
+				</Section>
+			</If>
+		</Conditional>
+		<Conditional>
+			<If condition="ShowAdded">
+				<Section header="Added Files">
+					<Conditional>
+						<If condition="HasAdded">
+							<Status>Listing added files...</Status>
+							<CreateTable tableId="AddedFiles" name="Added Files">
+								<Column columnId="File" alignment="Left" header="File Name"/>
+							</CreateTable>
+							<ForEach variable="FileName" set="Sort(AddedFiles.Keys)">
+								<TableRecords tableId="AddedFiles">
+									<Record>
+										<Element>{FileName}</Element>
+									</Record>
+								</TableRecords>
+							</ForEach>
+							<TableComplete tableId="AddedFiles"/>
+						</If>
+						<Else>
+							<Object>No added files found.</Object>
+						</Else>
+					</Conditional>
+				</Section>
+			</If>
+		</Conditional>
+		<Conditional>
+			<If condition="ShowRemoved">
+				<Section header="Removed Files">
+					<Conditional>
+						<If condition="HasRemoved">
+							<Status>Listing removed files...</Status>
+							<CreateTable tableId="RemovedFiles" name="Removed Files">
+								<Column columnId="File" alignment="Left" header="File Name"/>
+							</CreateTable>
+							<ForEach variable="FileName" set="Sort(RemovedFiles.Keys)">
+								<TableRecords tableId="RemovedFiles">
+									<Record>
+										<Element>{FileName}</Element>
+									</Record>
+								</TableRecords>
+							</ForEach>
+							<TableComplete tableId="RemovedFiles"/>
+						</If>
+						<Else>
+							<Object>No removed files found.</Object>
+						</Else>
+					</Conditional>
+				</Section>
+			</If>
+		</Conditional>
+		<Conditional>
+			<If condition="ShowChanged">
+				<Section header="Changed Files">
+					<Conditional>
+						<If condition="HasChanged">
+							<Status>Listing changed files...</Status>
+							<CreateTable tableId="ChangedFiles" name="Changed Files">
+								<Column columnId="File" alignment="Left" header="File Name"/>
+							</CreateTable>
+							<ForEach variable="FileName" set="Sort(ChangedFiles.Keys)">
+								<TableRecords tableId="ChangedFiles">
+									<Record>
+										<Element>{FileName}</Element>
+									</Record>
+								</TableRecords>
+							</ForEach>
+							<TableComplete tableId="ChangedFiles"/>
+						</If>
+						<Else>
+							<Object>No changed files found.</Object>
+						</Else>
+					</Conditional>
+				</Section>
+			</If>
+		</Conditional>
+	</Content>
+</Report>

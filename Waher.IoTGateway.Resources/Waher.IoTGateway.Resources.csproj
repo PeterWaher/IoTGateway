@@ -169,6 +169,7 @@
     <None Remove="Highlight\styles\xcode.css" />
     <None Remove="Highlight\styles\xt256.css" />
     <None Remove="Highlight\styles\zenburn.css" />
+    <None Remove="Reports\Files\CompareFolders.rpx" />
     <None Remove="Root\Admin.cssx" />
     <None Remove="Root\Admin.md" />
     <None Remove="Root\Audio\glass_ping-Go445-1207030150.mp3" />
@@ -693,6 +694,9 @@
     <Content Include="Highlight\styles\zenburn.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Reports\Files\CompareFolders.rpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\GraphVizLab\Examples\Network.dot">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -995,9 +999,6 @@
     <None Update="Root\PromptPopup.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Reports\" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" Condition="'$(OS)'=='Windows_NT'" />

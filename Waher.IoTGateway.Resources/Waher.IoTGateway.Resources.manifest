@@ -147,6 +147,9 @@
 		</Folder>
 	</Folder>
 	<Folder name="Reports">
+		<Folder name="Files">
+			<Content fileName="CompareFolders.rpx"/>
+		</Folder>
 	</Folder>
 	<Folder name="Root">
 		<Content fileName="Admin.cssx"/>

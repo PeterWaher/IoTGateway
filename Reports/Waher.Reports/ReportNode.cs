@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Things;
@@ -14,6 +15,7 @@ namespace Waher.Reports
 	{
 		private List<ReportNode> children = null;
 		private readonly string nodeId;
+		private readonly string localNodeId;
 		private readonly ReportNode parent;
 		private readonly object syncObj = new object();
 
@@ -26,6 +28,7 @@ namespace Waher.Reports
 		{
 			this.nodeId = NodeId;
 			this.parent = Parent;
+			this.localNodeId = Path.GetFileName(NodeId);
 
 			this.parent?.AddChild(this);
 		}
@@ -48,7 +51,7 @@ namespace Waher.Reports
 		/// <summary>
 		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
 		/// </summary>
-		public virtual string LocalId => this.nodeId;
+		public virtual string LocalId => this.localNodeId;
 
 		/// <summary>
 		/// If provided, an ID for the node, as it would appear or be used in system logs. Can be null, if Log ID equal to Node ID.

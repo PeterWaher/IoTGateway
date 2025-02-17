@@ -58,8 +58,8 @@
     <MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<Exec Command="dotnet publish -o:&quot;..\Clients\Waher.Client.WPF\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj&quot;"/>
 
-		<MSBuild Projects="..\Waher.IoTGateway.Setup.Windows.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
-		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Setup.Windows\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Waher.IoTGateway.Setup.Windows.csproj&quot;"/>
+		<MSBuild Projects="..\Waher.IoTGateway.Setup.Windows\Waher.IoTGateway.Setup.Windows.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Setup.Windows\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Waher.IoTGateway.Setup.Windows\Waher.IoTGateway.Setup.Windows.csproj&quot;"/>
 
 	</Target>
 

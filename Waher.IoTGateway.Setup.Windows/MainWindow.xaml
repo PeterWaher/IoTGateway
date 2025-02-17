@@ -1,0 +1,69 @@
+﻿<Window x:Class="Waher.IoTGateway.Setup.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" WindowStartupLocation="CenterScreen"
+        Title="Installing IoT Gateway™" Height="700" Width="800"
+		DataContext="{Binding ElementName=self}"
+		Initialized="Window_Initialized" Closing="Window_Closing" Closed="Window_Closed">
+	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
+		<StackPanel Name="MainPanel" Orientation="Vertical">
+			<Label FontSize="25" FontWeight="Bold">
+				<TextBlock TextWrapping="Wrap">
+					<Underline>Welcome to IoT Gateway™ installer</Underline>
+				</TextBlock>
+			</Label>
+			<Label FontSize="15">
+				<TextBlock TextWrapping="Wrap">This application helps you to install <Hyperlink NavigateUri="https://lils.is" RequestNavigate="Hyperlink_RequestNavigate">IoT Gateway</Hyperlink>™ on your local machine. The utility can be used to install multiple instances of IoT Gateway™, if you like. An <Italic>instance</Italic>, is a named separately running version of IoT Gateway™, using its own separate account (which does not have to be the same as the instance name). This tool can also uninstall and remove existing instances, if they were previously installed using this tool.</TextBlock>
+			</Label>
+			<Label FontSize="15">
+				<TextBlock TextWrapping="Wrap">
+					<Bold>Note: </Bold>
+					You do not need to update existing installations of IoT Gateway™ using this tool. IoT Gateway™ keeps itself updated. You will be notified every time IoT Gateway™ updates itself. If you suspect an instance cannot update itself, or is broken, you can update or repair it by pressing the corresponding button below.
+				</TextBlock>
+			</Label>
+			<StackPanel Name="InstallationsFound" HorizontalAlignment="Left" Width="auto">
+				<Label FontSize="20">
+					<TextBlock TextWrapping="Wrap">
+						<Underline>Installations Found on the machine</Underline>
+					</TextBlock>
+				</Label>
+				<StackPanel Name="InstallationsFoundCommand" Orientation="Vertical" HorizontalAlignment="Left" Width="auto">
+					<Button FontSize="15" Margin="10,10,0,10" Padding="20,5,20,5" Width="500" MinWidth="50" HorizontalAlignment="Left"
+							Background="DarkGreen" Foreground="White" Command="{Binding InstallNewInstance}">
+						<TextBlock TextWrapping="Wrap">Install another instance of IoT Gateway™ on machine.</TextBlock>
+					</Button>
+					<Button FontSize="15" Margin="10,10,0,10" Padding="20,5,20,5" Command="{Binding Quit}" 
+							HorizontalAlignment="Left" Width="500" MinWidth="50">Quit</Button>
+				</StackPanel>
+			</StackPanel>
+			<StackPanel Name="NoInstallationsFound" HorizontalAlignment="Left" Width="auto">
+				<Label FontSize="20">
+					<TextBlock TextWrapping="Wrap">
+						<Underline>No installations found on the machine</Underline>
+					</TextBlock>
+				</Label>
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Left" Width="auto">
+					<Button FontSize="15" Margin="10,10,0,10" Padding="20,5,20,5" Command="{Binding InstallDefault}" 
+							HorizontalAlignment="Left" Background="DarkGreen" Foreground="White" Width="500" MinWidth="50">
+						<TextBlock TextWrapping="Wrap">Install IoT Gateway™ on machine.</TextBlock>
+					</Button>
+					<Button FontSize="15" Margin="10,10,0,10" Padding="20,5,20,5" Command="{Binding Quit}" 
+							HorizontalAlignment="Left" Width="500" MinWidth="50">Quit</Button>
+				</StackPanel>
+			</StackPanel>
+			<Frame Name="StatusSeparator" BorderBrush="Black" BorderThickness="0.5" Margin="10"/>
+			<Label FontSize="15" HorizontalAlignment="Center">
+				<TextBlock TextWrapping="Wrap">
+					<Run>The following </Run>
+					<Run FontStyle="Italic">installation log</Run>
+					<Run> is available in</Run>
+					<Hyperlink Name="InstallationLogFile" NavigateUri="http://example.com" RequestNavigate="Hyperlink_RequestNavigate"/><Run>.</Run>
+				</TextBlock>
+			</Label>
+			<StackPanel Name="LogEntries" Orientation="Vertical">
+			</StackPanel>
+		</StackPanel>
+	</ScrollViewer>
+</Window>

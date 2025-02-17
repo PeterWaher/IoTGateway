@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<StartupObject>Waher.IoTGateway.Setup.Windows.App</StartupObject>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="EventXmlToHtml.xslt" />
+		<None Remove="Gateway.config" />
+		<None Remove="IoTGateway.package" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <COMReference Include="IWshRuntimeLibrary">
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>1</VersionMajor>
+	    <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+	    <Lcid>0</Lcid>
+	    <Isolated>false</Isolated>
+	    <EmbedInteropTypes>true</EmbedInteropTypes>
+	  </COMReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="EventXmlToHtml.xslt" />
+		<EmbeddedResource Include="Gateway.config" />
+		<EmbeddedResource Include="IoTGateway.package" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="System.IO.Pipelines" Version="9.0.0" />
+	  <PackageReference Include="System.Management" Version="9.0.0" />
+	  <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\IoTGateway\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Content\Waher.Content\Waher.Content.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Events\Waher.Events.Files\Waher.Events.Files.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Events\Waher.Events\Waher.Events.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Networking\Waher.Networking\Waher.Networking.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+		<ProjectReference Include="..\..\IoTGateway\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="copy &quot;$(SolutionDir)..\IoTGateway\Utilities\Waher.Utility.Install\Program.cs&quot; &quot;$(ProjectDir)UtilityInstall.cs&quot; /Y&#xD;&#xA;xcopy &quot;$(SolutionDir)..\IoTGateway.package&quot; /Y" />
+	</Target>
+
+</Project>

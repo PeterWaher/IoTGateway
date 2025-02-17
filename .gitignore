@@ -16,6 +16,9 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+# Package Files
+*.package
+
 # Compiler output
 bin/
 obj/

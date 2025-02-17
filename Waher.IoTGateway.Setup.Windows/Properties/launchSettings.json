@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Waher.IoTGateway.Setup.Windows": {
+      "commandName": "Project"
+    }
+  }
+}

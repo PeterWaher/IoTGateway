@@ -1,0 +1,23 @@
+﻿<Window x:Class="Waher.IoTGateway.Setup.Windows.ProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Waher.IoTGateway.Setup.Windows"
+        mc:Ignorable="d" FontSize="15" DataContext="{Binding ElementName=self}"
+        Title="Installation progress." Height="125" Width="450" WindowStartupLocation="CenterOwner">
+	<DockPanel LastChildFill="True" Margin="10">
+		<Grid DockPanel.Dock="Top">
+			<TextBlock TextWrapping="Wrap" Visibility="{Binding InstallingFiles, Converter={local:BooleanToVisibility}}">
+				<Run Text="{Binding NrFilesCopied}"/>
+				<Run>of</Run>
+				<Run Text="{Binding NrFilesExpected}"/>
+				<Run>files copied. (</Run><Run Text="{Binding ProgressPercent}"/><Run> %)</Run>
+			</TextBlock>
+			<TextBlock TextWrapping="Wrap" Visibility="{Binding HasInstallationStatus}">
+				<Run Text="{Binding InstallationStatus}"/>
+			</TextBlock>
+		</Grid>
+		<ProgressBar Value="{Binding ProgressPercent}" Margin="10"/>
+	</DockPanel>
+</Window>

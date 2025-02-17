@@ -1,0 +1,41 @@
+﻿<Window x:Class="Waher.IoTGateway.Setup.Windows.InstanceNameDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Waher.IoTGateway.Setup.Windows"
+        mc:Ignorable="d" FontSize="15" Initialized="Window_Initialized"
+		FocusManager.FocusedElement="{Binding ElementName=InstanceName}"
+        Title="Enter an Instance Name" Height="450" Width="600"
+		WindowStartupLocation="CenterOwner">
+	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10">
+		<StackPanel Orientation="Vertical">
+			<Label Margin="10">
+				<TextBlock TextWrapping="Wrap">You need to provide an <Italic>Instance Name</Italic> to proceed. Instance names are used to keep instances and their data separated. A valid instance name consists of letters a-z or A-Z, or digits 0-9.</TextBlock>
+			</Label>
+			<Label Margin="10,0,10,0" Padding="0">
+				<TextBlock TextWrapping="Wrap">Instance Name:</TextBlock>
+			</Label>
+			<TextBox Name="InstanceName" Margin="10,0,10,0" TextChanged="CheckInput"/>
+			<Label Margin="10,10,10,0" Padding="0">
+				<TextBlock TextWrapping="Wrap">Service Port: <Run Foreground="Red">*</Run></TextBlock>
+			</Label>
+			<TextBox Name="PortNumber" Margin="10,0,10,0" TextChanged="CheckInput"/>
+			<Label Margin="10,0,10,0" Foreground="Red">
+				<TextBlock TextWrapping="Wrap" Name="Message"></TextBlock>
+			</Label>
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+				<WrapPanel Orientation="Horizontal" Width="auto">
+					<Button Name="OkButton" Width="150" Margin="10" Padding="20,0,20,0" IsEnabled="False" IsDefault="true" Click="OkButton_Click">OK</Button>
+					<Button Name="CancelButton" Width="150" Margin="10" Padding="20,0,20,0" IsCancel="True">Cancel</Button>
+				</WrapPanel>
+			</StackPanel>
+			<Label Margin="10,0,10,0" Foreground="Red">
+				<TextBlock TextWrapping="Wrap">
+					<Run Foreground="Red">*</Run>
+					<Run Foreground="{DynamicResource {x:Static SystemColors.WindowTextColor}}">The Service Port is a port number used by the browser to view the IoT Gateway™. The default port number is 80, which corresponds to the default port for the HTTP protocol. You can also use other alternative HTTP port numbers, if you use 80 for something. Examples could be 8080, 8081, 8082, etc.</Run>
+				</TextBlock>
+			</Label>
+		</StackPanel>
+	</ScrollViewer>
+</Window>

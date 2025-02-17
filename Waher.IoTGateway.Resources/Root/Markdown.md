@@ -867,7 +867,7 @@ and a <code>\`\`\`</code> at the end.
 
 Example of indented HTML:
 
-```html
+```
 <div style="background-color: #f0f0f0; border: 1px solid #c0c0c0; padding: 10px;">
 
     <p>

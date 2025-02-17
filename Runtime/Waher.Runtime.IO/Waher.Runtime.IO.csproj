@@ -17,9 +17,9 @@
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageTags>IO extensions streams files strings certificates</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
-		<AssemblyVersion>1.0.0</AssemblyVersion>
-		<FileVersion>1.0.0</FileVersion>
-		<Version>1.0.0</Version>
+		<AssemblyVersion>1.0.1</AssemblyVersion>
+		<FileVersion>1.0.1</FileVersion>
+		<Version>1.0.1</Version>
 		<PackageIconUrl />
 		<FileUpgradeFlags>40</FileUpgradeFlags>
 		<UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Runtime\Waher.Runtime.IO\</UpgradeBackupLocation>

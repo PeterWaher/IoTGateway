@@ -13,6 +13,7 @@ using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Things;
 using Waher.Things.Attributes;
 
 namespace Waher.Networking.XMPP.Concentrator
@@ -30,14 +31,16 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="e">IQ Event Arguments describing the request.</param>
 		/// <param name="EditableObject">Object whose parameters will be edited.</param>
 		/// <param name="Title">Title of form.</param>
+		/// <param name="Origin">Origin of request.</param>
 		/// <returns>Data form containing editable parameters.</returns>
-		public static async Task<DataForm> GetEditableForm(XmppClient Client, IqEventArgs e, object EditableObject, string Title)
+		public static async Task<DataForm> GetEditableForm(XmppClient Client, IqEventArgs e, 
+			object EditableObject, string Title, IRequestOrigin Origin)
 		{
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
 
-			return await GetEditableForm(Client, Language, e.From, e.To, EditableObject, Title);
+			return await GetEditableForm(Client, Language, e.From, e.To, EditableObject, Title, Origin);
 		}
 
 		/// <summary>
@@ -49,15 +52,17 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="To">To addres</param>
 		/// <param name="EditableObject">Object whose parameters will be edited.</param>
 		/// <param name="Title">Title of form.</param>
+		/// <param name="Origin">Origin of request.</param>
 		/// <returns>Data form containing editable parameters.</returns>
-		public static async Task<DataForm> GetEditableForm(XmppClient Client, Language Language, string From, string To, object EditableObject, string Title)
+		public static async Task<DataForm> GetEditableForm(XmppClient Client, Language Language, 
+			string From, string To, object EditableObject, string Title, IRequestOrigin Origin)
 		{
 			Type T = EditableObject.GetType();
 			DataForm Parameters = new DataForm(Client, FormType.Form, To, From);
 
 			if (EditableObject is IEditableObject Editable)
 			{
-				await Editable.PopulateForm(Parameters, Language);
+				await Editable.PopulateForm(Parameters, Language, Origin);
 
 				if (!(Parameters.Pages is null))
 				{
@@ -676,13 +681,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="EditableObject">Object whose parameters will be set.</param>
 		/// <param name="Form">Data Form.</param>
 		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <param name="Origin">Origin of request.</param>
 		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-		public static async Task<SetEditableFormResult> SetEditableForm(IqEventArgs e, object EditableObject, DataForm Form, bool OnlySetChanged)
+		public static async Task<SetEditableFormResult> SetEditableForm(IqEventArgs e, object EditableObject, DataForm Form, bool OnlySetChanged, IRequestOrigin Origin)
 		{
 			Type T = EditableObject.GetType();
 			string DefaultLanguageCode = GetDefaultLanguageCode(T);
 			Language Language = await ConcentratorServer.GetLanguage(e.Query, DefaultLanguageCode);
-			return await SetEditableForm(Language, EditableObject, Form, OnlySetChanged);
+			return await SetEditableForm(Language, EditableObject, Form, OnlySetChanged, Origin);
 		}
 
 		/// <summary>
@@ -692,11 +698,12 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="EditableObject">Object whose parameters will be set.</param>
 		/// <param name="Form">Data Form.</param>
 		/// <param name="OnlySetChanged">If only changed parameters are to be set.</param>
+		/// <param name="Origin">Origin of request.</param>
 		/// <returns>Any errors encountered, or null if parameters was set properly.</returns>
-		public static async Task<SetEditableFormResult> SetEditableForm(Language Language, object EditableObject, DataForm Form, bool OnlySetChanged)
+		public static async Task<SetEditableFormResult> SetEditableForm(Language Language, object EditableObject, DataForm Form, bool OnlySetChanged, IRequestOrigin Origin)
 		{
 			if (EditableObject is IEditableObject Editable)
-				return await Editable.SetParameters(Form, Language, OnlySetChanged);
+				return await Editable.SetParameters(Form, Language, OnlySetChanged, Origin);
 			else
 			{
 				Type T = EditableObject.GetType();

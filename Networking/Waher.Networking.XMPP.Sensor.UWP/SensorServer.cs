@@ -376,16 +376,35 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Request">Sensor-data request object.</param>
 		/// <returns>If approved or partially approved, the result will contain the information about what has
 		/// been approved. If not approved, null is returned.</returns>
-		public Task<ApprovedReadoutParameters> CanReadAsync(string RequestorBareJid, SensorDataRequest Request)
+		public async Task<ApprovedReadoutParameters> CanReadAsync(string RequestorBareJid, SensorDataRequest Request)
 		{
 			RequestOrigin Origin = new RequestOrigin(RequestorBareJid,
 				Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 				Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
 				Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
-				null);
+				await this.GetAuthority(RequestorBareJid));
 
-			return this.CanReadAsync(Request.Types, Request.Nodes, Request.FieldNames, Origin);
+			return await this.CanReadAsync(Request.Types, Request.Nodes, Request.FieldNames, Origin);
 		}
+
+		/// <summary>
+		/// Gets an authority for a given Bare JID. If no appropriate authority is found, 
+		/// null is returned.
+		/// </summary>
+		/// <param name="BareJid">Bare JID</param>
+		/// <returns>Authority if found, or null otherwise.</returns>
+		public async Task<IRequestOrigin> GetAuthority(string BareJid)
+		{
+			AuthorityEventArgs e = new AuthorityEventArgs(BareJid);
+			await this.AssignAuthority.Raise(this, e, false);
+			return e.Authority;
+		}
+
+		/// <summary>
+		/// Event raised when a Bare JID needs to be assigned an authority for
+		/// authorization of privileged operations.
+		/// </summary>
+		public event EventHandlerAsync<AuthorityEventArgs> AssignAuthority;
 
 		/// <summary>
 		/// Checks if a requestor is permitted to read a nodes or set of nodes.

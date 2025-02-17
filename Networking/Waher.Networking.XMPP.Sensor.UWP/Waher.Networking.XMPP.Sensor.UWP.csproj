@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApprovedReadoutParameters.cs" />
+    <Compile Include="AuthorityEventArgs.cs" />
     <Compile Include="CustomSensorDataClientRequest.cs" />
     <Compile Include="FieldSubscriptionRule.cs" />
     <Compile Include="InternalReadoutErrorsEventArgs.cs" />

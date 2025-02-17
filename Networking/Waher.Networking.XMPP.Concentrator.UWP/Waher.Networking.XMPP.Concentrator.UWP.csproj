@@ -212,6 +212,10 @@
       <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
       <Name>Waher.Runtime.Timing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
+      <Name>Waher.Script</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
       <Name>Waher.Security</Name>

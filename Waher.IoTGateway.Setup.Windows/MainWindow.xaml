@@ -15,13 +15,7 @@
 				</TextBlock>
 			</Label>
 			<Label FontSize="15">
-				<TextBlock TextWrapping="Wrap">This application helps you to install <Hyperlink NavigateUri="https://lils.is" RequestNavigate="Hyperlink_RequestNavigate">IoT Gateway</Hyperlink>™ on your local machine. The utility can be used to install multiple instances of IoT Gateway™, if you like. An <Italic>instance</Italic>, is a named separately running version of IoT Gateway™, using its own separate account (which does not have to be the same as the instance name). This tool can also uninstall and remove existing instances, if they were previously installed using this tool.</TextBlock>
-			</Label>
-			<Label FontSize="15">
-				<TextBlock TextWrapping="Wrap">
-					<Bold>Note: </Bold>
-					You do not need to update existing installations of IoT Gateway™ using this tool. IoT Gateway™ keeps itself updated. You will be notified every time IoT Gateway™ updates itself. If you suspect an instance cannot update itself, or is broken, you can update or repair it by pressing the corresponding button below.
-				</TextBlock>
+				<TextBlock TextWrapping="Wrap">This application helps you to install <Hyperlink NavigateUri="https://waher.se/IoTGateway/Index.md" RequestNavigate="Hyperlink_RequestNavigate">IoT Gateway</Hyperlink>™ on your local machine. The utility can be used to install multiple instances of IoT Gateway™, if you like. An <Italic>instance</Italic>, is a named separately running version of IoT Gateway™, using its own separate account (which does not have to be the same as the instance name). This tool can also uninstall and remove existing instances, if they were previously installed using this tool.</TextBlock>
 			</Label>
 			<StackPanel Name="InstallationsFound" HorizontalAlignment="Left" Width="auto">
 				<Label FontSize="20">

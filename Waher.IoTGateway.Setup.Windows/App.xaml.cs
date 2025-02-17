@@ -333,7 +333,7 @@ namespace Waher.IoTGateway.Setup.Windows
 			{
 				Log.Informational("Updating or repairing instance '" + InstanceName + "'.");
 
-				if (StopService(InstanceName, ProgramDataFolder))
+				if (StopService(InstanceName))
 					return true;
 
 				PortNumber = GetPort(ProgramDataFolder);
@@ -491,54 +491,6 @@ namespace Waher.IoTGateway.Setup.Windows
 			return Errors;
 		}
 
-		private static void AddToRegistry(RegistryKey Key, string Path, params KeyValuePair<string?, object>[] Parameters)
-		{
-			Log.Informational("Adding registry entry.", Key.Name + "\\" + Path, Parameters);
-
-			RegistryKey? SubKey = Key.OpenSubKey(Path, true)
-				?? Key.CreateSubKey(Path, true);
-
-			foreach (KeyValuePair<string?, object> P in Parameters)
-				SubKey.SetValue(P.Key, P.Value);
-		}
-
-		private static void DeleteRegistryKey(RegistryKey Key, string Path)
-		{
-			Log.Informational("Deleting registry entry.", Key.Name + "\\" + Path);
-
-			try
-			{
-				Key.DeleteSubKeyTree(Path, true);
-			}
-			catch (Exception ex)
-			{
-				Log.Error("Unable to delete registry key: " + ex.Message);
-			}
-		}
-
-		private static void DeleteRegistryKey(RegistryKey Key, string Path, string Value)
-		{
-			Log.Informational("Deleting registry entry value.", Key.Name + "\\" + Path + "\\" + Value);
-
-			try
-			{
-				RegistryKey? SubKey = Key.OpenSubKey(Path, true);
-				if (SubKey is null)
-				{
-					Log.Warning("Subkey not found.");
-					return;
-				}
-
-				SubKey.DeleteValue(Value, true);
-
-				Key.DeleteValue(Path, true);
-			}
-			catch (Exception ex)
-			{
-				Log.Error("Unable to delete registry key value: " + ex.Message);
-			}
-		}
-
 		internal static void LogProcessStart(string Message, ProcessStartInfo StartInfo)
 		{
 			Log.Informational(Message,
@@ -553,7 +505,7 @@ namespace Waher.IoTGateway.Setup.Windows
 				new KeyValuePair<string, object>("UseShellExecute", StartInfo.UseShellExecute));
 		}
 
-		internal static bool StopService(string InstanceName, string ProgramDataFolder)
+		internal static bool StopService(string InstanceName)
 		{
 			string ServiceName = "IoT Gateway Service";
 			if (!string.IsNullOrEmpty(InstanceName))
@@ -637,7 +589,7 @@ namespace Waher.IoTGateway.Setup.Windows
 			string ProgramDataFolder = Path.Combine(AppData, string.IsNullOrEmpty(InstanceName) ? "IoT Gateway" : "IoT Gateway " + InstanceName);
 			bool Error = false;
 
-			if (StopService(InstanceName, ProgramDataFolder))
+			if (StopService(InstanceName))
 				return true;
 
 			Log.Informational("Unregistering Windows Service...");

@@ -26,7 +26,7 @@ namespace Waher.IoTGateway.Setup.Windows
 	/// </summary>
 	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
-		private const int NrFilesExpected = 1800;
+		private const int NrFilesExpected = 1586;
 
 		private static MainWindow? instance = null;
 		private readonly Dictionary<string, bool> instancesFound = [];
@@ -487,8 +487,12 @@ namespace Waher.IoTGateway.Setup.Windows
 				}
 				finally
 				{
-					Log.Unregister(InstallationProcess);
+					Log.Informational("Installation completed.",
+						new KeyValuePair<string, object>("NrFilesCopied", Progress.NrFilesCopied),
+						new KeyValuePair<string, object>("NrFilesSkipped", Progress.NrFilesSkipped),
+						new KeyValuePair<string, object>("NrFilesDeleted", Progress.NrFilesDeleted));
 
+					Log.Unregister(InstallationProcess);
 					Progress.Close();
 
 					await this.ShowInstallationResult(Errors, PortNumber);
@@ -1134,6 +1138,11 @@ namespace Waher.IoTGateway.Setup.Windows
 				}
 				finally
 				{
+					Log.Informational("Uninstallation completed.",
+						new KeyValuePair<string, object>("NrFilesCopied", InstallationProcess.NrFilesCopied),
+						new KeyValuePair<string, object>("NrFilesSkipped", InstallationProcess.NrFilesSkipped),
+						new KeyValuePair<string, object>("NrFilesDeleted", InstallationProcess.NrFilesDeleted));
+
 					Log.Unregister(InstallationProcess);
 					await this.ShowUninstallationResult(Errors);
 				}

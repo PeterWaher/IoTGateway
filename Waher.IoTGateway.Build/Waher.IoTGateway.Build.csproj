@@ -13,7 +13,6 @@
 
   <Target Name="BuildSetup">
 		<MSBuild Projects="..\Waher.IoTGateway\Waher.IoTGateway.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
-		<MSBuild Projects="..\Waher.IoTGateway.Installers\Waher.IoTGateway.Installers.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 
 		<MSBuild Projects="..\Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 

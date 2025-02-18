@@ -9,6 +9,7 @@ using Waher.Content.Getters;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.Events;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Networking.XMPP.Software
 {
@@ -437,7 +438,19 @@ namespace Waher.Networking.XMPP.Software
 		/// <param name="PackageInfo">Information about the software package.</param>
 		/// <returns>Filename of downloaded file.</returns>
 		/// <exception cref="GenericException">If package no longer exists, or is not acceissible, and therefore could not be downloaded.</exception>
-		public async Task<string> DownloadPackageAsync(Package PackageInfo)
+		public Task<string> DownloadPackageAsync(Package PackageInfo)
+		{
+			return this.DownloadPackageAsync(PackageInfo, null);
+		}
+
+		/// <summary>
+		/// Downloads a software package.
+		/// </summary>
+		/// <param name="PackageInfo">Information about the software package.</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <returns>Filename of downloaded file.</returns>
+		/// <exception cref="GenericException">If package no longer exists, or is not acceissible, and therefore could not be downloaded.</exception>
+		public async Task<string> DownloadPackageAsync(Package PackageInfo, TemporaryStream Destination)
 		{
 			string FileName = Path.Combine(this.packageFolder, PackageInfo.FileName);
 			int MaxRetryDelayMinutes = 5;
@@ -449,7 +462,7 @@ namespace Waher.Networking.XMPP.Software
 
 				try
 				{
-					ContentStreamResponse Content = await InternetContent.GetTempStreamAsync(new Uri(PackageInfo.Url), 120000);
+					ContentStreamResponse Content = await InternetContent.GetTempStreamAsync(new Uri(PackageInfo.Url), 120000, Destination);
 
 					if (Content.HasError)
 					{

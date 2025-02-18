@@ -202,12 +202,44 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Destination, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional callback method for validating remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, null, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination,
+			params KeyValuePair<string, string>[] Headers)
 		{
 			Tuple<string, byte[], Uri, Exception> T = await this.GetAndDecrypt(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
 
@@ -216,11 +248,12 @@ namespace Waher.Networking.XMPP.HTTPX
 				string ContentType = T.Item1;
 				byte[] Bin = T.Item2;
 
-				TemporaryStream Result = new TemporaryStream();
-				await Result.WriteAsync(Bin, 0, Bin.Length);
-				Result.Position = 0;
+				Destination ??= new TemporaryStream();
 
-				return new ContentStreamResponse(ContentType, Result);
+				await Destination.WriteAsync(Bin, 0, Bin.Length);
+				Destination.Position = 0;
+
+				return new ContentStreamResponse(ContentType, Destination);
 			}
 			else
 				return new ContentStreamResponse(T.Item4);

@@ -279,11 +279,43 @@ namespace Waher.Content.Getters
 		/// <param name="Uri">URI</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Destination, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
-		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
 			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, null, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination, 
+			params KeyValuePair<string, string>[] Headers)
 		{
 			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)
@@ -299,7 +331,7 @@ namespace Waher.Content.Getters
 				{
 					PrepareHeaders(Request, Headers, Handler);
 
-					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
+					HttpResponseMessage Response = await HttpClient.SendAsync(Request, HttpCompletionOption.ResponseHeadersRead);
 
 					if (!Response.IsSuccessStatusCode)
 					{
@@ -308,20 +340,30 @@ namespace Waher.Content.Getters
 					}
 
 					string ContentType = Response.Content.Headers.ContentType.ToString();
-					TemporaryStream File = new TemporaryStream();
+					bool TempStreamCreated = false;
+
+					if (Destination is null)
+					{
+						Destination = new TemporaryStream();
+						TempStreamCreated = true;
+					}
+
 					try
 					{
-						await Response.Content.CopyToAsync(File);
+						await Response.Content.CopyToAsync(Destination);
 					}
 					catch (Exception ex)
 					{
-						File.Dispose();
-						File = null;
+						if (TempStreamCreated)
+						{
+							Destination.Dispose();
+							Destination = null;
+						}
 
 						return new ContentStreamResponse(ex);
 					}
 
-					return new ContentStreamResponse(ContentType, File);
+					return new ContentStreamResponse(ContentType, Destination);
 				}
 			}
 		}

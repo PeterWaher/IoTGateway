@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Temporary;
 
 namespace Waher.Content
 {
@@ -1251,7 +1252,19 @@ namespace Waher.Content
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
-			return GetTempStreamAsync(Uri, null, null, Headers);
+			return GetTempStreamAsync(Uri, null, null, null, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			return GetTempStreamAsync(Uri, null, null, Destination, Headers);
 		}
 
 		/// <summary>
@@ -1263,7 +1276,20 @@ namespace Waher.Content
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
-			return GetTempStreamAsync(Uri, Certificate, null, Headers);
+			return GetTempStreamAsync(Uri, Certificate, null, null, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			return GetTempStreamAsync(Uri, Certificate, null, Destination, Headers);
 		}
 
 		/// <summary>
@@ -1287,12 +1313,43 @@ namespace Waher.Content
 		/// Gets a (possibly big) resource, given its URI.
 		/// </summary>
 		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
+				return Task.FromResult(new ContentStreamResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
+
+			return Getter.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, Destination, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return GetTempStreamAsync(Uri, null, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, int TimeoutMs, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			return GetTempStreamAsync(Uri, null, null, TimeoutMs, Destination, Headers);
 		}
 
 		/// <summary>
@@ -1313,6 +1370,21 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="Uri">Uniform resource identifier.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs,
+			TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+		{
+			return GetTempStreamAsync(Uri, Certificate, null, TimeoutMs, Destination, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
@@ -1324,6 +1396,26 @@ namespace Waher.Content
 				return Task.FromResult(new ContentStreamResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
 
 			return Getter.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Gets a (possibly big) resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Destination">Optional destination. Content will be output to this stream. If not provided, a new temporary stream will be created.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+		public static Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
+			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination, 
+			params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
+				return Task.FromResult(new ContentStreamResponse(new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri))));
+
+			return Getter.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, Destination, Headers);
 		}
 
 		#endregion

@@ -109,7 +109,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				await e.IqError(new StanzaErrors.ForbiddenException("End-to-end encryption required.", e.IQ));
 				return;
 			}
-			
+
 			string Method = XML.Attribute(e.Query, "method");
 			string Resource = XML.Attribute(e.Query, "resource");
 			string Version = XML.Attribute(e.Query, "version");
@@ -144,7 +144,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						break;
 
 					case "data":
-						Header = new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme, 
+						Header = new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
 							this.server.VanityResources, HeaderFields.ToArray());
 
 						foreach (XmlNode N2 in N.ChildNodes)
@@ -190,7 +190,7 @@ namespace Waher.Networking.XMPP.HTTPX
 										this.server.VanityResources, HeaderFields.ToArray());
 
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
-										new HttpRequest(this.server, Header, File, e.From, e.To, e.UsesE2eEncryption), 
+										new HttpRequest(this.server, Header, File, e.From, e.To, e.UsesE2eEncryption),
 										e.E2eEncryption, e.E2eReference, File, MaxChunkSize, Sipub, Ibb, Socks5, Jingle, PostResource));
 									return;
 
@@ -218,11 +218,11 @@ namespace Waher.Networking.XMPP.HTTPX
 			Header ??= new HttpRequestHeader(Method, Resource, Version, HttpxGetter.HttpxUriScheme,
 				this.server.VanityResources, HeaderFields.ToArray());
 
-			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From, e.To, e.UsesE2eEncryption), 
+			await this.Process(e.Id, e.From, e.To, new HttpRequest(this.server, Header, DataStream, e.From, e.To, e.UsesE2eEncryption),
 				e.E2eEncryption, e.E2eReference, MaxChunkSize, PostResource, Ibb, Socks5);
 		}
 
-		internal async Task Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e, 
+		internal async Task Process(string Id, string From, string To, HttpRequest Request, IEndToEndEncryption E2e,
 			string EndpointReference, int MaxChunkSize, string PostResource, bool Ibb, bool Socks5)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
@@ -275,7 +275,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								if (!string.IsNullOrEmpty(Challenge))
 									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 							}
-							
+
 							await this.SendQuickResponse(Request, E2e, EndpointReference, Id, From, To, 401, "Unauthorized", false, MaxChunkSize, Challenges.ToArray());
 							Request.Dispose();
 							return;
@@ -322,8 +322,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			Request.Dispose();
 		}
 
-		private async Task ExecuteRequest(IEndToEndEncryption E2e, string EndpointReference, string Id, string From, string To, 
-            int MaxChunkSize, string PostResource, bool Ibb, bool Socks5, HttpRequest Request, HttpResource Resource)
+		private async Task ExecuteRequest(IEndToEndEncryption E2e, string EndpointReference, string Id, string From, string To,
+			int MaxChunkSize, string PostResource, bool Ibb, bool Socks5, HttpRequest Request, HttpResource Resource)
 		{
 			HttpResponse Response = null;
 
@@ -345,8 +345,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private Task SendQuickResponse(HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference, string Id, string To, 
-            string From, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, params KeyValuePair<string, string>[] HeaderFields)
+		private Task SendQuickResponse(HttpRequest Request, IEndToEndEncryption E2e, string EndpointReference, string Id, string To,
+			string From, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, params KeyValuePair<string, string>[] HeaderFields)
 		{
 			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null, null), this.server, Request)
 			{
@@ -389,7 +389,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			return Task.CompletedTask;
 		}
 
-		internal async Task<ContentStreamResponse> GetLocalTempStreamAsync(string LocalUrl)
+		internal async Task<ContentStreamResponse> GetLocalTempStreamAsync(string LocalUrl, TemporaryStream Destination)
 		{
 			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, new Script.Variables());
 			int Code = T.Item1;
@@ -399,18 +399,27 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Code < 200 || Code >= 300)
 				return new ContentStreamResponse(new HttpException(Code, HttpException.GetStatusMessage(Code), Bin, ContentType));
 
-			TemporaryStream f = new TemporaryStream();
+			bool DestinationCreated = false;
+
+			if (Destination is null)
+			{
+				Destination = new TemporaryStream();
+				DestinationCreated = true;
+			}
+
 			try
 			{
-				await f.WriteAsync(Bin, 0, Bin.Length);
+				await Destination.WriteAsync(Bin, 0, Bin.Length);
 			}
 			catch (Exception ex)
 			{
-				f.Dispose();
+				if (DestinationCreated)
+					Destination.Dispose();
+
 				return new ContentStreamResponse(ex);
 			}
 
-			return new ContentStreamResponse(ContentType, f);
+			return new ContentStreamResponse(ContentType, Destination);
 		}
 
 	}

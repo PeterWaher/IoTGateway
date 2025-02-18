@@ -140,11 +140,13 @@ namespace Waher.Runtime.Temporary
 				File.Position = Pos;
 				this.stream.Dispose();
 				this.stream = File;
+				File = null;
 
 				this.checkSize = false;
 			}
 			catch (Exception ex)
 			{
+				File?.Dispose();
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}
@@ -161,11 +163,13 @@ namespace Waher.Runtime.Temporary
 				File.Position = Pos;
 				this.stream.Dispose();
 				this.stream = File;
+				File = null;
 
 				this.checkSize = false;
 			}
 			catch (Exception ex)
 			{
+				File?.Dispose();
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}

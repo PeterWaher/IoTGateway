@@ -1,43 +1,34 @@
-﻿using System.IO;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Runtime.Temporary
 {
 	/// <summary>
-	/// Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
-	/// The class provides an even letting the caller receive events on progress.
+	/// Class managing the contents of a temporary stream. When the class is disposed, any temporary file is deleted.
+	/// The class provides an event letting the caller receive events on progress.
 	/// </summary>
-	public class TemporaryProgressFile : TemporaryFile
+	public class TemporaryProgressStream : TemporaryStream
 	{
 		private long nrReadTotal = 0;
 		private long nrWrittenTotal = 0;
 
 		/// <summary>
-		/// Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
+		/// Class managing the contents of a temporary stream. When the class is disposed, any temporary file is deleted.
+		/// The class provides an event letting the caller receive events on progress.
 		/// </summary>
-		public TemporaryProgressFile()
+		public TemporaryProgressStream()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
+		/// Class managing the contents of a temporary stream. When the class is disposed, any temporary file is deleted.
+		/// The class provides an event letting the caller receive events on progress.
 		/// </summary>
-		/// <param name="FileName">Name of temporary file. Call <see cref="Path.GetTempFileName()"/> to get a new temporary file name.</param>
-		public TemporaryProgressFile(string FileName)
-			: base(FileName)
-		{
-		}
-
-		/// <summary>
-		/// Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
-		/// </summary>
-		/// <param name="FileName">Name of temporary file. Call <see cref="Path.GetTempFileName()"/> to get a new temporary file name.</param>
 		/// <param name="BufferSize">Buffer size.</param>
-		public TemporaryProgressFile(string FileName, int BufferSize)
-			: base(FileName, BufferSize)
+		public TemporaryProgressStream(int BufferSize)
+			: base(BufferSize)
 		{
 		}
 

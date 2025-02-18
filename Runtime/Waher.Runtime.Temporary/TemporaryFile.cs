@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Runtime.Temporary
@@ -69,18 +70,26 @@ namespace Waher.Runtime.Temporary
 			if (!(this.fileName is null))
 			{
 				if (this.deleteWhenDisposed)
-				{
-					try
-					{
-						File.Delete(this.fileName);
-					}
-					catch (Exception ex)
-					{
-						Log.Exception(ex);
-					}
-				}
+					DeleteFile(FileName);
 
 				this.fileName = null;
+			}
+		}
+
+		private static void DeleteFile(string FileName)
+		{
+			try
+			{
+				if (File.Exists(FileName))
+					File.Delete(FileName);
+			}
+			catch (IOException)		// File locked. Wait a while and try again.
+			{
+				Task.Delay(10000).ContinueWith((T) => DeleteFile(FileName));
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 	}

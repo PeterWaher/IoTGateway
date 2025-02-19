@@ -1042,8 +1042,8 @@ namespace Waher.IoTGateway
 				webServer.Register(root = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true, HostDomainOptions.UseDomainSubfolders));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(httpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", GoToDefaultPage);
-				webServer.Register(new HttpConfigurableFileResource("/robots.txt", Path.Combine(rootFolder, "robots.txt"), PlainTextCodec.DefaultContentType));
-				webServer.Register(new HttpConfigurableFileResource("/favicon.ico", Path.Combine(rootFolder, "favicon.ico"), ImageCodec.ContentTypeIcon));
+				webServer.Register(new HttpConfigurableFileResource("/robots.txt", Path.Combine(rootFolder, "robots.txt"), PlainTextCodec.DefaultContentType, true));
+				webServer.Register(new HttpConfigurableFileResource("/favicon.ico", Path.Combine(rootFolder, "favicon.ico"), ImageCodec.ContentTypeIcon, false));
 				webServer.Register(new ClientEvents());
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());

@@ -506,6 +506,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Task EarlyHint(string Resource, string Relation,
 			params KeyValuePair<string, string>[] AdditionalParameters)
 		{
+			if (Resource.Length > 256)
+				return Task.CompletedTask;
+
 			if (this.earlyHintsSent is null)
 				this.earlyHintsSent = new Dictionary<string, EarlyHintRec>();
 

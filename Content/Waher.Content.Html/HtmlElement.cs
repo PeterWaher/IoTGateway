@@ -414,5 +414,12 @@ namespace Waher.Content.Html
 			else
 				return string.Empty;
 		}
+
+		/// <summary>
+		/// Gets a given attribute value, if available. The empty string is returned if the attribute does not exist.
+		/// </summary>
+		/// <param name="Name">Name of attribute.</param>
+		/// <returns>Attribute value, if exists, empty string otherwise.</returns>
+		public string this[string Name] => this.GetAttribute(Name);
 	}
 }

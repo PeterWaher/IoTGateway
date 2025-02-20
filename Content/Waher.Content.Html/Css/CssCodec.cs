@@ -22,14 +22,14 @@ namespace Waher.Content.Html.Css
 		/// <summary>
 		/// Content-Type for CSS files.
 		/// </summary>
-		public const string ContentType = "text/css";
+		public const string DefaultContentType = "text/css";
 
 		/// <summary>
 		/// CSS content types.
 		/// </summary>
 		public static readonly string[] CssContentTypes = new string[]
 		{
-			ContentType
+			DefaultContentType
 		};
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace Waher.Content.Html.Css
 		{
 			switch (ContentType.ToLower())
 			{
-				case CssCodec.ContentType:
+				case CssCodec.DefaultContentType:
 					FileExtension = CssFileExtensions[0];
 					return true;
 

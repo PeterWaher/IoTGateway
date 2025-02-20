@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Html.Elements
+﻿namespace Waher.Content.Html.Elements
 {
 	/// <summary>
 	/// NEXTID element

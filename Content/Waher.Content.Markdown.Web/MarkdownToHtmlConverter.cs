@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
@@ -88,9 +89,8 @@ namespace Waher.Content.Markdown.Web
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
-		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
 			if (State is null)
 				return true;
@@ -150,7 +150,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				RootFolder = rootFolder,
 				ResourceMap = Request.Server,
-				Progress = Progress
+				Progress = State.Progress
 			};
 
 			if (!string.IsNullOrEmpty(bareJid))

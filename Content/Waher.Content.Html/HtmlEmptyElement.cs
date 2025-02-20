@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Html
+﻿namespace Waher.Content.Html
 {
 	/// <summary>
 	/// Base class for all empty HTML elements.

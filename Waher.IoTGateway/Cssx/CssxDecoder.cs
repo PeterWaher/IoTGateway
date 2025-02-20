@@ -20,9 +20,14 @@ namespace Waher.IoTGateway.Cssx
 		}
 
 		/// <summary>
+		/// Default Content-Type for CSSX: text/x-cssx
+		/// </summary>
+		public const string DefaultContentType = "text/x-cssx";
+
+		/// <summary>
 		/// Plain text content types.
 		/// </summary>
-		public static readonly string[] CssxContentTypes = new string[] { "text/x-cssx" };
+		public static readonly string[] CssxContentTypes = new string[] { DefaultContentType };
 
 		/// <summary>
 		/// Plain text file extensions.
@@ -47,7 +52,7 @@ namespace Waher.IoTGateway.Cssx
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == "text/x-cssx")
+			if (ContentType == DefaultContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -86,7 +91,7 @@ namespace Waher.IoTGateway.Cssx
 			switch (FileExtension.ToLower())
 			{
 				case "cssx":
-					ContentType = "text/x-cssx";
+					ContentType = DefaultContentType;
 					return true;
 
 				default:
@@ -105,7 +110,7 @@ namespace Waher.IoTGateway.Cssx
 		{
 			switch (ContentType.ToLower())
 			{
-				case "text/x-cssx":
+				case DefaultContentType:
 					FileExtension = "cssx";
 					return true;
 

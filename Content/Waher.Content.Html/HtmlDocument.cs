@@ -2032,20 +2032,20 @@ namespace Waher.Content.Html
 			this.root?.Export(Output, new Dictionary<string, string>());
 		}
 
-        /// <summary>
-        /// Exports the HTML document to XML.
-        /// </summary>
-        /// <param name="Output">XML Output</param>
-        public void Export(StringBuilder Output)
-        {
-            this.root?.Export(Output);
-        }
+		/// <summary>
+		/// Exports the HTML document to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		public void Export(StringBuilder Output)
+		{
+			this.root?.Export(Output);
+		}
 
-        /// <summary>
-        /// Gets meta-data about the page.
-        /// </summary>
-        /// <returns>Meta-data</returns>
-        public PageMetaData GetMetaData()
+		/// <summary>
+		/// Gets meta-data about the page.
+		/// </summary>
+		/// <returns>Meta-data</returns>
+		public PageMetaData GetMetaData()
 		{
 			return new PageMetaData(this);
 		}
@@ -2057,21 +2057,55 @@ namespace Waher.Content.Html
 		/// <returns>BODY contents.</returns>
 		public static string GetBody(string Html)
 		{
-			int i = Html.IndexOf("<body>", StringComparison.CurrentCultureIgnoreCase);
-			if (i > 0)
-				Html = Html.Substring(i + 6).TrimStart();
-
-			i = Html.IndexOf("</body>", StringComparison.CurrentCultureIgnoreCase);
-			Html = Html.Substring(0, i).TrimEnd();
+			Html = GetContents(Html, "<body", "</body>");
+			if (string.IsNullOrEmpty(Html))
+				return Html;
 
 			if (Html.StartsWith("<section>", StringComparison.CurrentCultureIgnoreCase) &&
 				Html.EndsWith("</section>", StringComparison.CurrentCultureIgnoreCase))
 			{
-				string Html2 = Html.Substring(9).TrimStart();
-				Html2 = Html2.Substring(0, Html2.Length - 10).TrimEnd();
+				Html = Html.Substring(9, Html.Length - 19).Trim();
+			}
 
-				if (!Html2.Contains("<section>"))
-					Html = Html2;
+			return Html;
+		}
+
+		private static string GetContents(string Html, string StartTag, string EndTag)
+		{
+			int i = Html.IndexOf(StartTag, StringComparison.CurrentCultureIgnoreCase);
+			if (i < 0)
+				return string.Empty;
+
+			i += StartTag.Length;
+
+			i = Html.IndexOf('>', i);
+			if (i < 0)
+				return string.Empty;
+
+			i++;
+			int j = Html.IndexOf(EndTag, i, StringComparison.CurrentCultureIgnoreCase);
+
+			if (j < 0)
+				return Html.Substring(i).TrimStart();
+			else
+				return Html.Substring(i, j - i).Trim();
+		}
+
+		/// <summary>
+		/// Extracts the contents of the HEAD element in a HTML string.
+		/// </summary>
+		/// <param name="Html">HTML string</param>
+		/// <returns>HEAD contents.</returns>
+		public static string GetHead(string Html)
+		{
+			Html = GetContents(Html, "<head", "</head>");
+			if (string.IsNullOrEmpty(Html))
+				return Html;
+
+			if (Html.StartsWith("<section>", StringComparison.CurrentCultureIgnoreCase) &&
+				Html.EndsWith("</section>", StringComparison.CurrentCultureIgnoreCase))
+			{
+				Html = Html.Substring(9, Html.Length - 19).Trim();
 			}
 
 			return Html;

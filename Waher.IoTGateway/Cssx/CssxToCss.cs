@@ -27,12 +27,12 @@ namespace Waher.IoTGateway.Cssx
 		/// <summary>
 		/// Converts content from these content types.
 		/// </summary>
-		public string[] FromContentTypes => new string[] { "text/x-cssx" };
+		public string[] FromContentTypes => new string[] { CssxDecoder.DefaultContentType };
 
 		/// <summary>
 		/// Converts content to these content types. 
 		/// </summary>
-		public string[] ToContentTypes => new string[] { CssCodec.ContentType };
+		public string[] ToContentTypes => new string[] { CssCodec.DefaultContentType };
 
 		/// <summary>
 		/// How well the content is converted.
@@ -43,9 +43,8 @@ namespace Waher.IoTGateway.Cssx
 		/// Performs the actual conversion.
 		/// </summary>
 		/// <param name="State">State of the current conversion.</param>
-		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
 			string Cssx;
 
@@ -99,7 +98,25 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="LockSession">If the session should be locked (true),
 		/// or if the caller has already locked the session (false).</param>
 		/// <returns>CSS</returns>
-		internal static async Task<string> Convert(string Cssx, ConversionState State, Variables Session, string FileName, bool LockSession)
+		internal static Task<string> Convert(string Cssx, ConversionState State, Variables Session, string FileName, bool LockSession)
+		{
+			return Convert(Cssx, "¤", "¤", State, Session, FileName, LockSession);
+		}
+
+		/// <summary>
+		/// Converts CSSX to CSS, using the current theme
+		/// </summary>
+		/// <param name="WebContent">Web Content (CSSX/HTMLX, etc.)</param>
+		/// <param name="StartDelimiter">Start delimiter</param>
+		/// <param name="StopDelimiter">Stop delimiter</param>
+		/// <param name="State">Conversion state, if available.</param>
+		/// <param name="Session">Current session</param>
+		/// <param name="FileName">Source file name.</param>
+		/// <param name="LockSession">If the session should be locked (true),
+		/// or if the caller has already locked the session (false).</param>
+		/// <returns>CSS</returns>
+		internal static async Task<string> Convert(string WebContent, string StartDelimiter, string StopDelimiter, ConversionState State, 
+			Variables Session, string FileName, bool LockSession)
 		{
 			bool Pushed = false;
 
@@ -132,25 +149,25 @@ namespace Waher.IoTGateway.Cssx
 				StringBuilder Result = new StringBuilder();
 				Expression Exp;
 				int i = 0;
-				int c = Cssx.Length;
+				int c = WebContent.Length;
 				int j, k;
 				string Script;
 				object Value;
 
 				while (i < c)
 				{
-					j = Cssx.IndexOf('¤', i);
+					j = WebContent.IndexOf(StartDelimiter, i);
 					if (j < 0)
 						break;
 
 					if (j > i)
-						Result.Append(Cssx[i..j]);
+						Result.Append(WebContent[i..j]);
 
-					k = Cssx.IndexOf('¤', j + 1);
+					k = WebContent.IndexOf(StopDelimiter, j + 1);
 					if (k < 0)
 						break;
 
-					Script = Cssx.Substring(j + 1, k - j - 1);
+					Script = WebContent.Substring(j + 1, k - j - 1);
 					Exp = new Expression(Script, FileName);
 					Value = await Exp.EvaluateAsync(Session);
 
@@ -185,7 +202,7 @@ namespace Waher.IoTGateway.Cssx
 				}
 
 				if (i < c)
-					Result.Append(Cssx[i..]);
+					Result.Append(WebContent[i..]);
 
 				return Result.ToString();
 			}

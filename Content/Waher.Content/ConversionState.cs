@@ -22,10 +22,11 @@ namespace Waher.Content
 		/// the converter finds a better option.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
 		/// <param name="Session">Session states.</param>
+		/// <param name="Progress">Optional interface for reporting progress during conversion.</param>
 		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
 		/// Can be null if there are no alternatives.</param>
 		public ConversionState(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL,
-			string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
+			string ToContentType, Stream To, Variables Session, ICodecProgress Progress, params string[] PossibleContentTypes)
 		{
 			this.FromContentType = FromContentType;
 			this.From = From;
@@ -35,6 +36,7 @@ namespace Waher.Content
 			this.ToContentType = ToContentType;
 			this.To = To;
 			this.Session = Session;
+			this.Progress = Progress;
 			this.PossibleContentTypes = PossibleContentTypes;
 		}
 
@@ -79,6 +81,11 @@ namespace Waher.Content
 		/// Session states.
 		/// </summary>
 		public Variables Session { get; }
+
+		/// <summary>
+		/// Optional interface for reporting progress during conversion.
+		/// </summary>
+		public ICodecProgress Progress { get; }
 
 		/// <summary>
 		/// Possible content types the converter is allowed to convert to. 

@@ -246,7 +246,7 @@ table
 }
 
 table > colgroup {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 table, th, td
@@ -262,11 +262,6 @@ table
     width: fit-content;
     border-radius: 8px;
 }
-
-table > colgroup {
-    width: 100%;
-}
-
 /* region MISC */
 
 section

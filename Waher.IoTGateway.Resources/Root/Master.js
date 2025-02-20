@@ -44,7 +44,7 @@ function NativeHeaderHandler() {
                 const child = subMenu.children[i]
                 const textElement = Array.from(child.children).find(c => c.tagName.toLocaleLowerCase() === "a")
                 if (textElement) {
-                    maxWidth = Math.max(maxWidth, textElement.offsetWidth)
+                    maxWidth = Math.max(maxWidth, textElement.getBoundingClientRect().width)
                     textElements.push(textElement)
                 }
             }
@@ -53,7 +53,7 @@ function NativeHeaderHandler() {
             // offset sibling elements (underneeth) to position over to not have gaps between list items
             const offsetParentsSiblings = (listItem) => {
                 const text = listItem.children[0]
-                const siblingHeightOffset = listItem.offsetHeight - text.offsetHeight
+                const siblingHeightOffset = listItem.getBoundingClientRect().height - text.getBoundingClientRect().height
 
                 let listItemSibling = listItem.nextElementSibling
                 while (listItemSibling) {
@@ -280,4 +280,6 @@ let NativeHeader;
 window.addEventListener("load", () => {
     NativeHeader = NativeHeaderHandler();
     Popup = PopupHandler()
+
+    document.getElementById("large-pagpage-name").parentElement.style.flex = 1
 })

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Html.Css;
 using Waher.IoTGateway.ScriptExtensions.Constants;

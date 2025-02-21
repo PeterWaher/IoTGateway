@@ -16,13 +16,13 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly int streamId;
 		private readonly HttpClientConnection connection;
-		private readonly ProfilerThread streamThread;
 		private readonly int headerInputWindowSize;
 		private HttpRequestHeader headers = null;
 		private MemoryStream buildingHeaders = null;
 		private TemporaryStream inputDataStream = null;
 		private StreamState state = StreamState.Idle;
 		private WebSocket webSocket = null;
+		private ProfilerThread streamThread;
 		private string protocol = null;
 		private int rfc9218Priority = 3;
 		private bool rfc9218Incremental = false;
@@ -156,8 +156,17 @@ namespace Waher.Networking.HTTP.HTTP2
 			get => this.state;
 			internal set
 			{
-				this.state = value;
-				this.streamThread?.NewState(this.state.ToString());
+				if (this.state != value)
+				{
+					this.state = value;
+					this.streamThread?.NewState(this.state.ToString());
+
+					if (value == StreamState.Closed)
+					{
+						this.streamThread?.Stop();
+						this.streamThread = null;
+					}
+				}
 			}
 		}
 

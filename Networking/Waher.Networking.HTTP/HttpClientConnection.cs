@@ -804,6 +804,7 @@ namespace Waher.Networking.HTTP
 		internal BinaryTcpClient Client => this.client;
 		internal bool Encrypted => this.encrypted;
 		internal int Port => this.port;
+		internal IFlowControl FlowControl => this.flowControl;
 
 #if INFO_IN_SNIFFERS
 		private static void AppendFlags(FrameType Type, byte Flags, StringBuilder sb)
@@ -1601,7 +1602,7 @@ namespace Waher.Networking.HTTP
 		internal ProfilerThread CreateProfilerThread(int StreamId)
 		{
 			string s = StreamId.ToString();
-			ProfilerThread StreamThread = this.http2Profiler.CreateThread(s, ProfilerThreadType.Sequential);
+			ProfilerThread StreamThread = this.http2Profiler.CreateThread(s, ProfilerThreadType.StateMachine);
 
 			if (StreamId == 0)
 				StreamThread.Label = "Connection";
@@ -1853,6 +1854,8 @@ namespace Waher.Networking.HTTP
 				{
 					if (!await this.SendHttp2Frame(FrameType.Data, 1, false, StreamId, Stream, Data, Offset, 0, DataEncoding))   // END_STREAM
 						return -1;
+
+					this.flowControl?.RemoveStream(Stream);
 				}
 
 				return 0;
@@ -2545,6 +2548,9 @@ namespace Waher.Networking.HTTP
 						}
 						finally
 						{
+							Request.Http2Stream.State = StreamState.Closed;
+							this.flowControl?.RemoveStream(Request.Http2Stream);
+
 							if (DisposeResponse2)
 								await Response.DisposeAsync();
 						}

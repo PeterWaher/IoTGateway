@@ -12,11 +12,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 		}
 
-		public string[] FromContentTypes => new string[] { "text/x-test1" };
-		public string[] ToContentTypes => new string[] { "text/x-test2" };
+		public string[] FromContentTypes => ["text/x-test1"];
+		public string[] ToContentTypes => ["text/x-test2"];
 		public Grade ConversionGrade => Grade.Ok;
 
-		public async Task<bool> ConvertAsync(ConversionState State, ICodecProgress Progress)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
 			byte[] Data = new byte[State.From.Length];
 			await State.From.ReadAsync(Data, 0, (int)State.From.Length);

@@ -79,7 +79,7 @@ namespace Waher.Networking.HTTP
 		public Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (this.get is null)
-				throw new MethodNotAllowedException(this.AllowedMethods);
+				throw new MethodNotAllowedException(this.AllowedMethods, Request);
 			else
 				return this.get(Request, Response);
 		}

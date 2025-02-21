@@ -286,6 +286,9 @@ namespace Waher.Security.LoginMonitor
 		/// </returns>
 		public async Task<DateTime?> GetEarliestLoginOpportunity(string RemoteEndpoint, string Protocol)
 		{
+			if (string.IsNullOrEmpty(RemoteEndpoint))
+				return null;
+
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
 
 			if (EP.Blocked)

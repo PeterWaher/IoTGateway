@@ -198,7 +198,7 @@ namespace Waher.Networking.HTTP
 				}
 				else if (this.header.HttpVersion < 1)
 				{
-					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported",
+					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported", 
 						"At least HTTP Version 1.0 is required."), true);
 					return false;
 				}
@@ -383,7 +383,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						await this.SendResponse(null, null, new HttpException(411, "Length Required",
+						await this.SendResponse(null, null, new HttpException(411, "Length Required", 
 							"Content Length required."), true);
 						return false;
 					}
@@ -449,7 +449,7 @@ namespace Waher.Networking.HTTP
 				this.dataStream.Dispose();
 				this.dataStream = null;
 
-				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large",
+				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", 
 					"Maximum Entity Size: " + MaxEntitySize.ToString()), true);
 				return false;
 			}
@@ -476,7 +476,8 @@ namespace Waher.Networking.HTTP
 					if (this.HasSniffers && i > Offset)
 						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Buffer, Offset, i - Offset));
 
-					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid HTTP/2 connection preface."), true);
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", 
+						"Invalid HTTP/2 connection preface."), true);
 					return false;
 				}
 
@@ -2218,7 +2219,7 @@ namespace Waher.Networking.HTTP
 									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 							}
 
-							await this.SendResponse(Request, null, new HttpException(401, UnauthorizedException.StatusMessage,
+							await this.SendResponse(Request, null, new HttpException(401, UnauthorizedException.StatusMessage, Request,
 								(await Resource.DefaultErrorContent(401)) ?? "Unauthorized access prohibited."), false, Challenges.ToArray());
 							Request.Dispose();
 							return true;
@@ -2233,13 +2234,13 @@ namespace Waher.Networking.HTTP
 						{
 							if (!Request.HasData)
 							{
-								await this.SendResponse(Request, null, new HttpException(100, "Continue", null), false);
+								await this.SendResponse(Request, null, new HttpException(100, "Continue", Request, null), false);
 								return null;
 							}
 						}
 						else
 						{
-							await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed",
+							await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed", Request,
 								(await Resource.DefaultErrorContent(417)) ?? "Unable to parse Expect header."), true);
 							Request.Dispose();
 							return false;
@@ -2283,7 +2284,7 @@ namespace Waher.Networking.HTTP
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 				{
 					await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
-						InsufficientStorageException.StatusMessage, "Insufficient space."), true);
+						InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
 				}
 				else
 					await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
@@ -2354,7 +2355,7 @@ namespace Waher.Networking.HTTP
 						Location.Append(s);
 					}
 
-					await this.SendResponse(Request, Response, new HttpException(TemporaryRedirectException.Code, TemporaryRedirectException.StatusMessage,
+					await this.SendResponse(Request, Response, new HttpException(TemporaryRedirectException.Code, TemporaryRedirectException.StatusMessage, Request,
 						new KeyValuePair<string, string>("Location", Location.ToString()),
 						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests")), false);
 				}
@@ -2415,7 +2416,7 @@ namespace Waher.Networking.HTTP
 						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 						{
 							await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
-								InsufficientStorageException.StatusMessage, "Insufficient space."), true);
+								InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
 						}
 						else
 							await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
@@ -2517,7 +2518,7 @@ namespace Waher.Networking.HTTP
 					Response.SetHeader("Connection", "close");
 				}
 
-				if (Request.Http2Stream is null)
+				if (Request?.Http2Stream is null)
 				{
 					if (ex is null)
 						await Response.SendResponse();

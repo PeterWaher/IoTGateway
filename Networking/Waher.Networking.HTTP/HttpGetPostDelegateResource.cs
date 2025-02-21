@@ -47,7 +47,7 @@ namespace Waher.Networking.HTTP
 		public Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (this.post is null)
-				throw new MethodNotAllowedException(this.AllowedMethods);
+				throw new MethodNotAllowedException(this.AllowedMethods, Request);
 			else
 				return this.post(Request, Response);
 		}

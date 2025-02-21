@@ -260,13 +260,13 @@ namespace Waher.Networking.HTTP
 				case "PUT":
 				case "PATCH":
 					if (!this.allowPutPatch)
-						throw new MethodNotAllowedException(this.AllowedMethods);
+						throw new MethodNotAllowedException(this.AllowedMethods, Request);
 
 					break;
 
 				case "DELETE":
 					if (!this.allowDelete)
-						throw new MethodNotAllowedException(this.AllowedMethods);
+						throw new MethodNotAllowedException(this.AllowedMethods, Request);
 					break;
 			}
 		}
@@ -1444,7 +1444,7 @@ namespace Waher.Networking.HTTP
 			Variables Session = Request.Session;
 			if (Session is null)
 			{
-				await Response.SendResponse(new MethodNotAllowedException(this.AllowedMethods));
+				await Response.SendResponse(new ForbiddenException("Session required."));
 				return;
 			}
 

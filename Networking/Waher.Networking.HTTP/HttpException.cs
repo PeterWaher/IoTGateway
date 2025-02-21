@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.Networking.HTTP
@@ -9,8 +10,10 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Base class of all HTTP Exceptions.
 	/// </summary>
-	public class HttpException : Exception
+	public class HttpException : Exception, IEventObject, IEventActor
 	{
+		private readonly HttpRequest request;
+
 		/// <summary>
 		/// Empty array of custom headers.
 		/// </summary>
@@ -28,7 +31,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="StatusCode">HTTP Status Code.</param>
 		/// <param name="Message">HTTP Status Message.</param>
 		public HttpException(int StatusCode, string Message)
-			: this(StatusCode, Message, NoCustomHeaders)
+			: this(StatusCode, Message, null, NoCustomHeaders)
 		{
 		}
 
@@ -39,10 +42,8 @@ namespace Waher.Networking.HTTP
 		/// <param name="Message">HTTP Status Message.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public HttpException(int StatusCode, string Message, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Message)
+			: this(StatusCode, Message, null, HeaderFields)
 		{
-			this.statusCode = StatusCode;
-			this.headerFields = HeaderFields;
 		}
 
 		/// <summary>
@@ -52,7 +53,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Message">HTTP Status Message.</param>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public HttpException(int StatusCode, string Message, object ContentObject)
-			: this(StatusCode, Message, ContentObject, NoCustomHeaders)
+			: this(StatusCode, Message, null, ContentObject, NoCustomHeaders)
 		{
 		}
 
@@ -64,11 +65,8 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public HttpException(int StatusCode, string Message, object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Message)
+			: this(StatusCode, Message, null, ContentObject, HeaderFields)
 		{
-			this.statusCode = StatusCode;
-			this.headerFields = HeaderFields;
-			this.contentObject = ContentObject;
 		}
 
 		/// <summary>
@@ -79,7 +77,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public HttpException(int StatusCode, string Message, byte[] Content, string ContentType)
-			: this(StatusCode, Message, Content, ContentType, NoCustomHeaders)
+			: this(StatusCode, Message, null, Content, ContentType, NoCustomHeaders)
 		{
 		}
 
@@ -92,13 +90,112 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public HttpException(int StatusCode, string Message, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
+			: this(StatusCode, Message, null, Content, ContentType, HeaderFields)
+		{
+		}
+
+		/// <summary>
+		/// Base class of all HTTP Exceptions.
+		/// </summary>
+		/// <param name="StatusCode">HTTP Status Code.</param>
+		/// <param name="Message">HTTP Status Message.</param>
+		/// <param name="Request">Optional HTTP Request</param>
+		public HttpException(int StatusCode, string Message, HttpRequest Request)
+			: this(StatusCode, Message, Request, NoCustomHeaders)
+		{
+		}
+
+		/// <summary>
+		/// Base class of all HTTP Exceptions.
+		/// </summary>
+		/// <param name="StatusCode">HTTP Status Code.</param>
+		/// <param name="Message">HTTP Status Message.</param>
+		/// <param name="Request">Optional HTTP Request</param>
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public HttpException(int StatusCode, string Message, HttpRequest Request, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Message)
+		{
+			this.statusCode = StatusCode;
+			this.headerFields = HeaderFields;
+			this.request = Request;
+		}
+
+		/// <summary>
+		/// Base class of all HTTP Exceptions.
+		/// </summary>
+		/// <param name="StatusCode">HTTP Status Code.</param>
+		/// <param name="Message">HTTP Status Message.</param>
+		/// <param name="Request">Optional HTTP Request</param>
+		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
+		public HttpException(int StatusCode, string Message, HttpRequest Request, object ContentObject)
+			: this(StatusCode, Message, Request, ContentObject, NoCustomHeaders)
+		{
+		}
+
+		/// <summary>
+		/// Base class of all HTTP Exceptions.
+		/// </summary>
+		/// <param name="StatusCode">HTTP Status Code.</param>
+		/// <param name="Message">HTTP Status Message.</param>
+		/// <param name="Request">Optional HTTP Request</param>
+		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public HttpException(int StatusCode, string Message, HttpRequest Request, object ContentObject, 
+			params KeyValuePair<string, string>[] HeaderFields)
+			: base(Message)
+		{
+			this.statusCode = StatusCode;
+			this.headerFields = HeaderFields;
+			this.contentObject = ContentObject;
+			this.request = Request;
+		}
+
+		/// <summary>
+		/// Base class of all HTTP Exceptions.
+		/// </summary>
+		/// <param name="StatusCode">HTTP Status Code.</param>
+		/// <param name="Message">HTTP Status Message.</param>
+		/// <param name="Request">Optional HTTP Request</param>
+		/// <param name="Content">Any encoded content to return.</param>
+		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
+		public HttpException(int StatusCode, string Message, HttpRequest Request, byte[] Content, string ContentType)
+			: this(StatusCode, Message, Request, Content, ContentType, NoCustomHeaders)
+		{
+		}
+
+		/// <summary>
+		/// Base class of all HTTP Exceptions.
+		/// </summary>
+		/// <param name="StatusCode">HTTP Status Code.</param>
+		/// <param name="Message">HTTP Status Message.</param>
+		/// <param name="Request">Optional HTTP Request</param>
+		/// <param name="Content">Any encoded content to return.</param>
+		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public HttpException(int StatusCode, string Message, HttpRequest Request, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
 			: base(Message)
 		{
 			this.statusCode = StatusCode;
 			this.headerFields = HeaderFields;
 			this.content = Content;
 			this.contentType = ContentType;
+			this.request = Request;
 		}
+
+		/// <summary>
+		/// Original request.
+		/// </summary>
+		public HttpRequest Request => this.request;
+
+		/// <summary>
+		/// Object identifier related to the object.
+		/// </summary>
+		public string Object => this.request?.Header?.ResourcePart ?? string.Empty;
+
+		/// <summary>
+		/// Actor identifier related to the object.
+		/// </summary>
+		public string Actor => this.request?.RemoteEndPoint ?? string.Empty;
 
 		/// <summary>
 		/// Gets the default status message, given a status code.

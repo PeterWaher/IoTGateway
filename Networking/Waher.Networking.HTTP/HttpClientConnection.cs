@@ -2534,9 +2534,6 @@ namespace Waher.Networking.HTTP
 						}
 						finally
 						{
-							Request.Http2Stream.State = StreamState.Closed;
-							this.flowControl?.RemoveStream(Request.Http2Stream);
-
 							if (DisposeResponse2)
 								await Response.DisposeAsync();
 						}

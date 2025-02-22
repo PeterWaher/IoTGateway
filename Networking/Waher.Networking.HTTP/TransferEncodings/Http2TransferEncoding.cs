@@ -181,7 +181,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				if (!await this.clientConnection.SendHttp2Frame(FrameType.Data, 1, false, this.stream.StreamId, this.stream, Array.Empty<byte>()))
 					return false;
 
-				this.clientConnection.FlowControl?.RemoveStream(this.stream);
+				if (!this.stream.HasWebSocket)
+					this.clientConnection.FlowControl?.RemoveStream(this.stream);
 			}
 
 			return true;

@@ -492,9 +492,15 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal void Upgrade(WebSocket WebSocket)
 		{
 			this.webSocket = WebSocket;
+			this.connection.Upgrade(WebSocket);
 			this.upgradedToWebSocket = true;
 			this.State = StreamState.Open;
 		}
+
+		/// <summary>
+		/// If the connection has been upgraded to a web socket.
+		/// </summary>
+		public bool HasWebSocket => !(this.webSocket is null);
 
 		/// <summary>
 		/// Reports an early hint of a resource the recipient may need to

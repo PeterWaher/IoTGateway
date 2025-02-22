@@ -1841,7 +1841,8 @@ namespace Waher.Networking.HTTP
 					if (!await this.SendHttp2Frame(FrameType.Data, 1, false, StreamId, Stream, Data, Offset, 0, DataEncoding))   // END_STREAM
 						return -1;
 
-					this.flowControl?.RemoveStream(Stream);
+					if (!Stream.HasWebSocket)
+						this.flowControl?.RemoveStream(Stream);
 				}
 
 				return 0;
@@ -1882,7 +1883,7 @@ namespace Waher.Networking.HTTP
 				return -1;
 			}
 
-			if (Last)
+			if (Last && !Stream.HasWebSocket)
 				this.flowControl?.RemoveStream(Stream);
 
 			return NrBytes;
@@ -2552,6 +2553,11 @@ namespace Waher.Networking.HTTP
 			this.client.OnReceivedReset(this.Client_OnReceivedWebSocket);
 			this.webSocket = Socket;
 		}
+
+		/// <summary>
+		/// If the connection has been upgraded to a web socket.
+		/// </summary>
+		public bool HasWebSocket => !(this.webSocket is null);
 
 		/// <summary>
 		/// Checks if the connection is live.

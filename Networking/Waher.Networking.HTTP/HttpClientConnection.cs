@@ -198,7 +198,7 @@ namespace Waher.Networking.HTTP
 				}
 				else if (this.header.HttpVersion < 1)
 				{
-					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported", 
+					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported",
 						"At least HTTP Version 1.0 is required."), true);
 					return false;
 				}
@@ -383,7 +383,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						await this.SendResponse(null, null, new HttpException(411, "Length Required", 
+						await this.SendResponse(null, null, new HttpException(411, "Length Required",
 							"Content Length required."), true);
 						return false;
 					}
@@ -396,24 +396,10 @@ namespace Waher.Networking.HTTP
 
 			if (this.HasSniffers)
 			{
-				if (Offset == 0 && NrAccepted == Data.Length)
-				{
-					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data));
-					else
-						this.ReceiveBinary(ConstantBuffer, Data);
-				}
+				if (this.rxText)
+					this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
 				else
-				{
-					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
-					else
-					{
-						byte[] Data2 = new byte[NrAccepted];
-						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
-						this.ReceiveBinary(true, Data2);
-					}
-				}
+					this.ReceiveBinary(false, Data, Offset, NrAccepted);
 			}
 
 			if (Complete)
@@ -449,7 +435,7 @@ namespace Waher.Networking.HTTP
 				this.dataStream.Dispose();
 				this.dataStream = null;
 
-				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", 
+				await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large",
 					"Maximum Entity Size: " + MaxEntitySize.ToString()), true);
 				return false;
 			}
@@ -476,7 +462,7 @@ namespace Waher.Networking.HTTP
 					if (this.HasSniffers && i > Offset)
 						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Buffer, Offset, i - Offset));
 
-					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", 
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed",
 						"Invalid HTTP/2 connection preface."), true);
 					return false;
 				}

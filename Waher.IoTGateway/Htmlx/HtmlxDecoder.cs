@@ -90,7 +90,7 @@ namespace Waher.IoTGateway.Htmlx
 		{
 			switch (FileExtension.ToLower())
 			{
-				case "cssx":
+				case "htmlx":
 					ContentType = DefaultContentType;
 					return true;
 

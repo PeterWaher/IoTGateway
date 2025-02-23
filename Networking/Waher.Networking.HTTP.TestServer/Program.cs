@@ -240,7 +240,8 @@ internal class Program
 			{
 				Response.ContentType = "text/plain";
 				return Response.Write("Hello World.");
-			};
+			}
+			;
 
 			static async Task HelloMarkdown(HttpRequest Request, HttpResponse Response)
 			{
@@ -255,13 +256,15 @@ internal class Program
 
 				Response.ContentType = "text/html";
 				await Response.Write(Html);
-			};
+			}
+			;
 
 			static Task HelloStyles(HttpRequest Request, HttpResponse Response)
 			{
 				Response.ContentType = "text/css";
 				return Response.Write("body\r\n{\r\nbackground-color:yellow\r\n}");
-			};
+			}
+			;
 
 			WebServer.Register("/Hello", Hello, Hello);
 			WebServer.Register("/Hello.md", HelloMarkdown, HelloMarkdown);
@@ -269,7 +272,7 @@ internal class Program
 
 			Log.Informational("Press CTRL+C to quit.");
 
-			Console.CancelKeyPress += (_, e)=>
+			Console.CancelKeyPress += (_, e) =>
 			{
 				Terminating = true;
 				e.Cancel = true;
@@ -286,10 +289,8 @@ internal class Program
 		{
 			Log.Informational("Shutting down.");
 
-			WebServer?.Dispose();
-
-			if (Sniffer is not null)
-				Sniffer?.DisposeAsync().Wait();
+			WebServer?.DisposeAsync().Wait();
+			Sniffer?.DisposeAsync().Wait();
 
 			Log.TerminateAsync().Wait();
 		}

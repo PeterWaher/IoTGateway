@@ -69,8 +69,11 @@ namespace Waher.Networking.HTTP.Test
 
 		protected async Task Cleanup()
 		{
-			this.server?.Dispose();
-			this.server = null;
+			if (this.server is not null)
+			{
+				await this.server.DisposeAsync();
+				this.server = null;
+			}
 
 			if (this.xmlSniffer is not null)
 			{

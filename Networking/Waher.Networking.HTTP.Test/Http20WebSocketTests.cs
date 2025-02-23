@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -12,12 +11,6 @@ namespace Waher.Networking.HTTP.Test
 		public new static void ClassInitialize(TestContext _)
 		{
 			WebSocketTests.ClassInitialize(_);
-		}
-
-		[ClassCleanup]
-		public new static async Task ClassCleanup()
-		{
-			await WebSocketTests.ClassCleanup();
 		}
 
 		public override Version ProtocolVersion => HttpVersion.Version20;

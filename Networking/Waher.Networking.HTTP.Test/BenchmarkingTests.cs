@@ -64,7 +64,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_01_GET_Chunked(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int TotalSize)
 		{
-			this.Setup(false, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(false, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			HttpResource Resource = this.server.Register("/test01.txt", async (req, resp) =>
 			{
@@ -191,7 +191,7 @@ namespace Waher.Networking.HTTP.Test
 		public async Task Test_02_PUT(string SnifferFileName, bool NoRfc7540Priorities,
 			bool SupportDeflate, bool SupportGZip, bool SupportBrotli, int TotalSize)
 		{
-			this.Setup(false, SnifferFileName, false, SupportDeflate, SupportGZip, SupportBrotli);
+			this.Setup(false, SnifferFileName, NoRfc7540Priorities, SupportDeflate, SupportGZip, SupportBrotli);
 
 			if (!this.server.TryGetResource("/Test02", false, out _, out _))
 				this.server.Register(new HttpFolderResource("/Test02", "Data", true, false, true, false));

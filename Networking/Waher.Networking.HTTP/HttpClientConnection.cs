@@ -777,7 +777,7 @@ namespace Waher.Networking.HTTP
 				this.client?.DisposeWhenDone();
 				this.client = null;
 
-				await this.server.Remove(this, this.http2Profiler);
+				await this.server.Remove(this);
 
 				this.flowControl?.Dispose();
 				this.flowControl = null;
@@ -791,6 +791,7 @@ namespace Waher.Networking.HTTP
 		internal bool Encrypted => this.encrypted;
 		internal int Port => this.port;
 		internal IFlowControl FlowControl => this.flowControl;
+		internal Profiler Http2Profiler => this.http2Profiler;
 
 #if INFO_IN_SNIFFERS
 		private static void AppendFlags(FrameType Type, byte Flags, StringBuilder sb)
@@ -980,16 +981,19 @@ namespace Waher.Networking.HTTP
 						{
 							Stream.State = StreamState.HalfClosedRemote;
 
-							if (this.http2HeaderWriter is null)
+							if (!Stream.UpgradedToWebSocket)
 							{
-								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
-									this.localSettings.HeaderTableSize);
-							}
+								if (this.http2HeaderWriter is null)
+								{
+									this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
+										this.localSettings.HeaderTableSize);
+								}
 
-							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
-								Stream.InputDataStream, Stream))
-							{
-								return false;
+								if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+									Stream.InputDataStream, Stream))
+								{
+									return false;
+								}
 							}
 						}
 						break;
@@ -1841,7 +1845,7 @@ namespace Waher.Networking.HTTP
 					if (!await this.SendHttp2Frame(FrameType.Data, 1, false, StreamId, Stream, Data, Offset, 0, DataEncoding))   // END_STREAM
 						return -1;
 
-					if (!Stream.HasWebSocket)
+					if (!Stream.UpgradedToWebSocket)
 						this.flowControl?.RemoveStream(Stream);
 				}
 
@@ -1883,7 +1887,7 @@ namespace Waher.Networking.HTTP
 				return -1;
 			}
 
-			if (Last && !Stream.HasWebSocket)
+			if (Last && !Stream.UpgradedToWebSocket)
 				this.flowControl?.RemoveStream(Stream);
 
 			return NrBytes;
@@ -2548,9 +2552,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal void Upgrade(WebSocket Socket)
+		internal void Upgrade(WebSocket Socket, bool ChangeReceptionHandler)
 		{
-			this.client.OnReceivedReset(this.Client_OnReceivedWebSocket);
+			if (ChangeReceptionHandler)
+				this.client.OnReceivedReset(this.Client_OnReceivedWebSocket);
+
 			this.webSocket = Socket;
 		}
 

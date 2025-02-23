@@ -9,8 +9,6 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class MethodNotAllowedException : HttpException, IEventTags
 	{
-		private readonly string method;
-
 		/// <summary>
 		/// 405
 		/// </summary>
@@ -66,11 +64,16 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Method
+		/// </summary>
+		public string Method => this.Request.Header.Method;
+
+		/// <summary>
 		/// Tags related to the object.
 		/// </summary>
 		public KeyValuePair<string, object>[] Tags => new KeyValuePair<string, object>[]
 		{
-			new KeyValuePair<string, object>("Method", this.method)
+			new KeyValuePair<string, object>("Method", this.Method)
 		};
 
 		private static string Join(string[] Methods)

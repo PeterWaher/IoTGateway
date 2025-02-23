@@ -14,6 +14,7 @@ using Waher.Events.Console;
 using Waher.Networking.HTTP.WebSockets;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.IO;
+using Waher.Runtime.Profiling;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP.Test
@@ -22,72 +23,87 @@ namespace Waher.Networking.HTTP.Test
 	{
 		private const int MaxTextSize = 64 * 1024;
 		private const int MaxBinarySize = 1024 * 1024;
-		private static HttpServer server;
-		private static ConsoleEventSink sink = null;
-		private static XmlFileSniffer xmlSniffer = null;
+		private static TestContext context;
+		private HttpServer server;
+		private ConsoleEventSink sink = null;
+		private XmlFileSniffer xmlSniffer = null;
 
 		private WebSocketListener webSocketListener;
 
 		public abstract Version ProtocolVersion { get; }
 
-		public static void ClassInitialize(TestContext _)
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext Context)
 		{
-			sink = new ConsoleEventSink();
-			Log.Register(sink);
-
-			if (xmlSniffer is null)
-			{
-				File.Delete("WebSocket.xml");
-				xmlSniffer = xmlSniffer = new XmlFileSniffer("WebSocket.xml",
-						@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
-						int.MaxValue, BinaryPresentationMethod.ByteCount);
-			}
-
-			X509Certificate2 Certificate = Certificates.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
-			server = new HttpServer(8081, 8088, Certificate,
-				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
-				xmlSniffer);
-
-			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
-			{
-				return true;
-			};
-		}
-
-		public static async Task ClassCleanup()
-		{
-			server?.Dispose();
-			server = null;
-
-			if (xmlSniffer is not null)
-			{
-				await xmlSniffer.DisposeAsync();
-				xmlSniffer = null;
-			}
-
-			if (sink is not null)
-			{
-				Log.Unregister(sink);
-				await sink.DisposeAsync();
-				sink = null;
-			}
+			context = Context;
 		}
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
+			string SnifferFileName = context.TestName;
+			if (string.IsNullOrEmpty(SnifferFileName))
+				SnifferFileName = "WebSocket";
+
+			SnifferFileName = "Sniffers" + Path.DirectorySeparatorChar + SnifferFileName + ".xml";
+
+			this.sink = new ConsoleEventSink();
+			Log.Register(this.sink);
+
+			File.Delete(SnifferFileName);
+			this.xmlSniffer = new XmlFileSniffer(SnifferFileName,
+				@"..\..\..\..\..\Waher.IoTGateway.Resources\Transforms\SnifferXmlToHtml.xslt",
+				int.MaxValue, BinaryPresentationMethod.ByteCount);
+
+			X509Certificate2 Certificate = Certificates.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");  // Certificate from http://www.cert-depot.com/
+			this.server = new HttpServer(8081, 8088, Certificate,
+				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
+				this.xmlSniffer);
+
+			this.server.SetHttp2ConnectionSettings(true, 65535, 16384, 100, 8192, false, false, true, false);
+
+			this.server.ConnectionProfiled += async (sender, e) =>
+			{
+				string Uml = e.ExportPlantUml(TimeUnit.MilliSeconds);
+				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, "uml"), Uml);
+			};
+
+			ServicePointManager.ServerCertificateValidationCallback = delegate (Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
+			{
+				return true;
+			};
+
 			this.webSocketListener = new WebSocketListener("/ws", false, MaxTextSize, MaxBinarySize, "chat");
-			server.Register(this.webSocketListener);
+			this.server.Register(this.webSocketListener);
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
 			if (this.webSocketListener is not null)
 			{
-				server.Unregister(this.webSocketListener);
+				this.server.Unregister(this.webSocketListener);
 				this.webSocketListener.Dispose();
 				this.webSocketListener = null;
+			}
+
+			if (this.server is not null)
+			{
+				await this.server.DisposeAsync();
+				this.server = null;
+			}
+
+			if (this.xmlSniffer is not null)
+			{
+				await this.xmlSniffer.DisposeAsync();
+				this.xmlSniffer = null;
+			}
+
+			if (this.sink is not null)
+			{
+				Log.Unregister(this.sink);
+				await this.sink.DisposeAsync();
+				this.sink = null;
 			}
 		}
 

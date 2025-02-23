@@ -596,7 +596,7 @@ namespace Waher.Networking.HTTP
 			{
 				Http2Stream Stream = this.Request.Http2Stream;
 
-				if (!(Stream is null) && !Stream.HasWebSocket)
+				if (!(Stream is null) && !Stream.UpgradedToWebSocket)
 				{
 					Stream.State = StreamState.Closed;
 					this.clientConnection.FlowControl?.RemoveStream(Stream);

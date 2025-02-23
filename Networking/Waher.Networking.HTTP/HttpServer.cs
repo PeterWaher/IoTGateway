@@ -35,7 +35,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Implements an HTTP server.
 	/// </summary>
-	public class HttpServer : CommunicationLayer, IDisposable, IResourceMap
+	public class HttpServer : CommunicationLayer, IDisposableAsync, IResourceMap
 	{
 		/// <summary>
 		/// Default HTTP Port (80).
@@ -657,7 +657,16 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
+		[Obsolete("Use DisposeAsync instead.")]
 		public void Dispose()
+		{
+			this.DisposeAsync().Wait();
+		}
+
+		/// <summary>
+		/// <see cref="IDisposableAsync.DisposeAsync"/>
+		/// </summary>
+		public async Task DisposeAsync()
 		{
 #if WINDOWS_UWP
 			NetworkInformation.NetworkStatusChanged -= this.NetworkChange_NetworkAddressChanged;
@@ -682,6 +691,21 @@ namespace Waher.Networking.HTTP
 					Listener.Key.Stop();
 #endif
 			}
+
+			HttpClientConnection[] Connections = this.GetConnections(true);
+
+			foreach (HttpClientConnection Connection in Connections)
+			{
+				try
+				{
+					await this.Remove(Connection);
+					await Connection.DisposeAsync();
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			} 
 
 			this.sessions?.Dispose();
 			this.sessions = null;
@@ -1329,7 +1353,7 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
-		internal async Task<bool> Remove(HttpClientConnection Connection, Profiler ConnectionProfiler)
+		internal async Task<bool> Remove(HttpClientConnection Connection)
 		{
 			bool Result;
 
@@ -1338,13 +1362,13 @@ namespace Waher.Networking.HTTP
 				Result = this.connections.Remove(Connection.Id);
 			}
 
-			if (!(ConnectionProfiler is null))
-				await this.ConnectionProfiled.Raise(this, ConnectionProfiler);
+			if (!(Connection.Http2Profiler is null))
+				await this.ConnectionProfiled.Raise(this, Connection.Http2Profiler);
 
 			return Result;
 		}
 
-		internal HttpClientConnection[] GetConnections()
+		internal HttpClientConnection[] GetConnections(bool Clear)
 		{
 			HttpClientConnection[] Connections;
 
@@ -1352,6 +1376,9 @@ namespace Waher.Networking.HTTP
 			{
 				Connections = new HttpClientConnection[this.connections.Count];
 				this.connections.Values.CopyTo(Connections, 0);
+
+				if (Clear)
+					this.connections.Clear();
 			}
 
 			return Connections;
@@ -1364,7 +1391,7 @@ namespace Waher.Networking.HTTP
 		{
 			base.Add(Sniffer);
 
-			foreach (HttpClientConnection Connection in this.GetConnections())
+			foreach (HttpClientConnection Connection in this.GetConnections(false))
 			{
 				if (!Connection.Disposed)
 					Connection.Add(Sniffer);
@@ -1378,7 +1405,7 @@ namespace Waher.Networking.HTTP
 		{
 			base.AddRange(Sniffers);
 
-			foreach (HttpClientConnection Connection in this.GetConnections())
+			foreach (HttpClientConnection Connection in this.GetConnections(false))
 			{
 				if (!Connection.Disposed)
 					Connection.AddRange(Sniffers);
@@ -1392,7 +1419,7 @@ namespace Waher.Networking.HTTP
 		{
 			bool Result = base.Remove(Sniffer);
 
-			foreach (HttpClientConnection Connection in this.GetConnections())
+			foreach (HttpClientConnection Connection in this.GetConnections(false))
 			{
 				if (!Connection.Disposed)
 					Connection.Remove(Sniffer);

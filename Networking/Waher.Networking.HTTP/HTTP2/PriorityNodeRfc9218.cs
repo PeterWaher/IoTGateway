@@ -156,16 +156,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			LinkedList<KeyValuePair<int, PendingRequest>> ToRelease = null;
 			LinkedListNode<PendingRequest> Loop;
+			int MaxResources = Math.Min(this.AvailableResources, Resources);
 			int i;
 
-			while (Resources > 0 && !((Loop = this.pendingRequests?.First) is null))
+			while (MaxResources > 0 && !((Loop = this.pendingRequests?.First) is null))
 			{
 				this.pendingRequests.RemoveFirst();
 
 				i = Loop.Value.Requested;
 
-				if (Resources < i)
-					i = Resources;
+				if (MaxResources < i)
+					i = MaxResources;
 
 				if (this.maxFrameSize < i)
 					i = this.maxFrameSize;
@@ -188,6 +189,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				ToRelease.AddLast(new KeyValuePair<int, PendingRequest>(i, Loop.Value));
 
 				Resources -= i;
+				MaxResources -= i;
 			}
 
 			if (!(ToRelease is null))

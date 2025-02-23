@@ -85,13 +85,13 @@ namespace Waher.Networking.HTTP.Test
 				if (!getTestJited)
 				{
 					// JIT pass
-
+				
 					await GetTest(HttpVersion.Version10);
 					await GetTest(HttpVersion.Version11);
 					await GetTest(HttpVersion.Version20);
-
+				
 					getTestJited = true;
-
+				
 					await Task.Delay(1000);
 				}
 
@@ -99,7 +99,7 @@ namespace Waher.Networking.HTTP.Test
 
 				TimeSpan Time10 = await GetTest(HttpVersion.Version10);
 				await Task.Delay(1000);
-
+				
 				TimeSpan Time11 = await GetTest(HttpVersion.Version11);
 				await Task.Delay(1000);
 
@@ -113,10 +113,10 @@ namespace Waher.Networking.HTTP.Test
 				Console.Out.Write("| ");
 				Console.Out.Write(PadLeft(TotalSize.ToString(), 10));
 				Console.Out.Write(" B | ");
-
+				
 				Console.Out.Write(PadLeft(Time10.TotalSeconds.ToString("F3"), 10));
 				Console.Out.Write(" s | ");
-
+				
 				Console.Out.Write(PadLeft(Time11.TotalSeconds.ToString("F3"), 10));
 				Console.Out.Write(" s | ");
 

@@ -312,8 +312,10 @@
     <Compile Include="WebSockets\WebSocket.cs" />
     <Compile Include="WebSockets\WebSocketBinaryEventArgs.cs" />
     <Compile Include="WebSockets\WebSocketClosedEventArgs.cs" />
+    <Compile Include="WebSockets\WebSocketCloseStatus.cs" />
     <Compile Include="WebSockets\WebSocketEventArgs.cs" />
     <Compile Include="WebSockets\WebSocketListener.cs" />
+    <Compile Include="WebSockets\WebSocketOpcode.cs" />
     <Compile Include="WebSockets\WebSocketTextEventArgs.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.HTTP.UWP.rd.xml" />
   </ItemGroup>

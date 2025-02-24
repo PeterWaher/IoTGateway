@@ -27,8 +27,9 @@ namespace Waher.Security.LoginMonitor
 		private static LoginAuditor instance = null;
 
 		private readonly Dictionary<string, RemoteEndpoint> states = new Dictionary<string, RemoteEndpoint>();
-		private readonly LoginInterval[] intervals;
-		private readonly int nrIntervals;
+		private readonly Dictionary<string, RemoteEndpointIntervals> endpointIntervals = new Dictionary<string, RemoteEndpointIntervals>();
+		private readonly LoginInterval[] defaultIntervals;
+		private readonly int defaultNrIntervals;
 		private CaseInsensitiveString domain;
 
 		/// <summary>
@@ -47,8 +48,29 @@ namespace Waher.Security.LoginMonitor
 		public LoginAuditor(string ObjectID, params LoginInterval[] LoginIntervals)
 			: base(ObjectID)
 		{
-			this.intervals = LoginIntervals;
-			this.nrIntervals = this.intervals.Length;
+			this.defaultIntervals = LoginIntervals;
+			this.defaultNrIntervals = this.defaultIntervals.Length;
+		}
+
+		/// <summary>
+		/// Class that monitors login events, and help applications determine malicious intent. 
+		/// Register instance of class with <see cref="Log.Register(IEventSink)"/> to activate it.
+		/// Call its <see cref="GetEarliestLoginOpportunity(string, string)"/> method to get information about 
+		/// when a remote endpoint can login.
+		/// 
+		/// Stream of events are analyzed, to detect events with Event ID "LoginSuccessful" and "LoginFailure". Individual state objects 
+		/// are maintained for each remote endpoint, allowing services to query the LoginAuditor class (using its 
+		/// <see cref="GetEarliestLoginOpportunity(string, string)"/> method) about the current state of each remote endpoint trying to login.
+		/// </summary>
+		/// <param name="ObjectID">Log Object ID</param>
+		/// <param name="EndpointIntervals">Intervals specific for given endpoints.</param>
+		/// <param name="DefaultLoginIntervals">Default number of login attempts possible during given time period. Numbers must be positive, and
+		/// interval ascending. If continually failing past accepted intervals, remote endpoint will be registered as malicious.</param>
+		public LoginAuditor(string ObjectID, RemoteEndpointIntervals[] EndpointIntervals, params LoginInterval[] DefaultLoginIntervals)
+			: this(ObjectID, DefaultLoginIntervals)
+		{
+			foreach (RemoteEndpointIntervals Intervals in EndpointIntervals)
+				this.endpointIntervals[Intervals.Endpoint] = Intervals;
 		}
 
 		/// <summary>
@@ -132,6 +154,7 @@ namespace Waher.Security.LoginMonitor
 		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndpoint, string Protocol, bool CreateNew)
 		{
 			RemoteEndpoint EP;
+			RemoteEndpointIntervals Intervals;
 
 			RemoteEndpoint = RemoteEndpoint.RemovePortNumber();
 
@@ -139,8 +162,12 @@ namespace Waher.Security.LoginMonitor
 			{
 				if (this.states.TryGetValue(RemoteEndpoint, out EP))
 					return EP;
+
+				if (!this.endpointIntervals.TryGetValue(RemoteEndpoint, out Intervals))
+					Intervals = null;
 			}
 
+			int NrIntervals = Intervals?.NrIntervals ?? this.defaultNrIntervals;
 			bool Created = false;
 			bool Updated = false;
 
@@ -157,8 +184,8 @@ namespace Waher.Security.LoginMonitor
 					LastProtocol = Protocol,
 					Created = DateTime.Now,
 					Blocked = false,
-					State = new int[this.nrIntervals],
-					Timestamps = new DateTime[this.nrIntervals],
+					State = new int[NrIntervals],
+					Timestamps = new DateTime[NrIntervals],
 					Domain = this.domain
 				};
 
@@ -167,10 +194,10 @@ namespace Waher.Security.LoginMonitor
 			}
 			else
 			{
-				if (EP.State is null || EP.State.Length != this.nrIntervals)
+				if (EP.State is null || EP.State.Length != NrIntervals)
 				{
-					EP.State = new int[this.nrIntervals];
-					EP.Timestamps = new DateTime[this.nrIntervals];
+					EP.State = new int[NrIntervals];
+					EP.Timestamps = new DateTime[NrIntervals];
 
 					EP.Reset(false);
 					Updated = true;
@@ -182,6 +209,7 @@ namespace Waher.Security.LoginMonitor
 				if (this.states.TryGetValue(RemoteEndpoint, out RemoteEndpoint EP2))
 					return EP2;
 
+				EP.Intervals = Intervals;
 				this.states[RemoteEndpoint] = EP;
 			}
 
@@ -228,6 +256,8 @@ namespace Waher.Security.LoginMonitor
 		public async Task<bool> ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp, string Reason)
 		{
 			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
+			LoginInterval[] Intervals = EP.Intervals?.Intervals ?? this.defaultIntervals;
+			int NrIntervals = EP.Intervals?.NrIntervals ?? this.defaultNrIntervals;
 			int i;
 
 			if (EP.Blocked)
@@ -237,9 +267,9 @@ namespace Waher.Security.LoginMonitor
 			{
 				i = 0;
 
-				while (i < this.nrIntervals)
+				while (i < NrIntervals)
 				{
-					if (EP.State[i] < this.intervals[i].NrAttempts)
+					if (EP.State[i] < Intervals[i].NrAttempts)
 					{
 						EP.State[i]++;
 						break;
@@ -250,7 +280,7 @@ namespace Waher.Security.LoginMonitor
 						EP.Timestamps[i] = Timestamp;
 
 						i++;
-						if (i >= this.nrIntervals)
+						if (i >= NrIntervals)
 						{
 							await this.Block(EP, Reason, Protocol);
 							return true;
@@ -260,7 +290,7 @@ namespace Waher.Security.LoginMonitor
 			}
 			else
 			{
-				for (i = 0; i < this.nrIntervals; i++)
+				for (i = 0; i < NrIntervals; i++)
 				{
 					EP.State[i] = 1;
 					EP.Timestamps[i] = Timestamp;
@@ -297,7 +327,8 @@ namespace Waher.Security.LoginMonitor
 			if (!EP.LastFailed)
 				return null;
 
-			return this.GetEarliestLoginOpportunity(EP.State, EP.Timestamps);
+			return this.GetEarliestLoginOpportunity(EP.State, EP.Timestamps,
+				EP.Intervals?.Intervals ?? this.defaultIntervals);
 		}
 
 		/// <summary>
@@ -305,13 +336,17 @@ namespace Waher.Security.LoginMonitor
 		/// </summary>
 		/// <param name="States">Current login attempt states.</param>
 		/// <param name="Timestamps">Current login attempt timestamps.</param>
+		/// <param name="Intervals">Number of login attempts possible during given time period. Numbers must be positive, and
+		/// interval ascending. If continually failing past accepted intervals, remote endpoint will be registered as malicious.</param>
 		/// <returns>Earliest login opportunity.</returns>
-		public DateTime? GetEarliestLoginOpportunity(int[] States, DateTime[] Timestamps)
+		public DateTime? GetEarliestLoginOpportunity(int[] States, DateTime[] Timestamps, 
+			LoginInterval[] Intervals)
 		{
+			int NrIntervals = Intervals.Length;
 			int i = 0;
-			int c = Math.Min(Math.Min(States.Length, Timestamps.Length), this.nrIntervals);
+			int c = Math.Min(Math.Min(States.Length, Timestamps.Length), NrIntervals);
 
-			while (i < c && States[i] >= this.intervals[i].NrAttempts)
+			while (i < c && States[i] >= Intervals[i].NrAttempts)
 				i++;
 
 			if (i == 0)
@@ -320,7 +355,7 @@ namespace Waher.Security.LoginMonitor
 			if (i >= c)
 				return DateTime.MaxValue;
 
-			DateTime Next = this.intervals[i - 1].AddIntervalTo(Timestamps[i - 1]);
+			DateTime Next = Intervals[i - 1].AddIntervalTo(Timestamps[i - 1]);
 			if (Next <= DateTime.Now)
 				return null;
 			else

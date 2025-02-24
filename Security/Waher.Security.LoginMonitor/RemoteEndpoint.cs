@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -16,6 +17,7 @@ namespace Waher.Security.LoginMonitor
 	[Index("Blocked", "Endpoint", "Created")]
 	public class RemoteEndpoint
 	{
+		private RemoteEndpointIntervals intervals = null;
 		private string objectId = null;
 		private string endpoint = null;
 		private string lastProtocol = string.Empty;
@@ -185,6 +187,16 @@ namespace Waher.Security.LoginMonitor
 		{
 			get => this.domain;
 			set => this.domain = value;
+		}
+
+		/// <summary>
+		/// Intervals associated with the remote endpoint.
+		/// </summary>
+		[IgnoreMember]
+		internal RemoteEndpointIntervals Intervals
+		{
+			get => this.intervals;
+			set => this.intervals = value;
 		}
 
 		/// <summary>

@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Waher.Events;
 
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.
 	/// </summary>
-	public class MethodNotAllowedException : HttpException
+	public class MethodNotAllowedException : HttpException, IEventTags
 	{
 		/// <summary>
 		/// 405
@@ -50,6 +51,30 @@ namespace Waher.Networking.HTTP
 			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
+
+		/// <summary>
+		/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.
+		/// </summary>
+		/// <param name="AllowedMethods">Allowed methods.</param>
+		/// <param name="Request">Request object.</param>
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public MethodNotAllowedException(string[] AllowedMethods, HttpRequest Request, params KeyValuePair<string, string>[] HeaderFields)
+			: base(Code, StatusMessage, Request, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
+		{
+		}
+
+		/// <summary>
+		/// Method
+		/// </summary>
+		public string Method => this.Request.Header.Method;
+
+		/// <summary>
+		/// Tags related to the object.
+		/// </summary>
+		public KeyValuePair<string, object>[] Tags => new KeyValuePair<string, object>[]
+		{
+			new KeyValuePair<string, object>("Method", this.Method)
+		};
 
 		private static string Join(string[] Methods)
 		{

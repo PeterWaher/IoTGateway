@@ -396,24 +396,10 @@ namespace Waher.Networking.HTTP
 
 			if (this.HasSniffers)
 			{
-				if (Offset == 0 && NrAccepted == Data.Length)
-				{
-					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data));
-					else
-						this.ReceiveBinary(ConstantBuffer, Data);
-				}
+				if (this.rxText)
+					this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
 				else
-				{
-					if (this.rxText)
-						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
-					else
-					{
-						byte[] Data2 = new byte[NrAccepted];
-						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
-						this.ReceiveBinary(true, Data2);
-					}
-				}
+					this.ReceiveBinary(false, Data, Offset, NrAccepted);
 			}
 
 			if (Complete)
@@ -476,7 +462,8 @@ namespace Waher.Networking.HTTP
 					if (this.HasSniffers && i > Offset)
 						this.ReceiveText(InternetContent.ISO_8859_1.GetString(Buffer, Offset, i - Offset));
 
-					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed", "Invalid HTTP/2 connection preface."), true);
+					await this.SendResponse(null, null, new HttpException(405, "Method Not Allowed",
+						"Invalid HTTP/2 connection preface."), true);
 					return false;
 				}
 
@@ -790,7 +777,7 @@ namespace Waher.Networking.HTTP
 				this.client?.DisposeWhenDone();
 				this.client = null;
 
-				await this.server.Remove(this, this.http2Profiler);
+				await this.server.Remove(this);
 
 				this.flowControl?.Dispose();
 				this.flowControl = null;
@@ -803,6 +790,8 @@ namespace Waher.Networking.HTTP
 		internal BinaryTcpClient Client => this.client;
 		internal bool Encrypted => this.encrypted;
 		internal int Port => this.port;
+		internal IFlowControl FlowControl => this.flowControl;
+		internal Profiler Http2Profiler => this.http2Profiler;
 
 #if INFO_IN_SNIFFERS
 		private static void AppendFlags(FrameType Type, byte Flags, StringBuilder sb)
@@ -992,16 +981,19 @@ namespace Waher.Networking.HTTP
 						{
 							Stream.State = StreamState.HalfClosedRemote;
 
-							if (this.http2HeaderWriter is null)
+							if (!Stream.UpgradedToWebSocket)
 							{
-								this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
-									this.localSettings.HeaderTableSize);
-							}
+								if (this.http2HeaderWriter is null)
+								{
+									this.http2HeaderWriter = new HeaderWriter(this.localSettings.HeaderTableSize,
+										this.localSettings.HeaderTableSize);
+								}
 
-							if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
-								Stream.InputDataStream, Stream))
-							{
-								return false;
+								if (!await this.RequestReceived(Stream.Headers ?? new HttpRequestHeader(2.0),
+									Stream.InputDataStream, Stream))
+								{
+									return false;
+								}
 							}
 						}
 						break;
@@ -1600,7 +1592,7 @@ namespace Waher.Networking.HTTP
 		internal ProfilerThread CreateProfilerThread(int StreamId)
 		{
 			string s = StreamId.ToString();
-			ProfilerThread StreamThread = this.http2Profiler.CreateThread(s, ProfilerThreadType.Sequential);
+			ProfilerThread StreamThread = this.http2Profiler.CreateThread(s, ProfilerThreadType.StateMachine);
 
 			if (StreamId == 0)
 				StreamThread.Label = "Connection";
@@ -1852,6 +1844,9 @@ namespace Waher.Networking.HTTP
 				{
 					if (!await this.SendHttp2Frame(FrameType.Data, 1, false, StreamId, Stream, Data, Offset, 0, DataEncoding))   // END_STREAM
 						return -1;
+
+					if (!Stream.UpgradedToWebSocket)
+						this.flowControl?.RemoveStream(Stream);
 				}
 
 				return 0;
@@ -1892,7 +1887,7 @@ namespace Waher.Networking.HTTP
 				return -1;
 			}
 
-			if (Last)
+			if (Last && !Stream.UpgradedToWebSocket)
 				this.flowControl?.RemoveStream(Stream);
 
 			return NrBytes;
@@ -2218,7 +2213,7 @@ namespace Waher.Networking.HTTP
 									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 							}
 
-							await this.SendResponse(Request, null, new HttpException(401, UnauthorizedException.StatusMessage,
+							await this.SendResponse(Request, null, new HttpException(401, UnauthorizedException.StatusMessage, Request,
 								(await Resource.DefaultErrorContent(401)) ?? "Unauthorized access prohibited."), false, Challenges.ToArray());
 							Request.Dispose();
 							return true;
@@ -2233,13 +2228,13 @@ namespace Waher.Networking.HTTP
 						{
 							if (!Request.HasData)
 							{
-								await this.SendResponse(Request, null, new HttpException(100, "Continue", null), false);
+								await this.SendResponse(Request, null, new HttpException(100, "Continue", Request, null), false);
 								return null;
 							}
 						}
 						else
 						{
-							await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed",
+							await this.SendResponse(Request, null, new HttpException(417, "Expectation Failed", Request,
 								(await Resource.DefaultErrorContent(417)) ?? "Unable to parse Expect header."), true);
 							Request.Dispose();
 							return false;
@@ -2283,7 +2278,7 @@ namespace Waher.Networking.HTTP
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 				{
 					await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
-						InsufficientStorageException.StatusMessage, "Insufficient space."), true);
+						InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
 				}
 				else
 					await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
@@ -2354,7 +2349,7 @@ namespace Waher.Networking.HTTP
 						Location.Append(s);
 					}
 
-					await this.SendResponse(Request, Response, new HttpException(TemporaryRedirectException.Code, TemporaryRedirectException.StatusMessage,
+					await this.SendResponse(Request, Response, new HttpException(TemporaryRedirectException.Code, TemporaryRedirectException.StatusMessage, Request,
 						new KeyValuePair<string, string>("Location", Location.ToString()),
 						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests")), false);
 				}
@@ -2415,7 +2410,7 @@ namespace Waher.Networking.HTTP
 						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
 						{
 							await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code,
-								InsufficientStorageException.StatusMessage, "Insufficient space."), true);
+								InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
 						}
 						else
 							await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
@@ -2517,7 +2512,7 @@ namespace Waher.Networking.HTTP
 					Response.SetHeader("Connection", "close");
 				}
 
-				if (Request.Http2Stream is null)
+				if (Request?.Http2Stream is null)
 				{
 					if (ex is null)
 						await Response.SendResponse();
@@ -2557,11 +2552,18 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal void Upgrade(WebSocket Socket)
+		internal void Upgrade(WebSocket Socket, bool ChangeReceptionHandler)
 		{
-			this.client.OnReceivedReset(this.Client_OnReceivedWebSocket);
+			if (ChangeReceptionHandler)
+				this.client.OnReceivedReset(this.Client_OnReceivedWebSocket);
+
 			this.webSocket = Socket;
 		}
+
+		/// <summary>
+		/// If the connection has been upgraded to a web socket.
+		/// </summary>
+		public bool HasWebSocket => !(this.webSocket is null);
 
 		/// <summary>
 		/// Checks if the connection is live.

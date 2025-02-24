@@ -344,7 +344,7 @@ namespace Waher.Networking.HTTP
 						await this.get.GET(Request, Response);
 					}
 					else
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					break;
 
 				case "POST":
@@ -380,7 +380,7 @@ namespace Waher.Networking.HTTP
 					else if (!(this.post is null))
 						await this.post.POST(Request, Response);
 					else
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					break;
 
 				case "PUT":
@@ -416,7 +416,7 @@ namespace Waher.Networking.HTTP
 					else if (!(this.put is null))
 						await this.put.PUT(Request, Response);
 					else
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					break;
 
 				case "PATCH":
@@ -452,39 +452,39 @@ namespace Waher.Networking.HTTP
 					else if (!(this.patch is null))
 						await this.patch.PATCH(Request, Response);
 					else
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					break;
 
 				case "DELETE":
 					if (this.delete is null)
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					else
 						await this.delete.DELETE(Request, Response);
 					break;
 
 				case "OPTIONS":
 					if (this.options is null)
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					else
 						await this.options.OPTIONS(Request, Response);
 					break;
 
 				case "TRACE":
 					if (this.trace is null)
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					else
 						await this.trace.TRACE(Request, Response);
 					break;
 
 				case "CONNECT":
 					if (this.connect is null)
-						throw new MethodNotAllowedException(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods, Request);
 					else
 						await this.connect.CONNECT(Request, Response);
 					break;
 
 				default:
-					throw new MethodNotAllowedException(this.allowedMethods);
+					throw new MethodNotAllowedException(this.allowedMethods, Request);
 			}
 
 			if (this.Synchronous)

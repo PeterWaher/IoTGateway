@@ -181,7 +181,7 @@ namespace Waher.Networking.HTTP
 				this.AssertHeaderOpen();
 
 				if (!string.IsNullOrEmpty(value) && this.statusCode >= 200 && this.statusCode < 300)
-					this.Request.Header.AssertAcceptable(value);
+					this.httpRequest.Header.AssertAcceptable(value);
 
 				this.contentType = value;
 			}
@@ -576,18 +576,31 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public async Task SendResponse()
 		{
-			if (!this.responseSent)
+			try
 			{
-				this.responseSent = true;
+				if (!this.responseSent)
+				{
+					this.responseSent = true;
 
-				this.httpServer?.RequestResponded(this.httpRequest, this.statusCode);
+					this.httpServer?.RequestResponded(this.httpRequest, this.statusCode);
 
-				if (this.transferEncoding is null)
-					await this.StartSendResponse(false);
-				else
-					await this.transferEncoding.ContentSentAsync();
+					if (this.transferEncoding is null)
+						await this.StartSendResponse(false);
+					else
+						await this.transferEncoding.ContentSentAsync();
 
-				await this.OnResponseSent.Raise(this, EventArgs.Empty);
+					await this.OnResponseSent.Raise(this, EventArgs.Empty);
+				}
+			}
+			finally
+			{
+				Http2Stream Stream = this.httpRequest?.Http2Stream;
+
+				if (!(Stream is null) && !Stream.UpgradedToWebSocket)
+				{
+					Stream.State = StreamState.Closed;
+					this.clientConnection.FlowControl?.RemoveStream(Stream);
+				}
 			}
 		}
 

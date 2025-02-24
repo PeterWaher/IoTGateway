@@ -169,7 +169,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			if (!(WebSocketProtocol is null))
 				Response.SetHeader("Sec-WebSocket-Protocol", WebSocketProtocol);
 
-			Request.clientConnection.Upgrade(Socket);
+			Request.clientConnection.Upgrade(Socket, true);	// HTTP/1.1
 
 			await Response.SendResponse();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.HTTP2;
@@ -175,12 +176,13 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				this.pos = 0;
 			}
-			else if (this.stream.State != StreamState.Closed)
+			else if (EndOfData && this.stream.State != StreamState.Closed)
 			{
 				if (!await this.clientConnection.SendHttp2Frame(FrameType.Data, 1, false, this.stream.StreamId, this.stream, Array.Empty<byte>()))
 					return false;
 
-				this.stream.State = StreamState.Closed;
+				if (!this.stream.UpgradedToWebSocket)
+					this.clientConnection.FlowControl?.RemoveStream(this.stream);
 			}
 
 			return true;

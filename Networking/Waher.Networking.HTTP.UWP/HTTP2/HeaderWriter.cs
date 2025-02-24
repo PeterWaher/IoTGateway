@@ -67,7 +67,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (this.dynamicHeaderSize > this.maxDynamicHeaderSize)
 				this.TrimDynamicHeaders();
 
-			if (this.bitsLeft < 8)
+			if (this.bitsLeft < 8 && this.bitsLeft > 0)
 				return this.WriteByteBits(0, this.bitsLeft);
 			else
 				return true;

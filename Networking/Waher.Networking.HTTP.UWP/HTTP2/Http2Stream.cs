@@ -16,13 +16,13 @@ namespace Waher.Networking.HTTP.HTTP2
 	{
 		private readonly int streamId;
 		private readonly HttpClientConnection connection;
-		private readonly ProfilerThread streamThread;
 		private readonly int headerInputWindowSize;
 		private HttpRequestHeader headers = null;
 		private MemoryStream buildingHeaders = null;
 		private TemporaryStream inputDataStream = null;
 		private StreamState state = StreamState.Idle;
 		private WebSocket webSocket = null;
+		private ProfilerThread streamThread;
 		private string protocol = null;
 		private int rfc9218Priority = 3;
 		private bool rfc9218Incremental = false;
@@ -156,8 +156,17 @@ namespace Waher.Networking.HTTP.HTTP2
 			get => this.state;
 			internal set
 			{
-				this.state = value;
-				this.streamThread?.NewState(this.state.ToString());
+				if (this.state != value)
+				{
+					this.state = value;
+					this.streamThread?.NewState(this.state.ToString());
+
+					if (value == StreamState.Closed)
+					{
+						this.streamThread?.Stop();
+						this.streamThread = null;
+					}
+				}
 			}
 		}
 
@@ -444,7 +453,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			this.dataBytesTransmitted += NrBytes;
 
-			if (Last && NrBytes == Count)
+			if (Last && NrBytes == Count && this.webSocket is null)
 				this.State = StreamState.Closed;
 
 			return NrBytes;
@@ -483,6 +492,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal void Upgrade(WebSocket WebSocket)
 		{
 			this.webSocket = WebSocket;
+			this.connection.Upgrade(WebSocket, false);
 			this.upgradedToWebSocket = true;
 			this.State = StreamState.Open;
 		}
@@ -506,6 +516,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Task EarlyHint(string Resource, string Relation,
 			params KeyValuePair<string, string>[] AdditionalParameters)
 		{
+			if (Resource.Length > 256)
+				return Task.CompletedTask;
+
 			if (this.earlyHintsSent is null)
 				this.earlyHintsSent = new Dictionary<string, EarlyHintRec>();
 

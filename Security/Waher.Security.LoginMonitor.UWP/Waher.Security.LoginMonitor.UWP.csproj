@@ -130,6 +130,7 @@
     <Compile Include="LoginInterval.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteEndpoint.cs" />
+    <Compile Include="RemoteEndpointIntervals.cs" />
     <EmbeddedResource Include="Properties\Waher.Security.LoginMonitor.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,6 @@ namespace Waher.Security.LoginMonitor.Test
 		private static readonly TimeSpan OneH = TimeSpan.FromHours(1);
 		private static readonly TimeSpan _23H = TimeSpan.FromHours(23);
 		private static readonly TimeSpan _5D23H = new(5, 23, 0, 0, 0);
-		private static FilesProvider filesProvider = null;
 		private static LoginAuditor auditor = null;
 
 		[ClassInitialize]

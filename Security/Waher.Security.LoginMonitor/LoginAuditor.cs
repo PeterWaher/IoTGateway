@@ -327,21 +327,19 @@ namespace Waher.Security.LoginMonitor
 			if (!EP.LastFailed)
 				return null;
 
-			return this.GetEarliestLoginOpportunity(EP.State, EP.Timestamps,
-				EP.Intervals?.Intervals ?? this.defaultIntervals);
+			return this.GetEarliestLoginOpportunity(EP);
 		}
 
 		/// <summary>
 		/// Gets the earliest next login opportunity for a remote endpoint, given its states and timetamps.
 		/// </summary>
-		/// <param name="States">Current login attempt states.</param>
-		/// <param name="Timestamps">Current login attempt timestamps.</param>
-		/// <param name="Intervals">Number of login attempts possible during given time period. Numbers must be positive, and
-		/// interval ascending. If continually failing past accepted intervals, remote endpoint will be registered as malicious.</param>
+		/// <param name="Endpoint">Remote endpoint.</param>
 		/// <returns>Earliest login opportunity.</returns>
-		public DateTime? GetEarliestLoginOpportunity(int[] States, DateTime[] Timestamps, 
-			LoginInterval[] Intervals)
+		public DateTime? GetEarliestLoginOpportunity(RemoteEndpoint Endpoint)
 		{
+			int[] States = Endpoint.State;
+			DateTime[] Timestamps = Endpoint.Timestamps;
+			LoginInterval[] Intervals = Endpoint.Intervals?.Intervals ?? this.defaultIntervals;
 			int NrIntervals = Intervals.Length;
 			int i = 0;
 			int c = Math.Min(Math.Min(States.Length, Timestamps.Length), NrIntervals);

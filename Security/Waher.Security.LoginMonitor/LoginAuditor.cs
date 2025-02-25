@@ -28,6 +28,7 @@ namespace Waher.Security.LoginMonitor
 
 		private readonly Dictionary<string, RemoteEndpoint> states = new Dictionary<string, RemoteEndpoint>();
 		private readonly Dictionary<string, RemoteEndpointIntervals> endpointIntervals = new Dictionary<string, RemoteEndpointIntervals>();
+		private readonly RemoteEndpointIntervals[] ipRangesIntervals;
 		private readonly LoginInterval[] defaultIntervals;
 		private readonly int defaultNrIntervals;
 		private CaseInsensitiveString domain;
@@ -69,8 +70,17 @@ namespace Waher.Security.LoginMonitor
 		public LoginAuditor(string ObjectID, RemoteEndpointIntervals[] EndpointIntervals, params LoginInterval[] DefaultLoginIntervals)
 			: this(ObjectID, DefaultLoginIntervals)
 		{
+			List<RemoteEndpointIntervals> IpRanges = new List<RemoteEndpointIntervals>();
+
 			foreach (RemoteEndpointIntervals Intervals in EndpointIntervals)
-				this.endpointIntervals[Intervals.Endpoint] = Intervals;
+			{
+				if (Intervals.IsIpRange)
+					IpRanges.Add(Intervals);
+				else
+					this.endpointIntervals[Intervals.Endpoint] = Intervals;
+			}
+
+			this.ipRangesIntervals = IpRanges.ToArray();
 		}
 
 		/// <summary>
@@ -164,7 +174,21 @@ namespace Waher.Security.LoginMonitor
 					return EP;
 
 				if (!this.endpointIntervals.TryGetValue(RemoteEndPoint, out Intervals))
+				{
 					Intervals = null;
+
+					if (IPAddress.TryParse(RemoteEndPoint.RemovePortNumber(), out IPAddress Address))
+					{
+						foreach (RemoteEndpointIntervals Range in this.ipRangesIntervals)
+						{
+							if (Range.IpRange.Matches(Address))
+							{
+								Intervals = Range;
+								break;
+							}
+						}
+					}
+				}
 			}
 
 			int NrIntervals = Intervals?.NrIntervals ?? this.defaultNrIntervals;

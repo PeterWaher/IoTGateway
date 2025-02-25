@@ -47,10 +47,8 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="LoginIntervals">Number of login attempts possible during given time period. Numbers must be positive, and
 		/// interval ascending. If continually failing past accepted intervals, remote endpoint will be registered as malicious.</param>
 		public LoginAuditor(string ObjectID, params LoginInterval[] LoginIntervals)
-			: base(ObjectID)
+			: this(ObjectID, null, LoginIntervals)
 		{
-			this.defaultIntervals = LoginIntervals;
-			this.defaultNrIntervals = this.defaultIntervals.Length;
 		}
 
 		/// <summary>
@@ -68,19 +66,27 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="DefaultLoginIntervals">Default number of login attempts possible during given time period. Numbers must be positive, and
 		/// interval ascending. If continually failing past accepted intervals, remote endpoint will be registered as malicious.</param>
 		public LoginAuditor(string ObjectID, RemoteEndpointIntervals[] EndpointIntervals, params LoginInterval[] DefaultLoginIntervals)
-			: this(ObjectID, DefaultLoginIntervals)
+			: base(ObjectID)
 		{
-			List<RemoteEndpointIntervals> IpRanges = new List<RemoteEndpointIntervals>();
+			this.defaultIntervals = DefaultLoginIntervals;
+			this.defaultNrIntervals = this.defaultIntervals.Length;
 
-			foreach (RemoteEndpointIntervals Intervals in EndpointIntervals)
+			if (EndpointIntervals is null)
+				this.ipRangesIntervals = null;
+			else
 			{
-				if (Intervals.IsIpRange)
-					IpRanges.Add(Intervals);
-				else
-					this.endpointIntervals[Intervals.Endpoint] = Intervals;
-			}
+				List<RemoteEndpointIntervals> IpRanges = new List<RemoteEndpointIntervals>();
 
-			this.ipRangesIntervals = IpRanges.ToArray();
+				foreach (RemoteEndpointIntervals Intervals in EndpointIntervals)
+				{
+					if (Intervals.IsIpRange)
+						IpRanges.Add(Intervals);
+					else
+						this.endpointIntervals[Intervals.Endpoint] = Intervals;
+				}
+		
+				this.ipRangesIntervals = IpRanges.ToArray();
+			}
 		}
 
 		/// <summary>
@@ -176,8 +182,9 @@ namespace Waher.Security.LoginMonitor
 				if (!this.endpointIntervals.TryGetValue(RemoteEndPoint, out Intervals))
 				{
 					Intervals = null;
-
-					if (IPAddress.TryParse(RemoteEndPoint.RemovePortNumber(), out IPAddress Address))
+					
+					if (!(this.ipRangesIntervals is null) &&
+						IPAddress.TryParse(RemoteEndPoint.RemovePortNumber(), out IPAddress Address))
 					{
 						foreach (RemoteEndpointIntervals Range in this.ipRangesIntervals)
 						{

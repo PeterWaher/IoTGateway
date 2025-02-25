@@ -91,6 +91,7 @@ using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
 using Waher.Reports;
 using Waher.Reports.Files;
+using System.Linq;
 
 namespace Waher.IoTGateway
 {
@@ -601,61 +602,89 @@ namespace Waher.IoTGateway
 								break;
 
 							case "LoginAuditor":
-								List<LoginInterval> LoginIntervals = new List<LoginInterval>();
-								Duration LastInterval = Duration.Zero;
-								bool LastMaxInterval = false;
 
-								foreach (XmlNode N2 in E.ChildNodes)
+								LoginInterval[] ParseIntervals(XmlElement E)
 								{
-									if (N2.LocalName == "Interval")
+									List<LoginInterval> LoginIntervals = new List<LoginInterval>();
+									Duration LastInterval = Duration.Zero;
+									bool LastMaxInterval = false;
+
+									foreach (XmlNode N2 in E.ChildNodes)
 									{
-										if (LastMaxInterval)
+										if (N2 is XmlElement E2 && E2.LocalName == "Interval")
 										{
-											Log.Error("Only the last login auditor interval can be the empty 'eternal' interval.",
-												GatewayConfigLocalFileName);
-											break;
-										}
-
-										XmlElement E2 = (XmlElement)N2;
-										int NrAttempts = XML.Attribute(E2, "nrAttempts", 0);
-										if (NrAttempts <= 0)
-										{
-											Log.Error("Number of attempts must be positive when defining an interval for the LoginAuditor",
-												GatewayConfigLocalFileName);
-											continue;
-										}
-
-										if (!E2.HasAttribute("interval"))
-										{
-											LoginIntervals.Add(new LoginInterval(NrAttempts, TimeSpan.MaxValue));
-											LastMaxInterval = true;
-										}
-										else
-										{
-											Duration Interval = XML.Attribute(E2, "interval", Duration.Zero);
-											if (Interval <= Duration.Zero)
+											if (LastMaxInterval)
 											{
-												Log.Error("Login Auditor intervals must be positive", GatewayConfigLocalFileName);
-												continue;
+												Log.Error("Only the last login auditor interval can be the empty 'eternal' interval.",
+													GatewayConfigLocalFileName);
+												break;
 											}
 
-											if (Interval <= LastInterval)
+											int NrAttempts = XML.Attribute(E2, "nrAttempts", 0);
+											if (NrAttempts <= 0)
 											{
-												Log.Error("Login Auditor intervals must be specified in an increasing order.",
+												Log.Error("Number of attempts must be positive when defining an interval for the LoginAuditor",
 													GatewayConfigLocalFileName);
 												continue;
 											}
 
-											LoginIntervals.Add(new LoginInterval(NrAttempts, Interval));
-											LastInterval = Interval;
+											if (!E2.HasAttribute("interval"))
+											{
+												LoginIntervals.Add(new LoginInterval(NrAttempts, TimeSpan.MaxValue));
+												LastMaxInterval = true;
+											}
+											else
+											{
+												Duration Interval = XML.Attribute(E2, "interval", Duration.Zero);
+												if (Interval <= Duration.Zero)
+												{
+													Log.Error("Login Auditor intervals must be positive", GatewayConfigLocalFileName);
+													continue;
+												}
+
+												if (Interval <= LastInterval)
+												{
+													Log.Error("Login Auditor intervals must be specified in an increasing order.",
+														GatewayConfigLocalFileName);
+													continue;
+												}
+
+												LoginIntervals.Add(new LoginInterval(NrAttempts, Interval));
+												LastInterval = Interval;
+											}
 										}
+									}
+
+									return LoginIntervals.ToArray();
+								}
+
+								LoginInterval[] LoginIntervals = ParseIntervals(E);
+								List<RemoteEndpointIntervals> EndpointExceptions = new List<RemoteEndpointIntervals>();
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "Exception")
+									{
+										string EndPoint = XML.Attribute(E2, "endpoint");
+										LoginInterval[] ExceptionIntervals = ParseIntervals(E2);
+
+										if (ExceptionIntervals.Length == 0)
+											Log.Error("Login Auditor exception intervals not specified for endpoint: " + EndPoint, GatewayConfigLocalFileName);
+										else
+											loginAuditor = new LoginAuditor("Login Auditor", LoginIntervals);
+
+										if (ExceptionIntervals.Length == 0)
+											Log.Error("Login Auditor intervals not specified.", GatewayConfigLocalFileName);
+										else
+											EndpointExceptions.Add(new RemoteEndpointIntervals(EndPoint, ExceptionIntervals));
 									}
 								}
 
-								if (LoginIntervals.Count == 0)
+								if (LoginIntervals.Length == 0)
 									Log.Error("Login Auditor intervals not specified.", GatewayConfigLocalFileName);
 								else
-									loginAuditor = new LoginAuditor("Login Auditor", LoginIntervals.ToArray());
+									loginAuditor = new LoginAuditor("Login Auditor", EndpointExceptions.ToArray(), LoginIntervals);
+
 								break;
 						}
 					}

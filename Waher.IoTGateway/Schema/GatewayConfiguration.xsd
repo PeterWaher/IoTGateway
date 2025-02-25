@@ -255,14 +255,27 @@
 				</xs:element>
 				<xs:element name="LoginAuditor" minOccurs="0" maxOccurs="1">
 					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="Interval" minOccurs="1" maxOccurs="unbounded">
+						<xs:choice minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="Interval">
 								<xs:complexType>
 									<xs:attribute name="nrAttempts" type="xs:positiveInteger" use="required"/>
 									<xs:attribute name="interval" type="PositiveDuration" use="optional"/>
 								</xs:complexType>
 							</xs:element>
-						</xs:sequence>
+							<xs:element name="Exception">
+								<xs:complexType>
+									<xs:sequence minOccurs="1" maxOccurs="unbounded">
+										<xs:element name="Interval">
+											<xs:complexType>
+												<xs:attribute name="nrAttempts" type="xs:positiveInteger" use="required"/>
+												<xs:attribute name="interval" type="PositiveDuration" use="optional"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="endpoint" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>

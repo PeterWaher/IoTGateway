@@ -87,6 +87,19 @@ namespace Waher.Runtime.IO
 		/// <summary>
 		/// Checks if an IP Address matches the defined range.
 		/// </summary>
+		/// <param name="Endpoint">Endpoint.</param>
+		/// <returns>If it matches.</returns>
+		public bool Matches(string Endpoint)
+		{
+			if (IPAddress.TryParse(Endpoint.RemovePortNumber(), out IPAddress Address))
+				return this.Matches(Address);
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Checks if an IP Address matches the defined range.
+		/// </summary>
 		/// <param name="Address">IP Address.</param>
 		/// <returns>If it matches.</returns>
 		public bool Matches(IPAddress Address)

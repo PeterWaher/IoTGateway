@@ -201,37 +201,16 @@ function ClosePreview(TextArea)
 	}
 }
 
-
-
-
-
-
-
-
-var EditTimer = null;
-
-function MarkdownKeyDown(Control, Event) {
-	InitEditTimer();
+function MarkdownKeyDown(Control, Event)
+{
 	return MarkdownEditorKeyDown(Control, Event);
 }
 
-function InitEditTimer() {
-	var TextArea = document.getElementById("MarkdownEditorInput");
-	var Timeout = TextArea.getAttribute("data-previewtimer") ? 1000 : 500;
-
-	if (EditTimer)
-		window.clearTimeout(EditTimer);
-
-	EditTimer = window.setTimeout(UpdateHtml, Timeout);
-}
 
 
-
-
-
-function ToggleSidePreview(on)
+function ToggleSidePreview(Button, on)
 {
-	var Div = GetMarkdownDiv()
+	var Div = GetTextArea(Button).parentElement
 	var prev = Div.hasAttribute("data-preview-side")
 	if (on)
 		Div.setAttribute("data-preview-side", "")
@@ -244,7 +223,7 @@ function ToggleSidePreview(on)
 function MarkdownEditorBottomPreviewAndEdit(Button)
 {
 	// if the toggle side preview return true it means that the mode is changing so continue on previewing
-	if (ToggleSidePreview(false) && document.getElementsByClassName("MarkdownPreview").length > 0)
+	if (ToggleSidePreview(Button, false) && document.getElementsByClassName("MarkdownPreview").length > 0)
 		return;
 
 	var TextArea = GetTextArea(Button, true);
@@ -255,15 +234,17 @@ function MarkdownEditorBottomPreviewAndEdit(Button)
 		StartPreview(Button, true);
 }
 
-function MarkdownEditorSidePreviewAndEdit(Button) {
+function MarkdownEditorSidePreviewAndEdit(Button)
+{
 	// if the toggle side preview return true it means that the mode is changing so continue on previewing
-	if (ToggleSidePreview(true) && document.getElementsByClassName("MarkdownPreview").length > 0)
+	if (ToggleSidePreview(Button, true) && document.getElementsByClassName("MarkdownPreview").length > 0)
 		return;
 
 	var TextArea = GetTextArea(Button, true);
 
-	if (TextArea.getAttribute("data-preview")) {
-		ToggleSidePreview(false);
+	if (TextArea.getAttribute("data-preview"))
+	{
+		ToggleSidePreview(Button, false);
 		TextArea.setAttribute("data-preview", "");
 	}
 	else
@@ -290,13 +271,12 @@ function StartPreview(Button, ShowEditor)
 			return;
 		}
 	}
-
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
 		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
-			var PreviewDiv = TextArea.previousSibling;
+			var PreviewDiv = TextArea.nextSibling;
 			if (!PreviewDiv || PreviewDiv.tagName !== "DIV" || PreviewDiv.className !== "MarkdownPreview")
 			{
 				PreviewDiv = document.createElement("DIV");
@@ -309,7 +289,8 @@ function StartPreview(Button, ShowEditor)
 				TextArea.setAttribute("style", "display:none");
 
 			TextArea.setAttribute("data-preview", "true");
-			TextArea.parentNode.insertBefore(PreviewDiv, TextArea);
+			TextArea.parentNode.appendChild(PreviewDiv, TextArea);
+
 		};
 	}
 
@@ -319,10 +300,6 @@ function StartPreview(Button, ShowEditor)
 	xhttp.send(TextArea.value);
 }
 
-function GetMarkdownDiv()
-{
-	return document.getElementById("MarkdownDiv")
-}
 function GetTextArea(Button, HidePreview)
 {
 	if (Button.tagName === "TEXTAREA")
@@ -921,7 +898,6 @@ function MarkdownEditorKeyDown(Control, Event)
 function InitMarkdownEditorPreview(Control)
 {
 	var Timer = Control.getAttribute("data-previewtimer");
-
 	if (Timer)
 	{
 		window.clearTimeout(Timer);
@@ -942,3 +918,18 @@ function MarkdownEditorHelp(Control)
 	var Window = window.open("/Markdown.md", "_blank");
 	Window.focus();
 }
+
+function InitializeMarkdownEditor(container)
+{
+	const textInput = container.parentElement.getElementsByTagName("TEXTAREA")[0]
+	container.appendChild(textInput)
+	textInput.addEventListener("input", e => MarkdownKeyDown(e.target, e))
+}
+
+window.addEventListener("load", () =>
+{
+	Array.from(document.getElementsByClassName("MarkdownDiv")).forEach(container =>
+	{
+		InitializeMarkdownEditor(container)
+	})
+})

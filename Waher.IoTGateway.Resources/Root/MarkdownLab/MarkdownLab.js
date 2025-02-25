@@ -49,5 +49,21 @@ function UpdateHtml()
 	xhttp.open("POST", "MarkdownLab" + Suffix + ".ws", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
 	xhttp.setRequestHeader("Accept", Type);
-	xhttp.send(document.getElementById("Markdown").value);
+	xhttp.send(document.getElementById("LabMarkdownEditorInput").value);
 }
+
+window.addEventListener("load", () =>
+{
+	let updated;
+
+	setInterval(() =>
+	{
+		if (updated)
+		{
+			updated = false;
+			UpdateHtml()
+		}
+	}, 1000)
+
+	document.getElementById("LabMarkdownEditorInput").addEventListener("input", () => updated = true)
+})

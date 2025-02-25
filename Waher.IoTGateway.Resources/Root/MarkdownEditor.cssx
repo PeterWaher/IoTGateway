@@ -1,5 +1,6 @@
 ﻿.MarkdownEditorToolbar
 {
+	width: 100%;
 	background-color:¤Toolbar:=Blend(BackgroundColor,TextColor,0.05)¤;
 	border:1px solid ¤Dark:=Blend(BackgroundColor,TextColor,0.25)¤;
 	margin-bottom:0;
@@ -197,7 +198,7 @@
 }
 
 
-#MarkdownDiv[data-preview-side] #MarkdownEditorInput
+.MarkdownDiv[data-preview-side] .MarkdownEditorInput
 {
 	width: 50%;
 }
@@ -263,13 +264,19 @@
 {
 }
 
-#MarkdownDiv[data-preview-side]
+.MarkdownDiv[data-preview-side]
 {
 	display: flex;
 	flex-wrap: wrap;
 }
 
-#MarkdownDiv[data-preview-side] .MarkdownPreview
+.MarkdownDiv[data-preview-side] .MarkdownPreview
+{
+	width: 50%;
+	padding: 1rem;
+}
+
+.MarkdownDiv[data-preview-side] textarea
 {
 	width: 50%;
 }

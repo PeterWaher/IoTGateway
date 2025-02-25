@@ -17,6 +17,7 @@ Login: /Login.md
 <div id="Lab">
 <section id="MarkdownSection">
 ![](/MarkdownEditor.md)
+<textarea id="LabMarkdownEditorInput" autofocus="autofocus" wrap="hard"></textarea>
 </section>
 
 <section id="HtmlSection">

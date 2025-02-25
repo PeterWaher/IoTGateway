@@ -1,4 +1,4 @@
-﻿<div id="MarkdownDiv">
+﻿<div class="MarkdownDiv">
 <div class="MarkdownEditorToolbar">
 <button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorBold" onclick="MarkdownEditorBold(this)" title="Bold (CTRL+B)">
 **B**</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorItalic" onclick="MarkdownEditorItalic(this)" title="Italic (CTRL+I)">
@@ -51,5 +51,4 @@ a.</button><button type="button" tabindex="-1" class="MarkdownEditorButton Markd
 •|•</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorHelp" onclick="MarkdownEditorHelp(this)" title="Markdown Reference (F1)">
 ?</button>
 </div>
-<textarea id="MarkdownEditorInput" autofocus="autofocus" wrap="hard" onkeydown="return MarkdownKeyDown(this,event);" oninput="InitEditTimer()"></textarea>
 </div>

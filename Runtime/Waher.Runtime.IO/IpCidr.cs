@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace Waher.Things.Ip
+namespace Waher.Runtime.IO
 {
 	/// <summary>
 	/// IP Address Rangee, expressed using CIDR format.

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.IO;
 using Waher.Security;
 
 namespace Waher.Things.Ip.Model

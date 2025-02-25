@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
@@ -199,10 +200,10 @@ namespace Waher.Things.Ip
 			foreach (string Part in Certificate.Subject.Split(certificateSubjectSeparator, StringSplitOptions.None))
 			{
 				if (Part.StartsWith("CN="))
-					Domains.Add(Part.Substring(3));
+					Domains.Add(Part[3..]);
 				else if (Part.StartsWith("SAN="))
 				{
-					Domains.Add(Part.Substring(4));
+					Domains.Add(Part[4..]);
 					HasAlternativeNames = true;
 				}
 			}
@@ -226,7 +227,7 @@ namespace Waher.Things.Ip
 						{
 							int i = Name.LastIndexOf('=');
 							if (i > 0)
-								Domains.Add(Name.Substring(i + 1));
+								Domains.Add(Name[(i + 1)..]);
 						}
 					}
 				}

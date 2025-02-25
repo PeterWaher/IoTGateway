@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Persistence.Files;
 
 namespace Waher.Security.LoginMonitor.Test
 {

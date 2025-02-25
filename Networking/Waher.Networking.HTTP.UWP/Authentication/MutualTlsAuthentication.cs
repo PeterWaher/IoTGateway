@@ -68,9 +68,9 @@ namespace Waher.Networking.HTTP.Authentication
 			if (Certificate is null)
 				return null;
 
-			string UserName = Certificate.Subject;
-			if (UserName.StartsWith("CN="))
-				UserName = UserName.Substring(3);
+			string UserName = BinaryTcpClient.GetDomainFromSubject(Certificate.Subject);
+			if (string.IsNullOrEmpty(UserName))
+				return null;
 
 			if (!Client.RemoteCertificateValid)
 			{

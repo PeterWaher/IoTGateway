@@ -51,7 +51,7 @@ namespace Waher.Networking.SASL
         /// <summary>
         /// Records a successful log in.
         /// </summary>
-        /// <param name="RemoteEndpoint">Identifier of remote endpoint performing the login.</param>
-        Task LoggedIn(string RemoteEndpoint);
+        /// <param name="RemoteEndPoint">Identifier of remote endpoint performing the login.</param>
+        Task LoggedIn(string RemoteEndPoint);
 	}
 }

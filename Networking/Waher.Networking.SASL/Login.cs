@@ -88,7 +88,7 @@ namespace Waher.Networking.SASL
 			IAccount Account = await PersistenceLayer.GetAccount(UserName);
 			if (Account is null)
 			{
-				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Connection.RemoteEndpoint, Connection.Protocol,
+				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Connection.RemoteEndPoint, Connection.Protocol,
 					new KeyValuePair<string, object>("UserName", UserName));
 				await Connection.SaslErrorNotAuthorized();
 				return null;
@@ -96,7 +96,7 @@ namespace Waher.Networking.SASL
 
 			if (!Account.Enabled)
 			{
-				LoginAuditor.Fail("Login attempt using disabled account.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using disabled account.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 				await Connection.SaslErrorAccountDisabled();
 				return null;
 			}
@@ -107,12 +107,12 @@ namespace Waher.Networking.SASL
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(null);
 
-				LoginAuditor.Success("Login successful.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Success("Login successful.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 			}
 			else
 			{
 				await Connection.SaslErrorNotAuthorized();
-				LoginAuditor.Fail("Login attempt failed.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt failed.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 			}
 
 			return null;

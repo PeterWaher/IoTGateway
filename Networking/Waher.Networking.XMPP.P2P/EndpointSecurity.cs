@@ -74,7 +74,7 @@ namespace Waher.Networking.XMPP.P2P
 		private static Type[] e2eTypes = null;
 		private static bool e2eTypesLocked = false;
 
-		private readonly Dictionary<string, RemoteEndpoints> contacts;
+		private readonly Dictionary<string, RemoteEndPoints> contacts;
 		private XmppClient client;
 		private readonly XmppServerlessMessaging serverlessMessaging;
 		private Dictionary<string, IE2eEndpoint> oldKeys = null;
@@ -90,7 +90,7 @@ namespace Waher.Networking.XMPP.P2P
 		private AeadChaCha20Poly1305 acp = new AeadChaCha20Poly1305();
 		private ChaCha20 cha = new ChaCha20();
 
-		private class RemoteEndpoints
+		private class RemoteEndPoints
 		{
 			public Dictionary<string, IE2eEndpoint> ByFqn;
 			public IE2eEndpoint Default;
@@ -142,7 +142,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.securityStrength = SecurityStrength;
 			this.client = Client;
 			this.serverlessMessaging = ServerlessMessaging;
-			this.contacts = new Dictionary<string, RemoteEndpoints>(StringComparer.CurrentCultureIgnoreCase);
+			this.contacts = new Dictionary<string, RemoteEndPoints>(StringComparer.CurrentCultureIgnoreCase);
 
 			if (LocalEndpoints is null)
 			{
@@ -419,7 +419,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			lock (this.contacts)
 			{
-				foreach (RemoteEndpoints Endpoints in this.contacts.Values)
+				foreach (RemoteEndPoints Endpoints in this.contacts.Values)
 				{
 					foreach (IE2eEndpoint Endpoint in Endpoints.ByFqn.Values)
 						Endpoint.Dispose();
@@ -614,14 +614,14 @@ namespace Waher.Networking.XMPP.P2P
 					return false;
 				}
 
-				RemoteEndpoints OldEndpoints;
+				RemoteEndPoints OldEndpoints;
 
 				lock (this.contacts)
 				{
 					if (!this.contacts.TryGetValue(FullJID, out OldEndpoints))
 						OldEndpoints = null;
 
-					this.contacts[FullJID] = new RemoteEndpoints()
+					this.contacts[FullJID] = new RemoteEndPoints()
 					{
 						ByFqn = Endpoints
 					};
@@ -649,7 +649,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If E2E information was found and removed.</returns>
 		public bool RemovePeerPkiInfo(string FullJID)
 		{
-			RemoteEndpoints Keys;
+			RemoteEndPoints Keys;
 
 			lock (this.contacts)
 			{
@@ -687,7 +687,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			lock (this.contacts)
 			{
-				if (this.contacts.TryGetValue(FullJid, out RemoteEndpoints Endpoints))
+				if (this.contacts.TryGetValue(FullJid, out RemoteEndPoints Endpoints))
 					return SortedArray(Endpoints.ByFqn);
 			}
 
@@ -811,7 +811,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			lock (this.contacts)
 			{
-				if (!this.contacts.TryGetValue(RemoteJid, out RemoteEndpoints Endpoints))
+				if (!this.contacts.TryGetValue(RemoteJid, out RemoteEndPoints Endpoints))
 					return null;
 
 				if (EndpointReference is null)

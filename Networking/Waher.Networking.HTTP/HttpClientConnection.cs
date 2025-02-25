@@ -2045,19 +2045,8 @@ namespace Waher.Networking.HTTP
 
 		private async Task<bool> RequestReceived(HttpRequestHeader Header, Stream DataStream, Http2Stream Http2Stream)
 		{
-#if WINDOWS_UWP
-			StreamSocket UnderlyingSocket = this.client.Client;
 			HttpRequest Request = new HttpRequest(this.server, Header, DataStream,
-				UnderlyingSocket.Information.RemoteAddress.ToString() + ":" + UnderlyingSocket.Information.RemotePort,
-				UnderlyingSocket.Information.LocalAddress.ToString() + ":" + UnderlyingSocket.Information.LocalPort,
-				Http2Stream);
-#else
-			Socket UnderlyingSocket = this.client.Client.Client;
-			HttpRequest Request = new HttpRequest(this.server, Header, DataStream,
-				UnderlyingSocket.RemoteEndPoint.ToString(),
-				UnderlyingSocket.LocalEndPoint.ToString(),
-				Http2Stream);
-#endif
+				this.client.RemoteEndPoint, this.client.LocalEndPoint, Http2Stream);
 			Request.clientConnection = this;
 
 			bool? Queued = await this.QueueRequest(Request);
@@ -2090,12 +2079,8 @@ namespace Waher.Networking.HTTP
 				{
 					Request.Resource = Resource;
 					Request.SubPath = SubPath;
-#if WINDOWS_UWP
-					this.server.RequestReceived(Request, this.client.Client.Information.RemoteAddress.ToString() + ":" + 
-						this.client.Client.Information.RemotePort, Resource, SubPath);
-#else
-					this.server.RequestReceived(Request, this.client.Client.Client.RemoteEndPoint.ToString(), Resource, SubPath);
-#endif
+
+					this.server.RequestReceived(Request, this.client.RemoteEndPoint, Resource, SubPath);
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
 					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0 && Request.Header.Method != "OPTIONS")
@@ -2246,12 +2231,7 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-#if WINDOWS_UWP
-					this.server.RequestReceived(Request, this.client.Client.Information.RemoteAddress.ToString() + ":" + 
-						this.client.Client.Information.RemotePort, null, Request.Header.Resource);
-#else
-					this.server.RequestReceived(Request, this.client.Client.Client.RemoteEndPoint.ToString(), null, Request.Header.Resource);
-#endif
+					this.server.RequestReceived(Request, this.client.RemoteEndPoint, null, Request.Header.Resource);
 
 					await this.SendResponse(Request, null, new NotFoundException("Resource not found: " + this.server.CheckResourceOverride(Request.Header.Resource)), false);
 					Result = true;

@@ -179,12 +179,13 @@ namespace Waher.Things.Ip.Model
 								}
 							}
 
-							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
-
 							BinaryTcpClient Incoming = new BinaryTcpClient(Client, false);
 							BinaryTcpClient Outgoing = null;
 
 							Incoming.Bind(true);
+
+							this.Information("Connection accepted from " + Incoming.RemoteEndPoint + ".");
+
 
 							if (!Types.TryGetModuleParameter("X509", out object Obj) || !(Obj is X509Certificate Certificate))
 								Certificate = null;
@@ -284,15 +285,9 @@ namespace Waher.Things.Ip.Model
 
 		private async Task SwitchToTls(BinaryTcpClient Incoming, BinaryTcpClient Outgoing, X509Certificate Certificate)
 		{
-			string RemoteIpEndpoint;
-			EndPoint EP = Incoming.Client.Client.RemoteEndPoint;
+			string RemoteEndpoint = Incoming.RemoteEndPoint.RemovePortNumber();
 
-			if (EP is IPEndPoint IpEP)
-				RemoteIpEndpoint = IpEP.Address.ToString();
-			else
-				RemoteIpEndpoint = EP.ToString();
-
-			if (LoginAuditor.CanStartTls(RemoteIpEndpoint))
+			if (LoginAuditor.CanStartTls(RemoteEndpoint))
 			{
 				try
 				{
@@ -328,19 +323,19 @@ namespace Waher.Things.Ip.Model
 								break;
 						}
 
-						string RemoteEndpoint = Incoming.Client.Client.RemoteEndPoint.ToString().RemovePortNumber();
+						string RemoteEndPoint = Incoming.RemoteEndPoint.RemovePortNumber();
 
 						if (User is null)
 						{
 							string Msg = "Invalid login: No user found matching certificate subject.";
-							LoginAuditor.Fail(Msg, User.UserName, RemoteEndpoint, "PROXY");
+							LoginAuditor.Fail(Msg, User.UserName, RemoteEndPoint, "PROXY");
 							this.Error(Msg);
 							await Incoming.DisposeAsync();
 							await Outgoing.DisposeAsync();
 							return;
 						}
 						else
-							LoginAuditor.Success("Successful login using remote certificate.", User.UserName, RemoteEndpoint, "PROXY");
+							LoginAuditor.Success("Successful login using remote certificate.", User.UserName, RemoteEndPoint, "PROXY");
 					}
 
 					if (this.HasSniffers)
@@ -383,7 +378,7 @@ namespace Waher.Things.Ip.Model
 				}
 				catch (AuthenticationException ex)
 				{
-					await this.LoginFailure(ex, Incoming, Outgoing, RemoteIpEndpoint);
+					await this.LoginFailure(ex, Incoming, Outgoing, RemoteEndpoint);
 				}
 				catch (Win32Exception ex)
 				{
@@ -393,7 +388,7 @@ namespace Waher.Things.Ip.Model
 						await Outgoing.DisposeAsync();
 					}
 					else
-						await this.LoginFailure(ex, Incoming, Outgoing, RemoteIpEndpoint);
+						await this.LoginFailure(ex, Incoming, Outgoing, RemoteEndpoint);
 				}
 				catch (IOException)
 				{

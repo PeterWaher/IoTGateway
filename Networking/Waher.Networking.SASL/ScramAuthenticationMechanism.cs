@@ -73,7 +73,7 @@ namespace Waher.Networking.SASL
 			if (UserName is null || Nonce is null)
 			{
 				Connection.SaslErrorMalformedRequest();
-				LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 				return Task.FromResult<bool?>(null);
 			}
 
@@ -126,7 +126,7 @@ namespace Waher.Networking.SASL
 						if (ServerNonce != Pair.Value)
 						{
 							await Connection.SaslErrorMalformedRequest();
-							LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+							LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 							return null;
 						}
 						break;
@@ -140,14 +140,14 @@ namespace Waher.Networking.SASL
 			if (!ServerNonceChecked)
 			{
 				await Connection.SaslErrorMalformedRequest();
-				LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using malformed request.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 				return null;
 			}
 
 			IAccount Account = await PersistenceLayer.GetAccount(UserName);
 			if (Account is null)
 			{
-				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Connection.RemoteEndpoint, Connection.Protocol,
+				LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Connection.RemoteEndPoint, Connection.Protocol,
 					new KeyValuePair<string, object>("UserName", UserName));
 				await Connection.SaslErrorNotAuthorized();
 				return null;
@@ -155,7 +155,7 @@ namespace Waher.Networking.SASL
 
 			if (!Account.Enabled)
 			{
-				LoginAuditor.Fail("Login attempt using disabled account.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt using disabled account.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 				await Connection.SaslErrorAccountDisabled();
 				return null;
 			}
@@ -202,12 +202,12 @@ namespace Waher.Networking.SASL
 
 				Connection.ResetState(true);
 				await Connection.SaslSuccess(Response);
-				LoginAuditor.Success("Login successful.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Success("Login successful.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 			}
 			else
 			{
 				await Connection.SaslErrorNotAuthorized();
-				LoginAuditor.Fail("Login attempt failed.", UserName, Connection.RemoteEndpoint, Connection.Protocol);
+				LoginAuditor.Fail("Login attempt failed.", UserName, Connection.RemoteEndPoint, Connection.Protocol);
 			}
 
 			return null;

@@ -15,16 +15,16 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Event arguments for endpoint annotation events.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		public AnnotateEndpointEventArgs(string RemoteEndpoint)
+		/// <param name="RemoteEndPoint">Remote endpoint.</param>
+		public AnnotateEndpointEventArgs(string RemoteEndPoint)
 		{
-			this.remoteEndpoint = RemoteEndpoint;
+			this.remoteEndpoint = RemoteEndPoint;
 		}
 
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		public string RemoteEndpoint => this.remoteEndpoint;
+		public string RemoteEndPoint => this.remoteEndpoint;
 
 		/// <summary>
 		/// Gets annotations, in the form of an array of tags.

@@ -1156,10 +1156,10 @@ namespace Waher.Networking.HTTP
 
 						if (!(Client is null))
 						{
-							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
-
 							BinaryTcpClient BinaryTcpClient = new BinaryTcpClient(Client, false);
 							BinaryTcpClient.Bind(true);
+
+							this.Information("Connection accepted from " + BinaryTcpClient.RemoteEndPoint + ".");
 
 							if (Tls)
 							{
@@ -1223,15 +1223,9 @@ namespace Waher.Networking.HTTP
 
 		private async Task SwitchToTls(BinaryTcpClient Client, ClientCertificates ClientCertificates, bool TrustCertificates, int Port)
 		{
-			string RemoteIpEndpoint;
-			EndPoint EP = Client.Client.Client.RemoteEndPoint;
+			string RemoteEndpoint = Client.RemoteEndPoint.RemovePortNumber();
 
-			if (EP is IPEndPoint IpEP)
-				RemoteIpEndpoint = IpEP.Address.ToString();
-			else
-				RemoteIpEndpoint = EP.ToString();
-
-			if (Security.LoginMonitor.LoginAuditor.CanStartTls(RemoteIpEndpoint))
+			if (Security.LoginMonitor.LoginAuditor.CanStartTls(RemoteEndpoint))
 			{
 				try
 				{
@@ -1308,7 +1302,7 @@ namespace Waher.Networking.HTTP
 					if (this.HasSniffers)
 						this.Exception(ex);
 
-					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
+					await this.LoginFailure(ex, Client, RemoteEndpoint);
 				}
 				catch (SocketException ex)
 				{
@@ -1322,7 +1316,7 @@ namespace Waher.Networking.HTTP
 					if (this.HasSniffers)
 						this.Exception(ex);
 
-					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
+					await this.LoginFailure(ex, Client, RemoteEndpoint);
 				}
 				catch (IOException ex)
 				{
@@ -2078,7 +2072,7 @@ namespace Waher.Networking.HTTP
 				using (MemoryStream ms = new MemoryStream())
 				{
 					HttpRequest Request = new HttpRequest(this,
-						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "unknown", "unknown")
+						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "internal", "internal")
 					{
 						Session = Session,
 						SubPath = SubPath,

@@ -20,8 +20,8 @@ namespace Waher.Networking.SASL
         /// Successful login to account registered.
         /// </summary>
         /// <param name="UserName">User name of account.</param>
-        /// <param name="RemoteEndpoint">Remote endpoint of client.</param>
-        void AccountLogin(CaseInsensitiveString UserName, string RemoteEndpoint);
+        /// <param name="RemoteEndPoint">Remote endpoint of client.</param>
+        void AccountLogin(CaseInsensitiveString UserName, string RemoteEndPoint);
 
 		/// <summary>
 		/// Generates a set of random numbers.

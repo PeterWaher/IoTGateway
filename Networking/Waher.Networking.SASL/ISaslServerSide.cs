@@ -27,7 +27,7 @@ namespace Waher.Networking.SASL
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		string RemoteEndpoint
+		string RemoteEndPoint
 		{
 			get;
 		}

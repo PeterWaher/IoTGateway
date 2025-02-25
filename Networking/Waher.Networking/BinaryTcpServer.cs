@@ -592,7 +592,7 @@ namespace Waher.Networking
 
 							if (await this.AcceptConnection(Connection))
 							{
-								this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+								this.Information("Connection accepted from " + BinaryTcpClient.RemoteEndPoint + ".");
 
 								if (this.tls)
 								{

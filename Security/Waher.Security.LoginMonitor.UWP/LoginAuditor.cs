@@ -119,22 +119,22 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Gets an annotated Remote endpoint state object, if one is available.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
+		/// <param name="RemoteEndPoint">Remote Endpoint.</param>
 		/// <returns>Annotated state object, if available. Null otherwise.</returns>
-		public Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint)
+		public Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndPoint)
 		{
-			return this.GetAnnotatedStateObject(RemoteEndpoint, false);
+			return this.GetAnnotatedStateObject(RemoteEndPoint, false);
 		}
 
 		/// <summary>
 		/// Gets an annotated Remote endpoint state object, if one is available.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
+		/// <param name="RemoteEndPoint">Remote Endpoint.</param>
 		/// <param name="CreateNew">If a new object can be created if none exists.</param>
 		/// <returns>Annotated state object, if available. Null otherwise.</returns>
-		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndpoint, bool CreateNew)
+		public async Task<RemoteEndpoint> GetAnnotatedStateObject(string RemoteEndPoint, bool CreateNew)
 		{
-			string s = RemoteEndpoint.RemovePortNumber();
+			string s = RemoteEndPoint.RemovePortNumber();
 			RemoteEndpoint EP = await this.GetStateObject(s, string.Empty, CreateNew);
 			if (EP is null)
 				return null;
@@ -151,19 +151,19 @@ namespace Waher.Security.LoginMonitor
 			return EP;
 		}
 
-		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndpoint, string Protocol, bool CreateNew)
+		private async Task<RemoteEndpoint> GetStateObject(string RemoteEndPoint, string Protocol, bool CreateNew)
 		{
 			RemoteEndpoint EP;
 			RemoteEndpointIntervals Intervals;
 
-			RemoteEndpoint = RemoteEndpoint.RemovePortNumber();
+			RemoteEndPoint = RemoteEndPoint.RemovePortNumber();
 
 			lock (this.states)
 			{
-				if (this.states.TryGetValue(RemoteEndpoint, out EP))
+				if (this.states.TryGetValue(RemoteEndPoint, out EP))
 					return EP;
 
-				if (!this.endpointIntervals.TryGetValue(RemoteEndpoint, out Intervals))
+				if (!this.endpointIntervals.TryGetValue(RemoteEndPoint, out Intervals))
 					Intervals = null;
 			}
 
@@ -171,7 +171,7 @@ namespace Waher.Security.LoginMonitor
 			bool Created = false;
 			bool Updated = false;
 
-			EP = await Database.FindFirstIgnoreRest<RemoteEndpoint>(new FilterFieldEqualTo("Endpoint", RemoteEndpoint), "Created");
+			EP = await Database.FindFirstIgnoreRest<RemoteEndpoint>(new FilterFieldEqualTo("Endpoint", RemoteEndPoint), "Created");
 
 			if (EP is null)
 			{
@@ -180,7 +180,7 @@ namespace Waher.Security.LoginMonitor
 
 				EP = new RemoteEndpoint()
 				{
-					Endpoint = RemoteEndpoint,
+					Endpoint = RemoteEndPoint,
 					LastProtocol = Protocol,
 					Created = DateTime.Now,
 					Blocked = false,
@@ -206,11 +206,11 @@ namespace Waher.Security.LoginMonitor
 
 			lock (this.states)
 			{
-				if (this.states.TryGetValue(RemoteEndpoint, out RemoteEndpoint EP2))
+				if (this.states.TryGetValue(RemoteEndPoint, out RemoteEndpoint EP2))
 					return EP2;
 
 				EP.Intervals = Intervals;
-				this.states[RemoteEndpoint] = EP;
+				this.states[RemoteEndPoint] = EP;
 			}
 
 			if (Created)
@@ -227,11 +227,11 @@ namespace Waher.Security.LoginMonitor
 		/// NOTE: Typically, logins are audited by listening on logged events.
 		/// This method should only be called directly when such events are not logged.
 		/// </summary>
-		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
-		public async Task ProcessLoginSuccessful(string RemoteEndpoint, string Protocol)
+		public async Task ProcessLoginSuccessful(string RemoteEndPoint, string Protocol)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 			if (EP.LastProtocol == Protocol && !EP.LastFailed)
 				return;
 
@@ -247,15 +247,15 @@ namespace Waher.Security.LoginMonitor
 		/// NOTE: Typically, logins are audited by listening on logged events.
 		/// This method should only be called directly when such events are not logged.
 		/// </summary>
-		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Reason">Reason for the failure. Will be logged with the state object, in case the remote endpoint
 		/// gets blocked.</param>
 		/// <returns>If the remote endpoint was or has been blocked as a result of the failure.</returns>
-		public async Task<bool> ProcessLoginFailure(string RemoteEndpoint, string Protocol, DateTime Timestamp, string Reason)
+		public async Task<bool> ProcessLoginFailure(string RemoteEndPoint, string Protocol, DateTime Timestamp, string Reason)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 			LoginInterval[] Intervals = EP.Intervals?.Intervals ?? this.defaultIntervals;
 			int NrIntervals = EP.Intervals?.NrIntervals ?? this.defaultNrIntervals;
 			int i;
@@ -305,7 +305,7 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Checks when a remote endpoint can login.
 		/// </summary>
-		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
 		/// <returns>When the remote endpoint is allowed to login:
 		/// 
@@ -314,12 +314,12 @@ namespace Waher.Security.LoginMonitor
 		/// Other <see cref="DateTime"/> values indicate when, at the earliest, the remote endpoint
 		/// is allowed to login again.
 		/// </returns>
-		public async Task<DateTime?> GetEarliestLoginOpportunity(string RemoteEndpoint, string Protocol)
+		public async Task<DateTime?> GetEarliestLoginOpportunity(string RemoteEndPoint, string Protocol)
 		{
-			if (string.IsNullOrEmpty(RemoteEndpoint))
+			if (string.IsNullOrEmpty(RemoteEndPoint))
 				return null;
 
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 
 			if (EP.Blocked)
 				return DateTime.MaxValue;
@@ -385,11 +385,11 @@ namespace Waher.Security.LoginMonitor
 		/// Appends WHOIS information to a Markdown document.
 		/// </summary>
 		/// <param name="Markdown">Markdown being built.</param>
-		/// <param name="RemoteEndpoint">Remote Endpoint.</param>
+		/// <param name="RemoteEndPoint">Remote Endpoint.</param>
 		/// <returns>WHOIS information found, or <see cref="string.Empty"/> if no information found.</returns>
-		public static async Task<string> AppendWhoIsInfo(StringBuilder Markdown, string RemoteEndpoint)
+		public static async Task<string> AppendWhoIsInfo(StringBuilder Markdown, string RemoteEndPoint)
 		{
-			if (IPAddress.TryParse(RemoteEndpoint, out IPAddress Address))
+			if (IPAddress.TryParse(RemoteEndPoint, out IPAddress Address))
 			{
 				try
 				{
@@ -417,12 +417,12 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Annotates a remote endpoint.
 		/// </summary>
-		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
 		/// <param name="Tags">Predefined tags.</param>
 		/// <returns>Tags, including tags provided by external annotation.</returns>
-		public static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, params KeyValuePair<string, object>[] Tags)
+		public static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndPoint, params KeyValuePair<string, object>[] Tags)
 		{
-			AnnotateEndpointEventArgs e = new AnnotateEndpointEventArgs(RemoteEndpoint);
+			AnnotateEndpointEventArgs e = new AnnotateEndpointEventArgs(RemoteEndPoint);
 
 			foreach (KeyValuePair<string, object> Tag in Tags)
 				e.AddTag(Tag.Key, Tag.Value);
@@ -440,20 +440,20 @@ namespace Waher.Security.LoginMonitor
 		/// <summary>
 		/// Unblocks a remote endpoint and resets counters for it.
 		/// </summary>
-		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
-		public Task UnblockAndReset(string RemoteEndpoint)
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
+		public Task UnblockAndReset(string RemoteEndPoint)
 		{
-			return this.UnblockAndReset(RemoteEndpoint, string.Empty);
+			return this.UnblockAndReset(RemoteEndPoint, string.Empty);
 		}
 
 		/// <summary>
 		/// Unblocks a remote endpoint and resets counters for it.
 		/// </summary>
-		/// <param name="RemoteEndpoint">String-representation of remote endpoint.</param>
+		/// <param name="RemoteEndPoint">String-representation of remote endpoint.</param>
 		/// <param name="Protocol">Protocol used to log in.</param>
-		public async Task UnblockAndReset(string RemoteEndpoint, string Protocol)
+		public async Task UnblockAndReset(string RemoteEndPoint, string Protocol)
 		{
-			RemoteEndpoint EP = await this.GetStateObject(RemoteEndpoint, Protocol, true);
+			RemoteEndpoint EP = await this.GetStateObject(RemoteEndPoint, Protocol, true);
 
 			if (!string.IsNullOrEmpty(Protocol))
 				EP.LastProtocol = Protocol;
@@ -464,7 +464,7 @@ namespace Waher.Security.LoginMonitor
 
 			lock (tlsHackEndpoints)
 			{
-				tlsHackEndpoints.Remove(RemoteEndpoint);
+				tlsHackEndpoints.Remove(RemoteEndPoint);
 			}
 		}
 
@@ -473,16 +473,16 @@ namespace Waher.Security.LoginMonitor
 		/// </summary>
 		/// <param name="Message">Log message</param>
 		/// <param name="UserName">Attempted user name.</param>
-		/// <param name="RemoteEndpoint">String representation of remote endpoint</param>
+		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
 		/// <param name="Protocol">Protocol</param>
 		/// <param name="Tags">Any informative tags.</param>
-		public static async void Fail(string Message, string UserName, string RemoteEndpoint, string Protocol,
+		public static async void Fail(string Message, string UserName, string RemoteEndPoint, string Protocol,
 			params KeyValuePair<string, object>[] Tags)
 		{
 			try
 			{
-				Tags = await Annotate(RemoteEndpoint, Protocol, Tags);
-				Log.Notice(Message, UserName, RemoteEndpoint, "LoginFailure", Tags);
+				Tags = await Annotate(RemoteEndPoint, Protocol, Tags);
+				Log.Notice(Message, UserName, RemoteEndPoint, "LoginFailure", Tags);
 			}
 			catch (Exception ex)
 			{
@@ -490,7 +490,7 @@ namespace Waher.Security.LoginMonitor
 			}
 		}
 
-		private static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndpoint, string Protocol,
+		private static async Task<KeyValuePair<string, object>[]> Annotate(string RemoteEndPoint, string Protocol,
 			params KeyValuePair<string, object>[] Tags)
 		{
 			int c = Tags?.Length ?? 0;
@@ -500,7 +500,7 @@ namespace Waher.Security.LoginMonitor
 				Array.Resize(ref Tags, c + 1);
 
 			Tags[c] = new KeyValuePair<string, object>("Protocol", Protocol);
-			return await Annotate(RemoteEndpoint, Tags);
+			return await Annotate(RemoteEndPoint, Tags);
 		}
 
 		/// <summary>
@@ -508,16 +508,16 @@ namespace Waher.Security.LoginMonitor
 		/// </summary>
 		/// <param name="Message">Log message</param>
 		/// <param name="UserName">Attempted user name.</param>
-		/// <param name="RemoteEndpoint">String representation of remote endpoint</param>
+		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
 		/// <param name="Protocol">Protocol</param>
 		/// <param name="Tags">Any informative tags.</param>
-		public static async void Success(string Message, string UserName, string RemoteEndpoint, string Protocol,
+		public static async void Success(string Message, string UserName, string RemoteEndPoint, string Protocol,
 			params KeyValuePair<string, object>[] Tags)
 		{
 			try
 			{
-				Tags = await Annotate(RemoteEndpoint, Protocol, Tags);
-				Log.Informational(Message, UserName, RemoteEndpoint, "LoginSuccessful", Tags);
+				Tags = await Annotate(RemoteEndPoint, Protocol, Tags);
+				Log.Informational(Message, UserName, RemoteEndPoint, "LoginSuccessful", Tags);
 			}
 			catch (Exception ex)
 			{
@@ -552,17 +552,17 @@ namespace Waher.Security.LoginMonitor
 		/// </summary>
 		/// <param name="Message">Log message</param>
 		/// <param name="UserName">Attempted user name.</param>
-		/// <param name="RemoteEndpoint">String representation of remote endpoint</param>
+		/// <param name="RemoteEndPoint">String representation of remote endpoint</param>
 		/// <param name="Protocol">Protocol</param>
 		/// <param name="Tags">Any informative tags.</param>
-		public static async Task SilentSuccess(string Message, string UserName, string RemoteEndpoint, string Protocol,
+		public static async Task SilentSuccess(string Message, string UserName, string RemoteEndPoint, string Protocol,
 			params KeyValuePair<string, object>[] Tags)
 		{
 			LoginAuditor Auditor = Instance;
 			if (Auditor is null)
 				return;
 
-			string s = RemoteEndpoint.RemovePortNumber();
+			string s = RemoteEndPoint.RemovePortNumber();
 			RemoteEndpoint EP = await Auditor.GetStateObject(s, Protocol, false);
 			if (EP is null)
 				return;
@@ -570,24 +570,24 @@ namespace Waher.Security.LoginMonitor
 			if (!EP.LastFailed)
 				return;
 
-			Success(Message, UserName, RemoteEndpoint, Protocol, Tags);
+			Success(Message, UserName, RemoteEndPoint, Protocol, Tags);
 		}
 
 		/// <summary>
 		/// Reports a TLS hacking attempt from an endpoint. Can be used to deny TLS negotiation to proceed, and conserving resources
 		/// through use of <see cref="CanStartTls(string)"/>.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint performing the attack.</param>
+		/// <param name="RemoteEndPoint">Remote endpoint performing the attack.</param>
 		/// <param name="Message">Message to log.</param>
 		/// <param name="Protocol">Protocol used.</param>
-		public static async Task ReportTlsHackAttempt(string RemoteEndpoint, string Message, string Protocol)
+		public static async Task ReportTlsHackAttempt(string RemoteEndPoint, string Message, string Protocol)
 		{
 			lock (tlsHackEndpoints)
 			{
-				tlsHackEndpoints[RemoteEndpoint] = DateTime.Now;
+				tlsHackEndpoints[RemoteEndPoint] = DateTime.Now;
 			}
 
-			Fail(Message, string.Empty, RemoteEndpoint, Protocol, await Annotate(RemoteEndpoint));
+			Fail(Message, string.Empty, RemoteEndPoint, Protocol, await Annotate(RemoteEndPoint));
 		}
 
 		private static readonly Dictionary<string, DateTime> tlsHackEndpoints = new Dictionary<string, DateTime>();
@@ -596,18 +596,18 @@ namespace Waher.Security.LoginMonitor
 		/// Checks if TLS negotiation can start, for a given endpoint. If the endpoint has tries a TLS hack attempt during the
 		/// last hour, the answer will be no.
 		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint wishing to start TLS.</param>
+		/// <param name="RemoteEndPoint">Remote endpoint wishing to start TLS.</param>
 		/// <returns>If TLS-negotiation can proceed.</returns>
-		public static bool CanStartTls(string RemoteEndpoint)
+		public static bool CanStartTls(string RemoteEndPoint)
 		{
 			lock (tlsHackEndpoints)
 			{
-				if (tlsHackEndpoints.TryGetValue(RemoteEndpoint, out DateTime TP))
+				if (tlsHackEndpoints.TryGetValue(RemoteEndPoint, out DateTime TP))
 				{
 					if (DateTime.Now.Subtract(TP).TotalHours < 1)
 						return false;
 
-					tlsHackEndpoints.Remove(RemoteEndpoint);
+					tlsHackEndpoints.Remove(RemoteEndPoint);
 					return true;
 				}
 				else

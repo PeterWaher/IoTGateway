@@ -321,8 +321,9 @@ The [Networking](Networking) folder contains libraries that manage different asp
 
 The folder also contains the following unit test projects:
 
-| Project                              | Type          | Project description |
-|--------------------------------------|---------------|---------------------|
+| Project                              | Type     | Project description |
+|--------------------------------------|----------|---------------------|
+| **Waher.Networking.Test**            | .NET 8.0 | The [Waher.Networking.Test](Networking/Waher.Networking.Test) project contains unit-tests for the [Waher.Networking](Networking/Waher.Networking) library. |
 | **Waher.Networking.Cluster.Test**    | .NET 8.0 | The [Waher.Networking.Cluster.Test](Networking/Waher.Networking.Cluster.Test) project contains unit-tests for the [Waher.Networking.Cluster](Networking/Waher.Networking.Cluster) library. |
 | **Waher.Networking.CoAP.Test**       | .NET 8.0 | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
 | **Waher.Networking.DNS.Test**        | .NET 8.0 | The [Waher.Networking.DNS.Test](Networking/Waher.Networking.DNS.Test) project contains unit-tests for the [Waher.Networking.DNS](Networking/Waher.Networking.DNS) library. |

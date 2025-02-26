@@ -15,8 +15,10 @@ namespace Waher.Runtime.Queue
 		private readonly CancellationTokenSource cancel = new CancellationTokenSource();
 		private readonly Task[] processors;
 		private AsyncQueue<T> queue = new AsyncQueue<T>();
+		private int nrProcessors;
 		private bool terminating = false;
 		private bool terminated = false;
+		private bool idle = true;
 
 		/// <summary>
 		/// Processes work tasks, in an asynchronous manner.
@@ -30,7 +32,8 @@ namespace Waher.Runtime.Queue
 			List<Task> Processors = new List<Task>();
 			int i;
 
-			for (i = 0; i < NrProcessors; i++)
+			this.nrProcessors = NrProcessors;
+			for (i = 0; i < this.nrProcessors; i++)
 				Processors.Add(this.PerformWork(i));
 
 			this.processors = Processors.ToArray();
@@ -76,7 +79,10 @@ namespace Waher.Runtime.Queue
 		public void Queue(T Work)
 		{
 			if (!this.terminating)
+			{
+				this.idle = false;
 				this.queue?.Queue(Work);
+			}
 		}
 
 		/// <summary>
@@ -87,7 +93,10 @@ namespace Waher.Runtime.Queue
 		public Task<bool> Forward(T Work)
 		{
 			if (!this.terminating)
+			{
+				this.idle = false;
 				return this.queue?.Forward(Work) ?? Task.FromResult(false);
+			}
 			else
 				return Task.FromResult(false);
 		}
@@ -108,6 +117,11 @@ namespace Waher.Runtime.Queue
 		public int QueueSize => this.queue?.CountItems ?? 0;
 
 		/// <summary>
+		/// If processor is idle
+		/// </summary>
+		public bool Idle => this.idle;
+
+		/// <summary>
 		/// Performs console operations.
 		/// </summary>
 		/// <param name="ProcessorIndex">Index of processor.</param>
@@ -116,6 +130,7 @@ namespace Waher.Runtime.Queue
 			try
 			{
 				CancellationToken Cancel = this.cancel.Token;
+				ProcessorEventArgs e = new ProcessorEventArgs(ProcessorIndex);
 				T Item;
 				Task<T> Task;
 
@@ -125,25 +140,17 @@ namespace Waher.Runtime.Queue
 					if (Task is null)
 						break;
 
-					if (!Task.IsCompleted)
+					if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
 					{
-						if (!(this.OnIdle is null))
-						{
-							try
-							{
-								await this.OnIdle.Raise(this, new ProcessorEventArgs(ProcessorIndex));
-							}
-							catch (Exception ex)
-							{
-								Log.Exception(ex);
-							}
-						}
+						this.idle = true;
+						await this.OnIdle.Raise(this, e);
 					}
 
 					Item = await Task;
 					if (Item is null)
 						break;
 
+					this.idle = false;
 					try
 					{
 						await Item.Execute(Cancel);
@@ -177,14 +184,15 @@ namespace Waher.Runtime.Queue
 
 			Task OnIdle(object Sender, EventArgs e)
 			{
-				Idle.TrySetResult(true);
+				Task.Run(() => Idle.TrySetResult(true));
 				return Task.CompletedTask;
-			};
+			}
+			;
 
 			this.OnIdle += OnIdle;
 			try
 			{
-				if (this.queue.CountItems == 0)
+				if (this.idle)
 					return;
 
 				await Idle.Task;

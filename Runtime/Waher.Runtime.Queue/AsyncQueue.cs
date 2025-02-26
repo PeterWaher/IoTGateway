@@ -22,6 +22,8 @@ namespace Waher.Runtime.Queue
 		private volatile int countSubscribers = 0;
 		private bool disposed = false;
 		private bool terminated = false;
+		private bool empty = true;
+		private bool waiting = false;
 
 		/// <summary>
 		/// Asynchronous Queue, for use when transporting items of class 
@@ -73,6 +75,34 @@ namespace Waher.Runtime.Queue
 				lock (this.synchObj)
 				{
 					return this.countSubscribers;
+				}
+			}
+		}
+
+		/// <summary>
+		/// If the queue is empty.
+		/// </summary>
+		public bool Empty
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.empty;
+				}
+			}
+		}
+
+		/// <summary>
+		/// If there are subscribers waiting for work.
+		/// </summary>
+		public bool Waiting
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.waiting;
 				}
 			}
 		}
@@ -160,6 +190,8 @@ namespace Waher.Runtime.Queue
 		/// <param name="First">If item is to be added first in the queue.</param>
 		public void Queue(T Item, bool First)
 		{
+			EventHandler h = null;
+
 			lock (this.synchObj)
 			{
 				if (this.terminated || this.disposed)
@@ -175,15 +207,28 @@ namespace Waher.Runtime.Queue
 						this.queue.AddLast(Record);
 
 					this.countItems++;
+					if (this.empty)
+					{
+						this.empty = false;
+						h = this.OnNotEmpty;
+					}
 				}
 				else
 				{
 					TaskCompletionSource<T> Waiter = this.subscribers.First.Value;
 					this.subscribers.RemoveFirst();
 					this.countSubscribers--;
-					Task.Run(() => Waiter.TrySetResult(Item));	// Ensures waiting logic not interrupting current logic.
+					if (this.countSubscribers <= 0)
+					{
+						this.waiting = false;
+						h = this.OnNotWaiting;
+					}
+
+					Task.Run(() => Waiter.TrySetResult(Item));  // Ensures waiting logic not interrupting current logic.
 				}
 			}
+
+			h?.Raise(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -224,6 +269,9 @@ namespace Waher.Runtime.Queue
 		/// <returns>If item was forwarded for processing (true), or discarded (false).</returns>
 		public Task<bool> Forward(T Item, bool First)
 		{
+			EventHandler h = null;
+			Task<bool> Result;
+
 			lock (this.synchObj)
 			{
 				if (this.terminated || this.disposed)
@@ -241,19 +289,34 @@ namespace Waher.Runtime.Queue
 						this.queue.AddLast(Record);
 
 					this.countItems++;
+					if (this.empty)
+					{
+						this.empty = false;
+						h = this.OnNotEmpty;
+					}
 
-					return Record.Forwarded.Task;
+					Result = Record.Forwarded.Task;
 				}
 				else
 				{
 					TaskCompletionSource<T> Waiter = this.subscribers.First.Value;
 					this.subscribers.RemoveFirst();
 					this.countSubscribers--;
+					if (this.countSubscribers <= 0)
+					{
+						this.waiting = false;
+						h = this.OnNotWaiting;
+					}
+
 					Waiter.TrySetResult(Item);
 
-					return Task.FromResult(true);
+					Result = Task.FromResult(true);
 				}
 			}
+
+			h?.Raise(this, EventArgs.Empty);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -288,6 +351,8 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
 		private Task<T> Wait(CancellationToken Cancel, bool RegisterCancelToken)
 		{
+			EventHandler h = null;
+			Task<T> Result;
 			Item Record;
 
 			lock (this.synchObj)
@@ -308,27 +373,40 @@ namespace Waher.Runtime.Queue
 
 					this.subscribers.AddLast(Item);
 					this.countSubscribers++;
+					if (!this.waiting)
+					{
+						this.waiting = true;
+						h = this.OnWaiting;
+					}
 
-					return Item.Task;
+					Result = Item.Task;
 				}
 				else
 				{
 					Record = this.queue.First.Value;
 					this.queue.RemoveFirst();
 					this.countItems--;
+					if (this.countItems <= 0)
+					{
+						this.empty = true;
+						h = this.OnEmpty;
+					}
 
 					Record.Forwarded?.TrySetResult(true);
 
 					if (this.terminated && this.queue.First is null)
+					{
 						this.disposed = true;
+						Result = Task.FromResult<T>(default);
+					}
 					else
-						return Task.FromResult(Record.Value);
+						Result = Task.FromResult(Record.Value);
 				}
 			}
 
-			this.RaiseDisposed();
+			h?.Raise(this, EventArgs.Empty);
 
-			return Task.FromResult(Record.Value);
+			return Result;
 		}
 
 		/// <summary>
@@ -355,12 +433,15 @@ namespace Waher.Runtime.Queue
 
 		private bool TryGetItem(bool Remove, out T Item)
 		{
+			EventHandler h = null;
+			bool Result;
+
 			lock (this.synchObj)
 			{
 				if (this.disposed || this.queue.First is null)
 				{
 					Item = null;
-					return false;
+					Result = false;
 				}
 				else
 				{
@@ -371,21 +452,30 @@ namespace Waher.Runtime.Queue
 					{
 						this.queue.RemoveFirst();
 						this.countItems--;
+						if (this.countItems <= 0)
+						{
+							this.empty = true;
+							h = this.OnEmpty;
+						}
 
 						Record.Forwarded?.TrySetResult(true);
 
 						if (this.terminated && this.queue.First is null)
+						{
 							this.disposed = true;
+							Result = false;
+						}
 						else
-							return true;
+							Result = true;
 					}
 					else
-						return true;
+						Result = true;
 				}
 			}
 
-			this.RaiseDisposed();
-			return true;
+			h?.Raise(this, EventArgs.Empty);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -455,24 +545,40 @@ namespace Waher.Runtime.Queue
 		/// <summary>
 		/// Event raised when queue has been disposed.
 		/// </summary>
-		public event EventHandlerAsync Disposed = null;
+		public event EventHandler Disposed = null;
 
-		private async void RaiseDisposed()
+		/// <summary>
+		/// Event raised when <see cref="Empty"/> changed to true.
+		/// </summary>
+		public event EventHandler OnEmpty = null;
+
+		/// <summary>
+		/// Event raised when <see cref="Empty"/> changed to false.
+		/// </summary>
+		public event EventHandler OnNotEmpty = null;
+
+		/// <summary>
+		/// Event raised when <see cref="Waiting"/> changed to true.
+		/// </summary>
+		public event EventHandler OnWaiting = null;
+
+		/// <summary>
+		/// Event raised when <see cref="Waiting"/> changed to false.
+		/// </summary>
+		public event EventHandler OnNotWaiting = null;
+
+		private void RaiseDisposed()
 		{
 			try
 			{
 				this.terminatedTask.TrySetResult(true);
 
-				EventHandlerAsync h = this.Disposed;
-
-				if (!(h is null))
-					await h(this, EventArgs.Empty);
+				this.Disposed.Raise(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
 			}
 		}
-
 	}
 }

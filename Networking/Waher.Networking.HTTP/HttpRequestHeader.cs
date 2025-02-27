@@ -530,5 +530,15 @@ namespace Waher.Networking.HTTP
 				throw new NotAcceptableException("Not acceptable response format: " + Alternative);
 		}
 
+		/// <summary>
+		/// Gets the best alternative acceptable to the client.
+		/// </summary>
+		/// <param name="Alternatives">Array of alternatives to choose from.</param>
+		/// <returns>The best choice. If none are acceptable, null is returned.</returns>
+		public string IsAcceptable(string[] Alternatives)
+		{
+			return this.accept?.GetBestAlternative(Alternatives);
+		}
+
 	}
 }

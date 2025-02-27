@@ -603,7 +603,7 @@ namespace Waher.IoTGateway
 
 							case "LoginAuditor":
 
-								LoginInterval[] ParseIntervals(XmlElement E)
+								static LoginInterval[] ParseIntervals(XmlElement E)
 								{
 									List<LoginInterval> LoginIntervals = new List<LoginInterval>();
 									Duration LastInterval = Duration.Zero;
@@ -1077,6 +1077,8 @@ namespace Waher.IoTGateway
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());
 				webServer.Register(new Logout());
+				webServer.Register(new Echo());
+				webServer.Register(new WebResources.Ping());
 				webServer.Register(new ProposeContract());
 
 				if (emoji1_24x24 is null)
@@ -2371,7 +2373,7 @@ namespace Waher.IoTGateway
 							Disposable.Dispose();
 					}
 
-					webServer.Dispose();
+					await webServer.DisposeAsync();
 					webServer = null;
 				}
 

@@ -220,77 +220,140 @@ function ToggleSidePreview(Button, on)
 	return prev !== on
 }
 
+function GetPreviewMode(Button)
+{
+	const container = GetTextArea(Button).parentElement;
+	const onlyPreview = container.querySelector(".MarkdownEditorPreview")
+	const bottomPreview = container.querySelector(".MarkdownEditorBottomPreviewAndEdit")
+	const sidePreview = container.querySelector(".MarkdownEditorSidePreviewAndEdit")
+
+	if (onlyPreview.hasAttribute("data-toggled"))
+		return 1
+	if (bottomPreview.hasAttribute("data-toggled"))
+		return 2
+	if (sidePreview.hasAttribute("data-toggled"))
+		return 3
+
+	return 0
+}
+
+function UpdatePreviewButtonsHtml(Button, indexToggled)
+{
+	const container = GetTextArea(Button).parentElement;
+	const onlyPreview = container.querySelector(".MarkdownEditorPreview")
+	const bottomPreview = container.querySelector(".MarkdownEditorBottomPreviewAndEdit")
+	const sidePreview = container.querySelector(".MarkdownEditorSidePreviewAndEdit")
+
+	const previews = [onlyPreview, bottomPreview, sidePreview]
+	previews.forEach((e, i) => {
+		if (i + 1 === indexToggled)
+		{
+			e.setAttribute("data-toggled", "")
+		} else 
+		{
+			e.removeAttribute("data-toggled")
+		}
+	})
+}
+
+function ResetPreview(Button)
+{
+	var TextArea = GetTextArea(Button);
+	const mode = GetPreviewMode(Button)
+
+	if (mode === 1)
+	{
+		TextArea.style.display = "inline-block"
+		TextArea.nextSibling.style.display = "none"
+		TextArea.parentElement.removeAttribute("data-preview-side")	
+		TextArea.setAttribute("data-preview", "")
+	}
+	else if (mode === 2)
+		{
+		TextArea.nextSibling.style.display = "none"
+		TextArea.setAttribute("data-preview", "")
+	}
+	else if (mode === 3)
+		{
+		TextArea.nextSibling.style.display = "none"
+		TextArea.parentElement.removeAttribute("data-preview-side")	
+		TextArea.setAttribute("data-preview", "")
+	}
+
+	UpdatePreviewButtonsHtml(Button, 0)
+}
+
 function MarkdownEditorBottomPreviewAndEdit(Button)
 {
-	// if the toggle side preview return true it means that the mode is changing so continue on previewing
-	if (ToggleSidePreview(Button, false) && document.getElementsByClassName("MarkdownPreview").length > 0)
-		return;
+	const TextArea = GetTextArea(Button);
 
-	var TextArea = GetTextArea(Button, true);
-
-	if (TextArea.getAttribute("data-preview"))
-		TextArea.setAttribute("data-preview", "");
-	else
-		StartPreview(Button, true);
+	const mode = GetPreviewMode(Button)
+	ResetPreview(Button)
+	if (mode !== 2)
+	{
+		TextArea.setAttribute("data-preview", "true")
+		TextArea.nextSibling.style.display = "inline-block"
+		TryUpdatePreview(Button, true)
+		UpdatePreviewButtonsHtml(Button, 2)
+	}		
 }
 
 function MarkdownEditorSidePreviewAndEdit(Button)
 {
-	// if the toggle side preview return true it means that the mode is changing so continue on previewing
-	if (ToggleSidePreview(Button, true) && document.getElementsByClassName("MarkdownPreview").length > 0)
-		return;
+	const TextArea = GetTextArea(Button);
 
-	var TextArea = GetTextArea(Button, true);
-
-	if (TextArea.getAttribute("data-preview"))
+	const mode = GetPreviewMode(Button)
+	ResetPreview(Button)
+	if (mode !== 3)
 	{
-		ToggleSidePreview(Button, false);
-		TextArea.setAttribute("data-preview", "");
-	}
-	else
-		StartPreview(Button, true);
+		TextArea.setAttribute("data-preview", "true")
+		TextArea.parentElement.setAttribute("data-preview-side", "")
+		TextArea.nextSibling.style.display = "inline-block"
+		TryUpdatePreview(Button, true)
+		UpdatePreviewButtonsHtml(Button, 3)
+	}		
 }
-
 
 function MarkdownEditorPreview(Button)
 {
-	StartPreview(Button, false);
+	const TextArea = GetTextArea(Button);
+
+	const mode = GetPreviewMode(Button)
+	ResetPreview(Button)
+	if (mode !== 1)
+	{
+		TextArea.setAttribute("data-preview", "true")
+		TextArea.style.display = "none"
+		TextArea.nextSibling.style.display = "inline-block"
+		TryUpdatePreview(Button, true)
+		UpdatePreviewButtonsHtml(Button, 1)
+	}		
 }
 
-function StartPreview(Button, ShowEditor)
+function TryUpdatePreview(Button, ShowEditor)
 {
 	var TextArea = GetTextArea(Button);
+	const PreviewDiv = TextArea.nextSibling;
 
 	if (TextArea.getAttribute("data-preview"))
 	{
-		TextArea.setAttribute("data-preview", "");
-
 		if (!ShowEditor)
 		{
 			RaiseOnInput(TextArea);
 			return;
 		}
 	}
+
+	if (TextArea.getAttribute("data-preview") !== "true")
+		return
+
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
 		if (xhttp.readyState === 4 && xhttp.status === 200)
 		{
-			var PreviewDiv = TextArea.nextSibling;
-			if (!PreviewDiv || PreviewDiv.tagName !== "DIV" || PreviewDiv.className !== "MarkdownPreview")
-			{
-				PreviewDiv = document.createElement("DIV");
-				PreviewDiv.setAttribute("class", "MarkdownPreview");
-			}
-
 			PreviewDiv.innerHTML = xhttp.responseText;
-
-			if (!ShowEditor)
-				TextArea.setAttribute("style", "display:none");
-
-			TextArea.setAttribute("data-preview", "true");
 			TextArea.parentNode.appendChild(PreviewDiv, TextArea);
-
 		};
 	}
 
@@ -907,7 +970,7 @@ function InitMarkdownEditorPreview(Control)
 	Timer = window.setTimeout(function ()
 	{
 		Control.setAttribute("data-previewtimer", "");
-		StartPreview(Control, true);
+		TryUpdatePreview(Control, true);
 	}, 500);
 
 	Control.setAttribute("data-previewtimer", Timer);
@@ -921,15 +984,38 @@ function MarkdownEditorHelp(Control)
 
 function InitializeMarkdownEditor(container)
 {
-	const textInput = container.parentElement.getElementsByTagName("TEXTAREA")[0]
+	const textInput = container.nextElementSibling || container.parentElement.getElementsByTagName("TEXTAREA")[0]
+	textInput.setAttribute("data-visible", "")
 	container.appendChild(textInput)
 	textInput.addEventListener("input", e => MarkdownKeyDown(e.target, e))
+	
+	if (container.getAttribute("data-scale") === "true")
+		textInput.addEventListener("input", e => AdaptSize(e.target))
+
+	const preview = document.createElement("div")
+	preview.classList.add("MarkdownPreview")
+	preview.style.display = "none";
+	container.appendChild(preview)
 }
 
-window.addEventListener("load", () =>
+function MarkdownEditorInitializeHack(event)
 {
-	Array.from(document.getElementsByClassName("MarkdownDiv")).forEach(container =>
-	{
+	const container = event.target.previousElementSibling
+	event.target.remove()
+	setTimeout(() => {
 		InitializeMarkdownEditor(container)
-	})
-})
+	}, 0)
+}
+
+function AdaptSize(Control)
+{
+	{
+		var maxheight = Math.floor((("innerHeight" in window ? window.innerHeight : document.documentElement.offsetHeight) * 2) / 3);
+		var h = Control.scrollHeight;
+		if (h > maxheight)
+			h = maxheight;
+
+		if (h > Control.clientHeight)
+			Control.style.height = h + "px";
+	}
+}

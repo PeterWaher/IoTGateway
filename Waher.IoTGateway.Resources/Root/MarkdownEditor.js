@@ -988,6 +988,9 @@ function InitializeMarkdownEditor(container)
 	textInput.setAttribute("data-visible", "")
 	container.appendChild(textInput)
 	textInput.addEventListener("input", e => MarkdownKeyDown(e.target, e))
+	
+	if (container.getAttribute("data-scale") === "true")
+		textInput.addEventListener("input", e => AdaptSize(e.target))
 
 	const preview = document.createElement("div")
 	preview.classList.add("MarkdownPreview")
@@ -1002,4 +1005,17 @@ function MarkdownEditorInitializeHack(event)
 	setTimeout(() => {
 		InitializeMarkdownEditor(container)
 	}, 0)
+}
+
+function AdaptSize(Control)
+{
+	{
+		var maxheight = Math.floor((("innerHeight" in window ? window.innerHeight : document.documentElement.offsetHeight) * 2) / 3);
+		var h = Control.scrollHeight;
+		if (h > maxheight)
+			h = maxheight;
+
+		if (h > Control.clientHeight)
+			Control.style.height = h + "px";
+	}
 }

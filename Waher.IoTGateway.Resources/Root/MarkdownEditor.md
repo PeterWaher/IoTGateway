@@ -1,4 +1,6 @@
-﻿<div class="MarkdownDiv">
+﻿Parameter: Scale
+
+<div class="MarkdownDiv" data-scale="{{(Exists(Scale) && (Scale = True || Scale = "")) ? "true" : "false"}}">
 <div class="MarkdownEditorToolbar">
 <button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorBold" onclick="MarkdownEditorBold(this)" title="Bold (CTRL+B)">
 **B**</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorItalic" onclick="MarkdownEditorItalic(this)" title="Italic (CTRL+I)">

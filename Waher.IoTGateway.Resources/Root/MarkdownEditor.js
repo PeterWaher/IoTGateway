@@ -985,7 +985,6 @@ function MarkdownEditorHelp(Control)
 function InitializeMarkdownEditor(container)
 {
 	const textInput = container.nextElementSibling || container.parentElement.getElementsByTagName("TEXTAREA")[0]
-	console.log(textInput)
 	textInput.setAttribute("data-visible", "")
 	container.appendChild(textInput)
 	textInput.addEventListener("input", e => MarkdownKeyDown(e.target, e))
@@ -996,10 +995,11 @@ function InitializeMarkdownEditor(container)
 	container.appendChild(preview)
 }
 
-window.addEventListener("load", () =>
+function MarkdownEditorInitializeHack(event)
 {
-	Array.from(document.getElementsByClassName("MarkdownDiv")).forEach(container =>
-	{
+	const container = event.target.previousElementSibling
+	event.target.remove()
+	setTimeout(() => {
 		InitializeMarkdownEditor(container)
-	})
-})
+	}, 0)
+}

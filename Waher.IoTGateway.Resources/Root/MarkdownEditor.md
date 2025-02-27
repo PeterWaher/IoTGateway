@@ -52,3 +52,4 @@ a.</button><button type="button" tabindex="-1" class="MarkdownEditorButton Markd
 ?</button>
 </div>
 </div>
+<img src onerror="MarkdownEditorInitializeHack(event)"/>

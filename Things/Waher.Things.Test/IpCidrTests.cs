@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
-using Waher.Things.Ip;
+using Waher.Runtime.IO;
 
 namespace Waher.Things.Test
 {

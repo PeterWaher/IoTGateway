@@ -360,7 +360,7 @@ function TryUpdatePreview(Button, ShowEditor)
 	xhttp.open("POST", "/MarkdownLab/MarkdownLabHtml.ws", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
 	xhttp.setRequestHeader("Accept", "text/html");
-	xhttp.send(TextArea.value);
+	xhttp.send(TextArea.value || " ");
 }
 
 function GetTextArea(Button, HidePreview)
@@ -998,12 +998,18 @@ function InitializeMarkdownEditor(container)
 	container.appendChild(preview)
 }
 
-function MarkdownEditorInitializeHack(event)
+function MarkdownEditorInitializeHack(event, previewOn)
 {
 	const container = event.target.previousElementSibling
 	event.target.remove()
 	setTimeout(() => {
 		InitializeMarkdownEditor(container)
+		if (previewOn)
+		{
+			setTimeout(() => {
+				MarkdownEditorBottomPreviewAndEdit(container.getElementsByClassName("MarkdownEditorBottomPreviewAndEdit")[0])
+			}, 0)
+		}
 	}, 0)
 }
 

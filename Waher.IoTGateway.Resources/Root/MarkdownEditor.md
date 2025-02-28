@@ -1,6 +1,6 @@
 ﻿Parameter: Scale
 
-<div class="MarkdownDiv" data-scale="{{(Exists(Scale) && (Scale = True || Scale = "")) ? "true" : "false"}}">
+<div class="MarkdownDiv" data-scale="{{Scale matches Bool(PScale) and PScale ? "true" : "false"}}">
 <div class="MarkdownEditorToolbar">
 <button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorBold" onclick="MarkdownEditorBold(this)" title="Bold (CTRL+B)">
 **B**</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorItalic" onclick="MarkdownEditorItalic(this)" title="Italic (CTRL+I)">
@@ -54,4 +54,4 @@ a.</button><button type="button" tabindex="-1" class="MarkdownEditorButton Markd
 ?</button>
 </div>
 </div>
-<img src onerror="MarkdownEditorInitializeHack(event)"/>
+<img src onerror="MarkdownEditorInitializeHack(event, {{Preview matches Bool(PPreview) and PPreview ? "true" : "false"}})"/>

@@ -651,8 +651,6 @@
 	<Assembly fileName="Waher.WebService.Sparql.dll" />
 	<Assembly fileName="Waher.WebService.Sparql.pdb" />
 	<Assembly fileName="Waher.WebService.Sparql.xml" />
-	<Assembly fileName="WindowsBase.dll" />
-	<Assembly fileName="ZstdSharp.dll" />
 	<Assembly fileName='Waher.Utility.AnalyzeClock.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.AnalyzeClock.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.AnalyzeClock.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>

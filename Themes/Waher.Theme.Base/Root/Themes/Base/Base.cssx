@@ -45,6 +45,60 @@ main
     z-index:2;
 }
 
+/* #region util */
+
+.flex-centering
+{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.text-center
+{
+    text-align: center;
+}
+
+/* #endregion util */
+
+/* #region Carousel*/
+
+.native-carousel
+{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.native-carousel > * {
+    position: absolute;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.2s;
+    opacity: 0;
+}
+
+.native-carousel > *[data-carousel-right]
+{
+    transform: translateX(20rem);
+    transition: opacity 0.1s, transform 0.2s;
+}
+.native-carousel > *[data-carousel-left]
+{
+    transform: translateX(-20rem);
+    transition: opacity 0.1s, transform 0.2s;
+}
+
+.native-carousel > *[data-carousel-active]
+{
+    opacity: 1;
+    pointer-events: initial;
+}
+
+/* #endregion Carousel*/
+
+
 /* #region Backdrop */
 #native-backdrop
 {

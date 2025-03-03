@@ -172,7 +172,7 @@ function PopupHandler() {
             [tabindex]:not([tabindex="-1"]),
             [contenteditable]:not([contenteditable="false"])
             `
-          );
+        );
         const firstFocusableElement = focusableElements[0];
         const lastFocusableElement = focusableElements[focusableElements.length - 1];
 
@@ -274,12 +274,100 @@ function PopupHandler() {
     }
 }
 
+function Carousel(id) {
+    let carouselIndex = 0;
+    let carouselCount = 0;
+
+    const previousButton = document.querySelector(`*[data-carousel=${id}][data-carousel-previous]`);
+    const nextButton = document.querySelector(`*[data-carousel=${id}][data-carousel-next]`);
+    const carouselContainer = document.getElementById(id);
+
+    if ([previousButton, nextButton, carouselContainer].includes(undefined)) {
+        Popup.Alert(`Carousel (${id}) is not properly setup`);
+        return;
+    }
+
+    carouselCount = carouselContainer.children.length;
+
+    function BoundedIndex(index) {
+        return (index + carouselCount /* + carouselCount to cover cases where you take the index - 1 and it becomes -1 wich would return a negative modulo */) % carouselCount
+    }
+
+    function ShiftCarousel(dir) {
+        if (carouselCount > 2) {
+            carouselContainer.children[BoundedIndex(carouselIndex - 1)].removeAttribute("data-carousel-left");
+            carouselContainer.children[carouselIndex].removeAttribute("data-carousel-active");
+            carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-right");
+            carouselIndex = BoundedIndex(carouselIndex + dir);
+            carouselContainer.children[BoundedIndex(carouselIndex - 1)].setAttribute("data-carousel-left", "");
+            carouselContainer.children[carouselIndex].setAttribute("data-carousel-active", "");
+            carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-right", "");
+        } else {
+            if (dir === 1) {
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-left");
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = "none"
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-right", "");
+                carouselContainer.offsetLeft; // flush css changes in order to skip the transition
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = ""
+                carouselContainer.children[carouselIndex].removeAttribute("data-carousel-active");
+                carouselContainer.children[carouselIndex].setAttribute("data-carousel-left", "");
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-right", "")
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-active", "")
+                carouselIndex = BoundedIndex(carouselIndex + dir);
+            } else {
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-right");
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = "none"
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-left", "");
+                carouselContainer.offsetLeft; // flush css changes in order to skip the transition
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = ""
+                carouselContainer.children[carouselIndex].removeAttribute("data-carousel-active");
+                carouselContainer.children[carouselIndex].setAttribute("data-carousel-right", "");
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-left", "")
+                carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-active", "")
+                carouselIndex = BoundedIndex(carouselIndex + dir);
+
+            }
+        }
+    }
+
+    // needs to be run when the height of any elements in the carousel changes
+    function CalibrateHeight()
+    {
+        let max = 0;
+        Array.from(carouselContainer.children).forEach(x => {
+            x.style.bottom = -1000;
+            x.style.right = -1000;
+            x.style.display = "block"
+            max = Math.max(max, x.getBoundingClientRect().height)
+            x.style.display = ""
+        })
+
+        carouselContainer.style.height = max + "px";
+    }
+
+    function Initialize() {
+        previousButton.addEventListener("click", () => ShiftCarousel(-1));
+        nextButton.addEventListener("click", () => ShiftCarousel(1));
+
+        carouselContainer.children[0].setAttribute("data-carousel-active", "")
+
+        CalibrateHeight()
+    }
+
+    Initialize()
+
+    return {
+        ShiftCarousel,
+        CalibrateHeight
+    }
+}
+
 let Popup;
 let NativeHeader;
 
 window.addEventListener("load", () => {
     NativeHeader = NativeHeaderHandler();
-    Popup = PopupHandler()
+    Popup = PopupHandler();
 
-    document.getElementById("large-pagpage-name").parentElement.style.flex = 1
+    document.getElementById("large-pagpage-name").parentElement.style.flex = 1;
 })

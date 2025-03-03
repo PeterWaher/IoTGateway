@@ -78,6 +78,8 @@
                             Pre.parentNode.removeChild(Pre);
                     }
 
+                    loginCarousel.CalibrateHeight()
+
                     LoginTimer = window.setTimeout(DisplayQuickLogin, 2000);
                 }
                 catch (e)
@@ -119,5 +121,9 @@ function SignatureReceivedBE(Empty)
 }
 
 var LoginTimer = null;
+let loginCarousel = null;
 
-window.addEventListener("load", DisplayQuickLogin);
+window.addEventListener("load", () => {
+    DisplayQuickLogin();
+    loginCarousel = Carousel("login-carousel")
+});

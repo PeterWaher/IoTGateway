@@ -77,8 +77,11 @@
                         if (Pre)
                             Pre.parentNode.removeChild(Pre);
                     }
-
-                    loginCarousel.CalibrateHeight()
+                    if (!hightCalibraded)
+                    {
+                        loginCarousel.CalibrateHeight()
+                        hightCalibraded = true
+                    }
 
                     LoginTimer = window.setTimeout(DisplayQuickLogin, 2000);
                 }
@@ -120,10 +123,27 @@ function SignatureReceivedBE(Empty)
     }
 }
 
+
 var LoginTimer = null;
+let hightCalibraded = false;
 let loginCarousel = null;
 
 window.addEventListener("load", () => {
+    function SetLoginMethod(method) 
+    {
+        fetch("/GatewayRoot/LoginOption.ws", {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({method:method})
+        })
+    }
+
     DisplayQuickLogin();
     loginCarousel = Carousel("login-carousel")
+    loginCarousel.container.addEventListener("elementchanged", () => {
+        const method = loginCarousel.current.getAttribute("data-login-method")
+
+        if (typeof method === "string" && method !== "")
+            SetLoginMethod(method)
+    })
 });

@@ -275,6 +275,8 @@ function PopupHandler() {
 }
 
 function Carousel(id) {
+    const elementChangedEvent = new Event("elementchanged")
+
     let carouselIndex = 0;
     let carouselCount = 0;
 
@@ -328,11 +330,12 @@ function Carousel(id) {
 
             }
         }
+
+        carouselContainer.dispatchEvent(elementChangedEvent)
     }
 
     // needs to be run when the height of any elements in the carousel changes
-    function CalibrateHeight()
-    {
+    function CalibrateHeight() {
         let max = 0;
         Array.from(carouselContainer.children).forEach(x => {
             x.style.bottom = -1000;
@@ -357,8 +360,11 @@ function Carousel(id) {
     Initialize()
 
     return {
+        get current() { return carouselContainer.children[carouselIndex] },
+        get container() { return carouselContainer },
+        
         ShiftCarousel,
-        CalibrateHeight
+        CalibrateHeight,
     }
 }
 

@@ -879,6 +879,7 @@ namespace Waher.IoTGateway.Setup
 
 						if (!(this.client is null))
 						{
+							this.client.OnStateChanged -= this.Client_OnStateChanged;
 							await this.client.OfflineAndDisposeAsync();
 							this.client = null;
 						}

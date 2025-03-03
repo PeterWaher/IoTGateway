@@ -913,7 +913,7 @@ namespace Waher.IoTGateway
 							NeedsCleanup = true;
 						}
 
-						DateTime StartConfig = DateTime.Now;
+						DateTime StartConfig = DateTime.UtcNow;
 
 						try
 						{
@@ -970,7 +970,7 @@ namespace Waher.IoTGateway
 							break;
 						}
 
-						if (DateTime.Now.Subtract(StartConfig).TotalSeconds > 2)
+						if (DateTime.UtcNow.Subtract(StartConfig).TotalSeconds > 2)
 							await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 					}
 				}

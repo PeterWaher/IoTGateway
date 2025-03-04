@@ -354,7 +354,8 @@ namespace Waher.Script.Model
 							if (Encapsulation is null)
 								Encapsulation = Argument.Encapsulate;
 						}
-						else if (Argument.AssociatedObjectValue is IEnumerable Enumerable)
+						else if (Argument.AssociatedObjectValue is IEnumerable Enumerable &&
+							!(Argument.AssociatedObjectValue is string))
 						{
 							Arguments[i] = Operators.Vectors.VectorDefinition.Encapsulate(Enumerable, false, this);
 							e[i] = null;
@@ -393,7 +394,8 @@ namespace Waher.Script.Model
 							if (Encapsulation is null)
 								Encapsulation = Operators.LambdaDefinition.EncapsulateToVector;
 						}
-						else if (Argument.AssociatedObjectValue is IEnumerable Enumerable)
+						else if (Argument.AssociatedObjectValue is IEnumerable Enumerable &&
+							!(Argument.AssociatedObjectValue is string))
 						{
 							Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(Enumerable);
 							e[i] = null;

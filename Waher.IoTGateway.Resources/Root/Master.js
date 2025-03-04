@@ -352,9 +352,21 @@ function Carousel(id) {
         previousButton.addEventListener("click", () => ShiftCarousel(-1));
         nextButton.addEventListener("click", () => ShiftCarousel(1));
 
-        carouselContainer.children[0].setAttribute("data-carousel-active", "")
+        CalibrateHeight();
 
-        CalibrateHeight()
+        carouselIndex = -1;
+        for (let i = 0; i < carouselContainer.children.length; i++)
+        {
+            if (carouselContainer.children[i].hasAttribute("data-carousel-active"))
+                carouselIndex = i;
+        }
+
+        if (carouselIndex === -1)
+        {
+            carouselIndex = 0;
+            carouselContainer.children[0].setAttribute("data-carousel-active", "");
+        }
+            
     }
 
     Initialize()

@@ -3016,8 +3016,6 @@ namespace Waher.IoTGateway
 
 		private static bool IsLocalCall(IPAddress Address, HttpRequest Request, bool DoLog)
 		{
-			return false;
-
 			if (Address.Equals(ipv4Local) || Address.Equals(ipv6Local))
 				return true;
 

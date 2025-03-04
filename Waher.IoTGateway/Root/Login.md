@@ -11,12 +11,16 @@ Neuron:
 
 {{Waher.IoTGateway.Gateway.CheckLocalLogin(Request)}}
 
+{{
+	LoginMethod := Request.Header.Cookie["login-method"] ?? ""
+}}
+
 <section id="LoginContainer" class="flex-centering">
 	<h1>Login</h1>
 
 	<p>You need to login to proceed.</p>
 	<div class="native-carousel" id="login-carousel">
-		<form id="LoginForm" action="/Login" method="post" data-login-method="user-password">
+		<form id="LoginForm" action="/Login" method="post" data-login-method="user-password" {{ LoginMethod = "user-password" ? "data-carousel-active" : "" }}>
 			<div>
 				<p>User Name:</p>
 				<input id="UserName" name="UserName" type="text" autofocus="autofocus" style="max-width:20em" />
@@ -32,7 +36,7 @@ Neuron:
 		{{if exists(QuickLoginServiceId) and Waher.IoTGateway.Setup.LegalIdentityConfiguration.Instance.HasApprovedLegalIdentities then
 		(
 		]]
-		<div data-login-method="quick-login">
+		<div data-login-method="quick-login" ((LoginMethod = "quick-login" ? "data-carousel-active" : ""))>
 			<p class="text-center">Neuro-Access Login</p>
 			<div id="quickLoginCode" data-mode="image" data-serviceId="((QuickLoginServiceId(Request) ))" 
 			data-purpose="To login on ((Domain)), for administrative purposes. This login request is valid for five (5) minutes."></div>

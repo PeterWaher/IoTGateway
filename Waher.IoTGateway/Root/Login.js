@@ -131,9 +131,12 @@ let loginCarousel = null;
 window.addEventListener("load", () => {
     function SetLoginMethod(method) 
     {
-        fetch("/GatewayRoot/LoginOption.ws", {
+        fetch("/GatewayRoot/LoginMethod.ws", {
             method: "POST",
-            headers: { "Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
             body: JSON.stringify({method:method})
         })
     }

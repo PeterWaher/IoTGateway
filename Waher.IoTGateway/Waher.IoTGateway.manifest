@@ -6,6 +6,7 @@
 		<Content fileName="Events.js"/>
 		<Content fileName="Login.js"/>
 		<Content fileName="Login.md"/>
+		<Content fileName="LoginMethod.ws"/>
 		<Content fileName="ProposeContract.js"/>
 		<Content fileName="ProposeContract.md"/>
 		<Content fileName="SignatureRequest.js"/>

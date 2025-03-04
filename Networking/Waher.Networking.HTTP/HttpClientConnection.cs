@@ -2261,7 +2261,7 @@ namespace Waher.Networking.HTTP
 						InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
 				}
 				else
-					await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
+					await this.SendResponse(Request, null, new InternalServerErrorException(ex), true);
 
 				Result = false;
 			}
@@ -2272,7 +2272,7 @@ namespace Waher.Networking.HTTP
 				ex = XML.AnnotateException(ex);
 				this.Exception(ex);
 
-				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
+				await this.SendResponse(Request, null, new InternalServerErrorException(ex), !Result);
 			}
 			catch (Exception ex)
 			{
@@ -2280,7 +2280,7 @@ namespace Waher.Networking.HTTP
 
 				this.Exception(ex);
 
-				await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), !Result);
+				await this.SendResponse(Request, null, new InternalServerErrorException(ex), !Result);
 			}
 
 			Request.Dispose();
@@ -2393,7 +2393,7 @@ namespace Waher.Networking.HTTP
 								InsufficientStorageException.StatusMessage, Request, "Insufficient space."), true);
 						}
 						else
-							await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
+							await this.SendResponse(Request, null, new InternalServerErrorException(ex), true);
 					}
 					catch (Exception)
 					{
@@ -2412,7 +2412,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						await this.SendResponse(Request, Response, new InternalServerErrorException(ex.Message), true);
+						await this.SendResponse(Request, Response, new InternalServerErrorException(ex), true);
 					}
 					catch (Exception)
 					{
@@ -2430,7 +2430,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						await this.SendResponse(Request, Response, new InternalServerErrorException(ex.Message), true);
+						await this.SendResponse(Request, Response, new InternalServerErrorException(ex), true);
 					}
 					catch (Exception)
 					{

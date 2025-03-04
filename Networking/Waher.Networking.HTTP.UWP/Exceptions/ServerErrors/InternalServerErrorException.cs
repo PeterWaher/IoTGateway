@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Waher.Events;
 
 namespace Waher.Networking.HTTP
 {
@@ -23,6 +25,16 @@ namespace Waher.Networking.HTTP
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public InternalServerErrorException(params KeyValuePair<string, string>[] HeaderFields)
 			: base(Code, StatusMessage, HeaderFields)
+		{
+		}
+
+		/// <summary>
+		/// The server encountered an unexpected condition which prevented it from fulfilling the request. 
+		/// </summary>
+		/// <param name="Exception">Exception object to return. The object will be encoded before being sent.</param>
+		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
+		public InternalServerErrorException(Exception Exception, params KeyValuePair<string, string>[] HeaderFields)
+			: this(Log.UnnestException(Exception).Message, HeaderFields)
 		{
 		}
 

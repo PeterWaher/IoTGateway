@@ -7,12 +7,12 @@ using Waher.Script.Objects.Matrices;
 namespace Waher.Script.Functions.Transforms
 {
 	/// <summary>
-	/// Creates a scaling matrix in 2-dimentional space.
+	/// Creates a scaling matrix in 2-dimensional space.
 	/// </summary>
 	public class Scale2D : FunctionTwoScalarVariables
 	{
 		/// <summary>
-		/// Creates a scaling matrix in 2-dimentional space.
+		/// Creates a scaling matrix in 2-dimensional space.
 		/// </summary>
 		/// <param name="Sx">Scaling factor along x-axis.</param>
 		/// <param name="Sy">Scaling factor along y-axis.</param>

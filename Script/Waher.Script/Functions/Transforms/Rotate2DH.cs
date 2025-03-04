@@ -6,12 +6,12 @@ using Waher.Script.Objects.Matrices;
 namespace Waher.Script.Functions.Transforms
 {
 	/// <summary>
-	/// Creates a rotation matrix in 2-dimentional homogenous coordinates.
+	/// Creates a rotation matrix in 2-dimensional homogenous coordinates.
 	/// </summary>
 	public class Rotate2DH : FunctionOneScalarVariable
 	{
 		/// <summary>
-		/// Creates a rotation matrix in 2-dimentional homogenous coordinates.
+		/// Creates a rotation matrix in 2-dimensional homogenous coordinates.
 		/// </summary>
 		/// <param name="Angle">Angle of rotation.</param>
 		/// <param name="Start">Start position in script expression.</param>

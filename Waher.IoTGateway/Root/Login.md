@@ -9,10 +9,9 @@ Parameter: from
 Neuron:
 {{GW:=Waher.IoTGateway.Gateway;Domain:=empty(GW.Domain) ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(x,":") and exists(number(after(x,":"))) then "localhost:"+after(x,":") else "localhost") : GW.Domain}}
 
-{{Waher.IoTGateway.Gateway.CheckLocalLogin(Request)}}
-
 {{
-	LoginMethod := Request.Header.Cookie["login-method"] ?? ""
+	LoginMethod := Request.Header.Cookie["login-method"] ?? "";
+	Waher.IoTGateway.Gateway.CheckLocalLogin(Request)
 }}
 
 <section id="LoginContainer" class="flex-centering">

@@ -22,6 +22,10 @@ function NativeHeaderHandler() {
         subMenu.parentElement.addEventListener("mouseenter", () => {
             count++
 
+            // cancled when on mobile view
+            if (window.matchMedia("screen and (max-width: 900px)").matches) 
+                return
+
             subMenu.setAttribute("expanded", "")
 
             // set set max height to prevent vertical overflow

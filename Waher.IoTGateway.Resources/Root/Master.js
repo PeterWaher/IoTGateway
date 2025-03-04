@@ -21,9 +21,6 @@ function NativeHeaderHandler() {
         // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
             count++
-            // to use this you "need" a mouse
-            if (!matchMedia('(pointer:fine)').matches)
-                return
 
             subMenu.setAttribute("expanded", "")
 
@@ -36,6 +33,7 @@ function NativeHeaderHandler() {
             if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth) {
                 topSubmenue.style.left = `${window.innerWidth - topSubmenue.offsetWidth}px`
             }
+
 
             // normalise list item width
             const textElements = []
@@ -304,7 +302,7 @@ function Carousel(id) {
             carouselContainer.children[BoundedIndex(carouselIndex - 1)].setAttribute("data-carousel-left", "");
             carouselContainer.children[carouselIndex].setAttribute("data-carousel-active", "");
             carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-right", "");
-        } else {
+        } else if (carouselCount == 2) {
             if (dir === 1) {
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-left");
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = "none"
@@ -327,7 +325,6 @@ function Carousel(id) {
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-left", "")
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-active", "")
                 carouselIndex = BoundedIndex(carouselIndex + dir);
-
             }
         }
 
@@ -365,6 +362,12 @@ function Carousel(id) {
         {
             carouselIndex = 0;
             carouselContainer.children[0].setAttribute("data-carousel-active", "");
+        }
+
+        if (carouselCount < 2)
+        {
+            previousButton.remove()
+            nextButton.remove()
         }
             
     }

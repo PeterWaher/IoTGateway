@@ -7,12 +7,12 @@ using Waher.Script.Objects.Matrices;
 namespace Waher.Script.Functions.Transforms
 {
 	/// <summary>
-	/// Creates a translation matrix for 2-dimentional homogenous coordinates.
+	/// Creates a translation matrix for 2-dimensional homogenous coordinates.
 	/// </summary>
 	public class Translate2DH : FunctionTwoScalarVariables
 	{
 		/// <summary>
-		/// Creates a translation matrix for 2-dimentional homogenous coordinates.
+		/// Creates a translation matrix for 2-dimensional homogenous coordinates.
 		/// </summary>
 		/// <param name="Dx">Translation along x-axis.</param>
 		/// <param name="Dy">Translation along y-axis.</param>

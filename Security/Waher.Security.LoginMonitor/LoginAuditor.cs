@@ -611,14 +611,14 @@ namespace Waher.Security.LoginMonitor
 		/// <param name="RemoteEndPoint">Remote endpoint performing the attack.</param>
 		/// <param name="Message">Message to log.</param>
 		/// <param name="Protocol">Protocol used.</param>
-		public static async Task ReportTlsHackAttempt(string RemoteEndPoint, string Message, string Protocol)
+		public static void ReportTlsHackAttempt(string RemoteEndPoint, string Message, string Protocol)
 		{
 			lock (tlsHackEndpoints)
 			{
 				tlsHackEndpoints[RemoteEndPoint] = DateTime.Now;
 			}
 
-			Fail(Message, string.Empty, RemoteEndPoint, Protocol, await Annotate(RemoteEndPoint));
+			Fail(Message, string.Empty, RemoteEndPoint, Protocol);
 		}
 
 		private static readonly Dictionary<string, DateTime> tlsHackEndpoints = new Dictionary<string, DateTime>();

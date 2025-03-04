@@ -1341,7 +1341,7 @@ namespace Waher.Networking.HTTP
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
 		{
 			Exception ex2 = Log.UnnestException(ex);
-			await Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
+			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
 
 			await Client.DisposeAsync();
 		}

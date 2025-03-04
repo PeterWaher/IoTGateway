@@ -1056,8 +1056,8 @@ The following functions operate on vectors:
 | `PopLast(v)`                                           | Returns the last element in a vector `v`, and if `v` is a variable reference, the variable will contain a vector where the last element has been removed. | `PopLast(v)` |
 | `Prod(v)`                                              | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)`                                           | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
-| `PushFirst(v)`                                         | Adds a new element to a vector `v`, increasing its dimention, adding the element as the first element. If `v` is a variable reference, the variable will contain the new vector. | `PushFirst(x,v)` |
-| `PushLast(v)`                                          | Adds a new element to a vector `v`, increasing its dimention, adding the element as the last element. If `v` is a variable reference, the variable will contain the new vector. | `PushLast(x,v)` |
+| `PushFirst(v)`                                         | Adds a new element to a vector `v`, increasing its dimension, adding the element as the first element. If `v` is a variable reference, the variable will contain the new vector. | `PushFirst(x,v)` |
+| `PushLast(v)`                                          | Adds a new element to a vector `v`, increasing its dimension, adding the element as the last element. If `v` is a variable reference, the variable will contain the new vector. | `PushLast(x,v)` |
 | `Reverse(s)`                                           | Returns a string with the characters of the string `s` reversed. | `Reverse("Hello World")` |
 | `Reverse(v)`                                           | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
 | `Right(v,N)`                                           | Returns a vector with the right-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Right(v,3)` |

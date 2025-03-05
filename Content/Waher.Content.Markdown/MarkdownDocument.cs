@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -5413,22 +5414,10 @@ namespace Waher.Content.Markdown
 			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in Details.metaData)
 			{
 				if (Master.metaData.TryGetValue(Meta.Key, out KeyValuePair<string, bool>[] Meta0))
-					Master.metaData[Meta.Key] = Concat(Meta0, Meta.Value);
+					Master.metaData[Meta.Key] = Meta0.Join(Meta.Value);
 				else
 					Master.metaData[Meta.Key] = Meta.Value;
 			}
-		}
-
-		private static KeyValuePair<string, bool>[] Concat(KeyValuePair<string, bool>[] Meta1, KeyValuePair<string, bool>[] Meta2)
-		{
-			int c = Meta1.Length;
-			int d = Meta2.Length;
-			KeyValuePair<string, bool>[] Result = new KeyValuePair<string, bool>[c + d];
-
-			Array.Copy(Meta1, 0, Result, 0, c);
-			Array.Copy(Meta2, 0, Result, c, d);
-
-			return Result;
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Events;
 
 namespace Waher.Networking.HTTP
 {
@@ -29,7 +30,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Location">Location.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public SeeOtherException(string Location, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Join(HeaderFields, new KeyValuePair<string, string>("Location", Location)))
+			: base(Code, StatusMessage, HeaderFields.Join(new KeyValuePair<string, string>("Location", Location)))
 		{
 		}
 
@@ -43,7 +44,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public SeeOtherException(string Location, object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, new KeyValuePair<string, string>("Location", Location)))
+			: base(Code, StatusMessage, ContentObject, HeaderFields.Join(new KeyValuePair<string, string>("Location", Location)))
 		{
 		}
 
@@ -58,7 +59,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public SeeOtherException(string Location, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, new KeyValuePair<string, string>("Location", Location)))
+			: base(Code, StatusMessage, Content, ContentType, HeaderFields.Join(new KeyValuePair<string, string>("Location", Location)))
 		{
 		}
 	}

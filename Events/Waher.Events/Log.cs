@@ -1796,17 +1796,11 @@ namespace Waher.Events
 		/// <returns>Joined array.</returns>
 		public static T[] Join<T>(this T[] Array, params T[] NewElements)
 		{
-			if (Array is null)
-				return NewElements;
-
-			int c = Array.Length;
+			int c = Array?.Length ?? 0;
 			if (c == 0)
 				return NewElements;
 
-			if (NewElements is null)
-				return Array;
-
-			int d = NewElements.Length;
+			int d = NewElements?.Length ?? 0;
 			if (d == 0)
 				return Array;
 

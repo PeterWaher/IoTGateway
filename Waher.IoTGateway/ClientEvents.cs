@@ -1168,13 +1168,12 @@ namespace Waher.IoTGateway
 
 				default:
 					Dictionary<string, bool> Result = new Dictionary<string, bool>();
-					Dictionary<string, (string, string, string)[]> TabIDs;
 
 					lock (tabIdsByLocation)
 					{
 						foreach (string Location in Locations)
 						{
-							if (tabIdsByLocation.TryGetValue(Location, out TabIDs))
+							if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, (string, string, string)[]> TabIDs))
 							{
 								foreach (string TabID in TabIDs.Keys)
 									Result[TabID] = true;

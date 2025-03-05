@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Content
@@ -36,5 +37,11 @@ namespace Waher.Content
 		/// Called when the body has been processed.
 		/// </summary>
 		Task BodyProcessed();
+
+		/// <summary>
+		/// Reports a dependency timestamp.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp.</param>
+		void DependencyTimestamp(DateTime Timestamp);
 	}
 }

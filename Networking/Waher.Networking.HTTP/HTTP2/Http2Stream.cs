@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -564,6 +565,15 @@ namespace Waher.Networking.HTTP.HTTP2
 		public Task BodyProcessed()
 		{
 			return this.SendReportedEarlyHints();
+		}
+
+		/// <summary>
+		/// Reports a dependency timestamp.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp.</param>
+		public void DependencyTimestamp(DateTime Timestamp)
+		{
+			// Do nothing.
 		}
 
 		private async Task SendReportedEarlyHints()

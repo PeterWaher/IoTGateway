@@ -4,6 +4,7 @@ using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Content.Markdown.Rendering;
 using Waher.Runtime.IO;
+using System.IO;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -49,8 +50,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// </summary>
 		/// <param name="Item">Multi-media item.</param>
 		/// <param name="ParentURL">URL to parent document.</param>
+		/// <param name="Progress">Optional interface for reporting progress.</param>
 		/// <returns>Parsed Markdown document.</returns>
-		public static async Task<MarkdownDocument> GetMarkdown(MultimediaItem Item, string ParentURL)
+		public static async Task<MarkdownDocument> GetMarkdown(MultimediaItem Item, string ParentURL,
+			ICodecProgress Progress)
 		{
 			int i = Item.Url.IndexOf('?');
 			string Query;
@@ -108,6 +111,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			string MarkdownText = await Files.ReadAllTextAsync(FileName);
+			Progress?.DependencyTimestamp(File.GetLastWriteTimeUtc(FileName));
+
 			MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Settings, FileName, string.Empty, ParentURL);
 			Markdown.Master = Document;
 
@@ -141,7 +146,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			{
 				foreach (MultimediaItem Item in Items)
 				{
-					MarkdownDocument Markdown = await GetMarkdown(Item, Document.URL);
+					MarkdownDocument Markdown = await GetMarkdown(Item, Document.URL, Document.Settings?.Progress);
 					await Renderer.RenderDocument(Markdown, true);
 				}
 			}

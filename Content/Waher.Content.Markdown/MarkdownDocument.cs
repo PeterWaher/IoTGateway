@@ -5317,6 +5317,8 @@ namespace Waher.Content.Markdown
 					FileName = MasterMetaValue;
 
 				string MarkdownText = await Files.ReadAllTextAsync(FileName);
+				this.settings?.Progress?.DependencyTimestamp(File.GetLastWriteTimeUtc(FileName));
+
 				this.master = await CreateAsync(MarkdownText, this.settings);
 				this.master.fileName = FileName;
 				this.master.syntaxHighlighting |= this.syntaxHighlighting;

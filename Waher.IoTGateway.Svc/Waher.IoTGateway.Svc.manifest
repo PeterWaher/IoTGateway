@@ -884,6 +884,7 @@
 		<Content fileName='Index.md'/>
 		<Content fileName='Login.js'/>
 		<Content fileName='Login.md'/>
+		<Content fileName="LoginMethod.ws"/>
 		<Content fileName='Markdown.md'/>
 		<Content fileName="MarkdownEditor.cssx"/>
 		<Content fileName="MarkdownEditor.js"/>

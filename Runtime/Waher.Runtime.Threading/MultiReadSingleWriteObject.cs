@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,10 +12,10 @@ namespace Waher.Runtime.Threading
 	/// </summary>
 	public class MultiReadSingleWriteObject : IMultiReadSingleWriteObject, IDisposable
 	{
-#if DEBUG
-		private readonly string creatorStacktrace;
-#endif
+		private readonly bool recordStackTraces;
 		private readonly object owner;
+		private readonly string creatorStackTrace;
+		private string lockStackTrace;
 		private LinkedList<TaskCompletionSource<bool>> noWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private readonly object synchObj = new object();
@@ -38,10 +39,30 @@ namespace Waher.Runtime.Threading
 		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
 		/// </summary>
 		public MultiReadSingleWriteObject()
-		{
 #if DEBUG
-			this.creatorStacktrace = Environment.StackTrace;
+			: this(true)
+#else
+			: this(false)
 #endif
+		{
+		}
+
+		/// <summary>
+		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
+		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
+		/// </summary>
+		/// <param name="RecordStackTraces">If stack traces should be recorded when object
+		/// is locked. Default value is true in DEBUG mode and false if not in DEBUG mode.</param>
+		public MultiReadSingleWriteObject(bool RecordStackTraces)
+		{
+			this.recordStackTraces = RecordStackTraces;
+
+			if (this.recordStackTraces)
+				this.creatorStackTrace = Environment.StackTrace;
+			else
+				this.creatorStackTrace = null;
+
+			this.lockStackTrace = null;
 		}
 
 		/// <summary>
@@ -49,12 +70,21 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public object Owner => this.owner;
 
-#if DEBUG
 		/// <summary>
-		/// Stack trace from creation of object.
+		/// If stack traces should be recorded when object is locked. Default value is true 
+		/// in DEBUG mode and false if not in DEBUG mode.
 		/// </summary>
-		public string CreatorStacktrace => this.creatorStacktrace;
-#endif
+		public bool RecordStackTraces => this.recordStackTraces;
+
+		/// <summary>
+		/// Stack trace from creation of object, if <see cref="RecordStackTraces"/> is true.
+		/// </summary>
+		public string CreatorStackTrace => this.creatorStackTrace;
+
+		/// <summary>
+		/// Stack trace from lock of object, if <see cref="RecordStackTraces"/> is true.
+		/// </summary>
+		public string LockStackTrace => this.lockStackTrace;
 
 		/// <summary>
 		/// Number of concurrent readers.
@@ -184,7 +214,12 @@ namespace Waher.Runtime.Threading
 					if (!this.isWriting)
 					{
 						if (this.nrReaders == 0)
+						{
 							this.token++;
+
+							if (this.recordStackTraces)
+								this.lockStackTrace = Environment.StackTrace;
+						}
 
 						return ++this.nrReaders;
 					}
@@ -215,12 +250,17 @@ namespace Waher.Runtime.Threading
 
 				this.nrReaders--;
 				if (this.nrReaders == 0)
+				{
 					this.token++;
+
+					if (this.recordStackTraces)
+						this.lockStackTrace = null;
+				}
 				else
-					return Task.FromResult<int>(this.nrReaders);
+					return Task.FromResult(this.nrReaders);
 
 				if (this.noReadersOrWriters.First is null)
-					return Task.FromResult<int>(0);
+					return Task.FromResult(0);
 
 				List = this.noReadersOrWriters;
 				this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
@@ -229,7 +269,7 @@ namespace Waher.Runtime.Threading
 			foreach (TaskCompletionSource<bool> T in List)
 				T.TrySetResult(true);
 
-			return Task.FromResult<int>(0);
+			return Task.FromResult(0);
 		}
 
 		/// <summary>
@@ -249,7 +289,12 @@ namespace Waher.Runtime.Threading
 					if (!this.isWriting)
 					{
 						if (this.nrReaders == 0)
+						{
 							this.token++;
+
+							if (this.recordStackTraces)
+								this.lockStackTrace = Environment.StackTrace;
+						}
 
 						this.nrReaders++;
 						return true;
@@ -307,6 +352,9 @@ namespace Waher.Runtime.Threading
 					{
 						this.token++;
 						this.isWriting = true;
+
+						if (this.recordStackTraces)
+							this.lockStackTrace = Environment.StackTrace;
 						return;
 					}
 					else
@@ -338,6 +386,9 @@ namespace Waher.Runtime.Threading
 
 				this.token++;
 				this.isWriting = false;
+
+				if (this.recordStackTraces)
+					this.lockStackTrace = null;
 
 				if (!(this.noReadersOrWriters.First is null))
 				{
@@ -389,6 +440,9 @@ namespace Waher.Runtime.Threading
 					{
 						this.token++;
 						this.isWriting = true;
+
+						if (this.recordStackTraces)
+							this.lockStackTrace = Environment.StackTrace;
 						return true;
 					}
 					else if (Timeout <= 0)
@@ -440,6 +494,9 @@ namespace Waher.Runtime.Threading
 				this.nrReaders = 0;
 				this.isWriting = false;
 				this.token++;
+
+				if (this.recordStackTraces)
+					this.lockStackTrace = null;
 
 				if (!(this.noReadersOrWriters.First is null))
 				{

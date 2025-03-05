@@ -14,6 +14,8 @@ namespace Waher.Runtime.Threading.Test
 		public async Task Test_01_Read()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			long Token = obj.Token;
 
 			Assert.AreEqual(0, obj.NrReaders);
@@ -21,16 +23,45 @@ namespace Waher.Runtime.Threading.Test
 			await obj.BeginRead();
 			Assert.AreEqual(1, obj.NrReaders);
 			Assert.AreEqual(Token + 1, obj.Token);
+			CheckLockStackTrace(obj);
 
 			await obj.EndRead();
 			Assert.AreEqual(0, obj.NrReaders);
 			Assert.AreEqual(Token + 2, obj.Token);
+			CheckLockStackTrace(obj);
+		}
+
+		private static void CheckCreatorStackTrace(MultiReadSingleWriteObject obj)
+		{
+#if DEBUG
+			Assert.IsFalse(string.IsNullOrEmpty(obj.CreatorStackTrace));
+#else
+			Assert.IsTrue(string.IsNullOrEmpty(obj.CreatorStackTrace));
+#endif
+
+			Assert.IsTrue(string.IsNullOrEmpty(obj.LockStackTrace));
+		}
+
+		private static void CheckLockStackTrace(MultiReadSingleWriteObject obj)
+		{
+			if (obj.NrReaders > 0 || obj.IsWriting)
+			{
+#if DEBUG
+				Assert.IsFalse(string.IsNullOrEmpty(obj.LockStackTrace));
+#else
+				Assert.IsTrue(string.IsNullOrEmpty(obj.LockStackTrace));
+#endif
+			}
+			else
+				Assert.IsTrue(string.IsNullOrEmpty(obj.LockStackTrace));
 		}
 
 		[TestMethod]
 		public async Task Test_02_Write()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			long Token = obj.Token;
 
 			Assert.IsFalse(obj.IsWriting);
@@ -38,16 +69,20 @@ namespace Waher.Runtime.Threading.Test
 			await obj.BeginWrite();
 			Assert.IsTrue(obj.IsWriting);
 			Assert.AreEqual(Token + 1, obj.Token);
+			CheckLockStackTrace(obj);
 
 			await obj.EndWrite();
 			Assert.IsFalse(obj.IsWriting);
 			Assert.AreEqual(Token + 2, obj.Token);
+			CheckLockStackTrace(obj);
 		}
 
 		[TestMethod]
 		public async Task Test_03_MultiRead()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			long Token = obj.Token;
 
 			Assert.AreEqual(0, obj.NrReaders);
@@ -55,24 +90,30 @@ namespace Waher.Runtime.Threading.Test
 			await obj.BeginRead();
 			Assert.AreEqual(1, obj.NrReaders);
 			Assert.AreEqual(Token + 1, obj.Token);
+			CheckLockStackTrace(obj);
 
 			await obj.BeginRead();
 			Assert.AreEqual(2, obj.NrReaders);
 			Assert.AreEqual(Token + 1, obj.Token);
+			CheckLockStackTrace(obj);
 
 			await obj.EndRead();
 			Assert.AreEqual(1, obj.NrReaders);
 			Assert.AreEqual(Token + 1, obj.Token);
+			CheckLockStackTrace(obj);
 
 			await obj.EndRead();
 			Assert.AreEqual(0, obj.NrReaders);
 			Assert.AreEqual(Token + 2, obj.Token);
+			CheckLockStackTrace(obj);
 		}
 
 		[TestMethod]
 		public async Task Test_04_ReadWrite()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			TaskCompletionSource<bool> Done1 = new();
 			TaskCompletionSource<bool> Done2 = new();
 			long Token = obj.Token;
@@ -87,14 +128,17 @@ namespace Waher.Runtime.Threading.Test
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					await obj.EndRead();
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
 
 					Done1.SetResult(true);
 				}
@@ -111,18 +155,22 @@ namespace Waher.Runtime.Threading.Test
 					Thread.Sleep(1000);
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
 
 					await obj.BeginWrite();
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(Token + 3, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.IsTrue(obj.IsWriting);
+					CheckLockStackTrace(obj);
 
 					await obj.EndWrite();
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
 
 					Done2.SetResult(true);
 				}
@@ -144,6 +192,8 @@ namespace Waher.Runtime.Threading.Test
 		public async Task Test_05_WriteRead()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			TaskCompletionSource<bool> Done1 = new();
 			TaskCompletionSource<bool> Done2 = new();
 			long Token = obj.Token;
@@ -158,13 +208,16 @@ namespace Waher.Runtime.Threading.Test
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
 
 					await obj.EndWrite();
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
 
 					Done1.SetResult(true);
 				}
@@ -181,18 +234,23 @@ namespace Waher.Runtime.Threading.Test
 					Thread.Sleep(1000);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
 
 					await obj.BeginRead();
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.AreEqual(Token + 3, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(1, obj.NrReaders);
+					CheckLockStackTrace(obj);
 
 					await obj.EndRead();
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
+
 					Done2.SetResult(true);
 				}
 				catch (Exception ex)
@@ -213,6 +271,8 @@ namespace Waher.Runtime.Threading.Test
 		public async Task Test_06_WriteWrite()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			TaskCompletionSource<bool> Done1 = new();
 			TaskCompletionSource<bool> Done2 = new();
 			long Token = obj.Token;
@@ -227,13 +287,17 @@ namespace Waher.Runtime.Threading.Test
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
 
 					await obj.EndWrite();
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
+
 					Done1.SetResult(true);
 				}
 				catch (Exception ex)
@@ -249,14 +313,18 @@ namespace Waher.Runtime.Threading.Test
 					Thread.Sleep(1000);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
 
 					await obj.BeginWrite();
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.AreEqual(Token + 3, obj.Token);
+					CheckLockStackTrace(obj);
 
 					await obj.EndWrite();
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
+
 					Done2.SetResult(true);
 				}
 				catch (Exception ex)
@@ -277,6 +345,8 @@ namespace Waher.Runtime.Threading.Test
 		public async Task Test_07_ReadReadWrite()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			TaskCompletionSource<bool> Done1 = new();
 			TaskCompletionSource<bool> Done2 = new();
 			long Token = obj.Token;
@@ -291,29 +361,36 @@ namespace Waher.Runtime.Threading.Test
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					await obj.BeginRead();
 					Assert.AreEqual(2, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.AreEqual(2, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					await obj.EndRead();
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.AreEqual(1, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
 					Assert.AreEqual(Token + 1, obj.Token);
+					CheckLockStackTrace(obj);
 
 					await obj.EndRead();
 					Assert.AreEqual(0, obj.NrReaders);
+					CheckLockStackTrace(obj);
+
 					Done1.SetResult(true);
 				}
 				catch (Exception ex)
@@ -329,19 +406,24 @@ namespace Waher.Runtime.Threading.Test
 					Thread.Sleep(1000);
 					Assert.AreEqual(2, obj.NrReaders);
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
 
 					await obj.BeginWrite();
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(Token + 3, obj.Token);
+					CheckLockStackTrace(obj);
 
 					Thread.Sleep(2000);
 					Assert.AreEqual(0, obj.NrReaders);
 					Assert.IsTrue(obj.IsWriting);
 					Assert.AreEqual(Token + 3, obj.Token);
+					CheckLockStackTrace(obj);
 
 					await obj.EndWrite();
 					Assert.IsFalse(obj.IsWriting);
+					CheckLockStackTrace(obj);
+
 					Done2.SetResult(true);
 				}
 				catch (Exception ex)
@@ -358,15 +440,10 @@ namespace Waher.Runtime.Threading.Test
 			Assert.AreEqual(Token + 4, obj.Token);
 		}
 
-		private class Counter
+		private class Counter(long StartValue)
 		{
 			private readonly object synchObj = new();
-			private long token;
-
-			public Counter(long StartValue)
-			{
-				this.token = StartValue;
-			}
+			private long token = StartValue;
 
 			public long Token
 			{
@@ -400,6 +477,8 @@ namespace Waher.Runtime.Threading.Test
 		public async Task Test_08_RandomLoad()
 		{
 			using MultiReadSingleWriteObject obj = new();
+			CheckCreatorStackTrace(obj);
+
 			LinkedList<TaskCompletionSource<bool>> Tasks = new();
 			Random rnd = new();
 			int i;
@@ -430,12 +509,14 @@ namespace Waher.Runtime.Threading.Test
 								Assert.AreEqual(0, obj.NrReaders);
 								Assert.IsTrue(obj.IsWriting);
 								Assert.AreEqual(Counter.PreInc(), obj.Token);
+								CheckLockStackTrace(obj);
 								NrWrites++;
 
 								Thread.Sleep(10);
 								Assert.AreEqual(0, obj.NrReaders);
 								Assert.IsTrue(obj.IsWriting);
 								Assert.AreEqual(Counter.PostInc(), obj.Token);
+								CheckLockStackTrace(obj);
 
 								await obj.EndWrite();
 

@@ -861,6 +861,7 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(new ClientEventsWebSocket()));
 					SetupResources.AddLast(webServer.Register(new Login()));
 					SetupResources.AddLast(webServer.Register(new Logout()));
+					SetupResources.AddLast(webServer.Register(new MasterJavascript()));
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -1077,6 +1078,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());
 				webServer.Register(new Logout());
+				webServer.Register(new MasterJavascript());
 				webServer.Register(new Echo());
 				webServer.Register(new WebResources.Ping());
 				webServer.Register(new ProposeContract());

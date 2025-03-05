@@ -1,9 +1,6 @@
 ﻿Copyright: /Copyright.md
 Icon: /favicon.ico
 CSS: {{Theme.CSSX}}
-Javascript: /AlertPopup.md.js
-Javascript: /ConfirmPopup.md.js
-Javascript: /PromptPopup.md.js
 Javascript: /Master.js
 
 <header id="native-header">

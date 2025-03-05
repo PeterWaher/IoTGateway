@@ -1,0 +1,159 @@
+﻿using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Waher.Content.Html.JavaScript;
+using Waher.Content.Markdown;
+using Waher.Content.Markdown.JavaScript;
+using Waher.Networking.HTTP;
+
+namespace Waher.IoTGateway.WebResources
+{
+	/// <summary>
+	/// A resource that returns as a single JavaScript file, the following four files:
+	/// 
+	/// * /Master.js
+	/// * /AlertPopup.md.js
+	/// * /ConfirmPopup.md.js
+	/// * /PromptPopup.md.js
+	/// </summary>
+	public class MasterJavascript : HttpSynchronousResource, IHttpGetMethod
+	{
+		private readonly string masterJsFileName;
+		private readonly string alertPopupMdFileName;
+		private readonly string confirmPopupMdFileName;
+		private readonly string promptPopupMdFileName;
+		private string masterJs = null;
+		private string alertPopupJs = null;
+		private string confirmPopupJs = null;
+		private string promptPopupJs = null;
+		private DateTime masterJsLastModified = DateTime.MinValue;
+		private DateTime alertPopupJsLastModified = DateTime.MinValue;
+		private DateTime confirmPopupJsLastModified = DateTime.MinValue;
+		private DateTime promptPopupJsLastModified = DateTime.MinValue;
+		private DateTime lastModified = DateTime.MinValue;
+		private byte[] masterJsData = null;
+		private string contentType = null;
+
+		/// <summary>
+		/// A resource that returns as a single JavaScript file, the following four files:
+		/// 
+		/// * /Master.js
+		/// * /AlertPopup.md.js
+		/// * /ConfirmPopup.md.js
+		/// * /PromptPopup.md.js
+		/// </summary>
+		public MasterJavascript()
+			: base("/Master.js")
+		{
+			this.masterJsFileName = Path.Combine(Gateway.RootFolder, "Master.js");
+			this.alertPopupMdFileName = Path.Combine(Gateway.RootFolder, "AlertPopup.md");
+			this.confirmPopupMdFileName = Path.Combine(Gateway.RootFolder, "ConfirmPopup.md");
+			this.promptPopupMdFileName = Path.Combine(Gateway.RootFolder, "PromptPopup.md");
+		}
+
+		/// <summary>
+		/// If the resource handles sub-paths.
+		/// </summary>
+		public override bool HandlesSubPaths => false;
+
+		/// <summary>
+		/// If the resource uses user sessions.
+		/// </summary>
+		public override bool UserSessions => false;
+
+		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET => true;
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task GET(HttpRequest Request, HttpResponse Response)
+		{
+			DateTime TP;
+			bool Modified = false;
+
+			if ((TP = File.GetLastWriteTimeUtc(this.masterJsFileName)) > this.masterJsLastModified ||
+				this.masterJs is null)
+			{
+				this.masterJs = await File.ReadAllTextAsync(this.masterJsFileName);
+				this.masterJsLastModified = TP;
+				Modified = true;
+
+				if (TP > this.lastModified)
+					this.lastModified = TP;
+			}
+
+			if ((TP = File.GetLastWriteTimeUtc(this.alertPopupMdFileName)) > this.alertPopupJsLastModified ||
+				this.alertPopupJs is null)
+			{
+				this.alertPopupJs = await MarkdownToJavaScript(this.alertPopupMdFileName);
+				this.alertPopupJsLastModified = TP;
+				Modified = true;
+
+				if (TP > this.lastModified)
+					this.lastModified = TP;
+			}
+
+			if ((TP = File.GetLastWriteTimeUtc(this.confirmPopupMdFileName)) > this.confirmPopupJsLastModified ||
+				this.confirmPopupJs is null)
+			{
+				this.confirmPopupJs = await MarkdownToJavaScript(this.confirmPopupMdFileName);
+				this.confirmPopupJsLastModified = TP;
+				Modified = true;
+
+				if (TP > this.lastModified)
+					this.lastModified = TP;
+			}
+
+			if ((TP = File.GetLastWriteTimeUtc(this.promptPopupMdFileName)) > this.promptPopupJsLastModified ||
+				this.promptPopupJs is null)
+			{
+				this.promptPopupJs = await MarkdownToJavaScript(this.promptPopupMdFileName);
+				this.promptPopupJsLastModified = TP;
+				Modified = true;
+
+				if (TP > this.lastModified)
+					this.lastModified = TP;
+			}
+
+			if (Modified || this.masterJsData is null)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.AppendLine(this.masterJs);
+				sb.AppendLine();
+				sb.AppendLine(this.alertPopupJs);
+				sb.AppendLine();
+				sb.AppendLine(this.confirmPopupJs);
+				sb.AppendLine();
+				sb.AppendLine(this.promptPopupJs);
+
+				this.contentType = JavaScriptCodec.DefaultContentType + "; charset=utf-8";
+				this.masterJsData = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+			}
+
+			Response.ContentType = this.contentType;
+			await Response.Write(true, this.masterJsData);
+		}
+
+		private static async Task<string> MarkdownToJavaScript(string FileName)
+		{
+			string Markdown = await File.ReadAllTextAsync(FileName);
+			MarkdownSettings Settings = new MarkdownSettings()
+			{
+				ParseMetaData = false
+			};
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, FileName, null, null);
+			string JavaScript = await Doc.GenerateJavaScript();
+
+			return JavaScript;
+		}
+
+	}
+}

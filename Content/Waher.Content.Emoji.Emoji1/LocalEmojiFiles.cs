@@ -100,7 +100,7 @@ namespace Waher.Content.Emoji.Emoji1
 
 			try
 			{
-				DateTime TP = File.GetLastWriteTime(this.zipFileName);
+				DateTime TP = File.GetLastWriteTimeUtc(this.zipFileName);
 
 				if (File.Exists(this.zipFileName) && RuntimeSettings.Get(this.zipFileName, DateTime.MinValue) != TP)
 				{
@@ -137,7 +137,7 @@ namespace Waher.Content.Emoji.Emoji1
 
 				ZipFile.ExtractToDirectory(this.zipFileName, this.programDataFolder);
 
-				DateTime TP = File.GetLastWriteTime(this.zipFileName);
+				DateTime TP = File.GetLastWriteTimeUtc(this.zipFileName);
 				await RuntimeSettings.SetAsync(this.zipFileName, TP);
 
 				try

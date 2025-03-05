@@ -44,10 +44,10 @@ namespace Waher.Reports.Files
 			{
 				try
 				{
-					if (this.parsedReport is null || File.GetLastWriteTime(this.fileName) > this.reportTimestamp)
+					if (this.parsedReport is null || File.GetLastWriteTimeUtc(this.fileName) > this.reportTimestamp)
 					{
 						this.parsedReport = new ReportFile(this.fileName);
-						this.reportTimestamp = File.GetLastWriteTime(this.fileName);
+						this.reportTimestamp = File.GetLastWriteTimeUtc(this.fileName);
 					}
 
 					return this.parsedReport;

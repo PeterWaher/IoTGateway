@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;
@@ -348,9 +350,9 @@ namespace Waher.Script.Persistence.SQL
 					await FindRestrictions(Restriction2, BinOp.RightOperand, Variables);
 
 					if (!(Restriction1.BlockIds is null) && !(Restriction2.BlockIds is null))
-						Restriction.BlockIds = Join(Restriction1.BlockIds, Restriction2.BlockIds);
+						Restriction.BlockIds = Restriction1.BlockIds.Join(Restriction2.BlockIds);
 					else if (!(Restriction1.Creators is null) && !(Restriction2.Creators is null))
-						Restriction.Creators = Join(Restriction1.Creators, Restriction2.Creators);
+						Restriction.Creators = Restriction1.Creators.Join(Restriction2.Creators);
 				}
 				else if (BinOp is Range Range)
 				{
@@ -620,22 +622,6 @@ namespace Waher.Script.Persistence.SQL
 			}
 
 			return Element.AssociatedObjectValue;
-		}
-
-		private static T[] Join<T>(T[] A, T[] B)
-		{
-			int cA = A?.Length ?? 0;
-			int cB = B?.Length ?? 0;
-			int c = cA + cB;
-			T[] Result = new T[c];
-
-			if (cA > 0)
-				Array.Copy(A, 0, Result, 0, cA);
-
-			if (cB > 0)
-				Array.Copy(B, 0, Result, cA, cB);
-
-			return Result;
 		}
 
 		/// <summary>

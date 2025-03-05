@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="AllowedMethods">Allowed methods.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public MethodNotAllowedException(string[] AllowedMethods, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
+			: base(Code, StatusMessage, HeaderFields.Join(new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 
@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public MethodNotAllowedException(string[] AllowedMethods, object ContentObject, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
+			: base(Code, StatusMessage, ContentObject, HeaderFields.Join(new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 
@@ -48,7 +48,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public MethodNotAllowedException(string[] AllowedMethods, byte[] Content, string ContentType, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
+			: base(Code, StatusMessage, Content, ContentType, HeaderFields.Join(new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 
@@ -59,7 +59,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Request">Request object.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public MethodNotAllowedException(string[] AllowedMethods, HttpRequest Request, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Request, Join(HeaderFields, new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
+			: base(Code, StatusMessage, Request, HeaderFields.Join(new KeyValuePair<string, string>("Allow", Join(AllowedMethods))))
 		{
 		}
 

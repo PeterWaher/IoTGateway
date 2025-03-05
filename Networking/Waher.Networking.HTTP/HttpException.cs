@@ -274,29 +274,6 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Joins two sets (possibly empty) of header arrays.
-		/// </summary>
-		/// <param name="Headers1">First array of headers.</param>
-		/// <param name="Headers2">Second array of headers.</param>
-		/// <returns>Joined array of headers.</returns>
-		protected static KeyValuePair<string, string>[] Join(KeyValuePair<string, string>[] Headers1, params KeyValuePair<string, string>[] Headers2)
-		{
-			int c1 = Headers1?.Length ?? 0;
-			if (c1 == 0)
-				return Headers2;
-
-			int c2 = Headers2?.Length ?? 0;
-			if (c2 == 0)
-				return Headers1;
-
-			KeyValuePair<string, string>[] Result = new KeyValuePair<string, string>[c1 + c2];
-			Array.Copy(Headers1, 0, Result, 0, c1);
-			Array.Copy(Headers2, 0, Result, c1, c2);
-
-			return Result;
-		}
-
-		/// <summary>
 		/// HTTP Status Code.
 		/// </summary>
 		public int StatusCode => this.statusCode;

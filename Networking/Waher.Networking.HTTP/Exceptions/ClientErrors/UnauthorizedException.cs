@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Events;
 
 namespace Waher.Networking.HTTP
 {
@@ -23,7 +24,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Challenges">Challenges to send to client.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public UnauthorizedException(string[] Challenges, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Join(HeaderFields, CreateChallengeHeaders(Challenges)))
+			: base(Code, StatusMessage, HeaderFields.Join(CreateChallengeHeaders(Challenges)))
 		{
 		}
 
@@ -34,7 +35,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Challenges">Challenges to send to client.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public UnauthorizedException(object ContentObject, string[] Challenges, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, ContentObject, Join(HeaderFields, CreateChallengeHeaders(Challenges)))
+			: base(Code, StatusMessage, ContentObject, HeaderFields.Join(CreateChallengeHeaders(Challenges)))
 		{
 		}
 
@@ -46,7 +47,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Challenges">Challenges to send to client.</param>
 		/// <param name="HeaderFields">HTTP Header fields to include in the response.</param>
 		public UnauthorizedException(byte[] Content, string ContentType, string[] Challenges, params KeyValuePair<string, string>[] HeaderFields)
-			: base(Code, StatusMessage, Content, ContentType, Join(HeaderFields, CreateChallengeHeaders(Challenges)))
+			: base(Code, StatusMessage, Content, ContentType, HeaderFields.Join(CreateChallengeHeaders(Challenges)))
 		{
 		}
 

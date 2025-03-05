@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Security.DTLS.Ciphers
 {
@@ -75,7 +76,7 @@ namespace Waher.Security.DTLS.Ciphers
 			// Key calculation: RFC 5246 §6.3:
 
 			byte[] KeyBlock = this.PRF(State.masterSecret, "key expansion",
-				Concat(State.serverRandom, State.clientRandom),
+				State.serverRandom.Join(State.clientRandom),
 				(uint)((this.macKeyLength + this.encKeyLength + this.fixedIvLength) << 1));
 
 			int Pos = 0;
@@ -149,7 +150,7 @@ namespace Waher.Security.DTLS.Ciphers
 			int Pos = 0;
 			uint BytesLeft = NrBytes;
 
-			Seed = Concat(Encoding.UTF8.GetBytes(Label), Seed);
+			Seed = Encoding.UTF8.GetBytes(Label).Join(Seed);
 			A = Seed;
 
 			using (HMACSHA256 Hmac = new HMACSHA256(Secret))
@@ -157,7 +158,7 @@ namespace Waher.Security.DTLS.Ciphers
 				while (BytesLeft > 0)
 				{
 					A = Hmac.ComputeHash(A);
-					P = Hmac.ComputeHash(Concat(A, Seed));
+					P = Hmac.ComputeHash(A.Join(Seed));
 
 					if (BytesLeft < P.Length)
 					{
@@ -173,29 +174,6 @@ namespace Waher.Security.DTLS.Ciphers
 					}
 				}
 			}
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Concatenates two binary arrays.
-		/// </summary>
-		/// <param name="A1">Array 1</param>
-		/// <param name="A2">Array 2</param>
-		/// <returns>A1+A2</returns>
-		public static byte[] Concat(byte[] A1, byte[] A2)
-		{
-			int c1, c2;
-
-			if (A1 is null || (c1 = A1.Length) == 0)
-				return A2;
-			else if (A2 is null || (c2 = A2.Length) == 0)
-				return A1;
-
-			byte[] Result = new byte[c1 + c2];
-
-			Array.Copy(A1, 0, Result, 0, c1);
-			Array.Copy(A2, 0, Result, c1, c2);
 
 			return Result;
 		}

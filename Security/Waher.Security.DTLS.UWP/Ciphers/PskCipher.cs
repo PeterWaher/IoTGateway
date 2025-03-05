@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Security.DTLS.Ciphers
 {
@@ -81,7 +83,7 @@ namespace Waher.Security.DTLS.Ciphers
 				// RFC 5246, §8.1, Computing the Master Secret:
 
 				this.SetMasterSecret(this.PRF(PremasterSecret, "master secret",
-					Concat(State.clientRandom, State.serverRandom), 48), State);
+					State.clientRandom.Join(State.serverRandom), 48), State);
 
 				PremasterSecret.Initialize();
 			}

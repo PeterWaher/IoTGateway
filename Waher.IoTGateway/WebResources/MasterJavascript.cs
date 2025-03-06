@@ -6,6 +6,7 @@ using Waher.Content.Html.JavaScript;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.JavaScript;
 using Waher.Networking.HTTP;
+using Waher.Script;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -147,7 +148,9 @@ namespace Waher.IoTGateway.WebResources
 			string Markdown = await File.ReadAllTextAsync(FileName);
 			MarkdownSettings Settings = new MarkdownSettings()
 			{
-				ParseMetaData = false
+				ParseMetaData = false,
+				AllowInlineScript = true,
+				Variables = new Variables()
 			};
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, FileName, null, null);
 			string JavaScript = await Doc.GenerateJavaScript();

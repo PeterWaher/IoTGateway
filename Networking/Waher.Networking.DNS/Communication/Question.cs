@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.DNS.Enumerations;
+﻿using Waher.Networking.DNS.Enumerations;
 
 namespace Waher.Networking.DNS.Communication
 {

@@ -1493,6 +1493,7 @@ namespace Waher.IoTGateway
 
 			Link.Append("/QR/");
 			Link.Append(WebUtility.UrlEncode(e.Text));
+			Link.Append("?w=400&h=400&q=2");
 
 			e.Url = Link.ToString();
 

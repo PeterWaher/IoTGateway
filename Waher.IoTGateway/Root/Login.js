@@ -127,11 +127,14 @@ function SignatureReceivedBE(Empty)
 var LoginTimer = null;
 let hightCalibraded = false;
 let loginCarousel = null;
+const virtualTimerInterval = 1000/5.0
+let virtualTimerIntervalLastTimeStamp = -1
 
 window.addEventListener("load", () => {
+
     function SetLoginMethod(method) 
     {
-        fetch("/GatewayRoot/LoginMethod.ws", {
+        fetch("/LoginMethod.ws", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -139,6 +142,7 @@ window.addEventListener("load", () => {
             },
             body: JSON.stringify({method:method})
         })
+
     }
 
     DisplayQuickLogin();
@@ -148,5 +152,9 @@ window.addEventListener("load", () => {
 
         if (typeof method === "string" && method !== "")
             SetLoginMethod(method)
+    })
+
+    document.addEventListener("visibilitychange", () => {
+        location.reload()
     })
 });

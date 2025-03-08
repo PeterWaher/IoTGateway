@@ -11,7 +11,7 @@ Neuron:
 
 {{
 	LoginMethod := Request.Header.Cookie["login-method"] ?? "";
-	Waher.IoTGateway.Gateway.CheckLocalLogin(Request)
+	Waher.IoTGateway.Gateway.CheckLocalLogin(Request);
 }}
 
 <section id="LoginContainer" class="flex-centering">
@@ -46,9 +46,13 @@ Neuron:
 
 
 	<span>
-		<button type="button" data-carousel="login-carousel" data-carousel-previous>&lt;</button>
-		<button type="button" data-carousel="login-carousel" data-carousel-next>&gt;</button>
-
+		<button type="button" data-carousel="login-carousel" data-carousel-button=0><img draggable="false" (dragstart)="false;" class="unselectable" src="/Images/user-password-login-icon.svg"></button>
+		{{if exists(QuickLoginServiceId) and Waher.IoTGateway.Setup.LegalIdentityConfiguration.Instance.HasApprovedLegalIdentities then
+		(
+		]]
+		<button type="button" data-carousel="login-carousel" data-carousel-button=1><img draggable="false" (dragstart)="false;" class="unselectable" src="/Images/quick-login-login-icon.svg"></button>
+		[[
+		)}}
 	</span>
 	{{if exists(LoginError) then]]
 <div class='error'>

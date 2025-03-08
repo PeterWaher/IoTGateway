@@ -59,6 +59,15 @@ main
     text-align: center;
 }
 
+.unselectable {
+  user-drag: none; 
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
 /* #endregion util */
 
 /* #region Carousel*/
@@ -343,6 +352,15 @@ html body fieldset
 }
 
 /* endregion MISC */
+
+/* region input */
+
+.buttonSelected
+{
+    background-color: ¤if GrayScale(ButtonColor).Red > 100 then Blend(ButtonColor, "black", 0.2) else Blend(ButtonColor, "white", 0.2)¤;
+}
+
+/* endregion input */
 
 
 @media screen and (min-width: 901px) {

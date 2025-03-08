@@ -276,18 +276,20 @@ function PopupHandler() {
     }
 }
 
-function Carousel(id) {
+function Carousel(containerId) {
     const elementChangedEvent = new Event("elementchanged")
 
     let carouselIndex = 0;
     let carouselCount = 0;
 
-    const previousButton = document.querySelector(`*[data-carousel=${id}][data-carousel-previous]`);
-    const nextButton = document.querySelector(`*[data-carousel=${id}][data-carousel-next]`);
-    const carouselContainer = document.getElementById(id);
+    const previousButton = document.querySelector(`*[data-carousel=${containerId}][data-carousel-previous]`);
+    const nextButton = document.querySelector(`*[data-carousel=${containerId}][data-carousel-next]`);
+    const carouselContainer = document.getElementById(containerId);
+    const carouselButtons = Array.from(document.querySelectorAll(`[data-carousel=${containerId}][data-carousel-button]`))
+
 
     if ([previousButton, nextButton, carouselContainer].includes(undefined)) {
-        Popup.Alert(`Carousel (${id}) is not properly setup`);
+        Popup.Alert(`Carousel (${containerId}) is not properly setup`);
         return;
     }
 
@@ -297,16 +299,24 @@ function Carousel(id) {
         return (index + carouselCount /* + carouselCount to cover cases where you take the index - 1 and it becomes -1 wich would return a negative modulo */) % carouselCount
     }
 
-    function ShiftCarousel(dir) {
-        if (carouselCount > 2) {
-            carouselContainer.children[BoundedIndex(carouselIndex - 1)].removeAttribute("data-carousel-left");
-            carouselContainer.children[carouselIndex].removeAttribute("data-carousel-active");
-            carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-right");
-            carouselIndex = BoundedIndex(carouselIndex + dir);
-            carouselContainer.children[BoundedIndex(carouselIndex - 1)].setAttribute("data-carousel-left", "");
-            carouselContainer.children[carouselIndex].setAttribute("data-carousel-active", "");
-            carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-right", "");
-        } else if (carouselCount == 2) {
+    function SetCarouselIndex(index)
+    {
+        if (carouselButtons.length > 0)
+        {
+            carouselButtons[carouselIndex].classList.remove("buttonSelected")
+            carouselButtons[index].classList.add("buttonSelected")
+        }
+        carouselIndex = index
+    }
+
+    function SetCarouselIndexAnim(index)
+    {
+        if (index === carouselIndex)
+            return
+        
+        if (carouselCount > 1) {
+
+            const dir = Math.sign(index - carouselIndex)
             if (dir === 1) {
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-left");
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = "none"
@@ -317,7 +327,6 @@ function Carousel(id) {
                 carouselContainer.children[carouselIndex].setAttribute("data-carousel-left", "");
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-right", "")
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-active", "")
-                carouselIndex = BoundedIndex(carouselIndex + dir);
             } else {
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-right");
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].style.transition = "none"
@@ -328,9 +337,10 @@ function Carousel(id) {
                 carouselContainer.children[carouselIndex].setAttribute("data-carousel-right", "");
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].removeAttribute("data-carousel-left", "")
                 carouselContainer.children[BoundedIndex(carouselIndex + 1)].setAttribute("data-carousel-active", "")
-                carouselIndex = BoundedIndex(carouselIndex + dir);
             }
+            SetCarouselIndex(BoundedIndex(carouselIndex + dir));
         }
+
 
         carouselContainer.dispatchEvent(elementChangedEvent)
     }
@@ -350,22 +360,30 @@ function Carousel(id) {
     }
 
     function Initialize() {
-        previousButton.addEventListener("click", () => ShiftCarousel(-1));
-        nextButton.addEventListener("click", () => ShiftCarousel(1));
+        if (previousButton && nextButton)
+        {
+            previousButton.addEventListener("click", () => SetCarouselIndexAnim(carouselIndex-1));
+            nextButton.addEventListener("click", () => SetCarouselIndexAnim(carouselIndex+1));
+        } 
+        else 
+        {
+            carouselButtons.forEach(e => {
+                e.addEventListener("click", () => {
+                    SetCarouselIndexAnim(Number(e.getAttribute("data-carousel-button")))
+                })
+            })
+        }
 
         CalibrateHeight();
 
-        carouselIndex = -1;
+        SetCarouselIndex(0)
+        carouselContainer.children[0].setAttribute("data-carousel-active", "");
         for (let i = 0; i < carouselContainer.children.length; i++)
         {
             if (carouselContainer.children[i].hasAttribute("data-carousel-active"))
-                carouselIndex = i;
-        }
-
-        if (carouselIndex === -1)
-        {
-            carouselIndex = 0;
-            carouselContainer.children[0].setAttribute("data-carousel-active", "");
+            {
+                SetCarouselIndex(i);
+            }
         }
 
         if (carouselCount < 2)
@@ -382,7 +400,6 @@ function Carousel(id) {
         get current() { return carouselContainer.children[carouselIndex] },
         get container() { return carouselContainer },
         
-        ShiftCarousel,
         CalibrateHeight,
     }
 }

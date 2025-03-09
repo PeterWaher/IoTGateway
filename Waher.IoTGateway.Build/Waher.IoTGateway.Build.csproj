@@ -12,11 +12,15 @@
 	</Target>
 
   <Target Name="BuildSetup">
-		<MSBuild Projects="..\Waher.IoTGateway\Waher.IoTGateway.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+		<MSBuild Projects="..\Waher.IoTGateway\Waher.IoTGateway.csproj" Targets="Build" 
+						 Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 
-		<MSBuild Projects="..\Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+		<MSBuild Projects="..\Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj" Targets="Build" 
+						 Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
 
-    <MSBuild Projects="..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj" Targets="Build" Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+    <MSBuild Projects="..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj" Targets="Build" 
+						 Properties="Configuration=$(Configuration);SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+		
     <Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput&quot; -c:$(Configuration) --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
 		<Exec Command="..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.package -m ..\Waher.IoTGateway.Svc\bin\Release\PublishOutput\Waher.IoTGateway.Svc.manifest"/>
 		

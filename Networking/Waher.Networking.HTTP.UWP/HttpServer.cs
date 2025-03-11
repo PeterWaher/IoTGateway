@@ -703,7 +703,7 @@ namespace Waher.Networking.HTTP
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Exception(ex);
 				}
 			} 
 

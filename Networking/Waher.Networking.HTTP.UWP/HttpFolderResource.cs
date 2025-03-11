@@ -247,8 +247,7 @@ namespace Waher.Networking.HTTP
 				string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, true, out bool Exists);
 				if (Exists)
 				{
-					DateTime LastModified = File.GetLastWriteTime(FullPath);
-					LastModified = LastModified.ToUniversalTime();
+					DateTime LastModified = File.GetLastWriteTimeUtc(FullPath);
 
 					if (GreaterOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 						throw new NotModifiedException();
@@ -526,7 +525,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, true, out bool Exists);
 			if (Exists)
 			{
-				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
+				DateTime LastModified = File.GetLastWriteTimeUtc(FullPath);
 				CacheRec Rec;
 
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
@@ -537,14 +536,17 @@ namespace Waher.Networking.HTTP
 				}
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response,
+					ContentType, FullPath, Request.Header.Resource, LastModified);
+
 				if (AcceptableResponse is null || Response.ResponseSent)
 					return;
 
-				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
 
-				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified,
+				await SendResponse(AcceptableResponse.Stream, FullPath, 
+					AcceptableResponse.ContentType, Rec.IsDynamic, Rec.ETag, 
+					AcceptableResponse.LastModified, AcceptableResponse.LastModifiedUpdated,
 					Response, Request, this.defaultResponseHeaders);
 			}
 			else
@@ -579,11 +581,14 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentType">Content Type.</param>
 		/// <param name="ETag">ETag of resource.</param>
 		/// <param name="LastModified">When resource was last modified.</param>
+		/// <param name="LastModifiedUpdated">If <paramref name="LastModified"/> has
+		/// been updated during the processing of the resource.</param>
 		/// <param name="Response">HTTP response object.</param>
-		public static Task SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
-			HttpResponse Response)
+		public static Task SendResponse(string FullPath, string ContentType, string ETag, 
+			DateTime LastModified, bool LastModifiedUpdated, HttpResponse Response)
 		{
-			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, null, null);
+			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified,
+				LastModifiedUpdated, Response, null, null);
 		}
 
 		/// <summary>
@@ -593,12 +598,16 @@ namespace Waher.Networking.HTTP
 		/// <param name="ContentType">Content Type.</param>
 		/// <param name="ETag">ETag of resource.</param>
 		/// <param name="LastModified">When resource was last modified.</param>
+		/// <param name="LastModifiedUpdated">If <paramref name="LastModified"/> has
+		/// been updated during the processing of the resource.</param>
 		/// <param name="Response">HTTP response object.</param>
 		/// <param name="Request">HTTP request object.</param>
-		public static Task SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
-			HttpResponse Response, HttpRequest Request)
+		public static Task SendResponse(string FullPath, string ContentType, string ETag, 
+			DateTime LastModified, bool LastModifiedUpdated, HttpResponse Response, 
+			HttpRequest Request)
 		{
-			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response, Request, null);
+			return SendResponse(null, FullPath, ContentType, false, ETag, LastModified,
+				LastModifiedUpdated, Response, Request, null);
 		}
 
 		/// <summary>
@@ -619,8 +628,9 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private static async Task SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag,
-			DateTime LastModified, HttpResponse Response, HttpRequest Request, LinkedList<KeyValuePair<string, string>> DefaultResponseHeaders)
+		private static async Task SendResponse(Stream f, string FullPath, string ContentType, 
+			bool IsDynamic, string ETag, DateTime LastModified, bool LastModifiedUpdated,
+			HttpResponse Response, HttpRequest Request, LinkedList<KeyValuePair<string, string>> DefaultResponseHeaders)
 		{
 			ReadProgress Progress = new ReadProgress()
 			{
@@ -629,7 +639,9 @@ namespace Waher.Networking.HTTP
 				f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
 				Next = null,
 				Boundary = null,
-				ContentType = null
+				ContentType = null,
+				FullPath = FullPath,
+				SetLastModified = LastModifiedUpdated ? (DateTime?)LastModified : null
 			};
 			Progress.BytesLeft = Progress.TotalLength = Progress.f.Length;
 			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
@@ -787,19 +799,43 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private class AcceptableResponse
+		private class AcceptableResponse : ICodecProgress
 		{
+			public ICodecProgress Progress;
+			public DateTime LastModified;
 			public Stream Stream;
 			public string ContentType;
 			public bool Dynamic;
+			public bool LastModifiedUpdated = false;
+
+			public Task EarlyHint(string Resource, string Relation, params KeyValuePair<string, string>[] AdditionalParameters)
+				=> this.Progress?.EarlyHint(Resource, Relation, AdditionalParameters) ?? Task.CompletedTask;
+
+			public Task HeaderProcessed() => this.Progress?.HeaderProcessed() ?? Task.CompletedTask;
+			public Task BodyProcessed() => this.Progress?.BodyProcessed() ?? Task.CompletedTask;
+			
+			public void DependencyTimestamp(DateTime Timestamp)
+			{
+				DateTime TP = Timestamp.ToUniversalTime();
+
+				if (TP > this.LastModified)
+				{
+					this.LastModified = TP;
+					this.LastModifiedUpdated = true;
+				}
+
+				this.Progress?.DependencyTimestamp(Timestamp);
+			}
 		}
 
-		private async Task<AcceptableResponse> CheckAcceptable(HttpRequest Request, HttpResponse Response, string ContentType,
-			string FullPath, string ResourceName)
+		private async Task<AcceptableResponse> CheckAcceptable(HttpRequest Request, HttpResponse Response,
+			string ContentType, string FullPath, string ResourceName, DateTime LastModified)
 		{
 			HttpRequestHeader Header = Request.Header;
 			AcceptableResponse Result = new AcceptableResponse()
 			{
+				Progress = Response.Progress,
+				LastModified = LastModified,
 				ContentType = ContentType,
 				Dynamic = false
 			};
@@ -916,9 +952,9 @@ namespace Waher.Networking.HTTP
 									Alternatives.Add(AcceptRecord.Item);
 								}
 							}
-							
+
 							ConversionState State = new ConversionState(ContentType, f, FullPath, ResourceName,
-								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Response.Progress, 
+								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Result,
 								Alternatives?.ToArray());
 
 							if (await Converter.ConvertAsync(State))
@@ -989,9 +1025,11 @@ namespace Waher.Networking.HTTP
 			public ByteRangeInterval Next;
 			public HttpResponse Response;
 			public HttpRequest Request;
+			public DateTime? SetLastModified;
 			public Stream f;
 			public string Boundary;
 			public string ContentType;
+			public string FullPath;
 			public long BytesLeft;
 			public long TotalLength;
 			public int BlockSize;
@@ -1098,6 +1136,18 @@ namespace Waher.Networking.HTTP
 					await this.Response.DisposeAsync();
 					this.Response = null;
 				}
+
+				if (this.SetLastModified.HasValue)
+				{
+					try
+					{
+						File.SetLastWriteTimeUtc(this.FullPath, this.SetLastModified.Value);
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+				}
 			}
 		}
 
@@ -1114,7 +1164,7 @@ namespace Waher.Networking.HTTP
 			if (Exists)
 			{
 				HttpRequestHeader Header = Request.Header;
-				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
+				DateTime LastModified = File.GetLastWriteTimeUtc(FullPath);
 				DateTimeOffset? Limit;
 				CacheRec Rec;
 
@@ -1134,10 +1184,13 @@ namespace Waher.Networking.HTTP
 				}
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response,
+					ContentType, FullPath, Request.Header.Resource, LastModified);
+
 				if (AcceptableResponse is null || Response.ResponseSent)
 					return;
 
+				LastModified = AcceptableResponse.LastModified;
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
 
@@ -1145,7 +1198,9 @@ namespace Waher.Networking.HTTP
 				{
 					Response = Response,
 					Request = Request,
-					f = AcceptableResponse.Stream ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+					FullPath = FullPath,
+					f = AcceptableResponse.Stream ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+					SetLastModified = AcceptableResponse.LastModifiedUpdated ? (DateTime?)LastModified : null
 				};
 
 				ByteRangeInterval Interval = FirstInterval;

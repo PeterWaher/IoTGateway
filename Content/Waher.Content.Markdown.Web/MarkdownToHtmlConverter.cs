@@ -322,29 +322,27 @@ namespace Waher.Content.Markdown.Web
 			}
 
 			string s = await this.DoConversion(Doc);    // Result needs to be generated, so that IsDynamic property is properly evaluated. (Can depend on master file, which is loaded during generation.)
+			HttpResponse Response = Request?.Response;
 
-			if (!(State.Session is null) && State.Session.TryGetVariable("Response", out v))
+			if (!(Response is null))
 			{
-				if (v.ValueObject is HttpResponse Response)
+				if (Response.ResponseSent)
+					return Doc.IsDynamic;
+
+				if (!this.CopyHttpHeader("Cache-Control", Doc, Response))
 				{
-					if (Response.ResponseSent)
-						return Doc.IsDynamic;
-
-					if (!this.CopyHttpHeader("Cache-Control", Doc, Response))
-					{
-						if (Doc.IsDynamic)
-							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
-						else
-							Response.SetHeader("Cache-Control", "no-transform,public,max-age=60,s-maxage=60,stale-while-revalidate=604800");
-					}
-
-					this.CopyHttpHeader("Access-Control-Allow-Origin", Doc, Response);
-					this.CopyHttpHeader("Content-Security-Policy", Doc, Response);
-					this.CopyHttpHeader("Public-Key-Pins", Doc, Response);
-					this.CopyHttpHeader("Strict-Transport-Security", Doc, Response);
-					this.CopyHttpHeader("Sunset", Doc, Response);
-					this.CopyHttpHeader("Vary", Doc, Response);
+					if (Doc.IsDynamic)
+						Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+					else
+						Response.SetHeader("Cache-Control", "no-transform,public,max-age=60,s-maxage=60,stale-while-revalidate=604800");
 				}
+
+				this.CopyHttpHeader("Access-Control-Allow-Origin", Doc, Response);
+				this.CopyHttpHeader("Content-Security-Policy", Doc, Response);
+				this.CopyHttpHeader("Public-Key-Pins", Doc, Response);
+				this.CopyHttpHeader("Strict-Transport-Security", Doc, Response);
+				this.CopyHttpHeader("Sunset", Doc, Response);
+				this.CopyHttpHeader("Vary", Doc, Response);
 			}
 
 			byte[] Data = Utf8WithBOM.GetBytes(s);

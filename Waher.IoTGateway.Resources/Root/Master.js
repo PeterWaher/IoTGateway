@@ -29,8 +29,8 @@ function NativeHeaderHandler() {
             subMenu.setAttribute("expanded", "")
 
             // set set max height to prevent vertical overflow
-            if (subMenu.offsetHeight + subMenu.offsetTop > window.outerHeight) {
-                subMenu.style.height = `${window.innerHeight - subMenu.offsetTop}px`
+            if (subMenu.getBoundingClientRect().bottom > window.innerHeight) {
+                subMenu.style.height = `${window.innerHeight - subMenu.getBoundingClientRect().top}px`
             }
 
             // if overflowing to the righ, offset the top submenue to the left to not

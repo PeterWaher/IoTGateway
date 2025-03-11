@@ -67,16 +67,16 @@ namespace Waher.Content.QR.Test.VersionTests
 
 		public static void SaveImage(QrMatrix M, string FileName, ColorFunction Color)
 		{
-			SaveImage(M, FileName, Color, false);
+			SaveImage(M, FileName, Color, 1);
 		}
 
-		public static void SaveImage(QrMatrix M, string FileName, ColorFunction Color, bool AntiAlias)
+		public static void SaveImage(QrMatrix M, string FileName, ColorFunction Color, int Quality)
 		{
 			int ImgSize = Math.Max(300, M.Size * 3);
-			SaveImage(M, ImgSize, FileName, Color, AntiAlias);
+			SaveImage(M, ImgSize, FileName, Color, Quality);
 		}
 
-		public static void SaveImage(QrMatrix M, int? ImgSize, string FileName, ColorFunction Color, bool AntiAlias)
+		public static void SaveImage(QrMatrix M, int? ImgSize, string FileName, ColorFunction Color, int Quality)
 		{
 			byte[] RGBA;
 			int Size;
@@ -84,12 +84,12 @@ namespace Waher.Content.QR.Test.VersionTests
 			if (ImgSize.HasValue)
 			{
 				Size = ImgSize.Value;
-				RGBA = Color is null ? M.ToRGBA(Size, Size) : M.ToRGBA(Size, Size, Color, AntiAlias);
+				RGBA = Color is null ? M.ToRGBA(Size, Size) : M.ToRGBA(Size, Size, Color, Quality);
 			}
 			else
 			{
 				Size = M.Size + 8;
-				RGBA = Color is null ? M.ToRGBA() : M.ToRGBA(Color, AntiAlias);
+				RGBA = Color is null ? M.ToRGBA() : M.ToRGBA(Color, Quality);
 			}
 
 			IntPtr Pixels = Marshal.AllocCoTaskMem(RGBA.Length);

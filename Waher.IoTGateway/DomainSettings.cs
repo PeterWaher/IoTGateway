@@ -606,7 +606,7 @@ namespace Waher.IoTGateway
                 Timestamp = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
 
             if (Timestamp == DateTime.MinValue)
-                return File.GetLastWriteTime(FileName);
+                return File.GetLastWriteTimeUtc(FileName);
             else
                 return Timestamp;
         }

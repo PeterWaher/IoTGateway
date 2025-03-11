@@ -32,8 +32,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_01_GF256_Pow2()
 		{
-			byte[] Expected = new byte[]
-			{
+			byte[] Expected =
+			[
 				1,2,4,8,16,32,64,128,29,58,116,232,205,135,19,38,76,152,45,90,
 				180,117,234,201,143,3,6,12,24,48,96,192,157,39,78,156,37,74,
 				148,53,106,212,181,119,238,193,159,35,70,140,5,10,20,40,80,160,
@@ -49,7 +49,7 @@ namespace Waher.Content.QR.Test
 				81,162,89,178,121,242,249,239,195,155,43,86,172,69,138,9,18,36,
 				72,144,61,122,244,245,247,243,251,235,203,139,11,22,44,88,176,
 				125,250,233,207,131,27,54,108,216,173,71,142,1
-			};
+			];
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(GF256.PowerOf2Table));
 		}
@@ -57,8 +57,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_02_GF256_Log2()
 		{
-			byte[] Expected = new byte[]
-			{
+			byte[] Expected =
+			[
 				0,0,1,25,2,50,26,198,3,223,51,238,27,104,199,75,
 				4,100,224,14,52,141,239,129,28,193,105,248,200,8,76,113,
 				5,138,101,47,225,36,15,33,53,147,142,218,240,18,130,69,
@@ -75,7 +75,7 @@ namespace Waher.Content.QR.Test
 				108,161,59,82,41,157,85,170,251,96,134,177,187,204,62,90,
 				203,89,95,176,156,169,160,81,11,245,22,235,122,117,44,215,
 				79,174,213,233,230,231,173,232,116,214,244,234,168,80,88,175
-			};
+			];
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(GF256.Log2Table));
 		}
@@ -83,7 +83,7 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_03_GF256Px_1()
 		{
-			byte[] Expected = new byte[] { 1, 1 };
+			byte[] Expected = [1, 1];
 			ReedSolomonEC EC = new(1);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
@@ -92,7 +92,7 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_04_GF256Px_2()
 		{
-			byte[] Expected = new byte[] { 1, 3, 2 };
+			byte[] Expected = [1, 3, 2];
 			ReedSolomonEC EC = new(2);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
@@ -101,7 +101,7 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_05_GF256Px_3()
 		{
-			byte[] Expected = new byte[] { 1, 7, 14, 8 };
+			byte[] Expected = [1, 7, 14, 8];
 			ReedSolomonEC EC = new(3);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
@@ -110,8 +110,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_06_GF256Px_7()
 		{
-			byte[] Expected = new byte[]
-			{
+			byte[] Expected =
+			[
 				GF256.PowerOf2Table[0],
 				GF256.PowerOf2Table[87],
 				GF256.PowerOf2Table[229],
@@ -120,7 +120,7 @@ namespace Waher.Content.QR.Test
 				GF256.PowerOf2Table[238],
 				GF256.PowerOf2Table[102],
 				GF256.PowerOf2Table[21]
-			};
+			];
 			ReedSolomonEC EC = new(7);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
@@ -129,8 +129,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_07_GF256Px_30()
 		{
-			byte[] Expected = new byte[]
-			{
+			byte[] Expected =
+			[
 				GF256.PowerOf2Table[0],
 				GF256.PowerOf2Table[41],
 				GF256.PowerOf2Table[173],
@@ -162,7 +162,7 @@ namespace Waher.Content.QR.Test
 				GF256.PowerOf2Table[40],
 				GF256.PowerOf2Table[192],
 				GF256.PowerOf2Table[180]
-			};
+			];
 			ReedSolomonEC EC = new(30);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
@@ -172,21 +172,21 @@ namespace Waher.Content.QR.Test
 		public void Test_08_EC_Code()
 		{
 			ReedSolomonEC EC = new(10);
-			byte[] Code = EC.GenerateCorrectionCode(new byte[] { 32, 91, 11, 120, 209, 114, 220, 77, 67, 64, 236, 17, 236, 17, 236, 17 });
-			byte[] Expected = new byte[] { 196, 35, 39, 119, 235, 215, 231, 226, 93, 23 };
+			byte[] Code = EC.GenerateCorrectionCode([32, 91, 11, 120, 209, 114, 220, 77, 67, 64, 236, 17, 236, 17, 236, 17]);
+			byte[] Expected = [196, 35, 39, 119, 235, 215, 231, 226, 93, 23];
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(Code));
 		}
 
 		[TestMethod]
 		public void Test_09_TotalDataBytes_H()
 		{
-			int[] DataBytes = new int[]
-			{
+			int[] DataBytes =
+			[
 				9, 16, 26, 36, 46, 60, 66, 86, 100, 122, 140, 158, 180, 197,
 				223, 253, 283, 313, 341, 385, 406, 442, 464, 514, 538, 596,
 				628, 661, 701, 745, 793, 845, 901, 961, 986, 1054, 1096, 1142,
 				1222, 1276
-			};
+			];
 
 			int i = 0;
 
@@ -197,13 +197,13 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_10_TotalDataBytes_L()
 		{
-			int[] DataBytes = new int[]
-			{
+			int[] DataBytes =
+			[
 				19, 34, 55, 80, 108, 136, 156, 194, 232, 274, 324, 370, 428,
 				461, 523, 589, 647, 721, 795, 861, 932, 1006, 1094, 1174,
 				1276, 1370, 1468, 1531, 1631, 1735, 1843, 1955, 2071, 2191,
 				2306, 2434, 2566, 2702, 2812, 2956
-			};
+			];
 
 			int i = 0;
 
@@ -214,13 +214,13 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_11_TotalDataBytes_M()
 		{
-			int[] DataBytes = new int[]
-			{
+			int[] DataBytes =
+			[
 				16, 28, 44, 64, 86, 108, 124, 154, 182, 216, 254, 290, 334,
 				365, 415, 453, 507, 563, 627, 669, 714, 782, 860, 914, 1000,
 				1062, 1128, 1193, 1267, 1373, 1455, 1541, 1631, 1725, 1812,
 				1914, 1992, 2102, 2216, 2334
-			};
+			];
 
 			int i = 0;
 
@@ -231,13 +231,13 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_12_TotalDataBytes_Q()
 		{
-			int[] DataBytes = new int[]
-			{
+			int[] DataBytes =
+			[
 				13, 22, 34, 48, 62, 76, 88, 110, 132, 154, 180, 206, 244,
 				261, 295, 325, 367, 397, 445, 485, 512, 568, 614, 664, 718,
 				754, 808, 871, 911, 985, 1033, 1115, 1171, 1231, 1286, 1354,
 				1426, 1502, 1582, 1666
-			};
+			];
 
 			int i = 0;
 
@@ -248,16 +248,16 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_13_ApplyErrorCorrection()
 		{
-			byte[] Message = new byte[]
-			{
+			byte[] Message =
+			[
 				67, 85, 70, 134, 87, 38, 85, 194, 119, 50, 6, 18, 6, 103, 38,
 				246, 246, 66, 7, 118, 134, 242, 7, 38, 86, 22, 198, 199, 146, 6,
 				182, 230, 247, 119, 50, 7, 118, 134, 87, 38, 82, 6, 134, 151, 50, 7,
 				70, 247, 118, 86, 194, 6, 151, 50, 16, 236, 17, 236, 17, 236, 17, 236
-			};
+			];
 			byte[] FinalMessage = this.encoder.ApplyErrorCorrection(5, CorrectionLevel.Q, Message);
-			byte[] Expected = new byte[]
-			{
+			byte[] Expected =
+			[
 				67, 246, 182, 70, 85, 246, 230, 247, 70, 66, 247, 118, 134, 7, 119,
 				86, 87, 118, 50, 194, 38, 134, 7, 6, 85, 242, 118, 151, 194, 7, 134,
 				50, 119, 38, 87, 16, 50, 86, 38, 236, 6, 22, 82, 17, 18, 198, 6, 236,
@@ -267,7 +267,7 @@ namespace Waher.Content.QR.Test
 				229, 200, 238, 106, 248, 134, 76, 40, 154, 27, 195, 255, 117, 129,
 				230, 172, 154, 209, 189, 82, 111, 17, 10, 2, 86, 163, 108, 131, 161,
 				163, 240, 32, 111, 120, 192, 178, 39, 133, 141, 236
-			};
+			];
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(FinalMessage));
 		}
@@ -275,13 +275,13 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_14_GenerateMatrix()
 		{
-			byte[] Message = new byte[]
-			{
+			byte[] Message =
+			[
 				67, 85, 70, 134, 87, 38, 85, 194, 119, 50, 6, 18, 6, 103, 38,
 				246, 246, 66, 7, 118, 134, 242, 7, 38, 86, 22, 198, 199, 146, 6,
 				182, 230, 247, 119, 50, 7, 118, 134, 87, 38, 82, 6, 134, 151, 50, 7,
 				70, 247, 118, 86, 194, 6, 151, 50, 16, 236, 17, 236, 17, 236, 17, 236
-			};
+			];
 			QrMatrix Matrix = this.encoder.GenerateMatrix(5, CorrectionLevel.Q, Message, true);
 
 			ConsoleOut.WriteLine(Matrix.ToFullBlockText());
@@ -500,12 +500,12 @@ namespace Waher.Content.QR.Test
 			CorrectionLevel Level = CorrectionLevel.Q;
 			string Message = "HELLO WORLD";
 			KeyValuePair<byte[], VersionInfo> Encoding = this.encoder.Encode(Level, Message);
-			byte[] Expected = new byte[]
-			{
+			byte[] Expected =
+			[
 				0b00100000, 0b01011011, 0b00001011, 0b01111000, 0b11010001,
 				0b01110010, 0b11011100, 0b01001101, 0b01000011, 0b01000000,
 				0b11101100, 0b00010001, 0b11101100
-			};
+			];
 
 			Assert.AreEqual(1, Encoding.Value.Version);
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(Encoding.Key));
@@ -535,7 +535,7 @@ namespace Waher.Content.QR.Test
 			CorrectionLevel Level = CorrectionLevel.H;
 			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
 			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
-			VersionTests.VersionTests.SaveImage(M, null, "CustomNoScale.png", CustomColor, false);
+			VersionTests.VersionTests.SaveImage(M, null, "CustomNoScale.png", CustomColor, 1);
 		}
 
 		[TestMethod]
@@ -544,16 +544,70 @@ namespace Waher.Content.QR.Test
 			CorrectionLevel Level = CorrectionLevel.H;
 			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
 			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
-			VersionTests.VersionTests.SaveImage(M, 500, "CustomNoAntiAlias.png", CustomColor, false);
+			VersionTests.VersionTests.SaveImage(M, 400, "CustomNoAntiAlias.png", CustomColor, 1);
 		}
 
 		[TestMethod]
-		public void Test_35_Custom_AntiAlias()
+		public void Test_35_Custom_Quality_2()
 		{
 			CorrectionLevel Level = CorrectionLevel.H;
 			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
 			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
-			VersionTests.VersionTests.SaveImage(M, 500, "CustomAntiAlias.png", CustomColor, true);
+			VersionTests.VersionTests.SaveImage(M, 400, "CustomAntiAlias2.png", CustomColor, 2);
+		}
+
+		[TestMethod]
+		public void Test_36_Custom_Quality_3()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 400, "CustomAntiAlias3.png", CustomColor, 3);
+		}
+
+		[TestMethod]
+		public void Test_37_Custom_Quality_4()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 400, "CustomAntiAlias4.png", CustomColor, 4);
+		}
+
+		[TestMethod]
+		public void Test_38_Custom_Large_NoAntiAlias()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 2048, "CustomLargeNoAntiAlias.png", CustomColor, 1);
+		}
+
+		[TestMethod]
+		public void Test_39_Custom_Large_Quality_2()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 2048, "CustomLargeAntiAlias2.png", CustomColor, 2);
+		}
+
+		[TestMethod]
+		public void Test_40_Custom_Large_Quality_3()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 2048, "CustomLargeAntiAlias3.png", CustomColor, 3);
+		}
+
+		[TestMethod]
+		public void Test_41_Custom_Large_Quality_4()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "iotid:2be3be1f-0f8f-7e1b-0808-cc7844e9e732@legal.lab.tagroot.io";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			VersionTests.VersionTests.SaveImage(M, 2048, "CustomLargeAntiAlias4.png", CustomColor, 4);
 		}
 
 		private readonly static SKBitmap Icon = SvgPath.SvgPathToBitmap(
@@ -629,7 +683,8 @@ namespace Waher.Content.QR.Test
 
 				case DotType.AlignmentMarkerForegroundInner:
 					return 0xff600000;  // darker blue
-			};
+			}
+			;
 		}
 
 	}

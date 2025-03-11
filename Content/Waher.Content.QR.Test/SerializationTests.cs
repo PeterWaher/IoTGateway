@@ -12,7 +12,7 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_01_Bits()
 		{
-			BitWriter Output = new BitWriter();
+			BitWriter Output = new();
 
 			Output.WriteBits(0b0010, 4);
 			Output.WriteBits(0b000001011, 9);
@@ -47,8 +47,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_02_Numeric()
 		{
-			BitWriter Output = new BitWriter();
-			NumericEncoder Encoder = new NumericEncoder(Output);
+			BitWriter Output = new();
+			NumericEncoder Encoder = new(Output);
 			string Msg = "8675309";
 
 			Assert.IsTrue(NumericEncoder.CanEncode(Msg));
@@ -65,8 +65,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_03_Alphanumeric()
 		{
-			BitWriter Output = new BitWriter();
-			AlphanumericEncoder Encoder = new AlphanumericEncoder(Output);
+			BitWriter Output = new();
+			AlphanumericEncoder Encoder = new(Output);
 			string Msg = "HELLO WORLD";
 
 			Assert.IsTrue(AlphanumericEncoder.CanEncode(Msg));
@@ -82,8 +82,8 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_04_Byte()
 		{
-			BitWriter Output = new BitWriter();
-			ByteEncoder Encoder = new ByteEncoder(Output);
+			BitWriter Output = new();
+			ByteEncoder Encoder = new(Output);
 
 			Encoder.Encode("Hello, world!");
 

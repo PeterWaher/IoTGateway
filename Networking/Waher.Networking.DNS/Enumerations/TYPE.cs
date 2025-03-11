@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.DNS.Enumerations
+﻿namespace Waher.Networking.DNS.Enumerations
 {
 	/// <summary>
 	/// TYPE fields are used in resource records.

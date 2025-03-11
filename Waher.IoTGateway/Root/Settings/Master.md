@@ -4,9 +4,6 @@ Date: 2018-06-02
 Author: Peter Waher
 Copyright: /Copyright.md
 CSS: {{Theme.CSSX}}
-Javascript: /AlertPopup.md.js
-Javascript: /ConfirmPopup.md.js
-Javascript: /PromptPopup.md.js
 Javascript: /Master.js
 
 <header id="native-header">

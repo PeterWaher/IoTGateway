@@ -71,7 +71,7 @@ LoadMarkdown(FileName)
 <legend>Invite contact</legend>
 
 <p>
-<label for="ConnectToJID">To add a contact to the roster, enter its *Bare JID* (XMPP address) below and press **Connect**: (Your address is **{{Client.BareJID}}**)</label>  
+<label for="ConnectToJID">To add a contact to the roster, enter its *Bare JID* (XMPP address) below and press **Connect**: (Your address is **`{{Client.BareJID}}`**)</label>  
 <input id="ConnectToJID" name="ConnectToJID" type="email" autofocus="autofocus" onkeydown="return ConnectToKeyDown(this,event);"/>
 </p>
 

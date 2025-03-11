@@ -448,14 +448,14 @@ namespace Waher.IoTGateway
 								if (!Directory.Exists(exceptionFolder))
 									Directory.CreateDirectory(exceptionFolder);
 
-								DateTime Now = DateTime.Now;
+								DateTime UtcNow = DateTime.UtcNow;
 								string[] ExceptionFiles = Directory.GetFiles(exceptionFolder, "*.txt", SearchOption.TopDirectoryOnly);
 								foreach (string ExceptionFile in ExceptionFiles)
 								{
 									try
 									{
-										DateTime TP = File.GetLastWriteTime(ExceptionFile);
-										if ((Now - TP).TotalDays > 90)
+										DateTime TP = File.GetLastWriteTimeUtc(ExceptionFile);
+										if ((UtcNow - TP).TotalDays > 90)
 											File.Delete(ExceptionFile);
 										else
 										{
@@ -479,10 +479,10 @@ namespace Waher.IoTGateway
 
 									do
 									{
-										Now = DateTime.Now;
+										UtcNow = DateTime.UtcNow;
 
-										exceptionFileName = Path.Combine(exceptionFolder, Now.Year.ToString("D4") + "-" + Now.Month.ToString("D2") + "-" + Now.Day.ToString("D2") +
-											" " + Now.Hour.ToString("D2") + "." + Now.Minute.ToString("D2") + "." + Now.Second.ToString("D2") + ".txt");
+										exceptionFileName = Path.Combine(exceptionFolder, UtcNow.Year.ToString("D4") + "-" + UtcNow.Month.ToString("D2") + "-" + UtcNow.Day.ToString("D2") +
+											" " + UtcNow.Hour.ToString("D2") + "." + UtcNow.Minute.ToString("D2") + "." + UtcNow.Second.ToString("D2") + ".txt");
 
 										try
 										{
@@ -861,6 +861,7 @@ namespace Waher.IoTGateway
 					SetupResources.AddLast(webServer.Register(new ClientEventsWebSocket()));
 					SetupResources.AddLast(webServer.Register(new Login()));
 					SetupResources.AddLast(webServer.Register(new Logout()));
+					SetupResources.AddLast(webServer.Register(new MasterJavascript()));
 
 					emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%",
 						Path.Combine(runtimeFolder, "Graphics", "Emoji1.zip"), Path.Combine(appDataFolder, "Graphics"));
@@ -1077,6 +1078,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new ClientEventsWebSocket());
 				webServer.Register(new Login());
 				webServer.Register(new Logout());
+				webServer.Register(new MasterJavascript());
 				webServer.Register(new Echo());
 				webServer.Register(new WebResources.Ping());
 				webServer.Register(new ProposeContract());
@@ -1338,7 +1340,7 @@ namespace Waher.IoTGateway
 								if (FileName.StartsWith(BinaryFolder))
 									FileName = FileName[BinaryFolder.Length..];
 
-								DateTime LastWriteTime = File.GetLastWriteTime(LanguageFile);
+								DateTime LastWriteTime = File.GetLastWriteTimeUtc(LanguageFile);
 								DateTime LastImportedTime = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
 
 								if (LastWriteTime > LastImportedTime)
@@ -1491,6 +1493,7 @@ namespace Waher.IoTGateway
 
 			Link.Append("/QR/");
 			Link.Append(WebUtility.UrlEncode(e.Text));
+			Link.Append("?w=400&h=400&q=2");
 
 			e.Url = Link.ToString();
 
@@ -1731,8 +1734,8 @@ namespace Waher.IoTGateway
 							}
 							else
 							{
-								DateTime TP = File.GetLastWriteTime(s);
-								DateTime TP2 = File.GetLastWriteTime(s2);
+								DateTime TP = File.GetLastWriteTimeUtc(s);
+								DateTime TP2 = File.GetLastWriteTimeUtc(s2);
 
 								if (TP > TP2 &&
 									(!ContentOptions.TryGetValue(s2, out CopyOptions CopyOptions2) ||
@@ -1786,8 +1789,8 @@ namespace Waher.IoTGateway
 
 									if (CopyOptions == CopyOptions.IfNewer && File.Exists(s2))
 									{
-										DateTime TP = File.GetLastWriteTime(s);
-										DateTime TP2 = File.GetLastWriteTime(s2);
+										DateTime TP = File.GetLastWriteTimeUtc(s);
+										DateTime TP2 = File.GetLastWriteTimeUtc(s2);
 
 										if (TP <= TP2)
 											break;
@@ -4783,7 +4786,7 @@ namespace Waher.IoTGateway
 
 				if (File.Exists(FullFileName))
 				{
-					DateTime TP2 = File.GetLastWriteTime(FullFileName);
+					DateTime TP2 = File.GetLastWriteTimeUtc(FullFileName);
 					MarkdownSettings Settings;
 					MarkdownDocument Detail;
 					string Markdown;

@@ -236,8 +236,9 @@ namespace Waher.Networking.XMPP.HTTPX
 							}
 						}
 
-						await HttpFolderResource.SendResponse(CachedResource.FileName, CachedResource.ContentType, CachedResource.ETag,
-							CachedResource.LastModified.UtcDateTime, Response, Request);
+						await HttpFolderResource.SendResponse(CachedResource.FileName, 
+							CachedResource.ContentType, CachedResource.ETag,
+							CachedResource.LastModified.UtcDateTime, false, Response, Request);
 
 						return;
 					}

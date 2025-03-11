@@ -524,8 +524,6 @@ namespace Waher.Runtime.Threading.Test
 							}
 							else
 							{
-								bool Recursive = false;
-
 								int NrReaders = await obj.BeginRead();
 								Assert.IsFalse(obj.IsWriting);
 
@@ -541,7 +539,6 @@ namespace Waher.Runtime.Threading.Test
 
 									default:
 										Assert.AreEqual(Counter.Token, obj.Token);
-										Recursive = true;
 										break;
 								}
 								NrReads++;
@@ -550,9 +547,12 @@ namespace Waher.Runtime.Threading.Test
 								Assert.IsFalse(obj.IsWriting);
 								Assert.IsTrue(obj.NrReaders > 0);
 
-								Assert.AreEqual(Recursive ? Counter.Token : Counter.PostInc(), obj.Token);
+								NrReaders = await obj.EndRead();
 
-								await obj.EndRead();
+								if (NrReaders == 0)
+									Assert.AreEqual(Counter.PreInc(), obj.Token);
+								else
+									Assert.AreEqual(Counter.Token, obj.Token);
 
 								Thread.Sleep(j);
 							}

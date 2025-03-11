@@ -40,7 +40,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If file is encrypted.</param>
 		protected SerialFile(string FileName, string CollectionName, bool Encrypted)
 		{
-			this.fileAccess = new MultiReadSingleWriteObject(this);
+			this.fileAccess = new MultiReadSingleWriteObject(this, false);
 			this.fileName = FileName;
 			this.collectionName = CollectionName;
 			this.encrypted = Encrypted;

@@ -50,6 +50,16 @@ namespace Waher.Runtime.Threading
 		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
 		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
 		/// </summary>
+		public MultiReadSingleWriteObject(object Owner, bool RecordStackTraces)
+			: this(RecordStackTraces)
+		{
+			this.owner = Owner;
+		}
+
+		/// <summary>
+		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
+		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
+		/// </summary>
 		/// <param name="RecordStackTraces">If stack traces should be recorded when object
 		/// is locked. Default value is true in DEBUG mode and false if not in DEBUG mode.</param>
 		public MultiReadSingleWriteObject(bool RecordStackTraces)

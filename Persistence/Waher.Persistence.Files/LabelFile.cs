@@ -20,7 +20,7 @@ namespace Waher.Persistence.Files
 		private LabelFile(string FileName, string CollectionName, int TimeoutMilliseconds, bool Encrypted)
 			: base(FileName, CollectionName, Encrypted)
 		{
-			this.synchObj = new MultiReadSingleWriteObject(this);
+			this.synchObj = new MultiReadSingleWriteObject(this, false);
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 

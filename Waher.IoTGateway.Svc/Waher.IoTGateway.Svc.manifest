@@ -688,6 +688,10 @@
 	<Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.manifest' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.Markdown.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.Markdown.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.Markdown.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutput\win-x86\'/>
+	<Assembly fileName='Waher.Utility.Markdown.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Markdown\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>

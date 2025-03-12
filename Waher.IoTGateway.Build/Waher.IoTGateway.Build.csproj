@@ -44,7 +44,9 @@
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.GenManifest\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Install\Waher.Utility.Install.csproj&quot;"/>
-    <MSBuild Projects="..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Markdown\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Markdown\Waher.Utility.Markdown.csproj&quot;"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RegEx\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RegEx\Waher.Utility.RegEx.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.RunScript\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.RunScript\Waher.Utility.RunScript.csproj&quot;"/>

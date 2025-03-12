@@ -487,7 +487,9 @@ namespace Waher.IoTGateway
 										try
 										{
 											if (!File.Exists(exceptionFileName))
+											{
 												exceptionFile = File.CreateText(exceptionFileName);
+											}
 											else
 												await Task.Delay(1000);
 										}

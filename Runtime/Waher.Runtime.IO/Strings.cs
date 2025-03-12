@@ -22,13 +22,31 @@ namespace Waher.Runtime.IO
 		/// <returns>Encoding</returns>
 		public static Encoding GetEncoding(byte[] Data, Encoding DefaultEncoding, out int BomLength)
 		{
+			return GetEncoding(Data, 0, Data.Length, DefaultEncoding, out BomLength);
+		}
+
+		/// <summary>
+		/// Gets the encoding of a string from a its binary representation, taking
+		/// any Byte Order Mark (BOM) into account.
+		/// 
+		/// If no BOM is found, the default encoding in <paramref name="DefaultEncoding"/>
+		/// is used, if defined. If not, ISO-8859-1 is used
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Offset">Offset into array where string is encoded.</param>
+		/// <param name="Count">Number of bytes of encoded string.</param>
+		/// <param name="DefaultEncoding">Default encoding to use, in case
+		/// a Byte Order Mark (BOM) is not found in the binary representation.</param>
+		/// <param name="BomLength">Length of Byte Order Mark (BOM).</param>
+		/// <returns>Encoding</returns>
+		public static Encoding GetEncoding(byte[] Data, int Offset, int Count, Encoding DefaultEncoding, out int BomLength)
+		{
 			BomLength = 0;
 
 			if (Data is null)
 				return DefaultEncoding ?? ISO_8859_1;
 
-			int c = Data.Length;
-			if (c == 0)
+			if (Count == 0)
 				return DefaultEncoding ?? ISO_8859_1;
 
 			/************************************************************
@@ -50,19 +68,19 @@ namespace Waher.Runtime.IO
 
 			BomLength = 0;
 
-			if (c >= 3 && Data[0] == 0xef && Data[1] == 0xbb && Data[2] == 0xbf)
+			if (Count >= 3 && Data[Offset] == 0xef && Data[Offset + 1] == 0xbb && Data[Offset + 2] == 0xbf)
 			{
 				BomLength = 3;
 				return Encoding.UTF8;
 			}
-			else if (c >= 2 && Data[0] == 0xfe && Data[1] == 0xff)
+			else if (Count >= 2 && Data[Offset] == 0xfe && Data[Offset + 1] == 0xff)
 			{
 				BomLength = 2;
 				return Encoding.BigEndianUnicode;
 			}
-			else if (c >= 2 && Data[0] == 0xff && Data[1] == 0xfe)
+			else if (Count >= 2 && Data[Offset] == 0xff && Data[Offset + 1] == 0xfe)
 			{
-				if (c >= 4 && Data[2] == 0 && Data[3] == 0)
+				if (Count >= 4 && Data[Offset + 2] == 0 && Data[Offset + 3] == 0)
 				{
 					BomLength = 4;
 					return Encoding.UTF32;
@@ -73,23 +91,23 @@ namespace Waher.Runtime.IO
 					return Encoding.Unicode;
 				}
 			}
-			else if (c >= 4 && Data[0] == 0 && Data[1] == 0 && Data[2] == 0xfe && Data[3] == 0xff)
+			else if (Count >= 4 && Data[Offset] == 0 && Data[Offset + 1] == 0 && Data[Offset + 2] == 0xfe && Data[Offset + 3] == 0xff)
 			{
 				BomLength = 4;
 				return BigEndianUnicode32;
 			}
-			else if (c >= 4 && Data[0] == 0x2b && Data[1] == 0x2f && Data[2] == 0x76)
+			else if (Count >= 4 && Data[Offset] == 0x2b && Data[Offset + 1] == 0x2f && Data[Offset + 2] == 0x76)
 			{
-				if (Data[3] == 0x39 ||
-					Data[3] == 0x2b ||
-					Data[3] == 0x2f)
+				if (Data[Offset + 3] == 0x39 ||
+					Data[Offset + 3] == 0x2b ||
+					Data[Offset + 3] == 0x2f)
 				{
 					BomLength = 4;
 					return Encoding.UTF7;
 				}
-				else if (Data[3] == 0x38)
+				else if (Data[Offset + 3] == 0x38)
 				{
-					if (c >= 5 && Data[4] == 0x2d)
+					if (Count >= 5 && Data[Offset + 4] == 0x2d)
 						BomLength = 5;
 					else
 						BomLength = 4;
@@ -97,21 +115,44 @@ namespace Waher.Runtime.IO
 					return Encoding.UTF7;
 				}
 			}
-			else if (c >= 3 && Data[0] == 0xf7 && Data[1] == 0x64 && Data[2] == 0x4c)
+			else if (Count >= 3 && Data[Offset] == 0xf7 && Data[Offset + 1] == 0x64 && Data[Offset + 2] == 0x4c)
 				throw new ArgumentException("UTF-1 encoding not supported.", nameof(Data));
-			else if (c >= 4 && Data[0] == 0xdd && Data[1] == 0x73 && Data[2] == 0x66 && Data[3] == 0x73)
+			else if (Count >= 4 && Data[Offset] == 0xdd && Data[Offset + 1] == 0x73 && Data[Offset + 2] == 0x66 && Data[Offset + 3] == 0x73)
 				throw new ArgumentException("UTF-EBCDIC encoding not supported.", nameof(Data));
-			else if (c >= 3 && Data[0] == 0x0e && Data[1] == 0xfe && Data[2] == 0xff)
+			else if (Count >= 3 && Data[Offset] == 0x0e && Data[Offset + 1] == 0xfe && Data[Offset + 2] == 0xff)
 				throw new ArgumentException("SCSU encoding not supported.", nameof(Data));
-			else if (c >= 3 && Data[0] == 0xfb && Data[1] == 0xee && Data[2] == 0x28)
+			else if (Count >= 3 && Data[Offset] == 0xfb && Data[Offset + 1] == 0xee && Data[Offset + 2] == 0x28)
 				throw new ArgumentException("BOCU encoding not supported.", nameof(Data));
-			else if (c >= 4 && Data[0] == 0x84 && Data[1] == 0x31 && Data[2] == 0x95 && Data[3] == 0x33)
+			else if (Count >= 4 && Data[Offset] == 0x84 && Data[Offset + 1] == 0x31 && Data[Offset + 2] == 0x95 && Data[Offset + 3] == 0x33)
 			{
 				BomLength = 4;
 				return GB18030;
 			}
 
 			return DefaultEncoding ?? ISO_8859_1;
+		}
+
+		/// <summary>
+		/// Gets a string from its binary representation, taking
+		/// any Byte Order Mark (BOM) into account.
+		/// 
+		/// If no BOM is found, the default encoding in <paramref name="DefaultEncoding"/>
+		/// is used, if defined. If not, ISO-8859-1 is used
+		/// </summary>
+		/// <param name="Data">Binary Data</param>
+		/// <param name="Offset">Offset into array where string is encoded.</param>
+		/// <param name="Count">Number of bytes of encoded string.</param>
+		/// <param name="DefaultEncoding">Default encoding to use, in case
+		/// a Byte Order Mark (BOM) is not found in the binary representation.</param>
+		/// <returns>Decoded string</returns>
+		public static string GetString(byte[] Data, int Offset, int Count, Encoding DefaultEncoding)
+		{
+			if (Data is null)
+				return null;
+
+			Encoding Encoding = GetEncoding(Data, Offset, Count, DefaultEncoding, out int BomLength);
+			
+			return Encoding.GetString(Data, Offset + BomLength, Count - BomLength);
 		}
 
 		/// <summary>

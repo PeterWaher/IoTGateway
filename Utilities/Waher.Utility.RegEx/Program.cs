@@ -53,7 +53,7 @@ namespace Waher.Utility.RegEx
 		{
 			FileStream FileOutput = null;
 			XmlWriter Output = null;
-			Encoding Encoding = Encoding.Default;
+			Encoding Encoding = Encoding.UTF8;
 			RegexOptions Options = RegexOptions.Compiled;
 			List<string> Paths = [];
 			string Expression = null;

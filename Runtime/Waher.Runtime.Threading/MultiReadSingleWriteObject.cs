@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,6 +44,16 @@ namespace Waher.Runtime.Threading
 			: this(false)
 #endif
 		{
+		}
+
+		/// <summary>
+		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
+		/// When disposing the object, it automatically ends any reading and writing locks it maintains.
+		/// </summary>
+		public MultiReadSingleWriteObject(object Owner, bool RecordStackTraces)
+			: this(RecordStackTraces)
+		{
+			this.owner = Owner;
 		}
 
 		/// <summary>
@@ -206,6 +215,8 @@ namespace Waher.Runtime.Threading
 		public virtual async Task<int> BeginRead()
 		{
 			TaskCompletionSource<bool> Wait = null;
+			int Result = 0;
+			bool RecordStackTrace = false;
 
 			while (true)
 			{
@@ -218,10 +229,10 @@ namespace Waher.Runtime.Threading
 							this.token++;
 
 							if (this.recordStackTraces)
-								this.lockStackTrace = Environment.StackTrace;
+								RecordStackTrace = true;
 						}
 
-						return ++this.nrReaders;
+						Result = ++this.nrReaders;
 					}
 					else
 					{
@@ -230,7 +241,18 @@ namespace Waher.Runtime.Threading
 					}
 				}
 
-				await Wait.Task;
+				if (Wait is null)
+				{
+					if (RecordStackTrace)
+						this.lockStackTrace = Environment.StackTrace;
+
+					return Result;
+				}
+				else
+				{
+					await Wait.Task;
+					Wait = null;
+				}
 			}
 		}
 
@@ -281,6 +303,7 @@ namespace Waher.Runtime.Threading
 		{
 			TaskCompletionSource<bool> Wait = null;
 			DateTime Start = DateTime.Now;
+			bool RecordStackTrace = false;
 
 			while (true)
 			{
@@ -293,11 +316,10 @@ namespace Waher.Runtime.Threading
 							this.token++;
 
 							if (this.recordStackTraces)
-								this.lockStackTrace = Environment.StackTrace;
+								RecordStackTrace = true;
 						}
 
 						this.nrReaders++;
-						return true;
 					}
 					else if (Timeout <= 0)
 						return false;
@@ -308,26 +330,38 @@ namespace Waher.Runtime.Threading
 					}
 				}
 
-				using (Timer Timer = new Timer((P) =>
+				if (Wait is null)
 				{
-					Wait.TrySetResult(false);
+					if (RecordStackTrace)
+						this.lockStackTrace = Environment.StackTrace;
 
-				}, null, Timeout, System.Threading.Timeout.Infinite))
+					return true;
+				}
+				else
 				{
-					DateTime Now = DateTime.Now;
-					bool Result = await Wait.Task;
-					if (!Result)
+					using (Timer Timer = new Timer((P) =>
 					{
-						lock (this.synchObj)
+						Wait.TrySetResult(false);
+
+					}, null, Timeout, System.Threading.Timeout.Infinite))
+					{
+						DateTime Now = DateTime.Now;
+						bool Result = await Wait.Task;
+
+						if (!Result)
 						{
-							this.noWriters.Remove(Wait);
+							lock (this.synchObj)
+							{
+								this.noWriters.Remove(Wait);
+							}
+
+							return false;
 						}
 
-						return false;
+						Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
+						Start = Now;
+						Wait = null;
 					}
-
-					Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
-					Start = Now;
 				}
 			}
 		}
@@ -340,6 +374,7 @@ namespace Waher.Runtime.Threading
 		{
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
+			bool RecordStackTrace = false;
 
 			while (true)
 			{
@@ -354,8 +389,7 @@ namespace Waher.Runtime.Threading
 						this.isWriting = true;
 
 						if (this.recordStackTraces)
-							this.lockStackTrace = Environment.StackTrace;
-						return;
+							RecordStackTrace = true;
 					}
 					else
 					{
@@ -365,8 +399,19 @@ namespace Waher.Runtime.Threading
 					}
 				}
 
-				await Wait.Task;
-				Prev = Wait;
+				if (Wait is null)
+				{
+					if (RecordStackTrace)
+						this.lockStackTrace = Environment.StackTrace;
+
+					return;
+				}
+				else
+				{
+					await Wait.Task;
+					Prev = Wait;
+					Wait = null;
+				}
 			}
 		}
 
@@ -428,6 +473,7 @@ namespace Waher.Runtime.Threading
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
 			DateTime Start = DateTime.Now;
+			bool RecordStackeTrace = false;
 
 			while (true)
 			{
@@ -442,8 +488,7 @@ namespace Waher.Runtime.Threading
 						this.isWriting = true;
 
 						if (this.recordStackTraces)
-							this.lockStackTrace = Environment.StackTrace;
-						return true;
+							RecordStackeTrace = true;
 					}
 					else if (Timeout <= 0)
 						return false;
@@ -455,28 +500,40 @@ namespace Waher.Runtime.Threading
 					}
 				}
 
-				using (Timer Timer = new Timer((P) =>
+				if (Wait is null)
 				{
-					Wait.TrySetResult(false);
+					if (RecordStackeTrace)
+						this.lockStackTrace = Environment.StackTrace;
 
-				}, null, Timeout, System.Threading.Timeout.Infinite))
+					return true;
+				}
+				else
 				{
-					DateTime Now = DateTime.Now;
-					bool Result = await Wait.Task;
-					if (!Result)
+					using (Timer Timer = new Timer((P) =>
 					{
-						lock (this.synchObj)
+						Wait.TrySetResult(false);
+
+					}, null, Timeout, System.Threading.Timeout.Infinite))
+					{
+						DateTime Now = DateTime.Now;
+						bool Result = await Wait.Task;
+
+						if (!Result)
 						{
-							this.noWriters.Remove(Wait);
-							this.noReadersOrWriters.Remove(Wait);
+							lock (this.synchObj)
+							{
+								this.noWriters.Remove(Wait);
+								this.noReadersOrWriters.Remove(Wait);
+							}
+
+							return false;
 						}
 
-						return false;
+						Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
+						Start = Now;
+						Prev = Wait;
+						Wait = null;
 					}
-
-					Timeout -= (int)((Now - Start).TotalMilliseconds + 0.5);
-					Start = Now;
-					Prev = Wait;
 				}
 			}
 		}

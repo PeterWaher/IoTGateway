@@ -36,7 +36,7 @@ namespace Waher.Persistence.Files
 			this.fileName = FileName;
 			this.filePreExisting = File.Exists(this.fileName);
 			this.blockSize = BlockSize;
-			this.fileAccess = new MultiReadSingleWriteObject(this);
+			this.fileAccess = new MultiReadSingleWriteObject(this, false);
 			this.asyncFileIo = FilesProvider.AsyncFileIo;
 
 			string Folder = Path.GetDirectoryName(FileName);

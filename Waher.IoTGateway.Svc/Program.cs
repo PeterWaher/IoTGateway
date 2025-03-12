@@ -305,9 +305,16 @@ namespace Waher.IoTGateway.Svc
 					case PlatformID.Win32Windows:
 					case PlatformID.Win32NT:
 					case PlatformID.WinCE:
-						Log.Register(new EventFilter("Windows Event Log Filter",
-							new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName),
-							EventType.Notice));
+						try
+						{
+							Log.Register(new EventFilter("Windows Event Log Filter",
+								new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway" + instanceName),
+								EventType.Notice));
+						}
+						catch (Exception ex)
+						{
+							Log.Exception(ex);
+						}
 						break;
 				}
 

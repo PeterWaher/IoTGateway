@@ -319,9 +319,9 @@ table, th, td
 }
 
 
+
 table 
 {
-    display: block;
     max-width: 100%;
     width: fit-content;
     border-radius: 8px;

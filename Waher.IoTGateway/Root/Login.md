@@ -37,7 +37,7 @@ Neuron:
 		]]
 		<div data-login-method="quick-login" ((LoginMethod = "quick-login" ? "data-carousel-active" : ""))>
 			<p class="text-center">Neuro-Access Login</p>
-			<div id="quickLoginCode" data-mode="image" data-serviceId="((QuickLoginServiceId(Request) ))" 
+			<div id="quickLoginCode" style="margin-block: 2rem" data-mode="image" data-serviceId="((QuickLoginServiceId(Request) ))" 
 			data-purpose="To login on ((Domain)), for administrative purposes. This login request is valid for five (5) minutes."></div>
 		</div>
 		[[;

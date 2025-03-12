@@ -66,9 +66,9 @@
                         }
 
                         if (Data.base64)
-                            Img.setAttribute("src", "data:" + Data.contentType + ";base64," + Data.base64);
+                            Img.setAttribute("src", "data:" + Data.contentType + ";base64," + Data.base64) + "&fg=Theme&bg=Theme";
                         else if (Data.src)
-                            Img.setAttribute("src", Data.src);
+                            Img.setAttribute("src", Data.src + "&fg=Theme&bg=Theme");
 
                         Img.setAttribute("width", Data.width);
                         Img.setAttribute("height", Data.height);

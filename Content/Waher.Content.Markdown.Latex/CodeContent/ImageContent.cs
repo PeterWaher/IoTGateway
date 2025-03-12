@@ -51,7 +51,7 @@ namespace Waher.Content.Markdown.Latex.CodeContent
 			if (!string.IsNullOrEmpty(Title))
 			{
 				Output.Append("\\caption{");
-				Output.Append(Title);
+				Output.Append(LatexRenderer.EscapeLaTeX(Title));
 				Output.AppendLine("}");
 			}
 

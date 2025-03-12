@@ -303,7 +303,8 @@ function Carousel(containerId) {
     {
         if (carouselButtons.length > 0)
         {
-            carouselButtons[carouselIndex].classList.remove("buttonSelected")
+            if (carouselIndex >= 0)
+                carouselButtons[carouselIndex].classList.remove("buttonSelected")
             carouselButtons[index].classList.add("buttonSelected")
         }
         carouselIndex = index
@@ -376,14 +377,21 @@ function Carousel(containerId) {
 
         CalibrateHeight();
 
-        SetCarouselIndex(0)
-        carouselContainer.children[0].setAttribute("data-carousel-active", "");
+        carouselIndex = -1
         for (let i = 0; i < carouselContainer.children.length; i++)
         {
             if (carouselContainer.children[i].hasAttribute("data-carousel-active"))
             {
+                carouselContainer.children[i].setAttribute("data-carousel-active", "")
                 SetCarouselIndex(i);
+                break;
             }
+        }
+
+        if (carouselIndex === -1)
+        {
+            carouselContainer.children[0].setAttribute("data-carousel-active", "")
+            SetCarouselIndex(0);
         }
 
         if (carouselCount < 2)
@@ -411,5 +419,7 @@ window.addEventListener("load", () => {
     NativeHeader = NativeHeaderHandler();
     Popup = PopupHandler();
 
-    document.getElementById("large-pagpage-name").parentElement.style.flex = 1;
+    const largeName = document.getElementById("large-pagpage-name");
+    if (largeName !== null)
+        largeName.parentElement.style.flex = 1;
 })

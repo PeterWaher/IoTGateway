@@ -575,7 +575,7 @@ namespace Waher.Content.Markdown.GraphViz
 				return null;
 
 			string TxtFileName = FileName + ".txt";
-			await Files.WriteAllTextAsync(TxtFileName, GraphText, Encoding.Default);
+			await Files.WriteAllTextAsync(TxtFileName, GraphText, Encoding.Default);	// Use UTF-8 ?
 
 			StringBuilder Arguments = new StringBuilder();
 

@@ -28,6 +28,9 @@ namespace Waher.Content.Markdown.Latex
 		/// </summary>
 		public readonly LaTeXSettings LatexSettings;
 
+		private bool inAbstract = false;
+		private bool abstractOutput = false;
+
 		/// <summary>
 		/// Renders LaTeX from a Markdown document.
 		/// </summary>
@@ -171,15 +174,8 @@ namespace Waher.Content.Markdown.Latex
 			if (MakeTitle)
 				this.Output.AppendLine("\\maketitle");
 
-			if (this.Document.TryGetMetaData("DESCRIPTION", out Values))
-			{
-				this.Output.AppendLine("\\begin{abstract}");
-
-				foreach (KeyValuePair<string, bool> P in Values)
-					this.Output.AppendLine(EscapeLaTeX(P.Key));
-
-				this.Output.AppendLine("\\end{abstract}");
-			}
+			this.inAbstract = false;
+			this.abstractOutput = false;
 
 			return Task.CompletedTask;
 		}
@@ -189,6 +185,12 @@ namespace Waher.Content.Markdown.Latex
 		/// </summary>
 		public override Task RenderDocumentFooter()
 		{
+			if (this.inAbstract)
+			{
+				this.Output.AppendLine("\\end{abstract}");
+				this.inAbstract = false;
+			}
+
 			this.Output.AppendLine("\\end{document}");
 
 			return Task.CompletedTask;
@@ -1029,6 +1031,32 @@ namespace Waher.Content.Markdown.Latex
 		{
 			string Command;
 
+			if (!this.abstractOutput)
+			{
+				if (Element.HasOneChild &&
+					Element.FirstChild is InlineText Text &&
+					string.Compare(Text.Value, "abstract", true) == 0)
+				{
+					this.Output.AppendLine("\\begin{abstract}");
+					this.abstractOutput = true;
+					this.inAbstract = true;
+					return;
+				}
+				else
+				{
+					if (this.Document.TryGetMetaData("DESCRIPTION", out KeyValuePair<string, bool>[] Values))
+					{
+						this.Output.AppendLine("\\begin{abstract}");
+
+						foreach (KeyValuePair<string, bool> P in Values)
+							this.Output.AppendLine(EscapeLaTeX(P.Key));
+
+						this.Output.AppendLine("\\end{abstract}");
+						this.abstractOutput = true;
+					}
+				}
+			}
+
 			switch (this.LatexSettings.DocumentClass)
 			{
 				case LaTeXDocumentClass.Book:
@@ -1093,6 +1121,12 @@ namespace Waher.Content.Markdown.Latex
 							break;
 					}
 					break;
+			}
+
+			if (this.inAbstract)
+			{
+				this.Output.AppendLine("\\end{abstract}");
+				this.inAbstract = false;
 			}
 
 			this.Output.Append('\\');

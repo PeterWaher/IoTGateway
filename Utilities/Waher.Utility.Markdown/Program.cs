@@ -195,6 +195,7 @@ namespace Waher.Utility.Markdown
 					typeof(Program).Assembly,
 					typeof(Expression).Assembly,
 					typeof(Graph).Assembly,
+					typeof(InternetContent).Assembly,
 					typeof(HtmlCodec).Assembly,
 					typeof(ImageCodec).Assembly,
 					typeof(XmlCodec).Assembly,

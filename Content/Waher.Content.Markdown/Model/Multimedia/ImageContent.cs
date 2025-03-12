@@ -101,6 +101,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		{
 			string FileName;
 
+			if (FileExtension.StartsWith("."))
+				FileExtension = FileExtension.Substring(1);
+
 			using (SHA256 H = SHA256.Create())
 			{
 				byte[] Digest = H.ComputeHash(BinaryImage);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model;
 using Waher.Runtime.IO;
 
@@ -39,15 +40,22 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 
 				if (Uri.TryCreate(Url, UriKind.RelativeOrAbsolute, out Uri ParsedUri))
 				{
+					string Extension;
 					Stream f;
 
 					if (ParsedUri.IsAbsoluteUri)
 					{
-						ContentStreamResponse P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000);
+						ContentStreamResponse P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000,
+							new KeyValuePair<string, string>("Accept", "image/png"));
+
 						if (P.HasError)
 							continue;
 
 						f = P.Encoded;
+						f.Position = 0;
+
+						if (!InternetContent.TryGetFileExtension(P.ContentType, out Extension))
+							Extension = "tmp";
 					}
 					else
 					{
@@ -56,12 +64,13 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 							continue;
 
 						f = File.OpenRead(FileName);
+						Extension = Path.GetExtension(FileName);
 					}
 
 					try
 					{
 						byte[] Bin = await f.ReadAllAsync();
-						string FileName = await GetTemporaryFile(Bin);
+						string FileName = await GetTemporaryFile(Bin, Extension);
 
 						if (AloneInParagraph)
 						{
@@ -101,6 +110,13 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 
 						if (AloneInParagraph)
 						{
+							Output.AppendLine();
+							Output.Append("\\caption{");
+
+							foreach (MarkdownElement Child in ChildNodes)
+								await Child.Render(Renderer);
+
+							Output.AppendLine("}");
 							Output.AppendLine("\\end{figure}");
 							Output.AppendLine();
 						}

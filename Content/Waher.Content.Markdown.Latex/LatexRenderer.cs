@@ -124,12 +124,22 @@ namespace Waher.Content.Markdown.Latex
 			{
 				MakeTitle = true;
 
+				bool First = true;
+
 				foreach (KeyValuePair<string, bool> P in Values)
 				{
-					this.Output.Append("\\author{");
-					this.Output.Append(P.Key);
-					this.Output.AppendLine("}");
+					if (First)
+					{
+						this.Output.AppendLine("\\author{");
+						First = false;
+					}
+					else
+						this.Output.AppendLine("\\and");
+
+					this.Output.AppendLine(P.Key);
 				}
+
+				this.Output.AppendLine("}");
 			}
 
 			if (this.Document.TryGetMetaData("DATE", out Values))
@@ -410,6 +420,7 @@ namespace Waher.Content.Markdown.Latex
 
 				if (AloneInParagraph)
 				{
+					this.Output.AppendLine();
 					this.Output.AppendLine("\\end{figure}");
 					this.Output.AppendLine();
 				}
@@ -435,6 +446,7 @@ namespace Waher.Content.Markdown.Latex
 
 				if (AloneInParagraph)
 				{
+					this.Output.AppendLine();
 					this.Output.AppendLine("\\end{figure}");
 					this.Output.AppendLine();
 				}
@@ -462,6 +474,7 @@ namespace Waher.Content.Markdown.Latex
 
 					if (AloneInParagraph)
 					{
+						this.Output.AppendLine();
 						this.Output.AppendLine("\\end{figure}");
 						this.Output.AppendLine();
 					}
@@ -1309,7 +1322,10 @@ namespace Waher.Content.Markdown.Latex
 						await E.Render(this);
 
 					if (k > 1)
+					{
 						this.Output.Append('}');
+						i += k - 1;
+					}
 				}
 
 				this.Output.AppendLine("\\\\");

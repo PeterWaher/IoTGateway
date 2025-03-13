@@ -60,7 +60,7 @@
 		<Exec Command="dotnet publish -o:&quot;..\WebServices\Waher.WebService.Tesseract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj&quot;"/>
 
 		<Exec Command="dotnet publish -o:&quot;..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput&quot; -c:$(Configuration) --self-contained:true &quot;..\Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj&quot;"/>
-		<Exec Command="..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.package -m ..\Waher.IoTGateway.Svc\bin\Release\PublishOutput\Waher.IoTGateway.Svc.manifest"/>
+		<Exec Command="..\Utilities\Waher.Utility.Install\bin\$(Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe -p ..\..\IoTGateway.package -m ..\Waher.IoTGateway.Svc\bin\$(Configuration)\PublishOutput\Waher.IoTGateway.Svc.manifest"/>
 
 		<MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<Exec Command="dotnet publish -o:&quot;..\Clients\Waher.Client.WPF\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true /p:PublishSingleFile=true &quot;..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj&quot;"/>

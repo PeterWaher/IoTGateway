@@ -165,9 +165,10 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override Task Render(DetailsReference Element)
 		{
-			this.Output.Append("[%Details]");
-
-			return Task.CompletedTask;
+			if (!(this.Document.Detail is null))
+				return this.RenderDocument(this.Document.Detail, true);
+			else
+				return this.Render((MetaReference)Element);
 		}
 
 		/// <summary>

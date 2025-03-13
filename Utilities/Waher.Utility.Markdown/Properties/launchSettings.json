@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.Markdown": {
+      "commandName": "Project",
+      "commandLineArgs": "-i \"C:\\My Projects\\IECON2025\\Paper\\Index.md\" -o \"C:\\My Projects\\IECON2025\\Paper\\Output\\Paper.md\" -h"
+    }
+  }
+}

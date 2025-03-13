@@ -7,7 +7,6 @@ using System.Xml;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
-using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;

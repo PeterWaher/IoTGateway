@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Html.JavaScript;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.JavaScript;
@@ -20,10 +21,11 @@ namespace Waher.IoTGateway.WebResources
 	/// </summary>
 	public class MasterJavascript : HttpSynchronousResource, IHttpGetMethod
 	{
-		private readonly string masterJsFileName;
-		private readonly string alertPopupMdFileName;
-		private readonly string confirmPopupMdFileName;
-		private readonly string promptPopupMdFileName;
+		private IResourceMap resourceMap;
+		private string masterJsFileName = null;
+		private string alertPopupMdFileName = null;
+		private string confirmPopupMdFileName = null;
+		private string promptPopupMdFileName = null;
 		private string masterJs = null;
 		private string alertPopupJs = null;
 		private string confirmPopupJs = null;
@@ -44,13 +46,19 @@ namespace Waher.IoTGateway.WebResources
 		/// * /ConfirmPopup.md.js
 		/// * /PromptPopup.md.js
 		/// </summary>
-		public MasterJavascript()
+		public MasterJavascript(IResourceMap ResourceMap)
 			: base("/Master.js")
 		{
-			this.masterJsFileName = Path.Combine(Gateway.RootFolder, "Master.js");
-			this.alertPopupMdFileName = Path.Combine(Gateway.RootFolder, "AlertPopup.md");
-			this.confirmPopupMdFileName = Path.Combine(Gateway.RootFolder, "ConfirmPopup.md");
-			this.promptPopupMdFileName = Path.Combine(Gateway.RootFolder, "PromptPopup.md");
+			this.resourceMap = ResourceMap;
+		}
+
+		/// <summary>
+		/// How resources are mapped on the server.
+		/// </summary>
+		public IResourceMap ResourceMap
+		{
+			get => this.resourceMap;
+			internal set => this.resourceMap = value;
 		}
 
 		/// <summary>
@@ -78,6 +86,30 @@ namespace Waher.IoTGateway.WebResources
 		{
 			DateTime TP;
 			bool Modified = false;
+
+			if (string.IsNullOrEmpty(this.masterJsFileName))
+			{
+				if (!this.resourceMap.TryGetFileName("/Master.js", out this.masterJsFileName))
+					this.masterJsFileName = Path.Combine(Gateway.RootFolder, "Master.js");
+			}
+
+			if (string.IsNullOrEmpty(this.alertPopupMdFileName))
+			{
+				if (!this.resourceMap.TryGetFileName("/AlertPopup.md", out this.alertPopupMdFileName))
+					this.alertPopupMdFileName = Path.Combine(Gateway.RootFolder, "AlertPopup.md");
+			}
+
+			if (string.IsNullOrEmpty(this.confirmPopupMdFileName))
+			{
+				if (!this.resourceMap.TryGetFileName("/ConfirmPopup.md", out this.confirmPopupMdFileName))
+					this.confirmPopupMdFileName = Path.Combine(Gateway.RootFolder, "ConfirmPopup.md");
+			}
+
+			if (string.IsNullOrEmpty(this.promptPopupMdFileName))
+			{
+				if (!this.resourceMap.TryGetFileName("/PromptPopup.md", out this.promptPopupMdFileName))
+					this.promptPopupMdFileName = Path.Combine(Gateway.RootFolder, "PromptPopup.md");
+			}
 
 			if ((TP = File.GetLastWriteTimeUtc(this.masterJsFileName)) > this.masterJsLastModified ||
 				this.masterJs is null)

@@ -95,7 +95,7 @@ namespace Waher.IoTGateway.Exceptions
 							if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
 								Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
 							{
-								s = System.Text.Encoding.Default.GetString(Buffer, Last, i - Last);
+								s = Strings.GetString(Buffer, Last, i - Last, System.Text.Encoding.UTF8);
 								Process(s, Statistics);
 
 								i += 5;
@@ -112,7 +112,7 @@ namespace Waher.IoTGateway.Exceptions
 
 					if (Last < NrRead)
 					{
-						s = System.Text.Encoding.Default.GetString(Buffer, Last, NrRead - Last);
+						s = Strings.GetString(Buffer, Last, NrRead - Last, System.Text.Encoding.UTF8);
 						Process(s, Statistics);
 					}
 				}

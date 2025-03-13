@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content.Html.Elements;
+using Waher.Content.Markdown.Model;
 
 namespace Waher.Content.Markdown.Latex.CodeContent
 {
@@ -29,14 +31,29 @@ namespace Waher.Content.Markdown.Latex.CodeContent
 		{
 			StringBuilder Output = Renderer.Output;
 			byte[] Bin = Convert.FromBase64String(GetImageBase64(Rows));
-			string FileName = await Multimedia.ImageContent.GetTemporaryFile(Bin);
 
+			int i = Language.IndexOf(':');
+			string ContentType = i < 0 ? Language : Language.Substring(0, i);
+			string Title = i < 0 ? string.Empty : Language.Substring(i + 1);
+
+			if (!InternetContent.TryGetFileExtension(ContentType, out string Extension))
+				Extension = "tmp";
+
+			string FileName = await Multimedia.ImageContent.GetTemporaryFile(Bin, Extension);
+			
 			Output.AppendLine("\\begin{figure}[h]");
 			Output.AppendLine("\\centering");
 
 			Output.Append("\\fbox{\\includegraphics{");
 			Output.Append(FileName.Replace('\\', '/'));
 			Output.AppendLine("}}");
+
+			if (!string.IsNullOrEmpty(Title))
+			{
+				Output.Append("\\caption{");
+				Output.Append(LatexRenderer.EscapeLaTeX(Title));
+				Output.AppendLine("}");
+			}
 
 			Output.AppendLine("\\end{figure}");
 			Output.AppendLine();

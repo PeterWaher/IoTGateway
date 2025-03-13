@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Runtime.Console;
+using Waher.Runtime.IO;
 
 namespace Waher.Utility.ExStat
 {
@@ -216,7 +217,7 @@ namespace Waher.Utility.ExStat
 									if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
 										Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
 									{
-										s = Encoding.Default.GetString(Buffer, Last, i - Last);
+										s = Strings.GetString(Buffer, Last, i - Last, Encoding.UTF8);
 										Process(s, Statistics);
 
 										i += 5;
@@ -233,7 +234,7 @@ namespace Waher.Utility.ExStat
 
 							if (Last < NrRead)
 							{
-								s = Encoding.Default.GetString(Buffer, Last, NrRead - Last);
+								s = Strings.GetString(Buffer, Last, NrRead - Last, Encoding.UTF8);
 								Process(s, Statistics);
 							}
 						}

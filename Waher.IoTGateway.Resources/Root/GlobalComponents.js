@@ -137,6 +137,11 @@ function PopupHandler() {
     popupContainer.setAttribute("aria-labelledby", "native-popup-label")
     popupContainer.setAttribute("aria-describedby", "native-popup-description")
 
+    // favicon icon notifier
+    let faviconDotActive = false
+    const favicon = document.querySelector("link[rel~='icon']");
+    const originalFavicon = favicon.href
+
     let focusFunction = null;
 
     // create backdrop
@@ -155,9 +160,11 @@ function PopupHandler() {
             popupContainer.innerHTML = popupStack[popupStack.length - 1].html
             setTimeout(UpdateFocusTrap, 0)
             ShowBackdrop();
+            AddFaviconDot();
         }
         else {
             popupContainer.innerHTML = ""
+            RemoveFaviconDot()
             HideBackdrop()
             setTimeout(RemoveFocusTrap, 0)
         }
@@ -264,6 +271,52 @@ function PopupHandler() {
     async function PromptSubmit(value) {
         PopStack(value)
     }
+
+    /* #region icon alert  */
+
+    function RemoveFaviconDot()
+    {
+        if (!faviconDotActive)
+            return;
+
+        faviconDotActive = false
+
+        favicon.href = originalFavicon
+    }
+
+    function AddFaviconDot() {
+        if (faviconDotActive)
+            return;
+
+        faviconDotActive =  true
+    
+        let canvas = document.createElement("canvas");
+        let ctx = canvas.getContext("2d");
+    
+        let img = new Image();
+        img.src = favicon.href;
+        img.onload = () => {
+            // Set canvas size to match the favicon
+            const dotRadius = img.width/4.0;
+            const dotMargin = img.width/16.0
+            canvas.width = img.width;
+            canvas.height = img.height;
+    
+            // Draw the original favicon
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Draw a red dot (top-right corner)
+            ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(canvas.width - dotRadius - dotMargin, dotRadius + dotMargin, dotRadius, 0, 2 * Math.PI); // Adjust position/size if needed
+            ctx.fill();
+    
+            // Replace the favicon
+            favicon.href = canvas.toDataURL("image/png")
+        };
+    }
+
+    /* #endregion icon alert */
 
     return {
         Alert,

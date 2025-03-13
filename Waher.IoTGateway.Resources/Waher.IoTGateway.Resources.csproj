@@ -177,6 +177,7 @@
 		<None Remove="Root\Emojis.md" />
 		<None Remove="Root\Entities.md" />
 		<None Remove="Root\favicon.ico" />
+		<None Remove="Root\GlobalComponents.js" />
 		<None Remove="Root\GraphStore.js" />
 		<None Remove="Root\GraphStore.md" />
 		<None Remove="Root\GraphStore.ws" />
@@ -212,7 +213,7 @@
 		<None Remove="Root\MarkdownLab\MarkdownLabXaml.ws" />
 		<None Remove="Root\MarkdownLab\MarkdownLabXml.ws" />
 		<None Remove="Root\Master.md" />
-		<None Remove="Root\Master.js" />
+		<None Remove="Root\GlobalComponents.js" />
 		<None Remove="Root\PlantUmlLab\Examples\Activity.uml" />
 		<None Remove="Root\PlantUmlLab\Examples\Archimate.uml" />
 		<None Remove="Root\PlantUmlLab\Examples\Class.uml" />
@@ -697,6 +698,9 @@
 		<Content Include="Reports\Files\CompareFolders.rpx">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Root\GlobalComponents.js">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Root\GraphVizLab\Examples\Network.dot">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -913,7 +917,7 @@
 		<Content Include="Root\Master.md">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Root\Master.js">
+		<Content Include="Root\GlobalComponents.js">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Root\robots.txt">

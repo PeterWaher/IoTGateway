@@ -362,11 +362,235 @@ namespace Waher.Content.Markdown.Latex
 		/// <param name="Element">Element to render</param>
 		public override Task Render(HtmlEntity Element)
 		{
-			this.Output.Append(GetLaTeX(Element.Entity));
+			string s = GetLaTeXEscapeCommand(Element.Entity);
+
+			if (IsEquationCommand(s))
+			{
+				this.Output.Append('$');
+				this.Output.Append(s);
+				this.Output.Append('$');
+			}
+			else
+				this.Output.Append(s);
+
 			return Task.CompletedTask;
 		}
 
-		private static string GetLaTeX(string Entity)
+		private static bool IsEquationCommand(string Command)
+		{
+			switch (Command)
+			{
+				// Relational Operators
+				case "\\leq":
+				case "\\geq":
+				case "\\neq":
+				case "\\approx":
+				case "\\equiv":
+				case "\\propto":
+				case "\\sim":
+				case "\\simeq":
+				case "\\cong":
+				case "\\asymp":
+				case "\\doteq":
+				case "\\bowtie":
+				case "\\models":
+				case "\\perp":
+				case "\\parallel":
+				case "\\nparallel":
+				case "\\subset":
+				case "\\supset":
+				case "\\subseteq":
+				case "\\supseteq":
+				case "\\nsubseteq":
+				case "\\nsupseteq":
+				case "\\subsetneq":
+				case "\\supsetneq":
+				case "\\in":
+				case "\\ni":
+				case "\\notin":
+				case "\\vdash":
+				case "\\dashv":
+				case "\\Vdash":
+				case "\\vDash":
+				case "\\nvdash":
+				case "\\nvDash":
+				case "\\nVdash":
+				case "\\nVDash":
+
+				// Arithmetic Operators
+				case "\\pm":
+				case "\\mp":
+				case "\\times":
+				case "\\div":
+				case "\\cdot":
+				case "\\ast":
+				case "\\star":
+				case "\\circ":
+				case "\\bullet":
+				case "\\oplus":
+				case "\\ominus":
+				case "\\otimes":
+				case "\\oslash":
+				case "\\odot":
+				case "\\bigoplus":
+				case "\\bigotimes":
+				case "\\bigodot":
+				case "\\sum":
+				case "\\prod":
+				case "\\coprod":
+				case "\\int":
+				case "\\iint":
+				case "\\iiint":
+				case "\\oint":
+				case "\\bigcup":
+				case "\\bigcap":
+				case "\\bigsqcup":
+				case "\\biguplus":
+				case "\\bigvee":
+				case "\\bigwedge":
+
+				// Greek Letters
+				case "\\alpha":
+				case "\\beta":
+				case "\\gamma":
+				case "\\delta":
+				case "\\epsilon":
+				case "\\zeta":
+				case "\\eta":
+				case "\\theta":
+				case "\\iota":
+				case "\\kappa":
+				case "\\lambda":
+				case "\\mu":
+				case "\\nu":
+				case "\\xi":
+				case "\\pi":
+				case "\\rho":
+				case "\\sigma":
+				case "\\tau":
+				case "\\upsilon":
+				case "\\phi":
+				case "\\chi":
+				case "\\psi":
+				case "\\omega":
+				case "\\Gamma":
+				case "\\Delta":
+				case "\\Theta":
+				case "\\Lambda":
+				case "\\Xi":
+				case "\\Pi":
+				case "\\Sigma":
+				case "\\Upsilon":
+				case "\\Phi":
+				case "\\Psi":
+				case "\\Omega":
+
+				// Miscellaneous Symbols
+				case "\\infty":
+				case "\\partial":
+				case "\\nabla":
+				case "\\forall":
+				case "\\exists":
+				case "\\neg":
+				case "\\land":
+				case "\\lor":
+				case "\\Rightarrow":
+				case "\\Leftarrow":
+				case "\\Leftrightarrow":
+				case "\\rightarrow":
+				case "\\leftarrow":
+				case "\\leftrightarrow":
+				case "\\uparrow":
+				case "\\downarrow":
+				case "\\updownarrow":
+				case "\\Uparrow":
+				case "\\Downarrow":
+				case "\\Updownarrow":
+				case "\\square":
+				case "\\blacksquare":
+				case "\\triangle":
+				case "\\blacktriangle":
+				case "\\diamond":
+				case "\\blacklozenge":
+				case "\\lozenge":
+				case "\\angle":
+				case "\\measuredangle":
+				case "\\sphericalangle":
+				case "\\perthousand":
+				case "\\degree":
+				case "\\prime":
+				case "\\doubleprime":
+				case "\\backslash":
+				case "\\setminus":
+				case "\\cup":
+				case "\\cap":
+				case "\\uplus":
+				case "\\sqcup":
+				case "\\sqcap":
+				case "\\vee":
+				case "\\wedge":
+				case "\\cdots":
+				case "\\vdots":
+				case "\\ddots":
+				case "\\aleph":
+				case "\\beth":
+				case "\\gimel":
+				case "\\daleth":
+				case "\\hbar":
+				case "\\imath":
+				case "\\jmath":
+				case "\\ell":
+				case "\\wp":
+				case "\\Re":
+				case "\\Im":
+				case "\\mho":
+				case "\\eth":
+				case "\\textmu":
+				case "\\textpm":
+				case "\\textdiv":
+				case "\\texttimes":
+				case "\\textdegree":
+				case "\\textasciicircum":
+				case "\\textasciitilde":
+				case "\\textbackslash":
+				case "\\textbar":
+				case "\\textbraceleft":
+				case "\\textbraceright":
+				case "\\textbullet":
+				case "\\textdagger":
+				case "\\textdaggerdbl":
+				case "\\textellipsis":
+				case "\\textemdash":
+				case "\\textendash":
+				case "\\textgreater":
+				case "\\textless":
+				case "\\textquotedblleft":
+				case "\\textquotedblright":
+				case "\\textquoteleft":
+				case "\\textquoteright":
+				case "\\textsection":
+				case "\\textsterling":
+				case "\\textunderscore":
+				case "\\textvisiblespace":
+				case "\\textcent":
+				case "\\textcurrency":
+				case "\\textyen":
+				case "\\textnumero":
+				case "\\textcircledP":
+				case "\\textregistered":
+				case "\\texttrademark":
+				case "\\textcopyright":
+				case "\\textordfeminine":
+				case "\\textordmasculine":
+				case "\\textparagraph":
+					return true;
+
+				default:
+					return false;
+			}
+		}
+
+		private static string GetLaTeXEscapeCommand(string Entity)
 		{
 			// Ref: https://gist.github.com/adityam/1431606
 

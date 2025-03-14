@@ -548,7 +548,7 @@ namespace Waher.IoTGateway
 																ex is OutOfMemoryException ||
 																ex is AccessViolationException))
 															{
-																exceptionFile.WriteLine(ex.StackTrace);
+																exceptionFile.WriteLine(ex.StackTrace);		// Avoid worsening the situation and conserve stack space.
 															}
 															else
 																exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));

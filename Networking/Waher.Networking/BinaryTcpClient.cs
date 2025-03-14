@@ -69,6 +69,8 @@ namespace Waher.Networking
 		private class Rec
 		{
 			public byte[] Data;
+			public int Offset;
+			public int Count;
 			public EventHandlerAsync<DeliveryEventArgs> Callback;
 			public object State;
 			public TaskCompletionSource<bool> Task;
@@ -1145,23 +1147,34 @@ namespace Waher.Networking
 
 							if (this.sending)
 							{
-								byte[] Packet;
+								Rec Item;
 
-								if (ConstantBuffer && Offset == 0 && Count == Buffer.Length)
-									Packet = Buffer;
+								if (ConstantBuffer)
+								{
+									Item = new Rec()
+									{
+										Data = Buffer,
+										Offset = Offset,
+										Count = Count,
+										Callback = Callback,
+										State = State,
+										Task = Task
+									};
+								}
 								else
 								{
-									Packet = new byte[Count];
-									Array.Copy(Buffer, Offset, Packet, 0, Count);
-								}
+									Item = new Rec()
+									{
+										Data = new byte[Count],
+										Offset = 0,
+										Count = Count,
+										Callback = Callback,
+										State = State,
+										Task = Task
+									};
 
-								Rec Item = new Rec()
-								{
-									Data = Packet,
-									Callback = Callback,
-									State = State,
-									Task = Task
-								};
+									Array.Copy(Buffer, Offset, Item.Data, 0, Count);
+								}
 
 								if (Priority)
 									this.queue.AddFirst(Item);
@@ -1191,8 +1204,8 @@ namespace Waher.Networking
 								this.queue.RemoveFirst();
 
 								Buffer = Rec.Data;
-								Offset = 0;
-								Count = Buffer.Length;
+								Offset = Rec.Offset;
+								Count = Rec.Count;
 								Callback = Rec.Callback;
 								State = Rec.State;
 								Task = Rec.Task;

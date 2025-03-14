@@ -542,7 +542,17 @@ namespace Waher.IoTGateway
 
 															exceptionFile.WriteLine(ex.Message);
 															exceptionFile.WriteLine();
-															exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+
+															if (ex is SystemException &&
+																(ex is StackOverflowException ||
+																ex is OutOfMemoryException ||
+																ex is AccessViolationException))
+															{
+																exceptionFile.WriteLine(ex.StackTrace);
+															}
+															else
+																exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+
 															exceptionFile.WriteLine();
 
 															if (ex is AggregateException ex2)

@@ -36,6 +36,7 @@ namespace Waher.Networking
 		private readonly LinkedList<Rec> queue = new LinkedList<Rec>();
 		private LinkedList<TaskCompletionSource<bool>> idleQueue = null;
 		private LinkedList<TaskCompletionSource<bool>> cancelledQueue = null;
+		private LinkedList<TaskCompletionSource<bool>> waitingQueue = null;
 #if WINDOWS_UWP
 		private readonly MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private readonly StreamSocket client;
@@ -54,6 +55,8 @@ namespace Waher.Networking
 		private string domainName;
 		private string remoteEndPoint = string.Empty;
 		private string localEndPoint = string.Empty;
+		private int outputQueueSize = 0;
+		private int maxOutputQueueSize = 2 * 65536; // 128 kB by default.
 		private bool connecting = false;
 		private bool connected = false;
 		private bool disposing = false;
@@ -250,7 +253,7 @@ namespace Waher.Networking
 		/// </summary>
 		public Stream Stream => this.stream;
 #endif
-		
+
 		/// <summary>
 		/// Remote End-point of connection. This corresponds to the IP Endpoint of the 
 		/// remote party in normal cases. It can also be the domain name of the remote
@@ -263,6 +266,45 @@ namespace Waher.Networking
 		/// connection.
 		/// </summary>
 		public string LocalEndPoint => this.localEndPoint;
+
+		/// <summary>
+		/// Current output queue size, in bytes.
+		/// </summary>
+		public int OutputQueueSize
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.outputQueueSize;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Maximum output queue size, in bytes.
+		/// </summary>
+		public int MaxOutputQueueSize
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.maxOutputQueueSize;
+				}
+			}
+
+			set
+			{
+				if (value <= 0)
+					throw new ArgumentOutOfRangeException("Max output queue size must be positive.", nameof(value));
+
+				lock (this.synchObj)
+				{
+					this.maxOutputQueueSize = value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Connects to a host using TCP.
@@ -569,6 +611,7 @@ namespace Waher.Networking
 			}
 
 			this.queue.Clear();
+			this.outputQueueSize = 0;
 
 			this.EmptyIdleQueueLocked();
 			this.EmptyCancelQueueLocked();
@@ -1128,9 +1171,12 @@ namespace Waher.Networking
 #else
 				Stream Stream;
 #endif
+				TaskCompletionSource<bool> Wait;
 
 				while (true)
 				{
+					Wait = null;
+
 					lock (this.synchObj)
 					{
 						if (this.disposing || this.disposed)
@@ -1147,47 +1193,69 @@ namespace Waher.Networking
 
 							if (this.sending)
 							{
-								Rec Item;
-
-								if (ConstantBuffer)
+								if (this.outputQueueSize > 0 && this.outputQueueSize + Count > this.maxOutputQueueSize)
 								{
-									Item = new Rec()
-									{
-										Data = Buffer,
-										Offset = Offset,
-										Count = Count,
-										Callback = Callback,
-										State = State,
-										Task = Task
-									};
+									Wait = new TaskCompletionSource<bool>();
+
+									if (this.waitingQueue is null)
+										this.waitingQueue = new LinkedList<TaskCompletionSource<bool>>();
+
+									this.waitingQueue.AddLast(Wait);
 								}
 								else
 								{
-									Item = new Rec()
+									Rec Item;
+
+									if (ConstantBuffer)
 									{
-										Data = new byte[Count],
-										Offset = 0,
-										Count = Count,
-										Callback = Callback,
-										State = State,
-										Task = Task
-									};
+										Item = new Rec()
+										{
+											Data = Buffer,
+											Offset = Offset,
+											Count = Count,
+											Callback = Callback,
+											State = State,
+											Task = Task
+										};
+									}
+									else
+									{
+										Item = new Rec()
+										{
+											Data = new byte[Count],
+											Offset = 0,
+											Count = Count,
+											Callback = Callback,
+											State = State,
+											Task = Task
+										};
 
-									Array.Copy(Buffer, Offset, Item.Data, 0, Count);
+										Array.Copy(Buffer, Offset, Item.Data, 0, Count);
+									}
+
+									if (Priority)
+										this.queue.AddFirst(Item);
+									else
+										this.queue.AddLast(Item);
+
+									this.outputQueueSize += Count;
+									return;
 								}
-
-								if (Priority)
-									this.queue.AddFirst(Item);
-								else
-									this.queue.AddLast(Item);
-								return;
 							}
-
-							this.sending = true;
-							CheckSending = false;
+							else
+							{
+								this.sending = true;
+								CheckSending = false;
+							}
 						}
 						else
 						{
+							while (!(this.waitingQueue?.First is null))
+							{
+								this.waitingQueue.First.Value.TrySetResult(true);
+								this.waitingQueue.RemoveFirst();
+							}
+
 							if (this.queue.First is null)
 							{
 								this.sending = false;
@@ -1202,6 +1270,7 @@ namespace Waher.Networking
 							{
 								Rec Rec = this.queue.First.Value;
 								this.queue.RemoveFirst();
+								this.outputQueueSize -= Rec.Count;
 
 								Buffer = Rec.Data;
 								Offset = Rec.Offset;
@@ -1224,6 +1293,12 @@ namespace Waher.Networking
 							this.sending = false;
 							break;
 						}
+					}
+
+					if (!(Wait is null))
+					{
+						await Wait.Task;
+						continue;
 					}
 
 #if WINDOWS_UWP

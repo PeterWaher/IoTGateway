@@ -41,7 +41,7 @@ namespace Waher.Content.Markdown.Latex.CodeContent
 
 			string FileName = await Multimedia.ImageContent.GetTemporaryFile(Bin, Extension);
 			
-			Output.AppendLine("\\begin{figure}[h]");
+			Output.AppendLine("\\begin{figure}[!hb]");
 			Output.AppendLine("\\centering");
 
 			Output.Append("\\fbox{\\includegraphics{");

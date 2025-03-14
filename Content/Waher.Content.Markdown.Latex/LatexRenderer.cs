@@ -164,11 +164,21 @@ namespace Waher.Content.Markdown.Latex
 			this.Output.AppendLine("\\usepackage{enumitem}");
 			this.Output.AppendLine("\\usepackage{amsmath}");
 			this.Output.AppendLine("\\usepackage{amssymb}");
-			this.Output.AppendLine("\\usepackage{babel}");
+
+			this.Output.Append("\\usepackage");
+			if (!string.IsNullOrEmpty(this.LatexSettings.Language))
+			{
+				this.Output.Append("[");
+				this.Output.Append(EscapeLaTeX(this.LatexSettings.Language));
+				this.Output.Append("]");
+			}
+			this.Output.AppendLine("{babel}");
+
 			this.Output.AppendLine("\\usepackage{graphicx}");
 			this.Output.AppendLine("\\usepackage{pifont}");
 			this.Output.AppendLine("\\usepackage{multirow}");
 			this.Output.AppendLine("\\usepackage{ragged2e}");
+			this.Output.AppendLine("\\usepackage{textcomp}");
 			this.Output.AppendLine("\\newlist{tasklist}{itemize}{2}");
 			this.Output.AppendLine("\\setlist[tasklist]{label=$\\square$}");
 			this.Output.AppendLine("\\newcommand{\\checkmarksymbol}{\\ding{51}}");
@@ -363,17 +373,35 @@ namespace Waher.Content.Markdown.Latex
 		public override Task Render(HtmlEntity Element)
 		{
 			string s = GetLaTeXEscapeCommand(Element.Entity);
-
-			if (IsEquationCommand(s))
+			if (string.IsNullOrEmpty(s))
+				this.Output.Append(EscapeLaTeX(Html.HtmlEntity.EntityToCharacter(Element.Entity)));
+			else if (IsEquationCommand(s))
 			{
 				this.Output.Append('$');
 				this.Output.Append(s);
 				this.Output.Append('$');
 			}
-			else
+			else if (AllSymbols(s))
 				this.Output.Append(s);
+			else
+			{
+				this.Output.Append('{');
+				this.Output.Append(s);
+				this.Output.Append('}');
+			}
 
 			return Task.CompletedTask;
+		}
+
+		private static bool AllSymbols(string Command)
+		{
+			foreach (char ch in Command)
+			{
+				if (!char.IsLetter(ch) || char.IsDigit(ch))
+					return false;
+			}
+
+			return true;
 		}
 
 		private static bool IsEquationCommand(string Command)
@@ -592,7 +620,7 @@ namespace Waher.Content.Markdown.Latex
 
 		private static string GetLaTeXEscapeCommand(string Entity)
 		{
-			// Ref: https://gist.github.com/adityam/1431606
+			// Ref (with alterations): https://gist.github.com/adityam/1431606
 
 			switch (Entity)
 			{
@@ -897,7 +925,7 @@ namespace Waher.Content.Markdown.Latex
 				case "plusb": return "\\boxplus";
 				case "longmapsto": return "\\longmapsto";
 				case "circlearrowleft": return "\\circlearrowright";
-				case "CloseCurlyQuote": return "\\quoteright";
+				case "CloseCurlyQuote": return "\\textquoteright";
 				case "bnequiv": return "\\equiv";
 				case "iota": return "\\greekiota";
 				case "compfn": return "\\circ";
@@ -1571,7 +1599,7 @@ namespace Waher.Content.Markdown.Latex
 				case "NotSquareSupersetEqual": return "\\nsqsupseteq";
 				case "lessgtr": return "\\lessgtr";
 				case "gesl": return "\\gtreqless";
-				case "OpenCurlyQuote": return "\\quoteleft";
+				case "OpenCurlyQuote": return "\\textquoteleft";
 				case "sqsubseteq": return "\\sqsubseteq";
 				case "lfloor": return "\\lfloor";
 				case "urcorner": return "\\urcorner";
@@ -1694,7 +1722,7 @@ namespace Waher.Content.Markdown.Latex
 				case "yicy": return "\\cyrillicyi";
 				case "rtrif": return "\\blacktriangleleft";
 				case "notniva": return "\\nni";
-				case "rsquo": return "\\quoteright";
+				case "rsquo": return "'";
 				case "rsh": return "\\Rsh";
 				case "ordm": return "\\ordmasculine";
 				case "OverBrace": return "\\overbrace";
@@ -1727,12 +1755,12 @@ namespace Waher.Content.Markdown.Latex
 				case "rgr": return "\\greekrho";
 				case "oslash": return "\\ostroke";
 				case "rfloor": return "\\rfloor";
-				case "rdquo": return "\\quotedblright";
+				case "rdquo": return "\"";
 				case "lsquor": return "\\quotesinglebase";
 				case "veebar": return "\\veebar";
 				case "rcedil": return "\\rcommaaccent";
 				case "rcaron": return "\\rcaron";
-				case "rsquor": return "\\quoteright";
+				case "rsquor": return "\\textquoteright";
 				case "prec": return "\\prec";
 				case "mgr": return "\\greekmu";
 				case "rarrtl": return "\\rightarrowtail";
@@ -1885,7 +1913,7 @@ namespace Waher.Content.Markdown.Latex
 				case "nsubset": return "\\subset";
 				case "lthree": return "\\leftthreetimes";
 				case "lt": return "\\lt";
-				case "lsquo": return "\\quoteleft";
+				case "lsquo": return "'";
 				case "strns": return "\\textmacron";
 				case "DownRightVector": return "\\rightharpoondown";
 				case "Sub": return "\\Subset";
@@ -1913,7 +1941,7 @@ namespace Waher.Content.Markdown.Latex
 				case "gammad": return "\\greekdigamma";
 				case "nsup": return "\\nsupset";
 				case "sub": return "\\subset";
-				case "ldquo": return "\\quotedblleft";
+				case "ldquo": return "\"";
 				case "aacute": return "\\aacute";
 				case "lcaron": return "\\lcaron";
 				case "LessFullEqual": return "\\leqq";
@@ -2099,7 +2127,7 @@ namespace Waher.Content.Markdown.Latex
 				case "GreaterEqual": return "\\geq";
 			}
 
-			return EscapeLaTeX(Html.HtmlEntity.EntityToCharacter(Entity));
+			return null;
 		}
 
 		/// <summary>
@@ -2170,7 +2198,7 @@ namespace Waher.Content.Markdown.Latex
 
 				if (AloneInParagraph)
 				{
-					this.Output.AppendLine("\\begin{figure}[h]");
+					this.Output.AppendLine("\\begin{figure}[!hb]");
 					this.Output.AppendLine("\\centering");
 				}
 
@@ -2196,7 +2224,7 @@ namespace Waher.Content.Markdown.Latex
 
 				if (AloneInParagraph)
 				{
-					this.Output.AppendLine("\\begin{figure}[h]");
+					this.Output.AppendLine("\\begin{figure}[!hb]");
 					this.Output.AppendLine("\\centering");
 				}
 
@@ -2224,7 +2252,7 @@ namespace Waher.Content.Markdown.Latex
 
 					if (AloneInParagraph)
 					{
-						this.Output.AppendLine("\\begin{figure}[h]");
+						this.Output.AppendLine("\\begin{figure}[!hb]");
 						this.Output.AppendLine("\\centering");
 					}
 
@@ -2303,7 +2331,7 @@ namespace Waher.Content.Markdown.Latex
 			}
 			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
 			{
-				this.Output.AppendLine("\\begin{table}[!h]");
+				this.Output.AppendLine("\\begin{table}[!hb]");
 				this.Output.AppendLine("\\centering");
 				this.Output.Append("\\begin{tabular}{");
 				foreach (string _ in M.ColumnNames)
@@ -3076,7 +3104,7 @@ namespace Waher.Content.Markdown.Latex
 			string s;
 			int i, j, k;
 
-			this.Output.AppendLine("\\begin{table}[!h]");
+			this.Output.AppendLine("\\begin{table}[!hb]");
 			this.Output.AppendLine("\\centering");
 			this.Output.Append("\\begin{tabular}{");
 			foreach (TextAlignment Alignment in Element.ColumnAlignments)

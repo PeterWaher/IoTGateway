@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 
 						if (AloneInParagraph)
 						{
-							Output.AppendLine("\\begin{figure}[h]");
+							Output.AppendLine("\\begin{figure}[!hb]");
 							Output.AppendLine("\\centering");
 						}
 

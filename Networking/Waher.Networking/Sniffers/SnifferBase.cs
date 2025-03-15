@@ -414,7 +414,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public async Task FlushAsync()
 		{
-			await this.processor.WaitUntilIdle();
+			if (!(this.processor is null))
+				await this.processor.WaitUntilIdle();
 		}
 
 		#region ISniffEventProcessor

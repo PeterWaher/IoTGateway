@@ -24,10 +24,7 @@ namespace Waher.Networking.SASL
 		/// <summary>
 		/// Name of the mechanism.
 		/// </summary>
-		public override string Name
-		{
-			get { return "LOGIN"; }
-		}
+		public override string Name => "LOGIN";
 
 		/// <summary>
 		/// Weight of mechanisms. The higher the value, the more preferred.
@@ -41,7 +38,7 @@ namespace Waher.Networking.SASL
 		/// <returns>If mechanism is allowed.</returns>
 		public override bool Allowed(SslStream SslStream)
 		{
-			return (!(SslStream is null) && SslStream.IsEncrypted && SslStream.CipherStrength >= 128);
+			return !(SslStream is null) && SslStream.IsEncrypted && SslStream.CipherStrength >= 128;
 		}
 
 		/// <summary>

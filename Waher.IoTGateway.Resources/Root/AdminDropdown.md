@@ -37,7 +37,7 @@ SnifferItem(Text,Url,Privileges[]):=
 [Admin](Admin.md)
 <ul>
     <li>
-        <a>Communication</a>
+        <p>Communication</p>
         <ul>
             <li>{{MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1","Admin.Communication.Endpoints");}}</li>
             <li>{{MenuItem("Domain","/Settings/Domain.md","Admin.Communication.Domain");}}</li>
@@ -48,7 +48,7 @@ SnifferItem(Text,Url,Privileges[]):=
         </ul>
     </li>
     <li>
-        <a>Data</a>
+        <p>Data</p>
         <ul>
             <li>{{MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");}}</li>
             <li>{{MenuItem("Database","/Settings/Database.md","Admin.Data.Database");}}</li>
@@ -60,7 +60,7 @@ SnifferItem(Text,Url,Privileges[]):=
         </ul>
     </li>
     <li>
-        <a>Lab</a>
+        <p>Lab</p>
         <ul>
             <li>{{MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab.GraphViz"]);}}</li>
             <li>{{MenuItem("Markdown","/MarkdownLab/MarkdownLab.md",["Admin.Lab.Script","Admin.Lab.Markdown"]);}}</li>
@@ -69,7 +69,7 @@ SnifferItem(Text,Url,Privileges[]):=
         </ul>
     </li>
     <li>
-        <a>Legal</a>
+        <p>Legal</p>
         <ul>
             <li>{{MenuItem("Legal Identity","/Settings/LegalIdentity.md","Admin.Legal.ID");}}</li>
             <li>{{MenuItem("Personal Data","/Settings/PersonalData.md","Admin.Legal.PersonalData");}}</li>
@@ -78,14 +78,14 @@ SnifferItem(Text,Url,Privileges[]):=
         </ul>
     </li>
     <li>
-        <a>Presentation</a>
+        <p>Presentation</p>
         <ul>
-            <li>{{MenuItem("favicon.ico","/Settings/EditFavIcon.md","Admin.Presentation.Edit.FavIconIco");}}<li>
-            <li>{{MenuItem("Theme","/Settings/Theme.md","Admin.Presentation.Theme");}}<li>
+            <li>{{MenuItem("favicon.ico","/Settings/EditFavIcon.md","Admin.Presentation.Edit.FavIconIco");}}</li>
+            <li>{{MenuItem("Theme","/Settings/Theme.md","Admin.Presentation.Theme");}}</li>
         </ul>
     </li>
     <li>
-        <a>Security</a>
+        <p>Security</p>
         <ul>
             <li>{{MenuItem("robots.txt","/Settings/EditRobots.md","Admin.Security.Edit.RobotsTxt");}}</li>
             <li>{{MenuItem("Roles","/Settings/Roles.md","Admin.Security.Roles");}}</li>
@@ -93,14 +93,14 @@ SnifferItem(Text,Url,Privileges[]):=
         </ul>
     </li>
     <li>
-        <a>Session</a>
+        <p>Session</p>
         <ul>
             <li>{{MenuItem("Change Password","/Settings/ChangePassword.md","");}}</li>
             <li>{{MenuItem("Logout","/Logout","");}}</li>
         </ul>
     </li>
     <li>
-        <a>Software</a>
+        <p>Software</p>
         <ul>
 {{
 foreach Module in Waher.Runtime.Inventory.Types.Modules do

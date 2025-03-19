@@ -2,10 +2,6 @@
 
 /* region Header*/
 
-header#native-header
-{
-    padding: 1.5rem;
-}
 #native-header nav > ul
 {
     background-color: rgba(0,0,0,0.9);
@@ -1020,19 +1016,21 @@ abbr:hover::after
 
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (min-width: 901px) {
+    /* region Header */
 
-    /* region Header*/
-
-    header
+    #native-header li > ul > li > p,
+    #native-header li > ul > li > a
     {
-        background-color:¤BackgroundColor¤;
+        border: 1px solid white;
+        background-color: black;
     }
 
-    header > nav > ul > li {
-        background-color:#A0A0FF;
+    #native-header li > ul > li:hover > p,
+    #native-header li > ul > li:hover > a
+    {
+        background-color: ¤BackgroundColor¤;
     }
 
-    /* endregion Header*/
-
+    /* endregion Header */
 }

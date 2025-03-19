@@ -3,27 +3,33 @@ function NativeHeaderHandler() {
     let count = 0
     Array.from(header.children[0].children[1].getElementsByTagName("ul")).forEach(subMenu => {
         let topSubmenue = subMenu
-        const sibling = subMenu.nextElementSibling || subMenu.previousElementSibling;
+        const menueItemText = subMenu.nextElementSibling || subMenu.previousElementSibling;
 
         while (topSubmenue.parentElement.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
             topSubmenue = topSubmenue.parentElement.parentElement
         }
 
-        // if link dose not go anywhere, expand on click
-        sibling.addEventListener("click", event => {
-            // expand menue on mobile view
-            if (window.matchMedia("screen and (max-width: 900px)").matches) {
-                event.preventDefault(); // if link, prevent opening
+        if (window.matchMedia("screen and (max-width: 900px)").matches) {
+            const button = document.createElement("button")
+            button.classList.add("native-dropdown-button")
+            button.addEventListener("click", () => {
                 subMenu.toggleAttribute("expanded");
+            })
+            subMenu.parentElement.appendChild(button)
+            
+            if (menueItemText.tagName === "P") {
+                menueItemText.addEventListener("click", event => {
+                    event.preventDefault();
+                    subMenu.toggleAttribute("expanded");
+                })
             }
-        })
+        }
 
         // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
             count++
-
             // cancled when on mobile view
-            if (window.matchMedia("screen and (max-width: 900px)").matches) 
+            if (window.matchMedia("screen and (max-width: 900px)").matches)
                 return
 
             subMenu.setAttribute("expanded", "")
@@ -44,7 +50,7 @@ function NativeHeaderHandler() {
             maxWidth = 0
             for (let i = 0; i < subMenu.children.length; i++) {
                 const child = subMenu.children[i]
-                const textElement = Array.from(child.children).find(c => c.tagName.toLocaleLowerCase() === "a")
+                const textElement = Array.from(child.children).find(c => c.tagName === "A" || c.tagName === "P")
                 if (textElement) {
                     maxWidth = Math.max(maxWidth, textElement.getBoundingClientRect().width)
                     textElements.push(textElement)
@@ -52,9 +58,17 @@ function NativeHeaderHandler() {
             }
             textElements.forEach(el => el.style.width = `${maxWidth}px`)
 
+            // fix item heights
+            const menueItems = subMenu.children
+            for (let i = 0; i < menueItems.length; i++) {
+                if (menueItems[i].children[0])
+                    menueItems[i].children[0].style.height = Math.ceil(menueItems[i].getBoundingClientRect().height) + "px"
+            }
+
             // offset sibling elements (underneeth) to position over to not have gaps between list items
             const offsetParentsSiblings = (listItem) => {
                 const text = listItem.children[0]
+                listItem.style.height = "";
                 const siblingHeightOffset = listItem.getBoundingClientRect().height - text.getBoundingClientRect().height
 
                 let listItemSibling = listItem.nextElementSibling
@@ -274,8 +288,7 @@ function PopupHandler() {
 
     /* #region icon alert  */
 
-    function RemoveFaviconDot()
-    {
+    function RemoveFaviconDot() {
         if (!faviconDotActive)
             return;
 
@@ -352,10 +365,8 @@ function Carousel(containerId) {
         return (index + carouselCount /* + carouselCount to cover cases where you take the index - 1 and it becomes -1 wich would return a negative modulo */) % carouselCount
     }
 
-    function SetCarouselIndex(index)
-    {
-        if (carouselButtons.length > 0)
-        {
+    function SetCarouselIndex(index) {
+        if (carouselButtons.length > 0) {
             if (carouselIndex >= 0)
                 carouselButtons[carouselIndex].classList.remove("buttonSelected")
             carouselButtons[index].classList.add("buttonSelected")
@@ -363,11 +374,10 @@ function Carousel(containerId) {
         carouselIndex = index
     }
 
-    function SetCarouselIndexAnim(index)
-    {
+    function SetCarouselIndexAnim(index) {
         if (index === carouselIndex)
             return
-        
+
         if (carouselCount > 1) {
 
             const dir = Math.sign(index - carouselIndex)
@@ -414,13 +424,11 @@ function Carousel(containerId) {
     }
 
     function Initialize() {
-        if (previousButton && nextButton)
-        {
-            previousButton.addEventListener("click", () => SetCarouselIndexAnim(carouselIndex-1));
-            nextButton.addEventListener("click", () => SetCarouselIndexAnim(carouselIndex+1));
-        } 
-        else 
-        {
+        if (previousButton && nextButton) {
+            previousButton.addEventListener("click", () => SetCarouselIndexAnim(carouselIndex - 1));
+            nextButton.addEventListener("click", () => SetCarouselIndexAnim(carouselIndex + 1));
+        }
+        else {
             carouselButtons.forEach(e => {
                 e.addEventListener("click", () => {
                     SetCarouselIndexAnim(Number(e.getAttribute("data-carousel-button")))
@@ -431,24 +439,20 @@ function Carousel(containerId) {
         CalibrateHeight();
 
         carouselIndex = -1
-        for (let i = 0; i < carouselContainer.children.length; i++)
-        {
-            if (carouselContainer.children[i].hasAttribute("data-carousel-active"))
-            {
+        for (let i = 0; i < carouselContainer.children.length; i++) {
+            if (carouselContainer.children[i].hasAttribute("data-carousel-active")) {
                 carouselContainer.children[i].setAttribute("data-carousel-active", "")
                 SetCarouselIndex(i);
                 break;
             }
         }
 
-        if (carouselIndex === -1)
-        {
+        if (carouselIndex === -1) {
             carouselContainer.children[0].setAttribute("data-carousel-active", "")
             SetCarouselIndex(0);
         }
 
-        if (carouselCount < 2)
-        {
+        if (carouselCount < 2) {
             previousButton.remove()
             nextButton.remove()
         }

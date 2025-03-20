@@ -326,7 +326,19 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed.</returns>
 		public Task<T> Wait()
 		{
-			return this.Wait(CancellationToken.None, false);
+			return this.Wait(CancellationToken.None, false, null);
+		}
+
+
+		/// <summary>
+		/// Waits indefinitely (or until queue is disposed) for an item to be available.
+		/// If Queue is disposed, a null item will be returned to the subscriber.
+		/// </summary>
+		/// <param name="Timeout">Optional timeout, in milliseconds.</param>
+		/// <returns>Item to process, or null if queue is disposed.</returns>
+		public Task<T> Wait(int Timeout)
+		{
+			return this.Wait(CancellationToken.None, false, Timeout);
 		}
 
 		/// <summary>
@@ -338,7 +350,20 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
 		public Task<T> Wait(CancellationToken Cancel)
 		{
-			return this.Wait(Cancel, true);
+			return this.Wait(Cancel, true, null);
+		}
+
+		/// <summary>
+		/// Waits indefinitely (or until queue is disposed or task cancelled) for an item 
+		/// to be available. If Queue is disposed, a null item will be returned to the 
+		/// subscriber.
+		/// </summary>
+		/// <param name="Cancel">Cancellation token</param>
+		/// <param name="Timeout">Optional timeout, in milliseconds.</param>
+		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
+		public Task<T> Wait(CancellationToken Cancel, int Timeout)
+		{
+			return this.Wait(Cancel, true, Timeout);
 		}
 
 		/// <summary>
@@ -348,12 +373,16 @@ namespace Waher.Runtime.Queue
 		/// </summary>
 		/// <param name="Cancel">Cancellation token</param>
 		/// <param name="RegisterCancelToken">If task can be cancelled.</param>
+		/// <param name="Timeout">Optional timeout, in milliseconds.</param>
 		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
-		private Task<T> Wait(CancellationToken Cancel, bool RegisterCancelToken)
+		private Task<T> Wait(CancellationToken Cancel, bool RegisterCancelToken, int? Timeout)
 		{
 			EventHandler h = null;
 			Task<T> Result;
 			Item Record;
+
+			if (Timeout.HasValue && Timeout.Value <= 0)
+				throw new ArgumentException("Timeout must be positive.", nameof(Timeout));
 
 			lock (this.synchObj)
 			{
@@ -380,6 +409,33 @@ namespace Waher.Runtime.Queue
 					}
 
 					Result = Item.Task;
+
+					if (Timeout.HasValue)
+					{
+						Task.Delay(Timeout.Value).ContinueWith((_) =>
+						{
+							EventHandler h2 = null;
+
+							lock (this.synchObj)
+							{
+								if (!this.disposed && this.subscribers.Remove(Item))
+								{
+									this.countSubscribers--;
+									if (this.countSubscribers <= 0)
+									{
+										this.waiting = false;
+										h2 = this.OnNotWaiting;
+									}
+
+									Item.TrySetResult(null);
+								}
+							}
+
+							h2?.Raise(this, EventArgs.Empty);
+
+							return Task.CompletedTask;
+						});
+					}
 				}
 				else
 				{

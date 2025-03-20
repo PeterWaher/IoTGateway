@@ -52,25 +52,27 @@
 		/// </summary>
 		public LaTeXSettings()
 		{
-			this.DocumentClass = LaTeXDocumentClass.Article;
-			this.PaperFormat = LaTeXPaper.A4;
-			this.DefaultFontSize = 10;
 		}
 
 		/// <summary>
 		/// Document class of LaTeX output.
 		/// </summary>
-		public LaTeXDocumentClass DocumentClass { get; set; }
+		public LaTeXDocumentClass DocumentClass { get; set; } = LaTeXDocumentClass.Article;
 
 		/// <summary>
 		/// Document output paper format.
 		/// </summary>
-		public LaTeXPaper PaperFormat { get; set; }
+		public LaTeXPaper PaperFormat { get; set; } = LaTeXPaper.A4;
 
 		/// <summary>
 		/// Default font size, in points (pt)
 		/// </summary>
-		public int DefaultFontSize { get; set; }
+		public int DefaultFontSize { get; set; } = 10;
+
+		/// <summary>
+		/// Document language.
+		/// </summary>
+		public string Language { get; set; } = "english";
 
 	}
 }

@@ -19,10 +19,7 @@ namespace Waher.Networking.SASL
 		/// <summary>
 		/// Name of the mechanism.
 		/// </summary>
-		public override string Name
-		{
-			get { return "SCRAM-SHA-1"; }
-		}
+		public override string Name => "SCRAM-SHA-1";
 
 		/// <summary>
 		/// Weight of mechanisms. The higher the value, the more preferred.

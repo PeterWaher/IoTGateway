@@ -50,6 +50,7 @@ namespace Waher.Utility.Markdown
 		/// -lpf PAPER            LaTeX paper format. Default=A4
 		///                       Possible values: Letter, A4
 		/// -lfs SIZE             Default font size. Default=10
+		/// -ldl LANGUAGE         Document language. Default=english
 		/// </summary>
 		static int Main(string[] args)
 		{
@@ -206,7 +207,7 @@ namespace Waher.Utility.Markdown
 					typeof(WpfXamlRenderer).Assembly,
 					typeof(XamarinFormsXamlRenderer).Assembly,
 					typeof(XmlRenderer).Assembly);
-
+				
 				string InputContentType = InternetContent.GetContentType(Path.GetExtension(InputFileName));
 				if (string.IsNullOrEmpty(InputContentType))
 					throw new Exception("Unable to determine content type of input file.");

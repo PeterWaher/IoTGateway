@@ -556,15 +556,13 @@ namespace Waher.IoTGateway
 			return Result;
 		}
 
-		private static Task QueueCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
+		private static async Task QueueCacheItem_Removed(object Sender, CacheItemEventArgs<string, TabQueue> e)
 		{
 			TabQueue Queue = e.Value;
 			string TabID = Queue.TabID;
 
 			Remove(TabID, null);
-			Queue.Dispose();
-
-			return Task.CompletedTask;
+			await Queue.DisposeAsync();
 		}
 
 		private static void Remove(string TabID, string Resource)
@@ -1294,7 +1292,7 @@ namespace Waher.IoTGateway
 			public Dictionary<string, string> Query { get; }
 		}
 
-		internal class TabQueue : IDisposable
+		internal class TabQueue : IDisposableAsync
 		{
 			public string TabID;
 			public string SessionID;
@@ -1315,8 +1313,16 @@ namespace Waher.IoTGateway
 				this.Session = Session;
 			}
 
+			[Obsolete("Use DisposeAsync instead.")]
 			public void Dispose()
 			{
+				this.DisposeAsync().Wait();
+			}
+
+			public async Task DisposeAsync()
+			{
+				await this.SyncObj.TryBeginWrite(10000);
+
 				this.SyncObj?.Dispose();
 				this.SyncObj = null;
 

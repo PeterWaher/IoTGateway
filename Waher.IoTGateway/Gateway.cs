@@ -2751,6 +2751,18 @@ namespace Waher.IoTGateway
 				if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 					From = "/";
 
+				if (Request.Session.TryGetVariable("User", out v) && 
+					v.ValueObject is IUser &&
+					!string.IsNullOrEmpty(From) &&
+					!From.Contains("Login"))
+				{
+					if (DoLog)
+						Log.Debug("Already logged in.");
+
+					await Login.RedirectBackToFrom(Response, From, ThrowRedirection);
+					return;
+				}
+
 				if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 				{
 					LoginAuditor.Success("User logged in by default, since XMPP not configued and loopback interface not available.",

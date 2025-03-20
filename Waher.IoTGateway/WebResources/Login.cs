@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Security;
@@ -153,12 +154,17 @@ namespace Waher.IoTGateway.WebResources
 			Request.Session.Remove("LoginError");
 
 			if (!string.IsNullOrEmpty(From))
-			{
-				if (ThrowRedirection)
-					throw new SeeOtherException(From);
-				else
-					await Response.SendResponse(new SeeOtherException(From));
-			}
+				await RedirectBackToFrom(Response, From, ThrowRedirection);
+		}
+
+		internal static async Task RedirectBackToFrom(HttpResponse Response, string From, 
+			bool ThrowRedirection)
+		{
+			if (ThrowRedirection)
+				throw new SeeOtherException(From);
+			else
+				await Response.SendResponse(new SeeOtherException(From));
+
 		}
 
 		private class InternalUser : IUserWithClaims, IRequestOrigin

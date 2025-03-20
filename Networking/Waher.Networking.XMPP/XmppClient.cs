@@ -1138,19 +1138,7 @@ namespace Waher.Networking.XMPP
 				await OfflineSent.Task;
 			}
 
-			foreach (ISniffer Sniffer in this.Sniffers)
-			{
-				this.Remove(Sniffer);
-
-				if (DisposeSniffers)
-				{
-					if (Sniffer is IDisposableAsync DisposableAsync)
-						await DisposableAsync.DisposeAsync();
-					else if (Sniffer is IDisposable Disposable)
-						Disposable.Dispose();
-				}
-			}
-
+			await this.RemoveRange(this.Sniffers, true);
 			await this.DisposeAsync();
 		}
 

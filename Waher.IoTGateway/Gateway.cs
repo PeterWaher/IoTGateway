@@ -2378,16 +2378,7 @@ namespace Waher.IoTGateway
 
 				if (!(webServer is null))
 				{
-					foreach (ISniffer Sniffer in webServer.Sniffers)
-					{
-						webServer.Remove(Sniffer);
-
-						if (Sniffer is IDisposableAsync DisposableAsync)
-							await DisposableAsync.DisposeAsync();
-						else if (Sniffer is IDisposable Disposable)
-							Disposable.Dispose();
-					}
-
+					await webServer.RemoveRange(webServer.Sniffers, true);
 					await webServer.DisposeAsync();
 					webServer = null;
 				}

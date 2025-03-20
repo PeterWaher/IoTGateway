@@ -629,17 +629,7 @@ namespace Waher.Networking
 #endif
 
 			if (this.HasSniffers)
-			{
-				foreach (ISniffer Sniffer in this.Sniffers)
-				{
-					this.Remove(Sniffer);
-
-					if (Sniffer is IDisposableAsync DisposableAsync)
-						await DisposableAsync.DisposeAsync();
-					else if (Sniffer is IDisposable Disposable)
-						Disposable.Dispose();
-				}
-			}
+				await this.RemoveRange(this.Sniffers, true);
 		}
 
 		/// <summary>

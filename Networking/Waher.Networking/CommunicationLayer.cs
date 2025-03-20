@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 
@@ -104,6 +105,36 @@ namespace Waher.Networking
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Removes a set of sniffers, if registered.
+		/// </summary>
+		/// <param name="Sniffers">Sniffers to remove.</param>
+		public Task RemoveRange(IEnumerable<ISniffer> Sniffers)
+		{
+			return this.RemoveRange(Sniffers, false);
+		}
+
+		/// <summary>
+		/// Removes a set of sniffers, if registered.
+		/// </summary>
+		/// <param name="Sniffers">Sniffers to remove.</param>
+		/// <param name="DisposeSniffers">If the sniffers should be disposed.</param>
+		public async Task RemoveRange(IEnumerable<ISniffer> Sniffers, bool DisposeSniffers)
+		{
+			foreach (ISniffer Sniffer in Sniffers)
+			{
+				this.Remove(Sniffer);
+
+				if (DisposeSniffers)
+				{
+					if (Sniffer is IDisposableAsync DisposableAsync)
+						await DisposableAsync.DisposeAsync();
+					else if (Sniffer is IDisposable Disposable)
+						Disposable.Dispose();
+				}
+			}
 		}
 
 		/// <summary>

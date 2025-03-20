@@ -2756,6 +2756,9 @@ namespace Waher.IoTGateway
 					!string.IsNullOrEmpty(From) &&
 					!From.Contains("Login"))
 				{
+					if (DoLog)
+						Log.Debug("Already logged in.");
+
 					await Login.RedirectBackToFrom(Response, From, ThrowRedirection);
 					return;
 				}

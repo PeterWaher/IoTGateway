@@ -164,6 +164,9 @@ namespace Waher.IoTGateway.WebResources
 
 		private string HexOutput(byte[] Data, int Offset, int Count)
 		{
+			if (Data is null)
+				return "<" + Data.Length.ToString() + " bytes>";
+
 			switch (Data is null ? BinaryPresentationMethod.ByteCount : this.binaryPresentationMethod)
 			{
 				case BinaryPresentationMethod.Hexadecimal:

@@ -387,11 +387,14 @@ namespace Waher.Script.Xml.Model
 				{
 					foreach (XmlAttribute Attr in E.Attributes)
 					{
+						if (Attr.Name == "xmlns")
+							continue;
+
 						bool Found = false;
 
 						foreach (XmlScriptAttribute Attr2 in this.attributes)
 						{
-							if (Attr2.Name==Attr.Name)
+							if (Attr2.Name == Attr.Name)
 							{
 								Found = true;
 								break;

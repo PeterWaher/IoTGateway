@@ -1138,19 +1138,7 @@ namespace Waher.Networking.XMPP
 				await OfflineSent.Task;
 			}
 
-			foreach (ISniffer Sniffer in this.Sniffers)
-			{
-				this.Remove(Sniffer);
-
-				if (DisposeSniffers)
-				{
-					if (Sniffer is IDisposableAsync DisposableAsync)
-						await DisposableAsync.DisposeAsync();
-					else if (Sniffer is IDisposable Disposable)
-						Disposable.Dispose();
-				}
-			}
-
+			await this.RemoveRange(this.Sniffers, true);
 			await this.DisposeAsync();
 		}
 
@@ -2737,8 +2725,13 @@ namespace Waher.Networking.XMPP
 
 			lock (this.synchObject)
 			{
-				if (Handlers.ContainsKey(Key))
+				if (Handlers.TryGetValue(Key, out EventHandlerAsync<IqEventArgs> PrevHandler))
+				{
+					if (PrevHandler.Method == Handler.Method && PrevHandler.Target == Handler.Target)
+						return;
+
 					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
+				}
 
 				Handlers[Key] = Handler;
 
@@ -2830,8 +2823,13 @@ namespace Waher.Networking.XMPP
 
 			lock (this.synchObject)
 			{
-				if (this.messageHandlers.ContainsKey(Key))
+				if (this.messageHandlers.TryGetValue(Key, out EventHandlerAsync<MessageEventArgs> PrevHandler))
+				{
+					if (PrevHandler.Method == Handler.Method && PrevHandler.Target == Handler.Target)
+						return;
+					
 					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
+				}
 
 				this.messageHandlers[Key] = Handler;
 
@@ -2884,8 +2882,13 @@ namespace Waher.Networking.XMPP
 		{
 			lock (this.synchObject)
 			{
-				if (this.messageFormHandlers.ContainsKey(FormType))
+				if (this.messageFormHandlers.TryGetValue(FormType, out EventHandlerAsync<MessageFormEventArgs> PrevHandler))
+				{
+					if (PrevHandler.Method == Handler.Method && PrevHandler.Target == Handler.Target)
+						return;
+
 					throw new ArgumentException("Handler already registered: " + FormType, nameof(FormType));
+				}
 
 				this.messageFormHandlers[FormType] = Handler;
 			}
@@ -2926,8 +2929,13 @@ namespace Waher.Networking.XMPP
 
 			lock (this.synchObject)
 			{
-				if (this.presenceHandlers.ContainsKey(Key))
+				if (this.presenceHandlers.TryGetValue(Key, out EventHandlerAsync<PresenceEventArgs> PrevHandler))
+				{
+					if (PrevHandler.Method == Handler.Method && PrevHandler.Target == Handler.Target)
+						return;
+
 					throw new ArgumentException("Handler already registered: " + Namespace + "#" + LocalName, nameof(LocalName));
+				}
 
 				this.presenceHandlers[Key] = Handler;
 

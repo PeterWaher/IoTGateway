@@ -629,17 +629,7 @@ namespace Waher.Networking
 #endif
 
 			if (this.HasSniffers)
-			{
-				foreach (ISniffer Sniffer in this.Sniffers)
-				{
-					this.Remove(Sniffer);
-
-					if (Sniffer is IDisposableAsync DisposableAsync)
-						await DisposableAsync.DisposeAsync();
-					else if (Sniffer is IDisposable Disposable)
-						Disposable.Dispose();
-				}
-			}
+				await this.RemoveRange(this.Sniffers, true);
 		}
 
 		/// <summary>
@@ -802,7 +792,10 @@ namespace Waher.Networking
 		/// </summary>
 		protected virtual Task Disconnected()
 		{
-			return this.OnDisconnected.Raise(this, EventArgs.Empty);
+			if (!(this.OnDisconnected is null))
+				return this.OnDisconnected.Raise(this, EventArgs.Empty);
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -850,7 +843,7 @@ namespace Waher.Networking
 				{
 					try
 					{
-						await this.OnError.Raise(this, ex);
+						await h(this, ex);
 					}
 					catch (Exception ex2)
 					{
@@ -1345,7 +1338,8 @@ namespace Waher.Networking
 						return;
 					}
 
-					await this.OnWriteQueueEmpty.Raise(this, EventArgs.Empty);
+					if (!(this.OnWriteQueueEmpty is null))
+						await this.OnWriteQueueEmpty.Raise(this, EventArgs.Empty);
 				}
 			}
 			catch (Exception ex)

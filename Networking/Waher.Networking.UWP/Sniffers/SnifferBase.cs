@@ -42,12 +42,14 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual async Task DisposeAsync()
 		{
-			if (!(this.processor is null))
+			AsyncProcessor<SnifferEvent> Processor = this.processor;
+			this.processor = null;
+
+			if (!(Processor is null))
 			{
-				this.processor.CloseForTermination();
-				await this.processor.WaitUntilIdle();
-				await this.processor.DisposeAsync();
-				this.processor = null;
+				Processor.CloseForTermination();
+				await Processor.WaitUntilIdle();
+				await Processor.DisposeAsync();
 			}
 		}
 
@@ -414,7 +416,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public async Task FlushAsync()
 		{
-			await this.processor.WaitUntilIdle();
+			if (!(this.processor is null))
+				await this.processor.WaitUntilIdle();
 		}
 
 		#region ISniffEventProcessor

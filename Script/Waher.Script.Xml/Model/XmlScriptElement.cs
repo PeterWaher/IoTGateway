@@ -367,13 +367,40 @@ namespace Waher.Script.Xml.Model
 						return Result;
 				}
 
+				bool Wildcard = false;
+
 				foreach (XmlScriptAttribute Attr in this.attributes)
 				{
-					XmlAttribute Attr2 = E.Attributes[Attr.Name];
+					if (string.IsNullOrEmpty(Attr.Name))
+						Wildcard = true;
+					else
+					{
+						XmlAttribute Attr2 = E.Attributes[Attr.Name];
 
-					Result = Attr.PatternMatch(Attr2, AlreadyFound);
-					if (Result != PatternMatchResult.Match)
-						return Result;
+						Result = Attr.PatternMatch(Attr2, AlreadyFound);
+						if (Result != PatternMatchResult.Match)
+							return Result;
+					}
+				}
+
+				if (!Wildcard)
+				{
+					foreach (XmlAttribute Attr in E.Attributes)
+					{
+						bool Found = false;
+
+						foreach (XmlScriptAttribute Attr2 in this.attributes)
+						{
+							if (Attr2.Name==Attr.Name)
+							{
+								Found = true;
+								break;
+							}
+						}
+
+						if (!Found)
+							return PatternMatchResult.NoMatch;
+					}
 				}
 
 				XmlNode N = E.FirstChild;
@@ -402,11 +429,8 @@ namespace Waher.Script.Xml.Model
 												break;
 											else if (N is XmlElement E3)
 											{
-												if (E3.LocalName == E2.LocalName &&
-													E3.NamespaceURI == E2.NamespaceURI)
-												{
+												if (N2.IsApplicable(N))
 													Elements.Add(E3);
-												}
 												else
 													break;
 											}

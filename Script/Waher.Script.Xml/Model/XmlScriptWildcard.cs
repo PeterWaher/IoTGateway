@@ -1,30 +1,27 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {
 	/// <summary>
-	/// XML Script attribute node, whose value is defined by script.
+	/// XML Script wildcard node.
 	/// </summary>
-	public class XmlScriptAttributeString : XmlScriptAttribute 
+	public class XmlScriptWildcard : XmlScriptNode
 	{
-		private readonly string value;
+		private XmlScriptNode next = null;
 
 		/// <summary>
-		/// XML Script attribute node, whose value is defined by script.
+		/// XML Script wildcard node.
 		/// </summary>
-		/// <param name="Name">Element name.</param>
-		/// <param name="Value">String value.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public XmlScriptAttributeString(string Name, string Value, int Start, int Length, Expression Expression)
-			: base(Name, Start, Length, Expression)
+		public XmlScriptWildcard(int Start, int Length, Expression Expression)
+			: base(Start, Length, Expression)
 		{
-			this.value = Value;
 		}
 
 		/// <summary>
@@ -47,25 +44,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			Parent.SetAttribute(this.Name, this.value);
-		}
-
-		/// <summary>
-		/// Gets the attribute value.
-		/// </summary>
-		/// <param name="Variables">Current set of variables.</param>
-		internal override string GetValue(Variables Variables)
-		{
-			return this.value;
-		}
-
-		/// <summary>
-		/// Gets the attribute value.
-		/// </summary>
-		/// <param name="Variables">Current set of variables.</param>
-		internal override Task<string> GetValueAsync(Variables Variables)
-		{
-			return Task.FromResult<string>(this.value);
+			throw new ScriptRuntimeException("Wildcards cannot be used to build XML documents.", this);
 		}
 
 		/// <summary>
@@ -76,10 +55,7 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (CheckAgainst is XmlAttribute)
-				return CheckAgainst.Value == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
-			else
-				return PatternMatchResult.NoMatch;
+			return PatternMatchResult.Match;
 		}
 
 		/// <summary>
@@ -88,9 +64,9 @@ namespace Waher.Script.Xml.Model
 		/// <param name="CheckAgainst">Value to check against.</param>
 		/// <param name="AlreadyFound">Variables already identified.</param>
 		/// <returns>Pattern match result</returns>
-		public override PatternMatchResult PatternMatch(string CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			return CheckAgainst == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			return PatternMatchResult.Match;
 		}
 
 		/// <summary>
@@ -98,9 +74,23 @@ namespace Waher.Script.Xml.Model
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
 		/// <returns>If the node is applicable for pattern matching.</returns>
-		public override bool IsApplicable(string CheckAgainst)
+		public override bool IsApplicable(XmlNode CheckAgainst)
 		{
-			return CheckAgainst == this.value;
+			return this.next is null || !this.next.IsApplicable(CheckAgainst);
+		}
+
+		/// <summary>
+		/// If the node represents a vector of nodes.
+		/// </summary>
+		public override bool IsVector => true;
+
+		/// <summary>
+		/// Next node in the sequence, after the wildcard
+		/// </summary>
+		public XmlScriptNode Next
+		{
+			get => this.next;
+			internal set => this.next = value;
 		}
 	}
 }

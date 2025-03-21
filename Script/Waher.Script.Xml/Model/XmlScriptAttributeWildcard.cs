@@ -2,29 +2,27 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {
 	/// <summary>
-	/// XML Script attribute node, whose value is defined by script.
+	/// XML Script attribute wildcard node, used in pattern matching to match any
+	/// attribute or sequence of attributes.
 	/// </summary>
-	public class XmlScriptAttributeString : XmlScriptAttribute 
+	public class XmlScriptAttributeWildcard : XmlScriptAttribute 
 	{
-		private readonly string value;
-
 		/// <summary>
-		/// XML Script attribute node, whose value is defined by script.
+		/// XML Script attribute wildcard node, used in pattern matching to match any
+		/// attribute or sequence of attributes.
 		/// </summary>
-		/// <param name="Name">Element name.</param>
-		/// <param name="Value">String value.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public XmlScriptAttributeString(string Name, string Value, int Start, int Length, Expression Expression)
-			: base(Name, Start, Length, Expression)
+		public XmlScriptAttributeWildcard(int Start, int Length, Expression Expression)
+			: base(string.Empty, Start, Length, Expression)
 		{
-			this.value = Value;
 		}
 
 		/// <summary>
@@ -47,7 +45,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			Parent.SetAttribute(this.Name, this.value);
+			throw new ScriptRuntimeException("Attribute wildcards cannot be used to build XML documents.", this);
 		}
 
 		/// <summary>
@@ -56,7 +54,12 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override string GetValue(Variables Variables)
 		{
-			return this.value;
+			throw this.NoValueException();
+		}
+
+		private ScriptRuntimeException NoValueException()
+		{
+			return new ScriptRuntimeException("Attribute wildcards have no specific values.", this);
 		}
 
 		/// <summary>
@@ -65,7 +68,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override Task<string> GetValueAsync(Variables Variables)
 		{
-			return Task.FromResult<string>(this.value);
+			throw this.NoValueException();
 		}
 
 		/// <summary>
@@ -77,7 +80,7 @@ namespace Waher.Script.Xml.Model
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
 			if (CheckAgainst is XmlAttribute)
-				return CheckAgainst.Value == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+				return PatternMatchResult.Match;
 			else
 				return PatternMatchResult.NoMatch;
 		}
@@ -90,7 +93,7 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(string CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			return CheckAgainst == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			return PatternMatchResult.NoMatch;
 		}
 
 		/// <summary>
@@ -100,7 +103,7 @@ namespace Waher.Script.Xml.Model
 		/// <returns>If the node is applicable for pattern matching.</returns>
 		public override bool IsApplicable(string CheckAgainst)
 		{
-			return CheckAgainst == this.value;
+			return false;
 		}
 	}
 }

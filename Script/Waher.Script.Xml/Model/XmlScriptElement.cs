@@ -419,7 +419,7 @@ namespace Waher.Script.Xml.Model
 
 							if (!(N is null))
 							{
-								if (N2.IsApplicable(N))
+								if (N2.IsApplicable(N, null))
 								{
 									if (N2.IsVector && N is XmlElement E2)
 									{
@@ -432,7 +432,7 @@ namespace Waher.Script.Xml.Model
 												break;
 											else if (N is XmlElement E3)
 											{
-												if (N2.IsApplicable(N))
+												if (N2.IsApplicable(N, E2))
 													Elements.Add(E3);
 												else
 													break;
@@ -498,16 +498,29 @@ namespace Waher.Script.Xml.Model
 		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="First">First element</param>
 		/// <returns>If the node is applicable for pattern matching.</returns>
-		public override bool IsApplicable(XmlNode CheckAgainst)
+		public override bool IsApplicable(XmlNode CheckAgainst, XmlElement First)
 		{
-			if (!(CheckAgainst is XmlElement E) || this.name != E.LocalName)
+			if (!(CheckAgainst is XmlElement E))
 				return false;
 
-			if (this.xmlns is null)
-				return true;
+			if (First is null)
+			{
+				if (this.name != E.LocalName)
+					return false;
 
-			return this.xmlns.IsApplicable(CheckAgainst.NamespaceURI);
+				if (this.xmlns is null)
+					return true;
+
+				return this.xmlns.IsApplicable(CheckAgainst.NamespaceURI);
+			}
+			else
+			{
+				return 
+					E.LocalName == First.LocalName &&
+					E.NamespaceURI == First.NamespaceURI;
+			}
 		}
 	}
 }

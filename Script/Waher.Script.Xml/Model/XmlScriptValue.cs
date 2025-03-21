@@ -208,14 +208,28 @@ namespace Waher.Script.Xml.Model
 		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="First">First element</param>
 		/// <returns>If the node is applicable for pattern matching.</returns>
-		public override bool IsApplicable(XmlNode CheckAgainst)
+		public override bool IsApplicable(XmlNode CheckAgainst, XmlElement First)
 		{
-			return (CheckAgainst is XmlText ||
-				CheckAgainst is XmlWhitespace ||
-				CheckAgainst is XmlSignificantWhitespace ||
-				CheckAgainst is XmlCDataSection ||
-				CheckAgainst is XmlElement);
+			if (CheckAgainst is XmlElement E)
+			{
+				if (First is null)
+					return true;
+				else
+				{
+					return
+						E.LocalName == First.LocalName &&
+						E.NamespaceURI == First.NamespaceURI;
+				}
+			}
+			else
+			{
+				return CheckAgainst is XmlText ||
+					CheckAgainst is XmlWhitespace ||
+					CheckAgainst is XmlSignificantWhitespace ||
+					CheckAgainst is XmlCDataSection;
+			}
 		}
 
 		/// <summary>

@@ -122,8 +122,9 @@ namespace Waher.Script.Xml.Model
 		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="First">First element</param>
 		/// <returns>If the node is applicable for pattern matching.</returns>
-		public abstract bool IsApplicable(XmlNode CheckAgainst);
+		public abstract bool IsApplicable(XmlNode CheckAgainst, XmlElement First);
 
 		/// <summary>
 		/// If the node represents a vector of nodes.

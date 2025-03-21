@@ -11,6 +11,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Client.WPF.Dialogs.Legal;
 using Waher.Networking.XMPP.Contracts.EventArguments;
+using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Client.WPF.Model.Legal
 {
@@ -23,15 +24,20 @@ namespace Waher.Client.WPF.Model.Legal
 		{
 		}
 
-		public static async Task<LegalService> Create(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
+		public static async Task<LegalService> Create(TreeNode Parent, string JID, string Name, 
+			string Node, EndpointSecurity E2eEndpoint,  Dictionary<string, bool> Features)
 		{
-			LegalService Result = new LegalService(Parent, JID, Name, Node, Features);
+			LegalService Result = new(Parent, JID, Name, Node, Features);
 
 			Result.contractsClient = new ContractsClient(Result.Account.Client, JID);
 			Result.contractsClient.SetKeySettingsInstance(string.Empty, true);
 
 			await Result.contractsClient.LoadKeys(true);
-			await Result.contractsClient.EnableE2eEncryption(true, false);
+
+			if (E2eEndpoint is null)
+				await Result.contractsClient.EnableE2eEncryption(true, false);
+			else
+				await Result.contractsClient.EnableE2eEncryption(E2eEndpoint, false);
 
 			Result.contractsClient.IdentityUpdated += Result.ContractsClient_IdentityUpdated;
 
@@ -109,7 +115,7 @@ namespace Waher.Client.WPF.Model.Legal
 		{
 			try
 			{
-				LegalIdentityForm Form = new LegalIdentityForm
+				LegalIdentityForm Form = new()
 				{
 					Owner = MainWindow.currentInstance
 				};
@@ -118,7 +124,7 @@ namespace Waher.Client.WPF.Model.Legal
 
 				if (Result.HasValue && Result.Value)
 				{
-					List<Property> Properties = new List<Property>();
+					List<Property> Properties = [];
 
 					if (!string.IsNullOrEmpty(s = Form.FirstName.Text))
 						Properties.Add(new Property("FIRST", s));
@@ -154,7 +160,7 @@ namespace Waher.Client.WPF.Model.Legal
 						Properties.Add(new Property("COUNTRY", s));
 
 					await this.contractsClient.GenerateNewKeys();
-					await this.contractsClient.Apply(Properties.ToArray(), (sender2, e2) =>
+					await this.contractsClient.Apply([.. Properties], (sender2, e2) =>
 					{
 						if (!e2.Ok)
 							MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to register legal identity." : e2.ErrorText);
@@ -172,7 +178,7 @@ namespace Waher.Client.WPF.Model.Legal
 
 		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
 		{
-			StringBuilder Markdown = new StringBuilder();
+			StringBuilder Markdown = new();
 
 			Markdown.AppendLine("Legal identity updated:");
 			Markdown.AppendLine();
@@ -234,7 +240,7 @@ namespace Waher.Client.WPF.Model.Legal
 					{
 						foreach (LegalIdentity Identity in e2.Identities)
 						{
-							StringBuilder Markdown = new StringBuilder();
+							StringBuilder Markdown = new();
 
 							Output(XmppClient.GetBareJID(e2.To), Markdown, Identity.GetTags());
 

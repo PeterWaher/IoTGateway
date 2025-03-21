@@ -19,7 +19,6 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.XMPP;
-using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
@@ -1180,6 +1179,9 @@ namespace Waher.Client.WPF.Model
 
 			}, null);
 
+			bool SupportsDiscovery = false;
+			bool SupportsLegal = false;
+
 			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (Sender, e) =>
 			{
 				foreach (Item Item in e.Items)
@@ -1201,6 +1203,10 @@ namespace Waher.Client.WPF.Model
 
 							if (e2.HasAnyFeature(ThingRegistryClient.NamespacesDiscovery))
 							{
+								if (SupportsDiscovery)
+									return;
+
+								SupportsDiscovery = true;
 								ThingRegistry = new ThingRegistry(this, Item.JID, Item.Name, Item.Node, e2.Features);
 								Component = ThingRegistry;
 							}
@@ -1215,7 +1221,14 @@ namespace Waher.Client.WPF.Model
 								Component = new MucService(this, Item.JID, Item.Name, Item.Node, e2.Features, this.mucClient);
 							}
 							else if (e2.HasAnyFeature(ContractsClient.NamespacesLegalIdentities))
-								Component = await LegalService.Create(this, Item.JID, Item.Name, Item.Node, e2.Features);
+							{
+								if (SupportsLegal)
+									return;
+
+								SupportsLegal = true;
+								Component = await LegalService.Create(this, Item.JID, Item.Name, 
+									Item.Node, this.e2eEncryption, e2.Features);
+							}
 							else if (e2.HasFeature(EventLog.NamespaceEventLogging))
 								Component = new EventLog(this, Item.JID, Item.Name, Item.Node, e2.Features);
 							else

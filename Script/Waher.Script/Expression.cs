@@ -4302,6 +4302,7 @@ namespace Waher.Script
 			catch (ScriptReturnValueException ex)
 			{
 				Result = ex.ReturnValue;
+				ScriptReturnValueException.Reuse(ex);
 			}
 
 			return Result.AssociatedObjectValue;
@@ -4329,6 +4330,7 @@ namespace Waher.Script
 			catch (ScriptReturnValueException ex)
 			{
 				Result = ex.ReturnValue;
+				ScriptReturnValueException.Reuse(ex);
 			}
 
 			return Result.AssociatedObjectValue;

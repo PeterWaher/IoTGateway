@@ -1650,6 +1650,7 @@ namespace Waher.Script.Graphs
 			catch (ScriptReturnValueException ex)
 			{
 				Result = ex.ReturnValue;
+				ScriptReturnValueException.Reuse(ex);
 			}
 
 			return Result;

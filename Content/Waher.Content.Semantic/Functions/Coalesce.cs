@@ -153,6 +153,7 @@ namespace Waher.Content.Semantic.Functions
 				}
 				catch (ScriptReturnValueException ex)
 				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
 					throw new ScriptReturnValueException(ex.ReturnValue);
 				}
 				catch (Exception ex)
@@ -184,6 +185,7 @@ namespace Waher.Content.Semantic.Functions
 				}
 				catch (ScriptReturnValueException ex)
 				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
 					throw new ScriptReturnValueException(ex.ReturnValue);
 				}
 				catch (Exception ex)

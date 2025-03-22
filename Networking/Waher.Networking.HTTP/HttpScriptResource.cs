@@ -126,6 +126,7 @@ namespace Waher.Networking.HTTP
 				catch (ScriptReturnValueException ex)
 				{
 					E = ex.ReturnValue;
+					ScriptReturnValueException.Reuse(ex);
 				}
 
 				Result = E.AssociatedObjectValue;

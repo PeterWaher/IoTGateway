@@ -619,7 +619,9 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 			catch (ScriptReturnValueException ex)
 			{
-				return ex.ReturnValue.AssociatedObjectValue;
+				object ReturnValue = ex.ReturnValue.AssociatedObjectValue;
+				ScriptReturnValueException.Reuse(ex);
+				return ReturnValue;
 			}
 			catch (Exception)
 			{
@@ -636,7 +638,9 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 			catch (ScriptReturnValueException ex)
 			{
-				return ex.ReturnValue.AssociatedObjectValue;
+				object ReturnValue = ex.ReturnValue.AssociatedObjectValue;
+				ScriptReturnValueException.Reuse(ex);
+				return ReturnValue;
 			}
 			catch (Exception ex)
 			{

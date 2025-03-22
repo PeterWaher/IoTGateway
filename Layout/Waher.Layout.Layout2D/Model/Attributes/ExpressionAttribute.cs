@@ -118,6 +118,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 			catch (ScriptReturnValueException ex)
 			{
 				Result = ex.ReturnValue;
+				ScriptReturnValueException.Reuse(ex);
 			}
 			catch (Exception ex)
 			{

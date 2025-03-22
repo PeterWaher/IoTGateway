@@ -130,6 +130,7 @@ namespace Waher.Script.Threading.Functions
 				catch (ScriptReturnValueException ex)
 				{
 					Result.TrySetResult(ex.ReturnValue);
+				ScriptReturnValueException.Reuse(ex);
 				}
 				catch (Exception ex)
 				{

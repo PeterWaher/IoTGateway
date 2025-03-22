@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Conditional
 {
@@ -41,6 +43,7 @@ namespace Waher.Script.Operators.Conditional
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement S = this.left.Evaluate(Variables);
+			IElement Last = ObjectValue.Null;
 			
 			if (!(S is ICollection<IElement> Elements))
 			{
@@ -66,11 +69,29 @@ namespace Waher.Script.Operators.Conditional
 
 			foreach (IElement Element in Elements)
 			{
-				Variables[this.variableName] = Element;
-				S = this.right.Evaluate(Variables);
+				try
+				{
+					Variables[this.variableName] = Element;
+					Last = this.right.Evaluate(Variables);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+
+					ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+				
+					ScriptContinueLoopException.Reuse(ex);
+				}
 			}
 
-			return S;
+			return Last;
 		}
 
 		/// <summary>
@@ -84,6 +105,7 @@ namespace Waher.Script.Operators.Conditional
 				return this.Evaluate(Variables);
 
 			IElement S = await this.left.EvaluateAsync(Variables);
+			IElement Last = ObjectValue.Null;
 
 			if (!(S is ICollection<IElement> Elements))
 			{
@@ -109,11 +131,29 @@ namespace Waher.Script.Operators.Conditional
 
 			foreach (IElement Element in Elements)
 			{
-				Variables[this.variableName] = Element;
-				S = await this.right.EvaluateAsync(Variables);
+				try
+				{
+					Variables[this.variableName] = Element;
+					Last = await this.right.EvaluateAsync(Variables);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+
+					ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+				
+					ScriptContinueLoopException.Reuse(ex);
+				}
 			}
 
-			return S;
+			return Last;
 		}
 	}
 }

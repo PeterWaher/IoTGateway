@@ -104,6 +104,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				catch (ScriptReturnValueException ex)
 				{
 					Result = ex.ReturnValue;
+					ScriptReturnValueException.Reuse(ex);
 				}
 				catch (ScriptAbortedException)
 				{

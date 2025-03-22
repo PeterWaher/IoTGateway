@@ -37,8 +37,26 @@ namespace Waher.Script.Operators.Vectors
 
             do
             {
-                Elements.AddLast(this.left.Evaluate(Variables));
+				try
+				{
+					Elements.AddLast(this.left.Evaluate(Variables));
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
 
+					ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
+
+					ScriptContinueLoopException.Reuse(ex);
+				}
+				
                 Condition = this.right.Evaluate(Variables) as BooleanValue;
                 if (Condition is null)
                     throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
@@ -63,9 +81,27 @@ namespace Waher.Script.Operators.Vectors
 
             do
             {
-                Elements.AddLast(await this.left.EvaluateAsync(Variables));
+				try
+				{
+					Elements.AddLast(await this.left.EvaluateAsync(Variables));
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
 
-                Condition = await this.right.EvaluateAsync(Variables) as BooleanValue;
+					ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
+
+					ScriptContinueLoopException.Reuse(ex);
+				}
+
+				Condition = await this.right.EvaluateAsync(Variables) as BooleanValue;
                 if (Condition is null)
                     throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
             }

@@ -113,6 +113,7 @@ namespace Waher.Script.Persistence.SPARQL
 			catch (ScriptReturnValueException ex)
 			{
 				Obj = ex.ReturnValue.AssociatedObjectValue;
+				ScriptReturnValueException.Reuse(ex);
 			}
 			catch (Exception ex)
 			{

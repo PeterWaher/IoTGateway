@@ -65,8 +65,10 @@ namespace Waher.Script.Functions.Strings
             }
             catch (ScriptReturnValueException ex)
             {
-                return ex.ReturnValue;
-            }
-        }
+                IElement ReturnValue = ex.ReturnValue;
+				ScriptReturnValueException.Reuse(ex);
+                return ReturnValue;
+			}
+		}
     }
 }

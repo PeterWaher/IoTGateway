@@ -480,3 +480,4 @@ window.addEventListener("load", () => {
     if (largeName !== null)
         largeName.parentElement.style.flex = 1;
 })
+

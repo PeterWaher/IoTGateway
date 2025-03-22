@@ -344,6 +344,42 @@ Would return:
 [7, 12, 81]
 ```
 
+##### Wildcards in Object Pattern Matching
+
+You can use a wildcard `*` when using an object definition when performing pattern matching of object content. Wildcards can be used to
+match any object properties. Consider the following pattern matching script that matches properties of an object and puts the values in
+the corresponding variable references:
+
+	{
+		"name":Required(Str(Name)),
+		"age":Optional(Int(Age)),
+		"profession":Optional(Str(Profession)),
+		"employedSince":Required(DateTime(EmployedSince))
+	}
+	:=
+	{
+		"name":"Kalle",
+		"age":50,
+		"profession":"Bus Driver",
+		"employedSince":DateTime(2010,1,02)
+	};
+
+But if you are only interested in the name and the date when the person was employed, you can use wildcards to ignore the other elements 
+and attributes:
+
+	{
+		"name":Required(Str(Name)),
+		"employedSince":Required(DateTime(EmployedSince)),
+		*
+	}
+	:=
+	{
+		"name":"Kalle",
+		"age":50,
+		"profession":"Bus Driver",
+		"employedSince":DateTime(2010,1,02)
+	};
+
 ### Suffix-operators
 
 Suffix-operators are written after the operand to which they are applied. The following table lists available suffix operators:
@@ -3424,7 +3460,7 @@ successfully and extracts mentioned components:
 		<EmployedSince>2010-01-02</EmployedSince>
 	</Person>;
 
-But if you are only interested in the Name and the date when the person was employed, you can use wildcards to ignore the other elements 
+But if you are only interested in the name and the date when the person was employed, you can use wildcards to ignore the other elements 
 and attributes:
 
 	<Person name=Required(Str(Name)) *>

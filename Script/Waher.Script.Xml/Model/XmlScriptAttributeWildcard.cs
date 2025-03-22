@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
@@ -45,7 +44,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			throw new ScriptRuntimeException("Attribute wildcards cannot be used to build XML documents.", this);
+			// Ignore
 		}
 
 		/// <summary>
@@ -54,12 +53,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override string GetValue(Variables Variables)
 		{
-			throw this.NoValueException();
-		}
-
-		private ScriptRuntimeException NoValueException()
-		{
-			return new ScriptRuntimeException("Attribute wildcards have no specific values.", this);
+			return string.Empty;
 		}
 
 		/// <summary>
@@ -68,7 +62,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override Task<string> GetValueAsync(Variables Variables)
 		{
-			throw this.NoValueException();
+			return Task.FromResult(string.Empty);
 		}
 
 		/// <summary>

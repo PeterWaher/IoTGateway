@@ -48,7 +48,8 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Test_04_JSON()
 		{
-			await ScriptEvaluationTests.Test("{'a':A,'b':B,'c':Required(C),'d':Optional(D)}:={'a':s,'c':true,'b':b};[A,B,C,D]",
+			await ScriptEvaluationTests.Test("{'a':A,'b':B,'c':Required(C),'d':Optional(D)}:=" +
+				"{'a':s,'c':true,'b':b};[A,B,C,D]",
 				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, true, null });
 		}
 
@@ -151,7 +152,7 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Test_11_XML_7()
 		{
-			string s = "<a b=Int(B) *><*><c/><*></a>:="+
+			string s = "<a b=Int(B) *><*><c/><*></a>:=" +
 				"<a c='20' d='30' b='10'><b/><d/><c/></a>;B";
 
 			await ScriptEvaluationTests.Test(s, 10);
@@ -207,6 +208,30 @@ namespace Waher.Script.Test
 			"</Person>:=Xml;[Name,EmployedSince]";
 
 			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
+		[TestMethod]
+		public async Task Test_15_JSON_2()
+		{
+			await ScriptEvaluationTests.Test("{*,'a':A,'b':B,'c':Required(C),'d':Optional(D)}:=" +
+				"{'a':s,'c':true,'b':b,'e':Now};[A,B,C,D]",
+				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, true, null });
+		}
+
+		[TestMethod]
+		public async Task Test_16_JSON_3()
+		{
+			await ScriptEvaluationTests.Test("{'a':A,'b':B,'c':Required(C),'d':Optional(D),*}:=" +
+				"{'a':s,'c':true,'b':b,'e':Now};[A,B,C,D]",
+				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, true, null });
+		}
+
+		[TestMethod]
+		public async Task Test_17_JSON_4()
+		{
+			await ScriptEvaluationTests.Test("{'a':A,'b':B,*,'c':Required(C),'d':Optional(D),*}:=" +
+				"{'a':s,'c':true,'b':b,'e':Now};[A,B,C,D]",
+				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, true, null });
 		}
 
 	}

@@ -3783,33 +3783,48 @@ namespace Waher.Script
 			}
 			else if (ch == '{')
 			{
+				bool ObjectWildcard = false;
+				bool WsBak = this.canSkipWhitespace;
+
 				this.pos++;
+				this.canSkipWhitespace = true;
 				this.SkipWhiteSpace();
-				if (this.PeekNextChar() == '}')
+
+				switch (this.PeekNextChar())
 				{
-					this.pos++;
-					return new ObjectExNihilo(new LinkedList<KeyValuePair<string, ScriptNode>>(), Start, this.pos - Start, this);
+					case '}':
+						this.pos++;
+						this.CanSkipWhitespace = WsBak;
+						return new ObjectExNihilo(new LinkedList<KeyValuePair<string, ScriptNode>>(), false, Start, this.pos - Start, this);
+
+					case '*':
+						this.pos++;
+						ObjectWildcard = true;
+						Node = null;
+						break;
+
+					default:
+						Node = this.ParseStatement(true);
+						break;
 				}
 
-				bool WsBak = this.canSkipWhitespace;
-				this.canSkipWhitespace = true;
-
-				Node = this.ParseStatement(true);
-
 				this.SkipWhiteSpace();
-				if ((ch = this.PeekNextChar()) == ':')
+				if (ObjectWildcard || (ch = this.PeekNextChar()) == ':')
 				{
-					this.pos++;
-
 					bool DoubleColon = false;
 
-					if (this.PeekNextChar() == ':')
+					if (!ObjectWildcard)
 					{
 						this.pos++;
-						DoubleColon = true;
+
+						if (this.PeekNextChar() == ':')
+						{
+							this.pos++;
+							DoubleColon = true;
+						}
 					}
 
-					if (!DoubleColon && (Node is VariableReference || Node is ConstantElement))
+					if (!DoubleColon && (ObjectWildcard || Node is VariableReference || Node is ConstantElement))
 					{
 						LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
 						Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
@@ -3817,31 +3832,10 @@ namespace Waher.Script
 						StringValue StringValue;
 						string s;
 
-						if (Node is VariableReference VariableReference)
-							s = VariableReference.VariableName;
-						else if (!((ConstantElement = Node as ConstantElement) is null) &&
-							!((StringValue = ConstantElement.Constant as StringValue) is null))
+						if (!ObjectWildcard)
 						{
-							s = StringValue.Value;
-						}
-						else
-							throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
-
-						MembersFound[s] = true;
-						Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
-
-						this.SkipWhiteSpace();
-						while ((ch = this.PeekNextChar()) == ',')
-						{
-							this.pos++;
-							Node = this.ParseStatement(false);
-
-							this.SkipWhiteSpace();
-							if (this.PeekNextChar() != ':')
-								throw new SyntaxException("Expected :.", this.pos, this.script);
-
-							if (Node is VariableReference VariableReference2)
-								s = VariableReference2.VariableName;
+							if (Node is VariableReference VariableReference)
+								s = VariableReference.VariableName;
 							else if (!((ConstantElement = Node as ConstantElement) is null) &&
 								!((StringValue = ConstantElement.Constant as StringValue) is null))
 							{
@@ -3850,12 +3844,47 @@ namespace Waher.Script
 							else
 								throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
-							if (MembersFound.ContainsKey(s))
-								throw new SyntaxException("Member already defined.", this.pos, this.script);
-
-							this.pos++;
 							MembersFound[s] = true;
 							Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+						
+							this.SkipWhiteSpace();
+						}
+
+						while ((ch = this.PeekNextChar()) == ',')
+						{
+							this.pos++;
+							this.SkipWhiteSpace();
+
+							if (this.PeekNextChar() == '*')
+							{
+								this.pos++;
+								ObjectWildcard = true;
+							}
+							else
+							{
+								Node = this.ParseStatement(false);
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextChar() != ':')
+									throw new SyntaxException("Expected :.", this.pos, this.script);
+
+								if (Node is VariableReference VariableReference2)
+									s = VariableReference2.VariableName;
+								else if (!((ConstantElement = Node as ConstantElement) is null) &&
+									!((StringValue = ConstantElement.Constant as StringValue) is null))
+								{
+									s = StringValue.Value;
+								}
+								else
+									throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
+
+								if (MembersFound.ContainsKey(s))
+									throw new SyntaxException("Member already defined.", this.pos, this.script);
+
+								this.pos++;
+								MembersFound[s] = true;
+								Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+							}
 
 							this.SkipWhiteSpace();
 						}
@@ -3865,7 +3894,7 @@ namespace Waher.Script
 
 						this.canSkipWhitespace = WsBak;
 						this.pos++;
-						return new ObjectExNihilo(Members, Start, this.pos - Start, this);
+						return new ObjectExNihilo(Members, ObjectWildcard, Start, this.pos - Start, this);
 					}
 
 					ScriptNode Temp = this.ParseList();

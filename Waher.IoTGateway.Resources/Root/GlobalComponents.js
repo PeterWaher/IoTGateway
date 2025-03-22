@@ -164,6 +164,16 @@ function PopupHandler() {
     document.body.appendChild(backdrop);
     HideBackdrop()
 
+    let enterFunction = () => {}
+    let escapeFunction = () => {}
+
+    popupContainer.addEventListener("keyup", event => {
+        if (event.key === "Enter")
+            enterFunction()
+        if (event.key === "Escape")
+            escapeFunction()
+    })
+
     function PopStack(args) {
         popupStack.pop().OnPop(args)
         DisplayPopup()
@@ -255,6 +265,8 @@ function PopupHandler() {
     async function Alert(message) {
         const html = CreateHTMLAlertPopup({ Message: `<p>${message}</p>` });
         Focus()
+        enterFunction = AlertOk;
+        escapeFunction = AlertOk;
         await Popup(html);
     }
     function AlertOk() {
@@ -264,6 +276,8 @@ function PopupHandler() {
     async function Confirm(message) {
         const html = CreateHTMLConfirmPopup({ Message: `<p>${message}</p>` });
         Focus()
+        enterFunction = ConfirmYes;
+        escapeFunction = ConfirmNo;
         return await Popup(html);
     }
 
@@ -279,6 +293,8 @@ function PopupHandler() {
         setTimeout(() => {
             document.getElementById(PROMPT_INPUT_ID).focus()
         }, 0)
+        enterFunction = () => PromptSubmit(document.getElementById('native-prompt-input').value);
+        escapeFunction = () => PromptSubmit(undefined);
         return await Popup(html);
     }
 

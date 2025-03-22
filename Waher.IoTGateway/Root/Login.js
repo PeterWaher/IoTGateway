@@ -158,3 +158,7 @@ window.addEventListener("load", () => {
         location.reload()
     })
 });
+
+setTimeout(() => {
+    location.href = "/"
+}, 5 * 60 * 1000)

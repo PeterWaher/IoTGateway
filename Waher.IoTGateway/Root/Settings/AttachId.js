@@ -120,3 +120,7 @@ var LoginTimer = null;
 window.addEventListener("load", async () => {
     DisplayAttachIdQR()
 })
+
+setTimeout(() => {
+    location.href = "/"
+}, 5 * 60 * 1000)

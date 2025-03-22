@@ -13,8 +13,8 @@ Javascript: /Master.js
 </div>
 - [Home](/)
 - [TAG](https://www.trustanchorgroup.com/)
-- [Lab](http://lab.tagroot.io/)
-- ![Admin](/AdminDropdown.md)
+- [Lab](http://lab.tagroot.io/) {{if (exists(User) && User is Waher.Security.IUser) then ]]
+- ![Admin](/AdminDropdown.md) [[ }}
 - <p id="large-pagpage-name">[%Title]</p>
 - [LinkedIn](https://www.linkedin.com/company/trust-anchor-group)
 - [Twitter](https://twitter.com/group_anchor)

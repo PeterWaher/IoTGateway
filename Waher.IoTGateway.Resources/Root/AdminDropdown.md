@@ -1,117 +1,85 @@
 {{
+Categories := [
+    {
+        header: "Communication",
+        items: [
+            { label: "Blocked Endpoints", page: "/RemoteEndpoints.md?BlockedOnly=1", privilage: "Admin.Communication.Endpoints" },
+            { label: "Domain", page: "/Settings/Domain.md", privilage: "Admin.Communication.Domain" },
+            { label: "Notification", page: "/Settings/Notification.md", privilage: "Admin.Communication.Notification" },
+            { label: "Roster", page: "/Settings/Roster.md", privilage: "Admin.Communication.Roster" },
+            { label: "XMPP", page: "/Settings/XMPP.md", privilage: "Admin.Communication.XMPP" },
+            { label: "XMPP Sniffer", page: "/Sniffers/XMPP.md", privilage: ["Admin.Communication.XMPP", "Admin.Communication.Sniffer"] }
+        ]
+    },
+    {
+        header: "Data",
+        items: [
+            { label: "Backup", page: "/Settings/Backup.md", privilage: "Admin.Data.Backup" },
+            { label: "Database", page: "/Settings/Database.md", privilage: "Admin.Data.Database" },
+            { label: "Database Sniffer", page: "/Sniffers/Database.md", privilage: ["Admin.Data.Database", "Admin.Communication.Sniffer"] },
+            { label: "Events", page: "/Sniffers/EventLog.md", privilage: "Admin.Data.Events" },
+            { label: "Graph Store", page: "/GraphStore.md", privilage: "Admin.Graphs.Get" },
+            { label: "Restore", page: "/Settings/Restore.md", privilage: "Admin.Data.Restore" },
+            { label: "SPARQL", page: "/Sparql.md", privilage: "Admin.Graphs.Query" }
+        ]
+    },
+    {
+        header: "Lab",
+        items: [
+            { label: "GraphViz", page: "/GraphVizLab/GraphVizLab.md", privilage: ["Admin.Lab.Script", "Admin.Lab.GraphViz"] },
+            { label: "Markdown", page: "/MarkdownLab/MarkdownLab.md", privilage: ["Admin.Lab.Script", "Admin.Lab.Markdown"] },
+            { label: "PlantUML", page: "/PlantUmlLab/PlantUmlLab.md", privilage: ["Admin.Lab.Script", "Admin.Lab.PlantUml"] },
+            { label: "Script", page: "/Prompt.md", privilage: "Admin.Lab.Script" }
+        ]
+    },
+    {
+        header: "Legal",
+        items: [
+            { label: "Legal Identity", page: "/Settings/LegalIdentity.md", privilage: "Admin.Legal.ID" },
+            { label: "Personal Data", page: "/Settings/PersonalData.md", privilage: "Admin.Legal.PersonalData" },
+            { label: "Propose Contract", page: "/ProposeContract.md", privilage: "Admin.Legal.ProposeContract" },
+            { label: "Signature Requests", page: "/SignatureRequests.md", privilage: "Admin.Legal.SignatureRequests" }
+        ]
+    },
+    {
+        header: "Presentation",
+        items: [
+            { label: "favicon.ico", page: "/Settings/EditFavIcon.md", privilage: "Admin.Presentation.Edit.FavIconIco" },
+            { label: "Theme", page: "/Settings/Theme.md", privilage: "Admin.Presentation.Theme" }
+        ]
+    },
+    {
+        header: "Security",
+        items: [
+            { label: "robots.txt", page: "/Settings/EditRobots.md", privilage: "Admin.Security.Edit.RobotsTxt" },
+            { label: "Roles", page: "/Settings/Roles.md", privilage: "Admin.Security.Roles" },
+            { label: "Users", page: "/Settings/Users.md", privilage: "Admin.Security.Users" }
+        ]
+    },
+    {
+        header: "Session",
+        items: [
+            { label: "Change Password", page: "/Settings/ChangePassword.md", privilage: "" },
+            { label: "Logout", page: "/Logout", privilage: "" }
+        ]
+    },
+    {
+        header: "Software",
+        items: [
+        ]
+    }
+];
 
-IsAuthorized(Privileges[]):=
-(
-	if !exists(User) || User is not Waher.Security.IUser then
-		false
-	else if count(Privileges)=0 then
-		true
-	else
-		And([foreach Privilege in Privileges do (User.HasPrivilege(Privilege)???false)])
-);
-
-MenuItem(Text,Url,Privileges[]):=
-(
-	if IsAuthorized(Privileges) then
-		]]<a href="((Url))">((Text))</a>
-[[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
-[[
-);
-
-MenuItem2(Text,Url,Privileges[]):=
-(
-	if IsAuthorized(Privileges) then
-		]]<li><a href="((Url))">((Text))</a></li>[[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
-[[
-);
-
-SnifferItem(Text,Url,Privileges[]):=
-(
-	if IsAuthorized(Privileges) then
-		]]<a href="((Url))">((Text))</a>
-[[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
-[[
-);
-
-}}
-[Admin](Admin.md)
-<ul>
-    <li>
-        <p>Communication</p>
-        <ul>
-            <li>{{MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1","Admin.Communication.Endpoints");}}</li>
-            <li>{{MenuItem("Domain","/Settings/Domain.md","Admin.Communication.Domain");}}</li>
-            <li>{{MenuItem("Notification","/Settings/Notification.md","Admin.Communication.Notification");}}</li>
-            <li>{{MenuItem("Roster","/Settings/Roster.md","Admin.Communication.Roster");}}</li>
-            <li>{{MenuItem("XMPP","/Settings/XMPP.md","Admin.Communication.XMPP");}}</li>
-            <li>{{SnifferItem("XMPP Sniffer","/Sniffers/XMPP.md",["Admin.Communication.XMPP","Admin.Communication.Sniffer"]);}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Data</p>
-        <ul>
-            <li>{{MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");}}</li>
-            <li>{{MenuItem("Database","/Settings/Database.md","Admin.Data.Database");}}</li>
-            <li>{{SnifferItem("Database Sniffer","/Sniffers/Database.md",["Admin.Data.Database","Admin.Communication.Sniffer"]);}}</li>
-            <li>{{MenuItem("Events","/Sniffers/EventLog.md","Admin.Data.Events");}}</li>
-            <li>{{MenuItem("Graph Store","/GraphStore.md","Admin.Graphs.Get");}}</li>
-            <li>{{MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");}}</li>
-            <li>{{MenuItem("SPARQL","/Sparql.md","Admin.Graphs.Query");}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Lab</p>
-        <ul>
-            <li>{{MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab.GraphViz"]);}}</li>
-            <li>{{MenuItem("Markdown","/MarkdownLab/MarkdownLab.md",["Admin.Lab.Script","Admin.Lab.Markdown"]);}}</li>
-            <li>{{MenuItem("PlantUML","/PlantUmlLab/PlantUmlLab.md",["Admin.Lab.Script","Admin.Lab.PlantUml"]);}}</li>
-            <li>{{MenuItem("Script","/Prompt.md","Admin.Lab.Script");}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Legal</p>
-        <ul>
-            <li>{{MenuItem("Legal Identity","/Settings/LegalIdentity.md","Admin.Legal.ID");}}</li>
-            <li>{{MenuItem("Personal Data","/Settings/PersonalData.md","Admin.Legal.PersonalData");}}</li>
-            <li>{{MenuItem("Propose Contract","/ProposeContract.md","Admin.Legal.ProposeContract");}}</li>
-            <li>{{MenuItem("Signature Requests","/SignatureRequests.md","Admin.Legal.SignatureRequests");}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Presentation</p>
-        <ul>
-            <li>{{MenuItem("favicon.ico","/Settings/EditFavIcon.md","Admin.Presentation.Edit.FavIconIco");}}</li>
-            <li>{{MenuItem("Theme","/Settings/Theme.md","Admin.Presentation.Theme");}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Security</p>
-        <ul>
-            <li>{{MenuItem("robots.txt","/Settings/EditRobots.md","Admin.Security.Edit.RobotsTxt");}}</li>
-            <li>{{MenuItem("Roles","/Settings/Roles.md","Admin.Security.Roles");}}</li>
-            <li>{{MenuItem("Users","/Settings/Users.md","Admin.Security.Users");}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Session</p>
-        <ul>
-            <li>{{MenuItem("Change Password","/Settings/ChangePassword.md","");}}</li>
-            <li>{{MenuItem("Logout","/Logout","");}}</li>
-        </ul>
-    </li>
-    <li>
-        <p>Software</p>
-        <ul>
-{{
-foreach Module in Waher.Runtime.Inventory.Types.Modules do
-(
-if Module is Waher.IoTGateway.IConfigurableModule then
-(
-foreach ConfigurablePage in Module.GetConfigurablePages() do 
-MenuItem2(ConfigurablePage.Title,ConfigurablePage.ConfigurationPage,ConfigurablePage.Privileges)
-)
+foreach Module in Waher.Runtime.Inventory.Types.Modules do (
+    if Module is Waher.IoTGateway.IConfigurableModule then
+    (
+        foreach ConfigurablePage in Module.GetConfigurablePages() do 
+            Categories[Count(Categories) - 1].items := PushLast({
+                label: ConfigurablePage.Title,
+                page: ConfigurablePage.ConfigurationPage,
+                privilage: ConfigurablePage.Privileges ?? ""
+            }, Categories[Count(Categories) - 1].items);
+    )
 );
 }}
-        </ul>
-    </li>
-</ul>
+![Admin](/AdminDropdownComponent.md)

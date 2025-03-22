@@ -155,6 +155,7 @@
 		<Content fileName="Admin.cssx"/>
 		<Content fileName="Admin.md"/>
 		<Content fileName="AdminDropdown.md"/>
+		<Content fileName="AdminDropdownComponent.md"/>
 		<Content fileName="AlertPopup.md"/>
 		<Content fileName="ConfirmPopup.md"/>
 		<Content fileName="Emojis.md"/>

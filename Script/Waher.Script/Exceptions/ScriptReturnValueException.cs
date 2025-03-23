@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.ExceptionServices;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Exceptions

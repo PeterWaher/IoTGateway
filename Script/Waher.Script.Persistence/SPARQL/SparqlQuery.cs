@@ -619,9 +619,20 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 			catch (ScriptReturnValueException ex)
 			{
-				object ReturnValue = ex.ReturnValue.AssociatedObjectValue;
-				ScriptReturnValueException.Reuse(ex);
-				return ReturnValue;
+				return ex.ReturnValue.AssociatedObjectValue;
+				//object ReturnValue = ex.ReturnValue.AssociatedObjectValue;
+				//ScriptReturnValueException.Reuse(ex);
+				//return ReturnValue;
+			}
+			catch (ScriptBreakLoopException ex)
+			{
+				return ex.LoopValue?.AssociatedObjectValue;
+				//ScriptBreakLoopException.Reuse(ex);
+			}
+			catch (ScriptContinueLoopException ex)
+			{
+				return ex.LoopValue?.AssociatedObjectValue;
+				//ScriptContinueLoopException.Reuse(ex);
 			}
 			catch (Exception)
 			{
@@ -638,9 +649,20 @@ namespace Waher.Script.Persistence.SPARQL
 			}
 			catch (ScriptReturnValueException ex)
 			{
-				object ReturnValue = ex.ReturnValue.AssociatedObjectValue;
-				ScriptReturnValueException.Reuse(ex);
-				return ReturnValue;
+				return ex.ReturnValue.AssociatedObjectValue;
+				//object ReturnValue = ex.ReturnValue.AssociatedObjectValue;
+				//ScriptReturnValueException.Reuse(ex);
+				//return ReturnValue;
+			}
+			catch (ScriptBreakLoopException ex)
+			{
+				return ex.LoopValue?.AssociatedObjectValue;
+				//ScriptBreakLoopException.Reuse(ex);
+			}
+			catch (ScriptContinueLoopException ex)
+			{
+				return ex.LoopValue?.AssociatedObjectValue;
+				//ScriptContinueLoopException.Reuse(ex);
 			}
 			catch (Exception ex)
 			{

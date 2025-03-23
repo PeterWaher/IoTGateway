@@ -77,7 +77,7 @@ namespace Waher.Script.Operators.Vectors
 					if (ex.HasLoopValue)
 						Elements2.AddLast(ex.LoopValue);
 
-					ScriptBreakLoopException.Reuse(ex);
+					//ScriptBreakLoopException.Reuse(ex);
 					break;
 				}
 				catch (ScriptContinueLoopException ex)
@@ -85,7 +85,7 @@ namespace Waher.Script.Operators.Vectors
                     if (ex.HasLoopValue)
 						Elements2.AddLast(ex.LoopValue);
 
-					ScriptContinueLoopException.Reuse(ex);
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 			}
 
@@ -139,7 +139,7 @@ namespace Waher.Script.Operators.Vectors
 					if (ex.HasLoopValue)
 						Elements2.AddLast(ex.LoopValue);
 
-					ScriptBreakLoopException.Reuse(ex);
+					//ScriptBreakLoopException.Reuse(ex);
 					break;
 				}
 				catch (ScriptContinueLoopException ex)
@@ -147,7 +147,7 @@ namespace Waher.Script.Operators.Vectors
 					if (ex.HasLoopValue)
 						Elements2.AddLast(ex.LoopValue);
 
-					ScriptContinueLoopException.Reuse(ex);
+					//ScriptContinueLoopException.Reuse(ex);
 					continue;
 				}
             }

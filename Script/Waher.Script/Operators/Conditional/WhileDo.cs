@@ -49,7 +49,7 @@ namespace Waher.Script.Operators.Conditional
 					if (ex.HasLoopValue)
 						Last = ex.LoopValue;
 
-					ScriptBreakLoopException.Reuse(ex);
+					//ScriptBreakLoopException.Reuse(ex);
 					break;
 				}
 				catch (ScriptContinueLoopException ex)
@@ -57,7 +57,7 @@ namespace Waher.Script.Operators.Conditional
 					if (ex.HasLoopValue)
 						Last = ex.LoopValue;
 				
-					ScriptContinueLoopException.Reuse(ex);
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 
 				Condition = this.left.Evaluate(Variables) as BooleanValue;
@@ -96,7 +96,7 @@ namespace Waher.Script.Operators.Conditional
 					if (ex.HasLoopValue)
 						Last = ex.LoopValue;
 
-					ScriptBreakLoopException.Reuse(ex);
+					//ScriptBreakLoopException.Reuse(ex);
 					break;
 				}
 				catch (ScriptContinueLoopException ex)
@@ -104,7 +104,7 @@ namespace Waher.Script.Operators.Conditional
 					if (ex.HasLoopValue)
 						Last = ex.LoopValue;
 				
-					ScriptContinueLoopException.Reuse(ex);
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 
 				Condition = await this.left.EvaluateAsync(Variables) as BooleanValue;

@@ -55,7 +55,7 @@ namespace Waher.Script.Functions.Runtime
 				return base.Evaluate(Variables);
 			else
 			{
-				ScriptContinueLoopException.TryThrowReused();
+				//ScriptContinueLoopException.TryThrowReused();
 				throw new ScriptContinueLoopException();
 			}
 		}
@@ -71,7 +71,7 @@ namespace Waher.Script.Functions.Runtime
 				return base.EvaluateAsync(Variables);
 			else
 			{
-				ScriptContinueLoopException.TryThrowReused();
+				//ScriptContinueLoopException.TryThrowReused();
 				throw new ScriptContinueLoopException();
 			}
 		}
@@ -84,7 +84,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			ScriptContinueLoopException.TryThrowReused(Argument);
+			//ScriptContinueLoopException.TryThrowReused(Argument);
 			throw new ScriptContinueLoopException(Argument);
 		}
 	}

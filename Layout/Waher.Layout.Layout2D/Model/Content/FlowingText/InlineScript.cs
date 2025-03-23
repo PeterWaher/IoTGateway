@@ -1,5 +1,4 @@
-﻿using SkiaSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
@@ -7,6 +6,7 @@ using Waher.Events;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Script;
 using Waher.Script.Exceptions;
+using Waher.Script.Objects;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -104,7 +104,17 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				catch (ScriptReturnValueException ex)
 				{
 					Result = ex.ReturnValue;
-					ScriptReturnValueException.Reuse(ex);
+					//ScriptReturnValueException.Reuse(ex);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					Result = ex.LoopValue ?? ObjectValue.Null;
+					//ScriptBreakLoopException.Reuse(ex);
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					Result = ex.LoopValue ?? ObjectValue.Null;
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 				catch (ScriptAbortedException)
 				{

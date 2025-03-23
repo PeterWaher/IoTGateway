@@ -11,6 +11,7 @@ using Waher.Script.Operators.Vectors;
 using Waher.Script.Operators.Matrices;
 using Waher.Script.Operators.Sets;
 using System.Threading.Tasks;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators
 {
@@ -166,9 +167,20 @@ namespace Waher.Script.Operators
 					}
 					catch (ScriptReturnValueException ex)
 					{
-						IElement ReturnValue = ex.ReturnValue;
-						ScriptReturnValueException.Reuse(ex);
-						return ReturnValue;
+						return ex.ReturnValue;
+						//IElement ReturnValue = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+						//return ReturnValue;
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
 					}
 				}
 				else
@@ -210,9 +222,20 @@ namespace Waher.Script.Operators
 					}
 					catch (ScriptReturnValueException ex)
 					{
-						IElement Returnvalue = ex.ReturnValue;
-						ScriptReturnValueException.Reuse(ex);
-						return Returnvalue;
+						return ex.ReturnValue;
+						//IElement Returnvalue = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+						//return Returnvalue;
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						return ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
 					}
 				}
 				else
@@ -261,9 +284,20 @@ namespace Waher.Script.Operators
 				}
 				catch (ScriptReturnValueException ex)
 				{
-					IElement Returnvalue = ex.ReturnValue;
-					ScriptReturnValueException.Reuse(ex);
-					return Returnvalue;
+					return ex.ReturnValue;
+					//IElement Returnvalue = ex.ReturnValue;
+					//ScriptReturnValueException.Reuse(ex);
+					//return Returnvalue;
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					return ex.LoopValue ?? ObjectValue.Null;
+					//ScriptBreakLoopException.Reuse(ex);
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					return ex.LoopValue ?? ObjectValue.Null;
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 			}
 		}
@@ -305,9 +339,20 @@ namespace Waher.Script.Operators
 				}
 				catch (ScriptReturnValueException ex)
 				{
-					IElement Returnvalue = ex.ReturnValue;
-					ScriptReturnValueException.Reuse(ex);
-					return Returnvalue;
+					return ex.ReturnValue;
+					//IElement Returnvalue = ex.ReturnValue;
+					//ScriptReturnValueException.Reuse(ex);
+					//return Returnvalue;
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					return ex.LoopValue ?? ObjectValue.Null;
+					//ScriptBreakLoopException.Reuse(ex);
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					return ex.LoopValue ?? ObjectValue.Null;
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 			}
 		}

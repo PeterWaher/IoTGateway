@@ -2,6 +2,7 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Functions.Strings
 {
@@ -65,10 +66,21 @@ namespace Waher.Script.Functions.Strings
             }
             catch (ScriptReturnValueException ex)
             {
-                IElement ReturnValue = ex.ReturnValue;
-				ScriptReturnValueException.Reuse(ex);
-                return ReturnValue;
+                return ex.ReturnValue;
+                //IElement ReturnValue = ex.ReturnValue;
+				//ScriptReturnValueException.Reuse(ex);
+                //return ReturnValue;
+			}
+			catch (ScriptBreakLoopException ex)
+			{
+				return ex.LoopValue ?? ObjectValue.Null;
+				//ScriptBreakLoopException.Reuse(ex);
+			}
+			catch (ScriptContinueLoopException ex)
+			{
+				return ex.LoopValue ?? ObjectValue.Null;
+				//ScriptContinueLoopException.Reuse(ex);
 			}
 		}
-    }
+	}
 }

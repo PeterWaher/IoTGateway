@@ -34,7 +34,7 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            ScriptReturnValueException.TryThrowReused(Argument);
+            //ScriptReturnValueException.TryThrowReused(Argument);
 			throw new ScriptReturnValueException(Argument);
         }
     }

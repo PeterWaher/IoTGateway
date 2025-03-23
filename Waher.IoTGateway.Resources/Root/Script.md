@@ -199,6 +199,17 @@ statements between braces. Examples:
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
+**Note 2**: You can use the `Break([x])` function to break out of a loop, and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last value of the loop. If a value is provided to the `Continue` function,
+the value will be considered the value of the current iteration of the loop. If no value is 
+provided, the iteration will not produce a value.
+
+**Note 3**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
+
 ##### Implicit vector notation
 
 Vectors can also be defined implicitly using an implicit vector notation:
@@ -238,6 +249,17 @@ statements between braces. Examples:
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
+**Note 2**: You can use the `Break([x])` function to break out of a loop, and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last row of the loop. If a value is provided to the `Continue` function,
+the value will be considered the row of the current iteration of the loop. If no value is provided, 
+the iteration will not produce a row.
+
+**Note 3**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
+
 ##### Implicit matrix notation
 
 Matrices can also be defined implicitly using implicit vector notation, where the `Expression` evaluates to row vectors. Example:
@@ -267,6 +289,17 @@ statements between braces. Examples:
 	S:={FOR EACH x IN 1..10|0.1 : x^2};
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+
+**Note 2**: You can use the `Break([x])` function to break out of a loop, and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last value of the loop. If a value is provided to the `Continue` function,
+the value will be considered the value of the current iteration of the loop. If no value is 
+provided, the iteration will not produce a value.
+
+**Note 3**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
 
 ##### Implicit set notation
 
@@ -827,6 +860,18 @@ if the loop is ascending or descending.
 
 **Note 3**: Exceptions caught using the `CATCH` statement are accessible within the `CATCH` statement by referencing the variable `Exception`.
 
+**Note 4**: You can use the `Break([x])` function to break out of a loop (`DO` ... `WHILE`, 
+`WHILE` ... `DO`, `FOREACH`, `FOR EACH`, and `FOR`), and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last value of the loop. If a value is provided to the `Continue` function,
+the value will be considered the value of the current iteration of the loop. The last value
+produced will be the value returned from the loop statement.
+
+**Note 5**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
+
 ### Lists
 
 Lists of statements are created by writing a list of statements or arguments, each separated by a comma `,` character. Example:
@@ -1154,6 +1199,8 @@ The following functions are useful to control the runtime execution of the scrip
 
 | Function                      | Description                                                                                                                                                                                                                                | In Pattern Matching                                    | Example |
 |-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|---------|
+| `Break([x])`                  | Breaks the current loop. If a value is included as an argument, it is taken as the final value of the loop.                                                                                                                                |                                                        | `break(Result)` |
+| `Continue([x])`               | Skips the rest of the content evaluation and continues to the condition statement of the loop. If a value is included as an argument, it is taken as the final value of the current iteration, otherwise the interation lacks a value.     |                                                        | `continue(Result)` |
 | `Create(Type[,ArgList])`      | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments.                                                    |                                                        | `Create(System.String,'-',80)` |
 | `CreateType(Type[,TypeList])` | Creates a concrete type from a generic type `Type` together with a list of types in `TypeList` forming the basis for the concretization of the generic type.                                                                               |                                                        | `CreateType(System.Array,System.Byte)` |
 | `Delete(x)`                   | Alias for `Destroy(x)`.                                                                                                                                                                                                                    |                                                        | `Delete(x)` |

@@ -234,5 +234,113 @@ namespace Waher.Script.Test
 				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, true, null });
 		}
 
+		[TestMethod]
+		public async Task Test_18_XML_11()
+		{
+			string s = "Xml:=<Person name='Kalle' age='50'>\r\n" +
+				"\t<Profession>Bus Driver</Profession>\r\n" +
+				"\t<EmployedSince>2010-01-02</EmployedSince>\r\n" +
+			"</Person>;";
+
+			s += "<Person name=Required(Str(Name)) *>\r\n" +
+				"\t<*>\r\n" +
+				"\t<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>\r\n" +
+				"\t<*>\r\n" +
+			"</Person>:=Xml;[Name,EmployedSince]";
+
+			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
+		[TestMethod]
+		public async Task Test_19_XML_12()
+		{
+			string s = "Xml:=<Person name='Kalle' age='50'>\r\n" +
+				"\t<Profession>Bus Driver</Profession>\r\n" +
+				"\t<EmployedSince>2010-01-02</EmployedSince>\r\n" +
+			"</Person>;";
+
+			s += "<Person name=Required(Str(Name)) * *>\r\n" +
+				"\t<*>\r\n" +
+				"\t<*>\r\n" +
+				"\t<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>\r\n" +
+				"\t<*>\r\n" +
+				"\t<*>\r\n" +
+			"</Person>:=Xml;[Name,EmployedSince]";
+
+			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
+		[TestMethod]
+		public async Task Test_20_XML_13()
+		{
+			string s = "Xml:=<Person name='Kalle' age='50'>" +
+				"<Profession>Bus Driver</Profession>" +
+				"<EmployedSince>2010-01-02</EmployedSince>" +
+			"</Person>;";
+
+			s += "<Person name=Required(Str(Name)) *>\r\n" +
+				"\t<*>\r\n" +
+				"\t<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>\r\n" +
+				"\t<*>\r\n" +
+			"</Person>:=Xml;[Name,EmployedSince]";
+
+			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
+		[TestMethod]
+		public async Task Test_21_XML_14()
+		{
+			string s = "Xml:=<Person name='Kalle' age='50'>" +
+				"<Profession>Bus Driver</Profession>" +
+				"<EmployedSince>2010-01-02</EmployedSince>" +
+			"</Person>;";
+
+			s += "<Person name=Required(Str(Name)) * *>\r\n" +
+				"\t<*>\r\n" +
+				"\t<*>\r\n" +
+				"\t<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>\r\n" +
+				"\t<*>\r\n" +
+				"\t<*>\r\n" +
+			"</Person>:=Xml;[Name,EmployedSince]";
+
+			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
+		[TestMethod]
+		public async Task Test_22_XML_15()
+		{
+			string s = "Xml:=<Person name='Kalle' age='50'>\r\n" +
+				"\t<Profession>Bus Driver</Profession>\r\n" +
+				"\t<EmployedSince>2010-01-02</EmployedSince>\r\n" +
+			"</Person>;";
+
+			s += "<Person name=Required(Str(Name)) *>" +
+				"<*>" +
+				"<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>" +
+				"<*>" +
+			"</Person>:=Xml;[Name,EmployedSince]";
+
+			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
+		[TestMethod]
+		public async Task Test_23_XML_16()
+		{
+			string s = "Xml:=<Person name='Kalle' age='50'>\r\n" +
+				"\t<Profession>Bus Driver</Profession>\r\n" +
+				"\t<EmployedSince>2010-01-02</EmployedSince>\r\n" +
+			"</Person>;";
+
+			s += "<Person name=Required(Str(Name)) * *>" +
+				"<*>" +
+				"<*>" +
+				"<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>" +
+				"<*>" +
+				"<*>" +
+			"</Person>:=Xml;[Name,EmployedSince]";
+
+			await ScriptEvaluationTests.Test(s, new object[] { "Kalle", new DateTime(2010, 1, 2) });
+		}
+
 	}
 }

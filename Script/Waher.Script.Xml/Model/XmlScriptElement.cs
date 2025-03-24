@@ -413,6 +413,9 @@ namespace Waher.Script.Xml.Model
 				{
 					foreach (XmlScriptNode N2 in this.children)
 					{
+						if (N2.IsWhitespace)
+							continue;
+
 						do
 						{
 							Again = false;
@@ -421,43 +424,53 @@ namespace Waher.Script.Xml.Model
 							{
 								if (N2.IsApplicable(N, null))
 								{
-									if (N2.IsVector && N is XmlElement E2)
+									if (N2.IsVector)
 									{
-										List<XmlElement> Elements = new List<XmlElement>() { E2 };
-
-										while (true)
+										if (N is XmlElement E2)
 										{
-											N = N.NextSibling;
-											if (N is null)
-												break;
-											else if (N is XmlElement E3)
+											List<XmlElement> Elements = new List<XmlElement>() { E2 };
+
+											while (true)
 											{
-												if (N2.IsApplicable(N, E2))
-													Elements.Add(E3);
+												N = N.NextSibling;
+												if (N is null)
+													break;
+												else if (N is XmlElement E3)
+												{
+													if (N2.IsApplicable(N, E2))
+														Elements.Add(E3);
+													else
+														break;
+												}
+												else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
+													N is XmlComment)
+												{
+													continue;
+												}
 												else
 													break;
 											}
-											else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
-												N is XmlComment)
-											{
-												continue;
-											}
-											else
-												break;
-										}
 
-										Result = N2.PatternMatch(new ObjectVector(Elements.ToArray()), AlreadyFound);
+											Result = N2.PatternMatch(new ObjectVector(Elements.ToArray()), AlreadyFound);
+										}
+										else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
+											N is XmlComment)
+										{
+											N = N.NextSibling;
+											Again = true;
+											continue;
+										}
+										else
+										{
+											Result = N2.PatternMatch(N, AlreadyFound);
+											N = N.NextSibling;
+										}
 									}
 									else
 									{
 										Result = N2.PatternMatch(N, AlreadyFound);
 										N = N.NextSibling;
 									}
-								}
-								else if ((N2 is XmlScriptText Text && string.IsNullOrWhiteSpace(Text.Text)) ||
-									N2 is XmlScriptComment)
-								{
-									Result = PatternMatchResult.Match;
 								}
 								else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
 									N is XmlComment)

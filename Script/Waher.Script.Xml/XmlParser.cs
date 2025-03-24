@@ -137,7 +137,7 @@ namespace Waher.Script.Xml
 
 							Parser.SkipChars(Len);
 
-							if (!(LastWildCard is null))
+							if (!(LastWildCard is null) && !NewChild.IsWhitespace)
 							{
 								LastWildCard.Next = NewChild;
 								LastWildCard = null;
@@ -242,7 +242,7 @@ namespace Waher.Script.Xml
 								break;
 						}
 
-						if (!(LastWildCard is null) && !(NewChild is null))
+						if (!(LastWildCard is null) && !(NewChild is null) && !NewChild.IsWhitespace)
 						{
 							LastWildCard.Next = NewChild;
 							LastWildCard = null;

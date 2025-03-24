@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -25,6 +24,11 @@ namespace Waher.Script.Xml.Model
 		{
 			this.text = Text;
 		}
+
+		/// <summary>
+		/// If the node represents whitespace.
+		/// </summary>
+		public override bool IsWhitespace => true;
 
 		/// <summary>
 		/// Builds an XML Document object

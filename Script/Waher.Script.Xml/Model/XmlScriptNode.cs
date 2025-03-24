@@ -133,5 +133,10 @@ namespace Waher.Script.Xml.Model
 		{
 			get => false;
 		}
+
+		/// <summary>
+		/// If the node represents whitespace.
+		/// </summary>
+		public virtual bool IsWhitespace => false;
 	}
 }

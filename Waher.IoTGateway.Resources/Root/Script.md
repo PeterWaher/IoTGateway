@@ -3497,29 +3497,33 @@ or attributes not listed in the pattern. An attribute wildcard is defined as `*`
 elements not listed in the pattern. An element wildcard is defined as `<*>`. Consider the following pattern matching script, that evaluates
 successfully and extracts mentioned components:
 
-	<Person name=Required(Str(Name)) age=Optional(Int(Age))>
-		<Profession><[Optional(Str(Profession))]></Profession>
-		<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>
-	</Person>
-	:=
-	<Person name="Kalle" age="50">
-		<Profession>Bus Driver</Profession>
-		<EmployedSince>2010-01-02</EmployedSince>
-	</Person>;
+```
+<Person name=Required(Str(Name)) age=Optional(Int(Age))>
+	<Profession><[Optional(Str(Profession))]></Profession>
+	<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>
+</Person>
+:=
+<Person name="Kalle" age="50">
+	<Profession>Bus Driver</Profession>
+	<EmployedSince>2010-01-02</EmployedSince>
+</Person>;
+```
 
 But if you are only interested in the name and the date when the person was employed, you can use wildcards to ignore the other elements 
 and attributes:
 
-	<Person name=Required(Str(Name)) *>
-		<*>
-		<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>
-		<*>
-	</Person>
-	:=
-	<Person name="Kalle" age="50">
-		<Profession>Bus Driver</Profession>
-		<EmployedSince>2010-01-02</EmployedSince>
-	</Person>;
+```
+<Person name=Required(Str(Name)) *>
+	<*>
+	<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>
+	<*>
+</Person>
+:=
+<Person name="Kalle" age="50">
+	<Profession>Bus Driver</Profession>
+	<EmployedSince>2010-01-02</EmployedSince>
+</Person>;
+```
 
 =========================================================================================================================================================
 

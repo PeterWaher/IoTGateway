@@ -1,4 +1,5 @@
-﻿using Waher.Script.Abstraction.Elements;
+﻿using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -10,7 +11,7 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Max(v)
     /// </summary>
-    public class Max : FunctionOneVectorVariable
+    public class Max : FunctionOneVectorVariable, IIterativeEvaluator
     {
         /// <summary>
         /// Max(v)
@@ -145,5 +146,58 @@ namespace Waher.Script.Functions.Vectors
                 return Result;
         }
 
-    }
+		#region IIterativeEvalautor
+
+		private IElement max = null;
+        private IOrderedSet maxSet = null;
+
+		/// <summary>
+		/// If the evaluator can perform the computation iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates a new instance of the iterative evaluator.
+		/// </summary>
+		/// <returns>Reference to new instance.</returns>
+		public IIterativeEvaluator CreateNewEvaluator()
+		{
+			return new Max(this.Argument, this.Start, this.Length, this.Expression);
+		}
+
+		/// <summary>
+		/// Restarts the evaluator.
+		/// </summary>
+		public void RestartEvaluator()
+		{
+			this.max = null;
+		}
+
+		/// <summary>
+		/// Aggregates one new element.
+		/// </summary>
+		/// <param name="Element">Element.</param>
+		public void AggregateElement(IElement Element)
+		{
+            if (this.max is null || this.maxSet.Compare(this.max, Element) < 0)
+            {
+				if (!(Element.AssociatedSet is IOrderedSet S))
+					throw new ScriptRuntimeException("Cannot compare operands.", this);
+
+				this.max = Element;
+                this.maxSet = S;
+            }
+		}
+
+		/// <summary>
+		/// Gets the aggregated result.
+		/// </summary>
+		public IElement GetAggregatedResult()
+		{
+            return this.max ?? ObjectValue.Null;
+		}
+
+		#endregion
+
+	}
 }

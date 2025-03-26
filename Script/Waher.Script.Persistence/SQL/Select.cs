@@ -275,6 +275,8 @@ namespace Waher.Script.Persistence.SQL
 			else
 				c = 0;
 
+			ScriptNode Having = this.having;
+
 			if (this.groupBy is null)
 			{
 				e = await Source.Find(Offset, Top, this.generic, this.where, Variables, OrderBy.ToArray(), this);
@@ -284,14 +286,15 @@ namespace Waher.Script.Persistence.SQL
 			else
 			{
 				e = await Source.Find(0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
-				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames);
+				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames,
+					AdditionalFields, ref Having);
 			}
 
 			if (!(AdditionalFields is null))
 				e = new FieldAggregatorEnumerator(e, Variables, AdditionalFields?.ToArray());
 
-			if (!(this.having is null))
-				e = new ConditionalEnumerator(e, Variables, this.having);
+			if (!(Having is null))
+				e = new ConditionalEnumerator(e, Variables, Having);
 
 			if (CalculatedOrder)
 			{

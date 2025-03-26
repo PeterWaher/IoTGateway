@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Functions.Vectors
 {
     /// <summary>
     /// Sum(v)
     /// </summary>
-    public class Sum : FunctionOneVectorVariable
+    public class Sum : FunctionOneVectorVariable, IIterativeEvaluator
     {
         /// <summary>
         /// Sum(v)
@@ -152,5 +154,56 @@ namespace Waher.Script.Functions.Vectors
                 return Result;
         }
 
-    }
+		#region IIterativeEvalautor
+
+		private IElement sum = null;
+
+		/// <summary>
+		/// If the evaluator can perform the computation iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates a new instance of the iterative evaluator.
+		/// </summary>
+		/// <returns>Reference to new instance.</returns>
+		public IIterativeEvaluator CreateNewEvaluator()
+		{
+			return new Sum(this.Argument, this.Start, this.Length, this.Expression);
+		}
+
+		/// <summary>
+		/// Restarts the evaluator.
+		/// </summary>
+		public void RestartEvaluator()
+		{
+			this.sum = null;
+		}
+
+		/// <summary>
+		/// Aggregates one new element.
+		/// </summary>
+		/// <param name="Element">Element.</param>
+		public void AggregateElement(IElement Element)
+		{
+			if (this.sum is null)
+				this.sum = Element;
+			else
+				this.sum = Add.EvaluateAddition(this.sum, Element, this);
+		}
+
+		/// <summary>
+		/// Gets the aggregated result.
+		/// </summary>
+		public IElement GetAggregatedResult()
+		{
+			if (this.sum is null)
+				return ObjectValue.Null;
+			else 
+				return this.sum;
+		}
+
+		#endregion
+
+	}
 }

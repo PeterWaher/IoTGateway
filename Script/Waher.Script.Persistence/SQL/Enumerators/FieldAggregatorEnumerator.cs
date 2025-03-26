@@ -25,7 +25,8 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         /// <param name="ItemEnumerator">Item enumerator</param>
         /// <param name="Variables">Current set of variables</param>
         /// <param name="AdditionalFields">Fields to add to enumerated items.</param>
-        public FieldAggregatorEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, KeyValuePair<string, ScriptNode>[] AdditionalFields)
+        public FieldAggregatorEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, 
+            KeyValuePair<string, ScriptNode>[] AdditionalFields)
         {
 			this.e = ItemEnumerator;
 			this.variables = Variables;

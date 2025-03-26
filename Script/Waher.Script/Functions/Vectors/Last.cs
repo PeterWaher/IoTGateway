@@ -1,4 +1,5 @@
-﻿using Waher.Script.Abstraction.Elements;
+﻿using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -7,7 +8,7 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Last(v)
     /// </summary>
-    public class Last : FunctionOneVectorVariable
+    public class Last : FunctionOneVectorVariable, IIterativeEvaluator
     {
         /// <summary>
         /// Last(v)
@@ -52,5 +53,50 @@ namespace Waher.Script.Functions.Vectors
                 return Argument.GetElement(c - 1);
         }
 
-    }
+		#region IIterativeEvaluator
+
+		private IElement last = null;
+
+		/// <summary>
+		/// If the evaluator can perform the computation iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates a new instance of the iterative evaluator.
+		/// </summary>
+		/// <returns>Reference to new instance.</returns>
+		public IIterativeEvaluator CreateNewEvaluator()
+		{
+			return new Last(this.Argument, this.Start, this.Length, this.Expression);
+		}
+
+		/// <summary>
+		/// Restarts the evaluator.
+		/// </summary>
+		public void RestartEvaluator()
+		{
+			this.last = null;
+		}
+
+		/// <summary>
+		/// Aggregates one new element.
+		/// </summary>
+		/// <param name="Element">Element.</param>
+		public void AggregateElement(IElement Element)
+		{
+			this.last = Element;
+		}
+
+		/// <summary>
+		/// Gets the aggregated result.
+		/// </summary>
+		public IElement GetAggregatedResult()
+		{
+			return this.last ?? ObjectValue.Null;
+		}
+
+		#endregion
+
+	}
 }

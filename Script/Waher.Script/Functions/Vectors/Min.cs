@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -11,7 +10,7 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Min(v)
 	/// </summary>
-	public class Min : FunctionOneVectorVariable, IIterativeEvaluator
+	public class Min : FunctionOneVectorVariable, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Min(v)
@@ -146,58 +145,19 @@ namespace Waher.Script.Functions.Vectors
 				return Result;
 		}
 
-		#region IIterativeEvalautor
-
-		private IElement min = null;
-		private IOrderedSet minSet = null;
+		#region IIterativeEvalaution
 
 		/// <summary>
-		/// If the evaluator can perform the computation iteratively.
+		/// If the node can be evaluated iteratively.
 		/// </summary>
 		public bool CanEvaluateIteratively => true;
 
 		/// <summary>
-		/// Creates a new instance of the iterative evaluator.
+		/// Creates an iterative evaluator for the node.
 		/// </summary>
-		/// <returns>Reference to new instance.</returns>
-		public IIterativeEvaluator CreateNewEvaluator()
-		{
-			return new Min(this.Argument, this.Start, this.Length, this.Expression);
-		}
-
-		/// <summary>
-		/// Restarts the evaluator.
-		/// </summary>
-		public void RestartEvaluator()
-		{
-			this.min = null;
-		}
-
-		/// <summary>
-		/// Aggregates one new element.
-		/// </summary>
-		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
-		{
-			if (this.min is null || this.minSet.Compare(this.min, Element) > 0)
-			{
-				if (!(Element.AssociatedSet is IOrderedSet S))
-					throw new ScriptRuntimeException("Cannot compare operands.", this);
-
-				this.min = Element;
-				this.minSet = S;
-			}
-		}
-
-		/// <summary>
-		/// Gets the aggregated result.
-		/// </summary>
-		public IElement GetAggregatedResult()
-		{
-			return this.min ?? ObjectValue.Null;
-		}
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new MinEvaluator(this);
 
 		#endregion
-
 	}
 }

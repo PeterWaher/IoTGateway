@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -10,7 +9,7 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Count(v)
 	/// </summary>
-	public class Count : FunctionMultiVariate, IIterativeEvaluator
+	public class Count : FunctionMultiVariate, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Count(v)
@@ -100,49 +99,19 @@ namespace Waher.Script.Functions.Vectors
 			return new DoubleNumber(Count);
 		}
 
-		#region IIterativeEvaluator
-
-		private long count = 0;
+		#region IIterativeEvaluation
 
 		/// <summary>
-		/// If the evaluator can perform the computation iteratively.
+		/// If the node can be evaluated iteratively.
 		/// </summary>
 		public bool CanEvaluateIteratively => this.Arguments.Length == 1;
 
 		/// <summary>
-		/// Creates a new instance of the iterative evaluator.
+		/// Creates an iterative evaluator for the node.
 		/// </summary>
-		/// <returns>Reference to new instance.</returns>
-		public IIterativeEvaluator CreateNewEvaluator()
-		{
-			return new Count(this.Arguments[0], this.Start, this.Length, this.Expression);
-		}
-
-		/// <summary>
-		/// Restarts the evaluator.
-		/// </summary>
-		public void RestartEvaluator()
-		{
-			this.count = 0;
-		}
-
-		/// <summary>
-		/// Aggregates one new element.
-		/// </summary>
-		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
-		{
-			this.count++;
-		}
-
-		/// <summary>
-		/// Gets the aggregated result.
-		/// </summary>
-		public IElement GetAggregatedResult()
-		{
-			return new DoubleNumber(this.count);
-		}
-
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new CountEvaluator();
+		
 		#endregion
 
 	}

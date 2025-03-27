@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -12,7 +11,7 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Average(v), Avg(v)
 	/// </summary>
-	public class Average : FunctionOneVectorVariable, IIterativeEvaluator
+	public class Average : FunctionOneVectorVariable, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Average(v), Avg(v)
@@ -133,68 +132,22 @@ namespace Waher.Script.Functions.Vectors
 				if (Result is IRingElement RE && !((Avg = RE.MultiplyRight(new DoubleNumber(1.0 / n))) is null))
 					return Avg;
 				else
-					return Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(n), Node);
+					return Divide.EvaluateDivision(Result, new DoubleNumber(n), Node);
 			}
 		}
 
-		#region IIterativeEvalautor
-
-		private IElement sum = null;
-		private long count = 0;
+		#region IIterativeEvaluation
 
 		/// <summary>
-		/// If the evaluator can perform the computation iteratively.
+		/// If the node can be evaluated iteratively.
 		/// </summary>
 		public bool CanEvaluateIteratively => true;
 
 		/// <summary>
-		/// Creates a new instance of the iterative evaluator.
+		/// Creates an iterative evaluator for the node.
 		/// </summary>
-		/// <returns>Reference to new instance.</returns>
-		public IIterativeEvaluator CreateNewEvaluator()
-		{
-			return new Average(this.Argument, this.Start, this.Length, this.Expression);
-		}
-
-		/// <summary>
-		/// Restarts the evaluator.
-		/// </summary>
-		public void RestartEvaluator()
-		{
-			this.sum = null;
-			this.count = 0;
-		}
-
-		/// <summary>
-		/// Aggregates one new element.
-		/// </summary>
-		/// <param name="Element">Element.</param>
-		public void AggregateElement(IElement Element)
-		{
-			if (this.sum is null)
-			{
-				this.sum = Element;
-				this.count = 1;
-			}
-			else
-			{
-				this.sum = Add.EvaluateAddition(this.sum, Element, this);
-				this.count++;
-			}
-		}
-
-		/// <summary>
-		/// Gets the aggregated result.
-		/// </summary>
-		public IElement GetAggregatedResult()
-		{
-			if (this.sum is null)
-				return ObjectValue.Null;
-			else if (this.count == 1)
-				return this.sum;
-			else
-				return Divide.EvaluateDivision(this.sum, new DoubleNumber(this.count), this);
-		}
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new AverageEvaluator(this);
 
 		#endregion
 

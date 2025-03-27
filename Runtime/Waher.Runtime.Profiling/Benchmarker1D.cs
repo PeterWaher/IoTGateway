@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace Waher.Runtime.Profiling
 {
@@ -8,8 +10,7 @@ namespace Waher.Runtime.Profiling
 	/// </summary>
 	public class Benchmarker1D : IBenchmarker
 	{
-		private readonly SortedDictionary<string, bool> tests = new SortedDictionary<string, bool>();
-		private readonly Dictionary<string, long> ticks = new Dictionary<string, long>();
+		private readonly SortedDictionary<string, long> tests = new SortedDictionary<string, long>();
 		private readonly object syncObject = new object();
 		private readonly Stopwatch watch;
 
@@ -31,11 +32,16 @@ namespace Waher.Runtime.Profiling
 			{
 				lock (this.syncObject)
 				{
-					string[] Result = new string[this.tests.Count];
-					this.tests.Keys.CopyTo(Result, 0);
-					return Result;
+					return this.GetTestsLocked();
 				}
 			}
+		}
+
+		private string[] GetTestsLocked()
+		{
+			string[] Result = new string[this.tests.Count];
+			this.tests.Keys.CopyTo(Result, 0);
+			return Result;
 		}
 
 		/// <summary>
@@ -72,22 +78,91 @@ namespace Waher.Runtime.Profiling
 		{
 			lock (this.syncObject)
 			{
-				double?[] Result = new double?[this.tests.Count];
-				int i;
-
-				i = 0;
-				foreach (string Name in this.tests.Keys)
-				{
-					if (this.ticks.TryGetValue(Name, out long Ticks))
-						Result[i] = Ticks * Scale;
-					else
-						Result[i] = null;
-
-					i++;
-				}
-
-				return Result;
+				return this.GetScaledTicksLocked(Scale);
 			}
+		}
+
+		private double?[] GetScaledTicksLocked(double Scale)
+		{
+			double?[] Result = new double?[this.tests.Count];
+			int i;
+
+			i = 0;
+			foreach (string Name in this.tests.Keys)
+			{
+				if (this.tests.TryGetValue(Name, out long Ticks))
+					Result[i] = Ticks * Scale;
+				else
+					Result[i] = null;
+
+				i++;
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets benchmarking result in ticks, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptTicks() => this.GetResultScript(1);
+
+		/// <summary>
+		/// Gets benchmarking result in seconds, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptSeconds() => this.GetResultScript(1.0 / Stopwatch.Frequency);
+
+		/// <summary>
+		/// Gets benchmarking result in milliseconds, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptMilliseconds() => this.GetResultScript(1000.0 / Stopwatch.Frequency);
+
+		/// <summary>
+		/// Gets benchmarking result in microseconds, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptMicroseconds() => this.GetResultScript(1000000.0 / Stopwatch.Frequency);
+
+		private string GetResultScript(double Scale)
+		{
+			StringBuilder sb = new StringBuilder();
+			string[] Names;
+			double?[] Values;
+			double? d;
+			int i, c;
+
+			lock (this.syncObject)
+			{
+				Names = this.GetTestsLocked();
+				Values = this.GetScaledTicksLocked(Scale);
+			}
+
+			c = Names.Length;
+
+			sb.Append('[');
+
+			for (i = 0; i < c; i++)
+			{
+				if (i > 0)
+					sb.Append(",\r\n ");
+				sb.Append("[\"");
+				sb.Append(Names[i].Replace("\"", "\\\""));
+				sb.Append("\",");
+
+				d = Values[i];
+				if (d.HasValue)
+					sb.Append(d.Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+				else
+					sb.Append("null");
+
+				sb.Append(']');
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -98,10 +173,12 @@ namespace Waher.Runtime.Profiling
 		/// completed.</returns>
 		public Benchmarking Start(string Name)
 		{
+			GC.GetTotalMemory(true);
+
 			lock (this.syncObject)
 			{
 				if (!this.tests.ContainsKey(Name))
-					this.tests[Name] = true;
+					this.tests[Name] = 0;
 			}
 
 			return new Benchmarking(this, Name, 0, 0, this.watch.ElapsedTicks);
@@ -120,7 +197,20 @@ namespace Waher.Runtime.Profiling
 
 			lock (this.syncObject)
 			{
-				this.ticks[Name] = ElapsedTicks;
+				this.tests[Name] = ElapsedTicks;
+			}
+		}
+
+		/// <summary>
+		/// Removes a benchmark.
+		/// </summary>
+		/// <param name="Name">Name of benchmark.</param>
+		/// <returns>If the benchmark was found, and removed.</returns>
+		public bool Remove(string Name)
+		{
+			lock (this.syncObject)
+			{
+				return this.tests.Remove(Name);
 			}
 		}
 

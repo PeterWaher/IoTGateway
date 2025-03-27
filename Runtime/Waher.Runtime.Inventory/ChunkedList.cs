@@ -11,7 +11,6 @@ namespace Waher.Runtime.Inventory
 	public class ChunkedList<T> : ICollection<T>
 	{
 		private const int initialChunkSize = 16;
-		private const int initialMaxChunkSize = 1024;
 
 		private readonly int maxChunkSize;
 		private Chunk current;
@@ -34,7 +33,7 @@ namespace Waher.Runtime.Inventory
 		/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
 		/// </summary>
 		public ChunkedList()
-			: this(initialChunkSize, initialMaxChunkSize)
+			: this(initialChunkSize, int.MaxValue)
 		{
 		}
 
@@ -66,7 +65,7 @@ namespace Waher.Runtime.Inventory
 			this.current = this.firstChunk = this.lastChunk = new Chunk(InitialChunkSize);
 
 			this.chunkSize <<= 1;
-			if (this.chunkSize > this.maxChunkSize)
+			if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
 				this.chunkSize = this.maxChunkSize;
 		}
 
@@ -109,7 +108,7 @@ namespace Waher.Runtime.Inventory
 				this.current = this.lastChunk;
 
 				this.chunkSize <<= 1;
-				if (this.chunkSize > this.maxChunkSize)
+				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
 					this.chunkSize = this.maxChunkSize;
 
 				this.current.Elements[this.current.Count++] = Item;

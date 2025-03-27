@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
   </ItemGroup>
 
 </Project>

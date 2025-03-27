@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace Waher.Runtime.Profiling
 {
@@ -32,11 +34,16 @@ namespace Waher.Runtime.Profiling
 			{
 				lock (this.syncObject)
 				{
-					string[] Result = new string[this.tests.Count];
-					this.tests.Keys.CopyTo(Result, 0);
-					return Result;
+					return this.GetTestsLocked();
 				}
 			}
+		}
+
+		private string[] GetTestsLocked()
+		{
+			string[] Result = new string[this.tests.Count];
+			this.tests.Keys.CopyTo(Result, 0);
+			return Result;
 		}
 
 		/// <summary>
@@ -48,11 +55,16 @@ namespace Waher.Runtime.Profiling
 			{
 				lock (this.syncObject)
 				{
-					long[] Result = new long[this.complexities.Count];
-					this.complexities.Keys.CopyTo(Result, 0);
-					return Result;
+					return this.GetComplexitiesLocked();
 				}
 			}
+		}
+
+		private long[] GetComplexitiesLocked()
+		{
+			long[] Result = new long[this.complexities.Count];
+			this.complexities.Keys.CopyTo(Result, 0);
+			return Result;
 		}
 
 		/// <summary>
@@ -89,31 +101,112 @@ namespace Waher.Runtime.Profiling
 		{
 			lock (this.syncObject)
 			{
-				double?[,] Result = new double?[this.tests.Count, this.complexities.Count];
-				int i, j;
+				return this.GetScaledTicksLocked(Scale);
+			}
+		}
 
-				i = 0;
-				foreach (string Name in this.tests.Keys)
+		private double?[,] GetScaledTicksLocked(double Scale)
+		{
+			double?[,] Result = new double?[this.tests.Count, this.complexities.Count];
+			int i, j;
+
+			i = 0;
+			foreach (string Name in this.tests.Keys)
+			{
+				j = 0;
+				foreach (long Complexity in this.complexities.Keys)
 				{
-					j = 0;
-					foreach (long Complexity in this.complexities.Keys)
+					if (this.ticks.TryGetValue(Name, out Dictionary<long, long> Complexities) &&
+						Complexities.TryGetValue(Complexity, out long Ticks))
 					{
-						if (this.ticks.TryGetValue(Name, out Dictionary<long, long> Complexities) &&
-							Complexities.TryGetValue(Complexity, out long Ticks))
-						{
-							Result[i, j] = Ticks * Scale;
-						}
-						else
-							Result[i, j] = null;
-
-						j++;
+						Result[i, j] = Ticks * Scale;
 					}
+					else
+						Result[i, j] = null;
 
-					i++;
+					j++;
 				}
 
-				return Result;
+				i++;
 			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets benchmarking result in ticks, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptTicks() => this.GetResultScript(1);
+
+		/// <summary>
+		/// Gets benchmarking result in seconds, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptSeconds() => this.GetResultScript(1.0 / Stopwatch.Frequency);
+
+		/// <summary>
+		/// Gets benchmarking result in milliseconds, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptMilliseconds() => this.GetResultScript(1000.0 / Stopwatch.Frequency);
+
+		/// <summary>
+		/// Gets benchmarking result in microseconds, as script.
+		/// </summary>
+		/// <returns>Script</returns>
+		public string GetResultScriptMicroseconds() => this.GetResultScript(1000000.0 / Stopwatch.Frequency);
+
+		private string GetResultScript(double Scale)
+		{
+			StringBuilder sb = new StringBuilder();
+			string[] Names;
+			long[] ComplexitiesN;
+			double?[,] Values;
+			double? d;
+			int i, j, c, N;
+
+			lock (this.syncObject)
+			{
+				Names = this.GetTestsLocked();
+				ComplexitiesN = this.GetComplexitiesLocked();
+				Values = this.GetScaledTicksLocked(Scale);
+			}
+
+			c = Names.Length;
+			N = ComplexitiesN.Length;
+
+			sb.Append("[[\"N\\\\Test\"");
+			foreach (string Name in Names)
+			{
+				sb.Append(",\"");
+				sb.Append(Name.Replace("\"", "\\\""));
+				sb.Append('"');
+			}
+			sb.Append(']');
+
+			for (j = 0; j < N; j++)
+			{
+				sb.Append(",\r\n [");
+				sb.Append(ComplexitiesN[j].ToString());
+
+				for (i = 0; i < c; i++)
+				{
+					sb.Append(',');
+
+					d = Values[i, j];
+					if (d.HasValue)
+						sb.Append(d.Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+					else
+						sb.Append("null");
+				}
+
+				sb.Append(']');
+			}
+
+			sb.Append(']');
+
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -125,6 +218,8 @@ namespace Waher.Runtime.Profiling
 		/// completed.</returns>
 		public Benchmarking Start(string Name, long Complexity)
 		{
+			GC.GetTotalMemory(true);
+
 			lock (this.syncObject)
 			{
 				if (!this.tests.ContainsKey(Name))
@@ -157,6 +252,36 @@ namespace Waher.Runtime.Profiling
 				}
 
 				Complexities[N] = ElapsedTicks;
+			}
+		}
+
+		/// <summary>
+		/// Removes a benchmark.
+		/// </summary>
+		/// <param name="Name">Name of benchmark.</param>
+		/// <returns>If the benchmark was found, and removed.</returns>
+		public bool Remove(string Name)
+		{
+			lock (this.syncObject)
+			{
+				this.ticks.Remove(Name);
+				return this.tests.Remove(Name);
+			}
+		}
+
+		/// <summary>
+		/// Removes a complexity.
+		/// </summary>
+		/// <param name="N">Complexity N</param>
+		/// <returns>If the benchmark was found, and removed.</returns>
+		public bool Remove(long N)
+		{
+			lock (this.syncObject)
+			{
+				foreach (Dictionary<long, long> Complexities in this.ticks.Values)
+					Complexities.Remove(N);
+
+				return this.complexities.Remove(N);
 			}
 		}
 

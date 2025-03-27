@@ -991,7 +991,7 @@ function InitializeMarkdownEditor(container)
 	
 	if (container.getAttribute("data-scale") === "true")
 	{
-		textInput.addEventListener("input", e => {console.log(1);AdaptSize(e.target)})
+		textInput.addEventListener("input", e => {AdaptSize(e.target)})
 		requestAnimationFrame(() => {
 			AdaptSize(container.getElementsByTagName("textarea")[0])
 		})

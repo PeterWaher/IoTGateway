@@ -27,66 +27,78 @@ function NativeHeaderHandler() {
 
         // expand submenu
         subMenu.parentElement.addEventListener("mouseenter", () => {
-            count++
-            // cancled when on mobile view
-            if (window.matchMedia("screen and (max-width: 900px)").matches)
-                return
+            const delay = subMenu === topSubmenue ? 0 : 100
 
-            subMenu.setAttribute("expanded", "")
+            setTimeout(() => {
+                if (!subMenu.parentElement.matches(":hover"))
+                    return;
 
-            // set set max height to prevent vertical overflow
-            if (subMenu.getBoundingClientRect().bottom > window.innerHeight) {
-                subMenu.style.height = `${window.innerHeight - subMenu.getBoundingClientRect().top}px`
-            }
+                count++
 
-            // if overflowing to the righ, offset the top submenue to the left to not
-            if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth) {
-                topSubmenue.style.left = `${window.innerWidth - topSubmenue.offsetWidth}px`
-            }
-
-
-            // normalise list item width
-            const textElements = []
-            maxWidth = 0
-            for (let i = 0; i < subMenu.children.length; i++) {
-                const child = subMenu.children[i]
-                const textElement = Array.from(child.children).find(c => c.tagName === "A" || c.tagName === "P")
-                if (textElement) {
-                    maxWidth = Math.max(maxWidth, textElement.getBoundingClientRect().width)
-                    textElements.push(textElement)
+                // cancled when on mobile view
+                if (window.matchMedia("screen and (max-width: 900px)").matches)
+                    return
+    
+                subMenu.setAttribute("expanded", "")
+    
+                // set set max height to prevent vertical overflow
+                if (subMenu.getBoundingClientRect().bottom > window.innerHeight) {
+                    subMenu.style.height = `${window.innerHeight - subMenu.getBoundingClientRect().top}px`
                 }
-            }
-            textElements.forEach(el => el.style.width = `${maxWidth}px`)
-
-            // fix item heights
-            const menueItems = subMenu.children
-            for (let i = 0; i < menueItems.length; i++) {
-                if (menueItems[i].children[0])
-                    menueItems[i].children[0].style.height = Math.ceil(menueItems[i].getBoundingClientRect().height) + "px"
-            }
-
-            // offset sibling elements (underneeth) to position over to not have gaps between list items
-            const offsetParentsSiblings = (listItem) => {
-                const text = listItem.children[0]
-                listItem.style.height = "";
-                const siblingHeightOffset = listItem.getBoundingClientRect().height - text.getBoundingClientRect().height
-
-                let listItemSibling = listItem.nextElementSibling
-                while (listItemSibling) {
-                    listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
-                    listItemSibling = listItemSibling.nextElementSibling
+    
+                // if overflowing to the righ, offset the top submenue to the left to not
+                if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth) {
+                    topSubmenue.style.left = `${window.innerWidth - topSubmenue.offsetWidth}px`
                 }
-            }
-
-            let listItem = subMenu.parentElement
-            while (true) {
-                if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
-                    offsetParentsSiblings(listItem)
-                    listItem = listItem.parentElement.parentElement
+    
+    
+                // normalise list item width
+                const textElements = []
+                maxWidth = 0
+                for (let i = 0; i < subMenu.children.length; i++) {
+                    const child = subMenu.children[i]
+                    const textElement = Array.from(child.children).find(c => c.tagName === "A" || c.tagName === "P")
+                    if (textElement) {
+                        if (textElement.innerText === "Internet Gateway Registration")
+                            console.log(textElement.offsetWidth, textElement.getBoundingClientRect().width)
+                        const width = Number( window.getComputedStyle(textElement).width.split("px")[0])
+                        maxWidth = Math.max(maxWidth, width)
+                        textElements.push(textElement)
+                    }
                 }
-                else
-                    break
-            }
+                textElements.forEach(el => el.style.width = `${maxWidth}px`)
+    
+                // fix item heights
+                const menueItems = subMenu.children
+                for (let i = 0; i < menueItems.length; i++) {
+                    if (menueItems[i].children[0])
+                        menueItems[i].children[0].style.height = Math.ceil(menueItems[i].getBoundingClientRect().height) + "px"
+                }
+    
+                // offset sibling elements (underneeth) to position over to not have gaps between list items
+                const offsetParentsSiblings = (listItem) => {
+                    const text = listItem.children[0]
+                    listItem.style.height = "";
+                    const siblingHeightOffset = listItem.getBoundingClientRect().height - text.getBoundingClientRect().height
+    
+                    let listItemSibling = listItem.nextElementSibling
+                    while (listItemSibling) {
+                        listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
+                        listItemSibling = listItemSibling.nextElementSibling
+                    }
+                }
+    
+                let listItem = subMenu.parentElement
+                while (true) {
+                    if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
+                        offsetParentsSiblings(listItem)
+                        listItem = listItem.parentElement.parentElement
+                    }
+                    else
+                        break
+                }
+            }, delay)
+
         })
 
         // close submenu

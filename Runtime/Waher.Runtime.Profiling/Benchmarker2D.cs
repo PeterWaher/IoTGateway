@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Waher.Runtime.Profiling
 {
 	/// <summary>
-	/// Class that keeps track of benchmarking results and timing.
+	/// Class that keeps track of benchmarking results by name, complexity and timing.
 	/// </summary>
-	public class Benchmarker : IDisposable
+	public class Benchmarker2D : IBenchmarker
 	{
 		private readonly SortedDictionary<string, bool> tests = new SortedDictionary<string, bool>();
 		private readonly SortedDictionary<long, bool> complexities = new SortedDictionary<long, bool>();
@@ -16,9 +15,9 @@ namespace Waher.Runtime.Profiling
 		private readonly Stopwatch watch;
 
 		/// <summary>
-		/// Class that keeps track of benchmarking results and timing.
+		/// Class that keeps track of benchmarking results by name, complexity and timing.
 		/// </summary>
-		public Benchmarker()
+		public Benchmarker2D()
 		{
 			this.watch = new Stopwatch();
 			this.watch.Start();
@@ -135,16 +134,17 @@ namespace Waher.Runtime.Profiling
 					this.complexities[Complexity] = true;
 			}
 
-			return new Benchmarking(this, Name, Complexity, this.watch.ElapsedTicks);
+			return new Benchmarking(this, Name, Complexity, 0, this.watch.ElapsedTicks);
 		}
 
 		/// <summary>
 		/// Stops a benchmark.
 		/// </summary>
 		/// <param name="Name">Name of benchmark.</param>
-		/// <param name="Complexity">Complexity of benchmark (N).</param>
+		/// <param name="N">Complexity of benchmark (N).</param>
+		/// <param name="M">Complexity of benchmark (M).</param>
 		/// <param name="StartTicks">Elapsed ticks at the start of benchmark.</param>
-		internal void Stop(string Name, long Complexity, long StartTicks)
+		public void Stop(string Name, long N, long M, long StartTicks)
 		{
 			long ElapsedTicks = this.watch.ElapsedTicks - StartTicks;
 
@@ -156,7 +156,7 @@ namespace Waher.Runtime.Profiling
 					this.ticks[Name] = Complexities;
 				}
 
-				Complexities[Complexity] = ElapsedTicks;
+				Complexities[N] = ElapsedTicks;
 			}
 		}
 

@@ -7,9 +7,10 @@ namespace Waher.Runtime.Profiling
 	/// </summary>
 	public class Benchmarking : IDisposable
 	{
-		private readonly Benchmarker benchmarker;
+		private readonly IBenchmarker benchmarker;
 		private readonly string name;
-		private readonly long complexity;
+		private readonly long m;
+		private readonly long n;
 		private readonly long startTicks;
 
 		/// <summary>
@@ -17,14 +18,16 @@ namespace Waher.Runtime.Profiling
 		/// </summary>
 		/// <param name="Benchmarker">Benchmarker object.</param>
 		/// <param name="Name">Name of benchmark.</param>
-		/// <param name="Complexity">Complexity of benchmark.</param>
+		/// <param name="N">Complexity of benchmark (N).</param>
+		/// <param name="M">Complexity of benchmark (M).</param>
 		/// <param name="StartTicks">Start ticks.</param>
-		public Benchmarking(Benchmarker Benchmarker, string Name, long Complexity, 
+		internal Benchmarking(IBenchmarker Benchmarker, string Name, long N, long M, 
 			long StartTicks)
 		{
 			this.benchmarker = Benchmarker;
 			this.name = Name;
-			this.complexity = Complexity;
+			this.n = N;
+			this.m = M;
 			this.startTicks = StartTicks;
 		}
 
@@ -33,7 +36,7 @@ namespace Waher.Runtime.Profiling
 		/// </summary>
 		public void Dispose()
 		{
-			this.benchmarker.Stop(this.name, this.complexity, this.startTicks);
+			this.benchmarker.Stop(this.name, this.n, this.m, this.startTicks);
 		}
 	}
 }

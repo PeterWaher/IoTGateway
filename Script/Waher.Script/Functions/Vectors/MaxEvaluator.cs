@@ -14,6 +14,8 @@ namespace Waher.Script.Functions.Vectors
 		private readonly Max node;
 		private IElement max = null;
 		private IOrderedSet maxSet = null;
+		private double? doubleMax = null;
+		private bool isDouble = true;
 
 		/// <summary>
 		/// Max(v) iterative evaluator
@@ -30,6 +32,8 @@ namespace Waher.Script.Functions.Vectors
 		public void RestartEvaluator()
 		{
 			this.max = null;
+			this.doubleMax = null;
+			this.isDouble = true;
 		}
 
 		/// <summary>
@@ -38,14 +42,22 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Element">Element.</param>
 		public void AggregateElement(IElement Element)
 		{
-            if (this.max is null || this.maxSet.Compare(this.max, Element) < 0)
-            {
+			if (this.isDouble && Element is DoubleNumber D)
+			{
+				double d = D.Value;
+
+				if (d > this.doubleMax)
+					this.doubleMax = d;
+			}
+			else if (this.max is null || this.maxSet.Compare(this.max, Element) < 0)
+			{
 				if (!(Element.AssociatedSet is IOrderedSet S))
 					throw new ScriptRuntimeException("Cannot compare operands.", this.node);
 
 				this.max = Element;
-                this.maxSet = S;
-            }
+				this.maxSet = S;
+				this.isDouble = false;
+			}
 		}
 
 		/// <summary>
@@ -53,7 +65,15 @@ namespace Waher.Script.Functions.Vectors
 		/// </summary>
 		public IElement GetAggregatedResult()
 		{
-            return this.max ?? ObjectValue.Null;
+			if (this.isDouble)
+			{
+				if (this.doubleMax.HasValue)
+					return new DoubleNumber(this.doubleMax.Value);
+				else
+					return ObjectValue.Null;
+			}
+			else
+				return this.max ?? ObjectValue.Null;
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -33,10 +32,7 @@ namespace Waher.Script.Functions.Vectors
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.
         /// </summary>
-        public override string[] Aliases
-        {
-            get { return new string[] { "var" }; }
-        }
+        public override string[] Aliases => new string[] { "var" };
 
         /// <summary>
         /// Evaluates the function on a vector argument.

@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Script.Functions.Vectors
@@ -16,6 +12,8 @@ namespace Waher.Script.Functions.Vectors
     {
         private readonly Sum node;
 		private IElement sum = null;
+		private double doubleSum = 0;
+		private bool isDouble = true;
 
 		/// <summary>
 		/// Sum(v) iterative evaluator
@@ -31,6 +29,8 @@ namespace Waher.Script.Functions.Vectors
 		public void RestartEvaluator()
 		{
 			this.sum = null;
+			this.doubleSum = 0;
+			this.isDouble = true;
 		}
 
 		/// <summary>
@@ -39,8 +39,17 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Element">Element.</param>
 		public void AggregateElement(IElement Element)
 		{
-			if (this.sum is null)
-				this.sum = Element;
+			if (this.isDouble && Element is DoubleNumber D)
+				this.doubleSum += D.Value;
+			else if (this.sum is null)
+			{
+				this.isDouble = false;
+
+				if (this.sum is null)
+					this.sum = Element;
+				else
+					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.node);
+			}
 			else
 				this.sum = Add.EvaluateAddition(this.sum, Element, this.node);
 		}

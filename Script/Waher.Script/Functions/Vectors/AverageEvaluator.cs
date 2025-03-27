@@ -12,6 +12,8 @@ namespace Waher.Script.Functions.Vectors
 	{
 		private readonly Average node;
 		private IElement sum = null;
+		private double doubleSum = 0;
+		private bool isDouble = true;
 		private long count = 0;
 
 		/// <summary>
@@ -30,6 +32,8 @@ namespace Waher.Script.Functions.Vectors
 		{
 			this.sum = null;
 			this.count = 0;
+			this.doubleSum = 0;
+			this.isDouble = true;
 		}
 
 		/// <summary>
@@ -38,10 +42,25 @@ namespace Waher.Script.Functions.Vectors
 		/// <param name="Element">Element.</param>
 		public void AggregateElement(IElement Element)
 		{
-			if (this.sum is null)
+			if (this.isDouble && Element is DoubleNumber D)
 			{
-				this.sum = Element;
-				this.count = 1;
+				this.doubleSum += D.Value;
+				this.count++;
+			}
+			else if (this.sum is null)
+			{
+				this.isDouble = false;
+
+				if (this.count == 0)
+				{
+					this.sum = Element;
+					this.count = 1;
+				}
+				else
+				{
+					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.node);
+					this.count++;
+				}
 			}
 			else
 			{
@@ -55,8 +74,10 @@ namespace Waher.Script.Functions.Vectors
 		/// </summary>
 		public IElement GetAggregatedResult()
 		{
-			if (this.sum is null)
+			if (this.count == 0)
 				return ObjectValue.Null;
+			else if (this.isDouble)
+				return new DoubleNumber(this.doubleSum / this.count);
 			else if (this.count == 1)
 				return this.sum;
 			else

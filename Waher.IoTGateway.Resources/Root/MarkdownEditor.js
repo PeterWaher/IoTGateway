@@ -990,7 +990,12 @@ function InitializeMarkdownEditor(container)
 	textInput.addEventListener("input", e => MarkdownKeyDown(e.target, e))
 	
 	if (container.getAttribute("data-scale") === "true")
-		textInput.addEventListener("input", e => AdaptSize(e.target))
+	{
+		textInput.addEventListener("input", e => {console.log(1);AdaptSize(e.target)})
+		requestAnimationFrame(() => {
+			AdaptSize(container.getElementsByTagName("textarea")[0])
+		})
+	}
 
 	const preview = document.createElement("div")
 	preview.classList.add("MarkdownPreview")
@@ -1005,7 +1010,7 @@ function MarkdownEditorInitializeHack(event, previewOn)
 	setTimeout(() => {
 		InitializeMarkdownEditor(container)
 		if (previewOn)
-		{
+			{
 			setTimeout(() => {
 				MarkdownEditorBottomPreviewAndEdit(container.getElementsByClassName("MarkdownEditorBottomPreviewAndEdit")[0])
 			}, 0)

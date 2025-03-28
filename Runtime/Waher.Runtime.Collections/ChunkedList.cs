@@ -10,7 +10,7 @@ namespace Waher.Runtime.Collections
 	/// <typeparam name="T">Element type.</typeparam>
 	public class ChunkedList<T> : ICollection<T>
 	{
-		private const int initialChunkSize = 4;
+		private const int initialChunkSize = 16;
 
 		private readonly int maxChunkSize;
 		private Chunk current;

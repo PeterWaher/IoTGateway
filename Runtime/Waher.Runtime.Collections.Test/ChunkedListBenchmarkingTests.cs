@@ -12,6 +12,7 @@ namespace Waher.Runtime.Collections.Test
 	{
 		private static readonly int[] smallNumberOfItems =
 		[
+			99,		// To ensure all code is JIT compiled
 			1,
 			2,
 			3,
@@ -35,6 +36,7 @@ namespace Waher.Runtime.Collections.Test
 		];
 		private static readonly int[] largeNumberOfItems =
 		[
+			99,		// To ensure all code is JIT compiled
 			100,
 			200,
 			500,
@@ -136,6 +138,7 @@ namespace Waher.Runtime.Collections.Test
 			Script.AppendLine("G.Title:=\"Add()\";");
 			Script.AppendLine("L:=legend([\"ChunkedList\",\"LinkedList\",\"List\"],[\"Red\",\"Green\",\"Blue\"],\"White\",1);");
 			Script.AppendLine("r2:=100*t2./t1;");
+			Script.AppendLine("r2:=r2>500?500:r2;");
 			Script.AppendLine("r3:=100*t3./t1;");
 			Script.AppendLine("GRel:=plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
 			Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");

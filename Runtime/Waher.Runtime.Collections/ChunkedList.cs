@@ -1,9 +1,26 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Runtime.Collections
 {
+	/// <summary>
+	/// Callback method for the ForEach method.
+	/// </summary>
+	/// <typeparam name="T">Element type.</typeparam>
+	/// <param name="Item">Item being iterated.</param>
+	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
+	public delegate bool ForEachCallback<T>(T Item);
+
+	/// <summary>
+	/// Asynchronous callback method for the ForEach method.
+	/// </summary>
+	/// <typeparam name="T">Element type.</typeparam>
+	/// <param name="Item">Item being iterated.</param>
+	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
+	public delegate Task<bool> ForEachAsyncCallback<T>(T Item);
+
 	/// <summary>
 	/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
 	/// </summary>
@@ -137,7 +154,7 @@ namespace Waher.Runtime.Collections
 
 			while (!(Loop is null))
 			{
-				if (Array.IndexOf(Loop.Elements, Item) >= 0)
+				if (Loop.Count > 0 && Array.IndexOf(Loop.Elements, Item, 0, Loop.Count) >= 0)
 					return true;
 
 				Loop = Loop.Next;
@@ -154,13 +171,14 @@ namespace Waher.Runtime.Collections
 		public void CopyTo(T[] Desintation, int DesintationIndex)
 		{
 			Chunk Loop = this.firstChunk;
+			int c;
 
 			while (!(Loop is null))
 			{
-				if (Loop.Count > 0)
+				if ((c = Loop.Count) > 0)
 				{
-					Array.Copy(Loop.Elements, 0, Desintation, DesintationIndex, Loop.Count);
-					DesintationIndex += Loop.Count;
+					Array.Copy(Loop.Elements, 0, Desintation, DesintationIndex, c);
+					DesintationIndex += c;
 				}
 
 				Loop = Loop.Next;
@@ -179,9 +197,11 @@ namespace Waher.Runtime.Collections
 
 			while (!(Loop is null))
 			{
-				for (i = 0, c = Loop.Count; i < c; i++)
+				c = Loop.Count;
+				if (c > 0)
 				{
-					if (Item.Equals(Loop.Elements[i]))
+					i = Array.IndexOf(Loop.Elements, Item, 0, c);
+					if (i >= 0)
 					{
 						if (i < c - 1)
 							Array.Copy(Loop.Elements, i + 1, Loop.Elements, i, c - i - 1);
@@ -205,6 +225,8 @@ namespace Waher.Runtime.Collections
 		/// <returns>Enumerator</returns>
 		public IEnumerator<T> GetEnumerator()
 		{
+			// More efficient than yield.
+			// (But ForEach is more efficient that using an enumerator.)
 			return new ChunkedListEnumerator(this.firstChunk);
 		}
 
@@ -274,6 +296,58 @@ namespace Waher.Runtime.Collections
 				this.current = null;
 				this.pos = -1;
 			}
+		}
+
+		/// <summary>
+		/// Iterates through all elements in the collection, and calls the callback method 
+		/// in <paramref name="Callback"/> for each element. The loop can be terminated 
+		/// early, by returning false from the callback method.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
+		public bool ForEach(ForEachCallback<T> Callback)
+		{
+			Chunk Loop = this.firstChunk;
+			int i, c;
+
+			while (!(Loop is null))
+			{
+				for (i = 0, c = Loop.Count; i < c; i++)
+				{
+					if (!Callback(Loop.Elements[i]))
+						return false;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Iterates through all elements in the collection, and calls the callback method 
+		/// in <paramref name="Callback"/> for each element. The loop can be terminated 
+		/// early, by returning false from the callback method.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
+		public async Task<bool> ForEachAsync(ForEachAsyncCallback<T> Callback)
+		{
+			Chunk Loop = this.firstChunk;
+			int i, c;
+
+			while (!(Loop is null))
+			{
+				for (i = 0, c = Loop.Count; i < c; i++)
+				{
+					if (!await Callback(Loop.Elements[i]))
+						return false;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return true;
 		}
 	}
 }

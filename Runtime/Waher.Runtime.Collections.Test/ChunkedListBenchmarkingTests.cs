@@ -186,15 +186,74 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public Task Test_05_Contains_Small()
+		public Task Test_05_ForEach_Small()
 		{
-			return Test_Contains("Test_05_Contains_Small", smallNumberOfItems, 500);
+			return Test_ForEach("Test_05_ForEach_Small", smallNumberOfItems, 500);
 		}
 
 		[TestMethod]
-		public Task Test_06_Contains_Large()
+		public Task Test_06_ForEach_Large()
 		{
-			return Test_Contains("Test_06_Contains_Large", largeNumberOfItems, 2000);
+			return Test_ForEach("Test_06_ForEach_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_ForEach(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						foreach (double _ in LinkedList)
+							;
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (double _ in List)
+							;
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						ChunkedList.ForEach((_) => true);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "ForEach()", Limit);
+		}
+
+		[TestMethod]
+		public Task Test_07_Contains_Small()
+		{
+			return Test_Contains("Test_07_Contains_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_08_Contains_Large()
+		{
+			return Test_Contains("Test_08_Contains_Large", largeNumberOfItems, 2000);
 		}
 
 		private static async Task Test_Contains(string Name, int[] NumberOfItems, int Limit)
@@ -210,7 +269,7 @@ namespace Waher.Runtime.Collections.Test
 			{
 				foreach (int N in NumberOfItems)
 				{
-					Items = RandomOrder(N, 100);
+					Items = RandomOrder(N, 500);
 					LinkedList = [];
 					List = [];
 					ChunkedList = [];
@@ -254,6 +313,77 @@ namespace Waher.Runtime.Collections.Test
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
 			await OutputResults(Benchmarker, Name, "Contains()", Limit);
+		}
+
+		[TestMethod]
+		public Task Test_09_Remove_Small()
+		{
+			return Test_Remove("Test_09_Remove_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_10_Remove_Large()
+		{
+			return Test_Remove("Test_10_Remove_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_Remove(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			double[] Items;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					Items = RandomOrder(N, 500);
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (!LinkedList.Remove(Item))
+								throw new Exception("Item not found in LinkedList");
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (!List.Remove(Item))
+								throw new Exception("Item not found in List");
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (!ChunkedList.Remove(Item))
+								throw new Exception("Item not found in ChunkedList");
+						}
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "Remove()", Limit);
 		}
 
 		private static double[] RandomOrder(int N, int MaxItems)
@@ -354,11 +484,5 @@ namespace Waher.Runtime.Collections.Test
 					LegendRel.CreatePixels().EncodeAsPng());
 			}
 		}
-
-		/* TODO:
-		 * Remove
-		 * double
-		 * string
-		 */
 	}
 }

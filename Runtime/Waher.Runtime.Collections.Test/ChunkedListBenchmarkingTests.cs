@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Text;
 using Waher.Layout.Layout2D.Functions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Script;
 using Waher.Script.Graphs;
-using Waher.Script.Model;
 
 namespace Waher.Runtime.Collections.Test
 {
@@ -26,15 +23,26 @@ namespace Waher.Runtime.Collections.Test
 			8,
 			9,
 			10,
-			15,
+			12,
+			14,
+			16,
+			18,
 			20,
+			25,
 			30,
+			35,
 			40,
+			45,
 			50,
+			55,
 			60,
+			65,
 			70,
+			75,
 			80,
+			85,
 			90,
+			95,
 			100,
 		];
 		private static readonly int[] largeNumberOfItems =
@@ -43,7 +51,6 @@ namespace Waher.Runtime.Collections.Test
 			100,
 			200,
 			500,
-			1000,
 			1000,
 			2000,
 			5000,
@@ -293,11 +300,13 @@ namespace Waher.Runtime.Collections.Test
 
 					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
 					{
-						ChunkedList.ForEachChunk((Items, c) =>
+						ChunkedList.ForEachChunk((Items, i, c) =>
 						{
-							foreach (double Item in Items)
-								;
-							
+							while (c-- > 0)
+							{
+								double _ = Items[i++];
+							}
+
 							return true;
 						});
 					}
@@ -451,6 +460,128 @@ namespace Waher.Runtime.Collections.Test
 			await OutputResults(Benchmarker, Name, "Remove()", Limit);
 		}
 
+		[TestMethod]
+		public Task Test_13_RemoveFirst_Small()
+		{
+			return Test_RemoveFirst("Test_13_RemoveFirst_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+			public Task Test_14_RemoveFirst_Large()
+		{
+			return Test_RemoveFirst("Test_14_RemoveFirst_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_RemoveFirst(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						while (LinkedList.First is not null)
+							LinkedList.RemoveFirst();
+					}
+
+					if (N <= 100000)
+					{
+						using Benchmarking Test = Benchmarker.Start("List", N);
+
+						while (List.Count > 0)
+							List.RemoveAt(0);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						while (ChunkedList.HasFirstItem)
+							ChunkedList.RemoveFirst();
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "RemoveFirst()", Limit);
+		}
+
+		[TestMethod]
+		public Task Test_15_RemoveLast_Small()
+		{
+			return Test_RemoveLast("Test_15_RemoveLast_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_16_RemoveLast_Large()
+		{
+			return Test_RemoveLast("Test_16_RemoveLast_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_RemoveLast(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						while (LinkedList.Last is not null)
+							LinkedList.RemoveLast();
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						while ((i = List.Count) > 0)
+							List.RemoveAt(i - 1);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						while (ChunkedList.HasLastItem)
+							ChunkedList.RemoveLast();
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "RemoveLast()", Limit);
+		}
+
 		private static double[] RandomOrder(int N, int MaxItems)
 		{
 			Random rnd = new();
@@ -496,10 +627,10 @@ namespace Waher.Runtime.Collections.Test
 			Script.AppendLine("r2:=100*t2./t1;");
 			Script.Append("r2:=r2>");
 			Script.Append(Limit);
-			Script.Append('?');
+			Script.Append("?null:r2;");
+			Script.Append("r3:=[foreach i in 0..(count(t3)-1): exists(t3[i]) ? (x:=100*t3[i]/t1[i];x>");
 			Script.Append(Limit);
-			Script.AppendLine(":r2;");
-			Script.AppendLine("r3:=100*t3./t1;");
+			Script.AppendLine("?null:x) : null];");
 			Script.AppendLine("GRel:=plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
 			Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");
 			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\")+");

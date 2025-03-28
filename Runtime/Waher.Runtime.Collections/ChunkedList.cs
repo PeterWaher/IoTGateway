@@ -134,15 +134,11 @@ namespace Waher.Runtime.Collections
 		public bool Contains(T Item)
 		{
 			Chunk Loop = this.firstChunk;
-			int i, c;
 
 			while (!(Loop is null))
 			{
-				for (i = 0, c = Loop.Count; i < c; i++)
-				{
-					if (Item.Equals(Loop.Elements[i]))
-						return true;
-				}
+				if (Array.IndexOf(Loop.Elements, Item) >= 0)
+					return true;
 
 				Loop = Loop.Next;
 			}

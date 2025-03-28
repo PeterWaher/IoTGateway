@@ -1,9 +1,12 @@
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using Waher.Layout.Layout2D.Functions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Script;
 using Waher.Script.Graphs;
+using Waher.Script.Model;
 
 namespace Waher.Runtime.Collections.Test
 {
@@ -58,6 +61,7 @@ namespace Waher.Runtime.Collections.Test
 			900000,
 			1000000
 		];
+		private static readonly object syncObj = new();
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
@@ -71,16 +75,16 @@ namespace Waher.Runtime.Collections.Test
 		[TestMethod]
 		public Task Test_01_Add_Small()
 		{
-			return Test_Add("Test_01_Add_Small", smallNumberOfItems);
+			return Test_Add("Test_01_Add_Small", smallNumberOfItems, 500);
 		}
 
 		[TestMethod]
 		public Task Test_02_Add_Large()
 		{
-			return Test_Add("Test_02_Add_Large", largeNumberOfItems);
+			return Test_Add("Test_02_Add_Large", largeNumberOfItems, 2000);
 		}
 
-		private static async Task Test_Add(string Name, int[] NumberOfItems)
+		private static async Task Test_Add(string Name, int[] NumberOfItems, int Limit)
 		{
 			Benchmarker2D Benchmarker = new();
 			LinkedList<double> LinkedList;
@@ -88,37 +92,192 @@ namespace Waher.Runtime.Collections.Test
 			ChunkedList<double> ChunkedList;
 			int i;
 
-			foreach (int N in NumberOfItems)
+			lock (syncObj)
 			{
-				LinkedList = [];
-				List = [];
-				ChunkedList = [];
-
-				using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+				foreach (int N in NumberOfItems)
 				{
-					for (i = 0; i < N; i++)
-						LinkedList.AddLast(i);
-				}
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
 
-				using (Benchmarking Test = Benchmarker.Start("List", N))
-				{
-					for (i = 0; i < N; i++)
-						List.Add(i);
-				}
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						for (i = 0; i < N; i++)
+							LinkedList.AddLast(i);
+					}
 
-				using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
-				{
-					for (i = 0; i < N; i++)
-						ChunkedList.Add(i);
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						for (i = 0; i < N; i++)
+							List.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						for (i = 0; i < N; i++)
+							ChunkedList.Add(i);
+					}
 				}
 			}
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name);
+			await OutputResults(Benchmarker, Name, "Add()", Limit);
 		}
 
-		private static async Task OutputResults(Benchmarker2D Benchmarker, string FileNamePrefix)
+		[TestMethod]
+		public Task Test_03_Enumerate_Small()
+		{
+			return Test_Enumerate("Test_03_Enumerate_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_04_Enumerate_Large()
+		{
+			return Test_Enumerate("Test_04_Enumerate_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_Enumerate(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						foreach (double _ in LinkedList)
+							;
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (double _ in List)
+							;
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						foreach (double _ in ChunkedList)
+							;
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "Enumerate()", Limit);
+		}
+
+		[TestMethod]
+		public Task Test_05_Contains_Small()
+		{
+			return Test_Contains("Test_05_Contains_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_06_Contains_Large()
+		{
+			return Test_Contains("Test_06_Contains_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_Contains(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			double[] Items;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					Items = RandomOrder(N, 100);
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (!LinkedList.Contains(Item))
+								throw new Exception("Item not found in LinkedList");
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (!List.Contains(Item))
+								throw new Exception("Item not found in List");
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (!ChunkedList.Contains(Item))
+								throw new Exception("Item not found in ChunkedList");
+						}
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "Contains()", Limit);
+		}
+
+		private static double[] RandomOrder(int N, int MaxItems)
+		{
+			Random rnd = new();
+			int c = Math.Min(N, MaxItems);
+			double[] Result = new double[c];
+			List<int> Left = [];
+			int i, j, k;
+
+			for (i = 0; i < N; i++)
+				Left.Add(i);
+
+			for (i = 0, j = N; i < c; i++, j--)
+			{
+				k = rnd.Next(j);
+				Result[i] = Left[k];
+				Left.RemoveAt(k);
+			}
+
+			return Result;
+		}
+
+		private static async Task OutputResults(Benchmarker2D Benchmarker, string BaseFileName, string Title, int Limit)
 		{
 			StringBuilder Script = new();
 			Script.Append("M:=");
@@ -135,10 +294,16 @@ namespace Waher.Runtime.Collections.Test
 			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\");");
 			Script.AppendLine("G.LabelX:=\"N\";");
 			Script.AppendLine("G.LabelY:=\"Time (ms)\";");
-			Script.AppendLine("G.Title:=\"Add()\";");
+			Script.Append("G.Title:=\"");
+			Script.Append(Title);
+			Script.AppendLine("\";");
 			Script.AppendLine("L:=legend([\"ChunkedList\",\"LinkedList\",\"List\"],[\"Red\",\"Green\",\"Blue\"],\"White\",1);");
 			Script.AppendLine("r2:=100*t2./t1;");
-			Script.AppendLine("r2:=r2>500?500:r2;");
+			Script.Append("r2:=r2>");
+			Script.Append(Limit);
+			Script.Append('?');
+			Script.Append(Limit);
+			Script.AppendLine(":r2;");
 			Script.AppendLine("r3:=100*t3./t1;");
 			Script.AppendLine("GRel:=plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
 			Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");
@@ -146,14 +311,16 @@ namespace Waher.Runtime.Collections.Test
 			Script.AppendLine("plot2dcurve(N,100*ones(count(N)),\"Black\");");
 			Script.AppendLine("GRel.LabelX:=\"N\";");
 			Script.AppendLine("GRel.LabelY:=\"Performance Increase (%)\";");
-			Script.AppendLine("GRel.Title:=\"Add()\";");
+			Script.Append("GRel.Title:=\"");
+			Script.Append(Title);
+			Script.AppendLine("\";");
 			Script.AppendLine("LRel:=legend([\"ChunkedList vs LinkedList\",\"ChunkedList vs List\"],[\"Green\",\"Blue\"],\"White\",1);");
 			Script.AppendLine("GRel;");
 
 			if (!Directory.Exists("Output"))
 				Directory.CreateDirectory("Output");
 
-			File.WriteAllText("Output\\" + FileNamePrefix + ".script", Script.ToString());
+			File.WriteAllText("Output\\Script_" + BaseFileName + ".script", Script.ToString());
 
 			Variables Variables = [];
 
@@ -169,17 +336,29 @@ namespace Waher.Runtime.Collections.Test
 				Height = 720
 			};
 
-			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_G.png",
+			await File.WriteAllBytesAsync("Output\\G_" + BaseFileName + ".png",
 				G.CreatePixels(Settings).EncodeAsPng());
 
-			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_GRel.png",
+			await File.WriteAllBytesAsync("Output\\GRel_" + BaseFileName + ".png",
 				GRel.CreatePixels(Settings).EncodeAsPng());
 
-			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_Legend.png",
-				Legend.CreatePixels().EncodeAsPng());
+			if (!File.Exists("Output\\Legend.png"))
+			{
+				await File.WriteAllBytesAsync("Output\\Legend.png",
+					Legend.CreatePixels().EncodeAsPng());
+			}
 
-			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_LegendRel.png",
-				LegendRel.CreatePixels().EncodeAsPng());
+			if (!File.Exists("Output\\LegendRel.png"))
+			{
+				await File.WriteAllBytesAsync("Output\\LegendRel.png",
+					LegendRel.CreatePixels().EncodeAsPng());
+			}
 		}
+
+		/* TODO:
+		 * Remove
+		 * double
+		 * string
+		 */
 	}
 }

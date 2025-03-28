@@ -122,8 +122,11 @@ namespace Waher.Script.Graphs3D
 			//this.showZeroY = ShowZeroY;
 			//this.showZeroZ = ShowZeroZ;
 
-			this.minX = Min.CalcMin(X, Node);
-			this.maxX = Max.CalcMax(X, Node);
+			if (this.minX is null)
+				this.minX = Min.CalcMin(X, Node);
+
+			if (this.maxX is null)
+				this.maxX = Max.CalcMax(X, Node);
 
 			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
 			{
@@ -133,8 +136,11 @@ namespace Waher.Script.Graphs3D
 				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
 			}
 
-			this.minY = Min.CalcMin(Y, Node);
-			this.maxY = Max.CalcMax(Y, Node);
+			if (this.minY is null)
+				this.minY = Min.CalcMin(Y, Node);
+
+			if (this.maxY is null)
+				this.maxY = Max.CalcMax(Y, Node);
 
 			if (ShowZeroY && c > 0 && this.minY.AssociatedSet is IAbelianGroup AG2)
 			{
@@ -144,8 +150,11 @@ namespace Waher.Script.Graphs3D
 				this.maxY = Max.CalcMax(new ObjectVector(this.maxY, Zero), null);
 			}
 
-			this.minZ = Min.CalcMin(Z, Node);
-			this.maxZ = Max.CalcMax(Z, Node);
+			if (this.minZ is null)
+				this.minZ = Min.CalcMin(Z, Node);
+
+			if (this.maxZ is null)
+				this.maxZ = Max.CalcMax(Z, Node);
 
 			if (ShowZeroZ && c > 0 && this.minZ.AssociatedSet is IAbelianGroup AG3)
 			{
@@ -198,32 +207,56 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// Smallest X-value.
 		/// </summary>
-		public IElement MinX => this.minX;
+		public IElement MinX
+		{
+			get => this.minX;
+			set => this.minX = value;
+		}
 
 		/// <summary>
 		/// Largest X-value.
 		/// </summary>
-		public IElement MaxX => this.maxX;
+		public IElement MaxX
+		{
+			get => this.maxX;
+			set => this.maxX = value;
+		}
 
 		/// <summary>
 		/// Smallest Y-value.
 		/// </summary>
-		public IElement MinY => this.minY;
+		public IElement MinY
+		{
+			get => this.minY;
+			set => this.minY = value;
+		}
 
 		/// <summary>
 		/// Largest Y-value.
 		/// </summary>
-		public IElement MaxY => this.maxY;
+		public IElement MaxY
+		{
+			get => this.maxY;
+			set => this.maxY = value;
+		}
 
 		/// <summary>
 		/// Smallest Z-value.
 		/// </summary>
-		public IElement MinZ => this.minZ;
+		public IElement MinZ
+		{
+			get => this.minZ;
+			set => this.minZ = value;
+		}
 
 		/// <summary>
 		/// Largest Z-value.
 		/// </summary>
-		public IElement MaxZ => this.maxZ;
+		public IElement MaxZ
+		{
+			get => this.maxZ;
+			set => this.maxZ = value;
+		}
 
 		/// <summary>
 		/// Title for graph.

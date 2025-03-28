@@ -129,9 +129,9 @@ namespace Waher.Runtime.Collections.Test
 			List.Add(1);
 			List.Add(2);
 			int Count = 0;
-			foreach (var item in List)
+			foreach (int item in List)
 				Count++;
-			
+
 			Assert.AreEqual(2, Count);
 		}
 
@@ -277,7 +277,7 @@ namespace Waher.Runtime.Collections.Test
 			// Add elements to the end
 			for (int i = 0; i < 10000; i++)
 				List.AddLastItem(i);
-			
+
 			Assert.AreEqual(10000, List.Count);
 			Assert.AreEqual(0, List.FirstItem);
 			Assert.AreEqual(9999, List.LastItem);
@@ -285,7 +285,7 @@ namespace Waher.Runtime.Collections.Test
 			// Remove elements from the beginning
 			for (int i = 0; i < 5000; i++)
 				List.RemoveFirst();
-			
+
 			Assert.AreEqual(5000, List.Count);
 			Assert.AreEqual(5000, List.FirstItem);
 			Assert.AreEqual(9999, List.LastItem);
@@ -293,7 +293,7 @@ namespace Waher.Runtime.Collections.Test
 			// Add elements to the beginning
 			for (int i = 0; i < 5000; i++)
 				List.AddFirstItem(-i);
-			
+
 			Assert.AreEqual(10000, List.Count);
 			Assert.AreEqual(-4999, List.FirstItem);
 			Assert.AreEqual(9999, List.LastItem);
@@ -301,7 +301,7 @@ namespace Waher.Runtime.Collections.Test
 			// Remove elements from the end
 			for (int i = 0; i < 5000; i++)
 				List.RemoveLast();
-			
+
 			Assert.AreEqual(5000, List.Count);
 			Assert.AreEqual(-4999, List.FirstItem);
 			Assert.AreEqual(0, List.LastItem);
@@ -330,7 +330,7 @@ namespace Waher.Runtime.Collections.Test
 
 			// Enumerate remaining elements
 			int expectedValue = -4999;
-			foreach (var item in List)
+			foreach (int item in List)
 			{
 				Assert.AreEqual(expectedValue, item);
 				expectedValue++;
@@ -339,6 +339,265 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(5000, List.Count);
 			Assert.AreEqual(-4999, List.FirstItem);
 			Assert.AreEqual(0, List.LastItem);
+		}
+		[TestMethod]
+		public void Test_29_Indexer_Get()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.Add(2);
+			List.Add(3);
+
+			Assert.AreEqual(1, List[0]);
+			Assert.AreEqual(2, List[1]);
+			Assert.AreEqual(3, List[2]);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_30_Indexer_Get_OutOfRange()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			_ = List[1]; // Should throw ArgumentOutOfRangeException
+		}
+
+		[TestMethod]
+		public void Test_31_Indexer_Set()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.Add(2);
+			List.Add(3);
+
+			List[1] = 5;
+
+			Assert.AreEqual(1, List[0]);
+			Assert.AreEqual(5, List[1]);
+			Assert.AreEqual(3, List[2]);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_32_Indexer_Set_OutOfRange()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List[1] = 5; // Should throw ArgumentOutOfRangeException
+		}
+
+		[TestMethod]
+		public void Test_33_IndexOf()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.Add(2);
+			List.Add(3);
+
+			Assert.AreEqual(0, List.IndexOf(1));
+			Assert.AreEqual(1, List.IndexOf(2));
+			Assert.AreEqual(2, List.IndexOf(3));
+			Assert.AreEqual(-1, List.IndexOf(4));
+		}
+
+		[TestMethod]
+		public void Test_34_Insert()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.Add(3);
+
+			List.Insert(1, 2);
+
+			Assert.AreEqual(1, List[0]);
+			Assert.AreEqual(2, List[1]);
+			Assert.AreEqual(3, List[2]);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_35_Insert_OutOfRange()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.Insert(2, 2); // Should throw ArgumentOutOfRangeException
+		}
+
+		[TestMethod]
+		public void Test_36_RemoveAt()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.Add(2);
+			List.Add(3);
+
+			List.RemoveAt(1);
+
+			Assert.AreEqual(1, List[0]);
+			Assert.AreEqual(3, List[1]);
+			Assert.AreEqual(2, List.Count);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_37_RemoveAt_OutOfRange()
+		{
+			ChunkedList<int> List = [];
+			List.Add(1);
+			List.RemoveAt(1); // Should throw ArgumentOutOfRangeException
+		}
+
+		[TestMethod]
+		public void Test_38_Insert_ChunkWithStartGreaterThanZero()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			// Remove first two elements
+			List.RemoveAt(0);
+			List.RemoveAt(0);
+
+			// Insert element at index 1 (in the chunk where Start > 0)
+			List.Insert(1, 5);
+
+			// Enumerate items to ensure all items are available and in the correct order
+			int[] Expected = { 3, 5, 4 };
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_39_Insert_ChunkNotFull()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3
+			};
+
+			// Insert element at index 1 (in the chunk that is not entirely full)
+			List.Insert(1, 5);
+
+			// Enumerate items to ensure all items are available and in the correct order
+			int[] Expected = { 1, 5, 2, 3 };
+			int Index = 0;
+			
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_40_Insert_ChunkFull_0()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			List.Insert(0, 5);
+
+			int[] Expected = { 5, 1, 2, 3, 4 };
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_41_Insert_ChunkFull_1()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			List.Insert(1, 5);
+
+			int[] Expected = { 1, 5, 2, 3, 4 };
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_42_Insert_ChunkFull_2()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			// Insert element at index 2 (in the chunk that is full, so it needs to be divided into two)
+			List.Insert(2, 5);
+
+			// Enumerate items to ensure all items are available and in the correct order
+			int[] Expected = { 1, 2, 5, 3, 4 };
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_43_Insert_ChunkFull_3()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			// Insert element at index 2 (in the chunk that is full, so it needs to be divided into two)
+			List.Insert(3, 5);
+
+			// Enumerate items to ensure all items are available and in the correct order
+			int[] Expected = { 1, 2, 3, 5, 4 };
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_44_Insert_ChunkFull_4()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1,
+				2,
+				3,
+				4
+			};
+
+			// Insert element at index 2 (in the chunk that is full, so it needs to be divided into two)
+			List.Insert(4, 5);
+
+			// Enumerate items to ensure all items are available and in the correct order
+			int[] Expected = { 1, 2, 3, 4, 5 };
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
 		}
 	}
 }

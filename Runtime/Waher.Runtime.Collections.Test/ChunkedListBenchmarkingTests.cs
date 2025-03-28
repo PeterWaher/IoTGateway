@@ -467,7 +467,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-			public Task Test_14_RemoveFirst_Large()
+		public Task Test_14_RemoveFirst_Large()
 		{
 			return Test_RemoveFirst("Test_14_RemoveFirst_Large", largeNumberOfItems, 2000);
 		}
@@ -625,16 +625,16 @@ namespace Waher.Runtime.Collections.Test
 			Script.AppendLine("\";");
 			Script.AppendLine("L:=legend([\"ChunkedList\",\"LinkedList\",\"List\"],[\"Red\",\"Green\",\"Blue\"],\"White\",1);");
 			Script.AppendLine("r2:=100*t2./t1;");
-			Script.Append("r2:=r2>");
-			Script.Append(Limit);
-			Script.Append("?null:r2;");
-			Script.Append("r3:=[foreach i in 0..(count(t3)-1): exists(t3[i]) ? (x:=100*t3[i]/t1[i];x>");
-			Script.Append(Limit);
-			Script.AppendLine("?null:x) : null];");
+			Script.AppendLine("r3:=[foreach i in 0..(count(t3)-1): exists(t3[i]) ? 100*t3[i]/t1[i] : null];");
 			Script.AppendLine("GRel:=plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
 			Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");
 			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\")+");
 			Script.AppendLine("plot2dcurve(N,100*ones(count(N)),\"Black\");");
+			Script.Append("if Max(Max(r2),Max(r3))>");
+			Script.Append(Limit);
+			Script.AppendLine(" then GRel.MaxY:=");
+			Script.Append(Limit);
+			Script.AppendLine(";");
 			Script.AppendLine("GRel.LabelX:=\"N\";");
 			Script.AppendLine("GRel.LabelY:=\"Performance Increase (%)\";");
 			Script.Append("GRel.Title:=\"");

@@ -46,7 +46,7 @@ namespace Waher.Runtime.Collections
 	/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">Element type.</typeparam>
-	public class ChunkedList<T> : ICollection<T>
+	public class ChunkedList<T> : ICollection<T>, IList<T>
 	{
 		private const int initialChunkSize = 16;
 
@@ -92,8 +92,8 @@ namespace Waher.Runtime.Collections
 		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
 		public ChunkedList(int InitialChunkSize, int MaxChunkSize)
 		{
-			if (InitialChunkSize <= 0)
-				throw new ArgumentException("Chunk size must be positive.", nameof(InitialChunkSize));
+			if (InitialChunkSize <= 1)
+				throw new ArgumentException("Chunk size must be larger than one.", nameof(InitialChunkSize));
 
 			if (MaxChunkSize < InitialChunkSize)
 				throw new ArgumentException("Max chunk size must be greater than or equal to initial chunk size.", nameof(MaxChunkSize));
@@ -280,14 +280,12 @@ namespace Waher.Runtime.Collections
 					if (i >= 0)
 					{
 						if (i == Loop.Start)
-							Loop.Elements[Loop.Start++] = default;
+							Loop.Start++;
 						else
 						{
 							c = --Loop.Pos;
 							if (i < c)
 								Array.Copy(Loop.Elements, i + 1, Loop.Elements, i, c - i);
-						
-							Loop.Elements[c] = default;
 						}
 
 						this.count--;
@@ -672,5 +670,260 @@ namespace Waher.Runtime.Collections
 		}
 
 		#endregion
+
+		#region IList<T>
+
+		/// <summary>
+		/// Gets or sets the element at the specified index.
+		/// </summary>
+		/// <param name="Index">The zero-based index of the element to get or set.</param>
+		/// <returns>The element at the specified index.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">index is not a valid index.</exception>"
+		public T this[int Index]
+		{
+			get
+			{
+				if (Index < 0 || Index >= this.count)
+					throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+				Chunk Loop = this.firstChunk;
+				int c;
+
+				while (!(Loop is null))
+				{
+					c = Loop.Pos - Loop.Start;
+
+					if (Index < c)
+						return Loop.Elements[Loop.Start + Index];
+					else
+						Index -= c;
+
+					Loop = Loop.Next;
+				}
+
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+			}
+
+			set
+			{
+				if (Index < 0 || Index >= this.count)
+					throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+				Chunk Loop = this.firstChunk;
+				int c;
+
+				while (!(Loop is null))
+				{
+					c = Loop.Pos - Loop.Start;
+
+					if (Index < c)
+					{
+						Loop.Elements[Loop.Start + Index] = value;
+						return;
+					}
+					else
+						Index -= c;
+
+					Loop = Loop.Next;
+				}
+
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+			}
+		}
+
+		/// <summary>
+		/// Determines the index of a specific item
+		/// </summary>
+		/// <param name="Item">The object to locate</param>
+		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
+		public int IndexOf(T Item)
+		{
+			Chunk Loop = this.firstChunk;
+			int i, c, Index = 0;
+
+			while (!(Loop is null))
+			{
+				c = Loop.Pos - Loop.Start;
+
+				if (c > 0 &&
+					(i = Array.IndexOf(Loop.Elements, Item, Loop.Start, Loop.Pos - Loop.Start)) >= 0)
+				{
+					return Index + i;
+				}
+
+				Index += c;
+				Loop = Loop.Next;
+			}
+
+			return -1;
+		}
+
+		/// <summary>
+		/// Inserts an item to the list at the specified index.
+		/// </summary>
+		/// <param name="Index">The zero-based index at which item should be inserted.</param>
+		/// <param name="Item">The object to insert into the list.</param>
+		public void Insert(int Index, T Item)
+		{
+			if (Index < 0 || Index > this.count)
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+			if (Index == this.count)
+			{
+				this.Add(Item);
+				return;
+			}
+
+			Chunk Loop = this.firstChunk;
+			int c;
+
+			while (!(Loop is null))
+			{
+				c = Loop.Pos - Loop.Start;
+
+				if (Index < c)
+				{
+					if (Loop.Start > 0)
+					{
+						if (Index > 0)
+							Array.Copy(Loop.Elements, Loop.Start, Loop.Elements, Loop.Start - 1, Index);
+
+						Loop.Elements[--Loop.Start + Index] = Item;
+					}
+					else if (Loop.Pos < Loop.Size)
+					{
+						if (Index < Loop.Pos)
+							Array.Copy(Loop.Elements, Index, Loop.Elements, Index + 1, Loop.Pos - Index);
+
+						Loop.Elements[Index] = Item;
+						Loop.Pos++;
+					}
+					else
+					{
+						Chunk Temp = Loop.Next;
+						Chunk NewChunk = new Chunk(Loop.Size, Loop)
+						{
+							Next = Temp
+						};
+
+						c = Loop.Size >> 1;
+
+						if (Index < c)
+						{
+							NewChunk.Pos = Loop.Size - c;
+							Array.Copy(Loop.Elements, c, NewChunk.Elements, 0, NewChunk.Pos);
+							Array.Copy(Loop.Elements, Index, Loop.Elements, Index + 1, c - Index);
+							Loop.Elements[Index] = Item;
+							Loop.Pos = c + 1;
+						}
+						else
+						{
+							Loop.Pos = c;
+							Index -= c;
+							NewChunk.Pos = Loop.Size - c + 1;
+
+							if (Index > 0)
+							{
+								Array.Copy(Loop.Elements, c, NewChunk.Elements, 0, Index);
+								c += Index;
+							}
+
+							NewChunk.Elements[Index++] = Item;
+
+							if (Loop.Size > c)
+								Array.Copy(Loop.Elements, c, NewChunk.Elements, Index, Loop.Size - c);
+						}
+					}
+
+					this.count++;
+					return;
+				}
+				else
+					Index -= c;
+
+				Loop = Loop.Next;
+			}
+
+			throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+		}
+
+		/// <summary>
+		/// Removes the item at the specified index.
+		/// </summary>
+		/// <param name="Index">The zero-based index of the item to remove.</param>
+		public void RemoveAt(int Index)
+		{
+			if (Index < 0 || Index >= this.count)
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+			Chunk Loop = this.firstChunk;
+			int c;
+
+			while (!(Loop is null))
+			{
+				c = Loop.Pos - Loop.Start;
+
+				if (Index < c)
+				{
+					if (Index == 0)
+						Loop.Start++;
+					else
+					{
+						Index += Loop.Start;
+						c = --Loop.Pos;
+
+						if (Index < c)
+							Array.Copy(Loop.Elements, Index + 1, Loop.Elements, Index, c - Index);
+					}
+
+					this.count--;
+
+					if (Loop.Start == Loop.Pos)
+					{
+						Loop.Start = 0;
+						Loop.Pos = 0;
+
+						if (Loop.Prev is null)
+							this.firstChunk = Loop.Next ?? Loop;
+						else
+							Loop.Prev.Next = Loop.Next;
+
+						if (Loop.Next is null)
+							this.lastChunk = Loop.Prev ?? Loop;
+						else
+							Loop.Next.Prev = Loop.Prev;
+
+						this.chunkSize >>= 1;
+						if (this.chunkSize < this.minChunkSize)
+							this.chunkSize = this.minChunkSize;
+
+					}
+
+					return;
+				}
+				else
+					Index -= c;
+
+				Loop = Loop.Next;
+			}
+
+			throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+		}
+
+		#endregion
+		
+		// TODO:
+		// T[] ToArray();
+		// void AddRange(IEnumerable<T> collection);
+		// void CopyTo(int index, T[] array, int arrayIndex, int count);
+		// void CopyTo(T[] array, int arrayIndex);
+		// void CopyTo(T[] array);
+		// void ForEach(Action<T> action);
+		// int IndexOf(T item, int index, int count);
+		// int IndexOf(T item, int index);
+		// int LastIndexOf(T item);
+		// int LastIndexOf(T item, int index);
+		// int LastIndexOf(T item, int index, int count);
+
 	}
 }

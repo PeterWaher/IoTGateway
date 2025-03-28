@@ -14,12 +14,30 @@ namespace Waher.Runtime.Collections
 	public delegate bool ForEachCallback<T>(T Item);
 
 	/// <summary>
-	/// Asynchronous callback method for the ForEach method.
+	/// Asynchronous callback method for the ForEachAsync method.
 	/// </summary>
 	/// <typeparam name="T">Element type.</typeparam>
 	/// <param name="Item">Item being iterated.</param>
 	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
 	public delegate Task<bool> ForEachAsyncCallback<T>(T Item);
+
+	/// <summary>
+	/// Callback method for the ForEachChunk method.
+	/// </summary>
+	/// <typeparam name="T">Element type.</typeparam>
+	/// <param name="Chunk">Chunk being iterated.</param>
+	/// <param name="Count">Number of items in chunk.</param>
+	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
+	public delegate bool ForEachChunkCallback<T>(T[] Chunk, int Count);
+
+	/// <summary>
+	/// Asynchronous callback method for the ForEachChunkAsync method.
+	/// </summary>
+	/// <typeparam name="T">Element type.</typeparam>
+	/// <param name="Chunk">Chunk being iterated.</param>
+	/// <param name="Count">Number of items in chunk.</param>
+	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
+	public delegate Task<bool> ForEachChunkAsyncCallback<T>(T[] Chunk, int Count);
 
 	/// <summary>
 	/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
@@ -341,6 +359,60 @@ namespace Waher.Runtime.Collections
 				for (i = 0, c = Loop.Count; i < c; i++)
 				{
 					if (!await Callback(Loop.Elements[i]))
+						return false;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Iterates through all chunks of elements in the collection, and calls the callback 
+		/// method in <paramref name="Callback"/> for each chunk. The loop can be terminated 
+		/// early, by returning false from the callback method.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
+		public bool ForEachChunk(ForEachChunkCallback<T> Callback)
+		{
+			Chunk Loop = this.firstChunk;
+			int c;
+
+			while (!(Loop is null))
+			{
+				c = Loop.Count;
+				if (c > 0)
+				{
+					if (!Callback(Loop.Elements, c))
+						return false;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Iterates through all chunks of elements in the collection, and calls the callback 
+		/// method in <paramref name="Callback"/> for each chunk. The loop can be terminated 
+		/// early, by returning false from the callback method.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
+		public async Task<bool> ForEachChunkAsync(ForEachChunkAsyncCallback<T> Callback)
+		{
+			Chunk Loop = this.firstChunk;
+			int c;
+
+			while (!(Loop is null))
+			{
+				c = Loop.Count;
+				if (c > 0)
+				{
+					if (!await Callback(Loop.Elements, c))
 						return false;
 				}
 

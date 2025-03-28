@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Waher.Runtime.Inventory
+namespace Waher.Runtime.Collections
 {
 	/// <summary>
 	/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
@@ -10,7 +10,7 @@ namespace Waher.Runtime.Inventory
 	/// <typeparam name="T">Element type.</typeparam>
 	public class ChunkedList<T> : ICollection<T>
 	{
-		private const int initialChunkSize = 16;
+		private const int initialChunkSize = 4;
 
 		private readonly int maxChunkSize;
 		private Chunk current;

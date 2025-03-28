@@ -1,20 +1,44 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Text;
+using Waher.Layout.Layout2D.Functions;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
+using Waher.Script;
+using Waher.Script.Graphs;
 
-namespace Waher.Runtime.Inventory.Test
+namespace Waher.Runtime.Collections.Test
 {
 	[TestClass]
 	public class ChunkedListBenchmarkingTests
 	{
-		private static readonly int[] numberOfItems = new int[]
-		{
+		private static readonly int[] smallNumberOfItems =
+		[
+			1,
+			2,
+			3,
+			4,
+			5,
+			6,
+			7,
+			8,
+			9,
 			10,
+			15,
+			20,
+			30,
+			40,
+			50,
+			60,
+			70,
+			80,
+			90,
+			100,
+		];
+		private static readonly int[] largeNumberOfItems =
+		[
 			100,
 			200,
 			500,
+			1000,
 			1000,
 			2000,
 			5000,
@@ -31,10 +55,30 @@ namespace Waher.Runtime.Inventory.Test
 			800000,
 			900000,
 			1000000
-		};
+		];
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext _)
+		{
+			Types.Initialize(
+				typeof(Expression).Assembly,
+				typeof(Graph).Assembly,
+				typeof(Legend).Assembly);
+		}
 
 		[TestMethod]
-		public void Test_01_Add()
+		public Task Test_01_Add_Small()
+		{
+			return Test_Add("Test_01_Add_Small", smallNumberOfItems);
+		}
+
+		[TestMethod]
+		public Task Test_02_Add_Large()
+		{
+			return Test_Add("Test_02_Add_Large", largeNumberOfItems);
+		}
+
+		private static async Task Test_Add(string Name, int[] NumberOfItems)
 		{
 			Benchmarker2D Benchmarker = new();
 			LinkedList<double> LinkedList;
@@ -42,7 +86,7 @@ namespace Waher.Runtime.Inventory.Test
 			ChunkedList<double> ChunkedList;
 			int i;
 
-			foreach (int N in numberOfItems)
+			foreach (int N in NumberOfItems)
 			{
 				LinkedList = [];
 				List = [];
@@ -67,13 +111,13 @@ namespace Waher.Runtime.Inventory.Test
 				}
 			}
 
-			PrintScript(Benchmarker);
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name);
 		}
 
-		private static void PrintScript(Benchmarker2D Benchmarker)
+		private static async Task OutputResults(Benchmarker2D Benchmarker, string FileNamePrefix)
 		{
-			Benchmarker.Remove(10);
-
 			StringBuilder Script = new();
 			Script.Append("M:=");
 			Script.Append(Benchmarker.GetResultScriptMilliseconds());
@@ -95,14 +139,44 @@ namespace Waher.Runtime.Inventory.Test
 			Script.AppendLine("r3:=100*t3./t1;");
 			Script.AppendLine("GRel:=plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
 			Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");
-			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\");");
+			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\")+");
+			Script.AppendLine("plot2dcurve(N,100*ones(count(N)),\"Black\");");
 			Script.AppendLine("GRel.LabelX:=\"N\";");
 			Script.AppendLine("GRel.LabelY:=\"Performance Increase (%)\";");
 			Script.AppendLine("GRel.Title:=\"Add()\";");
 			Script.AppendLine("LRel:=legend([\"ChunkedList vs LinkedList\",\"ChunkedList vs List\"],[\"Green\",\"Blue\"],\"White\",1);");
 			Script.AppendLine("GRel;");
 
-			Console.Out.WriteLine(Script.ToString());
+			if (!Directory.Exists("Output"))
+				Directory.CreateDirectory("Output");
+
+			File.WriteAllText("Output\\" + FileNamePrefix + ".script", Script.ToString());
+
+			Variables Variables = [];
+
+			await Expression.EvalAsync(Script.ToString(), Variables);
+
+			Graph G = (Graph)Variables["G"];
+			Graph GRel = (Graph)Variables["GRel"];
+			Graph Legend = (Graph)Variables["L"];
+			Graph LegendRel = (Graph)Variables["LRel"];
+			GraphSettings Settings = new()
+			{
+				Width = 1280,
+				Height = 720
+			};
+
+			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_G.png",
+				G.CreatePixels(Settings).EncodeAsPng());
+
+			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_GRel.png",
+				GRel.CreatePixels(Settings).EncodeAsPng());
+
+			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_Legend.png",
+				Legend.CreatePixels().EncodeAsPng());
+
+			await File.WriteAllBytesAsync("Output\\" + FileNamePrefix + "_LegendRel.png",
+				LegendRel.CreatePixels().EncodeAsPng());
 		}
 	}
 }

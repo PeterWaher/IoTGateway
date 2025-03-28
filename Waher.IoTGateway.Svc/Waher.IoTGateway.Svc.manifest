@@ -447,6 +447,9 @@
 	<Assembly fileName="Waher.Runtime.Cache.dll" />
 	<Assembly fileName="Waher.Runtime.Cache.pdb" />
 	<Assembly fileName="Waher.Runtime.Cache.xml" />
+	<Assembly fileName="Waher.Runtime.Collections.dll"/>
+	<Assembly fileName="Waher.Runtime.Collections.pdb"/>
+	<Assembly fileName="Waher.Runtime.Collections.xml"/>
 	<Assembly fileName="Waher.Runtime.Console.dll" />
 	<Assembly fileName="Waher.Runtime.Console.pdb" />
 	<Assembly fileName="Waher.Runtime.Console.xml" />

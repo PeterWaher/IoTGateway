@@ -1,7 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-
-namespace Waher.Runtime.Inventory.Test
+namespace Waher.Runtime.Collections.Test
 {
 	[TestClass]
 	public class ChunkedListTests

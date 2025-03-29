@@ -5,13 +5,6 @@ using System.Security.Cryptography.X509Certificates;
 namespace Waher.Content
 {
 	/// <summary>
-	/// Delegate for remote certificate event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender</param>
-	/// <param name="e">Event arguments</param>
-	public delegate void RemoteCertificateEventHandler(object Sender, RemoteCertificateEventArgs e);
-
-	/// <summary>
 	/// Remove certificate validation event arguments.
 	/// </summary>
 	public class RemoteCertificateEventArgs : EventArgs

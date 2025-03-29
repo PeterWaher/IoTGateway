@@ -56,7 +56,7 @@ namespace Waher.Content.Deleters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
 		public override async Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate, RemoteCertificateValidator);
 			using (HttpClient HttpClient = new HttpClient(Handler, true)

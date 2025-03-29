@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.FullTextSearch
 {
-	/// <summary>
-	/// Delegate for object reference event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task ObjectReferenceEventHandler(object Sender, ObjectReferenceEventArgs e);
-
 	/// <summary>
 	/// Event arguments for object reference events.
 	/// </summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
@@ -120,7 +121,7 @@ namespace Waher.Script.Fractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static void Smooth(double[] ColorIndex, double[] Boundary, int Width, int Height, int N,
+		public static async Task Smooth(double[] ColorIndex, double[] Boundary, int Width, int Height, int N,
 			SKColor[] Palette, ScriptNode Node, Variables Variables)
 		{
 			// Passing ColorIndex through the heat equation of 2 spatial dimensions, 
@@ -205,21 +206,21 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Variables.Preview(Node.Expression, new GraphBitmap(Variables, ToPixels(ColorIndex, Width, Height, Palette)));
+							await Variables.Preview(Node.Expression, new GraphBitmap(Variables, ToPixels(ColorIndex, Width, Height, Palette)));
 
-						Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
+						await Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
 				}
 			}
 
 			Variables.ConsoleOut?.Write("Iterations: " + Iterations.ToString());
-			Variables.Status(Node.Expression, string.Empty);
+			await Variables.Status(Node.Expression, string.Empty);
 		}
 
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static void Smooth(double[] R, double[] G, double[] B, double[] A,
+		public static async Task Smooth(double[] R, double[] G, double[] B, double[] A,
 			double[] BoundaryR, double[] BoundaryG, double[] BoundaryB, double[] BoundaryA,
 			int Width, int Height, ScriptNode Node, Variables Variables)
 		{
@@ -362,15 +363,15 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Variables.Preview(Node.Expression, new GraphBitmap(Variables, ToPixels(R, G, B, A, Width, Height)));
+							await Variables.Preview(Node.Expression, new GraphBitmap(Variables, ToPixels(R, G, B, A, Width, Height)));
 
-						Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
+						await Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
 				}
 			}
 
 			Variables.ConsoleOut?.Write("Iterations: " + Iterations.ToString());
-			Variables.Status(Node.Expression, string.Empty);
+			await Variables.Status(Node.Expression, string.Empty);
 		}
 
 		/// <summary>

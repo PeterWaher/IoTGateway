@@ -36,7 +36,7 @@ namespace Waher.Content
 		/// <param name="RemoteCertificateValidator">Optional validator of remote certificates.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator,
+		Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
@@ -49,7 +49,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
 		Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 	}
 }

@@ -428,7 +428,7 @@ namespace Waher.Script
 		/// <summary>
 		/// Event raised when there is a new value to preview.
 		/// </summary>
-		public event PreviewEventHandler OnPreview;
+		public event EventHandlerAsync<PreviewEventArgs> OnPreview;
 
 		/// <summary>
 		/// If previews are desired.
@@ -452,24 +452,15 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Expression">Expression being executed.</param>
 		/// <param name="Result">Preview</param>
-		public void Preview(Expression Expression, IElement Result)
+		public async Task Preview(Expression Expression, IElement Result)
 		{
-			PreviewEventHandler h = this.OnPreview;
+			EventHandlerAsync<PreviewEventArgs> h = this.OnPreview;
 
 			if (!(h is null))
-			{
-				try
-				{
-					h(this, new PreviewEventArgs(Expression, this, Result));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+				await h.Raise(this, new PreviewEventArgs(Expression, this, Result));
 
 			if (this.contextVariables is Variables v)
-				v.Preview(Expression, Result);
+				await v.Preview(Expression, Result);
 		}
 
 
@@ -478,20 +469,11 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Expression">Expression.</param>
 		/// <param name="Result">Status Message</param>
-		public void Status(Expression Expression, string Result)
+		public async Task Status(Expression Expression, string Result)
 		{
-			StatusEventHandler h = this.OnStatus;
+			EventHandlerAsync<StatusEventArgs> h = this.OnStatus;
 			if (!(h is null))
-			{
-				try
-				{
-					h(this, new StatusEventArgs(Expression, this, Result));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+				await h(this, new StatusEventArgs(Expression, this, Result));
 		}
 
 		/// <summary>
@@ -505,7 +487,6 @@ namespace Waher.Script
 		/// <summary>
 		/// Event raised when a status message has been reported.
 		/// </summary>
-		public event StatusEventHandler OnStatus = null;
-
+		public event EventHandlerAsync<StatusEventArgs> OnStatus = null;
 	}
 }

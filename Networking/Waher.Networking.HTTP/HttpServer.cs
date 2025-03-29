@@ -1810,26 +1810,15 @@ namespace Waher.Networking.HTTP
 		}
 
 
-		private async Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
 		{
-			CacheItemEventHandler<string, Variables> h = this.SessionRemoved;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			return this.SessionRemoved.Raise(this, e);
 		}
 
 		/// <summary>
 		/// Event raised when a session has been closed.
 		/// </summary>
-		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
+		public event EventHandlerAsync<CacheItemEventArgs<string, Variables>> SessionRemoved = null;
 
 		/// <summary>
 		/// Event raised before sending an error back to a client. Allows the server to prepare custom error pages.

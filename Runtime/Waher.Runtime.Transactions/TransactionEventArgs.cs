@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Runtime.Transactions
 {
-	/// <summary>
-	/// Delegate for transaction events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task TransactionEventHandler(object Sender, TransactionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for transaction events.
 	/// </summary>

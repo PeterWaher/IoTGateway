@@ -74,7 +74,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
 		/// <exception cref="GenericException">Annotated exception. Inner exception determines the cause.</exception>
 		public override async Task<ContentResponse> DeleteAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpxClient HttpxClient;
 			string BareJid;

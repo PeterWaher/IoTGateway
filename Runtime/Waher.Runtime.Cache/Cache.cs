@@ -402,39 +402,28 @@ namespace Waher.Runtime.Cache
 
 		private async void OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
 		{
-			CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
-
-			if (!(h is null))
+			try
 			{
-				try
-				{
-					await h(this, new CacheItemEventArgs<KeyType, ValueType>(Key, Value, Reason));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				EventHandlerAsync<CacheItemEventArgs<KeyType, ValueType>> h = this.Removed;
+
+				if (!(h is null))
+					await h.Raise(this, new CacheItemEventArgs<KeyType, ValueType>(Key, Value, Reason));
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
 		private async void OnRemoved(IEnumerable<CacheItem<KeyType, ValueType>> Items, RemovedReason Reason)
 		{
-			CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
+			EventHandlerAsync<CacheItemEventArgs<KeyType, ValueType>> h = this.Removed;
 			try
 			{
 				if (!(h is null))
 				{
 					foreach (CacheItem<KeyType, ValueType> Item in Items)
-					{
-						try
-						{
-							await h(this, new CacheItemEventArgs<KeyType, ValueType>(Item.Key, Item.Value, Reason));
-						}
-						catch (Exception ex)
-						{
-							Log.Exception(ex);
-						}
-					}
+						await h.Raise(this, new CacheItemEventArgs<KeyType, ValueType>(Item.Key, Item.Value, Reason));
 				}
 			}
 			catch (Exception ex)
@@ -476,7 +465,7 @@ namespace Waher.Runtime.Cache
 		/// <summary>
 		/// Event raised when an item has been removed from the cache.
 		/// </summary>
-		public event CacheItemEventHandler<KeyType, ValueType> Removed = null;
+		public event EventHandlerAsync<CacheItemEventArgs<KeyType, ValueType>> Removed = null;
 
 		/// <summary>
 		/// Clears the cache.

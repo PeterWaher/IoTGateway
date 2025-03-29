@@ -100,18 +100,7 @@ namespace Waher.Persistence
 
 		private static void RaiseInserted(object Object)
 		{
-			ObjectEventHandler h = ObjectInserted;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			ObjectInserted?.Raise(Provider, new ObjectEventArgs(Object));
 		}
 
 		private static void RaiseInserted(IEnumerable<object> Objects)
@@ -123,7 +112,7 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Event raised when an object has been inserted.
 		/// </summary>
-		public static event ObjectEventHandler ObjectInserted = null;
+		public static event EventHandler<ObjectEventArgs> ObjectInserted = null;
 
 		/// <summary>
 		/// Inserts a set of objects into the default collection of the database.
@@ -631,18 +620,7 @@ namespace Waher.Persistence
 
 		private static void RaiseUpdated(object Object)
 		{
-			ObjectEventHandler h = ObjectUpdated;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			ObjectUpdated?.Raise(Provider, new ObjectEventArgs(Object));
 		}
 
 		private static void RaiseUpdated(IEnumerable<object> Objects)
@@ -654,7 +632,7 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Event raised when an object has been updated.
 		/// </summary>
-		public static event ObjectEventHandler ObjectUpdated = null;
+		public static event EventHandler<ObjectEventArgs> ObjectUpdated = null;
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
@@ -723,7 +701,7 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Event raised when an object has been deleted.
 		/// </summary>
-		public static event ObjectEventHandler ObjectDeleted = null;
+		public static event EventHandler<ObjectEventArgs> ObjectDeleted = null;
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
@@ -781,18 +759,7 @@ namespace Waher.Persistence
 
 		private static void RaiseDeleted(object Object)
 		{
-			ObjectEventHandler h = ObjectDeleted;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			ObjectDeleted?.Raise(Provider, new ObjectEventArgs(Object));
 		}
 
 		private static void RaiseDeleted(IEnumerable<object> Objects)
@@ -1207,24 +1174,13 @@ namespace Waher.Persistence
 		{
 			await Provider.Clear(CollectionName);
 
-			CollectionEventHandler h = CollectionCleared;
-			if (!(h is null))
-			{
-				try
-				{
-					await h(Provider, new CollectionEventArgs(CollectionName));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			await CollectionCleared.Raise(Provider, new CollectionEventArgs(CollectionName));
 		}
 
 		/// <summary>
 		/// Event raised when a collection has been cleared.
 		/// </summary>
-		public static event CollectionEventHandler CollectionCleared = null;
+		public static event EventHandlerAsync<CollectionEventArgs> CollectionCleared = null;
 
 		/// <summary>
 		/// Analyzes the database and exports findings to XML.
@@ -1284,51 +1240,51 @@ namespace Waher.Persistence
 			string[] Result = await Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData, Thread);
 
 			if (Result.Length > 0)
-				RaiseRepaired(Result, Flagged);
+				await RaiseRepaired(Result, Flagged);
 
 			return Result;
 		}
 
-		private static void RaiseRepaired(string[] Collections, KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged)
+		private static async Task RaiseRepaired(string[] Collections, KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged)
 		{
-			FlagSource[] FlaggedCollection;
-			CollectionRepairedEventHandler h = CollectionRepaired;
-
-			if (!(h is null))
+			try
 			{
-				foreach (string Collection in Collections)
-				{
-					FlaggedCollection = null;
+				FlagSource[] FlaggedCollection;
+				EventHandlerAsync<CollectionRepairedEventArgs> h = CollectionRepaired;
 
-					if (!(Flagged is null))
+				if (!(h is null))
+				{
+					foreach (string Collection in Collections)
 					{
-						foreach (KeyValuePair<string, Dictionary<string, FlagSource>> Rec in Flagged)
+						FlaggedCollection = null;
+
+						if (!(Flagged is null))
 						{
-							if (Rec.Key == Collection)
+							foreach (KeyValuePair<string, Dictionary<string, FlagSource>> Rec in Flagged)
 							{
-								FlaggedCollection = new FlagSource[Rec.Value.Count];
-								Rec.Value.Values.CopyTo(FlaggedCollection, 0);
-								break;
+								if (Rec.Key == Collection)
+								{
+									FlaggedCollection = new FlagSource[Rec.Value.Count];
+									Rec.Value.Values.CopyTo(FlaggedCollection, 0);
+									break;
+								}
 							}
 						}
-					}
 
-					try
-					{
-						h(Provider, new CollectionRepairedEventArgs(Collection, FlaggedCollection));
-					}
-					catch (Exception)
-					{
-						// Ignore
+						await h.Raise(Provider, new CollectionRepairedEventArgs(Collection, FlaggedCollection));
 					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when a collection has been repaired.
 		/// </summary>
-		public static event CollectionRepairedEventHandler CollectionRepaired = null;
+		public static event EventHandlerAsync<CollectionRepairedEventArgs> CollectionRepaired = null;
 
 		/// <summary>
 		/// Analyzes the database and exports findings to XML.
@@ -1363,7 +1319,7 @@ namespace Waher.Persistence
 			string[] Result = await Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, Thread);
 
 			if (Repair && Result.Length > 0)
-				RaiseRepaired(Result, Flagged);
+				await RaiseRepaired(Result, Flagged);
 
 			return Result;
 		}

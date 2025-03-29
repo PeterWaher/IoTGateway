@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence
 {
-	/// <summary>
-	/// Event handler for collection events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CollectionEventHandler(object Sender, CollectionEventArgs e);
-
 	/// <summary>
 	/// Event arguments for collection events.
 	/// </summary>

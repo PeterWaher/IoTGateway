@@ -111,8 +111,7 @@ namespace Waher.Script.Threading.Functions
 			{
 				Task Preview(object Sender, PreviewEventArgs e)
 				{
-					Variables.Preview(e.Expression, e.Preview);
-					return Task.CompletedTask;
+					return Variables.Preview(e.Expression, e.Preview);
 				}
 
 				v.OnPreview += Preview;

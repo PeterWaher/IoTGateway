@@ -44,7 +44,7 @@ namespace Waher.Content.Posters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
 		public virtual Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.PostAsync(Uri, Data, Certificate, RemoteCertificateValidator, 60000, Headers);
 		}
@@ -60,7 +60,7 @@ namespace Waher.Content.Posters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
 		public virtual async Task<ContentResponse> PostAsync(Uri Uri, object Data, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			ContentResponse P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
 			ContentBinaryResponse Result = await this.PostAsync(Uri, P.Encoded, P.ContentType, Certificate, RemoteCertificateValidator, TimeoutMs, Headers);
@@ -81,7 +81,7 @@ namespace Waher.Content.Posters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
 		public virtual Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
-			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
+			X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.PostAsync(Uri, EncodedData, ContentType, Certificate, RemoteCertificateValidator, 60000, Headers);
 		}
@@ -98,7 +98,7 @@ namespace Waher.Content.Posters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
 		public abstract Task<ContentBinaryResponse> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, 
-			X509Certificate Certificate, RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, 
+			X509Certificate Certificate, EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, 
 			params KeyValuePair<string, string>[] Headers);
 
 	}

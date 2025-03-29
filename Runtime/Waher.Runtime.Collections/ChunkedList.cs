@@ -7,22 +7,6 @@ using System.Threading.Tasks;
 namespace Waher.Runtime.Collections
 {
 	/// <summary>
-	/// Callback method for the ForEach method.
-	/// </summary>
-	/// <typeparam name="T">Element type.</typeparam>
-	/// <param name="Item">Item being iterated.</param>
-	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
-	public delegate bool ForEachCallback<T>(T Item);
-
-	/// <summary>
-	/// Asynchronous callback method for the ForEachAsync method.
-	/// </summary>
-	/// <typeparam name="T">Element type.</typeparam>
-	/// <param name="Item">Item being iterated.</param>
-	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
-	public delegate Task<bool> ForEachAsyncCallback<T>(T Item);
-
-	/// <summary>
 	/// Callback method for the ForEachChunk method.
 	/// </summary>
 	/// <typeparam name="T">Element type.</typeparam>
@@ -43,6 +27,14 @@ namespace Waher.Runtime.Collections
 	public delegate Task<bool> ForEachChunkAsyncCallback<T>(T[] Chunk, int Offset, int Count);
 
 	/// <summary>
+	/// Asynchronous predicate function with one argument.
+	/// </summary>
+	/// <typeparam name="T">Argument type.</typeparam>
+	/// <param name="Arg">Argument.</param>
+	/// <returns>Result of call.</returns>
+	public delegate Task<bool> PredicateAsync<in T>(T Arg);
+
+	/// <summary>
 	/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">Element type.</typeparam>
@@ -57,7 +49,7 @@ namespace Waher.Runtime.Collections
 		private Chunk lastChunk;
 		private int chunkSize;
 		private int count = 0;
-
+		
 		/// <summary>
 		/// Number of elements in collection.
 		/// </summary>
@@ -411,7 +403,7 @@ namespace Waher.Runtime.Collections
 		/// </summary>
 		/// <param name="Callback">Callback method.</param>
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
-		public bool ForEach(ForEachCallback<T> Callback)
+		public bool ForEach(Predicate<T> Callback)
 		{
 			Chunk Loop = this.firstChunk;
 			int i, c;
@@ -437,7 +429,7 @@ namespace Waher.Runtime.Collections
 		/// </summary>
 		/// <param name="Callback">Callback method.</param>
 		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
-		public async Task<bool> ForEachAsync(ForEachAsyncCallback<T> Callback)
+		public async Task<bool> ForEachAsync(PredicateAsync<T> Callback)
 		{
 			Chunk Loop = this.firstChunk;
 			int i, c;

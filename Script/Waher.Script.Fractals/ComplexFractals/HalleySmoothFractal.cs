@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -113,9 +114,23 @@ namespace Waher.Script.Fractals.ComplexFractals
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			string ColorExpression = null;
 			SKColor[] Palette;
@@ -234,18 +249,18 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (!(f is null))
 			{
-				return CalcHalley(rc, ic, dr, R, f, Variables, Palette, dimx, dimy, this, this.FractalZoomScript,
+				return await CalcHalley(rc, ic, dr, R, f, Variables, Palette, dimx, dimy, this, this.FractalZoomScript,
 				   new object[] { Palette, dimx, dimy, R, fDef, ColorExpression });
 			}
 			else if (!(CoefficientsZ is null))
 			{
-				return CalcHalley(rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
+				return await CalcHalley(rc, ic, dr, R, CoefficientsZ, Palette, dimx, dimy,
 				   this, Variables, this.FractalZoomScript,
 				   new object[] { Palette, dimx, dimy, R, CoefficientsZ, ColorExpression });
 			}
 			else
 			{
-				return CalcHalley(rc, ic, dr, R, Coefficients, Palette, dimx, dimy,
+				return await CalcHalley(rc, ic, dr, R, Coefficients, Palette, dimx, dimy,
 					this, Variables, this.FractalZoomScript,
 					new object[] { Palette, dimx, dimy, R, Coefficients, ColorExpression });
 			}
@@ -297,7 +312,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
+		public static async Task<FractalGraph> CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
 			double[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
 		{
@@ -425,10 +440,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+			await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+			await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
 			return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
@@ -437,7 +452,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
+		public static async Task<FractalGraph> CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
 			Complex[] Coefficients, SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
 		{
@@ -597,10 +612,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+			await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+			await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
 			return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
@@ -609,7 +624,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
+		public static async Task<FractalGraph> CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
 			ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
@@ -745,10 +760,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+			await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+			await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
 			return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);

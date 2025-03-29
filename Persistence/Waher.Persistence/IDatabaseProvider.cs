@@ -19,7 +19,7 @@ namespace Waher.Persistence
 	/// </summary>
 	/// <param name="Objects">Objects</param>
 	public delegate void ObjectsCallback(IEnumerable<object> Objects);
-
+	
 	/// <summary>
 	/// Interface for database providers that can be plugged into the static <see cref="Database"/> class.
 	/// </summary>

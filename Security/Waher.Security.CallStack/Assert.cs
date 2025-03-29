@@ -205,18 +205,7 @@ namespace Waher.Security.CallStack
 			Log.Warning("Unauthorized access detected and prevented.", ObjectId, string.Empty, "UnauthorizedAccess", EventLevel.Major, 
 				string.Empty, Assembly.FullName, Trace.ToString(), Tags.ToArray());
 
-			UnauthorizedAccessEventHandler h = UnauthorizedAccess;
-			if (!(h is null))
-			{
-				try
-				{
-					h(null, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			UnauthorizedAccess?.Raise(null, e);
 
 			throw new UnauthorizedCallstackException("Unauthorized access.");
 		}
@@ -230,7 +219,7 @@ namespace Waher.Security.CallStack
 		/// <summary>
 		/// Event raised when an unauthorized access has been detected.
 		/// </summary>
-		public static event UnauthorizedAccessEventHandler UnauthorizedAccess = null;
+		public static event EventHandler<UnauthorizedAccessEventArgs> UnauthorizedAccess = null;
 
 	}
 }

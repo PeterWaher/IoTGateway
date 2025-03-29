@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.Runtime.Transactions
 {
@@ -36,7 +37,7 @@ namespace Waher.Runtime.Transactions
 		/// <summary>
 		/// Event raised when the transaction state has changed.
 		/// </summary>
-		event TransactionEventHandler StateChanged;
+		event EventHandlerAsync<TransactionEventArgs> StateChanged;
 
 		/// <summary>
 		/// Prepares the transaction for execution. This step can be used for validation and authorization of the transaction.

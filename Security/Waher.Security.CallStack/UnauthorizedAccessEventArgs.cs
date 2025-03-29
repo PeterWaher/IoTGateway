@@ -5,13 +5,6 @@ using System.Reflection;
 namespace Waher.Security.CallStack
 {
 	/// <summary>
-	/// Delegate for unauthorized access event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event. Might be null.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void UnauthorizedAccessEventHandler(object Sender, UnauthorizedAccessEventArgs e);
-
-	/// <summary>
 	/// Event arguments for the <see cref="Assert.UnauthorizedAccess"/> event.
 	/// </summary>
 	public class UnauthorizedAccessEventArgs : EventArgs

@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
@@ -62,7 +63,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
 		public Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -78,7 +79,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
 		public async Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
@@ -118,7 +119,7 @@ namespace Waher.Content.Getters
 		/// <param name="RemoteCertificateValidator">Optional validator.</param>
 		/// <returns>Http Client Handler</returns>
 		public static HttpClientHandler GetClientHandler(X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator)
 		{
 			RemoteCertificateValidator Validator = new RemoteCertificateValidator(RemoteCertificateValidator);
 
@@ -154,13 +155,13 @@ namespace Waher.Content.Getters
 		/// </summary>
 		private class RemoteCertificateValidator
 		{
-			private readonly RemoteCertificateEventHandler callback;
+			private readonly EventHandler<RemoteCertificateEventArgs> callback;
 
 			/// <summary>
 			/// Validator of remote certificate.
 			/// </summary>
 			/// <param name="Callback">Optional callback method.</param>
-			public RemoteCertificateValidator(RemoteCertificateEventHandler Callback)
+			public RemoteCertificateValidator(EventHandler<RemoteCertificateEventArgs> Callback)
 			{
 				this.callback = Callback;
 			}
@@ -170,8 +171,7 @@ namespace Waher.Content.Getters
 			{
 				RemoteCertificateEventArgs e = new RemoteCertificateEventArgs(Certificate, Chain, SslPolicyErrors);
 
-				if (!(this.callback is null))
-					this.callback(Sender, e);
+				this.callback.Raise(Sender, e);
 
 				if (e.IsValid.HasValue)
 					return e.IsValid.Value;
@@ -280,7 +280,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
 		}
@@ -295,7 +295,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Destination, Headers);
 		}
@@ -310,7 +310,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			return this.GetTempStreamAsync(Uri, Certificate, RemoteCertificateValidator, TimeoutMs, null, Headers);
 		}
@@ -326,7 +326,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public async Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);
@@ -400,7 +400,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
 		public Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			params KeyValuePair<string, string>[] Headers)
 		{
 			return this.HeadAsync(Uri, Certificate, RemoteCertificateValidator, 60000, Headers);
@@ -416,7 +416,7 @@ namespace Waher.Content.Getters
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
 		public async Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator,
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			HttpClientHandler Handler = GetClientHandler(Certificate, RemoteCertificateValidator);

@@ -6,11 +6,6 @@ using Waher.Runtime.Threading;
 namespace Waher.Runtime.Transactions
 {
 	/// <summary>
-	/// Asynchronous callback method.
-	/// </summary>
-	public delegate Task MethodAsync();
-
-	/// <summary>
 	/// Abstract base class for transactions.
 	/// </summary>
 	public abstract class Transaction : ITransaction
@@ -85,25 +80,16 @@ namespace Waher.Runtime.Transactions
 		/// Raises an event.
 		/// </summary>
 		/// <param name="EventHandler">Event handler for event.</param>
-		protected async Task Raise(TransactionEventHandler EventHandler)
+		protected async Task Raise(EventHandlerAsync<TransactionEventArgs> EventHandler)
 		{
 			if (!(EventHandler is null))
-			{
-				try
-				{
-					await EventHandler(this, new TransactionEventArgs(this));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+				await EventHandler.Raise(this, new TransactionEventArgs(this));
 		}
 
 		/// <summary>
 		/// Event raised when the transaction state has changed.
 		/// </summary>
-		public event TransactionEventHandler StateChanged;
+		public event EventHandlerAsync<TransactionEventArgs> StateChanged;
 
 		/// <summary>
 		/// Prepares the transaction for execution. This step can be used for validation and authorization of the transaction.
@@ -371,7 +357,7 @@ namespace Waher.Runtime.Transactions
 		/// Calls <paramref name="Action"/> when the transaction is idle.
 		/// </summary>
 		/// <param name="Action">Callback method.</param>
-		public async Task WhenIdle(MethodAsync Action)
+		public async Task WhenIdle(Func<Task> Action)
 		{
 			await this.synchObject.BeginWrite();
 			try

@@ -4,13 +4,6 @@ using Waher.Layout.Layout2D.Model;
 namespace Waher.Layout.Layout2D.Events
 {
     /// <summary>
-    /// Delegate for Drawing event handlers.
-    /// </summary>
-    /// <param name="Sender">Sender of event.</param>
-    /// <param name="e">Event arguments</param>
-    public delegate void DrawingEventHandler(object Sender, DrawingEventArgs e);
-
-    /// <summary>
     /// Event raised when the layout model has been Drawing internally.
     /// </summary>
     public class DrawingEventArgs : EventArgs

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -87,9 +88,23 @@ namespace Waher.Script.Fractals.ComplexFractals
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
         {
             string ColorExpression = null;
             SKColor[] Palette;
@@ -187,12 +202,12 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             if (!(f is null))
             {
-                return CalcJulia(rc, ic, f, dr, Palette, dimx, dimy, this, Variables,
+                return await CalcJulia(rc, ic, f, dr, Palette, dimx, dimy, this, Variables,
 					this.FractalZoomScript, new object[] { Palette, dimx, dimy, r0, i0, ColorExpression, fDef });
             }
             else
             {
-                return CalcJulia(rc, ic, r0, i0, dr, Palette, dimx, dimy, this, Variables,
+                return await CalcJulia(rc, ic, r0, i0, dr, Palette, dimx, dimy, this, Variables,
 					this.FractalZoomScript, new object[] { Palette, dimx, dimy, r0, i0, ColorExpression, fDef });
             }
         }
@@ -247,7 +262,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcJulia(double rCenter, double iCenter, double R0, double I0, double rDelta,
+		public static async Task<FractalGraph> CalcJulia(double rCenter, double iCenter, double R0, double I0, double rDelta,
             SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
         {
@@ -306,10 +321,10 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-            Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+            await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-            FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+            await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
             return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
@@ -318,7 +333,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcJulia(double rCenter, double iCenter, ILambdaExpression f,
+		public static async Task<FractalGraph> CalcJulia(double rCenter, double iCenter, ILambdaExpression f,
             double rDelta, SKColor[] Palette, int Width, int Height, ScriptNode Node, 
 			Variables Variables, FractalZoomScript FractalZoomScript, object State)
         {
@@ -423,10 +438,10 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-            Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+            await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-            FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+            await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
             return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);

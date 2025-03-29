@@ -235,8 +235,9 @@ namespace Waher.Runtime.Collections.Test
 
 					using (Benchmarking Test = Benchmarker.Start("List", N))
 					{
-						foreach (double _ in List)
-							;
+						List.ForEach((_) =>
+						{
+						});
 					}
 
 					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
@@ -294,8 +295,9 @@ namespace Waher.Runtime.Collections.Test
 
 					using (Benchmarking Test = Benchmarker.Start("List", N))
 					{
-						foreach (double _ in List)
-							;
+						List.ForEach((_) =>
+						{
+						});
 					}
 
 					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
@@ -580,6 +582,61 @@ namespace Waher.Runtime.Collections.Test
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
 			await OutputResults(Benchmarker, Name, "RemoveLast()", Limit);
+		}
+
+		[TestMethod]
+		public Task Test_17_AddFirst_Small()
+		{
+			return Test_AddFirst("Test_17_AddFirst_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_18_AddFirst_Large()
+		{
+			return Test_AddFirst("Test_18_AddFirst_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_AddFirst(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						for (i = 0; i < N; i++)
+							LinkedList.AddFirst(i);
+					}
+
+					if (N <= 100000)
+					{
+						using Benchmarking Test = Benchmarker.Start("List", N);
+						
+						for (i = 0; i < N; i++)
+							List.Insert(0, i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						for (i = 0; i < N; i++)
+							ChunkedList.AddFirstItem(i);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "AddFirst()", Limit);
 		}
 
 		private static double[] RandomOrder(int N, int MaxItems)

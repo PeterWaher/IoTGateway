@@ -129,7 +129,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "Add()", Limit);
+			await OutputResults(Benchmarker, Name, "Add()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -189,7 +189,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "Enumerate()", Limit);
+			await OutputResults(Benchmarker, Name, "Enumerate()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -249,7 +249,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "ForEach()", Limit);
+			await OutputResults(Benchmarker, Name, "ForEach()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -317,7 +317,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "ForEachChunk()", Limit);
+			await OutputResults(Benchmarker, Name, "ForEachChunk()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -388,7 +388,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "Contains()", Limit);
+			await OutputResults(Benchmarker, Name, "Contains()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -459,7 +459,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "Remove()", Limit);
+			await OutputResults(Benchmarker, Name, "Remove()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -521,7 +521,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "RemoveFirst()", Limit);
+			await OutputResults(Benchmarker, Name, "RemoveFirst()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -581,7 +581,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "RemoveLast()", Limit);
+			await OutputResults(Benchmarker, Name, "RemoveLast()", Limit, true, true);
 		}
 
 		[TestMethod]
@@ -621,7 +621,7 @@ namespace Waher.Runtime.Collections.Test
 					if (N <= 100000)
 					{
 						using Benchmarking Test = Benchmarker.Start("List", N);
-						
+
 						for (i = 0; i < N; i++)
 							List.Insert(0, i);
 					}
@@ -636,7 +636,63 @@ namespace Waher.Runtime.Collections.Test
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
-			await OutputResults(Benchmarker, Name, "AddFirst()", Limit);
+			await OutputResults(Benchmarker, Name, "AddFirst()", Limit, true, true);
+		}
+
+		[TestMethod]
+		public Task Test_19_Index_Small()
+		{
+			return Test_Index("Test_19_Index_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_20_Index_Large()
+		{
+			return Test_Index("Test_20_Index_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_Index(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			double[] Items;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					Items = RandomOrder(N, 500);
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						for (i = 0; i < N; i++)
+							List[i] = List[i];
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						for (i = 0; i < N; i++)
+							List[i] = List[i];
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "this[Index]", Limit, false, true);
 		}
 
 		private static double[] RandomOrder(int N, int MaxItems)
@@ -660,34 +716,74 @@ namespace Waher.Runtime.Collections.Test
 			return Result;
 		}
 
-		private static async Task OutputResults(Benchmarker2D Benchmarker, string BaseFileName, string Title, int Limit)
+		private static async Task OutputResults(Benchmarker2D Benchmarker, string BaseFileName,
+			string Title, int Limit, bool IncludeLinkedList, bool IncludeList)
 		{
 			StringBuilder Script = new();
+
 			Script.Append("M:=");
 			Script.Append(Benchmarker.GetResultScriptMilliseconds());
 			Script.AppendLine(";");
 			Script.AppendLine("M2:=M[,1..(M.Rows-1)];");
-			Script.AppendLine("N:=M2[0,];");
-			Script.AppendLine("t1:=M2[1,];");
-			Script.AppendLine("t2:=M2[2,];");
-			Script.AppendLine("t3:=M2[3,];");
+			Script.AppendLine("c:=0;");
+			Script.AppendLine("N:=M2[c++,];");
+			Script.AppendLine("t1:=M2[c++,];");
+
+			if (IncludeLinkedList)
+				Script.AppendLine("t2:=M2[c++,];");
+
+			if (IncludeList)
+				Script.AppendLine("t3:=M2[c++,];");
+
 			Script.AppendLine("G:=plot2dcurve(N,t1,\"Red\")+scatter2d(N,t1,\"Red\",5)+");
-			Script.AppendLine("plot2dcurve(N,t2,\"Green\")+scatter2d(N,t2,\"Green\",5)+");
-			Script.AppendLine("plot2dcurve(N,t3,\"Blue\")+scatter2d(N,t3,\"Blue\",5)+");
+
+			if (IncludeLinkedList)
+				Script.AppendLine("plot2dcurve(N,t2,\"Green\")+scatter2d(N,t2,\"Green\",5)+");
+
+			if (IncludeList)
+				Script.AppendLine("plot2dcurve(N,t3,\"Blue\")+scatter2d(N,t3,\"Blue\",5)+");
+
 			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\");");
 			Script.AppendLine("G.LabelX:=\"N\";");
 			Script.AppendLine("G.LabelY:=\"Time (ms)\";");
 			Script.Append("G.Title:=\"");
 			Script.Append(Title);
 			Script.AppendLine("\";");
-			Script.AppendLine("L:=legend([\"ChunkedList\",\"LinkedList\",\"List\"],[\"Red\",\"Green\",\"Blue\"],\"White\",1);");
-			Script.AppendLine("r2:=100*t2./t1;");
-			Script.AppendLine("r3:=[foreach i in 0..(count(t3)-1): exists(t3[i]) ? 100*t3[i]/t1[i] : null];");
-			Script.AppendLine("GRel:=plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
-			Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");
+			Script.Append("L:=legend([\"ChunkedList\"");
+			if (IncludeLinkedList)
+				Script.Append(",\"LinkedList\"");
+			if (IncludeList)
+				Script.Append(",\"List\"");
+			Script.Append("],[\"Red\"");
+			if (IncludeLinkedList)
+				Script.Append(",\"Green\"");
+			if (IncludeList)
+				Script.Append(",\"Blue\"");
+			Script.AppendLine("],\"White\",1);");
+
+			if (IncludeLinkedList)
+				Script.AppendLine("r2:=100*t2./t1;");
+
+			if (IncludeList)
+				Script.AppendLine("r3:=[foreach i in 0..(count(t3)-1): exists(t3[i]) ? 100*t3[i]/t1[i] : null];");
+
+			Script.Append("GRel:=");
+
+			if (IncludeLinkedList)
+				Script.AppendLine("plot2dcurve(N,r2,\"Green\")+scatter2d(N,r2,\"Green\",5)+");
+
+			if (IncludeList)
+				Script.AppendLine("plot2dcurve(N,r3,\"Blue\")+scatter2d(N,r3,\"Blue\",5)+");
+
 			Script.AppendLine("plot2dcurve(N,zeroes(count(N)),\"Black\")+");
 			Script.AppendLine("plot2dcurve(N,100*ones(count(N)),\"Black\");");
-			Script.Append("if Max(Max(r2),Max(r3))>");
+
+			if (IncludeLinkedList && IncludeList)
+				Script.Append("if Max(Max(r2),Max(r3))>");
+			else if (IncludeLinkedList)
+				Script.Append("if Max(r2)>");
+			else
+				Script.Append("if Max(r3)>");
 			Script.Append(Limit);
 			Script.AppendLine(" then GRel.MaxY:=");
 			Script.Append(Limit);

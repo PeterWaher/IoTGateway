@@ -144,3 +144,12 @@ this type of linked-list operation.
 **Note 2**: The `List<T>` structure quickly diverges in performance for this operation. It is
 not suitable for implementing queues or priority queues, for instance, where you process items
 from either end of the list.
+
+Index operations (get/set)
+-----------------------------
+
+Index operations using `this[Index]` is not available in the `LinkedList<T>` structure, so
+the benchmark comparison is only done between the `ChunkedList<T>` and `List<T>` structures:
+
+![Index operations](GRel_Test_19_Index_Small.png 600)
+![Index operations](GRel_Test_20_Index_Large.png 600)

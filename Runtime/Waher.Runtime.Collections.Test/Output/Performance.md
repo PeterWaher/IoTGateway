@@ -179,3 +179,11 @@ Removing items from their indices (`RemoveAt()` method) is not available in `Lin
 
 ![RemoveAt operations](GRel_Test_25_RemoveAt_Small.png 600)
 ![RemoveAt operations](GRel_Test_26_RemoveAt_Large.png 600)
+
+Inserting items by index
+--------------------------
+
+Inserting items by index (`Insert()` method) is not available in `LinkedList<T>`:
+
+![Insert operations](GRel_Test_27_Insert_Small.png 600)
+![Insert operations](GRel_Test_28_Insert_Large.png 600)

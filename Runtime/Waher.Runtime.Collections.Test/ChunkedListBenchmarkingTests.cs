@@ -892,6 +892,61 @@ namespace Waher.Runtime.Collections.Test
 			await OutputResults(Benchmarker, Name, "RemoveAt()", Limit, false, true);
 		}
 
+		[TestMethod]
+		public Task Test_27_Insert_Small()
+		{
+			return Test_Insert("Test_27_Insert_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_28_Insert_Large()
+		{
+			return Test_Insert("Test_28_Insert_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_Insert(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int[] Indices;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					Indices = RandomOrderInt(N, Math.Min(N, 500));
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					Array.Sort(Indices, (i, j) => j - i);
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (int Index in Indices)
+							List.Insert(Index, -1);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						foreach (int Index in Indices)
+							ChunkedList.Insert(Index, -1);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "Insert()", Limit, false, true);
+		}
+
 		private static double[] RandomOrder(int N, int MaxItems)
 		{
 			Random rnd = new();

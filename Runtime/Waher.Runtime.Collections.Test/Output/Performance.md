@@ -162,3 +162,12 @@ Finding elements uses the `IndexOf` method for for `ChunkedList<T>` and `List<T>
 
 ![Index operations](GRel_Test_21_IndexOf_Small.png 600)
 ![Index operations](GRel_Test_22_IndexOf_Large.png 600)
+
+Finding last elements
+------------------------
+
+Finding last elements uses the `LastIndexOf` method for for `ChunkedList<T>` and `List<T>`, and 
+the `FindLast` method for `LinkedList<T>`:
+
+![Index operations](GRel_Test_23_LastIndexOf_Small.png 600)
+![Index operations](GRel_Test_24_LastIndexOf_Large.png 600)

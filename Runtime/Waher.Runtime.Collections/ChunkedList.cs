@@ -49,7 +49,7 @@ namespace Waher.Runtime.Collections
 		private Chunk lastChunk;
 		private int chunkSize;
 		private int count = 0;
-		
+
 		/// <summary>
 		/// Number of elements in collection.
 		/// </summary>
@@ -806,6 +806,98 @@ namespace Waher.Runtime.Collections
 		}
 
 		/// <summary>
+		/// Determines the last index of a specific item
+		/// </summary>
+		/// <param name="Item">The object to locate</param>
+		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
+		public int LastIndexOf(T Item)
+		{
+			return this.LastIndexOf(Item, this.count - 1, this.count);
+		}
+
+		/// <summary>
+		/// Determines the last index of a specific item
+		/// </summary>
+		/// <param name="Item">The object to locate</param>
+		/// <param name="Index">Start index of search.</param>
+		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
+		public int LastIndexOf(T Item, int Index)
+		{
+			return this.LastIndexOf(Item, Index, Index + 1);
+		}
+
+		/// <summary>
+		/// Determines the last index of a specific item
+		/// </summary>
+		/// <param name="Item">The object to locate</param>
+		/// <param name="Index">Start index of search.</param>
+		/// <param name="Count">Number of items to search, maximum.</param>
+		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
+		public int LastIndexOf(T Item, int Index, int Count)
+		{
+			if (Index < 0 || Index >= this.count)
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+			if (Count < 0 || Count > Index + 1)
+				throw new ArgumentOutOfRangeException("Count out of bounds.", nameof(Count));
+
+			Chunk Loop = this.firstChunk;
+			int i = 0, j = 0, c;
+
+			while (!(Loop is null) && Index > 0)
+			{
+				c = Loop.Pos - Loop.Start;
+
+				if (c <= Index)
+				{
+					Index -= c;
+					j += c;
+				}
+				else
+				{
+					i = Index;
+					break;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			if (Loop is null)
+			{
+				Loop = this.lastChunk;
+				i = Loop.Pos - Loop.Start;
+			}
+
+			j += Loop.Pos - Loop.Start;
+
+			while (!(Loop is null) && Count >= 0)
+			{
+				c = Loop.Pos - Loop.Start;
+				j -= c;
+
+				if (c > 0)
+				{
+					if (Count < c)
+						c = Count;
+
+					if (i < 0)
+						i = Array.LastIndexOf(Loop.Elements, Item, Loop.Pos - 1, c);
+					else
+						i = Array.LastIndexOf(Loop.Elements, Item, Loop.Start + i, c);
+
+					if (i >= 0)
+						return j + i;
+					
+					Count -= c;
+				}
+
+				Loop = Loop.Prev;
+			}
+
+			return -1;
+		}
+
+		/// <summary>
 		/// Inserts an item to the list at the specified index.
 		/// </summary>
 		/// <param name="Index">The zero-based index at which item should be inserted.</param>
@@ -958,16 +1050,13 @@ namespace Waher.Runtime.Collections
 		}
 
 		#endregion
-		
+
 		// TODO:
 		// T[] ToArray();
 		// void AddRange(IEnumerable<T> collection);
 		// void CopyTo(int index, T[] array, int arrayIndex, int count);
 		// void CopyTo(T[] array, int arrayIndex);
 		// void CopyTo(T[] array);
-		// int LastIndexOf(T item);
-		// int LastIndexOf(T item, int index);
-		// int LastIndexOf(T item, int index, int count);
 
 	}
 }

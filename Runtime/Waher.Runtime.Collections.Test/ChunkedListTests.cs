@@ -642,5 +642,50 @@ namespace Waher.Runtime.Collections.Test
 			ChunkedList<int> List = [1, 2];
 			List.IndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
 		}
+		[TestMethod]
+		public void Test_49_LastIndexOf_Item()
+		{
+			ChunkedList<int> List = [1, 2, 3, 2, 4];
+
+			Assert.AreEqual(3, List.LastIndexOf(2)); // Last occurrence of 2
+			Assert.AreEqual(4, List.LastIndexOf(4)); // Last occurrence of 4
+			Assert.AreEqual(-1, List.LastIndexOf(5)); // No occurrence of 5
+		}
+
+		[TestMethod]
+		public void Test_50_LastIndexOf_Item_Index()
+		{
+			ChunkedList<int> List = [1, 2, 3, 2, 4];
+
+			Assert.AreEqual(3, List.LastIndexOf(2, 4)); // Last occurrence of 2 starting from index 4
+			Assert.AreEqual(1, List.LastIndexOf(2, 2)); // Last occurrence of 2 starting from index 2
+			Assert.AreEqual(-1, List.LastIndexOf(2, 0)); // No occurrence of 2 starting from index 0
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_51_LastIndexOf_Item_Index_OutOfRange()
+		{
+			ChunkedList<int> List = [1, 2];
+			List.LastIndexOf(2, 3); // Should throw ArgumentOutOfRangeException
+		}
+
+		[TestMethod]
+		public void Test_52_LastIndexOf_Item_Index_Count()
+		{
+			ChunkedList<int> List = [1, 2, 3, 2, 4];
+
+			Assert.AreEqual(3, List.LastIndexOf(2, 4, 5)); // Last occurrence of 2 in the range
+			Assert.AreEqual(1, List.LastIndexOf(2, 2, 3)); // Last occurrence of 2 in the range
+			Assert.AreEqual(-1, List.LastIndexOf(2, 2, 1)); // No occurrence of 2 in the specified range
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_53_LastIndexOf_Item_Index_Count_OutOfRange()
+		{
+			ChunkedList<int> List = [1, 2];
+			List.LastIndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
+		}
 	}
 }

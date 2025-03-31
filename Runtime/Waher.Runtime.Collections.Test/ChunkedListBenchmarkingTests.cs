@@ -837,11 +837,87 @@ namespace Waher.Runtime.Collections.Test
 			await OutputResults(Benchmarker, Name, "LastIndexOf()", Limit, true, true);
 		}
 
+		[TestMethod]
+		public Task Test_25_RemoveAt_Small()
+		{
+			return Test_RemoveAt("Test_25_RemoveAt_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_26_RemoveAt_Large()
+		{
+			return Test_RemoveAt("Test_26_RemoveAt_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_RemoveAt(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int[] Indices;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					Indices = RandomOrderInt(N, Math.Min(N, 500));
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					Array.Sort(Indices, (i, j) => j - i);
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (int Index in Indices)
+							List.RemoveAt(Index);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						foreach (int Index in Indices)
+							ChunkedList.RemoveAt(Index);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "RemoveAt()", Limit, false, true);
+		}
+
 		private static double[] RandomOrder(int N, int MaxItems)
 		{
 			Random rnd = new();
 			int c = Math.Min(N, MaxItems);
 			double[] Result = new double[c];
+			List<int> Left = [];
+			int i, j, k;
+
+			for (i = 0; i < N; i++)
+				Left.Add(i);
+
+			for (i = 0, j = N; i < c; i++, j--)
+			{
+				k = rnd.Next(j);
+				Result[i] = Left[k];
+				Left.RemoveAt(k);
+			}
+
+			return Result;
+		}
+
+		private static int[] RandomOrderInt(int N, int MaxItems)
+		{
+			Random rnd = new();
+			int c = Math.Min(N, MaxItems);
+			int[] Result = new int[c];
 			List<int> Left = [];
 			int i, j, k;
 

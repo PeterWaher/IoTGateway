@@ -687,5 +687,65 @@ namespace Waher.Runtime.Collections.Test
 			ChunkedList<int> List = [1, 2];
 			List.LastIndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
 		}
+
+		[TestMethod]
+		public void Test_54_RemoveAt_ReduceChunks()
+		{
+			ChunkedList<int> List = new(4);
+
+			// Add elements to fill multiple chunks
+			for (int i = 0; i < 16; i++)
+				List.Add(i);
+
+			// Remove elements to reduce the number of chunks
+			for (int i = 0; i < 8; i++)
+				List.RemoveAt(0);
+
+			// Check that the remaining elements are correct
+			int[] Expected = { 8, 9, 10, 11, 12, 13, 14, 15 };
+			int Index = 0;
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_55_RemoveAt_ReduceChunks_Middle()
+		{
+			ChunkedList<int> List = new(4);
+
+			// Add elements to fill multiple chunks
+			for (int i = 0; i < 16; i++)
+				List.Add(i);
+
+			// Remove elements from the middle to reduce the number of chunks
+			for (int i = 0; i < 8; i++)
+				List.RemoveAt(4);
+
+			// Check that the remaining elements are correct
+			int[] Expected = { 0, 1, 2, 3, 12, 13, 14, 15 };
+			int Index = 0;
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_RemoveAt_ReduceChunks_End()
+		{
+			ChunkedList<int> List = new(4);
+
+			// Add elements to fill multiple chunks
+			for (int i = 0; i < 16; i++)
+				List.Add(i);
+
+			// Remove elements from the end to reduce the number of chunks
+			for (int i = 0; i < 8; i++)
+				List.RemoveAt(List.Count - 1);
+
+			// Check that the remaining elements are correct
+			int[] Expected = { 0, 1, 2, 3, 4, 5, 6, 7 };
+			int Index = 0;
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
 	}
 }

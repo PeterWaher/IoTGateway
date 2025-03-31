@@ -160,8 +160,8 @@ Finding elements
 Finding elements uses the `IndexOf` method for for `ChunkedList<T>` and `List<T>`, and the
 `Find` method for `LinkedList<T>`:
 
-![Index operations](GRel_Test_21_IndexOf_Small.png 600)
-![Index operations](GRel_Test_22_IndexOf_Large.png 600)
+![IndexOf operations](GRel_Test_21_IndexOf_Small.png 600)
+![IndexOf operations](GRel_Test_22_IndexOf_Large.png 600)
 
 Finding last elements
 ------------------------
@@ -169,5 +169,13 @@ Finding last elements
 Finding last elements uses the `LastIndexOf` method for for `ChunkedList<T>` and `List<T>`, and 
 the `FindLast` method for `LinkedList<T>`:
 
-![Index operations](GRel_Test_23_LastIndexOf_Small.png 600)
-![Index operations](GRel_Test_24_LastIndexOf_Large.png 600)
+![LastIndexOf operations](GRel_Test_23_LastIndexOf_Small.png 600)
+![LastIndexOf operations](GRel_Test_24_LastIndexOf_Large.png 600)
+
+Removing items by index
+--------------------------
+
+Removing items from their indices (`RemoveAt()` method) is not available in `LinkedList<T>`:
+
+![RemoveAt operations](GRel_Test_25_RemoveAt_Small.png 600)
+![RemoveAt operations](GRel_Test_26_RemoveAt_Large.png 600)

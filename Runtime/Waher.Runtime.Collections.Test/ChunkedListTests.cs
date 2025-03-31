@@ -825,5 +825,107 @@ namespace Waher.Runtime.Collections.Test
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
 		}
+
+		[TestMethod]
+		public void Test_62_CopyTo_Destination()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			int[] Destination = new int[8];
+			List.CopyTo(Destination);
+
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Destination[i]);
+		}
+
+		[TestMethod]
+		public void Test_63_CopyTo_DestinationIndex()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			int[] Destination = new int[10];
+			List.CopyTo(Destination, 2);
+
+			int[] Expected = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Destination[i]);
+		}
+
+		[TestMethod]
+		public void Test_64_CopyTo_Index_DestinationIndex_Count()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			int[] Destination = new int[10];
+			List.CopyTo(2, Destination, 3, 4);
+
+			int[] Expected = [0, 0, 0, 2, 3, 4, 5, 0, 0, 0];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Destination[i]);
+		}
+
+		[TestMethod]
+		public void Test_65_CopyTo_ChunkLimits()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 12; i++)
+				List.Add(i);
+
+			int[] Destination = new int[12];
+			List.CopyTo(Destination);
+
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Destination[i]);
+		}
+
+		[TestMethod]
+		public void Test_66_CopyTo_DestinationIndex_ChunkLimits()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 12; i++)
+				List.Add(i);
+
+			int[] Destination = new int[14];
+			List.CopyTo(Destination, 2);
+
+			int[] Expected = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Destination[i]);
+		}
+
+		[TestMethod]
+		public void Test_67_CopyTo_Index_DestinationIndex_Count_ChunkLimits()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 12; i++)
+				List.Add(i);
+
+			int[] Destination = new int[14];
+			List.CopyTo(2, Destination, 3, 8);
+
+			int[] Expected = [0, 0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Destination[i]);
+		}
 	}
 }

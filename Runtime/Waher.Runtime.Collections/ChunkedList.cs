@@ -234,23 +234,16 @@ namespace Waher.Runtime.Collections
 		/// <summary>
 		/// Copies the contents of the collection to an array.
 		/// </summary>
-		/// <param name="Desintation">Destination array.</param>
-		/// <param name="DesintationIndex">Start index into the array where elements are to be copied.</param>
-		public void CopyTo(T[] Desintation, int DesintationIndex)
+		/// <param name="Destination">Destination array.</param>
+		/// <param name="DestinationIndex">Start index into the array where elements are to be copied.</param>
+		public void CopyTo(T[] Destination, int DestinationIndex)
 		{
-			Chunk Loop = this.firstChunk;
-			int c;
+			this.CopyTo(0, Destination, DestinationIndex, this.count);
+		}
 
-			while (!(Loop is null))
-			{
-				if ((c = Loop.Pos - Loop.Start) > 0)
-				{
-					Array.Copy(Loop.Elements, Loop.Start, Desintation, DesintationIndex, c);
-					DesintationIndex += c;
-				}
-
-				Loop = Loop.Next;
-			}
+		private void CopyTo(int v, object desintation, int desintationIndex, int count)
+		{
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -1158,12 +1151,74 @@ namespace Waher.Runtime.Collections
 			}
 		}
 
+		/// <summary>
+		/// Copies the contents of the collection to an array.
+		/// </summary>
+		/// <param name="Destination">Destination array.</param>
+		public void CopyTo(T[] Destination)
+		{
+			this.CopyTo(0, Destination, 0, this.count);
+		}
+
+		/// <summary>
+		/// Copies the contents of the collection to an array.
+		/// </summary>
+		/// <param name="Index">Index of the first item to copy.</param>
+		/// <param name="Destination">Destination array.</param>
+		/// <param name="DestinationIndex">Start index into the array where elements are to be copied.</param>
+		/// <param name="Count">Number of elements to copy.</param>
+		public void CopyTo(int Index, T[] Destination, int DestinationIndex, int Count)
+		{
+			Chunk Loop = this.firstChunk;
+			int i, c;
+			bool Offset = Index > 0;
+
+			while (!(Loop is null) && Count > 0)
+			{
+				i = Loop.Start;
+				if ((c = Loop.Pos - i) > 0)
+				{
+					if (Offset)
+					{
+						if (Index >= c)
+						{
+							Index -= c;
+							if (Index == 0)
+								Offset = false;
+						}
+						else
+						{
+							c -= Index;
+							i += Index;
+							Offset = false;
+
+							if (Count < c)
+								c = Count;
+
+							Array.Copy(Loop.Elements, i, Destination, DestinationIndex, c);
+							DestinationIndex += c;
+							Count -= c;
+						}
+					}
+					else
+					{
+						if (Count < c)
+							c = Count;
+
+						Array.Copy(Loop.Elements, i, Destination, DestinationIndex, c);
+						DestinationIndex += c;
+						Count -= c;
+					}
+				}
+
+				Loop = Loop.Next;
+			}
+		}
+
 		#endregion
 
 		// TODO:
-		// void CopyTo(int index, T[] array, int arrayIndex, int count);
-		// void CopyTo(T[] array, int arrayIndex);
-		// void CopyTo(T[] array);
+		// ToArray
 
 	}
 }

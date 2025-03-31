@@ -202,3 +202,11 @@ A second benchmark is performed when the range is an enumeration not based on an
 
 ![Adding a range of items](GRel_Test_31_AddRangeEnumeration_Small.png 600)
 ![Adding a range of items](GRel_Test_32_AddRangeEnumeration_Large.png 600)
+
+Copying elements to an array
+-------------------------------
+
+Copying elements to an array using the `CopyTo()` method:
+
+![Copying elements](GRel_Test_33_CopyTo_Small.png 600)
+![Copying elements](GRel_Test_34_CopyTo_Large.png 600)

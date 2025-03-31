@@ -1044,6 +1044,68 @@ namespace Waher.Runtime.Collections.Test
 			await OutputResults(Benchmarker, Name, "AddRange() - Enumeration", Limit, false, true);
 		}
 
+		[TestMethod]
+		public Task Test_33_CopyTo_Small()
+		{
+			return Test_CopyTo("Test_33_CopyTo_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_34_CopyTo_Large()
+		{
+			return Test_CopyTo("Test_34_CopyTo_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_CopyTo(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.AddLastItem(i);
+					}
+
+					double[] A;
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						A = new double[N];
+						LinkedList.CopyTo(A, 0);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						A = new double[N];
+						List.CopyTo(A, 0);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						A = new double[N];
+						ChunkedList.CopyTo(A, 0);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "CopyTo()", Limit, true, true);
+		}
+
 		private static double[] RandomOrder(int N, int MaxItems)
 		{
 			Random rnd = new();

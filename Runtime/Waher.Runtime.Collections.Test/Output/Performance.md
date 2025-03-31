@@ -13,7 +13,7 @@ The `ChunkedList<T>` is a generic data structure that is optimized for performan
 features from the `LinkedList<T>` structure, with features of the `List<T>` structure. 
 
 The `LinkedList<T>` structure generates nodes for each element, and arranges them in a linked 
-list. It is very straight forward to add and remove elements. But the structure requires a lot 
+list. It is very straightforward to add and remove elements. But the structure requires a lot 
 of  memory overhead, especially if storing small elements. It is also inefficient to process, as
 elements are not stored closely together, not allowing processor caches to be utilized 
 efficiently.
@@ -44,7 +44,7 @@ does the same thing for a larger set of elements. The times are then compared to
 relative performance (in percent) between the `ChunkedList<T>` and the `LinkedList<T>` and
 `List<T>` structures.
 
-For all graphs, the x-axis represents the number of elements added, and the y-axis represents
+For all graphs, the x-axis represents the number of elements, and the y-axis represents
 the relative performance, in percent. An additional black line parallel to the x-axis marks the
 100% level, where the lists perform equally. If the colored graph lies above this line, the
 `ChunkedList<T>` structure performs better than the structure represented by the graph. If the 

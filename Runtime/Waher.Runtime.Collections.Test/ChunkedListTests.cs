@@ -927,5 +927,89 @@ namespace Waher.Runtime.Collections.Test
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
+
+		[TestMethod]
+		public void Test_68_ToArray_SingleChunk()
+		{
+			ChunkedList<int> List = new(4);
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			int[] Result = [.. List];
+			int[] Expected = [0, 1, 2, 3];
+		
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_69_ToArray_MultipleChunks()
+		{
+			ChunkedList<int> List = new(4);
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			int[] Result = [.. List];
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_70_ToArray_MultipleChunks_Larger()
+		{
+			ChunkedList<int> List = new(4);
+			for (int i = 0; i < 12; i++)
+				List.Add(i);
+
+			int[] Result = [.. List];
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+			
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_71_ToArray_EmptyList()
+		{
+			ChunkedList<int> List = new(4);
+			int[] Result = [.. List];
+
+			Assert.AreEqual(0, Result.Length);
+		}
+
+		[TestMethod]
+		public void Test_72_ToArray_SingleElement()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1
+			};
+
+			int[] Result = [.. List];
+			int[] Expected = [1];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_73_ToArray_MultipleChunks_WithGaps()
+		{
+			ChunkedList<int> List = new(4);
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			// Remove some elements to create gaps
+			List.RemoveAt(2);
+			List.RemoveAt(4);
+
+			int[] Result = [.. List];
+			int[] Expected = [0, 1, 3, 4, 6, 7];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
 	}
 }

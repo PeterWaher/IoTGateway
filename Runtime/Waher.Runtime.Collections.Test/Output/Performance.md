@@ -210,3 +210,12 @@ Copying elements to an array using the `CopyTo()` method:
 
 ![Copying elements](GRel_Test_33_CopyTo_Small.png 600)
 ![Copying elements](GRel_Test_34_CopyTo_Large.png 600)
+
+Creating an array of elements
+--------------------------------
+
+Creating an array containing the elements of a list, using the `ToArray()` method
+(`CopyTo` method for LinkedList):
+
+![Creating Array](GRel_Test_35_ToArray_Small.png 600)
+![Creating Array](GRel_Test_36_ToArray_Large.png 600)

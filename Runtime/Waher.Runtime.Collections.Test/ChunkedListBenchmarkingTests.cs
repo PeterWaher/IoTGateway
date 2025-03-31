@@ -1078,7 +1078,7 @@ namespace Waher.Runtime.Collections.Test
 						List.Add(i);
 						ChunkedList.AddLastItem(i);
 					}
-
+					
 					double[] A;
 
 					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
@@ -1104,6 +1104,66 @@ namespace Waher.Runtime.Collections.Test
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
 			await OutputResults(Benchmarker, Name, "CopyTo()", Limit, true, true);
+		}
+
+		[TestMethod]
+		public Task Test_35_ToArray_Small()
+		{
+			return Test_ToArray("Test_35_ToArray_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_36_ToArray_Large()
+		{
+			return Test_ToArray("Test_36_ToArray_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_ToArray(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.AddLastItem(i);
+					}
+
+					double[] A;
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						A = new double[N];
+						LinkedList.CopyTo(A, 0);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						A = [.. List];
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						A = [.. List];
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "ToArray()", Limit, true, true);
 		}
 
 		private static double[] RandomOrder(int N, int MaxItems)

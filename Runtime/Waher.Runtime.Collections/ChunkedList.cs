@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -1215,10 +1216,30 @@ namespace Waher.Runtime.Collections
 			}
 		}
 
+		/// <summary>
+		/// Returns an array containing all elements of the collection.
+		/// </summary>
+		/// <returns>Array of elements</returns>
+		public T[] ToArray()
+		{
+			T[] Result = new T[this.count];
+			Chunk Loop = this.firstChunk;
+			int i = 0, c;
+
+			while (!(Loop is null))
+			{
+				if ((c = Loop.Pos - Loop.Start) > 0)
+				{
+					Array.Copy(Loop.Elements, Loop.Start, Result, i, c);
+					i += c;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return Result;
+		}
+
 		#endregion
-
-		// TODO:
-		// ToArray
-
 	}
 }

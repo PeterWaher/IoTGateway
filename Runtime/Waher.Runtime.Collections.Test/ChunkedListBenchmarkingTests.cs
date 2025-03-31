@@ -695,6 +695,77 @@ namespace Waher.Runtime.Collections.Test
 			await OutputResults(Benchmarker, Name, "this[Index]", Limit, false, true);
 		}
 
+		[TestMethod]
+		public Task Test_21_IndexOf_Small()
+		{
+			return Test_IndexOf("Test_21_IndexOf_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_22_IndexOf_Large()
+		{
+			return Test_IndexOf("Test_22_IndexOf_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_IndexOf(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			double[] Items;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					Items = RandomOrder(N, 500);
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (LinkedList.Find(Item) is null)
+								throw new Exception("Item not found in LinkedList");
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (List.IndexOf(Item) < 0)
+								throw new Exception("Item not found in List");
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						foreach (double Item in Items)
+						{
+							if (ChunkedList.IndexOf(Item) < 0)
+								throw new Exception("Item not found in ChunkedList");
+						}
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "IndexOf()", Limit, true, true);
+		}
+
 		private static double[] RandomOrder(int N, int MaxItems)
 		{
 			Random rnd = new();

@@ -599,5 +599,48 @@ namespace Waher.Runtime.Collections.Test
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
 		}
+
+		[TestMethod]
+		public void Test_45_IndexOf_Item_Index()
+		{
+			ChunkedList<int> List =
+			[
+				1,
+				2,
+				3,
+				2,
+				4
+			];
+
+			Assert.AreEqual(1, List.IndexOf(2, 0)); // First occurrence of 2
+			Assert.AreEqual(3, List.IndexOf(2, 2)); // Second occurrence of 2
+			Assert.AreEqual(-1, List.IndexOf(2, 4)); // No occurrence of 2 after index 4
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_46_IndexOf_Item_Index_OutOfRange()
+		{
+			ChunkedList<int> List = [1, 2];
+			List.IndexOf(2, 3); // Should throw ArgumentOutOfRangeException
+		}
+
+		[TestMethod]
+		public void Test_47_IndexOf_Item_Index_Count()
+		{
+			ChunkedList<int> List = [1, 2, 3, 2, 4];
+
+			Assert.AreEqual(1, List.IndexOf(2, 0, 5)); // First occurrence of 2
+			Assert.AreEqual(3, List.IndexOf(2, 2, 3)); // Second occurrence of 2
+			Assert.AreEqual(-1, List.IndexOf(2, 2, 1)); // No occurrence of 2 in the specified range
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(ArgumentOutOfRangeException))]
+		public void Test_48_IndexOf_Item_Index_Count_OutOfRange()
+		{
+			ChunkedList<int> List = [1, 2];
+			List.IndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
+		}
 	}
 }

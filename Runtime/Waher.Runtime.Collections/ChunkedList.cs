@@ -730,20 +730,75 @@ namespace Waher.Runtime.Collections
 		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
 		public int IndexOf(T Item)
 		{
-			Chunk Loop = this.firstChunk;
-			int i, c, Index = 0;
+			return this.IndexOf(Item, 0, this.count);
+		}
 
-			while (!(Loop is null))
+		/// <summary>
+		/// Determines the index of a specific item
+		/// </summary>
+		/// <param name="Item">The object to locate</param>
+		/// <param name="Index">Start index of search.</param>
+		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
+		public int IndexOf(T Item, int Index)
+		{
+			return this.IndexOf(Item, Index, this.count - Index);
+		}
+
+		/// <summary>
+		/// Determines the index of a specific item
+		/// </summary>
+		/// <param name="Item">The object to locate</param>
+		/// <param name="Index">Start index of search.</param>
+		/// <param name="Count">Number of items to search, maximum.</param>
+		/// <returns>The index of item if found in the list; otherwise, -1.</returns>
+		public int IndexOf(T Item, int Index, int Count)
+		{
+			if (Index < 0 || Index >= this.count)
+				throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
+
+			if (Count < 0 || Index + Count > this.count)
+				throw new ArgumentOutOfRangeException("Count out of bounds.", nameof(Count));
+
+			Chunk Loop = this.firstChunk;
+			int i, c, Result = 0;
+
+			while (!(Loop is null) && Count >= 0)
 			{
 				c = Loop.Pos - Loop.Start;
 
-				if (c > 0 &&
-					(i = Array.IndexOf(Loop.Elements, Item, Loop.Start, Loop.Pos - Loop.Start)) >= 0)
+				if (c > 0)
 				{
-					return Index + i;
+					if (Index > 0)
+					{
+						if (Index >= c)
+							Index -= c;
+						else
+						{
+							c -= Index;
+
+							if (Count < c)
+								c = Count;
+
+							if ((i = Array.IndexOf(Loop.Elements, Item, Loop.Start + Index, c)) >= 0)
+								return Result + i;
+
+							Count -= c;
+						}
+					}
+					else
+					{
+						if (Count < c)
+							c = Count;
+
+						if ((i = Array.IndexOf(Loop.Elements, Item, Loop.Start, c)) >= 0)
+							return Result + i;
+
+						Count -= c;
+					}
+
+					Result += c;
 				}
 
-				Index += c;
 				Loop = Loop.Next;
 			}
 
@@ -910,9 +965,6 @@ namespace Waher.Runtime.Collections
 		// void CopyTo(int index, T[] array, int arrayIndex, int count);
 		// void CopyTo(T[] array, int arrayIndex);
 		// void CopyTo(T[] array);
-		// void ForEach(Action<T> action);
-		// int IndexOf(T item, int index, int count);
-		// int IndexOf(T item, int index);
 		// int LastIndexOf(T item);
 		// int LastIndexOf(T item, int index);
 		// int LastIndexOf(T item, int index, int count);

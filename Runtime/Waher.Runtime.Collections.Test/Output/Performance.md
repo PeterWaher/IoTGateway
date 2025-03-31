@@ -153,3 +153,12 @@ the benchmark comparison is only done between the `ChunkedList<T>` and `List<T>`
 
 ![Index operations](GRel_Test_19_Index_Small.png 600)
 ![Index operations](GRel_Test_20_Index_Large.png 600)
+
+Finding elements
+-------------------
+
+Finding elements uses the `IndexOf` method for for `ChunkedList<T>` and `List<T>`, and the
+`Find` method for `LinkedList<T>`:
+
+![Index operations](GRel_Test_21_IndexOf_Small.png 600)
+![Index operations](GRel_Test_22_IndexOf_Large.png 600)

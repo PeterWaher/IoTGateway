@@ -116,10 +116,12 @@ function SignatureReceivedBE(Empty)
 
     var s = window.location.href;
     var i = s.indexOf("from=");
-    if (i > 0)
-    {
+    if (i > 0) {
         s = s.substring(i + 5);
         window.location.href = unescape(s);
+    }
+    else {
+        window.location = ""
     }
 }
 

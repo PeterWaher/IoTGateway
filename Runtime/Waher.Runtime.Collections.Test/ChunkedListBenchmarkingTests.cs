@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using Waher.Layout.Layout2D.Functions;
 using Waher.Runtime.Inventory;
@@ -945,6 +946,102 @@ namespace Waher.Runtime.Collections.Test
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
 			await OutputResults(Benchmarker, Name, "Insert()", Limit, false, true);
+		}
+
+		[TestMethod]
+		public Task Test_29_AddRangeArray_Small()
+		{
+			return Test_AddRangeArray("Test_29_AddRangeArray_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_30_AddRangeArray_Large()
+		{
+			return Test_AddRangeArray("Test_30_AddRangeArray_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_AddRangeArray(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					double[] A = new double[N];
+
+					for (i = 0; i < N; i++)
+						A[i] = i;
+
+					List = [];
+					ChunkedList = [];
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						List.AddRange(A);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						ChunkedList.AddRange(A);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "AddRange() - Array", Limit, false, true);
+		}
+
+		[TestMethod]
+		public Task Test_31_AddRangeEnumeration_Small()
+		{
+			return Test_AddRangeEnumeration("Test_31_AddRangeEnumeration_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_32_AddRangeEnumeration_Large()
+		{
+			return Test_AddRangeEnumeration("Test_32_AddRangeEnumeration_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_AddRangeEnumeration(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList<double> Enumeration = [];
+
+					for (i = 0; i < N; i++)
+						Enumeration.AddLast(i);
+
+					List = [];
+					ChunkedList = [];
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						List.AddRange(Enumeration);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						ChunkedList.AddRange(Enumeration);
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "AddRange() - Enumeration", Limit, false, true);
 		}
 
 		private static double[] RandomOrder(int N, int MaxItems)

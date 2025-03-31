@@ -466,7 +466,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Insert(1, 5);
 
 			// Enumerate items to ensure all items are available and in the correct order
-			int[] Expected = { 3, 5, 4 };
+			int[] Expected = [3, 5, 4];
 			int Index = 0;
 
 			foreach (int Item in List)
@@ -487,7 +487,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Insert(1, 5);
 
 			// Enumerate items to ensure all items are available and in the correct order
-			int[] Expected = { 1, 5, 2, 3 };
+			int[] Expected = [1, 5, 2, 3];
 			int Index = 0;
 			
 			foreach (int Item in List)
@@ -507,7 +507,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Insert(0, 5);
 
-			int[] Expected = { 5, 1, 2, 3, 4 };
+			int[] Expected = [5, 1, 2, 3, 4];
 			int Index = 0;
 
 			foreach (int Item in List)
@@ -527,7 +527,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Insert(1, 5);
 
-			int[] Expected = { 1, 5, 2, 3, 4 };
+			int[] Expected = [1, 5, 2, 3, 4];
 			int Index = 0;
 
 			foreach (int Item in List)
@@ -549,7 +549,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Insert(2, 5);
 
 			// Enumerate items to ensure all items are available and in the correct order
-			int[] Expected = { 1, 2, 5, 3, 4 };
+			int[] Expected = [1, 2, 5, 3, 4];
 			int Index = 0;
 
 			foreach (int Item in List)
@@ -571,7 +571,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Insert(3, 5);
 
 			// Enumerate items to ensure all items are available and in the correct order
-			int[] Expected = { 1, 2, 3, 5, 4 };
+			int[] Expected = [1, 2, 3, 5, 4];
 			int Index = 0;
 
 			foreach (int Item in List)
@@ -593,7 +593,7 @@ namespace Waher.Runtime.Collections.Test
 			List.Insert(4, 5);
 
 			// Enumerate items to ensure all items are available and in the correct order
-			int[] Expected = { 1, 2, 3, 4, 5 };
+			int[] Expected = [1, 2, 3, 4, 5];
 			int Index = 0;
 
 			foreach (int Item in List)
@@ -632,7 +632,7 @@ namespace Waher.Runtime.Collections.Test
 
 			Assert.AreEqual(1, List.IndexOf(2, 0, 5)); // First occurrence of 2
 			Assert.AreEqual(3, List.IndexOf(2, 2, 3)); // Second occurrence of 2
-			Assert.AreEqual(-1, List.IndexOf(2, 2, 1)); // No occurrence of 2 in the specified range
+			Assert.AreEqual(-1, List.IndexOf(2, 2, 1)); // No occurrence of 2 in the specified Range
 		}
 
 		[TestMethod]
@@ -675,9 +675,9 @@ namespace Waher.Runtime.Collections.Test
 		{
 			ChunkedList<int> List = [1, 2, 3, 2, 4];
 
-			Assert.AreEqual(3, List.LastIndexOf(2, 4, 5)); // Last occurrence of 2 in the range
-			Assert.AreEqual(1, List.LastIndexOf(2, 2, 3)); // Last occurrence of 2 in the range
-			Assert.AreEqual(-1, List.LastIndexOf(2, 2, 1)); // No occurrence of 2 in the specified range
+			Assert.AreEqual(3, List.LastIndexOf(2, 4, 5)); // Last occurrence of 2 in the Range
+			Assert.AreEqual(1, List.LastIndexOf(2, 2, 3)); // Last occurrence of 2 in the Range
+			Assert.AreEqual(-1, List.LastIndexOf(2, 2, 1)); // No occurrence of 2 in the specified Range
 		}
 
 		[TestMethod]
@@ -702,7 +702,7 @@ namespace Waher.Runtime.Collections.Test
 				List.RemoveAt(0);
 
 			// Check that the remaining elements are correct
-			int[] Expected = { 8, 9, 10, 11, 12, 13, 14, 15 };
+			int[] Expected = [8, 9, 10, 11, 12, 13, 14, 15];
 			int Index = 0;
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
@@ -722,14 +722,14 @@ namespace Waher.Runtime.Collections.Test
 				List.RemoveAt(4);
 
 			// Check that the remaining elements are correct
-			int[] Expected = { 0, 1, 2, 3, 12, 13, 14, 15 };
+			int[] Expected = [0, 1, 2, 3, 12, 13, 14, 15];
 			int Index = 0;
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
 		}
 
 		[TestMethod]
-		public void Test_RemoveAt_ReduceChunks_End()
+		public void Test_56_RemoveAt_ReduceChunks_End()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -742,8 +742,86 @@ namespace Waher.Runtime.Collections.Test
 				List.RemoveAt(List.Count - 1);
 
 			// Check that the remaining elements are correct
-			int[] Expected = { 0, 1, 2, 3, 4, 5, 6, 7 };
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
 			int Index = 0;
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_57_AddRange_WithinSingleChunk()
+		{
+			ChunkedList<int> List = new(4);
+			List<int> Range = [1, 2, 3];
+
+			List.AddRange(Range);
+
+			Assert.AreEqual(3, List.Count);
+			int[] Expected = [1, 2, 3];
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_58_AddRange_CrossChunkLimits()
+		{
+			ChunkedList<int> List = new(4);
+			List<int> Range = [1, 2, 3, 4, 5, 6, 7, 8];
+
+			List.AddRange(Range);
+
+			Assert.AreEqual(8, List.Count);
+			int[] Expected = [1, 2, 3, 4, 5, 6, 7, 8];
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_59_AddRange_MultipleChunks()
+		{
+			ChunkedList<int> List = new(4);
+			List<int> Range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+			List.AddRange(Range);
+
+			Assert.AreEqual(12, List.Count);
+			int[] Expected = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+			int Index = 0;
+
+			foreach (int Item in List)
+				Assert.AreEqual(Expected[Index++], Item);
+		}
+
+		[TestMethod]
+		public void Test_60_AddRange_EmptyCollection()
+		{
+			ChunkedList<int> List = new(4);
+			List<int> Range = [];
+
+			List.AddRange(Range);
+
+			Assert.AreEqual(0, List.Count);
+		}
+
+		[TestMethod]
+		public void Test_61_AddRange_ExistingElements()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				0
+			};
+			List<int> Range = [1, 2, 3, 4, 5, 6, 7, 8];
+
+			List.AddRange(Range);
+
+			Assert.AreEqual(9, List.Count);
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+			int Index = 0;
+			
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
 		}

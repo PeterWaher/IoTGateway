@@ -187,3 +187,18 @@ Inserting items by index (`Insert()` method) is not available in `LinkedList<T>`
 
 ![Insert operations](GRel_Test_27_Insert_Small.png 600)
 ![Insert operations](GRel_Test_28_Insert_Large.png 600)
+
+Adding a range of items
+--------------------------
+
+Adding a range of items (`AddRange()` method) is not available in `LinkedList<T>`. Both
+`List<T>` and `ChunkedList<T>` structures are optimized for adding ranges originating from
+arrays. A benchmark of this operation follows first:
+
+![Adding a range of items](GRel_Test_29_AddRangeArray_Small.png 600)
+![Adding a range of items](GRel_Test_30_AddRangeArray_Large.png 600)
+
+A second benchmark is performed when the range is an enumeration not based on an array:
+
+![Adding a range of items](GRel_Test_31_AddRangeEnumeration_Small.png 600)
+![Adding a range of items](GRel_Test_32_AddRangeEnumeration_Large.png 600)

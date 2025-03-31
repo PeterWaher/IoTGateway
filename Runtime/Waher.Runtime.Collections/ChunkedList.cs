@@ -887,7 +887,7 @@ namespace Waher.Runtime.Collections
 
 					if (i >= 0)
 						return j + i;
-					
+
 					Count -= c;
 				}
 
@@ -896,6 +896,10 @@ namespace Waher.Runtime.Collections
 
 			return -1;
 		}
+
+		#endregion
+
+		#region Members corresponding to List<T> interface.
 
 		/// <summary>
 		/// Inserts an item to the list at the specified index.
@@ -1049,11 +1053,114 @@ namespace Waher.Runtime.Collections
 			throw new ArgumentOutOfRangeException("Index out of bounds.", nameof(Index));
 		}
 
+		/// <summary>
+		/// Adds a range of elements (last) to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRange(IEnumerable<T> Collection)
+		{
+			if (Collection is T[] A)
+				this.AddRange(A);
+			else
+			{
+				IEnumerator<T> e = Collection.GetEnumerator();
+
+				if (this.current.Start > 0)
+				{
+					if (this.current.Start < this.current.Pos)
+					{
+						Array.Copy(this.current.Elements, this.current.Start,
+							this.current.Elements, 0, this.current.Pos - this.current.Start);
+					}
+
+					this.current.Pos -= this.current.Start;
+					this.current.Start = 0;
+				}
+
+				while (this.current.Pos < this.current.Size && e.MoveNext())
+				{
+					this.current.Elements[this.current.Pos++] = e.Current;
+					this.count++;
+				}
+
+				while (e.MoveNext())
+				{
+					this.lastChunk = new Chunk(this.chunkSize, this.current);
+					this.current = this.lastChunk;
+
+					this.chunkSize <<= 1;
+					if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+						this.chunkSize = this.maxChunkSize;
+
+					this.current.Elements[this.current.Pos++] = e.Current;
+					this.count++;
+
+					while (this.current.Pos < this.current.Size && e.MoveNext())
+					{
+						this.current.Elements[this.current.Pos++] = e.Current;
+						this.count++;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Adds a range of elements (last) to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRange(T[] Collection)
+		{
+			int i = 0;
+			int c = Collection.Length;
+			int d;
+
+			if (this.current.Start > 0)
+			{
+				if (this.current.Start < this.current.Pos)
+				{
+					Array.Copy(this.current.Elements, this.current.Start,
+						this.current.Elements, 0, this.current.Pos - this.current.Start);
+				}
+
+				this.current.Pos -= this.current.Start;
+				this.current.Start = 0;
+			}
+
+			while (this.current.Pos < this.current.Size && i < c)
+			{
+				d = Math.Min(this.current.Size - this.current.Pos, c - i);
+				Array.Copy(Collection, i, this.current.Elements, this.current.Pos, d);
+				i += d;
+				this.count += d;
+				this.current.Pos += d;
+			}
+
+			while (i < c)
+			{
+				this.lastChunk = new Chunk(this.chunkSize, this.current);
+				this.current = this.lastChunk;
+
+				this.chunkSize <<= 1;
+				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+					this.chunkSize = this.maxChunkSize;
+
+				this.current.Elements[this.current.Pos++] = Collection[i++];
+				this.count++;
+
+				while (this.current.Pos < this.current.Size && i < c)
+				{
+					d = Math.Min(this.current.Size - this.current.Pos, c - i);
+					Array.Copy(Collection, i, this.current.Elements, this.current.Pos, d);
+					i += d;
+					this.count += d;
+					this.current.Pos += d;
+				}
+			}
+		}
+
 		#endregion
 
 		// TODO:
-		// T[] ToArray();
-		// void AddRange(IEnumerable<T> collection);
 		// void CopyTo(int index, T[] array, int arrayIndex, int count);
 		// void CopyTo(T[] array, int arrayIndex);
 		// void CopyTo(T[] array);

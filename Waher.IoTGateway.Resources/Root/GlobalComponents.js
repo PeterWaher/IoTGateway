@@ -59,14 +59,12 @@ function NativeHeaderHandler() {
                     const child = subMenu.children[i]
                     const textElement = Array.from(child.children).find(c => c.tagName === "A" || c.tagName === "P")
                     if (textElement) {
-                        if (textElement.innerText === "Internet Gateway Registration")
-                            console.log(textElement.offsetWidth, textElement.getBoundingClientRect().width)
-                        const width = Number( window.getComputedStyle(textElement).width.split("px")[0])
+                        const width = Number(window.getComputedStyle(textElement).width.split("px")[0])
                         maxWidth = Math.max(maxWidth, width)
                         textElements.push(textElement)
                     }
                 }
-                textElements.forEach(el => el.style.width = `${maxWidth}px`)
+                textElements.forEach(el => el.style.width = `${Math.ceil(maxWidth)}px`)
     
                 // fix item heights
                 const menueItems = subMenu.children

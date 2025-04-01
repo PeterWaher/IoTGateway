@@ -9,7 +9,10 @@
 		<Authors>Peter Waher</Authors>
 		<Company>Waher Data AB</Company>
 		<Product>Waher.IoTGateway</Product>
-		<Description>Class library that contains specialized collections for increased performance.</Description>
+		<Description>Class library that contains specialized collections for increased performance.
+
+For more information about ChunkedList, including benchmarking &amp; performance:
+https://lab.tagroot.io/Community/Post/ChunkedList</Description>
 		<Copyright>Copyright © Waher Data AB 2025. All rights reserved.</Copyright>
 		<PackageLicenseUrl />
 		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Collections</PackageProjectUrl>

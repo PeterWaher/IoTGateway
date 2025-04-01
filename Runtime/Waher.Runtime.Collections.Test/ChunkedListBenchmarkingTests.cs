@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text;
 using Waher.Layout.Layout2D.Functions;
 using Waher.Runtime.Inventory;

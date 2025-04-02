@@ -1,15 +1,6 @@
 ﻿namespace Waher.Persistence.Filters
 {
 	/// <summary>
-	/// Delegate for custom filters.
-	/// </summary>
-	/// <typeparam name="T">Type of object</typeparam>
-	/// <param name="Object">Object</param>
-	/// <returns>If object passes test.</returns>
-	public delegate bool PassTest<T>(T Object)
-		where T : class;
-
-	/// <summary>
 	/// Interface for custom filters.
 	/// </summary>
 	public interface ICustomFilter

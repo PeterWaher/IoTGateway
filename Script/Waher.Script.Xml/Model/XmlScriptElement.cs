@@ -367,13 +367,43 @@ namespace Waher.Script.Xml.Model
 						return Result;
 				}
 
+				bool Wildcard = false;
+
 				foreach (XmlScriptAttribute Attr in this.attributes)
 				{
-					XmlAttribute Attr2 = E.Attributes[Attr.Name];
+					if (string.IsNullOrEmpty(Attr.Name))
+						Wildcard = true;
+					else
+					{
+						XmlAttribute Attr2 = E.Attributes[Attr.Name];
 
-					Result = Attr.PatternMatch(Attr2, AlreadyFound);
-					if (Result != PatternMatchResult.Match)
-						return Result;
+						Result = Attr.PatternMatch(Attr2, AlreadyFound);
+						if (Result != PatternMatchResult.Match)
+							return Result;
+					}
+				}
+
+				if (!Wildcard)
+				{
+					foreach (XmlAttribute Attr in E.Attributes)
+					{
+						if (Attr.Name == "xmlns")
+							continue;
+
+						bool Found = false;
+
+						foreach (XmlScriptAttribute Attr2 in this.attributes)
+						{
+							if (Attr2.Name == Attr.Name)
+							{
+								Found = true;
+								break;
+							}
+						}
+
+						if (!Found)
+							return PatternMatchResult.NoMatch;
+					}
 				}
 
 				XmlNode N = E.FirstChild;
@@ -383,54 +413,64 @@ namespace Waher.Script.Xml.Model
 				{
 					foreach (XmlScriptNode N2 in this.children)
 					{
+						if (N2.IsWhitespace)
+							continue;
+
 						do
 						{
 							Again = false;
 
 							if (!(N is null))
 							{
-								if (N2.IsApplicable(N))
+								if (N2.IsApplicable(N, null))
 								{
-									if (N2.IsVector && N is XmlElement E2)
+									if (N2.IsVector)
 									{
-										List<XmlElement> Elements = new List<XmlElement>() { E2 };
-
-										while (true)
+										if (N is XmlElement E2)
 										{
-											N = N.NextSibling;
-											if (N is null)
-												break;
-											else if (N is XmlElement E3)
+											List<XmlElement> Elements = new List<XmlElement>() { E2 };
+
+											while (true)
 											{
-												if (E3.LocalName == E2.LocalName &&
-													E3.NamespaceURI == E2.NamespaceURI)
+												N = N.NextSibling;
+												if (N is null)
+													break;
+												else if (N is XmlElement E3)
 												{
-													Elements.Add(E3);
+													if (N2.IsApplicable(N, E2))
+														Elements.Add(E3);
+													else
+														break;
+												}
+												else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
+													N is XmlComment)
+												{
+													continue;
 												}
 												else
 													break;
 											}
-											else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
-												N is XmlComment)
-											{
-												continue;
-											}
-											else
-												break;
-										}
 
-										Result = N2.PatternMatch(new ObjectVector(Elements.ToArray()), AlreadyFound);
+											Result = N2.PatternMatch(new ObjectVector(Elements.ToArray()), AlreadyFound);
+										}
+										else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
+											N is XmlComment)
+										{
+											N = N.NextSibling;
+											Again = true;
+											continue;
+										}
+										else
+										{
+											Result = N2.PatternMatch(N, AlreadyFound);
+											N = N.NextSibling;
+										}
 									}
 									else
 									{
 										Result = N2.PatternMatch(N, AlreadyFound);
 										N = N.NextSibling;
 									}
-								}
-								else if ((N2 is XmlScriptText Text && string.IsNullOrWhiteSpace(Text.Text)) ||
-									N2 is XmlScriptComment)
-								{
-									Result = PatternMatchResult.Match;
 								}
 								else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
 									N is XmlComment)
@@ -471,16 +511,29 @@ namespace Waher.Script.Xml.Model
 		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="First">First element</param>
 		/// <returns>If the node is applicable for pattern matching.</returns>
-		public override bool IsApplicable(XmlNode CheckAgainst)
+		public override bool IsApplicable(XmlNode CheckAgainst, XmlElement First)
 		{
-			if (!(CheckAgainst is XmlElement E) || this.name != E.LocalName)
+			if (!(CheckAgainst is XmlElement E))
 				return false;
 
-			if (this.xmlns is null)
-				return true;
+			if (First is null)
+			{
+				if (this.name != E.LocalName)
+					return false;
 
-			return this.xmlns.IsApplicable(CheckAgainst.NamespaceURI);
+				if (this.xmlns is null)
+					return true;
+
+				return this.xmlns.IsApplicable(CheckAgainst.NamespaceURI);
+			}
+			else
+			{
+				return 
+					E.LocalName == First.LocalName &&
+					E.NamespaceURI == First.NamespaceURI;
+			}
 		}
 	}
 }

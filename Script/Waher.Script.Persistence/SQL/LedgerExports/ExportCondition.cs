@@ -172,6 +172,17 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 					catch (ScriptReturnValueException ex)
 					{
 						E = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						E = ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						E = ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
 					}
 					catch (Exception ex)
 					{

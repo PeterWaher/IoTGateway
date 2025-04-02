@@ -228,6 +228,17 @@ namespace Waher.WebService.Script
 				catch (ScriptReturnValueException ex)
 				{
 					Result = ex.ReturnValue;
+					//ScriptReturnValueException.Reuse(ex);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					Result = ex.LoopValue ?? ObjectValue.Null;
+					//ScriptBreakLoopException.Reuse(ex);
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					Result = ex.LoopValue ?? ObjectValue.Null;
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 				catch (ScriptAbortedException)
 				{

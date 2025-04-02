@@ -3,17 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Waher.Events;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Runtime.Inventory.Loader
 {
-	/// <summary>
-	/// Delegate for methods filtering what files to be loaded or not.
-	/// </summary>
-	/// <param name="FileName">Full path of file to be loaded.</param>
-	/// <returns>If the file should be dynamically loaded or not.</returns>
-	public delegate bool LoadFileCallback(string FileName);
-
 	/// <summary>
 	/// Static class, loading and initializing assemblies dynamically.
 	/// </summary>
@@ -41,7 +33,7 @@ namespace Waher.Runtime.Inventory.Loader
 		/// </summary>
 		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
 		/// <param name="LoadFile">Optional callback method used to determine what files to load.</param>
-		public static void Initialize(string Folder, LoadFileCallback LoadFile)
+		public static void Initialize(string Folder, Predicate<string> LoadFile)
 		{
 			if (string.IsNullOrEmpty(Folder))
 			{

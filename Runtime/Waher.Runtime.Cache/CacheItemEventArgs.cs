@@ -35,13 +35,6 @@ namespace Waher.Runtime.Cache
     }
 
     /// <summary>
-    /// Delegate for cache item removal event handlers.
-    /// </summary>
-    /// <param name="Sender">Sender of event.</param>
-    /// <param name="e">Event arguments.</param>
-    public delegate Task CacheItemEventHandler<KeyType, ValueType>(object Sender, CacheItemEventArgs<KeyType, ValueType> e);
-
-    /// <summary>
     /// Event arguments for cache item removal events.
     /// </summary>
     /// <typeparam name="KeyType">Cache key type.</typeparam>

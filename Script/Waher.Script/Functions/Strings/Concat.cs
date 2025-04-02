@@ -8,7 +8,7 @@ namespace Waher.Script.Functions.Strings
 	/// <summary>
 	/// Concatenates the elements of a vector, optionally delimiting the elements with a Delimiter.
 	/// </summary>
-	public class Concat : FunctionMultiVariate
+	public class Concat : FunctionMultiVariate, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Concatenates the elements of a vector, optionally delimiting the elements with a Delimiter.
@@ -76,5 +76,27 @@ namespace Waher.Script.Functions.Strings
 
 			return new StringValue(Result.ToString());
 		}
+
+		#region IIterativeEvalaution
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => this.Arguments.Length == 1 ||
+			(this.Arguments.Length == 2 && this.Arguments[1] is ConstantElement);
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator()
+		{
+			if (this.Arguments.Length == 2 && this.Arguments[1] is ConstantElement C)
+				return new ConcatEvaluator(C.Constant.AssociatedObjectValue?.ToString());
+			else
+				return new ConcatEvaluator(null);
+		}
+
+		#endregion
 	}
 }

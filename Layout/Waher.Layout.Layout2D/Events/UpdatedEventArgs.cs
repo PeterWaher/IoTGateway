@@ -4,13 +4,6 @@ using Waher.Layout.Layout2D.Model;
 namespace Waher.Layout.Layout2D.Events
 {
 	/// <summary>
-	/// Delegate for Updated event handlers.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments</param>
-	public delegate void UpdatedEventHandler(object Sender, UpdatedEventArgs e);
-
-	/// <summary>
 	/// Event raised when the layout model has been updated internally.
 	/// </summary>
 	public class UpdatedEventArgs : EventArgs

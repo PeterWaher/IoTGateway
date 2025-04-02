@@ -284,7 +284,7 @@ namespace Waher.IoTGateway
 				reportsFolder = appDataFolder + "Reports" + Path.DirectorySeparatorChar;
 
 				Log.Register(new EventFilter("Alert Filter", new AlertNotifier("Alert Notifier"), EventType.Alert,
-					new CustomEventFilterDelegate((Event) => string.IsNullOrEmpty(Event.Facility))));
+					(Event) => string.IsNullOrEmpty(Event.Facility)));
 
 				Log.Register(new XmlFileEventSink("XML File Event Sink",
 					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
@@ -2378,16 +2378,7 @@ namespace Waher.IoTGateway
 
 				if (!(webServer is null))
 				{
-					foreach (ISniffer Sniffer in webServer.Sniffers)
-					{
-						webServer.Remove(Sniffer);
-
-						if (Sniffer is IDisposableAsync DisposableAsync)
-							await DisposableAsync.DisposeAsync();
-						else if (Sniffer is IDisposable Disposable)
-							Disposable.Dispose();
-					}
-
+					await webServer.RemoveRange(webServer.Sniffers, true);
 					await webServer.DisposeAsync();
 					webServer = null;
 				}
@@ -3492,7 +3483,7 @@ namespace Waher.IoTGateway
 		/// <param name="When">When the event is to be executed.</param>
 		/// <param name="State">State object</param>
 		/// <returns>Timepoint of when event was scheduled.</returns>
-		public static DateTime ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
+		public static DateTime ScheduleEvent(Action<object> Callback, DateTime When, object State)
 		{
 			return scheduler?.Add(When, Callback, State) ?? DateTime.MinValue;
 		}
@@ -3504,7 +3495,7 @@ namespace Waher.IoTGateway
 		/// <param name="When">When the event is to be executed.</param>
 		/// <param name="State">State object</param>
 		/// <returns>Timepoint of when event was scheduled.</returns>
-		public static DateTime ScheduleEvent(ScheduledEventCallbackAsync Callback, DateTime When, object State)
+		public static DateTime ScheduleEvent(Func<object, Task> Callback, DateTime When, object State)
 		{
 			return scheduler?.Add(When, Callback, State) ?? DateTime.MinValue;
 		}

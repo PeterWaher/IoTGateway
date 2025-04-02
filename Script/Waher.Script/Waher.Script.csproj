@@ -36,6 +36,7 @@ Script Syntax: https://waher.se/Script.md</Description>
 	</PropertyGroup>
 	<ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
   </ItemGroup>
   <ItemGroup>

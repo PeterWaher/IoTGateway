@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -32,7 +31,7 @@ namespace Waher.Script.Operators.Conditional
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            IElement Last = null;
+            IElement Last = ObjectValue.Null;
             BooleanValue Condition;
 
             Condition = this.left.Evaluate(Variables) as BooleanValue;
@@ -41,17 +40,32 @@ namespace Waher.Script.Operators.Conditional
 
             while (Condition.Value)
             {
-                Last = this.right.Evaluate(Variables);
+                try
+                {
+                    Last = this.right.Evaluate(Variables);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
 
-                Condition = this.left.Evaluate(Variables) as BooleanValue;
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+				
+					//ScriptContinueLoopException.Reuse(ex);
+				}
+
+				Condition = this.left.Evaluate(Variables) as BooleanValue;
                 if (Condition is null)
                     throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
             }
 
-            if (Last is null)
-                return ObjectValue.Null;
-            else
-                return Last;
+            return Last;
         }
 
         /// <summary>
@@ -64,7 +78,7 @@ namespace Waher.Script.Operators.Conditional
             if (!this.isAsync)
                 return this.Evaluate(Variables);
 
-            IElement Last = null;
+            IElement Last = ObjectValue.Null;
             BooleanValue Condition;
 
             Condition = await this.left.EvaluateAsync(Variables) as BooleanValue;
@@ -73,17 +87,32 @@ namespace Waher.Script.Operators.Conditional
 
             while (Condition.Value)
             {
-                Last = await this.right.EvaluateAsync(Variables);
+                try
+                {
+                    Last = await this.right.EvaluateAsync(Variables);
+                }
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
 
-                Condition = await this.left.EvaluateAsync(Variables) as BooleanValue;
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+				
+					//ScriptContinueLoopException.Reuse(ex);
+				}
+
+				Condition = await this.left.EvaluateAsync(Variables) as BooleanValue;
                 if (Condition is null)
                     throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
             }
 
-            if (Last is null)
-                return ObjectValue.Null;
-            else
-                return Last;
+            return Last;
         }
     }
 }

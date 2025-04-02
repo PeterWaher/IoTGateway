@@ -14,6 +14,7 @@ namespace Waher.Script.Operators
 	public class ObjectExNihilo : ScriptNode
 	{
 		private readonly LinkedList<KeyValuePair<string, ScriptNode>> members;
+		private readonly bool hasWildcards = false;
 		private Dictionary<string, ScriptNode> quick = null;
 		private bool isAsync;
 
@@ -25,15 +26,35 @@ namespace Waher.Script.Operators
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public ObjectExNihilo(LinkedList<KeyValuePair<string, ScriptNode>> Members, int Start, int Length, Expression Expression)
+			: this(Members, false, Start,Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates an object from nothing.
+		/// </summary>
+		/// <param name="Members">Members</param>
+		/// <param name="HasWildcards">If the object definition includes wildcards.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public ObjectExNihilo(LinkedList<KeyValuePair<string, ScriptNode>> Members, 
+			bool HasWildcards, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.members = Members;
+			this.hasWildcards = HasWildcards;
 
 			foreach (KeyValuePair<string, ScriptNode> P in Members)
 				P.Value?.SetParent(this);
 
 			this.CalcIsAsync();
 		}
+
+		/// <summary>
+		/// If the object definition includes wildcards.
+		/// </summary>
+		public bool HasWildcards => this.hasWildcards;
 
 		private void CalcIsAsync()
 		{
@@ -171,8 +192,12 @@ namespace Waher.Script.Operators
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			if (!(obj is ObjectExNihilo O) || !base.Equals(obj))
+			if (!(obj is ObjectExNihilo O) ||
+				this.hasWildcards != O.hasWildcards ||
+				!base.Equals(obj))
+			{
 				return false;
+			}
 
 			LinkedList<KeyValuePair<string, ScriptNode>>.Enumerator e1 = this.members.GetEnumerator();
 			LinkedList<KeyValuePair<string, ScriptNode>>.Enumerator e2 = O.members.GetEnumerator();
@@ -204,6 +229,8 @@ namespace Waher.Script.Operators
 		{
 			int Result = base.GetHashCode();
 
+			Result ^= Result << 5 ^ this.hasWildcards.GetHashCode();
+
 			foreach (KeyValuePair<string, ScriptNode> P in this.members)
 			{
 				Result ^= Result << 5 ^ P.Key.GetHashCode();
@@ -227,10 +254,13 @@ namespace Waher.Script.Operators
 			{
 				this.CheckQuick();
 
-				foreach (KeyValuePair<string, IElement> P in Object)
+				if (!this.hasWildcards)
 				{
-					if (!this.quick.ContainsKey(P.Key))
-						return PatternMatchResult.NoMatch;
+					foreach (KeyValuePair<string, IElement> P in Object)
+					{
+						if (!this.quick.ContainsKey(P.Key))
+							return PatternMatchResult.NoMatch;
+					}
 				}
 
 				foreach (KeyValuePair<string, ScriptNode> P in this.members)
@@ -248,10 +278,13 @@ namespace Waher.Script.Operators
 			{
 				this.CheckQuick();
 
-				foreach (KeyValuePair<string, object> P in Object2)
+				if (!this.hasWildcards)
 				{
-					if (!this.quick.ContainsKey(P.Key))
-						return PatternMatchResult.NoMatch;
+					foreach (KeyValuePair<string, object> P in Object2)
+					{
+						if (!this.quick.ContainsKey(P.Key))
+							return PatternMatchResult.NoMatch;
+					}
 				}
 
 				foreach (KeyValuePair<string, ScriptNode> P in this.members)
@@ -274,10 +307,13 @@ namespace Waher.Script.Operators
 			{
 				this.CheckQuick();
 
-				foreach (KeyValuePair<string, string> P in Object3)
+				if (!this.hasWildcards)
 				{
-					if (!this.quick.ContainsKey(P.Key))
-						return PatternMatchResult.NoMatch;
+					foreach (KeyValuePair<string, string> P in Object3)
+					{
+						if (!this.quick.ContainsKey(P.Key))
+							return PatternMatchResult.NoMatch;
+					}
 				}
 
 				foreach (KeyValuePair<string, ScriptNode> P in this.members)

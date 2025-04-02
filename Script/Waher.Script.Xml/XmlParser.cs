@@ -116,6 +116,8 @@ namespace Waher.Script.Xml
 
 					XmlScriptElement Element = new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
 						ElementStart, Parser.Position - ElementStart, Parser.Expression);
+					XmlScriptWildcard LastWildCard = null;
+					XmlScriptNode NewChild;
 
 					while (true)
 					{
@@ -130,11 +132,19 @@ namespace Waher.Script.Xml
 						{
 							Len = i - Pos;
 
-							Element.Add(new XmlScriptText(Parser.Expression.Script.Substring(Pos, Len),
+							Element.Add(NewChild = new XmlScriptText(Parser.Expression.Script.Substring(Pos, Len),
 								Pos, Len, Parser.Expression));
 
 							Parser.SkipChars(Len);
+
+							if (!(LastWildCard is null) && !NewChild.IsWhitespace)
+							{
+								LastWildCard.Next = NewChild;
+								LastWildCard = null;
+							}
 						}
+
+						NewChild = null;
 
 						switch (Parser.PeekNextChars(2))
 						{
@@ -161,7 +171,7 @@ namespace Waher.Script.Xml
 										throw Parser.SyntaxError("Unterminated comment.");
 
 									Len = i - Pos;
-									Element.Add(new XmlScriptComment(Parser.Expression.Script.Substring(Pos, Len),
+									Element.Add(NewChild = new XmlScriptComment(Parser.Expression.Script.Substring(Pos, Len),
 										Pos, Len, Parser.Expression));
 
 									Parser.SkipChars(Len + 3);
@@ -176,7 +186,7 @@ namespace Waher.Script.Xml
 										throw Parser.SyntaxError("Unterminated CDATA construct.");
 
 									Len = i - Pos;
-									Element.Add(new XmlScriptCData(Parser.Expression.Script.Substring(Pos, Len),
+									Element.Add(NewChild = new XmlScriptCData(Parser.Expression.Script.Substring(Pos, Len),
 										Pos, Len, Parser.Expression));
 
 									Parser.SkipChars(Len + 3);
@@ -198,7 +208,7 @@ namespace Waher.Script.Xml
 								Parser.SkipChars(2);
 
 								if (!(Node is null))
-									Element.Add(new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
+									Element.Add(NewChild = new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
 								break;
 
 							case "<(":
@@ -212,12 +222,30 @@ namespace Waher.Script.Xml
 
 								Parser.SkipChars(2);
 
-								Element.Add(new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
+								if (!(Node is null))
+									Element.Add(NewChild = new XmlScriptValue(Node, Node.Start, Node.Length, Node.Expression));
 								break;
 
+							case "<*":
+								Parser.SkipChars(2);
+								if (Parser.PeekNextChar() != '>')
+									throw Parser.SyntaxError("> expected.");
+
+								Parser.NextChar();
+
+								if (LastWildCard is null)
+									Element.Add(LastWildCard = new XmlScriptWildcard(Pos, Parser.Position - Pos, Parser.Expression));
+								continue;
+
 							default:
-								Element.Add(this.ParseElement(Parser));
+								Element.Add(NewChild = this.ParseElement(Parser));
 								break;
+						}
+
+						if (!(LastWildCard is null) && !(NewChild is null) && !NewChild.IsWhitespace)
+						{
+							LastWildCard.Next = NewChild;
+							LastWildCard = null;
 						}
 					}
 				}
@@ -267,6 +295,17 @@ namespace Waher.Script.Xml
 
 						Attributes.Add(Attribute);
 					}
+				}
+				else if (ch == '*')
+				{
+					int AttributeStart = Parser.Position;
+					Parser.NextChar();
+
+					if (Attributes is null)
+						Attributes = new List<XmlScriptAttribute>();
+
+					Attributes.Add(new XmlScriptAttributeWildcard(AttributeStart,
+						Parser.Position - AttributeStart, Parser.Expression));
 				}
 				else if (char.IsWhiteSpace(ch))
 					Parser.NextChar();

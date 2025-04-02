@@ -14,21 +14,21 @@ namespace Waher.Events
 	/// <summary>
 	/// Asynchronous version of <see cref="EventArgs"/> with a typed event arguments.
 	/// </summary>
-	public delegate Task EventHandlerAsync<T>(object Sender, T e);
+	public delegate Task EventHandlerAsync<in T>(object Sender, T e);
 
 	/// <summary>
 	/// Callback function with one argument.
 	/// </summary>
-	/// <typeparam name="ArgT">Argument type.</typeparam>
+	/// <typeparam name="T">Argument type.</typeparam>
 	/// <param name="Arg">Argument</param>
-	public delegate void Callback<ArgT>(ArgT Arg);
+	public delegate void Callback<in T>(T Arg);
 
 	/// <summary>
 	/// Asynchronous callback function with one argument.
 	/// </summary>
-	/// <typeparam name="ArgT">Argument type.</typeparam>
+	/// <typeparam name="T">Argument type.</typeparam>
 	/// <param name="Arg">Argument</param>
-	public delegate Task CallbackAsync<ArgT>(ArgT Arg);
+	public delegate Task CallbackAsync<in T>(T Arg);
 
 	#endregion
 

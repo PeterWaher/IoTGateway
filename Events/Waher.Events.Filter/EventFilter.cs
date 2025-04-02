@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Events.Filter
 {
@@ -18,7 +19,7 @@ namespace Waher.Events.Filter
 		/// <param name="EventSink">Secondary event sink that will receive events that pass the filter.</param>
 		/// <param name="FromType">From what event type events are allowed.</param>
 		/// <param name="CustomFilter">Callback method implementing a custom event filter.</param>
-		public EventFilter(string ObjectID, IEventSink EventSink, EventType FromType, CustomEventFilterDelegate CustomFilter)
+		public EventFilter(string ObjectID, IEventSink EventSink, EventType FromType, Predicate<Event> CustomFilter)
 			: this(ObjectID, EventSink, FromType, (CustomEventFilter)CustomFilter)
 		{
 		}

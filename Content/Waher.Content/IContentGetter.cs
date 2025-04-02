@@ -38,7 +38,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
 		Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate, 
-			RemoteCertificateEventHandler RemoteCertificateValidator, 
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded object.</returns>
 		Task<ContentResponse> GetAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, 
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers);
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
 		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
@@ -75,7 +75,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers);
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, TemporaryStream Destination, params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
 		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
@@ -87,7 +87,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
 		/// Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
@@ -100,7 +100,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		Task<ContentStreamResponse> GetTempStreamAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination,
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, int TimeoutMs, TemporaryStream Destination,
 			params KeyValuePair<string, string>[] Headers);
 	}
 }

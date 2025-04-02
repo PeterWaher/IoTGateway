@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
@@ -123,8 +124,11 @@ namespace Waher.Script.Graphs
 			//this.showZeroX = ShowZeroX;
 			//this.showZeroY = ShowZeroY;
 
-			this.minX = Min.CalcMin(X, Node);
-			this.maxX = Max.CalcMax(X, Node);
+			if (this.minX is null)
+				this.minX = Min.CalcMin(X, Node);
+
+			if (this.maxX is null)
+				this.maxX = Max.CalcMax(X, Node);
 
 			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
 			{
@@ -134,8 +138,11 @@ namespace Waher.Script.Graphs
 				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
 			}
 
-			this.minY = Min.CalcMin(Y, Node);
-			this.maxY = Max.CalcMax(Y, Node);
+			if (this.minY is null)
+				this.minY = Min.CalcMin(Y, Node);
+
+			if (this.maxY is null)
+				this.maxY = Max.CalcMax(Y, Node);
 
 			if (ShowZeroY && c > 0 && this.minY.AssociatedSet is IAbelianGroup AG2)
 			{
@@ -230,22 +237,38 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Smallest X-value.
 		/// </summary>
-		public IElement MinX => this.minX;
+		public IElement MinX
+		{
+			get => this.minX;
+			set => this.minX = value;
+		}
 
 		/// <summary>
 		/// Largest X-value.
 		/// </summary>
-		public IElement MaxX => this.maxX;
+		public IElement MaxX
+		{
+			get => this.maxX;
+			set => this.maxX = value;
+		}
 
 		/// <summary>
 		/// Smallest Y-value.
 		/// </summary>
-		public IElement MinY => this.minY;
+		public IElement MinY
+		{
+			get => this.minY;
+			set => this.minY = value;
+		}
 
 		/// <summary>
 		/// Largest Y-value.
 		/// </summary>
-		public IElement MaxY => this.maxY;
+		public IElement MaxY
+		{
+			get => this.maxY;
+			set => this.maxY = value;
+		}
 
 		/// <summary>
 		/// If graph was generated using element-wise addition operations.

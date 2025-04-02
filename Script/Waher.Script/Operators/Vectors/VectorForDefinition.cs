@@ -4,7 +4,6 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Operators.Conditional;
 
 namespace Waher.Script.Operators.Vectors
@@ -79,10 +78,28 @@ namespace Waher.Script.Operators.Vectors
 
             LinkedList<IElement> Elements = new LinkedList<IElement>();
 
-            do
-            {
-                Variables[this.variableName] = From;
-                Elements.AddLast(this.right.Evaluate(Variables));
+			do
+			{
+				try
+				{
+					Variables[this.variableName] = From;
+					Elements.AddLast(this.right.Evaluate(Variables));
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
+
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
+
+					//ScriptContinueLoopException.Reuse(ex);
+				}
 
                 if (Direction == 0)
                     Done = true;
@@ -151,10 +168,28 @@ namespace Waher.Script.Operators.Vectors
 
             LinkedList<IElement> Elements = new LinkedList<IElement>();
 
-            do
-            {
-                Variables[this.variableName] = From;
-                Elements.AddLast(await this.right.EvaluateAsync(Variables));
+			do
+			{
+				try
+				{
+					Variables[this.variableName] = From;
+					Elements.AddLast(await this.right.EvaluateAsync(Variables));
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
+
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+                    if (ex.HasLoopValue)
+						Elements.AddLast(ex.LoopValue);
+
+					//ScriptContinueLoopException.Reuse(ex);
+				}
 
                 if (Direction == 0)
                     Done = true;

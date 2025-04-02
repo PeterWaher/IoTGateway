@@ -37,7 +37,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
 		Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, 
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, 
 			params KeyValuePair<string, string>[] Headers);
 
 		/// <summary>
@@ -50,7 +50,7 @@ namespace Waher.Content
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded headers object.</returns>
 		Task<ContentResponse> HeadAsync(Uri Uri, X509Certificate Certificate,
-			RemoteCertificateEventHandler RemoteCertificateValidator, 
+			EventHandler<RemoteCertificateEventArgs> RemoteCertificateValidator, 
 			int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 	}
 }

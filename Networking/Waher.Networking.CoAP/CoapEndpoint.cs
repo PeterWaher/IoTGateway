@@ -2690,7 +2690,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="When">When the event is to be executed.</param>
 		/// <param name="State">State object</param>
 		/// <returns>Timepoint of when event was scheduled.</returns>
-		public DateTime ScheduleEvent(ScheduledEventCallbackAsync Callback, DateTime When, object State)
+		public DateTime ScheduleEvent(Func<object, Task> Callback, DateTime When, object State)
 		{
 			if (!(this.scheduler is null))
 				return this.scheduler.Add(When, Callback, State);

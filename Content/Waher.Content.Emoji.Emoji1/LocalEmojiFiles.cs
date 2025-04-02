@@ -38,20 +38,6 @@ namespace Waher.Content.Emoji.Emoji1
 	}
 
 	/// <summary>
-	/// Delegate to a FileExists method.
-	/// </summary>
-	/// <param name="path">Path to check.</param>
-	/// <returns>If the file exists.</returns>
-	public delegate bool FileExistsHandler(string path);
-
-	/// <summary>
-	/// Delegate to a ReadAllBytes method.
-	/// </summary>
-	/// <param name="path">Path of file to load.</param>
-	/// <returns>Contents of file.</returns>
-	public delegate byte[] ReadAllBytesHandler(string path);
-
-	/// <summary>
 	/// Provides emojis from Emoji One (http://emojione.com/) stored as local files.
 	/// </summary>
 	public class Emoji1LocalFiles : IEmojiSource, IDisposable

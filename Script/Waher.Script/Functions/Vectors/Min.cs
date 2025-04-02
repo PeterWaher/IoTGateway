@@ -10,7 +10,7 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Min(v)
 	/// </summary>
-	public class Min : FunctionOneVectorVariable
+	public class Min : FunctionOneVectorVariable, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Min(v)
@@ -144,5 +144,20 @@ namespace Waher.Script.Functions.Vectors
 			else
 				return Result;
 		}
+
+		#region IIterativeEvalaution
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new MinEvaluator(this);
+
+		#endregion
 	}
 }

@@ -153,7 +153,24 @@ namespace Waher.Content.Semantic.Functions
 				}
 				catch (ScriptReturnValueException ex)
 				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
 					throw new ScriptReturnValueException(ex.ReturnValue);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
+					if (ex.HasLoopValue)
+						throw new ScriptBreakLoopException(ex.LoopValue);
+					else
+						throw new ScriptBreakLoopException();
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
+					if (ex.HasLoopValue)
+						throw new ScriptContinueLoopException(ex.LoopValue);
+					else
+						throw new ScriptContinueLoopException();
 				}
 				catch (Exception ex)
 				{
@@ -184,7 +201,24 @@ namespace Waher.Content.Semantic.Functions
 				}
 				catch (ScriptReturnValueException ex)
 				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
 					throw new ScriptReturnValueException(ex.ReturnValue);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
+					if (ex.HasLoopValue)
+						throw new ScriptBreakLoopException(ex.LoopValue);
+					else
+						throw new ScriptBreakLoopException();
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					ExceptionDispatchInfo.Capture(ex).Throw();
+					if (ex.HasLoopValue)
+						throw new ScriptContinueLoopException(ex.LoopValue);
+					else
+						throw new ScriptContinueLoopException();
 				}
 				catch (Exception ex)
 				{

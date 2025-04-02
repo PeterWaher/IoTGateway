@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -79,11 +80,25 @@ namespace Waher.Script.Fractals.ComplexFractals
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
-        {
-            string ColorExpression = null;
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		{
+			string ColorExpression = null;
             SKColor[] Palette;
 			object Obj;
             double rc, ic;
@@ -156,7 +171,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             if (dimx <= 0 || dimx > 5000 || dimy <= 0 || dimy > 5000)
                 throw new ScriptRuntimeException("Image size must be within 1x1 to 5000x5000", this);
 
-            return CalcNovaMandelbrot(rc, ic, dr, Rr, Ri, pr, pi, Palette, dimx, dimy, 
+            return await CalcNovaMandelbrot(rc, ic, dr, Rr, Ri, pr, pi, Palette, dimx, dimy, 
                 this, Variables, this.FractalZoomScript, 
                 new object[] { Palette, dimx, dimy, Rr, Ri, pr, pi, ColorExpression });
         }
@@ -218,7 +233,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcNovaMandelbrot(double rCenter, double iCenter, double rDelta, double Rr, double Ri,
+		public static async Task<FractalGraph> CalcNovaMandelbrot(double rCenter, double iCenter, double rDelta, double Rr, double Ri,
             double pr, double pi, SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
         {
@@ -320,10 +335,10 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-            Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+            await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-            FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+            await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
             return new FractalGraph(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);

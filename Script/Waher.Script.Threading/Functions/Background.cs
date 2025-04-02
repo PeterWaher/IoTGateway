@@ -111,8 +111,7 @@ namespace Waher.Script.Threading.Functions
 			{
 				Task Preview(object Sender, PreviewEventArgs e)
 				{
-					Variables.Preview(e.Expression, e.Preview);
-					return Task.CompletedTask;
+					return Variables.Preview(e.Expression, e.Preview);
 				}
 
 				v.OnPreview += Preview;
@@ -130,6 +129,17 @@ namespace Waher.Script.Threading.Functions
 				catch (ScriptReturnValueException ex)
 				{
 					Result.TrySetResult(ex.ReturnValue);
+					//ScriptReturnValueException.Reuse(ex);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					Result.TrySetResult(ex.LoopValue ?? ObjectValue.Null);
+					//ScriptBreakLoopException.Reuse(ex);
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					Result.TrySetResult(ex.LoopValue ?? ObjectValue.Null);
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 				catch (Exception ex)
 				{

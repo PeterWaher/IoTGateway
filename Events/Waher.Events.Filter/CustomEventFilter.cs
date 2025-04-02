@@ -1,24 +1,19 @@
-﻿namespace Waher.Events.Filter
-{
-	/// <summary>
-	/// Delegate for custom event filters.
-	/// </summary>
-	/// <param name="Event"></param>
-	/// <returns>If the event is allowed.</returns>
-	public delegate bool CustomEventFilterDelegate(Event Event);
+﻿using System;
 
+namespace Waher.Events.Filter
+{
 	/// <summary>
 	/// Implements a custom event filter based on a delegate.
 	/// </summary>
 	public class CustomEventFilter : ICustomEventFilter
 	{
-		private readonly CustomEventFilterDelegate callback;
+		private readonly Predicate<Event> callback;
 
 		/// <summary>
 		/// Implements a custom event filter based on a delegate.
 		/// </summary>
 		/// <param name="Callback">Method called when an event is being evaluated.</param>
-		public CustomEventFilter(CustomEventFilterDelegate Callback)
+		public CustomEventFilter(Predicate<Event> Callback)
 		{
 			this.callback = Callback;
 		}
@@ -27,7 +22,7 @@
 		/// Converts a delegate to a custom event filter.
 		/// </summary>
 		/// <param name="Callback">Callback method.</param>
-		public static implicit operator CustomEventFilter(CustomEventFilterDelegate Callback)
+		public static implicit operator CustomEventFilter(Predicate<Event> Callback)
 		{
 			return new CustomEventFilter(Callback);
 		}

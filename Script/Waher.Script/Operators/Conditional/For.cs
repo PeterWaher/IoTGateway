@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Conditional
 {
@@ -52,7 +52,7 @@ namespace Waher.Script.Operators.Conditional
             if (!(From.AssociatedSet is IOrderedSet S))
                 throw new ScriptRuntimeException("Cannot compare range.", this);
 
-            IElement Step, Last;
+            IElement Step, Last = ObjectValue.Null;
             int Direction = S.Compare(From, To);
             bool Done;
 
@@ -81,10 +81,28 @@ namespace Waher.Script.Operators.Conditional
 
             do
             {
-                Variables[this.variableName] = From;
-                Last = this.right.Evaluate(Variables);
+                try
+                {
+                    Variables[this.variableName] = From;
+                    Last = this.right.Evaluate(Variables);
+                }
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
 
-                if (Direction == 0)
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+                    if (ex.HasLoopValue)
+                        Last = ex.LoopValue;
+				
+					//ScriptContinueLoopException.Reuse(ex);
+				}
+
+				if (Direction == 0)
                     Done = true;
                 else
                 {
@@ -122,7 +140,7 @@ namespace Waher.Script.Operators.Conditional
             if (!(From.AssociatedSet is IOrderedSet S))
                 throw new ScriptRuntimeException("Cannot compare range.", this);
 
-            IElement Step, Last;
+            IElement Step, Last = ObjectValue.Null;
             int Direction = S.Compare(From, To);
             bool Done;
 
@@ -151,10 +169,28 @@ namespace Waher.Script.Operators.Conditional
 
             do
             {
-                Variables[this.variableName] = From;
-                Last = await this.right.EvaluateAsync(Variables);
+                try
+                {
+                    Variables[this.variableName] = From;
+                    Last = await this.right.EvaluateAsync(Variables);
+                }
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+				
+                    //ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Last = ex.LoopValue;
+				
+					//ScriptContinueLoopException.Reuse(ex);
+				}
 
-                if (Direction == 0)
+				if (Direction == 0)
                     Done = true;
                 else
                 {

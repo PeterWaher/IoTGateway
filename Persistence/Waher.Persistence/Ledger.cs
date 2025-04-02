@@ -123,24 +123,13 @@ namespace Waher.Persistence
 
 		private static void RaiseEntryAdded(object Object)
 		{
-			ObjectEventHandler h = EntryAdded;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			EntryAdded?.Raise(Provider, new ObjectEventArgs(Object));
 		}
 
 		/// <summary>
 		/// Event raised when an entry has been added to the ledger.
 		/// </summary>
-		public static event ObjectEventHandler EntryAdded = null;
+		public static event EventHandler<ObjectEventArgs> EntryAdded = null;
 
 		/// <summary>
 		/// Updates an entry in the ledger.
@@ -154,24 +143,13 @@ namespace Waher.Persistence
 
 		private static void RaiseEntryUpdated(object Object)
 		{
-			ObjectEventHandler h = EntryUpdated;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			EntryUpdated?.Raise(Provider, new ObjectEventArgs(Object));
 		}
 
 		/// <summary>
 		/// Event raised when an entry has been updated in the ledger.
 		/// </summary>
-		public static event ObjectEventHandler EntryUpdated = null;
+		public static event EventHandler<ObjectEventArgs> EntryUpdated = null;
 
 		/// <summary>
 		/// Deletes an entry in the ledger.
@@ -185,24 +163,13 @@ namespace Waher.Persistence
 
 		private static void RaiseEntryDeleted(object Object)
 		{
-			ObjectEventHandler h = EntryDeleted;
-			if (!(h is null))
-			{
-				try
-				{
-					h(Provider, new ObjectEventArgs(Object));
-				}
-				catch (Exception)
-				{
-					// Ignore
-				}
-			}
+			EntryDeleted?.Raise(Provider, new ObjectEventArgs(Object));
 		}
 
 		/// <summary>
 		/// Event raised when an entry has been deleted in the ledger.
 		/// </summary>
-		public static event ObjectEventHandler EntryDeleted = null;
+		public static event EventHandler<ObjectEventArgs> EntryDeleted = null;
 
 		/// <summary>
 		/// Clears a collection in the ledger.
@@ -216,24 +183,20 @@ namespace Waher.Persistence
 
 		private static async void RaiseCollectionCleared(string Collection)
 		{
-			CollectionEventHandler h = CollectionCleared;
-			if (!(h is null))
+			try
 			{
-				try
-				{
-					await h(Provider, new CollectionEventArgs(Collection));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
+				await CollectionCleared.Raise(Provider, new CollectionEventArgs(Collection));
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 
 		/// <summary>
 		/// Event raised when a collection has been cleared.
 		/// </summary>
-		public static event CollectionEventHandler CollectionCleared = null;
+		public static event EventHandlerAsync<CollectionEventArgs> CollectionCleared = null;
 
 		/// <summary>
 		/// Gets an eumerator for objects of type <typeparamref name="T"/>.

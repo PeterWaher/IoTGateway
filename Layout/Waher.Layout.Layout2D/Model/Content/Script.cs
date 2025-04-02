@@ -13,6 +13,7 @@ using Waher.Layout.Layout2D.Model.Transforms;
 using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
+using Waher.Script.Objects;
 using Waher.Script.Operators.Matrices;
 
 namespace Waher.Layout.Layout2D.Model.Content
@@ -172,6 +173,17 @@ namespace Waher.Layout.Layout2D.Model.Content
 					catch (ScriptReturnValueException ex)
 					{
 						Result = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						Result = ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						Result = ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
 					}
 					catch (ScriptAbortedException)
 					{

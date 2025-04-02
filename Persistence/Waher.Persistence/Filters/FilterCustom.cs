@@ -8,12 +8,12 @@ namespace Waher.Persistence.Filters
 	public class FilterCustom<T> : Filter, ICustomFilter
 		where T : class
 	{
-		private readonly PassTest<T> test;
+		private readonly Predicate<T> test;
 
 		/// <summary>
 		/// Custom filter used to filter objects using an external expression.
 		/// </summary>
-		public FilterCustom(PassTest<T> Test)
+		public FilterCustom(Predicate<T> Test)
 		{
 			this.test = Test;
 		}
@@ -21,7 +21,7 @@ namespace Waher.Persistence.Filters
 		/// <summary>
 		/// Test to apply to objects.
 		/// </summary>
-		public PassTest<T> Test => this.test;
+		public Predicate<T> Test => this.test;
 
 		/// <summary>
 		/// Checks if an object passes the test or not.

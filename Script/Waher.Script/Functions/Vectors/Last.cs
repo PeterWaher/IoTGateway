@@ -1,4 +1,5 @@
-﻿using Waher.Script.Abstraction.Elements;
+﻿using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -7,7 +8,7 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Last(v)
     /// </summary>
-    public class Last : FunctionOneVectorVariable
+    public class Last : FunctionOneVectorVariable, IIterativeEvaluation
     {
         /// <summary>
         /// Last(v)
@@ -52,5 +53,23 @@ namespace Waher.Script.Functions.Vectors
                 return Argument.GetElement(c - 1);
         }
 
-    }
+		#region IIterativeEvaluation
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator()
+		{
+			return new LastEvaluator();
+		}
+
+		#endregion
+
+	}
 }

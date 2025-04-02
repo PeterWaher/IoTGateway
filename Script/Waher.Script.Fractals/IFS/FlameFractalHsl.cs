@@ -8,6 +8,7 @@ using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Fractals.IFS
 {
@@ -162,11 +163,25 @@ namespace Waher.Script.Fractals.IFS
 		public override string FunctionName => nameof(FlameFractalHsl);
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
-        {
-            double xc, yc;
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		{
+			double xc, yc;
             double dr;
             long N;
             int dimx, dimy;
@@ -328,7 +343,7 @@ namespace Waher.Script.Fractals.IFS
                 Variables.ConsoleOut?.WriteLine("Width: " + Expression.ToString(dr), Variables);
             }
 
-            return CalcFlame(xc, yc, dr, N, Functions, dimx, dimy, Seed, SuperSampling, Gamma, LightFactor, Preview, Parallel, Variables, this, 
+            return await CalcFlame(xc, yc, dr, N, Functions, dimx, dimy, Seed, SuperSampling, Gamma, LightFactor, Preview, Parallel, Variables, this, 
 				this.FractalZoomScript, new object[] { dimx, dimy, N, FunctionsExpression, Seed, SuperSampling, Gamma, LightFactor, Preview, Parallel });
         }
 
@@ -384,7 +399,7 @@ namespace Waher.Script.Fractals.IFS
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcFlame(double xCenter, double yCenter, double rDelta, long N,
+		public static async Task<FractalGraph> CalcFlame(double xCenter, double yCenter, double rDelta, long N,
             FlameFunction[] Functions, int Width, int Height, int Seed, int SuperSampling, double Gamma,
             double LightFactor, bool Preview, bool Parallel, Variables Variables, ScriptNode Node,
             FractalZoomScript FractalZoomScript, object State)
@@ -443,7 +458,7 @@ namespace Waher.Script.Fractals.IFS
             yMin = yCenter - rDelta / (2 * AspectRatio);
             yMax = yMin + rDelta / AspectRatio;
 
-            int NrGames = Parallel ? System.Environment.ProcessorCount : 1;
+            int NrGames = Parallel ? Environment.ProcessorCount : 1;
 
             if (NrGames <= 1)
             {
@@ -451,7 +466,7 @@ namespace Waher.Script.Fractals.IFS
                 Variables v = new Variables();
                 Variables.CopyTo(v);
 
-                RunChaosGame(v, Functions, SumWeights, P, Preview, Gamma, LightFactor, Node);
+                await RunChaosGame(v, Functions, SumWeights, P, Preview, Gamma, LightFactor, Node);
 
                 return new FractalGraph(Variables, P.RenderBitmapHsl(Gamma, LightFactor, false, SKColors.Black), xMin, yMin, xMax, yMax, rDelta,
                     false, Node, FractalZoomScript, State);
@@ -545,7 +560,7 @@ namespace Waher.Script.Fractals.IFS
 
             try
             {
-                RunChaosGame(v, Functions, SumWeights, P2, Preview, Gamma, LightFactor, Node);
+                RunChaosGame(v, Functions, SumWeights, P2, Preview, Gamma, LightFactor, Node).Wait();
             }
             catch (ThreadAbortException)
             {
@@ -561,7 +576,7 @@ namespace Waher.Script.Fractals.IFS
             }
         }
 
-        private static void RunChaosGame(Variables v, FlameFunction[] Functions,
+        private static async Task RunChaosGame(Variables v, FlameFunction[] Functions,
             double[] SumWeights, FlameState P, bool Preview, double Gamma, double LightFactor,
             ScriptNode Node)
         {
@@ -617,7 +632,7 @@ namespace Waher.Script.Fractals.IFS
 
 							if (Preview)
 							{
-								v.Preview(Node.Expression, new GraphBitmap(v, P.RenderBitmapHsl(Gamma, LightFactor, true, SKColors.Black)));
+								await v.Preview(Node.Expression, new GraphBitmap(v, P.RenderBitmapHsl(Gamma, LightFactor, true, SKColors.Black)));
 
 								Temp2 = DateTime.Now;
 
@@ -637,7 +652,7 @@ namespace Waher.Script.Fractals.IFS
 							IterationsPerSeconds = NrIterationsSinceLast / (Temp - PrevPreview).TotalSeconds;
 							PercentDone = (100 * (1.0 - ((double)P.N) / P.N0));
 							TimeLeft = new TimeSpan((long)((Temp - Start).Ticks * 100 / PercentDone));
-							v.Status(Node.Expression, P.N.ToString() + " iterations left, " + NrIterations.ToString() + " iterations done, " + IterationsPerSeconds.ToString("F0") + " iterations/s, " + PercentDone.ToString("F1") + "% done, Time Left: " + TimeLeft.ToString() + ".");
+							await v.Status(Node.Expression, P.N.ToString() + " iterations left, " + NrIterations.ToString() + " iterations done, " + IterationsPerSeconds.ToString("F0") + " iterations/s, " + PercentDone.ToString("F1") + "% done, Time Left: " + TimeLeft.ToString() + ".");
 							PrevNrIterations = NrIterations;
 							PrevPreview = Temp;
 						}
@@ -654,7 +669,7 @@ namespace Waher.Script.Fractals.IFS
                 }
                 while (P.IncHistogram());
 
-				v.Status(Node.Expression, string.Empty);
+				await v.Status(Node.Expression, string.Empty);
             }
             else
             {

@@ -28,7 +28,12 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <param name="Variables">Current set of variables</param>
 		/// <param name="GroupBy">Group on these fields</param>
 		/// <param name="GroupNames">Names given to grouped fields</param>
-		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, ScriptNode[] GroupBy, ScriptNode[] GroupNames)
+		/// <param name="AdditionalFields">Optional calculated fields.</param>
+		/// <param name="Having">Optional having clause</param>
+		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, 
+			ScriptNode[] GroupBy, ScriptNode[] GroupNames,
+			List<KeyValuePair<string, ScriptNode>> AdditionalFields,
+			ref ScriptNode Having)
 		{
 			this.e = ItemEnumerator;
 			this.variables = Variables;

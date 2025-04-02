@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
@@ -35,12 +35,29 @@ namespace Waher.Script.Fractals
 		public override string[] DefaultArgumentNames => new string[] { "Image" };
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument">Function argument.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+		public override IElement Evaluate(IElement Argument, Variables Variables)
+		{
+			return this.EvaluateAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
 		{
 			PixelInformation Pixels;
 
@@ -72,20 +89,9 @@ namespace Waher.Script.Fractals
 			(double[] BoundaryR, double[] BoundaryG, double[] BoundaryB, double[] BoundaryA) =
 				FractalGraph.FindBoundaries(R, G, B, A, Width, Height);
 
-			FractalGraph.Smooth(R, G, B, A, BoundaryR, BoundaryG, BoundaryB, BoundaryA, Width, Height, this, Variables);
+			await FractalGraph.Smooth(R, G, B, A, BoundaryR, BoundaryG, BoundaryB, BoundaryA, Width, Height, this, Variables);
 
 			return new GraphBitmap(Variables, FractalGraph.ToPixels(R, G, B, A, Width, Height));
-		}
-
-		/// <summary>
-		/// Evaluates the function on a scalar argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
-		{
-			return Task.FromResult(this.EvaluateScalar(Argument, Variables));
 		}
 	}
 }

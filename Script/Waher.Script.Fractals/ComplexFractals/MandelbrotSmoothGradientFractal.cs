@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -77,11 +78,25 @@ namespace Waher.Script.Fractals.ComplexFractals
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// TODO
 		/// </summary>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
-        {
-            string ColorExpression = null;
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		{
+			string ColorExpression = null;
             SKColor[] Palette;
             double rc, ic;
             double dr;
@@ -161,12 +176,12 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             if (!(f is null))
             {
-                return CalcMandelbrot(rc, ic, dr, f, Variables, Palette, dimx, dimy, this, this.FractalZoomScript,
+                return await CalcMandelbrot(rc, ic, dr, f, Variables, Palette, dimx, dimy, this, this.FractalZoomScript,
                     new object[] { Palette, dimx, dimy, ColorExpression, fDef });
             }
             else
             {
-                return CalcMandelbrot(rc, ic, dr, Palette, dimx, dimy, this, Variables, this.FractalZoomScript,
+                return await CalcMandelbrot(rc, ic, dr, Palette, dimx, dimy, this, Variables, this.FractalZoomScript,
                     new object[] { Palette, dimx, dimy, ColorExpression, fDef });
             }
         }
@@ -211,7 +226,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
+		public static async Task<FractalGraph> CalcMandelbrot(double rCenter, double iCenter, double rDelta,
             SKColor[] Palette, int Width, int Height, ScriptNode Node, Variables Variables,
 			FractalZoomScript FractalZoomScript, object State)
         {
@@ -270,10 +285,10 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-            Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+            await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-            FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+            await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
             FractalGraph.Diff(ColorIndex, Width, Height, out double[] dx, out double[] dy);
             FractalGraph.Angle(ColorIndex, Width, Height, N, dx, dy);
 
@@ -284,7 +299,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public static FractalGraph CalcMandelbrot(double rCenter, double iCenter, double rDelta,
+		public static async Task<FractalGraph> CalcMandelbrot(double rCenter, double iCenter, double rDelta,
             ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
             ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
         {
@@ -402,10 +417,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             }
 
-            Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+            await Variables.Preview(Node.Expression, new GraphBitmap(Variables, FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
-            FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
+            await FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
             FractalGraph.Diff(ColorIndex, Width, Height, out double[] dx, out double[] dy);
             FractalGraph.Angle(ColorIndex, Width, Height, N, dx, dy);
 

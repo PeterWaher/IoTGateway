@@ -26,15 +26,21 @@ namespace Waher.Script.Functions.Runtime
         /// </summary>
         public override string FunctionName => nameof(Preview);
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.Argument.Evaluate(Variables);
-            Variables.Preview(this.Expression, E);
+            Variables.Preview(this.Expression, E).Wait();
             return E;
         }
 
@@ -46,7 +52,7 @@ namespace Waher.Script.Functions.Runtime
         public override async Task<IElement> EvaluateAsync(Variables Variables)
         {
             IElement E = await this.Argument.EvaluateAsync(Variables);
-            Variables.Preview(this.Expression, E);
+            await Variables.Preview(this.Expression, E);
             return E;
         }
 

@@ -10,7 +10,7 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Max(v)
     /// </summary>
-    public class Max : FunctionOneVectorVariable
+    public class Max : FunctionOneVectorVariable, IIterativeEvaluation
     {
         /// <summary>
         /// Max(v)
@@ -145,5 +145,20 @@ namespace Waher.Script.Functions.Vectors
                 return Result;
         }
 
-    }
+		#region IIterativeEvalaution
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+        /// <summary>
+        /// Creates an iterative evaluator for the node.
+        /// </summary>
+        /// <returns>Iterative evaluator reference.</returns>
+        public IIterativeEvaluator CreateEvaluator() => new MaxEvaluator(this);
+
+		#endregion
+
+	}
 }

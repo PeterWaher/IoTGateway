@@ -7,18 +7,6 @@ using Waher.Events;
 namespace Waher.Runtime.Timing
 {
 	/// <summary>
-	/// Callback method for scheduled events.
-	/// </summary>
-	/// <param name="State">State object to pass to the scheduled event.</param>
-	public delegate void ScheduledEventCallback(object State);
-
-	/// <summary>
-	/// Callback method for asynchronous scheduled events.
-	/// </summary>
-	/// <param name="State">State object to pass to the scheduled event.</param>
-	public delegate Task ScheduledEventCallbackAsync(object State);
-
-	/// <summary>
 	/// Class that can be used to schedule events in time. It uses a timer to execute tasks at the appointed time. 
 	/// If no events are scheduled the timer is terminated, and recreated when new events are scheduled.
 	/// </summary>
@@ -63,7 +51,7 @@ namespace Waher.Runtime.Timing
 		/// <param name="Callback">Method called when event is to be executed.</param>
 		/// <param name="State">State object bassed to <paramref name="Callback"/>.</param>
 		/// <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
-		public DateTime Add(DateTime When, ScheduledEventCallback Callback, object State)
+		public DateTime Add(DateTime When, Action<object> Callback, object State)
 		{
 			lock (this.events)
 			{
@@ -84,7 +72,7 @@ namespace Waher.Runtime.Timing
 		/// <param name="Callback">Method called when event is to be executed.</param>
 		/// <param name="State">State object bassed to <paramref name="Callback"/>.</param>
 		/// <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
-		public DateTime Add(DateTime When, ScheduledEventCallbackAsync Callback, object State)
+		public DateTime Add(DateTime When, Func<object, Task> Callback, object State)
 		{
 			lock (this.events)
 			{

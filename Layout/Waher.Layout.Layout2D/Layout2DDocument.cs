@@ -450,7 +450,7 @@ namespace Waher.Layout.Layout2D
 		/// Event raised when the layout dimensions are being measured. Event can be raised multiple times
 		/// during the rendering process.
 		/// </summary>
-		public event DrawingEventHandler OnMeasuringDimensions = null;
+		public event EventHandler<DrawingEventArgs> OnMeasuringDimensions = null;
 
 		/// <summary>
 		/// Raises the <see cref="OnMeasuringDimensions"/> event.
@@ -458,25 +458,13 @@ namespace Waher.Layout.Layout2D
 		/// <param name="State">Current drawing state.</param>
 		public void RaiseMeasuringDimensions(DrawingState State)
 		{
-			DrawingEventHandler h = this.OnMeasuringDimensions;
-
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, new DrawingEventArgs(this, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			this.OnMeasuringDimensions?.Raise(this, new DrawingEventArgs(this, State));
 		}
 
 		/// <summary>
 		/// Event raised when the layout positions are being measured. Event is eaised once after dimensions have been measured.
 		/// </summary>
-		public event DrawingEventHandler OnMeasuringPositions = null;
+		public event EventHandler<DrawingEventArgs> OnMeasuringPositions = null;
 
 		/// <summary>
 		/// Raises the <see cref="OnMeasuringPositions"/> event.
@@ -484,19 +472,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="State">Current drawing state.</param>
 		public void RaiseMeasuringPositions(DrawingState State)
 		{
-			DrawingEventHandler h = this.OnMeasuringPositions;
-
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, new DrawingEventArgs(this, State));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			this.OnMeasuringPositions?.Raise(this, new DrawingEventArgs(this, State));
 		}
 
 		#endregion
@@ -504,7 +480,7 @@ namespace Waher.Layout.Layout2D
 		/// <summary>
 		/// Event raised when the internal state of the layout has been updated.
 		/// </summary>
-		public event UpdatedEventHandler OnUpdated = null;
+		public event EventHandler<UpdatedEventArgs> OnUpdated = null;
 
 		/// <summary>
 		/// Raises the <see cref="OnUpdated"/> event.
@@ -512,19 +488,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Element">Element being updated.</param>
 		public void RaiseUpdated(ILayoutElement Element)
 		{
-			UpdatedEventHandler h = this.OnUpdated;
-
-			if (!(h is null))
-			{
-				try
-				{
-					h(this, new UpdatedEventArgs(this, Element));
-				}
-				catch (Exception ex)
-				{
-					Log.Exception(ex);
-				}
-			}
+			this.OnUpdated?.Raise(this, new UpdatedEventArgs(this, Element));
 		}
 
 		/// <summary>

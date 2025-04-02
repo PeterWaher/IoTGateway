@@ -199,6 +199,17 @@ statements between braces. Examples:
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
+**Note 2**: You can use the `Break([x])` function to break out of a loop, and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last value of the loop. If a value is provided to the `Continue` function,
+the value will be considered the value of the current iteration of the loop. If no value is 
+provided, the iteration will not produce a value.
+
+**Note 3**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
+
 ##### Implicit vector notation
 
 Vectors can also be defined implicitly using an implicit vector notation:
@@ -238,6 +249,17 @@ statements between braces. Examples:
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
 
+**Note 2**: You can use the `Break([x])` function to break out of a loop, and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last row of the loop. If a value is provided to the `Continue` function,
+the value will be considered the row of the current iteration of the loop. If no value is provided, 
+the iteration will not produce a row.
+
+**Note 3**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
+
 ##### Implicit matrix notation
 
 Matrices can also be defined implicitly using implicit vector notation, where the `Expression` evaluates to row vectors. Example:
@@ -267,6 +289,17 @@ statements between braces. Examples:
 	S:={FOR EACH x IN 1..10|0.1 : x^2};
 
 **Note**: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+
+**Note 2**: You can use the `Break([x])` function to break out of a loop, and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last value of the loop. If a value is provided to the `Continue` function,
+the value will be considered the value of the current iteration of the loop. If no value is 
+provided, the iteration will not produce a value.
+
+**Note 3**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
 
 ##### Implicit set notation
 
@@ -343,6 +376,42 @@ Would return:
 ```
 [7, 12, 81]
 ```
+
+##### Wildcards in Object Pattern Matching
+
+You can use a wildcard `*` when using an object definition when performing pattern matching of object content. Wildcards can be used to
+match any object properties. Consider the following pattern matching script that matches properties of an object and puts the values in
+the corresponding variable references:
+
+	{
+		"name":Required(Str(Name)),
+		"age":Optional(Int(Age)),
+		"profession":Optional(Str(Profession)),
+		"employedSince":Required(DateTime(EmployedSince))
+	}
+	:=
+	{
+		"name":"Kalle",
+		"age":50,
+		"profession":"Bus Driver",
+		"employedSince":DateTime(2010,1,02)
+	};
+
+But if you are only interested in the name and the date when the person was employed, you can use wildcards to ignore the other elements 
+and attributes:
+
+	{
+		"name":Required(Str(Name)),
+		"employedSince":Required(DateTime(EmployedSince)),
+		*
+	}
+	:=
+	{
+		"name":"Kalle",
+		"age":50,
+		"profession":"Bus Driver",
+		"employedSince":DateTime(2010,1,02)
+	};
 
 ### Suffix-operators
 
@@ -791,6 +860,18 @@ if the loop is ascending or descending.
 
 **Note 3**: Exceptions caught using the `CATCH` statement are accessible within the `CATCH` statement by referencing the variable `Exception`.
 
+**Note 4**: You can use the `Break([x])` function to break out of a loop (`DO` ... `WHILE`, 
+`WHILE` ... `DO`, `FOREACH`, `FOR EACH`, and `FOR`), and the `Continue([x])` 
+function to skip to the next iteration. If a value is provided to the `Break` function, the value 
+will be considered the last value of the loop. If a value is provided to the `Continue` function,
+the value will be considered the value of the current iteration of the loop. The last value
+produced will be the value returned from the loop statement.
+
+**Note 5**: There is a performance penalty of using `Break` and `Continue`, compared to using
+conditional statements within the loop. Internally, `Continue` and `Break` use exceptions to exit
+from evaluation in the parsed syntax tree. The performance penalty can be as large as 100 times,
+and should only be used if a conditional statement is not possible, or too complex to create.
+
 ### Lists
 
 Lists of statements are created by writing a list of statements or arguments, each separated by a comma `,` character. Example:
@@ -1118,6 +1199,8 @@ The following functions are useful to control the runtime execution of the scrip
 
 | Function                      | Description                                                                                                                                                                                                                                | In Pattern Matching                                    | Example |
 |-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|---------|
+| `Break([x])`                  | Breaks the current loop. If a value is included as an argument, it is taken as the final value of the loop.                                                                                                                                |                                                        | `break(Result)` |
+| `Continue([x])`               | Skips the rest of the content evaluation and continues to the condition statement of the loop. If a value is included as an argument, it is taken as the final value of the current iteration, otherwise the interation lacks a value.     |                                                        | `continue(Result)` |
 | `Create(Type[,ArgList])`      | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments.                                                    |                                                        | `Create(System.String,'-',80)` |
 | `CreateType(Type[,TypeList])` | Creates a concrete type from a generic type `Type` together with a list of types in `TypeList` forming the basis for the concretization of the generic type.                                                                               |                                                        | `CreateType(System.Array,System.Byte)` |
 | `Delete(x)`                   | Alias for `Destroy(x)`.                                                                                                                                                                                                                    |                                                        | `Delete(x)` |
@@ -3405,6 +3488,41 @@ The result of this script is as follows. Here, whitespace is included in the scr
 		<y value="1" prod="5" /><y value="2" prod="10" /><y value="3" prod="15" /><y value="4" prod="20" /><y value="5" prod="25" />
 	</x>
 </MultTable>
+```
+
+#### Wildcards in XML Pattern Matching
+
+There are two types of wildcards you can use when performing pattern matching of XML content. Attribute wildcards are used to match any attribute
+or attributes not listed in the pattern. An attribute wildcard is defined as `*`. Element wildcards are used to match any element or set of 
+elements not listed in the pattern. An element wildcard is defined as `<*>`. Consider the following pattern matching script, that evaluates
+successfully and extracts mentioned components:
+
+```
+<Person name=Required(Str(Name)) age=Optional(Int(Age))>
+	<Profession><[Optional(Str(Profession))]></Profession>
+	<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>
+</Person>
+:=
+<Person name="Kalle" age="50">
+	<Profession>Bus Driver</Profession>
+	<EmployedSince>2010-01-02</EmployedSince>
+</Person>;
+```
+
+But if you are only interested in the name and the date when the person was employed, you can use wildcards to ignore the other elements 
+and attributes:
+
+```
+<Person name=Required(Str(Name)) *>
+	<*>
+	<EmployedSince><[Required(DateTime(EmployedSince))]></EmployedSince>
+	<*>
+</Person>
+:=
+<Person name="Kalle" age="50">
+	<Profession>Bus Driver</Profession>
+	<EmployedSince>2010-01-02</EmployedSince>
+</Person>;
 ```
 
 =========================================================================================================================================================

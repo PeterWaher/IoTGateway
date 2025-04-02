@@ -9,7 +9,7 @@ namespace Waher.Script.Functions.Vectors
 	/// <summary>
 	/// Count(v)
 	/// </summary>
-	public class Count : FunctionMultiVariate
+	public class Count : FunctionMultiVariate, IIterativeEvaluation
 	{
 		/// <summary>
 		/// Count(v)
@@ -45,10 +45,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get { return new string[] { "Vector" }; }
-		}
+		public override string[] DefaultArgumentNames => new string[] { "Vector" };
 
 		/// <summary>
 		/// Evaluates the function on a vector argument.
@@ -101,6 +98,21 @@ namespace Waher.Script.Functions.Vectors
 
 			return new DoubleNumber(Count);
 		}
+
+		#region IIterativeEvaluation
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => this.Arguments.Length == 1;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new CountEvaluator();
+		
+		#endregion
 
 	}
 }

@@ -3,13 +3,6 @@
 namespace Waher.Persistence
 {
 	/// <summary>
-	/// Event handler for collection repaired events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate Task CollectionRepairedEventHandler(object Sender, CollectionRepairedEventArgs e);
-
-	/// <summary>
 	/// Event arguments for collection repaired events.
 	/// </summary>
 	public class CollectionRepairedEventArgs : CollectionEventArgs

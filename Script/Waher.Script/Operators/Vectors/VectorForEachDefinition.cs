@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Conditional;
 
@@ -41,8 +42,8 @@ namespace Waher.Script.Operators.Vectors
 		{
             IElement S = this.left.Evaluate(Variables);
             LinkedList<IElement> Elements2 = new LinkedList<IElement>();
-            
-            if (!(S is ICollection<IElement> Elements))
+
+			if (!(S is ICollection<IElement> Elements))
             {
                 if (S is IVector Vector)
                     Elements = Vector.VectorElements;
@@ -66,11 +67,29 @@ namespace Waher.Script.Operators.Vectors
 
             foreach (IElement Element in Elements)
             {
-                Variables[this.variableName] = Element;
-                Elements2.AddLast(this.right.Evaluate(Variables));
-            }
+				try
+				{
+					Variables[this.variableName] = Element;
+			    	Elements2.AddLast(this.right.Evaluate(Variables));
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements2.AddLast(ex.LoopValue);
 
-            return this.Encapsulate(Elements2);
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+                    if (ex.HasLoopValue)
+						Elements2.AddLast(ex.LoopValue);
+
+					//ScriptContinueLoopException.Reuse(ex);
+				}
+			}
+
+			return this.Encapsulate(Elements2);
         }
 
         /// <summary>
@@ -86,7 +105,7 @@ namespace Waher.Script.Operators.Vectors
             IElement S = await this.left.EvaluateAsync(Variables);
             LinkedList<IElement> Elements2 = new LinkedList<IElement>();
 
-            if (!(S is ICollection<IElement> Elements))
+			if (!(S is ICollection<IElement> Elements))
             {
                 if (S is IVector Vector)
                     Elements = Vector.VectorElements;
@@ -110,8 +129,27 @@ namespace Waher.Script.Operators.Vectors
 
             foreach (IElement Element in Elements)
             {
-                Variables[this.variableName] = Element;
-                Elements2.AddLast(await this.right.EvaluateAsync(Variables));
+				try
+				{
+					Variables[this.variableName] = Element;
+			    	Elements2.AddLast(await this.right.EvaluateAsync(Variables));
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements2.AddLast(ex.LoopValue);
+
+					//ScriptBreakLoopException.Reuse(ex);
+					break;
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					if (ex.HasLoopValue)
+						Elements2.AddLast(ex.LoopValue);
+
+					//ScriptContinueLoopException.Reuse(ex);
+					continue;
+				}
             }
 
             return this.Encapsulate(Elements2);

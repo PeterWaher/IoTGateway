@@ -10,7 +10,7 @@ namespace Waher.Persistence.FullTextSearch
 	/// <summary>
 	/// Order in which results are returned.
 	/// </summary>
-	public enum	FullTextSearchOrder
+	public enum FullTextSearchOrder
 	{
 		/// <summary>
 		/// Relevant to keywords used.
@@ -66,65 +66,38 @@ namespace Waher.Persistence.FullTextSearch
 	/// </summary>
 	public static class Search
 	{
-		internal static async Task RaiseObjectAddedToIndex(object Sender, ObjectReferenceEventArgs e)
+		internal static Task RaiseObjectAddedToIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			try
-			{
-				ObjectReferenceEventHandler h = ObjectAddedToIndex;
-				if (!(h is null))
-					await h(Sender, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return ObjectAddedToIndex.Raise(Sender, e);
 		}
 
 		/// <summary>
 		/// Event raised when a new object instance has been indexed in the
 		/// full-text-search index.
 		/// </summary>
-		public static event ObjectReferenceEventHandler ObjectAddedToIndex;
+		public static event EventHandlerAsync<ObjectReferenceEventArgs> ObjectAddedToIndex;
 
-		internal static async Task RaiseObjectRemovedFromIndex(object Sender, ObjectReferenceEventArgs e)
+		internal static Task RaiseObjectRemovedFromIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			try
-			{
-				ObjectReferenceEventHandler h = ObjectRemovedFromIndex;
-				if (!(h is null))
-					await h(Sender, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return ObjectRemovedFromIndex.Raise(Sender, e);
 		}
 
 		/// <summary>
 		/// Event raised when an object instance has been removed from the
 		/// full-text-search index.
 		/// </summary>
-		public static event ObjectReferenceEventHandler ObjectRemovedFromIndex;
+		public static event EventHandlerAsync<ObjectReferenceEventArgs> ObjectRemovedFromIndex;
 
-		internal static async Task RaiseObjectUpdatedInIndex(object Sender, ObjectReferenceEventArgs e)
+		internal static Task RaiseObjectUpdatedInIndex(object Sender, ObjectReferenceEventArgs e)
 		{
-			try
-			{
-				ObjectReferenceEventHandler h = ObjectUpdatedInIndex;
-				if (!(h is null))
-					await h(Sender, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Exception(ex);
-			}
+			return ObjectUpdatedInIndex.Raise(Sender, e);
 		}
 
 		/// <summary>
 		/// Event raised when an object instance has been updated in the
 		/// full-text-search index.
 		/// </summary>
-		public static event ObjectReferenceEventHandler ObjectUpdatedInIndex;
+		public static event EventHandlerAsync<ObjectReferenceEventArgs> ObjectUpdatedInIndex;
 
 		/// <summary>
 		/// Parses a search string into keyworkds.
@@ -160,7 +133,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Order">Sort order of result set.</param>
 		/// <returns>Array of objects. Noncompatible (with <typeparamref name="T"/>) items are returned as null 
 		/// in the array..</returns>
-		public static Task<T[]> FullTextSearch<T>(string IndexCollection, 
+		public static Task<T[]> FullTextSearch<T>(string IndexCollection,
 			int Offset, int MaxCount, FullTextSearchOrder Order, params Keyword[] Keywords)
 			where T : class
 		{

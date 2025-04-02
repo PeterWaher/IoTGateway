@@ -142,7 +142,7 @@ namespace Waher.IoTGateway
 		private static readonly Dictionary<EventHandlerAsync, int> serviceCommandNrByCallback = new Dictionary<EventHandlerAsync, int>();
 		private static readonly Dictionary<string, DateTime> lastUnauthorizedAccess = new Dictionary<string, DateTime>();
 		private static readonly DateTime startTime = DateTime.Now;
-		private static byte[] emergencyMemory = NextBytes(65536);
+		private static byte[] emergencyMemory = new byte[1024 * 1024];
 		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
@@ -300,6 +300,7 @@ namespace Waher.IoTGateway
 					Initialize();
 
 					beforeUninstallCommandNr = RegisterServiceCommand(BeforeUninstall);
+					NextBytes(emergencyMemory);
 
 					if (!Directory.Exists(rootFolder))
 					{
@@ -523,7 +524,6 @@ namespace Waher.IoTGateway
 													{
 														emergencyMemory = null;
 														GC.GetTotalMemory(true);
-														GC.Collect(GC.MaxGeneration);
 														Emergency = true;
 													}
 													else
@@ -3591,13 +3591,36 @@ namespace Waher.IoTGateway
 				throw new ArgumentException("Number of bytes must be non-negative.", nameof(NrBytes));
 
 			byte[] Result = new byte[NrBytes];
-
+			
 			lock (rnd)
 			{
 				rnd.GetBytes(Result);
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Generates random bytes into an array.
+		/// </summary>
+		/// <param name="Buffer">Buffer to receive the random bytes.</param>
+		public static void NextBytes(byte[] Buffer)
+		{
+			NextBytes(Buffer, 0, Buffer.Length);
+		}
+
+		/// <summary>
+		/// Generates random bytes into an array.
+		/// </summary>
+		/// <param name="Buffer">Buffer to receive the random bytes.</param>
+		/// <param name="Offset">Offset of first byte.</param>
+		/// <param name="Count">Number of bytes to generate</param>
+		public static void NextBytes(byte[] Buffer, int Offset, int Count)
+		{
+			lock (rnd)
+			{
+				rnd.GetBytes(Buffer, Offset, Count);
+			}
 		}
 
 		#endregion

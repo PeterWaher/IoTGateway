@@ -10,8 +10,8 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// Variance(v), Var(v)
     /// </summary>
-    public class Variance : FunctionOneVectorVariable
-    {
+    public class Variance : FunctionOneVectorVariable, IIterativeEvaluation
+	{
         /// <summary>
         /// Variance(v), Var(v)
         /// </summary>
@@ -115,5 +115,19 @@ namespace Waher.Script.Functions.Vectors
             throw new ScriptRuntimeException("Expected a numeric vector.", this);
         }
 
-    }
+		#region IIterativeEvalaution
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new VarianceEvaluator(this);
+
+		#endregion
+	}
 }

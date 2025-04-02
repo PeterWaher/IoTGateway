@@ -80,5 +80,5 @@ namespace Waher.Script.Functions.Vectors
 
 			return Argument.GetElement(i);
 		}
-    }
+	}
 }

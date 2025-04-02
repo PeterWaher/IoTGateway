@@ -172,6 +172,8 @@
 		<None Remove="Reports\Files\CompareFolders.rpx" />
 		<None Remove="Root\Admin.cssx" />
 		<None Remove="Root\Admin.md" />
+		<None Remove="Root\AdminDropdown.md" />
+		<None Remove="Root\AdminDropdownComponent.md" />
 		<None Remove="Root\Audio\glass_ping-Go445-1207030150.mp3" />
 		<None Remove="Root\Audio\glass_ping-Go445-1207030150.wav" />
 		<None Remove="Root\Emojis.md" />
@@ -697,6 +699,12 @@
 		</Content>
 		<Content Include="Reports\Files\CompareFolders.rpx">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Root\AdminDropdown.md">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Root\AdminDropdownComponent.md">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Root\GlobalComponents.js">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

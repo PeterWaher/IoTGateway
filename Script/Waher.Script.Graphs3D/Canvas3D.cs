@@ -2718,7 +2718,7 @@ namespace Waher.Script.Graphs3D
 				if (Loop is null)
 					Rec.segments.AddLast(Records.LastSegment);
 				else if (Prev is null)
-					Rec.segments.AddLast(Records.LastSegment);
+					Rec.segments.AddFirst(Records.LastSegment);
 				else
 					Rec.segments.AddAfter(Prev, Records.LastSegment);
 			}

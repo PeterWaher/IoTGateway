@@ -120,9 +120,9 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 		/// Tries to create a unit from the description available in the object.
 		/// </summary>
 		/// <returns>Unit, if able, null if not.</returns>
-		public Unit TryCreateUnit()
+		public readonly Unit TryCreateUnit()
 		{
-			LinkedList<KeyValuePair<AtomicUnit, int>> Parts = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			LinkedList<UnitFactor> Parts = new LinkedList<UnitFactor>();
 			Prefix Prefix = Prefix.None;
 
 			if (unitPerBase64.TryGetValue(Convert.ToBase64String(this.Binary), out string s))
@@ -182,7 +182,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			return Result;
 		}
 
-		private bool AddStep(LinkedList<KeyValuePair<AtomicUnit, int>> Parts, string Unit, byte Exponent,
+		private readonly bool AddStep(LinkedList<UnitFactor> Parts, string Unit, byte Exponent,
 			ref Prefix Prefix, int ExponentModifier)
 		{
 			int i = Exponent;
@@ -194,7 +194,7 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 			if (i != 0)
 			{
-				Parts.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Unit), i));
+				Parts.AddLast(new UnitFactor(Unit, i));
 				Prefix += ExponentModifier;
 			}
 
@@ -229,15 +229,15 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 			{
 				Unit = Unit.ToReferenceUnits(ref Value, ref NrDecimals);
 
-				foreach (KeyValuePair<AtomicUnit, int> P in Unit.Factors)
+				foreach (UnitFactor P in Unit.Factors)
 				{
-					int Exponent = 128 + (P.Value << 1);
+					int Exponent = 128 + (P.Exponent << 1);
 					if (Exponent < 0 || Exponent > 255)
 						return false;
 
 					byte Exp = (byte)Exponent;
 
-					switch (P.Key.Name)
+					switch (P.Unit.Name)
 					{
 						case "rad":
 							Units.Radians = Exp;
@@ -253,8 +253,8 @@ namespace Waher.Things.Ieee1451.Ieee1451_0.Messages
 
 						case "g":
 							Units.Kilograms = Exp;
-							Value *= Math.Pow(1000, -P.Value);
-							NrDecimals += P.Value;
+							Value *= Math.Pow(1000, -P.Exponent);
+							NrDecimals += P.Exponent;
 							break;
 
 						case "s":

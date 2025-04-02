@@ -16,6 +16,7 @@ using Waher.IoTGateway;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Language;
 using Waher.Script.Persistence.SPARQL;
 using Waher.Script.Persistence.SPARQL.Sources;
@@ -271,17 +272,17 @@ namespace Waher.WebService.Sparql
 			}
 
 			List<KeyValuePair<string, string>> Files = new List<KeyValuePair<string, string>>();
-			LinkedList<ISemanticModel> Models = new LinkedList<ISemanticModel>();
+			ChunkedList<ISemanticModel> Models = new ChunkedList<ISemanticModel>();
 
 			if (Content.Decoded is TurtleDocument TurtleDoc)
 			{
 				Files.Add(new KeyValuePair<string, string>(TurtleDoc.Text, TurtleCodec.DefaultExtension));
-				Models.AddLast(TurtleDoc);
+				Models.Add(TurtleDoc);
 			}
 			else if (Content.Decoded is RdfDocument RdfDoc)
 			{
 				Files.Add(new KeyValuePair<string, string>(RdfDoc.Text, RdfCodec.DefaultExtension));
-				Models.AddLast(RdfDoc);
+				Models.Add(RdfDoc);
 			}
 			else if (Content.Decoded is Dictionary<string, object> Form)
 			{
@@ -290,12 +291,12 @@ namespace Waher.WebService.Sparql
 					if (P.Value is TurtleDocument TurtleDoc2)
 					{
 						Files.Add(new KeyValuePair<string, string>(TurtleDoc2.Text, TurtleCodec.DefaultExtension));
-						Models.AddLast(TurtleDoc2);
+						Models.Add(TurtleDoc2);
 					}
 					else if (P.Value is RdfDocument RdfDoc2)
 					{
 						Files.Add(new KeyValuePair<string, string>(RdfDoc2.Text, RdfCodec.DefaultExtension));
-						Models.AddLast(RdfDoc2);
+						Models.Add(RdfDoc2);
 					}
 					else
 					{
@@ -311,12 +312,12 @@ namespace Waher.WebService.Sparql
 					if (P.Decoded is TurtleDocument TurtleDoc2)
 					{
 						Files.Add(new KeyValuePair<string, string>(TurtleDoc2.Text, TurtleCodec.DefaultExtension));
-						Models.AddLast(TurtleDoc2);
+						Models.Add(TurtleDoc2);
 					}
 					else if (P.Decoded is RdfDocument RdfDoc2)
 					{
 						Files.Add(new KeyValuePair<string, string>(RdfDoc2.Text, RdfCodec.DefaultExtension));
-						Models.AddLast(RdfDoc2);
+						Models.Add(RdfDoc2);
 					}
 					else
 					{
@@ -331,7 +332,7 @@ namespace Waher.WebService.Sparql
 				{
 					try
 					{
-						Models.AddLast(new RdfDocument(s));
+						Models.Add(new RdfDocument(s));
 						Files.Add(new KeyValuePair<string, string>(s, RdfCodec.DefaultExtension));
 					}
 					catch (Exception)
@@ -344,7 +345,7 @@ namespace Waher.WebService.Sparql
 				{
 					try
 					{
-						Models.AddLast(new TurtleDocument(s));
+						Models.Add(new TurtleDocument(s));
 						Files.Add(new KeyValuePair<string, string>(s, TurtleCodec.DefaultExtension));
 					}
 					catch (Exception)

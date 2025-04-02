@@ -88,7 +88,8 @@ function DisplayAttachIdQR() {
             "serviceId": ServiceId,
             "tab": TabID,
             "mode": Mode,
-            "purpose": Purpose
+            "purpose": Purpose,
+            "propertiesFilter": "PNR,COUNTRY"
         }));
 }
 
@@ -109,10 +110,8 @@ function SignatureReceived(Data) {
     if (Data.Properties.PNR)
         document.getElementById("PersonalNumber").value = Data.Properties.PNR
 
-    if (Data.Properties.NATIONALITY)
-        document.getElementById("Country").value = Data.Properties.NATIONALITY
-
-    
+    if (Data.Properties.COUNTRY)
+        document.getElementById("Country").value = Data.Properties.COUNTRY
 }
 
 var LoginTimer = null;

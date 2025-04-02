@@ -1105,40 +1105,40 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Evaluation_Test_42_Units()
 		{
-			await Test("10 m", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
-			await Test("10 km", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
-			await Test("10 mm", new PhysicalQuantity(10, new Unit(Prefix.Milli, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
-			await Test("10 m^2", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
-			await Test("10 m^3", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3))));
-			await Test("10 m²", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
-			await Test("10 m³", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3))));
-			await Test("10 W⋅s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("W"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), 1))));
-			await Test("10 W*s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("W"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), 1))));
-			await Test("10 m⋅s^-1", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
-			await Test("10 m/s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
-			await Test("10 m^2/s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
-			await Test("10 m/s^2", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2))));
-			await Test("10 kg⋅m²/(A⋅s³)", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("A"), -1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -3))));
+			await Test("10 m", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m"))));
+			await Test("10 km", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new UnitFactor("m"))));
+			await Test("10 mm", new PhysicalQuantity(10, new Unit(Prefix.Milli, new UnitFactor("m"))));
+			await Test("10 m^2", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m", 2))));
+			await Test("10 m^3", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m", 3))));
+			await Test("10 m²", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m", 2))));
+			await Test("10 m³", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m", 3))));
+			await Test("10 W⋅s", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("W"), new UnitFactor("s"))));
+			await Test("10 W*s", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("W"), new UnitFactor("s"))));
+			await Test("10 m⋅s^-1", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m"), new UnitFactor("s", -1))));
+			await Test("10 m/s", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m"), new UnitFactor("s", -1))));
+			await Test("10 m^2/s", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m", 2), new UnitFactor("s", -1))));
+			await Test("10 m/s^2", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("m"), new UnitFactor("s", -2))));
+			await Test("10 kg⋅m²/(A⋅s³)", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new UnitFactor("g"), new UnitFactor("m", 2), new UnitFactor("A", -1), new UnitFactor("s", -3))));
 
-			await Test("10 m + 2 km", new PhysicalQuantity(2010, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			await Test("10 m + 2 km", new PhysicalQuantity(2010, new Unit(Prefix.None, new UnitFactor("m"))));
 			await Test("10 m < 2 km", true);
 			await Test("2 km < 10 m", false);
-			await Test("2 km - 10 m", new PhysicalQuantity(1.99, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
-			await Test("2 km * 10 m", new PhysicalQuantity(20, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
-			await Test("2 km² / 10 m", new PhysicalQuantity(0.2, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
-			await Test("10 m / 2 s", new PhysicalQuantity(5, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
-			await Test("1 m^3 + 150 l", new PhysicalQuantity(1.15, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3))));
-			await Test("150 l + 1 m^3", new PhysicalQuantity(1150, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("l"), 1))));
+			await Test("2 km - 10 m", new PhysicalQuantity(1.99, new Unit(Prefix.Kilo, new UnitFactor("m"))));
+			await Test("2 km * 10 m", new PhysicalQuantity(20, new Unit(Prefix.Kilo, new UnitFactor("m", 2))));
+			await Test("2 km² / 10 m", new PhysicalQuantity(0.2, new Unit(Prefix.Kilo, new UnitFactor("m"))));
+			await Test("10 m / 2 s", new PhysicalQuantity(5, new Unit(Prefix.None, new UnitFactor("m"), new UnitFactor("s", -1))));
+			await Test("1 m^3 + 150 l", new PhysicalQuantity(1.15, new Unit(Prefix.None, new UnitFactor("m", 3))));
+			await Test("150 l + 1 m^3", new PhysicalQuantity(1150, new Unit(Prefix.None, new UnitFactor("l"))));
 
-			await Test("10 km m", new PhysicalQuantity(10000, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
-			await Test("10*sin(pi/6) m", new PhysicalQuantity(10 * Math.Sin(Math.PI / 6), new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			await Test("10 km m", new PhysicalQuantity(10000, new Unit(Prefix.None, new UnitFactor("m"))));
+			await Test("10*sin(pi/6) m", new PhysicalQuantity(10 * Math.Sin(Math.PI / 6), new Unit(Prefix.None, new UnitFactor("m"))));
 			await Test("sin(10 W)", Math.Sin(10));
 			await Test("10 °C > 20 °F", true);
 			await Test("10 m² > 1000 inch²", true);
 
 			await Test("10 kWh", new PhysicalQuantity(10, new Unit(Prefix.Kilo, "W", "h")));
-			await Test("10 mph", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<string, int>("SM", 1), new KeyValuePair<string, int>("h", -1))));
-			await Test("10 fps", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<string, int>("ft", 1), new KeyValuePair<string, int>("s", -1))));
+			await Test("10 mph", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("SM"), new UnitFactor("h", -1))));
+			await Test("10 fps", new PhysicalQuantity(10, new Unit(Prefix.None, new UnitFactor("ft"), new UnitFactor("s", -1))));
 			await Test("10 ft", new PhysicalQuantity(10, new Unit("ft")));
 
 			await Test("10 kWh J", new PhysicalQuantity(36000000, new Unit(Prefix.None, "J")));
@@ -1229,11 +1229,11 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Evaluation_Test_58_Measurements()
 		{
-			await Test("10 m +- 1cm", new Measurement(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1)), 0.01));
+			await Test("10 m +- 1cm", new Measurement(10, new Unit(Prefix.None, new UnitFactor("m")), 0.01));
 
 			await Test("(10 m +- 1cm) + (2 km +- 10m)", new Measurement(2010, new Unit(Prefix.None, "m"), 10.01));
 			await Test("(10 m +- 1cm) * (2 s +- 100ms)", new Measurement(20, new Unit(Prefix.None, "m", "s"), 1.02));
-			await Test("(10 m +- 1cm) / (2 s +- 100ms)", new Measurement(5, new Unit(Prefix.None, new KeyValuePair<string, int>("m", 1), new KeyValuePair<string, int>("s", -1)), 0.255));
+			await Test("(10 m +- 1cm) / (2 s +- 100ms)", new Measurement(5, new Unit(Prefix.None, new UnitFactor("m"), new UnitFactor("s", -1)), 0.255));
 		}
 
 		[TestMethod]

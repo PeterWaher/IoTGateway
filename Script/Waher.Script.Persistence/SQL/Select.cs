@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -191,7 +192,7 @@ namespace Waher.Script.Persistence.SQL
 
 			IDataSource Source = await this.source.GetSource(Variables);
 
-			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
+			ChunkedList<KeyValuePair<VariableReference, bool>> OrderBy = new ChunkedList<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;
 
 			if (!(this.groupBy is null))
@@ -237,9 +238,9 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			LinkedList<IElement[]> Items = new LinkedList<IElement[]>();
+			ChunkedList<IElement[]> Items = new ChunkedList<IElement[]>();
 			Dictionary<string, int> ColumnIndices = new Dictionary<string, int>();
-			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
+			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
 			ScriptNode[] Columns2 = this.columns;
 			bool Columns2Cloned = false;
 			IResultSetEnumerator e;
@@ -264,7 +265,7 @@ namespace Waher.Script.Persistence.SQL
 						Columns2[i] = Ref2;
 
 						if (AdditionalFields is null)
-							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
+							AdditionalFields = new ChunkedList<KeyValuePair<string, ScriptNode>>();
 
 						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
 					}
@@ -298,7 +299,7 @@ namespace Waher.Script.Persistence.SQL
 
 			if (CalculatedOrder)
 			{
-				List<KeyValuePair<ScriptNode, bool>> Order = new List<KeyValuePair<ScriptNode, bool>>();
+				ChunkedList<KeyValuePair<ScriptNode, bool>> Order = new ChunkedList<KeyValuePair<ScriptNode, bool>>();
 
 				if (!(this.orderBy is null))
 					Order.AddRange(this.orderBy);
@@ -328,16 +329,16 @@ namespace Waher.Script.Persistence.SQL
 
 			while (await e2.MoveNextAsync())
 			{
-				Items.AddLast(e2.CurrentRecord);
+				Items.Add(e2.CurrentRecord);
 				NrRecords++;
 			}
 
 			if (this.selectOneObject)
 			{
-				if (Items.First is null)
+				if (!Items.HasFirstItem)
 					return ObjectValue.Null;
-				else if (NrRecords == 1 && Items.First.Value.Length == 1)
-					return Items.First.Value[0];
+				else if (NrRecords == 1 && Items.FirstItem.Length == 1)
+					return Items.FirstItem[0];
 			}
 
 			IElement[] Elements = new IElement[Columns2 is null ? NrRecords : NrRecords * c];
@@ -448,7 +449,8 @@ namespace Waher.Script.Persistence.SQL
 			return Result;
 		}
 
-		private void AddIfNotFound(VariableReference Ref, bool Ascending, List<KeyValuePair<VariableReference, bool>> OrderBy)
+		private void AddIfNotFound(VariableReference Ref, bool Ascending,
+			ChunkedList<KeyValuePair<VariableReference, bool>> OrderBy)
 		{
 			string Name = Ref.VariableName;
 

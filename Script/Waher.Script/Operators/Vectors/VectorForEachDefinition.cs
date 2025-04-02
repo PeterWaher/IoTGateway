@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -41,7 +42,7 @@ namespace Waher.Script.Operators.Vectors
         public override IElement Evaluate(Variables Variables)
 		{
             IElement S = this.left.Evaluate(Variables);
-            LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 			if (!(S is ICollection<IElement> Elements))
             {
@@ -56,7 +57,7 @@ namespace Waher.Script.Operators.Vectors
                     while (e.MoveNext())
                     {
                         Variables[this.variableName] = e.Current;
-                        Elements2.AddLast(this.right.Evaluate(Variables));
+                        Elements2.Add(this.right.Evaluate(Variables));
                     }
 
                     return this.Encapsulate(Elements2);
@@ -70,12 +71,12 @@ namespace Waher.Script.Operators.Vectors
 				try
 				{
 					Variables[this.variableName] = Element;
-			    	Elements2.AddLast(this.right.Evaluate(Variables));
+			    	Elements2.Add(this.right.Evaluate(Variables));
 				}
 				catch (ScriptBreakLoopException ex)
 				{
 					if (ex.HasLoopValue)
-						Elements2.AddLast(ex.LoopValue);
+						Elements2.Add(ex.LoopValue);
 
 					//ScriptBreakLoopException.Reuse(ex);
 					break;
@@ -83,7 +84,7 @@ namespace Waher.Script.Operators.Vectors
 				catch (ScriptContinueLoopException ex)
 				{
                     if (ex.HasLoopValue)
-						Elements2.AddLast(ex.LoopValue);
+						Elements2.Add(ex.LoopValue);
 
 					//ScriptContinueLoopException.Reuse(ex);
 				}
@@ -103,7 +104,7 @@ namespace Waher.Script.Operators.Vectors
                 return this.Evaluate(Variables);
 
             IElement S = await this.left.EvaluateAsync(Variables);
-            LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 			if (!(S is ICollection<IElement> Elements))
             {
@@ -118,7 +119,7 @@ namespace Waher.Script.Operators.Vectors
                     while (e.MoveNext())
                     {
                         Variables[this.variableName] = e.Current;
-                        Elements2.AddLast(await this.right.EvaluateAsync(Variables));
+                        Elements2.Add(await this.right.EvaluateAsync(Variables));
                     }
 
                     return this.Encapsulate(Elements2);
@@ -132,12 +133,12 @@ namespace Waher.Script.Operators.Vectors
 				try
 				{
 					Variables[this.variableName] = Element;
-			    	Elements2.AddLast(await this.right.EvaluateAsync(Variables));
+			    	Elements2.Add(await this.right.EvaluateAsync(Variables));
 				}
 				catch (ScriptBreakLoopException ex)
 				{
 					if (ex.HasLoopValue)
-						Elements2.AddLast(ex.LoopValue);
+						Elements2.Add(ex.LoopValue);
 
 					//ScriptBreakLoopException.Reuse(ex);
 					break;
@@ -145,7 +146,7 @@ namespace Waher.Script.Operators.Vectors
 				catch (ScriptContinueLoopException ex)
 				{
 					if (ex.HasLoopValue)
-						Elements2.AddLast(ex.LoopValue);
+						Elements2.Add(ex.LoopValue);
 
 					//ScriptContinueLoopException.Reuse(ex);
 					continue;
@@ -160,7 +161,7 @@ namespace Waher.Script.Operators.Vectors
         /// </summary>
         /// <param name="Elements">Elements to encapsulate.</param>
         /// <returns>Encapsulated element.</returns>
-        protected virtual IElement Encapsulate(LinkedList<IElement> Elements)
+        protected virtual IElement Encapsulate(ChunkedList<IElement> Elements)
         {
             return VectorDefinition.Encapsulate(Elements, true, this);
         }

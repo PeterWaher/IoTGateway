@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -89,7 +90,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
-			List<KeyValuePair<string, string>> HeaderList = null;
+			ChunkedList<KeyValuePair<string, string>> HeaderList = null;
 			ContentResponse Content;
 
 			if (Arguments.Length > 1)

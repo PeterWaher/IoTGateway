@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -15,7 +15,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	/// </summary>
 	public class ExportToTable : ILedgerExport
 	{
-		private readonly LinkedList<IElement> elements = new LinkedList<IElement>();
+		private readonly ChunkedList<IElement> elements = new ChunkedList<IElement>();
 		private readonly ScriptNode[] columns;
 		private readonly int width;
 		private int height;
@@ -177,11 +177,11 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 					else
 						E = Ref.Evaluate(this.variables);
 
-					this.elements.AddLast(E);
+					this.elements.Add(E);
 				}
 				catch (Exception ex)
 				{
-					this.elements.AddLast(new ObjectValue(ex));
+					this.elements.Add(new ObjectValue(ex));
 				}
 			}
 

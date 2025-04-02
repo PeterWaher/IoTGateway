@@ -267,7 +267,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If an index was found and dropped.</returns>
 		public Task<bool> DropIndex(string Name)
 		{
-			throw InvalidOperation();
+			throw this.InvalidOperation();
 		}
 
 		/// <summary>
@@ -275,7 +275,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		public Task DropCollection()
 		{
-			throw InvalidOperation();
+			throw this.InvalidOperation();
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -35,7 +36,7 @@ namespace Waher.Script.Operators.Vectors
 			if (Left.Dimension != Right.Dimension)
 				throw new ScriptRuntimeException("Vectors of different dimensions.", this);
 
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 			IEnumerator<IElement> e1 = Left.VectorElements.GetEnumerator();
 			IEnumerator<IElement> e2 = Right.VectorElements.GetEnumerator();
 			IElement v1;
@@ -44,7 +45,7 @@ namespace Waher.Script.Operators.Vectors
 			{
 				v1 = e1.Current;
 				while (e2.MoveNext())
-					Elements.AddLast(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, false, this));
+					Elements.Add(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, false, this));
 
 				e2.Reset();
 			}

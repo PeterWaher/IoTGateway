@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -26,13 +26,24 @@ namespace Waher.Script.Abstraction.Sets
         /// <returns>If the element is contained in the set.</returns>
         public abstract bool Contains(IElement Element);
 
-        /// <summary>
-        /// Encapsulates a set of elements into a similar structure as that provided by the current element.
-        /// </summary>
-        /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
-        /// <param name="Node">Script node from where the encapsulation is done.</param>
-        /// <returns>Encapsulated object of similar type as the current object.</returns>
-        public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return Operators.Sets.SetDefinition.Encapsulate(Elements);
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
         {
             return Operators.Sets.SetDefinition.Encapsulate(Elements);
         }
@@ -80,10 +91,7 @@ namespace Waher.Script.Abstraction.Sets
         /// <summary>
         /// If the element represents a scalar value.
         /// </summary>
-        public override bool IsScalar
-        {
-            get { return false; }
-        }
+        public override bool IsScalar => false;
 
         /// <summary>
         /// Size of set, if finite and known, otherwise null is returned.
@@ -114,10 +122,10 @@ namespace Waher.Script.Abstraction.Sets
 							Result = new FiniteSet(Elements);
 						else if (Obj is IEnumerable<object> Objects)
 						{
-							LinkedList<IElement> List = new LinkedList<IElement>();
+							ChunkedList<IElement> List = new ChunkedList<IElement>();
 
 							foreach (object x in Objects)
-								List.AddLast(Expression.Encapsulate(x));
+								List.Add(Expression.Encapsulate(x));
 
 							Result = new FiniteSet(List);
 						}

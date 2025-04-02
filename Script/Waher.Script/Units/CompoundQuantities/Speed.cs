@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Waher.Script.Units.CompoundQuantities
 {
@@ -32,35 +31,35 @@ namespace Waher.Script.Units.CompoundQuantities
 		/// <summary>
 		/// Compound quantities. Must only use base quantity units.
 		/// </summary>
-		public Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>[] CompoundQuantities
+		public Tuple<string, Prefix, UnitFactor[]>[] CompoundQuantities
 		{
 			get
 			{
-				return new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>[]
+				return new Tuple<string, Prefix, UnitFactor[]>[]
 				{
-					new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>("mph", Prefix.None, 
-						new KeyValuePair<AtomicUnit, int>[]
+					new Tuple<string, Prefix, UnitFactor[]>("mph", Prefix.None, 
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("SM"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("h"), -1)
+							new UnitFactor("SM"),
+							new UnitFactor("h", -1)
 						}),
-					new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>("fps", Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+					new Tuple<string, Prefix, UnitFactor[]>("fps", Prefix.None,
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("ft"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+							new UnitFactor("ft"),
+							new UnitFactor("s", -1)
 						}),
-					new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>("kph", Prefix.Kilo,
-						new KeyValuePair<AtomicUnit, int>[]
+					new Tuple<string, Prefix, UnitFactor[]>("kph", Prefix.Kilo,
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("h"), -1)
+							new UnitFactor("m"),
+							new UnitFactor("h", -1)
 						}),
-					new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>("kmph", Prefix.Kilo,
-						new KeyValuePair<AtomicUnit, int>[]
+					new Tuple<string, Prefix, UnitFactor[]>("kmph", Prefix.Kilo,
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("h"), -1)
+							new UnitFactor("m"),
+							new UnitFactor("h", -1)
 						})
 				};
 			}

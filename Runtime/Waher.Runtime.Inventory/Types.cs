@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Inventory
 {
@@ -615,8 +616,8 @@ namespace Waher.Runtime.Inventory
 			{
 				if (isInitialized)
 				{
-					List<Assembly> NewAssemblies = new List<Assembly>();
-					List<Assembly> AllAssemblies = new List<Assembly>();
+					ChunkedList<Assembly> NewAssemblies = new ChunkedList<Assembly>();
+					ChunkedList<Assembly> AllAssemblies = new ChunkedList<Assembly>();
 
 					AllAssemblies.AddRange(assemblies);
 
@@ -790,16 +791,16 @@ namespace Waher.Runtime.Inventory
 				{
 					foreach (KeyValuePair<string, Assembly> P in NamespaceAliases)
 					{
-						LinkedList<KeyValuePair<string, string>> CheckNamespaces = new LinkedList<KeyValuePair<string, string>>();
-
-						CheckNamespaces.AddLast(new KeyValuePair<string, string>(P.Key, P.Value.GetName().Name));
-
-						while (!(CheckNamespaces.First is null))
+						ChunkedList<KeyValuePair<string, string>> CheckNamespaces = new ChunkedList<KeyValuePair<string, string>>
 						{
-							string MapToNamespace = CheckNamespaces.First.Value.Value;
-							string Alias = CheckNamespaces.First.Value.Key;
+							new KeyValuePair<string, string>(P.Key, P.Value.GetName().Name)
+						};
 
-							CheckNamespaces.RemoveFirst();
+						while (CheckNamespaces.HasFirstItem)
+						{
+							KeyValuePair<string, string> P2 = CheckNamespaces.RemoveFirst();
+							string MapToNamespace = P2.Value;
+							string Alias = P2.Key;
 
 							if (typesPerNamespace.TryGetValue(MapToNamespace, out Types))
 							{
@@ -820,7 +821,7 @@ namespace Waher.Runtime.Inventory
 								{
 									i = Subnamespace.LastIndexOf('.');
 									if (i >= 0)
-										CheckNamespaces.AddLast(new KeyValuePair<string, string>(Alias + Subnamespace.Substring(i), Subnamespace));
+										CheckNamespaces.Add(new KeyValuePair<string, string>(Alias + Subnamespace.Substring(i), Subnamespace));
 								}
 							}
 						}
@@ -1197,7 +1198,7 @@ namespace Waher.Runtime.Inventory
 				return x.Key.GetType().FullName.CompareTo(y.Key.GetType().FullName);
 			});
 
-			List<InterfaceType> Result = new List<InterfaceType>();
+			ChunkedList<InterfaceType> Result = new ChunkedList<InterfaceType>();
 
 			foreach (KeyValuePair<InterfaceType, Grade> P in Found)
 				Result.Add(P.Key);

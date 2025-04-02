@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Script.Abstraction.Sets;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -62,16 +63,42 @@ namespace Waher.Script.Objects.Matrices
 					int x = 0;
 					int y = 0;
 
-					foreach (IElement E in this.elements)
+					if (this.elements is ChunkedList<IElement> Values)
 					{
-						if (!(E.AssociatedObjectValue is double d))
-							d = 0;
+						ChunkNode<IElement> Loop = Values.FirstChunk;
+						int i, c;
 
-						v[y, x++] = d;
-						if (x >= this.columns)
+						while (!(Loop is null))
 						{
-							y++;
-							x = 0;
+							for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+							{
+								if (!(Loop[i].AssociatedObjectValue is double d))
+									d = 0;
+
+								v[y, x++] = d;
+								if (x >= this.columns)
+								{
+									y++;
+									x = 0;
+								}
+							}
+
+							Loop = Loop.Next;
+						}
+					}
+					else
+					{
+						foreach (IElement E in this.elements)
+						{
+							if (!(E.AssociatedObjectValue is double d))
+								d = 0;
+
+							v[y, x++] = d;
+							if (x >= this.columns)
+							{
+								y++;
+								x = 0;
+							}
 						}
 					}
 
@@ -584,6 +611,17 @@ namespace Waher.Script.Objects.Matrices
 		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
 		/// <param name="Node">Script node from where the encapsulation is done.</param>
 		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return MatrixDefinition.Encapsulate(Elements, this.rows, this.columns, Node);
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
 		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
 			return MatrixDefinition.Encapsulate(Elements, this.rows, this.columns, Node);
@@ -621,7 +659,7 @@ namespace Waher.Script.Objects.Matrices
 					return this.rowVectors;
 
 				double[,] v = this.Values;
-				LinkedList<IElement> Rows = new LinkedList<IElement>();
+				ChunkedList<IElement> Rows = new ChunkedList<IElement>();
 				int x, y;
 				double[] r;
 
@@ -632,7 +670,7 @@ namespace Waher.Script.Objects.Matrices
 					for (x = 0; x < this.columns; x++)
 						r[x] = v[y, x];
 
-					Rows.AddLast(new DoubleVector(r));
+					Rows.Add(new DoubleVector(r));
 				}
 
 				this.rowVectors = Rows;
@@ -640,7 +678,7 @@ namespace Waher.Script.Objects.Matrices
 			}
 		}
 
-		private LinkedList<IElement> rowVectors = null;
+		private ChunkedList<IElement> rowVectors = null;
 
         /// <summary>
         /// Returns a transposed matrix.

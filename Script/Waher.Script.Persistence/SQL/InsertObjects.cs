@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -67,7 +68,7 @@ namespace Waher.Script.Persistence.SQL
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
-			List<IElement> Result = new List<IElement>();
+			ChunkedList<IElement> Result = new ChunkedList<IElement>();
 			IEnumerable<IElement> Objects;
 			IElement E;
 			long Count = 0;

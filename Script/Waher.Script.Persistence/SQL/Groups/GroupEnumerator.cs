@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL.Enumerators;
@@ -32,7 +33,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <param name="Having">Optional having clause</param>
 		public GroupEnumerator(IResultSetEnumerator ItemEnumerator, Variables Variables, 
 			ScriptNode[] GroupBy, ScriptNode[] GroupNames,
-			List<KeyValuePair<string, ScriptNode>> AdditionalFields,
+			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields,
 			ref ScriptNode Having)
 		{
 			this.e = ItemEnumerator;
@@ -62,7 +63,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MoveNextAsync()
 		{
-			List<object> Objects = null;
+			ChunkedList<object> Objects = null;
 			IElement E;
 			object[] Last = null;
 			int i, c = this.groupBy.Length;
@@ -111,7 +112,7 @@ namespace Waher.Script.Persistence.SQL.Groups
 				}
 
 				if (Objects is null)
-					Objects = new List<object>();
+					Objects = new ChunkedList<object>();
 
 				Objects.Add(this.e.Current);
 			}

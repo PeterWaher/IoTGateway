@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Waher.Script.Abstraction.Sets;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
@@ -53,12 +54,33 @@ namespace Waher.Script.Objects.VectorSpaces
 					DateTime[] v = new DateTime[this.dimension];
                     int i = 0;
 
-                    foreach (IElement Element in this.elements)
+                    if (this.elements is ChunkedList<IElement> Values)
                     {
-                        if (!(Element.AssociatedObjectValue is DateTime TP))
-                            TP = DateTime.MinValue;
+						ChunkNode<IElement> Loop = Values.FirstChunk;
+						int j, c;
 
-                        v[i++] = TP;
+						while (!(Loop is null))
+						{
+							for (j = Loop.Start, c = Loop.Pos; j < c; j++)
+							{
+                                if (!(Loop[j].AssociatedObjectValue is DateTime TP))
+                                    TP = DateTime.MinValue;
+
+								v[i++] = TP;
+							}
+
+							Loop = Loop.Next;
+						}
+					}
+					else
+                    {
+                        foreach (IElement Element in this.elements)
+                        {
+                            if (!(Element.AssociatedObjectValue is DateTime TP))
+                                TP = DateTime.MinValue;
+
+                            v[i++] = TP;
+                        }
                     }
 
                     this.values = v;
@@ -224,13 +246,24 @@ namespace Waher.Script.Objects.VectorSpaces
         /// </summary>
         public override ICollection<IElement> ChildElements => this.Elements;
 
-        /// <summary>
-        /// Encapsulates a set of elements into a similar structure as that provided by the current element.
-        /// </summary>
-        /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
-        /// <param name="Node">Script node from where the encapsulation is done.</param>
-        /// <returns>Encapsulated object of similar type as the current object.</returns>
-        public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return VectorDefinition.Encapsulate(Elements, true, Node);
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
         {
             return VectorDefinition.Encapsulate(Elements, true, Node);
         }

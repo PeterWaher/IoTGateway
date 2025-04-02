@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Functions.Runtime.PropertyEnumerators;
-using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects;
-using System.Threading.Tasks;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Persistence.Output
 {
@@ -31,7 +32,7 @@ namespace Waher.Script.Persistence.Output
 		{
 			if (Object is GenericObject Obj)
 			{
-				List<IElement> Elements = new List<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				if (!string.IsNullOrEmpty(Obj.CollectionName) && !Obj.TryGetFieldValue("CollectionName", out object _))
 				{

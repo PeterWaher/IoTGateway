@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Xml.Model;
 
 namespace Waher.Script.Xml
@@ -48,7 +46,7 @@ namespace Waher.Script.Xml
 
 		private XmlScriptDocument ParseDocument(ScriptParser Parser)
 		{
-			List<XmlScriptProcessingInstruction> ProcessingInstructions = null;
+			ChunkedList<XmlScriptProcessingInstruction> ProcessingInstructions = null;
 			int Start = Parser.Start;
 			int Pos;
 			char ch;
@@ -65,7 +63,7 @@ namespace Waher.Script.Xml
 					return null;
 
 				if (ProcessingInstructions is null)
-					ProcessingInstructions = new List<XmlScriptProcessingInstruction>();
+					ProcessingInstructions = new ChunkedList<XmlScriptProcessingInstruction>();
 
 				string Text = Parser.Expression.Script.Substring(Pos, Parser.Position - Pos - 1);
 
@@ -97,7 +95,7 @@ namespace Waher.Script.Xml
 			if (Parser.NextChar() != '<')
 				throw Parser.SyntaxError("< expected.");
 
-			List<XmlScriptAttribute> Attributes = null;
+			ChunkedList<XmlScriptAttribute> Attributes = null;
 			XmlScriptAttribute Xmlns = null;
 			IElement ElementValue;
 			XmlScriptAttribute Attribute;
@@ -291,7 +289,7 @@ namespace Waher.Script.Xml
 					else
 					{
 						if (Attributes is null)
-							Attributes = new List<XmlScriptAttribute>();
+							Attributes = new ChunkedList<XmlScriptAttribute>();
 
 						Attributes.Add(Attribute);
 					}
@@ -302,7 +300,7 @@ namespace Waher.Script.Xml
 					Parser.NextChar();
 
 					if (Attributes is null)
-						Attributes = new List<XmlScriptAttribute>();
+						Attributes = new ChunkedList<XmlScriptAttribute>();
 
 					Attributes.Add(new XmlScriptAttributeWildcard(AttributeStart,
 						Parser.Position - AttributeStart, Parser.Expression));

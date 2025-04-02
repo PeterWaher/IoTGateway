@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Waher.Script.Units.CompoundQuantities
 {
@@ -38,17 +37,17 @@ namespace Waher.Script.Units.CompoundQuantities
 		/// <summary>
 		/// Compound quantities. Must only use base quantity units.
 		/// </summary>
-		public Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>[] CompoundQuantities
+		public Tuple<string, Prefix, UnitFactor[]>[] CompoundQuantities
 		{
 			get
 			{
-				return new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>[]
+				return new Tuple<string, Prefix, UnitFactor[]>[]
 				{
-					new Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>("Wh", Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+					new Tuple<string, Prefix, UnitFactor[]>("Wh", Prefix.None,
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("W"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("h"), 1)
+							new UnitFactor("W"),
+							new UnitFactor("h")
 						})
 				};
 			}

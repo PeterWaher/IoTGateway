@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -73,10 +73,10 @@ namespace Waher.Script.Operators.Membership
 			{
 				if (Left.IsScalar)
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement E in Right.ChildElements)
-						Elements.AddLast(this.Evaluate(Left, E));
+						Elements.Add(this.Evaluate(Left, E));
 
 					return Right.Encapsulate(Elements, this);
 				}
@@ -87,14 +87,14 @@ namespace Waher.Script.Operators.Membership
 
 					if (LeftChildren.Count == RightChildren.Count)
 					{
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 						IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
 						IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
 						try
 						{
 							while (eLeft.MoveNext() && eRight.MoveNext())
-								Elements.AddLast(this.Evaluate(eLeft.Current, eRight.Current));
+								Elements.Add(this.Evaluate(eLeft.Current, eRight.Current));
 						}
 						finally
 						{
@@ -106,16 +106,16 @@ namespace Waher.Script.Operators.Membership
 					}
 					else
 					{
-						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+						ChunkedList<IElement> LeftResult = new ChunkedList<IElement>();
 
 						foreach (IElement LeftChild in LeftChildren)
 						{
-							LinkedList<IElement> RightResult = new LinkedList<IElement>();
+							ChunkedList<IElement> RightResult = new ChunkedList<IElement>();
 
 							foreach (IElement RightChild in RightChildren)
-								RightResult.AddLast(this.Evaluate(LeftChild, RightChild));
+								RightResult.Add(this.Evaluate(LeftChild, RightChild));
 
-							LeftResult.AddLast(Right.Encapsulate(RightResult, this));
+							LeftResult.Add(Right.Encapsulate(RightResult, this));
 						}
 
 						return Left.Encapsulate(LeftResult, this);

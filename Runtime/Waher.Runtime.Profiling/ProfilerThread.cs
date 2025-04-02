@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Profiling.Events;
 using Waher.Runtime.Profiling.Export;
 
@@ -49,8 +50,8 @@ namespace Waher.Runtime.Profiling
 	/// </summary>
 	public class ProfilerThread
 	{
-		private readonly List<ProfilerThread> subThreads = new List<ProfilerThread>();
-		private readonly List<ProfilerEvent> events = new List<ProfilerEvent>();
+		private readonly ChunkedList<ProfilerThread> subThreads = new ChunkedList<ProfilerThread>();
+		private readonly ChunkedList<ProfilerEvent> events = new ChunkedList<ProfilerEvent>();
 		private readonly string name;
 		private readonly int order;
 		private readonly bool sampleDelta;

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using System.Text;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Objects;
 
@@ -15,7 +15,7 @@ namespace Waher.Script.Units
 	public sealed class Unit
 	{
 		private readonly Prefix prefix;
-		private readonly ICollection<KeyValuePair<AtomicUnit, int>> factors;
+		private readonly ICollection<UnitFactor> factors;
 		private bool hasBaseUnits = false;
 		private bool hasReferenceUnits = false;
 
@@ -24,7 +24,7 @@ namespace Waher.Script.Units
 		/// </summary>
 		/// <param name="Prefix">Associated prefix.</param>
 		/// <param name="Factors">Sequence of atomic unit factors, and their corresponding exponents.</param>
-		public Unit(Prefix Prefix, ICollection<KeyValuePair<AtomicUnit, int>> Factors)
+		public Unit(Prefix Prefix, ICollection<UnitFactor> Factors)
 		{
 			this.prefix = Prefix;
 			this.factors = Factors;
@@ -35,28 +35,10 @@ namespace Waher.Script.Units
 		/// </summary>
 		/// <param name="Prefix">Associated prefix.</param>
 		/// <param name="Factors">Sequence of atomic unit factors, and their corresponding exponents.</param>
-		public Unit(Prefix Prefix, params KeyValuePair<AtomicUnit, int>[] Factors)
+		public Unit(Prefix Prefix, params UnitFactor[] Factors)
 		{
 			this.prefix = Prefix;
 			this.factors = Factors;
-		}
-
-		/// <summary>
-		/// Represents a unit.
-		/// </summary>
-		/// <param name="Prefix">Associated prefix.</param>
-		/// <param name="Factors">Sequence of atomic unit factors, and their corresponding exponents.</param>
-		public Unit(Prefix Prefix, params KeyValuePair<string, int>[] Factors)
-		{
-			this.prefix = Prefix;
-
-			int i, c = Factors.Length;
-			KeyValuePair<AtomicUnit, int>[] Factors2 = new KeyValuePair<AtomicUnit, int>[c];
-
-			for (i = 0; i < c; i++)
-				Factors2[i] = new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Factors[i].Key), Factors[i].Value);
-
-			this.factors = Factors2;
 		}
 
 		/// <summary>
@@ -78,13 +60,13 @@ namespace Waher.Script.Units
 		{
 		}
 
-		private static KeyValuePair<AtomicUnit, int>[] Prepare(AtomicUnit[] AtomicUnits)
+		private static UnitFactor[] Prepare(AtomicUnit[] AtomicUnits)
 		{
 			int i, c = AtomicUnits.Length;
-			KeyValuePair<AtomicUnit, int>[] Result = new KeyValuePair<AtomicUnit, int>[c];
+			UnitFactor[] Result = new UnitFactor[c];
 
 			for (i = 0; i < c; i++)
-				Result[i] = new KeyValuePair<AtomicUnit, int>(AtomicUnits[i], 1);
+				Result[i] = new UnitFactor(AtomicUnits[i], 1);
 
 			return Result;
 		}
@@ -108,10 +90,10 @@ namespace Waher.Script.Units
 			this.prefix = Prefix;
 
 			int i, c = AtomicUnits.Length;
-			KeyValuePair<AtomicUnit, int>[] Factors = new KeyValuePair<AtomicUnit, int>[c];
+			UnitFactor[] Factors = new UnitFactor[c];
 
 			for (i = 0; i < c; i++)
-				Factors[i] = new KeyValuePair<AtomicUnit, int>(new AtomicUnit(AtomicUnits[i]), 1);
+				Factors[i] = new UnitFactor(AtomicUnits[i], 1);
 
 			this.factors = Factors;
 		}
@@ -156,8 +138,8 @@ namespace Waher.Script.Units
 				return false;
 
 			Prefix Prefix;
-			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
-			KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundFactors;
+			ChunkedList<UnitFactor> Factors = new ChunkedList<UnitFactor>();
+			KeyValuePair<Prefix, UnitFactor[]> CompoundFactors;
 			bool HasCompoundFactors;
 			string Name, Name2, s;
 			int Exponent;
@@ -259,13 +241,13 @@ namespace Waher.Script.Units
 
 					if (LastDivision)
 					{
-						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit2.Factors)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value * Exponent));
+						foreach (UnitFactor Factor in Unit2.Factors)
+							Factors.Add(new UnitFactor(Factor.Unit, -Factor.Exponent * Exponent));
 					}
 					else
 					{
-						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit2.Factors)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, Factor.Value * Exponent));
+						foreach (UnitFactor Factor in Unit2.Factors)
+							Factors.Add(new UnitFactor(Factor.Unit, Factor.Exponent * Exponent));
 					}
 				}
 				else
@@ -383,21 +365,21 @@ namespace Waher.Script.Units
 					{
 						if (LastDivision)
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+							foreach (UnitFactor Segment in CompoundFactors.Value)
+								Factors.Add(new UnitFactor(Segment.Unit, -Segment.Exponent * Exponent));
 						}
 						else
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+							foreach (UnitFactor Segment in CompoundFactors.Value)
+								Factors.Add(new UnitFactor(Segment.Unit, Segment.Exponent * Exponent));
 						}
 					}
 					else
 					{
 						if (LastDivision)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
+							Factors.Add(new UnitFactor(Name, -Exponent));
 						else
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
+							Factors.Add(new UnitFactor(Name, Exponent));
 					}
 				}
 
@@ -426,7 +408,7 @@ namespace Waher.Script.Units
 				PermitPrefix = false;
 			}
 
-			if (Factors.First is null)
+			if (!Factors.HasFirstItem)
 				return false;
 
 			Unit = new Unit(Prefix, Factors);
@@ -442,7 +424,7 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Sequence of atomic unit factors, and their corresponding exponents.
 		/// </summary>
-		public ICollection<KeyValuePair<AtomicUnit, int>> Factors => this.factors;
+		public ICollection<UnitFactor> Factors => this.factors;
 
 		/// <summary>
 		/// If the unit is empty. (A unit of only a prefix, but no factors, is not empty.)
@@ -469,7 +451,7 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Empty unit.
 		/// </summary>
-		public static readonly Unit Empty = new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>[0]);
+		public static readonly Unit Empty = new Unit(Prefix.None, new UnitFactor[0]);
 
 		/// <summary>
 		/// Inverts the unit.
@@ -480,10 +462,10 @@ namespace Waher.Script.Units
 		public Unit Invert(out int ResidueExponent)
 		{
 			int Exponent = Prefixes.PrefixToExponent(this.prefix);
-			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			ChunkedList<UnitFactor> Factors = new ChunkedList<UnitFactor>();
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
-				Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value));
+			foreach (UnitFactor Factor in this.factors)
+				Factors.Add(new UnitFactor(Factor.Unit, -Factor.Exponent));
 
 			return new Unit(Prefixes.ExponentToPrefix(-Exponent, out ResidueExponent), Factors);
 		}
@@ -514,16 +496,16 @@ namespace Waher.Script.Units
 			string Name;
 			bool Found;
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+			foreach (UnitFactor Factor in this.factors)
 			{
-				Name = Factor.Key.Name;
+				Name = Factor.Unit.Name;
 				Found = false;
 
-				foreach (KeyValuePair<AtomicUnit, int> Factor2 in Unit2.factors)
+				foreach (UnitFactor Factor2 in Unit2.factors)
 				{
-					if (Name == Factor2.Key.Name)
+					if (Name == Factor2.Unit.Name)
 					{
-						if (Factor.Value != Factor2.Value)
+						if (Factor.Exponent != Factor2.Exponent)
 							return false;
 
 						Found = true;
@@ -543,8 +525,8 @@ namespace Waher.Script.Units
 		{
 			int i = (int)this.prefix;
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
-				i ^= Factor.Key.GetHashCode() ^ Factor.Value.GetHashCode();
+			foreach (UnitFactor Factor in this.factors)
+				i ^= Factor.Unit.GetHashCode() ^ Factor.Exponent.GetHashCode();
 
 			return i;
 		}
@@ -565,9 +547,9 @@ namespace Waher.Script.Units
 			StringBuilder Denominator = null;
 			int NrDenominators = 0;
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+			foreach (UnitFactor Factor in this.factors)
 			{
-				if (Factor.Value > 0)
+				if (Factor.Exponent > 0)
 				{
 					if (Numerator is null)
 					{
@@ -579,18 +561,18 @@ namespace Waher.Script.Units
 					else
 						Numerator.Append('⋅');
 
-					Numerator.Append(Factor.Key.Name);
+					Numerator.Append(Factor.Unit.Name);
 
-					if (Factor.Value > 1)
+					if (Factor.Exponent > 1)
 					{
-						if (Factor.Value == 2)
+						if (Factor.Exponent == 2)
 							Numerator.Append('²');
-						else if (Factor.Value == 3)
+						else if (Factor.Exponent == 3)
 							Numerator.Append('³');
 						else
 						{
 							Numerator.Append('^');
-							Numerator.Append(Factor.Value.ToString());
+							Numerator.Append(Factor.Exponent.ToString());
 						}
 					}
 				}
@@ -602,18 +584,18 @@ namespace Waher.Script.Units
 						Denominator.Append('⋅');
 
 					NrDenominators++;
-					Denominator.Append(Factor.Key.Name);
+					Denominator.Append(Factor.Unit.Name);
 
-					if (Factor.Value < -1)
+					if (Factor.Exponent < -1)
 					{
-						if (Factor.Value == -2)
+						if (Factor.Exponent == -2)
 							Denominator.Append('²');
-						else if (Factor.Value == -3)
+						else if (Factor.Exponent == -3)
 							Denominator.Append('³');
 						else
 						{
 							Denominator.Append('^');
-							Denominator.Append((-Factor.Value).ToString());
+							Denominator.Append((-Factor.Exponent).ToString());
 						}
 					}
 				}
@@ -652,44 +634,38 @@ namespace Waher.Script.Units
 		/// <returns>Resulting unit.</returns>
 		public static Unit Multiply(Unit Left, Unit Right, out int ResidueExponent)
 		{
-			LinkedList<KeyValuePair<AtomicUnit, int>> Result = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			ChunkedList<UnitFactor> Result = new ChunkedList<UnitFactor>();
 			int LeftExponent = Prefixes.PrefixToExponent(Left.prefix);
 			int RightExponent = Prefixes.PrefixToExponent(Right.prefix);
 			int ResultExponent = LeftExponent + RightExponent;
 			Prefix ResultPrefix = Prefixes.ExponentToPrefix(ResultExponent, out ResidueExponent);
-			LinkedListNode<KeyValuePair<AtomicUnit, int>> Loop;
 			string Name;
-			int Exponent;
-			bool Found;
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in Left.factors)
-				Result.AddLast(Factor);
+			Result.AddRange(Left.factors);
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in Right.factors)
+			foreach (UnitFactor Factor in Right.factors)
 			{
-				Name = Factor.Key.Name;
-				Loop = Result.First;
-				Found = false;
+				Name = Factor.Unit.Name;
 
-				while (!(Loop is null) && !Found)
+				if (!Result.Update((ref UnitFactor f, out bool Keep) =>
 				{
-					if (Loop.Value.Key.Name == Name)
+					if (f.Unit.Name == Name)
 					{
-						Found = true;
-						Exponent = Loop.Value.Value + Factor.Value;
-						if (Exponent == 0)
-							Result.Remove(Loop);
-						else
-							Loop.Value = new KeyValuePair<AtomicUnit, int>(Loop.Value.Key, Exponent);
+						f = new UnitFactor(f.Unit, f.Exponent + Factor.Exponent);
+						Keep = f.Exponent != 0;
+						return false;
 					}
 					else
-						Loop = Loop.Next;
+					{
+						Keep = true;
+						return true;
+					}
+				}))
+				{
+					continue;
 				}
 
-				if (Found)
-					continue;
-
-				Result.AddLast(Factor);
+				Result.Add(Factor);
 			}
 
 			return new Unit(ResultPrefix, Result);
@@ -704,44 +680,38 @@ namespace Waher.Script.Units
 		/// <returns>Resulting unit.</returns>
 		public static Unit Divide(Unit Left, Unit Right, out int ResidueExponent)
 		{
-			LinkedList<KeyValuePair<AtomicUnit, int>> Result = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			ChunkedList<UnitFactor> Result = new ChunkedList<UnitFactor>();
 			int LeftExponent = Prefixes.PrefixToExponent(Left.prefix);
 			int RightExponent = Prefixes.PrefixToExponent(Right.prefix);
 			int ResultExponent = LeftExponent - RightExponent;
 			Prefix ResultPrefix = Prefixes.ExponentToPrefix(ResultExponent, out ResidueExponent);
-			LinkedListNode<KeyValuePair<AtomicUnit, int>> Loop;
 			string Name;
-			int Exponent;
-			bool Found;
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in Left.factors)
-				Result.AddLast(Factor);
+			Result.AddRange(Left.factors);
 
-			foreach (KeyValuePair<AtomicUnit, int> Factor in Right.factors)
+			foreach (UnitFactor Factor in Right.factors)
 			{
-				Name = Factor.Key.Name;
-				Loop = Result.First;
-				Found = false;
+				Name = Factor.Unit.Name;
 
-				while (!(Loop is null) && !Found)
+				if (!Result.Update((ref UnitFactor f, out bool Keep) =>
 				{
-					if (Loop.Value.Key.Name == Name)
+					if (f.Unit.Name == Name)
 					{
-						Found = true;
-						Exponent = Loop.Value.Value - Factor.Value;
-						if (Exponent == 0)
-							Result.Remove(Loop);
-						else
-							Loop.Value = new KeyValuePair<AtomicUnit, int>(Loop.Value.Key, Exponent);
+						f = new UnitFactor(f.Unit, f.Exponent - Factor.Exponent);
+						Keep = f.Exponent != 0;
+						return false;
 					}
 					else
-						Loop = Loop.Next;
+					{
+						Keep = true;
+						return true;
+					}
+				}))
+				{
+					continue;
 				}
 
-				if (Found)
-					continue;
-
-				Result.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value));
+				Result.Add(new UnitFactor(Factor.Unit, -Factor.Exponent));
 			}
 
 			return new Unit(ResultPrefix, Result);
@@ -764,9 +734,9 @@ namespace Waher.Script.Units
 
 				bool HasNonBase = false;
 
-				foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+				foreach (UnitFactor Factor in this.factors)
 				{
-					if (!baseUnits.ContainsKey(Factor.Key.Name))
+					if (!baseUnits.ContainsKey(Factor.Unit.Name))
 					{
 						HasNonBase = true;
 						break;
@@ -775,34 +745,34 @@ namespace Waher.Script.Units
 
 				if (HasNonBase)
 				{
-					LinkedList<KeyValuePair<AtomicUnit, int>> BaseFactors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+					ChunkedList<UnitFactor> BaseFactors = new ChunkedList<UnitFactor>();
 					int Exponent = Prefixes.PrefixToExponent(this.prefix);
 					int FactorExponent;
 					string Name;
 
-					foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+					foreach (UnitFactor Factor in this.factors)
 					{
-						FactorExponent = Factor.Value;
+						FactorExponent = Factor.Exponent;
 
-						if (baseUnits.ContainsKey(Name = Factor.Key.Name))
-							this.Add(BaseFactors, Factor.Key, Factor.Value);
+						if (baseUnits.ContainsKey(Name = Factor.Unit.Name))
+							this.Add(BaseFactors, Factor.Unit, Factor.Exponent);
 						else if (derivedUnits.TryGetValue(Name, out PhysicalQuantity Quantity))
 						{
 							Magnitude *= Math.Pow(Quantity.Magnitude, FactorExponent);
 							Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
 
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
-								this.Add(BaseFactors, Segment.Key, Segment.Value * FactorExponent);
+							foreach (UnitFactor Segment in Quantity.Unit.factors)
+								this.Add(BaseFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 						}
-						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Units))
+						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, UnitFactor[]> Units))
 						{
 							Exponent += Prefixes.PrefixToExponent(Units.Key) * FactorExponent;
 
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Units.Value)
-								this.Add(BaseFactors, Segment.Key, Segment.Value * FactorExponent);
+							foreach (UnitFactor Segment in Units.Value)
+								this.Add(BaseFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 						}
 						else
-							this.Add(BaseFactors, Factor.Key, Factor.Value);
+							this.Add(BaseFactors, Factor.Unit, Factor.Exponent);
 					}
 
 					Unit Result = new Unit(Prefixes.ExponentToPrefix(Exponent, out FactorExponent), BaseFactors);
@@ -821,18 +791,27 @@ namespace Waher.Script.Units
 			}
 		}
 
-		private void Add(LinkedList<KeyValuePair<AtomicUnit, int>> Factors, AtomicUnit AtomicUnit, int Exponent)
+		private void Add(ChunkedList<UnitFactor> Factors, AtomicUnit AtomicUnit, int Exponent)
 		{
-			LinkedListNode<KeyValuePair<AtomicUnit, int>> Loop = Factors.First;
 			string Name = AtomicUnit.Name;
 
-			while (!(Loop is null) && Loop.Value.Key.Name != Name)
-				Loop = Loop.Next;
-
-			if (Loop is null)
-				Factors.AddLast(new KeyValuePair<AtomicUnit, int>(AtomicUnit, Exponent));
-			else
-				Loop.Value = new KeyValuePair<AtomicUnit, int>(AtomicUnit, Loop.Value.Value + Exponent);
+			if (Factors.Update((ref UnitFactor f, out bool Keep) =>
+			{
+				if (f.Unit.Name == Name)
+				{
+					f = new UnitFactor(f.Unit, f.Exponent + Exponent);
+					Keep = f.Exponent != 0;
+					return false;
+				}
+				else
+				{
+					Keep = true;
+					return true;
+				}
+			}))
+			{
+				Factors.Add(new UnitFactor(AtomicUnit, Exponent));
+			}
 		}
 
 		/// <summary>
@@ -864,9 +843,9 @@ namespace Waher.Script.Units
 
 				bool HasNonReference = false;
 
-				foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+				foreach (UnitFactor Factor in this.factors)
 				{
-					if (!referenceUnits.ContainsKey(Factor.Key.Name))
+					if (!referenceUnits.ContainsKey(Factor.Unit.Name))
 					{
 						HasNonReference = true;
 						break;
@@ -875,23 +854,23 @@ namespace Waher.Script.Units
 
 				if (HasNonReference)
 				{
-					LinkedList<KeyValuePair<AtomicUnit, int>> ReferenceFactors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+					ChunkedList<UnitFactor> ReferenceFactors = new ChunkedList<UnitFactor>();
 					int Exponent = Prefixes.PrefixToExponent(this.prefix);
 					int FactorExponent;
 					string Name;
 
-					foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+					foreach (UnitFactor Factor in this.factors)
 					{
-						FactorExponent = Factor.Value;
+						FactorExponent = Factor.Exponent;
 
-						if (referenceUnits.ContainsKey(Name = Factor.Key.Name))
-							this.Add(ReferenceFactors, Factor.Key, Factor.Value);
+						if (referenceUnits.ContainsKey(Name = Factor.Unit.Name))
+							this.Add(ReferenceFactors, Factor.Unit, Factor.Exponent);
 						else if (baseUnits.TryGetValue(Name, out IBaseQuantity BaseQuantity))
 						{
 							if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, FactorExponent))
 								this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, FactorExponent);
 							else
-								this.Add(ReferenceFactors, Factor.Key, Factor.Value);
+								this.Add(ReferenceFactors, Factor.Unit, Factor.Exponent);
 						}
 						else if (derivedUnits.TryGetValue(Name, out PhysicalQuantity Quantity))
 						{
@@ -903,42 +882,42 @@ namespace Waher.Script.Units
 								Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
 							}
 
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
+							foreach (UnitFactor Segment in Quantity.Unit.factors)
 							{
-								if (referenceUnits.ContainsKey(Name = Segment.Key.Name))
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+								if (referenceUnits.ContainsKey(Name = Segment.Unit.Name))
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
-										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
+									if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Exponent * FactorExponent))
+										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Exponent * FactorExponent);
 									else
-										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+										this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								}
 								else
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 							}
 						}
-						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Units))
+						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, UnitFactor[]> Units))
 						{
 							Exponent += Prefixes.PrefixToExponent(Units.Key) * FactorExponent;
 
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Units.Value)
+							foreach (UnitFactor Segment in Units.Value)
 							{
-								if (referenceUnits.ContainsKey(Name = Segment.Key.Name))
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+								if (referenceUnits.ContainsKey(Name = Segment.Unit.Name))
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
-										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
+									if (BaseQuantity.ToReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Exponent * FactorExponent))
+										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Exponent * FactorExponent);
 									else
-										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+										this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								}
 								else
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 							}
 						}
 						else
-							this.Add(ReferenceFactors, Factor.Key, Factor.Value);
+							this.Add(ReferenceFactors, Factor.Unit, Factor.Exponent);
 					}
 
 					Unit Result = new Unit(Prefixes.ExponentToPrefix(Exponent, out FactorExponent), ReferenceFactors);
@@ -991,9 +970,9 @@ namespace Waher.Script.Units
 
 				bool HasNonReference = false;
 
-				foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+				foreach (UnitFactor Factor in this.factors)
 				{
-					if (!referenceUnits.ContainsKey(Factor.Key.Name))
+					if (!referenceUnits.ContainsKey(Factor.Unit.Name))
 					{
 						HasNonReference = true;
 						break;
@@ -1002,23 +981,23 @@ namespace Waher.Script.Units
 
 				if (HasNonReference)
 				{
-					LinkedList<KeyValuePair<AtomicUnit, int>> ReferenceFactors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+					ChunkedList<UnitFactor> ReferenceFactors = new ChunkedList<UnitFactor>();
 					int Exponent = Prefixes.PrefixToExponent(this.prefix);
 					int FactorExponent;
 					string Name;
 
-					foreach (KeyValuePair<AtomicUnit, int> Factor in this.factors)
+					foreach (UnitFactor Factor in this.factors)
 					{
-						FactorExponent = Factor.Value;
+						FactorExponent = Factor.Exponent;
 
-						if (referenceUnits.ContainsKey(Name = Factor.Key.Name))
-							this.Add(ReferenceFactors, Factor.Key, Factor.Value);
+						if (referenceUnits.ContainsKey(Name = Factor.Unit.Name))
+							this.Add(ReferenceFactors, Factor.Unit, Factor.Exponent);
 						else if (baseUnits.TryGetValue(Name, out IBaseQuantity BaseQuantity))
 						{
 							if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, FactorExponent))
 								this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, FactorExponent);
 							else
-								this.Add(ReferenceFactors, Factor.Key, Factor.Value);
+								this.Add(ReferenceFactors, Factor.Unit, Factor.Exponent);
 						}
 						else if (derivedUnits.TryGetValue(Name, out PhysicalQuantity Quantity))
 						{
@@ -1030,42 +1009,42 @@ namespace Waher.Script.Units
 								Exponent += Prefixes.PrefixToExponent(Quantity.Unit.prefix) * FactorExponent;
 							}
 
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Quantity.Unit.factors)
+							foreach (UnitFactor Segment in Quantity.Unit.factors)
 							{
-								if (referenceUnits.ContainsKey(Name = Segment.Key.Name))
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+								if (referenceUnits.ContainsKey(Name = Segment.Unit.Name))
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
-										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
+									if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Exponent * FactorExponent))
+										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Exponent * FactorExponent);
 									else
-										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+										this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								}
 								else
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 							}
 						}
-						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Units))
+						else if (compoundUnits.TryGetValue(Name, out KeyValuePair<Prefix, UnitFactor[]> Units))
 						{
 							Exponent += Prefixes.PrefixToExponent(Units.Key) * FactorExponent;
 
-							foreach (KeyValuePair<AtomicUnit, int> Segment in Units.Value)
+							foreach (UnitFactor Segment in Units.Value)
 							{
-								if (referenceUnits.ContainsKey(Name = Segment.Key.Name))
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+								if (referenceUnits.ContainsKey(Name = Segment.Unit.Name))
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								else if (baseUnits.TryGetValue(Name, out BaseQuantity))
 								{
-									if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Value * FactorExponent))
-										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Value * FactorExponent);
+									if (BaseQuantity.FromReferenceUnit(ref Magnitude, ref NrDecimals, Name, Segment.Exponent * FactorExponent))
+										this.Add(ReferenceFactors, BaseQuantity.ReferenceUnit, Segment.Exponent * FactorExponent);
 									else
-										this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+										this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 								}
 								else
-									this.Add(ReferenceFactors, Segment.Key, Segment.Value * FactorExponent);
+									this.Add(ReferenceFactors, Segment.Unit, Segment.Exponent * FactorExponent);
 							}
 						}
 						else
-							this.Add(ReferenceFactors, Factor.Key, Factor.Value);
+							this.Add(ReferenceFactors, Factor.Unit, Factor.Exponent);
 					}
 
 					Unit Result = new Unit(Prefixes.ExponentToPrefix(Exponent, out FactorExponent), ReferenceFactors);
@@ -1093,7 +1072,7 @@ namespace Waher.Script.Units
 		{
 			Dictionary<string, IBaseQuantity> BaseUnits = new Dictionary<string, IBaseQuantity>();
 			Dictionary<string, IBaseQuantity> ReferenceUnits = new Dictionary<string, IBaseQuantity>();
-			Dictionary<string, KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>> CompoundUnits = new Dictionary<string, KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>>();
+			Dictionary<string, KeyValuePair<Prefix, UnitFactor[]>> CompoundUnits = new Dictionary<string, KeyValuePair<Prefix, UnitFactor[]>>();
 			Dictionary<string, PhysicalQuantity> DerivedUnits = new Dictionary<string, PhysicalQuantity>();
 			IBaseQuantity BaseQuantity;
 			ICompoundQuantity CompoundQuantity;
@@ -1137,8 +1116,8 @@ namespace Waher.Script.Units
 					continue;
 				}
 
-				foreach (Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundUnit in CompoundQuantity.CompoundQuantities)
-					CompoundUnits[CompoundUnit.Item1] = new KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>(CompoundUnit.Item2, CompoundUnit.Item3);
+				foreach (Tuple<string, Prefix, UnitFactor[]> CompoundUnit in CompoundQuantity.CompoundQuantities)
+					CompoundUnits[CompoundUnit.Item1] = new KeyValuePair<Prefix, UnitFactor[]>(CompoundUnit.Item2, CompoundUnit.Item3);
 			}
 
 			foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IDerivedQuantity)))
@@ -1170,7 +1149,7 @@ namespace Waher.Script.Units
 		private readonly static Dictionary<string, IUnitCategory> categoryPerUnit = new Dictionary<string, IUnitCategory>();
 		private static Dictionary<string, IBaseQuantity> baseUnits = null;
 		private static Dictionary<string, IBaseQuantity> referenceUnits = null;
-		private static Dictionary<string, KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]>> compoundUnits = null;
+		private static Dictionary<string, KeyValuePair<Prefix, UnitFactor[]>> compoundUnits = null;
 		private static Dictionary<string, PhysicalQuantity> derivedUnits = null;
 		private static IUnitCategory[] unitCategories = null;
 		private static readonly object synchObject = new object();
@@ -1199,7 +1178,7 @@ namespace Waher.Script.Units
 		/// <param name="Name">Name of compoud unit.</param>
 		/// <param name="Factors">Factors in unit.</param>
 		/// <returns>If a compound unit with the given name was found.</returns>
-		internal static bool TryGetCompoundUnit(string Name, out KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> Factors)
+		internal static bool TryGetCompoundUnit(string Name, out KeyValuePair<Prefix, UnitFactor[]> Factors)
 		{
 			lock (synchObject)
 			{
@@ -1321,7 +1300,7 @@ namespace Waher.Script.Units
 
 				if (unitCategories is null)
 				{
-					List<IUnitCategory> Categories = new List<IUnitCategory>();
+					ChunkedList<IUnitCategory> Categories = new ChunkedList<IUnitCategory>();
 
 					foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IUnitCategory)))
 					{

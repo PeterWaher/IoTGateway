@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -355,9 +356,11 @@ namespace Waher.Script
 				ScriptNode Node2 = this.ParseStatement(true);
 				if (!(Node2 is null))
 				{
-					LinkedList<ScriptNode> Statements = new LinkedList<ScriptNode>();
-					Statements.AddLast(Node);
-					Statements.AddLast(Node2);
+					ChunkedList<ScriptNode> Statements = new ChunkedList<ScriptNode>
+					{
+						Node,
+						Node2
+					};
 
 					this.SkipWhiteSpace();
 					while (this.PeekNextChar() == ';')
@@ -367,7 +370,7 @@ namespace Waher.Script
 						if (Node2 is null)
 							break;
 
-						Statements.AddLast(Node2);
+						Statements.Add(Node2);
 						this.SkipWhiteSpace();
 					}
 
@@ -600,7 +603,7 @@ namespace Waher.Script
 			this.SkipWhiteSpace();
 			if (this.PeekNextChar() == ',')
 			{
-				List<ScriptNode> Elements = new List<ScriptNode>()
+				ChunkedList<ScriptNode> Elements = new ChunkedList<ScriptNode>()
 				{
 					Node
 				};
@@ -746,8 +749,8 @@ namespace Waher.Script
 							return new DynamicIndexAssignment(DynamicIndex, Right, Start, this.pos - Start, this);
 						else if (Left is NamedFunctionCall f)
 						{
-							List<string> ArgumentNames = new List<string>();
-							List<ArgumentType> ArgumentTypes = new List<ArgumentType>();
+							ChunkedList<string> ArgumentNames = new ChunkedList<string>();
+							ChunkedList<ArgumentType> ArgumentTypes = new ChunkedList<ArgumentType>();
 							ArgumentType ArgumentType;
 
 							foreach (ScriptNode Argument in f.Arguments)
@@ -2809,7 +2812,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							Unit Unit = new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("°" + new string(ch, 1)), 1));
+							Unit Unit = new Unit(Prefix.None, new UnitFactor("°" + new string(ch, 1)));
 
 							if (Node is ConstantElement ConstantElement)
 							{
@@ -2997,8 +3000,8 @@ namespace Waher.Script
 		internal Unit ParseUnit(bool PermitPrefix)
 		{
 			Prefix Prefix;
-			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
-			KeyValuePair<Prefix, KeyValuePair<AtomicUnit, int>[]> CompoundFactors;
+			ChunkedList<UnitFactor> Factors = new ChunkedList<UnitFactor>();
+			KeyValuePair<Prefix, UnitFactor[]> CompoundFactors;
 			bool HasCompoundFactors;
 			string Name, Name2, s;
 			int Start = this.pos;
@@ -3112,13 +3115,13 @@ namespace Waher.Script
 
 					if (LastDivision)
 					{
-						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value * Exponent));
+						foreach (UnitFactor Factor in Unit.Factors)
+							Factors.Add(new UnitFactor(Factor.Unit, -Factor.Exponent * Exponent));
 					}
 					else
 					{
-						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, Factor.Value * Exponent));
+						foreach (UnitFactor Factor in Unit.Factors)
+							Factors.Add(new UnitFactor(Factor.Unit, Factor.Exponent * Exponent));
 					}
 				}
 				else
@@ -3207,21 +3210,21 @@ namespace Waher.Script
 					{
 						if (LastDivision)
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+							foreach (UnitFactor Segment in CompoundFactors.Value)
+								Factors.Add(new UnitFactor(Segment.Unit, -Segment.Exponent * Exponent));
 						}
 						else
 						{
-							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors.Value)
-								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+							foreach (UnitFactor Segment in CompoundFactors.Value)
+								Factors.Add(new UnitFactor(Segment.Unit, Segment.Exponent * Exponent));
 						}
 					}
 					else
 					{
 						if (LastDivision)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
+							Factors.Add(new UnitFactor(Name, -Exponent));
 						else
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
+							Factors.Add(new UnitFactor(Name, Exponent));
 					}
 				}
 
@@ -3250,7 +3253,7 @@ namespace Waher.Script
 
 			this.pos = LastCompletion;
 
-			if (Factors.First is null)
+			if (!Factors.HasFirstItem)
 			{
 				this.pos = Start;
 				return null;
@@ -3795,7 +3798,7 @@ namespace Waher.Script
 					case '}':
 						this.pos++;
 						this.CanSkipWhitespace = WsBak;
-						return new ObjectExNihilo(new LinkedList<KeyValuePair<string, ScriptNode>>(), false, Start, this.pos - Start, this);
+						return new ObjectExNihilo(new ChunkedList<KeyValuePair<string, ScriptNode>>(), false, Start, this.pos - Start, this);
 
 					case '*':
 						this.pos++;
@@ -3826,7 +3829,7 @@ namespace Waher.Script
 
 					if (!DoubleColon && (ObjectWildcard || Node is VariableReference || Node is ConstantElement))
 					{
-						LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
+						ChunkedList<KeyValuePair<string, ScriptNode>> Members = new ChunkedList<KeyValuePair<string, ScriptNode>>();
 						Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
 						ConstantElement ConstantElement;
 						StringValue StringValue;
@@ -3845,7 +3848,7 @@ namespace Waher.Script
 								throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
 							MembersFound[s] = true;
-							Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+							Members.Add(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 						
 							this.SkipWhiteSpace();
 						}
@@ -3883,7 +3886,7 @@ namespace Waher.Script
 
 								this.pos++;
 								MembersFound[s] = true;
-								Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+								Members.Add(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 							}
 
 							this.SkipWhiteSpace();
@@ -5486,21 +5489,20 @@ namespace Waher.Script
 					return !(Converter is null);
 
 				Dictionary<Type, bool> Explored = new Dictionary<Type, bool>() { { From, true } };
-				LinkedList<ITypeConverter> Search = new LinkedList<ITypeConverter>();
+				ChunkedList<ITypeConverter> Search = new ChunkedList<ITypeConverter>();
 
 				foreach (ITypeConverter Converter3 in Converters.Values)
 				{
 					if (!(Converter3 is null))
 					{
-						Search.AddLast(Converter3);
+						Search.Add(Converter3);
 						Explored[Converter3.To] = true;
 					}
 				}
 
-				while (!(Search.First is null))
+				while (Search.HasFirstItem)
 				{
-					ITypeConverter C = Search.First.Value;
-					Search.RemoveFirst();
+					ITypeConverter C = Search.RemoveFirst();
 
 					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2) && !(Converters2 is null))
 					{
@@ -5530,7 +5532,7 @@ namespace Waher.Script
 							{
 								if (!Explored.ContainsKey(Converter3.To))
 								{
-									Search.AddLast(Converter3);
+									Search.Add(Converter3);
 									Explored[Converter3.To] = true;
 								}
 							}

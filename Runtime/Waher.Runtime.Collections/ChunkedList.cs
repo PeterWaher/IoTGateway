@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,9 +36,20 @@ namespace Waher.Runtime.Collections
 	public delegate Task<bool> PredicateAsync<in T>(T Arg);
 
 	/// <summary>
+	/// Delegate for callback methods that update the elements of a <see cref="ChunkedList{T}"/>.
+	/// </summary>
+	/// <typeparam name="T">Type of element.</typeparam>
+	/// <param name="Value">Value that can be updated.</param>
+	/// <param name="Keep">If the value should be kept.</param>
+	/// <returns>If the iteration can continue (true) or should be terminated early (false).</returns>
+	public delegate bool UpdateCallback<T>(ref T Value, out bool Keep);
+
+	/// <summary>
 	/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>.
 	/// </summary>
 	/// <typeparam name="T">Element type.</typeparam>
+	[DebuggerDisplay("Count = {Count}")]
+	[DebuggerTypeProxy(typeof(ChunkedListDebugView<>))]
 	public class ChunkedList<T> : ICollection<T>, IList<T>
 	{
 		private const int initialChunkSize = 16;
@@ -102,8 +113,9 @@ namespace Waher.Runtime.Collections
 				this.chunkSize = this.maxChunkSize;
 		}
 
-		private class Chunk
+		internal class Chunk
 		{
+			public ChunkNode<T> node;
 			public T[] Elements;
 			public Chunk Next;
 			public Chunk Prev;
@@ -147,6 +159,36 @@ namespace Waher.Runtime.Collections
 
 				return base.ToString();
 			}
+
+			public ChunkNode<T> Node
+			{
+				get
+				{
+					if (this.node is null)
+						this.node = new ChunkNode<T>(this);
+
+					return this.node;
+				}
+			}
+
+			public T this[int Index]
+			{
+				get
+				{
+					if (Index < this.Start || Index >= this.Pos)
+						throw new IndexOutOfRangeException();
+
+					return this.Elements[Index];
+				}
+
+				set
+				{
+					if (Index < this.Start || Index >= this.Pos)
+						throw new IndexOutOfRangeException();
+
+					this.Elements[Index] = value;
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -154,6 +196,16 @@ namespace Waher.Runtime.Collections
 		{
 			return "Count = " + this.count.ToString();
 		}
+
+		/// <summary>
+		/// First chunk
+		/// </summary>
+		public ChunkNode<T> FirstChunk => this.firstChunk.Node;
+
+		/// <summary>
+		/// Last chunk
+		/// </summary>
+		public ChunkNode<T> LastChunk => this.firstChunk.Node;
 
 		#region ICollection<T>
 
@@ -242,11 +294,6 @@ namespace Waher.Runtime.Collections
 			this.CopyTo(0, Destination, DestinationIndex, this.count);
 		}
 
-		private void CopyTo(int v, object desintation, int desintationIndex, int count)
-		{
-			throw new NotImplementedException();
-		}
-
 		/// <summary>
 		/// Removes an element from the collection.
 		/// </summary>
@@ -291,10 +338,12 @@ namespace Waher.Runtime.Collections
 							else
 								Loop.Next.Prev = Loop.Prev;
 
+							Loop.Next = null;
+							Loop.Prev = null;
+
 							this.chunkSize >>= 1;
 							if (this.chunkSize < this.minChunkSize)
 								this.chunkSize = this.minChunkSize;
-
 						}
 
 						return true;
@@ -404,7 +453,7 @@ namespace Waher.Runtime.Collections
 
 			while (!(Loop is null))
 			{
-				for (i = 0, c = Loop.Pos; i < c; i++)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
 					if (!Callback(Loop.Elements[i]))
 						return false;
@@ -430,7 +479,7 @@ namespace Waher.Runtime.Collections
 
 			while (!(Loop is null))
 			{
-				for (i = 0, c = Loop.Pos; i < c; i++)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
 					if (!await Callback(Loop.Elements[i]))
 						return false;
@@ -493,6 +542,95 @@ namespace Waher.Runtime.Collections
 				}
 
 				Loop = Loop.Next;
+			}
+
+			return true;
+		}
+
+		#endregion
+
+		#region Update Optimization
+
+		/// <summary>
+		/// Iterates through all elements in the collection, and calls the callback method 
+		/// in <paramref name="Callback"/> for each element, allowing the method to update the
+		/// value or remove it. The loop can be terminated early, by returning false from the 
+		/// callback method. Deleting an element is done by returning null from the callback 
+		/// method.
+		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <returns>If the loop was completed (true) or terminated early (false).</returns>
+		public bool Update(UpdateCallback<T> Callback)
+		{
+			Chunk Loop = this.firstChunk;
+			Chunk Next;
+			int i, c, d;
+			bool Continue = true;
+			bool Deleted = false;
+
+			while (!(Loop is null))
+			{
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					Continue = Callback(ref Loop.Elements[i], out bool Keep);
+
+					if (!Keep)
+					{
+						if (i == Loop.Start)
+							Loop.Start++;
+						else
+						{
+							d = c - i - 1;
+							if (d > 0)
+								Array.Copy(Loop.Elements, i + 1, Loop.Elements, i, d);
+
+							Loop.Pos--;
+							i--;
+							c--;
+						}
+
+						this.count--;
+						Deleted = true;
+					}
+
+					if (!Continue)
+						break;
+				}
+
+				Next = Loop.Next;
+
+				if (Deleted)
+				{
+					Deleted = false;
+
+					if (Loop.Start == Loop.Pos)
+					{
+						Loop.Start = 0;
+						Loop.Pos = 0;
+
+						if (Loop.Prev is null)
+							this.firstChunk = Next ?? Loop;
+						else
+							Loop.Prev.Next = Next;
+
+						if (Next is null)
+							this.lastChunk = Loop.Prev ?? Loop;
+						else
+							Next.Prev = Loop.Prev;
+
+						Loop.Next = null;
+						Loop.Prev = null;
+
+						this.chunkSize >>= 1;
+						if (this.chunkSize < this.minChunkSize)
+							this.chunkSize = this.minChunkSize;
+					}
+				}
+
+				Loop = Next;
+
+				if (!Continue)
+					return false;
 			}
 
 			return true;
@@ -1030,10 +1168,12 @@ namespace Waher.Runtime.Collections
 						else
 							Loop.Next.Prev = Loop.Prev;
 
+						Loop.Next = null;
+						Loop.Prev = null;
+
 						this.chunkSize >>= 1;
 						if (this.chunkSize < this.minChunkSize)
 							this.chunkSize = this.minChunkSize;
-
 					}
 
 					return;
@@ -1077,7 +1217,7 @@ namespace Waher.Runtime.Collections
 					this.count++;
 				}
 
-				while (e.MoveNext())
+				while (this.current.Pos >= this.current.Size && e.MoveNext())
 				{
 					this.lastChunk = new Chunk(this.chunkSize, this.current);
 					this.current = this.lastChunk;

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Objects.Matrices;
@@ -42,28 +42,28 @@ namespace Waher.Script.Model
             {
                 if (Argument is IMatrix Matrix)
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                     int i, c = Matrix.Rows;
 
                     if (Matrix is DoubleMatrix)
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.Evaluate((DoubleVector)Matrix.GetRow(i), Variables));
+                            Elements.Add(this.Evaluate((DoubleVector)Matrix.GetRow(i), Variables));
                     }
                     else if (Matrix is ComplexMatrix)
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.Evaluate((ComplexVector)Matrix.GetRow(i), Variables));
+                            Elements.Add(this.Evaluate((ComplexVector)Matrix.GetRow(i), Variables));
                     }
                     else if (Matrix is BooleanMatrix)
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.Evaluate((BooleanVector)Matrix.GetRow(i), Variables));
+                            Elements.Add(this.Evaluate((BooleanVector)Matrix.GetRow(i), Variables));
                     }
                     else
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.Evaluate(Matrix.GetRow(i), Variables));
+                            Elements.Add(this.Evaluate(Matrix.GetRow(i), Variables));
                     }
 
                     return Argument.Encapsulate(Elements, this);
@@ -72,10 +72,10 @@ namespace Waher.Script.Model
                 {
                     if (Argument is ISet Set)
                     {
-                        LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                         foreach (IElement E in Set.ChildElements)
-                            Elements.AddLast(this.Evaluate(E, Variables));
+                            Elements.Add(this.Evaluate(E, Variables));
 
                         return Argument.Encapsulate(Elements, this);
                     }
@@ -131,28 +131,28 @@ namespace Waher.Script.Model
             {
                 if (Argument is IMatrix Matrix)
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                     int i, c = Matrix.Rows;
 
                     if (Matrix is DoubleMatrix)
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this.EvaluateAsync((DoubleVector)Matrix.GetRow(i), Variables));
+                            Elements.Add(await this.EvaluateAsync((DoubleVector)Matrix.GetRow(i), Variables));
                     }
                     else if (Matrix is ComplexMatrix)
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this.EvaluateAsync((ComplexVector)Matrix.GetRow(i), Variables));
+                            Elements.Add(await this.EvaluateAsync((ComplexVector)Matrix.GetRow(i), Variables));
                     }
                     else if (Matrix is BooleanMatrix)
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this.EvaluateAsync((BooleanVector)Matrix.GetRow(i), Variables));
+                            Elements.Add(await this.EvaluateAsync((BooleanVector)Matrix.GetRow(i), Variables));
                     }
                     else
                     {
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this.EvaluateAsync(Matrix.GetRow(i), Variables));
+                            Elements.Add(await this.EvaluateAsync(Matrix.GetRow(i), Variables));
                     }
 
                     return Argument.Encapsulate(Elements, this);
@@ -161,10 +161,10 @@ namespace Waher.Script.Model
                 {
                     if (Argument is ISet Set)
                     {
-                        LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                         foreach (IElement E in Set.ChildElements)
-                            Elements.AddLast(await this.EvaluateAsync(E, Variables));
+                            Elements.Add(await this.EvaluateAsync(E, Variables));
 
                         return Argument.Encapsulate(Elements, this);
                     }

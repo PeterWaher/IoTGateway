@@ -37,19 +37,19 @@ namespace Waher.Script.Units.DerivedQuantities
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
 					new KeyValuePair<string, PhysicalQuantity>("Hz", new PhysicalQuantity(1, new Unit(Prefix.None, 
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+							new UnitFactor("s", -1)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("cps", new PhysicalQuantity(1, new Unit(Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+							new UnitFactor("s", -1)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("rpm", new PhysicalQuantity(1, new Unit(Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("min"), -1)
+							new UnitFactor("min", -1)
 						})))
 				};
 			}

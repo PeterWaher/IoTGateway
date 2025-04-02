@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -15,8 +16,8 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	/// </summary>
 	public class ExportCondition : CustomEntryExport
 	{
-		private readonly LinkedList<KeyValuePair<string, object>> currentProperties = new LinkedList<KeyValuePair<string, object>>();
-		private readonly List<KeyValuePair<string, ScriptNode>> additionalFields;
+		private readonly ChunkedList<KeyValuePair<string, object>> currentProperties = new ChunkedList<KeyValuePair<string, object>>();
+		private readonly ChunkedList<KeyValuePair<string, ScriptNode>> additionalFields;
 		private readonly ScriptNode condition;
 		private readonly ObjectProperties properties = null;
 		private readonly Variables contextVariables;
@@ -40,7 +41,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="AdditionalFields">Additional calculated fields.</param>
 		public ExportCondition(ILedgerExport Output, ScriptNode Condition, Variables Variables,
-			List<KeyValuePair<string, ScriptNode>> AdditionalFields)
+			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields)
 			: base(Output)
 		{
 			this.condition = Condition;
@@ -140,7 +141,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public override Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
-			this.currentProperties.AddLast(new KeyValuePair<string, object>(PropertyName, PropertyValue));
+			this.currentProperties.Add(new KeyValuePair<string, object>(PropertyName, PropertyValue));
 			return Task.FromResult(true);
 		}
 
@@ -190,7 +191,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 					}
 
 					this.entryVariables[P.Key] = E;
-					this.currentProperties.AddLast(new KeyValuePair<string, object>(P.Key, E.AssociatedObjectValue));
+					this.currentProperties.Add(new KeyValuePair<string, object>(P.Key, E.AssociatedObjectValue));
 				}
 			}
 

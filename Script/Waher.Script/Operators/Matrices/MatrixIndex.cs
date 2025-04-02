@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Matrices
 {
@@ -86,10 +86,10 @@ namespace Waher.Script.Operators.Matrices
 			}
 			else
             {
-                LinkedList<IElement> Elements = new LinkedList<IElement>();
+                ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                 foreach (IElement E in Matrix.ChildElements)
-                    Elements.AddLast(EvaluateIndex(E, IndexX, IndexY, NullCheck, Node));
+                    Elements.Add(EvaluateIndex(E, IndexX, IndexY, NullCheck, Node));
 
                 return Matrix.Encapsulate(Elements, Node);
             }
@@ -120,10 +120,10 @@ namespace Waher.Script.Operators.Matrices
                     throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
                 else
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+                    ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                     foreach (IElement E in IndexY.ChildElements)
-                        Elements.AddLast(EvaluateIndex(Matrix, IndexX, E, Node));
+                        Elements.Add(EvaluateIndex(Matrix, IndexX, E, Node));
 
                     return IndexY.Encapsulate(Elements, Node);
                 }
@@ -132,10 +132,10 @@ namespace Waher.Script.Operators.Matrices
             {
                 if (IndexY.IsScalar)
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+                    ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                     foreach (IElement E in IndexX.ChildElements)
-                        Elements.AddLast(EvaluateIndex(Matrix, E, IndexY, Node));
+                        Elements.Add(EvaluateIndex(Matrix, E, IndexY, Node));
 
                     return IndexX.Encapsulate(Elements, Node);
                 }
@@ -146,14 +146,14 @@ namespace Waher.Script.Operators.Matrices
 
                     if (IndexXChildren.Count == IndexYChildren.Count)
                     {
-                        LinkedList<IElement> Elements = new LinkedList<IElement>();
+                        ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                         IEnumerator<IElement> eX = IndexXChildren.GetEnumerator();
                         IEnumerator<IElement> eY = IndexYChildren.GetEnumerator();
 
                         try
                         {
                             while (eX.MoveNext() && eY.MoveNext())
-                                Elements.AddLast(EvaluateIndex(Matrix, eX.Current, eY.Current, Node));
+                                Elements.Add(EvaluateIndex(Matrix, eX.Current, eY.Current, Node));
                         }
                         finally
                         {
@@ -165,16 +165,16 @@ namespace Waher.Script.Operators.Matrices
                     }
                     else
                     {
-                        LinkedList<IElement> XResult = new LinkedList<IElement>();
+                        ChunkedList<IElement> XResult = new ChunkedList<IElement>();
 
                         foreach (IElement XChild in IndexXChildren)
                         {
-                            LinkedList<IElement> YResult = new LinkedList<IElement>();
+                            ChunkedList<IElement> YResult = new ChunkedList<IElement>();
 
                             foreach (IElement YChild in IndexYChildren)
-                                YResult.AddLast(EvaluateIndex(Matrix, XChild, YChild, Node));
+                                YResult.Add(EvaluateIndex(Matrix, XChild, YChild, Node));
 
-                            XResult.AddLast(IndexY.Encapsulate(YResult, Node));
+                            XResult.Add(IndexY.Encapsulate(YResult, Node));
                         }
 
                         return IndexX.Encapsulate(XResult, Node);

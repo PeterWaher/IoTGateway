@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -96,7 +97,7 @@ namespace Waher.Script.Content.Functions.Encoding
 						MaxCols = c;
 				}
 
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (string[] Rec in Records)
 				{
@@ -107,24 +108,24 @@ namespace Waher.Script.Content.Functions.Encoding
 						foreach (string s in Rec)
 						{
 							if (s is null || string.IsNullOrEmpty(s))
-								Elements.AddLast(new ObjectValue(null));
+								Elements.Add(new ObjectValue(null));
 							else if (CommonTypes.TryParse(s, out double dbl))
-								Elements.AddLast(new DoubleNumber(dbl));
+								Elements.Add(new DoubleNumber(dbl));
 							else if (CommonTypes.TryParse(s, out bool b))
-								Elements.AddLast(new BooleanValue(b));
+								Elements.Add(new BooleanValue(b));
 							else if (XML.TryParse(s, out DateTime TP))
-								Elements.AddLast(new DateTimeValue(TP));
+								Elements.Add(new DateTimeValue(TP));
 							else if (TimeSpan.TryParse(s, out TimeSpan TS))
-								Elements.AddLast(new ObjectValue(TS));
+								Elements.Add(new ObjectValue(TS));
 							else
-								Elements.AddLast(new StringValue(s));
+								Elements.Add(new StringValue(s));
 
 							i++;
 						}
 					}
 
 					while (i++ < MaxCols)
-						Elements.AddLast(new StringValue(string.Empty));
+						Elements.Add(new StringValue(string.Empty));
 				}
 
 				return Operators.Matrices.MatrixDefinition.Encapsulate(Elements, Rows, MaxCols, this);
@@ -159,6 +160,5 @@ namespace Waher.Script.Content.Functions.Encoding
 
 			return this.DoDecodeAsync(Bin, Argument2, Encoding);
 		}
-
 	}
 }

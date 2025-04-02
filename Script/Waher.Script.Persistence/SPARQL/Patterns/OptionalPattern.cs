@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
+using Waher.Runtime.Collections;
 
 namespace Waher.Script.Persistence.SPARQL.Patterns
 {
@@ -34,7 +35,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			if (ExistingMatches is null)
 				return null;
 
-			LinkedList<Possibility> NewMatches2 = new LinkedList<Possibility>();
+			ChunkedList<Possibility> NewMatches2 = new ChunkedList<Possibility>();
 
 			foreach (Possibility P in ExistingMatches)
 			{
@@ -42,11 +43,11 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					new Possibility[] { P }, Query);
 
 				if (NewMatches is null)
-					NewMatches2.AddLast(P);
+					NewMatches2.Add(P);
 				else
 				{
 					foreach (Possibility P2 in NewMatches)
-						NewMatches2.AddLast(P2);
+						NewMatches2.Add(P2);
 				}
 			}
 

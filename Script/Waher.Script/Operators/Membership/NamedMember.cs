@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
+using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Vectors;
-using System.Threading;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -103,14 +103,14 @@ namespace Waher.Script.Operators.Membership
 							this._event = T.GetRuntimeEvent(this.name);
 							if (this._event is null)
 							{
-								List<MethodLambda> Methods = null;
+								ChunkedList<MethodLambda> Methods = null;
 
 								foreach (MethodInfo MI in T.GetRuntimeMethods())
 								{
 									if (!MI.IsAbstract && MI.IsPublic && MI.Name == this.name)
 									{
 										if (Methods is null)
-											Methods = new List<MethodLambda>();
+											Methods = new ChunkedList<MethodLambda>();
 
 										Methods.Add(new MethodLambda(Instance, MI));
 									}
@@ -198,10 +198,10 @@ namespace Waher.Script.Operators.Membership
 				this.synchObject.Release();
 			}
 
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			foreach (IElement E in Operand.ChildElements)
-				Elements.AddLast(await EvaluateDynamic(E, this.name, this.nullCheck, this));
+				Elements.Add(await EvaluateDynamic(E, this.name, this.nullCheck, this));
 
 			return Operand.Encapsulate(Elements, this);
 		}
@@ -266,14 +266,14 @@ namespace Waher.Script.Operators.Membership
 			if (!(Event is null))
 				return Expression.Encapsulate(Event);
 
-			List<MethodLambda> Methods = null;
+			ChunkedList<MethodLambda> Methods = null;
 
 			foreach (MethodInfo MI in T.GetRuntimeMethods())
 			{
 				if (!MI.IsAbstract && MI.IsPublic && MI.Name == Name)
 				{
 					if (Methods is null)
-						Methods = new List<MethodLambda>();
+						Methods = new ChunkedList<MethodLambda>();
 
 					Methods.Add(new MethodLambda(Instance, MI));
 				}
@@ -293,10 +293,10 @@ namespace Waher.Script.Operators.Membership
 			if (Operand.IsScalar)
 				throw new ScriptRuntimeException("Member '" + Name + "' not found on type '" + T.FullName + "'.", Node);
 
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			foreach (IElement E in Operand.ChildElements)
-				Elements.AddLast(await EvaluateDynamic(E, Name, NullCheck, Node));
+				Elements.Add(await EvaluateDynamic(E, Name, NullCheck, Node));
 
 			return Operand.Encapsulate(Elements, Node);
 		}

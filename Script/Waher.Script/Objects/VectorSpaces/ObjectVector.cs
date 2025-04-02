@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Waher.Script.Abstraction.Sets;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
@@ -35,10 +36,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <param name="Elements">Elements.</param>
 		public ObjectVector(ICollection<object> Elements)
 		{
-			LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 			foreach (object Obj in Elements)
-				Elements2.AddLast(Expression.Encapsulate(Obj));
+				Elements2.Add(Expression.Encapsulate(Obj));
 
 			this.elements = Elements2;
 			this.dimension = Elements2.Count;
@@ -50,10 +51,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <param name="Elements">Elements.</param>
 		public ObjectVector(Array Elements)
 		{
-			LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 			foreach (object Obj in Elements)
-				Elements2.AddLast(Expression.Encapsulate(Obj));
+				Elements2.Add(Expression.Encapsulate(Obj));
 
 			this.elements = Elements2;
 			this.dimension = Elements2.Count;
@@ -98,13 +99,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <summary>
 		/// Vector elements.
 		/// </summary>
-		public ICollection<IElement> Elements
-		{
-			get
-			{
-				return this.elements;
-			}
-		}
+		public ICollection<IElement> Elements => this.elements;
 
 		/// <summary>
 		/// Dimension of vector.
@@ -187,10 +182,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IVectorSpaceElement MultiplyScalar(IFieldElement Scalar)
 		{
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			foreach (IElement Element in this.elements)
-				Elements.AddLast(Operators.Arithmetics.Multiply.EvaluateMultiplication(Scalar, Element, null));
+				Elements.Add(Operators.Arithmetics.Multiply.EvaluateMultiplication(Scalar, Element, null));
 
 			return new ObjectVector(Elements);
 		}
@@ -202,7 +197,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			if (Element.IsScalar)
 				return null;
@@ -212,7 +207,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			IEnumerator<IElement> e2 = ChildElements.GetEnumerator();
 
 			while (e1.MoveNext() && e2.MoveNext())
-				Elements.AddLast(Operators.Arithmetics.Add.EvaluateAddition(e1.Current, e2.Current, null));
+				Elements.Add(Operators.Arithmetics.Add.EvaluateAddition(e1.Current, e2.Current, null));
 
 			return new ObjectVector(Elements);
 		}
@@ -223,10 +218,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Negation of current element.</returns>
 		public override IGroupElement Negate()
 		{
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			foreach (IElement Element in this.elements)
-				Elements.AddLast(Operators.Arithmetics.Negate.EvaluateNegation(Element));
+				Elements.Add(Operators.Arithmetics.Negate.EvaluateNegation(Element));
 
 			return new ObjectVector(Elements);
 		}
@@ -283,6 +278,17 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
 		public override ICollection<IElement> ChildElements => this.Elements;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return VectorDefinition.Encapsulate(Elements, true, Node);
+		}
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.

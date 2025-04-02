@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -71,15 +71,15 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			LinkedList<IElement> List = new LinkedList<IElement>();
+			ChunkedList<IElement> List = new ChunkedList<IElement>();
 			int c = 0;
 
 			foreach (ScriptNode E in this.elements)
 			{
 				if (E is null)
-					List.AddLast((IElement)null);
+					List.Add((IElement)null);
 				else
-					List.AddLast(E.Evaluate(Variables));
+					List.Add(E.Evaluate(Variables));
 
 				c++;
 			}
@@ -90,11 +90,11 @@ namespace Waher.Script.Operators
 					return ObjectValue.Null;
 
 				case 1:
-					return List.First.Value;
+					return List.FirstItem;
 
 				case 2:
-					if (List.First.Value.AssociatedObjectValue is double Re &&
-						List.First.Next.Value.AssociatedObjectValue is double Im)
+					if (List.FirstItem.AssociatedObjectValue is double Re &&
+						List[1].AssociatedObjectValue is double Im)
 					{
 						return new ComplexNumber(new Complex(Re, Im));
 					}
@@ -114,15 +114,15 @@ namespace Waher.Script.Operators
 			if (!this.isAsync)
 				return this.Evaluate(Variables);
 
-			LinkedList<IElement> List = new LinkedList<IElement>();
+			ChunkedList<IElement> List = new ChunkedList<IElement>();
 			int c = 0;
 
 			foreach (ScriptNode E in this.elements)
 			{
 				if (E is null)
-					List.AddLast((IElement)null);
+					List.Add((IElement)null);
 				else
-					List.AddLast(await E.EvaluateAsync(Variables));
+					List.Add(await E.EvaluateAsync(Variables));
 
 				c++;
 			}
@@ -133,11 +133,11 @@ namespace Waher.Script.Operators
 					return ObjectValue.Null;
 
 				case 1:
-					return List.First.Value;
+					return List.FirstItem;
 
 				case 2:
-					if (List.First.Value.AssociatedObjectValue is double Re &&
-						List.First.Next.Value.AssociatedObjectValue is double Im)
+					if (List.FirstItem.AssociatedObjectValue is double Re &&
+						List[1].AssociatedObjectValue is double Im)
 					{
 						return new ComplexNumber(new Complex(Re, Im));
 					}

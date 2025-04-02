@@ -89,6 +89,16 @@ or `List`, where enumeration is done using `ForEach()`):
 ![Enumerating small amount of elements using ForEachChunk](GRel_Test_07_ForEachChunk_Small.png 600)
 ![Enumerating large amount of elements using ForEachChunk](GRel_Test_08_ForEachChunk_Large.png 600)
 
+Enumerating elements using nodes
+-----------------------------------
+
+The `LinkedList<T>` and `ChunkedList<T>` permit the enumeration of content using a linked list
+of node objects that point to each individual element (`LinkedList<T>`) or each chunk 
+(`ChunkedList<T>`). This iteration is compared to the `ForEach()` method of `List<T>`:
+
+![Enumerating small amount of elements using nodes](GRel_Test_37_NodeLoop_Small.png 600)
+![Enumerating large amount of elements using nodes](GRel_Test_38_NodeLoop_Large.png 600)
+
 Checking if list contains en element
 ---------------------------------------
 

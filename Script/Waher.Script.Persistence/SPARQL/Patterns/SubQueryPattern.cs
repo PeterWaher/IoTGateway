@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -47,7 +48,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			if (ResultSet.BooleanResult.HasValue)
 				throw new ScriptRuntimeException("Subquery only returned a Boolean value.", this.subQuery);
 
-			LinkedList<Possibility> Result = new LinkedList<Possibility>();
+			ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
 
 			foreach (ISparqlResultRecord Record in ResultSet.Records)
 			{
@@ -61,7 +62,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 						P = new Possibility(Item.Name, Item.Value, P);
 				}
 
-				Result.AddLast(P);
+				Result.Add(P);
 			}
 
 			return Result;

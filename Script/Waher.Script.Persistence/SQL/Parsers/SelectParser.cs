@@ -7,6 +7,7 @@ using Waher.Script.Operators.Membership;
 using Waher.Script.Persistence.Functions;
 using Waher.Script.Persistence.SPARQL.Parsers;
 using Waher.Script.Persistence.SQL.SourceDefinitions;
+using Waher.Runtime.Collections;
 
 namespace Waher.Script.Persistence.SQL.Parsers
 {
@@ -68,8 +69,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		{
 			Result = null;
 
-			List<ScriptNode> Columns;
-			List<ScriptNode> ColumnNames;
+			ChunkedList<ScriptNode> Columns;
+			ChunkedList<ScriptNode> ColumnNames;
 			ScriptNode Top = null;
 			string s;
 			bool Distinct = false;
@@ -142,8 +143,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			}
 			else
 			{
-				Columns = new List<ScriptNode>();
-				ColumnNames = new List<ScriptNode>();
+				Columns = new ChunkedList<ScriptNode>();
+				ColumnNames = new ChunkedList<ScriptNode>();
 
 				ScriptNode Node;
 				ScriptNode Name;
@@ -211,8 +212,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				s = Parser.PeekNextToken().ToUpper();
 			}
 
-			List<ScriptNode> GroupBy = null;
-			List<ScriptNode> GroupByNames = null;
+			ChunkedList<ScriptNode> GroupBy = null;
+			ChunkedList<ScriptNode> GroupByNames = null;
 			ScriptNode Having = null;
 
 			if (s == "GROUP")
@@ -221,8 +222,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (string.Compare(Parser.NextToken(), "BY", true) != 0)
 					return false;
 
-				GroupBy = new List<ScriptNode>();
-				GroupByNames = new List<ScriptNode>();
+				GroupBy = new ChunkedList<ScriptNode>();
+				GroupByNames = new ChunkedList<ScriptNode>();
 
 				while (true)
 				{
@@ -282,12 +283,12 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 				if (ImplicitGrouping)
 				{
-					GroupBy = new List<ScriptNode>();
-					GroupByNames = new List<ScriptNode>();
+					GroupBy = new ChunkedList<ScriptNode>();
+					GroupByNames = new ChunkedList<ScriptNode>();
 				}
 			}
 
-			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
+			ChunkedList<KeyValuePair<ScriptNode, bool>> OrderBy = null;
 
 			if (s == "ORDER")
 			{
@@ -295,7 +296,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (string.Compare(Parser.NextToken(), "BY", true) != 0)
 					return false;
 
-				OrderBy = new List<KeyValuePair<ScriptNode, bool>>();
+				OrderBy = new ChunkedList<KeyValuePair<ScriptNode, bool>>();
 
 				while (true)
 				{

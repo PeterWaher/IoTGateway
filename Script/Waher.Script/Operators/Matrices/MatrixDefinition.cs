@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -33,10 +34,10 @@ namespace Waher.Script.Operators.Matrices
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			LinkedList<IElement> Rows = new LinkedList<IElement>();
+			ChunkedList<IElement> Rows = new ChunkedList<IElement>();
 
 			foreach (ScriptNode Node in this.Elements)
-				Rows.AddLast(Node.Evaluate(Variables));
+				Rows.Add(Node.Evaluate(Variables));
 
 			return Encapsulate(Rows, this);
 		}
@@ -51,10 +52,10 @@ namespace Waher.Script.Operators.Matrices
 			if (!this.isAsync)
 				return this.Evaluate(Variables);
 
-			LinkedList<IElement> Rows = new LinkedList<IElement>();
+			ChunkedList<IElement> Rows = new ChunkedList<IElement>();
 
 			foreach (ScriptNode Node in this.Elements)
-				Rows.AddLast(await Node.EvaluateAsync(Variables));
+				Rows.Add(await Node.EvaluateAsync(Variables));
 
 			return Encapsulate(Rows, this);
 		}
@@ -66,7 +67,7 @@ namespace Waher.Script.Operators.Matrices
 		/// <returns>Encapsulated matrix.</returns>
 		public static IMatrix Encapsulate(ICollection<IElement> Rows, ScriptNode Node)
 		{
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 			IVectorSpaceElement Vector;
 			int? Columns = null;
 			int i;
@@ -94,8 +95,7 @@ namespace Waher.Script.Operators.Matrices
 					else
 						Columns = i;
 
-					foreach (IElement Element in Vector.VectorElements)
-						Elements.AddLast(Element);
+					Elements.AddRange(Vector.VectorElements);
 				}
 			}
 
@@ -125,12 +125,12 @@ namespace Waher.Script.Operators.Matrices
 			IElement Element2;
 			ISet CommonSuperSet = null;
 			ISet Set;
-			LinkedList<IElement> Upgraded = null;
+			ChunkedList<IElement> Upgraded = null;
 			int ItemIndex = 0;
 
 			if (Elements.Count == Rows && Columns > 1)
 			{
-				List<IElement> Temp = new List<IElement>();
+				ChunkedList<IElement> Temp = new ChunkedList<IElement>();
 
 				foreach (IElement E in Elements)
 				{
@@ -162,7 +162,7 @@ namespace Waher.Script.Operators.Matrices
 						Set = Element.AssociatedSet;
 
 					if (Set.Equals(CommonSuperSet))
-						Upgraded?.AddLast(Element);
+						Upgraded?.Add(Element);
 					else
 					{
 						Element2 = Element;
@@ -175,7 +175,7 @@ namespace Waher.Script.Operators.Matrices
 						{
 							if (Upgraded is null)
 							{
-								Upgraded = new LinkedList<IElement>();
+								Upgraded = new ChunkedList<IElement>();
 
 								IElement Element3;
 								int i = 0;
@@ -189,13 +189,13 @@ namespace Waher.Script.Operators.Matrices
 										break;
 									}
 
-									Upgraded.AddLast(Element3);
+									Upgraded.Add(Element3);
 									if (++i >= ItemIndex)
 										break;
 								}
 							}
 
-							Upgraded.AddLast(Element2);
+							Upgraded.Add(Element2);
 						}
 					}
 				}
@@ -208,15 +208,12 @@ namespace Waher.Script.Operators.Matrices
 				if (!(Upgraded is null))
 					Elements = Upgraded;
 
-				if (!(CommonSuperSet is null))
-				{
-					if (CommonSuperSet is DoubleNumbers)
-						return new DoubleMatrix(Rows, Columns, Elements);
-					else if (CommonSuperSet is ComplexNumbers)
-						return new ComplexMatrix(Rows, Columns, Elements);
-					else if (CommonSuperSet is BooleanValues)
-						return new BooleanMatrix(Rows, Columns, Elements);
-				}
+				if (CommonSuperSet is DoubleNumbers)
+					return new DoubleMatrix(Rows, Columns, Elements);
+				else if (CommonSuperSet is ComplexNumbers)
+					return new ComplexMatrix(Rows, Columns, Elements);
+				else if (CommonSuperSet is BooleanValues)
+					return new BooleanMatrix(Rows, Columns, Elements);
 			}
 
 			return new ObjectMatrix(Rows, Columns, Elements);

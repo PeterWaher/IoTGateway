@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -64,7 +65,7 @@ namespace Waher.Script.Operators.Vectors
 
 			if (!(Elements is ICollection<IElement> Elements2))
 			{
-				Elements2 = new List<IElement>();
+				Elements2 = new ChunkedList<IElement>();
 
 				foreach (IElement E in Elements)
 					Elements2.Add(E);
@@ -106,7 +107,7 @@ namespace Waher.Script.Operators.Vectors
 
 			if (!(Elements is ICollection<IElement> Elements2))
 			{
-				Elements2 = new List<IElement>();
+				Elements2 = new ChunkedList<IElement>();
 
 				foreach (IElement E in Elements)
 					Elements2.Add(E);

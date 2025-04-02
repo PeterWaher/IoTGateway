@@ -1,12 +1,12 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -25,10 +25,10 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class Graph2D : Graph
 	{
-		private LinkedList<IVector> x = new LinkedList<IVector>();
-		private LinkedList<IVector> y = new LinkedList<IVector>();
-		private readonly LinkedList<object[]> parameters = new LinkedList<object[]>();
-		private readonly LinkedList<IPainter2D> painters = new LinkedList<IPainter2D>();
+		private ChunkedList<IVector> x = new ChunkedList<IVector>();
+		private ChunkedList<IVector> y = new ChunkedList<IVector>();
+		private readonly ChunkedList<object[]> parameters = new ChunkedList<object[]>();
+		private readonly ChunkedList<IPainter2D> painters = new ChunkedList<IPainter2D>();
 		private IElement minX, maxX;
 		private IElement minY, maxY;
 		private Type axisTypeX;
@@ -154,8 +154,8 @@ namespace Waher.Script.Graphs
 
 			if (HasNull)
 			{
-				LinkedList<IElement> X2 = new LinkedList<IElement>();
-				LinkedList<IElement> Y2 = new LinkedList<IElement>();
+				ChunkedList<IElement> X2 = new ChunkedList<IElement>();
+				ChunkedList<IElement> Y2 = new ChunkedList<IElement>();
 
 				this.axisTypeX = null;
 				this.axisTypeY = null;
@@ -167,21 +167,21 @@ namespace Waher.Script.Graphs
 
 					if (ex.AssociatedObjectValue is null || ey.AssociatedObjectValue is null)
 					{
-						if (!(X2.First is null))
+						if (X2.HasFirstItem)
 						{
 							this.AddSegment(X, Y, X2, Y2, Node, Painter, Parameters);
-							X2 = new LinkedList<IElement>();
-							Y2 = new LinkedList<IElement>();
+							X2 = new ChunkedList<IElement>();
+							Y2 = new ChunkedList<IElement>();
 						}
 					}
 					else
 					{
-						X2.AddLast(ex);
-						Y2.AddLast(ey);
+						X2.Add(ex);
+						Y2.Add(ey);
 					}
 				}
 
-				if (!(X2.First is null))
+				if (X2.HasFirstItem)
 					this.AddSegment(X, Y, X2, Y2, Node, Painter, Parameters);
 			}
 			else
@@ -191,10 +191,10 @@ namespace Waher.Script.Graphs
 
 				if (c > 0)
 				{
-					this.x.AddLast(X);
-					this.y.AddLast(Y);
-					this.painters.AddLast(Painter);
-					this.parameters.AddLast(Parameters);
+					this.x.Add(X);
+					this.y.Add(Y);
+					this.painters.Add(Painter);
+					this.parameters.Add(Parameters);
 				}
 			}
 		}
@@ -213,26 +213,26 @@ namespace Waher.Script.Graphs
 			else if (X2V.GetType() != this.axisTypeX || Y2V.GetType() != this.axisTypeY)
 				throw new ScriptException("Incompatible types of series.");
 
-			this.x.AddLast(X2V);
-			this.y.AddLast(Y2V);
-			this.painters.AddLast(Painter);
-			this.parameters.AddLast(Parameters);
+			this.x.Add(X2V);
+			this.y.Add(Y2V);
+			this.painters.Add(Painter);
+			this.parameters.Add(Parameters);
 		}
 
 		/// <summary>
 		/// X-axis series.
 		/// </summary>
-		public LinkedList<IVector> X => this.x;
+		public ChunkedList<IVector> X => this.x;
 
 		/// <summary>
 		/// Y-axis series.
 		/// </summary>
-		public LinkedList<IVector> Y => this.y;
+		public ChunkedList<IVector> Y => this.y;
 
 		/// <summary>
 		/// Parameters.
 		/// </summary>
-		public LinkedList<object[]> Parameters => this.parameters;
+		public ChunkedList<object[]> Parameters => this.parameters;
 
 		/// <summary>
 		/// Smallest X-value.
@@ -377,13 +377,13 @@ namespace Waher.Script.Graphs
 		/// <returns>Result, if understood, null otherwise.</returns>
 		protected ISemiGroupElement AddRight(ISemiGroupElement Element, bool ElementWise)
 		{
-			if (this.x.First is null)
+			if (!this.x.HasFirstItem)
 				return Element;
 
 			if (!(Element is Graph2D G))
 				return null;
 
-			if (G.x.First is null)
+			if (!G.x.HasFirstItem)
 				return this;
 
 			Graph2D Result = new Graph2D(this.Settings)
@@ -400,17 +400,10 @@ namespace Waher.Script.Graphs
 				SameScale = this.SameScale
 			};
 
-			foreach (IVector v in this.x)
-				Result.x.AddLast(v);
-
-			foreach (IVector v in this.y)
-				Result.y.AddLast(v);
-
-			foreach (IPainter2D Painter in this.painters)
-				Result.painters.AddLast(Painter);
-
-			foreach (object[] P in this.parameters)
-				Result.parameters.AddLast(P);
+			Result.x.AddRange(this.x);
+			Result.y.AddRange(this.y);
+			Result.painters.AddRange(this.painters);
+			Result.parameters.AddRange(this.parameters);
 
 			if (G.axisTypeX != this.axisTypeX || G.axisTypeY != this.axisTypeY)
 				throw new ScriptException("Incompatible types of series.");
@@ -431,10 +424,10 @@ namespace Waher.Script.Graphs
 			if (!ElementWise)
 			{
 				foreach (IVector v in G.x)
-					Result.x.AddLast(v);
+					Result.x.Add(v);
 
 				foreach (IVector v in G.y)
-					Result.y.AddLast(v);
+					Result.y.Add(v);
 
 				Result.minX = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.minX, G.minX }, false, null), null);
 				Result.maxX = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.maxX, G.maxX }, false, null), null);
@@ -442,11 +435,8 @@ namespace Waher.Script.Graphs
 				Result.maxY = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.maxY, G.maxY }, false, null), null);
 			}
 
-			foreach (IPainter2D Painter in G.painters)
-				Result.painters.AddLast(Painter);
-
-			foreach (object[] P in G.parameters)
-				Result.parameters.AddLast(P);
+			Result.painters.AddRange(G.painters);
+			Result.parameters.AddRange(G.parameters);
 
 			Result.showXAxis |= G.showXAxis;
 			Result.showYAxis |= G.showYAxis;
@@ -455,8 +445,8 @@ namespace Waher.Script.Graphs
 			return Result;
 		}
 
-		private static void ElementwiseAccumulatedAddition(ref LinkedList<IVector> DestFixed, ref LinkedList<IVector> DestValues,
-			LinkedList<IVector> AddFixed, LinkedList<IVector> AddValues, ref IElement MinFixed, ref IElement MaxFixed,
+		private static void ElementwiseAccumulatedAddition(ref ChunkedList<IVector> DestFixed, ref ChunkedList<IVector> DestValues,
+			ChunkedList<IVector> AddFixed, ChunkedList<IVector> AddValues, ref IElement MinFixed, ref IElement MaxFixed,
 			ref IElement MinValues, ref IElement MaxValues, IElement AddMinFixed, IElement AddMaxFixed)
 		{
 			Dictionary<string, IElement> Values = new Dictionary<string, IElement>();
@@ -466,7 +456,7 @@ namespace Waher.Script.Graphs
 			IEnumerator<IElement> eY;
 			IVector X;
 			IVector Y;
-			LinkedList<IElement> Y2;
+			ChunkedList<IElement> Y2;
 
 			while (vX.MoveNext() && vY.MoveNext())
 			{
@@ -487,7 +477,7 @@ namespace Waher.Script.Graphs
 			{
 				X = vX.Current;
 				Y = vY.Current;
-				Y2 = new LinkedList<IElement>();
+				Y2 = new ChunkedList<IElement>();
 
 				eX = X.ChildElements.GetEnumerator();
 				eY = Y.ChildElements.GetEnumerator();
@@ -495,13 +485,13 @@ namespace Waher.Script.Graphs
 				while (eX.MoveNext() && eY.MoveNext())
 				{
 					if (Values.TryGetValue(eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty, out IElement Value))
-						Y2.AddLast(Operators.Arithmetics.Add.EvaluateAddition(Value, eY.Current, null));
+						Y2.Add(Operators.Arithmetics.Add.EvaluateAddition(Value, eY.Current, null));
 					else
-						Y2.AddLast(eY.Current);
+						Y2.Add(eY.Current);
 				}
 
-				DestFixed.AddLast(X);
-				DestValues.AddLast(Y = (IVector)Y.Encapsulate(Y2, null));
+				DestFixed.Add(X);
+				DestValues.Add(Y = (IVector)Y.Encapsulate(Y2, null));
 
 				MinValues = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinValues, Min.CalcMin(Y, null) }, false, null), null);
 				MaxValues = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxValues, Max.CalcMax(Y, null) }, false, null), null);
@@ -512,8 +502,8 @@ namespace Waher.Script.Graphs
 
 			IVector Labels = GetLabels(ref MinFixed, ref MaxFixed, DestFixed, 2, out LabelType LabelType);
 			string[] Strings = LabelStrings(Labels, LabelType);
-			LinkedList<IVector> NormalizedX = new LinkedList<IVector>();
-			LinkedList<IVector> NormalizedY = new LinkedList<IVector>();
+			ChunkedList<IVector> NormalizedX = new ChunkedList<IVector>();
+			ChunkedList<IVector> NormalizedY = new ChunkedList<IVector>();
 			Dictionary<string, IElement> Sorted = new Dictionary<string, IElement>();
 			IElement Zero = (MinValues.AssociatedSet as Group)?.AdditiveIdentity ?? DoubleNumber.ZeroElement;
 
@@ -524,7 +514,7 @@ namespace Waher.Script.Graphs
 			{
 				X = vX.Current;
 				Y = vY.Current;
-				Y2 = new LinkedList<IElement>();
+				Y2 = new ChunkedList<IElement>();
 
 				eX = X.ChildElements.GetEnumerator();
 				eY = Y.ChildElements.GetEnumerator();
@@ -535,13 +525,13 @@ namespace Waher.Script.Graphs
 				foreach (string s in Strings)
 				{
 					if (Sorted.TryGetValue(s, out IElement E))
-						Y2.AddLast(E);
+						Y2.Add(E);
 					else
-						Y2.AddLast(Zero);
+						Y2.Add(Zero);
 				}
 
-				NormalizedX.AddLast(Labels);
-				NormalizedY.AddLast((IVector)Y.Encapsulate(Y2, null));
+				NormalizedX.Add(Labels);
+				NormalizedY.Add((IVector)Y.Encapsulate(Y2, null));
 			}
 
 			DestFixed = NormalizedX;
@@ -1367,20 +1357,20 @@ namespace Waher.Script.Graphs
 					switch (E.LocalName)
 					{
 						case "X":
-							this.x.AddLast((IVector)await ParseAsync(E.InnerText, Variables));
+							this.x.Add((IVector)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							this.y.AddLast((IVector)await ParseAsync(E.InnerText, Variables));
+							this.y.Add((IVector)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Parameters":
 							IVector v = (IVector)await ParseAsync(E.InnerText, Variables);
-							this.parameters.AddLast(this.ToObjectArray(v));
+							this.parameters.Add(this.ToObjectArray(v));
 							break;
 
 						case "Painter":
-							this.painters.AddLast((IPainter2D)Types.Instantiate(Types.GetType(E.InnerText)));
+							this.painters.Add((IPainter2D)Types.Instantiate(Types.GetType(E.InnerText)));
 							break;
 					}
 				}

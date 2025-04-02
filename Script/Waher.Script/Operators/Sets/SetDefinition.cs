@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -32,10 +33,10 @@ namespace Waher.Script.Operators.Sets
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
             foreach (ScriptNode N in this.Elements)
-                Elements.AddLast(N.Evaluate(Variables));
+                Elements.Add(N.Evaluate(Variables));
 
             return Encapsulate(Elements);
         }
@@ -50,10 +51,10 @@ namespace Waher.Script.Operators.Sets
             if (!this.isAsync)
                 return this.Evaluate(Variables);
 
-            LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
             foreach (ScriptNode N in this.Elements)
-                Elements.AddLast(await N.EvaluateAsync(Variables));
+                Elements.Add(await N.EvaluateAsync(Variables));
 
             return Encapsulate(Elements);
         }

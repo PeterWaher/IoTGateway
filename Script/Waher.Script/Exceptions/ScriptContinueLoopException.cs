@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Exceptions
 {
@@ -8,7 +7,7 @@ namespace Waher.Script.Exceptions
 	/// </summary>
 	public class ScriptContinueLoopException : ScriptException 
 	{
-		private static readonly LinkedList<ScriptContinueLoopException> reused = new LinkedList<ScriptContinueLoopException>();
+		//private static readonly ChunkedList<ScriptContinueLoopException> reused = new ChunkedList<ScriptContinueLoopException>();
 
 		private readonly IElement loopValue;
 		private readonly bool hasLoopValue;

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -47,8 +47,8 @@ namespace Waher.Script.Operators.Sets
 		/// <param name="OtherConditions">Other conditions</param>
 		public static void SeparateConditions(ScriptNode[] Conditions, out In[] SetConditions, out ScriptNode[] OtherConditions)
 		{
-			List<In> SetConditionList = null;
-			List<ScriptNode> OtherConditionList = null;
+			ChunkedList<In> SetConditionList = null;
+			ChunkedList<ScriptNode> OtherConditionList = null;
 			int i, j, c = Conditions.Length;
 
 			for (i = 0; i < c; i++)
@@ -59,11 +59,11 @@ namespace Waher.Script.Operators.Sets
 				{
 					if (SetConditionList is null)
 					{
-						SetConditionList = new List<In>();
+						SetConditionList = new ChunkedList<In>();
 
 						if (i > 0)
 						{
-							OtherConditionList = new List<ScriptNode>();
+							OtherConditionList = new ChunkedList<ScriptNode>();
 
 							for (j = 0; j < i; j++)
 								OtherConditionList.Add(Conditions[j]);
@@ -75,7 +75,7 @@ namespace Waher.Script.Operators.Sets
 				else if (!(SetConditionList is null))
 				{
 					if (OtherConditionList is null)
-						OtherConditionList = new List<ScriptNode>();
+						OtherConditionList = new ChunkedList<ScriptNode>();
 
 					OtherConditionList.Add(Condition);
 				}

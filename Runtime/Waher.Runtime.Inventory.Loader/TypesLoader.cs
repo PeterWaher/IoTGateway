@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Waher.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Inventory.Loader
 {
@@ -140,7 +141,7 @@ namespace Waher.Runtime.Inventory.Loader
 
 		private static void LogException(BadImageFormatException ex)
 		{
-			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>()
+			ChunkedList<KeyValuePair<string, object>> Tags = new ChunkedList<KeyValuePair<string, object>>()
 			{
 				new KeyValuePair<string, object>("FusionLog", ex.FusionLog)
 			};

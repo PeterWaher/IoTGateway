@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -50,7 +51,7 @@ namespace Waher.Script.Functions.Vectors
 
                 if (!Elements.Remove(Result))
                 {
-                    LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
                     bool First = true;
 
                     foreach (IElement E in Elements)
@@ -58,13 +59,13 @@ namespace Waher.Script.Functions.Vectors
                         if (First)
                             First = false;
                         else
-                            Elements2.AddLast(E);
+                            Elements2.Add(E);
                     }
 
-                    Elements = Elements2;
-                }
-
-                Variables[this.reference.VariableName] = Argument.Encapsulate(Elements, this);
+					Variables[this.reference.VariableName] = Argument.Encapsulate(Elements2, this);
+				}
+                else
+                    Variables[this.reference.VariableName] = Argument.Encapsulate(Elements, this);
             }
 
             return Result;

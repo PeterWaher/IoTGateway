@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
@@ -14,9 +15,9 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	/// </summary>
 	public class ExportToJson : ILedgerExport
 	{
-		private readonly List<IElement> collections = new List<IElement>();
-		private readonly List<IElement> blocksInCollection = new List<IElement>();
-		private readonly List<IElement> eventsInBlock = new List<IElement>();
+		private readonly ChunkedList<IElement> collections = new ChunkedList<IElement>();
+		private readonly ChunkedList<IElement> blocksInCollection = new ChunkedList<IElement>();
+		private readonly ChunkedList<IElement> eventsInBlock = new ChunkedList<IElement>();
 		private Dictionary<string, IElement> currentCollection = null;
 		private Dictionary<string, IElement> currentBlock = null;
 		private Dictionary<string, IElement> currentEntry = null;

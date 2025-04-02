@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -12,7 +13,7 @@ namespace Waher.Content.Semantic.Model
 	/// </summary>
 	public class SemanticElementVector : ISemanticElement, IVector
 	{
-		private readonly List<IElement> elements = new List<IElement>();
+		private readonly ChunkedList<IElement> elements = new ChunkedList<IElement>();
 
 		/// <summary>
 		/// Contains a vector of semantic elements.
@@ -59,6 +60,19 @@ namespace Waher.Content.Semantic.Model
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
 		public ICollection<IElement> ChildElements => this.elements;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			SemanticElementVector Result = new SemanticElementVector();
+			Result.elements.AddRange(Elements);
+			return Result;
+		}
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.

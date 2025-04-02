@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Persistence.SQL.Enumerators;
 
 namespace Waher.Script.Persistence.SQL.Sources
@@ -317,7 +317,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 					Filter L = await ConvertAsync(LO, Variables, Name);
 					Filter R = await ConvertAsync(RO, Variables, Name);
 
-					List<Filter> Filters = new List<Filter>();
+					ChunkedList<Filter> Filters = new ChunkedList<Filter>();
 
 					if (L is FilterAnd L2)
 						Filters.AddRange(L2.ChildFilters);
@@ -337,7 +337,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 					Filter L = await ConvertAsync(LO, Variables, Name);
 					Filter R = await ConvertAsync(RO, Variables, Name);
 
-					List<Filter> Filters = new List<Filter>();
+					ChunkedList<Filter> Filters = new ChunkedList<Filter>();
 
 					if (L is FilterOr L2)
 						Filters.AddRange(L2.ChildFilters);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 
@@ -34,33 +35,32 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public abstract ISet AssociatedSet
-		{
-			get;
-		}
+		public abstract ISet AssociatedSet { get; }
 
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public abstract object AssociatedObjectValue
-		{
-			get;
-		}
+		public abstract object AssociatedObjectValue { get; }
 
 		/// <summary>
 		/// If the element represents a scalar value.
 		/// </summary>
-		public virtual bool IsScalar
-		{
-			get { return true; }
-		}
+		public virtual bool IsScalar => true;
 
 		/// <summary>
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
-		public virtual ICollection<IElement> ChildElements
+		public virtual ICollection<IElement> ChildElements => null;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public virtual IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
 		{
-			get { return null; }
+			return this.Encapsulate((ICollection<IElement>)Elements, Node);
 		}
 
 		/// <summary>
@@ -74,32 +74,31 @@ namespace Waher.Script.Abstraction.Elements
 			throw new Exceptions.ScriptRuntimeException("Object is a scalar and cannot encapsulate child elements.", Node);
 		}
 
-        /// <summary>
-        /// Converts the value to a .NET type.
-        /// </summary>
-        /// <param name="DesiredType">Desired .NET type.</param>
-        /// <param name="Value">Converted value.</param>
-        /// <returns>If conversion was possible.</returns>
-        public virtual bool TryConvertTo(Type DesiredType, out object Value)
-        {
+		/// <summary>
+		/// Converts the value to a .NET type.
+		/// </summary>
+		/// <param name="DesiredType">Desired .NET type.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public virtual bool TryConvertTo(Type DesiredType, out object Value)
+		{
 			TypeInfo DesiredTypeTypeInfo = DesiredType.GetTypeInfo();
 
 			if (DesiredTypeTypeInfo.IsAssignableFrom(this.GetType().GetTypeInfo()))
 			{
 				Value = this;
-                return true;
-            }
+				return true;
+			}
 
-            object Obj = this.AssociatedObjectValue;
+			object Obj = this.AssociatedObjectValue;
 
 			if (DesiredTypeTypeInfo.IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 			{
 				Value = Obj;
-                return true;
-            }
+				return true;
+			}
 
 			return Expression.TryConvert(this.AssociatedObjectValue, DesiredType, out Value);
 		}
-
 	}
 }

@@ -1011,5 +1011,168 @@ namespace Waher.Runtime.Collections.Test
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Result[i]);
 		}
+
+		[TestMethod]
+		public void Test_74_Update_SingleChunk_ChangeElements()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Value += 10;
+				Keep = true;
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Expected = [10, 11, 12, 13];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_75_Update_MultipleChunks_ChangeElements()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Value += 10;
+				Keep = true;
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Expected = [10, 11, 12, 13, 14, 15, 16, 17];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_76_UpdateSingleChunkDeleteElements()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Keep = Value % 2 != 0;
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Expected = [1, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_77_Update_MultipleChunks_DeleteElements()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Keep = Value % 2 != 0;
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Expected = [1, 3, 5, 7];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_78_Update_MultipleChunks_ChangeAndDeleteElements()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Keep = Value % 2 != 0;
+				Value += 10; // Change odd elements
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Expected = [11, 13, 15, 17];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_79_Update_EmptyList()
+		{
+			ChunkedList<int> List = new(4);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Keep = true;
+				Value += 10;
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Result = [.. List];
+			Assert.AreEqual(0, Result.Length);
+		}
+
+		[TestMethod]
+		public void Test_80_Update_BreakProcedure()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			static bool UpdateCallback(ref int Value, out bool Keep)
+			{
+				Keep = true;
+				if (Value == 4)
+					return false; // Break the update procedure
+
+				Value += 10;
+				return true;
+			}
+
+			List.Update(UpdateCallback);
+
+			int[] Expected = [10, 11, 12, 13, 4, 5, 6, 7];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
 	}
 }

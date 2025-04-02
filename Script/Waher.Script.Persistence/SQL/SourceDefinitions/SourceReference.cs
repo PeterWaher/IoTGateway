@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -137,7 +138,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				}
 				else
 				{
-					List<KeyValuePair<string, object>> TypesWithCollectionNames = null;
+					ChunkedList<KeyValuePair<string, object>> TypesWithCollectionNames = null;
 					Type TypeWithCollection = null;
 					bool CollectionUnique = true;
 
@@ -160,7 +161,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 
 								if (TypesWithCollectionNames is null)
 								{
-									TypesWithCollectionNames = new List<KeyValuePair<string, object>>
+									TypesWithCollectionNames = new ChunkedList<KeyValuePair<string, object>>
 									{
 										new KeyValuePair<string, object>("Type " + Nr.ToString(), TypeWithCollection.FullName)
 									};

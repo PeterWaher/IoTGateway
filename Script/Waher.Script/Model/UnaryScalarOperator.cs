@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Model
@@ -34,10 +33,10 @@ namespace Waher.Script.Model
 				return this.EvaluateScalar(Operand, Variables);
 			else
 			{
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 				foreach (IElement Child in Operand.ChildElements)
-					Result.AddLast(this.Evaluate(Child, Variables));
+					Result.Add(this.Evaluate(Child, Variables));
 
 				return Operand.Encapsulate(Result, this);
 			}
@@ -55,10 +54,10 @@ namespace Waher.Script.Model
 				return await this.EvaluateScalarAsync(Operand, Variables);
 			else
 			{
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 				foreach (IElement Child in Operand.ChildElements)
-					Result.AddLast(await this.EvaluateAsync(Child, Variables));
+					Result.Add(await this.EvaluateAsync(Child, Variables));
 
 				return Operand.Encapsulate(Result, this);
 			}

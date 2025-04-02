@@ -37,10 +37,10 @@ namespace Waher.Script.Units.DerivedQuantities
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
 					new KeyValuePair<string, PhysicalQuantity>("C", new PhysicalQuantity(1, new Unit(Prefix.None, 
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("A"), 1)
+							new UnitFactor("s"),
+							new UnitFactor("A")
 						})))
 				};
 			}

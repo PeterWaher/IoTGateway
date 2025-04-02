@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -10,7 +10,7 @@ namespace Waher.Script.Operators
 	/// </summary>
 	public class Sequence : ScriptNode
 	{
-		private readonly LinkedList<ScriptNode> statements;
+		private readonly ChunkedList<ScriptNode> statements;
 		private bool isAsync;
 
 		/// <summary>
@@ -20,7 +20,7 @@ namespace Waher.Script.Operators
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Sequence(LinkedList<ScriptNode> Statements, int Start, int Length, Expression Expression)
+		public Sequence(ChunkedList<ScriptNode> Statements, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.statements = Statements;
@@ -47,7 +47,7 @@ namespace Waher.Script.Operators
 		/// <summary>
 		/// Statements
 		/// </summary>
-		public LinkedList<ScriptNode> Statements => this.statements;
+		public ChunkedList<ScriptNode> Statements => this.statements;
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -97,33 +97,36 @@ namespace Waher.Script.Operators
 		/// <returns>If the process was completed.</returns>
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
-			LinkedListNode<ScriptNode> Loop;
+			ChunkNode<ScriptNode> Loop;
+			int i, c;
 
 			if (Order == SearchMethod.DepthFirst)
 			{
-				Loop = this.statements.First;
+				Loop = this.statements?.FirstChunk;
 
 				while (!(Loop is null))
 				{
-					if (!(Loop.Value?.ForAllChildNodes(Callback, State, Order) ?? true))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!(Loop[i]?.ForAllChildNodes(Callback, State, Order) ?? false))
+							return false;
+					}
 
 					Loop = Loop.Next;
 				}
 			}
 
-			Loop = this.statements.First;
 			bool RecalcIsAsync = false;
 
-			while (!(Loop is null))
+			if (!this.statements.Update((ref ScriptNode Node, out bool Keep) =>
 			{
-				ScriptNode Node = Loop.Value;
+				Keep = true;
+
 				if (!(Node is null))
 				{
 					bool Result = Callback(Node, out ScriptNode NewNode, State);
 					if (!(NewNode is null))
 					{
-						Loop.Value = NewNode;
 						NewNode.SetParent(this);
 						Node = NewNode;
 
@@ -139,7 +142,10 @@ namespace Waher.Script.Operators
 					}
 				}
 
-				Loop = Loop.Next;
+				return true;
+			}))
+			{
+				return false;
 			}
 
 			if (RecalcIsAsync)
@@ -147,12 +153,15 @@ namespace Waher.Script.Operators
 
 			if (Order == SearchMethod.BreadthFirst)
 			{
-				Loop = this.statements.First;
+				Loop = this.statements?.FirstChunk;
 
 				while (!(Loop is null))
 				{
-					if (!(Loop.Value?.ForAllChildNodes(Callback, State, Order) ?? true))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!(Loop[i]?.ForAllChildNodes(Callback, State, Order) ?? false))
+							return false;
+					}
 
 					Loop = Loop.Next;
 				}

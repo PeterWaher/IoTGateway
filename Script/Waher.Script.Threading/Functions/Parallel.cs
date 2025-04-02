@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
@@ -193,7 +193,7 @@ namespace Waher.Script.Threading.Functions
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			List<TaskRec> Records = new List<TaskRec>();
+			ChunkedList<TaskRec> Records = new ChunkedList<TaskRec>();
 			int i, c = 0;
 
 			foreach (ScriptNode Node in this.Arguments)

@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
-
 
 namespace Waher.Script.Fractals.IFS
 {
@@ -206,10 +205,10 @@ namespace Waher.Script.Fractals.IFS
 			if (!(Arguments[i].AssociatedObjectValue is Array Functions))
 				throw new ScriptRuntimeException("The fifth parameter to IfsFractal must be an array of homogenous 2D-transformations or lambda expressions.", this);
 
-			List<DoubleMatrix> Matrices = null;
-			List<ILambdaExpression> LambdaExpressions = null;
-			List<double> Weights = new List<double>();
-			List<SKColor> Colors = new List<SKColor>();
+			ChunkedList<DoubleMatrix> Matrices = null;
+			ChunkedList<ILambdaExpression> LambdaExpressions = null;
+			ChunkedList<double> Weights = new ChunkedList<double>();
+			ChunkedList<SKColor> Colors = new ChunkedList<SKColor>();
 			string FunctionsExpression = this.Arguments[i++].SubExpression;
 
 			foreach (object f in Functions)
@@ -220,7 +219,7 @@ namespace Waher.Script.Fractals.IFS
 						throw new ScriptRuntimeException("Cannot mix homogenous 2D-transforms with lambda expressions.", this);
 
 					if (Matrices is null)
-						Matrices = new List<DoubleMatrix>();
+						Matrices = new ChunkedList<DoubleMatrix>();
 
 					Matrices.Add(M);
 					Weights.Add(1);
@@ -232,7 +231,7 @@ namespace Waher.Script.Fractals.IFS
 						throw new ScriptRuntimeException("Cannot mix homogenous 2D-transforms with lambda expressions.", this);
 
 					if (LambdaExpressions is null)
-						LambdaExpressions = new List<ILambdaExpression>();
+						LambdaExpressions = new ChunkedList<ILambdaExpression>();
 
 					LambdaExpressions.Add(Lambda);
 					Weights.Add(1);

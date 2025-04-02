@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -141,16 +142,16 @@ namespace Waher.Script.Xml
 		/// <returns>XML string.</returns>
 		public static void ToXml(this Expression Expression, XmlWriter Xml)
 		{
-			LinkedList<ScriptNode> Stack = new LinkedList<ScriptNode>();
+			ChunkedList<ScriptNode> Stack = new ChunkedList<ScriptNode>();
 			int c = 0;
 
-			Stack.AddLast((ScriptNode)null);
+			Stack.Add(null);
 
 			Expression.ForAll((ScriptNode Node, out ScriptNode NewNode, object Stata) =>
 			{
 				NewNode = null;
 
-				while (Stack.Last?.Value != Node.Parent)
+				while (Stack.HasLastItem && Stack.LastItem != Node.Parent)
 				{
 					if (Node.Parent is null)
 						throw new InvalidOperationException("Parent node reference not set correctly on node.");
@@ -208,7 +209,7 @@ namespace Waher.Script.Xml
 						Xml.WriteAttributeString(PI.Name, Expression.ToString(Value));
 				}
 
-				Stack.AddLast(Node);
+				Stack.Add(Node);
 				
 				return true;
 

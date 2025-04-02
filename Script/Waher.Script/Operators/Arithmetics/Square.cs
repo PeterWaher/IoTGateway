@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -40,10 +40,10 @@ namespace Waher.Script.Operators.Arithmetics
 			if (Operand.IsScalar)
 				throw new ScriptRuntimeException("Scalar operands must be double values or ring elements.", this);
 
-			LinkedList<IElement> Result = new LinkedList<IElement>();
+			ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 			foreach (IElement Child in Operand.ChildElements)
-				Result.AddLast(this.Evaluate(Child, Variables));
+				Result.Add(this.Evaluate(Child, Variables));
 
 			return Operand.Encapsulate(Result, this);
 		}

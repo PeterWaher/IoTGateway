@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects;
-using System.Threading.Tasks;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 {
@@ -29,7 +29,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 		/// <returns>Property enumeration as a script element.</returns>
 		public async Task<IElement> EnumerateProperties(object Object)
 		{
-			List<IElement> Elements = new List<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 			Type T = Object.GetType();
 			IElement Value;
 

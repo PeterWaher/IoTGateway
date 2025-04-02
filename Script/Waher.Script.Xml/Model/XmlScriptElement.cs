@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -14,7 +15,7 @@ namespace Waher.Script.Xml.Model
 	{
 		private XmlScriptAttribute xmlns;
 		private readonly XmlScriptAttribute[] attributes;
-		private LinkedList<XmlScriptNode> children = null;
+		private ChunkedList<XmlScriptNode> children = null;
 		private readonly string name;
 		private readonly int nrAttributes;
 		private bool isAsync;
@@ -51,25 +52,32 @@ namespace Waher.Script.Xml.Model
 			if (this.isAsync)
 				return;
 
-			for (int i = 0; i < this.nrAttributes; i++)
+			ChunkNode<XmlScriptNode> Loop;
+			int i, c;
+
+			for (i = 0; i < this.nrAttributes; i++)
 			{
 				if (this.attributes[i]?.IsAsynchronous ?? false)
 				{
 					this.isAsync = true;
-					break;
+					return;
 				}
 			}
 
-			LinkedListNode<XmlScriptNode> Loop = this.children?.First;
+			Loop = this.children?.FirstChunk;
+
 			while (!(Loop is null))
 			{
-				if (Loop.Value?.IsAsynchronous ?? false)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					this.isAsync = true;
-					return;
+					if (Loop[i]?.IsAsynchronous ?? false)
+					{
+						this.isAsync = true;
+						return;
+					}
 				}
-				else
-					Loop = Loop.Next;
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -86,9 +94,9 @@ namespace Waher.Script.Xml.Model
 		public void Add(XmlScriptNode Node)
 		{
 			if (this.children is null)
-				this.children = new LinkedList<XmlScriptNode>();
+				this.children = new ChunkedList<XmlScriptNode>();
 
-			this.children.AddLast(Node);
+			this.children.Add(Node);
 			Node?.SetParent(this);
 
 			this.isAsync |= Node?.IsAsynchronous ?? false;
@@ -103,8 +111,8 @@ namespace Waher.Script.Xml.Model
 		/// <returns>If the process was completed.</returns>
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
-			LinkedListNode<XmlScriptNode> Loop;
-			int i;
+			ChunkNode<XmlScriptNode> Loop;
+			int i, c;
 
 			if (Order == SearchMethod.DepthFirst)
 			{
@@ -117,11 +125,15 @@ namespace Waher.Script.Xml.Model
 						return false;
 				}
 
-				Loop = this.children?.First;
+				Loop = this.children?.FirstChunk;
+
 				while (!(Loop is null))
 				{
-					if (!Loop.Value.ForAllChildNodes(Callback, State, Order))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!(Loop[i]?.ForAllChildNodes(Callback, State, Order) ?? false))
+							return false;
+					}
 
 					Loop = Loop.Next;
 				}
@@ -171,24 +183,27 @@ namespace Waher.Script.Xml.Model
 				}
 			}
 
-			Loop = this.children?.First;
+			Loop = this.children?.FirstChunk;
 			while (!(Loop is null))
 			{
-				b = !Callback(Loop.Value, out NewNode, State);
-				if (!(NewNode is null) && NewNode is XmlScriptNode Node2)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					Loop.Value = Node2;
-					Node2.SetParent(this);
+					b = !Callback(Loop[i], out NewNode, State);
+					if (!(NewNode is null) && NewNode is XmlScriptNode Node2)
+					{
+						Loop[i] = Node2;
+						Node2.SetParent(this);
 
-					RecalcIsAsync = true;
-				}
+						RecalcIsAsync = true;
+					}
 
-				if (b || (Order == SearchMethod.TreeOrder && !Loop.Value.ForAllChildNodes(Callback, State, Order)))
-				{
-					if (RecalcIsAsync)
-						this.CalcIsAsync();
+					if (b || (Order == SearchMethod.TreeOrder && !Loop[i].ForAllChildNodes(Callback, State, Order)))
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
 
-					return false;
+						return false;
+					}
 				}
 
 				Loop = Loop.Next;
@@ -208,11 +223,15 @@ namespace Waher.Script.Xml.Model
 						return false;
 				}
 
-				Loop = this.children?.First;
+				Loop = this.children?.FirstChunk;
+
 				while (!(Loop is null))
 				{
-					if (!Loop.Value.ForAllChildNodes(Callback, State, Order))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!(Loop[i]?.ForAllChildNodes(Callback, State, Order) ?? false))
+							return false;
+					}
 
 					Loop = Loop.Next;
 				}
@@ -428,7 +447,7 @@ namespace Waher.Script.Xml.Model
 									{
 										if (N is XmlElement E2)
 										{
-											List<XmlElement> Elements = new List<XmlElement>() { E2 };
+											ChunkedList<XmlElement> Elements = new ChunkedList<XmlElement>() { E2 };
 
 											while (true)
 											{

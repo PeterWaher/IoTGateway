@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -47,12 +48,12 @@ namespace Waher.Script.Functions.Vectors
             if (!(this.reference is null))
             {
                 ICollection<IElement> Elements = Argument.VectorElements;
-                LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+                ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
                 foreach (IElement E in Elements)
                 {
                     if (--c > 0)
-                        Elements2.AddLast(E);
+                        Elements2.Add(E);
                 }
 
                 Variables[this.reference.VariableName] = Argument.Encapsulate(Elements2, this);

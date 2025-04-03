@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -1389,10 +1390,13 @@ namespace Waher.Runtime.Collections
 			return Result;
 		}
 
-		private void MakeOneChunk()
+		private void MakeOneChunk(bool Trimmed)
 		{
-			if (!(this.firstChunk.Next is null))
+			if (!(this.firstChunk.Next is null) ||
+				(Trimmed && this.firstChunk.Start > 0 || this.firstChunk.Pos < this.firstChunk.Size))
+			{
 				this.firstChunk = this.lastChunk = new Chunk(this.ToArray());
+			}
 		}
 
 		/// <summary>
@@ -1400,8 +1404,9 @@ namespace Waher.Runtime.Collections
 		/// </summary>
 		public void Sort()
 		{
-			this.MakeOneChunk();
-			Array.Sort(this.firstChunk.Elements);
+			this.MakeOneChunk(false);
+			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start, 
+				this.firstChunk.Pos - this.firstChunk.Start);
 		}
 
 		/// <summary>
@@ -1410,8 +1415,9 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(IComparer<T> Comparer)
 		{
-			this.MakeOneChunk();
-			Array.Sort(this.firstChunk.Elements, Comparer);
+			this.MakeOneChunk(false);
+			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start, 
+				this.firstChunk.Pos - this.firstChunk.Start, Comparer);
 		}
 
 		/// <summary>
@@ -1420,7 +1426,7 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparison">Comparisong to use during sort.</param>
 		public void Sort(Comparison<T> Comparison)
 		{
-			this.MakeOneChunk();
+			this.MakeOneChunk(true);
 			Array.Sort(this.firstChunk.Elements, Comparison);
 		}
 
@@ -1432,8 +1438,29 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(int Index, int Count, IComparer<T> Comparer)
 		{
-			this.MakeOneChunk();
-			Array.Sort(this.firstChunk.Elements, Index, Count, Comparer);
+			this.MakeOneChunk(false);
+			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start + Index, Count, Comparer);
+		}
+
+		/// <summary>
+		/// Reverses the order of the elements in the collection.
+		/// </summary>
+		public void Reverse()
+		{
+			this.MakeOneChunk(false);
+			Array.Reverse(this.firstChunk.Elements, this.firstChunk.Start,
+				this.firstChunk.Pos - this.firstChunk.Start);
+		}
+
+		/// <summary>
+		/// Reverses the order of a subset of elements in the collection.
+		/// </summary>
+		/// <param name="Index">Index of first element.</param>
+		/// <param name="Count">Number of elements.</param>
+		public void Reverse(int Index, int Count)
+		{
+			this.MakeOneChunk(false);
+			Array.Reverse(this.firstChunk.Elements, this.firstChunk.Start + Index, Count);
 		}
 
 		#endregion

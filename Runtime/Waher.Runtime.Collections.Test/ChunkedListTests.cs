@@ -1185,7 +1185,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort();
 
-			int[] Expected = { 0, 1, 2, 3, 4, 5, 6, 7 };
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1202,7 +1202,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort(Comparer<int>.Create((x, y) => y.CompareTo(x)));
 
-			int[] Expected = { 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Expected = [7, 6, 5, 4, 3, 2, 1, 0];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1219,7 +1219,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort((x, y) => y.CompareTo(x));
 
-			int[] Expected = { 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Expected = [7, 6, 5, 4, 3, 2, 1, 0];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1236,7 +1236,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort(2, 4, Comparer<int>.Create((x, y) => x.CompareTo(y)));
 
-			int[] Expected = { 7, 6, 2, 3, 4, 5, 1, 0 };
+			int[] Expected = [7, 6, 2, 3, 4, 5, 1, 0];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1253,7 +1253,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort();
 
-			int[] Expected = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1270,7 +1270,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort(Comparer<int>.Create((x, y) => y.CompareTo(x)));
 
-			int[] Expected = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Expected = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1287,7 +1287,7 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort((x, y) => y.CompareTo(x));
 
-			int[] Expected = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Expected = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
@@ -1304,11 +1304,125 @@ namespace Waher.Runtime.Collections.Test
 
 			List.Sort(4, 8, Comparer<int>.Create((x, y) => x.CompareTo(y)));
 
-			int[] Expected = { 15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11, 3, 2, 1, 0 };
+			int[] Expected = [15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11, 3, 2, 1, 0];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Result[i]);
 		}
+
+		[TestMethod]
+		public void Test_89_Reverse_SingleChunk()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			List.Reverse();
+
+			int[] Expected = [3, 2, 1, 0];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_90_Reverse_MultipleChunks()
+		{
+			ChunkedList<int> List = new(4);
+			
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			List.Reverse();
+
+			int[] Expected = [7, 6, 5, 4, 3, 2, 1, 0];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_91_Reverse_Subset_SingleChunk()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			List.Reverse(1, 2);
+
+			int[] Expected = [0, 2, 1, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_92_Reverse_Subset_MultipleChunks()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			List.Reverse(2, 4);
+
+			int[] Expected = [0, 1, 5, 4, 3, 2, 6, 7];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_93_Reverse_EmptyList()
+		{
+			ChunkedList<int> List = new(4);
+
+			List.Reverse();
+
+			int[] Result = [.. List];
+			Assert.AreEqual(0, Result.Length);
+		}
+
+		[TestMethod]
+		public void Test_94_Reverse_SingleElement()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				1
+			};
+
+			List.Reverse();
+
+			int[] Expected = [1];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_95_Reverse_Subset_SingleElement()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			List.Reverse(1, 1);
+
+			int[] Expected = [0, 1, 2, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
 	}
 }

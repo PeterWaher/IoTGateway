@@ -4,7 +4,7 @@ namespace Waher.Runtime.Collections.Test
 	public class ChunkedListTests
 	{
 		[TestMethod]
-		public void Test_01_DefaultConstructor()
+		public void Test_001_DefaultConstructor()
 		{
 			ChunkedList<int> List = [];
 			Assert.AreEqual(0, List.Count);
@@ -12,14 +12,14 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_02_ConstructorWithInitialChunkSize()
+		public void Test_002_ConstructorWithInitialChunkSize()
 		{
 			ChunkedList<int> List = new(32);
 			Assert.AreEqual(0, List.Count);
 		}
 
 		[TestMethod]
-		public void Test_03_ConstructorWithInitialAndMaxChunkSize()
+		public void Test_003_ConstructorWithInitialAndMaxChunkSize()
 		{
 			ChunkedList<int> List = new(32, 64);
 			Assert.AreEqual(0, List.Count);
@@ -27,7 +27,7 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
-		public void Test_04_ConstructorWithInvalidInitialChunkSize()
+		public void Test_004_ConstructorWithInvalidInitialChunkSize()
 		{
 			ChunkedList<int> List = new(0);
 			Assert.AreEqual(0, List.Count);
@@ -35,14 +35,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
-		public void Test_05_ConstructorWithMaxChunkSizeLessThanInitialChunkSize()
+		public void Test_005_ConstructorWithMaxChunkSizeLessThanInitialChunkSize()
 		{
 			ChunkedList<int> List = new(64, 32);
 			Assert.AreEqual(0, List.Count);
 		}
 
 		[TestMethod]
-		public void Test_06_AddSingleItem()
+		public void Test_006_AddSingleItem()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -51,7 +51,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_07_AddMultipleItemsWithinInitialChunkSize()
+		public void Test_007_AddMultipleItemsWithinInitialChunkSize()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -64,7 +64,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_08_AddItemsExceedingInitialChunkSize()
+		public void Test_008_AddItemsExceedingInitialChunkSize()
 		{
 			ChunkedList<int> List = new(4, 8);
 			for (int i = 0; i < 5; i++)
@@ -73,7 +73,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_09_RemoveExistingItem()
+		public void Test_009_RemoveExistingItem()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -84,7 +84,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_10_RemoveNonExistingItem()
+		public void Test_010_RemoveNonExistingItem()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -92,7 +92,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_11_ContainsItem()
+		public void Test_011_ContainsItem()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -101,7 +101,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_12_Clear()
+		public void Test_012_Clear()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -111,7 +111,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_13_CopyTo()
+		public void Test_013_CopyTo()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -123,7 +123,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_14_Enumerator()
+		public void Test_014_Enumerator()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -136,7 +136,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_15_HasLastItem()
+		public void Test_015_HasLastItem()
 		{
 			ChunkedList<int> List = [];
 			Assert.IsFalse(List.HasLastItem);
@@ -146,7 +146,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_16_LastItem()
+		public void Test_016_LastItem()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -156,14 +156,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
-		public void Test_17_LastItem_EmptyList()
+		public void Test_017_LastItem_EmptyList()
 		{
 			ChunkedList<int> List = [];
 			_ = List.LastItem; // Should throw InvalidOperationException
 		}
 
 		[TestMethod]
-		public void Test_18_HasFirstItem()
+		public void Test_018_HasFirstItem()
 		{
 			ChunkedList<int> List = [];
 			Assert.IsFalse(List.HasFirstItem);
@@ -173,7 +173,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_19_FirstItem()
+		public void Test_019_FirstItem()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -183,14 +183,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
-		public void Test_20_FirstItem_EmptyList()
+		public void Test_020_FirstItem_EmptyList()
 		{
 			ChunkedList<int> List = [];
 			_ = List.FirstItem; // Should throw InvalidOperationException
 		}
 
 		[TestMethod]
-		public void Test_21_AddFirstItem()
+		public void Test_021_AddFirstItem()
 		{
 			ChunkedList<int> List = [];
 			List.AddFirstItem(1);
@@ -205,7 +205,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_22_AddLastItem()
+		public void Test_022_AddLastItem()
 		{
 			ChunkedList<int> List = [];
 			List.AddLastItem(1);
@@ -220,7 +220,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_23_RemoveFirst()
+		public void Test_023_RemoveFirst()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -238,14 +238,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
-		public void Test_24_RemoveFirst_EmptyList()
+		public void Test_024_RemoveFirst_EmptyList()
 		{
 			ChunkedList<int> List = [];
 			List.RemoveFirst(); // Should throw InvalidOperationException
 		}
 
 		[TestMethod]
-		public void Test_25_RemoveLast()
+		public void Test_025_RemoveLast()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -263,14 +263,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(InvalidOperationException))]
-		public void Test_26_RemoveLast_EmptyList()
+		public void Test_026_RemoveLast_EmptyList()
 		{
 			ChunkedList<int> List = [];
 			List.RemoveLast(); // Should throw InvalidOperationException
 		}
 
 		[TestMethod]
-		public void Test_27_AddRemoveManyElements()
+		public void Test_027_AddRemoveManyElements()
 		{
 			ChunkedList<int> List = [];
 
@@ -308,7 +308,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_28_AddRemoveAndEnumerate()
+		public void Test_028_AddRemoveAndEnumerate()
 		{
 			ChunkedList<int> List = [];
 
@@ -341,7 +341,7 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(0, List.LastItem);
 		}
 		[TestMethod]
-		public void Test_29_Indexer_Get()
+		public void Test_029_Indexer_Get()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -355,7 +355,7 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_30_Indexer_Get_OutOfRange()
+		public void Test_030_Indexer_Get_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -363,7 +363,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_31_Indexer_Set()
+		public void Test_031_Indexer_Set()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -379,7 +379,7 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_32_Indexer_Set_OutOfRange()
+		public void Test_032_Indexer_Set_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -387,7 +387,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_33_IndexOf()
+		public void Test_033_IndexOf()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -401,7 +401,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_34_Insert()
+		public void Test_034_Insert()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -416,7 +416,7 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_35_Insert_OutOfRange()
+		public void Test_035_Insert_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -424,7 +424,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_36_RemoveAt()
+		public void Test_036_RemoveAt()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -440,7 +440,7 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_37_RemoveAt_OutOfRange()
+		public void Test_037_RemoveAt_OutOfRange()
 		{
 			ChunkedList<int> List = [];
 			List.Add(1);
@@ -448,7 +448,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_38_Insert_ChunkWithStartGreaterThanZero()
+		public void Test_038_Insert_ChunkWithStartGreaterThanZero()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -474,7 +474,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_39_Insert_ChunkNotFull()
+		public void Test_039_Insert_ChunkNotFull()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -495,7 +495,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_40_Insert_ChunkFull_0()
+		public void Test_040_Insert_ChunkFull_0()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -515,7 +515,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_41_Insert_ChunkFull_1()
+		public void Test_041_Insert_ChunkFull_1()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -535,7 +535,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_42_Insert_ChunkFull_2()
+		public void Test_042_Insert_ChunkFull_2()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -557,7 +557,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_43_Insert_ChunkFull_3()
+		public void Test_043_Insert_ChunkFull_3()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -579,7 +579,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_44_Insert_ChunkFull_4()
+		public void Test_044_Insert_ChunkFull_4()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -601,7 +601,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_45_IndexOf_Item_Index()
+		public void Test_045_IndexOf_Item_Index()
 		{
 			ChunkedList<int> List =
 			[
@@ -619,14 +619,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_46_IndexOf_Item_Index_OutOfRange()
+		public void Test_046_IndexOf_Item_Index_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
 			List.IndexOf(2, 3); // Should throw ArgumentOutOfRangeException
 		}
 
 		[TestMethod]
-		public void Test_47_IndexOf_Item_Index_Count()
+		public void Test_047_IndexOf_Item_Index_Count()
 		{
 			ChunkedList<int> List = [1, 2, 3, 2, 4];
 
@@ -637,13 +637,13 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_48_IndexOf_Item_Index_Count_OutOfRange()
+		public void Test_048_IndexOf_Item_Index_Count_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
 			List.IndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
 		}
 		[TestMethod]
-		public void Test_49_LastIndexOf_Item()
+		public void Test_049_LastIndexOf_Item()
 		{
 			ChunkedList<int> List = [1, 2, 3, 2, 4];
 
@@ -653,7 +653,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_50_LastIndexOf_Item_Index()
+		public void Test_050_LastIndexOf_Item_Index()
 		{
 			ChunkedList<int> List = [1, 2, 3, 2, 4];
 
@@ -664,14 +664,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_51_LastIndexOf_Item_Index_OutOfRange()
+		public void Test_051_LastIndexOf_Item_Index_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
 			List.LastIndexOf(2, 3); // Should throw ArgumentOutOfRangeException
 		}
 
 		[TestMethod]
-		public void Test_52_LastIndexOf_Item_Index_Count()
+		public void Test_052_LastIndexOf_Item_Index_Count()
 		{
 			ChunkedList<int> List = [1, 2, 3, 2, 4];
 
@@ -682,14 +682,14 @@ namespace Waher.Runtime.Collections.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(ArgumentOutOfRangeException))]
-		public void Test_53_LastIndexOf_Item_Index_Count_OutOfRange()
+		public void Test_053_LastIndexOf_Item_Index_Count_OutOfRange()
 		{
 			ChunkedList<int> List = [1, 2];
 			List.LastIndexOf(2, 0, 3); // Should throw ArgumentOutOfRangeException
 		}
 
 		[TestMethod]
-		public void Test_54_RemoveAt_ReduceChunks()
+		public void Test_054_RemoveAt_ReduceChunks()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -709,7 +709,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_55_RemoveAt_ReduceChunks_Middle()
+		public void Test_055_RemoveAt_ReduceChunks_Middle()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -729,7 +729,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_56_RemoveAt_ReduceChunks_End()
+		public void Test_056_RemoveAt_ReduceChunks_End()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -749,7 +749,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_57_AddRange_WithinSingleChunk()
+		public void Test_057_AddRange_WithinSingleChunk()
 		{
 			ChunkedList<int> List = new(4);
 			List<int> Range = [1, 2, 3];
@@ -765,7 +765,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_58_AddRange_CrossChunkLimits()
+		public void Test_058_AddRange_CrossChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
 			List<int> Range = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -781,7 +781,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_59_AddRange_MultipleChunks()
+		public void Test_059_AddRange_MultipleChunks()
 		{
 			ChunkedList<int> List = new(4);
 			List<int> Range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -797,7 +797,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_60_AddRange_EmptyCollection()
+		public void Test_060_AddRange_EmptyCollection()
 		{
 			ChunkedList<int> List = new(4);
 			List<int> Range = [];
@@ -808,7 +808,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_61_AddRange_ExistingElements()
+		public void Test_061_AddRange_ExistingElements()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -827,7 +827,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_62_CopyTo_Destination()
+		public void Test_062_CopyTo_Destination()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -844,7 +844,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_63_CopyTo_DestinationIndex()
+		public void Test_063_CopyTo_DestinationIndex()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -861,7 +861,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_64_CopyTo_Index_DestinationIndex_Count()
+		public void Test_064_CopyTo_Index_DestinationIndex_Count()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -878,7 +878,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_65_CopyTo_ChunkLimits()
+		public void Test_065_CopyTo_ChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -895,7 +895,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_66_CopyTo_DestinationIndex_ChunkLimits()
+		public void Test_066_CopyTo_DestinationIndex_ChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -912,7 +912,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_67_CopyTo_Index_DestinationIndex_Count_ChunkLimits()
+		public void Test_067_CopyTo_Index_DestinationIndex_Count_ChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -929,7 +929,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_68_ToArray_SingleChunk()
+		public void Test_068_ToArray_SingleChunk()
 		{
 			ChunkedList<int> List = new(4);
 			for (int i = 0; i < 4; i++)
@@ -943,7 +943,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_69_ToArray_MultipleChunks()
+		public void Test_069_ToArray_MultipleChunks()
 		{
 			ChunkedList<int> List = new(4);
 			for (int i = 0; i < 8; i++)
@@ -957,7 +957,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_70_ToArray_MultipleChunks_Larger()
+		public void Test_070_ToArray_MultipleChunks_Larger()
 		{
 			ChunkedList<int> List = new(4);
 			for (int i = 0; i < 12; i++)
@@ -971,7 +971,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_71_ToArray_EmptyList()
+		public void Test_071_ToArray_EmptyList()
 		{
 			ChunkedList<int> List = new(4);
 			int[] Result = [.. List];
@@ -980,7 +980,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_72_ToArray_SingleElement()
+		public void Test_072_ToArray_SingleElement()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -995,7 +995,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_73_ToArray_MultipleChunks_WithGaps()
+		public void Test_073_ToArray_MultipleChunks_WithGaps()
 		{
 			ChunkedList<int> List = new(4);
 			for (int i = 0; i < 8; i++)
@@ -1013,7 +1013,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_74_Update_SingleChunk_ChangeElements()
+		public void Test_074_Update_SingleChunk_ChangeElements()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1037,7 +1037,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_75_Update_MultipleChunks_ChangeElements()
+		public void Test_075_Update_MultipleChunks_ChangeElements()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1061,7 +1061,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_76_UpdateSingleChunkDeleteElements()
+		public void Test_076_UpdateSingleChunkDeleteElements()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1084,7 +1084,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_77_Update_MultipleChunks_DeleteElements()
+		public void Test_077_Update_MultipleChunks_DeleteElements()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1107,7 +1107,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_78_Update_MultipleChunks_ChangeAndDeleteElements()
+		public void Test_078_Update_MultipleChunks_ChangeAndDeleteElements()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1131,7 +1131,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_79_Update_EmptyList()
+		public void Test_079_Update_EmptyList()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1149,7 +1149,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_80_Update_BreakProcedure()
+		public void Test_080_Update_BreakProcedure()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1176,7 +1176,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_81_Sort_Default()
+		public void Test_081_Sort_Default()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1193,7 +1193,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_82_Sort_Comparer()
+		public void Test_082_Sort_Comparer()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1210,7 +1210,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_83_Sort_Comparison()
+		public void Test_083_Sort_Comparison()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1227,7 +1227,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_84_Sort_Index_Count_Comparer()
+		public void Test_084_Sort_Index_Count_Comparer()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1244,7 +1244,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_85_Sort_MultipleChunks_Default()
+		public void Test_085_Sort_MultipleChunks_Default()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1261,7 +1261,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_86_Sort_MultipleChunks_Comparer()
+		public void Test_086_Sort_MultipleChunks_Comparer()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1278,7 +1278,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_87_Sort_MultipleChunks_Comparison()
+		public void Test_087_Sort_MultipleChunks_Comparison()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1295,7 +1295,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_88_Sort_MultipleChunks_Index_Count_Comparer()
+		public void Test_088_Sort_MultipleChunks_Index_Count_Comparer()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1312,7 +1312,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_89_Reverse_SingleChunk()
+		public void Test_089_Reverse_SingleChunk()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1329,10 +1329,10 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_90_Reverse_MultipleChunks()
+		public void Test_090_Reverse_MultipleChunks()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 8; i++)
 				List.Add(i);
 
@@ -1346,7 +1346,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_91_Reverse_Subset_SingleChunk()
+		public void Test_091_Reverse_Subset_SingleChunk()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1363,7 +1363,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_92_Reverse_Subset_MultipleChunks()
+		public void Test_092_Reverse_Subset_MultipleChunks()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1380,7 +1380,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_93_Reverse_EmptyList()
+		public void Test_093_Reverse_EmptyList()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1391,7 +1391,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_94_Reverse_SingleElement()
+		public void Test_094_Reverse_SingleElement()
 		{
 			ChunkedList<int> List = new(4)
 			{
@@ -1408,7 +1408,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_95_Reverse_Subset_SingleElement()
+		public void Test_095_Reverse_Subset_SingleElement()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1418,6 +1418,136 @@ namespace Waher.Runtime.Collections.Test
 			List.Reverse(1, 1);
 
 			int[] Expected = [0, 1, 2, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_96_GetSet_LastItem_SingleChunk()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			Assert.AreEqual(3, List.LastItem);
+
+			List.LastItem = 10;
+			Assert.AreEqual(10, List.LastItem);
+
+			int[] Expected = [0, 1, 2, 10];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_97_GetSet_LastItem_MultipleChunks()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			Assert.AreEqual(7, List.LastItem);
+
+			List.LastItem = 10;
+			Assert.AreEqual(10, List.LastItem);
+
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 10];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_98_GetSet_FirstItem_SingleChunk()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 4; i++)
+				List.Add(i);
+
+			Assert.AreEqual(0, List.FirstItem);
+
+			List.FirstItem = 10;
+			Assert.AreEqual(10, List.FirstItem);
+
+			int[] Expected = [10, 1, 2, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_99_GetSet_FirstItem_MultipleChunks()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 0; i < 8; i++)
+				List.Add(i);
+
+			Assert.AreEqual(0, List.FirstItem);
+
+			List.FirstItem = 10;
+			Assert.AreEqual(10, List.FirstItem);
+
+			int[] Expected = [10, 1, 2, 3, 4, 5, 6, 7];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void Test_100_Get_LastItem_EmptyList()
+		{
+			ChunkedList<int> List = new(4);
+			_ = List.LastItem;
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void Test_101_Get_FirstItem_EmptyList()
+		{
+			ChunkedList<int> List = new(4);
+			_ = List.FirstItem;
+		}
+
+		[TestMethod]
+		public void Test_102_Set_LastItem_EmptyList()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				LastItem = 10
+			};
+
+			Assert.AreEqual(10, List.LastItem);
+
+			int[] Expected = [10];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_103_Set_FirstItem_EmptyList()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				FirstItem = 10
+			};
+
+			Assert.AreEqual(10, List.FirstItem);
+
+			int[] Expected = [10];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)

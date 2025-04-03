@@ -667,6 +667,31 @@ namespace Waher.Runtime.Collections
 
 				return this.lastChunk.Elements[this.lastChunk.Pos - 1];
 			}
+
+			set
+			{
+				if (this.lastChunk is null)
+				{
+					this.firstChunk = this.lastChunk = new Chunk(this.chunkSize);
+
+					this.chunkSize <<= 1;
+					if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+						this.chunkSize = this.maxChunkSize;
+
+					this.lastChunk.Pos = 1;
+					this.lastChunk.Elements[0] = value;
+					this.count++;
+				}
+				else if (this.lastChunk.Pos == this.lastChunk.Start)
+				{
+					this.lastChunk.Start = 0;
+					this.lastChunk.Pos = 1;
+					this.lastChunk.Elements[0] = value;
+					this.count++;
+				}
+				else
+					this.lastChunk.Elements[this.lastChunk.Pos - 1] = value;
+			}
 		}
 
 		/// <summary>
@@ -685,6 +710,31 @@ namespace Waher.Runtime.Collections
 					throw new InvalidOperationException("No first item available.");
 
 				return this.firstChunk.Elements[this.firstChunk.Start];
+			}
+
+			set
+			{
+				if (this.firstChunk is null)
+				{
+					this.firstChunk = this.lastChunk = new Chunk(this.chunkSize);
+
+					this.chunkSize <<= 1;
+					if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+						this.chunkSize = this.maxChunkSize;
+
+					this.firstChunk.Pos = 1;
+					this.firstChunk.Elements[0] = value;
+					this.count++;
+				}
+				else if (this.firstChunk.Pos == this.firstChunk.Start)
+				{
+					this.firstChunk.Start = 0;
+					this.firstChunk.Pos = 1;
+					this.firstChunk.Elements[0] = value;
+					this.count++;
+				}
+				else
+					this.firstChunk.Elements[0] = value;
 			}
 		}
 

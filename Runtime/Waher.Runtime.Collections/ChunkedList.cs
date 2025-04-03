@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,7 +56,6 @@ namespace Waher.Runtime.Collections
 
 		private readonly int maxChunkSize;
 		private readonly int minChunkSize;
-		private Chunk current;
 		private Chunk firstChunk;
 		private Chunk lastChunk;
 		private int chunkSize;
@@ -107,7 +105,7 @@ namespace Waher.Runtime.Collections
 			this.maxChunkSize = MaxChunkSize;
 			this.minChunkSize = InitialChunkSize;
 
-			this.current = this.firstChunk = this.lastChunk = new Chunk(InitialChunkSize);
+			this.firstChunk = this.lastChunk = new Chunk(InitialChunkSize);
 
 			this.chunkSize <<= 1;
 			if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
@@ -225,31 +223,30 @@ namespace Waher.Runtime.Collections
 		/// <param name="Item">Item</param>
 		public void Add(T Item)
 		{
-			if (this.current.Pos < this.current.Size)
-				this.current.Elements[this.current.Pos++] = Item;
-			else if (this.current.Start > 0)
+			if (this.lastChunk.Pos < this.lastChunk.Size)
+				this.lastChunk.Elements[this.lastChunk.Pos++] = Item;
+			else if (this.lastChunk.Start > 0)
 			{
-				if (this.current.Start < this.current.Pos)
+				if (this.lastChunk.Start < this.lastChunk.Pos)
 				{
-					Array.Copy(this.current.Elements, this.current.Start,
-						this.current.Elements, 0, this.current.Pos - this.current.Start);
+					Array.Copy(this.lastChunk.Elements, this.lastChunk.Start,
+						this.lastChunk.Elements, 0, this.lastChunk.Pos - this.lastChunk.Start);
 				}
 
-				this.current.Pos -= this.current.Start;
-				this.current.Start = 0;
+				this.lastChunk.Pos -= this.lastChunk.Start;
+				this.lastChunk.Start = 0;
 
-				this.current.Elements[this.current.Pos++] = Item;
+				this.lastChunk.Elements[this.lastChunk.Pos++] = Item;
 			}
 			else
 			{
-				this.lastChunk = new Chunk(this.chunkSize, this.current);
-				this.current = this.lastChunk;
+				this.lastChunk = new Chunk(this.chunkSize, this.lastChunk);
 
 				this.chunkSize <<= 1;
 				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
 					this.chunkSize = this.maxChunkSize;
 
-				this.current.Elements[this.current.Pos++] = Item;
+				this.lastChunk.Elements[this.lastChunk.Pos++] = Item;
 			}
 
 			this.count++;
@@ -261,13 +258,12 @@ namespace Waher.Runtime.Collections
 		public void Clear()
 		{
 			this.lastChunk = this.firstChunk;
+			
 			this.firstChunk.Next = null;
-			this.current = this.firstChunk;
+			this.firstChunk.Start = 0;
+			this.firstChunk.Pos = 0;
 
-			this.current.Start = 0;
-			this.current.Pos = 0;
-
-			Array.Clear(this.current.Elements, 0, this.current.Size);
+			Array.Clear(this.firstChunk.Elements, 0, this.firstChunk.Size);
 			this.count = 0;
 		}
 
@@ -1259,39 +1255,38 @@ namespace Waher.Runtime.Collections
 			{
 				IEnumerator<T> e = Collection.GetEnumerator();
 
-				if (this.current.Start > 0)
+				if (this.lastChunk.Start > 0)
 				{
-					if (this.current.Start < this.current.Pos)
+					if (this.lastChunk.Start < this.lastChunk.Pos)
 					{
-						Array.Copy(this.current.Elements, this.current.Start,
-							this.current.Elements, 0, this.current.Pos - this.current.Start);
+						Array.Copy(this.lastChunk.Elements, this.lastChunk.Start,
+							this.lastChunk.Elements, 0, this.lastChunk.Pos - this.lastChunk.Start);
 					}
 
-					this.current.Pos -= this.current.Start;
-					this.current.Start = 0;
+					this.lastChunk.Pos -= this.lastChunk.Start;
+					this.lastChunk.Start = 0;
 				}
 
-				while (this.current.Pos < this.current.Size && e.MoveNext())
+				while (this.lastChunk.Pos < this.lastChunk.Size && e.MoveNext())
 				{
-					this.current.Elements[this.current.Pos++] = e.Current;
+					this.lastChunk.Elements[this.lastChunk.Pos++] = e.Current;
 					this.count++;
 				}
 
-				while (this.current.Pos >= this.current.Size && e.MoveNext())
+				while (this.lastChunk.Pos >= this.lastChunk.Size && e.MoveNext())
 				{
-					this.lastChunk = new Chunk(this.chunkSize, this.current);
-					this.current = this.lastChunk;
+					this.lastChunk = new Chunk(this.chunkSize, this.lastChunk);
 
 					this.chunkSize <<= 1;
 					if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
 						this.chunkSize = this.maxChunkSize;
 
-					this.current.Elements[this.current.Pos++] = e.Current;
+					this.lastChunk.Elements[this.lastChunk.Pos++] = e.Current;
 					this.count++;
 
-					while (this.current.Pos < this.current.Size && e.MoveNext())
+					while (this.lastChunk.Pos < this.lastChunk.Size && e.MoveNext())
 					{
-						this.current.Elements[this.current.Pos++] = e.Current;
+						this.lastChunk.Elements[this.lastChunk.Pos++] = e.Current;
 						this.count++;
 					}
 				}
@@ -1308,46 +1303,45 @@ namespace Waher.Runtime.Collections
 			int c = Collection.Length;
 			int d;
 
-			if (this.current.Start > 0)
+			if (this.lastChunk.Start > 0)
 			{
-				if (this.current.Start < this.current.Pos)
+				if (this.lastChunk.Start < this.lastChunk.Pos)
 				{
-					Array.Copy(this.current.Elements, this.current.Start,
-						this.current.Elements, 0, this.current.Pos - this.current.Start);
+					Array.Copy(this.lastChunk.Elements, this.lastChunk.Start,
+						this.lastChunk.Elements, 0, this.lastChunk.Pos - this.lastChunk.Start);
 				}
 
-				this.current.Pos -= this.current.Start;
-				this.current.Start = 0;
+				this.lastChunk.Pos -= this.lastChunk.Start;
+				this.lastChunk.Start = 0;
 			}
 
-			while (this.current.Pos < this.current.Size && i < c)
+			while (this.lastChunk.Pos < this.lastChunk.Size && i < c)
 			{
-				d = Math.Min(this.current.Size - this.current.Pos, c - i);
-				Array.Copy(Collection, i, this.current.Elements, this.current.Pos, d);
+				d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, c - i);
+				Array.Copy(Collection, i, this.lastChunk.Elements, this.lastChunk.Pos, d);
 				i += d;
 				this.count += d;
-				this.current.Pos += d;
+				this.lastChunk.Pos += d;
 			}
 
 			while (i < c)
 			{
-				this.lastChunk = new Chunk(this.chunkSize, this.current);
-				this.current = this.lastChunk;
+				this.lastChunk = new Chunk(this.chunkSize, this.lastChunk);
 
 				this.chunkSize <<= 1;
 				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
 					this.chunkSize = this.maxChunkSize;
 
-				this.current.Elements[this.current.Pos++] = Collection[i++];
+				this.lastChunk.Elements[this.lastChunk.Pos++] = Collection[i++];
 				this.count++;
 
-				while (this.current.Pos < this.current.Size && i < c)
+				while (this.lastChunk.Pos < this.lastChunk.Size && i < c)
 				{
-					d = Math.Min(this.current.Size - this.current.Pos, c - i);
-					Array.Copy(Collection, i, this.current.Elements, this.current.Pos, d);
+					d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, c - i);
+					Array.Copy(Collection, i, this.lastChunk.Elements, this.lastChunk.Pos, d);
 					i += d;
 					this.count += d;
-					this.current.Pos += d;
+					this.lastChunk.Pos += d;
 				}
 			}
 		}
@@ -1455,7 +1449,7 @@ namespace Waher.Runtime.Collections
 		public void Sort()
 		{
 			this.MakeOneChunk(false);
-			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start, 
+			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start,
 				this.firstChunk.Pos - this.firstChunk.Start);
 		}
 
@@ -1466,7 +1460,7 @@ namespace Waher.Runtime.Collections
 		public void Sort(IComparer<T> Comparer)
 		{
 			this.MakeOneChunk(false);
-			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start, 
+			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start,
 				this.firstChunk.Pos - this.firstChunk.Start, Comparer);
 		}
 
@@ -1511,6 +1505,102 @@ namespace Waher.Runtime.Collections
 		{
 			this.MakeOneChunk(false);
 			Array.Reverse(this.firstChunk.Elements, this.firstChunk.Start + Index, Count);
+		}
+
+		#endregion
+
+		#region AddRangeFirst/AddRangeLast
+
+		/// <summary>
+		/// Adds a range of elements last to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRangeLast(IEnumerable<T> Collection)
+		{
+			this.AddRange(Collection);
+		}
+
+		/// <summary>
+		/// Adds a range of elements last to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRangeLast(T[] Collection)
+		{
+			this.AddRange(Collection);
+		}
+
+		/// <summary>
+		/// Adds a range of elements first to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRangeFirst(IEnumerable<T> Collection)
+		{
+			if (Collection is T[] A)
+				this.AddRangeFirst(A);
+			else if (Collection is ICollection<T> C)
+			{
+				A = new T[C.Count];
+				C.CopyTo(A, 0);
+				this.AddRangeFirst(A);
+			}
+			else
+			{
+				IEnumerator<T> e = Collection.GetEnumerator();
+				ChunkedList<T> Temp = new ChunkedList<T>();
+
+				while (e.MoveNext())
+					Temp.AddLastItem(e.Current);
+
+				this.AddRangeFirst(Temp.ToArray());
+			}
+		}
+
+		/// <summary>
+		/// Adds a range of elements first to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRangeFirst(T[] Collection)
+		{
+			int c = Collection.Length;
+			int d;
+
+			if ((d = this.firstChunk.Size - this.firstChunk.Pos) > 0)
+			{
+				Array.Copy(this.firstChunk.Elements, 0, this.firstChunk.Elements, d, this.firstChunk.Pos);
+				this.firstChunk.Start += d;
+				this.firstChunk.Pos = this.firstChunk.Size;
+			}
+
+			if (this.firstChunk.Start > 0)
+			{
+				d = Math.Min(this.firstChunk.Start, c);
+
+				Array.Copy(Collection, c - d, this.firstChunk.Elements, this.firstChunk.Start - d, d);
+				c -= d;
+				this.firstChunk.Start -= d;
+				this.count += d;
+			}
+
+			while (c > 0)
+			{
+				Chunk Temp = this.firstChunk;
+				this.firstChunk = new Chunk(this.chunkSize);
+				Temp.Prev = this.firstChunk;
+				this.firstChunk.Next = Temp;
+
+				this.chunkSize <<= 1;
+				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+					this.chunkSize = this.maxChunkSize;
+
+				this.firstChunk.Start = this.firstChunk.Pos = this.firstChunk.Size;
+
+				d = Math.Min(this.firstChunk.Start, c);
+
+				Array.Copy(Collection, c - d, this.firstChunk.Elements, this.firstChunk.Start - d, d);
+				c -= d;
+				this.firstChunk.Start -= d;
+				this.count += d;
+			}
 		}
 
 		#endregion

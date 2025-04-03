@@ -1425,7 +1425,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_96_GetSet_LastItem_SingleChunk()
+		public void Test_096_GetSet_LastItem_SingleChunk()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1445,7 +1445,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_97_GetSet_LastItem_MultipleChunks()
+		public void Test_097_GetSet_LastItem_MultipleChunks()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1465,7 +1465,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_98_GetSet_FirstItem_SingleChunk()
+		public void Test_098_GetSet_FirstItem_SingleChunk()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1485,7 +1485,7 @@ namespace Waher.Runtime.Collections.Test
 		}
 
 		[TestMethod]
-		public void Test_99_GetSet_FirstItem_MultipleChunks()
+		public void Test_099_GetSet_FirstItem_MultipleChunks()
 		{
 			ChunkedList<int> List = new(4);
 
@@ -1548,6 +1548,144 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(10, List.FirstItem);
 
 			int[] Expected = [10];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_104_AddRangeFirst_SingleChunk_Array()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 4; i < 8; i++)
+				List.Add(i);
+
+			int[] NewElements = [ 0, 1, 2, 3 ];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_105_AddRangeFirst_MultipleChunks_Array()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 8; i < 16; i++)
+				List.Add(i);
+
+			int[] NewElements = [0, 1, 2, 3, 4, 5, 6, 7];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_106_AddRangeFirst_SingleChunk_Enumerable()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 4; i < 8; i++)
+				List.Add(i);
+
+			List<int> NewElements = [0, 1, 2, 3];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_107_AddRangeFirst_MultipleChunks_Enumerable()
+		{
+			ChunkedList<int> List = new(4);
+		
+			for (int i = 8; i < 16; i++)
+				List.Add(i);
+
+			List<int> NewElements = [0, 1, 2, 3, 4, 5, 6, 7];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_108_AddRangeFirst_EmptyList_Array()
+		{
+			ChunkedList<int> List = new(4);
+
+			int[] NewElements = [0, 1, 2, 3];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_109_AddRangeFirst_EmptyList_Enumerable()
+		{
+			ChunkedList<int> List = new(4);
+
+			List<int> NewElements = [0, 1, 2, 3];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_110_AddRangeFirst_SingleElement_Array()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				4
+			};
+
+			int[] NewElements = [0, 1, 2, 3];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3, 4];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_111_AddRangeFirst_SingleElement_Enumerable()
+		{
+			ChunkedList<int> List = new(4)
+			{
+				4
+			};
+
+			List<int> NewElements = [0, 1, 2, 3];
+			List.AddRangeFirst(NewElements);
+
+			int[] Expected = [0, 1, 2, 3, 4];
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)

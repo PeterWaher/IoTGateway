@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -102,10 +103,10 @@ namespace Waher.Security.JWT.Functions
 
 			if (Obj is IEnumerable<KeyValuePair<string, IElement>> GenObj)
 			{
-				LinkedList<KeyValuePair<string, object>> List = new LinkedList<KeyValuePair<string, object>>();
+				ChunkedList<KeyValuePair<string, object>> List = new ChunkedList<KeyValuePair<string, object>>();
 
 				foreach (KeyValuePair<string, IElement> P in GenObj)
-					List.AddLast(new KeyValuePair<string, object>(P.Key, P.Value.AssociatedObjectValue));
+					List.Add(new KeyValuePair<string, object>(P.Key, P.Value.AssociatedObjectValue));
 
 				Claims = List;
 			}

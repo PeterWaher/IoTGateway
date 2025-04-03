@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
@@ -15,14 +16,14 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// Triples in model.
 		/// </summary>
-		protected readonly LinkedList<ISemanticTriple> triples;
+		protected readonly ChunkedList<ISemanticTriple> triples;
 
 		/// <summary>
 		/// In-memory semantic model.
 		/// </summary>
 		public InMemorySemanticModel()
 		{
-			this.triples = new LinkedList<ISemanticTriple>();
+			this.triples = new ChunkedList<ISemanticTriple>();
 		}
 
 		/// <summary>
@@ -31,14 +32,14 @@ namespace Waher.Content.Semantic
 		/// <param name="Triples">Triples.</param>
 		public InMemorySemanticModel(IEnumerable<ISemanticTriple> Triples)
 		{
-			this.triples = Triples as LinkedList<ISemanticTriple>;
+			this.triples = Triples as ChunkedList<ISemanticTriple>;
 
 			if (this.triples is null)
 			{
-				this.triples = new LinkedList<ISemanticTriple>();
+				this.triples = new ChunkedList<ISemanticTriple>();
 
 				foreach (ISemanticTriple Triple in Triples)
-					this.triples.AddLast(Triple);
+					this.triples.Add(Triple);
 			}
 		}
 
@@ -66,7 +67,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Triple">Semantic triple to add.</param>
 		public virtual void Add(ISemanticTriple Triple)
 		{
-			this.triples.AddLast(Triple);
+			this.triples.Add(Triple);
 		}
 
 		/// <summary>
@@ -75,14 +76,14 @@ namespace Waher.Content.Semantic
 		/// <returns>Matrix.</returns>
 		public IMatrix ToMatrix()
 		{
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 			int Rows = 0;
 
 			foreach (ISemanticTriple T in this.triples)
 			{
-				Elements.AddLast(T.Subject);
-				Elements.AddLast(T.Predicate);
-				Elements.AddLast(T.Object);
+				Elements.Add(T.Subject);
+				Elements.Add(T.Predicate);
+				Elements.Add(T.Object);
 				Rows++;
 			}
 

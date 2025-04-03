@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 
@@ -43,8 +43,8 @@ namespace Waher.Content
 
 		private static string[][] Parse(string Csv, ref int Pos, int Len)
 		{
-			List<string[]> Records = new List<string[]>();
-			List<string> Fields = new List<string>();
+			ChunkedList<string[]> Records = new ChunkedList<string[]>();
+			ChunkedList<string> Fields = new ChunkedList<string>();
 			StringBuilder sb = new StringBuilder();
 			int State = 0;
 			int i = 0;
@@ -300,8 +300,8 @@ namespace Waher.Content
 			if (ElementToString is null)
 				throw new ArgumentNullException(nameof(ElementToString));
 
-			List<string[]> Records = new List<string[]>();
-			List<string> Fields = new List<string>();
+			ChunkedList<string[]> Records = new ChunkedList<string[]>();
+			ChunkedList<string> Fields = new ChunkedList<string>();
 
 			if (Matrix is ObjectMatrix M)
 			{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -70,7 +71,7 @@ namespace Waher.Content.Multipart
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
 			Dictionary<string, string> Form = new Dictionary<string, string>();
-			Dictionary<string, List<string>> Form2 = null;
+			Dictionary<string, ChunkedList<string>> Form2 = null;
 			string s = Strings.GetString(Data, Encoding);
 			string Key, Value;
 			int i;
@@ -97,10 +98,10 @@ namespace Waher.Content.Multipart
 				{
 					if (Form.ContainsKey(Key))
 					{
-						Form2 = new Dictionary<string, List<string>>();
+						Form2 = new Dictionary<string, ChunkedList<string>>();
 
 						foreach (KeyValuePair<string, string> P in Form)
-							Form2[P.Key] = new List<string>() { P.Value };
+							Form2[P.Key] = new ChunkedList<string>() { P.Value };
 					}
 					else
 					{
@@ -109,9 +110,9 @@ namespace Waher.Content.Multipart
 					}
 				}
 
-				if (!Form2.TryGetValue(Key, out List<string> Values))
+				if (!Form2.TryGetValue(Key, out ChunkedList<string> Values))
 				{
-					Values = new List<string>();
+					Values = new ChunkedList<string>();
 					Form2[Key] = Values;
 				}
 
@@ -123,7 +124,7 @@ namespace Waher.Content.Multipart
 
 			Dictionary<string, string[]> Form3 = new Dictionary<string, string[]>();
 
-			foreach (KeyValuePair<string, List<string>> P in Form2)
+			foreach (KeyValuePair<string, ChunkedList<string>> P in Form2)
 				Form3[P.Key] = P.Value.ToArray();
 
 			return Task.FromResult(new ContentResponse(ContentType, Form3, Data));

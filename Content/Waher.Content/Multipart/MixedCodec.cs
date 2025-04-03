@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Multipart
@@ -72,7 +73,7 @@ namespace Waher.Content.Multipart
 		public async Task<ContentResponse> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, 
 			KeyValuePair<string, string>[] Fields, Uri BaseUri, ICodecProgress Progress)
 		{
-			List<EmbeddedContent> List = new List<EmbeddedContent>();
+			ChunkedList<EmbeddedContent> List = new ChunkedList<EmbeddedContent>();
 
 			Exception Error = await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri, Progress);
 

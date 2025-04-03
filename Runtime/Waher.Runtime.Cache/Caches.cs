@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Cache
 {
@@ -43,7 +43,7 @@ namespace Waher.Runtime.Cache
 		/// <returns>Array of cache objects.</returns>
 		public static ICache[] GetCaches(bool ExcludeStandalone)
 		{
-			List<ICache> Result = new List<ICache>();
+			ChunkedList<ICache> Result = new ChunkedList<ICache>();
 
 			lock (caches)
 			{

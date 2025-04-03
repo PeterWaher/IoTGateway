@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Rss
@@ -32,9 +32,9 @@ namespace Waher.Content.Rss
 			this.xml = Xml;
 			this.Version = XML.Attribute(Xml.DocumentElement, "version", 0.0);
 
-			List<RssChannel> Channels = new List<RssChannel>();
-			List<RssWarning> Warnings = new List<RssWarning>();
-			List<IRssExtension> Extensions = new List<IRssExtension>();
+			ChunkedList<RssChannel> Channels = new ChunkedList<RssChannel>();
+			ChunkedList<RssWarning> Warnings = new ChunkedList<RssWarning>();
+			ChunkedList<IRssExtension> Extensions = new ChunkedList<IRssExtension>();
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{

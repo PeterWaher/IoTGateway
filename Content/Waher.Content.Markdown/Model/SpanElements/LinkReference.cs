@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -17,7 +17,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Label">Link label.</param>
-		public LinkReference(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, string Label)
+		public LinkReference(MarkdownDocument Document, ChunkedList<MarkdownElement> ChildElements, string Label)
 			: base(Document, ChildElements)
 		{
 			this.label = Label;
@@ -52,7 +52,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new LinkReference(Document, Children, this.label);
 		}
@@ -107,7 +107,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (!(Multimedia is null))
 			{
 				if (Statistics.IntUrlHyperlinks is null)
-					Statistics.IntUrlHyperlinks = new List<string>();
+					Statistics.IntUrlHyperlinks = new ChunkedList<string>();
 
 				string Url = Multimedia.Items[0].Url;
 

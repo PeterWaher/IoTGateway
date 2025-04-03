@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -76,7 +76,7 @@ namespace Waher.Content.Markdown.Functions
 		{
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Argument);
 			IElement Result = null;
-			LinkedList<IElement> Results = null;
+			ChunkedList<IElement> Results = null;
 			IElement Item = null;
 
 			foreach (MarkdownElement E in Doc.Elements)
@@ -89,11 +89,13 @@ namespace Waher.Content.Markdown.Functions
 				{
 					if (Results is null)
 					{
-						Results = new LinkedList<IElement>();
-						Results.AddLast(Result);
+						Results = new ChunkedList<IElement>
+						{
+							Result
+						};
 					}
 
-					Results.AddLast(Item);
+					Results.Add(Item);
 				}
 			}
 
@@ -118,7 +120,7 @@ namespace Waher.Content.Markdown.Functions
 					int i, Columns = Headers.Length;
 					string[] Headers2 = new string[Columns];
 					int Rows = Table.Rows.Length;
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					for (i = 0; i < Columns; i++)
 						Headers2[i] = (await Evaluate(Headers[i])).AssociatedObjectValue?.ToString() ?? string.Empty;
@@ -128,9 +130,9 @@ namespace Waher.Content.Markdown.Functions
 						foreach (MarkdownElement E in Row)
 						{
 							if (E is null)
-								Elements.AddLast(ObjectValue.Null);
+								Elements.Add(ObjectValue.Null);
 							else
-								Elements.AddLast(await Evaluate(E));
+								Elements.Add(await Evaluate(E));
 						}
 					}
 

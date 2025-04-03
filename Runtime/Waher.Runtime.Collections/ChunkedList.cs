@@ -60,6 +60,7 @@ namespace Waher.Runtime.Collections
 		private Chunk lastChunk;
 		private int chunkSize;
 		private int count = 0;
+		private bool? nullable;
 
 		/// <summary>
 		/// Number of elements in collection.
@@ -106,6 +107,41 @@ namespace Waher.Runtime.Collections
 			this.minChunkSize = InitialChunkSize;
 
 			this.firstChunk = this.lastChunk = new Chunk(InitialChunkSize);
+
+			this.chunkSize <<= 1;
+			if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
+				this.chunkSize = this.maxChunkSize;
+		}
+
+		/// <summary>
+		/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>,
+		/// initially filled with elements in <paramref name="InitialElements"/>.
+		/// </summary>
+		/// <param name="InitialElements">Initial elements.</param>
+		public ChunkedList(params T[] InitialElements)
+			: this(InitialElements, int.MaxValue)
+		{
+		}
+
+		/// <summary>
+		/// A chunked list is a linked list of chunks of objects of type <typeparamref name="T"/>,
+		/// initially filled with elements in <paramref name="InitialElements"/>.
+		/// </summary>
+		/// <param name="InitialElements">Initial elements.</param>
+		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
+		public ChunkedList(T[] InitialElements, int MaxChunkSize)
+		{
+			this.chunkSize = InitialElements.Length;
+			if (this.chunkSize == 0)
+				this.chunkSize = initialChunkSize;
+
+			if (MaxChunkSize < this.chunkSize)
+				throw new ArgumentException("Max chunk size must be greater than or equal to initial chunk size.", nameof(MaxChunkSize));
+
+			this.maxChunkSize = MaxChunkSize;
+			this.minChunkSize = this.chunkSize;
+
+			this.firstChunk = this.lastChunk = new Chunk(InitialElements);
 
 			this.chunkSize <<= 1;
 			if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
@@ -258,7 +294,7 @@ namespace Waher.Runtime.Collections
 		public void Clear()
 		{
 			this.lastChunk = this.firstChunk;
-			
+
 			this.firstChunk.Next = null;
 			this.firstChunk.Start = 0;
 			this.firstChunk.Pos = 0;
@@ -659,9 +695,17 @@ namespace Waher.Runtime.Collections
 			get
 			{
 				if (this.lastChunk is null || this.lastChunk.Pos == this.lastChunk.Start)
-					throw new InvalidOperationException("No last item available.");
+				{
+					if (!this.nullable.HasValue)
+						this.nullable = typeof(T).IsClass;
 
-				return this.lastChunk.Elements[this.lastChunk.Pos - 1];
+					if (this.nullable.Value)
+						return default;
+					else
+						throw new InvalidOperationException("No last item in the collection.");
+				}
+				else
+					return this.lastChunk.Elements[this.lastChunk.Pos - 1];
 			}
 
 			set
@@ -703,9 +747,17 @@ namespace Waher.Runtime.Collections
 			get
 			{
 				if (this.firstChunk is null || this.firstChunk.Pos == this.firstChunk.Start)
-					throw new InvalidOperationException("No first item available.");
+				{
+					if (!this.nullable.HasValue)
+						this.nullable = typeof(T).IsClass;
 
-				return this.firstChunk.Elements[this.firstChunk.Start];
+					if (this.nullable.Value)
+						return default;
+					else
+						throw new InvalidOperationException("No first item in the collection.");
+				}
+				else
+					return this.firstChunk.Elements[this.firstChunk.Start];
 			}
 
 			set
@@ -1297,12 +1349,38 @@ namespace Waher.Runtime.Collections
 		/// Adds a range of elements (last) to the list.
 		/// </summary>
 		/// <param name="Collection">Collection of elements to add.</param>
+		public void AddRange(ChunkedList<T> Collection)
+		{
+			Chunk Loop = Collection.firstChunk;
+
+			while (!(Loop is null))
+			{
+				this.AddRange(Loop.Elements, Loop.Start, Loop.Pos - Loop.Start);
+				Loop = Loop.Next;
+			}
+		}
+
+		/// <summary>
+		/// Adds a range of elements (last) to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
 		public void AddRange(T[] Collection)
 		{
-			int i = 0;
-			int c = Collection.Length;
+			this.AddRange(Collection, 0, Collection.Length);
+		}
+
+		/// <summary>
+		/// Adds a range of elements (last) to the list.
+		/// </summary>
+		/// <param name="Collection">Collection of elements to add.</param>
+		/// <param name="Index">Index of first element to add.</param>
+		/// <param name="Count">Number of elements to add.</param>
+		public void AddRange(T[] Collection, int Index, int Count)
+		{
 			int d;
 
+			Count += Index;
+			
 			if (this.lastChunk.Start > 0)
 			{
 				if (this.lastChunk.Start < this.lastChunk.Pos)
@@ -1315,16 +1393,16 @@ namespace Waher.Runtime.Collections
 				this.lastChunk.Start = 0;
 			}
 
-			while (this.lastChunk.Pos < this.lastChunk.Size && i < c)
+			while (this.lastChunk.Pos < this.lastChunk.Size && Index < Count)
 			{
-				d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, c - i);
-				Array.Copy(Collection, i, this.lastChunk.Elements, this.lastChunk.Pos, d);
-				i += d;
+				d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, Count - Index);
+				Array.Copy(Collection, Index, this.lastChunk.Elements, this.lastChunk.Pos, d);
+				Index += d;
 				this.count += d;
 				this.lastChunk.Pos += d;
 			}
 
-			while (i < c)
+			while (Index < Count)
 			{
 				this.lastChunk = new Chunk(this.chunkSize, this.lastChunk);
 
@@ -1332,14 +1410,14 @@ namespace Waher.Runtime.Collections
 				if (this.chunkSize > this.maxChunkSize || this.chunkSize <= 0)
 					this.chunkSize = this.maxChunkSize;
 
-				this.lastChunk.Elements[this.lastChunk.Pos++] = Collection[i++];
+				this.lastChunk.Elements[this.lastChunk.Pos++] = Collection[Index++];
 				this.count++;
 
-				while (this.lastChunk.Pos < this.lastChunk.Size && i < c)
+				while (this.lastChunk.Pos < this.lastChunk.Size && Index < Count)
 				{
-					d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, c - i);
-					Array.Copy(Collection, i, this.lastChunk.Elements, this.lastChunk.Pos, d);
-					i += d;
+					d = Math.Min(this.lastChunk.Size - this.lastChunk.Pos, Count - Index);
+					Array.Copy(Collection, Index, this.lastChunk.Elements, this.lastChunk.Pos, d);
+					Index += d;
 					this.count += d;
 					this.lastChunk.Pos += d;
 				}
@@ -1448,6 +1526,7 @@ namespace Waher.Runtime.Collections
 		/// </summary>
 		public void Sort()
 		{
+			// TODO: Can be optimized
 			this.MakeOneChunk(false);
 			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start,
 				this.firstChunk.Pos - this.firstChunk.Start);
@@ -1459,6 +1538,7 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(IComparer<T> Comparer)
 		{
+			// TODO: Can be optimized
 			this.MakeOneChunk(false);
 			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start,
 				this.firstChunk.Pos - this.firstChunk.Start, Comparer);
@@ -1470,6 +1550,7 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparison">Comparisong to use during sort.</param>
 		public void Sort(Comparison<T> Comparison)
 		{
+			// TODO: Can be optimized
 			this.MakeOneChunk(true);
 			Array.Sort(this.firstChunk.Elements, Comparison);
 		}
@@ -1482,6 +1563,7 @@ namespace Waher.Runtime.Collections
 		/// <param name="Comparer">Comparer to use during sort.</param>
 		public void Sort(int Index, int Count, IComparer<T> Comparer)
 		{
+			// TODO: Can be optimized
 			this.MakeOneChunk(false);
 			Array.Sort(this.firstChunk.Elements, this.firstChunk.Start + Index, Count, Comparer);
 		}
@@ -1491,6 +1573,7 @@ namespace Waher.Runtime.Collections
 		/// </summary>
 		public void Reverse()
 		{
+			// TODO: Can be optimized
 			this.MakeOneChunk(false);
 			Array.Reverse(this.firstChunk.Elements, this.firstChunk.Start,
 				this.firstChunk.Pos - this.firstChunk.Start);
@@ -1503,6 +1586,7 @@ namespace Waher.Runtime.Collections
 		/// <param name="Count">Number of elements.</param>
 		public void Reverse(int Index, int Count)
 		{
+			// TODO: Can be optimized
 			this.MakeOneChunk(false);
 			Array.Reverse(this.firstChunk.Elements, this.firstChunk.Start + Index, Count);
 		}
@@ -1601,6 +1685,23 @@ namespace Waher.Runtime.Collections
 				this.firstChunk.Start -= d;
 				this.count += d;
 			}
+		}
+
+		#endregion
+
+		#region InsertRange
+
+		/// <summary>
+		/// Inserts a range of elements at a given index.
+		/// </summary>
+		/// <param name="Index">Index to insert the range of elements.</param>
+		/// <param name="Collection">Collection of elements.</param>
+		public void InsertRange(int Index, IEnumerable<T> Collection)
+		{
+			// TODO: Can be optimized
+
+			foreach (T Item in Collection)
+				this.Insert(Index++, Item);
 		}
 
 		#endregion

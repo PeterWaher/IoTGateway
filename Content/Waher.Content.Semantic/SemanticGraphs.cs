@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Semantic
 {
@@ -77,8 +78,8 @@ namespace Waher.Content.Semantic
 		public static async Task<SemanticGraph[]> GetConnectedGraphs(ISemanticModel Model, ISemanticCube Cube)
 		{
 			Dictionary<ISemanticElement, int> Nodes = new Dictionary<ISemanticElement, int>();
-			List<SemanticGraph> Graphs = new List<SemanticGraph>();
-			LinkedList<ISemanticTriple> ToCheck = new LinkedList<ISemanticTriple>();
+			ChunkedList<SemanticGraph> Graphs = new ChunkedList<SemanticGraph>();
+			ChunkedList<ISemanticTriple> ToCheck = new ChunkedList<ISemanticTriple>();
 			SymmetricMatrix<bool> Connections = new SymmetricMatrix<bool>();
 			int NrTraces = 0;
 			int TraceNr;
@@ -99,7 +100,7 @@ namespace Waher.Content.Semantic
 						Connections[TraceNr, TraceNr] = true;
 					}
 
-					ToCheck.AddLast(Triple);
+					ToCheck.Add(Triple);
 				}
 				else if (Triple.Object.Tag is null)
 				{
@@ -127,7 +128,7 @@ namespace Waher.Content.Semantic
 						ISemanticPlane Plane = await Cube.GetTriplesByObject(Triple.Object);
 
 						foreach (ISemanticTriple T2 in Plane)
-							ToCheck.AddLast(T2);
+							ToCheck.Add(T2);
 					}
 				}
 				else
@@ -143,10 +144,9 @@ namespace Waher.Content.Semantic
 					continue;
 				}
 
-				while (!(ToCheck.First is null))
+				while (ToCheck.HasFirstItem)
 				{
-					ISemanticTriple T = ToCheck.First.Value;
-					ToCheck.RemoveFirst();
+					ISemanticTriple T = ToCheck.RemoveFirst();
 
 					if (T.Subject.Tag is null)
 					{
@@ -186,7 +186,7 @@ namespace Waher.Content.Semantic
 								ISemanticPlane Plane = await Cube.GetTriplesByObject(T.Object);
 
 								foreach (ISemanticTriple T2 in Plane)
-									ToCheck.AddLast(T2);
+									ToCheck.Add(T2);
 							}
 						}
 					}

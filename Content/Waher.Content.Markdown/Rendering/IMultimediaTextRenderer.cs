@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering
 {
@@ -17,7 +17,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		Task RenderText(TextRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, 
+		Task RenderText(TextRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes, bool AloneInParagraph, 
 			MarkdownDocument Document);
 	}
 }

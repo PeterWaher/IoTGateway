@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -16,7 +16,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public NestedBlock(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public NestedBlock(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 			this.hasBlocks = this.CalcHasBlocks();
@@ -64,8 +64,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			if (!Inconsistent)
 				return HasBlocks;
 
-			LinkedList<MarkdownElement> NewChildren = new LinkedList<MarkdownElement>();
-			LinkedList<MarkdownElement> Spans = null;
+			ChunkedList<MarkdownElement> NewChildren = new ChunkedList<MarkdownElement>();
+			ChunkedList<MarkdownElement> Spans = null;
 
 			foreach (MarkdownElement E in this.Children)
 			{
@@ -73,23 +73,23 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				{
 					if (!(Spans is null))
 					{
-						NewChildren.AddLast(new Paragraph(this.Document, Spans, true));
+						NewChildren.Add(new Paragraph(this.Document, Spans, true));
 						Spans = null;
 					}
 
-					NewChildren.AddLast(E);
+					NewChildren.Add(E);
 				}
 				else
 				{
 					if (Spans is null)
-						Spans = new LinkedList<MarkdownElement>();
+						Spans = new ChunkedList<MarkdownElement>();
 
-					Spans.AddLast(E);
+					Spans.Add(E);
 				}
 			}
 
 			if (!(Spans is null))
-				NewChildren.AddLast(new Paragraph(this.Document, Spans, true));
+				NewChildren.Add(new Paragraph(this.Document, Spans, true));
 
 			this.SetChildren(NewChildren);
 
@@ -128,7 +128,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new NestedBlock(Document, Children);
 		}

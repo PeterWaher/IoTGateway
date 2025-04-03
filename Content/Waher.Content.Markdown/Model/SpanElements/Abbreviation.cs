@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -17,7 +17,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Description">Description of abbreviation.</param>
-		public Abbreviation(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, string Description)
+		public Abbreviation(MarkdownDocument Document, ChunkedList<MarkdownElement> ChildElements, string Description)
 			: base(Document, ChildElements)
 		{
 			this.description = Description;
@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new Abbreviation(Document, Children, this.description);
 		}

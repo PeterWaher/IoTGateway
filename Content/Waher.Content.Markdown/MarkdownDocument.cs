@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -19,6 +18,7 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Text;
@@ -58,16 +58,16 @@ namespace Waher.Content.Markdown
 		internal static readonly Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
 		internal static readonly Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
-		private readonly List<KeyValuePair<AsyncMarkdownProcessing, object>> asyncTasks = new List<KeyValuePair<AsyncMarkdownProcessing, object>>();
+		private readonly ChunkedList<KeyValuePair<AsyncMarkdownProcessing, object>> asyncTasks = new ChunkedList<KeyValuePair<AsyncMarkdownProcessing, object>>();
 		private readonly Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private readonly Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private Dictionary<string, int> footnoteNumberByKey = null;
 		private Dictionary<string, Footnote> footnotes = null;
 		private SortedDictionary<int, char> toInsert = null;
 		private readonly Type[] transparentExceptionTypes;
-		private List<string> footnoteOrder = null;
-		private LinkedList<MarkdownElement> elements;
-		private readonly List<Header> headers = new List<Header>();
+		private ChunkedList<string> footnoteOrder = null;
+		private ChunkedList<MarkdownElement> elements;
+		private readonly ChunkedList<Header> headers = new ChunkedList<Header>();
 		private readonly IEmojiSource emojiSource;
 		private string markdownText;
 		private string fileName = string.Empty;
@@ -132,8 +132,8 @@ namespace Waher.Content.Markdown
 			MarkdownDocument Result = new MarkdownDocument(MarkdownText, IsDynamic, Settings, FileName, ResourceName, URL, TransparentExceptionTypes);
 
 			ICodecProgress Progress = Settings?.Progress;
-			List<Block> Blocks = ParseTextToBlocks(Result.markdownText);
-			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
+			ChunkedList<Block> Blocks = ParseTextToBlocks(Result.markdownText);
+			ChunkedList<KeyValuePair<string, bool>> Values = new ChunkedList<KeyValuePair<string, bool>>();
 			Block Block;
 			KeyValuePair<string, bool>[] Prev;
 			bool HasProgress = !(Progress is null);
@@ -182,7 +182,7 @@ namespace Waher.Content.Markdown
 								await CheckEarlyHints(Result.settings.Progress, Key, Values);
 
 							if (Result.metaData.TryGetValue(Key, out Prev))
-								Values.InsertRange(0, Prev);
+								Values.AddRangeFirst(Prev);
 							else if (Key == "LOGIN")
 								Result.isDynamic = true;
 
@@ -201,7 +201,7 @@ namespace Waher.Content.Markdown
 						await CheckEarlyHints(Result.settings.Progress, Key, Values);
 
 					if (Result.metaData.TryGetValue(Key, out Prev))
-						Values.InsertRange(0, Prev);
+						Values.AddRangeFirst(Prev);
 					else if (Key == "LOGIN")
 						Result.isDynamic = true;
 
@@ -594,16 +594,16 @@ namespace Waher.Content.Markdown
 			}
 		}
 
-		private Task<LinkedList<MarkdownElement>> ParseBlocks(List<Block> Blocks)
+		private Task<ChunkedList<MarkdownElement>> ParseBlocks(ChunkedList<Block> Blocks)
 		{
 			return this.ParseBlocks(Blocks, 0, Blocks.Count - 1);
 		}
 
-		private async Task<LinkedList<MarkdownElement>> ParseBlocks(List<Block> Blocks, int StartBlock, int EndBlock)
+		private async Task<ChunkedList<MarkdownElement>> ParseBlocks(ChunkedList<Block> Blocks, int StartBlock, int EndBlock)
 		{
-			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
-			LinkedList<MarkdownElement> Content;
-			List<Block> AlignedBlocks;
+			ChunkedList<MarkdownElement> Elements = new ChunkedList<MarkdownElement>();
+			ChunkedList<MarkdownElement> Content;
+			ChunkedList<Block> AlignedBlocks;
 			Block NextBlock;
 			Block Block;
 			string[] Rows;
@@ -630,7 +630,7 @@ namespace Waher.Content.Markdown
 						Content = await this.ParseBlock(Block);
 
 						foreach (MarkdownElement E in Content)
-							Elements.AddLast(E);
+							Elements.Add(E);
 
 						continue;
 					}
@@ -645,10 +645,10 @@ namespace Waher.Content.Markdown
 					}
 
 					if (i == BlockIndex + 1)
-						Elements.AddLast(new CodeBlock(this, Block.Rows, Block.Start, Block.End, c - 1));
+						Elements.Add(new CodeBlock(this, Block.Rows, Block.Start, Block.End, c - 1));
 					else
 					{
-						List<string> CodeBlock = new List<string>();
+						ChunkedList<string> CodeBlock = new ChunkedList<string>();
 
 						while (BlockIndex < i)
 						{
@@ -670,7 +670,7 @@ namespace Waher.Content.Markdown
 							}
 						}
 
-						Elements.AddLast(new CodeBlock(this, CodeBlock.ToArray(), 0, CodeBlock.Count - 1, c - 1));
+						Elements.Add(new CodeBlock(this, CodeBlock.ToArray(), 0, CodeBlock.Count - 1, c - 1));
 						BlockIndex--;
 					}
 					continue;
@@ -701,7 +701,7 @@ namespace Waher.Content.Markdown
 							i++;
 						}
 
-						List<string> Code = new List<string>();
+						ChunkedList<string> Code = new ChunkedList<string>();
 						bool Complete = true;
 
 						if (i > EndBlock)
@@ -762,7 +762,7 @@ namespace Waher.Content.Markdown
 						else
 							CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
 
-						Elements.AddLast(CodeBlock);
+						Elements.Add(CodeBlock);
 
 						if (!this.syntaxHighlighting && !string.IsNullOrEmpty(CodeBlock.Language))
 						{
@@ -792,10 +792,10 @@ namespace Waher.Content.Markdown
 
 						Content = await this.ParseBlocks(AlignedBlocks);
 
-						if (Elements.Last?.Value is CenterAligned CenterAligned)
+						if (Elements.HasLastItem && Elements.LastItem is CenterAligned CenterAligned)
 							CenterAligned.AddChildren(Content);
 						else
-							Elements.AddLast(new CenterAligned(this, Content));
+							Elements.Add(new CenterAligned(this, Content));
 					}
 					else if (Block.IsSuffixedBy(">>"))
 					{
@@ -810,19 +810,19 @@ namespace Waher.Content.Markdown
 
 						Content = await this.ParseBlocks(AlignedBlocks);
 
-						if (Elements.Last?.Value is RightAligned RightAligned)
+						if (Elements.HasLastItem && Elements.LastItem is RightAligned RightAligned)
 							RightAligned.AddChildren(Content);
 						else
-							Elements.AddLast(new RightAligned(this, Content));
+							Elements.Add(new RightAligned(this, Content));
 					}
 					else
 					{
 						Content = await this.ParseBlocks(Block.RemovePrefix(">", 2));
 
-						if (Elements.Last?.Value is BlockQuote BlockQuote)
+						if (Elements.HasLastItem && Elements.LastItem is BlockQuote BlockQuote)
 							BlockQuote.AddChildren(Content);
 						else
-							Elements.AddLast(new BlockQuote(this, Content));
+							Elements.Add(new BlockQuote(this, Content));
 					}
 
 					continue;
@@ -843,10 +843,10 @@ namespace Waher.Content.Markdown
 
 						Content = await this.ParseBlocks(AlignedBlocks);
 
-						if (Elements.Last?.Value is MarginAligned MarginAligned)
+						if (Elements.HasLastItem && Elements.LastItem is MarginAligned MarginAligned)
 							MarginAligned.AddChildren(Content);
 						else
-							Elements.AddLast(new MarginAligned(this, Content));
+							Elements.Add(new MarginAligned(this, Content));
 					}
 					else
 					{
@@ -861,10 +861,10 @@ namespace Waher.Content.Markdown
 
 						Content = await this.ParseBlocks(AlignedBlocks);
 
-						if (Elements.Last?.Value is LeftAligned LeftAligned)
+						if (Elements.HasLastItem && Elements.LastItem is LeftAligned LeftAligned)
 							LeftAligned.AddChildren(Content);
 						else
-							Elements.AddLast(new LeftAligned(this, Content));
+							Elements.Add(new LeftAligned(this, Content));
 					}
 
 					continue;
@@ -873,10 +873,10 @@ namespace Waher.Content.Markdown
 				{
 					Content = await this.ParseBlocks(Block.RemoveSuffix(">>"));
 
-					if (Elements.Last?.Value is RightAligned RightAligned)
+					if (Elements.HasLastItem && Elements.LastItem is RightAligned RightAligned)
 						RightAligned.AddChildren(Content);
 					else
-						Elements.AddLast(new RightAligned(this, Content));
+						Elements.Add(new RightAligned(this, Content));
 
 					continue;
 				}
@@ -884,10 +884,10 @@ namespace Waher.Content.Markdown
 				{
 					Content = await this.ParseBlocks(Block.RemovePrefix("+>", 3));
 
-					if (Elements.Last?.Value is InsertBlocks InsertBlocks)
+					if (Elements.HasLastItem && Elements.LastItem is InsertBlocks InsertBlocks)
 						InsertBlocks.AddChildren(Content);
 					else
-						Elements.AddLast(new InsertBlocks(this, Content));
+						Elements.Add(new InsertBlocks(this, Content));
 
 					continue;
 				}
@@ -895,10 +895,10 @@ namespace Waher.Content.Markdown
 				{
 					Content = await this.ParseBlocks(Block.RemovePrefix("->", 3));
 
-					if (Elements.Last?.Value is DeleteBlocks DeleteBlocks)
+					if (Elements.HasLastItem && Elements.LastItem is DeleteBlocks DeleteBlocks)
 						DeleteBlocks.AddChildren(Content);
 					else
-						Elements.AddLast(new DeleteBlocks(this, Content));
+						Elements.Add(new DeleteBlocks(this, Content));
 
 					continue;
 				}
@@ -909,12 +909,12 @@ namespace Waher.Content.Markdown
 					for (i = Block.Start; i <= Block.End; i++)
 						Comment[i] = Block.Rows[i].Substring(2);
 
-					Elements.AddLast(new CommentBlock(this, Comment));
+					Elements.Add(new CommentBlock(this, Comment));
 					continue;
 				}
 				else if (Block.End == Block.Start && (IsUnderline(Block.Rows[0], '-', true, true) || IsUnderline(Block.Rows[0], '*', true, true)))
 				{
-					Elements.AddLast(new HorizontalRule(this, Block.Rows[0]));
+					Elements.Add(new HorizontalRule(this, Block.Rows[0]));
 					continue;
 				}
 				else if (Block.End == Block.Start && IsUnderline(Block.Rows[0], '=', true, false))
@@ -922,25 +922,26 @@ namespace Waher.Content.Markdown
 					int NrColumns = Block.Rows[0].Split(whiteSpace, StringSplitOptions.RemoveEmptyEntries).Length;
 					HasSections = true;
 
-					if (Elements.First is null)
+					if (!Elements.HasFirstItem)
 					{
 						InitialNrColumns = NrColumns;
 						InitialSectionSeparator = Block.Rows[0];
 					}
 					else
-						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns, Block.Rows[0]));
+						Elements.Add(new SectionSeparator(this, ++SectionNr, NrColumns, Block.Rows[0]));
+				
 					continue;
 				}
 				else if (Block.End == Block.Start && IsUnderline(Block.Rows[0], '~', false, false))
 				{
-					Elements.AddLast(new InvisibleBreak(this, Block.Rows[0]));
+					Elements.Add(new InvisibleBreak(this, Block.Rows[0]));
 					continue;
 				}
 				else if (Block.IsPrefixedBy(s2 = "*", true) ||
 					Block.IsPrefixedBy(s2 = "+", true) ||
 					Block.IsPrefixedBy(s2 = "-", true))
 				{
-					LinkedList<Block> Segments = null;
+					ChunkedList<Block> Segments = null;
 					i = 0;
 					c = Block.End;
 
@@ -950,21 +951,21 @@ namespace Waher.Content.Markdown
 						if (IsPrefixedBy(s, s2, true))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<Block>();
+								Segments = new ChunkedList<Block>();
 
-							Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, d - 1));
+							Segments.Add(new Block(Block.Rows, Block.Positions, 0, i, d - 1));
 							i = d;
 						}
 					}
 
-					Segments?.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
+					Segments?.Add(new Block(Block.Rows, Block.Positions, 0, i, c));
 
-					LinkedList<MarkdownElement> Items;
+					ChunkedList<MarkdownElement> Items;
 					UnnumberedItem LastItem;
 
 					if (Segments is null)
 					{
-						List<Block> SubBlocks = Block.RemovePrefix(s2, 4);
+						ChunkedList<Block> SubBlocks = Block.RemovePrefix(s2, 4);
 
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
 						{
@@ -976,14 +977,14 @@ namespace Waher.Content.Markdown
 						Items = await this.ParseBlocks(SubBlocks);
 						LastItem = new UnnumberedItem(this, s2, new NestedBlock(this, Items));
 
-						if (Elements.Last?.Value is BulletList BulletList)
-							BulletList.AddChildren(LastItem);
+						if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+							BulletList.AddChild(LastItem);
 						else
-							Elements.AddLast(new BulletList(this, LastItem));
+							Elements.Add(new BulletList(this, LastItem));
 					}
 					else
 					{
-						Items = new LinkedList<MarkdownElement>();
+						Items = new ChunkedList<MarkdownElement>();
 						LastItem = null;
 
 						foreach (Block Segment in Segments)
@@ -991,14 +992,14 @@ namespace Waher.Content.Markdown
 							foreach (Block SegmentItem in Segment.RemovePrefix(s2, 4))
 							{
 								LastItem = new UnnumberedItem(this, s2, new NestedBlock(this, await this.ParseBlock(SegmentItem)));
-								Items.AddLast(LastItem);
+								Items.Add(LastItem);
 							}
 						}
 
-						if (Elements.Last?.Value is BulletList BulletList)
+						if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
 							BulletList.AddChildren(Items);
 						else
-							Elements.AddLast(new BulletList(this, Items));
+							Elements.Add(new BulletList(this, Items));
 					}
 
 					if (!(LastItem is null))
@@ -1020,16 +1021,16 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
+									Items.AddFirstItem(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
 							else
 							{
 								if (LastItem.Child.IsBlockElement)
-									Items.AddFirst(LastItem.Child);
+									Items.AddFirstItem(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
+									Items.AddFirstItem(new Paragraph(this, new ChunkedList<MarkdownElement>(LastItem.Child), true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1040,7 +1041,7 @@ namespace Waher.Content.Markdown
 				}
 				else if (Block.IsPrefixedBy("#.", true))
 				{
-					LinkedList<Tuple<int, bool, Block>> Segments = null;
+					ChunkedList<Tuple<int, bool, Block>> Segments = null;
 					i = 0;
 					c = Block.End;
 					int Index2 = 1;
@@ -1052,9 +1053,9 @@ namespace Waher.Content.Markdown
 						if (IsPrefixedByNumber(s, out j))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<Tuple<int, bool, Block>>();
+								Segments = new ChunkedList<Tuple<int, bool, Block>>();
 
-							Segments.AddLast(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							Segments.Add(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
 							i = d;
 							Index2 = j;
 							Explicit = true;
@@ -1062,23 +1063,23 @@ namespace Waher.Content.Markdown
 						else if (IsPrefixedBy(s, "#.", true))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<Tuple<int, bool, Block>>();
+								Segments = new ChunkedList<Tuple<int, bool, Block>>();
 
-							Segments.AddLast(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							Segments.Add(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
 							i = d;
 							Index2++;
 							Explicit = false;
 						}
 					}
 
-					Segments?.AddLast(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, c)));
+					Segments?.Add(new Tuple<int, bool, Block>(Index2, Explicit, new Block(Block.Rows, Block.Positions, 0, i, c)));
 
-					LinkedList<MarkdownElement> Items;
+					ChunkedList<MarkdownElement> Items;
 					NumberedItem LastItem;
 
 					if (Segments is null)
 					{
-						List<Block> SubBlocks = Block.RemovePrefix("#.", 4);
+						ChunkedList<Block> SubBlocks = Block.RemovePrefix("#.", 4);
 
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
 						{
@@ -1090,14 +1091,14 @@ namespace Waher.Content.Markdown
 						Items = await this.ParseBlocks(SubBlocks);
 						LastItem = new NumberedItem(this, Index2, Explicit, new NestedBlock(this, Items));
 
-						if (Elements.Last?.Value is NumberedList NumberedList)
-							NumberedList.AddChildren(LastItem);
+						if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
+							NumberedList.AddChild(LastItem);
 						else
-							Elements.AddLast(new NumberedList(this, LastItem));
+							Elements.Add(new NumberedList(this, LastItem));
 					}
 					else
 					{
-						Items = new LinkedList<MarkdownElement>();
+						Items = new ChunkedList<MarkdownElement>();
 						LastItem = null;
 
 						foreach (Tuple<int, bool, Block> Segment in Segments)
@@ -1108,14 +1109,14 @@ namespace Waher.Content.Markdown
 								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2,
 									new NestedBlock(this, await this.ParseBlock(SegmentItem)));
 
-								Items.AddLast(LastItem);
+								Items.Add(LastItem);
 							}
 						}
 
-						if (Elements.Last?.Value is NumberedList NumberedList)
+						if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
 							NumberedList.AddChildren(Items);
 						else
-							Elements.AddLast(new NumberedList(this, Items));
+							Elements.Add(new NumberedList(this, Items));
 					}
 
 					if (!(LastItem is null))
@@ -1137,16 +1138,16 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
+									Items.AddFirstItem(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
 							else
 							{
 								if (LastItem.Child.IsBlockElement)
-									Items.AddFirst(LastItem.Child);
+									Items.AddFirstItem(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
+									Items.AddFirstItem(new Paragraph(this, new ChunkedList<MarkdownElement>(LastItem.Child), true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1159,7 +1160,7 @@ namespace Waher.Content.Markdown
 					Block.IsPrefixedBy(s2 = "[x]", true) ||
 					Block.IsPrefixedBy(s2 = "[X]", true))
 				{
-					LinkedList<Tuple<Block, string, int>> Segments = null;
+					ChunkedList<Tuple<Block, string, int>> Segments = null;
 					int CheckPosition = Block.Positions[0] + 1;
 					string s3;
 					i = 0;
@@ -1173,23 +1174,23 @@ namespace Waher.Content.Markdown
 							IsPrefixedBy(s, s3 = "[X]", true))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<Tuple<Block, string, int>>();
+								Segments = new ChunkedList<Tuple<Block, string, int>>();
 
-							Segments.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, d - 1), s2, CheckPosition));
+							Segments.Add(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, d - 1), s2, CheckPosition));
 							s2 = s3;
 							i = d;
 							CheckPosition = Block.Positions[d] + 1;
 						}
 					}
 
-					Segments?.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
+					Segments?.Add(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
 
-					LinkedList<MarkdownElement> Items;
+					ChunkedList<MarkdownElement> Items;
 					TaskItem LastItem;
 
 					if (Segments is null)
 					{
-						List<Block> SubBlocks = Block.RemovePrefix(s2, 4);
+						ChunkedList<Block> SubBlocks = Block.RemovePrefix(s2, 4);
 
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
 						{
@@ -1201,14 +1202,14 @@ namespace Waher.Content.Markdown
 						Items = await this.ParseBlocks(SubBlocks);
 						LastItem = new TaskItem(this, s2 != "[ ]", CheckPosition, new NestedBlock(this, Items));
 
-						if (Elements.Last?.Value is TaskList TaskList)
-							TaskList.AddChildren(LastItem);
+						if (Elements.HasLastItem && Elements.LastItem is TaskList TaskList)
+							TaskList.AddChild(LastItem);
 						else
-							Elements.AddLast(new TaskList(this, LastItem));
+							Elements.Add(new TaskList(this, LastItem));
 					}
 					else
 					{
-						Items = new LinkedList<MarkdownElement>();
+						Items = new ChunkedList<MarkdownElement>();
 						LastItem = null;
 
 						foreach (Tuple<Block, string, int> Segment in Segments)
@@ -1218,14 +1219,14 @@ namespace Waher.Content.Markdown
 								LastItem = new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3,
 									new NestedBlock(this, await this.ParseBlock(SegmentItem)));
 
-								Items.AddLast(LastItem);
+								Items.Add(LastItem);
 							}
 						}
 
-						if (Elements.Last?.Value is TaskList TaskList)
+						if (Elements.HasLastItem && Elements.LastItem is TaskList TaskList)
 							TaskList.AddChildren(Items);
 						else
-							Elements.AddLast(new TaskList(this, Items));
+							Elements.Add(new TaskList(this, Items));
 					}
 
 					if (!(LastItem is null))
@@ -1247,16 +1248,16 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
+									Items.AddFirstItem(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
 							else
 							{
 								if (LastItem.Child.IsBlockElement)
-									Items.AddFirst(LastItem.Child);
+									Items.AddFirstItem(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
+									Items.AddFirstItem(new Paragraph(this, new ChunkedList<MarkdownElement>(LastItem.Child), true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1267,7 +1268,7 @@ namespace Waher.Content.Markdown
 				}
 				else if (Block.IsPrefixedByNumber(out Index))
 				{
-					LinkedList<Tuple<int, bool, Block>> Segments = null;
+					ChunkedList<Tuple<int, bool, Block>> Segments = null;
 					i = 0;
 					c = Block.End;
 					bool Explicit = true;
@@ -1278,9 +1279,9 @@ namespace Waher.Content.Markdown
 						if (IsPrefixedByNumber(s, out j))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<Tuple<int, bool, Block>>();
+								Segments = new ChunkedList<Tuple<int, bool, Block>>();
 
-							Segments.AddLast(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							Segments.Add(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
 							i = d;
 							Index = j;
 							Explicit = true;
@@ -1288,24 +1289,24 @@ namespace Waher.Content.Markdown
 						else if (IsPrefixedBy(s, "#.", true))
 						{
 							if (Segments is null)
-								Segments = new LinkedList<Tuple<int, bool, Block>>();
+								Segments = new ChunkedList<Tuple<int, bool, Block>>();
 
-							Segments.AddLast(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
+							Segments.Add(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, d - 1)));
 							i = d;
 							Index++;
 							Explicit = false;
 						}
 					}
 
-					Segments?.AddLast(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, c)));
+					Segments?.Add(new Tuple<int, bool, Block>(Index, Explicit, new Block(Block.Rows, Block.Positions, 0, i, c)));
 
-					LinkedList<MarkdownElement> Items;
+					ChunkedList<MarkdownElement> Items;
 					NumberedItem LastItem;
 
 					if (Segments is null)
 					{
 						s = Index.ToString();
-						List<Block> SubBlocks = Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2));
+						ChunkedList<Block> SubBlocks = Block.RemovePrefix(s + ".", Math.Max(4, s.Length + 2));
 
 						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 1)
 						{
@@ -1317,14 +1318,14 @@ namespace Waher.Content.Markdown
 						Items = await this.ParseBlocks(SubBlocks);
 						LastItem = new NumberedItem(this, Index, Explicit, new NestedBlock(this, Items));
 
-						if (Elements.Last?.Value is NumberedList NumberedList)
-							NumberedList.AddChildren(LastItem);
+						if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
+							NumberedList.AddChild(LastItem);
 						else
-							Elements.AddLast(new NumberedList(this, LastItem));
+							Elements.Add(new NumberedList(this, LastItem));
 					}
 					else
 					{
-						Items = new LinkedList<MarkdownElement>();
+						Items = new ChunkedList<MarkdownElement>();
 						LastItem = null;
 
 						foreach (Tuple<int, bool, Block> Segment in Segments)
@@ -1335,14 +1336,14 @@ namespace Waher.Content.Markdown
 								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2,
 									new NestedBlock(this, await this.ParseBlock(SegmentItem)));
 
-								Items.AddLast(LastItem);
+								Items.Add(LastItem);
 							}
 						}
 
-						if (Elements.Last?.Value is NumberedList NumberedList)
+						if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
 							NumberedList.AddChildren(Items);
 						else
-							Elements.AddLast(new NumberedList(this, Items));
+							Elements.Add(new NumberedList(this, Items));
 					}
 
 					if (!(LastItem is null))
@@ -1364,16 +1365,16 @@ namespace Waher.Content.Markdown
 									LastItemChildren.AddChildren(Items);
 								else
 								{
-									Items.AddFirst(new Paragraph(this, LastItemChildren.Children, true));
+									Items.AddFirstItem(new Paragraph(this, LastItemChildren.Children, true));
 									LastItem.Child = new NestedBlock(this, Items);
 								}
 							}
 							else
 							{
 								if (LastItem.Child.IsBlockElement)
-									Items.AddFirst(LastItem.Child);
+									Items.AddFirstItem(LastItem.Child);
 								else
-									Items.AddFirst(new Paragraph(this, new MarkdownElement[] { LastItem.Child }, true));
+									Items.AddFirstItem(new Paragraph(this, new ChunkedList<MarkdownElement>(LastItem.Child), true));
 
 								LastItem.Child = new NestedBlock(this, Items);
 							}
@@ -1388,7 +1389,7 @@ namespace Waher.Content.Markdown
 					MarkdownElement[][] DataRows = new MarkdownElement[TableInformation.NrDataRows][];
 					TextAlignment?[][] HeaderCellAlignments = new TextAlignment?[TableInformation.NrHeaderRows][];
 					TextAlignment?[][] DataCellAlignments = new TextAlignment?[TableInformation.NrDataRows][];
-					LinkedList<MarkdownElement> CellElements;
+					ChunkedList<MarkdownElement> CellElements;
 					string[] Row;
 					int[] Positions;
 
@@ -1414,9 +1415,9 @@ namespace Waher.Content.Markdown
 							{
 								CellElements = await this.ParseCell(Row[i], Positions[i], out HeaderCellAlignments[j][i]);
 
-								if (!(CellElements.First is null) && CellElements.First.Next is null)
+								if (CellElements.Count == 1)
 								{
-									if (CellElements.First.Value is FootnoteReference FRef)
+									if (CellElements.FirstItem is FootnoteReference FRef)
 									{
 										FRef.AutoExpand = true;
 
@@ -1431,7 +1432,7 @@ namespace Waher.Content.Markdown
 										}
 									}
 
-									Headers[j][i] = CellElements.First.Value;
+									Headers[j][i] = CellElements.FirstItem;
 								}
 								else
 									Headers[j][i] = new NestedBlock(this, CellElements);
@@ -1459,9 +1460,9 @@ namespace Waher.Content.Markdown
 							{
 								CellElements = await this.ParseCell(Row[i], Positions[i], out DataCellAlignments[j][i]);
 
-								if (!(CellElements.First is null) && CellElements.First.Next is null)
+								if (CellElements.Count == 1)
 								{
-									if (CellElements.First.Value is FootnoteReference FRef)
+									if (CellElements.FirstItem is FootnoteReference FRef)
 									{
 										FRef.AutoExpand = true;
 
@@ -1476,7 +1477,7 @@ namespace Waher.Content.Markdown
 										}
 									}
 
-									DataRows[j][i] = CellElements.First.Value;
+									DataRows[j][i] = CellElements.FirstItem;
 								}
 								else
 									DataRows[j][i] = new NestedBlock(this, CellElements);
@@ -1484,14 +1485,14 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					Elements.AddLast(new Table(this, c, Headers, DataRows, TableInformation.Alignments, TableInformation.AlignmentDefinitions,
+					Elements.Add(new Table(this, c, Headers, DataRows, TableInformation.Alignments, TableInformation.AlignmentDefinitions,
 						HeaderCellAlignments, DataCellAlignments, TableInformation.Caption, TableInformation.Id));
 
 					continue;
 				}
-				else if (Block.IsPrefixedBy(":", true) && !(Elements.Last is null))
+				else if (Block.IsPrefixedBy(":", true) && Elements.HasLastItem)
 				{
-					LinkedList<MarkdownElement> Description = await this.ParseBlocks(Block.RemovePrefix(":", 4));
+					ChunkedList<MarkdownElement> Description = await this.ParseBlocks(Block.RemovePrefix(":", 4));
 					DefinitionDescriptions DefinitionDescriptions;
 
 					i = BlockIndex;
@@ -1504,51 +1505,51 @@ namespace Waher.Content.Markdown
 					if (BlockIndex > i)
 					{
 						foreach (MarkdownElement E in await this.ParseBlocks(Blocks, i + 1, BlockIndex))
-							Description.AddLast(E);
+							Description.Add(E);
 					}
 
-					if (Description.First is null)
+					if (!Description.HasFirstItem)
 						continue;
 
-					if (Description.First.Next is null)
+					if (Description.Count == 1)
 						DefinitionDescriptions = new DefinitionDescriptions(this, Description);
 					else
 						DefinitionDescriptions = new DefinitionDescriptions(this, new NestedBlock(this, Description));
 
-					if (Elements.Last.Value is DefinitionDescriptions DefinitionDescriptions2)
+					if (Elements.HasLastItem && Elements.LastItem is DefinitionDescriptions DefinitionDescriptions2)
 						DefinitionDescriptions2.AddChildren(DefinitionDescriptions.Children);
-					else if (Elements.Last.Value is DefinitionTerms DefinitionTerms)
-						Elements.Last.Value = new DefinitionList(this, DefinitionTerms, DefinitionDescriptions);
-					else if (Elements.Last.Value is DefinitionList DefinitionList)
-						DefinitionList.AddChildren(DefinitionDescriptions);
+					else if (Elements.HasLastItem && Elements.LastItem is DefinitionTerms DefinitionTerms)
+						Elements.LastItem = new DefinitionList(this, DefinitionTerms, DefinitionDescriptions);
+					else if (Elements.HasLastItem && Elements.LastItem is DefinitionList DefinitionList)
+						DefinitionList.AddChild(DefinitionDescriptions);
 					else
-						Elements.AddLast(new DefinitionList(this, DefinitionDescriptions));
+						Elements.Add(new DefinitionList(this, DefinitionDescriptions));
 
 					continue;
 				}
 				else if (BlockIndex < EndBlock && Blocks[BlockIndex + 1].IsPrefixedBy(":", true))
 				{
-					LinkedList<MarkdownElement> Terms = new LinkedList<MarkdownElement>();
-					LinkedList<MarkdownElement> Term;
+					ChunkedList<MarkdownElement> Terms = new ChunkedList<MarkdownElement>();
+					ChunkedList<MarkdownElement> Term;
 
 					Rows = Block.Rows;
 					c = Block.End;
 					for (i = Block.Start; i <= c; i++)
 					{
 						Term = await this.ParseBlock(Rows, Block.Positions, i, i);
-						if (Term.First is null)
+						if (!Term.HasFirstItem)
 							continue;
 
-						if (Term.First.Next is null)
-							Terms.AddLast(Term.First.Value);
+						if (Term.Count == 1)
+							Terms.Add(Term.FirstItem);
 						else
-							Terms.AddLast(new NestedBlock(this, Term));
+							Terms.Add(new NestedBlock(this, Term));
 					}
 
-					if (Elements.Last?.Value is DefinitionList DefinitionList)
-						DefinitionList.AddChildren(new DefinitionTerms(this, Terms));
+					if (Elements.HasLastItem && Elements.LastItem is DefinitionList DefinitionList)
+						DefinitionList.AddChild(new DefinitionTerms(this, Terms));
 					else
-						Elements.AddLast(new DefinitionTerms(this, Terms));
+						Elements.Add(new DefinitionTerms(this, Terms));
 
 					continue;
 				}
@@ -1570,7 +1571,7 @@ namespace Waher.Content.Markdown
 					if (this.footnoteNumberByKey is null)
 					{
 						this.footnoteNumberByKey = new Dictionary<string, int>();
-						this.footnoteOrder = new List<string>();
+						this.footnoteOrder = new ChunkedList<string>();
 						this.footnotes = new Dictionary<string, Footnote>();
 					}
 
@@ -1589,14 +1590,14 @@ namespace Waher.Content.Markdown
 					if (IsUnderline(s, '=', false, false))
 					{
 						Header Header = new Header(this, 1, false, s, this.PrepareHeader(await this.ParseBlock(Rows, Block.Positions, 0, c - 1)));
-						Elements.AddLast(Header);
+						Elements.Add(Header);
 						this.headers.Add(Header);
 						continue;
 					}
 					else if (IsUnderline(s, '-', false, false))
 					{
 						Header Header = new Header(this, 2, false, s, this.PrepareHeader(await this.ParseBlock(Rows, Block.Positions, 0, c - 1)));
-						Elements.AddLast(Header);
+						Elements.Add(Header);
 						this.headers.Add(Header);
 						continue;
 					}
@@ -1617,63 +1618,73 @@ namespace Waher.Content.Markdown
 						Rows[c] = s.Substring(0, i).TrimEnd();
 
 					Header Header = new Header(this, d, true, Prefix, this.PrepareHeader(await this.ParseBlock(Rows, Block.Positions, Block.Start, c)));
-					Elements.AddLast(Header);
+					Elements.Add(Header);
 					this.headers.Add(Header);
 					continue;
 				}
 
-				KeyValuePair<LinkedList<MarkdownElement>, int> P = await this.ParseBlock(Block, Blocks, BlockIndex, EndBlock);
+				KeyValuePair<ChunkedList<MarkdownElement>, int> P = await this.ParseBlock(Block, Blocks, BlockIndex, EndBlock);
 				Content = P.Key;
 				BlockIndex = P.Value;
 
-				if (!(Content.First is null))
+				if (Content.HasFirstItem)
 				{
-					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML && this.settings.AllowHtml)
-						Elements.AddLast(new HtmlBlock(this, Content));
-					else if (Content.First.Next is null && Content.First.Value.OutsideParagraph)
+					if (Content.HasFirstItem &&
+						Content.HasLastItem &&
+						Content.FirstItem is InlineHTML &&
+						Content.LastItem is InlineHTML && 
+						this.settings.AllowHtml)
 					{
-						if (Content.First.Value is MarkdownElementChildren MarkdownElementChildren &&
-							MarkdownElementChildren.JoinOverParagraphs && !(Elements.Last is null) &&
-							Elements.Last.Value is MarkdownElementChildren MarkdownElementChildrenLast)
+						Elements.Add(new HtmlBlock(this, Content));
+					}
+					else if (Content.Count == 1 && Content.FirstItem.OutsideParagraph)
+					{
+						if (Content.HasFirstItem &&
+							Content.HasLastItem &&
+							Content.FirstItem is MarkdownElementChildren MarkdownElementChildren &&
+							MarkdownElementChildren.JoinOverParagraphs && 
+							Elements.LastItem is MarkdownElementChildren MarkdownElementChildrenLast)
 						{
 							MarkdownElementChildrenLast.AddChildren(MarkdownElementChildren.Children);
 						}
 						else
-							Elements.AddLast(Content.First.Value);
+							Elements.Add(Content.FirstItem);
 					}
 					else
-						Elements.AddLast(new Paragraph(this, Content));
+						Elements.Add(new Paragraph(this, Content));
 				}
 			}
 
 			if (HasSections)
 			{
-				LinkedList<MarkdownElement> Sections = new LinkedList<MarkdownElement>();
-				Sections.AddLast(new Sections(this, InitialNrColumns, InitialSectionSeparator, Elements));
+				ChunkedList<MarkdownElement> Sections = new ChunkedList<MarkdownElement>();
+				Sections.Add(new Sections(this, InitialNrColumns, InitialSectionSeparator, Elements));
 				return Sections;
 			}
 			else
 				return Elements;
 		}
 
-		private LinkedList<MarkdownElement> PrepareHeader(LinkedList<MarkdownElement> Content)
+		private ChunkedList<MarkdownElement> PrepareHeader(ChunkedList<MarkdownElement> Content)
 		{
-			if (Content?.First?.Value is NumberedList NumberedList &&
-				Content.First.Next is null &&
+			if (Content?.FirstItem is NumberedList NumberedList &&
+				Content.Count == 1 &&
 				NumberedList.HasOneChild &&
 				NumberedList.FirstChild is NumberedItem Item &&
 				Item.NumberExplicit)
 			{
-				LinkedList<MarkdownElement> NewContent = new LinkedList<MarkdownElement>();
-				NewContent.AddLast(new InlineText(this, Item.Number.ToString() + ". "));
+				ChunkedList<MarkdownElement> NewContent = new ChunkedList<MarkdownElement>
+				{
+					new InlineText(this, Item.Number.ToString() + ". ")
+				};
 
 				if (Item.Child is NestedBlock B)
 				{
 					foreach (MarkdownElement E in B.Children)
-						NewContent.AddLast(E);
+						NewContent.Add(E);
 				}
 				else
-					NewContent.AddLast(Item.Child);
+					NewContent.Add(Item.Child);
 
 				return NewContent;
 			}
@@ -1681,7 +1692,7 @@ namespace Waher.Content.Markdown
 				return Content;
 		}
 
-		private Task<LinkedList<MarkdownElement>> ParseCell(string Cell, int Position, out TextAlignment? Alignment)
+		private Task<ChunkedList<MarkdownElement>> ParseCell(string Cell, int Position, out TextAlignment? Alignment)
 		{
 			if (Cell.StartsWith("<<"))
 			{
@@ -1715,42 +1726,42 @@ namespace Waher.Content.Markdown
 			return this.ParseBlock(new string[] { Cell }, new int[] { Position });
 		}
 
-		private async Task<LinkedList<MarkdownElement>> ParseBlock(string[] Rows, int[] Positions)
+		private async Task<ChunkedList<MarkdownElement>> ParseBlock(string[] Rows, int[] Positions)
 		{
 			return (await this.ParseBlock(Rows, Positions, 0, Rows.Length - 1, null, 0, 0)).Key;
 		}
 
-		private async Task<LinkedList<MarkdownElement>> ParseBlock(Block Block)
+		private async Task<ChunkedList<MarkdownElement>> ParseBlock(Block Block)
 		{
 			return (await this.ParseBlock(Block.Rows, Block.Positions, Block.Start, Block.End, null, 0, 0)).Key;
 		}
 
-		private Task<KeyValuePair<LinkedList<MarkdownElement>, int>> ParseBlock(Block Block, List<Block> Blocks, int BlockIndex, int EndBlock)
+		private Task<KeyValuePair<ChunkedList<MarkdownElement>, int>> ParseBlock(Block Block, ChunkedList<Block> Blocks, int BlockIndex, int EndBlock)
 		{
 			return this.ParseBlock(Block.Rows, Block.Positions, Block.Start, Block.End, Blocks, BlockIndex, EndBlock);
 		}
 
-		private async Task<LinkedList<MarkdownElement>> ParseBlock(string[] Rows, int[] Positions, int StartRow, int EndRow)
+		private async Task<ChunkedList<MarkdownElement>> ParseBlock(string[] Rows, int[] Positions, int StartRow, int EndRow)
 		{
 			return (await this.ParseBlock(Rows, Positions, StartRow, EndRow, null, 0, 0)).Key;
 		}
 
-		private async Task<KeyValuePair<LinkedList<MarkdownElement>, int>> ParseBlock(string[] Rows, int[] Positions, int StartRow, int EndRow, List<Block> Blocks,
+		private async Task<KeyValuePair<ChunkedList<MarkdownElement>, int>> ParseBlock(string[] Rows, int[] Positions, int StartRow, int EndRow, ChunkedList<Block> Blocks,
 			int BlockIndex, int EndBlock)
 		{
-			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
+			ChunkedList<MarkdownElement> Elements = new ChunkedList<MarkdownElement>();
 			bool PreserveCrLf = Rows[StartRow].StartsWith("<") && Rows[EndRow].EndsWith(">");
 			BlockParseState State = new BlockParseState(Rows, Positions, StartRow, EndRow, PreserveCrLf, Blocks, BlockIndex, EndBlock);
 
 			await this.ParseBlock(State, (char)0, 1, Elements, true);
 
-			return new KeyValuePair<LinkedList<MarkdownElement>, int>(Elements, State.BlockIndex);
+			return new KeyValuePair<ChunkedList<MarkdownElement>, int>(Elements, State.BlockIndex);
 		}
 
 		private async Task<bool> ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount,
-			LinkedList<MarkdownElement> Elements, bool AcceptIncomplete)
+			ChunkedList<MarkdownElement> Elements, bool AcceptIncomplete)
 		{
-			LinkedList<MarkdownElement> ChildElements;
+			ChunkedList<MarkdownElement> ChildElements;
 			StringBuilder Text = new StringBuilder();
 			string Url, Title;
 			char ch, ch2, ch3;
@@ -1774,7 +1785,7 @@ namespace Waher.Content.Markdown
 				{
 					case '\n':
 						this.AppendAnyText(Elements, Text);
-						Elements.AddLast(new LineBreak(this));
+						Elements.Add(new LineBreak(this));
 						break;
 
 					case '\r':
@@ -1792,8 +1803,8 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
-								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>()
+								ChunkedList<string> Rows = new ChunkedList<string>();
+								ChunkedList<int> Positions = new ChunkedList<int>()
 								{
 									State.CurrentPosition
 								};
@@ -1806,10 +1817,10 @@ namespace Waher.Content.Markdown
 									{
 										Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (Elements.Last?.Value is BulletList BulletList)
-											BulletList.AddChildren(Item);
+										if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+											BulletList.AddChild(Item);
 										else
-											Elements.AddLast(new BulletList(this, Item));
+											Elements.Add(new BulletList(this, Item));
 
 										State.NextCharSameRow();
 										State.SkipWhitespaceSameRow(3);
@@ -1833,10 +1844,10 @@ namespace Waher.Content.Markdown
 								{
 									Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (Elements.Last?.Value is BulletList BulletList)
-										BulletList.AddChildren(Item);
+									if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+										BulletList.AddChild(Item);
 									else
-										Elements.AddLast(new BulletList(this, Item));
+										Elements.Add(new BulletList(this, Item));
 								}
 							}
 							else
@@ -1846,14 +1857,14 @@ namespace Waher.Content.Markdown
 						}
 
 						this.AppendAnyText(Elements, Text);
-						ChildElements = new LinkedList<MarkdownElement>();
+						ChildElements = new ChunkedList<MarkdownElement>();
 						ch2 = State.PeekNextCharSameRow();
 						if (ch2 == '*')
 						{
 							State.NextCharSameRow();
 
 							await this.ParseBlock(State, '*', 2, ChildElements, true);
-							Elements.AddLast(new Strong(this, ChildElements));
+							Elements.Add(new Strong(this, ChildElements));
 						}
 						else
 						{
@@ -1864,7 +1875,7 @@ namespace Waher.Content.Markdown
 							{
 								case ')':
 									State.NextCharSameRow();
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_wink));
 									break;
 
 								case '-':
@@ -1875,14 +1886,14 @@ namespace Waher.Content.Markdown
 									{
 										State.DiscardBackup();
 										State.NextCharSameRow();
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_wink));
 									}
 									else
 									{
 										State.RestoreState();
 
 										if (await this.ParseBlock(State, '*', 1, ChildElements, TerminationCharacter != '*'))
-											Elements.AddLast(new Emphasize(this, ChildElements));
+											Elements.Add(new Emphasize(this, ChildElements));
 										else
 											this.FixSyntaxError(Elements, "*", ChildElements);
 									}
@@ -1899,7 +1910,7 @@ namespace Waher.Content.Markdown
 											{
 												State.DiscardBackup();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_ok_woman));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_ok_woman));
 												break;
 											}
 										}
@@ -1907,7 +1918,7 @@ namespace Waher.Content.Markdown
 
 									State.RestoreState();
 									if (await this.ParseBlock(State, '*', 1, ChildElements, TerminationCharacter != '*'))
-										Elements.AddLast(new Emphasize(this, ChildElements));
+										Elements.Add(new Emphasize(this, ChildElements));
 									else
 										this.FixSyntaxError(Elements, "*", ChildElements);
 
@@ -1915,7 +1926,7 @@ namespace Waher.Content.Markdown
 
 								default:
 									if (await this.ParseBlock(State, '*', 1, ChildElements, TerminationCharacter != '*'))
-										Elements.AddLast(new Emphasize(this, ChildElements));
+										Elements.Add(new Emphasize(this, ChildElements));
 									else
 										this.FixSyntaxError(Elements, "*", ChildElements);
 									break;
@@ -1931,19 +1942,19 @@ namespace Waher.Content.Markdown
 						}
 
 						this.AppendAnyText(Elements, Text);
-						ChildElements = new LinkedList<MarkdownElement>();
+						ChildElements = new ChunkedList<MarkdownElement>();
 						ch2 = State.PeekNextCharSameRow();
 						if (ch2 == '_')
 						{
 							State.NextCharSameRow();
 
 							await this.ParseBlock(State, '_', 2, ChildElements, true);
-							Elements.AddLast(new Insert(this, ChildElements));
+							Elements.Add(new Insert(this, ChildElements));
 						}
 						else
 						{
 							if (await this.ParseBlock(State, '_', 1, ChildElements, TerminationCharacter != '_'))
-								Elements.AddLast(new Underline(this, ChildElements));
+								Elements.Add(new Underline(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "_", ChildElements);
 						}
@@ -1957,19 +1968,19 @@ namespace Waher.Content.Markdown
 						}
 
 						this.AppendAnyText(Elements, Text);
-						ChildElements = new LinkedList<MarkdownElement>();
+						ChildElements = new ChunkedList<MarkdownElement>();
 						ch2 = State.PeekNextCharSameRow();
 						if (ch2 == '~')
 						{
 							State.NextCharSameRow();
 
 							await this.ParseBlock(State, '~', 2, ChildElements, true);
-							Elements.AddLast(new Delete(this, ChildElements));
+							Elements.Add(new Delete(this, ChildElements));
 						}
 						else
 						{
 							if (await this.ParseBlock(State, '~', 1, ChildElements, TerminationCharacter != '~'))
-								Elements.AddLast(new StrikeThrough(this, ChildElements));
+								Elements.Add(new StrikeThrough(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "~", ChildElements);
 						}
@@ -1999,7 +2010,7 @@ namespace Waher.Content.Markdown
 								Text.Append(ch2);
 						}
 
-						Elements.AddLast(new InlineCode(this, Text.ToString()));
+						Elements.Add(new InlineCode(this, Text.ToString()));
 						Text.Clear();
 						break;
 
@@ -2025,7 +2036,7 @@ namespace Waher.Content.Markdown
 							{
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntity(this, "LeftDoubleBracket"));
+								Elements.Add(new HtmlEntity(this, "LeftDoubleBracket"));
 								break;
 							}
 							else if (ch2 == '%')
@@ -2040,9 +2051,9 @@ namespace Waher.Content.Markdown
 								{
 									Url = Text.ToString();
 									if (string.Compare(Url, "Details", true) == 0)
-										Elements.AddLast(new DetailsReference(this, Url));
+										Elements.Add(new DetailsReference(this, Url));
 									else
-										Elements.AddLast(new MetaReference(this, Url));
+										Elements.Add(new MetaReference(this, Url));
 									Text.Clear();
 								}
 								else
@@ -2066,14 +2077,14 @@ namespace Waher.Content.Markdown
 									if (this.footnoteNumberByKey is null)
 									{
 										this.footnoteNumberByKey = new Dictionary<string, int>();
-										this.footnoteOrder = new List<string>();
+										this.footnoteOrder = new ChunkedList<string>();
 										this.footnotes = new Dictionary<string, Footnote>();
 									}
 
 									try
 									{
 										Title = Url.ToLower();
-										Elements.AddLast(new FootnoteReference(this, XmlConvert.VerifyNCName(Title)));
+										Elements.Add(new FootnoteReference(this, XmlConvert.VerifyNCName(Title)));
 										if (!this.footnoteNumberByKey.ContainsKey(Title))
 										{
 											this.footnoteNumberByKey[Title] = ++this.lastFootnote;
@@ -2084,7 +2095,7 @@ namespace Waher.Content.Markdown
 									{
 										Title = Guid.NewGuid().ToString();
 
-										Elements.AddLast(new FootnoteReference(this, Title));
+										Elements.Add(new FootnoteReference(this, Title));
 										this.footnoteNumberByKey[Title] = ++this.lastFootnote;
 										this.footnoteOrder.Add(Title);
 										this.footnotes[Title] = new Footnote(this, Title, new Paragraph(this, await this.ParseBlock(new string[] { Url }, new int[] { State.CurrentPosition - 1 - Url.Length })));
@@ -2113,11 +2124,11 @@ namespace Waher.Content.Markdown
 								State.NextCharSameRow();
 
 							TaskItem Item;
-							List<string> Rows = new List<string>()
+							ChunkedList<string> Rows = new ChunkedList<string>()
 							{
 								State.RestOfRow()
 							};
-							List<int> Positions = new List<int>()
+							ChunkedList<int> Positions = new ChunkedList<int>()
 							{
 								State.CurrentPosition
 							};
@@ -2132,10 +2143,10 @@ namespace Waher.Content.Markdown
 									Item = new TaskItem(this, Checked, CheckPosition,
 										new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (Elements.Last?.Value is TaskList TaskList)
-										TaskList.AddChildren(Item);
+									if (Elements.HasLastItem && Elements.LastItem is TaskList TaskList)
+										TaskList.AddChild(Item);
 									else
-										Elements.AddLast(new TaskList(this, Item));
+										Elements.Add(new TaskList(this, Item));
 
 									Rows.Clear();
 									Positions.Clear();
@@ -2169,16 +2180,16 @@ namespace Waher.Content.Markdown
 								Item = new TaskItem(this, Checked, CheckPosition,
 									new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-								if (Elements.Last?.Value is TaskList TaskList)
-									TaskList.AddChildren(Item);
+								if (Elements.HasLastItem && Elements.LastItem is TaskList TaskList)
+									TaskList.AddChild(Item);
 								else
-									Elements.AddLast(new TaskList(this, Item));
+									Elements.Add(new TaskList(this, Item));
 							}
 
 							break;
 						}
 
-						ChildElements = new LinkedList<MarkdownElement>();
+						ChildElements = new ChunkedList<MarkdownElement>();
 						this.AppendAnyText(Elements, Text);
 
 						if (await this.ParseBlock(State, ']', 1, ChildElements, false))
@@ -2209,7 +2220,7 @@ namespace Waher.Content.Markdown
 									Url = Text.ToString();
 									Text.Clear();
 
-									Elements.AddLast(new Abbreviation(this, ChildElements, Url.Substring(5).Trim()));
+									Elements.Add(new Abbreviation(this, ChildElements, Url.Substring(5).Trim()));
 								}
 								else
 								{
@@ -2256,7 +2267,7 @@ namespace Waher.Content.Markdown
 
 									if (ch == '!')
 									{
-										List<MultimediaItem> Items = new List<MultimediaItem>()
+										ChunkedList<MultimediaItem> Items = new ChunkedList<MultimediaItem>()
 										{
 											new MultimediaItem(this, Url, Title, Width, Height)
 										};
@@ -2332,10 +2343,10 @@ namespace Waher.Content.Markdown
 										State.RestoreState();
 
 										Multimedia Multimedia = new Multimedia(this, ChildElements,
-											Elements.First is null && State.PeekNextChar() == 0,
+											!Elements.HasFirstItem && State.PeekNextChar() == 0,
 											Items.ToArray());
 										
-										Elements.AddLast(Multimedia);
+										Elements.Add(Multimedia);
 
 										if (!(this.settings?.Progress is null))
 										{
@@ -2345,7 +2356,7 @@ namespace Waher.Content.Markdown
 										}
 									}
 									else
-										Elements.AddLast(new Link(this, ChildElements, Url, Title));
+										Elements.Add(new Link(this, ChildElements, Url, Title));
 								}
 							}
 							else if (ch2 == ':' && FirstCharOnLine)
@@ -2357,7 +2368,7 @@ namespace Waher.Content.Markdown
 
 								if (ch2 > ' ' && ch2 != 160)
 								{
-									List<MultimediaItem> Items = new List<MultimediaItem>();
+									ChunkedList<MultimediaItem> Items = new ChunkedList<MultimediaItem>();
 
 									Text.Append(ch2);
 
@@ -2409,7 +2420,7 @@ namespace Waher.Content.Markdown
 									}
 
 									Multimedia Multimedia = new Multimedia(this, null, 
-										Elements.First is null && State.PeekNextChar() == 0, Items.ToArray());
+										!Elements.HasFirstItem && State.PeekNextChar() == 0, Items.ToArray());
 
 									this.references[Text.ToString().ToLower()] = Multimedia;
 
@@ -2446,22 +2457,22 @@ namespace Waher.Content.Markdown
 
 								if (ch == '!')
 								{
-									Elements.AddLast(new MultimediaReference(this, ChildElements, Title,
-										Elements.First is null && State.PeekNextChar() == 0));
+									Elements.Add(new MultimediaReference(this, ChildElements, Title,
+										!Elements.HasFirstItem && State.PeekNextChar() == 0));
 								}
 								else
-									Elements.AddLast(new LinkReference(this, ChildElements, Title));
+									Elements.Add(new LinkReference(this, ChildElements, Title));
 							}
 							else if (ch != '!')
-								Elements.AddLast(new SubScript(this, ChildElements));
+								Elements.Add(new SubScript(this, ChildElements));
 							else
 							{
 								this.FixSyntaxError(Elements, "![", ChildElements);
 
 								if (ch2 == (char)0)
-									Elements.AddLast(new InlineText(this, "]"));
+									Elements.Add(new InlineText(this, "]"));
 								else
-									Elements.AddLast(new InlineText(this, "]" + ch2));
+									Elements.Add(new InlineText(this, "]" + ch2));
 							}
 						}
 						else
@@ -2474,7 +2485,7 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new HtmlEntity(this, "RightDoubleBracket"));
+							Elements.Add(new HtmlEntity(this, "RightDoubleBracket"));
 						}
 						else
 							Text.Append(']');
@@ -2491,10 +2502,10 @@ namespace Waher.Content.Markdown
 							if (ch3 == '<')
 							{
 								State.NextCharSameRow();
-								Elements.AddLast(new HtmlEntity(this, "Ll"));
+								Elements.Add(new HtmlEntity(this, "Ll"));
 							}
 							else
-								Elements.AddLast(new HtmlEntity(this, "laquo"));
+								Elements.Add(new HtmlEntity(this, "laquo"));
 							break;
 						}
 						else if (ch2 == '-')
@@ -2511,10 +2522,10 @@ namespace Waher.Content.Markdown
 								if (ch3 == '>')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new HtmlEntity(this, "harr"));
+									Elements.Add(new HtmlEntity(this, "harr"));
 								}
 								else
-									Elements.AddLast(new HtmlEntity(this, "larr"));
+									Elements.Add(new HtmlEntity(this, "larr"));
 							}
 							else
 								Text.Append("<-");
@@ -2534,27 +2545,27 @@ namespace Waher.Content.Markdown
 								if (ch3 == '>')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new HtmlEntity(this, "hArr"));
+									Elements.Add(new HtmlEntity(this, "hArr"));
 								}
 								else
-									Elements.AddLast(new HtmlEntity(this, "lArr"));
+									Elements.Add(new HtmlEntity(this, "lArr"));
 							}
 							else
-								Elements.AddLast(new HtmlEntity(this, "leq"));
+								Elements.Add(new HtmlEntity(this, "leq"));
 							break;
 						}
 						else if (ch2 == '>')
 						{
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new HtmlEntity(this, "ne"));
+							Elements.Add(new HtmlEntity(this, "ne"));
 							break;
 						}
 						else if (ch2 == '3' && !(this.emojiSource is null))
 						{
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_heart));
+							Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_heart));
 							break;
 						}
 						else if (ch2 == '/')
@@ -2564,7 +2575,7 @@ namespace Waher.Content.Markdown
 							{
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_broken_heart));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_broken_heart));
 								break;
 							}
 						}
@@ -2598,9 +2609,9 @@ namespace Waher.Content.Markdown
 						if (Url.StartsWith("</"))
 						{
 							if (Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase))
-								Elements.AddLast(new InlineCode(this, Url));
+								Elements.Add(new InlineCode(this, Url));
 							else
-								Elements.AddLast(new InlineHTML(this, Url));
+								Elements.Add(new InlineHTML(this, Url));
 						}
 						else if (Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase))
 						{
@@ -2611,42 +2622,42 @@ namespace Waher.Content.Markdown
 								Text.Append(Url.Substring(1, 6));
 								Text.Append('>');
 
-								Elements.AddLast(new InlineHTML(this, Text.ToString()));
+								Elements.Add(new InlineHTML(this, Text.ToString()));
 							}
 							else
-								Elements.AddLast(new InlineCode(this, Url));
+								Elements.Add(new InlineCode(this, Url));
 						}
 						else if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
 						{
-							Elements.AddLast(new InlineHTML(this, Url));
+							Elements.Add(new InlineHTML(this, Url));
 
 							string s = State.UntilToken("</TEXTAREA>");
 
 							if (!string.IsNullOrEmpty(s))
-								Elements.AddLast(new InlineText(this, s));
+								Elements.Add(new InlineText(this, s));
 
-							Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
+							Elements.Add(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
 						}
 						else
 						{
 							int i = Url.IndexOf(' ');
 
 							if ((i < 0 && Url.IndexOf(':') >= 0) || (i > 0 && Url.LastIndexOf(':', i) >= 0))
-								Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));
+								Elements.Add(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));
 							else if ((i < 0 && Url.IndexOf('@') >= 0) || (i > 0 && Url.LastIndexOf('@', i) >= 0))
-								Elements.AddLast(new AutomaticLinkMail(this, Url.Substring(1, Url.Length - 2)));
+								Elements.Add(new AutomaticLinkMail(this, Url.Substring(1, Url.Length - 2)));
 							else
 							{
-								Elements.AddLast(new InlineHTML(this, Url));
+								Elements.Add(new InlineHTML(this, Url));
 
 								if (Url.StartsWith("<textarea", StringComparison.CurrentCultureIgnoreCase))
 								{
 									string s = State.UntilToken("</TEXTAREA>");
 
 									if (!string.IsNullOrEmpty(s))
-										Elements.AddLast(new InlineText(this, s));
+										Elements.Add(new InlineText(this, s));
 
-									Elements.AddLast(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
+									Elements.Add(new InlineHTML(this, "</" + Url.Substring(1, 8) + ">"));
 								}
 							}
 						}
@@ -2665,10 +2676,10 @@ namespace Waher.Content.Markdown
 								if (ch3 == '>')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new HtmlEntity(this, "Gg"));
+									Elements.Add(new HtmlEntity(this, "Gg"));
 								}
 								else
-									Elements.AddLast(new HtmlEntity(this, "raquo"));
+									Elements.Add(new HtmlEntity(this, "raquo"));
 								break;
 
 							case '=':
@@ -2678,10 +2689,10 @@ namespace Waher.Content.Markdown
 								if (!(this.emojiSource is null) && State.PeekNextCharSameRow() == ')')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
 								}
 								else
-									Elements.AddLast(new HtmlEntity(this, "geq"));
+									Elements.Add(new HtmlEntity(this, "geq"));
 								break;
 
 							case ':':
@@ -2693,25 +2704,25 @@ namespace Waher.Content.Markdown
 										case ')':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
 											break;
 
 										case '(':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_angry));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_angry));
 											break;
 
 										case '[':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
 											break;
 
 										case 'O':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
 											break;
 
 										case 'P':
@@ -2721,7 +2732,7 @@ namespace Waher.Content.Markdown
 										case 'þ':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue_winking_eye));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue_winking_eye));
 											break;
 
 										case '/':
@@ -2729,7 +2740,7 @@ namespace Waher.Content.Markdown
 										case 'L':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_confused));
 											break;
 
 										case 'X':
@@ -2737,7 +2748,7 @@ namespace Waher.Content.Markdown
 										case '#':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
 											break;
 
 										case '-':
@@ -2747,13 +2758,13 @@ namespace Waher.Content.Markdown
 												case ')':
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
 													break;
 
 												case '(':
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_angry));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_angry));
 													break;
 
 												default:
@@ -2779,7 +2790,7 @@ namespace Waher.Content.Markdown
 									{
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
 									}
 									else
 										Text.Append(">;");
@@ -2796,7 +2807,7 @@ namespace Waher.Content.Markdown
 									{
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_persevere));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_persevere));
 									}
 									else
 										Text.Append(">.");
@@ -2850,8 +2861,8 @@ namespace Waher.Content.Markdown
 						{
 							State.DiscardBackup();
 							Expression Exp = new Expression(Text.ToString(), this.fileName);
-							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables,
-								Elements.First is null && State.PeekNextChar() == 0, StartPosition, EndPosition));
+							Elements.Add(new InlineScript(this, Exp, this.settings.Variables,
+								!Elements.HasFirstItem && State.PeekNextChar() == 0, StartPosition, EndPosition));
 							Text.Clear();
 							this.isDynamic = true;
 						}
@@ -2859,10 +2870,8 @@ namespace Waher.Content.Markdown
 						{
 							ex = Log.UnnestException(ex);
 
-							Elements.AddLast(new HtmlBlock(this, new MarkdownElement[]
-							{
-								new InlineHTML(this, "<font class=\"error\">")
-							}));
+							Elements.Add(new HtmlBlock(this, new ChunkedList<MarkdownElement>(
+								new InlineHTML(this, "<font class=\"error\">"))));
 
 							if (ex is AggregateException ex2)
 							{
@@ -2872,10 +2881,8 @@ namespace Waher.Content.Markdown
 
 									Log.Exception(ex3, this.fileName);
 
-									Elements.AddLast(new Paragraph(this, new MarkdownElement[]
-									{
-										new InlineText(this, ex3.Message)
-									}));
+									Elements.Add(new Paragraph(this, new ChunkedList<MarkdownElement>(
+										new InlineText(this, ex3.Message))));
 								}
 							}
 							else
@@ -2884,16 +2891,12 @@ namespace Waher.Content.Markdown
 
 								Log.Exception(ex, this.fileName);
 
-								Elements.AddLast(new Paragraph(this, new MarkdownElement[]
-								{
-									new InlineText(this, ex.Message)
-								}));
+								Elements.Add(new Paragraph(this, new ChunkedList<MarkdownElement>(
+									new InlineText(this, ex.Message))));
 							}
 
-							Elements.AddLast(new HtmlBlock(this, new MarkdownElement[]
-							{
-								new InlineHTML(this, "</font>")
-							}));
+							Elements.Add(new HtmlBlock(this, new ChunkedList<MarkdownElement>(
+								new InlineHTML(this, "</font>"))));
 
 							this.CheckException(ex);
 						}
@@ -2912,21 +2915,21 @@ namespace Waher.Content.Markdown
 							if (ch3 == '>')
 							{
 								State.NextCharSameRow();
-								Elements.AddLast(new HtmlEntity(this, "rarr"));
+								Elements.Add(new HtmlEntity(this, "rarr"));
 							}
 							else if (ch3 == '-')
 							{
 								State.NextCharSameRow();
-								Elements.AddLast(new HtmlEntity(this, "mdash"));
+								Elements.Add(new HtmlEntity(this, "mdash"));
 							}
 							else
-								Elements.AddLast(new HtmlEntity(this, "ndash"));
+								Elements.Add(new HtmlEntity(this, "ndash"));
 						}
 						else if (ch2 == '+')
 						{
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new HtmlEntity(this, "MinusPlus"));
+							Elements.Add(new HtmlEntity(this, "MinusPlus"));
 						}
 						else if (ch2 == '_')
 						{
@@ -2941,7 +2944,7 @@ namespace Waher.Content.Markdown
 									State.DiscardBackup();
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_expressionless));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_expressionless));
 								}
 								else
 								{
@@ -2962,8 +2965,8 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
-								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>()
+								ChunkedList<string> Rows = new ChunkedList<string>();
+								ChunkedList<int> Positions = new ChunkedList<int>()
 								{
 									State.CurrentPosition
 								};
@@ -2976,10 +2979,10 @@ namespace Waher.Content.Markdown
 									{
 										Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (Elements.Last?.Value is BulletList BulletList)
-											BulletList.AddChildren(Item);
+										if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+											BulletList.AddChild(Item);
 										else
-											Elements.AddLast(new BulletList(this, Item));
+											Elements.Add(new BulletList(this, Item));
 
 										State.NextCharSameRow();
 										State.SkipWhitespaceSameRow(3);
@@ -3003,10 +3006,10 @@ namespace Waher.Content.Markdown
 								{
 									Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (Elements.Last?.Value is BulletList BulletList)
-										BulletList.AddChildren(Item);
+									if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+										BulletList.AddChild(Item);
 									else
-										Elements.AddLast(new BulletList(this, Item));
+										Elements.Add(new BulletList(this, Item));
 								}
 							}
 							else
@@ -3022,7 +3025,7 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new HtmlEntity(this, "PlusMinus"));
+							Elements.Add(new HtmlEntity(this, "PlusMinus"));
 						}
 						else if ((ch2 <= ' ' && ch2 > 0) || ch2 == 160)
 						{
@@ -3034,8 +3037,8 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
-								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>()
+								ChunkedList<string> Rows = new ChunkedList<string>();
+								ChunkedList<int> Positions = new ChunkedList<int>()
 								{
 									State.CurrentPosition
 								};
@@ -3048,10 +3051,10 @@ namespace Waher.Content.Markdown
 									{
 										Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (Elements.Last?.Value is BulletList BulletList)
-											BulletList.AddChildren(Item);
+										if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+											BulletList.AddChild(Item);
 										else
-											Elements.AddLast(new BulletList(this, Item));
+											Elements.Add(new BulletList(this, Item));
 
 										State.NextCharSameRow();
 										State.SkipWhitespaceSameRow(3);
@@ -3075,10 +3078,10 @@ namespace Waher.Content.Markdown
 								{
 									Item = new UnnumberedItem(this, new string(ch, 1), new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (Elements.Last?.Value is BulletList BulletList)
-										BulletList.AddChildren(Item);
+									if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
+										BulletList.AddChild(Item);
 									else
-										Elements.AddLast(new BulletList(this, Item));
+										Elements.Add(new BulletList(this, Item));
 								}
 							}
 							else
@@ -3103,7 +3106,7 @@ namespace Waher.Content.Markdown
 								State.NextCharSameRow();
 							}
 
-							Elements.AddLast(new HashTag(this, Text.ToString()));
+							Elements.Add(new HashTag(this, Text.ToString()));
 							Text.Clear();
 						}
 						else if (State.IsFirstCharOnLine && ch2 == '.')
@@ -3118,8 +3121,8 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 
 								NumberedItem Item;
-								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>()
+								ChunkedList<string> Rows = new ChunkedList<string>();
+								ChunkedList<int> Positions = new ChunkedList<int>()
 								{
 									State.CurrentPosition
 								};
@@ -3135,10 +3138,10 @@ namespace Waher.Content.Markdown
 										{
 											Item = new NumberedItem(this, 1, false, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-											if (Elements.Last?.Value is NumberedList NumberedList)
-												NumberedList.AddChildren(Item);
+											if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
+												NumberedList.AddChild(Item);
 											else
-												Elements.AddLast(new NumberedList(this, Item));
+												Elements.Add(new NumberedList(this, Item));
 
 											State.NextCharSameRow();
 											State.SkipWhitespaceSameRow(3);
@@ -3170,14 +3173,18 @@ namespace Waher.Content.Markdown
 								{
 									Item = new NumberedItem(this, 1, false, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-									if (Elements.Last?.Value is NumberedList NumberedList)
-										NumberedList.AddChildren(Item);
+									if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
+										NumberedList.AddChild(Item);
 									else
 									{
-										if (!Item.NumberExplicit && Elements.Last?.Value is NumberedItem PrevItem)
+										if (!Item.NumberExplicit &&
+											Elements.HasLastItem &&
+											Elements.LastItem is NumberedItem PrevItem)
+										{
 											Item.Number = PrevItem.Number + 1;
+										}
 
-										Elements.AddLast(new NumberedList(this, Item));
+										Elements.Add(new NumberedList(this, Item));
 									}
 								}
 							}
@@ -3197,7 +3204,7 @@ namespace Waher.Content.Markdown
 											State.DiscardBackup();
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
 											break;
 
 										default:
@@ -3210,7 +3217,7 @@ namespace Waher.Content.Markdown
 								case ')':
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
 									break;
 
 								default:
@@ -3248,7 +3255,7 @@ namespace Waher.Content.Markdown
 												State.DiscardBackup();
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 												ch2 = (char)0xffff;
 												break;
 
@@ -3261,7 +3268,7 @@ namespace Waher.Content.Markdown
 														State.DiscardBackup();
 														State.NextCharSameRow();
 														this.AppendAnyText(Elements, Text);
-														Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+														Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 														ch2 = (char)0xffff;
 														break;
 
@@ -3291,7 +3298,7 @@ namespace Waher.Content.Markdown
 														State.DiscardBackup();
 														State.NextCharSameRow();
 														this.AppendAnyText(Elements, Text);
-														Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+														Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 														ch2 = (char)0xffff;
 														break;
 
@@ -3325,7 +3332,7 @@ namespace Waher.Content.Markdown
 												State.DiscardBackup();
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
 												ch2 = (char)0xffff;
 												break;
 
@@ -3338,7 +3345,7 @@ namespace Waher.Content.Markdown
 									case ')':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
 										ch2 = (char)0xffff;
 										break;
 
@@ -3374,8 +3381,8 @@ namespace Waher.Content.Markdown
 										State.NextCharSameRow();
 
 									NumberedItem Item;
-									List<string> Rows = new List<string>();
-									List<int> Positions = new List<int>()
+									ChunkedList<string> Rows = new ChunkedList<string>();
+									ChunkedList<int> Positions = new ChunkedList<int>()
 									{
 										State.CurrentPosition
 									};
@@ -3394,10 +3401,10 @@ namespace Waher.Content.Markdown
 											{
 												Item = new NumberedItem(this, Index, true, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-												if (Elements.Last?.Value is NumberedList NumberedList)
-													NumberedList.AddChildren(Item);
+												if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
+													NumberedList.AddChild(Item);
 												else
-													Elements.AddLast(new NumberedList(this, Item));
+													Elements.Add(new NumberedList(this, Item));
 
 												State.NextCharSameRow();
 												State.SkipWhitespaceSameRow(3);
@@ -3431,10 +3438,10 @@ namespace Waher.Content.Markdown
 									{
 										Item = new NumberedItem(this, Index, true, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
-										if (Elements.Last?.Value is NumberedList NumberedList)
-											NumberedList.AddChildren(Item);
+										if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
+											NumberedList.AddChild(Item);
 										else
-											Elements.AddLast(new NumberedList(this, Item));
+											Elements.Add(new NumberedList(this, Item));
 									}
 								}
 								else
@@ -3465,42 +3472,42 @@ namespace Waher.Content.Markdown
 								if (ch3 == '>')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new HtmlEntity(this, "rArr"));
+									Elements.Add(new HtmlEntity(this, "rArr"));
 								}
 								else
-									Elements.AddLast(new HtmlEntity(this, "equiv"));
+									Elements.Add(new HtmlEntity(this, "equiv"));
 								break;
 
 							case 'D':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
 								break;
 
 							case ')':
 							case ']':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smile));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_smile));
 								break;
 
 							case '*':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
 								break;
 
 							case '(':
 							case '[':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
 								break;
 
 							case '$':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_flushed));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_flushed));
 								break;
 
 							case '/':
@@ -3508,7 +3515,7 @@ namespace Waher.Content.Markdown
 							case 'L':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_confused));
 								break;
 
 							case 'P':
@@ -3518,7 +3525,7 @@ namespace Waher.Content.Markdown
 							case 'þ':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
 								break;
 
 							case 'X':
@@ -3526,7 +3533,7 @@ namespace Waher.Content.Markdown
 							case '#':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+								Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
 								break;
 
 							default:
@@ -3553,7 +3560,7 @@ namespace Waher.Content.Markdown
 							Url = Text.ToString();
 							Text.Clear();
 
-							Elements.AddLast(new HtmlEntity(this, Url.Substring(1, Url.Length - 2)));
+							Elements.Add(new HtmlEntity(this, Url.Substring(1, Url.Length - 2)));
 						}
 						else if (ch2 == '#')
 						{
@@ -3580,7 +3587,7 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 									Text.Clear();
 
-									Elements.AddLast(new HtmlEntityUnicode(this, Code));
+									Elements.Add(new HtmlEntityUnicode(this, Code));
 								}
 							}
 							else if (char.IsDigit(ch3))
@@ -3596,7 +3603,7 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 									Text.Clear();
 
-									Elements.AddLast(new HtmlEntityUnicode(this, Code));
+									Elements.Add(new HtmlEntityUnicode(this, Code));
 								}
 							}
 						}
@@ -3608,9 +3615,9 @@ namespace Waher.Content.Markdown
 					case '"':
 						this.AppendAnyText(Elements, Text);
 						if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
-							Elements.AddLast(new HtmlEntity(this, "ldquo"));
+							Elements.Add(new HtmlEntity(this, "ldquo"));
 						else
-							Elements.AddLast(new HtmlEntity(this, "rdquo"));
+							Elements.Add(new HtmlEntity(this, "rdquo"));
 						break;
 
 					case '\'':
@@ -3630,12 +3637,12 @@ namespace Waher.Content.Markdown
 									case ')':
 									case 'D':
 										State.NextCharSameRow();
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
 										break;
 
 									case '(':
 										State.NextCharSameRow();
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
 										break;
 
 									case '-':
@@ -3645,19 +3652,19 @@ namespace Waher.Content.Markdown
 											case ')':
 											case 'D':
 												State.NextCharSameRow();
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
 												break;
 
 											case '(':
 												State.NextCharSameRow();
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
 												break;
 
 											default:
 												if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
-													Elements.AddLast(new HtmlEntity(this, "lsquo"));
+													Elements.Add(new HtmlEntity(this, "lsquo"));
 												else
-													Elements.AddLast(new HtmlEntity(this, "rsquo"));
+													Elements.Add(new HtmlEntity(this, "rsquo"));
 
 												Text.Append(":-");
 												break;
@@ -3666,9 +3673,9 @@ namespace Waher.Content.Markdown
 
 									default:
 										if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
-											Elements.AddLast(new HtmlEntity(this, "lsquo"));
+											Elements.Add(new HtmlEntity(this, "lsquo"));
 										else
-											Elements.AddLast(new HtmlEntity(this, "rsquo"));
+											Elements.Add(new HtmlEntity(this, "rsquo"));
 
 										Text.Append(':');
 										break;
@@ -3682,19 +3689,19 @@ namespace Waher.Content.Markdown
 									case ')':
 									case 'D':
 										State.NextCharSameRow();
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
 										break;
 
 									case '(':
 										State.NextCharSameRow();
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
 										break;
 
 									default:
 										if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
-											Elements.AddLast(new HtmlEntity(this, "lsquo"));
+											Elements.Add(new HtmlEntity(this, "lsquo"));
 										else
-											Elements.AddLast(new HtmlEntity(this, "rsquo"));
+											Elements.Add(new HtmlEntity(this, "rsquo"));
 
 										Text.Append('=');
 										break;
@@ -3703,9 +3710,9 @@ namespace Waher.Content.Markdown
 
 							default:
 								if (IsLeftQuote(PrevChar, State.PeekNextCharSameRow()))
-									Elements.AddLast(new HtmlEntity(this, "lsquo"));
+									Elements.Add(new HtmlEntity(this, "lsquo"));
 								else
-									Elements.AddLast(new HtmlEntity(this, "rsquo"));
+									Elements.Add(new HtmlEntity(this, "rsquo"));
 								break;
 						}
 						break;
@@ -3719,7 +3726,7 @@ namespace Waher.Content.Markdown
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
 
-								Elements.AddLast(new HtmlEntity(this, "hellip"));
+								Elements.Add(new HtmlEntity(this, "hellip"));
 							}
 							else
 								Text.Append("..");
@@ -3778,7 +3785,7 @@ namespace Waher.Content.Markdown
 										break;
 								}
 
-								Elements.AddLast(new HtmlEntity(this, Url));
+								Elements.Add(new HtmlEntity(this, Url));
 							}
 							else
 							{
@@ -3801,10 +3808,10 @@ namespace Waher.Content.Markdown
 								if (ch3 == '0')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new HtmlEntity(this, "pertenk"));
+									Elements.Add(new HtmlEntity(this, "pertenk"));
 								}
 								else
-									Elements.AddLast(new HtmlEntity(this, "permil"));
+									Elements.Add(new HtmlEntity(this, "permil"));
 								break;
 
 							case '-':
@@ -3818,7 +3825,7 @@ namespace Waher.Content.Markdown
 											State.DiscardBackup();
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
 											break;
 
 										default:
@@ -3836,7 +3843,7 @@ namespace Waher.Content.Markdown
 								{
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
 								}
 								else
 									Text.Append('%');
@@ -3855,37 +3862,37 @@ namespace Waher.Content.Markdown
 							case 'a':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntity(this, "ordf"));
+								Elements.Add(new HtmlEntity(this, "ordf"));
 								break;
 
 							case 'o':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntity(this, "ordm"));
+								Elements.Add(new HtmlEntity(this, "ordm"));
 								break;
 
 							case '0':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntity(this, "deg"));
+								Elements.Add(new HtmlEntity(this, "deg"));
 								break;
 
 							case '1':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntityUnicode(this, 185));
+								Elements.Add(new HtmlEntityUnicode(this, 185));
 								break;
 
 							case '2':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntityUnicode(this, 178));
+								Elements.Add(new HtmlEntityUnicode(this, 178));
 								break;
 
 							case '3':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new HtmlEntityUnicode(this, 179));
+								Elements.Add(new HtmlEntityUnicode(this, 179));
 								break;
 
 							case '4':
@@ -3941,7 +3948,7 @@ namespace Waher.Content.Markdown
 							case 'Z':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
-								Elements.AddLast(new SuperScript(this, new string(ch2, 1)));
+								Elements.Add(new SuperScript(this, new string(ch2, 1)));
 								break;
 
 							case 'T':
@@ -3951,10 +3958,10 @@ namespace Waher.Content.Markdown
 								if (State.PeekNextCharSameRow() == 'M')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new HtmlEntity(this, "trade"));
+									Elements.Add(new HtmlEntity(this, "trade"));
 								}
 								else
-									Elements.AddLast(new SuperScript(this, "T"));
+									Elements.Add(new SuperScript(this, "T"));
 								break;
 
 							case 's':
@@ -3964,10 +3971,10 @@ namespace Waher.Content.Markdown
 								if (State.PeekNextCharSameRow() == 't')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new SuperScript(this, "st"));
+									Elements.Add(new SuperScript(this, "st"));
 								}
 								else
-									Elements.AddLast(new SuperScript(this, "s"));
+									Elements.Add(new SuperScript(this, "s"));
 								break;
 
 							case 'n':
@@ -3977,10 +3984,10 @@ namespace Waher.Content.Markdown
 								if (State.PeekNextCharSameRow() == 'd')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new SuperScript(this, "nd"));
+									Elements.Add(new SuperScript(this, "nd"));
 								}
 								else
-									Elements.AddLast(new SuperScript(this, "n"));
+									Elements.Add(new SuperScript(this, "n"));
 								break;
 
 							case 'r':
@@ -3990,10 +3997,10 @@ namespace Waher.Content.Markdown
 								if (State.PeekNextCharSameRow() == 'd')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new SuperScript(this, "rd"));
+									Elements.Add(new SuperScript(this, "rd"));
 								}
 								else
-									Elements.AddLast(new SuperScript(this, "r"));
+									Elements.Add(new SuperScript(this, "r"));
 								break;
 
 							case 't':
@@ -4003,30 +4010,30 @@ namespace Waher.Content.Markdown
 								if (State.PeekNextCharSameRow() == 'h')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new SuperScript(this, "th"));
+									Elements.Add(new SuperScript(this, "th"));
 								}
 								else
-									Elements.AddLast(new SuperScript(this, "t"));
+									Elements.Add(new SuperScript(this, "t"));
 								break;
 
 							case '(':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
 
-								ChildElements = new LinkedList<MarkdownElement>();
+								ChildElements = new ChunkedList<MarkdownElement>();
 
 								await this.ParseBlock(State, ')', 1, ChildElements, true);
-								Elements.AddLast(new SuperScript(this, ChildElements));
+								Elements.Add(new SuperScript(this, ChildElements));
 								break;
 
 							case '[':
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
 
-								ChildElements = new LinkedList<MarkdownElement>();
+								ChildElements = new ChunkedList<MarkdownElement>();
 
 								await this.ParseBlock(State, ']', 1, ChildElements, true);
-								Elements.AddLast(new SuperScript(this, ChildElements));
+								Elements.Add(new SuperScript(this, ChildElements));
 								break;
 
 							default:
@@ -4040,30 +4047,30 @@ namespace Waher.Content.Markdown
 						{
 							if (State.IsFirstCharOnLine && ch2 > 0)
 							{
-								LinkedList<MarkdownElement> TotItem = null;
-								LinkedList<MarkdownElement> Item;
+								ChunkedList<MarkdownElement> TotItem = null;
+								ChunkedList<MarkdownElement> Item;
 								DefinitionList DefinitionList = new DefinitionList(this);
 								int i;
 
 								for (i = State.Start; i < State.Current; i++)
 								{
 									Item = await this.ParseBlock(State.Rows, State.Positions, i, i);
-									if (Item.First is null)
+									if (!Item.HasFirstItem)
 										continue;
 
 									if (TotItem is null)
 									{
-										if (Item.First.Next is null)
+										if (Item.Count == 1)
 											TotItem = Item;
 										else
-											TotItem.AddLast(Item.First.Value);
+											TotItem.Add(Item.FirstItem);
 									}
 									else
 									{
 										if (TotItem is null)
-											TotItem = new LinkedList<MarkdownElement>();
+											TotItem = new ChunkedList<MarkdownElement>();
 
-										TotItem.AddLast(new NestedBlock(this, Item));
+										TotItem.Add(new NestedBlock(this, Item));
 									}
 								}
 
@@ -4071,17 +4078,17 @@ namespace Waher.Content.Markdown
 									Text.Append(ch);
 								else
 								{
-									DefinitionList.AddChildren(new DefinitionTerms(this, TotItem));
+									DefinitionList.AddChild(new DefinitionTerms(this, TotItem));
 
 									Text.Clear();
 									Elements.Clear();
-									Elements.AddLast(DefinitionList);
+									Elements.Add(DefinitionList);
 
 									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 										State.NextCharSameRow();
 
-									List<string> Rows = new List<string>();
-									List<int> Positions = new List<int>()
+									ChunkedList<string> Rows = new ChunkedList<string>();
+									ChunkedList<int> Positions = new ChunkedList<int>()
 									{
 										State.CurrentPosition
 									};
@@ -4092,7 +4099,7 @@ namespace Waher.Content.Markdown
 									{
 										if (State.PeekNextCharSameRow() == ':')
 										{
-											DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
+											DefinitionList.AddChild(new DefinitionDescriptions(this, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
 
 											State.NextCharSameRow();
 											State.SkipWhitespaceSameRow(3);
@@ -4113,7 +4120,7 @@ namespace Waher.Content.Markdown
 									}
 
 									if (Rows.Count > 0)
-										DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
+										DefinitionList.AddChild(new DefinitionDescriptions(this, new NestedBlock(this, await this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
 								}
 							}
 							else
@@ -4147,7 +4154,7 @@ namespace Waher.Content.Markdown
 												Text.Append(new string(':', LeftLevel - 1));
 
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
 											break;
 
 										case 'L':
@@ -4156,7 +4163,7 @@ namespace Waher.Content.Markdown
 												Text.Append(new string(':', LeftLevel - 1));
 
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_confused));
 											break;
 
 										case 'P':
@@ -4169,7 +4176,7 @@ namespace Waher.Content.Markdown
 												Text.Append(new string(':', LeftLevel - 1));
 
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
 											break;
 
 										case 'O':
@@ -4179,7 +4186,7 @@ namespace Waher.Content.Markdown
 												Text.Append(new string(':', LeftLevel - 1));
 
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
 											break;
 
 										case 'X':
@@ -4189,7 +4196,7 @@ namespace Waher.Content.Markdown
 												Text.Append(new string(':', LeftLevel - 1));
 
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
 											break;
 
 										default:
@@ -4224,9 +4231,9 @@ namespace Waher.Content.Markdown
 									if (EmojiUtilities.TryGetEmoji(Title, out EmojiInfo Emoji))
 									{
 										if (LeftLevel > RightLevel)
-											Elements.AddLast(new InlineText(this, new string(':', LeftLevel - RightLevel)));
+											Elements.Add(new InlineText(this, new string(':', LeftLevel - RightLevel)));
 
-										Elements.AddLast(new EmojiReference(this, Emoji, RightLevel));
+										Elements.Add(new EmojiReference(this, Emoji, RightLevel));
 										Text.Clear();
 									}
 									else
@@ -4253,13 +4260,13 @@ namespace Waher.Content.Markdown
 											case ')':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_joy));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_joy));
 												break;
 
 											case '(':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_cry));
 												break;
 
 											case '-':
@@ -4268,13 +4275,13 @@ namespace Waher.Content.Markdown
 												{
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_joy));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_joy));
 												}
 												else if (ch3 == '(')
 												{
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_cry));
 												}
 												else
 													Text.Append(":'-");
@@ -4295,26 +4302,26 @@ namespace Waher.Content.Markdown
 											case ']':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smile));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_smile));
 												break;
 
 											case '(':
 											case '[':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
 												break;
 
 											case 'D':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
 												break;
 
 											case '*':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
 												break;
 
 											case '/':
@@ -4323,7 +4330,7 @@ namespace Waher.Content.Markdown
 											case 'L':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_confused));
 												break;
 
 											case 'P':
@@ -4333,14 +4340,14 @@ namespace Waher.Content.Markdown
 											case 'þ':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
 												break;
 
 											case 'O':
 											case 'o':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
 												break;
 
 											case 'X':
@@ -4348,7 +4355,7 @@ namespace Waher.Content.Markdown
 											case '#':
 												State.NextCharSameRow();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
 												break;
 
 											case '-':
@@ -4357,13 +4364,13 @@ namespace Waher.Content.Markdown
 												{
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_joy));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_joy));
 												}
 												else if (ch3 == '(')
 												{
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_cry));
 												}
 												else
 													Text.Append(":--");
@@ -4375,7 +4382,7 @@ namespace Waher.Content.Markdown
 												{
 													State.NextCharSameRow();
 													this.AppendAnyText(Elements, Text);
-													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji__1));
+													Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji__1));
 												}
 												else
 													Text.Append(":-1");
@@ -4391,45 +4398,45 @@ namespace Waher.Content.Markdown
 									case ']':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smile));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_smile));
 										break;
 
 									case '(':
 									case '[':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
 										break;
 
 									case '*':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
 										break;
 
 									case '/':
 									case '\\':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_confused));
 										break;
 
 									case '#':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
 										break;
 
 									case '@':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_angry));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_angry));
 										break;
 
 									case '$':
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_flushed));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_flushed));
 										break;
 
 									case '^':
@@ -4438,7 +4445,7 @@ namespace Waher.Content.Markdown
 										{
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
 										}
 										else
 											Text.Append(":^");
@@ -4464,14 +4471,14 @@ namespace Waher.Content.Markdown
 								case 'D':
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_wink));
 									break;
 
 								case '(':
 								case '[':
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_cry));
 									break;
 
 								case '-':
@@ -4482,14 +4489,14 @@ namespace Waher.Content.Markdown
 										case ']':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_wink));
 											break;
 
 										case '(':
 										case '[':
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_cry));
 											break;
 
 										default:
@@ -4504,7 +4511,7 @@ namespace Waher.Content.Markdown
 									{
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_wink));
 									}
 									else
 										Text.Append(";^");
@@ -4538,14 +4545,14 @@ namespace Waher.Content.Markdown
 											State.DiscardBackup();
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue_winking_eye));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue_winking_eye));
 											break;
 
 										case ')':
 											State.DiscardBackup();
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
 											break;
 
 										default:
@@ -4558,7 +4565,7 @@ namespace Waher.Content.Markdown
 								case ')':
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
 									break;
 
 								default:
@@ -4585,7 +4592,7 @@ namespace Waher.Content.Markdown
 											State.DiscardBackup();
 											State.NextCharSameRow();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
 											break;
 
 										default:
@@ -4598,7 +4605,7 @@ namespace Waher.Content.Markdown
 								case ')':
 									State.NextCharSameRow();
 									this.AppendAnyText(Elements, Text);
-									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+									Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
 									break;
 
 								default:
@@ -4615,7 +4622,7 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+							Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
 						}
 						else
 							Text.Append(ch);
@@ -4635,7 +4642,7 @@ namespace Waher.Content.Markdown
 										case '3':
 											State.DiscardBackup();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 											break;
 
 										case '-':
@@ -4643,7 +4650,7 @@ namespace Waher.Content.Markdown
 											{
 												State.DiscardBackup();
 												this.AppendAnyText(Elements, Text);
-												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+												Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 											}
 											else
 											{
@@ -4668,7 +4675,7 @@ namespace Waher.Content.Markdown
 										{
 											State.DiscardBackup();
 											this.AppendAnyText(Elements, Text);
-											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+											Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 											break;
 										}
 									}
@@ -4685,7 +4692,7 @@ namespace Waher.Content.Markdown
 										State.NextCharSameRow();
 										State.DiscardBackup();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
 									}
 									else
 									{
@@ -4702,7 +4709,7 @@ namespace Waher.Content.Markdown
 										State.NextCharSameRow();
 										State.DiscardBackup();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
 									}
 									else
 									{
@@ -4760,13 +4767,15 @@ namespace Waher.Content.Markdown
 									IMultimediaContent Handler = Multimedia.GetMultimediaHandler<IMultimediaHtmlRenderer>(Url);
 									if (!(Handler is null) && Handler.EmbedInlineLink(Url))
 									{
-										ChildElements = new LinkedList<MarkdownElement>();
-										ChildElements.AddLast(new InlineText(this, Url));
+										ChildElements = new ChunkedList<MarkdownElement>
+										{
+											new InlineText(this, Url)
+										};
 
 										Multimedia Multimedia = new Multimedia(this, ChildElements, true,
 											new MultimediaItem(this, Url, string.Empty, null, null));
 
-										Elements.AddLast(Multimedia);
+										Elements.Add(Multimedia);
 
 										if (!(this.settings?.Progress is null))
 										{
@@ -4779,7 +4788,7 @@ namespace Waher.Content.Markdown
 									}
 								}
 
-								Elements.AddLast(new AutomaticLinkUrl(this, Url));
+								Elements.Add(new AutomaticLinkUrl(this, Url));
 							}
 							else
 								Text.Append(ch);
@@ -4833,7 +4842,7 @@ namespace Waher.Content.Markdown
 										State.DiscardBackup();
 										State.NextCharSameRow();
 										this.AppendAnyText(Elements, Text);
-										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_ok_woman));
+										Elements.Add(new EmojiReference(this, EmojiUtilities.Emoji_ok_woman));
 									}
 									else
 									{
@@ -4933,23 +4942,23 @@ namespace Waher.Content.Markdown
 			}
 		}
 
-		private void AppendAnyText(LinkedList<MarkdownElement> Elements, StringBuilder Text)
+		private void AppendAnyText(ChunkedList<MarkdownElement> Elements, StringBuilder Text)
 		{
 			if (Text.Length > 0)
 			{
 				string s = Text.ToString();
 				Text.Clear();
 
-				if (!(Elements.First is null) || !string.IsNullOrEmpty(s.Trim()))
-					Elements.AddLast(new InlineText(this, s));
+				if (Elements.HasFirstItem || !string.IsNullOrEmpty(s.Trim()))
+					Elements.Add(new InlineText(this, s));
 			}
 		}
 
-		private void FixSyntaxError(LinkedList<MarkdownElement> Elements, string Prefix, LinkedList<MarkdownElement> ChildElements)
+		private void FixSyntaxError(ChunkedList<MarkdownElement> Elements, string Prefix, ChunkedList<MarkdownElement> ChildElements)
 		{
-			Elements.AddLast(new InlineText(this, Prefix));
+			Elements.Add(new InlineText(this, Prefix));
 			foreach (MarkdownElement E in ChildElements)
-				Elements.AddLast(E);
+				Elements.Add(E);
 		}
 
 		internal static bool IsPrefixedByNumber(string s, out int Numeral)
@@ -5066,11 +5075,11 @@ namespace Waher.Content.Markdown
 			return Count >= 3;
 		}
 
-		private static List<Block> ParseTextToBlocks(string MarkdownText)
+		private static ChunkedList<Block> ParseTextToBlocks(string MarkdownText)
 		{
-			List<Block> Blocks = new List<Block>();
-			List<string> Rows = new List<string>();
-			List<int> Positions = new List<int>();
+			ChunkedList<Block> Blocks = new ChunkedList<Block>();
+			ChunkedList<string> Rows = new ChunkedList<string>();
+			ChunkedList<int> Positions = new ChunkedList<int>();
 			int FirstLineIndent = 0;
 			int LineIndent = 0;
 			int RowStart = 0;
@@ -5642,7 +5651,7 @@ namespace Waher.Content.Markdown
 		{
 			if (this.metaData.TryGetValue(Key, out KeyValuePair<string, bool>[] Records))
 			{
-				List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
+				ChunkedList<KeyValuePair<string, bool>> Values = new ChunkedList<KeyValuePair<string, bool>>();
 				Values.AddRange(Records);
 				Values.Add(new KeyValuePair<string, bool>(Value.Trim(), Value.EndsWith("  ")));
 			}
@@ -6093,7 +6102,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Markdown elements making up the document.
 		/// </summary>
-		public IEnumerable<MarkdownElement> Elements => this.elements;
+		public ChunkedList<MarkdownElement> Elements => this.elements;
 
 		/// <summary>
 		/// Gets an enumerator of root markdown elements in the document.
@@ -6151,10 +6160,10 @@ namespace Waher.Content.Markdown
 			// TODO: Meta-data
 
 			MarkdownDocument Result = await CreateAsync(string.Empty, this.settings, this.transparentExceptionTypes);
-			IEnumerable<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
+			ChunkedList<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
 
 			foreach (MarkdownElement E in Edit)
-				Result.elements.AddLast(E);
+				Result.elements.Add(E);
 
 			// TODO: Footnotes
 
@@ -6162,7 +6171,7 @@ namespace Waher.Content.Markdown
 			return Result;
 		}
 
-		private static IEnumerable<MarkdownElement> Atomize(IEnumerable<MarkdownElement> Elements, out bool Reassemble)
+		private static ChunkedList<MarkdownElement> Atomize(ChunkedList<MarkdownElement> Elements, out bool Reassemble)
 		{
 			if (ContainsEditableText(Elements))
 			{
@@ -6176,25 +6185,25 @@ namespace Waher.Content.Markdown
 			}
 		}
 
-		private static IEnumerable<MarkdownElement> Atomize(IEnumerable<MarkdownElement> Elements)
+		private static ChunkedList<MarkdownElement> Atomize(ChunkedList<MarkdownElement> Elements)
 		{
-			LinkedList<MarkdownElement> Result = new LinkedList<MarkdownElement>();
+			ChunkedList<MarkdownElement> Result = new ChunkedList<MarkdownElement>();
 
 			foreach (MarkdownElement E in Elements)
 			{
 				if (E is IEditableText EditableText)
 				{
 					foreach (MarkdownElement E2 in EditableText.Atomize())
-						Result.AddLast(E2);
+						Result.Add(E2);
 				}
 				else
-					Result.AddLast(E);
+					Result.Add(E);
 			}
 
 			return Result;
 		}
 
-		private static bool ContainsEditableText(IEnumerable<MarkdownElement> Elements)
+		private static bool ContainsEditableText(ChunkedList<MarkdownElement> Elements)
 		{
 			foreach (MarkdownElement E in Elements)
 			{
@@ -6205,46 +6214,19 @@ namespace Waher.Content.Markdown
 			return false;
 		}
 
-		private static MarkdownElement[] ToArray(IEnumerable<MarkdownElement> Elements)
+		private static ChunkedList<MarkdownElement> Compare(ChunkedList<MarkdownElement> Elements1,
+			ChunkedList<MarkdownElement> Elements2, bool KeepUnchanged, MarkdownDocument Document)
 		{
-			if (Elements is MarkdownElement[] Array)
-				return Array;
-
-			if (Elements is ICollection<MarkdownElement> Collection)
-			{
-				Array = new MarkdownElement[Collection.Count];
-				Collection.CopyTo(Array, 0);
-				return Array;
-			}
-
-			int c = 0;
-
-			foreach (MarkdownElement E in Elements)
-				c++;
-
-			Array = new MarkdownElement[c];
-
-			c = 0;
-
-			foreach (MarkdownElement E in Elements)
-				Array[c++] = E;
-
-			return Array;
-		}
-
-		private static IEnumerable<MarkdownElement> Compare(IEnumerable<MarkdownElement> Elements1,
-			IEnumerable<MarkdownElement> Elements2, bool KeepUnchanged, MarkdownDocument Document)
-		{
-			LinkedList<MarkdownElement> Result = new LinkedList<MarkdownElement>();
-			MarkdownElement[] S1 = ToArray(Atomize(Elements1, out bool Reassemble1));
-			MarkdownElement[] S2 = ToArray(Atomize(Elements2, out bool Reassemble2));
-			EditScript<MarkdownElement> Script = Difference.Analyze<MarkdownElement>(S1, S2);
+			ChunkedList<MarkdownElement> Result = new ChunkedList<MarkdownElement>();
+			MarkdownElement[] S1 = Atomize(Elements1, out bool Reassemble1).ToArray();
+			MarkdownElement[] S2 = Atomize(Elements2, out bool Reassemble2).ToArray();
+			EditScript<MarkdownElement> Script = Difference.Analyze(S1, S2);
 			Step<MarkdownElement> Step, Step2;
 			int i, c = Script.Steps.Length;
 
 			if (Reassemble1 || Reassemble2)
 			{
-				List<MarkdownElement> Reassembled = new List<MarkdownElement>();
+				ChunkedList<MarkdownElement> Reassembled = new ChunkedList<MarkdownElement>();
 				StringBuilder sb = new StringBuilder();
 
 				for (i = 0; i < c; i++)
@@ -6326,7 +6308,7 @@ namespace Waher.Content.Markdown
 						continue;
 
 					foreach (MarkdownElement E in Step.Symbols)
-						Result.AddLast(E);
+						Result.Add(E);
 				}
 				else
 				{
@@ -6354,10 +6336,10 @@ namespace Waher.Content.Markdown
 							if (E1 is MarkdownElementChildren Children1 &&
 								E2 is MarkdownElementChildren Children2)
 							{
-								IEnumerable<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children,
+								ChunkedList<MarkdownElement> Diff = Compare(Children1.Children, Children2.Children,
 									KeepUnchanged || d > 1, Document);
 
-								Result.AddLast(Children1.Create(Diff, Document));
+								Result.Add(Children1.Create(Diff, Document));
 							}
 							else if (E1 is MarkdownElementSingleChild Child1 &&
 								E2 is MarkdownElementSingleChild Child2 &&
@@ -6365,22 +6347,22 @@ namespace Waher.Content.Markdown
 								Child1.Child is MarkdownElementChildren GrandChildren1 &&
 								Child2.Child is MarkdownElementChildren GrandChildren2)
 							{
-								IEnumerable<MarkdownElement> Diff = Compare(GrandChildren1.Children, GrandChildren2.Children,
+								ChunkedList<MarkdownElement> Diff = Compare(GrandChildren1.Children, GrandChildren2.Children,
 									KeepUnchanged || d > 1, Document);
 
-								Result.AddLast(Child1.Create(GrandChildren1.Create(Diff, Document), Document));
+								Result.Add(Child1.Create(GrandChildren1.Create(Diff, Document), Document));
 							}
 							else
 							{
-								Result.AddLast(GetElement(Step.Operation, Document, E1));
-								Result.AddLast(GetElement(Step2.Operation, Document, E2));
+								Result.Add(GetElement(Step.Operation, Document, E1));
+								Result.Add(GetElement(Step2.Operation, Document, E2));
 							}
 						}
 
 						i++;
 					}
 					else
-						Result.AddLast(GetElement(Step.Operation, Document, Step.Symbols));
+						Result.Add(GetElement(Step.Operation, Document, Step.Symbols));
 				}
 			}
 
@@ -6394,10 +6376,10 @@ namespace Waher.Content.Markdown
 				switch (Operation)
 				{
 					case EditOperation.Insert:
-						return new InsertBlocks(Document, Symbols);
+						return new InsertBlocks(Document, new ChunkedList<MarkdownElement>(Symbols));
 
 					case EditOperation.Delete:
-						return new DeleteBlocks(Document, Symbols);
+						return new DeleteBlocks(Document, new ChunkedList<MarkdownElement>(Symbols));
 				}
 			}
 			else
@@ -6405,10 +6387,10 @@ namespace Waher.Content.Markdown
 				switch (Operation)
 				{
 					case EditOperation.Insert:
-						return new Insert(Document, Symbols);
+						return new Insert(Document, new ChunkedList<MarkdownElement>(Symbols));
 
 					case EditOperation.Delete:
-						return new Delete(Document, Symbols);
+						return new Delete(Document, new ChunkedList<MarkdownElement>(Symbols));
 				}
 			}
 
@@ -6552,7 +6534,7 @@ namespace Waher.Content.Markdown
 			return Result;
 		}
 
-		private void GenerateStatDictionary(Dictionary<string, List<string>> Temp, out Dictionary<string, string[]> AsArrays, out Dictionary<string, int> AsCounts)
+		private void GenerateStatDictionary(Dictionary<string, ChunkedList<string>> Temp, out Dictionary<string, string[]> AsArrays, out Dictionary<string, int> AsCounts)
 		{
 			if (Temp is null)
 			{
@@ -6564,7 +6546,7 @@ namespace Waher.Content.Markdown
 			AsArrays = new Dictionary<string, string[]>();
 			AsCounts = new Dictionary<string, int>();
 
-			foreach (KeyValuePair<string, List<string>> P in Temp)
+			foreach (KeyValuePair<string, ChunkedList<string>> P in Temp)
 			{
 				AsArrays[P.Key] = P.Value.ToArray();
 				AsCounts[P.Key] = P.Value.Count;

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -19,7 +19,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="InitialNrColumns">Number of columns in first section.</param>
 		/// <param name="InitialRow">Initial section separator row, if provided, null otherwise.</param>
 		/// <param name="Children">Child elements.</param>
-		public Sections(MarkdownDocument Document, int InitialNrColumns, string InitialRow, IEnumerable<MarkdownElement> Children)
+		public Sections(MarkdownDocument Document, int InitialNrColumns, string InitialRow, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 			this.initialRow = InitialRow;
@@ -54,7 +54,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new Sections(Document, this.initialNrColumns, this.initialRow, Children);
 		}

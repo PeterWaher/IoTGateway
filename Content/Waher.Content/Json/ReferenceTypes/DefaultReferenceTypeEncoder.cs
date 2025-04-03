@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Json.ReferenceTypes
@@ -28,7 +29,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
 			Type T = Object.GetType();
-			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 			object Value;
 
 			foreach (FieldInfo FI in T.GetRuntimeFields())
@@ -38,7 +39,7 @@ namespace Waher.Content.Json.ReferenceTypes
 					Value = FI.GetValue(Object);
 
 					if (!Object.Equals(Value))
-						Properties.AddLast(new KeyValuePair<string, object>(FI.Name, Value));
+						Properties.Add(new KeyValuePair<string, object>(FI.Name, Value));
 				}
 			}
 
@@ -51,7 +52,7 @@ namespace Waher.Content.Json.ReferenceTypes
 					Value = PI.GetValue(Object, null);
 
 					if (!Object.Equals(Value))
-						Properties.AddLast(new KeyValuePair<string, object>(PI.Name, Value));
+						Properties.Add(new KeyValuePair<string, object>(PI.Name, Value));
 				}
 			}
 

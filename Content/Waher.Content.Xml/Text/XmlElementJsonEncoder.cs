@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Json;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Xml.Text
@@ -54,7 +55,7 @@ namespace Waher.Content.Xml.Text
 
 			if (Xml.HasChildNodes)
 			{
-				Dictionary<string, LinkedList<XmlElement>> ChildElements = null;
+				Dictionary<string, ChunkedList<XmlElement>> ChildElements = null;
 				StringBuilder InnerText = null;
 
 				foreach (XmlNode N in Xml.ChildNodes)
@@ -62,15 +63,15 @@ namespace Waher.Content.Xml.Text
 					if (N is XmlElement E)
 					{
 						if (ChildElements is null)
-							ChildElements = new Dictionary<string, LinkedList<XmlElement>>();
+							ChildElements = new Dictionary<string, ChunkedList<XmlElement>>();
 
-						if (!ChildElements.TryGetValue(E.LocalName, out	LinkedList<XmlElement> Elements))
+						if (!ChildElements.TryGetValue(E.LocalName, out	ChunkedList<XmlElement> Elements))
 						{
-							Elements = new LinkedList<XmlElement>();
+							Elements = new ChunkedList<XmlElement>();
 							ChildElements[E.LocalName] = Elements;
 						}
 
-						Elements.AddLast(E);
+						Elements.Add(E);
 					}
 					else if (N is XmlText ||
 						N is XmlCDataSection ||
@@ -86,10 +87,10 @@ namespace Waher.Content.Xml.Text
 
 				if (!(ChildElements is null))
 				{
-					foreach (KeyValuePair<string, LinkedList<XmlElement>> P in ChildElements)
+					foreach (KeyValuePair<string, ChunkedList<XmlElement>> P in ChildElements)
 					{
-						if (P.Value.First.Next is null)
-							AppendProperty(P.Key, P.Value.First.Value, Indent, ref First, Json);
+						if (P.Value.Count == 1)
+							AppendProperty(P.Key, P.Value.FirstItem, Indent, ref First, Json);
 						else
 							AppendProperty(P.Key, P.Value, Indent, ref First, Json);
 					}

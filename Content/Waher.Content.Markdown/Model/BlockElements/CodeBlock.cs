@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Rendering;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Model.BlockElements
@@ -91,8 +92,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 		private static void Init()
 		{
-			List<ICodeContentRenderer> CodeContents = new List<ICodeContentRenderer>();
-			List<IXmlVisualizer> XmlVisualizers = new List<IXmlVisualizer>();
+			ChunkedList<ICodeContentRenderer> CodeContents = new ChunkedList<ICodeContentRenderer>();
+			ChunkedList<IXmlVisualizer> XmlVisualizers = new ChunkedList<IXmlVisualizer>();
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICodeContentRenderer)))
 			{
@@ -158,7 +159,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				if (!PerLanguage.TryGetValue(Language, out Handlers))
 				{
-					List<ICodeContentRenderer> List = new List<ICodeContentRenderer>();
+					ChunkedList<ICodeContentRenderer> List = new ChunkedList<ICodeContentRenderer>();
 
 					foreach (Type T2 in Types.GetTypesImplementingInterface(typeof(T)))
 					{
@@ -219,7 +220,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				if (!xmlVisualizerHandlers.TryGetValue(Key, out Handlers))
 				{
-					List<IXmlVisualizer> List = new List<IXmlVisualizer>();
+					ChunkedList<IXmlVisualizer> List = new ChunkedList<IXmlVisualizer>();
 
 					foreach (IXmlVisualizer Visualizer in xmlVisualizers)
 					{

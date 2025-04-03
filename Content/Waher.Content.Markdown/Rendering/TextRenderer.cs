@@ -6,6 +6,7 @@ using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering
 {
@@ -335,7 +336,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// </summary>
 		/// <param name="ChildNodes">Label definition of multi-media content.</param>
 		/// <param name="AloneInParagraph">If the multi-media construct is alone in the paragraph.</param>
-		private async Task DefaultRenderingMultimedia(IEnumerable<MarkdownElement> ChildNodes,
+		private async Task DefaultRenderingMultimedia(ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph)
 		{
 			foreach (MarkdownElement E in ChildNodes)

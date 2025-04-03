@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -158,7 +159,7 @@ namespace Waher.Content.Semantic
 				using (XmlWriter w = XmlWriter.Create(sb, Settings))
 				{
 					Dictionary<string, string> Prefixes = new Dictionary<string, string>();
-					Dictionary<string, LinkedList<ISemanticTriple>> PerSubject = new Dictionary<string, LinkedList<ISemanticTriple>>();
+					Dictionary<string, ChunkedList<ISemanticTriple>> PerSubject = new Dictionary<string, ChunkedList<ISemanticTriple>>();
 					string s;
 
 					foreach (ISemanticTriple Triple in Model)
@@ -169,13 +170,13 @@ namespace Waher.Content.Semantic
 
 						s = Triple.Subject.ToString();
 
-						if (!PerSubject.TryGetValue(s, out LinkedList<ISemanticTriple> List))
+						if (!PerSubject.TryGetValue(s, out ChunkedList<ISemanticTriple> List))
 						{
-							List = new LinkedList<ISemanticTriple>();
+							List = new ChunkedList<ISemanticTriple>();
 							PerSubject[s] = List;
 						}
 
-						List.AddLast(Triple);
+						List.Add(Triple);
 					}
 
 					w.WriteStartElement("rdf", "RDF", Rdf.Namespace);
@@ -183,11 +184,11 @@ namespace Waher.Content.Semantic
 					foreach (KeyValuePair<string, string> P in Prefixes)
 						w.WriteAttributeString("xmlns", P.Key, string.Empty, P.Value);
 
-					foreach (KeyValuePair<string, LinkedList<ISemanticTriple>> Subject in PerSubject)
+					foreach (KeyValuePair<string, ChunkedList<ISemanticTriple>> Subject in PerSubject)
 					{
 						w.WriteStartElement("rdf", "Description", Rdf.Namespace);
 
-						if (Subject.Value.First.Value is BlankNode SubjectBlankNode)
+						if (Subject.Value.FirstItem is BlankNode SubjectBlankNode)
 							w.WriteAttributeString("rdf", "nodeID", string.Empty, SubjectBlankNode.NodeId);
 						else
 							w.WriteAttributeString("rdf", "about", string.Empty, Subject.Key);

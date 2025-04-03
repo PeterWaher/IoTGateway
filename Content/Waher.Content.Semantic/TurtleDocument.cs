@@ -8,6 +8,7 @@ using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
@@ -431,7 +432,7 @@ namespace Waher.Content.Semantic
 
 		private ISemanticElement ParseCollection()
 		{
-			LinkedList<ISemanticElement> Elements = null;
+			ChunkedList<ISemanticElement> Elements = null;
 
 			this.SkipWhiteSpace();
 
@@ -444,22 +445,26 @@ namespace Waher.Content.Semantic
 					if (Elements is null)
 						return RdfDocument.RdfNil;
 
-					LinkedListNode<ISemanticElement> Loop = Elements.First;
+					ChunkNode<ISemanticElement> Loop = Elements.FirstChunk;
 					BlankNode Result = this.CreateBlankNode();
 					BlankNode Current = Result;
+					int i, c;
 
 					while (!(Loop is null))
 					{
-						this.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop.Value));
+						for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+						{
+							this.Add(new SemanticTriple(Current, RdfDocument.RdfFirst, Loop[i]));
+
+							if (i < c - 1 || !(Loop.Next is null))
+							{
+								BlankNode Next = this.CreateBlankNode();
+								this.Add(new SemanticTriple(Current, RdfDocument.RdfRest, Next));
+								Current = Next;
+							}
+						}
 
 						Loop = Loop.Next;
-
-						if (!(Loop is null))
-						{
-							BlankNode Next = this.CreateBlankNode();
-							this.Add(new SemanticTriple(Current, RdfDocument.RdfRest, Next));
-							Current = Next;
-						}
 					}
 
 					this.Add(new SemanticTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
@@ -472,9 +477,9 @@ namespace Waher.Content.Semantic
 					break;
 
 				if (Elements is null)
-					Elements = new LinkedList<ISemanticElement>();
+					Elements = new ChunkedList<ISemanticElement>();
 
-				Elements.AddLast(Element);
+				Elements.Add(Element);
 				this.SkipWhiteSpace();
 			}
 

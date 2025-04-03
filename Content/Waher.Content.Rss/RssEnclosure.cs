@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Rss
 {
@@ -20,7 +20,7 @@ namespace Waher.Content.Rss
 			if (Xml is null)
 				throw new ArgumentNullException(nameof(Xml));
 
-			List<RssWarning> Warnings = new List<RssWarning>();
+			ChunkedList<RssWarning> Warnings = new ChunkedList<RssWarning>();
 
 			string s = XML.Attribute(Xml, "url");
 			if (Uri.TryCreate(BaseUri, s, out Uri Url))
@@ -33,7 +33,7 @@ namespace Waher.Content.Rss
 				Warnings.Add(new RssWarning(Xml, "Invalid Length: " + Xml.OuterXml));
 
 			this.ContentType = XML.Attribute(Xml, "type");
-			if (string.IsNullOrEmpty(ContentType))
+			if (string.IsNullOrEmpty(this.ContentType))
 				Warnings.Add(new RssWarning(Xml, "Invalid Content-Type: " + Xml.OuterXml));
 
 			this.Warnings = Warnings.ToArray();

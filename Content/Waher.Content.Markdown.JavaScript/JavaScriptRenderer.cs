@@ -12,6 +12,7 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
@@ -195,9 +196,9 @@ namespace Waher.Content.Markdown.JavaScript
 						InlineHTML Backlink = new InlineHTML(this.Document, "<a href=\"#fnref-" + Nr.ToString() + "\" class=\"footnote-backref\">&#8617;</a>");
 
 						if (Footnote.LastChild is Paragraph P)
-							P.AddChildren(Backlink);
+							P.AddChild(Backlink);
 						else
-							Footnote.AddChildren(Backlink);
+							Footnote.AddChild(Backlink);
 
 						Footnote.BacklinkAdded = true;
 					}
@@ -696,7 +697,7 @@ namespace Waher.Content.Markdown.JavaScript
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public async Task Render(string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
+		public async Task Render(string Url, string Title, ChunkedList<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			bool IsRelative = Url.IndexOf(':') < 0;
 

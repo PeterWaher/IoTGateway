@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -19,7 +19,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Url">URL</param>
 		/// <param name="Title">Optional title.</param>
-		public Link(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, string Url, string Title)
+		public Link(MarkdownDocument Document, ChunkedList<MarkdownElement> ChildElements, string Url, string Title)
 			: base(Document, ChildElements)
 		{
 			this.url = Url;
@@ -60,7 +60,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new Link(Document, Children, this.url, this.title);
 		}
@@ -116,7 +116,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void IncrementStatistics(MarkdownStatistics Statistics)
 		{
 			if (Statistics.IntUrlHyperlinks is null)
-				Statistics.IntUrlHyperlinks = new List<string>();
+				Statistics.IntUrlHyperlinks = new ChunkedList<string>();
 
 			if (!Statistics.IntUrlHyperlinks.Contains(this.url))
 				Statistics.IntUrlHyperlinks.Add(this.url);

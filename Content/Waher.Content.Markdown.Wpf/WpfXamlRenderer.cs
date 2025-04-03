@@ -11,6 +11,7 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Operators.Matrices;
@@ -617,7 +618,7 @@ namespace Waher.Content.Markdown.Wpf
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public async Task Render(string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
+		public async Task Render(string Url, string Title, ChunkedList<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			this.XmlOutput.WriteStartElement("Hyperlink");
 			this.XmlOutput.WriteAttributeString("NavigateUri", Document.CheckURL(Url, null));

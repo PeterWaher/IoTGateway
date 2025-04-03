@@ -17,6 +17,7 @@ using Waher.Content.Markdown.Xamarin;
 using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Timing;
@@ -196,7 +197,7 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <param name="JavaPath">Path to Java VM.</param>
 		public static void SearchForInstallationFolder(out string JarPath, out string JavaPath)
 		{
-			List<string> Folders = new List<string>();
+			ChunkedList<string> Folders = new ChunkedList<string>();
 
 			Folders.AddRange(FileSystem.GetFolders(new Environment.SpecialFolder[]
 			{
@@ -298,13 +299,13 @@ namespace Waher.Content.Markdown.PlantUml
 
 		private class AsyncState
 		{
-			public readonly List<GraphInfo> GraphInfos;
+			public readonly ChunkedList<GraphInfo> GraphInfos;
 			public readonly ResultType Type;
 
 			public AsyncState(ResultType Type, GraphInfo Info)
 			{
 				this.Type = Type;
-				this.GraphInfos = new List<GraphInfo>()
+				this.GraphInfos = new ChunkedList<GraphInfo>()
 				{
 					Info
 				};

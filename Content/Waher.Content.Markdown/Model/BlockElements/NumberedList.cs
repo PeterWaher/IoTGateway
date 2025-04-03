@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -14,7 +14,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public NumberedList(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public NumberedList(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 		}
@@ -47,7 +47,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new NumberedList(Document, Children);
 		}
@@ -62,27 +62,39 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Statistics.NrLists++;
 		}
 
+		/// <summary>
+		/// Adds a child to the element.
+		/// </summary>
+		/// <param name="NewChild">New child to add.</param>
+		public override void AddChild(MarkdownElement NewChild)
+		{
+			if (this.HasLastChild && 
+				this.LastChild is NumberedItem LastItem &&
+				NewChild is NumberedItem NewItem)
+			{
+				if (!NewItem.NumberExplicit)
+					NewItem.Number = LastItem.Number + 1;
+			}
+				
+			base.AddChild(NewChild);
+		}
 
 		/// <summary>
 		/// Adds children to the element.
 		/// </summary>
 		/// <param name="NewChildren">New children to add.</param>
-		public override void AddChildren(IEnumerable<MarkdownElement> NewChildren)
+		public override void AddChildren(ChunkedList<MarkdownElement> NewChildren)
 		{
-			if (this.LastChild is NumberedItem LastItem)
+			ChunkNode<MarkdownElement> Loop = NewChildren.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				int Next = LastItem.Number + 1;
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					this.AddChild(Loop[i]);
 
-				foreach (MarkdownElement E in NewChildren)
-				{
-					if (E is NumberedItem NewItem && !NewItem.NumberExplicit)
-						NewItem.Number = Next++;
-					else
-						break;
-				}
+				Loop = Loop.Next;
 			}
-
-			base.AddChildren(NewChildren);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Content
@@ -471,7 +472,7 @@ namespace Waher.Content
 		/// <returns>Parsed set of field values.</returns>
 		public static KeyValuePair<string, string>[] ParseFieldValues(string Value)
 		{
-			List<KeyValuePair<string, string>> Result = new List<KeyValuePair<string, string>>();
+			ChunkedList<KeyValuePair<string, string>> Result = new ChunkedList<KeyValuePair<string, string>>();
 			StringBuilder sb = new StringBuilder();
 			string Key = null;
 			int State = 0;

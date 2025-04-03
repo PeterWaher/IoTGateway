@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 
@@ -44,7 +45,7 @@ namespace Waher.Content
 		private readonly static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, string> fileExtensionsByContentType = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
-		private readonly static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
+		private readonly static Dictionary<string, ChunkedList<IContentConverter>> convertersByFrom = new Dictionary<string, ChunkedList<IContentConverter>>();
 		private readonly static Dictionary<string, IContentGetter[]> gettersByScheme = new Dictionary<string, IContentGetter[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentPoster[]> postersByScheme = new Dictionary<string, IContentPoster[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentPutter[]> puttersByScheme = new Dictionary<string, IContentPutter[]>(StringComparer.CurrentCultureIgnoreCase);
@@ -189,7 +190,7 @@ namespace Waher.Content
 			{
 				if (encoders is null)
 				{
-					List<IContentEncoder> Encoders = new List<IContentEncoder>();
+					ChunkedList<IContentEncoder> Encoders = new ChunkedList<IContentEncoder>();
 					IContentEncoder Encoder;
 					Type[] EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
 
@@ -461,7 +462,7 @@ namespace Waher.Content
 			{
 				if (decoders is null)
 				{
-					List<IContentDecoder> Decoders = new List<IContentDecoder>();
+					ChunkedList<IContentDecoder> Decoders = new ChunkedList<IContentDecoder>();
 					IContentDecoder Decoder;
 					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
 
@@ -843,10 +844,10 @@ namespace Waher.Content
 				if (convertersByStep.TryGetValue(PathKey, out Converter))
 					return !(Converter is null);
 
-				if (!convertersByFrom.TryGetValue(FromContentType, out List<IContentConverter> Converters))
+				if (!convertersByFrom.TryGetValue(FromContentType, out ChunkedList<IContentConverter> Converters))
 					return false;
 
-				LinkedList<ConversionStep> Queue = new LinkedList<ConversionStep>();
+				ChunkedList<ConversionStep> Queue = new ChunkedList<ConversionStep>();
 				ConversionStep Step;
 
 				foreach (IContentConverter C in Converters)
@@ -860,7 +861,7 @@ namespace Waher.Content
 						Distance = 1
 					};
 
-					Queue.AddLast(Step);
+					Queue.Add(Step);
 				}
 
 				Dictionary<string, ConversionStep> Possibilities = new Dictionary<string, ConversionStep>();
@@ -871,10 +872,9 @@ namespace Waher.Content
 				int StepDistance;
 				bool First;
 
-				while (!(Queue.First is null))
+				while (Queue.HasFirstItem)
 				{
-					Step = Queue.First.Value;
-					Queue.RemoveFirst();
+					Step = Queue.RemoveFirst();
 
 					StepDistance = Step.Distance + 1;
 					StepGrade = Step.Converter.ConversionGrade;
@@ -918,7 +918,7 @@ namespace Waher.Content
 									First = false;
 								}
 
-								Queue.AddLast(NextStep);
+								Queue.Add(NextStep);
 							}
 						}
 					}
@@ -926,7 +926,7 @@ namespace Waher.Content
 
 				if (!(Best is null))
 				{
-					List<KeyValuePair<string, IContentConverter>> List = new List<KeyValuePair<string, IContentConverter>>();
+					ChunkedList<KeyValuePair<string, IContentConverter>> List = new ChunkedList<KeyValuePair<string, IContentConverter>>();
 
 					while (!(Best is null))
 					{
@@ -958,7 +958,7 @@ namespace Waher.Content
 
 		private static void FindConverters()
 		{
-			List<IContentConverter> Converters = new List<IContentConverter>();
+			ChunkedList<IContentConverter> Converters = new ChunkedList<IContentConverter>();
 			IContentConverter Converter;
 			Type[] ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
 
@@ -986,9 +986,9 @@ namespace Waher.Content
 
 					foreach (string From in Converter.FromContentTypes)
 					{
-						if (!convertersByFrom.TryGetValue(From, out List<IContentConverter> List))
+						if (!convertersByFrom.TryGetValue(From, out ChunkedList<IContentConverter> List))
 						{
-							List = new List<IContentConverter>();
+							List = new ChunkedList<IContentConverter>();
 							convertersByFrom[From] = List;
 						}
 
@@ -1018,7 +1018,7 @@ namespace Waher.Content
 				if (converters is null)
 					FindConverters();
 
-				if (!convertersByFrom.TryGetValue(FromContentType, out List<IContentConverter> Converters))
+				if (!convertersByFrom.TryGetValue(FromContentType, out ChunkedList<IContentConverter> Converters))
 					return null;
 
 				return Converters.ToArray();
@@ -1072,9 +1072,9 @@ namespace Waher.Content
 
 		private static void BuildGetters()
 		{
-			List<IContentGetter> Getters = new List<IContentGetter>();
+			ChunkedList<IContentGetter> Getters = new ChunkedList<IContentGetter>();
 			Type[] GetterTypes = Types.GetTypesImplementingInterface(typeof(IContentGetter));
-			Dictionary<string, List<IContentGetter>> ByScheme = new Dictionary<string, List<IContentGetter>>();
+			Dictionary<string, ChunkedList<IContentGetter>> ByScheme = new Dictionary<string, ChunkedList<IContentGetter>>();
 			IContentGetter Getter;
 
 			foreach (Type T in GetterTypes)
@@ -1096,9 +1096,9 @@ namespace Waher.Content
 
 				foreach (string Schema in Getter.UriSchemes)
 				{
-					if (!ByScheme.TryGetValue(Schema, out List<IContentGetter> List))
+					if (!ByScheme.TryGetValue(Schema, out ChunkedList<IContentGetter> List))
 					{
-						List = new List<IContentGetter>();
+						List = new ChunkedList<IContentGetter>();
 						ByScheme[Schema] = List;
 					}
 
@@ -1108,7 +1108,7 @@ namespace Waher.Content
 
 			lock (gettersByScheme)
 			{
-				foreach (KeyValuePair<string, List<IContentGetter>> P in ByScheme)
+				foreach (KeyValuePair<string, ChunkedList<IContentGetter>> P in ByScheme)
 					gettersByScheme[P.Key] = P.Value.ToArray();
 			}
 
@@ -1465,9 +1465,9 @@ namespace Waher.Content
 
 		private static void BuildPosters()
 		{
-			List<IContentPoster> Posters = new List<IContentPoster>();
+			ChunkedList<IContentPoster> Posters = new ChunkedList<IContentPoster>();
 			Type[] PosterTypes = Types.GetTypesImplementingInterface(typeof(IContentPoster));
-			Dictionary<string, List<IContentPoster>> ByScheme = new Dictionary<string, List<IContentPoster>>();
+			Dictionary<string, ChunkedList<IContentPoster>> ByScheme = new Dictionary<string, ChunkedList<IContentPoster>>();
 			IContentPoster Poster;
 
 			foreach (Type T in PosterTypes)
@@ -1489,9 +1489,9 @@ namespace Waher.Content
 
 				foreach (string Schema in Poster.UriSchemes)
 				{
-					if (!ByScheme.TryGetValue(Schema, out List<IContentPoster> List))
+					if (!ByScheme.TryGetValue(Schema, out ChunkedList<IContentPoster> List))
 					{
-						List = new List<IContentPoster>();
+						List = new ChunkedList<IContentPoster>();
 						ByScheme[Schema] = List;
 					}
 
@@ -1501,7 +1501,7 @@ namespace Waher.Content
 
 			lock (postersByScheme)
 			{
-				foreach (KeyValuePair<string, List<IContentPoster>> P in ByScheme)
+				foreach (KeyValuePair<string, ChunkedList<IContentPoster>> P in ByScheme)
 					postersByScheme[P.Key] = P.Value.ToArray();
 			}
 
@@ -1788,9 +1788,9 @@ namespace Waher.Content
 
 		private static void BuildPutters()
 		{
-			List<IContentPutter> Putters = new List<IContentPutter>();
+			ChunkedList<IContentPutter> Putters = new ChunkedList<IContentPutter>();
 			Type[] PutterTypes = Types.GetTypesImplementingInterface(typeof(IContentPutter));
-			Dictionary<string, List<IContentPutter>> ByScheme = new Dictionary<string, List<IContentPutter>>();
+			Dictionary<string, ChunkedList<IContentPutter>> ByScheme = new Dictionary<string, ChunkedList<IContentPutter>>();
 			IContentPutter Putter;
 
 			foreach (Type T in PutterTypes)
@@ -1812,9 +1812,9 @@ namespace Waher.Content
 
 				foreach (string Schema in Putter.UriSchemes)
 				{
-					if (!ByScheme.TryGetValue(Schema, out List<IContentPutter> List))
+					if (!ByScheme.TryGetValue(Schema, out ChunkedList<IContentPutter> List))
 					{
-						List = new List<IContentPutter>();
+						List = new ChunkedList<IContentPutter>();
 						ByScheme[Schema] = List;
 					}
 
@@ -1824,7 +1824,7 @@ namespace Waher.Content
 
 			lock (puttersByScheme)
 			{
-				foreach (KeyValuePair<string, List<IContentPutter>> P in ByScheme)
+				foreach (KeyValuePair<string, ChunkedList<IContentPutter>> P in ByScheme)
 					puttersByScheme[P.Key] = P.Value.ToArray();
 			}
 
@@ -2108,9 +2108,9 @@ namespace Waher.Content
 
 		private static void BuildDeleters()
 		{
-			List<IContentDeleter> Deleters = new List<IContentDeleter>();
+			ChunkedList<IContentDeleter> Deleters = new ChunkedList<IContentDeleter>();
 			Type[] DeleterTypes = Types.GetTypesImplementingInterface(typeof(IContentDeleter));
-			Dictionary<string, List<IContentDeleter>> ByScheme = new Dictionary<string, List<IContentDeleter>>();
+			Dictionary<string, ChunkedList<IContentDeleter>> ByScheme = new Dictionary<string, ChunkedList<IContentDeleter>>();
 			IContentDeleter Deleter;
 
 			foreach (Type T in DeleterTypes)
@@ -2132,9 +2132,9 @@ namespace Waher.Content
 
 				foreach (string Schema in Deleter.UriSchemes)
 				{
-					if (!ByScheme.TryGetValue(Schema, out List<IContentDeleter> List))
+					if (!ByScheme.TryGetValue(Schema, out ChunkedList<IContentDeleter> List))
 					{
-						List = new List<IContentDeleter>();
+						List = new ChunkedList<IContentDeleter>();
 						ByScheme[Schema] = List;
 					}
 
@@ -2144,7 +2144,7 @@ namespace Waher.Content
 
 			lock (deletersByScheme)
 			{
-				foreach (KeyValuePair<string, List<IContentDeleter>> P in ByScheme)
+				foreach (KeyValuePair<string, ChunkedList<IContentDeleter>> P in ByScheme)
 					deletersByScheme[P.Key] = P.Value.ToArray();
 			}
 
@@ -2328,9 +2328,9 @@ namespace Waher.Content
 
 		private static void BuildHeaders()
 		{
-			List<IContentHeader> Headers = new List<IContentHeader>();
+			ChunkedList<IContentHeader> Headers = new ChunkedList<IContentHeader>();
 			Type[] HeaderTypes = Types.GetTypesImplementingInterface(typeof(IContentHeader));
-			Dictionary<string, List<IContentHeader>> ByScheme = new Dictionary<string, List<IContentHeader>>();
+			Dictionary<string, ChunkedList<IContentHeader>> ByScheme = new Dictionary<string, ChunkedList<IContentHeader>>();
 			IContentHeader Header;
 
 			foreach (Type T in HeaderTypes)
@@ -2352,9 +2352,9 @@ namespace Waher.Content
 
 				foreach (string Schema in Header.UriSchemes)
 				{
-					if (!ByScheme.TryGetValue(Schema, out List<IContentHeader> List))
+					if (!ByScheme.TryGetValue(Schema, out ChunkedList<IContentHeader> List))
 					{
-						List = new List<IContentHeader>();
+						List = new ChunkedList<IContentHeader>();
 						ByScheme[Schema] = List;
 					}
 
@@ -2364,7 +2364,7 @@ namespace Waher.Content
 
 			lock (headersByScheme)
 			{
-				foreach (KeyValuePair<string, List<IContentHeader>> P in ByScheme)
+				foreach (KeyValuePair<string, ChunkedList<IContentHeader>> P in ByScheme)
 					headersByScheme[P.Key] = P.Value.ToArray();
 			}
 

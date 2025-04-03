@@ -20,7 +20,8 @@
       <dependency id="Waher.Events" version="1.4.1"/>
       <dependency id="Waher.Networking.UWP" version="4.3.0"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="4.1.1"/>
-    </dependencies>
+			<dependency id="Waher.Runtime.Collections" version="1.0.0"/>
+		</dependencies>
   </metadata>
   <files>
     <file src="..\..\Images\Icon_64x64.png" target="Meta" />

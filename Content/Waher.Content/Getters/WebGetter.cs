@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Binary;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
@@ -446,7 +447,7 @@ namespace Waher.Content.Getters
 					foreach (KeyValuePair<string, IEnumerable<string>> Header in Response.Headers)
 					{
 						string s = null;
-						List<string> List = null;
+						ChunkedList<string> List = null;
 
 						foreach (string Value in Header.Value)
 						{
@@ -455,7 +456,7 @@ namespace Waher.Content.Getters
 							else
 							{
 								if (List is null)
-									List = new List<string>() { s };
+									List = new ChunkedList<string>() { s };
 
 								List.Add(Value);
 							}

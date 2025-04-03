@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Xml;
 using Waher.Content.Html.Elements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Html
 {
@@ -18,32 +19,32 @@ namespace Waher.Content.Html
 		private Title title = null;
 		private Body body = null;
 		private Head head = null;
-		private LinkedList<Main> main = null;
-		private LinkedList<Header> header = null;
-		private LinkedList<Footer> footer = null;
-		private LinkedList<Details> details = null;
-		private LinkedList<Summary> summary = null;
-		private LinkedList<Article> article = null;
-		private LinkedList<DtdInstruction> dtd = null;
-		private LinkedList<ProcessingInstruction> processingInstructions = null;
-		private LinkedList<Link> link = null;
-		private LinkedList<Meta> meta = null;
-		private LinkedList<Style> style = null;
-		private LinkedList<Address> address = null;
-		private LinkedList<Aside> aside = null;
-		private LinkedList<Nav> nav = null;
-		private LinkedList<Section> section = null;
-		private LinkedList<Dialog> dialog = null;
-		private LinkedList<Figure> figure = null;
-		private LinkedList<Elements.Audio> audio = null;
-		private LinkedList<Elements.Video> video = null;
-		private LinkedList<Img> img = null;
-		private LinkedList<Picture> picture = null;
-		private LinkedList<Cite> cite = null;
-		private LinkedList<Data> data = null;
-		private LinkedList<Time> time = null;
-		private LinkedList<Elements.Script> script = null;
-		private LinkedList<Form> form = null;
+		private ChunkedList<Main> main = null;
+		private ChunkedList<Header> header = null;
+		private ChunkedList<Footer> footer = null;
+		private ChunkedList<Details> details = null;
+		private ChunkedList<Summary> summary = null;
+		private ChunkedList<Article> article = null;
+		private ChunkedList<DtdInstruction> dtd = null;
+		private ChunkedList<ProcessingInstruction> processingInstructions = null;
+		private ChunkedList<Link> link = null;
+		private ChunkedList<Meta> meta = null;
+		private ChunkedList<Style> style = null;
+		private ChunkedList<Address> address = null;
+		private ChunkedList<Aside> aside = null;
+		private ChunkedList<Nav> nav = null;
+		private ChunkedList<Section> section = null;
+		private ChunkedList<Dialog> dialog = null;
+		private ChunkedList<Figure> figure = null;
+		private ChunkedList<Elements.Audio> audio = null;
+		private ChunkedList<Elements.Video> video = null;
+		private ChunkedList<Img> img = null;
+		private ChunkedList<Picture> picture = null;
+		private ChunkedList<Cite> cite = null;
+		private ChunkedList<Data> data = null;
+		private ChunkedList<Time> time = null;
+		private ChunkedList<Elements.Script> script = null;
+		private ChunkedList<Form> form = null;
 
 		/// <summary>
 		/// HTML document.
@@ -605,7 +606,7 @@ namespace Waher.Content.Html
 						else if (ch == '>')
 						{
 							if (this.dtd is null)
-								this.dtd = new LinkedList<DtdInstruction>();
+								this.dtd = new ChunkedList<DtdInstruction>();
 
 							DtdInstruction Dtd = new DtdInstruction(this, CurrentElement, Pos - 2, Pos, string.Empty);
 
@@ -613,7 +614,7 @@ namespace Waher.Content.Html
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(Dtd);
-							this.dtd.AddLast(Dtd);
+							this.dtd.Add(Dtd);
 
 							StartOfText = Pos + 1;
 							State = 0;
@@ -972,7 +973,7 @@ namespace Waher.Content.Html
 						if (ch == '>')
 						{
 							if (this.dtd is null)
-								this.dtd = new LinkedList<DtdInstruction>();
+								this.dtd = new ChunkedList<DtdInstruction>();
 
 							s = sb.ToString();
 							DtdInstruction Dtd = new DtdInstruction(this, CurrentElement, Pos - s.Length - 2, Pos, s);
@@ -981,7 +982,7 @@ namespace Waher.Content.Html
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(Dtd);
-							this.dtd.AddLast(Dtd);
+							this.dtd.Add(Dtd);
 
 							sb.Clear();
 							Empty = true;
@@ -1077,7 +1078,7 @@ namespace Waher.Content.Html
 						if (ch == '>')
 						{
 							if (this.processingInstructions is null)
-								this.processingInstructions = new LinkedList<ProcessingInstruction>();
+								this.processingInstructions = new ChunkedList<ProcessingInstruction>();
 
 							s = sb.ToString();
 							ProcessingInstruction PI = new ProcessingInstruction(this, CurrentElement, Pos - s.Length - 3, Pos, s);
@@ -1086,7 +1087,7 @@ namespace Waher.Content.Html
 								CurrentElement = CurrentElement.Parent as HtmlElement;
 
 							CurrentElement?.Add(PI);
-							this.processingInstructions.AddLast(PI);
+							this.processingInstructions.Add(PI);
 
 							sb.Clear();
 							Empty = true;
@@ -1509,7 +1510,7 @@ namespace Waher.Content.Html
 					case 19:    // In processing instruction
 					case 20:    // End of processing instruction?
 						if (this.processingInstructions is null)
-							this.processingInstructions = new LinkedList<ProcessingInstruction>();
+							this.processingInstructions = new ChunkedList<ProcessingInstruction>();
 
 						s = sb.ToString();
 						ProcessingInstruction PI = new ProcessingInstruction(this, CurrentElement, Pos - s.Length - 3, Pos, s);
@@ -1518,7 +1519,7 @@ namespace Waher.Content.Html
 							CurrentElement = CurrentElement.Parent as HtmlElement;
 
 						CurrentElement?.Add(PI);
-						this.processingInstructions.AddLast(PI);
+						this.processingInstructions.Add(PI);
 						break;
 
 					case 27:    // In CDATA
@@ -1674,8 +1675,8 @@ namespace Waher.Content.Html
 					Address Address = new Address(this, Parent, Start);
 					Result = Address;
 					if (this.address is null)
-						this.address = new LinkedList<Address>();
-					this.address.AddLast(Address);
+						this.address = new ChunkedList<Address>();
+					this.address.Add(Address);
 					break;
 
 				case "APPLET": Result = new Applet(this, Parent, Start); break;
@@ -1684,24 +1685,24 @@ namespace Waher.Content.Html
 					Article Article = new Article(this, Parent, Start);
 					Result = Article;
 					if (this.article is null)
-						this.article = new LinkedList<Article>();
-					this.article.AddLast(Article);
+						this.article = new ChunkedList<Article>();
+					this.article.Add(Article);
 					break;
 
 				case "ASIDE":
 					Aside Aside = new Aside(this, Parent, Start);
 					Result = Aside;
 					if (this.aside is null)
-						this.aside = new LinkedList<Aside>();
-					this.aside.AddLast(Aside);
+						this.aside = new ChunkedList<Aside>();
+					this.aside.Add(Aside);
 					break;
 
 				case "AUDIO":
 					Elements.Audio Audio = new Elements.Audio(this, Parent, Start);
 					Result = Audio;
 					if (this.audio is null)
-						this.audio = new LinkedList<Elements.Audio>();
-					this.audio.AddLast(Audio);
+						this.audio = new ChunkedList<Elements.Audio>();
+					this.audio.Add(Audio);
 					break;
 
 				case "B": Result = new B(this, Parent, Start); break;
@@ -1729,8 +1730,8 @@ namespace Waher.Content.Html
 					Cite Cite = new Cite(this, Parent, Start);
 					Result = Cite;
 					if (this.cite is null)
-						this.cite = new LinkedList<Cite>();
-					this.cite.AddLast(Cite);
+						this.cite = new ChunkedList<Cite>();
+					this.cite.Add(Cite);
 					break;
 
 				case "CODE": Result = new Code(this, Parent, Start); break;
@@ -1742,8 +1743,8 @@ namespace Waher.Content.Html
 					Data Data = new Data(this, Parent, Start);
 					Result = Data;
 					if (this.data is null)
-						this.data = new LinkedList<Data>();
-					this.data.AddLast(Data);
+						this.data = new ChunkedList<Data>();
+					this.data.Add(Data);
 					break;
 
 				case "DATALIST": Result = new DataList(this, Parent, Start); break;
@@ -1753,8 +1754,8 @@ namespace Waher.Content.Html
 					Details Details = new Details(this, Parent, Start);
 					Result = Details;
 					if (this.details is null)
-						this.details = new LinkedList<Details>();
-					this.details.AddLast(Details);
+						this.details = new ChunkedList<Details>();
+					this.details.Add(Details);
 					break;
 
 				case "DFN": Result = new Dfn(this, Parent, Start); break;
@@ -1762,8 +1763,8 @@ namespace Waher.Content.Html
 					Dialog Dialog = new Dialog(this, Parent, Start);
 					Result = Dialog;
 					if (this.dialog is null)
-						this.dialog = new LinkedList<Dialog>();
-					this.dialog.AddLast(Dialog);
+						this.dialog = new ChunkedList<Dialog>();
+					this.dialog.Add(Dialog);
 					break;
 
 				case "DIR": Result = new Dir(this, Parent, Start); break;
@@ -1779,8 +1780,8 @@ namespace Waher.Content.Html
 					Figure Figure = new Figure(this, Parent, Start);
 					Result = Figure;
 					if (this.figure is null)
-						this.figure = new LinkedList<Figure>();
-					this.figure.AddLast(Figure);
+						this.figure = new ChunkedList<Figure>();
+					this.figure.Add(Figure);
 					break;
 
 				case "FONT": Result = new Font(this, Parent, Start); break;
@@ -1788,16 +1789,16 @@ namespace Waher.Content.Html
 					Footer Footer = new Footer(this, Parent, Start);
 					Result = Footer;
 					if (this.footer is null)
-						this.footer = new LinkedList<Footer>();
-					this.footer.AddLast(Footer);
+						this.footer = new ChunkedList<Footer>();
+					this.footer.Add(Footer);
 					break;
 
 				case "FORM":
 					Form Form = new Form(this, Parent, Start);
 					Result = Form;
 					if (this.form is null)
-						this.form = new LinkedList<Form>();
-					this.form.AddLast(Form);
+						this.form = new ChunkedList<Form>();
+					this.form.Add(Form);
 					break;
 
 				case "FRAME": Result = new Frame(this, Parent, Start); break;
@@ -1822,8 +1823,8 @@ namespace Waher.Content.Html
 					Header Header = new Header(this, Parent, Start);
 					Result = Header;
 					if (this.header is null)
-						this.header = new LinkedList<Header>();
-					this.header.AddLast(Header);
+						this.header = new ChunkedList<Header>();
+					this.header.Add(Header);
 					break;
 
 				case "HGROUP": Result = new HGroup(this, Parent, Start); break;
@@ -1842,8 +1843,8 @@ namespace Waher.Content.Html
 					Img Img = new Img(this, Parent, Start);
 					Result = Img;
 					if (this.img is null)
-						this.img = new LinkedList<Img>();
-					this.img.AddLast(Img);
+						this.img = new ChunkedList<Img>();
+					this.img.Add(Img);
 					break;
 
 				case "INPUT": Result = new Input(this, Parent, Start); break;
@@ -1858,8 +1859,8 @@ namespace Waher.Content.Html
 					Link Link = new Link(this, Parent, Start);
 					Result = Link;
 					if (this.link is null)
-						this.link = new LinkedList<Link>();
-					this.link.AddLast(Link);
+						this.link = new ChunkedList<Link>();
+					this.link.Add(Link);
 					break;
 
 				case "LISTING": Result = new Listing(this, Parent, Start); break;
@@ -1867,8 +1868,8 @@ namespace Waher.Content.Html
 					Main Main = new Main(this, Parent, Start);
 					Result = Main;
 					if (this.main is null)
-						this.main = new LinkedList<Main>();
-					this.main.AddLast(Main);
+						this.main = new ChunkedList<Main>();
+					this.main.Add(Main);
 					break;
 
 				case "MAP": Result = new Map(this, Parent, Start); break;
@@ -1880,8 +1881,8 @@ namespace Waher.Content.Html
 					Meta Meta = new Meta(this, Parent, Start);
 					Result = Meta;
 					if (this.meta is null)
-						this.meta = new LinkedList<Meta>();
-					this.meta.AddLast(Meta);
+						this.meta = new ChunkedList<Meta>();
+					this.meta.Add(Meta);
 					break;
 
 				case "METER": Result = new Meter(this, Parent, Start); break;
@@ -1890,8 +1891,8 @@ namespace Waher.Content.Html
 					Nav Nav = new Nav(this, Parent, Start);
 					Result = Nav;
 					if (this.nav is null)
-						this.nav = new LinkedList<Nav>();
-					this.nav.AddLast(Nav);
+						this.nav = new ChunkedList<Nav>();
+					this.nav.Add(Nav);
 					break;
 
 				case "NEXTID": Result = new NextId(this, Parent, Start); break;
@@ -1910,8 +1911,8 @@ namespace Waher.Content.Html
 					Picture Picture = new Picture(this, Parent, Start);
 					Result = Picture;
 					if (this.picture is null)
-						this.picture = new LinkedList<Picture>();
-					this.picture.AddLast(Picture);
+						this.picture = new ChunkedList<Picture>();
+					this.picture.Add(Picture);
 					break;
 
 				case "PLAINTEXT": Result = new PlainText(this, Parent, Start); break;
@@ -1928,16 +1929,16 @@ namespace Waher.Content.Html
 					Elements.Script Script = new Elements.Script(this, Parent, Start);
 					Result = Script;
 					if (this.script is null)
-						this.script = new LinkedList<Elements.Script>();
-					this.script.AddLast(Script);
+						this.script = new ChunkedList<Elements.Script>();
+					this.script.Add(Script);
 					break;
 
 				case "SECTION":
 					Section Section = new Section(this, Parent, Start);
 					Result = Section;
 					if (this.section is null)
-						this.section = new LinkedList<Section>();
-					this.section.AddLast(Section);
+						this.section = new ChunkedList<Section>();
+					this.section.Add(Section);
 					break;
 
 				case "SELECT": Result = new Select(this, Parent, Start); break;
@@ -1953,8 +1954,8 @@ namespace Waher.Content.Html
 					Style Style = new Style(this, Parent, Start);
 					Result = Style;
 					if (this.style is null)
-						this.style = new LinkedList<Style>();
-					this.style.AddLast(Style);
+						this.style = new ChunkedList<Style>();
+					this.style.Add(Style);
 					break;
 
 				case "SUB": Result = new Sub(this, Parent, Start); break;
@@ -1962,8 +1963,8 @@ namespace Waher.Content.Html
 					Summary Summary = new Summary(this, Parent, Start);
 					Result = Summary;
 					if (this.summary is null)
-						this.summary = new LinkedList<Summary>();
-					this.summary.AddLast(Summary);
+						this.summary = new ChunkedList<Summary>();
+					this.summary.Add(Summary);
 					break;
 
 				case "SUP": Result = new Sup(this, Parent, Start); break;
@@ -1979,8 +1980,8 @@ namespace Waher.Content.Html
 					Time Time = new Time(this, Parent, Start);
 					Result = Time;
 					if (this.time is null)
-						this.time = new LinkedList<Time>();
-					this.time.AddLast(Time);
+						this.time = new ChunkedList<Time>();
+					this.time.Add(Time);
 					break;
 
 				case "TITLE":
@@ -2000,8 +2001,8 @@ namespace Waher.Content.Html
 					Elements.Video Video = new Elements.Video(this, Parent, Start);
 					Result = Video;
 					if (this.video is null)
-						this.video = new LinkedList<Elements.Video>();
-					this.video.AddLast(Video);
+						this.video = new ChunkedList<Elements.Video>();
+					this.video.Add(Video);
 					break;
 
 				case "WBR": Result = new Wbr(this, Parent, Start); break;

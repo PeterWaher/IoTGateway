@@ -420,7 +420,7 @@ namespace Waher.Runtime.Inventory
 		/// <returns>Array of loaded modules.</returns>
 		public static IModule[] GetLoadedModules(IComparer<IModule> Order)
 		{
-			List<IModule> Modules = new List<IModule>();
+			ChunkedList<IModule> Modules = new ChunkedList<IModule>();
 			IModule Module;
 			TypeInfo TI;
 
@@ -1166,7 +1166,7 @@ namespace Waher.Runtime.Inventory
 		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport, Type[] Interfaces)
 			where InterfaceType : IProcessingSupport<ObjectType>
 		{
-			List<KeyValuePair<InterfaceType, Grade>> Found = new List<KeyValuePair<InterfaceType, Grade>>();
+			ChunkedList<KeyValuePair<InterfaceType, Grade>> Found = new ChunkedList<KeyValuePair<InterfaceType, Grade>>();
 			TypeInfo TI;
 
 			foreach (Type T2 in Interfaces)

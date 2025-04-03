@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -147,7 +147,7 @@ namespace Waher.Content.Markdown.Functions
 
 			Markdown.AppendLine("|");
 
-			LinkedList<KeyValuePair<string, string>> Notes = null;
+			ChunkedList<KeyValuePair<string, string>> Notes = null;
 
 			for (Row = 0; Row < Rows; Row++)
 			{
@@ -166,9 +166,9 @@ namespace Waher.Content.Markdown.Functions
 							string NoteId = "n" + Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 							if (Notes is null)
-								Notes = new LinkedList<KeyValuePair<string, string>>();
+								Notes = new ChunkedList<KeyValuePair<string, string>>();
 
-							Notes.AddLast(new KeyValuePair<string, string>(NoteId, s));
+							Notes.Add(new KeyValuePair<string, string>(NoteId, s));
 
 							Markdown.Append("[^");
 							Markdown.Append(NoteId);

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -8,14 +8,14 @@ namespace Waher.Content.Markdown.Model
 	/// </summary>
 	public abstract class MarkdownElementChildren : MarkdownElement
 	{
-		private IEnumerable<MarkdownElement> children;
+		private ChunkedList<MarkdownElement> children;
 
 		/// <summary>
 		/// Abstract base class for all markdown elements with a variable number of child elements.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public MarkdownElementChildren(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public MarkdownElementChildren(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document)
 		{
 			this.children = Children;
@@ -29,99 +29,62 @@ namespace Waher.Content.Markdown.Model
 		public MarkdownElementChildren(MarkdownDocument Document, params MarkdownElement[] Children)
 			: base(Document)
 		{
-			this.children = Children;
+			this.children = new ChunkedList<MarkdownElement>(Children);
+		}
+
+		/// <summary>
+		/// Adds a child to the element.
+		/// </summary>
+		/// <param name="NewChild">New child to add.</param>
+		public virtual void AddChild(MarkdownElement NewChild)
+		{
+			this.children.Add(NewChild);
 		}
 
 		/// <summary>
 		/// Adds children to the element.
 		/// </summary>
 		/// <param name="NewChildren">New children to add.</param>
-		public void AddChildren(params MarkdownElement[] NewChildren)
+		public virtual void AddChildren(ChunkedList<MarkdownElement> NewChildren)
 		{
-			this.AddChildren((IEnumerable<MarkdownElement>)NewChildren);
+			this.children.AddRange(NewChildren);
 		}
 
 		/// <summary>
-		/// Adds children to the element.
+		/// If there is a first item.
 		/// </summary>
-		/// <param name="NewChildren">New children to add.</param>
-		public virtual void AddChildren(IEnumerable<MarkdownElement> NewChildren)
-		{
-			if (!(this.children is LinkedList<MarkdownElement> Children))
-			{
-				Children = new LinkedList<MarkdownElement>();
-			
-				foreach (MarkdownElement E in this.children)
-					Children.AddLast(E);
-				
-				this.children = Children;
-			}
-
-			foreach (MarkdownElement E in NewChildren)
-				Children.AddLast(E);
-		}
+		public bool HasFirstChild => this.children.HasFirstItem;
 
 		/// <summary>
 		/// First child, or null if none.
 		/// </summary>
-		public MarkdownElement FirstChild
-		{
-			get
-			{
-				foreach (MarkdownElement E in this.children)
-					return E;
+		public MarkdownElement FirstChild => this.children.FirstItem;
 
-				return null;
-			}
-		}
+		/// <summary>
+		/// If there is a last item.
+		/// </summary>
+		public bool HasLastChild => this.children.HasLastItem;
 
 		/// <summary>
 		/// Last child, or null if none.
 		/// </summary>
-		public MarkdownElement LastChild
-		{
-			get
-			{
-				MarkdownElement Result = null;
-
-				foreach (MarkdownElement E in this.children)
-					Result = E;
-
-				return Result;
-			}
-		}
+		public MarkdownElement LastChild => this.children.LastItem;
 
 		/// <summary>
 		/// If the element has only one child.
 		/// </summary>
-		public bool HasOneChild
-		{
-			get
-			{
-				bool First = true;
-
-				foreach (MarkdownElement E in this.children)
-				{
-					if (First)
-						First = false;
-					else
-						return false;
-				}
-
-				return !First;
-			}
-		}
+		public bool HasOneChild => this.children.Count == 1;
 
 		/// <summary>
 		/// Any children of the element.
 		/// </summary>
-		public override IEnumerable<MarkdownElement> Children => this.children;
+		public override ChunkedList<MarkdownElement> Children => this.children;
 
 		/// <summary>
 		/// Sets the children of the node.
 		/// </summary>
 		/// <param name="Children">Children to set.</param>
-		protected void SetChildren(IEnumerable<MarkdownElement> Children)
+		protected void SetChildren(ChunkedList<MarkdownElement> Children)
 		{
 			this.children = Children;
 		}
@@ -133,7 +96,7 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public abstract MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document);
+		public abstract MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document);
 
 		/// <summary>
 		/// If elements of this type should be joined over paragraphs.

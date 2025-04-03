@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -12,7 +12,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public BlockElementChildren(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public BlockElementChildren(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 		}
@@ -31,6 +31,5 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// If the element is a block element.
 		/// </summary>
 		public override bool IsBlockElement => true;
-
 	}
 }

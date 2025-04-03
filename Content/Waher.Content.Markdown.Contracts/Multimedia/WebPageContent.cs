@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Contracts.Multimedia
@@ -26,7 +26,7 @@ namespace Waher.Content.Markdown.Contracts.Multimedia
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		public async Task RenderContractXml(ContractsRenderer Renderer, MultimediaItem[] Items, 
-			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+			ChunkedList<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			Variables Variables = Document.Settings.Variables;
 			Variables?.Push();

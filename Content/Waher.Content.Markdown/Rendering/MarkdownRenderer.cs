@@ -10,6 +10,7 @@ using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -541,7 +542,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Items">Multi-media items</param>
 		/// <param name="ChildNodes">Label definition of multi-media content.</param>
 		/// <param name="AloneInParagraph">If the multi-media construct is alone in the paragraph.</param>
-		private async Task DefaultRenderingMultimedia(MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		private async Task DefaultRenderingMultimedia(MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph)
 		{
 			bool First = true;
@@ -679,7 +680,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// </summary>
 		/// <param name="Children">Child elements.</param>
 		/// <param name="Prefix">Block prefix</param>
-		private Task PrefixedBlock(IEnumerable<MarkdownElement> Children, string Prefix)
+		private Task PrefixedBlock(ChunkedList<MarkdownElement> Children, string Prefix)
 		{
 			return this.PrefixedBlock(Children, Prefix, Prefix);
 		}
@@ -692,7 +693,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
 		private Task PrefixedBlock(MarkdownElement Child, string PrefixFirstRow, string PrefixNextRows)
 		{
-			return this.PrefixedBlock(new MarkdownElement[] { Child }, PrefixFirstRow, PrefixNextRows);
+			return this.PrefixedBlock(new ChunkedList<MarkdownElement>(Child), PrefixFirstRow, PrefixNextRows);
 		}
 
 		/// <summary>
@@ -701,7 +702,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Children">Child elements.</param>
 		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
 		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		private async Task PrefixedBlock(IEnumerable<MarkdownElement> Children, string PrefixFirstRow, string PrefixNextRows)
+		private async Task PrefixedBlock(ChunkedList<MarkdownElement> Children, string PrefixFirstRow, string PrefixNextRows)
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))
 			{
@@ -729,7 +730,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// </summary>
 		/// <param name="Children">Child elements.</param>
 		/// <param name="Suffix">Block suffix</param>
-		private Task SuffixedBlock(IEnumerable<MarkdownElement> Children, string Suffix)
+		private Task SuffixedBlock(ChunkedList<MarkdownElement> Children, string Suffix)
 		{
 			return this.SuffixedBlock(Children, Suffix, Suffix);
 		}
@@ -740,7 +741,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Children">Child elements.</param>
 		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
 		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
-		private async Task SuffixedBlock(IEnumerable<MarkdownElement> Children, string SuffixFirstRow, string SuffixNextRows)
+		private async Task SuffixedBlock(ChunkedList<MarkdownElement> Children, string SuffixFirstRow, string SuffixNextRows)
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))
 			{
@@ -769,7 +770,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Children">Child elements.</param>
 		/// <param name="Prefix">Block prefix</param>
 		/// <param name="Suffix">Block suffix</param>
-		private Task PrefixSuffixedBlock(IEnumerable<MarkdownElement> Children, string Prefix, string Suffix)
+		private Task PrefixSuffixedBlock(ChunkedList<MarkdownElement> Children, string Prefix, string Suffix)
 		{
 			return this.PrefixSuffixedBlock(Children, Prefix, Prefix, Suffix, Suffix);
 		}
@@ -782,7 +783,7 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
 		/// <param name="SuffixFirstRow">Suffix, for first row.</param>
 		/// <param name="SuffixNextRows">Suffix, for the rest of the rows, if any.</param>
-		private async Task PrefixSuffixedBlock(IEnumerable<MarkdownElement> Children, string PrefixFirstRow, string PrefixNextRows,
+		private async Task PrefixSuffixedBlock(ChunkedList<MarkdownElement> Children, string PrefixFirstRow, string PrefixNextRows,
 			string SuffixFirstRow, string SuffixNextRows)
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))

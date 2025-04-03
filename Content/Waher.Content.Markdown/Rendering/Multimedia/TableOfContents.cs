@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering.Multimedia
 {
@@ -27,7 +27,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public async Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public async Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			StringBuilder Output = Renderer.Output;
@@ -129,9 +129,9 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		public async Task RenderText(TextRenderer Renderer, MultimediaItem[] Items,
-			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+			ChunkedList<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			LinkedList<int> Stack = new LinkedList<int>();
+			ChunkedList<int> Stack = new ChunkedList<int>();
 			StringBuilder Output = Renderer.Output;
 			int LastLevel = 0;
 			int ItemNr = 0;
@@ -154,7 +154,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 
 						LastLevel++;
 						ListItemAdded = false;
-						Stack.AddFirst(ItemNr);
+						Stack.AddFirstItem(ItemNr);
 						ItemNr = 0;
 					}
 				}
@@ -165,8 +165,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 						ListItemAdded = true;
 						LastLevel--;
 
-						ItemNr = Stack.First.Value;
-						Stack.RemoveFirst();
+						ItemNr = Stack.RemoveFirst();
 					}
 				}
 

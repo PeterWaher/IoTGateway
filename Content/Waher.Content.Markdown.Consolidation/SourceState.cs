@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -9,7 +8,7 @@ namespace Waher.Content.Markdown.Consolidation
 	/// </summary>
 	public class SourceState
 	{
-		private readonly List<DocumentInformation> documents = new List<DocumentInformation>();
+		private readonly ChunkedList<DocumentInformation> documents = new ChunkedList<DocumentInformation>();
 		private readonly string source;
 		private DocumentType type = DocumentType.Empty;
 		private string firstText = null;

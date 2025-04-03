@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering
 {
@@ -159,12 +160,15 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element being rendered</param>
 		public async Task RenderChildren(MarkdownElement Element)
 		{
-			IEnumerable<MarkdownElement> Children = Element.Children;
+			ChunkNode<MarkdownElement> Loop = Element.Children?.FirstChunk;
+			int i, c;
 
-			if (!(Children is null))
+			while (!(Loop is null))
 			{
-				foreach (MarkdownElement E in Children)
-					await E.Render(this);
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					await Loop[i].Render(this);
+
+				Loop = Loop.Next;
 			}
 		}
 

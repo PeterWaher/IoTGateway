@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
 
 namespace Waher.Content.Markdown.Latex.Multimedia
@@ -29,7 +29,7 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public async Task RenderLatex(LatexRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public async Task RenderLatex(LatexRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			StringBuilder Output = Renderer.Output;

@@ -9,6 +9,7 @@ using Waher.Runtime.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Xml
 {
@@ -622,10 +623,10 @@ namespace Waher.Content.Xml
 			}
 			else if (Value is IDictionary Dictionary)
 			{
-				LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+				ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 
 				foreach (object Key2 in Dictionary.Keys)
-					Properties.AddLast(new KeyValuePair<string, object>(Key2.ToString(), Dictionary[Key]));
+					Properties.Add(new KeyValuePair<string, object>(Key2.ToString(), Dictionary[Key]));
 
 				Encode(Properties, Key, null, Indent, Xml);
 			}
@@ -679,18 +680,18 @@ namespace Waher.Content.Xml
 			}
 			else
 			{
-				LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+				ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 
 				foreach (FieldInfo FI in T.GetRuntimeFields())
 				{
 					if (FI.IsPublic && !FI.IsStatic)
-						Properties.AddLast(new KeyValuePair<string, object>(FI.Name, FI.GetValue(Value)));
+						Properties.Add(new KeyValuePair<string, object>(FI.Name, FI.GetValue(Value)));
 				}
 
 				foreach (PropertyInfo PI in T.GetRuntimeProperties())
 				{
 					if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
-						Properties.AddLast(new KeyValuePair<string, object>(PI.Name, PI.GetValue(Value, null)));
+						Properties.Add(new KeyValuePair<string, object>(PI.Name, PI.GetValue(Value, null)));
 				}
 
 				Encode(Properties, Key, null, Indent, Xml);
@@ -1333,13 +1334,14 @@ namespace Waher.Content.Xml
 
 						if (!Comments || !ProcessingInstructions)
 						{
-							LinkedList<XmlNode> Nodes = new LinkedList<XmlNode>();
-							Nodes.AddLast(Doc.DocumentElement);
-
-							while (!(Nodes.First is null))
+							ChunkedList<XmlNode> Nodes = new ChunkedList<XmlNode>
 							{
-								XmlNode N = Nodes.First.Value;
-								Nodes.RemoveFirst();
+								Doc.DocumentElement
+							};
+
+							while (Nodes.HasFirstItem)
+							{
+								XmlNode N = Nodes.RemoveFirst();
 
 								if (N is XmlComment Comment)
 								{
@@ -1359,7 +1361,7 @@ namespace Waher.Content.Xml
 								else if (N is XmlElement E)
 								{
 									foreach (XmlNode N2 in E.ChildNodes)
-										Nodes.AddLast(N2);
+										Nodes.Add(N2);
 								}
 							}
 						}

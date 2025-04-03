@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Waher.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Cache
 {
@@ -85,8 +86,8 @@ namespace Waher.Runtime.Cache
 
 		private void TimerCallback(object state)
 		{
-			LinkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
-			LinkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
 			DateTime Now = DateTime.Now;
 			DateTime Limit;
 
@@ -104,9 +105,9 @@ namespace Waher.Runtime.Cache
 								break;
 
 							if (ToRemove1 is null)
-								ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
+								ToRemove1 = new ChunkedList<CacheItem<KeyType, ValueType>>();
 
-							ToRemove1.AddLast(this.valuesByKey[P.Value]);
+							ToRemove1.Add(this.valuesByKey[P.Value]);
 						}
 
 						if (!(ToRemove1 is null))
@@ -136,9 +137,9 @@ namespace Waher.Runtime.Cache
 								break;
 
 							if (ToRemove2 is null)
-								ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
+								ToRemove2 = new ChunkedList<CacheItem<KeyType, ValueType>>();
 
-							ToRemove2.AddLast(this.valuesByKey[P.Value]);
+							ToRemove2.Add(this.valuesByKey[P.Value]);
 						}
 
 						if (!(ToRemove2 is null))

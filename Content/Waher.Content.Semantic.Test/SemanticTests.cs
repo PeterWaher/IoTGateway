@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using Waher.Content.Semantic.Model;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Semantic.Test
 {
@@ -8,10 +9,9 @@ namespace Waher.Content.Semantic.Test
 	{
 		protected static void CompareTriples(ISemanticModel Result, ISemanticModel Expected)
 		{
-			Dictionary<string, string> NodeIdMap = new();
-			List<ISemanticTriple> Triples = new();
-			Triples.AddRange(Result);
-			List<ISemanticTriple> NotFound = new();
+			Dictionary<string, string> NodeIdMap = [];
+			ChunkedList<ISemanticTriple> Triples = [.. Result];
+			ChunkedList<ISemanticTriple> NotFound = [];
 
 			int i, c = Triples.Count;
 

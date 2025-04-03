@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model
 {
 	internal class BlockParseState
 	{
-		private readonly List<Block> blocks;
+		private readonly ChunkedList<Block> blocks;
 		private string[] rows;
 		private int[] positions;
 		private string currentRow;
@@ -21,7 +21,7 @@ namespace Waher.Content.Markdown.Model
 		private readonly bool preserveCrLf;
 		private char lastChar = (char)0;
 
-		public BlockParseState(string[] Rows, int[] Positions, int Start, int End, bool PreserveCrLf, List<Block> Blocks, int BlockIndex,
+		public BlockParseState(string[] Rows, int[] Positions, int Start, int End, bool PreserveCrLf, ChunkedList<Block> Blocks, int BlockIndex,
 			int EndBlock)
 		{
 			this.blocks = Blocks;
@@ -44,7 +44,7 @@ namespace Waher.Content.Markdown.Model
 			}
 		}
 
-		public List<Block> Blocks => this.blocks;
+		public ChunkedList<Block> Blocks => this.blocks;
 		public string[] Rows => this.rows;
 		public int[] Positions => this.positions;
 		public int Start => this.start;
@@ -223,7 +223,7 @@ namespace Waher.Content.Markdown.Model
 			public bool LineBreakAfter;
 		}
 
-		private LinkedList<StateBackup> backup = null;
+		private ChunkedList<StateBackup> backup = null;
 
 		public void BackupState()
 		{
@@ -238,18 +238,17 @@ namespace Waher.Content.Markdown.Model
 			};
 
 			if (this.backup is null)
-				this.backup = new LinkedList<StateBackup>();
+				this.backup = new ChunkedList<StateBackup>();
 
-			this.backup.AddFirst(Backup);
+			this.backup.AddFirstItem(Backup);
 		}
 
 		public void RestoreState()
 		{
-			if (this.backup is null || this.backup.First is null)
+			if (this.backup is null || !this.backup.HasFirstItem)
 				throw new Exception("No state backup to restore.");
 
-			StateBackup Backup = this.backup.First.Value;
-			this.backup.RemoveFirst();
+			StateBackup Backup = this.backup.RemoveFirst();
 
 			this.pos = Backup.Pos;
 			this.len = Backup.Len;
@@ -261,7 +260,7 @@ namespace Waher.Content.Markdown.Model
 
 		public void DiscardBackup()
 		{
-			if (this.backup is null || this.backup.First is null)
+			if (this.backup is null || !this.backup.HasFirstItem)
 				throw new Exception("No state backup to discard.");
 
 			this.backup.RemoveFirst();

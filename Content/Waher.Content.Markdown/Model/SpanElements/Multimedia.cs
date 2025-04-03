@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Events;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -27,7 +28,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Items">Multimedia items.</param>
-		public Multimedia(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements, bool AloneInParagraph, params MultimediaItem[] Items)
+		public Multimedia(MarkdownDocument Document, ChunkedList<MarkdownElement> ChildElements, bool AloneInParagraph, params MultimediaItem[] Items)
 			: base(Document, ChildElements)
 		{
 			this.items = Items;
@@ -125,7 +126,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				if (!renderersPerType.TryGetValue(typeof(T), out IMultimediaRenderer[] Renderers))
 				{
-					List<IMultimediaRenderer> Handlers = new List<IMultimediaRenderer>();
+					ChunkedList<IMultimediaRenderer> Handlers = new ChunkedList<IMultimediaRenderer>();
 					IMultimediaRenderer Handler;
 
 					foreach (Type Type in Types.GetTypesImplementingInterface(typeof(T)))
@@ -185,7 +186,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new Multimedia(Document, Children, this.aloneInParagraph, this.items);
 		}
@@ -256,9 +257,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				{
 					if (Statistics.IntMultimediaPerContentType is null)
 					{
-						Statistics.IntMultimediaPerContentType = new Dictionary<string, List<string>>();
-						Statistics.IntMultimediaPerContentCategory = new Dictionary<string, List<string>>();
-						Statistics.IntMultimediaPerExtension = new Dictionary<string, List<string>>();
+						Statistics.IntMultimediaPerContentType = new Dictionary<string, ChunkedList<string>>();
+						Statistics.IntMultimediaPerContentCategory = new Dictionary<string, ChunkedList<string>>();
+						Statistics.IntMultimediaPerExtension = new Dictionary<string, ChunkedList<string>>();
 					}
 
 					IncItem(Item.ContentType, Item.Url, Statistics.IntMultimediaPerContentType);
@@ -274,11 +275,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
-		private static void IncItem(string Key, string Url, Dictionary<string, List<string>> Dictionary)
+		private static void IncItem(string Key, string Url, Dictionary<string, ChunkedList<string>> Dictionary)
 		{
-			if (!Dictionary.TryGetValue(Key, out List<string> List))
+			if (!Dictionary.TryGetValue(Key, out ChunkedList<string> List))
 			{
-				List = new List<string>();
+				List = new ChunkedList<string>();
 				Dictionary[Key] = List;
 			}
 

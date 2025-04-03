@@ -140,6 +140,15 @@ namespace Waher.Runtime.Collections
 				Previous.Next = this;
 			}
 
+			public Chunk(T[] Elements)
+			{
+				this.Elements = Elements;
+				this.Size = this.Pos = this.Elements.Length;
+				this.Start = 0;
+				this.Next = null;
+				this.Prev = null;
+			}
+
 			public override string ToString()
 			{
 				StringBuilder sb = new StringBuilder();
@@ -1378,6 +1387,53 @@ namespace Waher.Runtime.Collections
 			}
 
 			return Result;
+		}
+
+		private void MakeOneChunk()
+		{
+			if (!(this.firstChunk.Next is null))
+				this.firstChunk = this.lastChunk = new Chunk(this.ToArray());
+		}
+
+		/// <summary>
+		/// Sorts the collection.
+		/// </summary>
+		public void Sort()
+		{
+			this.MakeOneChunk();
+			Array.Sort(this.firstChunk.Elements);
+		}
+
+		/// <summary>
+		/// Sorts the collection.
+		/// </summary>
+		/// <param name="Comparer">Comparer to use during sort.</param>
+		public void Sort(IComparer<T> Comparer)
+		{
+			this.MakeOneChunk();
+			Array.Sort(this.firstChunk.Elements, Comparer);
+		}
+
+		/// <summary>
+		/// Sorts the collection.
+		/// </summary>
+		/// <param name="Comparison">Comparisong to use during sort.</param>
+		public void Sort(Comparison<T> Comparison)
+		{
+			this.MakeOneChunk();
+			Array.Sort(this.firstChunk.Elements, Comparison);
+		}
+
+		/// <summary>
+		/// Sorts a part of the collection.
+		/// </summary>
+		/// <param name="Index">Start index of collection.</param>
+		/// <param name="Count">Number of elements to sort.</param>
+		/// <param name="Comparer">Comparer to use during sort.</param>
+		public void Sort(int Index, int Count, IComparer<T> Comparer)
+		{
+			this.MakeOneChunk();
+			Array.Sort(this.firstChunk.Elements, Index, Count, Comparer);
 		}
 
 		#endregion

@@ -489,7 +489,7 @@ namespace Waher.Runtime.Collections.Test
 			// Enumerate items to ensure all items are available and in the correct order
 			int[] Expected = [1, 5, 2, 3];
 			int Index = 0;
-			
+
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
 		}
@@ -821,7 +821,7 @@ namespace Waher.Runtime.Collections.Test
 			Assert.AreEqual(9, List.Count);
 			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 			int Index = 0;
-			
+
 			foreach (int Item in List)
 				Assert.AreEqual(Expected[Index++], Item);
 		}
@@ -838,7 +838,7 @@ namespace Waher.Runtime.Collections.Test
 			List.CopyTo(Destination);
 
 			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
@@ -847,7 +847,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_63_CopyTo_DestinationIndex()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 8; i++)
 				List.Add(i);
 
@@ -855,7 +855,7 @@ namespace Waher.Runtime.Collections.Test
 			List.CopyTo(Destination, 2);
 
 			int[] Expected = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
@@ -864,7 +864,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_64_CopyTo_Index_DestinationIndex_Count()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 8; i++)
 				List.Add(i);
 
@@ -872,7 +872,7 @@ namespace Waher.Runtime.Collections.Test
 			List.CopyTo(2, Destination, 3, 4);
 
 			int[] Expected = [0, 0, 0, 2, 3, 4, 5, 0, 0, 0];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
@@ -881,7 +881,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_65_CopyTo_ChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 12; i++)
 				List.Add(i);
 
@@ -889,7 +889,7 @@ namespace Waher.Runtime.Collections.Test
 			List.CopyTo(Destination);
 
 			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
@@ -898,7 +898,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_66_CopyTo_DestinationIndex_ChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 12; i++)
 				List.Add(i);
 
@@ -906,7 +906,7 @@ namespace Waher.Runtime.Collections.Test
 			List.CopyTo(Destination, 2);
 
 			int[] Expected = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
@@ -915,7 +915,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_67_CopyTo_Index_DestinationIndex_Count_ChunkLimits()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 12; i++)
 				List.Add(i);
 
@@ -923,7 +923,7 @@ namespace Waher.Runtime.Collections.Test
 			List.CopyTo(2, Destination, 3, 8);
 
 			int[] Expected = [0, 0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Destination[i]);
 		}
@@ -937,7 +937,7 @@ namespace Waher.Runtime.Collections.Test
 
 			int[] Result = [.. List];
 			int[] Expected = [0, 1, 2, 3];
-		
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Result[i]);
 		}
@@ -951,7 +951,7 @@ namespace Waher.Runtime.Collections.Test
 
 			int[] Result = [.. List];
 			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Result[i]);
 		}
@@ -965,7 +965,7 @@ namespace Waher.Runtime.Collections.Test
 
 			int[] Result = [.. List];
 			int[] Expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-			
+
 			for (int i = 0; i < Expected.Length; i++)
 				Assert.AreEqual(Expected[i], Result[i]);
 		}
@@ -1064,7 +1064,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_76_UpdateSingleChunkDeleteElements()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 4; i++)
 				List.Add(i);
 
@@ -1152,7 +1152,7 @@ namespace Waher.Runtime.Collections.Test
 		public void Test_80_Update_BreakProcedure()
 		{
 			ChunkedList<int> List = new(4);
-			
+
 			for (int i = 0; i < 8; i++)
 				List.Add(i);
 
@@ -1169,6 +1169,142 @@ namespace Waher.Runtime.Collections.Test
 			List.Update(UpdateCallback);
 
 			int[] Expected = [10, 11, 12, 13, 4, 5, 6, 7];
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_81_Sort_Default()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 7; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort();
+
+			int[] Expected = { 0, 1, 2, 3, 4, 5, 6, 7 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_82_Sort_Comparer()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 7; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+
+			int[] Expected = { 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_83_Sort_Comparison()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 7; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort((x, y) => y.CompareTo(x));
+
+			int[] Expected = { 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_84_Sort_Index_Count_Comparer()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 7; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort(2, 4, Comparer<int>.Create((x, y) => x.CompareTo(y)));
+
+			int[] Expected = { 7, 6, 2, 3, 4, 5, 1, 0 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_85_Sort_MultipleChunks_Default()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 15; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort();
+
+			int[] Expected = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_86_Sort_MultipleChunks_Comparer()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 15; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+
+			int[] Expected = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_87_Sort_MultipleChunks_Comparison()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 15; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort((x, y) => y.CompareTo(x));
+
+			int[] Expected = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+			int[] Result = [.. List];
+
+			for (int i = 0; i < Expected.Length; i++)
+				Assert.AreEqual(Expected[i], Result[i]);
+		}
+
+		[TestMethod]
+		public void Test_88_Sort_MultipleChunks_Index_Count_Comparer()
+		{
+			ChunkedList<int> List = new(4);
+
+			for (int i = 15; i >= 0; i--)
+				List.Add(i);
+
+			List.Sort(4, 8, Comparer<int>.Create((x, y) => x.CompareTo(y)));
+
+			int[] Expected = { 15, 14, 13, 12, 4, 5, 6, 7, 8, 9, 10, 11, 3, 2, 1, 0 };
 			int[] Result = [.. List];
 
 			for (int i = 0; i < Expected.Length; i++)

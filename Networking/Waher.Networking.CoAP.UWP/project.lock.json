@@ -1382,7 +1382,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -1433,7 +1434,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {
@@ -3254,7 +3256,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -3305,7 +3308,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {
@@ -5231,7 +5235,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -5282,7 +5287,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {
@@ -7103,7 +7109,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -7154,7 +7161,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {
@@ -9080,7 +9088,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -9131,7 +9140,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {
@@ -10952,7 +10962,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -11003,7 +11014,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {
@@ -12929,7 +12941,8 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "System.Text.RegularExpressions": "4.3.1"
+          "System.Text.RegularExpressions": "4.3.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -12980,7 +12993,8 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Events": "1.4.1"
+          "Waher.Events": "1.4.1",
+          "Waher.Runtime.Collections": "1.0.0"
         }
       },
       "Waher.Runtime.IO/1.0.2": {

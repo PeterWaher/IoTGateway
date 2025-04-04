@@ -116,10 +116,18 @@ namespace Waher.Content.Markdown.Model
 
 			if (!(this.children is null))
 			{
-				foreach (MarkdownElement E in this.children)
+				ChunkNode<MarkdownElement> Loop = this.children.FirstChunk;
+				int i, c;
+
+				while (!(Loop is null))
 				{
-					if (!E.ForEach(Callback, State))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!Loop[i].ForEach(Callback, State))
+							return false;
+					}
+
+					Loop = Loop.Next;
 				}
 			}
 
@@ -162,13 +170,20 @@ namespace Waher.Content.Markdown.Model
 		/// <returns>A hash code for the current object.</returns>
 		public override int GetHashCode()
 		{
+			ChunkNode<MarkdownElement> Loop = this.children.FirstChunk;
+			int i, c;
 			int h1 = base.GetHashCode();
 			int h2;
 
-			foreach (MarkdownElement E in this.children)
+			while (!(Loop is null))
 			{
-				h2 = E.GetHashCode();
-				h1 = ((h1 << 5) + h1) ^ h2;
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					h2 = Loop[i].GetHashCode();
+					h1 = ((h1 << 5) + h1) ^ h2;
+				}
+
+				Loop = Loop.Next;
 			}
 
 			return h1;

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
 using Waher.Runtime.Collections;
+using Waher.Script.Constants;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -35,30 +36,39 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 		private bool CalcHasBlocks()
 		{
+			ChunkNode<MarkdownElement> Loop = this.Children.FirstChunk;
 			bool HasBlocks = false;
 			bool HasSpans = false;
 			bool Inconsistent = false;
+			int i, c;
 
-			foreach (MarkdownElement E in this.Children)
+			while (!(Loop is null))
 			{
-				if (E.IsBlockElement)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					HasBlocks = true;
-					if (HasSpans)
+					if (Loop[i].IsBlockElement)
 					{
-						Inconsistent = true;
-						break;
+						HasBlocks = true;
+						if (HasSpans)
+						{
+							Inconsistent = true;
+							Loop = null;
+							break;
+						}
+					}
+					else
+					{
+						HasSpans = true;
+						if (HasBlocks)
+						{
+							Inconsistent = true;
+							Loop = null;
+							break;
+						}
 					}
 				}
-				else
-				{
-					HasSpans = true;
-					if (HasBlocks)
-					{
-						Inconsistent = true;
-						break;
-					}
-				}
+
+				Loop = Loop?.Next;
 			}
 
 			if (!Inconsistent)
@@ -66,26 +76,36 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			ChunkedList<MarkdownElement> NewChildren = new ChunkedList<MarkdownElement>();
 			ChunkedList<MarkdownElement> Spans = null;
+			MarkdownElement E;
 
-			foreach (MarkdownElement E in this.Children)
+			Loop = this.Children.FirstChunk;
+
+			while (!(Loop is null))
 			{
-				if (E.IsBlockElement)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					if (!(Spans is null))
+					E = Loop[i];
+
+					if (E.IsBlockElement)
 					{
-						NewChildren.Add(new Paragraph(this.Document, Spans, true));
-						Spans = null;
+						if (!(Spans is null))
+						{
+							NewChildren.Add(new Paragraph(this.Document, Spans, true));
+							Spans = null;
+						}
+
+						NewChildren.Add(E);
 					}
+					else
+					{
+						if (Spans is null)
+							Spans = new ChunkedList<MarkdownElement>();
 
-					NewChildren.Add(E);
+						Spans.Add(E);
+					}
 				}
-				else
-				{
-					if (Spans is null)
-						Spans = new ChunkedList<MarkdownElement>();
 
-					Spans.Add(E);
-				}
+				Loop = Loop?.Next;
 			}
 
 			if (!(Spans is null))

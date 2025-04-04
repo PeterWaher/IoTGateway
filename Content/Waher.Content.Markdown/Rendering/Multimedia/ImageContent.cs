@@ -34,8 +34,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 			{
 				bool SizeSet;
 
-				foreach (MarkdownElement E in ChildNodes)
-					await E.Render(Alt);
+				await Alt.Render(ChildNodes);
 
 				StringBuilder Output = Renderer.Output;
 				string AltStr = Alt.ToString();

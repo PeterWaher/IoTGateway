@@ -48,8 +48,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 				Renderer.Output.AppendLine("\"/>");
 			}
 
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(Renderer);
+			await Renderer.Render(ChildNodes);
 
 			Renderer.Output.AppendLine("</audio>");
 		}

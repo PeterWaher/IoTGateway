@@ -14,6 +14,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Script;
+using Waher.Script.Constants;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
@@ -719,8 +720,7 @@ namespace Waher.Content.Markdown.JavaScript
 
 			this.AppendHtml("\">");
 
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(this);
+			await this.Render(ChildNodes);
 
 			this.AppendHtml("</a>");
 		}
@@ -973,11 +973,19 @@ namespace Waher.Content.Markdown.JavaScript
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionDescriptions Element)
 		{
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				this.AppendHtml("<dd>");
-				await E.Render(this);
-				this.AppendHtmlLine("</dd>");
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.AppendHtml("<dd>");
+					await Loop[i].Render(this);
+					this.AppendHtmlLine("</dd>");
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -998,11 +1006,19 @@ namespace Waher.Content.Markdown.JavaScript
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionTerms Element)
 		{
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				this.AppendHtml("<dt>");
-				await E.Render(this);
-				this.AppendHtmlLine("</dt>");
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.AppendHtml("<dt>");
+					await Loop[i].Render(this);
+					this.AppendHtmlLine("</dt>");
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1014,8 +1030,7 @@ namespace Waher.Content.Markdown.JavaScript
 		{
 			this.AppendHtmlLine("<blockquote class=\"deleted\">");
 
-			foreach (MarkdownElement E in Element.Children)
-				await E.Render(this);
+			await this.RenderChildren(Element);
 
 			this.AppendHtmlLine("</blockquote>");
 		}
@@ -1146,29 +1161,38 @@ namespace Waher.Content.Markdown.JavaScript
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(NumberedList Element)
 		{
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+			int i, c;
 			NumberedItem Item;
 			int Expected = 0;
 
 			this.AppendHtmlLine("<ol>");
 
-			foreach (MarkdownElement E in Element.Children)
+			while (!(Loop is null))
 			{
-				Expected++;
-				Item = E as NumberedItem;
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					E = Loop[i];
+					Expected++;
+					Item = E as NumberedItem;
 
-				if (Item is null)
-					await E.Render(this);
-				else if (Item.Number == Expected)
-				{
-					this.AppendHtml("<li>");
-					await Item.Child.Render(this);
-					this.AppendHtmlLine("</li>");
+					if (Item is null)
+						await E.Render(this);
+					else if (Item.Number == Expected)
+					{
+						this.AppendHtml("<li>");
+						await Item.Child.Render(this);
+						this.AppendHtmlLine("</li>");
+					}
+					else
+					{
+						await Item.Render(this);
+						Expected = Item.Number;
+					}
 				}
-				else
-				{
-					await Item.Render(this);
-					Expected = Item.Number;
-				}
+
+				Loop = Loop.Next;
 			}
 
 			this.AppendHtmlLine("</ol>");
@@ -1255,13 +1279,23 @@ namespace Waher.Content.Markdown.JavaScript
 			if (Element.Headers.Length == 0 && !(this.Document?.Elements is null))
 			{
 				OnlyRows = true;
-				foreach (MarkdownElement Child in this.Document.Elements)
+
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				int c;
+
+				while (!(Loop is null))
 				{
-					if (Child != Element)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						OnlyRows = false;
-						break;
+						if (Loop[i] != Element)
+						{
+							OnlyRows = false;
+							Loop = null;
+							break;
+						}
 					}
+
+					Loop = Loop?.Next;
 				}
 			}
 
@@ -1395,33 +1429,44 @@ namespace Waher.Content.Markdown.JavaScript
 
 			if (Element.Child is NestedBlock NestedBlock)
 			{
+				ChunkNode<MarkdownElement> Loop = NestedBlock.Children.FirstChunk;
+				MarkdownElement E;
+				int i, c;
 				bool EndLabel = true;
 				bool First = true;
 
-				foreach (MarkdownElement E in NestedBlock.Children)
+				while (!(Loop is null))
 				{
-					if (First)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						First = false;
+						E = Loop[i];
 
-						if (E.InlineSpanElement)
-							await E.Render(this);
+						if (First)
+						{
+							First = false;
+
+							if (E.InlineSpanElement)
+								await E.Render(this);
+							else
+							{
+								await NestedBlock.Render(this);
+								Loop = null;
+								break;
+							}
+						}
 						else
 						{
-							await NestedBlock.Render(this);
-							break;
-						}
-					}
-					else
-					{
-						if (!E.InlineSpanElement)
-						{
-							this.AppendHtml("</label>");
-							EndLabel = false;
-						}
+							if (!E.InlineSpanElement)
+							{
+								this.AppendHtml("</label>");
+								EndLabel = false;
+							}
 
-						await E.Render(this);
+							await E.Render(this);
+						}
 					}
+
+					Loop = Loop?.Next;
 				}
 
 				if (EndLabel)

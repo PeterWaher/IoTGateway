@@ -207,20 +207,20 @@ namespace Waher.Content.Markdown.Rendering
 			}
 
 			// add default viewport
-            if (!this.Document.TryGetMetaData("VIEWPORT", out Values) || Values.Length == 0)
-            {
-                this.Output.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>");
+			if (!this.Document.TryGetMetaData("VIEWPORT", out Values) || Values.Length == 0)
+			{
+				this.Output.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>");
 
-            }
+			}
 
-            if (!(sb is null))
+			if (!(sb is null))
 			{
 				this.Output.Append("<meta name=\"description\" content=\"");
 				this.Output.Append(XML.HtmlAttributeEncode(sb.ToString()));
 				this.Output.AppendLine("\"/>");
 			}
 
-            foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.Document.MetaData)
+			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.Document.MetaData)
 			{
 				switch (MetaData.Key)
 				{
@@ -1050,10 +1050,7 @@ namespace Waher.Content.Markdown.Rendering
 				this.Output.Append("\" target=\"_blank");
 
 			this.Output.Append("\">");
-
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(this);
-
+			await this.Render(ChildNodes);
 			this.Output.Append("</a>");
 		}
 
@@ -1299,11 +1296,19 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionDescriptions Element)
 		{
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				this.Output.Append("<dd>");
-				await E.Render(this);
-				this.Output.AppendLine("</dd>");
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.Output.Append("<dd>");
+					await Loop[i].Render(this);
+					this.Output.AppendLine("</dd>");
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1324,11 +1329,19 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionTerms Element)
 		{
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				this.Output.Append("<dt>");
-				await E.Render(this);
-				this.Output.AppendLine("</dt>");
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.Output.Append("<dt>");
+					await Loop[i].Render(this);
+					this.Output.AppendLine("</dt>");
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1339,10 +1352,7 @@ namespace Waher.Content.Markdown.Rendering
 		public override async Task Render(DeleteBlocks Element)
 		{
 			this.Output.AppendLine("<blockquote class=\"deleted\">");
-
-			foreach (MarkdownElement E in Element.Children)
-				await E.Render(this);
-
+			await this.RenderChildren(Element);
 			this.Output.AppendLine("</blockquote>");
 		}
 
@@ -1483,29 +1493,38 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(NumberedList Element)
 		{
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+			MarkdownElement E;
 			NumberedItem Item;
 			int Expected = 0;
 
 			this.Output.AppendLine("<ol>");
 
-			foreach (MarkdownElement E in Element.Children)
+			while (!(Loop is null))
 			{
-				Expected++;
-				Item = E as NumberedItem;
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					E = Loop[i];
+					Expected++;
+					Item = E as NumberedItem;
 
-				if (Item is null)
-					await E.Render(this);
-				else if (Item.Number == Expected)
-				{
-					this.Output.Append("<li>");
-					await Item.Child.Render(this);
-					this.Output.AppendLine("</li>");
+					if (Item is null)
+						await E.Render(this);
+					else if (Item.Number == Expected)
+					{
+						this.Output.Append("<li>");
+						await Item.Child.Render(this);
+						this.Output.AppendLine("</li>");
+					}
+					else
+					{
+						await Item.Render(this);
+						Expected = Item.Number;
+					}
 				}
-				else
-				{
-					await Item.Render(this);
-					Expected = Item.Number;
-				}
+
+				Loop = Loop.Next;
 			}
 
 			this.Output.AppendLine("</ol>");
@@ -1733,33 +1752,44 @@ namespace Waher.Content.Markdown.Rendering
 
 			if (Element.Child is NestedBlock NestedBlock)
 			{
+				ChunkNode<MarkdownElement> Loop = NestedBlock.Children.FirstChunk;
+				MarkdownElement E;
+				int i, c;
 				bool EndLabel = true;
 				bool First = true;
 
-				foreach (MarkdownElement E in NestedBlock.Children)
+				while (!(Loop is null))
 				{
-					if (First)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						First = false;
+						E = Loop[i];
 
-						if (E.InlineSpanElement)
-							await E.Render(this);
+						if (First)
+						{
+							First = false;
+
+							if (E.InlineSpanElement)
+								await E.Render(this);
+							else
+							{
+								await NestedBlock.Render(this);
+								Loop = null;
+								break;
+							}
+						}
 						else
 						{
-							await NestedBlock.Render(this);
-							break;
-						}
-					}
-					else
-					{
-						if (!E.InlineSpanElement)
-						{
-							this.Output.Append("</label>");
-							EndLabel = false;
-						}
+							if (!E.InlineSpanElement)
+							{
+								this.Output.Append("</label>");
+								EndLabel = false;
+							}
 
-						await E.Render(this);
+							await E.Render(this);
+						}
 					}
+
+					Loop = Loop?.Next;
 				}
 
 				if (EndLabel)

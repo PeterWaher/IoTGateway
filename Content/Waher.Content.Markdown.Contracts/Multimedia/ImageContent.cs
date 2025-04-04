@@ -84,18 +84,7 @@ namespace Waher.Content.Markdown.Contracts.Multimedia
 							Output.WriteStartElement("caption");
 							if (string.IsNullOrEmpty(Title))
 							{
-								bool Found = false;
-
-								if (!(ChildNodes is null))
-								{
-									foreach (MarkdownElement E in ChildNodes)
-									{
-										await E.Render(Renderer);
-										Found = true;
-									}
-								}
-
-								if (!Found)
+								if (!await Renderer.Render(ChildNodes))
 									Output.WriteElementString("text", "Image");
 							}
 							else

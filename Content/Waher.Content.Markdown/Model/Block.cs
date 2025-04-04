@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Runtime.Collections;
 
@@ -188,9 +189,16 @@ namespace Waher.Content.Markdown.Model
 		{
 			ChunkedList<Block> Temp = this.RemovePrefix(Prefix, NrCharacters);
 			ChunkedList<Block> Result = new ChunkedList<Block>();
+			ChunkNode<Block> Loop = Temp.FirstChunk;
+			int i, c;
 
-			foreach (Block Block in Temp)
-				Result.AddRange(Block.RemoveSuffix(Suffix));
+			while (!(Loop is null))
+			{
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					Result.AddRange(Loop[i].RemoveSuffix(Suffix));
+
+				Loop = Loop.Next;
+			}
 
 			return Result;
 		}

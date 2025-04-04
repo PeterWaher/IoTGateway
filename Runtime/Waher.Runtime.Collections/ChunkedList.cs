@@ -59,7 +59,7 @@ namespace Waher.Runtime.Collections
 		private Chunk firstChunk;
 		private Chunk lastChunk;
 		private int chunkSize;
-		private int count = 0;
+		private int count;
 		private bool? nullable;
 
 		/// <summary>
@@ -105,6 +105,7 @@ namespace Waher.Runtime.Collections
 			this.chunkSize = InitialChunkSize;
 			this.maxChunkSize = MaxChunkSize;
 			this.minChunkSize = InitialChunkSize;
+			this.count = 0;
 
 			this.firstChunk = this.lastChunk = new Chunk(InitialChunkSize);
 
@@ -131,7 +132,7 @@ namespace Waher.Runtime.Collections
 		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
 		public ChunkedList(T[] InitialElements, int MaxChunkSize)
 		{
-			this.chunkSize = InitialElements.Length;
+			this.chunkSize = this.count = InitialElements.Length;
 			if (this.chunkSize == 0)
 				this.chunkSize = initialChunkSize;
 

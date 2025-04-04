@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -78,25 +79,32 @@ namespace Waher.Content.Markdown.Functions
 			IElement Result = null;
 			ChunkedList<IElement> Results = null;
 			IElement Item = null;
+			ChunkNode<MarkdownElement> Loop = Doc.Elements.FirstChunk;
+			int i, c;
 
-			foreach (MarkdownElement E in Doc.Elements)
+			while (!(Loop is null))
 			{
-				Item = await Evaluate(E);
-
-				if (Result is null)
-					Result = Item;
-				else
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					if (Results is null)
-					{
-						Results = new ChunkedList<IElement>
-						{
-							Result
-						};
-					}
+					Item = await Evaluate(Loop[i]);
 
-					Results.Add(Item);
+					if (Result is null)
+						Result = Item;
+					else
+					{
+						if (Results is null)
+						{
+							Results = new ChunkedList<IElement>
+							{
+								Result
+							};
+						}
+
+						Results.Add(Item);
+					}
 				}
+
+				Loop = Loop.Next;
 			}
 
 			if (Results is null)
@@ -121,14 +129,18 @@ namespace Waher.Content.Markdown.Functions
 					string[] Headers2 = new string[Columns];
 					int Rows = Table.Rows.Length;
 					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
+					MarkdownElement E;
+					int j, d;
 
 					for (i = 0; i < Columns; i++)
 						Headers2[i] = (await Evaluate(Headers[i])).AssociatedObjectValue?.ToString() ?? string.Empty;
 
 					foreach (MarkdownElement[] Row in Table.Rows)
 					{
-						foreach (MarkdownElement E in Row)
+						for (j = 0, d = Row.Length; j < d; j++)
 						{
+							E = Row[j];
+
 							if (E is null)
 								Elements.Add(ObjectValue.Null);
 							else

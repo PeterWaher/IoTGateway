@@ -13,6 +13,7 @@ using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Constants;
 using Waher.Script.Graphs;
 using Waher.Script.Operators.Matrices;
 
@@ -548,10 +549,7 @@ namespace Waher.Content.Markdown.Rendering
 			bool First = true;
 
 			this.Output.Append("![");
-
-			foreach (MarkdownElement Child in ChildNodes)
-				await Child.Render(this);
-
+			await this.Render(ChildNodes);
 			this.Output.Append(']');
 
 			foreach (MultimediaItem Item in Items)
@@ -706,8 +704,7 @@ namespace Waher.Content.Markdown.Rendering
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))
 			{
-				foreach (MarkdownElement E in Children)
-					await E.Render(Renderer);
+				await Renderer.Render(Children);
 
 				string s = Renderer.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
 				string[] Rows = s.Split('\n');
@@ -745,8 +742,7 @@ namespace Waher.Content.Markdown.Rendering
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))
 			{
-				foreach (MarkdownElement E in Children)
-					await E.Render(Renderer);
+				await Renderer.Render(Children);
 
 				string s = Renderer.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
 				string[] Rows = s.Split('\n');
@@ -788,8 +784,7 @@ namespace Waher.Content.Markdown.Rendering
 		{
 			using (MarkdownRenderer Renderer = new MarkdownRenderer(this.Document))
 			{
-				foreach (MarkdownElement E in Children)
-					await E.Render(Renderer);
+				await Renderer.Render(Children);
 
 				string s = Renderer.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
 				string[] Rows = s.Split('\n');
@@ -937,10 +932,18 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionTerms Element)
 		{
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				await E.Render(this);
-				this.Output.AppendLine();
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					await Loop[i].Render(this);
+					this.Output.AppendLine();
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 

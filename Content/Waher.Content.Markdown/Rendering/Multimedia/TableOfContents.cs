@@ -37,8 +37,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 			Output.AppendLine("<div class=\"toc\">");
 			Output.Append("<div class=\"tocTitle\">");
 
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(Renderer);
+			await Renderer.Render(ChildNodes);
 
 			Output.AppendLine("</div><div class=\"tocBody\">");
 
@@ -96,8 +95,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 				Output.Append(XML.HtmlAttributeEncode(await Header.Id));
 				Output.Append("\">");
 
-				foreach (MarkdownElement E in Header.Children)
-					await E.Render(Renderer);
+				await Renderer.RenderChildren(Header);
 
 				Output.Append("</a>");
 				ListItemAdded = true;

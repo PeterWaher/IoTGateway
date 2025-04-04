@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
 
@@ -88,18 +89,28 @@ namespace Waher.Content.Markdown.Consolidation
 		{
 			DocumentInformation Result = new DocumentInformation();
 			MarkdownElement First = null;
-			int i = 0;
 			bool IsTable = false;
 			bool IsCode = false;
+			ChunkNode<MarkdownElement> Loop = Markdown.Elements.FirstChunk;
+			MarkdownElement E;
+			int i, c;
 
-			foreach (MarkdownElement E in Markdown.Elements)
+			while (!(Loop is null))
 			{
-				First ??= E;
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					E = Loop[i];
+					First ??= E;
 
-				i++;
-				IsTable |= E is Table;
-				IsCode |= E is CodeBlock;
+					i++;
+					IsTable |= E is Table;
+					IsCode |= E is CodeBlock;
+				}
+
+				Loop = Loop.Next;
 			}
+
+			i = Markdown.Elements.Count;
 
 			Result.markdown = Markdown;
 			Result.id = Id;
@@ -112,7 +123,7 @@ namespace Waher.Content.Markdown.Consolidation
 				Result.type = DocumentType.Empty;
 			else if (i == 1)
 			{
-				int c = Result.rows.Length;
+				c = Result.rows.Length;
 
 				if (IsTable)
 				{
@@ -158,9 +169,9 @@ namespace Waher.Content.Markdown.Consolidation
 
 										foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 										{
-											if (N is XmlElement E)
+											if (N is XmlElement E2)
 											{
-												await Result.graph.ImportGraphAsync(E);
+												await Result.graph.ImportGraphAsync(E2);
 												break;
 											}
 										}

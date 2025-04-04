@@ -75,8 +75,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 			if (First)
 				Output.AppendLine(">");
 
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(Renderer);
+			await Renderer.Render(ChildNodes);
 
 			Output.Append("</video>");
 

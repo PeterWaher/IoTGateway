@@ -628,10 +628,7 @@ namespace Waher.Content.Markdown
 						LastHtmlIndent = true;
 						Block.Indent = 0;
 						Content = await this.ParseBlock(Block);
-
-						foreach (MarkdownElement E in Content)
-							Elements.Add(E);
-
+						Elements.AddRange(Content);
 						continue;
 					}
 
@@ -742,12 +739,7 @@ namespace Waher.Content.Markdown
 						{
 							try
 							{
-								StringBuilder sb = new StringBuilder();
-
-								foreach (string Row in Code)
-									sb.Append(Row);
-
-								byte[] Bin = Convert.FromBase64String(sb.ToString());
+								byte[] Bin = Convert.FromBase64String(Code.Concatenate());
 								s2 = Encoding.UTF8.GetString(Bin);
 
 								Rows = s2.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
@@ -929,7 +921,7 @@ namespace Waher.Content.Markdown
 					}
 					else
 						Elements.Add(new SectionSeparator(this, ++SectionNr, NrColumns, Block.Rows[0]));
-				
+
 					continue;
 				}
 				else if (Block.End == Block.Start && IsUnderline(Block.Rows[0], '~', false, false))
@@ -984,22 +976,17 @@ namespace Waher.Content.Markdown
 					}
 					else
 					{
-						Items = new ChunkedList<MarkdownElement>();
-						LastItem = null;
-
-						foreach (Block Segment in Segments)
-						{
-							foreach (Block SegmentItem in Segment.RemovePrefix(s2, 4))
-							{
-								LastItem = new UnnumberedItem(this, s2, new NestedBlock(this, await this.ParseBlock(SegmentItem)));
-								Items.Add(LastItem);
-							}
-						}
+						Items = await this.ParseUnnumberedItems(Segments, s2);
 
 						if (Elements.HasLastItem && Elements.LastItem is BulletList BulletList)
 							BulletList.AddChildren(Items);
 						else
 							Elements.Add(new BulletList(this, Items));
+
+						if (Items.HasLastItem)
+							LastItem = Items.LastItem as UnnumberedItem;
+						else
+							LastItem = null;
 					}
 
 					if (!(LastItem is null))
@@ -1098,25 +1085,17 @@ namespace Waher.Content.Markdown
 					}
 					else
 					{
-						Items = new ChunkedList<MarkdownElement>();
-						LastItem = null;
-
-						foreach (Tuple<int, bool, Block> Segment in Segments)
-						{
-							s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
-							foreach (Block SegmentItem in Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)))
-							{
-								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2,
-									new NestedBlock(this, await this.ParseBlock(SegmentItem)));
-
-								Items.Add(LastItem);
-							}
-						}
+						Items = await this.ParseNumberedItems(Segments);
 
 						if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
 							NumberedList.AddChildren(Items);
 						else
 							Elements.Add(new NumberedList(this, Items));
+
+						if (Items.HasLastItem)
+							LastItem = Items.LastItem as NumberedItem;
+						else
+							LastItem = null;
 					}
 
 					if (!(LastItem is null))
@@ -1209,24 +1188,17 @@ namespace Waher.Content.Markdown
 					}
 					else
 					{
-						Items = new ChunkedList<MarkdownElement>();
-						LastItem = null;
-
-						foreach (Tuple<Block, string, int> Segment in Segments)
-						{
-							foreach (Block SegmentItem in Segment.Item1.RemovePrefix(Segment.Item2, 4))
-							{
-								LastItem = new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3,
-									new NestedBlock(this, await this.ParseBlock(SegmentItem)));
-
-								Items.Add(LastItem);
-							}
-						}
+						Items = await this.ParseTaskItems(Segments);
 
 						if (Elements.HasLastItem && Elements.LastItem is TaskList TaskList)
 							TaskList.AddChildren(Items);
 						else
 							Elements.Add(new TaskList(this, Items));
+
+						if (Items.HasLastItem)
+							LastItem = Items.LastItem as TaskItem;
+						else
+							LastItem = null;
 					}
 
 					if (!(LastItem is null))
@@ -1325,25 +1297,17 @@ namespace Waher.Content.Markdown
 					}
 					else
 					{
-						Items = new ChunkedList<MarkdownElement>();
-						LastItem = null;
-
-						foreach (Tuple<int, bool, Block> Segment in Segments)
-						{
-							s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
-							foreach (Block SegmentItem in Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)))
-							{
-								LastItem = new NumberedItem(this, Segment.Item1, Segment.Item2,
-									new NestedBlock(this, await this.ParseBlock(SegmentItem)));
-
-								Items.Add(LastItem);
-							}
-						}
+						Items = await this.ParseNumberedItems(Segments);
 
 						if (Elements.HasLastItem && Elements.LastItem is NumberedList NumberedList)
 							NumberedList.AddChildren(Items);
 						else
 							Elements.Add(new NumberedList(this, Items));
+
+						if (Items.HasLastItem)
+							LastItem = Items.LastItem as NumberedItem;
+						else
+							LastItem = null;
 					}
 
 					if (!(LastItem is null))
@@ -1503,10 +1467,7 @@ namespace Waher.Content.Markdown
 					}
 
 					if (BlockIndex > i)
-					{
-						foreach (MarkdownElement E in await this.ParseBlocks(Blocks, i + 1, BlockIndex))
-							Description.Add(E);
-					}
+						Description.AddRange(await this.ParseBlocks(Blocks, i + 1, BlockIndex));
 
 					if (!Description.HasFirstItem)
 						continue;
@@ -1632,7 +1593,7 @@ namespace Waher.Content.Markdown
 					if (Content.HasFirstItem &&
 						Content.HasLastItem &&
 						Content.FirstItem is InlineHTML &&
-						Content.LastItem is InlineHTML && 
+						Content.LastItem is InlineHTML &&
 						this.settings.AllowHtml)
 					{
 						Elements.Add(new HtmlBlock(this, Content));
@@ -1642,7 +1603,7 @@ namespace Waher.Content.Markdown
 						if (Content.HasFirstItem &&
 							Content.HasLastItem &&
 							Content.FirstItem is MarkdownElementChildren MarkdownElementChildren &&
-							MarkdownElementChildren.JoinOverParagraphs && 
+							MarkdownElementChildren.JoinOverParagraphs &&
 							Elements.LastItem is MarkdownElementChildren MarkdownElementChildrenLast)
 						{
 							MarkdownElementChildrenLast.AddChildren(MarkdownElementChildren.Children);
@@ -1665,6 +1626,104 @@ namespace Waher.Content.Markdown
 				return Elements;
 		}
 
+		private async Task<ChunkedList<MarkdownElement>> ParseUnnumberedItems(
+			ChunkedList<Block> Segments, string Prefix)
+		{
+			ChunkedList<MarkdownElement> Items = new ChunkedList<MarkdownElement>();
+			ChunkNode<Block> Loop = Segments.FirstChunk;
+			ChunkNode<Block> Loop2;
+
+			while (!(Loop is null))
+			{
+				for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					Loop2 = Loop[i].RemovePrefix(Prefix, 4).FirstChunk;
+
+					while (!(Loop2 is null))
+					{
+						for (int j = Loop2.Start, d = Loop2.Pos; j < d; j++)
+						{
+							Items.Add(new UnnumberedItem(this, Prefix, new NestedBlock(this,
+								await this.ParseBlock(Loop2[j]))));
+						}
+
+						Loop2 = Loop2.Next;
+					}
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return Items;
+		}
+
+		private async Task<ChunkedList<MarkdownElement>> ParseNumberedItems(
+			ChunkedList<Tuple<int, bool, Block>> Segments)
+		{
+			ChunkedList<MarkdownElement> Items = new ChunkedList<MarkdownElement>();
+			ChunkNode<Tuple<int, bool, Block>> Loop = Segments.FirstChunk;
+			ChunkNode<Block> Loop2;
+			string s;
+
+			while (!(Loop is null))
+			{
+				for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					Tuple<int, bool, Block> Segment = Loop[i];
+
+					s = Segment.Item2 ? Segment.Item1.ToString() + "." : "#.";
+					Loop2 = Segment.Item3.RemovePrefix(s, Math.Max(4, s.Length + 2)).FirstChunk;
+
+					while (!(Loop2 is null))
+					{
+						for (int j = Loop2.Start, d = Loop2.Pos; j < d; j++)
+						{
+							Items.Add(new NumberedItem(this, Segment.Item1, Segment.Item2,
+								new NestedBlock(this, await this.ParseBlock(Loop2[j]))));
+						}
+
+						Loop2 = Loop2.Next;
+					}
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return Items;
+		}
+
+		private async Task<ChunkedList<MarkdownElement>> ParseTaskItems(ChunkedList<Tuple<Block, string, int>> Segments)
+		{
+			ChunkedList<MarkdownElement> Items = new ChunkedList<MarkdownElement>();
+			ChunkNode<Tuple<Block, string, int>> Loop = Segments.FirstChunk;
+			ChunkNode<Block> Loop2;
+
+			while (!(Loop is null))
+			{
+				for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					Tuple<Block, string, int> Segment = Loop[i];
+
+					Loop2 = Segment.Item1.RemovePrefix(Segment.Item2, 4).FirstChunk;
+
+					while (!(Loop2 is null))
+					{
+						for (int j = Loop2.Start, d = Loop2.Pos; j < d; j++)
+						{
+							Items.Add(new TaskItem(this, Segment.Item2 != "[ ]", Segment.Item3,
+								new NestedBlock(this, await this.ParseBlock(Loop2[j]))));
+						}
+
+						Loop2 = Loop2.Next;
+					}
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return Items;
+		}
+
 		private ChunkedList<MarkdownElement> PrepareHeader(ChunkedList<MarkdownElement> Content)
 		{
 			if (Content?.FirstItem is NumberedList NumberedList &&
@@ -1679,10 +1738,7 @@ namespace Waher.Content.Markdown
 				};
 
 				if (Item.Child is NestedBlock B)
-				{
-					foreach (MarkdownElement E in B.Children)
-						NewContent.Add(E);
-				}
+					NewContent.AddRange(B.Children);
 				else
 					NewContent.Add(Item.Child);
 
@@ -2345,7 +2401,7 @@ namespace Waher.Content.Markdown
 										Multimedia Multimedia = new Multimedia(this, ChildElements,
 											!Elements.HasFirstItem && State.PeekNextChar() == 0,
 											Items.ToArray());
-										
+
 										Elements.Add(Multimedia);
 
 										if (!(this.settings?.Progress is null))
@@ -2415,11 +2471,10 @@ namespace Waher.Content.Markdown
 
 									using (TextRenderer Renderer = new TextRenderer(Text))
 									{
-										foreach (MarkdownElement E in ChildElements)
-											await E.Render(Renderer);
+										await Renderer.Render(ChildElements);
 									}
 
-									Multimedia Multimedia = new Multimedia(this, null, 
+									Multimedia Multimedia = new Multimedia(this, null,
 										!Elements.HasFirstItem && State.PeekNextChar() == 0, Items.ToArray());
 
 									this.references[Text.ToString().ToLower()] = Multimedia;
@@ -2447,8 +2502,7 @@ namespace Waher.Content.Markdown
 								{
 									using (TextRenderer Renderer = new TextRenderer(Text))
 									{
-										foreach (MarkdownElement E in ChildElements)
-											await E.Render(Renderer);
+										await Renderer.Render(ChildElements);
 									}
 
 									Title = Text.ToString();
@@ -4957,8 +5011,7 @@ namespace Waher.Content.Markdown
 		private void FixSyntaxError(ChunkedList<MarkdownElement> Elements, string Prefix, ChunkedList<MarkdownElement> ChildElements)
 		{
 			Elements.Add(new InlineText(this, Prefix));
-			foreach (MarkdownElement E in ChildElements)
-				Elements.Add(E);
+			Elements.AddRange(ChildElements);
 		}
 
 		internal static bool IsPrefixedByNumber(string s, out int Numeral)
@@ -5999,18 +6052,23 @@ namespace Waher.Content.Markdown
 		/// <returns>If the operation was completed.</returns>
 		public bool ForEach(MarkdownElementHandler Callback, object State)
 		{
-			if (!(this.elements is null))
+			ChunkNode<MarkdownElement> Loop = this.elements?.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				foreach (MarkdownElement E in this.elements)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					if (!E.ForEach(Callback, State))
+					if (!Loop[i].ForEach(Callback, State))
 						return false;
 				}
+
+				Loop = Loop.Next;
 			}
 
 			if (!(this.references is null))
 			{
-				foreach (MarkdownElement E in this.references.Values)
+				foreach (Multimedia E in this.references.Values)
 				{
 					if (!E.ForEach(Callback, State))
 						return false;
@@ -6019,7 +6077,7 @@ namespace Waher.Content.Markdown
 
 			if (!(this.footnotes is null))
 			{
-				foreach (MarkdownElement E in this.footnotes.Values)
+				foreach (Footnote E in this.footnotes.Values)
 				{
 					if (!E.ForEach(Callback, State))
 						return false;
@@ -6160,10 +6218,8 @@ namespace Waher.Content.Markdown
 			// TODO: Meta-data
 
 			MarkdownDocument Result = await CreateAsync(string.Empty, this.settings, this.transparentExceptionTypes);
-			ChunkedList<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
 
-			foreach (MarkdownElement E in Edit)
-				Result.elements.Add(E);
+			Result.elements.AddRange(Compare(Previous.elements, this.elements, KeepUnchanged, Result));
 
 			// TODO: Footnotes
 
@@ -6188,16 +6244,23 @@ namespace Waher.Content.Markdown
 		private static ChunkedList<MarkdownElement> Atomize(ChunkedList<MarkdownElement> Elements)
 		{
 			ChunkedList<MarkdownElement> Result = new ChunkedList<MarkdownElement>();
+			ChunkNode<MarkdownElement> Loop = Elements.FirstChunk;
+			MarkdownElement E;
+			int i, c;
 
-			foreach (MarkdownElement E in Elements)
+			while (!(Loop is null))
 			{
-				if (E is IEditableText EditableText)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					foreach (MarkdownElement E2 in EditableText.Atomize())
-						Result.Add(E2);
+					E = Loop[i];
+
+					if (E is IEditableText EditableText)
+						Result.AddRange(EditableText.Atomize());
+					else
+						Result.Add(E);
 				}
-				else
-					Result.Add(E);
+
+				Loop = Loop.Next;
 			}
 
 			return Result;
@@ -6205,10 +6268,18 @@ namespace Waher.Content.Markdown
 
 		private static bool ContainsEditableText(ChunkedList<MarkdownElement> Elements)
 		{
-			foreach (MarkdownElement E in Elements)
+			ChunkNode<MarkdownElement> Loop = Elements.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				if (E is IEditableText)
-					return true;
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					if (Loop[i] is IEditableText)
+						return true;
+				}
+
+				Loop = Loop.Next;
 			}
 
 			return false;
@@ -6253,9 +6324,13 @@ namespace Waher.Content.Markdown
 					Type LastAtomType = null;
 					Atom LastAtom = null;
 					Type AtomType;
+					MarkdownElement E;
+					int j, d;
 
-					foreach (MarkdownElement E in Step.Symbols)
+					for (j = 0, d = Step.Symbols.Length; j < d; j++)
 					{
+						E = Step.Symbols[j];
+
 						if (E is Atom Atom)
 						{
 							AtomType = Atom.GetType();
@@ -6307,8 +6382,7 @@ namespace Waher.Content.Markdown
 					if (!KeepUnchanged)
 						continue;
 
-					foreach (MarkdownElement E in Step.Symbols)
-						Result.Add(E);
+					Result.AddRange(Step.Symbols);
 				}
 				else
 				{

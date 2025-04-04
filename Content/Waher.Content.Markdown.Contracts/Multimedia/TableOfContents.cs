@@ -34,9 +34,8 @@ namespace Waher.Content.Markdown.Contracts.Multimedia
 			bool ListItemAdded = true;
 
 			Output.WriteStartElement("paragraph");
-
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(Renderer);
+			
+			await Renderer.Render(ChildNodes);
 
 			Output.WriteEndElement();
 

@@ -113,8 +113,7 @@ namespace Waher.Content.Markdown.Latex.Multimedia
 							Output.AppendLine();
 							Output.Append("\\caption{");
 
-							foreach (MarkdownElement Child in ChildNodes)
-								await Child.Render(Renderer);
+							await Renderer.Render(ChildNodes);
 
 							Output.AppendLine("}");
 							Output.AppendLine("\\end{figure}");

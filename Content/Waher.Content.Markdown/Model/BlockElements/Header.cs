@@ -36,19 +36,27 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.row = Row;
 
 			string s = null;
+			ChunkNode<MarkdownElement> Loop = Children.FirstChunk;
+			int i, c;
 
-			foreach (MarkdownElement E in Children)
+			while (!(Loop is null))
 			{
-				if (E is InlineText Text)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					if (s is null)
-						s = Text.Value;
-					else
+					if (Loop[i] is InlineText Text)
 					{
-						s = null;
-						break;
+						if (s is null)
+							s = Text.Value;
+						else
+						{
+							s = null;
+							Loop = null;
+							break;
+						}
 					}
 				}
+
+				Loop = Loop?.Next;
 			}
 
 			if (s is null)

@@ -50,11 +50,10 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
                 }
 
                 Output.Append("\">");
+                
+                await Renderer.Render(ChildNodes);
 
-                foreach (MarkdownElement E in ChildNodes)
-                    await E.Render(Renderer);
-
-                Output.Append("</iframe>");
+				Output.Append("</iframe>");
 
                 if (AloneInParagraph)
                     Output.AppendLine();

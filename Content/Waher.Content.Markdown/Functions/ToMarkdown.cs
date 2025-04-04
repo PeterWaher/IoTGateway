@@ -11,6 +11,7 @@ using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Logical;
 using Waher.Script.Operators.Matrices;
 
 namespace Waher.Content.Markdown.Functions
@@ -184,10 +185,15 @@ namespace Waher.Content.Markdown.Functions
 				Markdown.AppendLine("|");
 			}
 
-			if (!(Notes is null))
+			ChunkNode<KeyValuePair<string, string>> Loop = Notes?.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				foreach (KeyValuePair<string, string> Note in Notes)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
+					KeyValuePair<string, string> Note = Loop[i];
+
 					Markdown.AppendLine();
 					Markdown.Append("[^");
 					Markdown.Append(Note.Key);
@@ -199,6 +205,8 @@ namespace Waher.Content.Markdown.Functions
 						Markdown.AppendLine(Row2);
 					}
 				}
+
+				Loop = Loop.Next;
 			}
 		}
 

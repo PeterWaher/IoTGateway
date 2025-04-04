@@ -14,7 +14,6 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Script;
-using Waher.Script.Constants;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
@@ -804,6 +803,7 @@ namespace Waher.Content.Markdown.JavaScript
 					{
 						await Renderer.RenderHtml(Renderer2, Multimedia.Items, Element.Children, Element.AloneInParagraph, Element.Document);
 						this.AppendHtml(Renderer2.ToString());
+						return;
 					}
 				}
 			}
@@ -918,9 +918,10 @@ namespace Waher.Content.Markdown.JavaScript
 					using (HtmlRenderer Renderer2 = new HtmlRenderer(this.htmlSettings))
 					{
 						if (await Renderer.RenderHtml(Renderer2, Element.Rows, Element.Language, Element.Indent, Element.Document))
+						{
+							this.AppendHtml(Renderer2.ToString());
 							return;
-
-						this.AppendHtml(Renderer2.ToString());
+						}
 					}
 				}
 				catch (Exception ex)

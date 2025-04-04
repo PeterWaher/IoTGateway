@@ -141,10 +141,16 @@ namespace Waher.Runtime.Text
 
 				if (!(ToRemove is null))
 				{
-					foreach (string Key in ToRemove)
+					ChunkNode<string> Loop = ToRemove.FirstChunk;
+
+					while (!(Loop is null))
 					{
-						if (this.mappings.Remove(Key))
-							NrRemoved++;
+						for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+						{
+							if (this.mappings.Remove(Loop[i]))
+								NrRemoved++;
+						}
+						Loop = Loop.Next;
 					}
 				}
 			}

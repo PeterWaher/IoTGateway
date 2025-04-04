@@ -1191,17 +1191,24 @@ namespace Waher.Runtime.Inventory
 
 			Found.Sort((x, y) =>
 			{
-				int i = x.Value.CompareTo(y.Value);
-				if (i != 0)
-					return i;
+				int j = x.Value.CompareTo(y.Value);
+				if (j != 0)
+					return j;
 
 				return x.Key.GetType().FullName.CompareTo(y.Key.GetType().FullName);
 			});
 
 			ChunkedList<InterfaceType> Result = new ChunkedList<InterfaceType>();
+			ChunkNode<KeyValuePair<InterfaceType, Grade>> Loop = Found.FirstChunk;
+			int i, c;
 
-			foreach (KeyValuePair<InterfaceType, Grade> P in Found)
-				Result.Add(P.Key);
+			while (!(Loop is null))
+			{
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					Result.Add(Loop[i].Key);
+
+				Loop = Loop.Next;
+			}
 
 			return Result.ToArray();
 		}

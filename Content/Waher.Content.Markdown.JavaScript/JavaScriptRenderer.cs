@@ -1280,7 +1280,7 @@ namespace Waher.Content.Markdown.JavaScript
 			{
 				OnlyRows = true;
 
-				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				ChunkNode<MarkdownElement> Loop = this.Document.Elements.FirstChunk;
 				int c;
 
 				while (!(Loop is null))

@@ -52,7 +52,7 @@ namespace Waher.Content.Markdown.Test
 				sb.AppendLine("Changes required:");
 				sb.AppendLine();
 
-				EditScript<string> Script = Difference.AnalyzeRows(Expected, Generated);
+				EditScript<string> Script = Difference.AnalyzeRows(Generated, Expected);
 
 				foreach (Step<string> Op in Script.Steps)
 				{

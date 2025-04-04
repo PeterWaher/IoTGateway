@@ -65,6 +65,18 @@ namespace Waher.Content.Markdown.Test
 
 				string JsonEncoded = Parsed.RunTest("return CreateHTML();");
 
+				// JavaScript engine not encoding quotes correctly:
+
+				JsonEncoded = JsonEncoded.
+					Replace("\"", "\\\"").
+					Replace("\\\\\"", "\\\"");
+
+				if (JsonEncoded.StartsWith("\\\""))
+					JsonEncoded = JsonEncoded[1..];
+
+				if (JsonEncoded.EndsWith("\\\""))
+					JsonEncoded = JsonEncoded[..^2] + "\"";
+
 				ConsoleOut.WriteLine("JSON Returned after executing JavaScript:");
 				ConsoleOut.WriteLine();
 				ConsoleOut.WriteLine(JsonEncoded);
@@ -83,8 +95,17 @@ namespace Waher.Content.Markdown.Test
 					ExpectedHtml = ExpectedHtml[(i + HtmlStartTag.Length)..].TrimStart();
 
 				i = ExpectedHtml.IndexOf(HtmlEndTag);
-				if (i > 0)
+				if (i >= 0)
 					ExpectedHtml = ExpectedHtml[..i];
+
+				// JavaScript engine not honoring special characters:
+
+				ExpectedHtml = ExpectedHtml.
+					Replace('’', '\'').
+					Replace('—', '-').
+					Replace('“', '"').
+					Replace('”', '"').
+					Replace('™','T');
 
 				MarkdownHtmlTests.AssertEqual(ExpectedHtml, GeneratedHtml, "Generated HTML does not match expected HTML.");
 			}

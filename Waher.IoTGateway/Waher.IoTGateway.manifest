@@ -18,6 +18,7 @@
 			<Content fileName="SimpleTree.js"/>
 		</Folder>
 		<Folder name="Settings">
+			<Content fileName="Attach.js"/>
 			<Content fileName="Backup.md"/>
 			<Content fileName="Backup.js"/>
 			<Content fileName="ChangePassword.md"/>

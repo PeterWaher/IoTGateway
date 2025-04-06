@@ -991,6 +991,7 @@
 			</Folder>
 		</Folder>
 		<Folder name='Settings'>
+			<Content fileName="Attach.js"/>
 			<Content fileName='Backup.js'/>
 			<Content fileName='Backup.md'/>
 			<Content fileName="ChangePassword.md"/>

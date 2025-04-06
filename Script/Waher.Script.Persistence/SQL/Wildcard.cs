@@ -30,8 +30,11 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			if (Variables is ObjectProperties Properties && Properties.Object is GroupObject GroupObject)
+			if (Variables is ObjectProperties Properties &&
+				Properties.Object is GroupObject GroupObject)
+			{
 				return Expression.Encapsulate(GroupObject.Objects);
+			}
 			else
 				throw new ScriptRuntimeException("Invalid context.", this);
 		}

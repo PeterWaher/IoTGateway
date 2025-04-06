@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Text
 {
@@ -60,7 +61,7 @@ namespace Waher.Runtime.Text
 				foreach (string Name in Exp.Expression.GetGroupNames())
 					Names[Name] = true;
 
-				List<KeyValuePair<int, string>> Parameters = new List<KeyValuePair<int, string>>();
+				ChunkedList<KeyValuePair<int, string>> Parameters = new ChunkedList<KeyValuePair<int, string>>();
 				int i = MapTo.IndexOf('{');
 				int j;
 
@@ -122,7 +123,7 @@ namespace Waher.Runtime.Text
 			if (Tag is null)
 				return 0;
 
-			LinkedList<string> ToRemove = null;
+			ChunkedList<string> ToRemove = null;
 			int NrRemoved = 0;
 
 			lock (this.mappings)
@@ -132,18 +133,24 @@ namespace Waher.Runtime.Text
 					if (!(P.Value.Tag is null) && P.Value.Tag.Equals(Tag))
 					{
 						if (ToRemove is null)
-							ToRemove = new LinkedList<string>();
+							ToRemove = new ChunkedList<string>();
 
-						ToRemove.AddLast(P.Key);
+						ToRemove.Add(P.Key);
 					}
 				}
 
 				if (!(ToRemove is null))
 				{
-					foreach (string Key in ToRemove)
+					ChunkNode<string> Loop = ToRemove.FirstChunk;
+
+					while (!(Loop is null))
 					{
-						if (this.mappings.Remove(Key))
-							NrRemoved++;
+						for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+						{
+							if (this.mappings.Remove(Loop[i]))
+								NrRemoved++;
+						}
+						Loop = Loop.Next;
 					}
 				}
 			}
@@ -268,9 +275,9 @@ namespace Waher.Runtime.Text
 
 			internal static MappingStep CalcStep(char Character, MappingExpression[] Expressions)
 			{
-				SortedDictionary<char, List<MappingExpression>> Next = new SortedDictionary<char, List<MappingExpression>>();
-				List<Mapping> Maps = null;
-				List<MappingStep> Steps = null;
+				SortedDictionary<char, ChunkedList<MappingExpression>> Next = new SortedDictionary<char, ChunkedList<MappingExpression>>();
+				ChunkedList<Mapping> Maps = null;
+				ChunkedList<MappingStep> Steps = null;
 
 				foreach (MappingExpression Exp in Expressions)
 				{
@@ -284,9 +291,9 @@ namespace Waher.Runtime.Text
 							AddMap(ref Maps, Exp);
 						else
 						{
-							if (!Next.TryGetValue(ch, out List<MappingExpression> List))
+							if (!Next.TryGetValue(ch, out ChunkedList<MappingExpression> List))
 							{
-								List = new List<MappingExpression>();
+								List = new ChunkedList<MappingExpression>();
 								Next[ch] = List;
 							}
 
@@ -302,10 +309,10 @@ namespace Waher.Runtime.Text
 					}
 				}
 
-				foreach (KeyValuePair<char, List<MappingExpression>> P in Next)
+				foreach (KeyValuePair<char, ChunkedList<MappingExpression>> P in Next)
 				{
 					if (Steps is null)
-						Steps = new List<MappingStep>();
+						Steps = new ChunkedList<MappingStep>();
 
 					Steps.Add(CalcStep(P.Key, P.Value.ToArray()));
 				}
@@ -318,10 +325,10 @@ namespace Waher.Runtime.Text
 				};
 			}
 
-			private static void AddMap(ref List<Mapping> Maps, MappingExpression Exp)
+			private static void AddMap(ref ChunkedList<Mapping> Maps, MappingExpression Exp)
 			{
 				if (Maps is null)
-					Maps = new List<Mapping>();
+					Maps = new ChunkedList<Mapping>();
 
 				Maps.Add(new Mapping()
 				{

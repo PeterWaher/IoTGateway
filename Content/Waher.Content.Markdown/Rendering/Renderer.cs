@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering
 {
@@ -87,8 +88,7 @@ namespace Waher.Content.Markdown.Rendering
 			if (!Inclusion)
 				await this.RenderDocumentHeader();
 
-			foreach (MarkdownElement E in this.Document.Elements)
-				await E.Render(this);
+			await this.Render(this.Document.Elements);
 
 			if (this.Document.NeedsToDisplayFootnotes)
 				await this.RenderFootnotes();
@@ -144,13 +144,13 @@ namespace Waher.Content.Markdown.Rendering
 		/// Renders the children of <paramref name="Element"/>.
 		/// </summary>
 		/// <param name="Element">Element being rendered</param>
-		public async Task RenderChildren(MarkdownElementChildren Element)
+		public Task RenderChildren(MarkdownElementChildren Element)
 		{
-			if (!(Element.Children is null))
-			{
-				foreach (MarkdownElement E in Element.Children)
-					await E.Render(this);
-			}
+			ChunkedList<MarkdownElement> Children = Element.Children;
+			if (!(Children is null))
+				return this.Render(Children);
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -159,12 +159,15 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element being rendered</param>
 		public async Task RenderChildren(MarkdownElement Element)
 		{
-			IEnumerable<MarkdownElement> Children = Element.Children;
+			ChunkNode<MarkdownElement> Loop = Element.Children?.FirstChunk;
+			int i, c;
 
-			if (!(Children is null))
+			while (!(Loop is null))
 			{
-				foreach (MarkdownElement E in Children)
-					await E.Render(this);
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					await Loop[i].Render(this);
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -178,6 +181,31 @@ namespace Waher.Content.Markdown.Rendering
 				return Task.CompletedTask;
 			else
 				return Element.Child.Render(this);
+		}
+
+		/// <summary>
+		/// Renders a collection of elements.
+		/// </summary>
+		/// <param name="Elements">Elements to render.</param>
+		/// <returns>If elements were rendered.</returns>
+		public async Task<bool> Render(ChunkedList<MarkdownElement> Elements)
+		{
+			ChunkNode<MarkdownElement> Loop = Elements.FirstChunk;
+			int i, c;
+			bool Rendered = false;
+
+			while (!(Loop is null))
+			{
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					await Loop[i].Render(this);
+					Rendered = true;
+				}
+
+				Loop = Loop.Next;
+			}
+
+			return Rendered;
 		}
 
 		#region Span Elements

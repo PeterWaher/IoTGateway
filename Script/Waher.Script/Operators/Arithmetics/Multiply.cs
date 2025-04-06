@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -148,10 +149,10 @@ namespace Waher.Script.Operators.Arithmetics
 				}
 				else
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement RightChild in Right.ChildElements)
-						Elements.AddLast(EvaluateMultiplication(Left, RightChild, Node));
+						Elements.Add(EvaluateMultiplication(Left, RightChild, Node));
 
 					return Right.Encapsulate(Elements, Node);
 				}
@@ -160,10 +161,10 @@ namespace Waher.Script.Operators.Arithmetics
 			{
 				if (Right.IsScalar)
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement LeftChild in Left.ChildElements)
-						Elements.AddLast(EvaluateMultiplication(LeftChild, Right, Node));
+						Elements.Add(EvaluateMultiplication(LeftChild, Right, Node));
 
 					return Left.Encapsulate(Elements, Node);
 				}
@@ -174,14 +175,14 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (LeftChildren.Count == RightChildren.Count)
 					{
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 						IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
 						IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
 						try
 						{
 							while (eLeft.MoveNext() && eRight.MoveNext())
-								Elements.AddLast(EvaluateMultiplication(eLeft.Current, eRight.Current, Node));
+								Elements.Add(EvaluateMultiplication(eLeft.Current, eRight.Current, Node));
 						}
 						finally
 						{
@@ -193,16 +194,16 @@ namespace Waher.Script.Operators.Arithmetics
 					}
 					else
 					{
-						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+						ChunkedList<IElement> LeftResult = new ChunkedList<IElement>();
 
 						foreach (IElement LeftChild in LeftChildren)
 						{
-							LinkedList<IElement> RightResult = new LinkedList<IElement>();
+							ChunkedList<IElement> RightResult = new ChunkedList<IElement>();
 
 							foreach (IElement RightChild in RightChildren)
-								RightResult.AddLast(EvaluateMultiplication(LeftChild, RightChild, Node));
+								RightResult.Add(EvaluateMultiplication(LeftChild, RightChild, Node));
 
-							LeftResult.AddLast(Right.Encapsulate(RightResult, Node));
+							LeftResult.Add(Right.Encapsulate(RightResult, Node));
 						}
 
 						return Left.Encapsulate(LeftResult, Node);

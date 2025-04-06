@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SQL;
@@ -69,7 +70,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 				if (this.graphIsVariableRef &&
 					!Variables.ContainsVariable(this.graphVariableRef))
 				{
-					LinkedList<Possibility> Result = new LinkedList<Possibility>();
+					ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
 
 					foreach (UriNode GraphName in Query.NamedGraphNames)
 					{
@@ -90,7 +91,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							if (!(PartResult is null))
 							{
 								foreach (Possibility P2 in PartResult)
-									Result.AddLast(P2);
+									Result.Add(P2);
 							}
 						}
 					}
@@ -106,7 +107,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			}
 			else
 			{
-				LinkedList<Possibility> Result = new LinkedList<Possibility>();
+				ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
 
 				foreach (Possibility P in ExistingMatches)
 				{
@@ -127,10 +128,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 								Cube, ObjectProperties, new Possibility[] { P }, Query);
 
 							if (!(PartResult is null))
-							{
-								foreach (Possibility P2 in PartResult)
-									Result.AddLast(P2);
-							}
+								Result.AddRange(PartResult);
 						}
 					}
 					else
@@ -148,10 +146,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 									}, Query);
 
 								if (!(PartResult is null))
-								{
-									foreach (Possibility P2 in PartResult)
-										Result.AddLast(P2);
-								}
+									Result.AddRange(PartResult);
 							}
 						}
 					}

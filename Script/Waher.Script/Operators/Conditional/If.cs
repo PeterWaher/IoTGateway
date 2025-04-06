@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -99,7 +100,7 @@ namespace Waher.Script.Operators.Conditional
             }
             else
             {
-                LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                 ICollection<IElement> ConditionElements = Condition.ChildElements;
                 ICollection<IElement> IfTrueElements = IfTrue.IsScalar ? null : IfTrue.ChildElements;
                 ICollection<IElement> IfFalseElements = IfFalse.IsScalar ? null : IfFalse.ChildElements;
@@ -116,7 +117,7 @@ namespace Waher.Script.Operators.Conditional
                 IEnumerator<IElement> e3 = IfFalseElements?.GetEnumerator();
 
                 while (e1.MoveNext() && (e2 is null || e2.MoveNext()) && (e3 is null || e3.MoveNext()))
-                    Elements.AddLast(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));
+                    Elements.Add(this.Evaluate(e1.Current, e2 is null ? IfTrue : e2.Current, e3 is null ? IfFalse : e3.Current));
 
                 return Condition.Encapsulate(Elements, this);
             }

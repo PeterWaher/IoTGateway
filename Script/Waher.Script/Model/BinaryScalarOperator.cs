@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -104,10 +105,10 @@ namespace Waher.Script.Model
 				}
 				else
 				{
-					LinkedList<IElement> Result = new LinkedList<IElement>();
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 					foreach (IElement RightChild in Right.ChildElements)
-						Result.AddLast(this.Evaluate(Left, RightChild, Variables));
+						Result.Add(this.Evaluate(Left, RightChild, Variables));
 
 					return Right.Encapsulate(Result, this);
 				}
@@ -116,10 +117,10 @@ namespace Waher.Script.Model
 			{
 				if (Right.IsScalar)
 				{
-					LinkedList<IElement> Result = new LinkedList<IElement>();
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 					foreach (IElement LeftChild in Left.ChildElements)
-						Result.AddLast(this.Evaluate(LeftChild, Right, Variables));
+						Result.Add(this.Evaluate(LeftChild, Right, Variables));
 
 					return Left.Encapsulate(Result, this);
 				}
@@ -130,14 +131,14 @@ namespace Waher.Script.Model
 
 					if (LeftChildren.Count == RightChildren.Count)
 					{
-						LinkedList<IElement> Result = new LinkedList<IElement>();
+						ChunkedList<IElement> Result = new ChunkedList<IElement>();
 						IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
 						IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
 						try
 						{
 							while (eLeft.MoveNext() && eRight.MoveNext())
-								Result.AddLast(this.Evaluate(eLeft.Current, eRight.Current, Variables));
+								Result.Add(this.Evaluate(eLeft.Current, eRight.Current, Variables));
 						}
 						finally
 						{
@@ -149,16 +150,16 @@ namespace Waher.Script.Model
 					}
 					else
 					{
-						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+						ChunkedList<IElement> LeftResult = new ChunkedList<IElement>();
 
 						foreach (IElement LeftChild in LeftChildren)
 						{
-							LinkedList<IElement> RightResult = new LinkedList<IElement>();
+							ChunkedList<IElement> RightResult = new ChunkedList<IElement>();
 
 							foreach (IElement RightChild in RightChildren)
-								RightResult.AddLast(this.Evaluate(LeftChild, RightChild, Variables));
+								RightResult.Add(this.Evaluate(LeftChild, RightChild, Variables));
 
-							LeftResult.AddLast(Right.Encapsulate(RightResult, this));
+							LeftResult.Add(Right.Encapsulate(RightResult, this));
 						}
 
 						return Left.Encapsulate(LeftResult, this);
@@ -197,10 +198,10 @@ namespace Waher.Script.Model
 				}
 				else
 				{
-					LinkedList<IElement> Result = new LinkedList<IElement>();
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 					foreach (IElement RightChild in Right.ChildElements)
-						Result.AddLast(await this.EvaluateAsync(Left, RightChild, Variables));
+						Result.Add(await this.EvaluateAsync(Left, RightChild, Variables));
 
 					return Right.Encapsulate(Result, this);
 				}
@@ -209,10 +210,10 @@ namespace Waher.Script.Model
 			{
 				if (Right.IsScalar)
 				{
-					LinkedList<IElement> Result = new LinkedList<IElement>();
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 					foreach (IElement LeftChild in Left.ChildElements)
-						Result.AddLast(await this.EvaluateAsync(LeftChild, Right, Variables));
+						Result.Add(await this.EvaluateAsync(LeftChild, Right, Variables));
 
 					return Left.Encapsulate(Result, this);
 				}
@@ -223,14 +224,14 @@ namespace Waher.Script.Model
 
 					if (LeftChildren.Count == RightChildren.Count)
 					{
-						LinkedList<IElement> Result = new LinkedList<IElement>();
+						ChunkedList<IElement> Result = new ChunkedList<IElement>();
 						IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
 						IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
 						try
 						{
 							while (eLeft.MoveNext() && eRight.MoveNext())
-								Result.AddLast(await this.EvaluateAsync(eLeft.Current, eRight.Current, Variables));
+								Result.Add(await this.EvaluateAsync(eLeft.Current, eRight.Current, Variables));
 						}
 						finally
 						{
@@ -242,16 +243,16 @@ namespace Waher.Script.Model
 					}
 					else
 					{
-						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+						ChunkedList<IElement> LeftResult = new ChunkedList<IElement>();
 
 						foreach (IElement LeftChild in LeftChildren)
 						{
-							LinkedList<IElement> RightResult = new LinkedList<IElement>();
+							ChunkedList<IElement> RightResult = new ChunkedList<IElement>();
 
 							foreach (IElement RightChild in RightChildren)
-								RightResult.AddLast(await this.EvaluateAsync(LeftChild, RightChild, Variables));
+								RightResult.Add(await this.EvaluateAsync(LeftChild, RightChild, Variables));
 
-							LeftResult.AddLast(Right.Encapsulate(RightResult, this));
+							LeftResult.Add(Right.Encapsulate(RightResult, this));
 						}
 
 						return Left.Encapsulate(LeftResult, this);

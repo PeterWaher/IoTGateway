@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -14,7 +14,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public BulletList(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public BulletList(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 		}
@@ -47,7 +47,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new BulletList(Document, Children);
 		}

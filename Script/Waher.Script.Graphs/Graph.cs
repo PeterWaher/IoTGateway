@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -961,7 +962,7 @@ namespace Waher.Script.Graphs
 				Max.AssociatedObjectValue is string)
 			{
 				Dictionary<string, bool> Indices = new Dictionary<string, bool>();
-				List<IElement> Labels = new List<IElement>();
+				ChunkedList<IElement> Labels = new ChunkedList<IElement>();
 				string s;
 
 				foreach (IVector Vector in Series)
@@ -1032,7 +1033,7 @@ namespace Waher.Script.Graphs
 				Den *= Math.Pow(10, -Exponent);
 
 			double StepSize = Num / Den;
-			List<double> Steps = new List<double>();
+			ChunkedList<double> Steps = new ChunkedList<double>();
 			double i = Math.Ceiling(Min / StepSize);
 			int j = 0;
 			double d = (i * Num) / Den;
@@ -1166,7 +1167,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Vector of labels.</returns>
 		public static DateTime[] GetLabels(DateTime Min, DateTime Max, int ApproxNrLabels, out LabelType LabelType)
 		{
-			List<DateTime> Labels = new List<DateTime>();
+			ChunkedList<DateTime> Labels = new ChunkedList<DateTime>();
 			TimeSpan Span = Max - Min;
 			TimeSpan StepSize = Span == TimeSpan.Zero ? new TimeSpan(0, 0, 1) : new TimeSpan((Span.Ticks + (ApproxNrLabels >> 1)) / ApproxNrLabels);
 			int i, c;

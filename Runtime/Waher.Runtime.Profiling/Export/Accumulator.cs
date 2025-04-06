@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Profiling.Events;
 
 namespace Waher.Runtime.Profiling.Export
@@ -9,8 +10,8 @@ namespace Waher.Runtime.Profiling.Export
 	public class Accumulator
 	{
 		private readonly Dictionary<string, long> sumTicks = new Dictionary<string, long>();
-		private readonly SortedDictionary<long, LinkedList<ProfilerEvent>> timeline = new SortedDictionary<long, LinkedList<ProfilerEvent>>();
-		private readonly LinkedList<string> order = new LinkedList<string>();
+		private readonly SortedDictionary<long, ChunkedList<ProfilerEvent>> timeline = new SortedDictionary<long, ChunkedList<ProfilerEvent>>();
+		private readonly ChunkedList<string> order = new ChunkedList<string>();
 		private readonly ProfilerThread thread;
 		private readonly object synchObj = new object();
 		private long startTick = 0;
@@ -44,13 +45,13 @@ namespace Waher.Runtime.Profiling.Export
 
 		private void AddLocked(long Tick, ProfilerEvent Event)
 		{
-			if (!this.timeline.TryGetValue(Tick, out LinkedList<ProfilerEvent> Events))
+			if (!this.timeline.TryGetValue(Tick, out ChunkedList<ProfilerEvent> Events))
 			{
-				Events = new LinkedList<ProfilerEvent>();
+				Events = new ChunkedList<ProfilerEvent>();
 				this.timeline[Tick] = Events;
 			}
 
-			Events.AddLast(Event);
+			Events.Add(Event);
 		}
 
 		private void CheckNameLocked(long Tick)
@@ -64,7 +65,7 @@ namespace Waher.Runtime.Profiling.Export
 				else
 				{
 					this.sumTicks[this.lastName] = Diff;
-					this.order.AddLast(this.lastName);
+					this.order.Add(this.lastName);
 				}
 
 				this.lastName = null;
@@ -116,7 +117,7 @@ namespace Waher.Runtime.Profiling.Export
 		/// Reports accumulated events to a list of events.
 		/// </summary>
 		/// <param name="Result">Resulting list of events.</param>
-		public void Report(List<ProfilerEvent> Result)
+		public void Report(ChunkedList<ProfilerEvent> Result)
 		{
 			lock (this.synchObj)
 			{
@@ -133,7 +134,7 @@ namespace Waher.Runtime.Profiling.Export
 
 				this.AddLocked(Tick, new Idle(Tick, this.thread));
 
-				foreach (LinkedList<ProfilerEvent> Events in this.timeline.Values)
+				foreach (ChunkedList<ProfilerEvent> Events in this.timeline.Values)
 					Result.AddRange(Events);
 			}
 		}

@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Objects.Sets;
-using Waher.Script.Operators.Vectors;
 using Waher.Script.Operators.Matrices;
 using Waher.Script.Operators.Sets;
-using System.Threading.Tasks;
-using Waher.Script.Objects;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators
 {
@@ -86,6 +87,17 @@ namespace Waher.Script.Operators
 		/// If the element represents a scalar value.
 		/// </summary>
 		public bool IsScalar => true;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return null;
+		}
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
@@ -255,7 +267,7 @@ namespace Waher.Script.Operators
 
 			if (!(Encapsulation is null))
 			{
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				ChunkedList<IElement> Result = new ChunkedList<IElement>();
 				IElement[] Arguments2 = new IElement[this.nrArguments];
 
 				for (j = 0; j < Dimension; j++)
@@ -268,7 +280,7 @@ namespace Waher.Script.Operators
 							Arguments2[i] = e[i].Current;
 					}
 
-					Result.AddLast(this.EvaluateCanonicalExtension(Arguments2, Variables));
+					Result.Add(this.EvaluateCanonicalExtension(Arguments2, Variables));
 				}
 
 				return Encapsulation(Result, this);
@@ -310,7 +322,7 @@ namespace Waher.Script.Operators
 
 			if (!(Encapsulation is null))
 			{
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				ChunkedList<IElement> Result = new ChunkedList<IElement>();
 				IElement[] Arguments2 = new IElement[this.nrArguments];
 
 				for (j = 0; j < Dimension; j++)
@@ -323,7 +335,7 @@ namespace Waher.Script.Operators
 							Arguments2[i] = e[i].Current;
 					}
 
-					Result.AddLast(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
+					Result.Add(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
 				}
 
 				return Encapsulation(Result, this);
@@ -408,10 +420,10 @@ namespace Waher.Script.Operators
 							else if (M.Rows != Dimension)
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
-							LinkedList<IElement> Vectors = new LinkedList<IElement>();
+							ChunkedList<IElement> Vectors = new ChunkedList<IElement>();
 
 							for (j = 0; j < Dimension; j++)
-								Vectors.AddLast(M.GetRow(j));
+								Vectors.Add(M.GetRow(j));
 
 							e[i] = Vectors.GetEnumerator();
 							if (Encapsulation is null)
@@ -454,10 +466,10 @@ namespace Waher.Script.Operators
 							else if (M.Rows != Dimension)
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
-							LinkedList<IElement> Vectors = new LinkedList<IElement>();
+							ChunkedList<IElement> Vectors = new ChunkedList<IElement>();
 
 							for (j = 0; j < Dimension; j++)
-								Vectors.AddLast(M.GetRow(j));
+								Vectors.Add(M.GetRow(j));
 
 							Arguments[i] = Argument = SetDefinition.Encapsulate(Vectors);
 							ChildElements = Argument.ChildElements;

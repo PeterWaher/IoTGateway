@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -36,14 +37,14 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			LinkedList<IElement> VectorElements = new LinkedList<IElement>();
+			ChunkedList<IElement> VectorElements = new ChunkedList<IElement>();
 
 			foreach (ScriptNode Node in this.Elements)
 			{
 				if (Node is null)
-					VectorElements.AddLast(ObjectValue.Null);
+					VectorElements.Add(ObjectValue.Null);
 				else
-					VectorElements.AddLast(Node.Evaluate(Variables));
+					VectorElements.Add(Node.Evaluate(Variables));
 			}
 
 			return Encapsulate(VectorElements, true, this);
@@ -59,14 +60,14 @@ namespace Waher.Script.Operators.Vectors
 			if (!this.isAsync)
 				return this.Evaluate(Variables);
 
-			LinkedList<IElement> VectorElements = new LinkedList<IElement>();
+			ChunkedList<IElement> VectorElements = new ChunkedList<IElement>();
 
 			foreach (ScriptNode Node in this.Elements)
 			{
 				if (Node is null)
-					VectorElements.AddLast(ObjectValue.Null);
+					VectorElements.Add(ObjectValue.Null);
 				else
-					VectorElements.AddLast(await Node.EvaluateAsync(Variables));
+					VectorElements.Add(await Node.EvaluateAsync(Variables));
 			}
 
 			return Encapsulate(VectorElements, true, this);
@@ -93,10 +94,10 @@ namespace Waher.Script.Operators.Vectors
 				return new ObjectValue(Bin);
 			else
 			{
-				LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 				foreach (object Obj in Elements)
-					Elements2.AddLast(Expression.Encapsulate(Obj));
+					Elements2.Add(Expression.Encapsulate(Obj));
 
 				return Encapsulate(Elements2, CanEncapsulateAsMatrix, Node);
 			}
@@ -111,10 +112,10 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Encapsulated vector (or, in the case on a byte array, an object value containing the binary information as a value).</returns>
 		public static IElement Encapsulate(IEnumerable Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
 		{
-			LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 			foreach (object Obj in Elements)
-				Elements2.AddLast(Expression.Encapsulate(Obj));
+				Elements2.Add(Expression.Encapsulate(Obj));
 
 			return Encapsulate(Elements2, CanEncapsulateAsMatrix, Node);
 		}
@@ -140,10 +141,10 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Encapsulated vector.</returns>
 		public static IVector Encapsulate(IEnumerable<object> Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
 		{
-			LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements2 = new ChunkedList<IElement>();
 
 			foreach (object Obj in Elements)
-				Elements2.AddLast(Expression.Encapsulate(Obj));
+				Elements2.Add(Expression.Encapsulate(Obj));
 
 			return Encapsulate(Elements2, CanEncapsulateAsMatrix, Node);
 		}
@@ -225,7 +226,7 @@ namespace Waher.Script.Operators.Vectors
 			{
 				if (Upgraded)
 				{
-					LinkedList<IElement> SuperElements = new LinkedList<IElement>();
+					ChunkedList<IElement> SuperElements = new ChunkedList<IElement>();
 
 					foreach (IElement Element in Elements)
 					{
@@ -235,12 +236,12 @@ namespace Waher.Script.Operators.Vectors
 							Set = Element.AssociatedSet;
 
 						if (Set.Equals(CommonSuperSet))
-							SuperElements.AddLast(Element);
+							SuperElements.Add(Element);
 						else
 						{
 							Element2 = Element;
 							if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet))
-								SuperElements.AddLast(Element2);
+								SuperElements.Add(Element2);
 							else
 							{
 								SuperElements = null;

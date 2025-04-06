@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Waher.Content.Images.Exif;
+using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
 
 namespace Waher.Content.Images
@@ -35,7 +36,7 @@ namespace Waher.Content.Images
 		public static bool TryParse(byte[] ExifData, out ExifTag[] Tags)
 		{
 			ExifReader Reader = new ExifReader(ExifData);
-			List<ExifTag> List = new List<ExifTag>();
+			ChunkedList<ExifTag> List = new ChunkedList<ExifTag>();
 
 			Tags = null;
 

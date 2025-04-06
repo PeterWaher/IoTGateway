@@ -39,22 +39,22 @@ namespace Waher.Script.Units.DerivedQuantities
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
 					new KeyValuePair<string, PhysicalQuantity>("knot", new PhysicalQuantity(0.514444, new Unit(Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+							new UnitFactor("m"),
+							new UnitFactor("s", -1)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("kn", new PhysicalQuantity(0.514444, new Unit(Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+							new UnitFactor("m"),
+							new UnitFactor("s", -1)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("kt", new PhysicalQuantity(0.514444, new Unit(Prefix.None,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1)
+							new UnitFactor("m"),
+							new UnitFactor("s", -1)
 						})))
 				};
 			}

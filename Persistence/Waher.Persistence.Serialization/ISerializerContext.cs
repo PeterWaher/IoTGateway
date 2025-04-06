@@ -8,7 +8,7 @@ namespace Waher.Persistence.Serialization
 	/// </summary>
 	/// <param name="EmbeddedObject">Embedded object.</param>
 	public delegate void EmbeddedObjectSetter(object EmbeddedObject);
-
+	
 	/// <summary>
 	/// Serialization context.
 	/// </summary>

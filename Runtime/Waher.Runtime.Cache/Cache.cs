@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Waher.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Cache
 {
@@ -85,8 +86,8 @@ namespace Waher.Runtime.Cache
 
 		private void TimerCallback(object state)
 		{
-			LinkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
-			LinkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
+			ChunkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
 			DateTime Now = DateTime.Now;
 			DateTime Limit;
 
@@ -104,18 +105,28 @@ namespace Waher.Runtime.Cache
 								break;
 
 							if (ToRemove1 is null)
-								ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
+								ToRemove1 = new ChunkedList<CacheItem<KeyType, ValueType>>();
 
-							ToRemove1.AddLast(this.valuesByKey[P.Value]);
+							ToRemove1.Add(this.valuesByKey[P.Value]);
 						}
 
 						if (!(ToRemove1 is null))
 						{
-							foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
+							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemove1.FirstChunk;
+							CacheItem<KeyType, ValueType> Item;
+
+							while (!(Loop is null))
 							{
-								this.valuesByKey.Remove(Item.Key);
-								this.keysByCreation.Remove(Item.Created);
-								this.keysByLastUsage.Remove(Item.LastUsed);
+								for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+								{
+									Item = Loop[i];
+
+									this.valuesByKey.Remove(Item.Key);
+									this.keysByCreation.Remove(Item.Created);
+									this.keysByLastUsage.Remove(Item.LastUsed);
+								}
+
+								Loop = Loop.Next;
 							}
 
 							if (this.valuesByKey.Count == 0)
@@ -136,18 +147,28 @@ namespace Waher.Runtime.Cache
 								break;
 
 							if (ToRemove2 is null)
-								ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
+								ToRemove2 = new ChunkedList<CacheItem<KeyType, ValueType>>();
 
-							ToRemove2.AddLast(this.valuesByKey[P.Value]);
+							ToRemove2.Add(this.valuesByKey[P.Value]);
 						}
 
 						if (!(ToRemove2 is null))
 						{
-							foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
+							ChunkNode<CacheItem<KeyType, ValueType>> Loop = ToRemove2.FirstChunk;
+							CacheItem<KeyType, ValueType> Item;
+
+							while (!(Loop is null))
 							{
-								this.valuesByKey.Remove(Item.Key);
-								this.keysByCreation.Remove(Item.Created);
-								this.keysByLastUsage.Remove(Item.LastUsed);
+								for (int i = Loop.Start, c = Loop.Pos; i < c; i++)
+								{
+									Item = Loop[i];
+
+									this.valuesByKey.Remove(Item.Key);
+									this.keysByCreation.Remove(Item.Created);
+									this.keysByLastUsage.Remove(Item.LastUsed);
+								}
+
+								Loop = Loop.Next;
 							}
 
 							if (this.valuesByKey.Count == 0)
@@ -545,12 +566,12 @@ namespace Waher.Runtime.Cache
 		/// <summary>
 		/// Removes an item from the cache.
 		/// </summary>
-		/// <param name="item">Key and value pair.</param>
+		/// <param name="Item">Key and value pair.</param>
 		/// <returns>If the item was found and removed.</returns>
-		public bool Remove(KeyValuePair<KeyType, ValueType> item)
+		public bool Remove(KeyValuePair<KeyType, ValueType> Item)
 		{
-			if (this.TryGetValue(item.Key, out ValueType Value) && Value.Equals(item.Value))
-				return this.Remove(item.Key);
+			if (this.TryGetValue(Item.Key, out ValueType Value) && Value.Equals(Item.Value))
+				return this.Remove(Item.Key);
 			else
 				return false;
 		}

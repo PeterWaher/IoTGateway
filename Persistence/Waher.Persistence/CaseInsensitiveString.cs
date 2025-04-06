@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence
 {
@@ -2356,7 +2357,7 @@ namespace Waher.Persistence
 			char[] A = ToLower(separator);
 			int i = this.lowerCase.IndexOfAny(A);
 			int Last = -1;
-			List<CaseInsensitiveString> Result = new List<CaseInsensitiveString>();
+			ChunkedList<CaseInsensitiveString> Result = new ChunkedList<CaseInsensitiveString>();
 			string s;
 
 			while (i >= 0 && count > 0)
@@ -2442,7 +2443,7 @@ namespace Waher.Persistence
 		{
 			int i = this.IndexOfAny(separator);
 			int Last = -1;
-			List<CaseInsensitiveString> Result = new List<CaseInsensitiveString>();
+			ChunkedList<CaseInsensitiveString> Result = new ChunkedList<CaseInsensitiveString>();
 			string s;
 
 			while (i >= 0 && count > 0)
@@ -2654,7 +2655,7 @@ namespace Waher.Persistence
 
 		private static char[] UpperAndLowerCases(char[] trimChars)
 		{
-			List<char> A = new List<char>();
+			ChunkedList<char> A = new ChunkedList<char>();
 			int i, c = trimChars.Length;
 			char ch, ch2;
 

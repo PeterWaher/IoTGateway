@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -225,7 +226,7 @@ namespace Waher.Script.Objects.Sets
 			if (!(SuperSetElements is null))
 			{
 				Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
-				LinkedList<IElement> Items = new LinkedList<IElement>();
+				ChunkedList<IElement> Items = new ChunkedList<IElement>();
 
 				Variables.Push();
 				try
@@ -259,7 +260,7 @@ namespace Waher.Script.Objects.Sets
 								return null;
 						}
 
-						Items.AddLast(Element);
+						Items.Add(Element);
 					}
 				}
 				finally
@@ -289,7 +290,7 @@ namespace Waher.Script.Objects.Sets
 				Variables.Push();
 				try
 				{
-					LinkedList<IElement> Items = new LinkedList<IElement>();
+					ChunkedList<IElement> Items = new ChunkedList<IElement>();
 					Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
 					IEnumerator<IElement> e;
 					bool Collision = false;
@@ -376,7 +377,7 @@ namespace Waher.Script.Objects.Sets
 								Variables[P.Key] = P.Value;
 
 							if (SatisfiesConditions(null, OtherConditions, Variables))
-								Items.AddLast(Pattern.Evaluate(Variables));
+								Items.Add(Pattern.Evaluate(Variables));
 						}
 
 						for (j = 0; j < c; j++)
@@ -418,7 +419,7 @@ namespace Waher.Script.Objects.Sets
 			if (!(SuperSetElements is null))
 			{
 				Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
-				LinkedList<IElement> Items = new LinkedList<IElement>();
+				ChunkedList<IElement> Items = new ChunkedList<IElement>();
 
 				Variables.Push();
 				try
@@ -452,7 +453,7 @@ namespace Waher.Script.Objects.Sets
 								return null;
 						}
 
-						Items.AddLast(Element);
+						Items.Add(Element);
 					}
 				}
 				finally
@@ -482,7 +483,7 @@ namespace Waher.Script.Objects.Sets
 				Variables.Push();
 				try
 				{
-					LinkedList<IElement> Items = new LinkedList<IElement>();
+					ChunkedList<IElement> Items = new ChunkedList<IElement>();
 					Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
 					IEnumerator<IElement> e;
 					bool Collision = false;
@@ -569,7 +570,7 @@ namespace Waher.Script.Objects.Sets
 								Variables[P.Key] = P.Value;
 
 							if (await SatisfiesConditionsAsync(null, OtherConditions, Variables))
-								Items.AddLast(await Pattern.EvaluateAsync(Variables));
+								Items.Add(await Pattern.EvaluateAsync(Variables));
 						}
 
 						for (j = 0; j < c; j++)
@@ -628,10 +629,10 @@ namespace Waher.Script.Objects.Sets
 
 			if (Obj is IEnumerable<object> Objects)
 			{
-				LinkedList<IElement> List = new LinkedList<IElement>();
+				ChunkedList<IElement> List = new ChunkedList<IElement>();
 
 				foreach (object x in Objects)
-					List.AddLast(Expression.Encapsulate(x));
+					List.Add(Expression.Encapsulate(x));
 
 				return List;
 			}

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Exceptions
 {
@@ -8,7 +7,7 @@ namespace Waher.Script.Exceptions
 	/// </summary>
 	public class ScriptReturnValueException : ScriptException 
 	{
-		private static readonly LinkedList<ScriptReturnValueException> reused = new LinkedList<ScriptReturnValueException>();
+		//private static readonly ChunkedList<ScriptReturnValueException> reused = new ChunkedList<ScriptReturnValueException>();
 
 		private readonly IElement returnValue;
 

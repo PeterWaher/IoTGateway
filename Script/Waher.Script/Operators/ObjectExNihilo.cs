@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -13,7 +14,7 @@ namespace Waher.Script.Operators
 	/// </summary>
 	public class ObjectExNihilo : ScriptNode
 	{
-		private readonly LinkedList<KeyValuePair<string, ScriptNode>> members;
+		private readonly ChunkedList<KeyValuePair<string, ScriptNode>> members;
 		private readonly bool hasWildcards = false;
 		private Dictionary<string, ScriptNode> quick = null;
 		private bool isAsync;
@@ -25,7 +26,7 @@ namespace Waher.Script.Operators
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public ObjectExNihilo(LinkedList<KeyValuePair<string, ScriptNode>> Members, int Start, int Length, Expression Expression)
+		public ObjectExNihilo(ChunkedList<KeyValuePair<string, ScriptNode>> Members, int Start, int Length, Expression Expression)
 			: this(Members, false, Start,Length, Expression)
 		{
 		}
@@ -38,7 +39,7 @@ namespace Waher.Script.Operators
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public ObjectExNihilo(LinkedList<KeyValuePair<string, ScriptNode>> Members, 
+		public ObjectExNihilo(ChunkedList<KeyValuePair<string, ScriptNode>> Members, 
 			bool HasWildcards, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
@@ -73,7 +74,7 @@ namespace Waher.Script.Operators
 		/// <summary>
 		/// Members, in order of definition.
 		/// </summary>
-		public LinkedList<KeyValuePair<string, ScriptNode>> Members => this.members;
+		public ChunkedList<KeyValuePair<string, ScriptNode>> Members => this.members;
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -123,35 +124,38 @@ namespace Waher.Script.Operators
 		/// <returns>If the process was completed.</returns>
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
-			LinkedListNode<KeyValuePair<string, ScriptNode>> Loop;
+			ChunkNode<KeyValuePair<string, ScriptNode>> Loop;
+			int i, c;
 
 			if (Order == SearchMethod.DepthFirst)
 			{
-				Loop = this.members.First;
+				Loop = this.members?.FirstChunk;
 
 				while (!(Loop is null))
 				{
-					if (!(Loop.Value.Value?.ForAllChildNodes(Callback, State, Order) ?? true))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!(Loop[i].Value?.ForAllChildNodes(Callback, State, Order) ?? false))
+							return false;
+					}
 
 					Loop = Loop.Next;
 				}
 			}
 
-			Loop = this.members.First;
-
-			ScriptNode Node;
 			bool RecalcIsAsync = false;
 
-			while (!(Loop is null))
+			if (!this.members.Update((ref KeyValuePair<string, ScriptNode> P, out bool Keep) =>
 			{
-				Node = Loop.Value.Value;
+				Keep = true;
+
+				ScriptNode Node = P.Value;
 				if (!(Node is null))
 				{
 					bool Result = Callback(Node, out ScriptNode NewNode, State);
 					if (!(NewNode is null))
 					{
-						Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, NewNode);
+						P = new KeyValuePair<string, ScriptNode>(P.Key, NewNode);
 						NewNode.SetParent(this);
 						Node = NewNode;
 
@@ -167,7 +171,10 @@ namespace Waher.Script.Operators
 					}
 				}
 
-				Loop = Loop.Next;
+				return true;
+			}))
+			{
+				return false;
 			}
 
 			if (RecalcIsAsync)
@@ -175,12 +182,15 @@ namespace Waher.Script.Operators
 
 			if (Order == SearchMethod.BreadthFirst)
 			{
-				Loop = this.members.First;
+				Loop = this.members?.FirstChunk;
 
 				while (!(Loop is null))
 				{
-					if (!(Loop.Value.Value?.ForAllChildNodes(Callback, State, Order) ?? true))
-						return false;
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						if (!(Loop[i].Value?.ForAllChildNodes(Callback, State, Order) ?? false))
+							return false;
+					}
 
 					Loop = Loop.Next;
 				}
@@ -199,8 +209,8 @@ namespace Waher.Script.Operators
 				return false;
 			}
 
-			LinkedList<KeyValuePair<string, ScriptNode>>.Enumerator e1 = this.members.GetEnumerator();
-			LinkedList<KeyValuePair<string, ScriptNode>>.Enumerator e2 = O.members.GetEnumerator();
+			IEnumerator<KeyValuePair<string, ScriptNode>> e1 = this.members.GetEnumerator();
+			IEnumerator<KeyValuePair<string, ScriptNode>> e2 = O.members.GetEnumerator();
 
 			while (true)
 			{

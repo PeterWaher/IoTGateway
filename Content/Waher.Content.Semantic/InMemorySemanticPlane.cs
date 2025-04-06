@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Semantic
 {
@@ -10,7 +11,7 @@ namespace Waher.Content.Semantic
 	/// </summary>
 	public class InMemorySemanticPlane : ISemanticPlane
 	{
-		private readonly LinkedList<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>> elements = new LinkedList<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>>();
+		private readonly ChunkedList<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>> elements = new ChunkedList<Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>>();
 		private readonly ISemanticElement reference;
 		private SortedDictionary<ISemanticElement, InMemorySemanticLine> yPerX = null;
 		private SortedDictionary<ISemanticElement, InMemorySemanticLine> xPerY = null;
@@ -37,7 +38,7 @@ namespace Waher.Content.Semantic
 		/// <param name="Triple">Triple</param>
 		public void Add(ISemanticElement X, ISemanticElement Y, ISemanticTriple Triple)
 		{
-			this.elements.AddLast(new Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>(X, Y, Triple));
+			this.elements.Add(new Tuple<ISemanticElement, ISemanticElement, ISemanticTriple>(X, Y, Triple));
 			this.xPerY = null;
 			this.yPerX = null;
 		}

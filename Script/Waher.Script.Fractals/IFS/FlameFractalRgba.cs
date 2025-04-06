@@ -1,14 +1,14 @@
-﻿using System;
-using System.Threading;
-using System.Collections.Generic;
+﻿using SkiaSharp;
+using System;
 using System.Text;
-using SkiaSharp;
+using System.Threading;
+using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
-using System.Threading.Tasks;
 
 namespace Waher.Script.Fractals.IFS
 {
@@ -219,7 +219,7 @@ namespace Waher.Script.Fractals.IFS
 			if (!(Obj is Array FlameArray))
 				throw new ScriptRuntimeException("The fifth parameter to FlameFractalRgba must be an array, containing flame definitions.", this);
 
-			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
+			ChunkedList<FlameFunction> FlameFunctions = new ChunkedList<FlameFunction>();
             double Weight;
             double Gamma;
             double Vibrancy;

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Wpf.Multimedia
 {
@@ -26,7 +26,7 @@ namespace Waher.Content.Markdown.Wpf.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public Task RenderWpfXaml(WpfXamlRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public Task RenderWpfXaml(WpfXamlRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MultimediaItem Item in Items)

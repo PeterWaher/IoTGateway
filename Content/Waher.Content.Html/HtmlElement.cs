@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Html
 {
@@ -11,9 +12,9 @@ namespace Waher.Content.Html
 	public class HtmlElement : HtmlNode
 	{
 		private Dictionary<string, HtmlAttribute> attributesByName = null;
-		private LinkedList<HtmlAttribute> attributes = null;
+		private ChunkedList<HtmlAttribute> attributes = null;
 		private Dictionary<string, HtmlAttribute> namespacesByPrefix = null;
-		private LinkedList<HtmlNode> children = null;
+		private ChunkedList<HtmlNode> children = null;
 		private readonly string fullName;
 		private readonly string localName;
 		private readonly string prefix;
@@ -63,9 +64,9 @@ namespace Waher.Content.Html
 		internal void Add(HtmlNode Node)
 		{
 			if (this.children is null)
-				this.children = new LinkedList<HtmlNode>();
+				this.children = new ChunkedList<HtmlNode>();
 
-			this.children.AddLast(Node);
+			this.children.Add(Node);
 		}
 
 		internal void AddAttribute(HtmlAttribute Attribute)
@@ -86,13 +87,13 @@ namespace Waher.Content.Html
 			{
 				if (this.attributes is null)
 				{
-					this.attributes = new LinkedList<HtmlAttribute>();
+					this.attributes = new ChunkedList<HtmlAttribute>();
 					this.attributesByName = new Dictionary<string, HtmlAttribute>(StringComparer.OrdinalIgnoreCase);
 				}
 
 				if (!this.attributesByName.ContainsKey(Attribute.FullName))
 				{
-					this.attributes.AddLast(Attribute);
+					this.attributes.Add(Attribute);
 					this.attributesByName[Attribute.FullName] = Attribute;
 				}
 			}
@@ -238,7 +239,7 @@ namespace Waher.Content.Html
 		/// <param name="Namespaces">Namespaces defined, by prefix.</param>
 		public override void Export(XmlWriter Output, Dictionary<string, string> Namespaces)
 		{
-			LinkedList<KeyValuePair<string, string>> NamespaceBak = null;
+			ChunkedList<KeyValuePair<string, string>> NamespaceBak = null;
 
 			if (!(this.namespacesByPrefix is null))
 			{
@@ -247,9 +248,9 @@ namespace Waher.Content.Html
 					if (Namespaces.TryGetValue(P.Key, out string s))
 					{
 						if (NamespaceBak is null)
-							NamespaceBak = new LinkedList<KeyValuePair<string, string>>();
+							NamespaceBak = new ChunkedList<KeyValuePair<string, string>>();
 
-						NamespaceBak.AddLast(new KeyValuePair<string, string>(P.Key, s));
+						NamespaceBak.Add(new KeyValuePair<string, string>(P.Key, s));
 					}
 
 					Namespaces[P.Key] = P.Value.Value;

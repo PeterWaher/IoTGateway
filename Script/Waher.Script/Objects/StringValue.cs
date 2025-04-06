@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Script.Objects
 {
@@ -93,16 +93,16 @@ namespace Waher.Script.Objects
 				return new StringValue(Element.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive);
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 				ISemiGroupElement SE;
 
 				foreach (IElement E in Element.ChildElements)
 				{
 					SE = E as ISemiGroupElement;
 					if (SE is null)
-						Elements.AddLast(new StringValue(E.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive));
+						Elements.Add(new StringValue(E.AssociatedObjectValue.ToString() + this.value, this.caseInsensitive));
 					else
-						Elements.AddLast(this.AddLeft(SE));
+						Elements.Add(this.AddLeft(SE));
 				}
 
 				return (ISemiGroupElement)Element.Encapsulate(Elements, null);
@@ -120,16 +120,16 @@ namespace Waher.Script.Objects
 				return new StringValue(this.value + Element.AssociatedObjectValue.ToString(), this.caseInsensitive);
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 				ISemiGroupElement SE;
 
 				foreach (IElement E in Element.ChildElements)
 				{
 					SE = E as ISemiGroupElement;
 					if (SE is null)
-						Elements.AddLast(new StringValue(this.value + E.AssociatedObjectValue.ToString(), this.caseInsensitive));
+						Elements.Add(new StringValue(this.value + E.AssociatedObjectValue.ToString(), this.caseInsensitive));
 					else
-						Elements.AddLast(this.AddRight(SE));
+						Elements.Add(this.AddRight(SE));
 				}
 
 				return (ISemiGroupElement)Element.Encapsulate(Elements, null);

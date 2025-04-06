@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Filters
 {
@@ -55,9 +55,9 @@ namespace Waher.Persistence.Filters
 		/// <returns>Normalized filter.</returns>
 		public override Filter Normalize()
 		{
-			List<Filter> Children = new List<Filter>();
+			ChunkedList<Filter> Children = new ChunkedList<Filter>();
 			Filter[] ChildFilters = this.ChildFilters;
-			List<Filter[]> Ors = null;
+			ChunkedList<Filter[]> Ors = null;
 			Filter Filter;
 
 			if (ChildFilters.Length == 1)
@@ -75,7 +75,7 @@ namespace Waher.Persistence.Filters
 				else if (Filter is FilterOr Or)
 				{
 					if (Ors is null)
-						Ors = new List<Filter[]>();
+						Ors = new ChunkedList<Filter[]>();
 
 					Ors.Add(Or.ChildFilters);
 				}

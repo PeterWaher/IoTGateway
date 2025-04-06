@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Security.JWS;
 
@@ -101,7 +102,7 @@ namespace Waher.Security.JWT
 									this.audience = AudStr.Split(',');
 								else if (P.Value is Array A)
 								{
-									List<string> Audience = new List<string>();
+									ChunkedList<string> Audience = new ChunkedList<string>();
 
 									foreach (object Item in A)
 										Audience.Add(Item.ToString());

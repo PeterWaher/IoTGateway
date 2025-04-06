@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -77,14 +76,14 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
-			LinkedList<IElement> ReverseLabelOrder = new LinkedList<IElement>();
-			LinkedList<IElement> ReverseValueOrder = new LinkedList<IElement>();
+			ChunkedList<IElement> ReverseLabelOrder = new ChunkedList<IElement>();
+			ChunkedList<IElement> ReverseValueOrder = new ChunkedList<IElement>();
 
 			foreach (IElement Label in Labels.VectorElements)
-				ReverseLabelOrder.AddFirst(Label);
+				ReverseLabelOrder.AddFirstItem(Label);
 
 			foreach (IElement Value in Values.VectorElements)
-				ReverseValueOrder.AddFirst(Value);
+				ReverseValueOrder.AddFirstItem(Value);
 
 			return new Graph2D(Variables, (IVector)Values.Encapsulate(ReverseValueOrder, this), (IVector)Labels.Encapsulate(ReverseLabelOrder, 
 				this), new HorizontalBarPainter(), true, false, this, Color?.AssociatedObjectValue ?? Graph.DefaultColor);

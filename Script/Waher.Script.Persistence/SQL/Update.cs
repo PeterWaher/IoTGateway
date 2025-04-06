@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -71,7 +71,7 @@ namespace Waher.Script.Persistence.SQL
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
 			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, false, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
-			LinkedList<object> ToUpdate = new LinkedList<object>();
+			ChunkedList<object> ToUpdate = new ChunkedList<object>();
 			int Count = 0;
 
 			if (!(this.properties is null))
@@ -87,7 +87,7 @@ namespace Waher.Script.Persistence.SQL
 				foreach (Assignment SetOperation in this.setOperations)
 					SetOperation.Evaluate(this.properties);
 
-				ToUpdate.AddLast(e.Current);
+				ToUpdate.Add(e.Current);
 				Count++;
 			}
 

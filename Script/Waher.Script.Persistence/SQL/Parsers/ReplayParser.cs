@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Membership;
@@ -54,8 +54,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		{
 			Result = null;
 
-			List<ScriptNode> Columns;
-			List<ScriptNode> ColumnNames;
+			ChunkedList<ScriptNode> Columns;
+			ChunkedList<ScriptNode> ColumnNames;
 			ScriptNode Top = null;
 			string s;
 
@@ -86,8 +86,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			}
 			else
 			{
-				Columns = new List<ScriptNode>();
-				ColumnNames = new List<ScriptNode>();
+				Columns = new ChunkedList<ScriptNode>();
+				ColumnNames = new ChunkedList<ScriptNode>();
 
 				ScriptNode Node;
 				ScriptNode Name;

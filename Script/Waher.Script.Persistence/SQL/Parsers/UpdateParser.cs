@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Model;
 using Waher.Script.Operators;
 using Waher.Script.Operators.Assignments;
@@ -62,7 +61,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			if (s != "SET")
 				return false;
 
-			List<Assignment> SetOperations = new List<Assignment>();
+			ChunkedList<Assignment> SetOperations = new ChunkedList<Assignment>();
 			ScriptNode Node = Parser.ParseList();
 
 			if (!(Node is ElementList List))

@@ -1108,7 +1108,14 @@ namespace Waher.Networking.HTTP
 							await this.Response.SendResponse(ex);
 						else
 							await this.Response.Flush(true);
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 
+					try
+					{
 						await this.Response.DisposeAsync();
 						this.Response = null;
 

@@ -91,7 +91,6 @@ using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
 using Waher.Reports;
 using Waher.Reports.Files;
-using System.Linq;
 
 namespace Waher.IoTGateway
 {
@@ -143,6 +142,7 @@ namespace Waher.IoTGateway
 		private static readonly Dictionary<EventHandlerAsync, int> serviceCommandNrByCallback = new Dictionary<EventHandlerAsync, int>();
 		private static readonly Dictionary<string, DateTime> lastUnauthorizedAccess = new Dictionary<string, DateTime>();
 		private static readonly DateTime startTime = DateTime.Now;
+		private static byte[] emergencyMemory = new byte[1024 * 1024];
 		private static IDatabaseProvider internalProvider = null;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
@@ -300,6 +300,7 @@ namespace Waher.IoTGateway
 					Initialize();
 
 					beforeUninstallCommandNr = RegisterServiceCommand(BeforeUninstall);
+					NextBytes(emergencyMemory);
 
 					if (!Directory.Exists(rootFolder))
 					{
@@ -514,57 +515,76 @@ namespace Waher.IoTGateway
 											{
 												lock (exceptionFile)
 												{
-													if (!exportExceptions || e.Exception.StackTrace.Contains("FirstChanceExceptionEventArgs"))
+													bool Emergency;
+
+													if (e.Exception is SystemException &&
+														(e.Exception is StackOverflowException ||
+														e.Exception is OutOfMemoryException ||
+														e.Exception is AccessViolationException))
+													{
+														emergencyMemory = null;
+														GC.GetTotalMemory(true);
+														Emergency = true;
+													}
+													else
+														Emergency = false;
+
+													string StackTrace = e.Exception.StackTrace;
+
+													if (!exportExceptions || StackTrace.Contains("FirstChanceExceptionEventArgs"))
 														return;
 
-													exceptionFile.WriteLine(new string('-', 80));
-													exceptionFile.Write("Type: ");
+													StringBuilder sb = new StringBuilder();
+
+													sb.AppendLine(new string('-', 80));
+													sb.Append("Type: ");
 
 													if (!(e.Exception is null))
-														exceptionFile.WriteLine(e.Exception.GetType().FullName);
+														sb.AppendLine(e.Exception.GetType().FullName);
 													else
-														exceptionFile.WriteLine("null");
+														sb.AppendLine("null");
 
-													exceptionFile.Write("Time: ");
-													exceptionFile.WriteLine(DateTime.UtcNow.ToString());
+													sb.Append("Time: ");
+													sb.AppendLine(DateTime.UtcNow.ToString());
 
 													if (!(e.Exception is null))
 													{
-														LinkedList<Exception> Exceptions = new LinkedList<Exception>();
-														Exceptions.AddLast(e.Exception);
-
-														while (!(Exceptions.First is null))
+														if (Emergency)
 														{
-															Exception ex = Exceptions.First.Value;
-															Exceptions.RemoveFirst();
+															sb.AppendLine();
+															sb.AppendLine(e.Exception.Message);
+															sb.AppendLine();
+															sb.AppendLine(StackTrace);     // Avoid worsening the situation and conserve stack space.
+															sb.AppendLine();
+														}
+														else
+														{
+															LinkedList<Exception> Exceptions = new LinkedList<Exception>();
+															Exceptions.AddLast(e.Exception);
 
-															exceptionFile.WriteLine();
-
-															exceptionFile.WriteLine(ex.Message);
-															exceptionFile.WriteLine();
-
-															if (ex is SystemException &&
-																(ex is StackOverflowException ||
-																ex is OutOfMemoryException ||
-																ex is AccessViolationException))
+															while (!(Exceptions.First is null))
 															{
-																exceptionFile.WriteLine(ex.StackTrace);		// Avoid worsening the situation and conserve stack space.
-															}
-															else
-																exceptionFile.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+																Exception ex = Exceptions.First.Value;
+																Exceptions.RemoveFirst();
 
-															exceptionFile.WriteLine();
+																sb.AppendLine();
+																sb.AppendLine(ex.Message);
+																sb.AppendLine();
+																sb.AppendLine(Log.CleanStackTrace(ex.StackTrace));
+																sb.AppendLine();
 
-															if (ex is AggregateException ex2)
-															{
-																foreach (Exception ex3 in ex2.InnerExceptions)
-																	Exceptions.AddLast(ex3);
+																if (ex is AggregateException ex2)
+																{
+																	foreach (Exception ex3 in ex2.InnerExceptions)
+																		Exceptions.AddLast(ex3);
+																}
+																else if (!(ex.InnerException is null))
+																	Exceptions.AddLast(ex.InnerException);
 															}
-															else if (!(ex.InnerException is null))
-																Exceptions.AddLast(ex.InnerException);
 														}
 													}
 
+													exceptionFile.Write(sb.ToString());
 													exceptionFile.Flush();
 												}
 											}
@@ -3571,13 +3591,36 @@ namespace Waher.IoTGateway
 				throw new ArgumentException("Number of bytes must be non-negative.", nameof(NrBytes));
 
 			byte[] Result = new byte[NrBytes];
-
+			
 			lock (rnd)
 			{
 				rnd.GetBytes(Result);
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Generates random bytes into an array.
+		/// </summary>
+		/// <param name="Buffer">Buffer to receive the random bytes.</param>
+		public static void NextBytes(byte[] Buffer)
+		{
+			NextBytes(Buffer, 0, Buffer.Length);
+		}
+
+		/// <summary>
+		/// Generates random bytes into an array.
+		/// </summary>
+		/// <param name="Buffer">Buffer to receive the random bytes.</param>
+		/// <param name="Offset">Offset of first byte.</param>
+		/// <param name="Count">Number of bytes to generate</param>
+		public static void NextBytes(byte[] Buffer, int Offset, int Count)
+		{
+			lock (rnd)
+			{
+				rnd.GetBytes(Buffer, Offset, Count);
+			}
 		}
 
 		#endregion

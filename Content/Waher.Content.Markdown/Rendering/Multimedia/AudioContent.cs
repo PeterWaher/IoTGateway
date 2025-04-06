@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering.Multimedia
 {
@@ -25,7 +26,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public async Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public async Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			Renderer.Output.Append("<audio");
@@ -47,8 +48,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 				Renderer.Output.AppendLine("\"/>");
 			}
 
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(Renderer);
+			await Renderer.Render(ChildNodes);
 
 			Renderer.Output.AppendLine("</audio>");
 		}

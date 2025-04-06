@@ -9,6 +9,7 @@ using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Networking.HTTP
 {
@@ -126,6 +127,17 @@ namespace Waher.Networking.HTTP
 				catch (ScriptReturnValueException ex)
 				{
 					E = ex.ReturnValue;
+					//ScriptReturnValueException.Reuse(ex);
+				}
+				catch (ScriptBreakLoopException ex)
+				{
+					E = ex.LoopValue ?? ObjectValue.Null;
+					//ScriptBreakLoopException.Reuse(ex);
+				}
+				catch (ScriptContinueLoopException ex)
+				{
+					E = ex.LoopValue ?? ObjectValue.Null;
+					//ScriptContinueLoopException.Reuse(ex);
 				}
 
 				Result = E.AssociatedObjectValue;

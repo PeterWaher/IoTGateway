@@ -6,6 +6,7 @@ using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -229,9 +230,9 @@ namespace Waher.Script.Persistence.SPARQL
 				}
 
 				GroupResultSet GroupComparer = new GroupResultSet(this.groupBy, this.groupByNames);
-				SortedDictionary<ISparqlResultRecord, KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>> Groups =
-					new SortedDictionary<ISparqlResultRecord, KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>>(GroupComparer);
-				LinkedList<ISparqlResultRecord> LastList = null;
+				SortedDictionary<ISparqlResultRecord, KeyValuePair<ISparqlResultRecord, ChunkedList<ISparqlResultRecord>>> Groups =
+					new SortedDictionary<ISparqlResultRecord, KeyValuePair<ISparqlResultRecord, ChunkedList<ISparqlResultRecord>>>(GroupComparer);
+				ChunkedList<ISparqlResultRecord> LastList = null;
 				ISparqlResultRecord LastRecord = null;
 				bool First = false;
 
@@ -239,7 +240,7 @@ namespace Waher.Script.Persistence.SPARQL
 				{
 					if (LastRecord is null || GroupComparer.Compare(LastRecord, P) != 0)
 					{
-						if (Groups.TryGetValue(P, out KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>> P2))
+						if (Groups.TryGetValue(P, out KeyValuePair<ISparqlResultRecord, ChunkedList<ISparqlResultRecord>> P2))
 						{
 							LastRecord = P2.Key;
 							LastList = P2.Value;
@@ -247,14 +248,14 @@ namespace Waher.Script.Persistence.SPARQL
 						}
 						else
 						{
-							LastList = new LinkedList<ISparqlResultRecord>();
-							Groups[P] = new KeyValuePair<ISparqlResultRecord, LinkedList<ISparqlResultRecord>>(P, LastList);
+							LastList = new ChunkedList<ISparqlResultRecord>();
+							Groups[P] = new KeyValuePair<ISparqlResultRecord, ChunkedList<ISparqlResultRecord>>(P, LastList);
 							LastRecord = P;
 							First = true;
 						}
 					}
 
-					LastList.AddLast(P);
+					LastList.Add(P);
 
 					if (!(VectorProperties is null))
 					{
@@ -281,7 +282,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 				if (!(this.having is null))
 				{
-					LinkedList<ISparqlResultRecord> Filtered = new LinkedList<ISparqlResultRecord>();
+					ChunkedList<ISparqlResultRecord> Filtered = new ChunkedList<ISparqlResultRecord>();
 					ObjectProperties RecordVariables = null;
 
 					foreach (ISparqlResultRecord Record in Possibilities)
@@ -295,7 +296,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 							object Value = await EvaluateValue(RecordVariables, this.having);
 							if (Value is bool b && b)
-								Filtered.AddLast(Record);
+								Filtered.Add(Record);
 						}
 						catch (Exception)
 						{
@@ -317,8 +318,8 @@ namespace Waher.Script.Persistence.SPARQL
 
 				case QueryType.Select:
 					Dictionary<string, int> ColumnVariables = new Dictionary<string, int>();
-					LinkedList<KeyValuePair<ScriptNode, int>> ColumnScript = null;
-					List<string> ColumnNames = new List<string>();
+					ChunkedList<KeyValuePair<ScriptNode, int>> ColumnScript = null;
+					ChunkedList<string> ColumnNames = new ChunkedList<string>();
 					string Name;
 					int i, c;
 					bool AllNames;
@@ -360,17 +361,17 @@ namespace Waher.Script.Persistence.SPARQL
 								else
 								{
 									if (ColumnScript is null)
-										ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+										ColumnScript = new ChunkedList<KeyValuePair<ScriptNode, int>>();
 
-									ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(Ref, i));
+									ColumnScript.Add(new KeyValuePair<ScriptNode, int>(Ref, i));
 								}
 							}
 							else
 							{
 								if (ColumnScript is null)
-									ColumnScript = new LinkedList<KeyValuePair<ScriptNode, int>>();
+									ColumnScript = new ChunkedList<KeyValuePair<ScriptNode, int>>();
 
-								ColumnScript.AddLast(new KeyValuePair<ScriptNode, int>(this.columns[i], i));
+								ColumnScript.Add(new KeyValuePair<ScriptNode, int>(this.columns[i], i));
 
 								if (Name is null)
 								{
@@ -487,7 +488,7 @@ namespace Waher.Script.Persistence.SPARQL
 
 				case QueryType.Construct:
 					Dictionary<string, string> BlankNodeDictionary = null;
-					LinkedList<SemanticTriple> Construction = new LinkedList<SemanticTriple>();
+					ChunkedList<SemanticTriple> Construction = new ChunkedList<SemanticTriple>();
 					IEnumerable<ISparqlResultRecord> Items = Possibilities;
 
 					RecordVariables = null;
@@ -579,7 +580,7 @@ namespace Waher.Script.Persistence.SPARQL
 									Object = new BlankNode(NewLabel);
 								}
 
-								Construction.AddLast(new SemanticTriple(Subject, Predicate, Object));
+								Construction.Add(new SemanticTriple(Subject, Predicate, Object));
 							}
 						}
 					}

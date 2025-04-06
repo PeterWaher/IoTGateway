@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -134,10 +135,11 @@ namespace Waher.Script.Persistence.Functions
 
 			if (Result is IEnumerable E)
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 				IEnumerator e = E.GetEnumerator();
+
 				while (e.MoveNext())
-					Elements.AddLast(Expression.Encapsulate(e.Current));
+					Elements.Add(Expression.Encapsulate(e.Current));
 
 				return new ObjectVector(Elements);
 			}

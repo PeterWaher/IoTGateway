@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Operators.Conditional;
 using Waher.Script.Operators.Vectors;
@@ -27,7 +27,7 @@ namespace Waher.Script.Operators.Matrices
         /// </summary>
         /// <param name="Elements">Elements</param>
         /// <returns>Encapsulated elements.</returns>
-        protected override IElement Encapsulate(LinkedList<IElement> Elements)
+        protected override IElement Encapsulate(ChunkedList<IElement> Elements)
         {
             return MatrixDefinition.Encapsulate(Elements, this);
         }

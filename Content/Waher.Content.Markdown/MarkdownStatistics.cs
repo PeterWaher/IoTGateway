@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown
 {
@@ -35,12 +36,12 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Internal (during computation of statistics) Mail hyperlinks.
 		/// </summary>
-		internal List<string> IntMailHyperlinks { get; set; }
+		internal ChunkedList<string> IntMailHyperlinks { get; set; }
 
 		/// <summary>
 		/// Internal (during computation of statistics) URL hyperlinks.
 		/// </summary>
-		internal List<string> IntUrlHyperlinks { get; set; }
+		internal ChunkedList<string> IntUrlHyperlinks { get; set; }
 
 		/// <summary>
 		/// Mail hyperlinks.
@@ -145,17 +146,17 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Internal (during computation of statistics) Multimedia links, per file extension.
 		/// </summary>
-		internal Dictionary<string, List<string>> IntMultimediaPerExtension { get; set; }
+		internal Dictionary<string, ChunkedList<string>> IntMultimediaPerExtension { get; set; }
 
 		/// <summary>
 		/// Internal (during computation of statistics) Multimedia links, per Content-Type
 		/// </summary>
-		internal Dictionary<string, List<string>> IntMultimediaPerContentType { get; set; }
+		internal Dictionary<string, ChunkedList<string>> IntMultimediaPerContentType { get; set; }
 
 		/// <summary>
 		/// Internal (during computation of statistics) Multimedia links, per Content Category (top part of Content-Type)
 		/// </summary>
-		internal Dictionary<string, List<string>> IntMultimediaPerContentCategory { get; set; }
+		internal Dictionary<string, ChunkedList<string>> IntMultimediaPerContentCategory { get; set; }
 
 		/// <summary>
 		/// Multimedia links, per file extension.

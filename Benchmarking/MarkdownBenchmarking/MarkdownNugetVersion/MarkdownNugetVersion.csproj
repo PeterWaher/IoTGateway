@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Waher.Content.Markdown" Version="5.2.0" />
+    <PackageReference Include="Waher.Content.Markdown.Contracts" Version="4.0.0" />
+    <PackageReference Include="Waher.Content.Markdown.JavaScript" Version="4.0.0" />
+    <PackageReference Include="Waher.Content.Markdown.Latex" Version="4.0.0" />
+    <PackageReference Include="Waher.Content.Markdown.Wpf" Version="4.0.0" />
+    <PackageReference Include="Waher.Runtime.Inventory" Version="1.3.1" />
+    <PackageReference Include="Waher.Script" Version="2.10.3" />
+    <PackageReference Include="Waher.Script.Content" Version="2.2.0" />
+    <PackageReference Include="Waher.Script.Graphs" Version="2.2.4" />
+    <PackageReference Include="Waher.Script.Graphs3D" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MarkdownBenchmarkingInterface\MarkdownBenchmarkingInterface.csproj" />
+  </ItemGroup>
+
+</Project>

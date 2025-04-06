@@ -39,32 +39,32 @@ namespace Waher.Script.Units.DerivedQuantities
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
 					new KeyValuePair<string, PhysicalQuantity>("Pa", new PhysicalQuantity(1, new Unit(Prefix.Kilo, 
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
+							new UnitFactor("g"),
+							new UnitFactor("m", -1),
+							new UnitFactor("s", -2)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("bar", new PhysicalQuantity(100, new Unit(Prefix.Mega,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
+							new UnitFactor("g"),
+							new UnitFactor("m", -1),
+							new UnitFactor("s", -2)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6.894757, new Unit(Prefix.Mega,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
+							new UnitFactor("g"),
+							new UnitFactor("m", -1),
+							new UnitFactor("s", -2)
 						}))),
 					new KeyValuePair<string, PhysicalQuantity>("atm", new PhysicalQuantity(101325, new Unit(Prefix.Kilo,
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
+							new UnitFactor("g"),
+							new UnitFactor("m", -1),
+							new UnitFactor("s", -2)
 						})))
 				};
 			}

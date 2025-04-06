@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Runtime.Collections;
 
 namespace Waher.Events
 {
@@ -8,7 +9,7 @@ namespace Waher.Events
 	/// </summary>
 	public class Event
 	{
-		private LinkedList<IEventSink> toAvoid = null;
+		private ChunkedList<IEventSink> toAvoid = null;
 		private readonly DateTime timestamp;
 		private readonly EventType type;
 		private readonly EventLevel level;
@@ -189,15 +190,15 @@ namespace Waher.Events
 		public void Avoid(IEventSink EventSink)
 		{
 			if (this.toAvoid is null)
-				this.toAvoid = new LinkedList<IEventSink>();
+				this.toAvoid = new ChunkedList<IEventSink>();
 
 			if (!this.toAvoid.Contains(EventSink))
-				this.toAvoid.AddLast(EventSink);
+				this.toAvoid.Add(EventSink);
 		}
 
 		/// <summary>
 		/// List of event sinks to avoid. Can be null.
 		/// </summary>
-		internal LinkedList<IEventSink> ToAvoid => this.toAvoid;
+		internal ChunkedList<IEventSink> ToAvoid => this.toAvoid;
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Parsers
@@ -77,8 +76,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 		internal void ParseList(ScriptParser Parser, out ScriptNode[] Columns, out bool[] Ascending)
 		{
-			List<ScriptNode> ColumnList = new List<ScriptNode>();
-			List<bool> AscendingList = new List<bool>();
+			ChunkedList<ScriptNode> ColumnList = new ChunkedList<ScriptNode>();
+			ChunkedList<bool> AscendingList = new ChunkedList<bool>();
 			string s;
 
 			do

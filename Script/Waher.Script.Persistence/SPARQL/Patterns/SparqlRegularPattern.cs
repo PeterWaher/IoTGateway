@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
+using Waher.Runtime.Collections;
 using Waher.Script.Model;
 using Waher.Script.Persistence.SPARQL.Filters;
 using Waher.Script.Persistence.SQL;
@@ -12,9 +13,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 	/// </summary>
 	public class SparqlRegularPattern : ISparqlPattern
 	{
-		private LinkedList<SemanticQueryTriple> triples = null;
-		private LinkedList<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
-		private LinkedList<IFilterNode> filter = null;
+		private ChunkedList<SemanticQueryTriple> triples = null;
+		private ChunkedList<KeyValuePair<ScriptNode, ScriptNode>> boundVariables = null;
+		private ChunkedList<IFilterNode> filter = null;
 
 		/// <summary>
 		/// Represents a pattern in a SPARQL query.
@@ -65,9 +66,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		public void AddTriple(SemanticQueryTriple Triple)
 		{
 			if (this.triples is null)
-				this.triples = new LinkedList<SemanticQueryTriple>();
+				this.triples = new ChunkedList<SemanticQueryTriple>();
 
-			this.triples.AddLast(Triple);
+			this.triples.Add(Triple);
 		}
 
 		/// <summary>
@@ -78,9 +79,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		public void AddVariableBinding(ScriptNode Value, ScriptNode Variable)
 		{
 			if (this.boundVariables is null)
-				this.boundVariables = new LinkedList<KeyValuePair<ScriptNode, ScriptNode>>();
+				this.boundVariables = new ChunkedList<KeyValuePair<ScriptNode, ScriptNode>>();
 
-			this.boundVariables.AddLast(new KeyValuePair<ScriptNode, ScriptNode>(Value, Variable));
+			this.boundVariables.Add(new KeyValuePair<ScriptNode, ScriptNode>(Value, Variable));
 		}
 
 		/// <summary>
@@ -90,12 +91,12 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		public void AddFilter(ScriptNode Filter)
 		{
 			if (this.filter is null)
-				this.filter = new LinkedList<IFilterNode>();
+				this.filter = new ChunkedList<IFilterNode>();
 
 			if (Filter is IFilterNode FilterNode)
-				this.filter.AddLast(FilterNode);
+				this.filter.Add(FilterNode);
 			else
-				this.filter.AddLast(new FilterScriptNode(Filter));
+				this.filter.Add(new FilterScriptNode(Filter));
 		}
 
 		/// <summary>
@@ -170,7 +171,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 
 			if (this.HasBoundVariables && !(ExistingMatches is null))
 			{
-				LinkedList<Possibility> NewMatches = new LinkedList<Possibility>();
+				ChunkedList<Possibility> NewMatches = new ChunkedList<Possibility>();
 				ObjectProperties RecordVariables = null;
 				Possibility P;
 				string Name;
@@ -204,7 +205,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							P = new Possibility(Name, Literal, P);
 					}
 
-					NewMatches.AddLast(P);
+					NewMatches.Add(P);
 				}
 
 				ExistingMatches = NewMatches;
@@ -212,7 +213,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 
 			if (this.HasFilter && !(ExistingMatches is null))
 			{
-				LinkedList<Possibility> Filtered = null;
+				ChunkedList<Possibility> Filtered = null;
 				ObjectProperties RecordVariables = null;
 				bool Pass;
 
@@ -238,9 +239,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					if (Pass)
 					{
 						if (Filtered is null)
-							Filtered = new LinkedList<Possibility>();
+							Filtered = new ChunkedList<Possibility>();
 
-						Filtered.AddLast(P);
+						Filtered.Add(P);
 					}
 				}
 
@@ -254,7 +255,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			IEnumerable<Possibility> Possibilities, SemanticQueryTriple T, int VariableIndex,
 			int ValueIndex1, int ValueIndex2, ISemanticCube Cube)
 		{
-			LinkedList<Possibility> NewPossibilities = null;
+			ChunkedList<Possibility> NewPossibilities = null;
 			string Name = T.VariableName(VariableIndex);
 			ISemanticElement Value;
 
@@ -266,10 +267,10 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 				if (NewTriples is null)
 					return null;
 
-				NewPossibilities = new LinkedList<Possibility>();
+				NewPossibilities = new ChunkedList<Possibility>();
 
 				foreach (ISemanticTriple T2 in NewTriples)
-					NewPossibilities.AddLast(new Possibility(Name, T2[VariableIndex]));
+					NewPossibilities.Add(new Possibility(Name, T2[VariableIndex]));
 			}
 			else
 			{
@@ -285,10 +286,10 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							continue;
 
 						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
+							NewPossibilities = new ChunkedList<Possibility>();
 
 						foreach (ISemanticTriple T2 in NewTriples)
-							NewPossibilities.AddLast(new Possibility(Name, T2[VariableIndex], P));
+							NewPossibilities.Add(new Possibility(Name, T2[VariableIndex], P));
 					}
 					else
 					{
@@ -296,9 +297,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							continue;
 
 						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
+							NewPossibilities = new ChunkedList<Possibility>();
 
-						NewPossibilities.AddLast(P);
+						NewPossibilities.Add(P);
 					}
 				}
 			}
@@ -310,7 +311,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 			IEnumerable<Possibility> Possibilities, SemanticQueryTriple T, int VariableIndex1,
 			int VariableIndex2, int ValueIndex, ISemanticCube Cube)
 		{
-			LinkedList<Possibility> NewPossibilities = null;
+			ChunkedList<Possibility> NewPossibilities = null;
 			string Name = T.VariableName(VariableIndex1);
 			string Name2 = T.VariableName(VariableIndex2);
 			ISemanticElement Value;
@@ -333,16 +334,16 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							continue;
 
 						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
+							NewPossibilities = new ChunkedList<Possibility>();
 
-						NewPossibilities.AddLast(new Possibility(Name, E));
+						NewPossibilities.Add(new Possibility(Name, E));
 					}
 					else
 					{
 						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
+							NewPossibilities = new ChunkedList<Possibility>();
 
-						NewPossibilities.AddLast(
+						NewPossibilities.Add(
 							new Possibility(Name, T2[VariableIndex1],
 							new Possibility(Name2, T2[VariableIndex2])));
 					}
@@ -368,9 +369,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							continue;
 
 						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
+							NewPossibilities = new ChunkedList<Possibility>();
 
-						NewPossibilities.AddLast(P);
+						NewPossibilities.Add(P);
 					}
 					else if (IsProcessed)
 					{
@@ -400,17 +401,16 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 									continue;
 
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
-									new Possibility(Name, E, P));
+								NewPossibilities.Add(new Possibility(Name, E, P));
 							}
 							else
 							{
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
+								NewPossibilities.Add(
 									new Possibility(Name, T2[VariableIndex1],
 									new Possibility(Name2, T2[VariableIndex2], P)));
 							}
@@ -426,7 +426,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		private async Task<IEnumerable<Possibility>> CrossPossibilitiesThreeVariables(
 			IEnumerable<Possibility> Possibilities, SemanticQueryTriple T, ISemanticCube Cube)
 		{
-			LinkedList<Possibility> NewPossibilities = null;
+			ChunkedList<Possibility> NewPossibilities = null;
 			string Name = T.SubjectVariable;
 			string Name2 = T.PredicateVariable;
 			string Name3 = T.ObjectVariable;
@@ -456,9 +456,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 						NewPossibility = new Possibility(Name3, T2.Object, NewPossibility);
 
 					if (NewPossibilities is null)
-						NewPossibilities = new LinkedList<Possibility>();
+						NewPossibilities = new ChunkedList<Possibility>();
 
-					NewPossibilities.AddLast(NewPossibility);
+					NewPossibilities.Add(NewPossibility);
 				}
 			}
 			else
@@ -478,9 +478,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 							continue;
 
 						if (NewPossibilities is null)
-							NewPossibilities = new LinkedList<Possibility>();
+							NewPossibilities = new ChunkedList<Possibility>();
 
-						NewPossibilities.AddLast(P);
+						NewPossibilities.Add(P);
 					}
 					else if (IsProcessed && IsProcessed2)   // Subject & Predicate variables already processed
 					{
@@ -514,17 +514,16 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 									continue;
 
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
-									new Possibility(Name2, T2.Predicate, P));
+								NewPossibilities.Add(new Possibility(Name2, T2.Predicate, P));
 							}
 							else
 							{
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
+								NewPossibilities.Add(
 									new Possibility(Name2, T2.Predicate,
 									new Possibility(Name3, T2.Object, P)));
 							}
@@ -544,17 +543,16 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 									continue;
 
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
-									new Possibility(Name, T2.Subject, P));
+								NewPossibilities.Add(new Possibility(Name, T2.Subject, P));
 							}
 							else
 							{
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
+								NewPossibilities.Add(
 									new Possibility(Name, T2.Subject,
 									new Possibility(Name3, T2.Object, P)));
 							}
@@ -574,17 +572,16 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 									continue;
 
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
-									new Possibility(Name, T2.Subject, P));
+								NewPossibilities.Add(new Possibility(Name, T2.Subject, P));
 							}
 							else
 							{
 								if (NewPossibilities is null)
-									NewPossibilities = new LinkedList<Possibility>();
+									NewPossibilities = new ChunkedList<Possibility>();
 
-								NewPossibilities.AddLast(
+								NewPossibilities.Add(
 									new Possibility(Name, T2.Subject,
 									new Possibility(Name2, T2.Predicate, P)));
 							}
@@ -612,9 +609,9 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 								NewPossibility = new Possibility(Name3, T2.Object, NewPossibility);
 
 							if (NewPossibilities is null)
-								NewPossibilities = new LinkedList<Possibility>();
+								NewPossibilities = new ChunkedList<Possibility>();
 
-							NewPossibilities.AddLast(NewPossibility);
+							NewPossibilities.Add(NewPossibility);
 						}
 					}
 				}
@@ -624,16 +621,16 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		}
 
 		private void CrossPossibilities(IEnumerable<ISemanticTriple> NewTriples,
-			Possibility Possibility, string Name, int Index, ref LinkedList<Possibility> NewPossibilities)
+			Possibility Possibility, string Name, int Index, ref ChunkedList<Possibility> NewPossibilities)
 		{
 			if (NewTriples is null)
 				return;
 
 			if (NewPossibilities is null)
-				NewPossibilities = new LinkedList<Possibility>();
+				NewPossibilities = new ChunkedList<Possibility>();
 
 			foreach (ISemanticTriple T2 in NewTriples)
-				NewPossibilities.AddLast(new Possibility(Name, T2[Index], Possibility));
+				NewPossibilities.Add(new Possibility(Name, T2[Index], Possibility));
 		}
 
 		/// <summary>
@@ -755,46 +752,64 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		/// <returns>If the process was completed.</returns>
 		public bool ForAll(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
+			int i, c;
+
 			if (!(this.triples is null))
 			{
-				foreach (ISemanticTriple T in this.triples)
+				ChunkNode<SemanticQueryTriple> Loop = this.triples.FirstChunk;
+				SemanticQueryTriple T;
+
+				while (!(Loop is null))
 				{
-					if (T.Subject is SemanticScriptElement S)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						if (!S.ForAll(Callback, State, Order))
-							return false;
+						T = Loop[i];
+
+						if (T.Subject is SemanticScriptElement S)
+						{
+							if (!S.ForAll(Callback, State, Order))
+								return false;
+						}
+
+						if (T.Predicate is SemanticScriptElement P)
+						{
+							if (!P.ForAll(Callback, State, Order))
+								return false;
+						}
+
+						if (T.Object is SemanticScriptElement O)
+						{
+							if (!O.ForAll(Callback, State, Order))
+								return false;
+						}
 					}
 
-					if (T.Predicate is SemanticScriptElement P)
-					{
-						if (!P.ForAll(Callback, State, Order))
-							return false;
-					}
-
-					if (T.Object is SemanticScriptElement O)
-					{
-						if (!O.ForAll(Callback, State, Order))
-							return false;
-					}
+					Loop = Loop.Next;
 				}
 			}
 
 			if (!(this.boundVariables is null))
 			{
-				LinkedListNode<KeyValuePair<ScriptNode, ScriptNode>> Loop = this.boundVariables.First;
+				ChunkNode<KeyValuePair<ScriptNode, ScriptNode>> Loop = this.boundVariables.FirstChunk;
+				KeyValuePair<ScriptNode, ScriptNode> P;
 
 				while (!(Loop is null))
 				{
-					if (!Callback(Loop.Value.Key, out ScriptNode NewKey, State))
-						return false;
-
-					if (!Callback(Loop.Value.Value, out ScriptNode NewValue, State))
-						return false;
-
-					if (!(NewKey is null) || !(NewValue is null))
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						Loop.Value = new KeyValuePair<ScriptNode, ScriptNode>(
-							NewKey ?? Loop.Value.Key, NewValue ?? Loop.Value.Value);
+						P = Loop[i];
+
+						if (!Callback(P.Key, out ScriptNode NewKey, State))
+							return false;
+
+						if (!Callback(P.Value, out ScriptNode NewValue, State))
+							return false;
+
+						if (!(NewKey is null) || !(NewValue is null))
+						{
+							Loop[i] = new KeyValuePair<ScriptNode, ScriptNode>(
+								NewKey ?? P.Key, NewValue ?? P.Value);
+						}
 					}
 
 					Loop = Loop.Next;
@@ -803,19 +818,22 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 
 			if (!(this.filter is null))
 			{
-				LinkedListNode<IFilterNode> Loop = this.filter.First;
+				ChunkNode<IFilterNode> Loop = this.filter.FirstChunk;
 
 				while (!(Loop is null))
 				{
-					if (!Callback(Loop.Value.ScriptNode, out ScriptNode NewValue, State))
-						return false;
-
-					if (!(NewValue is null))
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						if (NewValue is IFilterNode NewFilterNode)
-							Loop.Value = NewFilterNode;
-						else
-							Loop.Value = new FilterScriptNode(NewValue);
+						if (!Callback(Loop[i].ScriptNode, out ScriptNode NewValue, State))
+							return false;
+
+						if (!(NewValue is null))
+						{
+							if (NewValue is IFilterNode NewFilterNode)
+								Loop[i] = NewFilterNode;
+							else
+								Loop[i] = new FilterScriptNode(NewValue);
+						}
 					}
 
 					Loop = Loop.Next;

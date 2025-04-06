@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -47,11 +48,11 @@ namespace Waher.Content.Markdown.Model
 			return MarkdownDocument.IsPrefixedByNumber(this.rows[this.start], out Numeral);
 		}
 
-		public List<Block> RemovePrefix(string Prefix, int NrCharacters)
+		public ChunkedList<Block> RemovePrefix(string Prefix, int NrCharacters)
 		{
-			List<Block> Result = new List<Block>();
-			List<string> Rows = new List<string>();
-			List<int> Positions = new List<int>();
+			ChunkedList<Block> Result = new ChunkedList<Block>();
+			ChunkedList<string> Rows = new ChunkedList<string>();
+			ChunkedList<int> Positions = new ChunkedList<int>();
 			string s;
 			int Indent = 0;
 			int i, j, k;
@@ -136,11 +137,11 @@ namespace Waher.Content.Markdown.Model
 			return MarkdownDocument.IsSuffixedBy(this.rows[this.end], Suffix);
 		}
 
-		public List<Block> RemoveSuffix(string Suffix)
+		public ChunkedList<Block> RemoveSuffix(string Suffix)
 		{
-			List<Block> Result = new List<Block>();
-			List<string> Rows = new List<string>();
-			List<int> Positions = new List<int>();
+			ChunkedList<Block> Result = new ChunkedList<Block>();
+			ChunkedList<string> Rows = new ChunkedList<string>();
+			ChunkedList<int> Positions = new ChunkedList<int>();
 			string s;
 			int i, c;
 			int d = Suffix.Length;
@@ -184,13 +185,20 @@ namespace Waher.Content.Markdown.Model
 			return Result;
 		}
 
-		public List<Block> RemovePrefixAndSuffix(string Prefix, int NrCharacters, string Suffix)
+		public ChunkedList<Block> RemovePrefixAndSuffix(string Prefix, int NrCharacters, string Suffix)
 		{
-			List<Block> Temp = this.RemovePrefix(Prefix, NrCharacters);
-			List<Block> Result = new List<Block>();
+			ChunkedList<Block> Temp = this.RemovePrefix(Prefix, NrCharacters);
+			ChunkedList<Block> Result = new ChunkedList<Block>();
+			ChunkNode<Block> Loop = Temp.FirstChunk;
+			int i, c;
 
-			foreach (Block Block in Temp)
-				Result.AddRange(Block.RemoveSuffix(Suffix));
+			while (!(Loop is null))
+			{
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					Result.AddRange(Loop[i].RemoveSuffix(Suffix));
+
+				Loop = Loop.Next;
+			}
 
 			return Result;
 		}

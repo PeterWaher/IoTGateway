@@ -39,9 +39,9 @@ namespace Waher.Script.Units.DerivedQuantities
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
 					new KeyValuePair<string, PhysicalQuantity>("l", new PhysicalQuantity(1, new Unit(Prefix.Milli, 
-						new KeyValuePair<AtomicUnit, int>[]
+						new UnitFactor[]
 						{
-							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3)
+							new UnitFactor("m", 3)
 						})))
 				};
 			}

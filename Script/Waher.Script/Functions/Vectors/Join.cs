@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -259,7 +260,7 @@ namespace Waher.Script.Functions.Vectors
 					}
 				}
 
-				List<IElement> Elements = new List<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 				Elements.AddRange(ResultRef.ChildElements);
 
 				for (i = 1; i < c; i++)

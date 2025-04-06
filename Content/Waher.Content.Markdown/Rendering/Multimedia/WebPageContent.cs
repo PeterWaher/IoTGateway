@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Rendering.Multimedia
 {
@@ -26,7 +27,7 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public async Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public async Task RenderHtml(HtmlRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes,
             bool AloneInParagraph, MarkdownDocument Document)
         {
             StringBuilder Output = Renderer.Output;
@@ -49,11 +50,10 @@ namespace Waher.Content.Markdown.Rendering.Multimedia
                 }
 
                 Output.Append("\">");
+                
+                await Renderer.Render(ChildNodes);
 
-                foreach (MarkdownElement E in ChildNodes)
-                    await E.Render(Renderer);
-
-                Output.Append("</iframe>");
+				Output.Append("</iframe>");
 
                 if (AloneInParagraph)
                     Output.AppendLine();

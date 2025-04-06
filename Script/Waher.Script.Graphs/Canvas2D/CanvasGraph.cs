@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs.Canvas2D.Operations;
@@ -14,7 +15,7 @@ namespace Waher.Script.Graphs.Canvas2D
 	/// </summary>
 	public class CanvasGraph : Graph
 	{
-		private readonly LinkedList<CanvasOperation> operations = new LinkedList<CanvasOperation>();
+		private readonly ChunkedList<CanvasOperation> operations = new ChunkedList<CanvasOperation>();
 		private SKColor? defaultColor;
 		private SKColor? bgColor;
 		private int width;
@@ -130,11 +131,8 @@ namespace Waher.Script.Graphs.Canvas2D
 			{
 				CanvasGraph Result = new CanvasGraph(G.Settings, G.width, G.height, G.bgColor, G.defaultColor);
 
-				foreach (CanvasOperation Op in G.operations)
-					Result.operations.AddLast(Op);
-
-				foreach (CanvasOperation Op in this.operations)
-					Result.operations.AddLast(Op);
+				Result.operations.AddRange(G.operations);
+				Result.operations.AddRange(this.operations);
 
 				return Result;
 			}
@@ -153,11 +151,8 @@ namespace Waher.Script.Graphs.Canvas2D
 			{
 				CanvasGraph Result = new CanvasGraph(this.Settings, this.width, this.height, this.bgColor, this.defaultColor);
 
-				foreach (CanvasOperation Op in this.operations)
-					Result.operations.AddLast(Op);
-
-				foreach (CanvasOperation Op in G.operations)
-					Result.operations.AddLast(Op);
+				Result.operations.AddRange(this.operations);
+				Result.operations.AddRange(G.operations);
 
 				return Result;
 			}
@@ -177,8 +172,8 @@ namespace Waher.Script.Graphs.Canvas2D
 				return false;
 			}
 
-			LinkedList<CanvasOperation>.Enumerator e1 = this.operations.GetEnumerator();
-			LinkedList<CanvasOperation>.Enumerator e2 = G.operations.GetEnumerator();
+			IEnumerator<CanvasOperation> e1 = this.operations.GetEnumerator();
+			IEnumerator<CanvasOperation> e2 = G.operations.GetEnumerator();
 			bool b1, b2;
 
 			while (true)
@@ -313,7 +308,7 @@ namespace Waher.Script.Graphs.Canvas2D
 
 					await Op.ImportGraph(E, Variables);
 
-					this.operations.AddLast(Op);
+					this.operations.Add(Op);
 				}
 			}
 		}
@@ -335,7 +330,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// </summary>
 		public void LineTo(double x, double y)
 		{
-			this.operations.AddLast(new LineTo((float)x, (float)y));
+			this.operations.Add(new LineTo((float)x, (float)y));
 		}
 
 		/// <summary>
@@ -343,7 +338,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// </summary>
 		public void MoveTo(double x, double y)
 		{
-			this.operations.AddLast(new MoveTo((float)x, (float)y));
+			this.operations.Add(new MoveTo((float)x, (float)y));
 		}
 
 		/// <summary>
@@ -355,7 +350,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="y2">Y-coordinate of second point.</param>
 		public void Line(double x1, double y1, double x2, double y2)
 		{
-			this.operations.AddLast(new Line((float)x1, (float)y1, (float)x2, (float)y2));
+			this.operations.Add(new Line((float)x1, (float)y1, (float)x2, (float)y2));
 		}
 
 		/// <summary>
@@ -364,7 +359,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="Width">New pen width</param>
 		public void PenWidth(double Width)
 		{
-			this.operations.AddLast(new PenWidth((float)Width));
+			this.operations.Add(new PenWidth((float)Width));
 		}
 
 		/// <summary>
@@ -373,7 +368,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="Color">New pen color</param>
 		public void Color(SKColor Color)
 		{
-			this.operations.AddLast(new PenColor(Color));
+			this.operations.Add(new PenColor(Color));
 		}
 
 		/// <summary>
@@ -382,7 +377,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="Color">New pen color</param>
 		public void Color(object Color)
 		{
-			this.operations.AddLast(new PenColor(Graph.ToColor(Color)));
+			this.operations.Add(new PenColor(Graph.ToColor(Color)));
 		}
 
 		/// <summary>
@@ -394,7 +389,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="y2">Y-coordinate of second point.</param>
 		public void Rectangle(double x1, double y1, double x2, double y2)
 		{
-			this.operations.AddLast(new Rectangle((float)x1, (float)y1, (float)x2, (float)y2));
+			this.operations.Add(new Rectangle((float)x1, (float)y1, (float)x2, (float)y2));
 		}
 
 		/// <summary>
@@ -406,7 +401,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="y2">Y-coordinate of second point.</param>
 		public void FillRectangle(double x1, double y1, double x2, double y2)
 		{
-			this.operations.AddLast(new FillRectangle((float)x1, (float)y1, (float)x2, (float)y2));
+			this.operations.Add(new FillRectangle((float)x1, (float)y1, (float)x2, (float)y2));
 		}
 
 		/// <summary>
@@ -416,7 +411,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="y">Y-coordinate.</param>
 		public void Plot(double x, double y)
 		{
-			this.operations.AddLast(new Plot((float)x, (float)y));
+			this.operations.Add(new Plot((float)x, (float)y));
 		}
 
 		/// <summary>
@@ -428,7 +423,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="y2">Y-coordinate of second point.</param>
 		public void Ellipse(double x1, double y1, double x2, double y2)
 		{
-			this.operations.AddLast(new Ellipse((float)x1, (float)y1, (float)x2, (float)y2));
+			this.operations.Add(new Ellipse((float)x1, (float)y1, (float)x2, (float)y2));
 		}
 
 		/// <summary>
@@ -440,7 +435,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// <param name="y2">Y-coordinate of second point.</param>
 		public void FillEllipse(double x1, double y1, double x2, double y2)
 		{
-			this.operations.AddLast(new FillEllipse((float)x1, (float)y1, (float)x2, (float)y2));
+			this.operations.Add(new FillEllipse((float)x1, (float)y1, (float)x2, (float)y2));
 		}
 
 		/// <summary>
@@ -448,7 +443,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// </summary>
 		public void Clear()
 		{
-			this.operations.AddLast(new Clear());
+			this.operations.Add(new Clear());
 		}
 
 	}

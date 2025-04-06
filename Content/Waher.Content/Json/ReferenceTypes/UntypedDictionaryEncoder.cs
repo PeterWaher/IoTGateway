@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Json.ReferenceTypes
@@ -29,10 +30,10 @@ namespace Waher.Content.Json.ReferenceTypes
 		{
 			IDictionary Dictionary = (IDictionary)Object;
 
-			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 
 			foreach (object Key in Dictionary.Keys)
-				Properties.AddLast(new KeyValuePair<string, object>(Key.ToString(), Dictionary[Key]));
+				Properties.Add(new KeyValuePair<string, object>(Key.ToString(), Dictionary[Key]));
 
 			JSON.Encode(Properties, Indent, Json);
 		}

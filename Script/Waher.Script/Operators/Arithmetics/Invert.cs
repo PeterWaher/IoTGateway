@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -42,10 +43,10 @@ namespace Waher.Script.Operators.Arithmetics
 				throw new ScriptRuntimeException("Operand not invertible.", this);
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement E2 in Operand.ChildElements)
-					Elements.AddLast(this.Evaluate(E2, Variables));
+					Elements.Add(this.Evaluate(E2, Variables));
 
 				return Operand.Encapsulate(Elements, this);
 			}

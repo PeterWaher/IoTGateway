@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -9,6 +9,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Table : BlockElement
 	{
+		private ChunkedList<MarkdownElement> children;
 		private readonly MarkdownElement[][] headers;
 		private readonly MarkdownElement[][] rows;
 		private readonly TextAlignment?[][] headerCellAlignments;
@@ -96,19 +97,22 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Any children of the element.
 		/// </summary>
-		public override IEnumerable<MarkdownElement> Children
+		public override ChunkedList<MarkdownElement> Children
 		{
 			get
 			{
-				List<MarkdownElement> Result = new List<MarkdownElement>();
+				if (this.children is null)
+				{
+					this.children = new ChunkedList<MarkdownElement>();
 
-				foreach (MarkdownElement[] Row in this.headers)
-					Result.AddRange(Row);
+					foreach (MarkdownElement[] Row in this.headers)
+						this.children.AddRange(Row);
 
-				foreach (MarkdownElement[] Row in this.rows)
-					Result.AddRange(Row);
+					foreach (MarkdownElement[] Row in this.rows)
+						this.children.AddRange(Row);
+				}
 
-				return Result;
+				return this.children;
 			}
 		}
 

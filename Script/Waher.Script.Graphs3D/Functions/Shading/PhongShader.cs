@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -64,7 +62,7 @@ namespace Waher.Script.Graphs3D.Functions.Shading
 				LightSources = new Graphs3D.PhongLightSource[] { Source };
 			else if (Obj is IVector V)
 			{
-				List<Graphs3D.PhongLightSource> Sources = new List<Graphs3D.PhongLightSource>();
+				ChunkedList<Graphs3D.PhongLightSource> Sources = new ChunkedList<Graphs3D.PhongLightSource>();
 
 				foreach (IElement E in V.VectorElements)
 				{

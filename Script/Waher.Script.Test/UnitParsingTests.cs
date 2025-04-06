@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Units;
 
 namespace Waher.Script.Test
@@ -33,20 +31,20 @@ namespace Waher.Script.Test
 		public void Test_04_m2()
 		{
 			Unit Unit = Unit.Parse("m^2");
-			Assert.AreEqual(new Unit(Prefix.None, new KeyValuePair<string, int>("m", 2)), Unit);
+			Assert.AreEqual(new Unit(Prefix.None, new UnitFactor("m", 2)), Unit);
 
 			Unit = Unit.Parse("m²");
-			Assert.AreEqual(new Unit(Prefix.None, new KeyValuePair<string, int>("m", 2)), Unit);
+			Assert.AreEqual(new Unit(Prefix.None, new UnitFactor("m", 2)), Unit);
 		}
 
 		[TestMethod]
 		public void Test_05_m3()
 		{
 			Unit Unit = Unit.Parse("m^3");
-			Assert.AreEqual(new Unit(Prefix.None, new KeyValuePair<string, int>("m", 3)), Unit);
+			Assert.AreEqual(new Unit(Prefix.None, new UnitFactor("m", 3)), Unit);
 
 			Unit = Unit.Parse("m³");
-			Assert.AreEqual(new Unit(Prefix.None, new KeyValuePair<string, int>("m", 3)), Unit);
+			Assert.AreEqual(new Unit(Prefix.None, new UnitFactor("m", 3)), Unit);
 		}
 
 		[TestMethod]
@@ -64,13 +62,13 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("m⋅s^-1");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 1),
-				new KeyValuePair<string, int>("s", -1)), Unit);
+				new UnitFactor("m", 1),
+				new UnitFactor("s", -1)), Unit);
 
 			Unit = Unit.Parse("m/s");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 1),
-				new KeyValuePair<string, int>("s", -1)), Unit);
+				new UnitFactor("m", 1),
+				new UnitFactor("s", -1)), Unit);
 		}
 
 		[TestMethod]
@@ -78,13 +76,13 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("m^2/s");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 2),
-				new KeyValuePair<string, int>("s", -1)), Unit);
+				new UnitFactor("m", 2),
+				new UnitFactor("s", -1)), Unit);
 
 			Unit = Unit.Parse("m²/s");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 2),
-				new KeyValuePair<string, int>("s", -1)), Unit);
+				new UnitFactor("m", 2),
+				new UnitFactor("s", -1)), Unit);
 		}
 
 		[TestMethod]
@@ -92,13 +90,13 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("m/s^2");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 1),
-				new KeyValuePair<string, int>("s", -2)), Unit);
+				new UnitFactor("m", 1),
+				new UnitFactor("s", -2)), Unit);
 
 			Unit = Unit.Parse("m/s²");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("m", 1),
-				new KeyValuePair<string, int>("s", -2)), Unit);
+				new UnitFactor("m", 1),
+				new UnitFactor("s", -2)), Unit);
 		}
 
 		[TestMethod]
@@ -106,10 +104,10 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("kg⋅m²/(A⋅s³)");
 			Assert.AreEqual(new Unit(Prefix.Kilo,
-				new KeyValuePair<string, int>("g", 1),
-				new KeyValuePair<string, int>("m", 2),
-				new KeyValuePair<string, int>("A", -1),
-				new KeyValuePair<string, int>("s", -3)), Unit);
+				new UnitFactor("g", 1),
+				new UnitFactor("m", 2),
+				new UnitFactor("A", -1),
+				new UnitFactor("s", -3)), Unit);
 		}
 
 		[TestMethod]
@@ -117,8 +115,8 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("kWh");
 			Assert.AreEqual(new Unit(Prefix.Kilo,
-				new KeyValuePair<string, int>("W", 1),
-				new KeyValuePair<string, int>("h", 1)), Unit);
+				new UnitFactor("W", 1),
+				new UnitFactor("h", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -126,8 +124,8 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("mph");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("SM", 1),
-				new KeyValuePair<string, int>("h", -1)), Unit);
+				new UnitFactor("SM", 1),
+				new UnitFactor("h", -1)), Unit);
 		}
 
 		[TestMethod]
@@ -135,8 +133,8 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("fps");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("ft", 1),
-				new KeyValuePair<string, int>("s", -1)), Unit);
+				new UnitFactor("ft", 1),
+				new UnitFactor("s", -1)), Unit);
 		}
 
 		[TestMethod]
@@ -144,11 +142,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("ft");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("ft", 1)), Unit);
+				new UnitFactor("ft", 1)), Unit);
 
 			Unit = Unit.Parse("inch^2");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("inch", 2)), Unit);
+				new UnitFactor("inch", 2)), Unit);
 		}
 
 		[TestMethod]
@@ -156,7 +154,7 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("dal");
 			Assert.AreEqual(new Unit(Prefix.Deka,
-				new KeyValuePair<string, int>("l", 1)), Unit);
+				new UnitFactor("l", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -164,7 +162,7 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("%");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("%", 1)), Unit);
+				new UnitFactor("%", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -172,11 +170,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("°");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("°", 1)), Unit);
+				new UnitFactor("°", 1)), Unit);
 
 			Unit = Unit.Parse("deg");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("deg", 1)), Unit);
+				new UnitFactor("deg", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -184,11 +182,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("‰");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("‰", 1)), Unit);
+				new UnitFactor("‰", 1)), Unit);
 
 			Unit = Unit.Parse("%0");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("%0", 1)), Unit);
+				new UnitFactor("%0", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -196,11 +194,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("‱");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("‱", 1)), Unit);
+				new UnitFactor("‱", 1)), Unit);
 
 			Unit = Unit.Parse("%00");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("%00", 1)), Unit);
+				new UnitFactor("%00", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -208,7 +206,7 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("rad");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("rad", 1)), Unit);
+				new UnitFactor("rad", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -216,11 +214,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("1");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("1", 1)), Unit);
+				new UnitFactor("1", 1)), Unit);
 
 			Unit = Unit.Parse("pcs");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("pcs", 1)), Unit);
+				new UnitFactor("pcs", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -228,11 +226,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("dz");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("dz", 1)), Unit);
+				new UnitFactor("dz", 1)), Unit);
 
 			Unit = Unit.Parse("dozen");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("dozen", 1)), Unit);
+				new UnitFactor("dozen", 1)), Unit);
 		}
 
 		[TestMethod]
@@ -240,11 +238,11 @@ namespace Waher.Script.Test
 		{
 			Unit Unit = Unit.Parse("gr");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("gr", 1)), Unit);
+				new UnitFactor("gr", 1)), Unit);
 
 			Unit = Unit.Parse("gross");
 			Assert.AreEqual(new Unit(Prefix.None,
-				new KeyValuePair<string, int>("gross", 1)), Unit);
+				new UnitFactor("gross", 1)), Unit);
 		}
 
 	}

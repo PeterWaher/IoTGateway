@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -89,10 +90,10 @@ namespace Waher.Script.Model
 				}
 				else
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement E in Argument2.ChildElements)
-						Elements.AddLast(this.Evaluate(Argument1, E, Variables));
+						Elements.Add(this.Evaluate(Argument1, E, Variables));
 
 					return Argument2.Encapsulate(Elements, this);
 				}
@@ -101,10 +102,10 @@ namespace Waher.Script.Model
 			{
 				if (Argument2.IsScalar)
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement E in Argument1.ChildElements)
-						Elements.AddLast(this.Evaluate(E, Argument2, Variables));
+						Elements.Add(this.Evaluate(E, Argument2, Variables));
 
 					return Argument1.Encapsulate(Elements, this);
 				}
@@ -115,14 +116,14 @@ namespace Waher.Script.Model
 
 					if (Argument1Children.Count == Argument2Children.Count)
 					{
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 						IEnumerator<IElement> eArgument1 = Argument1Children.GetEnumerator();
 						IEnumerator<IElement> eArgument2 = Argument2Children.GetEnumerator();
 
 						try
 						{
 							while (eArgument1.MoveNext() && eArgument2.MoveNext())
-								Elements.AddLast(this.Evaluate(eArgument1.Current, eArgument2.Current, Variables));
+								Elements.Add(this.Evaluate(eArgument1.Current, eArgument2.Current, Variables));
 						}
 						finally
 						{
@@ -134,16 +135,16 @@ namespace Waher.Script.Model
 					}
 					else
 					{
-						LinkedList<IElement> Argument1Result = new LinkedList<IElement>();
+						ChunkedList<IElement> Argument1Result = new ChunkedList<IElement>();
 
 						foreach (IElement Argument1Child in Argument1Children)
 						{
-							LinkedList<IElement> Argument2Result = new LinkedList<IElement>();
+							ChunkedList<IElement> Argument2Result = new ChunkedList<IElement>();
 
 							foreach (IElement Argument2Child in Argument2Children)
-								Argument2Result.AddLast(this.Evaluate(Argument1Child, Argument2Child, Variables));
+								Argument2Result.Add(this.Evaluate(Argument1Child, Argument2Child, Variables));
 
-							Argument1Result.AddLast(Argument2.Encapsulate(Argument2Result, this));
+							Argument1Result.Add(Argument2.Encapsulate(Argument2Result, this));
 						}
 
 						return Argument1.Encapsulate(Argument1Result, this);
@@ -291,10 +292,10 @@ namespace Waher.Script.Model
 				}
 				else
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement E in Argument2.ChildElements)
-						Elements.AddLast(await this.EvaluateAsync(Argument1, E, Variables));
+						Elements.Add(await this.EvaluateAsync(Argument1, E, Variables));
 
 					return Argument2.Encapsulate(Elements, this);
 				}
@@ -303,10 +304,10 @@ namespace Waher.Script.Model
 			{
 				if (Argument2.IsScalar)
 				{
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 					foreach (IElement E in Argument1.ChildElements)
-						Elements.AddLast(await this.EvaluateAsync(E, Argument2, Variables));
+						Elements.Add(await this.EvaluateAsync(E, Argument2, Variables));
 
 					return Argument1.Encapsulate(Elements, this);
 				}
@@ -317,14 +318,14 @@ namespace Waher.Script.Model
 
 					if (Argument1Children.Count == Argument2Children.Count)
 					{
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 						IEnumerator<IElement> eArgument1 = Argument1Children.GetEnumerator();
 						IEnumerator<IElement> eArgument2 = Argument2Children.GetEnumerator();
 
 						try
 						{
 							while (eArgument1.MoveNext() && eArgument2.MoveNext())
-								Elements.AddLast(await this.EvaluateAsync(eArgument1.Current, eArgument2.Current, Variables));
+								Elements.Add(await this.EvaluateAsync(eArgument1.Current, eArgument2.Current, Variables));
 						}
 						finally
 						{
@@ -336,16 +337,16 @@ namespace Waher.Script.Model
 					}
 					else
 					{
-						LinkedList<IElement> Argument1Result = new LinkedList<IElement>();
+						ChunkedList<IElement> Argument1Result = new ChunkedList<IElement>();
 
 						foreach (IElement Argument1Child in Argument1Children)
 						{
-							LinkedList<IElement> Argument2Result = new LinkedList<IElement>();
+							ChunkedList<IElement> Argument2Result = new ChunkedList<IElement>();
 
 							foreach (IElement Argument2Child in Argument2Children)
-								Argument2Result.AddLast(await this.EvaluateAsync(Argument1Child, Argument2Child, Variables));
+								Argument2Result.Add(await this.EvaluateAsync(Argument1Child, Argument2Child, Variables));
 
-							Argument1Result.AddLast(Argument2.Encapsulate(Argument2Result, this));
+							Argument1Result.Add(Argument2.Encapsulate(Argument2Result, this));
 						}
 
 						return Argument1.Encapsulate(Argument1Result, this);

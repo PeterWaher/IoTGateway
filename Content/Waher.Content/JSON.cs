@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content.Json;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -108,7 +109,7 @@ namespace Waher.Content
 								return new object[0];
 							}
 
-							List<object> Array = new List<object>();
+							ChunkedList<object> Array = new ChunkedList<object>();
 
 							while (true)
 							{

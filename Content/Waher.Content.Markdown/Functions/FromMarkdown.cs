@@ -6,6 +6,7 @@ using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -76,25 +77,34 @@ namespace Waher.Content.Markdown.Functions
 		{
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Argument);
 			IElement Result = null;
-			LinkedList<IElement> Results = null;
+			ChunkedList<IElement> Results = null;
 			IElement Item = null;
+			ChunkNode<MarkdownElement> Loop = Doc.Elements.FirstChunk;
+			int i, c;
 
-			foreach (MarkdownElement E in Doc.Elements)
+			while (!(Loop is null))
 			{
-				Item = await Evaluate(E);
-
-				if (Result is null)
-					Result = Item;
-				else
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					if (Results is null)
-					{
-						Results = new LinkedList<IElement>();
-						Results.AddLast(Result);
-					}
+					Item = await Evaluate(Loop[i]);
 
-					Results.AddLast(Item);
+					if (Result is null)
+						Result = Item;
+					else
+					{
+						if (Results is null)
+						{
+							Results = new ChunkedList<IElement>
+							{
+								Result
+							};
+						}
+
+						Results.Add(Item);
+					}
 				}
+
+				Loop = Loop.Next;
 			}
 
 			if (Results is null)
@@ -118,19 +128,23 @@ namespace Waher.Content.Markdown.Functions
 					int i, Columns = Headers.Length;
 					string[] Headers2 = new string[Columns];
 					int Rows = Table.Rows.Length;
-					LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
+					MarkdownElement E;
+					int j, d;
 
 					for (i = 0; i < Columns; i++)
 						Headers2[i] = (await Evaluate(Headers[i])).AssociatedObjectValue?.ToString() ?? string.Empty;
 
 					foreach (MarkdownElement[] Row in Table.Rows)
 					{
-						foreach (MarkdownElement E in Row)
+						for (j = 0, d = Row.Length; j < d; j++)
 						{
+							E = Row[j];
+
 							if (E is null)
-								Elements.AddLast(ObjectValue.Null);
+								Elements.Add(ObjectValue.Null);
 							else
-								Elements.AddLast(await Evaluate(E));
+								Elements.Add(await Evaluate(E));
 						}
 					}
 

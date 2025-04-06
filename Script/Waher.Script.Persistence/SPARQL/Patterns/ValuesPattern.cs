@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Semantic;
+using Waher.Runtime.Collections;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SPARQL.Patterns
@@ -25,7 +26,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 
 		private static ISemanticElement[][] ToRecords(ISemanticElement[] Values)
 		{
-			List<ISemanticElement[]> Records = new List<ISemanticElement[]>();
+			ChunkedList<ISemanticElement[]> Records = new ChunkedList<ISemanticElement[]>();
 
 			foreach (ISemanticElement Element in Values)
 				Records.Add(new ISemanticElement[] { Element });
@@ -60,7 +61,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 		public Task<IEnumerable<Possibility>> Search(ISemanticCube Cube,
 			Variables Variables, IEnumerable<Possibility> ExistingMatches, SparqlQuery Query)
 		{
-			LinkedList<Possibility> Result = new LinkedList<Possibility>();
+			ChunkedList<Possibility> Result = new ChunkedList<Possibility>();
 			ISemanticElement Element;
 			int i, c = this.variables.Length;
 
@@ -72,7 +73,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 					{
 						Element = Record[i];
 						if (!(Element is null))
-							Result.AddLast(new Possibility(this.variables[i], Element));
+							Result.Add(new Possibility(this.variables[i], Element));
 					}
 				}
 			}
@@ -105,7 +106,7 @@ namespace Waher.Script.Persistence.SPARQL.Patterns
 						}
 
 						if (!(Extended is null))
-							Result.AddLast(Extended);
+							Result.Add(Extended);
 					}
 				}
 			}

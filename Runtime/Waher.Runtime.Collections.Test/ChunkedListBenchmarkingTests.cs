@@ -1165,6 +1165,82 @@ namespace Waher.Runtime.Collections.Test
 			await OutputResults(Benchmarker, Name, "ToArray()", Limit, true, true);
 		}
 
+		[TestMethod]
+		public Task Test_37_NodeLoop_Small()
+		{
+			return Test_NodeLoop("Test_37_NodeLoop_Small", smallNumberOfItems, 500);
+		}
+
+		[TestMethod]
+		public Task Test_38_NodeLoop_Large()
+		{
+			return Test_NodeLoop("Test_38_NodeLoop_Large", largeNumberOfItems, 2000);
+		}
+
+		private static async Task Test_NodeLoop(string Name, int[] NumberOfItems, int Limit)
+		{
+			Benchmarker2D Benchmarker = new();
+			LinkedList<double> LinkedList;
+			List<double> List;
+			ChunkedList<double> ChunkedList;
+			int i;
+
+			lock (syncObj)
+			{
+				foreach (int N in NumberOfItems)
+				{
+					LinkedList = [];
+					List = [];
+					ChunkedList = [];
+
+					for (i = 0; i < N; i++)
+					{
+						LinkedList.AddLast(i);
+						List.Add(i);
+						ChunkedList.Add(i);
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("LinkedList", N))
+					{
+						LinkedListNode<double>? Loop = LinkedList.First;
+
+						while (Loop is not null)
+						{
+							_ = Loop.Value;
+							Loop = Loop.Next;
+						}
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("List", N))
+					{
+						List.ForEach((_) =>
+						{
+						});
+					}
+
+					using (Benchmarking Test = Benchmarker.Start("ChunkedList", N))
+					{
+						ChunkNode<double> Loop = ChunkedList.FirstChunk;
+						int c;
+
+						while (Loop is not null)
+						{
+							for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+							{
+								_ = Loop[i];
+							}
+
+							Loop = Loop.Next;
+						}
+					}
+				}
+			}
+
+			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, Name, "Node Loop", Limit, true, true);
+		}
+
 		private static double[] RandomOrder(int N, int MaxItems)
 		{
 			Random rnd = new();
@@ -1276,7 +1352,7 @@ namespace Waher.Runtime.Collections.Test
 			else
 				Script.Append("if Max(r3)>");
 			Script.Append(Limit);
-			Script.AppendLine(" then GRel.MaxY:=");
+			Script.Append(" then GRel.MaxY:=");
 			Script.Append(Limit);
 			Script.AppendLine(";");
 			Script.AppendLine("GRel.LabelX:=\"N\";");

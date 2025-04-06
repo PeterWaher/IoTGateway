@@ -10,6 +10,7 @@ using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Operators.Matrices;
@@ -792,6 +793,7 @@ namespace Waher.Content.Markdown.Xamarin
 		{
 			int Row = 0;
 			bool ParagraphBullet;
+			int i, c;
 
 			this.XmlOutput.WriteStartElement("ContentView");
 			this.XmlOutput.WriteAttributeString("Padding", this.XamlSettings.ParagraphMargins);
@@ -813,7 +815,7 @@ namespace Waher.Content.Markdown.Xamarin
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement _ in Element.Children)
+			for (i = 0, c = Element.Children.Count; i < c; i++)
 			{
 				this.XmlOutput.WriteStartElement("RowDefinition");
 				this.XmlOutput.WriteAttributeString("Height", "Auto");
@@ -822,10 +824,15 @@ namespace Waher.Content.Markdown.Xamarin
 
 			this.XmlOutput.WriteEndElement();
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+
+			while (!(Loop is null))
 			{
-				if (E is UnnumberedItem Item)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
+					E = Loop[i];
+
 					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
 					this.GetMargins(E, out int TopMargin, out int BottomMargin);
 
@@ -845,12 +852,14 @@ namespace Waher.Content.Markdown.Xamarin
 					if (ParagraphBullet)
 						await E.Render(this);
 					else
-						await this.RenderLabel(Item, false);
+						await this.RenderLabel(E, false);
 
 					this.XmlOutput.WriteEndElement();
+
+					Row++;
 				}
 
-				Row++;
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();
@@ -872,19 +881,29 @@ namespace Waher.Content.Markdown.Xamarin
 			}
 			else if (Element is NestedBlock NestedBlock)
 			{
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				MarkdownElement E;
+				int i, c;
 				bool First = true;
 
 				TopMargin = BottomMargin = 0;
 
-				foreach (MarkdownElement E in NestedBlock.Children)
+				while (!(Loop is null))
 				{
-					if (First)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						First = false;
-						this.GetMargins(E, out TopMargin, out BottomMargin);
+						E = Loop[i];
+
+						if (First)
+						{
+							First = false;
+							this.GetMargins(E, out TopMargin, out BottomMargin);
+						}
+						else
+							this.GetMargins(E, out int _, out BottomMargin);
 					}
-					else
-						this.GetMargins(E, out int _, out BottomMargin);
+
+					Loop = Loop.Next;
 				}
 			}
 			else if (Element is MarkdownElementSingleChild SingleChild)
@@ -994,46 +1013,53 @@ namespace Waher.Content.Markdown.Xamarin
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionDescriptions Element)
 		{
-			MarkdownElement Last = null;
+			MarkdownElement Last = Element.Children.HasLastItem ? Element.Children.LastItem : null;
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+			int i, c;
 
-			foreach (MarkdownElement Description in Element.Children)
-				Last = Description;
-
-			foreach (MarkdownElement Description in Element.Children)
+			while (!(Loop is null))
 			{
-				if (Description.InlineSpanElement && !Description.OutsideParagraph)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					this.RenderContentView();
+					E = Loop[i];
 
-					this.XmlOutput.WriteStartElement("Label");
-					this.XmlOutput.WriteAttributeString("LineBreakMode", "WordWrap");
-					this.RenderLabelAlignment();
-					this.XmlOutput.WriteAttributeString("TextType", "Html");
+					if (E.InlineSpanElement && !E.OutsideParagraph)
+					{
+						this.RenderContentView();
 
-					using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()
-					{
-						XmlEntitiesOnly = true
-					}, this.Document))
-					{
-						await Description.Render(Renderer);
-						this.XmlOutput.WriteCData(Renderer.ToString());
+						this.XmlOutput.WriteStartElement("Label");
+						this.XmlOutput.WriteAttributeString("LineBreakMode", "WordWrap");
+						this.RenderLabelAlignment();
+						this.XmlOutput.WriteAttributeString("TextType", "Html");
+
+						using (HtmlRenderer Renderer = new HtmlRenderer(new HtmlSettings()
+						{
+							XmlEntitiesOnly = true
+						}, this.Document))
+						{
+							await E.Render(Renderer);
+							this.XmlOutput.WriteCData(Renderer.ToString());
+						}
+
+						this.XmlOutput.WriteEndElement();
+						this.XmlOutput.WriteEndElement();
 					}
+					else
+					{
+						this.XmlOutput.WriteStartElement("ContentView");
+						this.XmlOutput.WriteAttributeString("Padding", this.XamlSettings.DefinitionMargin.ToString() + ",0,0," +
+							(E == Last ? this.XamlSettings.DefinitionSeparator : 0).ToString());
 
-					this.XmlOutput.WriteEndElement();
-					this.XmlOutput.WriteEndElement();
+						this.XmlOutput.WriteStartElement("StackLayout");
+						await E.Render(this);
+						this.XmlOutput.WriteEndElement();
+
+						this.XmlOutput.WriteEndElement();
+					}
 				}
-				else
-				{
-					this.XmlOutput.WriteStartElement("ContentView");
-					this.XmlOutput.WriteAttributeString("Padding", this.XamlSettings.DefinitionMargin.ToString() + ",0,0," +
-						(Description == Last ? this.XamlSettings.DefinitionSeparator : 0).ToString());
 
-					this.XmlOutput.WriteStartElement("StackLayout");
-					await Description.Render(this);
-					this.XmlOutput.WriteEndElement();
-
-					this.XmlOutput.WriteEndElement();
-				}
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1053,21 +1079,28 @@ namespace Waher.Content.Markdown.Xamarin
 		public override async Task Render(DefinitionTerms Element)
 		{
 			int TopMargin = this.XamlSettings.ParagraphMarginTop;
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
 
-			foreach (MarkdownElement Term in Element.Children)
+			while (!(Loop is null))
 			{
-				this.RenderContentView(this.XamlSettings.ParagraphMarginLeft.ToString() + "," + TopMargin.ToString() + "," +
-					this.XamlSettings.ParagraphMarginRight.ToString() + ",0");
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.RenderContentView(this.XamlSettings.ParagraphMarginLeft.ToString() + "," + TopMargin.ToString() + "," +
+						this.XamlSettings.ParagraphMarginRight.ToString() + ",0");
 
-				bool BoldBak = this.Bold;
-				this.Bold = true;
+					bool BoldBak = this.Bold;
+					this.Bold = true;
 
-				await this.RenderLabel(Term, true);
+					await this.RenderLabel(Loop[i], true);
 
-				this.Bold = BoldBak;
-				this.XmlOutput.WriteEndElement();
+					this.Bold = BoldBak;
+					this.XmlOutput.WriteEndElement();
 
-				TopMargin = 0;
+					TopMargin = 0;
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1090,8 +1123,7 @@ namespace Waher.Content.Markdown.Xamarin
 			this.XmlOutput.WriteStartElement("StackLayout");
 			this.XmlOutput.WriteAttributeString("Orientation", "Vertical");
 
-			foreach (MarkdownElement E in Element.Children)
-				await E.Render(this);
+			await this.RenderChildren(Element);
 
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteEndElement();
@@ -1294,32 +1326,43 @@ namespace Waher.Content.Markdown.Xamarin
 
 				try
 				{
-					foreach (MarkdownElement E in Element.Children)
+					ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+					MarkdownElement E;
+					int i, c;
+
+					while (!(Loop is null))
 					{
-						if (E.InlineSpanElement)
+						for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 						{
-							if (Html is null)
-								Html = new HtmlRenderer(Settings, this.Document);
+							E = Loop[i];
 
-							await E.Render(Html);
-						}
-						else
-						{
-							if (!(Html is null))
+							if (E.InlineSpanElement)
 							{
-								this.XmlOutput.WriteStartElement("Label");
-								this.XmlOutput.WriteAttributeString("LineBreakMode", "WordWrap");
-								this.RenderLabelAlignment();
-								this.XmlOutput.WriteAttributeString("TextType", "Html");
-								this.XmlOutput.WriteCData(Html.ToString());
-								this.XmlOutput.WriteEndElement();
+								if (Html is null)
+									Html = new HtmlRenderer(Settings, this.Document);
 
-								Html.Dispose();
-								Html = null;
+								await E.Render(Html);
 							}
+							else
+							{
+								if (!(Html is null))
+								{
+									this.XmlOutput.WriteStartElement("Label");
+									this.XmlOutput.WriteAttributeString("LineBreakMode", "WordWrap");
+									this.RenderLabelAlignment();
+									this.XmlOutput.WriteAttributeString("TextType", "Html");
+									this.XmlOutput.WriteCData(Html.ToString());
+									this.XmlOutput.WriteEndElement();
 
-							await E.Render(this);
+									Html.Dispose();
+									Html = null;
+								}
+
+								await E.Render(this);
+							}
 						}
+
+						Loop = Loop.Next;
 					}
 
 					if (!(Html is null))
@@ -1357,6 +1400,7 @@ namespace Waher.Content.Markdown.Xamarin
 			int Expected = 0;
 			int Row = 0;
 			bool ParagraphBullet;
+			int i, c;
 
 			this.XmlOutput.WriteStartElement("ContentView");
 			this.XmlOutput.WriteAttributeString("Padding", this.XamlSettings.ParagraphMargins);
@@ -1378,7 +1422,7 @@ namespace Waher.Content.Markdown.Xamarin
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement _ in Element.Children)
+			for (i = 0, c = Element.Children.Count; i < c; i++)
 			{
 				this.XmlOutput.WriteStartElement("RowDefinition");
 				this.XmlOutput.WriteAttributeString("Height", "Auto");
@@ -1387,10 +1431,14 @@ namespace Waher.Content.Markdown.Xamarin
 
 			this.XmlOutput.WriteEndElement();
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+
+			while (!(Loop is null))
 			{
-				if (E is BlockElementSingleChild Item)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
+					E = Loop[i];
 					Expected++;
 
 					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
@@ -1403,7 +1451,7 @@ namespace Waher.Content.Markdown.Xamarin
 
 					this.XmlOutput.WriteStartElement("Label");
 
-					if (Item is NumberedItem NumberedItem)
+					if (E is NumberedItem NumberedItem)
 						this.XmlOutput.WriteValue((Expected = NumberedItem.Number).ToString());
 					else
 						this.XmlOutput.WriteValue(Expected.ToString());
@@ -1420,12 +1468,14 @@ namespace Waher.Content.Markdown.Xamarin
 					if (ParagraphBullet)
 						await E.Render(this);
 					else
-						await this.RenderLabel(Item, false);
+						await this.RenderLabel(E, false);
 
 					this.XmlOutput.WriteEndElement();
+
+					Row++;
 				}
 
-				Row++;
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();
@@ -1842,6 +1892,7 @@ namespace Waher.Content.Markdown.Xamarin
 		{
 			int Row = 0;
 			bool ParagraphBullet;
+			int i, c;
 
 			this.XmlOutput.WriteStartElement("ContentView");
 			this.XmlOutput.WriteAttributeString("Padding", this.XamlSettings.ParagraphMargins);
@@ -1863,7 +1914,7 @@ namespace Waher.Content.Markdown.Xamarin
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement _ in Element.Children)
+			for (i = 0, c = Element.Children.Count; i < c; i++)
 			{
 				this.XmlOutput.WriteStartElement("RowDefinition");
 				this.XmlOutput.WriteAttributeString("Height", "Auto");
@@ -1872,14 +1923,19 @@ namespace Waher.Content.Markdown.Xamarin
 
 			this.XmlOutput.WriteEndElement();
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+
+			while (!(Loop is null))
 			{
-				if (E is TaskItem TaskItem)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
+					E = Loop[i];
+
 					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
 					this.GetMargins(E, out int TopMargin, out int BottomMargin);
 
-					if (TaskItem.IsChecked)
+					if (E is TaskItem Item && Item.IsChecked)
 					{
 						this.RenderContentView("0," + TopMargin.ToString() + "," + this.XamlSettings.ListContentMargin.ToString() + "," +
 							BottomMargin.ToString());
@@ -1898,12 +1954,14 @@ namespace Waher.Content.Markdown.Xamarin
 					if (ParagraphBullet)
 						await E.Render(this);
 					else
-						await this.RenderLabel(TaskItem, false);
+						await this.RenderLabel(E, false);
 
 					this.XmlOutput.WriteEndElement();
+
+					Row++;
 				}
 
-				Row++;
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();

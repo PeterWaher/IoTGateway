@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.XmlLedger;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -127,7 +128,7 @@ namespace Waher.Script.Persistence.SQL
 				Offset = 0;
 
 			IDataSource Source = await this.source.GetSource(Variables);
-			List<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
+			ChunkedList<KeyValuePair<string, ScriptNode>> AdditionalFields = null;
 			ScriptNode[] Columns2 = this.columns;
 			bool Columns2Cloned = false;
 			Dictionary<string, int> ColumnIndices = null;
@@ -152,7 +153,7 @@ namespace Waher.Script.Persistence.SQL
 						Columns2[i] = Ref2;
 
 						if (AdditionalFields is null)
-							AdditionalFields = new List<KeyValuePair<string, ScriptNode>>();
+							AdditionalFields = new ChunkedList<KeyValuePair<string, ScriptNode>>();
 
 						AdditionalFields.Add(new KeyValuePair<string, ScriptNode>(Ref2.VariableName, this.columns[i]));
 					}

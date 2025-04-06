@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SkiaSharp;
+using System;
 using System.Numerics;
 using System.Text;
-using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
+using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.ComplexFractals
@@ -270,9 +270,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
-			List<double> AttractorsR = new List<double>();
-			List<double> AttractorsI = new List<double>();
-			List<int> AttractorColors = new List<int>();
+			ChunkedList<double> AttractorsR = new ChunkedList<double>();
+			ChunkedList<double> AttractorsI = new ChunkedList<double>();
+			ChunkedList<int> AttractorColors = new ChunkedList<int>();
 			double[] AttractorsR2 = new double[0];
 			double[] AttractorsI2 = new double[0];
 			int[] AttractorsColors2 = new int[0];
@@ -446,9 +446,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
-			List<double> AttractorsR = new List<double>();
-			List<double> AttractorsI = new List<double>();
-			List<int> AttractorColors = new List<int>();
+			ChunkedList<double> AttractorsR = new ChunkedList<double>();
+			ChunkedList<double> AttractorsI = new ChunkedList<double>();
+			ChunkedList<int> AttractorColors = new ChunkedList<int>();
 			double[] AttractorsR2 = new double[0];
 			double[] AttractorsI2 = new double[0];
 			int[] AttractorsColors2 = new int[0];
@@ -645,9 +645,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 			double RRe = R.Real;
 			double RIm = R.Imaginary;
-			List<double> AttractorsR = new List<double>();
-			List<double> AttractorsI = new List<double>();
-			List<int> AttractorColors = new List<int>();
+			ChunkedList<double> AttractorsR = new ChunkedList<double>();
+			ChunkedList<double> AttractorsI = new ChunkedList<double>();
+			ChunkedList<int> AttractorColors = new ChunkedList<int>();
 			double[] AttractorsR2 = new double[0];
 			double[] AttractorsI2 = new double[0];
 			int[] AttractorsColors2 = new int[0];

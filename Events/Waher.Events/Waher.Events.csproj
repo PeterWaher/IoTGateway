@@ -44,4 +44,7 @@
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj" />
+  </ItemGroup>
 </Project>

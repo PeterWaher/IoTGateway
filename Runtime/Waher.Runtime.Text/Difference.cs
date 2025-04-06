@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Text
 {
@@ -31,10 +29,10 @@ namespace Waher.Runtime.Text
 			int c1p = c1 + 1;
 			int c2p = c2 + 1;
 			BitArray Processed = new BitArray(c1p * c2p);
-			LinkedList<State<T>> Current = new LinkedList<State<T>>();
-			LinkedList<State<T>> Next = new LinkedList<State<T>>();
-			LinkedList<State<T>> NextNext = new LinkedList<State<T>>();
-			LinkedList<State<T>> Temp;
+			ChunkedList<State<T>> Current = new ChunkedList<State<T>>();
+			ChunkedList<State<T>> Next = new ChunkedList<State<T>>();
+			ChunkedList<State<T>> NextNext = new ChunkedList<State<T>>();
+			ChunkedList<State<T>> Temp;
 			State<T> P, Q;
 			bool b1, b2;
 			int i;
@@ -70,9 +68,9 @@ namespace Waher.Runtime.Text
 							};
 
 							if (P.Op == EditOperation.Insert)
-								Next.AddLast(Q);
+								Next.AddLastItem(Q);
 							else
-								NextNext.AddLast(Q);
+								NextNext.AddLastItem(Q);
 						}
 					}
 
@@ -89,9 +87,9 @@ namespace Waher.Runtime.Text
 							};
 
 							if (P.Op == EditOperation.Delete)
-								Next.AddLast(Q);
+								Next.AddLastItem(Q);
 							else
-								NextNext.AddLast(Q);
+								NextNext.AddLastItem(Q);
 						}
 					}
 
@@ -107,7 +105,7 @@ namespace Waher.Runtime.Text
 								Prev = P
 							};
 
-							Current.AddLast(Q);
+							Current.AddLastItem(Q);
 
 							if (Q.i1 == c1 && Q.i2 == c2)
 							{
@@ -118,11 +116,11 @@ namespace Waher.Runtime.Text
 					}
 				}
 
-				if (Current.First is null)
+				if (!Current.HasFirstItem)
 				{
 					Temp = Current;
 
-					if (Next.First is null)
+					if (!Next.HasFirstItem)
 						Current = NextNext;
 					else
 					{
@@ -133,12 +131,11 @@ namespace Waher.Runtime.Text
 					NextNext = Temp;
 				}
 
-				P = Current.Last.Value;
-				Current.RemoveLast();
+				P = Current.RemoveLast();
 			}
 
-			LinkedList<T> SameOp = new LinkedList<T>();
-			LinkedList<Step<T>> Steps = new LinkedList<Step<T>>();
+			ChunkedList<T> SameOp = new ChunkedList<T>();
+			ChunkedList<Step<T>> Steps = new ChunkedList<Step<T>>();
 			EditOperation Op = P.Op;
 			State<T> First = P;
 			T[] Symbols;
@@ -152,7 +149,7 @@ namespace Waher.Runtime.Text
 				{
 					Symbols = new T[c1];
 					SameOp.CopyTo(Symbols, 0);
-					Steps.AddFirst(new Step<T>(Symbols, First.i1, First.i2, Op));
+					Steps.AddFirstItem(new Step<T>(Symbols, First.i1, First.i2, Op));
 
 					SameOp.Clear();
 					c1 = 0;
@@ -164,11 +161,11 @@ namespace Waher.Runtime.Text
 				{
 					case EditOperation.Keep:
 					case EditOperation.Delete:
-						SameOp.AddFirst(S1[P.i1 - 1]);
+						SameOp.AddFirstItem(S1[P.i1 - 1]);
 						break;
 
 					case EditOperation.Insert:
-						SameOp.AddFirst(S2[P.i2 - 1]);
+						SameOp.AddFirstItem(S2[P.i2 - 1]);
 						break;
 				}
 
@@ -179,7 +176,7 @@ namespace Waher.Runtime.Text
 
 			Symbols = new T[c1];
 			SameOp.CopyTo(Symbols, 0);
-			Steps.AddFirst(new Step<T>(Symbols, First.i1, First.i2, Op));
+			Steps.AddFirstItem(new Step<T>(Symbols, First.i1, First.i2, Op));
 			c2++;
 
 			Step<T>[] Result = new Step<T>[c2];

@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
@@ -120,7 +120,7 @@ namespace Waher.Script.Fractals.IFS
 			if (!(Obj is Array FlameArray))
 				throw new ScriptRuntimeException("The second parameter to EstimateFlameSize must be an array, containing flame definitions.", this);
 
-			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
+			ChunkedList<FlameFunction> FlameFunctions = new ChunkedList<FlameFunction>();
             double Weight;
             FlameFunction CurrentFunction = null;
 

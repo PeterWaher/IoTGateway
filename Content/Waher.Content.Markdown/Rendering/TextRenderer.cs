@@ -6,6 +6,8 @@ using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Events;
+using Waher.Runtime.Collections;
+using Waher.Script.Constants;
 
 namespace Waher.Content.Markdown.Rendering
 {
@@ -335,11 +337,10 @@ namespace Waher.Content.Markdown.Rendering
 		/// </summary>
 		/// <param name="ChildNodes">Label definition of multi-media content.</param>
 		/// <param name="AloneInParagraph">If the multi-media construct is alone in the paragraph.</param>
-		private async Task DefaultRenderingMultimedia(IEnumerable<MarkdownElement> ChildNodes,
+		private async Task DefaultRenderingMultimedia(ChunkedList<MarkdownElement> ChildNodes,
 			bool AloneInParagraph)
 		{
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(this);
+			await this.Render(ChildNodes);
 
 			if (AloneInParagraph)
 			{
@@ -534,15 +535,23 @@ namespace Waher.Content.Markdown.Rendering
 				if (!s.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(s))
 					this.Output.AppendLine();
 
-				foreach (MarkdownElement E in Element.Children)
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				int i, c;
+
+				while (!(Loop is null))
 				{
-					await E.Render(Renderer);
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						await Loop[i].Render(Renderer);
 
-					s = Renderer.ToString();
-					Renderer.Clear();
-					this.Output.Append(s);
+						s = Renderer.ToString();
+						Renderer.Clear();
+						this.Output.Append(s);
 
-					LastIsParagraph = s.EndsWith(s2);
+						LastIsParagraph = s.EndsWith(s2);
+					}
+
+					Loop = Loop.Next;
 				}
 
 				if (!LastIsParagraph)
@@ -616,11 +625,19 @@ namespace Waher.Content.Markdown.Rendering
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionDescriptions Element)
 		{
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				this.Output.Append(":\t");
-				await E.Render(this);
-				this.Output.AppendLine();
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.Output.Append(":\t");
+					await Loop[i].Render(this);
+					this.Output.AppendLine();
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -641,24 +658,34 @@ namespace Waher.Content.Markdown.Rendering
 				if (!s.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(s))
 					this.Output.AppendLine();
 
-				foreach (MarkdownElement E in Element.Children)
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				MarkdownElement E;
+				int i, c;
+
+				while (!(Loop is null))
 				{
-					if (E is DefinitionTerms)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						if (FirstTerm)
-							FirstTerm = false;
-						else
-							this.Output.AppendLine();
+						E = Loop[i];
+
+						if (E is DefinitionTerms)
+						{
+							if (FirstTerm)
+								FirstTerm = false;
+							else
+								this.Output.AppendLine();
+						}
+
+						await E.Render(Renderer);
+						s = Renderer.ToString();
+						Renderer.Clear();
+						this.Output.Append(s);
+
+						LastIsParagraph = s.EndsWith(s2);
 					}
 
-					await E.Render(Renderer);
-					s = Renderer.ToString();
-					Renderer.Clear();
-					this.Output.Append(s);
-
-					LastIsParagraph = s.EndsWith(s2);
+					Loop = Loop.Next;
 				}
-
 				if (!LastIsParagraph)
 					this.Output.AppendLine();
 			}
@@ -673,16 +700,23 @@ namespace Waher.Content.Markdown.Rendering
 			using (TextRenderer Renderer = new TextRenderer())
 			{
 				string s;
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				int i, c;
 
-				foreach (MarkdownElement E in Element.Children)
+				while (!(Loop is null))
 				{
-					await E.Render(Renderer);
-					s = Renderer.ToString();
-					Renderer.Clear();
-					this.Output.Append(s);
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						await Loop[i].Render(Renderer);
+						s = Renderer.ToString();
+						Renderer.Clear();
+						this.Output.Append(s);
 
-					if (!s.EndsWith(Environment.NewLine))
-						this.Output.AppendLine();
+						if (!s.EndsWith(Environment.NewLine))
+							this.Output.AppendLine();
+					}
+
+					Loop = Loop.Next;
 				}
 			}
 		}
@@ -695,8 +729,7 @@ namespace Waher.Content.Markdown.Rendering
 		{
 			using (TextRenderer Renderer = new TextRenderer())
 			{
-				foreach (MarkdownElement E in Element.Children)
-					await E.Render(Renderer);
+				await Renderer.RenderChildren(Element);
 
 				string s = Renderer.ToString().Trim();
 				s = s.Replace("\r\n", "\n").Replace("\r", "\n");
@@ -771,25 +804,32 @@ namespace Waher.Content.Markdown.Rendering
 			{
 				string s;
 				bool First = true;
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				int i, c;
 
-				foreach (MarkdownElement E in Element.Children)
+				while (!(Loop is null))
 				{
-					await E.Render(Renderer);
-					s = Renderer.ToString().TrimStart().Trim(' ');    // Only space at the end, not CRLF
-					Renderer.Clear();
-
-					if (!string.IsNullOrEmpty(s))
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						if (First)
-							First = false;
-						else
-							this.Output.Append(' ');
+						await Loop[i].Render(Renderer);
+						s = Renderer.ToString().TrimStart().Trim(' ');    // Only space at the end, not CRLF
+						Renderer.Clear();
 
-						this.Output.Append(s);
+						if (!string.IsNullOrEmpty(s))
+						{
+							if (First)
+								First = false;
+							else
+								this.Output.Append(' ');
 
-						if (s.EndsWith("\n"))
-							First = true;
+							this.Output.Append(s);
+
+							if (s.EndsWith("\n"))
+								First = true;
+						}
 					}
+
+					Loop = Loop.Next;
 				}
 
 				this.Output.AppendLine();
@@ -805,8 +845,7 @@ namespace Waher.Content.Markdown.Rendering
 		{
 			using (TextRenderer Renderer = new TextRenderer())
 			{
-				foreach (MarkdownElement E in Element.Children)
-					await E.Render(Renderer);
+				await Renderer.RenderChildren(Element);
 
 				string s = Renderer.ToString().Trim();
 				s = s.Replace("\r\n", "\n").Replace("\r", "\n");
@@ -895,14 +934,22 @@ namespace Waher.Content.Markdown.Rendering
 				if (!s.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(s))
 					this.Output.AppendLine();
 
-				foreach (MarkdownElement E in Element.Children)
-				{
-					await E.Render(Renderer);
-					s = Renderer.ToString();
-					Renderer.Clear();
-					this.Output.Append(s);
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				int i, c;
 
-					LastIsParagraph = s.EndsWith(s2);
+				while (!(Loop is null))
+				{
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						await Loop[i].Render(Renderer);
+						s = Renderer.ToString();
+						Renderer.Clear();
+						this.Output.Append(s);
+
+						LastIsParagraph = s.EndsWith(s2);
+					}
+
+					Loop = Loop.Next;
 				}
 
 				if (!LastIsParagraph)
@@ -1043,14 +1090,22 @@ namespace Waher.Content.Markdown.Rendering
 				if (!s.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(s))
 					this.Output.AppendLine();
 
-				foreach (MarkdownElement E in Element.Children)
-				{
-					await E.Render(Renderer);
-					s = Renderer.ToString();
-					Renderer.Clear();
-					this.Output.Append(s);
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				int i, c;
 
-					LastIsParagraph = s.EndsWith(s2);
+				while (!(Loop is null))
+				{
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					{
+						await Loop[i].Render(Renderer);
+						s = Renderer.ToString();
+						Renderer.Clear();
+						this.Output.Append(s);
+
+						LastIsParagraph = s.EndsWith(s2);
+					}
+
+					Loop = Loop.Next;
 				}
 
 				if (!LastIsParagraph)

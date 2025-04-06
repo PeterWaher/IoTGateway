@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Semantic
 {
@@ -9,7 +10,7 @@ namespace Waher.Content.Semantic
 	/// </summary>
 	public class SemanticDataSet : ISemanticCube
 	{
-		private readonly LinkedList<ISemanticCube> sources = new LinkedList<ISemanticCube>();
+		private readonly ChunkedList<ISemanticCube> sources = new ChunkedList<ISemanticCube>();
 		private ISemanticCube first = null;
 		private int count = 0;
 
@@ -35,7 +36,7 @@ namespace Waher.Content.Semantic
 					if (this.first is null)
 						this.first = Source;
 
-					this.sources.AddLast(Source);
+					this.sources.Add(Source);
 					this.count++;
 				}
 			}
@@ -52,7 +53,7 @@ namespace Waher.Content.Semantic
 				if (this.first is null)
 					this.first = Source;
 
-				this.sources.AddLast(Source);
+				this.sources.Add(Source);
 				this.count++;
 			}
 		}
@@ -77,10 +78,10 @@ namespace Waher.Content.Semantic
 
 		private IEnumerator<ISemanticTriple> CreateJoinedEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticTriple>> Enumerators = new LinkedList<IEnumerator<ISemanticTriple>>();
+			ChunkedList<IEnumerator<ISemanticTriple>> Enumerators = new ChunkedList<IEnumerator<ISemanticTriple>>();
 
 			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(Source.GetEnumerator());
+				Enumerators.Add(Source.GetEnumerator());
 
 			return new JoinedTripleEnumerator(Enumerators, true);
 		}
@@ -314,7 +315,7 @@ namespace Waher.Content.Semantic
 				return await this.first.GetTriplesBySubjectAndPredicateAndObject(Subject, Predicate, Object);
 			else
 			{
-				LinkedList<ISemanticTriple> Result = new LinkedList<ISemanticTriple>();
+				ChunkedList<ISemanticTriple> Result = new ChunkedList<ISemanticTriple>();
 
 				foreach (ISemanticCube Source in this.sources)
 				{
@@ -323,7 +324,7 @@ namespace Waher.Content.Semantic
 						continue;
 
 					foreach (ISemanticTriple Triple in Part)
-						Result.AddLast(Triple);
+						Result.Add(Triple);
 				}
 
 				return Result;
@@ -336,10 +337,10 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public async Task<IEnumerator<ISemanticElement>> GetSubjectEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticElement>> Enumerators = new LinkedList<IEnumerator<ISemanticElement>>();
+			ChunkedList<IEnumerator<ISemanticElement>> Enumerators = new ChunkedList<IEnumerator<ISemanticElement>>();
 
 			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(await Source.GetSubjectEnumerator());
+				Enumerators.Add(await Source.GetSubjectEnumerator());
 
 			return new JoinedElementEnumerator(Enumerators, true);
 		}
@@ -350,10 +351,10 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public async Task<IEnumerator<ISemanticElement>> GetPredicateEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticElement>> Enumerators = new LinkedList<IEnumerator<ISemanticElement>>();
+			ChunkedList<IEnumerator<ISemanticElement>> Enumerators = new ChunkedList<IEnumerator<ISemanticElement>>();
 
 			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(await Source.GetPredicateEnumerator());
+				Enumerators.Add(await Source.GetPredicateEnumerator());
 
 			return new JoinedElementEnumerator(Enumerators, true);
 		}
@@ -364,10 +365,10 @@ namespace Waher.Content.Semantic
 		/// <returns>Enumerator of semantic elements.</returns>
 		public async Task<IEnumerator<ISemanticElement>> GetObjectEnumerator()
 		{
-			LinkedList<IEnumerator<ISemanticElement>> Enumerators = new LinkedList<IEnumerator<ISemanticElement>>();
+			ChunkedList<IEnumerator<ISemanticElement>> Enumerators = new ChunkedList<IEnumerator<ISemanticElement>>();
 
 			foreach (ISemanticCube Source in this.sources)
-				Enumerators.AddLast(await Source.GetObjectEnumerator());
+				Enumerators.Add(await Source.GetObjectEnumerator());
 
 			return new JoinedElementEnumerator(Enumerators, true);
 		}

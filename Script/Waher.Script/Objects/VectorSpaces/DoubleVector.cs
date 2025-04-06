@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Waher.Script.Abstraction.Sets;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
@@ -52,10 +53,33 @@ namespace Waher.Script.Objects.VectorSpaces
 					double[] v = new double[this.dimension];
 					int i = 0;
 
-					foreach (IElement Element in this.elements)
+					if (this.elements is ChunkedList<IElement> Values)
 					{
-						if (Element.AssociatedObjectValue is double d)
+						ChunkNode<IElement> Loop = Values.FirstChunk;
+						int j, c;
+
+						while (!(Loop is null))
+						{
+							for (j = Loop.Start, c = Loop.Pos; j < c; j++)
+							{
+								if (!(Loop[j].AssociatedObjectValue is double d))
+									d = 0;
+
+								v[i++] = d;
+							}
+
+							Loop = Loop.Next;
+						}
+					}
+					else
+					{
+						foreach (IElement Element in this.elements)
+						{
+							if (!(Element.AssociatedObjectValue is double d))
+								d = 0;
+
 							v[i++] = d;
+						}
 					}
 
 					this.values = v;
@@ -230,6 +254,17 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
 		public override ICollection<IElement> ChildElements => this.Elements;
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return VectorDefinition.Encapsulate(Elements, true, Node);
+		}
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.

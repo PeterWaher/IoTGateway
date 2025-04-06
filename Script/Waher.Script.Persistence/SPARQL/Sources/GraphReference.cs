@@ -5,6 +5,7 @@ using Waher.Content.Semantic;
 using Waher.Content.Semantic.Model;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Counters;
 
 namespace Waher.Script.Persistence.SPARQL.Sources
@@ -112,7 +113,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// Method called when new semantic models have been added to the graph.
 		/// </summary>
 		/// <param name="Models">Semantic models.</param>
-		public async Task ModelsAdded(LinkedList<ISemanticModel> Models)
+		public async Task ModelsAdded(ChunkedList<ISemanticModel> Models)
 		{
 			if (!this.InDatabase && this.NrFiles > DatabaseMinFileCount)
 			{
@@ -126,7 +127,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 
 				Models.Clear();
 				if (!(Model is null))
-					Models.AddLast(Model);
+					Models.Add(Model);
 			}
 
 			await this.AddTriplesToDatabase(Models);
@@ -138,7 +139,7 @@ namespace Waher.Script.Persistence.SPARQL.Sources
 		/// <param name="Models">Semantic models to save.</param>
 		public async Task AddTriplesToDatabase(IEnumerable<IEnumerable<ISemanticTriple>> Models)
 		{
-			List<DatabaseTriple> ToSave = new List<DatabaseTriple>();
+			ChunkedList<DatabaseTriple> ToSave = new ChunkedList<DatabaseTriple>();
 			int c = 0;
 
 			foreach (IEnumerable<ISemanticTriple> Model in Models)

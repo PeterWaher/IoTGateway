@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -14,7 +14,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public DefinitionList(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public DefinitionList(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 		}
@@ -51,19 +51,36 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override bool InlineSpanElement => false;
 
 		/// <summary>
+		/// Adds a child to the element.
+		/// </summary>
+		/// <param name="NewChild">New child to add.</param>
+		public override void AddChild(MarkdownElement NewChild)
+		{
+			if (this.HasLastChild &&
+				this.LastChild is MarkdownElementChildren MarkdownElementChildren &&
+				MarkdownElementChildren.GetType() == NewChild.GetType())
+			{
+				MarkdownElementChildren.AddChildren(((MarkdownElementChildren)NewChild).Children);
+			}
+			else
+				base.AddChild(NewChild);
+		}
+
+		/// <summary>
 		/// Adds children to the element.
 		/// </summary>
 		/// <param name="NewChildren">New children to add.</param>
-		public override void AddChildren(IEnumerable<MarkdownElement> NewChildren)
+		public override void AddChildren(ChunkedList<MarkdownElement> NewChildren)
 		{
-			MarkdownElement Last;
+			ChunkNode<MarkdownElement> Loop = NewChildren.FirstChunk;
+			int i, c;
 
-			foreach (MarkdownElement E in NewChildren)
+			while (!(Loop is null))
 			{
-				if (!((Last = this.LastChild) is null) && Last is MarkdownElementChildren MarkdownElementChildren && Last.GetType() == E.GetType())
-					MarkdownElementChildren.AddChildren(((MarkdownElementChildren)E).Children);
-				else
-					base.AddChildren((IEnumerable<MarkdownElement>)new MarkdownElement[] { E });
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					this.AddChild(Loop[i]);
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -74,7 +91,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new DefinitionList(Document, Children);
 		}

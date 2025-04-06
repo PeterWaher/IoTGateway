@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Semantic
 {
@@ -85,7 +86,7 @@ namespace Waher.Content.Semantic
 			Output.AppendLine("@startuml");
 
 			Dictionary<ISemanticElement, string> NodeIds = new Dictionary<ISemanticElement, string>();
-			Dictionary<string, LinkedList<LinkInfo>> LinksByNodeId = new Dictionary<string, LinkedList<LinkInfo>>();
+			Dictionary<string, ChunkedList<LinkInfo>> LinksByNodeId = new Dictionary<string, ChunkedList<LinkInfo>>();
 			int i = 0;
 
 			foreach (ISemanticElement Node in this.Nodes)
@@ -101,8 +102,8 @@ namespace Waher.Content.Semantic
 			{
 				string NodeId = NodeIds[Node];
 				ISemanticPlane Plane = await this.GetTriplesBySubject(Node);
-				LinkedList<KeyValuePair<string, object>> Properties = null;
-				LinkedList<LinkInfo> Links = null;
+				ChunkedList<KeyValuePair<string, object>> Properties = null;
+				ChunkedList<LinkInfo> Links = null;
 				string StereoType = null;
 				bool IsRdfType;
 
@@ -142,16 +143,16 @@ namespace Waher.Content.Semantic
 								else if (Values.Current is ISemanticLiteral Literal)
 								{
 									if (Properties is null)
-										Properties = new LinkedList<KeyValuePair<string, object>>();
+										Properties = new ChunkedList<KeyValuePair<string, object>>();
 
-									Properties.AddLast(new KeyValuePair<string, object>(PropertyName, Literal.StringValue));
+									Properties.Add(new KeyValuePair<string, object>(PropertyName, Literal.StringValue));
 								}
 								else if (NodeIds.TryGetValue(Values.Current, out string ObjectId))
 								{
 									if (Links is null)
-										Links = new LinkedList<LinkInfo>();
+										Links = new ChunkedList<LinkInfo>();
 
-									Links.AddLast(new LinkInfo()
+									Links.Add(new LinkInfo()
 									{
 										From = NodeId,
 										To = ObjectId,
@@ -162,7 +163,7 @@ namespace Waher.Content.Semantic
 								else
 								{
 									if (Properties is null)
-										Properties = new LinkedList<KeyValuePair<string, object>>();
+										Properties = new ChunkedList<KeyValuePair<string, object>>();
 
 									string ValueString;
 
@@ -171,7 +172,7 @@ namespace Waher.Content.Semantic
 									else
 										ValueString = Values.Current.ToString();
 
-									Properties.AddLast(new KeyValuePair<string, object>(PropertyName, ValueString));
+									Properties.Add(new KeyValuePair<string, object>(PropertyName, ValueString));
 								}
 							}
 						}
@@ -235,7 +236,7 @@ namespace Waher.Content.Semantic
 					LinksByNodeId[NodeId] = Links;
 			}
 
-			foreach (LinkedList<LinkInfo> Links in LinksByNodeId.Values)
+			foreach (ChunkedList<LinkInfo> Links in LinksByNodeId.Values)
 			{
 				foreach (LinkInfo Link in Links)
 				{

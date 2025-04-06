@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -77,10 +78,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <returns>Atoms.</returns>
 		public IEnumerable<Atom> Atomize()
 		{
-			LinkedList<Atom> Result = new LinkedList<Atom>();
+			ChunkedList<Atom> Result = new ChunkedList<Atom>();
 
 			foreach (char ch in this.code)
-				Result.AddLast(new InlineCodeCharacter(this.Document, this, ch));
+				Result.Add(new InlineCodeCharacter(this.Document, this, ch));
 
 			return Result;
 		}

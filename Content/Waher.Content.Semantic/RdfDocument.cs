@@ -8,6 +8,7 @@ using Waher.Content.Getters;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Semantic
@@ -315,7 +316,7 @@ namespace Waher.Content.Semantic
 			string BagId = null;
 			string AboutEach = null;
 			string AboutEachPrefix = null;
-			LinkedList<XmlAttribute> Properties = null;
+			ChunkedList<XmlAttribute> Properties = null;
 			XmlElement ForEach = null;
 
 			foreach (XmlAttribute Attr in E.Attributes)
@@ -377,9 +378,9 @@ namespace Waher.Content.Semantic
 					continue;
 
 				if (Properties is null)
-					Properties = new LinkedList<XmlAttribute>();
+					Properties = new ChunkedList<XmlAttribute>();
 
-				Properties.AddLast(Attr);
+				Properties.Add(Attr);
 			}
 
 			if (!(AboutEach is null))
@@ -567,7 +568,7 @@ namespace Waher.Content.Semantic
 
 				IEnumerable Attributes = ForEach is null ? (IEnumerable)E2.Attributes : new JoinAttributes(E2.Attributes, ForEach.Attributes);
 				IEnumerable ChildNodes = ForEach is null ? (IEnumerable)E2.ChildNodes : new JoinNodes(E2.ChildNodes, ForEach.ChildNodes);
-				LinkedList<XmlAttribute> Properties = null;
+				ChunkedList<XmlAttribute> Properties = null;
 				ISemanticElement Object = null;
 				ISemanticElement Bag2 = null;
 				Uri BaseUri2 = BaseUri;
@@ -633,9 +634,9 @@ namespace Waher.Content.Semantic
 						continue;
 
 					if (Properties is null)
-						Properties = new LinkedList<XmlAttribute>();
+						Properties = new ChunkedList<XmlAttribute>();
 
-					Properties.AddLast(Attr);
+					Properties.Add(Attr);
 				}
 
 				if (!(BagId is null))
@@ -767,7 +768,7 @@ namespace Waher.Content.Semantic
 						break;
 
 					case "Collection":
-						LinkedList<ISemanticElement> Elements = null;
+						ChunkedList<ISemanticElement> Elements = null;
 
 						foreach (XmlNode N2 in ChildNodes)
 						{
@@ -804,33 +805,37 @@ namespace Waher.Content.Semantic
 								continue;
 
 							if (Elements is null)
-								Elements = new LinkedList<ISemanticElement>();
+								Elements = new ChunkedList<ISemanticElement>();
 
 							if (!(Element is null))
-								Elements.AddLast(Element);
+								Elements.Add(Element);
 						}
 
 						if (Elements is null)
 							this.Add(new SemanticTriple(Subject, Predicate, RdfNil));
 						else
 						{
-							LinkedListNode<ISemanticElement> Loop = Elements.First;
+							ChunkNode<ISemanticElement> Loop = Elements.FirstChunk;
 							BlankNode Current = this.CreateBlankNode();
+							int i, c;
 
 							this.Add(new SemanticTriple(Subject, Predicate, Current));
 
 							while (!(Loop is null))
 							{
-								this.Add(new SemanticTriple(Current, RdfFirst, Loop.Value));
+								for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+								{
+									this.Add(new SemanticTriple(Current, RdfFirst, Loop[i]));
+
+									if (i < c - 1 || !(Loop.Next is null))
+									{
+										BlankNode Next = this.CreateBlankNode();
+										this.Add(new SemanticTriple(Current, RdfRest, Next));
+										Current = Next;
+									}
+								}
 
 								Loop = Loop.Next;
-
-								if (!(Loop is null))
-								{
-									BlankNode Next = this.CreateBlankNode();
-									this.Add(new SemanticTriple(Current, RdfRest, Next));
-									Current = Next;
-								}
 							}
 
 							this.Add(new SemanticTriple(Current, RdfRest, RdfNil));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -89,7 +90,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
-			List<KeyValuePair<string, string>> HeaderList = null;
+			ChunkedList<KeyValuePair<string, string>> HeaderList = null;
 			ContentResponse Content;
 
 			if (Arguments.Length > 1)
@@ -111,20 +112,20 @@ namespace Waher.Script.Content.Functions.InputOutput
 			return Expression.Encapsulate(Content.Decoded);
 		}
 
-		internal static List<KeyValuePair<string, string>> GetHeaders(object Arg, ScriptNode Node)
+		internal static ChunkedList<KeyValuePair<string, string>> GetHeaders(object Arg, ScriptNode Node)
 		{
-			List<KeyValuePair<string, string>> HeaderList;
+			ChunkedList<KeyValuePair<string, string>> HeaderList;
 
 			if (Arg is IDictionary<string, IElement> Headers)
 			{
-				HeaderList = new List<KeyValuePair<string, string>>();
+				HeaderList = new ChunkedList<KeyValuePair<string, string>>();
 
 				foreach (KeyValuePair<string, IElement> P in Headers)
 					HeaderList.Add(new KeyValuePair<string, string>(P.Key, P.Value.AssociatedObjectValue?.ToString()));
 			}
 			else if (Arg is string Accept)
 			{
-				HeaderList = new List<KeyValuePair<string, string>>()
+				HeaderList = new ChunkedList<KeyValuePair<string, string>>()
 				{
 					new KeyValuePair<string, string>("Accept", Accept)
 				};

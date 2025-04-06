@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Profiling.Events;
 using Waher.Runtime.Profiling.Export;
 
@@ -67,7 +68,7 @@ namespace Waher.Runtime.Profiling
 	{
 		private readonly SortedDictionary<string, int> exceptionOrdinals = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly SortedDictionary<string, int> eventOrdinals = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
-		private readonly List<ProfilerThread> threads = new List<ProfilerThread>();
+		private readonly ChunkedList<ProfilerThread> threads = new ChunkedList<ProfilerThread>();
 		private readonly SortedDictionary<int, object> notes = new SortedDictionary<int, object>();
 		private readonly Dictionary<string, ProfilerThread> threadsByName = new Dictionary<string, ProfilerThread>();
 		private readonly ProfilerThread mainThread;

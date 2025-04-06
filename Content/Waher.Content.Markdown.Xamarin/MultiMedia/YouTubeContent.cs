@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Xamarin.Multimedia
 {
@@ -27,7 +27,7 @@ namespace Waher.Content.Markdown.Xamarin.Multimedia
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		public Task RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, MultimediaItem[] Items,
-			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+			ChunkedList<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			XmlWriter Output = Renderer.XmlOutput;
 

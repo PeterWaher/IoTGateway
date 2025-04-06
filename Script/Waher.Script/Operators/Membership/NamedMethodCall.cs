@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
+using Waher.Runtime.Collections;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using System.Threading.Tasks;
-using Waher.Runtime.Inventory;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators.Membership
@@ -107,10 +108,10 @@ namespace Waher.Script.Operators.Membership
 				if (Operand.IsScalar)
 					throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
 
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement Item in Operand.ChildElements)
-					Elements.AddLast(await this.EvaluateAsync(Item, Variables));
+					Elements.Add(await this.EvaluateAsync(Item, Variables));
 
 				return Operand.Encapsulate(Elements, this);
 			}
@@ -197,7 +198,7 @@ namespace Waher.Script.Operators.Membership
 					if (this.methods is null)
 						this.methods = this.GetMethods(T);
 
-					List<KeyValuePair<string, int>> ByRef = null;
+					ChunkedList<KeyValuePair<string, int>> ByRef = null;
 					ParameterValues = null;
 					Extend = null;
 
@@ -236,7 +237,7 @@ namespace Waher.Script.Operators.Membership
 									ParameterValues[i] = Value;
 
 									if (ByRef is null)
-										ByRef = new List<KeyValuePair<string, int>>();
+										ByRef = new ChunkedList<KeyValuePair<string, int>>();
 
 									if (this.parameters[i] is VariableReference Ref)
 										ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
@@ -407,7 +408,7 @@ namespace Waher.Script.Operators.Membership
 				return Expression.Encapsulate(Value);
 			}
 
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 			Arguments = (IElement[])Arguments.Clone();
 
 			while (true)
@@ -426,7 +427,7 @@ namespace Waher.Script.Operators.Membership
 				if (i < this.nrParameters)
 					break;
 
-				Elements.AddLast(await this.EvaluateCanonicalAsync(Object, Method, MethodType, ParametersTypes, Arguments, 
+				Elements.Add(await this.EvaluateCanonicalAsync(Object, Method, MethodType, ParametersTypes, Arguments, 
 					ArgumentValues, Extend, Variables));
 			}
 
@@ -441,7 +442,7 @@ namespace Waher.Script.Operators.Membership
 
 		private MethodRec[] GetMethods(Type Type)
 		{
-			List<MethodRec> Result = new List<MethodRec>();
+			ChunkedList<MethodRec> Result = new ChunkedList<MethodRec>();
 			ParameterInfo[] ParameterInfo;
 			IEnumerable<MethodInfo> Methods = Type.GetRuntimeMethods();
 

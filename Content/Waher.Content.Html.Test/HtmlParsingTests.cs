@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Html.Elements;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Console;
 using Waher.Runtime.Inventory;
 
@@ -50,7 +51,7 @@ namespace Waher.Content.Html.Test
 			Assert.IsNotNull(Doc.Body);
 			Assert.IsNotNull(Doc.Title);
 
-			List<HtmlNode> Todo =
+			ChunkedList<HtmlNode> Todo =
 			[
 				Doc.Root
 			];

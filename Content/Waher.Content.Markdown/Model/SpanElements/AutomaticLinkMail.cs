@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -77,7 +77,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void IncrementStatistics(MarkdownStatistics Statistics)
 		{
 			if (Statistics.IntMailHyperlinks is null)
-				Statistics.IntMailHyperlinks = new List<string>();
+				Statistics.IntMailHyperlinks = new ChunkedList<string>();
 
 			if (!Statistics.IntMailHyperlinks.Contains(this.eMail))
 				Statistics.IntMailHyperlinks.Add(this.eMail);

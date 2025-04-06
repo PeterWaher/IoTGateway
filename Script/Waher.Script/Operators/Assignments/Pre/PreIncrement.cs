@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -60,10 +59,10 @@ namespace Waher.Script.Operators.Assignments.Pre
 				throw new ScriptRuntimeException("Unable to increment variable.", Node);
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement Element in Value.ChildElements)
-					Elements.AddLast(Increment(Element, Node));
+					Elements.Add(Increment(Element, Node));
 
 				return Value.Encapsulate(Elements, Node);
 			}

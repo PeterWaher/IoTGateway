@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Matrices
 {
@@ -82,10 +81,10 @@ namespace Waher.Script.Operators.Matrices
 			}
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement E in Matrix.ChildElements)
-					Elements.AddLast(EvaluateIndex(E, Index, NullCheck, Node));
+					Elements.Add(EvaluateIndex(E, Index, NullCheck, Node));
 
 				return Matrix.Encapsulate(Elements, Node);
 			}
@@ -112,10 +111,10 @@ namespace Waher.Script.Operators.Matrices
 				throw new ScriptRuntimeException("Column index must be a non-negative integer.", Node);
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement E in Index.ChildElements)
-					Elements.AddLast(EvaluateIndex(Matrix, E, Node));
+					Elements.Add(EvaluateIndex(Matrix, E, Node));
 
 				return Index.Encapsulate(Elements, Node);
 			}

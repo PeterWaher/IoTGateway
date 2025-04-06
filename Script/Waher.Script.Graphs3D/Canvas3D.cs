@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
 
@@ -15,7 +16,7 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class Canvas3D : Graph
 	{
-		private readonly SortedDictionary<float, LinkedList<PolyRec>> transparentPolygons = new SortedDictionary<float, LinkedList<PolyRec>>(new BackToFront());
+		private readonly SortedDictionary<float, ChunkedList<PolyRec>> transparentPolygons = new SortedDictionary<float, ChunkedList<PolyRec>>(new BackToFront());
 		private Guid id = Guid.NewGuid();
 		private byte[] pixels;
 		private float[] zBuffer;
@@ -2166,13 +2167,13 @@ namespace Waher.Script.Graphs3D
 				{
 					AvgZ /= k;
 
-					if (!this.transparentPolygons.TryGetValue(AvgZ, out LinkedList<PolyRec> PerZ))
+					if (!this.transparentPolygons.TryGetValue(AvgZ, out ChunkedList<PolyRec> PerZ))
 					{
-						PerZ = new LinkedList<PolyRec>();
+						PerZ = new ChunkedList<PolyRec>();
 						this.transparentPolygons[AvgZ] = PerZ;
 					}
 
-					PerZ.AddLast(new PolyRec()
+					PerZ.Add(new PolyRec()
 					{
 						World = World,
 						Screen = Screen,
@@ -2190,7 +2191,7 @@ namespace Waher.Script.Graphs3D
 
 		private void PaintTransparentPolygons()
 		{
-			foreach (LinkedList<PolyRec> List in this.transparentPolygons.Values)
+			foreach (ChunkedList<PolyRec> List in this.transparentPolygons.Values)
 			{
 				foreach (PolyRec Rec in List)
 				{
@@ -2877,8 +2878,8 @@ namespace Waher.Script.Graphs3D
 				Path = Paint.GetTextPath(Text, 0, 0);
 				e = Path.CreateIterator(false);
 
-				List<Vector4> P = new List<Vector4>();
-				List<Vector4[]> v = new List<Vector4[]>();
+				ChunkedList<Vector4> P = new ChunkedList<Vector4>();
+				ChunkedList<Vector4[]> v = new ChunkedList<Vector4[]>();
 				float MaxX = 0;
 				float X, Y;
 				float x0, x1, x2, x3;
@@ -3138,8 +3139,8 @@ namespace Waher.Script.Graphs3D
 				Path = Paint.GetTextPath(Text, 0, 0);
 				e = Path.CreateIterator(false);
 
-				List<Vector4> P = new List<Vector4>();
-				List<Vector4[]> v = new List<Vector4[]>();
+				ChunkedList<Vector4> P = new ChunkedList<Vector4>();
+				ChunkedList<Vector4[]> v = new ChunkedList<Vector4[]>();
 				float MinX = 0;
 				float MaxX = 0;
 				float MinY = 0;
@@ -3455,7 +3456,7 @@ namespace Waher.Script.Graphs3D
 			Output.WriteElementString("Pixels", Convert.ToBase64String(this.pixels));
 			Output.WriteElementString("ZBuffer", Expression.ToString(this.zBuffer));
 
-			foreach (KeyValuePair<float, LinkedList<PolyRec>> P in this.transparentPolygons)
+			foreach (KeyValuePair<float, ChunkedList<PolyRec>> P in this.transparentPolygons)
 			{
 				Output.WriteStartElement("Transparent");
 				Output.WriteAttributeString("z", Expression.ToString(P.Key));
@@ -3626,7 +3627,7 @@ namespace Waher.Script.Graphs3D
 						case "Transparent":
 							Expression.TryParse(E.GetAttribute("z"), out float z);
 
-							LinkedList<PolyRec> Polygons = new LinkedList<PolyRec>();
+							ChunkedList<PolyRec> Polygons = new ChunkedList<PolyRec>();
 							this.transparentPolygons[z] = Polygons;
 
 							foreach (XmlNode N2 in E.ChildNodes)
@@ -3686,7 +3687,7 @@ namespace Waher.Script.Graphs3D
 										}
 									}
 
-									Polygons.AddLast(P);
+									Polygons.Add(P);
 								}
 							}
 							break;

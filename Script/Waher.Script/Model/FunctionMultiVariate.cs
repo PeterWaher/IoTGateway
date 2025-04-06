@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -257,7 +258,7 @@ namespace Waher.Script.Model
 
 			if (!(Encapsulation is null))
 			{
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				ChunkedList<IElement> Result = new ChunkedList<IElement>();
 				IElement[] Arguments2 = new IElement[this.nrArguments];
 
 				for (j = 0; j < Dimension; j++)
@@ -270,7 +271,7 @@ namespace Waher.Script.Model
 							Arguments2[i] = e[i].Current;
 					}
 
-					Result.AddLast(this.EvaluateCanonicalExtension(Arguments2, Variables));
+					Result.Add(this.EvaluateCanonicalExtension(Arguments2, Variables));
 				}
 
 				return Encapsulation(Result, this);
@@ -330,10 +331,10 @@ namespace Waher.Script.Model
 							else if (M.Rows != Dimension)
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
-							LinkedList<IElement> Vectors = new LinkedList<IElement>();
+							ChunkedList<IElement> Vectors = new ChunkedList<IElement>();
 
 							for (j = 0; j < Dimension; j++)
-								Vectors.AddLast(M.GetRow(j));
+								Vectors.Add(M.GetRow(j));
 
 							e[i] = Vectors.GetEnumerator();
 							if (Encapsulation is null)
@@ -384,10 +385,10 @@ namespace Waher.Script.Model
 							else if (M.Rows != Dimension)
 								throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
 
-							LinkedList<IElement> Vectors = new LinkedList<IElement>();
+							ChunkedList<IElement> Vectors = new ChunkedList<IElement>();
 
 							for (j = 0; j < Dimension; j++)
-								Vectors.AddLast(M.GetRow(j));
+								Vectors.Add(M.GetRow(j));
 
 							Arguments[i] = Argument = Operators.Sets.SetDefinition.Encapsulate(Vectors);
 							ChildElements = Argument.ChildElements;
@@ -455,7 +456,7 @@ namespace Waher.Script.Model
 
 			if (!(Encapsulation is null))
 			{
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				ChunkedList<IElement> Result = new ChunkedList<IElement>();
 				IElement[] Arguments2 = new IElement[this.nrArguments];
 
 				for (j = 0; j < Dimension; j++)
@@ -468,7 +469,7 @@ namespace Waher.Script.Model
 							Arguments2[i] = e[i].Current;
 					}
 
-					Result.AddLast(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
+					Result.Add(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
 				}
 
 				return Encapsulation(Result, this);

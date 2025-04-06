@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SkiaSharp;
 using System.Numerics;
-using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -25,11 +25,11 @@ namespace Waher.Script.Fractals.IFS
         private double[] variationWeights;
         private double[] variation2Weights;
         private bool[] variation2IsReal;
-        private readonly List<IFlameVariation> variationsList = new List<IFlameVariation>();
-        private readonly List<ILambdaExpression> variations2List = new List<ILambdaExpression>();
-        private readonly List<double> variationsWeightList = new List<double>();
-        private readonly List<double> variations2WeightList = new List<double>();
-        private readonly List<bool> isReal = new List<bool>();
+        private readonly ChunkedList<IFlameVariation> variationsList = new ChunkedList<IFlameVariation>();
+        private readonly ChunkedList<ILambdaExpression> variations2List = new ChunkedList<ILambdaExpression>();
+        private readonly ChunkedList<double> variationsWeightList = new ChunkedList<double>();
+        private readonly ChunkedList<double> variations2WeightList = new ChunkedList<double>();
+        private readonly ChunkedList<bool> isReal = new ChunkedList<bool>();
         private SKColor color = SKColors.Red;
         private double weight = 1.0;
         private int nrVariations = 0;
@@ -54,8 +54,8 @@ namespace Waher.Script.Fractals.IFS
 			this.xv = new DoubleNumber(0);
 			this.yv = new DoubleNumber(0);
 			this.zv = new ComplexNumber(0);
-			this.doubleParameters = new IElement[] { xv, yv };
-			this.complexParameters = new IElement[] { zv };
+			this.doubleParameters = new IElement[] { this.xv, this.yv };
+			this.complexParameters = new IElement[] { this.zv };
 
 			if (M.Columns == 2 && M.Rows == 2)
             {

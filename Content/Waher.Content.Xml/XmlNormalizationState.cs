@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Xml
 {
@@ -10,8 +11,8 @@ namespace Waher.Content.Xml
 	{
 		private readonly StringBuilder output = new StringBuilder();
 		private readonly Dictionary<string, string> namespceByPrefix = new Dictionary<string, string>();
-		private readonly LinkedList<LinkedList<KeyValuePair<string, string>>> prefixStack = new LinkedList<LinkedList<KeyValuePair<string, string>>>();
-		private LinkedList<KeyValuePair<string, string>> newPrefixes = null;
+		private readonly ChunkedList<ChunkedList<KeyValuePair<string, string>>> prefixStack = new ChunkedList<ChunkedList<KeyValuePair<string, string>>>();
+		private ChunkedList<KeyValuePair<string, string>> newPrefixes = null;
 
 		/// <summary>
 		/// Current state of XML normalization process.
@@ -64,9 +65,9 @@ namespace Waher.Content.Xml
 				PrevNamespace = null;
 
 			if (this.newPrefixes is null)
-				this.newPrefixes = new LinkedList<KeyValuePair<string, string>>();
+				this.newPrefixes = new ChunkedList<KeyValuePair<string, string>>();
 
-			this.newPrefixes.AddLast(new KeyValuePair<string, string>(Prefix, PrevNamespace));
+			this.newPrefixes.Add(new KeyValuePair<string, string>(Prefix, PrevNamespace));
 			this.namespceByPrefix[Prefix] = Namespace;
 
 			return true;
@@ -77,7 +78,7 @@ namespace Waher.Content.Xml
 		/// </summary>
 		public void PushPrefixes()
 		{
-			this.prefixStack.AddLast(this.newPrefixes);
+			this.prefixStack.Add(this.newPrefixes);
 			this.newPrefixes = null;
 		}
 
@@ -86,11 +87,10 @@ namespace Waher.Content.Xml
 		/// </summary>
 		public void PopPrefixes()
 		{
-			if (this.prefixStack.Last is null)
+			if (!this.prefixStack.HasLastItem)
 				return;
 
-			LinkedList<KeyValuePair<string, string>> ToRemove = this.prefixStack.Last.Value;
-			this.prefixStack.RemoveLast();
+			ChunkedList<KeyValuePair<string, string>> ToRemove = this.prefixStack.RemoveLast();
 
 			if (!(ToRemove is null))
 			{

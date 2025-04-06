@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
@@ -25,7 +24,7 @@ namespace Waher.Script.Data.Model
 		{
 			try
 			{
-				LinkedList<IElement> Results = null;
+				ChunkedList<IElement> Results = null;
 				IElement Result = null;
 				bool First = true;
 
@@ -36,9 +35,9 @@ namespace Waher.Script.Data.Model
 					else
 					{
 						if (Results is null)
-							Results = new LinkedList<IElement>();
+							Results = new ChunkedList<IElement>();
 
-						Results.AddLast(Result);
+						Results.Add(Result);
 					}
 
 					if (!Reader.HasRows)
@@ -50,7 +49,7 @@ namespace Waher.Script.Data.Model
 						if (Reader.CanGetColumnSchema())
 						{
 							ReadOnlyCollection<DbColumn> Columns = Reader.GetColumnSchema();
-							List<string> Names = new List<string>();
+							ChunkedList<string> Names = new ChunkedList<string>();
 							int i = 1;
 
 							foreach (DbColumn Column in Columns)
@@ -70,7 +69,7 @@ namespace Waher.Script.Data.Model
 
 						int NrRows = 0;
 						int NrColumns = 0;
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 						object[] Row = null;
 
 						while (await Reader.ReadAsync())
@@ -84,13 +83,13 @@ namespace Waher.Script.Data.Model
 							Reader.GetValues(Row);
 
 							foreach (object Item in Row)
-								Elements.AddLast(Expression.Encapsulate(Item));
+								Elements.Add(Expression.Encapsulate(Item));
 
 							NrRows++;
 						}
 
 						if (NrRows == 1 && NrColumns == 1)
-							Result = Elements.First.Value;
+							Result = Elements.FirstItem;
 						else
 						{
 							Result = new ObjectMatrix(NrRows, NrColumns, Elements)
@@ -106,7 +105,7 @@ namespace Waher.Script.Data.Model
 					return Result;
 				else
 				{
-					Results.AddLast(Result);
+					Results.Add(Result);
 					return VectorDefinition.Encapsulate(Results, false, null);
 				}
 			}
@@ -144,6 +143,5 @@ namespace Waher.Script.Data.Model
 				ColumnNames = Header
 			};
 		}
-
 	}
 }

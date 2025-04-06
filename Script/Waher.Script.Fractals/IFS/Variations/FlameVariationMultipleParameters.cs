@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -87,6 +88,14 @@ namespace Waher.Script.Fractals.IFS.Variations
 		#endregion
 
 		#region IElement members
+
+		/// <summary>
+		/// TODO
+		/// </summary>
+		public IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return this;
+		}
 
 		/// <summary>
 		/// TODO

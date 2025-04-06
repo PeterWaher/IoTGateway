@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
@@ -14,12 +15,12 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 	/// </summary>
 	public class ExportToVariableTable : ILedgerExport
 	{
-		private readonly LinkedList<KeyValuePair<string, IElement>> collectionProperties = new LinkedList<KeyValuePair<string, IElement>>();
-		private readonly LinkedList<KeyValuePair<string, IElement>> blockProperties = new LinkedList<KeyValuePair<string, IElement>>();
-		private readonly LinkedList<KeyValuePair<string, IElement>> entryProperties = new LinkedList<KeyValuePair<string, IElement>>();
-		private readonly LinkedList<IElement[]> rows = new LinkedList<IElement[]>();
-		private readonly List<IElement> currentRow = new List<IElement>();
-		private readonly List<string> headers = new List<string>();
+		private readonly ChunkedList<KeyValuePair<string, IElement>> collectionProperties = new ChunkedList<KeyValuePair<string, IElement>>();
+		private readonly ChunkedList<KeyValuePair<string, IElement>> blockProperties = new ChunkedList<KeyValuePair<string, IElement>>();
+		private readonly ChunkedList<KeyValuePair<string, IElement>> entryProperties = new ChunkedList<KeyValuePair<string, IElement>>();
+		private readonly ChunkedList<IElement[]> rows = new ChunkedList<IElement[]>();
+		private readonly ChunkedList<IElement> currentRow = new ChunkedList<IElement>();
+		private readonly ChunkedList<string> headers = new ChunkedList<string>();
 		private readonly Dictionary<string, int> headerOrder = new Dictionary<string, int>();
 		private int width;
 		private int height;
@@ -47,17 +48,18 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>Object matrix.</returns>
 		public ObjectMatrix ToMatrix()
 		{
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			foreach (IElement[] Row in this.rows)
 			{
 				foreach (IElement E in Row)
-					Elements.AddLast(E ?? ObjectValue.Null);
+					Elements.Add(E ?? ObjectValue.Null);
 
 				int Padding = this.width - Row.Length;
+
 				while (Padding > 0)
 				{
-					Elements.AddLast(ObjectValue.Null);
+					Elements.Add(ObjectValue.Null);
 					Padding--;
 				}
 			}
@@ -101,7 +103,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartCollection(string CollectionName)
 		{
 			this.collectionProperties.Clear();
-			this.collectionProperties.AddLast(new KeyValuePair<string, IElement>("Collection", new StringValue(CollectionName)));
+			this.collectionProperties.Add(new KeyValuePair<string, IElement>("Collection", new StringValue(CollectionName)));
 
 			return Task.FromResult(true);
 		}
@@ -123,7 +125,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartBlock(string BlockID)
 		{
 			this.blockProperties.Clear();
-			this.blockProperties.AddLast(new KeyValuePair<string, IElement>("BlockId", new StringValue(BlockID)));
+			this.blockProperties.Add(new KeyValuePair<string, IElement>("BlockId", new StringValue(BlockID)));
 
 			return Task.FromResult(true);
 		}
@@ -136,7 +138,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> BlockMetaData(string Key, object Value)
 		{
-			this.blockProperties.AddLast(new KeyValuePair<string, IElement>(Key, Expression.Encapsulate(Value)));
+			this.blockProperties.Add(new KeyValuePair<string, IElement>(Key, Expression.Encapsulate(Value)));
 			return Task.FromResult(true);
 		}
 
@@ -160,10 +162,10 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		public Task<bool> StartEntry(string ObjectId, string TypeName, EntryType EntryType, DateTimeOffset EntryTimestamp)
 		{
 			this.entryProperties.Clear();
-			this.entryProperties.AddLast(new KeyValuePair<string, IElement>("ObjectId", new StringValue(ObjectId)));
-			this.entryProperties.AddLast(new KeyValuePair<string, IElement>("TypeName", new StringValue(TypeName)));
-			this.entryProperties.AddLast(new KeyValuePair<string, IElement>("EntryType", new ObjectValue(EntryType)));
-			this.entryProperties.AddLast(new KeyValuePair<string, IElement>("Timestamp", new ObjectValue(EntryTimestamp)));
+			this.entryProperties.Add(new KeyValuePair<string, IElement>("ObjectId", new StringValue(ObjectId)));
+			this.entryProperties.Add(new KeyValuePair<string, IElement>("TypeName", new StringValue(TypeName)));
+			this.entryProperties.Add(new KeyValuePair<string, IElement>("EntryType", new ObjectValue(EntryType)));
+			this.entryProperties.Add(new KeyValuePair<string, IElement>("Timestamp", new ObjectValue(EntryTimestamp)));
 
 			return Task.FromResult(true);
 		}
@@ -176,7 +178,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 		/// <returns>If export can continue.</returns>
 		public Task<bool> ReportProperty(string PropertyName, object PropertyValue)
 		{
-			this.entryProperties.AddLast(new KeyValuePair<string, IElement>(PropertyName, Expression.Encapsulate(PropertyValue)));
+			this.entryProperties.Add(new KeyValuePair<string, IElement>(PropertyName, Expression.Encapsulate(PropertyValue)));
 			return Task.FromResult(true);
 		}
 
@@ -200,7 +202,7 @@ namespace Waher.Script.Persistence.SQL.LedgerExports
 			foreach (KeyValuePair<string, IElement> P in this.entryProperties)
 				this.AddPropertyToRow(P.Key, P.Value);
 
-			this.rows.AddLast(this.currentRow.ToArray());
+			this.rows.Add(this.currentRow.ToArray());
 			this.height++;
 
 			int c = this.currentRow.Count;

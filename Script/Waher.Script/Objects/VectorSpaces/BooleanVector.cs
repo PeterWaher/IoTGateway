@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Waher.Script.Abstraction.Sets;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
@@ -50,21 +51,42 @@ namespace Waher.Script.Objects.VectorSpaces
             {
                 if (this.values is null)
                 {
-                    bool[] v = new bool[this.dimension];
-                    int i = 0;
-
-                    foreach (IElement Element in this.elements)
+					bool[] v = new bool[this.dimension];
+					int i = 0;
+					
+                    if (this.elements is ChunkedList<IElement> Values)
                     {
-                        if (!(Element.AssociatedObjectValue is bool b))
-                            b = false;
+						ChunkNode<IElement> Loop = Values.FirstChunk;
+						int j, c;
 
-                        v[i++] = b;
-					}
+						while (!(Loop is null))
+						{
+							for (j = Loop.Start, c = Loop.Pos; j < c; j++)
+							{
+								if (!(Loop[j].AssociatedObjectValue is bool b))
+									b = false;
 
-					this.values = v;
-                }
+								v[i++] = b;
+							}
 
-                return this.values;
+							Loop = Loop.Next;
+						}
+                    }
+                    else
+                    {
+                        foreach (IElement Element in this.elements)
+                        {
+                            if (!(Element.AssociatedObjectValue is bool b))
+                                b = false;
+
+                            v[i++] = b;
+                        }
+                    }
+                
+                    this.values = v;
+				}
+
+				return this.values;
             }
         }
 
@@ -240,23 +262,31 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <summary>
         /// If the element represents a scalar value.
         /// </summary>
-        public override bool IsScalar
-        {
-            get { return false; }
-        }
+        public override bool IsScalar => false;
 
         /// <summary>
         /// An enumeration of child elements. If the element is a scalar, this property will return null.
         /// </summary>
         public override ICollection<IElement> ChildElements => this.Elements;
 
-        /// <summary>
-        /// Encapsulates a set of elements into a similar structure as that provided by the current element.
-        /// </summary>
-        /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
-        /// <param name="Node">Script node from where the encapsulation is done.</param>
-        /// <returns>Encapsulated object of similar type as the current object.</returns>
-        public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ChunkedList<IElement> Elements, ScriptNode Node)
+		{
+			return VectorDefinition.Encapsulate(Elements, true, Node);
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
         {
             return VectorDefinition.Encapsulate(Elements, true, Node);
         }

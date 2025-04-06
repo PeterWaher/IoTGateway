@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Text;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -96,7 +97,7 @@ namespace Waher.Content.Multipart
 		/// <param name="Progress">Optional progress reporting of encoding/decoding. Can be null.</param>
 		/// <returns>Null if successful, exception object if not.</returns>
 		public static async Task<Exception> Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
-			List<EmbeddedContent> List, Uri BaseUri, ICodecProgress Progress)
+			ChunkedList<EmbeddedContent> List, Uri BaseUri, ICodecProgress Progress)
 		{
 			string Boundary = null;
 
@@ -159,7 +160,7 @@ namespace Waher.Content.Multipart
 		}
 
 		private static async Task<Exception> AddPart(byte[] Data, int Start, int i, bool Last,
-			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri, ICodecProgress Progress)
+			Dictionary<string, object> Form, ChunkedList<EmbeddedContent> List, Uri BaseUri, ICodecProgress Progress)
 		{
 			int j, k, l, m;
 			int Max = i - 3;

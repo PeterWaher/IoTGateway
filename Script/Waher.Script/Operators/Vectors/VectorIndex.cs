@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -112,10 +113,10 @@ namespace Waher.Script.Operators.Vectors
 			}
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement E in Vector.ChildElements)
-					Elements.AddLast(await EvaluateIndex(E, Index, NullCheck, Node));
+					Elements.Add(await EvaluateIndex(E, Index, NullCheck, Node));
 
 				return Vector.Encapsulate(Elements, Node);
 			}
@@ -183,10 +184,10 @@ namespace Waher.Script.Operators.Vectors
 			if (Index.IsScalar)
 				throw new ScriptRuntimeException("Provided index value not compatible with expected index type.", Node);
 
-			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			foreach (IElement E in Index.ChildElements)
-				Elements.AddLast(await EvaluateIndex(Object, T, ItemProperty, Parameters, E, Node));
+				Elements.Add(await EvaluateIndex(Object, T, ItemProperty, Parameters, E, Node));
 
 			return Index.Encapsulate(Elements, Node);
 		}
@@ -200,10 +201,10 @@ namespace Waher.Script.Operators.Vectors
 			}
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement E in Index.ChildElements)
-					Elements.AddLast(EvaluateIndex(s, E, Node));
+					Elements.Add(EvaluateIndex(s, E, Node));
 
 				return Index.Encapsulate(Elements, Node);
 			}
@@ -230,10 +231,10 @@ namespace Waher.Script.Operators.Vectors
 				throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
 			else
 			{
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (IElement E in Index.ChildElements)
-					Elements.AddLast(EvaluateIndex(Vector, E, Node));
+					Elements.Add(EvaluateIndex(Vector, E, Node));
 
 				return Index.Encapsulate(Elements, Node);
 			}

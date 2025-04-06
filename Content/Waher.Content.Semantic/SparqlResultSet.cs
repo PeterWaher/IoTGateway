@@ -4,6 +4,7 @@ using System.Xml;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Xml;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
@@ -84,9 +85,9 @@ namespace Waher.Content.Semantic
 			this.baseUri = BaseUri;
 			this.BooleanResult = null;
 
-			List<string> Variables = new List<string>();
-			List<Uri> Links = new List<Uri>();
-			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
+			ChunkedList<string> Variables = new ChunkedList<string>();
+			ChunkedList<Uri> Links = new ChunkedList<Uri>();
+			ChunkedList<ISparqlResultRecord> Records = new ChunkedList<ISparqlResultRecord>();
 
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
@@ -188,9 +189,9 @@ namespace Waher.Content.Semantic
 			this.baseUri = BaseUri;
 			this.BooleanResult = null;
 
-			List<string> Variables = new List<string>();
-			List<Uri> Links = new List<Uri>();
-			List<ISparqlResultRecord> Records = new List<ISparqlResultRecord>();
+			ChunkedList<string> Variables = new ChunkedList<string>();
+			ChunkedList<Uri> Links = new ChunkedList<Uri>();
+			ChunkedList<ISparqlResultRecord> Records = new ChunkedList<ISparqlResultRecord>();
 
 			foreach (KeyValuePair<string, object> P in Obj)
 			{

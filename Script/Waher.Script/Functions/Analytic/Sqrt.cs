@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Arithmetics;
@@ -84,5 +85,29 @@ namespace Waher.Script.Functions.Analytic
 		{
 			return new ComplexNumber(Complex.Sqrt(Argument));
 		}
+
+		/// <summary>
+		/// Calculates the square root of an operand.
+		/// </summary>
+		/// <param name="Operand">Operand whose square root is to be returned.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateSquareRoot(IElement Operand, ScriptNode Node)
+		{
+			if (Operand is DoubleNumber D)
+			{
+				double d = D.Value;
+
+				if (d < 0)
+					return new ComplexNumber(0, Math.Sqrt(-d));
+				else
+					return new DoubleNumber(Math.Sqrt(d));
+			}
+			else if (Operand is ComplexNumber C)
+				return new ComplexNumber(Complex.Sqrt(C.Value));
+			else
+				throw new ScriptRuntimeException("Unable to calculate the square root.", Node);
+		}
+
 	}
 }

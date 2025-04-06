@@ -54,7 +54,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
         {
             if (this.e is null)
             {
-                List<object> Items = new List<object>();
+				List<object> Items = new List<object>();
 
                 while (await this.items.MoveNextAsync())
                     Items.Add(this.items.Current);

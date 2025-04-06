@@ -11,7 +11,9 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script;
+using Waher.Script.Constants;
 using Waher.Script.Graphs;
 using Waher.Script.Operators.Matrices;
 
@@ -617,7 +619,7 @@ namespace Waher.Content.Markdown.Wpf
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public async Task Render(string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
+		public async Task Render(string Url, string Title, ChunkedList<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			this.XmlOutput.WriteStartElement("Hyperlink");
 			this.XmlOutput.WriteAttributeString("NavigateUri", Document.CheckURL(Url, null));
@@ -625,8 +627,7 @@ namespace Waher.Content.Markdown.Wpf
 			if (!string.IsNullOrEmpty(Title))
 				this.XmlOutput.WriteAttributeString("ToolTip", Title);
 
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(this);
+			await this.Render(ChildNodes);
 
 			this.XmlOutput.WriteEndElement();
 		}
@@ -809,6 +810,7 @@ namespace Waher.Content.Markdown.Wpf
 		{
 			int Row = 0;
 			bool ParagraphBullet;
+			int i, c;
 
 			this.XmlOutput.WriteStartElement("Grid");
 			this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMargins);
@@ -825,7 +827,7 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement _ in Element.Children)
+			for (i = 0, c = Element.Children.Count; i < c; i++)
 			{
 				this.XmlOutput.WriteStartElement("RowDefinition");
 				this.XmlOutput.WriteAttributeString("Height", "Auto");
@@ -834,45 +836,55 @@ namespace Waher.Content.Markdown.Wpf
 
 			this.XmlOutput.WriteEndElement();
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+
+			while (!(Loop is null))
 			{
-				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				this.GetMargins(E, out int TopMargin, out int BottomMargin);
-
-				this.XmlOutput.WriteStartElement("TextBlock");
-				this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
-				this.XmlOutput.WriteAttributeString("Grid.Column", "0");
-				this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
-				if (this.Alignment != TextAlignment.Left)
-					this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
-
-				this.XmlOutput.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
-					this.XamlSettings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
-
-				this.XmlOutput.WriteValue("•");
-				this.XmlOutput.WriteEndElement();
-
-				this.XmlOutput.WriteStartElement("StackPanel");
-				this.XmlOutput.WriteAttributeString("Grid.Column", "1");
-				this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
-
-				if (ParagraphBullet)
-					await E.Render(this);
-				else
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
+					E = Loop[i];
+
+					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
+					this.GetMargins(E, out int TopMargin, out int BottomMargin);
+
 					this.XmlOutput.WriteStartElement("TextBlock");
 					this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+					this.XmlOutput.WriteAttributeString("Grid.Column", "0");
+					this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
 					if (this.Alignment != TextAlignment.Left)
 						this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
 
-					await E.Render(this);
+					this.XmlOutput.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
+						this.XamlSettings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
+
+					this.XmlOutput.WriteValue("•");
+					this.XmlOutput.WriteEndElement();
+
+					this.XmlOutput.WriteStartElement("StackPanel");
+					this.XmlOutput.WriteAttributeString("Grid.Column", "1");
+					this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
+
+					if (ParagraphBullet)
+						await E.Render(this);
+					else
+					{
+						this.XmlOutput.WriteStartElement("TextBlock");
+						this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+						if (this.Alignment != TextAlignment.Left)
+							this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
+
+						await E.Render(this);
+
+						this.XmlOutput.WriteEndElement();
+					}
 
 					this.XmlOutput.WriteEndElement();
+
+					Row++;
 				}
 
-				this.XmlOutput.WriteEndElement();
-
-				Row++;
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();
@@ -891,21 +903,31 @@ namespace Waher.Content.Markdown.Wpf
 				TopMargin = 0;
 				BottomMargin = 0;
 			}
-			else if (Element is NestedBlock NestedBlock)
+			else if (Element is NestedBlock)
 			{
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				MarkdownElement E;
+				int i, c;
 				bool First = true;
 
 				TopMargin = BottomMargin = 0;
 
-				foreach (MarkdownElement E in NestedBlock.Children)
+				while (!(Loop is null))
 				{
-					if (First)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						First = false;
-						this.GetMargins(E, out TopMargin, out BottomMargin);
+						E = Loop[i];
+
+						if (First)
+						{
+							First = false;
+							this.GetMargins(E, out TopMargin, out BottomMargin);
+						}
+						else
+							this.GetMargins(E, out int _, out BottomMargin);
 					}
-					else
-						this.GetMargins(E, out int _, out BottomMargin);
+
+					Loop = Loop.Next;
 				}
 			}
 			else if (Element is MarkdownElementSingleChild SingleChild)
@@ -1023,26 +1045,33 @@ namespace Waher.Content.Markdown.Wpf
 		/// <param name="Element">Element to render</param>
 		public override async Task Render(DefinitionDescriptions Element)
 		{
-			MarkdownElement Last = null;
+			MarkdownElement Last = Element.Children.HasLastItem ? Element.Children.LastItem : null;
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+			int i, c;
 
-			foreach (MarkdownElement Description in Element.Children)
-				Last = Description;
-
-			foreach (MarkdownElement Description in Element.Children)
+			while (!(Loop is null))
 			{
-				if (Description.InlineSpanElement && !Description.OutsideParagraph)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					this.XmlOutput.WriteStartElement("TextBlock");
-					this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+					E = Loop[i];
+
+					if (E.InlineSpanElement && !E.OutsideParagraph)
+					{
+						this.XmlOutput.WriteStartElement("TextBlock");
+						this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+					}
+					else
+						this.XmlOutput.WriteStartElement("StackPanel");
+
+					this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.DefinitionMargin.ToString() + ",0,0," +
+						(E == Last ? this.XamlSettings.DefinitionSeparator : 0).ToString());
+
+					await E.Render(this);
+					this.XmlOutput.WriteEndElement();
 				}
-				else
-					this.XmlOutput.WriteStartElement("StackPanel");
 
-				this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.DefinitionMargin.ToString() + ",0,0," +
-					(Description == Last ? this.XamlSettings.DefinitionSeparator : 0).ToString());
-
-				await Description.Render(this);
-				this.XmlOutput.WriteEndElement();
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1062,19 +1091,26 @@ namespace Waher.Content.Markdown.Wpf
 		public override async Task Render(DefinitionTerms Element)
 		{
 			int TopMargin = this.XamlSettings.ParagraphMarginTop;
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			int i, c;
 
-			foreach (MarkdownElement Term in Element.Children)
+			while (!(Loop is null))
 			{
-				this.XmlOutput.WriteStartElement("TextBlock");
-				this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
-				this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMarginLeft.ToString() + "," +
-					TopMargin.ToString() + "," + this.XamlSettings.ParagraphMarginRight.ToString() + ",0");
-				this.XmlOutput.WriteAttributeString("FontWeight", "Bold");
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+				{
+					this.XmlOutput.WriteStartElement("TextBlock");
+					this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+					this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMarginLeft.ToString() + "," +
+						TopMargin.ToString() + "," + this.XamlSettings.ParagraphMarginRight.ToString() + ",0");
+					this.XmlOutput.WriteAttributeString("FontWeight", "Bold");
 
-				await Term.Render(this);
+					await Loop[i].Render(this);
 
-				this.XmlOutput.WriteEndElement();
-				TopMargin = 0;
+					this.XmlOutput.WriteEndElement();
+					TopMargin = 0;
+				}
+
+				Loop = Loop.Next;
 			}
 		}
 
@@ -1092,8 +1128,7 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteAttributeString("BorderBrush", this.XamlSettings.DeletedBlockQuoteBorderColor);
 			this.XmlOutput.WriteStartElement("StackPanel");
 
-			foreach (MarkdownElement E in Element.Children)
-				await E.Render(this);
+			await this.RenderChildren(Element);
 
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteEndElement();
@@ -1233,30 +1268,37 @@ namespace Waher.Content.Markdown.Wpf
 			else
 			{
 				bool SpanOpen = false;
+				ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+				MarkdownElement E;
+				int i, c;
 
-				foreach (MarkdownElement E in Element.Children)
+				while (!(Loop is null))
 				{
-					if (E.InlineSpanElement)
+					for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 					{
-						if (!SpanOpen)
+						E = Loop[i];
+
+						if (E.InlineSpanElement)
 						{
-							this.XmlOutput.WriteStartElement("TextBlock");
-							this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
-							if (this.Alignment != TextAlignment.Left)
-								this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
-							SpanOpen = true;
+							if (!SpanOpen)
+							{
+								this.XmlOutput.WriteStartElement("TextBlock");
+								this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+								if (this.Alignment != TextAlignment.Left)
+									this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
+								SpanOpen = true;
+							}
 						}
-					}
-					else
-					{
-						if (SpanOpen)
+						else if (SpanOpen)
 						{
 							this.XmlOutput.WriteEndElement();
 							SpanOpen = false;
 						}
+
+						await E.Render(this);
 					}
 
-					await E.Render(this);
+					Loop = Loop.Next;
 				}
 
 				if (SpanOpen)
@@ -1283,6 +1325,7 @@ namespace Waher.Content.Markdown.Wpf
 			int Expected = 0;
 			int Row = 0;
 			bool ParagraphBullet;
+			int i, c;
 
 			this.XmlOutput.WriteStartElement("Grid");
 			this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMargins);
@@ -1299,7 +1342,7 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement _ in Element.Children)
+			for (i = 0, c = Element.Children.Count; i < c; i++)
 			{
 				this.XmlOutput.WriteStartElement("RowDefinition");
 				this.XmlOutput.WriteAttributeString("Height", "Auto");
@@ -1308,53 +1351,62 @@ namespace Waher.Content.Markdown.Wpf
 
 			this.XmlOutput.WriteEndElement();
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+
+			while (!(Loop is null))
 			{
-				Expected++;
-				Item = E as NumberedItem;
-
-				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				this.GetMargins(E, out int TopMargin, out int BottomMargin);
-
-				this.XmlOutput.WriteStartElement("TextBlock");
-				this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
-				this.XmlOutput.WriteAttributeString("Grid.Column", "0");
-				this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
-				if (this.Alignment != TextAlignment.Left)
-					this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
-
-				this.XmlOutput.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
-					this.XamlSettings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
-
-				if (!(Item is null))
-					this.XmlOutput.WriteValue((Expected = Item.Number).ToString());
-				else
-					this.XmlOutput.WriteValue(Expected.ToString());
-
-				this.XmlOutput.WriteValue(".");
-				this.XmlOutput.WriteEndElement();
-
-				this.XmlOutput.WriteStartElement("StackPanel");
-				this.XmlOutput.WriteAttributeString("Grid.Column", "1");
-				this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
-
-				if (ParagraphBullet)
-					await E.Render(this);
-				else
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
+					E = Loop[i];
+					Expected++;
+					Item = E as NumberedItem;
+
+					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
+					this.GetMargins(E, out int TopMargin, out int BottomMargin);
+
 					this.XmlOutput.WriteStartElement("TextBlock");
 					this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+					this.XmlOutput.WriteAttributeString("Grid.Column", "0");
+					this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
 					if (this.Alignment != TextAlignment.Left)
 						this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
 
-					await E.Render(this);
+					this.XmlOutput.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
+						this.XamlSettings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
+
+					if (!(Item is null))
+						this.XmlOutput.WriteValue((Expected = Item.Number).ToString());
+					else
+						this.XmlOutput.WriteValue(Expected.ToString());
+
+					this.XmlOutput.WriteValue(".");
+					this.XmlOutput.WriteEndElement();
+
+					this.XmlOutput.WriteStartElement("StackPanel");
+					this.XmlOutput.WriteAttributeString("Grid.Column", "1");
+					this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
+
+					if (ParagraphBullet)
+						await E.Render(this);
+					else
+					{
+						this.XmlOutput.WriteStartElement("TextBlock");
+						this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+						if (this.Alignment != TextAlignment.Left)
+							this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
+
+						await E.Render(this);
+
+						this.XmlOutput.WriteEndElement();
+					}
 
 					this.XmlOutput.WriteEndElement();
+
+					Row++;
 				}
 
-				this.XmlOutput.WriteEndElement();
-
-				Row++;
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();
@@ -1374,19 +1426,30 @@ namespace Waher.Content.Markdown.Wpf
 			if (this.Alignment != TextAlignment.Left)
 				this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+			int i, c;
+
+			while (!(Loop is null))
 			{
-				if ((!E.InlineSpanElement || E.OutsideParagraph) && (s = E.BaselineAlignment) != BaselineAlignment.Baseline)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					this.XmlOutput.WriteStartElement("InlineUIContainer");
-					this.XmlOutput.WriteAttributeString("BaselineAlignment", s.ToString());
+					E = Loop[i];
 
-					await E.Render(this);
+					if ((!E.InlineSpanElement || E.OutsideParagraph) && (s = E.BaselineAlignment) != BaselineAlignment.Baseline)
+					{
+						this.XmlOutput.WriteStartElement("InlineUIContainer");
+						this.XmlOutput.WriteAttributeString("BaselineAlignment", s.ToString());
 
-					this.XmlOutput.WriteEndElement();
+						await E.Render(this);
+
+						this.XmlOutput.WriteEndElement();
+					}
+					else
+						await E.Render(this);
 				}
-				else
-					await E.Render(this);
+
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();
@@ -1560,6 +1623,7 @@ namespace Waher.Content.Markdown.Wpf
 		{
 			int Row = 0;
 			bool ParagraphBullet;
+			int i, c;
 
 			this.XmlOutput.WriteStartElement("Grid");
 			this.XmlOutput.WriteAttributeString("Margin", this.XamlSettings.ParagraphMargins);
@@ -1576,7 +1640,7 @@ namespace Waher.Content.Markdown.Wpf
 			this.XmlOutput.WriteEndElement();
 			this.XmlOutput.WriteStartElement("Grid.RowDefinitions");
 
-			foreach (MarkdownElement _ in Element.Children)
+			for (i = 0, c = Element.Children.Count; i < c; i++)
 			{
 				this.XmlOutput.WriteStartElement("RowDefinition");
 				this.XmlOutput.WriteAttributeString("Height", "Auto");
@@ -1585,48 +1649,58 @@ namespace Waher.Content.Markdown.Wpf
 
 			this.XmlOutput.WriteEndElement();
 
-			foreach (MarkdownElement E in Element.Children)
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+
+			while (!(Loop is null))
 			{
-				ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
-				this.GetMargins(E, out int TopMargin, out int BottomMargin);
-
-				if (E is TaskItem TaskItem && TaskItem.IsChecked)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					this.XmlOutput.WriteStartElement("TextBlock");
-					this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
-					this.XmlOutput.WriteAttributeString("Grid.Column", "0");
+					E = Loop[i];
+
+					ParagraphBullet = !E.InlineSpanElement || E.OutsideParagraph;
+					this.GetMargins(E, out int TopMargin, out int BottomMargin);
+
+					if (E is TaskItem TaskItem && TaskItem.IsChecked)
+					{
+						this.XmlOutput.WriteStartElement("TextBlock");
+						this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+						this.XmlOutput.WriteAttributeString("Grid.Column", "0");
+						this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
+						if (this.Alignment != TextAlignment.Left)
+							this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
+
+						this.XmlOutput.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
+							this.XamlSettings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
+
+						this.XmlOutput.WriteValue("✓");
+						this.XmlOutput.WriteEndElement();
+					}
+
+					this.XmlOutput.WriteStartElement("StackPanel");
+					this.XmlOutput.WriteAttributeString("Grid.Column", "1");
 					this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
-					if (this.Alignment != TextAlignment.Left)
-						this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
 
-					this.XmlOutput.WriteAttributeString("Margin", "0," + TopMargin.ToString() + "," +
-						this.XamlSettings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
+					if (ParagraphBullet)
+						await E.Render(this);
+					else
+					{
+						this.XmlOutput.WriteStartElement("TextBlock");
+						this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
+						if (this.Alignment != TextAlignment.Left)
+							this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
 
-					this.XmlOutput.WriteValue("✓");
-					this.XmlOutput.WriteEndElement();
-				}
+						await E.Render(this);
 
-				this.XmlOutput.WriteStartElement("StackPanel");
-				this.XmlOutput.WriteAttributeString("Grid.Column", "1");
-				this.XmlOutput.WriteAttributeString("Grid.Row", Row.ToString());
-
-				if (ParagraphBullet)
-					await E.Render(this);
-				else
-				{
-					this.XmlOutput.WriteStartElement("TextBlock");
-					this.XmlOutput.WriteAttributeString("TextWrapping", "Wrap");
-					if (this.Alignment != TextAlignment.Left)
-						this.XmlOutput.WriteAttributeString("TextAlignment", this.Alignment.ToString());
-
-					await E.Render(this);
+						this.XmlOutput.WriteEndElement();
+					}
 
 					this.XmlOutput.WriteEndElement();
+
+					Row++;
 				}
 
-				this.XmlOutput.WriteEndElement();
-
-				Row++;
+				Loop = Loop.Next;
 			}
 
 			this.XmlOutput.WriteEndElement();

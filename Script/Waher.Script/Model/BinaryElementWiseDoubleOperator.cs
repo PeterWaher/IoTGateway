@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Model
 {
@@ -87,10 +86,10 @@ namespace Waher.Script.Model
 
 				if (b)
 				{
-					LinkedList<IElement> Result = new LinkedList<IElement>();
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 					foreach (IElement LeftChild in Left.ChildElements)
-						Result.AddLast(this.Evaluate(LeftChild, Right, Variables));
+						Result.Add(this.Evaluate(LeftChild, Right, Variables));
 
 					return Left.Encapsulate(Result, this);
 				}
@@ -106,10 +105,10 @@ namespace Waher.Script.Model
 
 				if (b)
 				{
-					LinkedList<IElement> Result = new LinkedList<IElement>();
+					ChunkedList<IElement> Result = new ChunkedList<IElement>();
 
 					foreach (IElement RightChild in Right.ChildElements)
-						Result.AddLast(this.Evaluate(Left, RightChild, Variables));
+						Result.Add(this.Evaluate(Left, RightChild, Variables));
 
 					return Right.Encapsulate(Result, this);
 				}

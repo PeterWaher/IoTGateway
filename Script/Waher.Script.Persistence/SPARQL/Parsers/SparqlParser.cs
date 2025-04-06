@@ -8,6 +8,7 @@ using Waher.Content.Semantic.Functions;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
 using Waher.Content.Semantic.Ontologies;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Cryptography.Functions.Encoding;
@@ -200,15 +201,15 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					return false;
 			}
 
-			List<ScriptNode> Columns = null;
-			List<ScriptNode> ColumnNames = null;
-			List<ScriptNode> GroupBy = null;
-			List<ScriptNode> GroupByNames = null;
-			List<KeyValuePair<ScriptNode, bool>> OrderBy = null;
+			ChunkedList<ScriptNode> Columns = null;
+			ChunkedList<ScriptNode> ColumnNames = null;
+			ChunkedList<ScriptNode> GroupBy = null;
+			ChunkedList<ScriptNode> GroupByNames = null;
+			ChunkedList<KeyValuePair<ScriptNode, bool>> OrderBy = null;
 			SparqlRegularPattern Construct = null;
 			ISparqlPattern Where;
 			ScriptNode Having;
-			List<ScriptNode> From;
+			ChunkedList<ScriptNode> From;
 			Dictionary<UriNode, ISemanticCube> NamedGraphs = null;
 
 			switch (s)
@@ -281,8 +282,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					}
 					else
 					{
-						Columns = new List<ScriptNode>();
-						ColumnNames = new List<ScriptNode>();
+						Columns = new ChunkedList<ScriptNode>();
+						ColumnNames = new ChunkedList<ScriptNode>();
 
 						while (!string.IsNullOrEmpty(s) && s != "WHERE" && s != "FROM" && s != "{")
 						{
@@ -312,7 +313,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			while (s == "FROM")
 			{
 				if (From is null)
-					From = new List<ScriptNode>();
+					From = new ChunkedList<ScriptNode>();
 
 				Parser.NextToken();
 				Parser.SkipWhiteSpace();
@@ -397,8 +398,8 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				if (string.Compare(Parser.NextToken(), "BY", true) != 0)
 					throw Parser.SyntaxError("Expected BY");
 
-				GroupBy = new List<ScriptNode>();
-				GroupByNames = new List<ScriptNode>();
+				GroupBy = new ChunkedList<ScriptNode>();
+				GroupByNames = new ChunkedList<ScriptNode>();
 
 				while (!string.IsNullOrEmpty(s) && s != "HAVING" && s != "ORDER" && s != ";" && s != ")" && s != "}")
 				{
@@ -439,7 +440,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				if (s != "BY")
 					throw Parser.SyntaxError("Expected BY");
 
-				OrderBy = new List<KeyValuePair<ScriptNode, bool>>();
+				OrderBy = new ChunkedList<KeyValuePair<ScriptNode, bool>>();
 
 				while (true)
 				{
@@ -963,7 +964,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Parser.NextNonWhitespaceChar() != '{')
 						throw Parser.SyntaxError("Expected {");
 
-					List<ISemanticElement> Values = new List<ISemanticElement>();
+					ChunkedList<ISemanticElement> Values = new ChunkedList<ISemanticElement>();
 
 					while (true)
 					{
@@ -991,7 +992,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 				case '(':
 					Parser.NextChar();
 
-					List<string> Names = new List<string>();
+					ChunkedList<string> Names = new ChunkedList<string>();
 
 					while (true)
 					{
@@ -1018,14 +1019,14 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Parser.NextNonWhitespaceChar() != '{')
 						throw Parser.SyntaxError("Expected {");
 
-					List<ISemanticElement[]> Records = new List<ISemanticElement[]>();
+					ChunkedList<ISemanticElement[]> Records = new ChunkedList<ISemanticElement[]>();
 
 					while (true)
 					{
 						switch (Parser.NextNonWhitespaceChar())
 						{
 							case '(':
-								Values = new List<ISemanticElement>();
+								Values = new ChunkedList<ISemanticElement>();
 
 								for (i = 0; i < c; i++)
 								{
@@ -1892,7 +1893,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 			if (Parser.NextNonWhitespaceChar() != '(')
 				throw Parser.SyntaxError("Expected (");
 
-			List<ScriptNode> Arguments = new List<ScriptNode>();
+			ChunkedList<ScriptNode> Arguments = new ChunkedList<ScriptNode>();
 
 			while (true)
 			{
@@ -2077,7 +2078,7 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 		private ISemanticElement ParseCollection(ScriptParser Parser)
 		{
-			LinkedList<ISemanticElement> Elements = null;
+			ChunkedList<ISemanticElement> Elements = null;
 
 			Parser.SkipWhiteSpace();
 
@@ -2090,9 +2091,10 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					if (Elements is null)
 						return RdfDocument.RdfNil;
 
-					LinkedListNode<ISemanticElement> Loop = Elements.First;
+					ChunkNode<ISemanticElement> Loop = Elements.FirstChunk;
 					BlankNode Result = this.CreateBlankNode();
 					BlankNode Current = Result;
+					int i, c;
 
 					if (this.currentRegularPattern is null)
 					{
@@ -2102,16 +2104,19 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 
 					while (!(Loop is null))
 					{
-						this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfFirst, Loop.Value));
+						for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+						{
+							this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfFirst, Loop[i]));
+
+							if (i < c - 1 || !(Loop.Next is null))
+							{
+								BlankNode Next = this.CreateBlankNode();
+								this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfRest, Next));
+								Current = Next;
+							}
+						}
 
 						Loop = Loop.Next;
-
-						if (!(Loop is null))
-						{
-							BlankNode Next = this.CreateBlankNode();
-							this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfRest, Next));
-							Current = Next;
-						}
 					}
 
 					this.currentRegularPattern.AddTriple(new SemanticQueryTriple(Current, RdfDocument.RdfRest, RdfDocument.RdfNil));
@@ -2124,9 +2129,9 @@ namespace Waher.Script.Persistence.SPARQL.Parsers
 					break;
 
 				if (Elements is null)
-					Elements = new LinkedList<ISemanticElement>();
+					Elements = new ChunkedList<ISemanticElement>();
 
-				Elements.AddLast(Element);
+				Elements.Add(Element);
 				Parser.SkipWhiteSpace();
 			}
 

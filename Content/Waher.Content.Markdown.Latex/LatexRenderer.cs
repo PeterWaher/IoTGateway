@@ -11,6 +11,7 @@ using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
@@ -2717,56 +2718,66 @@ namespace Waher.Content.Markdown.Latex
 		public override async Task Render(DefinitionList Element)
 		{
 			int State = 0;
+			ChunkNode<MarkdownElement> Loop = Element.Children.FirstChunk;
+			MarkdownElement E;
+			int i, c;
 
 			this.Output.AppendLine("\\begin{description}");
 
-			foreach (MarkdownElement E in Element.Children)
+			while (!(Loop is null))
 			{
-				if (E is DefinitionTerms Terms)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					switch (State)
+					E = Loop[i];
+
+					if (E is DefinitionTerms Terms)
 					{
-						case 0:
-							this.Output.Append("\\item[");
-							await Terms.Render(this);
-							State++;
-							break;
+						switch (State)
+						{
+							case 0:
+								this.Output.Append("\\item[");
+								await Terms.Render(this);
+								State++;
+								break;
 
-						case 1:
-							this.Output.Append(", ");
-							await Terms.Render(this);
-							break;
+							case 1:
+								this.Output.Append(", ");
+								await Terms.Render(this);
+								break;
 
-						case 2:
-							this.Output.AppendLine("}");
-							this.Output.Append("\\item[");
-							State--;
-							await Terms.Render(this);
-							break;
+							case 2:
+								this.Output.AppendLine("}");
+								this.Output.Append("\\item[");
+								State--;
+								await Terms.Render(this);
+								break;
+						}
+					}
+					else if (E is DefinitionDescriptions Descriptions)
+					{
+						switch (State)
+						{
+							case 0:
+								this.Output.Append("\\item{");
+								await Descriptions.Render(this);
+								State += 2;
+								break;
+
+							case 1:
+								this.Output.Append("]{");
+								await Descriptions.Render(this);
+								State++;
+								break;
+
+							case 2:
+								this.Output.AppendLine();
+								await Descriptions.Render(this);
+								break;
+						}
 					}
 				}
-				else if (E is DefinitionDescriptions Descriptions)
-				{
-					switch (State)
-					{
-						case 0:
-							this.Output.Append("\\item{");
-							await Descriptions.Render(this);
-							State += 2;
-							break;
 
-						case 1:
-							this.Output.Append("]{");
-							await Descriptions.Render(this);
-							State++;
-							break;
-
-						case 2:
-							this.Output.AppendLine();
-							await Descriptions.Render(this);
-							break;
-					}
-				}
+				Loop = Loop.Next;
 			}
 
 			switch (State)

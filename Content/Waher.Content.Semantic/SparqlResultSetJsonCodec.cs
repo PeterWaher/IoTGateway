@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Semantic.Model;
 using Waher.Content.Semantic.Model.Literals;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script.Objects.Matrices;
@@ -168,7 +169,7 @@ namespace Waher.Content.Semantic
 
 			if (!(Result.Links is null))
 			{
-				List<string> Links = new List<string>();
+				ChunkedList<string> Links = new ChunkedList<string>();
 
 				foreach (Uri Link in Result.Links)
 					Links.Add(Link.ToString());
@@ -185,7 +186,7 @@ namespace Waher.Content.Semantic
 
 				if (!(Result.Records is null))
 				{
-					List<Dictionary<string, object>> Bindings = new List<Dictionary<string, object>>();
+					ChunkedList<Dictionary<string, object>> Bindings = new ChunkedList<Dictionary<string, object>>();
 
 					foreach (ISparqlResultRecord Record in Result.Records)
 					{
@@ -218,7 +219,7 @@ namespace Waher.Content.Semantic
 			Dictionary<string, object> Results = new Dictionary<string, object>();
 			ResultObj["results"] = Results;
 
-			List<Dictionary<string, object>> Bindings = new List<Dictionary<string, object>>();
+			ChunkedList<Dictionary<string, object>> Bindings = new ChunkedList<Dictionary<string, object>>();
 
 			int x, y;
 			int NrRows = Result.Rows;

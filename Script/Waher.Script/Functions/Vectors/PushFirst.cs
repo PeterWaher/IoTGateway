@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -48,12 +48,12 @@ namespace Waher.Script.Functions.Vectors
             if (!(Arguments[1] is IVector V))
                 throw new ScriptRuntimeException("Expected second argument to be a vector.", this);
 
-            LinkedList<IElement> Elements = new LinkedList<IElement>();
+            ChunkedList<IElement> Elements = new ChunkedList<IElement>
+			{
+				Arguments[0]
+			};
 
-            Elements.AddLast(Arguments[0]);
-
-            foreach (IElement E in V.VectorElements)
-                Elements.AddLast(E);
+            Elements.AddRange(V.VectorElements);
 
             IElement Result = V.Encapsulate(Elements, this);
 

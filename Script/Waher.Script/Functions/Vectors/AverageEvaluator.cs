@@ -43,30 +43,20 @@ namespace Waher.Script.Functions.Vectors
 		public void AggregateElement(IElement Element)
 		{
 			if (this.isDouble && Element is DoubleNumber D)
-			{
 				this.doubleSum += D.Value;
-				this.count++;
-			}
 			else if (this.sum is null)
 			{
 				this.isDouble = false;
 
 				if (this.count == 0)
-				{
 					this.sum = Element;
-					this.count = 1;
-				}
 				else
-				{
 					this.sum = Add.EvaluateAddition(new DoubleNumber(this.doubleSum), Element, this.node);
-					this.count++;
-				}
 			}
 			else
-			{
 				this.sum = Add.EvaluateAddition(this.sum, Element, this.node);
-				this.count++;
-			}
+
+			this.count++;
 		}
 
 		/// <summary>

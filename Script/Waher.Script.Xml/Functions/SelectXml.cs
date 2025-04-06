@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -121,18 +121,17 @@ namespace Waher.Script.Xml.Functions
 						Namespace = Root.NamespaceURI;
 					else
 					{
-						LinkedList<XmlElement> ToProcess = new LinkedList<XmlElement>();
+						ChunkedList<XmlElement> ToProcess = new ChunkedList<XmlElement>();
 
 						foreach (XmlNode N2 in Root.ChildNodes)
 						{
 							if (N2 is XmlElement E)
-								ToProcess.AddLast(E);
+								ToProcess.Add(E);
 						}
 
-						while (!(ToProcess.First is null))
+						while (ToProcess.HasFirstItem)
 						{
-							Root = ToProcess.First.Value;
-							ToProcess.RemoveFirst();
+							Root = ToProcess.RemoveFirst();
 
 							if (string.IsNullOrEmpty(Root.Prefix) && !string.IsNullOrEmpty(Root.NamespaceURI))
 							{
@@ -143,7 +142,7 @@ namespace Waher.Script.Xml.Functions
 							foreach (XmlNode N2 in Root.ChildNodes)
 							{
 								if (N2 is XmlElement E)
-									ToProcess.AddLast(E);
+									ToProcess.Add(E);
 							}
 						}
 					}

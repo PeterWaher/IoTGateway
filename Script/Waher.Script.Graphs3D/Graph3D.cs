@@ -1,11 +1,12 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -26,12 +27,12 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class Graph3D : Graph
 	{
-		private readonly LinkedList<IMatrix> x = new LinkedList<IMatrix>();
-		private readonly LinkedList<IMatrix> y = new LinkedList<IMatrix>();
-		private readonly LinkedList<IMatrix> z = new LinkedList<IMatrix>();
-		private readonly LinkedList<Vector4[,]> normals = new LinkedList<Vector4[,]>();
-		private readonly LinkedList<object[]> parameters = new LinkedList<object[]>();
-		private readonly LinkedList<IPainter3D> painters = new LinkedList<IPainter3D>();
+		private readonly ChunkedList<IMatrix> x = new ChunkedList<IMatrix>();
+		private readonly ChunkedList<IMatrix> y = new ChunkedList<IMatrix>();
+		private readonly ChunkedList<IMatrix> z = new ChunkedList<IMatrix>();
+		private readonly ChunkedList<Vector4[,]> normals = new ChunkedList<Vector4[,]>();
+		private readonly ChunkedList<object[]> parameters = new ChunkedList<object[]>();
+		private readonly ChunkedList<IPainter3D> painters = new ChunkedList<IPainter3D>();
 		private IElement minX, maxX;
 		private IElement minY, maxY;
 		private IElement minZ, maxZ;
@@ -170,39 +171,39 @@ namespace Waher.Script.Graphs3D
 
 			if (c > 0)
 			{
-				this.x.AddLast(X);
-				this.y.AddLast(Y);
-				this.z.AddLast(Z);
-				this.normals.AddLast(Normals);
-				this.painters.AddLast(Painter);
-				this.parameters.AddLast(Parameters);
+				this.x.Add(X);
+				this.y.Add(Y);
+				this.z.Add(Z);
+				this.normals.Add(Normals);
+				this.painters.Add(Painter);
+				this.parameters.Add(Parameters);
 			}
 		}
 
 		/// <summary>
 		/// X-axis series.
 		/// </summary>
-		public LinkedList<IMatrix> X => this.x;
+		public ChunkedList<IMatrix> X => this.x;
 
 		/// <summary>
 		/// Y-axis series.
 		/// </summary>
-		public LinkedList<IMatrix> Y => this.y;
+		public ChunkedList<IMatrix> Y => this.y;
 
 		/// <summary>
 		/// Z-axis series.
 		/// </summary>
-		public LinkedList<IMatrix> Z => this.z;
+		public ChunkedList<IMatrix> Z => this.z;
 
 		/// <summary>
 		/// Optional normals.
 		/// </summary>
-		public LinkedList<Vector4[,]> Normals => this.normals;
+		public ChunkedList<Vector4[,]> Normals => this.normals;
 
 		/// <summary>
 		/// Parameters.
 		/// </summary>
-		public LinkedList<object[]> Parameters => this.parameters;
+		public ChunkedList<object[]> Parameters => this.parameters;
 
 		/// <summary>
 		/// Smallest X-value.
@@ -411,13 +412,13 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Result, if understood, null otherwise.</returns>
 		protected ISemiGroupElement AddRight(ISemiGroupElement Element, bool _)
 		{
-			if (this.x.First is null)
+			if (!this.x.HasFirstItem)
 				return Element;
 
 			if (!(Element is Graph3D G))
 				return null;
 
-			if (G.x.First is null)
+			if (G.x.FirstItem is null)
 				return this;
 
 			Graph3D Result = new Graph3D(this.Settings)
@@ -432,30 +433,19 @@ namespace Waher.Script.Graphs3D
 				SameScale = this.SameScale
 			};
 
-			foreach (IMatrix M in this.x)
-				Result.x.AddLast(M);
-
-			foreach (IMatrix M in this.y)
-				Result.y.AddLast(M);
-
-			foreach (IMatrix M in this.z)
-				Result.z.AddLast(M);
-
-			foreach (Vector4[,] M in this.normals)
-				Result.normals.AddLast(M);
-
-			foreach (IPainter3D Painter in this.painters)
-				Result.painters.AddLast(Painter);
-
-			foreach (object[] P in this.parameters)
-				Result.parameters.AddLast(P);
+			Result.x.AddRange(this.x);
+			Result.y.AddRange(this.y);
+			Result.z.AddRange(this.z);
+			Result.normals.AddRange(this.normals);
+			Result.painters.AddRange(this.painters);
+			Result.parameters.AddRange(this.parameters);
 
 			foreach (IMatrix M in G.x)
 			{
 				if (M.GetType() != this.axisTypeX)
 					throw new ScriptException("Incompatible types of series.");
 
-				Result.x.AddLast(M);
+				Result.x.Add(M);
 			}
 
 			foreach (IMatrix M in G.y)
@@ -463,7 +453,7 @@ namespace Waher.Script.Graphs3D
 				if (M.GetType() != this.axisTypeY)
 					throw new ScriptException("Incompatible types of series.");
 
-				Result.y.AddLast(M);
+				Result.y.Add(M);
 			}
 
 			foreach (IMatrix M in G.z)
@@ -471,17 +461,12 @@ namespace Waher.Script.Graphs3D
 				if (M.GetType() != this.axisTypeZ)
 					throw new ScriptException("Incompatible types of series.");
 
-				Result.z.AddLast(M);
+				Result.z.Add(M);
 			}
 
-			foreach (Vector4[,] M in G.normals)
-				Result.normals.AddLast(M);
-
-			foreach (IPainter3D Painter in G.painters)
-				Result.painters.AddLast(Painter);
-
-			foreach (object[] P in G.parameters)
-				Result.parameters.AddLast(P);
+			Result.normals.AddRange(G.normals);
+			Result.painters.AddRange(G.painters);
+			Result.parameters.AddRange(G.parameters);
 
 			Result.minX = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { this.minX, G.minX }, false, null), null);
 			Result.maxX = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { this.maxX, G.maxX }, false, null), null);
@@ -1088,7 +1073,7 @@ namespace Waher.Script.Graphs3D
 			else if (Min.AssociatedObjectValue is string && Max.AssociatedObjectValue is string)
 			{
 				Dictionary<string, bool> Indices = new Dictionary<string, bool>();
-				List<IElement> Labels = new List<IElement>();
+				ChunkedList<IElement> Labels = new ChunkedList<IElement>();
 				string s;
 
 				foreach (IMatrix Matrix in Series)
@@ -1718,15 +1703,15 @@ namespace Waher.Script.Graphs3D
 					switch (E.LocalName)
 					{
 						case "X":
-							this.x.AddLast((IMatrix)await ParseAsync(E.InnerText, Variables));
+							this.x.Add((IMatrix)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							this.y.AddLast((IMatrix)await ParseAsync(E.InnerText, Variables));
+							this.y.Add((IMatrix)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Z":
-							this.z.AddLast((IMatrix)await ParseAsync(E.InnerText, Variables));
+							this.z.Add((IMatrix)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Normals":
@@ -1735,7 +1720,7 @@ namespace Waher.Script.Graphs3D
 							int i, j, c, d;
 
 							if (M is null)
-								this.normals.AddLast((Vector4[,])null);
+								this.normals.Add((Vector4[,])null);
 							else
 							{
 								c = M.Rows;
@@ -1748,17 +1733,17 @@ namespace Waher.Script.Graphs3D
 										M2[i, j] = (Vector4)(M.GetElement(i, j).AssociatedObjectValue);
 								}
 
-								this.normals.AddLast(M2);
+								this.normals.Add(M2);
 							}
 							break;
 
 						case "Parameters":
 							IVector v = (IVector)await ParseAsync(E.InnerText, Variables);
-							this.parameters.AddLast(this.ToObjectArray(v));
+							this.parameters.Add(this.ToObjectArray(v));
 							break;
 
 						case "Painter":
-							this.painters.AddLast((IPainter3D)Types.Instantiate(Types.GetType(E.InnerText)));
+							this.painters.Add((IPainter3D)Types.Instantiate(Types.GetType(E.InnerText)));
 							break;
 					}
 				}

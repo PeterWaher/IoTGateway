@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Waher.Networking.DNS;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -59,60 +59,58 @@ namespace Waher.Script.Networking.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
 		{
-			using (System.Net.NetworkInformation.Ping Icmp = new System.Net.NetworkInformation.Ping())
+			using System.Net.NetworkInformation.Ping Icmp = new System.Net.NetworkInformation.Ping();
+			PingReply Response;
+			PingOptions Options = new PingOptions()
 			{
-				PingReply Response;
-				PingOptions Options = new PingOptions()
+				Ttl = 1
+			};
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
+			IElement E;
+
+			do
+			{
+				Response = await Icmp.SendPingAsync(Argument, 2000, Ping.data, Options);
+
+				Elements.Add(new DoubleNumber(Options.Ttl));
+				Elements.Add(new ObjectValue(Response.Address));
+
+				if (Response.Status == IPStatus.Success)
+					E = new PhysicalQuantity(Response.RoundtripTime, Unit.Parse("ms"));
+				else if (Response.Status == IPStatus.TimedOut ||
+					Response.Status == IPStatus.TimeExceeded ||
+					Response.Status == IPStatus.TtlExpired)
 				{
-					Ttl = 1
-				};
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
-				IElement E;
-
-				do
-				{
-					Response = await Icmp.SendPingAsync(Argument, 2000, Ping.data, Options);
-
-					Elements.AddLast(new DoubleNumber(Options.Ttl));
-					Elements.AddLast(new ObjectValue(Response.Address));
-
-					if (Response.Status == IPStatus.Success)
-						E = new PhysicalQuantity(Response.RoundtripTime, Unit.Parse("ms"));
-					else if (Response.Status == IPStatus.TimedOut ||
-						Response.Status == IPStatus.TimeExceeded ||
-						Response.Status == IPStatus.TtlExpired)
-					{
-						E = ObjectValue.Null;
-					}
-					else
-						E = new StringValue(Ping.GetErrorMessage(Response));
-
-					Elements.AddLast(E);
-
-					try
-					{
-						string[] Names = await DnsResolver.ReverseDns(Response.Address);
-
-						if (Names.Length == 1)
-							E = new StringValue(Names[0]);
-						else
-							E = new ObjectVector(Names);
-					}
-					catch (Exception)
-					{
-						E = ObjectValue.Null;
-					}
-
-					Elements.AddLast(E);
-					Options.Ttl++;
+					E = ObjectValue.Null;
 				}
-				while (Response.Status != IPStatus.Success && Options.Ttl < 256);
+				else
+					E = new StringValue(Ping.GetErrorMessage(Response));
 
-				return new ObjectMatrix(Elements.Count / 4, 4, Elements)
+				Elements.Add(E);
+
+				try
 				{
-					ColumnNames = new string[] { "TTL", "IP", "Roundtrip", "Name" }
-				};
+					string[] Names = await DnsResolver.ReverseDns(Response.Address);
+
+					if (Names.Length == 1)
+						E = new StringValue(Names[0]);
+					else
+						E = new ObjectVector(Names);
+				}
+				catch (Exception)
+				{
+					E = ObjectValue.Null;
+				}
+
+				Elements.Add(E);
+				Options.Ttl++;
 			}
+			while (Response.Status != IPStatus.Success && Options.Ttl < 256);
+
+			return new ObjectMatrix(Elements.Count / 4, 4, Elements)
+			{
+				ColumnNames = new string[] { "TTL", "IP", "Roundtrip", "Name" }
+			};
 		}
 
 		/// <summary>

@@ -11,7 +11,7 @@ namespace Waher.Script.Functions.Vectors
     /// <summary>
     /// StandardDeviation(v), StdDev(v)
     /// </summary>
-    public class StandardDeviation : FunctionOneVectorVariable
+    public class StandardDeviation : FunctionOneVectorVariable, IIterativeEvaluation
     {
         /// <summary>
         /// StandardDeviation(v), StdDev(v)
@@ -125,5 +125,19 @@ namespace Waher.Script.Functions.Vectors
             throw new ScriptRuntimeException("Expected a numeric vector.", this);
         }
 
-    }
+		#region IIterativeEvalaution
+
+		/// <summary>
+		/// If the node can be evaluated iteratively.
+		/// </summary>
+		public bool CanEvaluateIteratively => true;
+
+		/// <summary>
+		/// Creates an iterative evaluator for the node.
+		/// </summary>
+		/// <returns>Iterative evaluator reference.</returns>
+		public IIterativeEvaluator CreateEvaluator() => new StandardDeviationEvaluator(this);
+
+		#endregion
+	}
 }

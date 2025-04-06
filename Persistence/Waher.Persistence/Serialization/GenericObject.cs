@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Serialization
 {
@@ -11,7 +12,7 @@ namespace Waher.Persistence.Serialization
 	[ArchivingTime(nameof(ArchivingTime))]
 	public sealed class GenericObject : ICollection<KeyValuePair<string, object>>
 	{
-		private IEnumerable<KeyValuePair<string, object>> properties = new LinkedList<KeyValuePair<string, object>>();
+		private IEnumerable<KeyValuePair<string, object>> properties = new ChunkedList<KeyValuePair<string, object>>();
 		private Dictionary<string, object> propertiesByName = null;
 		private string collectionName = null;
 		private string typeName = null;
@@ -217,7 +218,7 @@ namespace Waher.Persistence.Serialization
 
 		private void BuildEnumerable()
 		{
-			LinkedList<KeyValuePair<string, object>> List = new LinkedList<KeyValuePair<string, object>>();
+			ChunkedList<KeyValuePair<string, object>> List = new ChunkedList<KeyValuePair<string, object>>();
 			Dictionary<string, bool> Added = new Dictionary<string, bool>();
 
 			foreach (KeyValuePair<string, object> P in this.properties)
@@ -225,7 +226,7 @@ namespace Waher.Persistence.Serialization
 				if (!this.propertiesByName.TryGetValue(P.Key, out object Value))
 					continue;
 
-				List.AddLast(new KeyValuePair<string, object>(P.Key, Value));
+				List.Add(new KeyValuePair<string, object>(P.Key, Value));
 				Added[P.Key] = true;
 			}
 
@@ -234,7 +235,7 @@ namespace Waher.Persistence.Serialization
 				if (Added.ContainsKey(P.Key))
 					continue;
 
-				List.AddLast(P);
+				List.Add(P);
 			}
 
 			this.properties = List;

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Inventory
 {
@@ -419,7 +420,7 @@ namespace Waher.Runtime.Inventory
 		/// <returns>Array of loaded modules.</returns>
 		public static IModule[] GetLoadedModules(IComparer<IModule> Order)
 		{
-			List<IModule> Modules = new List<IModule>();
+			ChunkedList<IModule> Modules = new ChunkedList<IModule>();
 			IModule Module;
 			TypeInfo TI;
 
@@ -615,8 +616,8 @@ namespace Waher.Runtime.Inventory
 			{
 				if (isInitialized)
 				{
-					List<Assembly> NewAssemblies = new List<Assembly>();
-					List<Assembly> AllAssemblies = new List<Assembly>();
+					ChunkedList<Assembly> NewAssemblies = new ChunkedList<Assembly>();
+					ChunkedList<Assembly> AllAssemblies = new ChunkedList<Assembly>();
 
 					AllAssemblies.AddRange(assemblies);
 
@@ -790,16 +791,16 @@ namespace Waher.Runtime.Inventory
 				{
 					foreach (KeyValuePair<string, Assembly> P in NamespaceAliases)
 					{
-						LinkedList<KeyValuePair<string, string>> CheckNamespaces = new LinkedList<KeyValuePair<string, string>>();
-
-						CheckNamespaces.AddLast(new KeyValuePair<string, string>(P.Key, P.Value.GetName().Name));
-
-						while (!(CheckNamespaces.First is null))
+						ChunkedList<KeyValuePair<string, string>> CheckNamespaces = new ChunkedList<KeyValuePair<string, string>>
 						{
-							string MapToNamespace = CheckNamespaces.First.Value.Value;
-							string Alias = CheckNamespaces.First.Value.Key;
+							new KeyValuePair<string, string>(P.Key, P.Value.GetName().Name)
+						};
 
-							CheckNamespaces.RemoveFirst();
+						while (CheckNamespaces.HasFirstItem)
+						{
+							KeyValuePair<string, string> P2 = CheckNamespaces.RemoveFirst();
+							string MapToNamespace = P2.Value;
+							string Alias = P2.Key;
 
 							if (typesPerNamespace.TryGetValue(MapToNamespace, out Types))
 							{
@@ -820,7 +821,7 @@ namespace Waher.Runtime.Inventory
 								{
 									i = Subnamespace.LastIndexOf('.');
 									if (i >= 0)
-										CheckNamespaces.AddLast(new KeyValuePair<string, string>(Alias + Subnamespace.Substring(i), Subnamespace));
+										CheckNamespaces.Add(new KeyValuePair<string, string>(Alias + Subnamespace.Substring(i), Subnamespace));
 								}
 							}
 						}
@@ -1165,7 +1166,7 @@ namespace Waher.Runtime.Inventory
 		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport, Type[] Interfaces)
 			where InterfaceType : IProcessingSupport<ObjectType>
 		{
-			List<KeyValuePair<InterfaceType, Grade>> Found = new List<KeyValuePair<InterfaceType, Grade>>();
+			ChunkedList<KeyValuePair<InterfaceType, Grade>> Found = new ChunkedList<KeyValuePair<InterfaceType, Grade>>();
 			TypeInfo TI;
 
 			foreach (Type T2 in Interfaces)
@@ -1190,17 +1191,24 @@ namespace Waher.Runtime.Inventory
 
 			Found.Sort((x, y) =>
 			{
-				int i = x.Value.CompareTo(y.Value);
-				if (i != 0)
-					return i;
+				int j = x.Value.CompareTo(y.Value);
+				if (j != 0)
+					return j;
 
 				return x.Key.GetType().FullName.CompareTo(y.Key.GetType().FullName);
 			});
 
-			List<InterfaceType> Result = new List<InterfaceType>();
+			ChunkedList<InterfaceType> Result = new ChunkedList<InterfaceType>();
+			ChunkNode<KeyValuePair<InterfaceType, Grade>> Loop = Found.FirstChunk;
+			int i, c;
 
-			foreach (KeyValuePair<InterfaceType, Grade> P in Found)
-				Result.Add(P.Key);
+			while (!(Loop is null))
+			{
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
+					Result.Add(Loop[i].Key);
+
+				Loop = Loop.Next;
+			}
 
 			return Result.ToArray();
 		}

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Rss
 {
@@ -19,7 +19,7 @@ namespace Waher.Content.Rss
 			if (Xml is null)
 				throw new ArgumentNullException(nameof(Xml));
 
-			List<RssWarning> Warnings = new List<RssWarning>();
+			ChunkedList<RssWarning> Warnings = new ChunkedList<RssWarning>();
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{

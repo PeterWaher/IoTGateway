@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -58,7 +59,7 @@ namespace Waher.Script.Functions.Logging
 			string Module = string.Empty;
 			string StackTrace = string.Empty;
 			EventLevel Level = EventLevel.Minor;
-			List<KeyValuePair<string, object>> Tags = null;
+			ChunkedList<KeyValuePair<string, object>> Tags = null;
 			bool Detailed = false;
 
 			if (!(M is string Message))
@@ -81,7 +82,7 @@ namespace Waher.Script.Functions.Logging
 						KeyValuePair<string, object>[] Tags3 = Tags2.Tags;
 						if (!(Tags3 is null))
 						{
-							Tags = new List<KeyValuePair<string, object>>();
+							Tags = new ChunkedList<KeyValuePair<string, object>>();
 							Tags.AddRange(Tags3);
 						}
 					}
@@ -132,7 +133,7 @@ namespace Waher.Script.Functions.Logging
 							else
 							{
 								if (Tags is null)
-									Tags = new List<KeyValuePair<string, object>>();
+									Tags = new ChunkedList<KeyValuePair<string, object>>();
 
 								Tags.Add(new KeyValuePair<string, object>(P.Key, P.Value.AssociatedObjectValue));
 							}
@@ -140,7 +141,7 @@ namespace Waher.Script.Functions.Logging
 
 						default:
 							if (Tags is null)
-								Tags = new List<KeyValuePair<string, object>>();
+								Tags = new ChunkedList<KeyValuePair<string, object>>();
 
 							Tags.Add(new KeyValuePair<string, object>(P.Key, P.Value.AssociatedObjectValue));
 							break;

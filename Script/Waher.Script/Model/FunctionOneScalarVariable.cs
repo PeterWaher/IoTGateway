@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -61,41 +61,41 @@ namespace Waher.Script.Model
             {
                 if (Argument is IVector Vector)
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                     int i, c = Vector.Dimension;
 
                     if (Vector is DoubleVector dv)
                     {
                         double[] v = dv.Values;
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.EvaluateScalar(v[i], Variables));
+                            Elements.Add(this.EvaluateScalar(v[i], Variables));
                     }
                     else if (Vector is ComplexVector cv)
                     {
                         Complex[] v = cv.Values;
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.EvaluateScalar(v[i], Variables));
+                            Elements.Add(this.EvaluateScalar(v[i], Variables));
                     }
                     else if (Vector is BooleanVector bv)
                     {
                         bool[] v = bv.Values;
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(this.EvaluateScalar(v[i], Variables));
+                            Elements.Add(this.EvaluateScalar(v[i], Variables));
                     }
                     else
                     {
                         foreach (IElement E in Vector.ChildElements)
-                            Elements.AddLast(this.Evaluate(E, Variables));
+                            Elements.Add(this.Evaluate(E, Variables));
                     }
 
                     return Argument.Encapsulate(Elements, this);
                 }
                 else
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                     foreach (IElement E in Argument.ChildElements)
-                        Elements.AddLast(this.Evaluate(E, Variables));
+                        Elements.Add(this.Evaluate(E, Variables));
 
                     return Argument.Encapsulate(Elements, this);
                 }
@@ -230,41 +230,41 @@ namespace Waher.Script.Model
             {
                 if (Argument is IVector Vector)
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                     int i, c = Vector.Dimension;
 
                     if (Vector is DoubleVector dv)
                     {
                         double[] v = dv.Values;
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this.EvaluateScalarAsync(v[i], Variables));
+                            Elements.Add(await this.EvaluateScalarAsync(v[i], Variables));
                     }
                     else if (Vector is ComplexVector cv)
                     {
                         Complex[] v = cv.Values;
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this .EvaluateScalarAsync(v[i], Variables));
+                            Elements.Add(await this .EvaluateScalarAsync(v[i], Variables));
                     }
                     else if (Vector is BooleanVector bv)
                     {
                         bool[] v = bv.Values;
                         for (i = 0; i < c; i++)
-                            Elements.AddLast(await this .EvaluateScalarAsync(v[i], Variables));
+                            Elements.Add(await this .EvaluateScalarAsync(v[i], Variables));
                     }
                     else
                     {
                         foreach (IElement E in Vector.ChildElements)
-                            Elements.AddLast(await this.EvaluateAsync(E, Variables));
+                            Elements.Add(await this.EvaluateAsync(E, Variables));
                     }
 
                     return Argument.Encapsulate(Elements, this);
                 }
                 else
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                     foreach (IElement E in Argument.ChildElements)
-                        Elements.AddLast(await this.EvaluateAsync(E, Variables));
+                        Elements.Add(await this.EvaluateAsync(E, Variables));
 
                     return Argument.Encapsulate(Elements, this);
                 }

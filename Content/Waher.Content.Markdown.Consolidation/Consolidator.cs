@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Events;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -414,7 +415,7 @@ namespace Waher.Content.Markdown.Consolidation
 					case DocumentType.SingleCode:
 					case DocumentType.SingleXml:
 
-						List<string> ConsolidatedRows = new List<string>();
+						ChunkedList<string> ConsolidatedRows = new ChunkedList<string>();
 						int j = 0;
 						int d = this.sources.Count;
 
@@ -478,11 +479,8 @@ namespace Waher.Content.Markdown.Consolidation
 						{
 							int i;
 
-							if (this.legend is null)
-								this.legend = new Dictionary<string, KeyValuePair<SKColor, int>>();
-
-							if (this.palette is null)
-								this.palette = CreatePalette(this.maxPaletteSize);
+							this.legend ??= new Dictionary<string, KeyValuePair<SKColor, int>>();
+							this.palette ??= CreatePalette(this.maxPaletteSize);
 
 							foreach (KeyValuePair<string, SourceState> P in this.sources)
 							{
@@ -567,7 +565,7 @@ namespace Waher.Content.Markdown.Consolidation
 
 		private static readonly Regex dotEdge = new Regex("^(?'A'(\"[^\"]*\"|'[^']*'|[^\\s]*))\\s*->\\s*(?'B'(\"[^\"]*\"|'[^']*'|[^\\s]*))\\s*([\\[](?'Note'[^\\]]*)[\\]]\\s*)?;\\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
 
-		private static void OptimizeDotEdges(List<string> Rows)
+		private static void OptimizeDotEdges(ChunkedList<string> Rows)
 		{
 			Match[] Matches;
 			Match M;

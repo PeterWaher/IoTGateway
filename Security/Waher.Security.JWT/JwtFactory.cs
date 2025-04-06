@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Waher.Runtime.Collections;
 using Waher.Security.JWS;
 
 namespace Waher.Security.JWT
@@ -294,7 +295,7 @@ namespace Waher.Security.JWT
 				Headers2 = this.header;
 			else
 			{
-				List<KeyValuePair<string, object>> Union = new List<KeyValuePair<string, object>>();
+				ChunkedList<KeyValuePair<string, object>> Union = new ChunkedList<KeyValuePair<string, object>>();
 
 				Union.AddRange(this.header);
 

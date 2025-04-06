@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Semantic
 {
@@ -9,10 +10,10 @@ namespace Waher.Content.Semantic
 	/// </summary>
 	public class InMemorySemanticLine : ISemanticLine
 	{
-		private readonly LinkedList<KeyValuePair<ISemanticElement, ISemanticTriple>> elements = new LinkedList<KeyValuePair<ISemanticElement, ISemanticTriple>>();
+		private readonly ChunkedList<KeyValuePair<ISemanticElement, ISemanticTriple>> elements = new ChunkedList<KeyValuePair<ISemanticElement, ISemanticTriple>>();
 		private readonly ISemanticElement reference1;
 		private readonly ISemanticElement reference2;
-		private SortedDictionary<ISemanticElement, LinkedList<ISemanticTriple>> points = null;
+		private SortedDictionary<ISemanticElement, ChunkedList<ISemanticTriple>> points = null;
 
 		/// <summary>
 		/// In-memory semantic line.
@@ -43,7 +44,7 @@ namespace Waher.Content.Semantic
 		public void Add(ISemanticElement Point, ISemanticTriple Triple)
 		{
 			this.points = null;
-			this.elements.AddLast(new KeyValuePair<ISemanticElement, ISemanticTriple>(Point, Triple));
+			this.elements.Add(new KeyValuePair<ISemanticElement, ISemanticTriple>(Point, Triple));
 		}
 
 		/// <summary>
@@ -103,7 +104,7 @@ namespace Waher.Content.Semantic
 		{
 			this.CheckOrdered();
 
-			if (!this.points.TryGetValue(X, out LinkedList<ISemanticTriple> Points))
+			if (!this.points.TryGetValue(X, out ChunkedList<ISemanticTriple> Points))
 				Points = null;
 
 			return Task.FromResult<IEnumerable<ISemanticTriple>>(Points);
@@ -124,21 +125,21 @@ namespace Waher.Content.Semantic
 		{
 			if (this.points is null)
 			{
-				SortedDictionary<ISemanticElement, LinkedList<ISemanticTriple>> Ordered = 
-					new SortedDictionary<ISemanticElement, LinkedList<ISemanticTriple>>();
+				SortedDictionary<ISemanticElement, ChunkedList<ISemanticTriple>> Ordered = 
+					new SortedDictionary<ISemanticElement, ChunkedList<ISemanticTriple>>();
 				ISemanticElement LastPoint = null;
-				LinkedList<ISemanticTriple> Last = null;
+				ChunkedList<ISemanticTriple> Last = null;
 
 				foreach (KeyValuePair<ISemanticElement, ISemanticTriple> P in this.elements)
 				{
 					if ((LastPoint is null || !LastPoint.Equals(P.Key)) &&
 						!Ordered.TryGetValue(P.Key, out Last))
 					{
-						Last = new LinkedList<ISemanticTriple>();
+						Last = new ChunkedList<ISemanticTriple>();
 						Ordered[P.Key] = Last;
 					}
 
-					Last.AddLast(P.Value);
+					Last.Add(P.Value);
 				}
 
 				this.points = Ordered;

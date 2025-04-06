@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
+using Waher.Script.Constants;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -16,7 +17,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Children">Child elements.</param>
-		public NestedBlock(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public NestedBlock(MarkdownDocument Document, ChunkedList<MarkdownElement> Children)
 			: base(Document, Children)
 		{
 			this.hasBlocks = this.CalcHasBlocks();
@@ -35,61 +36,80 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 		private bool CalcHasBlocks()
 		{
+			ChunkNode<MarkdownElement> Loop = this.Children.FirstChunk;
 			bool HasBlocks = false;
 			bool HasSpans = false;
 			bool Inconsistent = false;
+			int i, c;
 
-			foreach (MarkdownElement E in this.Children)
+			while (!(Loop is null))
 			{
-				if (E.IsBlockElement)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					HasBlocks = true;
-					if (HasSpans)
+					if (Loop[i].IsBlockElement)
 					{
-						Inconsistent = true;
-						break;
+						HasBlocks = true;
+						if (HasSpans)
+						{
+							Inconsistent = true;
+							Loop = null;
+							break;
+						}
+					}
+					else
+					{
+						HasSpans = true;
+						if (HasBlocks)
+						{
+							Inconsistent = true;
+							Loop = null;
+							break;
+						}
 					}
 				}
-				else
-				{
-					HasSpans = true;
-					if (HasBlocks)
-					{
-						Inconsistent = true;
-						break;
-					}
-				}
+
+				Loop = Loop?.Next;
 			}
 
 			if (!Inconsistent)
 				return HasBlocks;
 
-			LinkedList<MarkdownElement> NewChildren = new LinkedList<MarkdownElement>();
-			LinkedList<MarkdownElement> Spans = null;
+			ChunkedList<MarkdownElement> NewChildren = new ChunkedList<MarkdownElement>();
+			ChunkedList<MarkdownElement> Spans = null;
+			MarkdownElement E;
 
-			foreach (MarkdownElement E in this.Children)
+			Loop = this.Children.FirstChunk;
+
+			while (!(Loop is null))
 			{
-				if (E.IsBlockElement)
+				for (i = Loop.Start, c = Loop.Pos; i < c; i++)
 				{
-					if (!(Spans is null))
+					E = Loop[i];
+
+					if (E.IsBlockElement)
 					{
-						NewChildren.AddLast(new Paragraph(this.Document, Spans, true));
-						Spans = null;
+						if (!(Spans is null))
+						{
+							NewChildren.Add(new Paragraph(this.Document, Spans, true));
+							Spans = null;
+						}
+
+						NewChildren.Add(E);
 					}
+					else
+					{
+						if (Spans is null)
+							Spans = new ChunkedList<MarkdownElement>();
 
-					NewChildren.AddLast(E);
+						Spans.Add(E);
+					}
 				}
-				else
-				{
-					if (Spans is null)
-						Spans = new LinkedList<MarkdownElement>();
 
-					Spans.AddLast(E);
-				}
+				Loop = Loop?.Next;
 			}
 
 			if (!(Spans is null))
-				NewChildren.AddLast(new Paragraph(this.Document, Spans, true));
+				NewChildren.Add(new Paragraph(this.Document, Spans, true));
 
 			this.SetChildren(NewChildren);
 
@@ -128,7 +148,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Children">New content.</param>
 		/// <param name="Document">Document that will contain the element.</param>
 		/// <returns>Object of same type and meta-data, but with new content.</returns>
-		public override MarkdownElementChildren Create(IEnumerable<MarkdownElement> Children, MarkdownDocument Document)
+		public override MarkdownElementChildren Create(ChunkedList<MarkdownElement> Children, MarkdownDocument Document)
 		{
 			return new NestedBlock(Document, Children);
 		}

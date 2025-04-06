@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Contracts.Multimedia
 {
@@ -26,7 +26,7 @@ namespace Waher.Content.Markdown.Contracts.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public async Task RenderContractXml(ContractsRenderer Renderer, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, 
+		public async Task RenderContractXml(ContractsRenderer Renderer, MultimediaItem[] Items, ChunkedList<MarkdownElement> ChildNodes, 
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			XmlWriter Output = Renderer.XmlOutput;
@@ -34,9 +34,8 @@ namespace Waher.Content.Markdown.Contracts.Multimedia
 			bool ListItemAdded = true;
 
 			Output.WriteStartElement("paragraph");
-
-			foreach (MarkdownElement E in ChildNodes)
-				await E.Render(Renderer);
+			
+			await Renderer.Render(ChildNodes);
 
 			Output.WriteEndElement();
 

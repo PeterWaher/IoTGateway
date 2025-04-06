@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -106,14 +107,14 @@ namespace Waher.Script.Operators.Comparisons
 					this.lastExpression = Expression;
 					this.regex = new Regex(Expression, this.options);
 
-					List<string> Names = null;
+					ChunkedList<string> Names = null;
 
 					foreach (string s in this.regex.GetGroupNames())
 					{
 						if (!int.TryParse(s, out int _))
 						{
 							if (Names is null)
-								Names = new List<string>();
+								Names = new ChunkedList<string>();
 
 							Names.Add(s);
 						}

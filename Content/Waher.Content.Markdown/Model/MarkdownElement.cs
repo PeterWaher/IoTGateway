@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Any children of the element.
 		/// </summary>
-		public virtual IEnumerable<MarkdownElement> Children => new MarkdownElement[0];
+		public virtual ChunkedList<MarkdownElement> Children => null;
 
 		/// <summary>
 		/// If the element is a block element.

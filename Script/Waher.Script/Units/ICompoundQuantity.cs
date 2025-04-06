@@ -11,7 +11,7 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Compound quantities. Must only use base quantity units.
 		/// </summary>
-		Tuple<string, Prefix, KeyValuePair<AtomicUnit, int>[]>[] CompoundQuantities
+		Tuple<string, Prefix, UnitFactor[]>[] CompoundQuantities
 		{
 			get;
 		}

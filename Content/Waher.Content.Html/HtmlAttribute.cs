@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Html
 {
@@ -9,7 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
 	public class HtmlAttribute : HtmlNode
 	{
-		private LinkedList<HtmlNode> segments = null;
+		private ChunkedList<HtmlNode> segments = null;
 		private readonly string fullName;
 		private readonly string localName;
 		private readonly string prefix;
@@ -110,9 +111,9 @@ namespace Waher.Content.Html
 		internal void Add(HtmlNode Segment)
 		{
 			if (this.segments is null)
-				this.segments = new LinkedList<HtmlNode>();
+				this.segments = new ChunkedList<HtmlNode>();
 
-			this.segments.AddLast(Segment);
+			this.segments.Add(Segment);
 			this.@value = null;
 		}
 

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Waher.Content.Markdown.Model.BlockElements;
+﻿using Waher.Content.Markdown.Model.BlockElements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -9,6 +8,7 @@ namespace Waher.Content.Markdown.Model
 	/// </summary>
 	public abstract class MarkdownElementSingleChild : MarkdownElement
 	{
+		private ChunkedList<MarkdownElement> children = null;
 		private MarkdownElement child;
 
 		/// <summary>
@@ -37,7 +37,16 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Any children of the element.
 		/// </summary>
-		public override IEnumerable<MarkdownElement> Children => new MarkdownElement[] { this.child };
+		public override ChunkedList<MarkdownElement> Children
+		{
+			get
+			{
+				if (this.children is null)
+					this.children = new ChunkedList<MarkdownElement>(this.child);
+
+				return this.children;
+			}
+		}
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

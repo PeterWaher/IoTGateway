@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -51,7 +51,7 @@ namespace Waher.Script.Functions.Matrices
 
 			if (In is IMatrix M)
 			{
-				List<IElement> Coordinates = new List<IElement>();
+				ChunkedList<IElement> Coordinates = new ChunkedList<IElement>();
 				int Rows = M.Rows;
 				int Columns = M.Columns;
 				int x, y;
@@ -72,7 +72,7 @@ namespace Waher.Script.Functions.Matrices
 			}
 			else if (In is IVector V)
 			{
-				List<double> Indices = new List<double>();
+				ChunkedList<double> Indices = new ChunkedList<double>();
 				int i = 0;
 
 				foreach (IElement Element in V.VectorElements)
@@ -87,7 +87,7 @@ namespace Waher.Script.Functions.Matrices
 			}
 			else if (In is ISet S)
 			{
-				List<double> Indices = new List<double>();
+				ChunkedList<double> Indices = new ChunkedList<double>();
 				int i = 0;
 
 				foreach (IElement Element in S.ChildElements)

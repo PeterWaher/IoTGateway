@@ -94,6 +94,5 @@ namespace Waher.Script.Functions.Vectors
             else
                 throw new ScriptRuntimeException("Cannot order elements.", this);
         }
-
-    }
+	}
 }

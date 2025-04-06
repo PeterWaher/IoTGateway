@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -81,10 +80,10 @@ namespace Waher.Script.Operators.Membership
             {
                 if (Operand.IsScalar)
                 {
-                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+					ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
                     foreach (IElement E in Member.ChildElements)
-                        Elements.AddLast(await EvaluateDynamicMember(Operand, E, NullCheck, Node));
+                        Elements.Add(await EvaluateDynamicMember(Operand, E, NullCheck, Node));
 
                     return Member.Encapsulate(Elements, Node);
                 }
@@ -95,14 +94,14 @@ namespace Waher.Script.Operators.Membership
 
                     if (OperandElements.Count == MemberElements.Count)
                     {
-                        LinkedList<IElement> Elements = new LinkedList<IElement>();
+						ChunkedList<IElement> Elements = new ChunkedList<IElement>();
                         IEnumerator<IElement> eOperand = OperandElements.GetEnumerator();
                         IEnumerator<IElement> eMember = MemberElements.GetEnumerator();
 
                         try
                         {
                             while (eOperand.MoveNext() && eMember.MoveNext())
-                                Elements.AddLast(await EvaluateDynamicMember(eOperand.Current, eMember.Current, NullCheck, Node));
+                                Elements.Add(await EvaluateDynamicMember(eOperand.Current, eMember.Current, NullCheck, Node));
                         }
                         finally
                         {
@@ -114,16 +113,16 @@ namespace Waher.Script.Operators.Membership
                     }
                     else
                     {
-                        LinkedList<IElement> OperandResult = new LinkedList<IElement>();
+						ChunkedList <IElement> OperandResult = new ChunkedList<IElement>();
 
                         foreach (IElement OperandChild in OperandElements)
                         {
-                            LinkedList<IElement> MemberResult = new LinkedList<IElement>();
+							ChunkedList<IElement> MemberResult = new ChunkedList<IElement>();
 
                             foreach (IElement MemberChild in MemberElements)
-                                MemberResult.AddLast(await EvaluateDynamicMember (OperandChild, MemberChild, NullCheck, Node));
+                                MemberResult.Add(await EvaluateDynamicMember (OperandChild, MemberChild, NullCheck, Node));
 
-                            OperandResult.AddLast(Member.Encapsulate(MemberResult, Node));
+                            OperandResult.Add(Member.Encapsulate(MemberResult, Node));
                         }
 
                         return Operand.Encapsulate(OperandResult, Node);

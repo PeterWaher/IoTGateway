@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Waher.Content.Html.Elements;
+﻿using Waher.Content.Html.Elements;
 using Waher.Content.Html.OpenGraph;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Html
 {
@@ -45,10 +45,10 @@ namespace Waher.Content.Html
 		/// <param name="Doc">HTML Document</param>
 		public PageMetaData(HtmlDocument Doc)
 		{
-			List<ImageInformation> Images = null;
-			List<AudioInformation> Audio = null;
-			List<VideoInformation> Video = null;
-			List<string> LocaleAlternate = null;
+			ChunkedList<ImageInformation> Images = null;
+			ChunkedList<AudioInformation> Audio = null;
+			ChunkedList<VideoInformation> Video = null;
+			ChunkedList<string> LocaleAlternate = null;
 			ImageInformation LastImage = null;
 			AudioInformation LastAudio = null;
 			VideoInformation LastVideo = null;
@@ -135,7 +135,7 @@ namespace Waher.Content.Html
 							};
 
 							if (Images is null)
-								Images = new List<ImageInformation>();
+								Images = new ChunkedList<ImageInformation>();
 
 							Images.Add(LastImage);
 							break;
@@ -173,7 +173,7 @@ namespace Waher.Content.Html
 							};
 
 							if (Audio is null)
-								Audio = new List<AudioInformation>();
+								Audio = new ChunkedList<AudioInformation>();
 
 							Audio.Add(LastAudio);
 							break;
@@ -208,7 +208,7 @@ namespace Waher.Content.Html
 
 						case "og:locale:alternate":
 							if (LocaleAlternate is null)
-								LocaleAlternate = new List<string>();
+								LocaleAlternate = new ChunkedList<string>();
 
 							LocaleAlternate.Add(Value);
 							break;
@@ -224,7 +224,7 @@ namespace Waher.Content.Html
 							};
 
 							if (Video is null)
-								Video = new List<VideoInformation>();
+								Video = new ChunkedList<VideoInformation>();
 
 							Video.Add(LastVideo);
 							break;

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects;
-using System.Threading.Tasks;
+using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 {
@@ -30,7 +30,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 		{
 			if (Object is Type T)
 			{
-				List<IElement> Elements = new List<IElement>();
+				ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 				foreach (PropertyInfo PI in T.GetRuntimeProperties())
 				{

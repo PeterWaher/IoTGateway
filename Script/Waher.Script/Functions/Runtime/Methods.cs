@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -67,7 +67,7 @@ namespace Waher.Script.Functions.Runtime
 			if (Obj is null)
 				return ObjectValue.Null;
 
-			List<IElement> Elements = new List<IElement>();
+			ChunkedList<IElement> Elements = new ChunkedList<IElement>();
 
 			if (Obj is Type T)
 			{

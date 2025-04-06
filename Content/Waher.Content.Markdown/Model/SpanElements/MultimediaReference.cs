@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content.Markdown.Rendering;
+using Waher.Runtime.Collections;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -18,7 +18,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Label">Multimedia label.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		public MultimediaReference(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Label, bool AloneInParagraph)
+		public MultimediaReference(MarkdownDocument Document, ChunkedList<MarkdownElement> ChildElements, string Label, bool AloneInParagraph)
 			: base(Document, ChildElements, Label)
 		{
 			this.aloneInParagraph = AloneInParagraph;

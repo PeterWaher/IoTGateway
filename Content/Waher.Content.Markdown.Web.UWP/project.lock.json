@@ -1580,7 +1580,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1614,7 +1614,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -1634,7 +1634,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -3787,7 +3787,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3821,7 +3821,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -3841,7 +3841,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -6099,7 +6099,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6133,7 +6133,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -6153,7 +6153,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -8306,7 +8306,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8340,7 +8340,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -8360,7 +8360,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -10618,7 +10618,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10652,7 +10652,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -10672,7 +10672,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -12825,7 +12825,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12859,7 +12859,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -12879,7 +12879,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -15137,7 +15137,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15171,7 +15171,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Content.Xml": "3.0.0"
         }
@@ -15191,7 +15191,7 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
-          "Waher.Content.Images": "3.0.0",
+          "Waher.Content.Images": "3.0.1",
           "Waher.Content.Markdown": "5.2.0",
           "Waher.Runtime.IO": "1.0.2"
         }
@@ -23115,7 +23115,7 @@
       "path": "../Waher.Content.Html/Waher.Content.Html.csproj",
       "msbuildProject": "../Waher.Content.Html/Waher.Content.Html.csproj"
     },
-    "Waher.Content.Images/3.0.0": {
+    "Waher.Content.Images/3.0.1": {
       "type": "project",
       "path": "../Waher.Content.Images/Waher.Content.Images.csproj",
       "msbuildProject": "../Waher.Content.Images/Waher.Content.Images.csproj"

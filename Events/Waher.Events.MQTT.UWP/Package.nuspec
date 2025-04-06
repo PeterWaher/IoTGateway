@@ -15,13 +15,13 @@
     <copyright>Copyright © Waher Data AB 2016-2025. All rights reserved.</copyright>
     <tags>logger logging logs events eventlogging eventlogs mqtt uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="3.2.0"/>
-      <dependency id="Waher.Content.Xml" version="3.0.0"/>
-      <dependency id="Waher.Events" version="1.4.1"/>
-      <dependency id="Waher.Networking.UWP" version="4.3.0"/>
+      <dependency id="Waher.Content" version="3.3.0"/>
+      <dependency id="Waher.Content.Xml" version="3.1.0"/>
+      <dependency id="Waher.Events" version="1.4.2"/>
+      <dependency id="Waher.Networking.UWP" version="4.3.1"/>
       <dependency id="Waher.Networking.MQTT.UWP" version="3.1.0"/>
-			<dependency id="Waher.Runtime.Collections" version="1.0.0"/>
-			<dependency id="Waher.Runtime.IO" version="1.0.2"/>
+			<dependency id="Waher.Runtime.Collections" version="1.0.1"/>
+			<dependency id="Waher.Runtime.IO" version="1.0.3"/>
 		</dependencies>
   </metadata>
   <files>

@@ -1580,7 +1580,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3834,7 +3834,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6193,7 +6193,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8447,7 +8447,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10806,7 +10806,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -13060,7 +13060,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15419,7 +15419,7 @@
           "Waher.Content.Xml": "3.0.0"
         }
       },
-      "Waher.Content.Images/3.0.0": {
+      "Waher.Content.Images/3.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -23444,7 +23444,7 @@
       "path": "../../Content/Waher.Content.Html/Waher.Content.Html.csproj",
       "msbuildProject": "../../Content/Waher.Content.Html/Waher.Content.Html.csproj"
     },
-    "Waher.Content.Images/3.0.0": {
+    "Waher.Content.Images/3.0.1": {
       "type": "project",
       "path": "../../Content/Waher.Content.Images/Waher.Content.Images.csproj",
       "msbuildProject": "../../Content/Waher.Content.Images/Waher.Content.Images.csproj"

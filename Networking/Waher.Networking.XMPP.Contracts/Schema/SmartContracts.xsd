@@ -344,60 +344,60 @@
 			<xs:documentation>Defines a set of transient parameter values.</xs:documentation>
 		</xs:annotation>
 	</xs:element>
-	
+
 	<xs:complexType name='Parameters'>
-			<xs:choice minOccurs='1' maxOccurs='unbounded'>
-				<xs:element name='stringParameter' type='StringParameter'>
-					<xs:annotation>
-						<xs:documentation>String-valued parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='numericalParameter' type='NumericalParameter'>
-					<xs:annotation>
-						<xs:documentation>Numerical parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='booleanParameter' type='BooleanParameter'>
-					<xs:annotation>
-						<xs:documentation>Boolean parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='dateParameter' type='DateParameter'>
-					<xs:annotation>
-						<xs:documentation>Date parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='timeParameter' type='TimeParameter'>
-					<xs:annotation>
-						<xs:documentation>Time parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='dateTimeParameter' type='DateTimeParameter'>
-					<xs:annotation>
-						<xs:documentation>Date and Time parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='durationParameter' type='DurationParameter'>
-					<xs:annotation>
-						<xs:documentation>Duration parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='calcParameter' type='CalcParameter'>
-					<xs:annotation>
-						<xs:documentation>Calculation parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='roleParameter' type='RoleParameter'>
-					<xs:annotation>
-						<xs:documentation>Role reference parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:element name='contractReferenceParameter' type='ContractReferenceParameter'>
-					<xs:annotation>
-						<xs:documentation>Contract reference parameter.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-			</xs:choice>
+		<xs:choice minOccurs='1' maxOccurs='unbounded'>
+			<xs:element name='stringParameter' type='StringParameter'>
+				<xs:annotation>
+					<xs:documentation>String-valued parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='numericalParameter' type='NumericalParameter'>
+				<xs:annotation>
+					<xs:documentation>Numerical parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='booleanParameter' type='BooleanParameter'>
+				<xs:annotation>
+					<xs:documentation>Boolean parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='dateParameter' type='DateParameter'>
+				<xs:annotation>
+					<xs:documentation>Date parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='timeParameter' type='TimeParameter'>
+				<xs:annotation>
+					<xs:documentation>Time parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='dateTimeParameter' type='DateTimeParameter'>
+				<xs:annotation>
+					<xs:documentation>Date and Time parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='durationParameter' type='DurationParameter'>
+				<xs:annotation>
+					<xs:documentation>Duration parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='calcParameter' type='CalcParameter'>
+				<xs:annotation>
+					<xs:documentation>Calculation parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='roleParameter' type='RoleParameter'>
+				<xs:annotation>
+					<xs:documentation>Role reference parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='contractReferenceParameter' type='ContractReferenceParameter'>
+				<xs:annotation>
+					<xs:documentation>Contract reference parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
 	</xs:complexType>
 
 	<xs:complexType name='Parameter' abstract='true'>
@@ -2231,79 +2231,118 @@
 			<xs:documentation>Expect an empty response on success.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
-			<xs:sequence>
-				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
-					<xs:annotation>
-						<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
-					</xs:annotation>
-				</xs:any>
-			</xs:sequence>
-			<xs:attribute name='id' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>Identifier of the smart contract hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='pid' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='purpose' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>A string containing the purpose of the request. This string can be shown to the parts of the contract.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='nonce' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
-					<xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='s' type='xs:base64Binary' use='required'>
-				<xs:annotation>
-					<xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
-					<xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
-					<xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
+			<xs:complexContent>
+				<xs:extension base='PetitionRequest'>
+					<xs:sequence>
+						<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+							<xs:annotation>
+								<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
+							</xs:annotation>
+						</xs:any>
+					</xs:sequence>
+					<xs:attribute name='id' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Identifier of the smart contract hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name='petitionContractMsg'>
+	<xs:complexType name='Petition' abstract='true'>
+		<xs:sequence>
+			<xs:element name='properties' minOccurs='0' maxOccurs='1'>
+				<xs:annotation>
+					<xs:documentation>Optional element specifying what properties will be forwarded to party making the request.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='property' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+							<xs:annotation>
+								<xs:documentation>Name of one property that will be forwarded.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='attachments' minOccurs='0' maxOccurs='1'>
+				<xs:annotation>
+					<xs:documentation>Optional element specifying what attachments will be forwarded to party making the request.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='attachment' type='xs:string' minOccurs='0' maxOccurs='unbounded'>
+							<xs:annotation>
+								<xs:documentation>Name of one attachment that will be forwarded, without file extension.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='pid' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='purpose' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>A string containing the purpose of the request. This string can be shown to the recipients of the request.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name='PetitionRequest' abstract='true'>
+		<xs:complexContent>
+			<xs:extension base='Petition'>
+				<xs:attribute name='nonce' type='xs:string' use='required'>
+					<xs:annotation>
+						<xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
+						<xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='s' type='xs:base64Binary' use='required'>
+					<xs:annotation>
+						<xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
+						<xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
+						<xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='PetitionMessage' abstract='true'>
+		<xs:complexContent>
+			<xs:extension base='Petition'>
+				<xs:sequence>
+					<xs:element ref='id:identity' minOccurs='1' maxOccurs='1'>
+						<xs:annotation>
+							<xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
+							<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
+						<xs:annotation>
+							<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
+						</xs:annotation>
+					</xs:any>
+				</xs:sequence>
+				<xs:attribute name='from' type='xs:string' use='required'>
+					<xs:annotation>
+						<xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name='petitionContractMsg' type='PetitionMessage'>
 		<xs:annotation>
 			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a smart contract to which the recipient of this message is part.</xs:documentation>
 			<xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionContractResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
 		</xs:annotation>
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref='id:identity' minOccurs='1' maxOccurs='1'>
-					<xs:annotation>
-						<xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
-						<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
-					</xs:annotation>
-				</xs:element>
-				<xs:any minOccurs='0' maxOccurs='1' namespace='##other'>
-					<xs:annotation>
-						<xs:documentation>Optional element that can provide machine-readable context for petition.</xs:documentation>
-					</xs:annotation>
-				</xs:any>
-			</xs:sequence>
-			<xs:attribute name='pid' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='from' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-			<xs:attribute name='purpose' type='xs:string' use='required'>
-				<xs:annotation>
-					<xs:documentation>A string containing the purpose of the request. This string can be shown to the parts of the contract.</xs:documentation>
-				</xs:annotation>
-			</xs:attribute>
-		</xs:complexType>
 	</xs:element>
 
 	<xs:element name='petitionContractResponse'>

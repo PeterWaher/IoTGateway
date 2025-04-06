@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Net.Mail;
+using System.Xml;
 using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Contracts.EventArguments
@@ -6,15 +7,9 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 	/// <summary>
 	/// Event arguments for legal identity petitions
 	/// </summary>
-	public class LegalIdentityPetitionEventArgs : MessageEventArgs
+	public class LegalIdentityPetitionEventArgs : PetitionEventArgs
 	{
-		private readonly LegalIdentity requestorIdentity;
-		private readonly string requestorFullJid;
 		private readonly string requestedIdentityId;
-		private readonly string petitionId;
-		private readonly string purpose;
-		private readonly string clientEndpoint;
-		private readonly XmlElement context;
 
 		/// <summary>
 		/// Event arguments for legal identity petitions
@@ -27,52 +22,21 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// <param name="Purpose">Purpose of petitioning the identity information.</param>
 		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
 		/// <param name="Context">Any machine-readable context XML element available in the petition.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
 		public LegalIdentityPetitionEventArgs(MessageEventArgs e, LegalIdentity RequestorIdentity, string RequestorFullJid,
-			string RequestedIdentityId, string PetitionId, string Purpose, string ClientEndpoint, XmlElement Context)
-			: base(e)
+			string RequestedIdentityId, string PetitionId, string Purpose, string ClientEndpoint, XmlElement Context,
+			string[] Properties, string[] Attachments)
+			: base(e, RequestorIdentity, RequestorFullJid, PetitionId, Purpose, ClientEndpoint, Context, Properties, Attachments)
 		{
-			this.requestorIdentity = RequestorIdentity;
-			this.requestorFullJid = RequestorFullJid;
 			this.requestedIdentityId = RequestedIdentityId;
-			this.petitionId = PetitionId;
-			this.purpose = Purpose;
-			this.clientEndpoint = ClientEndpoint;
-			this.context = Context;
 		}
-
-		/// <summary>
-		/// Legal Identity of requesting entity.
-		/// </summary>
-		public LegalIdentity RequestorIdentity => this.requestorIdentity;
-
-		/// <summary>
-		/// Full JID of requestor.
-		/// </summary>
-		public string RequestorFullJid => this.requestorFullJid;
 
 		/// <summary>
 		/// Requested identity ID
 		/// </summary>
 		public string RequestedIdentityId => this.requestedIdentityId;
-
-		/// <summary>
-		/// Petition ID
-		/// </summary>
-		public string PetitionId => this.petitionId;
-
-		/// <summary>
-		/// Purpose
-		/// </summary>
-		public string Purpose => this.purpose;
-
-		/// <summary>
-		/// Remote endpoint of remote party client.
-		/// </summary>
-		public string ClientEndpoint => this.clientEndpoint;
-
-		/// <summary>
-		/// Any machine-readable context XML element available in the petition.
-		/// </summary>
-		public XmlElement Context => this.context;
 	}
 }

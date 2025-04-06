@@ -25,6 +25,7 @@ using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Settings;
@@ -5694,7 +5695,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
 		public Task PetitionIdentityAsync(string LegalId, string PetitionId, string Purpose)
 		{
-			return this.PetitionIdentityAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, Purpose, null);
+			return this.PetitionIdentityAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, Purpose, null, null, null);
 		}
 
 		/// <summary>
@@ -5710,7 +5711,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
 		public Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose)
 		{
-			return this.PetitionIdentityAsync(Address, LegalId, PetitionId, Purpose, null);
+			return this.PetitionIdentityAsync(Address, LegalId, PetitionId, Purpose, null, null, null);
 		}
 
 		/// <summary>
@@ -5725,7 +5726,72 @@ namespace Waher.Networking.XMPP.Contracts
 		/// to identify the petition request.</param>
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
 		/// <param name="ContextXml">Any machine-readable context XML element you want to include in the petition.</param>
-		public async Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose, string ContextXml)
+		public Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose, string ContextXml)
+		{
+			return this.PetitionIdentityAsync(Address, LegalId, PetitionId, Purpose, ContextXml, null, null);
+		}
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
+		public Task PetitionIdentityAsync(string LegalId, string PetitionId, string Purpose,
+			string[] Properties, string[] Attachments)
+		{
+			return this.PetitionIdentityAsync(this.GetTrustProvider(LegalId), LegalId, PetitionId, Purpose, null, 
+				Properties, Attachments);
+		}
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
+		public Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose,
+			string[] Properties, string[] Attachments)
+		{
+			return this.PetitionIdentityAsync(Address, LegalId, PetitionId, Purpose, null, 
+				Properties, Attachments);
+		}
+
+		/// <summary>
+		/// Sends a petition to the owner of a legal identity, to access the information in the identity. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForIdentityReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedIdentityResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		/// <param name="ContextXml">Any machine-readable context XML element you want to include in the petition.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
+		public async Task PetitionIdentityAsync(string Address, string LegalId, string PetitionId, string Purpose, string ContextXml,
+			string[] Properties, string[] Attachments)
 		{
 			StringBuilder Xml = new StringBuilder();
 			byte[] Nonce = this.RandomBytes(32);
@@ -5752,11 +5818,43 @@ namespace Waher.Networking.XMPP.Contracts
 			else
 			{
 				Xml.Append("'>");
+				AppendHints(Xml, Properties, Attachments);
 				Xml.Append(ContextXml);
 				Xml.Append("</petitionIdentity>");
 			}
 
 			await this.client.IqSetAsync(Address, Xml.ToString());
+		}
+
+		private static void AppendHints(StringBuilder Xml, string[] Properties, string[] Attachments)
+		{
+			if (!(Properties is null))
+			{
+				Xml.Append("<properties>");
+
+				foreach (string Property in Properties)
+				{
+					Xml.Append("<property>");
+					Xml.Append(XML.Encode(Property));
+					Xml.Append("</property>");
+				}
+
+				Xml.Append("</properties>");
+			}
+
+			if (!(Attachments is null))
+			{
+				Xml.Append("<attachments>");
+
+				foreach (string Attachment in Attachments)
+				{
+					Xml.Append("<attachment>");
+					Xml.Append(XML.Encode(Attachment));
+					Xml.Append("</attachment>");
+				}
+
+				Xml.Append("</attachments>");
+			}
 		}
 
 		/// <summary>
@@ -5853,24 +5951,19 @@ namespace Waher.Networking.XMPP.Contracts
 			string Purpose = XML.Attribute(e.Content, "purpose");
 			string From = XML.Attribute(e.Content, "from");
 			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
-			LegalIdentity Identity = null;
-			XmlElement Context = null;
-
-			foreach (XmlNode N in e.Content.ChildNodes)
+			 
+			if (!TryGetContext(e.Content, out XmlElement Context, out string _,
+				out string[] Properties, out string[] Attachments, out LegalIdentity Identity))
 			{
-				if (N is XmlElement E)
-				{
-					if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
-						Identity = LegalIdentity.Parse(E);
-					else if (!(Context is null))
-						return;
-					else
-						Context = E;
-				}
+				this.client.Error("Invalid context. Ignoring message.");
+				return;
 			}
 
 			if (Identity is null)
+			{
+				this.client.Error("No identity in message. Ignoring message.");
 				return;
+			}
 
 			if (string.Compare(e.FromBareJID, this.componentAddress, true) == 0)
 			{
@@ -5885,9 +5978,91 @@ namespace Waher.Networking.XMPP.Contracts
 						return;
 					}
 
-					await this.PetitionForIdentityReceived.Raise(this, new LegalIdentityPetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, ClientEndpoint, Context));
+					await this.PetitionForIdentityReceived.Raise(this, new LegalIdentityPetitionEventArgs(e, 
+						Identity, From, LegalId, PetitionId, Purpose, ClientEndpoint, Context, Properties, Attachments));
 				}, null);
 			}
+		}
+
+		private static bool TryGetContext(XmlElement Query, out XmlElement Context,
+			out string Content, out string[] Properties, out string[] Attachments,
+			out LegalIdentity Identity)
+		{
+			ChunkedList<string> PropertyList = null;
+			ChunkedList<string> AttachmentList = null;
+			Context = null;
+			Properties = null;
+			Attachments = null;
+			Content = null;
+			Identity = null;
+
+			foreach (XmlNode N in Query)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				if (E.NamespaceURI == Query.NamespaceURI)
+				{
+					switch (E.LocalName)
+					{
+						case "identity":
+							Identity = LegalIdentity.Parse(E);
+							continue;
+
+						case "content":
+							if (string.IsNullOrEmpty(Content))
+							{
+								Content = E.InnerText;
+								continue;
+							}
+							else
+								return false;
+
+						case "properties":
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (!(N2 is XmlElement E2))
+									continue;
+
+								if (E2.LocalName == "property")
+								{
+									PropertyList ??= new ChunkedList<string>();
+									PropertyList.Add(E2.InnerText);
+								}
+								else
+									return false;
+							}
+							continue;
+
+						case "attachments":
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (!(N2 is XmlElement E2))
+									continue;
+
+								if (E2.LocalName == "attachment")
+								{
+									AttachmentList ??= new ChunkedList<string>();
+									AttachmentList.Add(E2.InnerText);
+								}
+								else
+									return false;
+							}
+							continue;
+					}
+				}
+
+				if (Context is null)
+					Context = E;
+				else
+					return false;
+				break;
+			}
+
+			Properties = PropertyList?.ToArray();
+			Attachments = AttachmentList?.ToArray();
+
+			return true;
 		}
 
 		/// <summary>
@@ -5942,7 +6117,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
 		public Task PetitionSignatureAsync(string LegalId, byte[] Content, string PetitionId, string Purpose)
 		{
-			return this.PetitionSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Content, PetitionId, Purpose, false, null);
+			return this.PetitionSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Content, PetitionId, Purpose, false, null, null, null);
 		}
 
 		/// <summary>
@@ -5959,7 +6134,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Purpose">Purpose string to show to the owner.</param>
 		public Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose)
 		{
-			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false, null);
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false, null, null, null);
 		}
 
 		/// <summary>
@@ -5977,11 +6152,80 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ContextXml">Any machine-readable context XML element you want to include in the petition.</param>
 		public Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose, string ContextXml)
 		{
-			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false, ContextXml);
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false, ContextXml, null, null);
+		}
+
+		/// <summary>
+		/// Sends a petition to a third party to request a digital signature of some content. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
+		public Task PetitionSignatureAsync(string LegalId, byte[] Content, string PetitionId, string Purpose,
+			string[] Properties, string[] Attachments)
+		{
+			return this.PetitionSignatureAsync(this.GetTrustProvider(LegalId), LegalId, Content, PetitionId, Purpose, false, null,
+				Properties, Attachments);
+		}
+
+		/// <summary>
+		/// Sends a petition to a third party to request a digital signature of some content. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
+		public Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose,
+			string[] Properties, string[] Attachments)
+		{
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false, null,
+				Properties, Attachments);
+		}
+
+		/// <summary>
+		/// Sends a petition to a third party to request a digital signature of some content. The petition is not
+		/// guaranteed to return a response. Response is returned if the recipient accepts the petition.
+		/// When a petition is received, the <see cref="PetitionForSignatureReceived"/> event is raised.
+		/// When a response to a petition is received, the <see cref="PetitionedSignatureResponseReceived"/> event is raised.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">Legal Identity to petition.</param>
+		/// <param name="Content">Content to be signed.</param>
+		/// <param name="PetitionId">A petition identifier. This identifier will follow the petition, and can be used
+		/// to identify the petition request.</param>
+		/// <param name="Purpose">Purpose string to show to the owner.</param>
+		/// <param name="ContextXml">Any machine-readable context XML element you want to include in the petition.</param>
+		/// <param name="Properties">Optional property hints to provide to the remote party,
+		/// highlighting which properties will be used in the response.</param>
+		/// <param name="Attachments">Optional attachment hints to provide to the remote party,
+		/// highlighting which attachments will be used in the response.</param>
+		public Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId, string Purpose, string ContextXml,
+			string[] Properties, string[] Attachments)
+		{
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, false, ContextXml,
+				Properties, Attachments);
 		}
 
 		private async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId,
-			string Purpose, bool PeerReview, string ContextXml)
+			string Purpose, bool PeerReview, string ContextXml, string[] Properties, string[] Attachments)
 		{
 			if (this.contentPerPid.TryGetValue(PetitionId, out KeyValuePair<byte[], bool> Rec))
 			{
@@ -6014,16 +6258,17 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("' s='");
 			Xml.Append(Convert.ToBase64String(Signature));
 			Xml.Append("'>");
+			AppendHints(Xml, Properties, Attachments);
 
-			if (string.IsNullOrEmpty(ContextXml))
-				Xml.Append(ContentStr);
-			else
+			if (!string.IsNullOrEmpty(ContentStr))
 			{
 				Xml.Append("<content>");
 				Xml.Append(ContentStr);
 				Xml.Append("</content>");
-				Xml.Append(ContextXml);
 			}
+
+			if (!string.IsNullOrEmpty(ContextXml))
+				Xml.Append(ContextXml);
 
 			Xml.Append("</petitionSignature>");
 
@@ -6138,39 +6383,31 @@ namespace Waher.Networking.XMPP.Contracts
 			string Purpose = XML.Attribute(e.Content, "purpose");
 			string From = XML.Attribute(e.Content, "from");
 			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
-			string ContentStr = string.Empty;
-			byte[] Content = null;
-			LegalIdentity Identity = null;
-			XmlElement Context = null;
+			byte[] Content;
 			bool PeerReview = false;
 
-			foreach (XmlNode N in e.Content.ChildNodes)
+			if (!TryGetContext(e.Content, out XmlElement Context, out string ContentStr,
+				out string[] Properties, out string[] Attachments, out LegalIdentity Identity))
 			{
-				if (!(N is XmlElement E))
-					continue;
-
-				switch (E.LocalName)
-				{
-					case "content":
-						ContentStr = E.InnerText;
-						Content = Convert.FromBase64String(ContentStr);
-						break;
-
-					case "identity":
-						Identity = LegalIdentity.Parse(E);
-						break;
-
-					default:
-						if (!(Context is null))
-							return;
-
-						Context = E;
-						break;
-				}
+				this.client.Error("Invalid context. Ignoring message.");
+				return;
 			}
 
-			if (Content is null)
+			if (string.IsNullOrEmpty(ContentStr))
+			{
+				this.client.Error("No content in message to sign. Ignoring message.");
 				return;
+			}
+
+			try
+			{
+				Content = Convert.FromBase64String(ContentStr);
+			}
+			catch (Exception)
+			{
+				this.client.Error("Invalid BASE64-encoded content in message to sign. Ignoring message.");
+				return;
+			}
 
 			if (Identity is null)
 			{
@@ -6224,7 +6461,8 @@ namespace Waher.Networking.XMPP.Contracts
 					return;
 				}
 
-				await h.Raise(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, PetitionId, Purpose, Content, ClientEndpoint, Context));
+				await h.Raise(this, new SignaturePetitionEventArgs(e, Identity, From, LegalId, 
+					PetitionId, Purpose, Content, ClientEndpoint, Context, Properties, Attachments));
 
 			}, null);
 		}
@@ -6377,7 +6615,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Identity.Serialize(Xml, true, true, true, true, true, true, true);
 			byte[] Content = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, true, null);
+			return this.PetitionSignatureAsync(Address, LegalId, Content, PetitionId, Purpose, true, null, null, null);
 		}
 
 		/// <summary>
@@ -6607,27 +6845,25 @@ namespace Waher.Networking.XMPP.Contracts
 			string From = XML.Attribute(e.Content, "from");
 			string ClientEndpoint = XML.Attribute(e.Content, "clientEp");
 			int i = ContractId.IndexOf('@');
-			LegalIdentity Identity = null;
-			XmlElement Context = null;
 
-			foreach (XmlNode N in e.Content.ChildNodes)
+			if (!TryGetContext(e.Content, out XmlElement Context, out string ContentStr,
+				out string[] Properties, out string[] Attachments, out LegalIdentity Identity))
 			{
-				if (!(N is XmlElement E))
-					continue;
-
-				if (E.LocalName == "identity" && E.NamespaceURI == e.Content.NamespaceURI)
-					Identity = LegalIdentity.Parse(E);
-				else if (!(Context is null))
-					return;
-				else
-					Context = E;
+				this.client.Error("Invalid context. Ignoring message.");
+				return;
 			}
 
 			if (Identity is null)
+			{
+				this.client.Error("No identity in message. Ignoring message.");
 				return;
+			}
 
 			if (!this.IsFromTrustProvider(ContractId, e.FromBareJID))
+			{
+				this.client.Error("Contract not hosted on trust provider. Ignoring message.");
 				return;
+			}
 
 			await this.Validate(Identity, false, async (sender2, e2) =>
 			{
@@ -6640,7 +6876,8 @@ namespace Waher.Networking.XMPP.Contracts
 					return;
 				}
 
-				await this.PetitionForContractReceived.Raise(this, new ContractPetitionEventArgs(e, Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint, Context));
+				await this.PetitionForContractReceived.Raise(this, new ContractPetitionEventArgs(e, 
+					Identity, From, ContractId, PetitionId, Purpose, ClientEndpoint, Context, Properties, Attachments));
 
 			}, null);
 		}

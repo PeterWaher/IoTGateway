@@ -451,11 +451,11 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name='petitionIdentityMsg' type='PetitionMessage'/>
-	<xs:annotation>
-		<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a legal identity owned by the recipient of this message.</xs:documentation>
-		<xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionIdentityResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
-	</xs:annotation>
+	<xs:element name='petitionIdentityMsg' type='PetitionMessage'>
+		<xs:annotation>
+			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a legal identity owned by the recipient of this message.</xs:documentation>
+			<xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionIdentityResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
+		</xs:annotation>
 	</xs:element>
 
 	<xs:element name='petitionIdentityResponse' type='PetitionResponse'>

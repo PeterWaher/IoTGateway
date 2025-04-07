@@ -18,7 +18,7 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Zero parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypes0 = new ArgumentType[0];
+		protected static readonly ArgumentType[] argumentTypes0 = Array.Empty<ArgumentType>();
 
 		/// <summary>
 		/// One scalar parameter.

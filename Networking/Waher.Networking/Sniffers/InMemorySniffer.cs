@@ -180,7 +180,7 @@ namespace Waher.Networking.Sniffers
 		public SnifferEvent[] ToArray()
 		{
 			if (this.disposed)
-				return new SnifferEvent[0];
+				return Array.Empty<SnifferEvent>();
 			else
 			{
 				lock (this.events)

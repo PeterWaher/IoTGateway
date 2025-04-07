@@ -77,7 +77,7 @@ namespace Waher.Networking.PeerToPeer
 		private ManualResetEvent ready = new ManualResetEvent(false);
 		private ManualResetEvent error = new ManualResetEvent(false);
 		private Exception exception;
-		private Player[] remotePlayers = new Player[0];
+		private Player[] remotePlayers = Array.Empty<Player>();
 		private int mqttTerminatedPacketIdentifier;
 		private int playerCount = 1;
 		private int connectionCount = 0;

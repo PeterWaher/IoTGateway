@@ -106,7 +106,7 @@ namespace Waher.Content
 							if (ch == ']')
 							{
 								Pos++;
-								return new object[0];
+								return System.Array.Empty<object>();
 							}
 
 							ChunkedList<object> Array = new ChunkedList<object>();

@@ -71,7 +71,7 @@ namespace Waher.Persistence
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
 			where T : class
 		{
-			return Task.FromResult<IEnumerable<T>>(new T[0]);
+			return Task.FromResult<IEnumerable<T>>(Array.Empty<T>());
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Waher.Persistence
 		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
-			return Task.FromResult<IEnumerable<T>>(new T[0]);
+			return Task.FromResult<IEnumerable<T>>(Array.Empty<T>());
 		}
 
 		/// <summary>
@@ -101,7 +101,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, params string[] SortOrder)
 		{
-			return Task.FromResult<IEnumerable<object>>(new object[0]);
+			return Task.FromResult<IEnumerable<object>>(Array.Empty<object>());
 		}
 
 		/// <summary>
@@ -116,7 +116,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			return Task.FromResult<IEnumerable<object>>(new object[0]);
+			return Task.FromResult<IEnumerable<object>>(Array.Empty<object>());
 		}
 
 		/// <summary>
@@ -133,7 +133,7 @@ namespace Waher.Persistence
 		public Task<IEnumerable<T>> Find<T>(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
-			return Task.FromResult<IEnumerable<T>>(new T[0]);
+			return Task.FromResult<IEnumerable<T>>(Array.Empty<T>());
 		}
 
 		/// <summary>
@@ -320,7 +320,7 @@ namespace Waher.Persistence
 		public Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, params string[] SortOrder)
 			where T : class
 		{
-			return Task.FromResult<IEnumerable<T>>(new T[0]);
+			return Task.FromResult<IEnumerable<T>>(Array.Empty<T>());
 		}
 
 		/// <summary>
@@ -336,7 +336,7 @@ namespace Waher.Persistence
 		public Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
-			return Task.FromResult<IEnumerable<T>>(new T[0]);
+			return Task.FromResult<IEnumerable<T>>(Array.Empty<T>());
 		}
 
 		/// <summary>
@@ -350,7 +350,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, params string[] SortOrder)
 		{
-			return Task.FromResult<IEnumerable<object>>(new object[0]);
+			return Task.FromResult<IEnumerable<object>>(Array.Empty<object>());
 		}
 
 		/// <summary>
@@ -365,7 +365,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			return Task.FromResult<IEnumerable<object>>(new object[0]);
+			return Task.FromResult<IEnumerable<object>>(Array.Empty<object>());
 		}
 
 		/// <summary>
@@ -513,7 +513,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -527,7 +527,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -540,7 +540,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found and repaired.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -554,7 +554,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found and repaired.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -568,7 +568,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -583,7 +583,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, ProfilerThread Thread)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -593,7 +593,7 @@ namespace Waher.Persistence
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(params string[] CollectionNames)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -604,7 +604,7 @@ namespace Waher.Persistence
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -664,7 +664,7 @@ namespace Waher.Persistence
 		/// Gets an array of available dictionary collections.
 		/// </summary>
 		/// <returns>Array of dictionary collections.</returns>
-		public Task<string[]> GetDictionaries() => Task.FromResult(new string[0]);
+		public Task<string[]> GetDictionaries() => Task.FromResult(Array.Empty<string>());
 
 		/// <summary>
 		/// Gets an array of available collections.
@@ -672,7 +672,7 @@ namespace Waher.Persistence
 		/// <returns>Array of collections.</returns>
 		public Task<string[]> GetCollections()
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -713,7 +713,7 @@ namespace Waher.Persistence
 		/// <returns>Array of labels.</returns>
 		public Task<string[]> GetLabels(string Collection)
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -750,6 +750,6 @@ namespace Waher.Persistence
 		/// Gets an array of collections that should be excluded from backups.
 		/// </summary>
 		/// <returns>Array of excluded collections.</returns>
-		public string[] GetExcludedCollections() => new string[0];
+		public string[] GetExcludedCollections() => Array.Empty<string>();
 	}
 }

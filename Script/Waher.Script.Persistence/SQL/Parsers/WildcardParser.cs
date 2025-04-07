@@ -1,4 +1,5 @@
-﻿using Waher.Script.Model;
+﻿using System;
+using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Parsers
 {
@@ -27,7 +28,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[0];
+		public string[] InternalKeywords => Array.Empty<string>();
 
 		/// <summary>
 		/// Tries to parse a script node.

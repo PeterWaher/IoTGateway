@@ -1803,7 +1803,7 @@ namespace Waher.Persistence.MongoDB
 			Thread?.Idle();
 			Thread?.Stop();
 
-			return new string[0];
+			return Array.Empty<string>();
 		}
 
 		/// <summary>
@@ -1813,7 +1813,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(params string[] CollectionNames)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult<string[]>(Array.Empty<string>());
 		}
 
 		/// <summary>
@@ -1824,7 +1824,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult<string[]>(Array.Empty<string>());
 		}
 
 		private static string Encode(string s)

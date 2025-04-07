@@ -221,7 +221,7 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		public ISniffer[] Sniffers
 		{
-			get { return this.GetBroker().Result?.Client?.Sniffers ?? new ISniffer[0]; }
+			get { return this.GetBroker().Result?.Client?.Sniffers ?? Array.Empty<ISniffer>(); }
 		}
 
 		/// <summary>
@@ -242,7 +242,7 @@ namespace Waher.Things.Xmpp
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.GetBroker().Result?.Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();
+			return this.GetBroker().Result?.Client?.GetEnumerator() ?? Array.Empty<ISniffer>().GetEnumerator();
 		}
 
 		/// <summary>

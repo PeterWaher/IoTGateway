@@ -2175,7 +2175,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized(Serializer);
 			await File.BeginRead();
@@ -2209,7 +2209,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized(Serializer);
 			await File.BeginRead();
@@ -2284,7 +2284,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized<T>();
 			await File.BeginRead();
@@ -2318,7 +2318,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized<T>();
 			await File.BeginRead();
@@ -2476,7 +2476,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			return await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, false, SortOrder, null);
 		}
@@ -2510,7 +2510,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
 
 			if (File is null)
-				return new object[0];
+				return Array.Empty<object>();
 
 			return await File.FindDelete(Offset, MaxCount, Filter, false, SortOrder, null);
 		}
@@ -2840,7 +2840,7 @@ namespace Waher.Persistence.Files
 		{
 			string Folder = Path.Combine(this.folder, "Dictionaries");
 			if (!Directory.Exists(Folder))
-				return Task.FromResult(new string[0]);
+				return Task.FromResult(Array.Empty<string>());
 
 			List<string> Collections = new List<string>();
 
@@ -3940,7 +3940,7 @@ namespace Waher.Persistence.Files
 				return await this.Repair(s, XsltPath, Collections);
 			}
 			else
-				return new string[0];
+				return Array.Empty<string>();
 		}
 
 		private string GetReportFileName()

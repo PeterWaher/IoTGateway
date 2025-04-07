@@ -698,7 +698,7 @@ namespace Waher.Things.Metering
 			lock (this.synchObject)
 			{
 				if (this.children is null)
-					return new INode[0];
+					return Array.Empty<INode>();
 				else
 					return this.children.ToArray();
 			}

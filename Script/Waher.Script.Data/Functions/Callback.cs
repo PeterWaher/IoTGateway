@@ -247,7 +247,7 @@ namespace Waher.Script.Data.Functions
 						CSharp.Append("this.Lambda.Evaluate(");
 
 					if (Parameters.Length == 0)
-						CSharp.Append("new IElement[0]");
+						CSharp.Append("Array.Empty<IElement>()");
 					else
 					{
 						CSharp.AppendLine("new IElement[]");

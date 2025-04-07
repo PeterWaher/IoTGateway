@@ -21,7 +21,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public GetTabIDs(int Start, int Length, Expression Expression)
-			: base(new ScriptNode[0], argumentTypes0, Start, Length, Expression)
+			: base(Array.Empty<ScriptNode>(), argumentTypes0, Start, Length, Expression)
 		{
 		}
 
@@ -96,7 +96,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 					else if (Obj is IUser User)
 						return ClientEvents.GetTabIDsForUser(User);
 					else if (Obj is null)
-						return new string[0];
+						return Array.Empty<string>();
 					else
 						return ClientEvents.GetTabIDsForLocation(Obj?.ToString());
 
@@ -105,7 +105,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 						GetQueryFilter(Arguments[1], Node));
 
 				default:
-					return new string[0];
+					return Array.Empty<string>();
 			}
 		}
 

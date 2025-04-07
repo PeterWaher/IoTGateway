@@ -231,7 +231,7 @@ namespace Waher.Script.Graphs.Canvas2D
 
 				using (SKImage Result = Surface.Snapshot())
 				{
-					States = new object[0];
+					States = Array.Empty<object>();
 					return PixelInformation.FromImage(Result);
 				}
 			}

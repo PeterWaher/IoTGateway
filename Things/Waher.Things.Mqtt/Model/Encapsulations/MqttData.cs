@@ -127,7 +127,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		/// </summary>
 		public virtual ControlParameter[] GetControlParameters()
 		{
-			return new ControlParameter[0];
+			return Array.Empty<ControlParameter>();
 		}
 
 		/// <summary>

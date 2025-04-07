@@ -350,7 +350,7 @@ namespace Waher.WebService.Script
 					{
 						try
 						{
-							AbortInternal.Invoke(this.thread, new object[0]);
+							AbortInternal.Invoke(this.thread, Array.Empty<object>());
 						}
 						catch (Exception)
 						{

@@ -148,8 +148,8 @@ namespace Waher.Content.Dsn
 
 			if (c == 0)
 			{
-				PerMessage = new PerMessageFields(new string[0]);
-				PerRecipients = new PerRecipientFields[0];
+				PerMessage = new PerMessageFields(Array.Empty<string>());
+				PerRecipients = Array.Empty<PerRecipientFields>();
 			}
 			else
 			{

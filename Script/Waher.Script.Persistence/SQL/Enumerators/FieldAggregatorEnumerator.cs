@@ -76,7 +76,7 @@ namespace Waher.Script.Persistence.SQL.Enumerators
             }
             else
             {
-                GroupObject Obj = new GroupObject(new object[] { this.current }, new object[0], new ScriptNode[0], this.objectVariables);
+                GroupObject Obj = new GroupObject(new object[] { this.current }, Array.Empty<object>(), Array.Empty<ScriptNode>(), this.objectVariables);
 
                 foreach (KeyValuePair<string, ScriptNode> P in this.additionalFields)
                     Obj[P.Key] = P.Value.Evaluate(this.objectVariables);

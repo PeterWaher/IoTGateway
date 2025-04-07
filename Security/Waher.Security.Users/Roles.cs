@@ -49,7 +49,7 @@ namespace Waher.Security.Users
 					{
 						Id = RoleId,
 						Description = string.Empty,
-						Privileges = new PrivilegePattern[0]
+						Privileges = Array.Empty<PrivilegePattern>()
 					};
 
 					await Database.Insert(Role);

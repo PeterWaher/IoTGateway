@@ -3764,7 +3764,7 @@ namespace Waher.IoTGateway
 
 			await Export.SetLastBackupAsync(Now);
 
-			StartExport.ExportInfo ExportInfo = await StartExport.GetExporter("Encrypted", false, new string[0]);
+			StartExport.ExportInfo ExportInfo = await StartExport.GetExporter("Encrypted", false, Array.Empty<string>());
 
 			ExportFormat.UpdateClientsFileUpdated(ExportInfo.LocalBackupFileName, -1, Now);
 
@@ -3998,7 +3998,7 @@ namespace Waher.IoTGateway
 		/// <returns>Array of addresses</returns>
 		public static CaseInsensitiveString[] GetNotificationAddresses()
 		{
-			return NotificationConfiguration.Instance?.Addresses ?? new CaseInsensitiveString[0];
+			return NotificationConfiguration.Instance?.Addresses ?? Array.Empty<CaseInsensitiveString>();
 		}
 
 		private static async Task SendNotification(string To, string Markdown, string Text, string Html, string MessageId, bool Update)
@@ -4411,7 +4411,7 @@ namespace Waher.IoTGateway
 			List<WebMenuItem> Result = new List<WebMenuItem>();
 			Variables Session = Request.Session;
 			if (Session is null)
-				return new WebMenuItem[0];
+				return Array.Empty<WebMenuItem>();
 
 			Language Language = ScriptExtensions.Constants.Language.GetLanguageAsync(Session).Result;
 

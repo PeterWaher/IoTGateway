@@ -219,7 +219,7 @@ namespace Waher.IoTGateway.Setup
 				string Json = JSON.Encode(new KeyValuePair<string, object>[]
 				{
 					new KeyValuePair<string, object>("bareJid", e.FromBareJID),
-					new KeyValuePair<string, object>("html", await this.RosterItemsHtml(new RosterItem[0], new PresenceEventArgs[] { e }))
+					new KeyValuePair<string, object>("html", await this.RosterItemsHtml(Array.Empty<RosterItem>(), new PresenceEventArgs[] { e }))
 				}, false);
 
 				Task _ = ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
@@ -241,7 +241,7 @@ namespace Waher.IoTGateway.Setup
 				string Json = JSON.Encode(new KeyValuePair<string, object>[]
 				{
 					new KeyValuePair<string, object>("bareJid", Item.BareJid),
-					new KeyValuePair<string, object>("html", await this.RosterItemsHtml(new RosterItem[]{ Item }, new PresenceEventArgs[0]))
+					new KeyValuePair<string, object>("html", await this.RosterItemsHtml(new RosterItem[]{ Item }, Array.Empty<PresenceEventArgs>()))
 				}, false);
 
 				await ClientEvents.PushEvent(TabIDs, "UpdateRosterItem", Json, true, "User");
@@ -597,7 +597,7 @@ namespace Waher.IoTGateway.Setup
 				Groups.Keys.CopyTo(GroupsArray, 0);
 			}
 			else
-				GroupsArray = new string[0];
+				GroupsArray = Array.Empty<string>();
 
 			StringBuilder sb = new StringBuilder();
 			bool First = true;

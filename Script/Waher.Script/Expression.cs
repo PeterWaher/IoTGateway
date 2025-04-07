@@ -2595,7 +2595,7 @@ namespace Waher.Script
 							if (Node is NamedMember NamedMember)
 							{
 								if (Right is null)
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], NamedMember.NullCheck || NullCheck, Start, this.pos - Start, this);
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, Array.Empty<ScriptNode>(), NamedMember.NullCheck || NullCheck, Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
 									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, NamedMember.NullCheck || NullCheck, Start, this.pos - Start, this);
 								else
@@ -2604,7 +2604,7 @@ namespace Waher.Script
 							else
 							{
 								if (Right is null)
-									Node = new DynamicFunctionCall(Node, new ScriptNode[0], NullCheck, Start, this.pos - Start, this);
+									Node = new DynamicFunctionCall(Node, Array.Empty<ScriptNode>(), NullCheck, Start, this.pos - Start, this);
 								else if (Right.GetType() == typeof(ElementList))
 									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, NullCheck, Start, this.pos - Start, this);
 								else
@@ -3306,7 +3306,7 @@ namespace Waher.Script
 				if (!(ElementList is null))
 					return new NamedFunctionCall(FunctionName, ElementList.Elements, NullCheck, Start, Length, Expression);
 				else if (Arguments is null)
-					return new NamedFunctionCall(FunctionName, new ScriptNode[0], NullCheck, Start, Length, Expression);
+					return new NamedFunctionCall(FunctionName, Array.Empty<ScriptNode>(), NullCheck, Start, Length, Expression);
 				else
 					return new NamedFunctionCall(FunctionName, new ScriptNode[] { Arguments }, NullCheck, Start, Length, Expression);
 			}
@@ -3665,7 +3665,7 @@ namespace Waher.Script
 							if (!(this.ParseEquivalence() is ScriptNode Operand))
 								throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
 
-							return new LambdaDefinition(new string[0], new ArgumentType[0], Operand, Start, this.pos - Start, this);
+							return new LambdaDefinition(Array.Empty<string>(), Array.Empty<ArgumentType>(), Operand, Start, this.pos - Start, this);
 						}
 					}
 
@@ -3685,7 +3685,7 @@ namespace Waher.Script
 				if (this.PeekNextChar() == ']')
 				{
 					this.pos++;
-					return new VectorDefinition(new ScriptNode[0], Start, this.pos - Start, this);
+					return new VectorDefinition(Array.Empty<ScriptNode>(), Start, this.pos - Start, this);
 				}
 
 				bool WsBak = this.canSkipWhitespace;

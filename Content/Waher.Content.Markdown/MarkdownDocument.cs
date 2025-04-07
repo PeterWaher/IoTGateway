@@ -5720,7 +5720,7 @@ namespace Waher.Content.Markdown
 		public string[] GetMetaData(string Key)
 		{
 			if (!this.metaData.TryGetValue(Key.ToUpper(), out KeyValuePair<string, bool>[] Value))
-				return new string[0];
+				return Array.Empty<string>();
 
 			int i, c = Value.Length;
 			string[] Result = new string[c];
@@ -5916,7 +5916,7 @@ namespace Waher.Content.Markdown
 			get
 			{
 				if (this.footnoteOrder is null)
-					return new string[0];
+					return Array.Empty<string>();
 				else
 					return this.footnoteOrder.ToArray();
 			}

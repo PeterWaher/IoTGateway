@@ -477,7 +477,7 @@ namespace Waher.Script.Operators.Membership
 						Result.Add(new MethodRec()
 						{
 							Method = PI.GetMethod,
-							Parameters = new ParameterInfo[0],
+							Parameters = Array.Empty<ParameterInfo>(),
 							MethodType = MethodType.LambdaProperty
 						});
 					}

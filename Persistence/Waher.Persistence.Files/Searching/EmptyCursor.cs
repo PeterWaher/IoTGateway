@@ -107,7 +107,7 @@ namespace Waher.Persistence.Files.Searching
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			T[] A = new T[0];
+			T[] A = Array.Empty<T>();
 			return (IEnumerator<T>)A.GetEnumerator();
 		}
 

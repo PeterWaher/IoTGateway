@@ -74,7 +74,7 @@ namespace Waher.Persistence
 		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
-		public Task<string[]> GetCollections() => Task.FromResult<string[]>(new string[0]);
+		public Task<string[]> GetCollections() => Task.FromResult<string[]>(Array.Empty<string>());
 
 		/// <summary>
 		/// Performs an export of the entire ledger.

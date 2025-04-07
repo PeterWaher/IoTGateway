@@ -83,7 +83,7 @@ namespace Waher.Security.Users
 					{
 						UserName = UserName,
 						PasswordHash = string.Empty,
-						RoleIds = new string[0]
+						RoleIds = Array.Empty<string>()
 					};
 
 					await Database.Insert(User);

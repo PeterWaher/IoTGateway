@@ -451,7 +451,7 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Empty unit.
 		/// </summary>
-		public static readonly Unit Empty = new Unit(Prefix.None, new UnitFactor[0]);
+		public static readonly Unit Empty = new Unit(Prefix.None, Array.Empty<UnitFactor>());
 
 		/// <summary>
 		/// Inverts the unit.

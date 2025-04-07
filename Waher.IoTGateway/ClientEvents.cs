@@ -862,7 +862,7 @@ namespace Waher.IoTGateway
 				}, QueryFilter, IgnoreCase);
 			}
 			else
-				return new string[0];
+				return Array.Empty<string>();
 		}
 
 		/// <summary>
@@ -1046,7 +1046,7 @@ namespace Waher.IoTGateway
 					Result = ProcessQueryFilterLocked(TabIDs, QueryFilter, IgnoreCase);
 				}
 				else
-					return new string[0];
+					return Array.Empty<string>();
 			}
 
 			if (string.IsNullOrEmpty(Location))
@@ -1159,7 +1159,7 @@ namespace Waher.IoTGateway
 			switch (Locations.Length)
 			{
 				case 0:
-					return new string[0];
+					return Array.Empty<string>();
 
 				case 1:
 					return GetTabIDsForLocation(Locations[0]);

@@ -30,7 +30,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
 		/// </summary>
-		public string[] Aliases => new string[0];
+		public string[] Aliases => Array.Empty<string>();
 
 		/// <summary>
 		/// Gets the constant value element.

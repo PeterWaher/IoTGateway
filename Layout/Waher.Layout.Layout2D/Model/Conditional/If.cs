@@ -41,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			{
 				ILayoutElement E = this.conditionResult ? this.ifTrue : this.ifFalse;
 				if (E is null)
-					return new ILayoutElement[0];
+					return Array.Empty<ILayoutElement>();
 				else
 					return new ILayoutElement[] { E };
 			}

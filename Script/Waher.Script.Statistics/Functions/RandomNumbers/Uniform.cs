@@ -66,7 +66,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
         /// <param name="Length">Length of expression covered by node.</param>
         /// <param name="Expression">Expression.</param>
         public Uniform(int Start, int Length, Expression Expression)
-            : base(new ScriptNode[0], argumentTypes0Parameters, Start, Length, Expression)
+            : base(Array.Empty<ScriptNode>(), argumentTypes0Parameters, Start, Length, Expression)
         {
         }
 

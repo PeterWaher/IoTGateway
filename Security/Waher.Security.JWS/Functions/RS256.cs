@@ -1,3 +1,4 @@
+using System;
 using System.Security.Cryptography;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -19,7 +20,7 @@ namespace Waher.Security.JWS.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>
 		public RS256(int Start, int Length, Expression Expression)
-			: base(new ScriptNode[0], argumentTypes0, Start, Length, Expression)
+			: base(Array.Empty<ScriptNode>(), argumentTypes0, Start, Length, Expression)
 		{
 		}
 

@@ -22,12 +22,12 @@ namespace Waher.Content.Binary
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => new string[0];
+		public string[] ContentTypes => Array.Empty<string>();
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions => new string[0];
+		public string[] FileExtensions => Array.Empty<string>();
 
 		/// <summary>
 		/// Encodes an object.

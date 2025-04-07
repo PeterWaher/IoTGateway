@@ -121,7 +121,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (this.response is null)
 				return;
 
-			HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(null, true, new byte[0], this.streamId, true, this.state);
+			HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(null, true, Array.Empty<byte>(), this.streamId, true, this.state);
 			await this.dataCallback.Raise(this.client, e, false);
 
 			if (!this.response.HeaderSent)

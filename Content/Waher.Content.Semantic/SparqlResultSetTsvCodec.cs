@@ -25,12 +25,12 @@ namespace Waher.Content.Semantic
 		/// <summary>
 		/// Supported Internet Content Types.
 		/// </summary>
-		public string[] ContentTypes => new string[0];
+		public string[] ContentTypes => Array.Empty<string>();
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions => new string[0];
+		public string[] FileExtensions => Array.Empty<string>();
 
 		/// <summary>
 		/// If the encoder encodes a specific object.

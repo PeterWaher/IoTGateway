@@ -624,7 +624,7 @@ namespace Waher.Script.Graphs
 			{
 				SKCanvas Canvas = Surface.Canvas;
 
-				States = new object[0];
+				States = Array.Empty<object>();
 
 				Canvas.Clear(Settings.BackgroundColor);
 

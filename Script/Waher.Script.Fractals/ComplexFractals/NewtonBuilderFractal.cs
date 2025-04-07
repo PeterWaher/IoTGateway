@@ -162,7 +162,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 					CoefficientsZ[j] = Expression.ToComplex(Vector.GetElement(j).AssociatedObjectValue);
 			}
 			else
-                CoefficientsZ = new Complex[0];
+                CoefficientsZ = Array.Empty<Complex>();
 
 			if (i < c && !(this.Arguments[i] is null) && Arguments[i] is ObjectVector)
 			{

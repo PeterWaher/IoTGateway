@@ -12,9 +12,9 @@ namespace Waher.Events
 	/// </summary>
 	public static class Log
 	{
-		private static Type[] alertExceptionTypes = new Type[0];
+		private static Type[] alertExceptionTypes = Array.Empty<Type>();
 		private static bool alertExceptionTypesLocked = false;
-		private static IEventSink[] staticSinks = new IEventSink[0];
+		private static IEventSink[] staticSinks = Array.Empty<IEventSink>();
 		private readonly static List<IEventSink> dynamicSinks = new List<IEventSink>();
 		private static Type[] nestedExceptionTypes = new Type[]
 		{

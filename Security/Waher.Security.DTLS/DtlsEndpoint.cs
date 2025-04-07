@@ -1270,7 +1270,7 @@ namespace Waher.Security.DTLS
 			if (this.mode == DtlsMode.Client)
 				throw new DtlsException("DTLS endpoints in client mode cannot request a party to start handshaking.");
 
-			return this.SendHandshake(HandshakeType.hello_request, new byte[0], false, true, this.GetState(RemoteEndpoint, false));
+			return this.SendHandshake(HandshakeType.hello_request, Array.Empty<byte>(), false, true, this.GetState(RemoteEndpoint, false));
 		}
 
 		/// <summary>

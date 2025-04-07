@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
@@ -70,7 +71,8 @@ namespace Waher.Script.Persistence.SQL
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
-			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, false, this.where, Variables, Array.Empty<KeyValuePair<VariableReference, bool>>(), this);
+			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, false, this.where, Variables, 
+				Array.Empty<KeyValuePair<VariableReference, bool>>(), this);
 			ChunkedList<object> ToUpdate = new ChunkedList<object>();
 			int Count = 0;
 

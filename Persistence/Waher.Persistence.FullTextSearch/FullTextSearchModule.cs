@@ -319,7 +319,9 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				foreach (object Obj in await collectionInformation.GetValuesAsync())
 				{
-					if (Obj is CollectionInformation Info && Info.IndexForFullTextSearch)
+					if (Obj is CollectionInformation Info && 
+						Info.IndexForFullTextSearch &&
+						!string.IsNullOrEmpty(Info.IndexCollectionName))
 					{
 						if (!ByIndex.TryGetValue(Info.IndexCollectionName, out List<string> Collections))
 						{

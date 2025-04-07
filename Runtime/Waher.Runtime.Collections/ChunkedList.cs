@@ -299,6 +299,7 @@ namespace Waher.Runtime.Collections
 			this.firstChunk.Next = null;
 			this.firstChunk.Start = 0;
 			this.firstChunk.Pos = 0;
+			this.chunkSize = this.firstChunk.Size;
 
 			Array.Clear(this.firstChunk.Elements, 0, this.firstChunk.Size);
 			this.count = 0;

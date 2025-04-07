@@ -20,7 +20,7 @@
       <dependency id="Waher.Events" version="1.4.2"/>
       <dependency id="Waher.Networking.UWP" version="4.3.1"/>
       <dependency id="Waher.Networking.MQTT.UWP" version="3.1.0"/>
-			<dependency id="Waher.Runtime.Collections" version="1.0.1"/>
+			<dependency id="Waher.Runtime.Collections" version="1.0.2"/>
 			<dependency id="Waher.Runtime.IO" version="1.0.3"/>
 		</dependencies>
   </metadata>

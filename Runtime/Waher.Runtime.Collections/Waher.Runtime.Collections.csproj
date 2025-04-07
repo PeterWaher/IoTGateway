@@ -20,9 +20,9 @@ https://lab.tagroot.io/Community/Post/ChunkedList</Description>
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageTags>collections performance</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
-		<AssemblyVersion>1.0.1</AssemblyVersion>
-		<FileVersion>1.0.1</FileVersion>
-		<Version>1.0.1</Version>
+		<AssemblyVersion>1.0.2</AssemblyVersion>
+		<FileVersion>1.0.2</FileVersion>
+		<Version>1.0.2</Version>
 		<PackageIconUrl />
 		<FileUpgradeFlags>40</FileUpgradeFlags>
 		<UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Runtime\Waher.Runtime.Collections\</UpgradeBackupLocation>

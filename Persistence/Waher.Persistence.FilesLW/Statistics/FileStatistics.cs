@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Waher.Persistence.Files.Statistics
@@ -490,7 +491,7 @@ namespace Waher.Persistence.Files.Statistics
 				lock (this.synchObject)
 				{
 					if (this.comments is null)
-						return new string[0];
+						return Array.Empty<string>();
 					else
 						return this.comments.ToArray();
 				}

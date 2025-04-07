@@ -28,7 +28,7 @@ namespace Waher.Persistence.Files
 		internal const int BlockHeaderSize = 14;
 
 		internal readonly MultiReadSingleWriteObject fileAccess;
-		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
+		private IndexBTreeFile[] indices = Array.Empty<IndexBTreeFile>();
 		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private readonly GenericObjectSerializer genericSerializer;
@@ -5816,7 +5816,7 @@ namespace Waher.Persistence.Files
 					if (Consistent)
 						return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields?.ToArray(), this.provider);
 					else
-						return new Searching.UnionCursor<T>(new Filter[0], this);   // Empty result set.
+						return new Searching.UnionCursor<T>(Array.Empty<Filter>(), this);   // Empty result set.
 				}
 				else if (Filter is FilterOr)
 				{

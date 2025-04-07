@@ -238,7 +238,7 @@ namespace Waher.Persistence.Serialization
 			this.isNullable = true;
 			this.collectionName = null;
 			this.typeNameSerialization = TypeNameSerialization.FullName;
-			this.indices = new string[0][];
+			this.indices = Array.Empty<string[]>();
 		}
 
 		internal ObjectSerializer()

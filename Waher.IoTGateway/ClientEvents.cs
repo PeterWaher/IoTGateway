@@ -763,7 +763,7 @@ namespace Waher.IoTGateway
 		/// <returns>Tab IDs</returns>
 		public static string[] GetTabIDsForLocation(string Location)
 		{
-			return GetTabIDsForLocation(Location, new KeyValuePair<string, string>[0]);
+			return GetTabIDsForLocation(Location, Array.Empty<KeyValuePair<string, string>>());
 		}
 
 		/// <summary>
@@ -872,7 +872,7 @@ namespace Waher.IoTGateway
 		/// <returns>Tab IDs</returns>
 		public static string[] GetTabIDsForUser(object User)
 		{
-			return GetTabIDsForUser(User, null, false, new KeyValuePair<string, string>[0]);
+			return GetTabIDsForUser(User, null, false, Array.Empty<KeyValuePair<string, string>>());
 		}
 
 		/// <summary>
@@ -939,7 +939,7 @@ namespace Waher.IoTGateway
 		/// <returns>Tab IDs</returns>
 		public static string[] GetTabIDsForUser(object User, string Location)
 		{
-			return GetTabIDsForUser(User, Location, new KeyValuePair<string, string>[0]);
+			return GetTabIDsForUser(User, Location, Array.Empty<KeyValuePair<string, string>>());
 		}
 
 		/// <summary>

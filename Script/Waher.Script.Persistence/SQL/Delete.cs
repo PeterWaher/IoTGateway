@@ -61,7 +61,7 @@ namespace Waher.Script.Persistence.SQL
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
-			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
+			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, Array.Empty<KeyValuePair<VariableReference, bool>>(), this);
 
 			if (Count.HasValue)
 				return new DoubleNumber(Count.Value);

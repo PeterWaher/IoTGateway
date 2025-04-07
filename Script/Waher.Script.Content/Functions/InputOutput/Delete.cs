@@ -89,10 +89,10 @@ namespace Waher.Script.Content.Functions.InputOutput
 				if (!(Arguments[2].AssociatedObjectValue is X509Certificate Certificate))
 					throw new ScriptRuntimeException("Expected X.509 certificate in third argument.", this);
 
-				Content = await InternetContent.DeleteAsync(Url, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Content = await InternetContent.DeleteAsync(Url, Certificate, HeaderList?.ToArray() ?? Array.Empty<KeyValuePair<string, string>>());
 			}
 			else
-				Content = await InternetContent.DeleteAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Content = await InternetContent.DeleteAsync(Url, HeaderList?.ToArray() ?? Array.Empty<KeyValuePair<string, string>>());
 
 			if (Content.HasError)
 				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);

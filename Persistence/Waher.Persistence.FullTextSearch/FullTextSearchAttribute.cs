@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -19,7 +20,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="IndexCollection">Name of full-text-search index collection.</param>
 		public FullTextSearchAttribute(string IndexCollection)
-			: this(IndexCollection, new PropertyDefinition[0])
+			: this(IndexCollection, Array.Empty<PropertyDefinition>())
 		{
 		}
 
@@ -65,7 +66,7 @@ namespace Waher.Persistence.FullTextSearch
 		public FullTextSearchAttribute(string IndexCollection, bool PropertyReference)
 		{
 			this.indexCollection = IndexCollection;
-			this.properties = new PropertyDefinition[0];
+			this.properties = Array.Empty<PropertyDefinition>();
 			this.hasPropertyDefinitions = (this.Properties?.Length ?? 0) > 0;
 			this.isPropertyReference = PropertyReference;
 		}
@@ -87,6 +88,24 @@ namespace Waher.Persistence.FullTextSearch
 					?? throw new ArgumentException("Object lacks a property named " + this.indexCollection, nameof(Reference));
 
 				object Obj = PI.GetValue(Reference);
+
+				if (Obj is string s)
+					return s;
+				else
+					throw new ArgumentException("Object property " + this.indexCollection + " does not return a string.", nameof(Reference));
+			}
+			else
+				return this.indexCollection;
+		}
+
+		/// <summary>
+		/// Name of full-text-search index collection.
+		/// </summary>
+		public string GetIndexCollection(GenericObject Reference)
+		{
+			if (this.isPropertyReference)
+			{
+				object Obj = Reference[this.indexCollection];
 
 				if (Obj is string s)
 					return s;

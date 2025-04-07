@@ -195,11 +195,11 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 				}
 
 				if (ExpectedDocIndex.Count == 0)
-					return new KeyValuePair<string, TokenReferences>[0];
+					return Array.Empty<KeyValuePair<string, TokenReferences>>();
 			}
 
 			if (ExpectedDocIndex is null)
-				return new KeyValuePair<string, TokenReferences>[0];
+				return Array.Empty<KeyValuePair<string, TokenReferences>>();
 
 			c = ExpectedDocIndex.Count;
 			ulong[] ObjectReferences = new ulong[c];

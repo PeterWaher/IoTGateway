@@ -27,7 +27,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 			if (i < 0)
 			{
 				this.type = Value;
-				this.fields = new KeyValuePair<string, string>[0];
+				this.fields = Array.Empty<KeyValuePair<string, string>>();
 			}
 			else
 			{

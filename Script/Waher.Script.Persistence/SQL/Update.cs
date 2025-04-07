@@ -70,7 +70,7 @@ namespace Waher.Script.Persistence.SQL
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
-			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, false, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
+			IResultSetEnumerator e = await Source.Find(0, int.MaxValue, false, this.where, Variables, Array.Empty<KeyValuePair<VariableReference, bool>>(), this);
 			ChunkedList<object> ToUpdate = new ChunkedList<object>();
 			int Count = 0;
 

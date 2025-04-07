@@ -154,7 +154,7 @@ namespace Waher.Script.Functions.Logging
 			if (Detailed)
 			{
 				this.DoLog(Message, Object, Actor, EventId, Level, Facility, Module, StackTrace,
-					Tags?.ToArray() ?? new KeyValuePair<string, object>[0]);
+					Tags?.ToArray() ?? Array.Empty<KeyValuePair<string, object>>());
 			}
 			else
 				this.DoLog(Message);

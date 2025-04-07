@@ -76,7 +76,7 @@ namespace Waher.Script.Content.Functions.Encoding
 			if (Encoding is null)
 				Content = await InternetContent.DecodeAsync(ContentType, Data, null);
 			else
-				Content = await InternetContent.DecodeAsync(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
+				Content = await InternetContent.DecodeAsync(ContentType, Data, Encoding, Array.Empty<KeyValuePair<string, string>>(), null);
 
 			if (Content.HasError)
 				throw new ScriptRuntimeException(Content.Error.Message, this, Content.Error);

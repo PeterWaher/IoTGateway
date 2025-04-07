@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Persistence.FullTextSearch.Tokenizers;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -12,6 +13,7 @@ namespace Waher.Persistence.FullTextSearch
 	internal class TypeInformation
 	{
 		private readonly IEnumerable<FullTextSearchAttribute> searchAttributes;
+		private readonly FullTextSearchAttribute firstSearchAttribute;
 		private readonly ITokenizer customTokenizer;
 		private readonly PropertyDefinition[] properties;
 		private readonly bool hasCustomTokenizer;
@@ -40,6 +42,7 @@ namespace Waher.Persistence.FullTextSearch
 			this.customTokenizer = CustomTokenizer;
 			this.hasCustomTokenizer = !(CustomTokenizer is null);
 			this.searchAttributes = SearchAttributes;
+			this.firstSearchAttribute = null;
 
 			this.dynamicIndexCollection = false;
 			this.hasPropertyDefinitions = false;
@@ -51,6 +54,9 @@ namespace Waher.Persistence.FullTextSearch
 
 				foreach (FullTextSearchAttribute Attribute in this.searchAttributes)
 				{
+					if (this.firstSearchAttribute is null)
+						this.firstSearchAttribute = Attribute;
+
 					if (Attribute.DynamicIndexCollection)
 						this.dynamicIndexCollection = true;
 
@@ -132,15 +138,21 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Name of full-text-search index collection.
 		/// </summary>
+		/// <param name="Reference">Object reference.</param>
 		public string GetIndexCollection(object Reference)
 		{
-			if (!(this.searchAttributes is null))
-			{
-				foreach (FullTextSearchAttribute Attribute in this.searchAttributes)
-					return Attribute.GetIndexCollection(Reference);
-			}
+			return this.firstSearchAttribute?.GetIndexCollection(Reference)
+				?? this.CollectionInformation.IndexCollectionName;
+		}
 
-			return this.CollectionInformation.IndexCollectionName;
+		/// <summary>
+		/// Name of full-text-search index collection.
+		/// </summary>
+		/// <param name="Reference">Object reference.</param>
+		public string GetIndexCollection(GenericObject Reference)
+		{
+			return this.firstSearchAttribute?.GetIndexCollection(Reference)
+				?? this.CollectionInformation.IndexCollectionName;
 		}
 
 		/// <summary>

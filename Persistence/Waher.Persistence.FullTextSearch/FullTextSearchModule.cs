@@ -317,7 +317,9 @@ namespace Waher.Persistence.FullTextSearch
 			await synchObj.BeginRead();
 			try
 			{
-				foreach (object Obj in await collectionInformation.GetValuesAsync())
+				object[] Values = await collectionInformation.GetValuesAsync();
+					
+				foreach (object Obj in Values)
 				{
 					if (Obj is CollectionInformation Info && 
 						Info.IndexForFullTextSearch &&
@@ -517,7 +519,7 @@ namespace Waher.Persistence.FullTextSearch
 				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, false);
 
 				if (Info is null || !Info.IndexForFullTextSearch)
-					return new PropertyDefinition[0];
+					return Array.Empty<PropertyDefinition>();
 				else
 					return (PropertyDefinition[])Info.Properties.Clone();
 			}
@@ -593,7 +595,6 @@ namespace Waher.Persistence.FullTextSearch
 				else
 				{
 					IndexName = CollectionName;
-
 					foreach (FullTextSearchAttribute Attribute in SearchAttrs)
 					{
 						IndexName = Attribute.GetIndexCollection(Instance);
@@ -836,11 +837,11 @@ namespace Waher.Persistence.FullTextSearch
 			where T : class
 		{
 			if (MaxCount <= 0 || Keywords is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			int NrKeywords = Keywords.Length;
 			if (NrKeywords == 0)
-				return new T[0];
+				return Array.Empty<T>();
 
 			Keywords = (Keyword[])Keywords.Clone();
 			Array.Sort(Keywords, orderOfProcessing);
@@ -888,7 +889,7 @@ namespace Waher.Persistence.FullTextSearch
 								continue;
 
 							if (!await Keyword.Process(Process))
-								return new T[0];
+								return Array.Empty<T>();
 						}
 					}
 				}
@@ -912,7 +913,7 @@ namespace Waher.Persistence.FullTextSearch
 								continue;
 
 							if (!await Keyword.Process(Process))
-								return new T[0];
+								return Array.Empty<T>();
 						}
 					}
 					finally

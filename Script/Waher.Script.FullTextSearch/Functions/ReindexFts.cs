@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.FullTextSearch.Functions
 {

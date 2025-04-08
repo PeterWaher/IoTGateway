@@ -96,8 +96,8 @@ namespace Waher.Runtime.Collections
 		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
 		public ChunkedList(int InitialChunkSize, int MaxChunkSize)
 		{
-			if (InitialChunkSize <= 1)
-				throw new ArgumentException("Chunk size must be larger than one.", nameof(InitialChunkSize));
+			if (InitialChunkSize <= 0)
+				throw new ArgumentException("Chunk size must be positive.", nameof(InitialChunkSize));
 
 			if (MaxChunkSize < InitialChunkSize)
 				throw new ArgumentException("Max chunk size must be greater than or equal to initial chunk size.", nameof(MaxChunkSize));

@@ -17,6 +17,7 @@ using Waher.Persistence.Serialization.Model;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Serialization
 {
@@ -211,7 +212,7 @@ namespace Waher.Persistence.Serialization
 		private Member objectIdMember = null;
 		private readonly Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
 		private readonly Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
-		private readonly LinkedList<Member> membersOrdered = new LinkedList<Member>();
+		private readonly ChunkedList<Member> membersOrdered = new ChunkedList<Member>();
 		private PropertyInfo archiveProperty = null;
 		private FieldInfo archiveField = null;
 		private MethodInfo obsoleteMethod = null;
@@ -418,7 +419,7 @@ namespace Waher.Persistence.Serialization
 			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new SerializationException("Serializers for abstract classes require type names to be serialized.", this.type);
 
-			List<string[]> Indices = new List<string[]>();
+			ChunkedList<string[]> Indices = new ChunkedList<string[]>();
 			Dictionary<string, bool> IndexFields = new Dictionary<string, bool>();
 
 			foreach (IndexAttribute IndexAttribute in this.typeInfo.GetCustomAttributes<IndexAttribute>(true))
@@ -436,7 +437,7 @@ namespace Waher.Persistence.Serialization
 			{
 				StringBuilder CSharp = new StringBuilder();
 				StringBuilder sb = new StringBuilder();
-				IEnumerable<MemberInfo> Members = GetMembers(this.typeInfo);
+				ChunkedList<MemberInfo> Members = GetMembers(this.typeInfo);
 				Dictionary<string, string> ShortNames = new Dictionary<string, string>();
 				Dictionary<Type, bool> MemberTypes = new Dictionary<Type, bool>();
 				Type MemberType;
@@ -3325,7 +3326,7 @@ namespace Waher.Persistence.Serialization
 						break;
 				}
 
-				List<MetadataReference> References = new List<MetadataReference>();
+				ChunkedList<MetadataReference> References = new ChunkedList<MetadataReference>();
 
 				foreach (string Location in Dependencies.Keys)
 				{
@@ -3539,7 +3540,7 @@ namespace Waher.Persistence.Serialization
 						continue;
 
 					this.membersByName[Member.Name] = Member;
-					this.membersOrdered.AddLast(Member);
+					this.membersOrdered.Add(Member);
 
 					if (this.normalized)
 						this.membersByFieldCode[Member.FieldCode] = Member;
@@ -5163,9 +5164,9 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="T">Type information.</param>
 		/// <returns>Enumerated set of members.</returns>
-		public static IEnumerable<MemberInfo> GetMembers(System.Reflection.TypeInfo T)
+		public static ChunkedList<MemberInfo> GetMembers(System.Reflection.TypeInfo T)
 		{
-			LinkedList<MemberInfo> Result = new LinkedList<MemberInfo>();
+			ChunkedList<MemberInfo> Result = new ChunkedList<MemberInfo>();
 			Dictionary<string, bool> Names = new Dictionary<string, bool>();
 
 			while (!(T is null))
@@ -5178,7 +5179,7 @@ namespace Waher.Persistence.Serialization
 #endif
 					if (!Names.ContainsKey(MI.Name))
 					{
-						Result.AddLast(MI);
+						Result.Add(MI);
 						Names[MI.Name] = true;  // To avoid repetition of virtual members.
 					}
 				}
@@ -5450,7 +5451,7 @@ namespace Waher.Persistence.Serialization
 
 		private async Task<T[]> ReadArray<T>(IDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
-			List<T> Elements = new List<T>();
+			ChunkedList<T> Elements = new ChunkedList<T>();
 			IObjectSerializer S = await this.Context.GetObjectSerializer(typeof(T));
 
 			while (NrElements > 0)
@@ -5467,7 +5468,7 @@ namespace Waher.Persistence.Serialization
 
 		private async Task<Array[]> ReadArrayOfArrays(IDeserializer Reader, ulong NrElements)
 		{
-			List<Array> Elements = new List<Array>();
+			ChunkedList<Array> Elements = new ChunkedList<Array>();
 
 			while (NrElements-- > 0)
 				Elements.Add(await this.ReadGenericArray(Reader));
@@ -5477,7 +5478,7 @@ namespace Waher.Persistence.Serialization
 
 		private async Task<GenericObject[]> ReadArrayOfObjects(IDeserializer Reader, ulong NrElements, uint ElementDataType)
 		{
-			List<GenericObject> Elements = new List<GenericObject>();
+			ChunkedList<GenericObject> Elements = new ChunkedList<GenericObject>();
 
 			while (NrElements-- > 0)
 				Elements.Add((GenericObject)await this.Deserialize(Reader, ElementDataType, true));
@@ -5487,7 +5488,7 @@ namespace Waher.Persistence.Serialization
 
 		private async Task<object[]> ReadArrayOfNullableElements(IDeserializer Reader, ulong NrElements)
 		{
-			List<object> Elements = new List<object>();
+			ChunkedList<object> Elements = new ChunkedList<object>();
 			uint ElementDataType;
 
 			while (NrElements-- > 0)

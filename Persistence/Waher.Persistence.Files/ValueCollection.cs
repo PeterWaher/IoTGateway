@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files
 {
@@ -82,7 +82,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Array of values.</returns>
 		public async Task<object[]> GetValuesAsync()
 		{
-			List<object> Result = new List<object>();
+			ChunkedList<object> Result = new ChunkedList<object>();
 
 			await this.dictionary.DictionaryFile.BeginRead();
 			try

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files.Statistics
 {
@@ -37,7 +37,7 @@ namespace Waher.Persistence.Files.Statistics
 		private readonly ulong nrSearches;
 		private bool isCorrupt = false;
 		private bool isBalanced = true;
-		private List<string> comments = null;
+		private ChunkedList<string> comments = null;
 		private readonly object synchObject = new object();
 		private int[] unreferencedBlocks = null;
 		private int[] unreferencedBlobBlocks = null;
@@ -604,7 +604,7 @@ namespace Waher.Persistence.Files.Statistics
 				this.isCorrupt = true;
 
 				if (this.comments is null)
-					this.comments = new List<string>();
+					this.comments = new ChunkedList<string>();
 
 				this.comments.Add(Message);
 			}
@@ -615,7 +615,7 @@ namespace Waher.Persistence.Files.Statistics
 			lock (this.synchObject)
 			{
 				if (this.comments is null)
-					this.comments = new List<string>();
+					this.comments = new ChunkedList<string>();
 
 				this.comments.Add(Message);
 			}

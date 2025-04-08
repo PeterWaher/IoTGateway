@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -235,7 +236,7 @@ namespace Waher.Persistence.Serialization
 				}
 			}
 
-			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+			ChunkedList<KeyValuePair<string, object>> Properties = new ChunkedList<KeyValuePair<string, object>>();
 			int? ArchivingTime = null;
 
 			while (true)
@@ -267,120 +268,120 @@ namespace Waher.Persistence.Serialization
 					switch (FieldDataType)
 					{
 						case TYPE_BOOLEAN:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadBoolean()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadBoolean()));
 							break;
 
 						case TYPE_BYTE:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByte()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadByte()));
 							break;
 
 						case TYPE_INT16:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt16()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadInt16()));
 							break;
 
 						case TYPE_INT32:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt32()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadInt32()));
 							break;
 
 						case TYPE_INT64:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadInt64()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadInt64()));
 							break;
 
 						case TYPE_SBYTE:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadSByte()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadSByte()));
 							break;
 
 						case TYPE_UINT16:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt16()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt16()));
 							break;
 
 						case TYPE_UINT32:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt32()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt32()));
 							break;
 
 						case TYPE_UINT64:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt64()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt64()));
 							break;
 
 						case TYPE_VARINT16:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt16()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt16()));
 							break;
 
 						case TYPE_VARINT32:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt32()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt32()));
 							break;
 
 						case TYPE_VARINT64:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt64()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt64()));
 							break;
 
 						case TYPE_VARUINT16:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt16()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt16()));
 							break;
 
 						case TYPE_VARUINT32:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt32()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt32()));
 							break;
 
 						case TYPE_VARUINT64:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt64()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt64()));
 							break;
 
 						case TYPE_DECIMAL:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDecimal()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadDecimal()));
 							break;
 
 						case TYPE_DOUBLE:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDouble()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadDouble()));
 							break;
 
 						case TYPE_SINGLE:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadSingle()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadSingle()));
 							break;
 
 						case TYPE_DATETIME:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTime()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTime()));
 							break;
 
 						case TYPE_DATETIMEOFFSET:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTimeOffset()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadDateTimeOffset()));
 							break;
 
 						case TYPE_TIMESPAN:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadTimeSpan()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadTimeSpan()));
 							break;
 
 						case TYPE_CHAR:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadChar()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadChar()));
 							break;
 
 						case TYPE_STRING:
 						case TYPE_ENUM:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadString()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadString()));
 							break;
 
 						case TYPE_CI_STRING:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadCaseInsensitiveString()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadCaseInsensitiveString()));
 							break;
 
 						case TYPE_BYTEARRAY:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadByteArray()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadByteArray()));
 							break;
 
 						case TYPE_GUID:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadGuid()));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadGuid()));
 							break;
 
 						case TYPE_NULL:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, null));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, null));
 							break;
 
 						case TYPE_ARRAY:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.ReadGenericArray(Reader)));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, await this.ReadGenericArray(Reader)));
 							break;
 
 						case TYPE_OBJECT:
-							Properties.AddLast(new KeyValuePair<string, object>(FieldName, await this.Deserialize(Reader, FieldDataType, true)));
+							Properties.Add(new KeyValuePair<string, object>(FieldName, await this.Deserialize(Reader, FieldDataType, true)));
 							break;
 
 						default:

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization.ReferenceTypes;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Persistence.Serialization
@@ -1131,7 +1132,7 @@ namespace Waher.Persistence.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_ARRAY:
-					List<T> Elements = new List<T>();
+					ChunkedList<T> Elements = new ChunkedList<T>();
 					IObjectSerializer S = await Context.GetObjectSerializer(typeof(T));
 					ulong NrElements = Reader.ReadVariableLengthUInt64();
 					uint ElementDataType = Reader.ReadBits(6);

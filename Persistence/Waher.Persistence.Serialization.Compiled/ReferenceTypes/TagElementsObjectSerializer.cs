@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
@@ -212,7 +213,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 				}
 			}
 
-			List<KeyValuePair<string, IElement>> Properties = new List<KeyValuePair<string, IElement>>();
+			ChunkedList<KeyValuePair<string, IElement>> Properties = new ChunkedList<KeyValuePair<string, IElement>>();
 
 			if (ObjectId != Guid.Empty)
 				Properties.Add(new KeyValuePair<string, IElement>("ObjectId", new ObjectValue(ObjectId)));

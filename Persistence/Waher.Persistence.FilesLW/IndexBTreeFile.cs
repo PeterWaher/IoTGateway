@@ -7,6 +7,7 @@ using Waher.Events;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files
 {
@@ -444,8 +445,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		internal async Task RegenerateLocked()
 		{
-			LinkedList<object> Objects = new LinkedList<object>();
-			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
+			ChunkedList<object> Objects = new ChunkedList<object>();
+			ChunkedList<Guid> ObjectIds = new ChunkedList<Guid>();
 			IObjectSerializer LastSerializer = null;
 			int Count = 0;
 			int c = 0;
@@ -475,8 +476,8 @@ namespace Waher.Persistence.Files
 						LastSerializer = Serializer;
 					}
 
-					ObjectIds.AddLast((Guid)e.CurrentObjectId);
-					Objects.AddLast(Obj);
+					ObjectIds.Add((Guid)e.CurrentObjectId);
+					Objects.Add(Obj);
 					c++;
 					Count++;
 

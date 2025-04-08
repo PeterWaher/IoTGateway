@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Markdown;
@@ -6,6 +7,7 @@ using Waher.Content.Markdown.Rendering;
 using Waher.Persistence.FullTextSearch;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Tokenizers;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 
@@ -14,8 +16,10 @@ namespace Waher.IoTGateway.Tokenizers
 	/// <summary>
 	/// Tokenizes contents defined in a Markdown document.
 	/// </summary>
-	public class MarkdownTokenizer : ITokenizer, IFileTokenizer
+	public class MarkdownTokenizer : ITokenizer, IFileTokenizer, IPropertyEvaluator
 	{
+		private string definition = string.Empty;
+
 		/// <summary>
 		/// Tokenizes contents defined in a Markdown document.
 		/// </summary>
@@ -104,5 +108,43 @@ namespace Waher.IoTGateway.Tokenizers
 
 			await Tokenize(Doc, Process);
 		}
+
+		#region IPropertyEvaluator
+
+		/// <summary>
+		/// Prepares the evaluator with its definition.
+		/// </summary>
+		/// <param name="Definition">Property definition</param>
+		public Task Prepare(string Definition)
+		{
+			this.definition = Definition;
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Evaluates the property evaluator, on an object instance.
+		/// </summary>
+		/// <param name="Instance">Object instance being indexed.</param>
+		/// <returns>Property value.</returns>
+		public async Task<object> Evaluate(object Instance)
+		{
+			if (Instance is GenericObject Obj)
+			{
+				if (Obj.TryGetFieldValue(this.definition, out object Obj2) &&
+					Obj2 is string Markdown)
+				{
+					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown);
+
+					if (MarkdownDocument.HeaderEndPosition(Markdown).HasValue)
+						return Doc;
+					else
+						return await Doc.GeneratePlainText();
+				}
+			}
+
+			return null;
+		}
+
+		#endregion
 	}
 }

@@ -78,7 +78,10 @@ namespace Waher.Persistence.FullTextSearch
 
 			foreach (PropertyDefinition Property in Properties)
 			{
-				if (!ByName.ContainsKey(Property.Definition))
+				if (!ByName.TryGetValue(Property.Definition, out PropertyDefinition Prev) ||
+					Property.Definition != Prev.Definition ||
+					Property.ExternalSource != Prev.ExternalSource ||
+					Property.Type != Prev.Type)
 				{
 					ByName[Property.Definition] = Property;
 					New = true;

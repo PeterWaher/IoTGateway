@@ -210,7 +210,7 @@ namespace Waher.WebService.Script
 		/// </summary>
 		public double Milliseconds
 		{
-			get => (this.watch.ElapsedTicks * 1000.0) / Stopwatch.Frequency;
+			get => this.watch.ElapsedTicks * 1000.0 / Stopwatch.Frequency;
 		}
 
 		private async void Execute(object P)

@@ -1340,7 +1340,7 @@ namespace Waher.Persistence.FullTextSearch
 
 			ReindexCollectionIteration Iteration = new ReindexCollectionIteration();
 
-			await Database.Iterate<object>(Iteration, Collections);
+			await Database.Iterate(Iteration, Collections);
 
 			return Iteration.NrObjectsProcessed;
 		}

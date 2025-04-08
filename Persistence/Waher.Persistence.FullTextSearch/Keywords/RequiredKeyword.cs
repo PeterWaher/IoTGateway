@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.FullTextSearch.Orders;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
 {
@@ -116,16 +117,16 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 
 			if (Process.IsRestricted)
 			{
-				LinkedList<ulong> ToRemove = null;
+				ChunkedList<ulong> ToRemove = null;
 
 				foreach (ulong ObjectReference in Process.ReferencesByObject.Keys)
 				{
 					if (!Process.Found.ContainsKey(ObjectReference))
 					{
 						if (ToRemove is null)
-							ToRemove = new LinkedList<ulong>();
+							ToRemove = new ChunkedList<ulong>();
 
-						ToRemove.AddLast(ObjectReference);
+						ToRemove.Add(ObjectReference);
 					}
 				}
 

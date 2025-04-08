@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -50,7 +51,7 @@ namespace Waher.Persistence.FullTextSearch
 			if (!(this.searchAttributes is null))
 			{
 				Dictionary<string, bool> HasPropertyDefinition = null;
-				List<PropertyDefinition> PropertyDefinitions = null;
+				ChunkedList<PropertyDefinition> PropertyDefinitions = null;
 
 				foreach (FullTextSearchAttribute Attribute in this.searchAttributes)
 				{
@@ -67,7 +68,7 @@ namespace Waher.Persistence.FullTextSearch
 						if (PropertyDefinitions is null)
 						{
 							HasPropertyDefinition = new Dictionary<string, bool>();
-							PropertyDefinitions = new List<PropertyDefinition>();
+							PropertyDefinitions = new ChunkedList<PropertyDefinition>();
 						}
 
 						foreach (PropertyDefinition PDef in Attribute.Properties)
@@ -182,17 +183,17 @@ namespace Waher.Persistence.FullTextSearch
 				await this.customTokenizer.Tokenize(Obj, Process);
 			else
 			{
-				LinkedList<object> Values = new LinkedList<object>();
+				ChunkedList<object> Values = new ChunkedList<object>();
 				object Value;
 
 				foreach (PropertyDefinition Property in Properties)
 				{
 					Value = await Property.GetValue(Obj);
 					if (!(Value is null))
-						Values.AddLast(Value);
+						Values.Add(Value);
 				}
 
-				if (!(Values.First is null))
+				if (Values.HasFirstItem)
 					await FullTextSearchModule.Tokenize(Values, Process);
 			}
 		}

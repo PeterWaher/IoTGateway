@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
 {
@@ -70,7 +71,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		public override async Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(SearchProcess Process)
 		{
 			string Preamble = FilterFieldLikeRegEx.GetRegExConstantPrefix(this.Expression, this.Parsed);
-			LinkedList<KeyValuePair<string, TokenReferences>> Result = new LinkedList<KeyValuePair<string, TokenReferences>>();
+			ChunkedList<KeyValuePair<string, TokenReferences>> Result = new ChunkedList<KeyValuePair<string, TokenReferences>>();
 
 			if (string.IsNullOrEmpty(Preamble))
 			{
@@ -84,7 +85,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 						foreach (KeyValuePair<string, object> P in await Process.Index.GetEntriesAsync(Key, Key + "!"))
 						{
 							if (P.Value is TokenReferences References)
-								Result.AddLast(new KeyValuePair<string, TokenReferences>(P.Key, References));
+								Result.Add(new KeyValuePair<string, TokenReferences>(P.Key, References));
 						}
 					}
 				}
@@ -101,7 +102,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 				{
 					Match M = this.Parsed.Match(Rec.Key);
 					if (M.Success && M.Index == 0 && M.Length == Rec.Key.Length && Rec.Value is TokenReferences References)
-						Result.AddLast(new KeyValuePair<string, TokenReferences>(Rec.Key, References));
+						Result.Add(new KeyValuePair<string, TokenReferences>(Rec.Key, References));
 				}
 			}
 

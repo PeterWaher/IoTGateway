@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.FullTextSearch.Tokenizers
 {
@@ -14,13 +14,13 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		public TokenizationProcess()
 		{
-			this.TokenCounts = new Dictionary<string, List<uint>>();
+			this.TokenCounts = new Dictionary<string, ChunkedList<uint>>();
 		}
 
 		/// <summary>
 		/// Accumulated token counts.
 		/// </summary>
-		public Dictionary<string, List<uint>> TokenCounts { get; }
+		public Dictionary<string, ChunkedList<uint>> TokenCounts { get; }
 
 		/// <summary>
 		/// Document Index Offset. Used to identify sequences of tokens in a document.
@@ -40,7 +40,7 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 			int i = 0;
 			TokenCount[] Counts = new TokenCount[c];
 
-			foreach (KeyValuePair<string, List<uint>> P in this.TokenCounts)
+			foreach (KeyValuePair<string, ChunkedList<uint>> P in this.TokenCounts)
 				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
 
 			return Counts;

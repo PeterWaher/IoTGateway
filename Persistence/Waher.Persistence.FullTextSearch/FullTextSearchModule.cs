@@ -15,6 +15,7 @@ using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Persistence.LifeCycle;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Script.Model;
@@ -312,7 +313,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Collection Names indexed in the full-text-search index.</returns>
 		public static async Task<Dictionary<string, string[]>> GetCollectionNames()
 		{
-			Dictionary<string, List<string>> ByIndex = new Dictionary<string, List<string>>();
+			Dictionary<string, ChunkedList<string>> ByIndex = new Dictionary<string, ChunkedList<string>>();
 
 			await synchObj.BeginRead();
 			try
@@ -325,9 +326,9 @@ namespace Waher.Persistence.FullTextSearch
 						Info.IndexForFullTextSearch &&
 						!string.IsNullOrEmpty(Info.IndexCollectionName))
 					{
-						if (!ByIndex.TryGetValue(Info.IndexCollectionName, out List<string> Collections))
+						if (!ByIndex.TryGetValue(Info.IndexCollectionName, out ChunkedList<string> Collections))
 						{
-							Collections = new List<string>();
+							Collections = new ChunkedList<string>();
 							ByIndex[Info.IndexCollectionName] = Collections;
 						}
 
@@ -342,7 +343,7 @@ namespace Waher.Persistence.FullTextSearch
 
 			Dictionary<string, string[]> Result = new Dictionary<string, string[]>();
 
-			foreach (KeyValuePair<string, List<string>> Rec in ByIndex)
+			foreach (KeyValuePair<string, ChunkedList<string>> Rec in ByIndex)
 				Result[Rec.Key] = Rec.Value.ToArray();
 
 			return Result;
@@ -375,7 +376,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// defined by <paramref name="IndexCollectionName"/>.</returns>
 		private static async Task<string[]> GetCollectionNamesLocked(string IndexCollectionName)
 		{
-			List<string> Result = new List<string>();
+			ChunkedList<string> Result = new ChunkedList<string>();
 
 			foreach (object Obj in await collectionInformation.GetValuesAsync())
 			{
@@ -657,7 +658,7 @@ namespace Waher.Persistence.FullTextSearch
 		private static Keyword[] ParseKeywords(string Search, bool TreatKeywordsAsPrefixes,
 			bool ParseQuotes)
 		{
-			List<Keyword> Result = new List<Keyword>();
+			ChunkedList<Keyword> Result = new ChunkedList<Keyword>();
 			StringBuilder sb = new StringBuilder();
 			bool First = true;
 			bool Required = false;
@@ -802,7 +803,7 @@ namespace Waher.Persistence.FullTextSearch
 			return Result.ToArray();
 		}
 
-		private static void Add(Keyword Keyword, List<Keyword> Result, ref bool Required, ref bool Prohibited)
+		private static void Add(Keyword Keyword, ChunkedList<Keyword> Result, ref bool Required, ref bool Prohibited)
 		{
 			if (Required)
 			{
@@ -954,7 +955,7 @@ namespace Waher.Persistence.FullTextSearch
 				};
 			}
 
-			List<T> Result = new List<T>();
+			ChunkedList<T> Result = new ChunkedList<T>();
 
 			switch (PaginationStrategy)
 			{
@@ -1504,9 +1505,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Indexable property values found.</returns>
 		internal static async Task<TokenCount[]> Tokenize(GenericObject Obj, params PropertyDefinition[] Properties)
 		{
-			LinkedList<object> Values = await GetValues(Obj, Properties);
+			ChunkedList<object> Values = await GetValues(Obj, Properties);
 
-			if (Values.First is null)
+			if (!Values.HasFirstItem)
 				return null;
 
 			return await Tokenize(Values);
@@ -1521,9 +1522,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Indexable property values found.</returns>
 		internal static async Task Tokenize(GenericObject Obj, TokenizationProcess Process, params PropertyDefinition[] Properties)
 		{
-			LinkedList<object> Values = await GetValues(Obj, Properties);
+			ChunkedList<object> Values = await GetValues(Obj, Properties);
 
-			if (!(Values.First is null))
+			if (Values.HasFirstItem)
 				await Tokenize(Values, Process);
 		}
 
@@ -1533,9 +1534,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Obj">Generic object</param>
 		/// <param name="Properties">Properties</param>
 		/// <returns>Enumeration of property values.</returns>
-		internal static async Task<LinkedList<object>> GetValues(GenericObject Obj, params PropertyDefinition[] Properties)
+		internal static async Task<ChunkedList<object>> GetValues(GenericObject Obj, params PropertyDefinition[] Properties)
 		{
-			LinkedList<object> Values = new LinkedList<object>();
+			ChunkedList<object> Values = new ChunkedList<object>();
 			object Value;
 
 			if (!(Obj is null))
@@ -1544,7 +1545,7 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					Value = await Property.GetValue(Obj);
 					if (!(Value is null))
-						Values.AddLast(Value);
+						Values.Add(Value);
 				}
 			}
 

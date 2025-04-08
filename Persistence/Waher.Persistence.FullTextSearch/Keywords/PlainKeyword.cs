@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
 {
@@ -53,13 +54,13 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <returns>Enumerable set of token references.</returns>
 		public override async Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(SearchProcess Process)
 		{
-			LinkedList<KeyValuePair<string, TokenReferences>> Result = new LinkedList<KeyValuePair<string, TokenReferences>>();
+			ChunkedList<KeyValuePair<string, TokenReferences>> Result = new ChunkedList<KeyValuePair<string, TokenReferences>>();
 			KeyValuePair<string, object>[] Records = await Process.Index.GetEntriesAsync(this.Keyword, this.Keyword + "!");
 
 			foreach (KeyValuePair<string, object> Rec in Records)
 			{
 				if (Rec.Value is TokenReferences References)
-					Result.AddLast(new KeyValuePair<string, TokenReferences>(this.Keyword, References));
+					Result.Add(new KeyValuePair<string, TokenReferences>(this.Keyword, References));
 			}
 
 			return Result;

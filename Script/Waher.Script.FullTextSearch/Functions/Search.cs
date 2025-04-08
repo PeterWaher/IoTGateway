@@ -157,9 +157,10 @@ namespace Waher.Script.FullTextSearch.Functions
 
 			if (i >= c)
 			{
-				return new ObjectVector(
-					await Waher.Persistence.FullTextSearch.Search.FullTextSearch<GenericObject>(
-						IndexCollection, Offset, MaxCount, Order, Strategy, Keywords));
+				GenericObject[] Result = await Waher.Persistence.FullTextSearch.Search.FullTextSearch<GenericObject>(
+					IndexCollection, Offset, MaxCount, Order, Strategy, Keywords);
+
+				return new ObjectVector(Result);
 			}
 			else
 			{

@@ -144,7 +144,7 @@ namespace Waher.Persistence.FullTextSearch
 					Tokens = await Tokenize(GenObj, CollectionInfo.Properties);
 				}
 
-				if (Tokens.Length == 0)
+				if (Tokens is null || Tokens.Length == 0)
 					return;
 
 				ObjectReference Ref;

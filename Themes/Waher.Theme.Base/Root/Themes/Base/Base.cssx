@@ -220,7 +220,7 @@ section a:active
     overflow: hidden;
     position: fixed;
     background: ¤Alpha(BackgroundColor, 255)¤;
-    width: 20rem;
+    min-width: min(20rem, 90%);
     max-width: 90%;
     padding: 1.5rem;
     border-radius: 1rem;

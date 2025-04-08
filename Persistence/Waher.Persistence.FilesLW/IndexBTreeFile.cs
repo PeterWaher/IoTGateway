@@ -495,7 +495,22 @@ namespace Waher.Persistence.Files
 			if (Count > 0)
 				await this.SaveNewObjectsLocked(ObjectIds, Objects, LastSerializer);
 
+			StringBuilder Index = new StringBuilder();
+			bool First = true;
+
+			foreach (string FieldName in this.FieldNames)
+			{
+				if (First)
+					First = false;
+				else
+					Index.Append(", ");
+
+				Index.Append(FieldName);
+			}
+
 			Log.Notice("Index regenerated.", this.indexFile.FileName,
+				new KeyValuePair<string, object>("Collection", this.indexFile.CollectionName),
+				new KeyValuePair<string, object>("Index", Index.ToString()),
 				new KeyValuePair<string, object>("NrObjects", c),
 				new KeyValuePair<string, object>("NrNotLoadable", d));
 		}

@@ -103,7 +103,8 @@ namespace Waher.Script.Operators.Vectors
 			}
 
 			IEnumerable<IElement> Elements = await ImplicitSet.CalculateElementsAsync(this.left, VectorElements,
-				this.setConditions, this.otherConditions, Variables);
+				this.setConditions, this.otherConditions, Variables)
+				?? throw new ScriptRuntimeException("Unable to evaluate implicit elements.", this.right);
 
 			if (!(Elements is ICollection<IElement> Elements2))
 			{

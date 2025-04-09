@@ -1025,7 +1025,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					if (DialogParameters.Mode == DownloadMode.OnlyNewer &&
 						File.Exists(FileName))
 					{
-						FileInfo Info = new FileInfo(FileName);
+						FileInfo Info = new(FileName);
 
 						if (Info.Exists &&
 							Info.Length == Package.Bytes &&
@@ -1076,7 +1076,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 				if (!Directory.Exists(this.packageFolder))
 					Directory.CreateDirectory(this.packageFolder!);
 
-				ProcessStartInfo StartInfo = new ProcessStartInfo()
+				ProcessStartInfo StartInfo = new()
 				{
 					UseShellExecute = true,
 					FileName = this.packageFolder!

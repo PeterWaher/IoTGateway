@@ -1025,8 +1025,8 @@ namespace Waher.Content.QR.Encoding
 			float SourceSize = this.size + (2 * SourceMargin);
 			float dx = SourceSize / QWidth;
 			float dy = SourceSize / QHeight;
-			float x0 = -SourceMargin - 0.5f;
-			float y0 = -SourceMargin - 0.5f;
+			float x0 = -SourceMargin;
+			float y0 = -SourceMargin;
 			int i, j;
 			int q2 = Quality * Quality;
 			int q2r = q2 >> 1;

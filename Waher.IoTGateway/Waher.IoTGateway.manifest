@@ -6,6 +6,7 @@
 		<Content fileName="Events.js"/>
 		<Content fileName="Login.js"/>
 		<Content fileName="Login.md"/>
+		<Content fileName="LoginMethod.ws"/>
 		<Content fileName="ProposeContract.js"/>
 		<Content fileName="ProposeContract.md"/>
 		<Content fileName="SignatureRequest.js"/>
@@ -17,6 +18,7 @@
 			<Content fileName="SimpleTree.js"/>
 		</Folder>
 		<Folder name="Settings">
+			<Content fileName="Attach.js"/>
 			<Content fileName="Backup.md"/>
 			<Content fileName="Backup.js"/>
 			<Content fileName="ChangePassword.md"/>

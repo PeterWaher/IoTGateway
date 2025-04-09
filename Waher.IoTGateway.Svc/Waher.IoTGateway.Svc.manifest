@@ -878,6 +878,8 @@
 	<Folder name="Root">
 		<Content fileName="Admin.cssx"/>
 		<Content fileName="Admin.md"/>
+		<Content fileName="AdminDropdown.md"/>
+		<Content fileName="AdminDropdownComponent.md"/>
 		<Content fileName='AlertPopup.md'/>
 		<Content fileName='ConfirmPopup.md'/>
 		<Content fileName='Copyright.md'/>
@@ -891,11 +893,12 @@
 		<Content fileName='Index.md'/>
 		<Content fileName='Login.js'/>
 		<Content fileName='Login.md'/>
+		<Content fileName="LoginMethod.ws"/>
 		<Content fileName='Markdown.md'/>
 		<Content fileName="MarkdownEditor.cssx"/>
 		<Content fileName="MarkdownEditor.js"/>
 		<Content fileName="MarkdownEditor.md"/>
-		<Content fileName='Master.js'/>
+		<Content fileName='GlobalComponents.js'/>
 		<Content fileName='Master.md'/>
 		<Content fileName='Prompt.js'/>
 		<Content fileName='Prompt.md'/>
@@ -988,6 +991,7 @@
 			</Folder>
 		</Folder>
 		<Folder name='Settings'>
+			<Content fileName="Attach.js"/>
 			<Content fileName='Backup.js'/>
 			<Content fileName='Backup.md'/>
 			<Content fileName="ChangePassword.md"/>

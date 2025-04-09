@@ -196,6 +196,7 @@
 			</Folder>
 		</Folder>
 		<Folder name="Images">
+			<Content fileName="ArrowUp.svg"/>
 			<Content fileName="GraphVizExample.gv"/>
 			<Content fileName="Layout2DExample.xml"/>
 			<Content fileName="logo-WaherDataAB-500x97.png"/>

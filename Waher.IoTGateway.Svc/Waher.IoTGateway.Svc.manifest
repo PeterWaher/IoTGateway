@@ -939,6 +939,7 @@
 			</Folder>
 		</Folder>
 		<Folder name='Images'>
+			<Content fileName="ArrowUp.svg"/>
 			<Content fileName='GraphVizExample.gv' />
 			<Content fileName='Layout2DExample.xml' />
 			<Content fileName='logo-WaherDataAB-200x39.png' />
@@ -946,6 +947,8 @@
 			<Content fileName='logo-WaherDataAB-400x77.png' />
 			<Content fileName='logo-WaherDataAB-500x97.png' />
 			<Content fileName='PlantUmlExample.uml' />
+			<Content fileName="quick-login-login-icon.svg"/>
+			<Content fileName="user-password-login-icon.svg"/>
 		</Folder>
 		<Folder name="MarkdownLab">
 			<Content fileName="MarkdownLab.js"/>
@@ -991,7 +994,7 @@
 			</Folder>
 		</Folder>
 		<Folder name='Settings'>
-			<Content fileName="Attach.js"/>
+			<Content fileName="AttachId.js"/>
 			<Content fileName='Backup.js'/>
 			<Content fileName='Backup.md'/>
 			<Content fileName="ChangePassword.md"/>

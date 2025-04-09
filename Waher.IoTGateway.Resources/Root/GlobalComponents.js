@@ -147,9 +147,85 @@ function NativeHeaderHandler() {
     }
 }
 
+function NativeFaviconHandler()
+{
+    let faviconDotActive = false
+    const favicon = document.querySelector("link[rel~='icon']");
+    const originalFavicon = favicon.href
+
+    function RemoveFaviconDot() {
+        if (!faviconDotActive)
+            return;
+
+        faviconDotActive = false
+
+        favicon.href = originalFavicon
+    }
+
+    function AddFaviconDot() {
+        if (faviconDotActive)
+            return;
+
+        faviconDotActive =  true
+    
+        let canvas = document.createElement("canvas");
+        let ctx = canvas.getContext("2d");
+    
+        let img = new Image();
+        img.src = favicon.href;
+        img.onload = () => {
+            // Set canvas size to match the favicon
+            const dotRadius = img.width/4.0;
+            const dotMargin = img.width/16.0
+            canvas.width = img.width;
+            canvas.height = img.height;
+    
+            // Draw the original favicon
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Draw a red dot (top-right corner)
+            ctx.fillStyle = "red";
+            ctx.beginPath();
+            ctx.arc(canvas.width - dotRadius - dotMargin, dotRadius + dotMargin, dotRadius, 0, 2 * Math.PI); // Adjust position/size if needed
+            ctx.fill();
+    
+            // Replace the favicon
+            favicon.href = canvas.toDataURL("image/png")
+        };
+    }
+
+    return {
+        AddFaviconDot,
+        RemoveFaviconDot,
+    }
+}
+
+function NativeBackdropHandler()
+{
+    const BACKDROP_ID = "native-backdrop"
+
+    // create backdrop
+    const backdrop = document.createElement("div")
+    backdrop.id = BACKDROP_ID
+    document.body.appendChild(backdrop);
+    HideBackdrop()
+
+    function ShowBackdrop() {
+        backdrop.style.display = "block"
+    }
+
+    function HideBackdrop() {
+        backdrop.style.display = "none"
+    }
+    
+    return {
+        ShowBackdrop,
+        HideBackdrop
+    }
+}
+
 function PopupHandler() {
     const POPUP_CONTAINER_ID = "native-popup-container"
-    const BACKDROP_ID = "native-backdrop"
     const PROMPT_INPUT_ID = "native-prompt-input"
     const KEYCODE_TAB = 9;
 
@@ -161,28 +237,41 @@ function PopupHandler() {
     popupContainer.setAttribute("aria-labelledby", "native-popup-label")
     popupContainer.setAttribute("aria-describedby", "native-popup-description")
 
-    // favicon icon notifier
-    let faviconDotActive = false
-    const favicon = document.querySelector("link[rel~='icon']");
-    const originalFavicon = favicon.href
-
     let focusFunction = null;
 
-    // create backdrop
-    const backdrop = document.createElement("div")
-    backdrop.id = BACKDROP_ID
-    document.body.appendChild(backdrop);
-    HideBackdrop()
-
-    let enterFunction = () => {}
-    let escapeFunction = () => {}
-
-    popupContainer.addEventListener("keyup", event => {
+    popupContainer.addEventListener("keydown", event => {
         if (event.key === "Enter")
-            enterFunction()
+        {
+            const enterFunction = GetPopupProperty("enterFunction")
+            if (enterFunction)
+            {
+                enterFunction()
+                event.preventDefault()
+            }
+        }
         if (event.key === "Escape")
-            escapeFunction()
+        {
+            const escapeFunction = GetPopupProperty("escapeFunction")
+            if (escapeFunction)
+            {
+                escapeFunction()
+                event.preventDefault()
+            }
+        }
     })
+
+    function ActivePopup()
+    {
+        if (popupStack.length < 1)
+            return undefined
+        return popupStack[popupStack.length - 1];
+    }
+
+    function GetPopupProperty(property)
+    {
+        const activePoup = ActivePopup()
+        return activePoup ? activePoup[property] : undefined
+    }
 
     function PopStack(args) {
         popupStack.pop().OnPop(args)
@@ -190,18 +279,21 @@ function PopupHandler() {
     }
 
     function DisplayPopup() {
-        if (popupStack.length) {
-            popupContainer.innerHTML = popupStack[popupStack.length - 1].html
-            setTimeout(UpdateFocusTrap, 0)
-            ShowBackdrop();
-            AddFaviconDot();
-        }
-        else {
+        const activePopup = ActivePopup()
+        if (!activePopup) {
             popupContainer.innerHTML = ""
-            RemoveFaviconDot()
-            HideBackdrop()
-            setTimeout(RemoveFocusTrap, 0)
+            NativeFavicon.RemoveFaviconDot()
+            NativeBackdrop.HideBackdrop()
+            RemoveFocusTrap, 0
+            return
         }
+
+        popupContainer.innerHTML = activePopup.html
+        UpdateFocusTrap()
+        if (activePopup["OnShow"])
+            activePopup["OnShow"]()
+        NativeBackdrop.ShowBackdrop();
+        NativeFavicon.AddFaviconDot();
     }
 
     function UpdateFocusTrap() {
@@ -249,113 +341,138 @@ function PopupHandler() {
         focusFunction = null;
     }
 
-    function ShowBackdrop() {
-        backdrop.style.display = "block"
+    function SoftUpdate(html, uuid)
+    {
+        for (let i = 0; i < popupStack.length; i++)
+            {
+                if (popupStack[i].uuid === uuid)
+                {
+                    updated = true
+                    popupStack[i].html = html
+                    return true
+                }
+            }
+        return false
     }
 
-    function HideBackdrop() {
-        backdrop.style.display = "none"
+    function PopupObject(html, enterFunction, escapeFunction, uuid, OnPop, OnShow)
+    {
+        return {
+            html: html,
+            enterFunction: enterFunction,
+            escapeFunction: escapeFunction,
+            uuid: uuid,
+            OnPop: OnPop,
+            OnShow: OnShow
+        }
     }
 
-    async function Popup(html) {
-        return new Promise((resolve, reject) => {
-            popupStack.push({
-                html: html,
-                OnPop: (args) => resolve(args),
+    function Popup(html, popupArgs) {
+        const uuid = crypto.randomUUID()
+        return {
+            uuid: uuid,
+            userActionPromise: new Promise((resolve, reject) => {
+                popupStack.push(PopupObject(
+                    html,
+                    popupArgs.enterFunction,
+                    popupArgs.escapeFunction,
+                    uuid,
+                    (args) => resolve(args),
+                    popupArgs.OnShow
+                ))
+                DisplayPopup()
             })
-            DisplayPopup()
-        })
+        }
     }
 
-    function Focus() {
-        // have to wait a frame since the container is not visible untill the content is added (the content is set as text so it will have to render before it is available)
-        setTimeout(() => { popupContainer.focus() }, 0)
+    function Focus()
+    {
+        popupContainer.focus()
     }
 
-    async function Alert(message) {
-        const html = CreateHTMLAlertPopup({ Message: `<p>${message}</p>` });
-        Focus()
-        enterFunction = AlertOk;
-        escapeFunction = AlertOk;
-        await Popup(html);
+    /////////// Alert
+
+    async function Alert(message, returnControlObject=false) {
+        const html = CreateHTMLAlertPopup({ Message: `<p id="native-popup-message">${message}</p>` });
+        
+        const controlObject = Popup(html, {
+            enterFunction: AlertOk,
+            escapeFunction: AlertOk,
+            OnShow: Focus,
+        });
+
+        if (!returnControlObject)
+            return await controlObject.userActionPromise
+
+        controlObject.PushUpdate = (newMessage) => {
+            if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
+                document.getElementById("native-popup-message").innerText = newMessage
+            return SoftUpdate(CreateHTMLAlertPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
+        }
+
+        return controlObject
     }
     function AlertOk() {
         PopStack()
     }
 
-    async function Confirm(message) {
-        const html = CreateHTMLConfirmPopup({ Message: `<p>${message}</p>` });
-        Focus()
-        enterFunction = ConfirmYes;
-        escapeFunction = ConfirmNo;
-        return await Popup(html);
+    /////////// Confirm
+
+    async function Confirm(message, returnControlObject=false) {
+        const html = CreateHTMLConfirmPopup({ Message: `<p id="native-popup-message">${message}</p>` });
+
+        const controlObject = Popup(html, {
+            enterFunction: ConfirmYes,
+            escapeFunction: ConfirmNo,
+            OnShow: Focus,
+        });
+
+        if (!returnControlObject)
+            return await controlObject.userActionPromise
+
+        controlObject.PushUpdate = (newMessage) => {
+            if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
+                document.getElementById("native-popup-message").innerText = newMessage
+            return SoftUpdate(CreateHTMLConfirmPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
+        }
+
+        return controlObject
     }
 
     function ConfirmYes() {
         PopStack(true)
     }
+
     function ConfirmNo() {
         PopStack(false)
     }
 
-    async function Prompt(message) {
-        const html = CreateHTMLPromptPopup({ Message: `<p>${message}</p>` });
-        setTimeout(() => {
-            document.getElementById(PROMPT_INPUT_ID).focus()
-        }, 0)
-        enterFunction = () => PromptSubmit(document.getElementById('native-prompt-input').value);
-        escapeFunction = () => PromptSubmit(undefined);
-        return await Popup(html);
+    /////////// Prompt
+
+    async function Prompt(message, returnControlObject=false) {
+        const html = CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${message}</p>` });
+
+        const controlObject = Popup(html, {
+            enterFunction: () => PromptSubmit(document.getElementById('native-prompt-input').value),
+            escapeFunction: () => PromptSubmit(undefined),
+            OnShow: () => document.getElementById(PROMPT_INPUT_ID).focus()
+        });
+
+        if (!returnControlObject)
+            return await controlObject.userActionPromise
+
+        controlObject.PushUpdate = (newMessage) => {
+            if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
+                document.getElementById("native-popup-message").innerText = newMessage
+            return SoftUpdate(CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
+        }
+
+        return controlObject
     }
 
     async function PromptSubmit(value) {
         PopStack(value)
     }
-
-    /* #region icon alert  */
-
-    function RemoveFaviconDot() {
-        if (!faviconDotActive)
-            return;
-
-        faviconDotActive = false
-
-        favicon.href = originalFavicon
-    }
-
-    function AddFaviconDot() {
-        if (faviconDotActive)
-            return;
-
-        faviconDotActive =  true
-    
-        let canvas = document.createElement("canvas");
-        let ctx = canvas.getContext("2d");
-    
-        let img = new Image();
-        img.src = favicon.href;
-        img.onload = () => {
-            // Set canvas size to match the favicon
-            const dotRadius = img.width/4.0;
-            const dotMargin = img.width/16.0
-            canvas.width = img.width;
-            canvas.height = img.height;
-    
-            // Draw the original favicon
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
-            // Draw a red dot (top-right corner)
-            ctx.fillStyle = "red";
-            ctx.beginPath();
-            ctx.arc(canvas.width - dotRadius - dotMargin, dotRadius + dotMargin, dotRadius, 0, 2 * Math.PI); // Adjust position/size if needed
-            ctx.fill();
-    
-            // Replace the favicon
-            favicon.href = canvas.toDataURL("image/png")
-        };
-    }
-
-    /* #endregion icon alert */
 
     return {
         Alert,
@@ -497,10 +614,14 @@ function Carousel(containerId) {
 
 let Popup;
 let NativeHeader;
+let NativeFavicon;
+let NativeBackdrop;
 
 window.addEventListener("load", () => {
     NativeHeader = NativeHeaderHandler();
     Popup = PopupHandler();
+    NativeFavicon = NativeFaviconHandler();
+    NativeBackdrop = NativeBackdropHandler()
 
     const largeName = document.getElementById("large-pagpage-name");
     if (largeName !== null)

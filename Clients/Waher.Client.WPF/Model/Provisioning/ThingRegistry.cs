@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,13 +11,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Questions;
-using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Dialogs.IoT;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.Events;
@@ -25,7 +25,6 @@ using Waher.Networking.XMPP.Provisioning.SearchOperators;
 using Waher.Networking.XMPP.Software;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 
 namespace Waher.Client.WPF.Model.Provisioning
@@ -34,6 +33,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 	{
 		private readonly bool supportsProvisioning;
 		private readonly bool supportsSoftwareUpdates;
+		private readonly string? packageFolder;
 		private ThingRegistryClient? registryClient;
 		private ProvisioningClient? provisioningClient;
 		private SoftwareUpdateClient? softwareClient;
@@ -85,11 +85,14 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			if (this.supportsSoftwareUpdates)
 			{
-				string PackageFolder = Path.Combine(AppContext.BaseDirectory, "Packages", JID);
-				this.softwareClient = new SoftwareUpdateClient(Client, JID, PackageFolder);
+				this.packageFolder = Path.Combine(AppContext.BaseDirectory, "Packages", JID);
+				this.softwareClient = new SoftwareUpdateClient(Client, JID, this.packageFolder);
 			}
 			else
+			{
 				this.softwareClient = null;
+				this.packageFolder = null;
+			}
 		}
 
 		private async void ProcessUnhandled()
@@ -577,6 +580,22 @@ namespace Waher.Client.WPF.Model.Provisioning
 				});
 
 				Item.Click += this.Unsubscribe_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Download Packages...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.DownloadPackages_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Open Packages Folder...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.OpenPackagesFolder_Click;
 			}
 		}
 
@@ -916,7 +935,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					return Task.CompletedTask;
 				}, null);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				MainWindow.ErrorBox(ex.Message);
 			}
@@ -960,11 +979,115 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		private class UnsubscriptionParamters
 		{
-			[Page("Subscription")]
+			[Page("Unsubscription")]
 			[Header("Package file name:")]
 			[Required]
 			[ToolTip("Wildcards (*) are permitted.")]
 			public string PackageName { get; set; } = string.Empty;
+		}
+
+		private async void DownloadPackages_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				DownloadParamters DialogParameters = new();
+				bool? Result = await MainWindow.ShowParameterDialog(this.softwareClient!.Client,
+					DialogParameters, "Download software packages");
+
+				if (!Result.HasValue || !Result.Value)
+					return;
+
+				Package[] Packages = await this.softwareClient.GetPackagesAsync();
+
+				if (!Directory.Exists(this.packageFolder))
+					Directory.CreateDirectory(this.packageFolder!);
+
+				Regex? Filter;
+
+				if (string.IsNullOrEmpty(DialogParameters.Filter))
+					Filter = null;
+				else
+					Filter = new Regex(Database.WildcardToRegex(DialogParameters.Filter, "*"));
+
+				foreach (Package Package in Packages)
+				{
+					MainWindow.ShowStatus(Package.FileName + "...");
+
+					if (Filter is not null)
+					{
+						Match M = Filter.Match(Package.FileName);
+						if (!M.Success || M.Index > 0 || M.Length != Package.FileName.Length)
+							continue;
+					}
+
+					string FileName = Path.Combine(this.packageFolder!, Package.FileName);
+
+					if (DialogParameters.Mode == DownloadMode.OnlyNewer &&
+						File.Exists(FileName))
+					{
+						FileInfo Info = new FileInfo(FileName);
+
+						if (Info.Exists &&
+							Info.Length == Package.Bytes &&
+							Info.LastWriteTimeUtc >= Package.Published.ToUniversalTime())
+						{
+							continue;
+						}
+					}
+
+					await this.softwareClient.DownloadPackageAsync(Package);
+				}
+
+				MainWindow.ShowStatus("Done.");
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		private class DownloadParamters
+		{
+			[Page("Download")]
+			[Header("Mode:")]
+			[Required]
+			[Option(DownloadMode.All, 0, "All matching packages.")]
+			[Option(DownloadMode.OnlyNewer, 0, "Only if packages are newer.")]
+			[ToolTip("What packages to download, if matching the filter.")]
+			public DownloadMode Mode { get; set; } = DownloadMode.OnlyNewer;
+
+			[Page("Download")]
+			[Header("Package Filter:")]
+			[Required]
+			[ToolTip("Only download packages matching this filter. Wildcards (*) are permitted.")]
+			public string Filter { get; set; } = "*";
+		}
+
+		private enum DownloadMode
+		{
+			All,
+			OnlyNewer
+		}
+
+		private void OpenPackagesFolder_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				if (!Directory.Exists(this.packageFolder))
+					Directory.CreateDirectory(this.packageFolder!);
+
+				ProcessStartInfo StartInfo = new ProcessStartInfo()
+				{
+					UseShellExecute = true,
+					FileName = this.packageFolder!
+				};
+
+				Process.Start(StartInfo);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 
 	}

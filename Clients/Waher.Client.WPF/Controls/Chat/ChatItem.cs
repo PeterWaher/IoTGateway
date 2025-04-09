@@ -163,7 +163,7 @@ namespace Waher.Client.WPF.Controls.Chat
 		{
 			try
 			{
-				if (!(Markdown is null))
+				if (Markdown is not null)
 				{
 					string XAML = await Markdown.GenerateXAML(ChatView.GetXamlSettings());
 					this.formattedMessage = XamlReader.Parse(XAML);

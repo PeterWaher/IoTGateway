@@ -144,7 +144,7 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				TreeNode Loop = this.Parent;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					if (Loop is MucService MucService)
 						return MucService;
@@ -348,7 +348,7 @@ namespace Waher.Client.WPF.Model.Muc
 							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to enter room." : e.ErrorText);
 					}
 
-					if (!(Form is null))
+					if (Form is not null)
 					{
 						string Prefix = this.MucClient.Client.BareJID + "." + this.roomId + "@" + this.domain;
 						bool Updated = false;
@@ -455,7 +455,7 @@ namespace Waher.Client.WPF.Model.Muc
 				bool InvitationSent = false;
 
 				Networking.XMPP.RosterItem Item = this.MucClient.Client[BareJid];
-				if (!(Item is null) && Item.HasLastPresence && Item.LastPresence.IsOnline)
+				if (Item is not null && Item.HasLastPresence && Item.LastPresence.IsOnline)
 				{
 					ServiceDiscoveryEventArgs e = await this.MucClient.Client.ServiceDiscoveryAsync(Item.LastPresenceFullJid);
 
@@ -555,7 +555,7 @@ namespace Waher.Client.WPF.Model.Muc
 					Result = null;
 			}
 
-			if (!(Result is null))
+			if (Result is not null)
 			{
 				bool Changed = false;
 
@@ -710,13 +710,7 @@ namespace Waher.Client.WPF.Model.Muc
 							"Information", MessageBoxButton.OK, MessageBoxImage.Information);
 					}
 					else
-					{
-						MainWindow.UpdateGui(async () =>
-						{
-							ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
-							Dialog.ShowDialog();
-						});
-					}
+						_ = MainWindow.ShowParameterDialog(e2.Form);
 				}
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get room registration form." : e2.ErrorText);

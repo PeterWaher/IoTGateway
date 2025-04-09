@@ -81,16 +81,16 @@ namespace Waher.Client.WPF.Controls
 				Dictionary<string, bool> Headers = null;
 				DisplayableParameters Parameters;
 
-				if (!(Children is null))
+				if (Children is not null)
 				{
 					foreach (TreeNode Child in this.selectedNode.Children)
 					{
 						this.ConnectionListView.Items.Add(Child);
 
-						if (!(GridView is null))
+						if (GridView is not null)
 						{
 							Parameters = Child.DisplayableParameters;
-							if (!(Parameters is null))
+							if (Parameters is not null)
 							{
 								foreach (Parameter P in Parameters.Ordered)
 								{

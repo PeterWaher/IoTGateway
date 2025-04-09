@@ -1,28 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Questions;
+using Waher.Client.WPF.Dialogs;
+using Waher.Client.WPF.Dialogs.IoT;
+using Waher.Client.WPF.Model.Concentrator;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.Provisioning.SearchOperators;
 using Waher.Networking.XMPP.Software;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.Client.WPF.Controls;
-using Waher.Client.WPF.Controls.Questions;
-using Waher.Client.WPF.Dialogs.IoT;
-using Waher.Client.WPF.Model.Concentrator;
-using Waher.Networking.XMPP.Provisioning.Events;
-using Waher.Networking.XMPP.Events;
-using System.IO;
+using Waher.Runtime.Language;
+using Waher.Things.Attributes;
 
 namespace Waher.Client.WPF.Model.Provisioning
 {
@@ -131,7 +135,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				MainWindow.UpdateGui(() =>
 				{
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					MainWindow.currentInstance!.NewQuestion(this.Account, this.provisioningClient, Question);
 					return Task.CompletedTask;
 				});
 			}
@@ -167,7 +171,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				MainWindow.UpdateGui(() =>
 				{
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					MainWindow.currentInstance!.NewQuestion(this.Account, this.provisioningClient, Question);
 					return Task.CompletedTask;
 				});
 			}
@@ -202,7 +206,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				MainWindow.UpdateGui(() =>
 				{
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					MainWindow.currentInstance!.NewQuestion(this.Account, this.provisioningClient, Question);
 					return Task.CompletedTask;
 				});
 			}
@@ -439,12 +443,12 @@ namespace Waher.Client.WPF.Model.Provisioning
 				MainWindow.UpdateGui(() =>
 				{
 					TabItem TabItem = MainWindow.NewTab("Search Result");
-					MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+					MainWindow.currentInstance!.Tabs.Items.Add(TabItem);
 
 					SearchResultView View = new([.. Headers], [.. Records]);
 					TabItem.Content = View;
 
-					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+					MainWindow.currentInstance!.Tabs.SelectedItem = TabItem;
 					return Task.CompletedTask;
 				});
 			}
@@ -557,6 +561,22 @@ namespace Waher.Client.WPF.Model.Provisioning
 				});
 
 				Item.Click += this.SoftwarePackages_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Subscribe...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.Subscribe_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Unsubscribe...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.Unsubscribe_Click;
 			}
 		}
 
@@ -859,12 +879,12 @@ namespace Waher.Client.WPF.Model.Provisioning
 					MainWindow.UpdateGui(() =>
 					{
 						TabItem TabItem = MainWindow.NewTab("Packages");
-						MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+						MainWindow.currentInstance!.Tabs.Items.Add(TabItem);
 
 						SearchResultView View = new([.. Headers], [.. Records]);
 						TabItem.Content = View;
 
-						MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+						MainWindow.currentInstance!.Tabs.SelectedItem = TabItem;
 						return Task.CompletedTask;
 					});
 				}
@@ -873,6 +893,78 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				return Task.CompletedTask;
 			}, null);
+		}
+
+		private async void Subscribe_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				SubscriptionParamters DialogParameters = new();
+
+				bool? Result = await MainWindow.ShowParameterDialog(this.softwareClient!.Client,
+					DialogParameters, "Subscribe to software updates");
+				if (!Result.HasValue || !Result.Value)
+					return;
+
+				await this.softwareClient!.Subscribe(DialogParameters.PackageName, (sender2, e2) =>
+				{
+					if (e2.Ok)
+						MainWindow.SuccessBox("Subscription successful.");
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to perform subscription." : e2.ErrorText);
+
+					return Task.CompletedTask;
+				}, null);
+			}
+			catch(Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		private class SubscriptionParamters
+		{
+			[Page("Subscription")]
+			[Header("Package file name:")]
+			[Required]
+			[ToolTip("Wildcards (*) are permitted.")]
+			public string PackageName { get; set; } = string.Empty;
+		}
+
+		private async void Unsubscribe_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				UnsubscriptionParamters DialogParameters = new();
+				bool? Result = await MainWindow.ShowParameterDialog(this.softwareClient!.Client,
+					DialogParameters, "Unsubscribe from software updates");
+
+				if (!Result.HasValue || !Result.Value)
+					return;
+
+				await this.softwareClient.Unsubscribe(DialogParameters.PackageName, (sender2, e2) =>
+				{
+					if (e2.Ok)
+						MainWindow.SuccessBox("Unsubscription successful.");
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to perform unsubscription." : e2.ErrorText);
+
+					return Task.CompletedTask;
+				}, null);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		private class UnsubscriptionParamters
+		{
+			[Page("Subscription")]
+			[Header("Package file name:")]
+			[Required]
+			[ToolTip("Wildcards (*) are permitted.")]
+			public string PackageName { get; set; } = string.Empty;
 		}
 
 	}

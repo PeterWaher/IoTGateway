@@ -152,7 +152,7 @@ namespace Waher.Client.WPF.Model.Muc
 			{
 				TreeNode Loop = this.Parent;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					if (Loop is MucService MucService)
 						return MucService;

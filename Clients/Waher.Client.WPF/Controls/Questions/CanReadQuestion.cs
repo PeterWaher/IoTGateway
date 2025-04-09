@@ -617,7 +617,7 @@ namespace Waher.Client.WPF.Controls.Questions
 
 		internal static bool MatchesToken(string Token, string[] Tokens)
 		{
-			if (!(Tokens is null))
+			if (Tokens is not null)
 			{
 				foreach (string Token2 in Tokens)
 				{

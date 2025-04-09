@@ -196,14 +196,8 @@ namespace Waher.Client.WPF.Dialogs
 		private async Task Client_OnRegistrationForm(object _, DataForm Form)
 		{
 			Field FormType = Form["FORM_TYPE"];
-			if (!(FormType is null) && FormType.ValueString == "urn:xmpp:captcha")
-			{
-				MainWindow.UpdateGui(async () =>
-				{
-					ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-					Dialog.ShowDialog();
-				});
-			}
+			if (FormType is not null && FormType.ValueString == "urn:xmpp:captcha")
+				_ = MainWindow.ShowParameterDialog(Form);
 			else
 				await Form.Submit();
 		}

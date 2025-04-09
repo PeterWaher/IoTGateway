@@ -380,7 +380,7 @@ namespace Waher.Client.WPF.Controls
 				if (Locked)
 					this.desktop.Unlock();
 
-				if (!(Data is null))
+				if (Data is not null)
 					Tile.UnlockBits(Data);
 
 				ms?.Dispose();

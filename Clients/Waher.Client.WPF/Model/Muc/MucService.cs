@@ -227,7 +227,7 @@ namespace Waher.Client.WPF.Model.Muc
 										PasswordField?.SetValue(Password);
 									}
 
-									MainWindow.currentInstance.ShowDataForm(e2.Form);
+									MainWindow.currentInstance!.ShowDataForm(e2.Form);
 								}
 								else
 									MainWindow.ErrorBox(e2.ErrorText);
@@ -428,7 +428,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private async Task<RoomNode> GetRoomNode(string RoomId, string Domain)
 		{
-			RoomNode Result;
+			RoomNode? Result;
 			string Jid = RoomId + "@" + Domain;
 
 			lock (this.roomByJid)
@@ -477,7 +477,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MainWindow.UpdateGui(async () =>
 			{
-				await MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
+				await MainWindow.currentInstance!.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
 					IsMarkdown, Timestamp, Type, RoomNode, RoomNode.Header);
 			});
 		}
@@ -490,30 +490,20 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MainWindow.UpdateGui(() =>
 			{
-				MainWindow.currentInstance.MucChatSubject(e.From, XmppClient.GetBareJID(e.To), RoomNode, e.Subject);
+				MainWindow.currentInstance!.MucChatSubject(e.From, XmppClient.GetBareJID(e.To), RoomNode, e.Subject);
 				return Task.CompletedTask;
 			});
 		}
 
 		private Task MucClient_RegistrationRequest(object Sender, MessageFormEventArgs e)
 		{
-			MainWindow.UpdateGui(async () =>
-			{
-				ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
-				Dialog.ShowDialog();
-			});
-
+			_ = MainWindow.ShowParameterDialog(e.Form);
 			return Task.CompletedTask;
 		}
 
 		private Task MucClient_OccupantRequest(object Sender, MessageFormEventArgs e)
 		{
-			MainWindow.UpdateGui(async () =>
-			{
-				ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
-				Dialog.ShowDialog();
-			});
-
+			_ = MainWindow.ShowParameterDialog(e.Form);
 			return Task.CompletedTask;
 		}
 
@@ -521,16 +511,16 @@ namespace Waher.Client.WPF.Model.Muc
 		{
 			RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 			OccupantNode OccupantNode = RoomNode.GetOccupantNode(e.NickName, e.Affiliation, e.Role, e.FullJid);
-			ChatView View = null;
+			ChatView? View = null;
 
 			if (!OccupantNode.Availability.HasValue || e.Availability != OccupantNode.Availability.Value)
 			{
 				OccupantNode.Availability = e.Availability;
 				OccupantNode.OnUpdated();
 
-				View = MainWindow.currentInstance.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+				View = MainWindow.currentInstance!.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
 
-				if (!(View is null))
+				if (View is not null)
 				{
 					switch (OccupantNode.Availability)
 					{
@@ -576,9 +566,9 @@ namespace Waher.Client.WPF.Model.Muc
 				RoomNode RoomNode = await this.GetRoomNode(e.RoomId, e.Domain);
 
 				if (View is null)
-					View = MainWindow.currentInstance.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+					View = MainWindow.currentInstance!.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
 
-				if (!(View is null))
+				if (View is not null)
 				{
 					foreach (MucStatus Status in e.MucStatus ?? new MucStatus[0])
 					{
@@ -691,7 +681,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MainWindow.UpdateGui(async () =>
 			{
-				await MainWindow.currentInstance.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
+				await MainWindow.currentInstance!.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
 				IsMarkdown, Timestamp, Occupant, e.From);
 			});
 		}
@@ -699,7 +689,7 @@ namespace Waher.Client.WPF.Model.Muc
 		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)
 		{
 			await this.GetRoomNode(e.RoomId, e.Domain);
-			ChatView View = MainWindow.currentInstance.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
+			ChatView View = MainWindow.currentInstance!.FindRoomView(e.From, XmppClient.GetBareJID(e.To));
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
 			if (IsMarkdown)

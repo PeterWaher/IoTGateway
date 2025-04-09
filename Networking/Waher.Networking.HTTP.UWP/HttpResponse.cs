@@ -558,7 +558,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>Challenges</returns>
 		public string[] GetChallenges()
 		{
-			return this.challenges?.ToArray() ?? new string[0];
+			return this.challenges?.ToArray() ?? Array.Empty<string>();
 		}
 
 		/// <summary>

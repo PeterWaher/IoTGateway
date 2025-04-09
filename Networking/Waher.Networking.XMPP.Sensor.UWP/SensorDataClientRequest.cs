@@ -153,7 +153,7 @@ namespace Waher.Networking.XMPP.Sensor
 				lock (this.synchObject)
 				{
 					if (this.errors is null)
-						return new ThingError[0];
+						return Array.Empty<ThingError>();
 					else
 						return this.errors.ToArray();
 				}
@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP.Sensor
 				lock (this.synchObject)
 				{
 					if (this.readFields is null)
-						return new Field[0];
+						return Array.Empty<Field>();
 					else
 						return this.readFields.ToArray();
 				}

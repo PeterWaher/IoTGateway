@@ -12,10 +12,10 @@ namespace Waher.Runtime.Queue
 	public class AsyncProcessor<T> : IDisposableAsync
 		where T : class, IWorkItem
 	{
-		private readonly CancellationTokenSource cancel = new CancellationTokenSource();
+		private readonly CancellationTokenSource[] cancelSources;
 		private readonly Task[] processors;
+		private readonly int nrProcessors;
 		private AsyncQueue<T> queue = new AsyncQueue<T>();
-		private int nrProcessors;
 		private bool terminating = false;
 		private bool terminated = false;
 		private bool idle = true;
@@ -33,6 +33,7 @@ namespace Waher.Runtime.Queue
 			int i;
 
 			this.nrProcessors = NrProcessors;
+			this.cancelSources = new CancellationTokenSource[NrProcessors];
 			for (i = 0; i < this.nrProcessors; i++)
 				Processors.Add(this.PerformWork(i));
 
@@ -54,7 +55,9 @@ namespace Waher.Runtime.Queue
 		public async Task DisposeAsync()
 		{
 			this.terminating = true;
-			this.cancel.Cancel();
+
+			for (int i = 0; i < this.nrProcessors; i++)
+				this.cancelSources[i]?.Cancel();
 
 			await Task.WhenAll(this.processors);
 
@@ -129,37 +132,43 @@ namespace Waher.Runtime.Queue
 		{
 			try
 			{
-				CancellationToken Cancel = this.cancel.Token;
 				ProcessorEventArgs e = new ProcessorEventArgs(ProcessorIndex);
 				T Item;
 				Task<T> Task;
 
 				while (true)
 				{
-					Task = this.queue?.Wait(Cancel);
-					if (Task is null)
-						break;
-
-					if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
+					using (CancellationTokenSource Cancel = new CancellationTokenSource())
 					{
-						this.idle = true;
-						await this.OnIdle.Raise(this, e);
-					}
+						this.cancelSources[ProcessorIndex] = Cancel;
 
-					Item = await Task;
-					if (Item is null)
-						break;
+						Task = this.queue?.Wait(Cancel.Token);
+						if (Task is null)
+							break;
 
-					this.idle = false;
-					try
-					{
-						await Item.Execute(Cancel);
-						Item.Processed(!this.cancel.IsCancellationRequested);
-					}
-					catch (Exception ex)
-					{
-						Item.Processed(false);
-						Log.Exception(ex);
+						if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
+						{
+							this.idle = true;
+							await this.OnIdle.Raise(this, e);
+						}
+
+						Item = await Task;
+						if (Item is null)
+							break;
+
+						this.idle = false;
+						try
+						{
+							await Item.Execute(Cancel.Token);
+							Item.Processed(!Cancel.IsCancellationRequested);
+						}
+						catch (Exception ex)
+						{
+							Item.Processed(false);
+							Log.Exception(ex);
+						}
+
+						this.cancelSources[ProcessorIndex] = null;
 					}
 				}
 			}

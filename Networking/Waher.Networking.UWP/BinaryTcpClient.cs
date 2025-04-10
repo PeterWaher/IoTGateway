@@ -47,7 +47,7 @@ namespace Waher.Networking
 		private readonly TcpClient tcpClient;
 		private readonly Guid id = Guid.NewGuid();
 		private Stream stream = null;
-		private CancellationTokenSource cancelReading;
+		private CancellationTokenSource currentCancelReading;
 #endif
 		private readonly object synchObj = new object();
 		private readonly bool sniffBinary;
@@ -110,8 +110,6 @@ namespace Waher.Networking
 			this.client = new StreamSocket();
 #else
 			this.tcpClient = new TcpClient();
-			this.cancelReading = new CancellationTokenSource();
-			NetworkingModule.RegisterToken(this.id, this.cancelReading);
 #endif
 		}
 
@@ -193,8 +191,6 @@ namespace Waher.Networking
 		{
 			this.sniffBinary = SniffBinary;
 			this.tcpClient = Client;
-			this.cancelReading = new CancellationTokenSource();
-			NetworkingModule.RegisterToken(this.id, this.cancelReading);
 
 			this.SetTcpEndPoints();
 		}
@@ -419,11 +415,16 @@ namespace Waher.Networking
 		/// </summary>
 		public bool Connected => this.connected && !this.disposing && !this.disposed;
 
-#if !WINDOWS_UWP
+#if WINDOWS_UWP
 		/// <summary>
-		/// Cancellation token for the connection.
+		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CancellationToken => this.cancelReading.Token;
+		public CancellationToken CurrenntCancellationToken => CancellationToken.None;
+#else
+		/// <summary>
+		/// Current Cancellation token for the current read operation.
+		/// </summary>
+		public CancellationToken CurrenntCancellationToken => this.currentCancelReading.Token;
 #endif
 
 		private void PreConnect()
@@ -570,13 +571,15 @@ namespace Waher.Networking
 				if (this.connecting || this.reading || this.sending)
 				{
 					this.disposing = true;
-					this.cancelReading.Cancel();
-					NetworkingModule.UnregisterToken(this.id);
+					this.currentCancelReading?.Cancel();
+					this.currentCancelReading = null;
 					DelayedDispose = true;
 				}
 				else
 					DelayedDispose = false;
 			}
+
+			NetworkingModule.UnregisterToken(this.id);
 
 			if (DelayedDispose)
 			{
@@ -703,7 +706,13 @@ namespace Waher.Networking
 
 					NrRead = Packet.Length;
 #else
-					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.cancelReading.Token);
+					CancellationTokenSource PrevCancel = this.currentCancelReading;
+					this.currentCancelReading = new CancellationTokenSource();
+					NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
+
+					PrevCancel?.Dispose();
+
+					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.currentCancelReading.Token);
 #endif
 					if (this.disposing || this.disposed || NetworkingModule.Stopping)
 						break;
@@ -742,6 +751,11 @@ namespace Waher.Networking
 			{
 				bool Disposing = false;
 
+				this.currentCancelReading?.Dispose();
+				this.currentCancelReading = null;
+
+				NetworkingModule.UnregisterToken(this.id);
+
 				lock (this.synchObj)
 				{
 					this.reading = false;
@@ -749,13 +763,6 @@ namespace Waher.Networking
 					if (this.cancelRead)
 					{
 						this.cancelRead = false;
-#if !WINDOWS_UWP
-						this.cancelReading.Dispose();
-						NetworkingModule.UnregisterToken(this.id);
-
-						this.cancelReading = new CancellationTokenSource();
-						NetworkingModule.RegisterToken(this.id, this.cancelReading);
-#endif
 						this.EmptyCancelQueueLocked();
 					}
 
@@ -2187,7 +2194,9 @@ namespace Waher.Networking
 #if WINDOWS_UWP
 					IAsyncAction _ = this.client.CancelIOAsync();
 #else
-					this.cancelReading.Cancel();
+					this.currentCancelReading?.Cancel();
+					this.currentCancelReading = null;
+
 					NetworkingModule.UnregisterToken(this.id);
 #endif
 				}

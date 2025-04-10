@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Persistence;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -392,7 +393,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append("<rsa pub=\"");
 					Xml.Append(Convert.ToBase64String(this.clientPubKey));
 					Xml.Append("\" size=\"");
-					Xml.Append(this.clientKeyName.Substring(3));
+					Xml.Append(this.clientKeyName[3..]);
 				}
 				else
 				{
@@ -520,7 +521,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (this.clientKeyName.StartsWith("RSA"))
 			{
-				if (!int.TryParse(this.clientKeyName.Substring(3), out int KeySize))
+				if (!int.TryParse(this.clientKeyName[3..], out int KeySize))
 					return false;
 
 				return RsaEndpoint.Verify(Data, Signature, KeySize, this.clientPubKey);
@@ -594,10 +595,97 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (!(this.properties is null))
 				{
-					foreach (Property P in this.properties)
+					switch (Key.ToUpper())
 					{
-						if (P.Name == Key)
-							return P.Value;
+						case "FIRST":
+							string FullName = null;
+
+							foreach (Property P in this.properties)
+							{
+								if (P.Name == Key)
+									return P.Value;
+								else if (P.Name == "FULLNAME")
+									FullName = P.Value;
+							}
+
+							if (!string.IsNullOrEmpty(FullName))
+							{
+								SeparateNames(FullName, out CaseInsensitiveString Result, out _, out _);
+								return Result;
+							}
+							break;
+
+						case "MIDDLE":
+							FullName = null;
+
+							foreach (Property P in this.properties)
+							{
+								if (P.Name == Key)
+									return P.Value;
+								else if (P.Name == "FULLNAME")
+									FullName = P.Value;
+							}
+
+							if (!string.IsNullOrEmpty(FullName))
+							{
+								SeparateNames(FullName, out _, out CaseInsensitiveString Result, out _);
+								return Result;
+							}
+							break;
+
+						case "LAST":
+							FullName = null;
+
+							foreach (Property P in this.properties)
+							{
+								if (P.Name == Key)
+									return P.Value;
+								else if (P.Name == "FULLNAME")
+									FullName = P.Value;
+							}
+
+							if (!string.IsNullOrEmpty(FullName))
+							{
+								SeparateNames(FullName, out _, out _, out CaseInsensitiveString Result);
+								return Result;
+							}
+							break;
+
+						case "FULLNAME":
+							string FirstName = null;
+							string MiddleNames = null;
+							string LastNames = null;
+
+							foreach (Property P in this.properties)
+							{
+								if (P.Name == Key)
+									return P.Value;
+
+								switch (P.Name)
+								{
+									case "FIRST":
+										FirstName = P.Value;
+										break;
+
+									case "MIDDLE":
+										MiddleNames = P.Value;
+										break;
+
+									case "LAST":
+										LastNames = P.Value;
+										break;
+								}
+							}
+
+							return JoinNames(FirstName, MiddleNames, LastNames);
+
+						default:
+							foreach (Property P in this.properties)
+							{
+								if (P.Name == Key)
+									return P.Value;
+							}
+							break;
 					}
 				}
 
@@ -731,6 +819,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 					case "LAST":
 						Result.LastNames = P.Value;
+						break;
+
+					case "FULLNAME":
+						Result.FullName = P.Value;
 						break;
 
 					case "ADDR":
@@ -883,6 +975,15 @@ namespace Waher.Networking.XMPP.Contracts
 				Result.BirthYear = null;
 			}
 
+			if (CaseInsensitiveString.IsNullOrEmpty(Result.FullName))
+				Result.FullName = JoinNames(Result.FirstName, Result.MiddleNames, Result.LastNames);
+			else if (CaseInsensitiveString.IsNullOrEmpty(Result.FirstName) &&
+				CaseInsensitiveString.IsNullOrEmpty(Result.MiddleNames) &&
+				CaseInsensitiveString.IsNullOrEmpty(Result.LastNames))
+			{
+				SeparateNames(Result.FullName, out Result.FirstName, out Result.MiddleNames, out Result.LastNames);
+			}
+
 			return Result;
 		}
 
@@ -893,6 +994,67 @@ namespace Waher.Networking.XMPP.Contracts
 		public PersonalInformation GetPersonalInformation()
 		{
 			return GetPersonalInformation(this.Properties);
+		}
+
+		/// <summary>
+		/// Separates a full name into its first, middle and last names.
+		/// </summary>
+		/// <param name="FullName">Full name</param>
+		/// <param name="FirstName">First name</param>
+		/// <param name="MiddleNames">Middle name(s)</param>
+		/// <param name="LastName">Last name(s)</param>
+		public static void SeparateNames(CaseInsensitiveString FullName,
+			out CaseInsensitiveString FirstName, out CaseInsensitiveString MiddleNames,
+			out CaseInsensitiveString LastName)
+		{
+			int i = FullName.IndexOf(' ');
+			if (i < 0)
+			{
+				FirstName = FullName;
+				MiddleNames = CaseInsensitiveString.Empty;
+				LastName = CaseInsensitiveString.Empty;
+				return;
+			}
+
+			FirstName = FullName.Substring(0, i);
+			FullName = FullName.Substring(i + 1).TrimStart();
+
+			i = FullName.LastIndexOf(' ');
+			if (i < 0)
+			{
+				LastName = FullName;
+				MiddleNames = CaseInsensitiveString.Empty;
+				return;
+			}
+
+			LastName = FullName.Substring(i + 1);
+			MiddleNames = FullName.Substring(0, i).TrimEnd();
+		}
+
+		/// <summary>
+		/// Joins a sequence of names into a full name.
+		/// </summary>
+		/// <param name="Names">Array of names.</param>
+		/// <returns>Full name</returns>
+		public static CaseInsensitiveString JoinNames(params CaseInsensitiveString[] Names)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			foreach (CaseInsensitiveString Name in Names)
+				Append(sb, Name);
+
+			return sb.ToString();
+		}
+
+		private static void Append(StringBuilder sb, string Name)
+		{
+			if (!string.IsNullOrEmpty(Name))
+			{
+				if (sb.Length > 0)
+					sb.Append(' ');
+
+				sb.Append(Name);
+			}
 		}
 
 	}

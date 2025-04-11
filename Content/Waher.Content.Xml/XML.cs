@@ -1381,6 +1381,18 @@ namespace Waher.Content.Xml
 		#region Normalization
 
 		/// <summary>
+		/// Normalizes XML in string form.
+		/// </summary>
+		/// <param name="Xml">XML to normalize</param>
+		/// <returns>Normalized XML</returns>
+		public static string NormalizeXml(string Xml)
+		{
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(Xml);
+			return NormalizeXml(Doc.DocumentElement);
+		}
+
+		/// <summary>
 		/// Normalizes a list of XML nodes.
 		/// </summary>
 		/// <param name="Xml">XML to normalize</param>

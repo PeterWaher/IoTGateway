@@ -1599,6 +1599,17 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
+		/// Replaces a singleton instance of a type.
+		/// </summary>
+		/// <param name="Object">Singleton object instance.</param>
+		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+		/// <returns>If the instance was found and removed.</returns>
+		public static bool ReplaceSingleton(object Object, params object[] Arguments)
+		{
+			return SingletonAttribute.Replace(Object, Arguments);
+		}
+
+		/// <summary>
 		/// Checks if a singleton type (with optional associated arguments) is registered.
 		/// </summary>
 		/// <param name="Type">Singleton type</param>

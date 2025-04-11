@@ -1604,9 +1604,9 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Object">Singleton object instance.</param>
 		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
 		/// <returns>If the instance was found and removed.</returns>
-		public static bool ReplaceSingleton(object Object, params object[] Arguments)
+		public static void ReplaceSingleton(object Object, params object[] Arguments)
 		{
-			return SingletonAttribute.Replace(Object, Arguments);
+			SingletonAttribute.Replace(Object, Arguments);
 		}
 
 		/// <summary>

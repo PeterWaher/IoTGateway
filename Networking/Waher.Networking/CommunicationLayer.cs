@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Collections;
 
 namespace Waher.Networking
 {
@@ -22,7 +23,7 @@ namespace Waher.Networking
 	/// </summary>
 	public class CommunicationLayer : ICommunicationLayer
 	{
-		private readonly List<ISniffer> sniffers;
+		private readonly ChunkedList<ISniffer> sniffers;
 		private readonly bool decoupledEvents;
 		private ISniffer[] staticList;
 		private bool hasSniffers;
@@ -37,7 +38,7 @@ namespace Waher.Networking
 		public CommunicationLayer(bool DecoupledEvents, params ISniffer[] Sniffers)
 		{
 			this.decoupledEvents = DecoupledEvents;
-			this.sniffers = new List<ISniffer>();
+			this.sniffers = new ChunkedList<ISniffer>();
 			this.sniffers.AddRange(Sniffers);
 			this.staticList = this.sniffers.ToArray();
 			this.hasSniffers = this.sniffers.Count > 0;

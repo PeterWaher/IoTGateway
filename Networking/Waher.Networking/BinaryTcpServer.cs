@@ -10,6 +10,8 @@ using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Security;
+using Waher.Runtime.Collections;
+
 
 
 #if WINDOWS_UWP
@@ -47,10 +49,10 @@ namespace Waher.Networking
 		public const int DefaultBufferSize = 16384;
 
 #if WINDOWS_UWP
-		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
+		private ChunkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new ChunkedList<KeyValuePair<StreamSocketListener, Guid>>();
 #else
 		private readonly string[] alpnProtocols;
-		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
+		private ChunkedList<TcpListener> listeners = new ChunkedList<TcpListener>();
 		private X509Certificate serverCertificate;
 		private ClientCertificates clientCertificates = ClientCertificates.NotUsed;
 		private bool trustClientCertificates = false;
@@ -163,16 +165,16 @@ namespace Waher.Networking
 			try
 			{
 #if WINDOWS_UWP
-				LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
-				this.listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
+				ChunkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
+				this.listeners = new ChunkedList<KeyValuePair<StreamSocketListener, Guid>>();
 
 				await this.Open(Listeners);
 
 				foreach (KeyValuePair<StreamSocketListener, Guid> P in Listeners)
 					P.Key.Dispose();
 #else
-				LinkedList<TcpListener> Listeners = this.listeners;
-				this.listeners = new LinkedList<TcpListener>();
+				ChunkedList<TcpListener> Listeners = this.listeners;
+				this.listeners = new ChunkedList<TcpListener>();
 
 				await this.Open(Listeners);
 
@@ -198,7 +200,7 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="Listeners">Optional list of existing listeners to reuse.</param>
 		/// <return>Number of network nterfaces where port was successfully opened, vs failed.</return>
-		public async Task<KeyValuePair<int, int>> Open(LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners)
+		public async Task<KeyValuePair<int, int>> Open(ChunkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners)
 		{
 			int NrOpened = 0;
 			int NrFailed = 0;
@@ -271,8 +273,8 @@ namespace Waher.Networking
 		/// closed as well.</param>
 		public void Close(bool CloseConnectedClients)
 		{
-			LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
-			this.listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
+			ChunkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
+			this.listeners = new ChunkedList<KeyValuePair<StreamSocketListener, Guid>>();
 
 			foreach (KeyValuePair<StreamSocketListener, Guid> P in Listeners)
 				P.Key.Dispose();
@@ -285,7 +287,7 @@ namespace Waher.Networking
 		/// Opens the server for incoming connection requests.
 		/// </summary>
 		/// <param name="Listeners">Optional list of existing listeners to reuse.</param>
-		public Task Open(LinkedList<TcpListener> Listeners)
+		public Task Open(ChunkedList<TcpListener> Listeners)
 		{
 			return this.Open(Listeners, out _, out _);
 		}
@@ -296,7 +298,7 @@ namespace Waher.Networking
 		/// <param name="Listeners">Optional list of existing listeners to reuse.</param>
 		/// <param name="NrOpened">Number of network interfaces where the port was successfully opened.</param>
 		/// <param name="NrFailed">Number of network interfaces where the port was not possible to be opened.</param>
-		public Task Open(LinkedList<TcpListener> Listeners, out int NrOpened, out int NrFailed)
+		public Task Open(ChunkedList<TcpListener> Listeners, out int NrOpened, out int NrFailed)
 		{
 			NrOpened = 0;
 			NrFailed = 0;
@@ -319,22 +321,19 @@ namespace Waher.Networking
 						{
 							Listener = null;
 
-							LinkedListNode<TcpListener> Node;
 							IPEndPoint DesiredEndpoint = new IPEndPoint(UnicastAddress.Address, this.port);
 
-							Node = Listeners?.First;
-							while (!(Node is null))
+							if (!(Listeners is null))
 							{
-								TcpListener L = Node.Value;
-
-								if ((!this.tls) && L.LocalEndpoint == DesiredEndpoint)
+								foreach (TcpListener L in Listeners)
 								{
-									Listener = L;
-									Listeners.Remove(Node);
-									break;
+									if ((!this.tls) && L.LocalEndpoint == DesiredEndpoint)
+									{
+										Listener = L;
+										Listeners.Remove(L);
+										break;
+									}
 								}
-
-								Node = Node.Next;
 							}
 
 							if (Listener is null)
@@ -346,7 +345,7 @@ namespace Waher.Networking
 									Task T = this.ListenForIncomingConnections(Listener);
 
 									NrOpened++;
-									this.listeners.AddLast(Listener);
+									this.listeners.Add(Listener);
 								}
 								catch (SocketException)
 								{
@@ -364,7 +363,7 @@ namespace Waher.Networking
 							else
 							{
 								NrOpened++;
-								this.listeners.AddLast(Listener);
+								this.listeners.Add(Listener);
 							}
 						}
 					}
@@ -385,8 +384,8 @@ namespace Waher.Networking
 		/// closed as well.</param>
 		public void Close(bool CloseConnectedClients)
 		{
-			LinkedList<TcpListener> Listeners = this.listeners;
-			this.listeners = new LinkedList<TcpListener>();
+			ChunkedList<TcpListener> Listeners = this.listeners;
+			this.listeners = new ChunkedList<TcpListener>();
 
 			foreach (TcpListener Listener in Listeners)
 				Listener.Stop();
@@ -567,19 +566,7 @@ namespace Waher.Networking
 						}
 						catch (InvalidOperationException)
 						{
-							LinkedListNode<TcpListener> Node = this.listeners?.First;
-
-							while (!(Node is null))
-							{
-								if (Node.Value == Listener)
-								{
-									this.listeners.Remove(Node);
-									break;
-								}
-
-								Node = Node.Next;
-							}
-
+							this.listeners?.Remove(Listener);
 							return;
 						}
 

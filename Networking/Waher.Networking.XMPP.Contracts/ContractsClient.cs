@@ -2058,8 +2058,7 @@ namespace Waher.Networking.XMPP.Contracts
 						StateObj.BareJid = this.client.BareJID;
 					else
 					{
-						Types.UnregisterSingleton(StateObj, Identity.Id);
-						Types.RegisterSingleton(StateObj2, Identity.Id);
+						Types.ReplaceSingleton(StateObj2, Identity.Id);
 						StateObj = StateObj2;
 					}
 				}

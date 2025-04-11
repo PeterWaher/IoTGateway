@@ -424,7 +424,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CurrenntCancellationToken => this.currentCancelReading.Token;
+		public CancellationToken CurrenntCancellationToken => this.currentCancelReading?.Token ?? CancellationToken.None;
 #endif
 
 		private void PreConnect()
@@ -572,7 +572,6 @@ namespace Waher.Networking
 				{
 					this.disposing = true;
 					this.currentCancelReading?.Cancel();
-					this.currentCancelReading = null;
 					DelayedDispose = true;
 				}
 				else
@@ -751,8 +750,9 @@ namespace Waher.Networking
 			{
 				bool Disposing = false;
 
-				this.currentCancelReading?.Dispose();
+				CancellationTokenSource Cancel = this.currentCancelReading;
 				this.currentCancelReading = null;
+				Cancel?.Dispose();
 
 				NetworkingModule.UnregisterToken(this.id);
 
@@ -2195,7 +2195,6 @@ namespace Waher.Networking
 					IAsyncAction _ = this.client.CancelIOAsync();
 #else
 					this.currentCancelReading?.Cancel();
-					this.currentCancelReading = null;
 
 					NetworkingModule.UnregisterToken(this.id);
 #endif

@@ -605,7 +605,7 @@ namespace Waher.Networking
 			this.connecting = false;
 			this.connected = false;
 
-			await this.CancelOutputQueueLocked();
+			await this.CancelOutputQueue();
 
 			this.queue.Clear();
 			this.outputQueueSize = 0;
@@ -1303,7 +1303,7 @@ namespace Waher.Networking
 					DataWriter.WriteBytes(Buffer);
 					await this.dataWriter.StoreAsync();
 #else
-					if (this.tcpClient?.Client.Poll(0, SelectMode.SelectRead) ?? false)
+					if (this.tcpClient?.Client.Poll(0, SelectMode.SelectWrite) ?? false)
 					{
 						await Stream.WriteAsync(Buffer, Offset, Count);
 
@@ -1337,7 +1337,7 @@ namespace Waher.Networking
 							DoDispose = this.disposing && !this.reading;
 						}
 
-						await this.CancelOutputQueueLocked();
+						await this.CancelOutputQueue();
 						break;
 					}
 #endif
@@ -1373,6 +1373,8 @@ namespace Waher.Networking
 
 					DoDispose = this.disposing && !this.reading;
 				}
+
+				await this.CancelOutputQueue();
 
 				if (!DoDispose)
 					this.Exception(ex);
@@ -1415,20 +1417,28 @@ namespace Waher.Networking
 			}
 		}
 
-		private async Task CancelOutputQueueLocked()
+		private async Task CancelOutputQueue()
 		{
-			if (!(this.queue is null))
+			Rec Rec;
+
+			while (true)
 			{
-				while (this.queue.HasFirstItem)
+				lock (this.synchObj)
 				{
-					Rec Rec = this.queue.RemoveFirst();
+					if (this.queue is null)
+						break;
+
+					if (!this.queue.HasFirstItem)
+						break;
+
+					Rec = this.queue.RemoveFirst();
 					this.outputQueueSize -= Rec.Count;
-
-					Rec.Task.TrySetResult(false);
-
-					if (!(Rec.Callback is null))
-						await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, false));
 				}
+
+				Rec.Task.TrySetResult(false);
+
+				if (!(Rec.Callback is null))
+					await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, false));
 			}
 		}
 

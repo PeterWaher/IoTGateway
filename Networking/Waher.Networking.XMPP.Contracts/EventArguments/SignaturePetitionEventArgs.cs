@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// <param name="RequestorFullJid">Full JID of requestor.</param>
 		/// <param name="SignatoryIdentityId">Legal identity of petitioned signatory.</param>
 		/// <param name="PetitionId">Petition ID. Identifies the petition.</param>
-		/// <param name="Purpose">Purpose of petitioning the identity information.</param>
+		/// <param name="Purpose">Purpose of petitioning the signature.</param>
 		/// <param name="Content">Content to sign.</param>
 		/// <param name="ClientEndpoint">Remote endpoint of remote party client.</param>
 		/// <param name="Context">Any machine-readable context XML element available in the petition.</param>

@@ -18,9 +18,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT MQTT</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.1.1</AssemblyVersion>
-    <FileVersion>2.1.1</FileVersion>
-		<Version>2.1.1</Version>
+    <AssemblyVersion>2.1.2</AssemblyVersion>
+    <FileVersion>2.1.2</FileVersion>
+		<Version>2.1.2</Version>
 		<PackageIcon>Icon_64x64.png</PackageIcon>
 	</PropertyGroup>
 

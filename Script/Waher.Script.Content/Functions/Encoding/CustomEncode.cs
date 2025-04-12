@@ -2,6 +2,7 @@
 using System.Text;
 using Waher.Content;
 using Waher.Content.Binary;
+using Waher.Runtime.IO;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -67,7 +68,7 @@ namespace Waher.Script.Content.Functions.Encoding
 
 					if (Charset is null)
 					{
-						Bin = Utf8WithBOM.GetBytes(s);
+						Bin = Strings.Utf8WithBom.GetBytes(s);
 						ContentType += "; charset=utf-8";
 					}
 					else
@@ -83,8 +84,6 @@ namespace Waher.Script.Content.Functions.Encoding
 
 			return new ObjectValue(new CustomEncoding(ContentType, Bin));
 		}
-
-		private static readonly System.Text.Encoding Utf8WithBOM = new UTF8Encoding(true);
 
 	}
 }

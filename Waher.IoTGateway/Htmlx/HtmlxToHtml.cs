@@ -9,6 +9,7 @@ using Waher.Content.Html.JavaScript;
 using Waher.Events;
 using Waher.IoTGateway.Cssx;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 
 namespace Waher.IoTGateway.Htmlx
@@ -119,7 +120,7 @@ namespace Waher.IoTGateway.Htmlx
 			if (!(State.Progress is null))
 				await State.Progress.BodyProcessed();
 
-			byte[] Data = CssxToCss.Utf8WithBOM.GetBytes(Html);
+			byte[] Data = Strings.Utf8WithBom.GetBytes(Html);
 			await State.To.WriteAsync(Data, 0, Data.Length);
 			State.ToContentType += "; charset=utf-8";
 

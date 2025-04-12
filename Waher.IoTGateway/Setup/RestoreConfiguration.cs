@@ -1937,7 +1937,7 @@ namespace Waher.IoTGateway.Setup
 
 			string s = await Files.ReadAllTextAsync(XmlPath);
 			s = XSL.Transform(s, Xslt);
-			byte[] Bin = WebResources.StartAnalyze.utf8Bom.GetBytes(s);
+			byte[] Bin = Strings.Utf8WithBom.GetBytes(s);
 
 			await Files.WriteAllBytesAsync(HtmlPath, Bin);
 

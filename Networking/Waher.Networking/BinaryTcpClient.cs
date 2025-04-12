@@ -1303,7 +1303,7 @@ namespace Waher.Networking
 					DataWriter.WriteBytes(Buffer);
 					await this.dataWriter.StoreAsync();
 #else
-					if (this.tcpClient?.Client.Poll(0, SelectMode.SelectWrite) ?? false)
+					if (this.tcpClient?.Client.Connected ?? false)
 					{
 						await Stream.WriteAsync(Buffer, Offset, Count);
 
@@ -1325,18 +1325,18 @@ namespace Waher.Networking
 					{
 						this.Error("Connection closed.");
 						Task?.TrySetResult(false);
-
+					
 						if (!(Callback is null))
 							await Callback.Raise(this, new DeliveryEventArgs(State, false));
-
+					
 						lock (this.synchObj)
 						{
 							this.sending = false;
 							this.EmptyIdleQueueLocked();
-
+					
 							DoDispose = this.disposing && !this.reading;
 						}
-
+					
 						await this.CancelOutputQueue();
 						break;
 					}
@@ -1364,20 +1364,21 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
+				this.Exception(ex.Message);
+				Task?.TrySetResult(false);
+
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, false));
+
 				lock (this.synchObj)
 				{
 					this.sending = false;
-					Task?.TrySetResult(false);
-
 					this.EmptyIdleQueueLocked();
 
 					DoDispose = this.disposing && !this.reading;
 				}
 
 				await this.CancelOutputQueue();
-
-				if (!DoDispose)
-					this.Exception(ex);
 			}
 			finally
 			{

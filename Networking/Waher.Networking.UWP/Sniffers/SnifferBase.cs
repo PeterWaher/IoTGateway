@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers.Model;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Queue;
 
 namespace Waher.Networking.Sniffers
@@ -379,35 +379,32 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public void Exception(DateTime Timestamp, Exception Exception)
 		{
-			LinkedList<Exception> Inner = null;
+			ChunkedList<Exception> Inner = null;
 
 			while (!(Exception is null))
 			{
 				if (Exception is AggregateException AggregateException)
 				{
 					if (Inner is null)
-						Inner = new LinkedList<Exception>();
+						Inner = new ChunkedList<Exception>();
 
 					foreach (Exception ex in AggregateException.InnerExceptions)
-						Inner.AddLast(ex);
+						Inner.Add(ex);
 				}
 				else if (!(Exception.InnerException is null))
 				{
 					if (Inner is null)
-						Inner = new LinkedList<Exception>();
+						Inner = new ChunkedList<Exception>();
 
-					Inner.AddLast(Exception.InnerException);
+					Inner.Add(Exception.InnerException);
 				}
 
 				this.Exception(Timestamp, Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace));
 
-				if (Inner?.First is null)
+				if (!(Inner?.HasFirstItem ?? false))
 					Exception = null;
 				else
-				{
-					Exception = Inner.First.Value;
-					Inner.RemoveFirst();
-				}
+					Exception = Inner.RemoveFirst();
 			}
 		}
 

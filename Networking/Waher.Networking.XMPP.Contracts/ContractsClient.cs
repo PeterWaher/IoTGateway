@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.XMPP;
@@ -1563,7 +1564,7 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 			byte[] Signature = await this.SignAsync(Data, SignWith.CurrentKeys);
 			string FileName = "ApplicationReview.xml";
-			string ContentType = "text/xml; charset=utf-8";
+			string ContentType = XmlCodec.DefaultContentType + "; charset=utf-8";
 
 			HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(FileName, ContentType, Data.Length);
 			if (!e2.Ok)

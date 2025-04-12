@@ -215,24 +215,23 @@ namespace Waher.Networking
 						continue;
 
 					Listener = null;
+					int i = 0;
 
-					LinkedListNode<KeyValuePair<StreamSocketListener, Guid>> Node;
-
-					Node = Listeners?.First;
-					while (!(Node is null))
+					Listeners?.ForEach((P) =>
 					{
-						StreamSocketListener L = Node.Value.Key;
-						Guid AdapterId = Node.Value.Value;
+						StreamSocketListener L = P.Key;
+						Guid AdapterId = P.Value;
 
 						if (AdapterId == Profile.NetworkAdapter.NetworkAdapterId)
 						{
 							Listener = L;
-							Listeners.Remove(Node);
-							break;
+							Listeners.RemoveAt(i);
+							return false;
 						}
 
-						Node = Node.Next;
-					}
+						i++;
+						return true;
+					});
 
 					if (Listener is null)
 					{
@@ -243,7 +242,7 @@ namespace Waher.Networking
 							Listener.ConnectionReceived += this.Listener_ConnectionReceived;
 
 							NrOpened++;
-							this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
+							this.listeners.Add(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
 						}
 						catch (Exception ex)
 						{
@@ -254,7 +253,7 @@ namespace Waher.Networking
 					else
 					{
 						NrOpened++;
-						this.listeners.AddLast(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
+						this.listeners.Add(new KeyValuePair<StreamSocketListener, Guid>(Listener, Profile.NetworkAdapter.NetworkAdapterId));
 					}
 				}
 			}

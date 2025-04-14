@@ -425,7 +425,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CurrenntCancellationToken => this.currentCancelReading?.Token ?? CancellationToken.None;
+		public CancellationToken CurrentCancellationToken => this.currentCancelReading?.Token ?? CancellationToken.None;
 #endif
 
 		private void PreConnect()

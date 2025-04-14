@@ -1873,7 +1873,7 @@ namespace Waher.Networking.HTTP
 			}
 #else
 			NrBytes = await this.flowControl.RequestResources(StreamId, Count, 
-				this.client.CurrenntCancellationToken);
+				this.client.CurrentCancellationToken);
 #endif
 			if (NrBytes <= 0)
 				return NrBytes;

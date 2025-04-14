@@ -1846,7 +1846,7 @@ namespace Waher.Networking.HTTP
 				return 0;
 			}
 
-			if (this.flowControl is null)
+			if (this.flowControl is null || this.client is null)
 				return -1;
 
 			int NrBytes;

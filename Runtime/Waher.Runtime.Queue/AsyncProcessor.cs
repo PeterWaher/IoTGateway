@@ -141,34 +141,38 @@ namespace Waher.Runtime.Queue
 					using (CancellationTokenSource Cancel = new CancellationTokenSource())
 					{
 						this.cancelSources[ProcessorIndex] = Cancel;
-
-						Task = this.queue?.Wait(Cancel.Token);
-						if (Task is null)
-							break;
-
-						if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
-						{
-							this.idle = true;
-							await this.OnIdle.Raise(this, e);
-						}
-
-						Item = await Task;
-						if (Item is null)
-							break;
-
-						this.idle = false;
 						try
 						{
-							await Item.Execute(Cancel.Token);
-							Item.Processed(!Cancel.IsCancellationRequested);
-						}
-						catch (Exception ex)
-						{
-							Item.Processed(false);
-							Log.Exception(ex);
-						}
+							Task = this.queue?.Wait(Cancel.Token);
+							if (Task is null)
+								break;
 
-						this.cancelSources[ProcessorIndex] = null;
+							if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
+							{
+								this.idle = true;
+								await this.OnIdle.Raise(this, e);
+							}
+
+							Item = await Task;
+							if (Item is null)
+								break;
+
+							this.idle = false;
+							try
+							{
+								await Item.Execute(Cancel.Token);
+								Item.Processed(!Cancel.IsCancellationRequested);
+							}
+							catch (Exception ex)
+							{
+								Item.Processed(false);
+								Log.Exception(ex);
+							}
+						}
+						finally
+						{
+							this.cancelSources[ProcessorIndex] = null;
+						}
 					}
 				}
 			}

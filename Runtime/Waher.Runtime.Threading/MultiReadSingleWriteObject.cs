@@ -21,6 +21,7 @@ namespace Waher.Runtime.Threading
 		private long token = 0;
 		private int nrReaders = 0;
 		private bool isWriting = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Represents an object that allows single concurrent writers but multiple concurrent readers.
@@ -104,6 +105,9 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+					
 					return this.nrReaders;
 				}
 			}
@@ -118,6 +122,9 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+					
 					return this.nrReaders > 0;
 				}
 			}
@@ -132,6 +139,9 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+					
 					return this.isWriting;
 				}
 			}
@@ -146,10 +156,18 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+					
 					return this.nrReaders > 0 || this.isWriting;
 				}
 			}
 		}
+
+		/// <summary>
+		/// If object has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
 
 		/// <summary>
 		/// Throws an <see cref="InvalidOperationException"/> if the object
@@ -159,6 +177,9 @@ namespace Waher.Runtime.Threading
 		{
 			lock (this.synchObj)
 			{
+				if (this.disposed)
+					throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 				if (this.nrReaders <= 0)
 					throw new InvalidOperationException("Not in a reading state.");
 			}
@@ -172,6 +193,9 @@ namespace Waher.Runtime.Threading
 		{
 			lock (this.synchObj)
 			{
+				if (this.disposed)
+					throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 				if (!this.isWriting)
 					throw new InvalidOperationException("Not in a writing state.");
 			}
@@ -185,6 +209,9 @@ namespace Waher.Runtime.Threading
 		{
 			lock (this.synchObj)
 			{
+				if (this.disposed)
+					throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 				if (this.nrReaders <= 0 && !this.isWriting)
 					throw new InvalidOperationException("Not in a reading or writing state.");
 			}
@@ -202,6 +229,9 @@ namespace Waher.Runtime.Threading
 			{
 				lock (this.synchObj)
 				{
+					if (this.disposed)
+						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 					return this.token;
 				}
 			}
@@ -214,6 +244,9 @@ namespace Waher.Runtime.Threading
 		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
 		public virtual async Task<int> BeginRead()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 			TaskCompletionSource<bool> Wait = null;
 			int Result = 0;
 			bool RecordStackTrace = false;
@@ -263,6 +296,9 @@ namespace Waher.Runtime.Threading
 		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
 		public virtual Task<int> EndRead()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 			LinkedList<TaskCompletionSource<bool>> List = null;
 
 			lock (this.synchObj)
@@ -301,6 +337,9 @@ namespace Waher.Runtime.Threading
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public virtual async Task<bool> TryBeginRead(int Timeout)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 			TaskCompletionSource<bool> Wait = null;
 			DateTime Start = DateTime.Now;
 			bool RecordStackTrace = false;
@@ -372,6 +411,9 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public virtual async Task BeginWrite()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
 			bool RecordStackTrace = false;
@@ -421,6 +463,9 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public virtual Task EndWrite()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 			LinkedList<TaskCompletionSource<bool>> List = null;
 			LinkedList<TaskCompletionSource<bool>> List2 = null;
 
@@ -470,6 +515,9 @@ namespace Waher.Runtime.Threading
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public virtual async Task<bool> TryBeginWrite(int Timeout)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
 			TaskCompletionSource<bool> Prev = null;
 			TaskCompletionSource<bool> Wait = null;
 			DateTime Start = DateTime.Now;
@@ -588,7 +636,13 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		public virtual void Dispose()
 		{
-			this.Unlock();
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+			else
+			{
+				this.disposed = true;
+				this.Unlock();
+			}
 		}
 
 	}

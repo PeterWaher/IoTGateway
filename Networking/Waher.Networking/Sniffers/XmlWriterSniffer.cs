@@ -327,6 +327,9 @@ namespace Waher.Networking.Sniffers
 			try
 			{
 				this.disposed = true;
+				
+				await base.DisposeAsync();
+				
 				this.DisposeOutput();
 				this.semaphore.Dispose();   // End writing
 			}

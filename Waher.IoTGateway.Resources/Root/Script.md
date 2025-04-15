@@ -2674,6 +2674,18 @@ about the script functions referenced in this section is available in the [Neuro
 | `PaymentService(Definition)`     | Creates a script-based service for payments.          |
 | `SellEDalerService(Definition)`  | Creates a script-based service for selling eDaler(R). |
 
+#### Serpro queries (available in TAG.Serpro.package)
+
+The following functions are available on systems with the `TAG.Serpro.package` installed. A more detailed description
+about the script functions referenced in this section is available in the [NeuronSerpro repository](https://github.com/Trust-Anchor-Group/NeuronSerpro).
+
+| Function                        | Description                                                                                       |
+|---------------------------------|---------------------------------------------------------------------------------------------------|
+| `SerproCpfDfStatus()`           | Checks the status of the CPF-DF (Cadastro de Pessoas Físicas - Declaração de Fatos) API Service.  |
+| `SerproCpfDf(CPF)`              | Makes a query against the CPF-DF (Cadastro de Pessoas Físicas - Declaração de Fatos) API Service. |
+| `SerproDataValidStatus()`       | Checks the status of the DataValid (v4) API Service.                                              |
+| `SerproDataValid(Claims,Photo)` | Makes a query against the DataValid (v4) API Service.                                             |
+
 #### Sending SMS (available in TAG.Service.GatewayApi.package)
 
 The following functions are available on systems with the `TAG.Service.GatewayApi.package` installed. A more detailed description

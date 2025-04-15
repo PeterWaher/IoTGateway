@@ -157,7 +157,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TreeNode Loop = this.Parent;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					if (Loop is XmppConcentrator Concentrator)
 						return Concentrator;
@@ -178,7 +178,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TreeNode Loop = this.Parent;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					if (Loop is DataSource DataSource)
 						return DataSource;
@@ -218,10 +218,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			if (!this.loadingChildren && !this.IsLoaded)
 			{
-				string FullJid = this.Concentrator?.FullJid;
+				string? FullJid = this.Concentrator?.FullJid;
 				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-				if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+				if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 				{
 					if (this.nodeInfo.HasChildren)
 					{
@@ -307,7 +307,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return await SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.Momentary);
@@ -325,7 +325,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return SensorClient.RequestReadout(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[] { new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition) }, FieldType.All);
@@ -343,7 +343,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return await SensorClient.Subscribe(Concentrator.RosterItem.LastPresenceFullJid,
 					new ThingReference[]
@@ -372,7 +372,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			XmppAccountNode XmppAccountNode = Concentrator.XmppAccountNode;
 			ControlClient ControlClient;
 
-			if (!(XmppAccountNode is null) && !((ControlClient = XmppAccountNode.ControlClient) is null))
+			if (XmppAccountNode is not null && !((ControlClient = XmppAccountNode.ControlClient) is null))
 			{
 				await ControlClient.GetForm(Concentrator.RosterItem.LastPresenceFullJid, "en", Callback, State,
 					new ThingReference(this.nodeInfo.NodeId, this.nodeInfo.SourceId, this.nodeInfo.Partition));
@@ -397,7 +397,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					return false;
 
 				XmppClient Client = XmppAccountNode.Client;
-				return !(Client is null) && Client.State == XmppState.Connected;
+				return Client is not null && Client.State == XmppState.Connected;
 			}
 		}
 
@@ -421,10 +421,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override void Add()
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -482,10 +482,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void Add(string Type)
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -494,13 +494,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					MainWindow.MouseDefault();
 
 					if (e.Ok)
-					{
-						MainWindow.UpdateGui(async () =>
-						{
-							ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
-							Dialog.ShowDialog();
-						});
-					}
+						_ = MainWindow.ShowParameterDialog(e.Form);
 					else
 						MainWindow.ErrorBox(e.ErrorText);
 
@@ -546,10 +540,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <param name="OnDeleted">Method called when node has been successfully deleted.</param>
 		public override async Task Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -582,11 +576,11 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override void Edit()
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 			string OldKey = this.Key;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -595,13 +589,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					MainWindow.MouseDefault();
 
 					if (e.Ok)
-					{
-						MainWindow.UpdateGui(async () =>
-						{
-							ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
-							Dialog.ShowDialog();
-						});
-					}
+						_ = MainWindow.ShowParameterDialog(e.Form);
 					else
 						MainWindow.ErrorBox(e.ErrorText);
 
@@ -617,7 +605,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						string NewKey = this.Key;
 						TreeNode Parent = this.Parent;
 
-						if (NewKey != OldKey && !(Parent is null))
+						if (NewKey != OldKey && Parent is not null)
 							Parent.RenameChild(OldKey, NewKey, this);
 					}
 					else if (!string.IsNullOrEmpty(e.From))
@@ -640,10 +628,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <param name="Sniffer">Sniffer object.</param>
 		public override void AddSniffer(ISniffer Sniffer)
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
@@ -673,12 +661,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// <returns>If the sniffer was found and removed.</returns>
 		public override async Task<bool> RemoveSniffer(ISniffer Sniffer)
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
 			if (Sniffer is TabSniffer TabSniffer &&
 				!TabSniffer.View.Custom &&
-				!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid) &&
+				ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid) &&
 				!string.IsNullOrEmpty(TabSniffer.SnifferId))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
@@ -703,10 +691,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			if (!(this.nodeInfo is null) && this.nodeInfo.HasCommands && this.commands is null)
 			{
-				string FullJid = this.Concentrator?.FullJid;
+				string? FullJid = this.Concentrator?.FullJid;
 				ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-				if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+				if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 				{
 					this.commands = new NodeCommand[0];
 
@@ -756,10 +744,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void NodeCommandClick(object Sender, System.Windows.RoutedEventArgs e)
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				MenuItem Item = (MenuItem)Sender;
 				NodeCommand Command = (NodeCommand)Item.Tag;
@@ -799,13 +787,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 								MainWindow.MouseDefault();
 
 								if (e2.Ok)
-								{
-									MainWindow.UpdateGui(async () =>
-									{
-										ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
-										Dialog.ShowDialog();
-									});
-								}
+									_ = MainWindow.ShowParameterDialog(e2.Form);
 								else
 									MainWindow.ErrorBox(e2.ErrorText);
 
@@ -827,17 +809,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 								MainWindow.MouseDefault();
 
 								if (e2.Ok)
-								{
-									MainWindow.UpdateGui(async () =>
-									{
-										ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
-
-										if (Dialog.Empty)
-											await e2.Form.Submit();
-										else
-											Dialog.ShowDialog();
-									});
-								}
+									_ = MainWindow.ShowParameterDialog(e2.Form);
 								else
 									MainWindow.ErrorBox(e2.ErrorText);
 
@@ -850,7 +822,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 									MainWindow.UpdateGui(async () =>
 									{
 										TabItem TabItem = MainWindow.NewTab(Command.Name, out TextBlock HeaderLabel);
-										MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+										MainWindow.currentInstance!.Tabs.Items.Add(TabItem);
 
 										QueryResultView ResultView = await QueryResultView.CreateAsync(this, e2.Query, HeaderLabel);
 										TabItem.Content = ResultView;
@@ -948,10 +920,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 		/// </summary>
 		public override async void Copy()
 		{
-			string FullJid = this.Concentrator?.FullJid;
+			string? FullJid = this.Concentrator?.FullJid;
 			ConcentratorClient ConcentratorClient = this.ConcentratorClient;
 
-			if (!(ConcentratorClient is null) && !string.IsNullOrEmpty(FullJid))
+			if (ConcentratorClient is not null && !string.IsNullOrEmpty(FullJid))
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 				bool Error = false;
@@ -1005,7 +977,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			sb.Append("' type='");
 			sb.Append(XML.Encode(Node.NodeType));
 
-			if (!(Parent is null))
+			if (Parent is not null)
 			{
 				sb.Append("' id='");
 				sb.Append(XML.Encode(Parent.NodeId));
@@ -1042,7 +1014,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 				NodeInformation[] Children = await NodesInformation.Task;
 
-				if (!(Children is null))
+				if (Children is not null)
 				{
 					foreach (NodeInformation Child in Children)
 						await ExportToXml(FullJid, ConcentratorClient, Node, Child, sb);
@@ -1059,7 +1031,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 		{
 			get
 			{
-				string FullJid = this.Concentrator?.FullJid;
+				string? FullJid = this.Concentrator?.FullJid;
 				if (string.IsNullOrEmpty(FullJid))
 					return false;
 
@@ -1103,7 +1075,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			try
 			{
-				string FullJid = this.Concentrator?.FullJid;
+				string? FullJid = this.Concentrator?.FullJid;
 				if (string.IsNullOrEmpty(FullJid))
 					return;
 
@@ -1241,7 +1213,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 									else
 										await Field.SetValue(InputField.ValueStrings);
 								}
-								else if (!(InputField is null))
+								else if (InputField is not null)
 									await Field.SetValue(InputField.ValueStrings);
 							}
 
@@ -1263,7 +1235,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 								ExtendedFields.Add(Field);
 							}
 
-							if (!(ExtendedFields is null))
+							if (ExtendedFields is not null)
 								e.Form.Fields = ExtendedFields.ToArray();
 
 							await e.Form.Submit();
@@ -1295,7 +1267,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 			Node CreatedNode = await Request.Task;
 
-			if (!(ChildElements is null))
+			if (ChildElements is not null)
 			{
 				foreach (XmlElement Child in ChildElements)
 					await ImportFromXml(FullJid, ConcentratorClient, CreatedNode, Child);

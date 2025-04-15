@@ -202,7 +202,7 @@ namespace Waher.Script.Fractals.IFS.Variations
 		{
 			get
 			{
-				return new IElement[0];
+				return Array.Empty<IElement>();
 			}
 		}
 

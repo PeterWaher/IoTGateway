@@ -41,7 +41,7 @@ namespace Waher.Client.WPF.Dialogs.AvalonExtensions
 				};
 				UIElement Parent = VisualTreeHelper.GetParent(this) as UIElement;
 				
-				while (!(Parent is null) && !(Parent is ScrollViewer))
+				while (Parent is not null && !(Parent is ScrollViewer))
 					Parent = VisualTreeHelper.GetParent(Parent) as UIElement;
 
 				Parent?.RaiseEvent(e2);

@@ -16,9 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.14.0</AssemblyVersion>
-    <FileVersion>1.14.0</FileVersion>
-    <Version>1.14.0</Version>
+    <AssemblyVersion>1.15.1</AssemblyVersion>
+    <FileVersion>1.15.1</FileVersion>
+    <Version>1.15.1</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Persistence\Waher.Persistence\</UpgradeBackupLocation>

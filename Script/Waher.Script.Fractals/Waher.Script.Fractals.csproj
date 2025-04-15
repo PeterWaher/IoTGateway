@@ -17,9 +17,9 @@ https://waher.se/Script.md#paletteGenerationFunctionsWaherScriptFractals</Descri
     <PackageIconUrl></PackageIconUrl>
     <PackageTags>script fractals</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.2.2</AssemblyVersion>
-    <FileVersion>2.2.2</FileVersion>
-    <Version>2.2.2</Version>
+    <AssemblyVersion>2.3.1</AssemblyVersion>
+    <FileVersion>2.3.1</FileVersion>
+    <Version>2.3.1</Version>
     <Product>Waher.IoTGateway</Product>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Fractals</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>

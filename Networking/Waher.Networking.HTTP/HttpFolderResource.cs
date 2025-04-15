@@ -89,7 +89,7 @@ namespace Waher.Networking.HTTP
 		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPutPatch, bool AllowDelete, bool AnonymousGET,
 			bool UserSessions, HostDomainOptions DomainOptions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: this(ResourceName, FolderPath, AllowPutPatch, AllowDelete, AnonymousGET, UserSessions,
-				  DomainOptions, new string[0], AuthenticationSchemes)
+				  DomainOptions, Array.Empty<string>(), AuthenticationSchemes)
 		{
 		}
 

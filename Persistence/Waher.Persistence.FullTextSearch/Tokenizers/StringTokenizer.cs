@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch.Tokenizers
@@ -79,9 +79,9 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 						sb.Clear();
 						First = true;
 
-						if (!Process.TokenCounts.TryGetValue(Token, out List<uint> DocIndex))
+						if (!Process.TokenCounts.TryGetValue(Token, out ChunkedList<uint> DocIndex))
 						{
-							DocIndex = new List<uint>();
+							DocIndex = new ChunkedList<uint>();
 							Process.TokenCounts[Token] = DocIndex;
 						}
 
@@ -95,9 +95,9 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 				Token = sb.ToString();
 				sb.Clear();
 
-				if (!Process.TokenCounts.TryGetValue(Token, out List<uint> DocIndex))
+				if (!Process.TokenCounts.TryGetValue(Token, out ChunkedList<uint> DocIndex))
 				{
-					DocIndex = new List<uint>();
+					DocIndex = new ChunkedList<uint>();
 					Process.TokenCounts[Token] = DocIndex;
 				}
 

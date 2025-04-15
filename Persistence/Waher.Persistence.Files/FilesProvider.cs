@@ -17,6 +17,7 @@ using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
@@ -1155,7 +1156,7 @@ namespace Waher.Persistence.Files
 			{
 				lock (this.files)
 				{
-					List<ObjectBTreeFile> List = new List<ObjectBTreeFile>();
+					ChunkedList<ObjectBTreeFile> List = new ChunkedList<ObjectBTreeFile>();
 					List.AddRange(this.files.Values);
 
 					if (!(this.master is null))
@@ -1573,7 +1574,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Task object</returns>
 		private async Task LoadConfiguration()
 		{
-			LinkedList<string> ToRemove = null;
+			ChunkedList<string> ToRemove = null;
 			KeyValuePair<string, object>[] Items = await this.master.ToArrayAsync();
 
 			foreach (KeyValuePair<string, object> P in Items)
@@ -1601,9 +1602,9 @@ namespace Waher.Persistence.Files
 						if (File is null)
 						{
 							if (ToRemove is null)
-								ToRemove = new LinkedList<string>();
+								ToRemove = new ChunkedList<string>();
 
-							ToRemove.AddLast(P.Key);
+							ToRemove.Add(P.Key);
 						}
 						break;
 
@@ -1619,9 +1620,9 @@ namespace Waher.Persistence.Files
 						if (File is null)
 						{
 							if (ToRemove is null)
-								ToRemove = new LinkedList<string>();
+								ToRemove = new ChunkedList<string>();
 
-							ToRemove.AddLast(P.Key);
+							ToRemove.Add(P.Key);
 							break;
 						}
 
@@ -2091,7 +2092,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Callback">Method to call when operation completed.</param>
 		private async Task Insert(IEnumerable<object> Objects, bool Lazy, ObjectsCallback Callback)
 		{
-			LinkedList<object> List = new LinkedList<object>();
+			ChunkedList<object> List = new ChunkedList<object>();
 			ObjectSerializer Serializer = null;
 			ObjectBTreeFile File = null;
 			string CollectionName = null;
@@ -2105,7 +2106,7 @@ namespace Waher.Persistence.Files
 				T2 = Object.GetType();
 				if (Serializer is null || T != T2)
 				{
-					if (!(List.First is null))
+					if (List.HasFirstItem)
 					{
 						await File.SaveNewObjects(List, Serializer, Lazy, Callback);
 						List.Clear();
@@ -2119,7 +2120,7 @@ namespace Waher.Persistence.Files
 				CollectionName2 = await Serializer.CollectionName(Object);
 				if (File is null || CollectionName != CollectionName2)
 				{
-					if (!(List.First is null))
+					if (List.HasFirstItem)
 					{
 						await File.SaveNewObjects(List, Serializer, Lazy, Callback);
 						List.Clear();
@@ -2136,10 +2137,10 @@ namespace Waher.Persistence.Files
 					CheckIndices = false;
 				}
 
-				List.AddLast(Object);
+				List.Add(Object);
 			}
 
-			if (!(List.First is null))
+			if (List.HasFirstItem)
 				await File.SaveNewObjects(List, Serializer, Lazy, Callback);
 		}
 
@@ -2175,7 +2176,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized(Serializer);
 			await File.BeginRead();
@@ -2209,7 +2210,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized(Serializer);
 			await File.BeginRead();
@@ -2227,12 +2228,12 @@ namespace Waher.Persistence.Files
 
 		internal static async Task<IEnumerable<T>> LoadAllLocked<T>(ICursor<T> ResultSet)
 		{
-			LinkedList<T> Result = new LinkedList<T>();
+			ChunkedList<T> Result = new ChunkedList<T>();
 
 			while (await ResultSet.MoveNextAsyncLocked())
 			{
 				if (ResultSet.CurrentTypeCompatible)
-					Result.AddLast(ResultSet.Current);
+					Result.Add(ResultSet.Current);
 			}
 
 			return Result;
@@ -2284,7 +2285,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized<T>();
 			await File.BeginRead();
@@ -2318,7 +2319,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			await File.CheckIndicesInitialized<T>();
 			await File.BeginRead();
@@ -2476,7 +2477,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
 
 			if (File is null)
-				return new T[0];
+				return Array.Empty<T>();
 
 			return await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, false, SortOrder, null);
 		}
@@ -2510,7 +2511,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile File = await this.GetFile(Collection, false);
 
 			if (File is null)
-				return new object[0];
+				return Array.Empty<object>();
 
 			return await File.FindDelete(Offset, MaxCount, Filter, false, SortOrder, null);
 		}
@@ -2645,7 +2646,7 @@ namespace Waher.Persistence.Files
 
 		private async Task Update(IEnumerable<object> Objects, bool Lazy, ObjectsCallback Callback)
 		{
-			LinkedList<object> List = new LinkedList<object>();
+			ChunkedList<object> List = new ChunkedList<object>();
 			ObjectSerializer Serializer = null;
 			ObjectBTreeFile File = null;
 			string CollectionName = null;
@@ -2658,7 +2659,7 @@ namespace Waher.Persistence.Files
 				T2 = Object.GetType();
 				if (Serializer is null || T != T2)
 				{
-					if (!(List.First is null))
+					if (List.HasFirstItem)
 					{
 						await File.UpdateObjects(List, Serializer, Lazy, Callback);
 						List.Clear();
@@ -2671,7 +2672,7 @@ namespace Waher.Persistence.Files
 				CollectionName2 = await Serializer.CollectionName(Object);
 				if (File is null || CollectionName != CollectionName2)
 				{
-					if (!(List.First is null))
+					if (List.HasFirstItem)
 					{
 						await File.UpdateObjects(List, Serializer, Lazy, Callback);
 						List.Clear();
@@ -2681,10 +2682,10 @@ namespace Waher.Persistence.Files
 					File = await this.GetFile(CollectionName);
 				}
 
-				List.AddLast(Object);
+				List.Add(Object);
 			}
 
-			if (!(List.First is null))
+			if (List.HasFirstItem)
 				await File.UpdateObjects(List, Serializer, Lazy, Callback);
 		}
 
@@ -2751,7 +2752,7 @@ namespace Waher.Persistence.Files
 
 		private async Task Delete(IEnumerable<object> Objects, bool Lazy, ObjectsCallback Callback)
 		{
-			LinkedList<object> List = new LinkedList<object>();
+			ChunkedList<object> List = new ChunkedList<object>();
 			ObjectSerializer Serializer = null;
 			ObjectBTreeFile File = null;
 			string CollectionName = null;
@@ -2764,7 +2765,7 @@ namespace Waher.Persistence.Files
 				T2 = Object.GetType();
 				if (Serializer is null || T != T2)
 				{
-					if (!(List.First is null))
+					if (List.HasFirstItem)
 					{
 						await File.DeleteObjects(List, Serializer, Lazy, Callback);
 						List.Clear();
@@ -2777,7 +2778,7 @@ namespace Waher.Persistence.Files
 				CollectionName2 = await Serializer.CollectionName(Object);
 				if (File is null || CollectionName != CollectionName2)
 				{
-					if (!(List.First is null))
+					if (List.HasFirstItem)
 					{
 						await File.DeleteObjects(List, Serializer, Lazy, Callback);
 						List.Clear();
@@ -2787,10 +2788,10 @@ namespace Waher.Persistence.Files
 					File = await this.GetFile(CollectionName);
 				}
 
-				List.AddLast(Object);
+				List.Add(Object);
 			}
 
-			if (!(List.First is null))
+			if (List.HasFirstItem)
 				await File.DeleteObjects(List, Serializer, Lazy, Callback);
 		}
 
@@ -2840,9 +2841,9 @@ namespace Waher.Persistence.Files
 		{
 			string Folder = Path.Combine(this.folder, "Dictionaries");
 			if (!Directory.Exists(Folder))
-				return Task.FromResult(new string[0]);
+				return Task.FromResult(Array.Empty<string>());
 
-			List<string> Collections = new List<string>();
+			ChunkedList<string> Collections = new ChunkedList<string>();
 
 			foreach (string FullFileName in Directory.GetFiles(Folder, "*.dict", SearchOption.TopDirectoryOnly))
 			{
@@ -2999,7 +3000,7 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				List<ObjectBTreeFile> Files = new List<ObjectBTreeFile>();
+				ChunkedList<ObjectBTreeFile> Files = new ChunkedList<ObjectBTreeFile>();
 
 				lock (this.files)
 				{
@@ -3454,7 +3455,7 @@ namespace Waher.Persistence.Files
 					{
 						string[] Comments = FileStat.Comments;
 						ProfilerThread RepairThread = Thread?.CreateSubThread("Repair " + File.CollectionName, ProfilerThreadType.Sequential);
-						LinkedList<Exception> Exceptions = null;
+						ChunkedList<Exception> Exceptions = null;
 						string TempFileName = Path.GetTempFileName();
 						string TempBtreeFileName = TempFileName + ".btree";
 						string TempBlobFileName = TempFileName + ".blob";
@@ -3562,9 +3563,9 @@ namespace Waher.Persistence.Files
 															RepairThread?.Exception(ex);
 
 															if (Exceptions is null)
-																Exceptions = new LinkedList<Exception>();
+																Exceptions = new ChunkedList<Exception>();
 
-															Exceptions.AddLast(ex);
+															Exceptions.Add(ex);
 															continue;
 														}
 
@@ -3940,7 +3941,7 @@ namespace Waher.Persistence.Files
 				return await this.Repair(s, XsltPath, Collections);
 			}
 			else
-				return new string[0];
+				return Array.Empty<string>();
 		}
 
 		private string GetReportFileName()

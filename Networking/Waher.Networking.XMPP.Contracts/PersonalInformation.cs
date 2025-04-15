@@ -25,6 +25,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public CaseInsensitiveString LastNames = null;
 
 		/// <summary>
+		/// FullName
+		/// </summary>
+		public CaseInsensitiveString FullName = null;
+
+		/// <summary>
 		/// Address
 		/// </summary>
 		public CaseInsensitiveString Address = null;

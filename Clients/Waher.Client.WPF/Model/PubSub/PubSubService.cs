@@ -292,11 +292,7 @@ namespace Waher.Client.WPF.Model.PubSub
 							return Task.CompletedTask;
 						}, string.Empty, string.Empty, Fields);
 
-					MainWindow.UpdateGui(async () =>
-					{
-						ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-						Dialog.ShowDialog();
-					});
+					_ = MainWindow.ShowParameterDialog(Form);
 				}
 				else
 					MainWindow.ErrorBox("Unable to get default node properties: " + e.ErrorText);

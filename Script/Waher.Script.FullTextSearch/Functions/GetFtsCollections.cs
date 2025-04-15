@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -19,7 +20,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>
 		public GetFtsCollections(int Start, int Length, Expression Expression)
-			: base( new ScriptNode[0], argumentTypes0, Start, Length, Expression)
+			: base(Array.Empty<ScriptNode>(), argumentTypes0, Start, Length, Expression)
 		{
 		}
 

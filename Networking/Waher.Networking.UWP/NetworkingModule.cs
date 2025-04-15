@@ -70,6 +70,7 @@ namespace Waher.Networking
 		/// </summary>
 		public static bool Stopping => stopping;
 
+#if !WINDOWS_UWP
 		/// <summary>
 		/// Registers a cancellation token source.
 		/// </summary>
@@ -95,6 +96,6 @@ namespace Waher.Networking
 				return sourcesById.Remove(Id);
 			}
 		}
-
+#endif
 	}
 }

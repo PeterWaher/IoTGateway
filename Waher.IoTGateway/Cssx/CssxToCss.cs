@@ -8,6 +8,7 @@ using Waher.Content.Html.Css;
 using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.IoTGateway.Setup;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 
 namespace Waher.IoTGateway.Cssx
@@ -57,7 +58,7 @@ namespace Waher.IoTGateway.Cssx
 			if (State.HasError)
 				return false;
 
-			byte[] Data = Utf8WithBOM.GetBytes(Css);
+			byte[] Data = Strings.Utf8WithBom.GetBytes(Css);
 			await State.To.WriteAsync(Data, 0, Data.Length);
 			State.ToContentType += "; charset=utf-8";
 
@@ -217,8 +218,5 @@ namespace Waher.IoTGateway.Cssx
 				}
 			}
 		}
-
-		internal static readonly System.Text.Encoding Utf8WithBOM = new UTF8Encoding(true);
-
 	}
 }

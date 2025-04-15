@@ -34,7 +34,7 @@ namespace Waher.Security.DTLS
 		internal byte[] sessionId = new byte[1] { 0 };
 		internal byte[] cookieRandom = new byte[32];
 		internal byte[] clientRandom = new byte[32];
-		internal byte[] serverRandom = new byte[0];
+		internal byte[] serverRandom = Array.Empty<byte>();
 		internal byte[] clientHandshakeHash = null;
 		internal byte[] serverHandshakeHash = null;
 		internal byte[] masterSecret = null;

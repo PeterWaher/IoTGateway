@@ -106,7 +106,7 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="State">Endpoint state.</param>
 		public override Task SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State)
 		{
-			return Endpoint.SendHandshake(HandshakeType.server_hello_done, new byte[0], false, true, State);
+			return Endpoint.SendHandshake(HandshakeType.server_hello_done, Array.Empty<byte>(), false, true, State);
 		}
 
 		/// <summary>

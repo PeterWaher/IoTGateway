@@ -233,7 +233,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>Set of messages.</returns>
 		public Task<IEnumerable<Message>> GetMessagesAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<IEnumerable<Message>>(new Message[0]);
+			return Task.FromResult<IEnumerable<Message>>(Array.Empty<Message>());
 		}
 
 		/// <summary>

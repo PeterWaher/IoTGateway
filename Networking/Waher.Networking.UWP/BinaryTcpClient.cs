@@ -21,6 +21,7 @@ using System.Security.Cryptography.X509Certificates;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Security;
+using Waher.Runtime.Collections;
 
 namespace Waher.Networking
 {
@@ -33,10 +34,10 @@ namespace Waher.Networking
 	{
 		private const int BufferSize = 65536;
 
-		private readonly LinkedList<Rec> queue = new LinkedList<Rec>();
-		private LinkedList<TaskCompletionSource<bool>> idleQueue = null;
-		private LinkedList<TaskCompletionSource<bool>> cancelledQueue = null;
-		private LinkedList<TaskCompletionSource<bool>> waitingQueue = null;
+		private readonly ChunkedList<Rec> queue = new ChunkedList<Rec>();
+		private ChunkedList<TaskCompletionSource<bool>> idleQueue = null;
+		private ChunkedList<TaskCompletionSource<bool>> cancelledQueue = null;
+		private ChunkedList<TaskCompletionSource<bool>> waitingQueue = null;
 #if WINDOWS_UWP
 		private readonly MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private readonly StreamSocket client;
@@ -47,7 +48,7 @@ namespace Waher.Networking
 		private readonly TcpClient tcpClient;
 		private readonly Guid id = Guid.NewGuid();
 		private Stream stream = null;
-		private CancellationTokenSource cancelReading;
+		private CancellationTokenSource currentCancelReading;
 #endif
 		private readonly object synchObj = new object();
 		private readonly bool sniffBinary;
@@ -110,8 +111,6 @@ namespace Waher.Networking
 			this.client = new StreamSocket();
 #else
 			this.tcpClient = new TcpClient();
-			this.cancelReading = new CancellationTokenSource();
-			NetworkingModule.RegisterToken(this.id, this.cancelReading);
 #endif
 		}
 
@@ -193,8 +192,6 @@ namespace Waher.Networking
 		{
 			this.sniffBinary = SniffBinary;
 			this.tcpClient = Client;
-			this.cancelReading = new CancellationTokenSource();
-			NetworkingModule.RegisterToken(this.id, this.cancelReading);
 
 			this.SetTcpEndPoints();
 		}
@@ -419,11 +416,16 @@ namespace Waher.Networking
 		/// </summary>
 		public bool Connected => this.connected && !this.disposing && !this.disposed;
 
-#if !WINDOWS_UWP
+#if WINDOWS_UWP
 		/// <summary>
-		/// Cancellation token for the connection.
+		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CancellationToken => this.cancelReading.Token;
+		public CancellationToken CurrenntCancellationToken => CancellationToken.None;
+#else
+		/// <summary>
+		/// Current Cancellation token for the current read operation.
+		/// </summary>
+		public CancellationToken CurrenntCancellationToken => this.currentCancelReading?.Token ?? CancellationToken.None;
 #endif
 
 		private void PreConnect()
@@ -570,14 +572,18 @@ namespace Waher.Networking
 				if (this.connecting || this.reading || this.sending)
 				{
 					this.disposing = true;
-					this.cancelReading.Cancel();
-					NetworkingModule.UnregisterToken(this.id);
+#if !WINDOWS_UWP
+					this.currentCancelReading?.Cancel();
+#endif
 					DelayedDispose = true;
 				}
 				else
 					DelayedDispose = false;
 			}
 
+#if !WINDOWS_UWP
+			NetworkingModule.UnregisterToken(this.id);
+#endif
 			if (DelayedDispose)
 			{
 				Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
@@ -602,13 +608,7 @@ namespace Waher.Networking
 			this.connecting = false;
 			this.connected = false;
 
-			LinkedListNode<Rec> Node = this.queue.First;
-
-			while (!(Node is null))
-			{
-				Node.Value.Task.TrySetResult(false);
-				Node = Node.Next;
-			}
+			await this.CancelOutputQueue();
 
 			this.queue.Clear();
 			this.outputQueueSize = 0;
@@ -703,7 +703,12 @@ namespace Waher.Networking
 
 					NrRead = Packet.Length;
 #else
-					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.cancelReading.Token);
+					CancellationTokenSource PrevCancel = this.currentCancelReading;
+					this.currentCancelReading = new CancellationTokenSource();
+					NetworkingModule.RegisterToken(this.id, this.currentCancelReading);
+					PrevCancel?.Dispose();
+
+					NrRead = await Stream.ReadAsync(this.buffer, 0, BufferSize, this.currentCancelReading.Token);
 #endif
 					if (this.disposing || this.disposed || NetworkingModule.Stopping)
 						break;
@@ -742,6 +747,14 @@ namespace Waher.Networking
 			{
 				bool Disposing = false;
 
+#if !WINDOWS_UWP
+				CancellationTokenSource Cancel = this.currentCancelReading;
+				this.currentCancelReading = null;
+				Cancel?.Dispose();
+
+				NetworkingModule.UnregisterToken(this.id);
+#endif
+
 				lock (this.synchObj)
 				{
 					this.reading = false;
@@ -749,13 +762,6 @@ namespace Waher.Networking
 					if (this.cancelRead)
 					{
 						this.cancelRead = false;
-#if !WINDOWS_UWP
-						this.cancelReading.Dispose();
-						NetworkingModule.UnregisterToken(this.id);
-
-						this.cancelReading = new CancellationTokenSource();
-						NetworkingModule.RegisterToken(this.id, this.cancelReading);
-#endif
 						this.EmptyCancelQueueLocked();
 					}
 
@@ -1191,9 +1197,9 @@ namespace Waher.Networking
 									Wait = new TaskCompletionSource<bool>();
 
 									if (this.waitingQueue is null)
-										this.waitingQueue = new LinkedList<TaskCompletionSource<bool>>();
+										this.waitingQueue = new ChunkedList<TaskCompletionSource<bool>>();
 
-									this.waitingQueue.AddLast(Wait);
+									this.waitingQueue.AddLastItem(Wait);
 								}
 								else
 								{
@@ -1227,9 +1233,9 @@ namespace Waher.Networking
 									}
 
 									if (Priority)
-										this.queue.AddFirst(Item);
+										this.queue.AddFirstItem(Item);
 									else
-										this.queue.AddLast(Item);
+										this.queue.Add(Item);
 
 									this.outputQueueSize += Count;
 									return;
@@ -1243,13 +1249,10 @@ namespace Waher.Networking
 						}
 						else
 						{
-							while (!(this.waitingQueue?.First is null))
-							{
-								this.waitingQueue.First.Value.TrySetResult(true);
-								this.waitingQueue.RemoveFirst();
-							}
+							while (this.waitingQueue?.HasFirstItem ?? false)
+								this.waitingQueue.RemoveFirst().TrySetResult(true);
 
-							if (this.queue.First is null)
+							if (!this.queue.HasFirstItem)
 							{
 								this.sending = false;
 								this.EmptyIdleQueueLocked();
@@ -1261,8 +1264,7 @@ namespace Waher.Networking
 							}
 							else
 							{
-								Rec Rec = this.queue.First.Value;
-								this.queue.RemoveFirst();
+								Rec Rec = this.queue.RemoveFirst();
 								this.outputQueueSize -= Rec.Count;
 
 								Buffer = Rec.Data;
@@ -1305,22 +1307,44 @@ namespace Waher.Networking
 					DataWriter.WriteBytes(Buffer);
 					await this.dataWriter.StoreAsync();
 #else
-					await Stream.WriteAsync(Buffer, Offset, Count);
+					if (this.tcpClient?.Client.Connected ?? false)
+					{
+						await Stream.WriteAsync(Buffer, Offset, Count);
+
+						try
+						{
+							await this.BinaryDataSent(ConstantBuffer, Buffer, Offset, Count);
+						}
+						catch (Exception ex)
+						{
+							this.Exception(ex);
+						}
+
+						Task.TrySetResult(true);
+
+						if (!(Callback is null))
+							await Callback.Raise(this, new DeliveryEventArgs(State, true));
+					}
+					else
+					{
+						this.Error("Connection closed.");
+						Task?.TrySetResult(false);
+					
+						if (!(Callback is null))
+							await Callback.Raise(this, new DeliveryEventArgs(State, false));
+					
+						lock (this.synchObj)
+						{
+							this.sending = false;
+							this.EmptyIdleQueueLocked();
+					
+							DoDispose = this.disposing && !this.reading;
+						}
+					
+						await this.CancelOutputQueue();
+						break;
+					}
 #endif
-
-					try
-					{
-						await this.BinaryDataSent(ConstantBuffer, Buffer, Offset, Count);
-					}
-					catch (Exception ex)
-					{
-						this.Exception(ex);
-					}
-
-					Task.TrySetResult(true);
-
-					if (!(Callback is null))
-						await Callback.Raise(this, new DeliveryEventArgs(State, true));
 				}
 
 				if (!this.disposed)
@@ -1344,18 +1368,21 @@ namespace Waher.Networking
 			}
 			catch (Exception ex)
 			{
+				this.Exception(ex.Message);
+				Task?.TrySetResult(false);
+
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, false));
+
 				lock (this.synchObj)
 				{
 					this.sending = false;
-					Task?.TrySetResult(false);
-
 					this.EmptyIdleQueueLocked();
 
 					DoDispose = this.disposing && !this.reading;
 				}
 
-				if (!DoDispose)
-					this.Exception(ex);
+				await this.CancelOutputQueue();
 			}
 			finally
 			{
@@ -1377,8 +1404,8 @@ namespace Waher.Networking
 		{
 			if (!(this.idleQueue is null))
 			{
-				foreach (TaskCompletionSource<bool> T in this.idleQueue)
-					T.TrySetResult(true);
+				while (this.idleQueue.HasFirstItem)
+					this.idleQueue.RemoveFirst().TrySetResult(true);
 
 				this.idleQueue = null;
 			}
@@ -1388,10 +1415,35 @@ namespace Waher.Networking
 		{
 			if (!(this.cancelledQueue is null))
 			{
-				foreach (TaskCompletionSource<bool> T in this.cancelledQueue)
-					T.TrySetResult(true);
+				while (this.cancelledQueue.HasFirstItem)
+					this.cancelledQueue.RemoveFirst().TrySetResult(true);
 
 				this.cancelledQueue = null;
+			}
+		}
+
+		private async Task CancelOutputQueue()
+		{
+			Rec Rec;
+
+			while (true)
+			{
+				lock (this.synchObj)
+				{
+					if (this.queue is null)
+						break;
+
+					if (!this.queue.HasFirstItem)
+						break;
+
+					Rec = this.queue.RemoveFirst();
+					this.outputQueueSize -= Rec.Count;
+				}
+
+				Rec.Task.TrySetResult(false);
+
+				if (!(Rec.Callback is null))
+					await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, false));
 			}
 		}
 
@@ -1457,10 +1509,10 @@ namespace Waher.Networking
 					return Task.FromResult(true);
 
 				if (this.idleQueue is null)
-					this.idleQueue = new LinkedList<TaskCompletionSource<bool>>();
+					this.idleQueue = new ChunkedList<TaskCompletionSource<bool>>();
 
 				TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-				this.idleQueue.AddLast(Result);
+				this.idleQueue.Add(Result);
 				return Result.Task;
 			}
 		}
@@ -2181,13 +2233,14 @@ namespace Waher.Networking
 					this.cancelRead = true;
 
 					if (this.cancelledQueue is null)
-						this.cancelledQueue = new LinkedList<TaskCompletionSource<bool>>();
+						this.cancelledQueue = new ChunkedList<TaskCompletionSource<bool>>();
 
-					this.cancelledQueue.AddLast(Task);
+					this.cancelledQueue.Add(Task);
 #if WINDOWS_UWP
 					IAsyncAction _ = this.client.CancelIOAsync();
 #else
-					this.cancelReading.Cancel();
+					this.currentCancelReading?.Cancel();
+
 					NetworkingModule.UnregisterToken(this.id);
 #endif
 				}

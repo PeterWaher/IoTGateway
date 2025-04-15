@@ -176,9 +176,32 @@ namespace Waher.Events.XMPP
 			Xml.Append(XML.Encode(Event.Message));
 			Xml.Append("</message>");
 
-			if (!(Event.Tags is null) && Event.Tags.Length > 0)
+			AppendTags(Xml, Event.Tags);
+
+			if (!string.IsNullOrEmpty(s = Event.StackTrace))
 			{
-				foreach (KeyValuePair<string, object> Tag in Event.Tags)
+				Xml.Append("<stackTrace>");
+				Xml.Append(XML.Encode(s));
+				Xml.Append("</stackTrace>");
+			}
+
+			Xml.Append("</log>");
+
+			this.client.SendMessage(MessageType.Normal, this.destination, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Appends a collection of tags to an XML string.
+		/// </summary>
+		/// <param name="Xml">XML string being constructed.</param>
+		/// <param name="Tags">Tags to append.</param>
+		public static void AppendTags(StringBuilder Xml, params KeyValuePair<string, object>[] Tags)
+		{
+			if (!(Tags is null) && Tags.Length > 0)
+			{
+				foreach (KeyValuePair<string, object> Tag in Tags)
 				{
 					Xml.Append("<tag name='");
 					Xml.Append(XML.Encode(Tag.Key));
@@ -294,19 +317,6 @@ namespace Waher.Events.XMPP
 					}
 				}
 			}
-
-			if (!string.IsNullOrEmpty(s = Event.StackTrace))
-			{
-				Xml.Append("<stackTrace>");
-				Xml.Append(XML.Encode(s));
-				Xml.Append("</stackTrace>");
-			}
-
-			Xml.Append("</log>");
-
-			this.client.SendMessage(MessageType.Normal, this.destination, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-
-			return Task.CompletedTask;
 		}
 	}
 }

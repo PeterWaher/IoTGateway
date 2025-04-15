@@ -232,7 +232,7 @@ namespace Waher.Networking.XMPP
 		private readonly Random gen = new Random();
 		private readonly object synchObject = new object();
 		private Availability currentAvailability = Availability.Online;
-		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
+		private KeyValuePair<string, string>[] customPresenceStatus = Array.Empty<KeyValuePair<string, string>>();
 		private ITextTransportLayer textTransportLayer = null;
 		private HashFunction entityHashFunction = HashFunction.SHA256;
 		private string entityNode = "https://github.com/PeterWaher/IoTGateway";

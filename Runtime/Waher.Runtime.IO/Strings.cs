@@ -225,6 +225,38 @@ namespace Waher.Runtime.IO
 		private static Encoding gb18030 = null;
 
 		/// <summary>
+		/// UTF-8 encoding with Byte Order Mark (BOM)
+		/// </summary>
+		public static Encoding Utf8WithBom
+		{
+			get
+			{
+				if (utf8WithBom is null)
+					utf8WithBom = new UTF8Encoding(true);
+
+				return utf8WithBom;
+			}
+		}
+
+		private static Encoding utf8WithBom = null;
+
+		/// <summary>
+		/// UTF-8 encoding without Byte Order Mark (BOM)
+		/// </summary>
+		public static Encoding Utf8WithoutBom
+		{
+			get
+			{
+				if (utf8WithoutBom is null)
+					utf8WithoutBom = new UTF8Encoding(false);
+
+				return utf8WithoutBom;
+			}
+		}
+
+		private static Encoding utf8WithoutBom = null;
+
+		/// <summary>
 		/// Returns the port number at the end of a string, if found.
 		/// </summary>
 		/// <param name="s">String</param>

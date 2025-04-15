@@ -19,7 +19,7 @@ namespace Waher.Security.JWS.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>
 		public HS256(int Start, int Length, Expression Expression)
-			: base(new ScriptNode[0], argumentTypes0, Start, Length, Expression)
+			: base(Array.Empty<ScriptNode>(), argumentTypes0, Start, Length, Expression)
 		{
 		}
 

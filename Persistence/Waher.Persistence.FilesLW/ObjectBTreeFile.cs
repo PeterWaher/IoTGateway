@@ -17,6 +17,7 @@ using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files
 {
@@ -28,8 +29,8 @@ namespace Waher.Persistence.Files
 		internal const int BlockHeaderSize = 14;
 
 		internal readonly MultiReadSingleWriteObject fileAccess;
-		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
-		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
+		private IndexBTreeFile[] indices = Array.Empty<IndexBTreeFile>();
+		private ChunkedList<IndexBTreeFile> indexList = new ChunkedList<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private readonly GenericObjectSerializer genericSerializer;
 		private readonly FilesProvider provider;
@@ -37,8 +38,8 @@ namespace Waher.Persistence.Files
 		private readonly FileOfBlocks blobFile;
 		private readonly Encoding encoding;
 		private SortedDictionary<uint, byte[]> blocksToSave = null;
-		private LinkedList<SaveRec> objectsToSave = null;
-		private LinkedList<LoadRec> objectsToLoad = null;
+		private ChunkedList<SaveRec> objectsToSave = null;
+		private ChunkedList<LoadRec> objectsToLoad = null;
 		private readonly object synchObject = new object();
 		private readonly IRecordHandler recordHandler;
 		private long lockToken = long.MinValue;
@@ -473,8 +474,8 @@ namespace Waher.Persistence.Files
 
 		private async Task CheckPending()
 		{
-			LinkedList<SaveRec> ToSave;
-			LinkedList<LoadRec> ToLoad;
+			ChunkedList<SaveRec> ToSave;
+			ChunkedList<LoadRec> ToLoad;
 
 			lock (this.synchObject)
 			{
@@ -1115,7 +1116,7 @@ namespace Waher.Persistence.Files
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
 
 			SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
-			LinkedList<Tuple<uint, int, byte[]>> ReplacementBlocks = new LinkedList<Tuple<uint, int, byte[]>>();
+			ChunkedList<Tuple<uint, int, byte[]>> ReplacementBlocks = new ChunkedList<Tuple<uint, int, byte[]>>();
 			Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blobBlockLimit, Offset);
 			uint[] BlocksToRemove;
@@ -1188,7 +1189,7 @@ namespace Waher.Persistence.Files
 				Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
 				if (ObjectId2 is null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-					ReplacementBlocks.AddFirst(new Tuple<uint, int, byte[]>(BlobBlockIndex, Reader.Position, DecryptedBlock));
+					ReplacementBlocks.AddFirstItem(new Tuple<uint, int, byte[]>(BlobBlockIndex, Reader.Position, DecryptedBlock));
 			}
 
 			i = 0;
@@ -1408,7 +1409,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Callback">Method to call when operation completed.</param>
 		public async Task SaveNewObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy, ObjectsCallback Callback)
 		{
-			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
+			ChunkedList<Guid> ObjectIds = new ChunkedList<Guid>();
 
 			if (Lazy)
 			{
@@ -1440,7 +1441,7 @@ namespace Waher.Persistence.Files
 					NestedLocks State = NestedLocks.CreateIfNested(this, true, Serializer);
 
 					foreach (object Object in Objects)
-						ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer, State));
+						ObjectIds.Add(await this.SaveNewObjectLocked(Object, Serializer, State));
 				}
 				finally
 				{
@@ -1514,9 +1515,9 @@ namespace Waher.Persistence.Files
 			lock (this.synchObject)
 			{
 				if (this.objectsToSave is null)
-					this.objectsToSave = new LinkedList<SaveRec>();
+					this.objectsToSave = new ChunkedList<SaveRec>();
 
-				this.objectsToSave.AddLast(new SaveRec()
+				this.objectsToSave.Add(new SaveRec()
 				{
 					Object = Object,
 					Serializer = Serializer,
@@ -1531,11 +1532,11 @@ namespace Waher.Persistence.Files
 			lock (this.synchObject)
 			{
 				if (this.objectsToSave is null)
-					this.objectsToSave = new LinkedList<SaveRec>();
+					this.objectsToSave = new ChunkedList<SaveRec>();
 
 				foreach (object Object in Objects)
 				{
-					this.objectsToSave.AddLast(new SaveRec()
+					this.objectsToSave.Add(new SaveRec()
 					{
 						Object = Object,
 						Serializer = Serializer,
@@ -1551,9 +1552,9 @@ namespace Waher.Persistence.Files
 			lock (this.synchObject)
 			{
 				if (this.objectsToSave is null)
-					this.objectsToSave = new LinkedList<SaveRec>();
+					this.objectsToSave = new ChunkedList<SaveRec>();
 
-				this.objectsToSave.AddLast(new SaveRec()
+				this.objectsToSave.Add(new SaveRec()
 				{
 					Object = Rec,
 					Serializer = Serializer,
@@ -2034,9 +2035,9 @@ namespace Waher.Persistence.Files
 			lock (this.synchObject)
 			{
 				if (this.objectsToLoad is null)
-					this.objectsToLoad = new LinkedList<LoadRec>();
+					this.objectsToLoad = new ChunkedList<LoadRec>();
 
-				this.objectsToLoad.AddLast(new LoadRec()
+				this.objectsToLoad.Add(new LoadRec()
 				{
 					ObjectId = ObjectId,
 					Serializer = Serializer,
@@ -2941,7 +2942,7 @@ namespace Waher.Persistence.Files
 
 			if (!(MergeResult.Residue is null))
 			{
-				LinkedList<uint> Links = null;
+				ChunkedList<uint> Links = null;
 				Block = MergeResult.Residue;
 
 				while (!(Block is null))
@@ -2958,9 +2959,9 @@ namespace Waher.Persistence.Files
 						if (Link != 0)
 						{
 							if (Links is null)
-								Links = new LinkedList<uint>();
+								Links = new ChunkedList<uint>();
 
-							Links.AddLast(Link);
+							Links.Add(Link);
 						}
 
 						return true;
@@ -2970,18 +2971,17 @@ namespace Waher.Persistence.Files
 					if (BlockIndex != 0)
 					{
 						if (Links is null)
-							Links = new LinkedList<uint>();
+							Links = new ChunkedList<uint>();
 
-						Links.AddLast(BlockIndex);
+						Links.Add(BlockIndex);
 					}
 
-					if (Links is null || Links.First is null)
+					if (Links is null || !Links.HasFirstItem)
 						Block = null;
 					else
 					{
-						BlockIndex = Links.First.Value;
+						BlockIndex = Links.RemoveFirst();
 						Block = await this.LoadBlockLocked(BlockIndex, true);
-						Links.RemoveFirst();
 						this.RegisterEmptyBlockLocked(BlockIndex);
 					}
 				}
@@ -4071,7 +4071,7 @@ namespace Waher.Persistence.Files
 
 				await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, BlobBlocksReferenced, ObjectIds, ExistingIds, null, null);
 
-				List<int> Blocks = new List<int>();
+				ChunkedList<int> Blocks = new ChunkedList<int>();
 
 				for (i = 0; i < this.blockLimit; i++)
 				{
@@ -4630,8 +4630,8 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertReadingOrWriting();
 #endif
-			LinkedList<KeyValuePair<string, Array>> Arrays = null;
-			LinkedList<KeyValuePair<string, GenericObject>> Objects = null;
+			ChunkedList<KeyValuePair<string, Array>> Arrays = null;
+			ChunkedList<KeyValuePair<string, GenericObject>> Objects = null;
 			object Value;
 			uint TypeCode;
 			string s;
@@ -4652,16 +4652,16 @@ namespace Waher.Persistence.Files
 				{
 					case ObjectSerializer.TYPE_ARRAY:
 						if (Arrays is null)
-							Arrays = new LinkedList<KeyValuePair<string, Array>>();
+							Arrays = new ChunkedList<KeyValuePair<string, Array>>();
 
-						Arrays.AddLast(new KeyValuePair<string, Array>(s, (Array)Value));
+						Arrays.Add(new KeyValuePair<string, Array>(s, (Array)Value));
 						break;
 
 					case ObjectSerializer.TYPE_OBJECT:
 						if (Objects is null)
-							Objects = new LinkedList<KeyValuePair<string, GenericObject>>();
+							Objects = new ChunkedList<KeyValuePair<string, GenericObject>>();
 
-						Objects.AddLast(new KeyValuePair<string, GenericObject>(s, (GenericObject)Value));
+						Objects.Add(new KeyValuePair<string, GenericObject>(s, (GenericObject)Value));
 						break;
 
 					default:
@@ -5286,7 +5286,7 @@ namespace Waher.Persistence.Files
 			if (SortOrder is null || SortOrder.Length == 0)
 				return this.FindBestIndex(out BestNrFields, 1, NrProperties, Properties);
 
-			List<string> TotProperties = new List<string>();
+			ChunkedList<string> TotProperties = new ChunkedList<string>();
 			Dictionary<string, bool> Added = new Dictionary<string, bool>();
 
 			TotProperties.AddRange(Properties);
@@ -5593,8 +5593,8 @@ namespace Waher.Persistence.Files
 
 				if (Filter is FilterAnd)
 				{
-					List<string> Properties = null;
-					LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
+					ChunkedList<string> Properties = null;
+					ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
 					string FieldName;
 
 					foreach (Filter ChildFilter in ChildFilters)
@@ -5604,7 +5604,7 @@ namespace Waher.Persistence.Files
 							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
 								if (Properties is null)
-									Properties = new List<string>();
+									Properties = new ChunkedList<string>();
 
 								FieldName = FilterFieldValue.FieldName;
 								if (!Properties.Contains(FieldName))
@@ -5617,14 +5617,14 @@ namespace Waher.Persistence.Files
 							string ConstantPrefix = FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 							if (RegExFields is null)
-								RegExFields = new LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
+								RegExFields = new ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 
-							RegExFields.AddLast(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
+							RegExFields.Add(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
 
 							if (!string.IsNullOrEmpty(ConstantPrefix))
 							{
 								if (Properties is null)
-									Properties = new List<string>();
+									Properties = new ChunkedList<string>();
 
 								FieldName = FilterFieldLikeRegEx2.FieldName;
 								if (!Properties.Contains(FieldName))
@@ -5710,7 +5710,7 @@ namespace Waher.Persistence.Files
 
 					Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
 					Dictionary<string, int> FieldOrder = new Dictionary<string, int>();
-					List<Searching.IApplicableFilter> AdditionalFields = null;
+					ChunkedList<Searching.IApplicableFilter> AdditionalFields = null;
 
 					i = 0;
 
@@ -5732,7 +5732,7 @@ namespace Waher.Persistence.Files
 							if (!FieldOrder.TryGetValue(FilterFieldValue.FieldName, out i) || ChildFilter is FilterFieldNotEqualTo)
 							{
 								if (AdditionalFields is null)
-									AdditionalFields = new List<Searching.IApplicableFilter>();
+									AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
 
 								AdditionalFields.Add(this.ConvertFilter(FilterFieldValue));
 								continue;
@@ -5783,13 +5783,12 @@ namespace Waher.Persistence.Files
 						}
 						else if (ChildFilter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
 						{
-							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = RegExFields.First.Value.Key;
-							string ConstantPrefix = RegExFields.First.Value.Value;
-
-							RegExFields.RemoveFirst();
+							KeyValuePair<Searching.FilterFieldLikeRegEx, string> P = RegExFields.RemoveFirst();
+							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = P.Key;
+							string ConstantPrefix = P.Value;
 
 							if (AdditionalFields is null)
-								AdditionalFields = new List<Searching.IApplicableFilter>();
+								AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
 
 							AdditionalFields.Add(FilterFieldLikeRegEx2);
 
@@ -5805,7 +5804,7 @@ namespace Waher.Persistence.Files
 						else if (ChildFilter is ICustomFilter CustomFilter)
 						{
 							if (AdditionalFields is null)
-								AdditionalFields = new List<Searching.IApplicableFilter>();
+								AdditionalFields = new ChunkedList<Searching.IApplicableFilter>();
 
 							AdditionalFields.Add(new Searching.FilterCustom(CustomFilter));
 						}
@@ -5816,7 +5815,7 @@ namespace Waher.Persistence.Files
 					if (Consistent)
 						return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields?.ToArray(), this.provider);
 					else
-						return new Searching.UnionCursor<T>(new Filter[0], this);   // Empty result set.
+						return new Searching.UnionCursor<T>(Array.Empty<Filter>(), this);   // Empty result set.
 				}
 				else if (Filter is FilterOr)
 				{
@@ -6180,8 +6179,8 @@ namespace Waher.Persistence.Files
 
 				if (Filter is FilterAnd)
 				{
-					List<string> Properties = null;
-					LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
+					ChunkedList<string> Properties = null;
+					ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
 
 					foreach (Filter ChildFilter in ChildFilters)
 					{
@@ -6190,7 +6189,7 @@ namespace Waher.Persistence.Files
 							if (!(FilterFieldValue is FilterFieldNotEqualTo))
 							{
 								if (Properties is null)
-									Properties = new List<string>();
+									Properties = new ChunkedList<string>();
 
 								Properties.Add(FilterFieldValue.FieldName);
 							}
@@ -6201,14 +6200,14 @@ namespace Waher.Persistence.Files
 							string ConstantPrefix = FilterFieldLikeRegEx.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
 							if (RegExFields is null)
-								RegExFields = new LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
+								RegExFields = new ChunkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 
-							RegExFields.AddLast(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
+							RegExFields.Add(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
 
 							if (!string.IsNullOrEmpty(ConstantPrefix))
 							{
 								if (Properties is null)
-									Properties = new List<string>();
+									Properties = new ChunkedList<string>();
 
 								Properties.Add(FilterFieldLikeRegEx2.FieldName);
 							}

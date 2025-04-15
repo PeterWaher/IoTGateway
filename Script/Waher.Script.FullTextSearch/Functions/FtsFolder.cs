@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -122,7 +123,7 @@ namespace Waher.Script.FullTextSearch.Functions
 					SubFoldersToExclude = new string[] { Arguments[i].AssociatedObjectValue?.ToString() };
 			}
 			else
-				SubFoldersToExclude = new string[0];
+				SubFoldersToExclude = Array.Empty<string>();
 
 			FolderIndexationStatistics Result = await Waher.Persistence.FullTextSearch.Search.IndexFolder(Index, Folder, Recursive.Value, SubFoldersToExclude);
 

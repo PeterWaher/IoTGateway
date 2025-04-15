@@ -160,7 +160,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public override PixelInformation CreatePixels(GraphSettings Settings, out object[] States)
 		{
-			States = new object[0];
+			States = Array.Empty<object>();
 			return this.pixels;
 		}
 

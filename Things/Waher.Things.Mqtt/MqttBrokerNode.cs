@@ -269,7 +269,7 @@ namespace Waher.Things.Mqtt
 		/// </summary>
 		public ISniffer[] Sniffers
 		{
-			get { return this.GetBroker().Result.Client?.Sniffers ?? new ISniffer[0]; } // TODO: Avoid blocking call
+			get { return this.GetBroker().Result.Client?.Sniffers ?? Array.Empty<ISniffer>(); } // TODO: Avoid blocking call
 		}
 
 		/// <summary>
@@ -290,7 +290,7 @@ namespace Waher.Things.Mqtt
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.GetBroker().Result.Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();  // TODO: Avoid blocking call
+			return this.GetBroker().Result.Client?.GetEnumerator() ?? Array.Empty<ISniffer>().GetEnumerator();  // TODO: Avoid blocking call
 		}
 
 		/// <summary>

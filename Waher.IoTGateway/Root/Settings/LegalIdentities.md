@@ -6,19 +6,6 @@ Login: /Login.md
 | ID | Created || Name  | PNr | Residence | Other | From | To | State |
 |:---|:----|:---|:------|:----|:----------|:------|:-----|:---|:------|
 {{
-JoinName(First,Middle,Last):=
-(
-	s:=First;
-
-	if !empty(Middle) then
-		s+=" "+Middle;
-
-	if !empty(Last) then
-		s+=" "+Last;
-
-	s
-);
-
 JoinResidence(Identity):=
 (
 	First:=true;
@@ -49,6 +36,7 @@ JoinOther(Properties[],Attachments[]):=
 		if (Name!="FIRST" and 
 			Name!="MIDDLE" and 
 			Name!="LAST" and 
+			Name!="LASTNAME" and 
 			Name!="PNR" and 
 			Name!="ADDR" and 
 			Name!="ADDR2" and 
@@ -85,6 +73,6 @@ JoinOther(Properties[],Attachments[]):=
 
 foreach ID in (Config.AllIdentitiesJSON ?? []) do
 	]]| `((ID.Id))` ||||||||||
-|  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(JoinName(ID["FIRST"],ID["MIDDLE"],ID["LAST"]) ) )) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties,ID.Attachments) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
+|  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(ID["FULLNAME"])) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties,ID.Attachments) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
 [[;
 }}

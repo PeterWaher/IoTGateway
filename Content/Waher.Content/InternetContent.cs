@@ -632,7 +632,7 @@ namespace Waher.Content
 				}
 			}
 			else
-				Fields = new KeyValuePair<string, string>[0];
+				Fields = Array.Empty<KeyValuePair<string, string>>();
 
 			return DecodeAsync(ContentType, Data, Encoding, Fields, BaseUri, Progress);
 		}

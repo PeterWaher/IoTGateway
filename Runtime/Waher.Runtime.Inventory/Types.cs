@@ -24,8 +24,8 @@ namespace Waher.Runtime.Inventory
 		private static readonly Dictionary<Type, ConstructorInfo> defaultConstructors = new Dictionary<Type, ConstructorInfo>();
 		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
-		private static readonly Type[] noTypes = new Type[0];
-		private static readonly object[] noParameters = new object[0];
+		private static readonly Type[] noTypes = Array.Empty<Type>();
+		private static readonly object[] noParameters = Array.Empty<object>();
 		private static readonly object synchObject = new object();
 		private static bool isInitialized = false;
 
@@ -92,7 +92,7 @@ namespace Waher.Runtime.Inventory
 					throw NotInitializedException();
 
 				if (!typesPerInterface.TryGetValue(InterfaceFullName, out SortedDictionary<string, Type> Types))
-					return new Type[0];
+					return Array.Empty<Type>();
 
 				Result = new Type[Types.Count];
 				Types.Values.CopyTo(Result, 0);
@@ -126,7 +126,7 @@ namespace Waher.Runtime.Inventory
 					throw NotInitializedException();
 
 				if (!typesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, Type> Types))
-					return new Type[0];
+					return Array.Empty<Type>();
 
 				Result = new Type[Types.Count];
 				Types.Values.CopyTo(Result, 0);
@@ -205,7 +205,7 @@ namespace Waher.Runtime.Inventory
 					throw NotInitializedException();
 
 				if (!namespacesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, bool> Namespaces))
-					return new string[0];
+					return Array.Empty<string>();
 
 				Result = new string[Namespaces.Count];
 				Namespaces.Keys.CopyTo(Result, 0);
@@ -375,7 +375,7 @@ namespace Waher.Runtime.Inventory
 						}
 					}
 
-					modules = new IModule[0];
+					modules = Array.Empty<IModule>();
 				}
 
 				lock (moduleParameters)
@@ -1596,6 +1596,17 @@ namespace Waher.Runtime.Inventory
 		public static bool UnregisterSingleton(object Object, params object[] Arguments)
 		{
 			return SingletonAttribute.Unregister(Object, Arguments);
+		}
+
+		/// <summary>
+		/// Replaces a singleton instance of a type.
+		/// </summary>
+		/// <param name="Object">Singleton object instance.</param>
+		/// <param name="Arguments">Any constructor arguments associated with the object instance.</param>
+		/// <returns>If the instance was found and removed.</returns>
+		public static void ReplaceSingleton(object Object, params object[] Arguments)
+		{
+			SingletonAttribute.Replace(Object, Arguments);
 		}
 
 		/// <summary>

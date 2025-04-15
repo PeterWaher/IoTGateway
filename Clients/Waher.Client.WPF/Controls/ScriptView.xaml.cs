@@ -193,7 +193,7 @@ namespace Waher.Client.WPF.Controls
 							Markdown.Append("| ");
 
 							object Item = M.GetElement(x, y).AssociatedObjectValue;
-							if (!(Item is null))
+							if (Item is not null)
 							{
 								if (!(Item is string s2))
 									s2 = Waher.Script.Expression.ToString(Item);

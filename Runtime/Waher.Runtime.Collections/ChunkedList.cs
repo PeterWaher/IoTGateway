@@ -96,8 +96,8 @@ namespace Waher.Runtime.Collections
 		/// <param name="MaxChunkSize">Maximum Chunk Size.</param>
 		public ChunkedList(int InitialChunkSize, int MaxChunkSize)
 		{
-			if (InitialChunkSize <= 1)
-				throw new ArgumentException("Chunk size must be larger than one.", nameof(InitialChunkSize));
+			if (InitialChunkSize <= 0)
+				throw new ArgumentException("Chunk size must be positive.", nameof(InitialChunkSize));
 
 			if (MaxChunkSize < InitialChunkSize)
 				throw new ArgumentException("Max chunk size must be greater than or equal to initial chunk size.", nameof(MaxChunkSize));
@@ -299,6 +299,7 @@ namespace Waher.Runtime.Collections
 			this.firstChunk.Next = null;
 			this.firstChunk.Start = 0;
 			this.firstChunk.Pos = 0;
+			this.chunkSize = this.firstChunk.Size;
 
 			Array.Clear(this.firstChunk.Elements, 0, this.firstChunk.Size);
 			this.count = 0;
@@ -424,12 +425,14 @@ namespace Waher.Runtime.Collections
 			private Chunk first;
 			private Chunk current;
 			private int pos;
+			private bool ended;
 
 			public ChunkedListEnumerator(Chunk FirstChunk)
 			{
 				this.first = FirstChunk;
 				this.current = null;
 				this.pos = -1;
+				this.ended = false;
 			}
 
 			public T Current
@@ -449,12 +452,16 @@ namespace Waher.Runtime.Collections
 			{
 				this.first = null;
 				this.current = null;
+				this.ended = true;
 			}
 
 			public bool MoveNext()
 			{
 				if (this.current is null)
 				{
+					if (this.ended)
+						return false;
+
 					this.current = this.first;
 					this.pos = this.current.Start - 1;
 				}
@@ -463,7 +470,10 @@ namespace Waher.Runtime.Collections
 				{
 					this.current = this.current.Next;
 					if (this.current is null)
+					{
+						this.ended = true;
 						return false;
+					}
 
 					this.pos = this.current.Start - 1;
 				}
@@ -475,6 +485,7 @@ namespace Waher.Runtime.Collections
 			{
 				this.current = null;
 				this.pos = -1;
+				this.ended = false;
 			}
 		}
 

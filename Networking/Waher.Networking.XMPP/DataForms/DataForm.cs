@@ -201,7 +201,7 @@ namespace Waher.Networking.XMPP.DataForms
 			this.records = Records.ToArray();
 
 			if (this.header is null)
-				this.header = new Field[0];
+				this.header = Array.Empty<Field>();
 
 			if (this.hasPages = (!(Pages is null) && Pages.Count > 0))
 				this.pages = Pages.ToArray();
@@ -367,10 +367,10 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 
 			this.title = string.Empty;
-			this.instructions = new string[0];
+			this.instructions = Array.Empty<string>();
 			this.fields = Fields;
-			this.records = new Field[0][];
-			this.header = new Field[0];
+			this.records = Array.Empty<Field[]>();
+			this.header = Array.Empty<Field>();
 			this.hasPages = false;
 			this.pages = new Page[] { new Page(this, this.title, this.fields) };
 		}

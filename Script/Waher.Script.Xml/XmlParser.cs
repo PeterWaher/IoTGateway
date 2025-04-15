@@ -1,4 +1,5 @@
-﻿using Waher.Runtime.Collections;
+﻿using System;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Xml.Model;
@@ -30,7 +31,7 @@ namespace Waher.Script.Xml
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[0];
+		public string[] InternalKeywords => Array.Empty<string>();
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -86,7 +87,7 @@ namespace Waher.Script.Xml
 			if (Root is null)
 				return null;
 
-			return new XmlScriptDocument(Root, ProcessingInstructions?.ToArray() ?? new XmlScriptProcessingInstruction[0],
+			return new XmlScriptDocument(Root, ProcessingInstructions?.ToArray() ?? Array.Empty<XmlScriptProcessingInstruction>(),
 				Start, Parser.Position - Start, Parser.Expression);
 		}
 
@@ -112,7 +113,7 @@ namespace Waher.Script.Xml
 				{
 					Parser.NextChar();
 
-					XmlScriptElement Element = new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
+					XmlScriptElement Element = new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? Array.Empty<XmlScriptAttribute>(),
 						ElementStart, Parser.Position - ElementStart, Parser.Expression);
 					XmlScriptWildcard LastWildCard = null;
 					XmlScriptNode NewChild;
@@ -253,7 +254,7 @@ namespace Waher.Script.Xml
 					if (Parser.NextChar() != '>')
 						throw Parser.SyntaxError("> expected.");
 
-					return new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
+					return new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? Array.Empty<XmlScriptAttribute>(),
 						ElementStart, Parser.Position - ElementStart, Parser.Expression);
 				}
 				else if (char.IsLetter(ch) || ch == '_' || ch == ':')

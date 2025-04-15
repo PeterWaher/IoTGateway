@@ -144,7 +144,7 @@ namespace Waher.Script.Fractals.IFS.Variations
 		/// <summary>
 		/// TODO
 		/// </summary>
-		public ICollection<IElement> ChildElements => new IElement[0];
+		public ICollection<IElement> ChildElements => Array.Empty<IElement>();
 
 		#endregion
 	}

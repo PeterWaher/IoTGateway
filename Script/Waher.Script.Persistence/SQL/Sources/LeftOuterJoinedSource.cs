@@ -128,7 +128,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 								if (this.defaultRight is null)
 								{
 									this.defaultRight = new GenericObject(this.rightSource.CollectionName,
-										typeof(GenericObject).FullName, Guid.Empty, new KeyValuePair<string, object>[0]);
+										typeof(GenericObject).FullName, Guid.Empty, Array.Empty<KeyValuePair<string, object>>());
 								}
 
 								if (this.flipped)

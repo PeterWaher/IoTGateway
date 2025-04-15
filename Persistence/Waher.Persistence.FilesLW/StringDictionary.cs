@@ -9,8 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
-using Waher.Persistence.Files.Searching;
-using Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files
 {
@@ -472,7 +471,7 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.BeginRead();
 			try
 			{
-				List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
+				ChunkedList<KeyValuePair<string, object>> Result = new ChunkedList<KeyValuePair<string, object>>();
 				ObjectBTreeFileCursor<KeyValuePair<string, object>> e = await this.GetEnumeratorLocked();
 
 				while (await e.MoveNextAsyncLocked())
@@ -692,7 +691,7 @@ namespace Waher.Persistence.Files
 					Entries = e;
 				}
 
-				List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
+				ChunkedList<KeyValuePair<string, object>> Result = new ChunkedList<KeyValuePair<string, object>>();
 
 				if (ToKey is null)
 				{

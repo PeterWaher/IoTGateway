@@ -4,6 +4,7 @@ using Waher.Content;
 using Waher.Content.Html.JavaScript;
 using Waher.IoTGateway.Cssx;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 
 namespace Waher.IoTGateway.Jsx
@@ -53,7 +54,7 @@ namespace Waher.IoTGateway.Jsx
 			if (State.HasError)
 				return false;
 
-			byte[] Data = CssxToCss.Utf8WithBOM.GetBytes(Javascript);
+			byte[] Data = Strings.Utf8WithBom.GetBytes(Javascript);
 			await State.To.WriteAsync(Data, 0, Data.Length);
 			State.ToContentType += "; charset=utf-8";
 

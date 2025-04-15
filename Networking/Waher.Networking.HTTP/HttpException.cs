@@ -17,7 +17,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Empty array of custom headers.
 		/// </summary>
-		protected static readonly KeyValuePair<string, string>[] NoCustomHeaders = new KeyValuePair<string, string>[0];
+		protected static readonly KeyValuePair<string, string>[] NoCustomHeaders = Array.Empty<KeyValuePair<string, string>>();
 
 		private readonly KeyValuePair<string, string>[] headerFields;
 		private readonly int statusCode;

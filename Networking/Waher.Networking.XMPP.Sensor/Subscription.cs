@@ -105,7 +105,7 @@ namespace Waher.Networking.XMPP.Sensor
 			get
 			{
 				if (this.fields is null)
-					return new string[0];
+					return Array.Empty<string>();
 				else
 				{
 					string[] Result = new string[this.fields.Count];

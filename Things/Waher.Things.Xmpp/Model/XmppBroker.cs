@@ -292,7 +292,7 @@ namespace Waher.Things.Xmpp.Model
 				Node.SubscriptionState = Item.State;
 				Node.ContactName = Item.Name;
 				Node.PendingSubscription = Item.PendingSubscription;
-				Node.Groups = Item.Groups ?? new string[0];
+				Node.Groups = Item.Groups ?? Array.Empty<string>();
 
 				await Node.UpdateAsync();
 			}

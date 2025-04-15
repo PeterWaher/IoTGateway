@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FullTextS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.FullTextSearch", "Script\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.csproj", "{98F40C68-0AB6-49CB-B913-95DC23D18D75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Collections", "Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj", "{5CDF528D-0A11-1018-12C2-6701324C8856}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{98F40C68-0AB6-49CB-B913-95DC23D18D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F40C68-0AB6-49CB-B913-95DC23D18D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F40C68-0AB6-49CB-B913-95DC23D18D75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CDF528D-0A11-1018-12C2-6701324C8856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CDF528D-0A11-1018-12C2-6701324C8856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CDF528D-0A11-1018-12C2-6701324C8856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CDF528D-0A11-1018-12C2-6701324C8856}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

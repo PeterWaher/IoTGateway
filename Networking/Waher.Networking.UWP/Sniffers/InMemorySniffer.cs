@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers.Model;
+using Waher.Runtime.Collections;
 
 namespace Waher.Networking.Sniffers
 {
@@ -11,7 +12,7 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
 	{
-		private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
+		private readonly ChunkedList<SnifferEvent> events = new ChunkedList<SnifferEvent>();
 		private readonly int maxCount;
 		private int count = 0;
 		private bool disposed = false;
@@ -124,7 +125,7 @@ namespace Waher.Networking.Sniffers
 			{
 				lock (this.events)
 				{
-					this.events.AddLast(Event);
+					this.events.Add(Event);
 					if (this.count >= this.maxCount)
 						this.events.RemoveFirst();
 					else
@@ -180,7 +181,7 @@ namespace Waher.Networking.Sniffers
 		public SnifferEvent[] ToArray()
 		{
 			if (this.disposed)
-				return new SnifferEvent[0];
+				return Array.Empty<SnifferEvent>();
 			else
 			{
 				lock (this.events)

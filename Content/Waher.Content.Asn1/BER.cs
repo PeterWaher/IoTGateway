@@ -328,7 +328,7 @@ namespace Waher.Content.Asn1
 		{
 			long Len = DecodeLength(Input);
 			if (Len == 0)
-				return new byte[0];
+				return Array.Empty<byte>();
 
 			if (Len < 0)
 			{
@@ -382,7 +382,7 @@ namespace Waher.Content.Asn1
 		{
 			long Len = DecodeLength(Input);
 			if (Len == 0)
-				return new int[0];
+				return Array.Empty<int>();
 
 			if (Len < 0)
 				throw new NotSupportedException("Indefinite length not supported.");

@@ -706,7 +706,7 @@ namespace Waher.Networking.XMPP.P2P
 				return SortedArray(ParseE2eKeys(Doc.DocumentElement, this.securityStrength) ?? new Dictionary<string, IE2eEndpoint>());
 			}
 
-			return new E2eEndpoint[0];
+			return Array.Empty<E2eEndpoint>();
 		}
 
 		private static IE2eEndpoint[] SortedArray(Dictionary<string, IE2eEndpoint> Endpoints)

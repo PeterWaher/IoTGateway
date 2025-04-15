@@ -44,7 +44,6 @@ namespace Waher.Networking.HTTP
 		private Stream dataStream = null;
 		private TransferEncoding transferEncoding = null;
 		private readonly HttpServer server;
-		private readonly CancellationToken cancellationToken;
 		private BinaryTcpClient client;
 		private HttpRequestHeader header = null;
 		private WebSocket webSocket = null;
@@ -90,11 +89,6 @@ namespace Waher.Networking.HTTP
 		{
 			this.server = Server;
 			this.client = Client;
-#if WINDOWS_UWP
-			this.cancellationToken = CancellationToken.None;
-#else
-			this.cancellationToken = Client.CancellationToken;
-#endif
 			this.encrypted = Encrypted;
 			this.port = Port;
 
@@ -1852,7 +1846,7 @@ namespace Waher.Networking.HTTP
 				return 0;
 			}
 
-			if (this.flowControl is null)
+			if (this.flowControl is null || this.client is null)
 				return -1;
 
 			int NrBytes;
@@ -1860,7 +1854,8 @@ namespace Waher.Networking.HTTP
 #if INFO_IN_SNIFFERS
 			if (this.HasSniffers)
 			{
-				Task<int> T = this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+				Task<int> T = this.flowControl.RequestResources(StreamId, Count, 
+					this.client.CurrenntCancellationToken);
 
 				if (!T.IsCompleted)
 				{
@@ -1872,9 +1867,13 @@ namespace Waher.Networking.HTTP
 					NrBytes = await T;
 			}
 			else
-				NrBytes = await this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+			{
+				NrBytes = await this.flowControl.RequestResources(StreamId, Count, 
+					this.client.CurrenntCancellationToken);
+			}
 #else
-			NrBytes = await this.flowControl.RequestResources(StreamId, Count, this.cancellationToken);
+			NrBytes = await this.flowControl.RequestResources(StreamId, Count, 
+				this.client.CurrentCancellationToken);
 #endif
 			if (NrBytes <= 0)
 				return NrBytes;

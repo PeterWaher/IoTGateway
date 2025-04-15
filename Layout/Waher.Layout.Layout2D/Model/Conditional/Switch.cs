@@ -40,7 +40,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			{
 				ILayoutElement E = this.activeCase is null ? (ILayoutElement)this.activeCase : this.otherwise;
 				if (E is null)
-					return new ILayoutElement[0];
+					return Array.Empty<ILayoutElement>();
 				else
 					return new ILayoutElement[] { E };
 			}

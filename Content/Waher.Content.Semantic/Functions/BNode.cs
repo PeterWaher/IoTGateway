@@ -19,7 +19,7 @@ namespace Waher.Content.Semantic.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public BNode(int Start, int Length, Expression Expression)
-			: base(new ScriptNode[0], argumentTypes0, Start, Length, Expression)
+			: base(Array.Empty<ScriptNode>(), argumentTypes0, Start, Length, Expression)
 		{
 		}
 

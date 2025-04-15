@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
 {
@@ -73,14 +74,14 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 			Characters[i - 1]++;
 			string ToExclusive = new string(Characters);
 
-			LinkedList<KeyValuePair<string, TokenReferences>> Result = new LinkedList<KeyValuePair<string, TokenReferences>>();
+			ChunkedList<KeyValuePair<string, TokenReferences>> Result = new ChunkedList<KeyValuePair<string, TokenReferences>>();
 			KeyValuePair<string, object>[] Records = await Process.Index.GetEntriesAsync(Preamble, ToExclusive);
 
 			foreach (KeyValuePair<string, object> Rec in Records)
 			{
 				Match M = this.Parsed.Match(Rec.Key);
 				if (M.Success && M.Index == 0 && M.Length == Rec.Key.Length && Rec.Value is TokenReferences References)
-					Result.AddLast(new KeyValuePair<string, TokenReferences>(Rec.Key, References));
+					Result.Add(new KeyValuePair<string, TokenReferences>(Rec.Key, References));
 			}
 
 			return Result;

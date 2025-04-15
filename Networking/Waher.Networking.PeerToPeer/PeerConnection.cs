@@ -574,7 +574,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						await this.SendTcp(true, new byte[0]);
+						await this.SendTcp(true, Array.Empty<byte>());
 					}
 					catch (Exception)
 					{

@@ -73,7 +73,7 @@ namespace Waher.Things.Mqtt.Model
 		private MqttTopic[] GetChildNodes()
 		{
 			if (this.topics is null)
-				return new MqttTopic[0];
+				return Array.Empty<MqttTopic>();
 			else
 			{
 				MqttTopic[] Result;
@@ -371,7 +371,7 @@ namespace Waher.Things.Mqtt.Model
 		public ControlParameter[] GetControlParameters()
 		{
 			if (this.data is null || !this.data.IsControllable)
-				return new ControlParameter[0];
+				return Array.Empty<ControlParameter>();
 			else
 				return this.data.GetControlParameters();
 		}

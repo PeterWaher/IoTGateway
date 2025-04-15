@@ -46,7 +46,7 @@ namespace Waher.Networking.HTTP
 		private readonly IHttpTraceMethod trace;
 		private readonly IHttpConnectMethod connect;
 		private readonly string resourceName;
-		private HttpServer[] serversStatic = new HttpServer[0];
+		private HttpServer[] serversStatic = Array.Empty<HttpServer>();
 
 		/// <summary>
 		/// Base class for all HTTP resources.

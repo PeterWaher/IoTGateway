@@ -900,7 +900,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					if (!(PrevData is null))
 						await Rec.ChunkReceived(Nr, true, ConstantBuffer, PrevData);
 					else
-						await Rec.ChunkReceived(Nr, true, true, new byte[0]);
+						await Rec.ChunkReceived(Nr, true, true, Array.Empty<byte>());
 
 					P[2] = null;
 				}
@@ -991,7 +991,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							if (Rx.BlockSize == 0)
 							{
 								HttpxChunks.chunkedStreams.Remove(Rx.Key);
-								await Rec.ChunkReceived(Rx.Nr++, true, true, new byte[0]);
+								await Rec.ChunkReceived(Rx.Nr++, true, true, Array.Empty<byte>());
 								await e.Stream.DisposeAsync();
 								return;
 							}
@@ -1059,7 +1059,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
 			{
 				HttpxChunks.chunkedStreams.Remove(Rx.Key);
-				await Rec.ChunkReceived(Rx.Nr++, true, true, new byte[0]);
+				await Rec.ChunkReceived(Rx.Nr++, true, true, Array.Empty<byte>());
 			}
 		}
 

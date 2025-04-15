@@ -76,7 +76,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				TreeNode Loop = this.Parent;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					if (Loop is XmppConcentrator Concentrator)
 						return Concentrator;

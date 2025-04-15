@@ -68,7 +68,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Create(ScriptNode Type, int Start, int Length, Expression Expression)
-			: this(Type, new ScriptNode[0], Start, Length, Expression)
+			: this(Type, Array.Empty<ScriptNode>(), Start, Length, Expression)
 		{
 		}
 

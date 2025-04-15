@@ -637,7 +637,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			public IDataSource Source;
 			public Dictionary<string, SubscriptionRec> Subscriptions = new Dictionary<string, SubscriptionRec>();
-			public SubscriptionRec[] SubscriptionsStatic = new SubscriptionRec[0];
+			public SubscriptionRec[] SubscriptionsStatic = Array.Empty<SubscriptionRec>();
 
 			public DataSourceRec(IDataSource Source)
 			{
@@ -4380,14 +4380,14 @@ namespace Waher.Networking.XMPP.Concentrator
 					return null;
 
 				if (!Actuator.IsControllable)
-					return new ControlParameter[0];
+					return Array.Empty<ControlParameter>();
 
 				return await Actuator.GetControlParameters();
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
-				return new ControlParameter[0];
+				return Array.Empty<ControlParameter>();
 			}
 		}
 

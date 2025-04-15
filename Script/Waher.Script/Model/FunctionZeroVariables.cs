@@ -1,4 +1,6 @@
-﻿namespace Waher.Script.Model
+﻿using System;
+
+namespace Waher.Script.Model
 {
     /// <summary>
     /// Base class for funcions of zero variables.
@@ -19,7 +21,7 @@
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[0];
+		public override string[] DefaultArgumentNames => Array.Empty<string>();
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.

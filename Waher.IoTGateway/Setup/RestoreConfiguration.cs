@@ -341,7 +341,7 @@ namespace Waher.IoTGateway.Setup
 				ValidateBackupFile Import = new ValidateBackupFile(BackupFileName, null);
 
 				(AesTransform1, cs1) = await DoImport(BackupFile, KeyFile, TabID, Extension, Import, false,
-					false, new string[0], new string[0]);
+					false, Array.Empty<string>(), Array.Empty<string>());
 
 				if (Overwrite)
 				{
@@ -1937,7 +1937,7 @@ namespace Waher.IoTGateway.Setup
 
 			string s = await Files.ReadAllTextAsync(XmlPath);
 			s = XSL.Transform(s, Xslt);
-			byte[] Bin = WebResources.StartAnalyze.utf8Bom.GetBytes(s);
+			byte[] Bin = Strings.Utf8WithBom.GetBytes(s);
 
 			await Files.WriteAllBytesAsync(HtmlPath, Bin);
 
@@ -2031,12 +2031,12 @@ namespace Waher.IoTGateway.Setup
 			string[] Parts;
 
 			if (string.IsNullOrEmpty(CollectionsStr))
-				Collections = new string[0];
+				Collections = Array.Empty<string>();
 			else
 				Collections = CollectionsStr.Split(',');
 
 			if (string.IsNullOrEmpty(PartsStr))
-				Parts = new string[0];
+				Parts = Array.Empty<string>();
 			else
 				Parts = PartsStr.Split(',');
 

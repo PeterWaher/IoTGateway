@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.FullTextSearch
@@ -13,8 +14,11 @@ namespace Waher.Persistence.FullTextSearch
 		/// Contains information about a collection, in relation to full-text-search.
 		/// </summary>
 		public CollectionInformation()
-			: this(string.Empty, string.Empty, false, new PropertyDefinition[0])
 		{
+			this.IndexCollectionName = string.Empty;
+			this.CollectionName = string.Empty;
+			this.IndexForFullTextSearch = false;
+			this.Properties = Array.Empty<PropertyDefinition>();
 		}
 
 		/// <summary>
@@ -74,7 +78,10 @@ namespace Waher.Persistence.FullTextSearch
 
 			foreach (PropertyDefinition Property in Properties)
 			{
-				if (!ByName.ContainsKey(Property.Definition))
+				if (!ByName.TryGetValue(Property.Definition, out PropertyDefinition Prev) ||
+					Property.Definition != Prev.Definition ||
+					Property.ExternalSource != Prev.ExternalSource ||
+					Property.Type != Prev.Type)
 				{
 					ByName[Property.Definition] = Property;
 					New = true;

@@ -427,7 +427,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private static string[] GetMethods(string Allow)
 		{
 			if (string.IsNullOrEmpty(Allow))
-				return new string[0];
+				return Array.Empty<string>();
 
 			string[] Result = Allow.Split(',');
 			int i, c = Result.Length;

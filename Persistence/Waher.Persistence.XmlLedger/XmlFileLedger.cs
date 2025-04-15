@@ -843,7 +843,7 @@ namespace Waher.Persistence.XmlLedger
 		/// <returns>Array of collections.</returns>
 		public Task<string[]> GetCollections()
 		{
-			return Task.FromResult(new string[0]);
+			return Task.FromResult(Array.Empty<string>());
 		}
 
 		/// <summary>

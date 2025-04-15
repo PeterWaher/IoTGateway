@@ -5,33 +5,13 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using Waher.Content.Markdown;
-using Waher.Content.Markdown.Consolidation;
-using Waher.Content.Markdown.GraphViz;
-using Waher.Content.Markdown.Layout2D;
-using Waher.Content.Markdown.PlantUml;
-using Waher.Content.Xml;
-using Waher.Events;
-using Waher.Layout.Layout2D;
-using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.MUC;
-using Waher.Networking.XMPP.Provisioning;
-using Waher.Networking.XMPP.PubSub;
-using Waher.Networking.XMPP.Sensor;
-using Waher.Runtime.Inventory;
-using Waher.Runtime.Timing;
-using Waher.Persistence;
-using Waher.Persistence.Files;
-using Waher.Persistence.Filters;
-using Waher.Persistence.Serialization;
+using System.Xml;
 using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Controls.Questions;
@@ -39,11 +19,34 @@ using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Model.Muc;
-using Waher.Runtime.Settings;
-using Waher.Networking.XMPP.Events;
+using Waher.Content.Markdown;
+using Waher.Content.Markdown.Consolidation;
 using Waher.Content.Markdown.Contracts;
+using Waher.Content.Markdown.GraphViz;
 using Waher.Content.Markdown.Latex;
+using Waher.Content.Markdown.Layout2D;
+using Waher.Content.Markdown.PlantUml;
 using Waher.Content.Markdown.Wpf;
+using Waher.Content.Xml;
+using Waher.Events;
+using Waher.Layout.Layout2D;
+using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.Events;
+using Waher.Networking.XMPP.MUC;
+using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.PubSub;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Persistence;
+using Waher.Persistence.Files;
+using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
+using Waher.Runtime.Language;
+using Waher.Runtime.Settings;
+using Waher.Runtime.Timing;
+using Waher.Script.Constants;
 
 namespace Waher.Client.WPF
 {
@@ -83,16 +86,15 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand Search = new("Search", "Search", typeof(MainWindow));
 		public static RoutedUICommand Script = new("Script", "Script", typeof(MainWindow));
 
-		internal static MainWindow currentInstance = null;
-		private static string appDataFolder = null;
-		private static FilesProvider databaseProvider = null;
-		private static Scheduler scheduler = new();
+		internal static MainWindow? currentInstance = null;
+		private static string? appDataFolder = null;
+		private static FilesProvider? databaseProvider = null;
+		private static Scheduler? scheduler = new();
 		private static readonly LinkedList<GuiUpdateTask> guiUpdateQueue = new();
 
 		public MainWindow()
 		{
-			if (currentInstance is null)
-				currentInstance = this;
+			currentInstance ??= this;
 
 			Types.Initialize(typeof(MainWindow).Assembly,
 				typeof(Content.InternetContent).Assembly,
@@ -195,12 +197,9 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		public static string AppDataFolder
-		{
-			get { return appDataFolder; }
-		}
+		public static string? AppDataFolder => appDataFolder;
 
-		internal static Scheduler Scheduler => scheduler;
+		internal static Scheduler? Scheduler => scheduler;
 
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
@@ -220,33 +219,33 @@ namespace Waher.Client.WPF
 				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
-				if (!(Value is null) && Value is int WindowLeft)
+				if (Value is not null && Value is int WindowLeft)
 					this.Left = WindowLeft;
 
 				Value = Registry.GetValue(registryKey, "WindowTop", (int)this.Top);
-				if (!(Value is null) && Value is int WindowTop)
+				if (Value is not null && Value is int WindowTop)
 					this.Top = WindowTop;
 
 				Value = Registry.GetValue(registryKey, "WindowWidth", (int)this.Width);
-				if (!(Value is null) && Value is int WindowWidth && WindowWidth > 0)
+				if (Value is not null && Value is int WindowWidth && WindowWidth > 0)
 					this.Width = WindowWidth;
 
 				Value = Registry.GetValue(registryKey, "WindowHeight", (int)this.Height);
-				if (!(Value is null) && Value is int WindowHeight && WindowHeight > 0)
+				if (Value is not null && Value is int WindowHeight && WindowHeight > 0)
 					this.Height = WindowHeight;
 
 				Value = Registry.GetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionTree.Width);
-				if (!(Value is int ConnectionTreeWidth) || ConnectionTreeWidth <= 0)
+				if (Value is not int ConnectionTreeWidth || ConnectionTreeWidth <= 0)
 					ConnectionTreeWidth = 150;
 
 				this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength(ConnectionTreeWidth);
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
-				if (!(Value is null) && Value is string s && Enum.TryParse(s, out WindowState WindowState))
+				if (Value is not null && Value is string s && Enum.TryParse(s, out WindowState WindowState))
 					this.WindowState = WindowState;
 
 				Value = Registry.GetValue(registryKey, "FileName", string.Empty);
-				if (!(Value is null) && Value is string s2)
+				if (Value is not null && Value is string s2)
 				{
 					this.MainView.FileName = s2;
 					if (!string.IsNullOrEmpty(this.MainView.FileName))
@@ -280,7 +279,7 @@ namespace Waher.Client.WPF
 
 			Log.TerminateAsync().Wait();
 
-			if (!(databaseProvider is null))
+			if (databaseProvider is not null)
 			{
 				databaseProvider.Stop().Wait();
 				databaseProvider.Flush().Wait();
@@ -294,11 +293,11 @@ namespace Waher.Client.WPF
 			this.MainView.ConnectTo_Executed(Sender, e);
 		}
 
-		public ITabView CurrentTab
+		public ITabView? CurrentTab
 		{
 			get
 			{
-				if (!(this.Tabs.SelectedItem is TabItem TabItem))
+				if (this.Tabs.SelectedItem is not TabItem TabItem)
 					return null;
 				else
 					return TabItem.Content as ITabView;
@@ -327,7 +326,7 @@ namespace Waher.Client.WPF
 
 		internal void SelectionChanged()
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 
 			if (Node is null)
 			{
@@ -365,7 +364,7 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private TreeNode SelectedNode
+		private TreeNode? SelectedNode
 		{
 			get
 			{
@@ -382,11 +381,11 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		public static MainWindow FindWindow(FrameworkElement Element)
+		public static MainWindow? FindWindow(FrameworkElement? Element)
 		{
-			MainWindow MainWindow = Element as MainWindow;
+			MainWindow? MainWindow = Element as MainWindow;
 
-			while (MainWindow is null && !(Element is null))
+			while (MainWindow is null && Element is not null)
 			{
 				Element = Element.Parent as FrameworkElement;
 				MainWindow = Element as MainWindow;
@@ -397,13 +396,13 @@ namespace Waher.Client.WPF
 
 		private void Add_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanAddChildren);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = Node is not null && Node.CanAddChildren;
 		}
 
 		private void Add_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanAddChildren)
 				return;
 
@@ -412,13 +411,13 @@ namespace Waher.Client.WPF
 
 		private void Refresh_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanRecycle);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanRecycle);
 		}
 
 		private void Refresh_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanRecycle)
 				return;
 
@@ -427,13 +426,13 @@ namespace Waher.Client.WPF
 
 		private void Delete_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanDelete);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanDelete);
 		}
 
 		private void Delete_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanDelete)
 				return;
 
@@ -454,13 +453,13 @@ namespace Waher.Client.WPF
 
 		private void Edit_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanEdit);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanEdit);
 		}
 
 		private void Edit_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanEdit)
 				return;
 
@@ -469,13 +468,13 @@ namespace Waher.Client.WPF
 
 		private void Copy_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanCopy);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanCopy);
 		}
 
 		private void Copy_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanCopy)
 				return;
 
@@ -486,13 +485,13 @@ namespace Waher.Client.WPF
 
 		private void Paste_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanPaste);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanPaste);
 		}
 
 		private void Paste_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanPaste)
 				return;
 
@@ -501,22 +500,22 @@ namespace Waher.Client.WPF
 
 		private void Sniff_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.IsSniffable);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.IsSniffable);
 		}
 
 		private void Sniff_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.IsSniffable)
 				return;
 
 			this.GetSnifferView(Node, null, false);
 		}
 
-		internal SnifferView GetSnifferView(TreeNode Node, string Identifier, bool Custom)
+		internal SnifferView GetSnifferView(TreeNode Node, string? Identifier, bool Custom)
 		{
-			SnifferView View;
+			SnifferView? View;
 
 			foreach (TabItem Tab in this.Tabs.Items)
 			{
@@ -524,7 +523,7 @@ namespace Waher.Client.WPF
 				if (View is null)
 					continue;
 
-				if ((!(Node is null) && View.Node == Node) || (!string.IsNullOrEmpty(Identifier) && View.Identifier == Identifier))
+				if ((Node is not null && View.Node == Node) || (!string.IsNullOrEmpty(Identifier) && View.Identifier == Identifier))
 				{
 					Tab.Focus();
 					return View;
@@ -547,7 +546,7 @@ namespace Waher.Client.WPF
 
 		internal LogView GetLogView(string Identifier)
 		{
-			LogView View;
+			LogView? View;
 
 			foreach (TabItem Tab in this.Tabs.Items)
 			{
@@ -555,7 +554,7 @@ namespace Waher.Client.WPF
 				if (View is null)
 					continue;
 
-				if (!(View.Identifier is null) && View.Identifier == Identifier)
+				if (View.Identifier is not null && View.Identifier == Identifier)
 				{
 					Tab.Focus();
 					return View;
@@ -614,7 +613,7 @@ namespace Waher.Client.WPF
 				if (this.Tabs.Items[i] is TabItem TabItem)
 				{
 					object Content = TabItem.Content;
-					if (!(Content is null) && Content is IDisposable Disposable)
+					if (Content is not null && Content is IDisposable Disposable)
 						Disposable.Dispose();
 				}
 
@@ -624,13 +623,13 @@ namespace Waher.Client.WPF
 
 		private void Chat_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanChat);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanChat);
 		}
 
 		private void Chat_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanChat)
 				return;
 
@@ -714,7 +713,7 @@ namespace Waher.Client.WPF
 						else
 							sb.Append(", ");
 
-						sb.Append(P.Value.ToString());
+						sb.Append(P.Value);
 						sb.Append(' ');
 						sb.Append(StateToString((XmppState)P.Key));
 					}
@@ -732,23 +731,23 @@ namespace Waher.Client.WPF
 
 		private static string StateToString(XmppState State)
 		{
-			switch (State)
+			return State switch
 			{
-				case XmppState.Offline: return "Offline";
-				case XmppState.Connecting: return "Connecting";
-				case XmppState.StreamNegotiation: return "Negotiating stream";
-				case XmppState.StreamOpened: return "Opened stream";
-				case XmppState.StartingEncryption: return "Starting encryption";
-				case XmppState.Authenticating: return "Authenticating";
-				case XmppState.Registering: return "Registering";
-				case XmppState.Binding: return "Binding";
-				case XmppState.RequestingSession: return "Requesting session";
-				case XmppState.FetchingRoster: return "Fetching roster";
-				case XmppState.SettingPresence: return "Setting presence";
-				case XmppState.Connected: return "Connected";
-				case XmppState.Error: return "In error";
-				default: return "Unknown";
-			}
+				XmppState.Offline => "Offline",
+				XmppState.Connecting => "Connecting",
+				XmppState.StreamNegotiation => "Negotiating stream",
+				XmppState.StreamOpened => "Opened stream",
+				XmppState.StartingEncryption => "Starting encryption",
+				XmppState.Authenticating => "Authenticating",
+				XmppState.Registering => "Registering",
+				XmppState.Binding => "Binding",
+				XmppState.RequestingSession => "Requesting session",
+				XmppState.FetchingRoster => "Fetching roster",
+				XmppState.SettingPresence => "Setting presence",
+				XmppState.Connected => "Connected",
+				XmppState.Error => "In error",
+				_ => "Unknown",
+			};
 		}
 
 		private class ReverseInt32 : IComparer<int>
@@ -820,7 +819,7 @@ namespace Waher.Client.WPF
 
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
-				if (!(TabItem.Content is ChatView ChatView))
+				if (TabItem.Content is not ChatView ChatView)
 					continue;
 
 				if (ChatView.Node is XmppContact XmppContact)
@@ -905,7 +904,7 @@ namespace Waher.Client.WPF
 
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
-				if (!(TabItem.Content is ChatView ChatView))
+				if (TabItem.Content is not ChatView ChatView)
 					continue;
 
 				if (ChatView.Node is RoomNode Room)
@@ -961,7 +960,7 @@ namespace Waher.Client.WPF
 			if (!string.IsNullOrEmpty(ThreadId))
 			{
 				ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
-				if (!(ChatView is null) && ChatView.ContainsThread(ThreadId))
+				if (ChatView is not null && ChatView.ContainsThread(ThreadId))
 				{
 					await ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 					return;
@@ -970,7 +969,7 @@ namespace Waher.Client.WPF
 
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
-				if (!(TabItem.Content is ChatView ChatView))
+				if (TabItem.Content is not ChatView ChatView)
 					continue;
 
 				if (ChatView.Node is OccupantNode Occupant)
@@ -998,7 +997,7 @@ namespace Waher.Client.WPF
 		{
 			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
 
-			if (!(ChatView is null))
+			if (ChatView is not null)
 			{
 				if (ChatView.Parent is TabItem TabItem)
 					NewHeader(Title, TabItem);
@@ -1027,15 +1026,15 @@ namespace Waher.Client.WPF
 
 		private void ReadMomentary_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanReadSensorData);
 		}
 
 		private async void ReadMomentary_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			try
 			{
-				TreeNode Node = this.SelectedNode;
+				TreeNode? Node = this.SelectedNode;
 				if (Node is null || !Node.CanReadSensorData)
 					return;
 
@@ -1059,15 +1058,15 @@ namespace Waher.Client.WPF
 
 		private void ReadDetailed_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanReadSensorData);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanReadSensorData);
 		}
 
 		private async void ReadDetailed_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			try
 			{
-				TreeNode Node = this.SelectedNode;
+				TreeNode? Node = this.SelectedNode;
 				if (Node is null || !Node.CanReadSensorData)
 					return;
 
@@ -1091,15 +1090,15 @@ namespace Waher.Client.WPF
 
 		private void SubscribeToMomentary_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanSubscribeToSensorData);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanSubscribeToSensorData);
 		}
 
 		private async void SubscribeToMomentary_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
 			try
 			{
-				TreeNode Node = this.SelectedNode;
+				TreeNode? Node = this.SelectedNode;
 				if (Node is null || !Node.CanSubscribeToSensorData)
 					return;
 
@@ -1129,13 +1128,13 @@ namespace Waher.Client.WPF
 
 		private void Configure_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanConfigure);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanConfigure);
 		}
 
 		private void Configure_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanConfigure)
 				return;
 
@@ -1161,10 +1160,7 @@ namespace Waher.Client.WPF
 			Doc.LoadXml(Xml);
 			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);*/
 
-			ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-			Dialog.Owner = this;
-
-			Dialog.ShowDialog();
+			await ShowParameterDialog(Form);
 		}
 
 		internal Task ShowError(object P)
@@ -1181,13 +1177,13 @@ namespace Waher.Client.WPF
 
 		private void Search_CanExecute(object Sender, CanExecuteRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
-			e.CanExecute = (!(Node is null) && Node.CanSearch);
+			TreeNode? Node = this.SelectedNode;
+			e.CanExecute = (Node is not null && Node.CanSearch);
 		}
 
 		private void Search_Executed(object Sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.SelectedNode;
+			TreeNode? Node = this.SelectedNode;
 			if (Node is null || !Node.CanSearch)
 				return;
 
@@ -1221,7 +1217,7 @@ namespace Waher.Client.WPF
 		{
 			QuestionView QuestionView = this.FindQuestionTab(Owner, ProvisioningClient);
 
-			if (!(QuestionView is null) && !(Question is null))
+			if (QuestionView is not null && Question is not null)
 			{
 				QuestionView.NewQuestion(Question);
 				return;
@@ -1260,12 +1256,11 @@ namespace Waher.Client.WPF
 					if (!Found)
 						Questions.AddLast(Question);
 
-					if (!(Questions.First is null))
+					if (Questions.First is not null)
 					{
 						UpdateGui(() =>
 						{
-							if (QuestionView is null)
-								QuestionView = this.CreateQuestionTab(Owner, ProvisioningClient);
+							QuestionView ??= this.CreateQuestionTab(Owner, ProvisioningClient);
 
 							foreach (Question Question2 in Questions)
 								QuestionView.NewQuestion(Question2);
@@ -1307,12 +1302,12 @@ namespace Waher.Client.WPF
 			return QuestionView;
 		}
 
-		internal static TabItem NewTab(string HeaderText)
+		internal static TabItem NewTab(string? HeaderText)
 		{
 			return NewTab(HeaderText, out TextBlock _);
 		}
 
-		internal static TabItem NewTab(string HeaderText, out TextBlock HeaderLabel)
+		internal static TabItem NewTab(string? HeaderText, out TextBlock HeaderLabel)
 		{
 			TabItem Result = new();
 			NewHeader(HeaderText, Result, out HeaderLabel);
@@ -1324,7 +1319,7 @@ namespace Waher.Client.WPF
 			NewHeader(HeaderText, Tab, out TextBlock _);
 		}
 
-		internal static void NewHeader(string HeaderText, TabItem Tab, out TextBlock HeaderLabel)
+		internal static void NewHeader(string? HeaderText, TabItem Tab, out TextBlock HeaderLabel)
 		{
 			StackPanel Header = new()
 			{
@@ -1341,7 +1336,7 @@ namespace Waher.Client.WPF
 
 			HeaderLabel = new TextBlock()
 			{
-				Text = HeaderText,
+				Text = HeaderText ?? string.Empty,
 				Margin = new Thickness(0, 0, 5, 0)
 			};
 
@@ -1370,10 +1365,10 @@ namespace Waher.Client.WPF
 
 		private static void CloseImage_MouseLeftButtonDown(object Sender, MouseButtonEventArgs e)
 		{
-			if ((Sender as Image)?.Tag is TabItem Item)
+			if (Sender is Image { Tag: TabItem Item })
 			{
 				currentInstance?.Tabs?.Items.Remove(Item);
-				if (!(Item.Content is null) && Item.Content is IDisposable Disposable)
+				if (Item.Content is not null && Item.Content is IDisposable Disposable)
 					Disposable.Dispose();
 			}
 		}
@@ -1392,7 +1387,7 @@ namespace Waher.Client.WPF
 		{
 			UpdateGui(() =>
 			{
-				currentInstance.MainView.ShowStatus(Message);
+				currentInstance!.MainView.ShowStatus(Message);
 				return Task.CompletedTask;
 			});
 		}
@@ -1405,6 +1400,71 @@ namespace Waher.Client.WPF
 				System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon);
 				return Task.CompletedTask;
 			});
+		}
+
+		public static async Task<bool?> ShowParameterDialog(XmppClient Client, 
+			object FormObject, string Title)
+		{
+			Language Language = await Translator.GetDefaultLanguageAsync();
+			DataForm Form = await Parameters.GetEditableForm(Client,
+				Language, string.Empty, string.Empty, FormObject, Title, null);
+
+			Form.SetMethodHandlers(
+				(sender, e) => Task.CompletedTask,
+				(sender, e) => Task.CompletedTask);
+
+			while (true)
+			{
+				bool? Result = await ShowParameterDialog(Form);
+
+				if (!Result.HasValue || !Result.Value)
+					return Result;
+
+				SetEditableFormResult EditResult = await Parameters.SetEditableForm(Language,
+					FormObject, Form, false, null);
+
+				if (EditResult.Errors is null || EditResult.Errors.Length == 0)
+					return true;
+
+				foreach (KeyValuePair<string, string> Error in EditResult.Errors)
+				{
+					Field? Field = Form[Error.Key];
+					if (Field is null)
+						continue;
+
+					Field.Error = Error.Value;
+				}
+			}
+		}
+
+		public static async Task<bool?> ShowParameterDialog(DataForm Form)
+		{
+			TaskCompletionSource<bool?> Result = new();
+
+			UpdateGui(async () =>
+			{
+				try
+				{
+					ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
+
+					if (Dialog.Empty)
+					{
+						await Form.Submit();
+						Result.TrySetResult(true);
+					}
+					else
+					{
+						Dialog.Owner = currentInstance;
+						Result.TrySetResult(Dialog.ShowDialog());
+					}
+				}
+				catch (Exception ex)
+				{
+					Result.TrySetException(ex);
+				}
+			});
+
+			return await Result.Task;
 		}
 
 		public static void MouseDefault()
@@ -1444,21 +1504,21 @@ namespace Waher.Client.WPF
 			}
 
 			if (Start)
-				currentInstance.Dispatcher.BeginInvoke(new GuiDelegate(DoUpdates));
+				currentInstance!.Dispatcher.BeginInvoke(new GuiDelegate(DoUpdates));
 		}
 
 		private static async Task DoUpdates()
 		{
 			try
 			{
-				GuiUpdateTask Rec = null;
-				GuiUpdateTask Prev;
+				GuiUpdateTask? Rec = null;
+				GuiUpdateTask? Prev;
 
 				while (true)
 				{
 					lock (guiUpdateQueue)
 					{
-						if (!(Rec is null))
+						if (Rec is not null)
 							guiUpdateQueue.RemoveFirst();
 
 						Prev = Rec;
@@ -1470,7 +1530,7 @@ namespace Waher.Client.WPF
 					try
 					{
 						Rec.Started = DateTime.Now;
-						await Rec.Method(Rec.State);
+						await Rec.Method!(Rec.State);
 					}
 					catch (Exception ex)
 					{
@@ -1502,9 +1562,9 @@ namespace Waher.Client.WPF
 
 		private class GuiUpdateTask
 		{
-			public GuiDelegateWithParameter Method;
-			public object State;
-			public string Name;
+			public GuiDelegateWithParameter? Method;
+			public object? State;
+			public string? Name;
 			public DateTime Requested;
 			public DateTime Started;
 			public DateTime Ended;

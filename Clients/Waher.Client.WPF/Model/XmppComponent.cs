@@ -86,13 +86,7 @@ namespace Waher.Client.WPF.Model
 			this.Account?.Client?.SendSearchFormRequest(null, this.jid, (Sender, e) =>
 			{
 				if (e.Ok)
-				{
-					MainWindow.UpdateGui(async () =>
-					{
-						ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.SearchForm);
-						Dialog.ShowDialog();
-					});
-				}
+					_ = MainWindow.ShowParameterDialog(e.SearchForm);
 				else
 					MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get search form." : e.ErrorText);
 

@@ -99,7 +99,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			{
 				TreeNode Loop = this.Parent;
 
-				while (!(Loop is null))
+				while (Loop is not null)
 				{
 					if (Loop is PubSubService PubSubService)
 						return PubSubService;
@@ -340,11 +340,7 @@ namespace Waher.Client.WPF.Model.PubSub
 						ex = XML.AnnotateException(ex, Payload);
 						Form["Payload"].Error = ex.Message;
 
-						MainWindow.UpdateGui(async () =>
-						{
-							Dialog = await ParameterDialog.CreateAsync(Form);
-							Dialog.ShowDialog();
-						});
+						_ = MainWindow.ShowParameterDialog(Form);
 
 						return Task.CompletedTask;
 					}
@@ -352,11 +348,7 @@ namespace Waher.Client.WPF.Model.PubSub
 					{
 						Form["Payload"].Error = ex.Message;
 
-						MainWindow.UpdateGui(async () =>
-						{
-							Dialog = await ParameterDialog.CreateAsync(Form);
-							Dialog.ShowDialog();
-						});
+						_ = MainWindow.ShowParameterDialog(Form);
 
 						return Task.CompletedTask;
 					}
@@ -385,11 +377,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				new TextMultiField(null, "Payload", "XML:", false, new string[] { string.Empty }, null, "XML payload of item.",
 					StringDataType.Instance, null, string.Empty, false, false, false));
 
-			MainWindow.UpdateGui(async () =>
-			{
-				Dialog = await ParameterDialog.CreateAsync(Form);
-				Dialog.ShowDialog();
-			});
+			_ = MainWindow.ShowParameterDialog(Form);
 		}
 
 		internal void ItemNotification(ItemNotificationEventArgs e)
@@ -635,11 +623,7 @@ namespace Waher.Client.WPF.Model.PubSub
 							return Task.CompletedTask;
 						}, string.Empty, string.Empty, e.Form.Fields);
 
-					MainWindow.UpdateGui(async () =>
-					{
-						ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-						Dialog.ShowDialog();
-					});
+					_ = MainWindow.ShowParameterDialog(Form);
 				}
 				else
 					MainWindow.ErrorBox("Unable to get node properties: " + e.ErrorText);

@@ -118,7 +118,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Any other properties registered on the cookie.
 		/// </summary>
-		public IEnumerable<KeyValuePair<string, string>> OtherProperties => (IEnumerable<KeyValuePair<string, string>>)this.otherProperties ?? new KeyValuePair<string, string>[0];
+		public IEnumerable<KeyValuePair<string, string>> OtherProperties => (IEnumerable<KeyValuePair<string, string>>)this.otherProperties ?? Array.Empty<KeyValuePair<string, string>>();
 
 		/// <summary>
 		/// Name of cookie

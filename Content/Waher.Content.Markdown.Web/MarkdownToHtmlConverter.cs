@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
@@ -345,7 +344,7 @@ namespace Waher.Content.Markdown.Web
 				this.CopyHttpHeader("Vary", Doc, Response);
 			}
 
-			byte[] Data = Utf8WithBOM.GetBytes(s);
+			byte[] Data = Strings.Utf8WithBom.GetBytes(s);
 
 			await State.To.WriteAsync(Data, 0, Data.Length);
 			State.ToContentType += "; charset=utf-8";
@@ -378,8 +377,6 @@ namespace Waher.Content.Markdown.Web
 			else
 				return false;
 		}
-
-		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
 
 		/// <summary>
 		/// HTML settings for automatically converted content.

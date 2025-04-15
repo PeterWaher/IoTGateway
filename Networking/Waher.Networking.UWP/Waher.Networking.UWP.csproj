@@ -170,6 +170,10 @@
       <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
       <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj">
+      <Project>{4e8600b1-cd70-4a68-9346-1e2b81b0d9f5}</Project>
+      <Name>Waher.Runtime.Collections</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj">
       <Project>{a93e546d-6ca5-4aa6-b9b7-3100b8d6467f}</Project>
       <Name>Waher.Runtime.Console</Name>

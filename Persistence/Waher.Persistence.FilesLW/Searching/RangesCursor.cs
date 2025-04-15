@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -144,9 +145,9 @@ namespace Waher.Persistence.Files.Searching
 			{
 				if (this.currentRange is null)
 				{
-					List<KeyValuePair<string, object>> SearchParameters = new List<KeyValuePair<string, object>>();
-					List<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
-					List<KeyValuePair<string, IApplicableFilter>> EndFilters = null;
+					ChunkedList<KeyValuePair<string, object>> SearchParameters = new ChunkedList<KeyValuePair<string, object>>();
+					ChunkedList<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
+					ChunkedList<KeyValuePair<string, IApplicableFilter>> EndFilters = null;
 					RangeInfo Range;
 					object Value;
 
@@ -157,7 +158,7 @@ namespace Waher.Persistence.Files.Searching
 						if (Range.IsPoint)
 						{
 							if (EndFilters is null)
-								EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+								EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 							SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Range.Point));
 							EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldEqualTo(Range.FieldName, Range.Point)));
@@ -171,7 +172,7 @@ namespace Waher.Persistence.Files.Searching
 								if (this.ascending[i])
 								{
 									if (StartFilters is null)
-										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										StartFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
 										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterOrEqualTo(Range.FieldName, Value)));
@@ -188,7 +189,7 @@ namespace Waher.Persistence.Files.Searching
 								else
 								{
 									if (EndFilters is null)
-										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
 										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterOrEqualTo(Range.FieldName, Value)));
@@ -204,7 +205,7 @@ namespace Waher.Persistence.Files.Searching
 								if (!this.ascending[i])
 								{
 									if (StartFilters is null)
-										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										StartFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
 										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
@@ -221,7 +222,7 @@ namespace Waher.Persistence.Files.Searching
 								else
 								{
 									if (EndFilters is null)
-										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
 										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
@@ -363,9 +364,9 @@ namespace Waher.Persistence.Files.Searching
 			{
 				if (this.currentRange is null)
 				{
-					List<KeyValuePair<string, object>> SearchParameters = new List<KeyValuePair<string, object>>();
-					List<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
-					List<KeyValuePair<string, IApplicableFilter>> EndFilters = null;
+					ChunkedList<KeyValuePair<string, object>> SearchParameters = new ChunkedList<KeyValuePair<string, object>>();
+					ChunkedList<KeyValuePair<string, IApplicableFilter>> StartFilters = null;
+					ChunkedList<KeyValuePair<string, IApplicableFilter>> EndFilters = null;
 					RangeInfo Range;
 					object Value;
 
@@ -376,7 +377,7 @@ namespace Waher.Persistence.Files.Searching
 						if (Range.IsPoint)
 						{
 							if (EndFilters is null)
-								EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+								EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 							SearchParameters.Add(new KeyValuePair<string, object>(Range.FieldName, Range.Point));
 							EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldEqualTo(Range.FieldName, Range.Point)));
@@ -390,7 +391,7 @@ namespace Waher.Persistence.Files.Searching
 								if (this.ascending[i])
 								{
 									if (EndFilters is null)
-										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
 										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterOrEqualTo(Range.FieldName, Value)));
@@ -400,7 +401,7 @@ namespace Waher.Persistence.Files.Searching
 								else
 								{
 									if (StartFilters is null)
-										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										StartFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MinInclusive)
 										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldGreaterOrEqualTo(Range.FieldName, Value)));
@@ -423,7 +424,7 @@ namespace Waher.Persistence.Files.Searching
 								if (this.ascending[i])
 								{
 									if (StartFilters is null)
-										StartFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										StartFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
 										StartFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));
@@ -440,7 +441,7 @@ namespace Waher.Persistence.Files.Searching
 								else
 								{
 									if (EndFilters is null)
-										EndFilters = new List<KeyValuePair<string, IApplicableFilter>>();
+										EndFilters = new ChunkedList<KeyValuePair<string, IApplicableFilter>>();
 
 									if (Range.MaxInclusive)
 										EndFilters.Add(new KeyValuePair<string, IApplicableFilter>(Range.FieldName, new FilterFieldLesserOrEqualTo(Range.FieldName, Value)));

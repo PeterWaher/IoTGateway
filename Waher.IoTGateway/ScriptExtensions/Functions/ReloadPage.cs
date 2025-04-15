@@ -1,4 +1,5 @@
-﻿using Waher.Script;
+﻿using System;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -17,7 +18,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public ReloadPage(int Start, int Length, Expression Expression)
-			: base(new ScriptNode[0], argumentTypes0, Start, Length, Expression)
+			: base(Array.Empty<ScriptNode>(), argumentTypes0, Start, Length, Expression)
 		{
 		}
 

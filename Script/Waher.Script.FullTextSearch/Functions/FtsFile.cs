@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
-using Waher.Persistence.FullTextSearch.Files;
-using Waher.Persistence.FullTextSearch.Tokenizers;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using F = Waher.Persistence.Filters;
+using Waher.Runtime.Collections;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -39,7 +38,7 @@ namespace Waher.Persistence.Files.Searching
 				return ConstantFields1;
 			else
 			{
-				List<string> Union = null;
+				ChunkedList<string> Union = null;
 
 				foreach (string s in ConstantFields2)
 				{
@@ -48,7 +47,7 @@ namespace Waher.Persistence.Files.Searching
 
 					if (Union is null)
 					{
-						Union = new List<string>();
+						Union = new ChunkedList<string>();
 						Union.AddRange(ConstantFields1);
 					}
 

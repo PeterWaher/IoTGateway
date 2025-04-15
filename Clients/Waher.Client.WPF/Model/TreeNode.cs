@@ -831,7 +831,7 @@ namespace Waher.Client.WPF.Model
 			}
 
 			TreeNode Loop = this;
-			while (!(Loop is null))
+			while (Loop is not null)
 			{
 				if (Loop is IMenuAggregator MenuAggregator)
 					MenuAggregator.AddContexMenuItems(this, ref CurrentGroup, Menu);

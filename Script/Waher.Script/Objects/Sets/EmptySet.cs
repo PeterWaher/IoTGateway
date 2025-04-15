@@ -64,7 +64,7 @@ namespace Waher.Script.Objects.Sets
             }
         }
 
-        private static readonly IElement[] noElements = new IElement[0];
+        private static readonly IElement[] noElements = Array.Empty<IElement>();
 
         /// <summary>
         /// Size of set, if finite and known, otherwise null is returned.

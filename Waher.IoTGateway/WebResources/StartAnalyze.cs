@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
@@ -149,7 +148,6 @@ namespace Waher.IoTGateway.WebResources
 		private static bool analyzing = false;
 		private static readonly object synchObject = new object();
 		private static XslCompiledTransform xslt = null;
-		internal static System.Text.Encoding utf8Bom = new UTF8Encoding(true);
 
 		/// <summary>
 		/// Analyzes the object database
@@ -189,7 +187,7 @@ namespace Waher.IoTGateway.WebResources
 
 				string s = await Files.ReadAllTextAsync(FullPath);
 				s = XSL.Transform(s, xslt);
-				byte[] Bin = utf8Bom.GetBytes(s);
+				byte[] Bin = Strings.Utf8WithBom.GetBytes(s);
 
 				string FullPath2 = FullPath[..^4] + ".html";
 				await Files.WriteAllBytesAsync(FullPath2, Bin);

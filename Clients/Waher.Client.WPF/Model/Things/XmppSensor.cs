@@ -33,7 +33,7 @@ namespace Waher.Client.WPF.Model.Things
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
 				return await SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.Momentary);
 			else
 				return null;
@@ -44,7 +44,7 @@ namespace Waher.Client.WPF.Model.Things
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
 				return await SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
 			else
 				throw new NotSupportedException();
@@ -55,7 +55,7 @@ namespace Waher.Client.WPF.Model.Things
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
-			if (!(XmppAccountNode is null) && !((SensorClient = XmppAccountNode.SensorClient) is null))
+			if (XmppAccountNode is not null && !((SensorClient = XmppAccountNode.SensorClient) is null))
 			{
 				return await SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
 					Duration.FromSeconds(1), Duration.FromMinutes(1), false);

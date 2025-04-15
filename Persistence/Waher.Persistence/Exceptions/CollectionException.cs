@@ -36,7 +36,7 @@ namespace Waher.Persistence.Exceptions
 			get
 			{
 				if (string.IsNullOrEmpty(this.collection))
-					return new KeyValuePair<string, object>[0];
+					return Array.Empty<KeyValuePair<string, object>>();
 				else
 				{
 					return new KeyValuePair<string, object>[]

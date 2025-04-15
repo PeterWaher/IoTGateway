@@ -1,39 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Questions;
+using Waher.Client.WPF.Dialogs.IoT;
+using Waher.Client.WPF.Model.Concentrator;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.Events;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Provisioning.Events;
 using Waher.Networking.XMPP.Provisioning.SearchOperators;
+using Waher.Networking.XMPP.Software;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.Client.WPF.Controls;
-using Waher.Client.WPF.Controls.Questions;
-using Waher.Client.WPF.Dialogs.IoT;
-using Waher.Client.WPF.Model.Concentrator;
-using Waher.Networking.XMPP.Provisioning.Events;
-using Waher.Networking.XMPP.Events;
+using Waher.Things.Attributes;
 
 namespace Waher.Client.WPF.Model.Provisioning
 {
 	public class ThingRegistry : XmppComponent, IMenuAggregator
 	{
 		private readonly bool supportsProvisioning;
-		private ThingRegistryClient registryClient;
-		private ProvisioningClient provisioningClient;
+		private readonly bool supportsSoftwareUpdates;
+		private readonly string? packageFolder;
+		private ThingRegistryClient? registryClient;
+		private ProvisioningClient? provisioningClient;
+		private SoftwareUpdateClient? softwareClient;
 
 		public ThingRegistry(TreeNode Parent, string JID, string Name, string Node, Dictionary<string, bool> Features)
 			: base(Parent, JID, Name, Node, Features)
 		{
 			this.supportsProvisioning = false;
+			this.supportsSoftwareUpdates = false;
 
 			foreach (string Namespace in ProvisioningClient.NamespacesProvisioningOwner)
 			{
@@ -44,26 +53,46 @@ namespace Waher.Client.WPF.Model.Provisioning
 				}
 			}
 
+			foreach (string Namespace in SoftwareUpdateClient.NamespacesSoftwareUpdates)
+			{
+				if (Features.ContainsKey(Namespace))
+				{
+					this.supportsSoftwareUpdates = true;
+					break;
+				}
+			}
+
 			this.registryClient = new ThingRegistryClient(this.Account.Client, JID);
+
+			XmppAccountNode Account = this.Account;
+			XmppClient Client = Account.Client;
 
 			if (this.supportsProvisioning)
 			{
-				XmppAccountNode Account = this.Account;
-				XmppClient Client = Account.Client;
-
 				this.provisioningClient = new ProvisioningClient(Client, JID)
 				{
 					ManagePresenceSubscriptionRequests = false
 				};
 
-				this.provisioningClient.IsFriendQuestion += this.ProvisioningClient_IsFriendQuestion;
-				this.provisioningClient.CanReadQuestion += this.ProvisioningClient_CanReadQuestion;
-				this.provisioningClient.CanControlQuestion += this.ProvisioningClient_CanControlQuestion;
+				this.provisioningClient!.IsFriendQuestion += this.ProvisioningClient_IsFriendQuestion;
+				this.provisioningClient!.CanReadQuestion += this.ProvisioningClient_CanReadQuestion;
+				this.provisioningClient!.CanControlQuestion += this.ProvisioningClient_CanControlQuestion;
 
 				this.ProcessUnhandled();
 			}
 			else
 				this.provisioningClient = null;
+
+			if (this.supportsSoftwareUpdates)
+			{
+				this.packageFolder = Path.Combine(AppContext.BaseDirectory, "Packages", JID);
+				this.softwareClient = new SoftwareUpdateClient(Client, JID, this.packageFolder);
+			}
+			else
+			{
+				this.softwareClient = null;
+				this.packageFolder = null;
+			}
 		}
 
 		private async void ProcessUnhandled()
@@ -83,9 +112,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		public bool SupportsProvisioning => this.supportsProvisioning;
 
-		public ThingRegistryClient ThingRegistryClient => this.registryClient;
+		public ThingRegistryClient? ThingRegistryClient => this.registryClient;
 
-		public ProvisioningClient ProvisioningClient => this.provisioningClient;
+		public ProvisioningClient? ProvisioningClient => this.provisioningClient;
 
 		private async Task ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
 		{
@@ -101,7 +130,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					JID = e.JID,
 					RemoteJID = e.RemoteJID,
 					OwnerJID = XmppClient.GetBareJID(e.To),
-					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
+					ProvisioningJID = this.provisioningClient!.ProvisioningServerAddress,
 					Sender = e.From
 				};
 
@@ -109,7 +138,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				MainWindow.UpdateGui(() =>
 				{
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					MainWindow.currentInstance!.NewQuestion(this.Account, this.provisioningClient, Question);
 					return Task.CompletedTask;
 				});
 			}
@@ -129,7 +158,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					JID = e.JID,
 					RemoteJID = e.RemoteJID,
 					OwnerJID = XmppClient.GetBareJID(e.To),
-					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
+					ProvisioningJID = this.provisioningClient!.ProvisioningServerAddress,
 					ServiceTokens = e.ServiceTokens,
 					DeviceTokens = e.DeviceTokens,
 					UserTokens = e.UserTokens,
@@ -145,7 +174,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				MainWindow.UpdateGui(() =>
 				{
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					MainWindow.currentInstance!.NewQuestion(this.Account, this.provisioningClient, Question);
 					return Task.CompletedTask;
 				});
 			}
@@ -165,7 +194,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					JID = e.JID,
 					RemoteJID = e.RemoteJID,
 					OwnerJID = XmppClient.GetBareJID(e.To),
-					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
+					ProvisioningJID = this.provisioningClient!.ProvisioningServerAddress,
 					ServiceTokens = e.ServiceTokens,
 					DeviceTokens = e.DeviceTokens,
 					UserTokens = e.UserTokens,
@@ -180,7 +209,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				MainWindow.UpdateGui(() =>
 				{
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					MainWindow.currentInstance!.NewQuestion(this.Account, this.provisioningClient, Question);
 					return Task.CompletedTask;
 				});
 			}
@@ -193,6 +222,9 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			this.provisioningClient?.Dispose();
 			this.provisioningClient = null;
+
+			this.softwareClient?.Dispose();
+			this.softwareClient = null;
 
 			base.Dispose();
 		}
@@ -214,7 +246,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		public override void Search()
 		{
-			SearchForThingsDialog Dialog = new SearchForThingsDialog()
+			SearchForThingsDialog Dialog = new()
 			{
 				Owner = MainWindow.currentInstance
 			};
@@ -224,7 +256,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			if (Result.HasValue && Result.Value)
 			{
 				Rule[] Rules = Dialog.GetRules();
-				List<SearchOperator> Operators = new List<SearchOperator>();
+				List<SearchOperator> Operators = [];
 				bool Numeric;
 
 				foreach (Rule Rule in Rules)
@@ -303,24 +335,24 @@ namespace Waher.Client.WPF.Model.Provisioning
 					}
 				}
 
-				this.registryClient.Search(0, 100, Operators.ToArray(), (Sender, e) =>
+				this.registryClient!.Search(0, 100, [.. Operators], (Sender, e) =>
 				{
-					this.ShowResult(e);
+					ShowResult(e);
 					return Task.CompletedTask;
 				}, null);
 			}
 		}
 
-		private void ShowResult(SearchResultEventArgs e)
+		private static void ShowResult(SearchResultEventArgs e)
 		{
 			if (e.Ok)
 			{
-				List<Field> Headers = new List<Field>()
-				{
+				List<Field> Headers =
+				[
 					new TextSingleField(null, "_JID", "JID", false, null, null, string.Empty, null, null, string.Empty, false, false, false)
-				};
-				List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
-				Dictionary<string, bool> TagNames = new Dictionary<string, bool>();
+				];
+				List<Dictionary<string, string>> Records = [];
+				Dictionary<string, bool> TagNames = [];
 				bool HasNodeId = false;
 				bool HasSourceId = false;
 				bool HasPartition = false;
@@ -352,10 +384,10 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				foreach (SearchResultThing Thing in e.Things)
 				{
-					Dictionary<string, string> Record = new Dictionary<string, string>()
-							{
-								{ "_JID", Thing.Jid }
-							};
+					Dictionary<string, string> Record = new()
+					{
+						{ "_JID", Thing.Jid }
+					};
 					string Label;
 
 					if (HasNodeId)
@@ -375,31 +407,31 @@ namespace Waher.Client.WPF.Model.Provisioning
 						{
 							TagNames[Tag.Name] = true;
 
-							switch (Tag.Name)
+							Label = Tag.Name switch
 							{
-								case "ALT": Label = "Altitude"; break;
-								case "APT": Label = "Apartment"; break;
-								case "AREA": Label = "Area"; break;
-								case "BLD": Label = "Building"; break;
-								case "CITY": Label = "City"; break;
-								case "CLASS": Label = "Class"; break;
-								case "COUNTRY": Label = "Country"; break;
-								case "LAT": Label = "Latitude"; break;
-								case "LONG": Label = "Longitude"; break;
-								case "MAN": Label = "Manufacturer"; break;
-								case "MLOC": Label = "Meter Location"; break;
-								case "MNR": Label = "Meter Number"; break;
-								case "MODEL": Label = "Model"; break;
-								case "NAME": Label = "Name"; break;
-								case "PURL": Label = "Product URL"; break;
-								case "REGION": Label = "Region"; break;
-								case "ROOM": Label = "Room"; break;
-								case "SN": Label = "Serial Number"; break;
-								case "STREET": Label = "Street"; break;
-								case "STREETNR": Label = "Street Number"; break;
-								case "V": Label = "Version"; break;
-								default: Label = Tag.Name; break;
-							}
+								"ALT" => "Altitude",
+								"APT" => "Apartment",
+								"AREA" => "Area",
+								"BLD" => "Building",
+								"CITY" => "City",
+								"CLASS" => "Class",
+								"COUNTRY" => "Country",
+								"LAT" => "Latitude",
+								"LONG" => "Longitude",
+								"MAN" => "Manufacturer",
+								"MLOC" => "Meter Location",
+								"MNR" => "Meter Number",
+								"MODEL" => "Model",
+								"NAME" => "Name",
+								"PURL" => "Product URL",
+								"REGION" => "Region",
+								"ROOM" => "Room",
+								"SN" => "Serial Number",
+								"STREET" => "Street",
+								"STREETNR" => "Street Number",
+								"V" => "Version",
+								_ => Tag.Name,
+							};
 
 							Headers.Add(new TextSingleField(null, Tag.Name, Label, false, null, null, string.Empty, null, null,
 								string.Empty, false, false, false));
@@ -414,12 +446,12 @@ namespace Waher.Client.WPF.Model.Provisioning
 				MainWindow.UpdateGui(() =>
 				{
 					TabItem TabItem = MainWindow.NewTab("Search Result");
-					MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+					MainWindow.currentInstance!.Tabs.Items.Add(TabItem);
 
-					SearchResultView View = new SearchResultView(Headers.ToArray(), Records.ToArray());
+					SearchResultView View = new([.. Headers], [.. Records]);
 					TabItem.Content = View;
 
-					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+					MainWindow.currentInstance!.Tabs.SelectedItem = TabItem;
 					return Task.CompletedTask;
 				});
 			}
@@ -431,16 +463,16 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		public override void Add()
 		{
-			ClaimDeviceForm Form = new ClaimDeviceForm();
+			ClaimDeviceForm Form = new();
 			bool? Result = Form.ShowDialog();
 
 			if (Result.HasValue && Result.Value)
 			{
-				this.registryClient.Mine(Form.MakePublic, Form.Tags, (Sender, e) =>
+				this.registryClient!.Mine(Form.MakePublic, Form.Tags, (Sender, e) =>
 				{
 					if (e.Ok)
 					{
-						StringBuilder Msg = new StringBuilder();
+						StringBuilder Msg = new();
 
 						Msg.AppendLine("Device successfully claimed.");
 						Msg.AppendLine();
@@ -484,12 +516,12 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 		public override void AddContexMenuItems(ref string CurrentGroup, ContextMenu Menu)
 		{
+			MenuItem Item;
+
 			base.AddContexMenuItems(ref CurrentGroup, Menu);
 
 			if (this.supportsProvisioning)
 			{
-				MenuItem Item;
-
 				this.GroupSeparator(ref CurrentGroup, "Database", Menu);
 
 				Menu.Items.Add(Item = new MenuItem()
@@ -520,20 +552,65 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				Item.Click += this.RecycleDeviceRuleCaches_Click;
 			}
+
+			if (this.supportsSoftwareUpdates)
+			{
+				this.GroupSeparator(ref CurrentGroup, "Software", Menu);
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Software Packages...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.SoftwarePackages_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Subscribe...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.Subscribe_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Unsubscribe...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.Unsubscribe_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Download Packages...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.DownloadPackages_Click;
+
+				Menu.Items.Add(Item = new MenuItem()
+				{
+					Header = "Open Packages Folder...",
+					IsEnabled = true
+				});
+
+				Item.Click += this.OpenPackagesFolder_Click;
+			}
 		}
 
 		private void MyDevices_Click(object Sender, RoutedEventArgs e)
 		{
-			this.provisioningClient.GetDevices(0, 100, (sender2, e2) =>
+			this.provisioningClient!.GetDevices(0, 100, (sender2, e2) =>
 			{
-				this.ShowResult(e2);
+				ShowResult(e2);
 				return Task.CompletedTask;
 			}, null);
 		}
 
 		private void RecycleDeviceRuleCaches_Click(object Sender, RoutedEventArgs e)
 		{
-			this.provisioningClient.ClearDeviceCaches((sender2, e2) =>
+			this.provisioningClient!.ClearDeviceCaches((sender2, e2) =>
 			{
 				if (e2.Ok)
 					MainWindow.SuccessBox("The rule caches in your connected devices have been cleared.");
@@ -551,7 +628,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			if (TreeNode is XmppContact Contact)
 			{
-				if (!(this.registryClient is null))
+				if (this.registryClient is not null)
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -571,7 +648,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					Item.Click += this.DisownDevice_Click;
 				}
 
-				if (!(this.provisioningClient is null))
+				if (this.provisioningClient is not null)
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -608,7 +685,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}
 			else if (TreeNode is Node Node)
 			{
-				if (!(this.registryClient is null))
+				if (this.registryClient is not null)
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -628,7 +705,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					Item.Click += this.DisownDeviceNode_Click;
 				}
 
-				if (!(this.provisioningClient is null))
+				if (this.provisioningClient is not null)
 				{
 					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
@@ -655,13 +732,13 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)Sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
-			this.provisioningClient.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
+			this.provisioningClient!.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
 			{
 				if (string.IsNullOrEmpty(e2.JID))
 					MainWindow.ErrorBox("Unable to find provisioning service for " + Contact.BareJID);
 				else
 				{
-					this.provisioningClient.ClearDeviceCache(e2.JID, Contact.BareJID, (sender3, e3) =>
+					this.provisioningClient!.ClearDeviceCache(e2.JID, Contact.BareJID, (sender3, e3) =>
 					{
 						if (e3.Ok)
 							MainWindow.SuccessBox("The rule cache in " + Contact.BareJID + " has been cleared.");
@@ -683,13 +760,13 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)Sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
-			this.provisioningClient.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
+			this.provisioningClient!.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
 			{
 				if (string.IsNullOrEmpty(e2.JID))
 					MainWindow.ErrorBox("Unable to find provisioning service for " + Contact.BareJID);
 				else
 				{
-					this.provisioningClient.DeleteDeviceRules(e2.JID, Contact.BareJID, string.Empty, string.Empty, string.Empty, (sender3, e3) =>
+					this.provisioningClient!.DeleteDeviceRules(e2.JID, Contact.BareJID, string.Empty, string.Empty, string.Empty, (sender3, e3) =>
 					{
 						if (e3.Ok)
 							MainWindow.SuccessBox("The rules in " + Contact.BareJID + " have been deleted.");
@@ -711,13 +788,13 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)Sender;
 			Node Node = (Node)Item.Tag;
 
-			this.provisioningClient.FindProvisioningService(Node.Concentrator.BareJID, (sender2, e2) =>
+			this.provisioningClient!.FindProvisioningService(Node.Concentrator.BareJID, (sender2, e2) =>
 			{
 				if (string.IsNullOrEmpty(e2.JID))
 					MainWindow.ErrorBox("Unable to find provisioning service for " + Node.Concentrator.BareJID);
 				else
 				{
-					this.provisioningClient.DeleteDeviceRules(e2.JID, Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender3, e3) =>
+					this.provisioningClient!.DeleteDeviceRules(e2.JID, Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender3, e3) =>
 					{
 						if (e3.Ok)
 							MainWindow.SuccessBox("The rules in " + Node.Header + " have been deleted.");
@@ -739,13 +816,13 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)Sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
-			this.registryClient.FindThingRegistry(Contact.BareJID, (sender2, e2) =>
+			this.registryClient!.FindThingRegistry(Contact.BareJID, (sender2, e2) =>
 			{
 				if (string.IsNullOrEmpty(e2.JID))
 					MainWindow.ErrorBox("Unable to find thing registry servicing " + Contact.BareJID);
 				else
 				{
-					this.registryClient.Disown(e2.JID, Contact.BareJID, string.Empty, string.Empty, string.Empty, (sender3, e3) =>
+					this.registryClient!.Disown(e2.JID, Contact.BareJID, string.Empty, string.Empty, string.Empty, (sender3, e3) =>
 					{
 						if (e3.Ok)
 							MainWindow.SuccessBox(Contact.BareJID + " has been disowned.");
@@ -766,13 +843,13 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)Sender;
 			Node Node = (Node)Item.Tag;
 
-			this.registryClient.FindThingRegistry(Node.Concentrator.BareJID, (sender2, e2) =>
+			this.registryClient!.FindThingRegistry(Node.Concentrator.BareJID, (sender2, e2) =>
 			{
 				if (string.IsNullOrEmpty(e2.JID))
 					MainWindow.ErrorBox("Unable to find thing registry servicing " + Node.Concentrator.BareJID);
 				else
 				{
-					this.registryClient.Disown(e2.JID, Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender3, e3) =>
+					this.registryClient!.Disown(e2.JID, Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender3, e3) =>
 					{
 						if (e3.Ok)
 							MainWindow.SuccessBox(Node.Header + " has been disowned.");
@@ -786,6 +863,231 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				return Task.CompletedTask;
 			}, null);
+		}
+
+		private void SoftwarePackages_Click(object Sender, RoutedEventArgs e)
+		{
+			this.softwareClient!.GetPackagesInformation((sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					List<Field> Headers =
+					[
+						new TextSingleField(null, "Filename", "File name", false, null, null, string.Empty, null, null, string.Empty, false, false, false),
+						new TextSingleField(null, "Published", "Published", false, null, null, string.Empty, null, null, string.Empty, false, false, false),
+						new TextSingleField(null, "Supersedes", "Supersedes", false, null, null, string.Empty, null, null, string.Empty, false, false, false),
+						new TextSingleField(null, "Created", "Created", false, null, null, string.Empty, null, null, string.Empty, false, false, false),
+						new TextSingleField(null, "Bytes", "Bytes", false, null, null, string.Empty, null, null, string.Empty, false, false, false)
+					];
+					List<Dictionary<string, string>> Records = [];
+
+					foreach (Package Package in e2.Packages)
+					{
+						Dictionary<string, string> Record = new()
+						{
+							{ "Filename", Package.FileName },
+							{ "Published", Package.Published.ToString() },
+							{ "Supersedes", Package.Supersedes.ToString() },
+							{ "Created", Package.Created.ToString() },
+							{ "Bytes", Package.Bytes.ToString() }
+						};
+
+						Records.Add(Record);
+					}
+
+					MainWindow.UpdateGui(() =>
+					{
+						TabItem TabItem = MainWindow.NewTab("Packages");
+						MainWindow.currentInstance!.Tabs.Items.Add(TabItem);
+
+						SearchResultView View = new([.. Headers], [.. Records]);
+						TabItem.Content = View;
+
+						MainWindow.currentInstance!.Tabs.SelectedItem = TabItem;
+						return Task.CompletedTask;
+					});
+				}
+				else
+					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to get list of software packages." : e2.ErrorText);
+
+				return Task.CompletedTask;
+			}, null);
+		}
+
+		private async void Subscribe_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				SubscriptionParamters DialogParameters = new();
+
+				bool? Result = await MainWindow.ShowParameterDialog(this.softwareClient!.Client,
+					DialogParameters, "Subscribe to software updates");
+				if (!Result.HasValue || !Result.Value)
+					return;
+
+				await this.softwareClient!.Subscribe(DialogParameters.PackageName, (sender2, e2) =>
+				{
+					if (e2.Ok)
+						MainWindow.SuccessBox("Subscription successful.");
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to perform subscription." : e2.ErrorText);
+
+					return Task.CompletedTask;
+				}, null);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		private class SubscriptionParamters
+		{
+			[Page("Subscription")]
+			[Header("Package file name:")]
+			[Required]
+			[ToolTip("Wildcards (*) are permitted.")]
+			public string PackageName { get; set; } = string.Empty;
+		}
+
+		private async void Unsubscribe_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				UnsubscriptionParamters DialogParameters = new();
+				bool? Result = await MainWindow.ShowParameterDialog(this.softwareClient!.Client,
+					DialogParameters, "Unsubscribe from software updates");
+
+				if (!Result.HasValue || !Result.Value)
+					return;
+
+				await this.softwareClient.Unsubscribe(DialogParameters.PackageName, (sender2, e2) =>
+				{
+					if (e2.Ok)
+						MainWindow.SuccessBox("Unsubscription successful.");
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to perform unsubscription." : e2.ErrorText);
+
+					return Task.CompletedTask;
+				}, null);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		private class UnsubscriptionParamters
+		{
+			[Page("Unsubscription")]
+			[Header("Package file name:")]
+			[Required]
+			[ToolTip("Wildcards (*) are permitted.")]
+			public string PackageName { get; set; } = string.Empty;
+		}
+
+		private async void DownloadPackages_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				DownloadParamters DialogParameters = new();
+				bool? Result = await MainWindow.ShowParameterDialog(this.softwareClient!.Client,
+					DialogParameters, "Download software packages");
+
+				if (!Result.HasValue || !Result.Value)
+					return;
+
+				Package[] Packages = await this.softwareClient.GetPackagesAsync();
+
+				if (!Directory.Exists(this.packageFolder))
+					Directory.CreateDirectory(this.packageFolder!);
+
+				Regex? Filter;
+
+				if (string.IsNullOrEmpty(DialogParameters.Filter))
+					Filter = null;
+				else
+					Filter = new Regex(Database.WildcardToRegex(DialogParameters.Filter, "*"));
+
+				foreach (Package Package in Packages)
+				{
+					MainWindow.ShowStatus(Package.FileName + "...");
+
+					if (Filter is not null)
+					{
+						Match M = Filter.Match(Package.FileName);
+						if (!M.Success || M.Index > 0 || M.Length != Package.FileName.Length)
+							continue;
+					}
+
+					string FileName = Path.Combine(this.packageFolder!, Package.FileName);
+
+					if (DialogParameters.Mode == DownloadMode.OnlyNewer &&
+						File.Exists(FileName))
+					{
+						FileInfo Info = new(FileName);
+
+						if (Info.Exists &&
+							Info.Length == Package.Bytes &&
+							Info.LastWriteTimeUtc >= Package.Published.ToUniversalTime())
+						{
+							continue;
+						}
+					}
+
+					await this.softwareClient.DownloadPackageAsync(Package);
+				}
+
+				MainWindow.ShowStatus("Done.");
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
+		}
+
+		private class DownloadParamters
+		{
+			[Page("Download")]
+			[Header("Mode:")]
+			[Required]
+			[Option(DownloadMode.All, 0, "All matching packages.")]
+			[Option(DownloadMode.OnlyNewer, 0, "Only if packages are newer.")]
+			[ToolTip("What packages to download, if matching the filter.")]
+			public DownloadMode Mode { get; set; } = DownloadMode.OnlyNewer;
+
+			[Page("Download")]
+			[Header("Package Filter:")]
+			[Required]
+			[ToolTip("Only download packages matching this filter. Wildcards (*) are permitted.")]
+			public string Filter { get; set; } = "*";
+		}
+
+		private enum DownloadMode
+		{
+			All,
+			OnlyNewer
+		}
+
+		private void OpenPackagesFolder_Click(object Sender, RoutedEventArgs e)
+		{
+			try
+			{
+				if (!Directory.Exists(this.packageFolder))
+					Directory.CreateDirectory(this.packageFolder!);
+
+				ProcessStartInfo StartInfo = new()
+				{
+					UseShellExecute = true,
+					FileName = this.packageFolder!
+				};
+
+				Process.Start(StartInfo);
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 
 	}

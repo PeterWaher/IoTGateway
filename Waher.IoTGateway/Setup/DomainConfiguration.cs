@@ -1256,7 +1256,7 @@ namespace Waher.IoTGateway.Setup
 						if (!(Account.Contact is null) && Account.Contact.Length != 0)
 						{
 							await Status.Raise(this, "Updating contact URIs in account.");
-							Account = await Account.Update(new string[0]);
+							Account = await Account.Update(Array.Empty<string>());
 							await Status.Raise(this, "Account updated.");
 						}
 					}
@@ -1275,7 +1275,7 @@ namespace Waher.IoTGateway.Setup
 					await Status.Raise(this, "Account not found.");
 					await Status.Raise(this, "Creating account.");
 
-					Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? new string[0] : new string[] { "mailto:" + this.contactEMail },
+					Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? Array.Empty<string>() : new string[] { "mailto:" + this.contactEMail },
 						this.acceptToS);
 
 					await Status.Raise(this, "Account created.");

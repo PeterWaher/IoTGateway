@@ -21,7 +21,7 @@ namespace Waher.IoTGateway.Setup
 		private static NotificationConfiguration instance = null;
 		private HttpResource testAddresses = null;
 
-		private CaseInsensitiveString[] addresses = new CaseInsensitiveString[0];
+		private CaseInsensitiveString[] addresses = Array.Empty<CaseInsensitiveString>();
 
 		/// <summary>
 		/// Notification Configuration

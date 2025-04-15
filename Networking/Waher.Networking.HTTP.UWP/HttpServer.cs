@@ -247,7 +247,7 @@ namespace Waher.Networking.HTTP
 			this.lastStat = DateTime.UtcNow;
 			this.adaptToNetworkChanges = AdaptToNetworkChanges;
 
-			this.httpPorts = new int[0];
+			this.httpPorts = Array.Empty<int>();
 
 #if WINDOWS_UWP
 			Task _ = this.AddHttpPorts(HttpPorts);
@@ -256,7 +256,7 @@ namespace Waher.Networking.HTTP
 				NetworkInformation.NetworkStatusChanged += this.NetworkChange_NetworkAddressChanged;
 #else
 			this.AddHttpPorts(HttpPorts);
-			this.httpsPorts = new int[0];
+			this.httpsPorts = Array.Empty<int>();
 			this.AddHttpsPorts(HttpsPorts);
 
 			if (this.adaptToNetworkChanges)
@@ -289,7 +289,7 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				int[] HttpPorts = this.httpPorts;
-				this.httpPorts = new int[0];
+				this.httpPorts = Array.Empty<int>();
 
 #if WINDOWS_UWP
 				LinkedList<KeyValuePair<StreamSocketListener, Guid>> Listeners = this.listeners;
@@ -310,7 +310,7 @@ namespace Waher.Networking.HTTP
 				await this.AddHttpPorts(HttpPorts, Listeners);
 #else
 				int[] HttpsPorts = this.httpsPorts;
-				this.httpsPorts = new int[0];
+				this.httpsPorts = Array.Empty<int>();
 				LinkedList<KeyValuePair<TcpListener, bool>> Listeners = this.listeners;
 				this.listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
 

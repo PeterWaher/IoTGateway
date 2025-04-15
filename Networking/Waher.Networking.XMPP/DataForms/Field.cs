@@ -6,6 +6,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Events;
+using System;
 
 namespace Waher.Networking.XMPP.DataForms
 {
@@ -190,7 +191,7 @@ namespace Waher.Networking.XMPP.DataForms
 				if (this.required)
 					this.error = "Required field.";
 
-				Result = new object[0];
+				Result = Array.Empty<object>();
 			}
 			else if (!(Value is null))
 			{

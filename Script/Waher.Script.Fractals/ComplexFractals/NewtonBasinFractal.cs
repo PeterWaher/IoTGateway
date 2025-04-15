@@ -273,9 +273,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			ChunkedList<double> AttractorsR = new ChunkedList<double>();
 			ChunkedList<double> AttractorsI = new ChunkedList<double>();
 			ChunkedList<int> AttractorColors = new ChunkedList<int>();
-			double[] AttractorsR2 = new double[0];
-			double[] AttractorsI2 = new double[0];
-			int[] AttractorsColors2 = new int[0];
+			double[] AttractorsR2 = Array.Empty<double>();
+			double[] AttractorsI2 = Array.Empty<double>();
+			int[] AttractorsColors2 = Array.Empty<int>();
 			double r0, i0, r1, i1;
 			double dr, di;
 			double r, i;
@@ -449,9 +449,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			ChunkedList<double> AttractorsR = new ChunkedList<double>();
 			ChunkedList<double> AttractorsI = new ChunkedList<double>();
 			ChunkedList<int> AttractorColors = new ChunkedList<int>();
-			double[] AttractorsR2 = new double[0];
-			double[] AttractorsI2 = new double[0];
-			int[] AttractorsColors2 = new int[0];
+			double[] AttractorsR2 = Array.Empty<double>();
+			double[] AttractorsI2 = Array.Empty<double>();
+			int[] AttractorsColors2 = Array.Empty<int>();
 			double r0, i0, r1, i1;
 			double dr, di;
 			double r, i;
@@ -648,9 +648,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 			ChunkedList<double> AttractorsR = new ChunkedList<double>();
 			ChunkedList<double> AttractorsI = new ChunkedList<double>();
 			ChunkedList<int> AttractorColors = new ChunkedList<int>();
-			double[] AttractorsR2 = new double[0];
-			double[] AttractorsI2 = new double[0];
-			int[] AttractorsColors2 = new int[0];
+			double[] AttractorsR2 = Array.Empty<double>();
+			double[] AttractorsI2 = Array.Empty<double>();
+			int[] AttractorsColors2 = Array.Empty<int>();
 			double r0, i0, r1, i1;
 			double dr, di;
 			double r, i;

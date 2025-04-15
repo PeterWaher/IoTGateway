@@ -37,7 +37,7 @@ namespace Waher.Networking.XMPP.Push
 		/// <summary>
 		/// Implemented extensions.
 		/// </summary>
-		public override string[] Extensions => new string[0];
+		public override string[] Extensions => Array.Empty<string>();
 
 		#region New Token
 

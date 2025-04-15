@@ -483,7 +483,7 @@ namespace Waher.Script.Persistence.SPARQL
 						}
 					}
 
-					return new ObjectValue(new SparqlResultSet(ColumnNames.ToArray(), new Uri[0],
+					return new ObjectValue(new SparqlResultSet(ColumnNames.ToArray(), Array.Empty<Uri>(),
 						Records.ToArray()));
 
 				case QueryType.Construct:

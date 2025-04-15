@@ -209,7 +209,7 @@ namespace Waher.Networking.XMPP.MUC
 
 			Result = new UserPresenceEventArgs(e, RoomId, Domain, NickName,
 				Affiliation, Role, FullJid, Reason, RoomDestroyed,
-				Status?.ToArray() ?? new MucStatus[0]);
+				Status?.ToArray() ?? Array.Empty<MucStatus>());
 
 			return true;
 		}

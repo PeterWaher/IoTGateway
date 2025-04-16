@@ -589,10 +589,10 @@ namespace Waher.IoTGateway
 													exceptionFile.Write(sb.ToString());
 													exceptionFile.Flush();
 												}
-											}
 
-											if (firstChanceExceptions?.HasSniffers ?? false)
-												firstChanceExceptions.Exception(e.Exception);
+												if (firstChanceExceptions?.HasSniffers ?? false)
+													firstChanceExceptions.Exception(e.Exception);
+											}
 										};
 									}
 								}

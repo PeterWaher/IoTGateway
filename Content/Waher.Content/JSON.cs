@@ -792,5 +792,29 @@ namespace Waher.Content
 		}
 
 		#endregion
+
+		#region Pretty JSON
+
+		/// <summary>
+		/// Reformats JSON to make it easier to read.
+		/// </summary>
+		/// <param name="Json">JSON</param>
+		/// <returns>Reformatted JSON.</returns>
+		public static string PrettyJson(string Json)
+		{
+			return Encode(Parse(Json), true);
+		}
+
+		/// <summary>
+		/// Reformats JSON to make it easier to read.
+		/// </summary>
+		/// <param name="Object">Object to encode into pretty JSON</param>
+		/// <returns>Reformatted JSON.</returns>
+		public static string PrettyJson(object Object)
+		{
+			return Encode(Object, true);
+		}
+
+		#endregion
 	}
 }

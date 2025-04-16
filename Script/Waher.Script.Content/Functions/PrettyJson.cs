@@ -35,7 +35,12 @@ namespace Waher.Script.Content.Functions
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			return new StringValue(JSON.Encode(Argument.AssociatedObjectValue, true));
+			object Obj = Argument.AssociatedObjectValue;
+
+			if (Obj is string s)
+				return new StringValue(JSON.PrettyJson(s));
+			else
+				return new StringValue(JSON.PrettyJson(Obj));
 		}
 	}
 }

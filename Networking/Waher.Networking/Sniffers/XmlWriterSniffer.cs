@@ -323,20 +323,26 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public override async Task DisposeAsync()
 		{
-			await this.semaphore.BeginWrite();
-			try
+			if (!this.disposed)
 			{
-				this.disposed = true;
-				
-				await base.DisposeAsync();
-				
-				this.DisposeOutput();
-				this.semaphore.Dispose();   // End writing
-			}
-			catch (Exception ex)
-			{
-				await this.semaphore.EndWrite();    // Only needed in case there's an Exception
-				Log.Exception(ex);
+				await this.semaphore.BeginWrite();
+				try
+				{
+					if (!this.disposed)
+					{
+						this.disposed = true;
+
+						await base.DisposeAsync();
+
+						this.DisposeOutput();
+						this.semaphore.Dispose();   // End writing
+					}
+				}
+				catch (Exception ex)
+				{
+					await this.semaphore.EndWrite();    // Only needed in case there's an Exception
+					Log.Exception(ex);
+				}
 			}
 		}
 	}

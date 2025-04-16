@@ -304,7 +304,7 @@ namespace Waher.Content.Markdown
 				return null;
 
 			string Header = Markdown.Substring(0, M.Index);
-			string[] Rows = Header.Split(CommonTypes.CRLF);
+			string[] Rows = Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 			string s;
 
 			foreach (string Row in Rows)

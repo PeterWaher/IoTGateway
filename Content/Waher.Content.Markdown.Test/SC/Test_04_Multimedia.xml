@@ -164,3 +164,46 @@
 		<text>PNG as a code block</text>
 	</caption>
 </imageStandalone>
+<paragraph>
+	<text>&lt;identityReview xmlns="urn:nf:iot:leg:id:1.0" id="2f924a41-2664-df86-740c-6ae6f348b6a9@legal.neuron.kikkin.io"&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="ID" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="Account" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="Provider" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="State" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="Created" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="Updated" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="From" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="To" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="JID" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="EMAIL" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="PHONE" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="AGENT" service="Waher.Service.IoTBroker.Legal.LegalComponent" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="FULLNAME" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="PNR" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="COUNTRY" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="ADDR" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="CITY" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedClaim claim="REGION" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>	&lt;validatedPhoto fileName="ProfilePhoto.jpeg" service="TAG.Identity.Serpro.ServiceModule" /&gt;</text>
+	<lineBreak />
+	<text>&lt;/identityReview&gt;</text>
+</paragraph>

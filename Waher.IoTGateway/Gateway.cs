@@ -92,6 +92,7 @@ using Waher.Things.SourceEvents;
 using Waher.Reports;
 using Waher.Reports.Files;
 using System.Runtime.CompilerServices;
+using Waher.Runtime.Collections;
 
 namespace Waher.IoTGateway
 {
@@ -1437,10 +1438,26 @@ namespace Waher.IoTGateway
 						}
 					}
 
-					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
+					ChunkedList<IModule> FailedModules = new ChunkedList<IModule>();
+
+					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder(), null, FailedModules))
 						Log.Informational("Server started.");
 					else
-						Log.Critical("Unable to start all modules.");
+					{
+						StringBuilder sb = new StringBuilder();
+
+						sb.AppendLine("Unable to start all modules. The following modules failed to load:");
+						sb.AppendLine();
+
+						foreach (IModule Module in FailedModules)
+						{
+							sb.Append("* `");
+							sb.Append(typeof(Module).FullName);
+							sb.AppendLine("`");
+						}
+
+						Log.Critical(sb.ToString());
+					}
 
 					await ProcessServiceConfigurations(false);
 

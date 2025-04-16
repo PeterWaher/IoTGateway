@@ -199,8 +199,7 @@ namespace Waher.Runtime.Queue
 			{
 				Task.Run(() => Idle.TrySetResult(true));
 				return Task.CompletedTask;
-			}
-			;
+			};
 
 			this.OnIdle += OnIdle;
 			try

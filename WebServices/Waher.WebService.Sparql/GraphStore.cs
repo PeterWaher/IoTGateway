@@ -97,7 +97,7 @@ namespace Waher.WebService.Sparql
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.GetPrivileges))
 			{
-				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				await Response.SendResponse(new ForbiddenException(Request, "Access to store denied."));
 				return;
 			}
 
@@ -228,7 +228,7 @@ namespace Waher.WebService.Sparql
 				throw new BadRequestException("Graph URI must be an absolute URI.");
 
 			if (Gateway.IsDomain(ParsedUri.Host, true))
-				throw new ForbiddenException("Unauthorized access to server domain.");
+				throw new ForbiddenException(Request, "Unauthorized access to server domain.");
 
 			GraphReference Reference = await Database.FindFirstIgnoreRest<GraphReference>(
 				new FilterFieldEqualTo("GraphUri", GraphUri));
@@ -249,7 +249,7 @@ namespace Waher.WebService.Sparql
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.AddPrivileges))
 			{
-				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				await Response.SendResponse(new ForbiddenException(Request, "Access to store denied."));
 				return;
 			}
 
@@ -474,7 +474,7 @@ namespace Waher.WebService.Sparql
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.DeletePrivileges))
 			{
-				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				await Response.SendResponse(new ForbiddenException(Request, "Access to store denied."));
 				return;
 			}
 
@@ -511,7 +511,7 @@ namespace Waher.WebService.Sparql
 		{
 			if (Request.User is null || !Request.User.HasPrivilege(SparqlServiceModule.UpdatePrivileges))
 			{
-				await Response.SendResponse(new ForbiddenException("Access to store denied."));
+				await Response.SendResponse(new ForbiddenException(Request, "Access to store denied."));
 				return;
 			}
 

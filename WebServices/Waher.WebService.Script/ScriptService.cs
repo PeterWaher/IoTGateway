@@ -150,7 +150,7 @@ namespace Waher.WebService.Script
 
 					if (!Exp.ForAll(this.IsAuthorized, User, SearchMethod.TreeOrder))
 					{
-						State.NewResult(new ObjectValue(new ForbiddenException("Unauthorized to execute expression.")));
+						State.NewResult(new ObjectValue(new ForbiddenException(Request, "Unauthorized to execute expression.")));
 						return;
 					}
 

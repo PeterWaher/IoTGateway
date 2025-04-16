@@ -52,7 +52,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				if (Request.DataStream.Length >= 65536)
 				{
-					await Response.SendResponse(new ForbiddenException("Content to echo may not exceed 64 kB."));
+					await Response.SendResponse(new ForbiddenException(Request, "Content to echo may not exceed 64 kB."));
 					return;
 				}
 

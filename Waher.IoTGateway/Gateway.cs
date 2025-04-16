@@ -4607,11 +4607,13 @@ namespace Waher.IoTGateway
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
 		public static Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
-			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
-			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Callback, Timeout);
+			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Callback, Timeout, Request);
 		}
 
 		/// <summary>
@@ -4638,11 +4640,13 @@ namespace Waher.IoTGateway
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
 		public static Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
-			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
-			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Callback, Timeout);
+			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Callback, Timeout, Request);
 		}
 
 		/// <summary>

@@ -1409,12 +1409,14 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
 		public Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
-			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
 			if (this.protectWithPassword)
-				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
+				throw new ForbiddenException(Request, "Petitioning legal identities is protected using passwords on this machine.");
 
 			return this.PetitionLegalIdentity(LegalId, PetitionId, Purpose, string.Empty, Callback, Timeout);
 		}
@@ -1476,17 +1478,20 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Petitions information about a smart contract from its owner.
 		/// </summary>
+		/// 
 		/// <param name="ContractId">ID of petitioned smart contract.</param>
 		/// <param name="PetitionId">A petition ID string used to contract request when response is returned.</param>
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
 		public Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
-			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
 			if (this.protectWithPassword)
-				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
+				throw new ForbiddenException(Request, "Petitioning legal identities is protected using passwords on this machine.");
 
 			return this.PetitionContract(ContractId, PetitionId, Purpose, string.Empty, Callback, Timeout);
 		}

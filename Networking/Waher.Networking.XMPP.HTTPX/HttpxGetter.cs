@@ -384,7 +384,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				BadRequestException.Code => new BadRequestException(Data, ContentType),
 				ConflictException.Code => new ConflictException(Data, ContentType),
 				FailedDependencyException.Code => new FailedDependencyException(Data, ContentType),
-				ForbiddenException.Code => new ForbiddenException(Data, ContentType),
+				ForbiddenException.Code => new ForbiddenException(Response.Request, Data, ContentType),
 				GoneException.Code => new GoneException(Data, ContentType),
 				LockedException.Code => new LockedException(Data, ContentType),
 				MethodNotAllowedException.Code => new MethodNotAllowedException(GetMethods(Response.GetFirstHeader("Allow")), Data, ContentType),

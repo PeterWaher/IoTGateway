@@ -85,7 +85,7 @@ namespace Waher.IoTGateway.WebResources
 
 					if (ParsedContract.HasStatus)
 					{
-						await Response.SendResponse(new ForbiddenException("Contract must not have a status section."));
+						await Response.SendResponse(new ForbiddenException(Request, "Contract must not have a status section."));
 						return;
 					}
 

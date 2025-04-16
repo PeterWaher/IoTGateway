@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Events;
 using Waher.Networking.Sniffers.Model;
 using Waher.Runtime.Threading;
 
@@ -320,13 +321,29 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public override Task DisposeAsync()
+		public override async Task DisposeAsync()
 		{
-			this.disposed = true;
-			this.DisposeOutput();
-			this.semaphore.Dispose();
+			if (!this.disposed)
+			{
+				await this.semaphore.BeginWrite();
+				try
+				{
+					if (!this.disposed)
+					{
+						this.disposed = true;
 
-			return base.DisposeAsync();
+						await base.DisposeAsync();
+
+						this.DisposeOutput();
+						this.semaphore.Dispose();   // End writing
+					}
+				}
+				catch (Exception ex)
+				{
+					await this.semaphore.EndWrite();    // Only needed in case there's an Exception
+					Log.Exception(ex);
+				}
+			}
 		}
 	}
 }

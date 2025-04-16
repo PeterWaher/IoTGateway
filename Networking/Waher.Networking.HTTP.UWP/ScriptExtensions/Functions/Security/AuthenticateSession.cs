@@ -73,17 +73,17 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 				if (Obj is bool UseEncryption)
 				{
 					if (UseEncryption && !Request.Encrypted)
-						throw new ForbiddenException("Access to resource requires encryption.");
+						throw new ForbiddenException(Request, "Access to resource requires encryption.");
 				}
 				else
 				{
 					double MinStrength = Expression.ToDouble(Obj);
 
 					if (!Request.Encrypted)
-						throw new ForbiddenException("Access to resource requires encryption.");
+						throw new ForbiddenException(Request, "Access to resource requires encryption.");
 
 					if (Request.CipherStrength < MinStrength)
-						throw new ForbiddenException("Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
+						throw new ForbiddenException(Request, "Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
 				}
 			}
 

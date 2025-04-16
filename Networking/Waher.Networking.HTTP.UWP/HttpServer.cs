@@ -2113,7 +2113,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.vanityResources.CheckVanityResource(ref SubPath);
 
-				FileName = Folder.GetFullPath(SubPath, null, false, MustExist, out bool Exists);
+				FileName = Folder.GetFullPath(null, SubPath, false, MustExist, out bool Exists);
 
 				return Exists;
 			}

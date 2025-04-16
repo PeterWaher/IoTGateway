@@ -244,7 +244,7 @@ namespace Waher.Networking.HTTP
 
 			if (Header.IfMatch is null && !(Header.IfUnmodifiedSince is null) && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
-				string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, true, out bool Exists);
+				string FullPath = this.GetFullPath(Request, null, true, true, out bool Exists);
 				if (Exists)
 				{
 					DateTime LastModified = File.GetLastWriteTimeUtc(FullPath);
@@ -360,14 +360,16 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Gets the full path of a resource in the folder.
 		/// </summary>
-		/// <param name="SubPath">Sub-path or resource.</param>
-		/// <param name="Header">Optional Request header.</param>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="AltSubPath">Alternative sub-path, if request subpath not available.</param>
 		/// <param name="ForbiddenExceptions">If forbidden exceptions can be thrown, if irregularities are found.</param>
 		/// <param name="MustExist">If file must exist.</param>
 		/// <param name="Found">If file name is found.</param>
 		/// <returns>Full path, if found.</returns>
-		internal string GetFullPath(string SubPath, HttpRequestHeader Header, bool ForbiddenExceptions, bool MustExist, out bool Found)
+		internal string GetFullPath(HttpRequest Request, string AltSubPath, bool ForbiddenExceptions, bool MustExist, out bool Found)
 		{
+			string SubPath = Request?.SubPath ?? AltSubPath;
+			HttpRequestHeader Header = Request?.Header;
 			string s = WebUtility.UrlDecode(SubPath).Replace('/', Path.DirectorySeparatorChar);
 			string s2, s3;
 			string ContentType;
@@ -376,7 +378,7 @@ namespace Waher.Networking.HTTP
 			if (ContainsInvalidFileCharacters(s, true, false))
 			{
 				if (ForbiddenExceptions)
-					throw new ForbiddenException("Path control characters not permitted in resource name.");
+					throw new ForbiddenException(Request, "Path control characters not permitted in resource name.");
 				else
 				{
 					Found = false;
@@ -398,7 +400,7 @@ namespace Waher.Networking.HTTP
 					if (ContainsInvalidFileCharacters(Host, false, true))
 					{
 						if (ForbiddenExceptions)
-							throw new ForbiddenException("Path control characters not permitted in Host header.");
+							throw new ForbiddenException(Request, "Path control characters not permitted in Host header.");
 						else
 						{
 							Found = false;
@@ -414,7 +416,7 @@ namespace Waher.Networking.HTTP
 						if (!this.definedDomains.ContainsKey(Host))
 						{
 							if (ForbiddenExceptions)
-								throw new ForbiddenException("Access to this folder is not permitted on this domain.");
+								throw new ForbiddenException(Request, "Access to this folder is not permitted on this domain.");
 							else
 							{
 								Found = false;
@@ -522,7 +524,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request, null, true, true, out bool Exists);
 			if (Exists)
 			{
 				DateTime LastModified = File.GetLastWriteTimeUtc(FullPath);
@@ -1013,7 +1015,7 @@ namespace Waher.Networking.HTTP
 
 			if (Protected)
 			{
-				await Response.SendResponse(new ForbiddenException("Resource is protected."));
+				await Response.SendResponse(new ForbiddenException(Request, "Resource is protected."));
 				return null;
 			}
 
@@ -1167,7 +1169,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request, null, true, true, out bool Exists);
 			if (Exists)
 			{
 				HttpRequestHeader Header = Request.Header;
@@ -1316,7 +1318,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUTPATCH(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, false, out bool _);
+			string FullPath = this.GetFullPath(Request, null, true, false, out bool _);
 
 			if (!Request.HasData)
 			{
@@ -1372,7 +1374,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUTPATCH(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, false, out bool Exists);
+			string FullPath = this.GetFullPath(Request, null, true, false, out bool Exists);
 
 			if (!Request.HasData)
 			{
@@ -1426,7 +1428,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header, true, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request, null, true, true, out bool Exists);
 
 			if (Exists)
 				File.Delete(FullPath);
@@ -1506,7 +1508,7 @@ namespace Waher.Networking.HTTP
 			Variables Session = Request.Session;
 			if (Session is null)
 			{
-				await Response.SendResponse(new ForbiddenException("Session required."));
+				await Response.SendResponse(new ForbiddenException(Request, "Session required."));
 				return;
 			}
 

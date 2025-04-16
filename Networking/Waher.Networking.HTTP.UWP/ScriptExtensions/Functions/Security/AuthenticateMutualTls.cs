@@ -89,17 +89,17 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 				throw new ScriptRuntimeException("Expected a users collection as the second argument.", this);
 
 			if (!Request.Encrypted)
-				throw new ForbiddenException("Access to resource requires encryption.");
+				throw new ForbiddenException(Request, "Access to resource requires encryption.");
 
 			if (Arguments.Length > 2)
 			{
 				double MinStrength = Expression.ToDouble(Arguments[2].AssociatedObjectValue);
 
 				if (!Request.Encrypted)
-					throw new ForbiddenException("Access to resource requires encryption.");
+					throw new ForbiddenException(Request, "Access to resource requires encryption.");
 
 				if (Request.CipherStrength < MinStrength)
-					throw new ForbiddenException("Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
+					throw new ForbiddenException(Request, "Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
 			}
 
 			MutualTlsAuthentication Mechanism = this.last;
@@ -109,7 +109,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 
 			IUser User = await Mechanism.IsAuthenticated(Request);
 			if (User is null)
-				throw new ForbiddenException("Invalid client certificate, or certificate not recognized.");
+				throw new ForbiddenException(Request, "Invalid client certificate, or certificate not recognized.");
 
 			return new ObjectValue(User);
 		}

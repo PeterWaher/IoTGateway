@@ -91,6 +91,7 @@ using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
 using Waher.Reports;
 using Waher.Reports.Files;
+using System.Runtime.CompilerServices;
 
 namespace Waher.IoTGateway
 {
@@ -181,6 +182,7 @@ namespace Waher.IoTGateway
 		private static CaseInsensitiveString[] alternativeDomains = null;
 		private static CaseInsensitiveString ownerJid = null;
 		private static Dictionary<string, string> defaultPageByHostName = null;
+		private static CommunicationLayer firstChanceExceptions = new CommunicationLayer(true);
 		private static string instance;
 		private static string appDataFolder;
 		private static string runtimeFolder;
@@ -588,6 +590,9 @@ namespace Waher.IoTGateway
 													exceptionFile.Flush();
 												}
 											}
+
+											if (firstChanceExceptions?.HasSniffers ?? false)
+												firstChanceExceptions.Exception(e.Exception);
 										};
 									}
 								}
@@ -2151,6 +2156,11 @@ namespace Waher.IoTGateway
 		public static event EventHandlerAsync<GetDataSourcesEventArgs> GetDataSources = null;
 
 		/// <summary>
+		/// Observable layer where first chance exceptions can be monitored.
+		/// </summary>
+		public static CommunicationLayer FirstChanceExceptions => firstChanceExceptions;
+
+		/// <summary>
 		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).
 		/// </summary>
 		private static void Initialize()
@@ -2410,6 +2420,7 @@ namespace Waher.IoTGateway
 					lock (exceptionFile)
 					{
 						exportExceptions = false;
+						firstChanceExceptions = null;
 
 						exceptionFile.WriteLine(new string('-', 80));
 						exceptionFile.Write("End of export: ");

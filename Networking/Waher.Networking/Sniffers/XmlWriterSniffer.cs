@@ -254,7 +254,8 @@ namespace Waher.Networking.Sniffers
 			}
 			finally
 			{
-				await this.semaphore.EndWrite();
+				if (!this.disposed)
+					await this.semaphore.EndWrite();
 			}
 		}
 

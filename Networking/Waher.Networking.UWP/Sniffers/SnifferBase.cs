@@ -47,8 +47,7 @@ namespace Waher.Networking.Sniffers
 
 			if (!(Processor is null))
 			{
-				Processor.CloseForTermination();
-				await Processor.WaitUntilIdle();
+				await Processor.CloseForTermination(true, 10000);
 				await Processor.DisposeAsync();
 			}
 		}

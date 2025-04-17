@@ -46,7 +46,7 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		}
 
 		/// <summary>
-		/// Tokenizes a set of strings.
+		/// Tokenizes a string.
 		/// </summary>
 		/// <param name="Text">String to tokenize.</param>
 		/// <param name="Process">Current tokenization process.</param>

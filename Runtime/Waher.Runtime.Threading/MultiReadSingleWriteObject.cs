@@ -107,7 +107,7 @@ namespace Waher.Runtime.Threading
 				{
 					if (this.disposed)
 						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
-					
+
 					return this.nrReaders;
 				}
 			}
@@ -124,7 +124,7 @@ namespace Waher.Runtime.Threading
 				{
 					if (this.disposed)
 						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
-					
+
 					return this.nrReaders > 0;
 				}
 			}
@@ -141,7 +141,7 @@ namespace Waher.Runtime.Threading
 				{
 					if (this.disposed)
 						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
-					
+
 					return this.isWriting;
 				}
 			}
@@ -158,7 +158,7 @@ namespace Waher.Runtime.Threading
 				{
 					if (this.disposed)
 						throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
-					
+
 					return this.nrReaders > 0 || this.isWriting;
 				}
 			}
@@ -332,7 +332,8 @@ namespace Waher.Runtime.Threading
 
 		/// <summary>
 		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for reading.
-		/// Each successful call to <see cref="TryBeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
+		/// Each successful call to <see cref="TryBeginRead(int)"/> must be followed by exactly 
+		/// one call to <see cref="EndRead"/>.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		public virtual async Task<bool> TryBeginRead(int Timeout)
@@ -406,6 +407,85 @@ namespace Waher.Runtime.Threading
 		}
 
 		/// <summary>
+		/// Waits until object ready for reading, or the attempt is cancelled.
+		/// Each successful call to <see cref="TryBeginRead(CancellationToken)"/> must be followed 
+		/// by exactly one call to <see cref="EndRead"/>.
+		/// </summary>
+		/// <param name="Cancel">Cancellation token</param>
+		/// <returns>If a read lock was obtained (true), or the attempt was cancelled (false).</returns>
+		public virtual async Task<bool> TryBeginRead(CancellationToken Cancel)
+		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
+			if (Cancel.CanBeCanceled)
+			{
+				TaskCompletionSource<bool> Wait = null;
+				bool RecordStackTrace = false;
+
+				Cancel.Register(() =>
+				{
+					Wait?.TrySetResult(false);
+				});
+
+				while (true)
+				{
+					lock (this.synchObj)
+					{
+						if (!this.isWriting)
+						{
+							if (this.nrReaders == 0)
+							{
+								this.token++;
+
+								if (this.recordStackTraces)
+									RecordStackTrace = true;
+							}
+
+							this.nrReaders++;
+						}
+						else if (Cancel.IsCancellationRequested)
+							return false;
+						else
+						{
+							Wait = new TaskCompletionSource<bool>();
+							this.noWriters.AddLast(Wait);
+						}
+					}
+
+					if (Wait is null)
+					{
+						if (RecordStackTrace)
+							this.lockStackTrace = Environment.StackTrace;
+
+						return true;
+					}
+					else
+					{
+						bool Result = await Wait.Task;
+
+						if (!Result)
+						{
+							lock (this.synchObj)
+							{
+								this.noWriters.Remove(Wait);
+							}
+
+							return false;
+						}
+
+						Wait = null;
+					}
+				}
+			}
+			else
+			{
+				await this.BeginRead();
+				return true;
+			}
+		}
+
+		/// <summary>
 		/// Waits until object ready for writing.
 		/// Each call to <see cref="BeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
 		/// </summary>
@@ -423,7 +503,10 @@ namespace Waher.Runtime.Threading
 				lock (this.synchObj)
 				{
 					if (!(Prev is null))
+					{
 						this.noWriters.Remove(Prev);    // In case previously locked for reading
+						this.noReadersOrWriters.Remove(Prev);
+					}
 
 					if (this.nrReaders == 0 && !this.isWriting)
 					{
@@ -510,9 +593,10 @@ namespace Waher.Runtime.Threading
 
 		/// <summary>
 		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for writing.
-		/// Each successful call to <see cref="TryBeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
+		/// Each successful call to <see cref="TryBeginWrite(int)"/> must be followed by exactly one call to <see cref="EndWrite"/>.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>If a write lock was obtained within the given time.</returns>
 		public virtual async Task<bool> TryBeginWrite(int Timeout)
 		{
 			if (this.disposed)
@@ -528,7 +612,10 @@ namespace Waher.Runtime.Threading
 				lock (this.synchObj)
 				{
 					if (!(Prev is null))
+					{
 						this.noWriters.Remove(Prev);    // In case previously locked for reading
+						this.noReadersOrWriters.Remove(Prev);
+					}
 
 					if (this.nrReaders == 0 && !this.isWriting)
 					{
@@ -583,6 +670,93 @@ namespace Waher.Runtime.Threading
 						Wait = null;
 					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// Waits until object ready for writing, or the attempt is cancelled.
+		/// Each successful call to <see cref="TryBeginWrite(CancellationToken)"/> must be followed 
+		/// by exactly one call to <see cref="EndWrite"/>.
+		/// </summary>
+		/// <param name="Cancel">Cancellation token</param>
+		/// <returns>If a write lock was obtained (true), or the attempt was cancelled (false).</returns>
+		public virtual async Task<bool> TryBeginWrite(CancellationToken Cancel)
+		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(MultiReadSingleWriteObject));
+
+			if (Cancel.CanBeCanceled)
+			{
+				TaskCompletionSource<bool> Prev = null;
+				TaskCompletionSource<bool> Wait = null;
+				DateTime Start = DateTime.Now;
+				bool RecordStackeTrace = false;
+
+				Cancel.Register(() =>
+				{
+					Prev?.TrySetResult(false);
+					Wait?.TrySetResult(false);
+				});
+
+				while (true)
+				{
+					lock (this.synchObj)
+					{
+						if (!(Prev is null))
+						{
+							this.noWriters.Remove(Prev);    // In case previously locked for reading
+							this.noReadersOrWriters.Remove(Prev);
+						}
+
+						if (this.nrReaders == 0 && !this.isWriting)
+						{
+							this.token++;
+							this.isWriting = true;
+
+							if (this.recordStackTraces)
+								RecordStackeTrace = true;
+						}
+						else if (Cancel.IsCancellationRequested)
+							return false;
+						else
+						{
+							Wait = new TaskCompletionSource<bool>();
+							this.noWriters.AddLast(Wait);
+							this.noReadersOrWriters.AddLast(Wait);
+						}
+					}
+
+					if (Wait is null)
+					{
+						if (RecordStackeTrace)
+							this.lockStackTrace = Environment.StackTrace;
+
+						return true;
+					}
+					else
+					{
+						bool Result = await Wait.Task;
+
+						if (!Result)
+						{
+							lock (this.synchObj)
+							{
+								this.noWriters.Remove(Wait);
+								this.noReadersOrWriters.Remove(Wait);
+							}
+
+							return false;
+						}
+
+						Prev = Wait;
+						Wait = null;
+					}
+				}
+			}
+			else
+			{
+				await this.BeginWrite();
+				return true;
 			}
 		}
 

@@ -13,6 +13,7 @@ namespace Waher.Runtime.Queue
 	{
 		private readonly CancellationTokenSource[] cancelWaitSources;
 		private readonly CancellationTokenSource[] cancelWorkSources;
+		private readonly T[] currentWorkItem;
 		private readonly Task[] processors;
 		private readonly int nrProcessors;
 		private AsyncQueue<T> queue = new AsyncQueue<T>();
@@ -37,6 +38,7 @@ namespace Waher.Runtime.Queue
 
 			this.cancelWaitSources = new CancellationTokenSource[NrProcessors];
 			this.cancelWorkSources = new CancellationTokenSource[NrProcessors];
+			this.currentWorkItem = new T[NrProcessors];
 
 			for (i = 0; i < this.nrProcessors; i++)
 				this.processors[i] = this.PerformWork(i);
@@ -229,6 +231,7 @@ namespace Waher.Runtime.Queue
 					using (CancellationTokenSource Cancel = new CancellationTokenSource())
 					{
 						this.cancelWorkSources[ProcessorIndex] = Cancel;
+						this.currentWorkItem[ProcessorIndex] = Item;
 						try
 						{
 							await Item.Execute(Cancel.Token);
@@ -242,6 +245,7 @@ namespace Waher.Runtime.Queue
 						finally
 						{
 							this.cancelWorkSources[ProcessorIndex] = null;
+							this.currentWorkItem[ProcessorIndex] = default;
 						}
 					}
 				}

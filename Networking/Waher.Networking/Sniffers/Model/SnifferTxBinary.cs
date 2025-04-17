@@ -37,10 +37,9 @@ namespace Waher.Networking.Sniffers.Model
 		/// Executes the operation.
 		/// </summary>
 		/// <param name="Cancel">Cancellation token.</param>
-		/// <param name="RegisterCancelToken">If task can be cancelled.</param>
-		protected override sealed Task Execute(CancellationToken Cancel, bool RegisterCancelToken)
+		public override sealed Task Execute(CancellationToken Cancel)
 		{
-			return this.Processor.Process(this);
+			return this.Processor.Process(this, Cancel);
 		}
 
 		/// <summary>

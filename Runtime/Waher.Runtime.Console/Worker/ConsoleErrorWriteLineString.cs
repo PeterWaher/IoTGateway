@@ -24,8 +24,7 @@ namespace Waher.Runtime.Console.Worker
 		/// Executes the console operation.
 		/// </summary>
 		/// <param name="Cancel">Cancellation token.</param>
-		/// <param name="RegisterCancelToken">If task can be cancelled.</param>
-		protected override Task Execute(CancellationToken Cancel, bool RegisterCancelToken)
+		public override Task Execute(CancellationToken Cancel)
 		{
 			System.Console.Error.WriteLine(this.value);
 			return Task.CompletedTask;

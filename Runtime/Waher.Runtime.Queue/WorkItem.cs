@@ -15,24 +15,14 @@ namespace Waher.Runtime.Queue
 		/// </summary>
 		public Task Execute()
 		{
-			return this.Execute(CancellationToken.None, false);
+			return this.Execute(CancellationToken.None);
 		}
 
 		/// <summary>
 		/// Executes the operation.
 		/// </summary>
 		/// <param name="Cancel">Cancellation token.</param>
-		public Task Execute(CancellationToken Cancel)
-		{
-			return this.Execute(Cancel, true);
-		}
-
-		/// <summary>
-		/// Executes the operation.
-		/// </summary>
-		/// <param name="Cancel">Cancellation token.</param>
-		/// <param name="RegisterCancelToken">If task can be cancelled.</param>
-		protected abstract Task Execute(CancellationToken Cancel, bool RegisterCancelToken);
+		public abstract Task Execute(CancellationToken Cancel);
 
 		/// <summary>
 		/// Flags the item as processed.
@@ -59,7 +49,9 @@ namespace Waher.Runtime.Queue
 		/// <returns>If item was processed successfully.</returns>
 		public Task<bool> Wait(CancellationToken Cancel)
 		{
-			Cancel.Register(() => this.processed.TrySetResult(false));
+			if (Cancel.CanBeCanceled)
+				Cancel.Register(() => this.processed.TrySetResult(false));
+
 			return this.processed.Task;
 		}
 	}

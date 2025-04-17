@@ -94,7 +94,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				
 				this.pendingRequests.AddLast(Request);
 
-				if (CancellationToken.HasValue)
+				if (CancellationToken.HasValue && CancellationToken.Value.CanBeCanceled)
 					CancellationToken.Value.Register(() => Request.Request.TrySetException(new OperationCanceledException()));
 
 				return Request.Request.Task;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
@@ -65,19 +66,23 @@ namespace Waher.Networking.Sniffers
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			this.lastEvent = Event.Timestamp;
 
-			return this.HexOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Rx");
+			return this.HexOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Rx", Cancel);
 		}
 
-		private async Task HexOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, string TagName)
+		private async Task HexOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, 
+			string TagName, CancellationToken Cancel)
 		{
 			if (this.disposed)
 				return;
 
-			await this.semaphore.BeginWrite();
+			if (!await this.semaphore.TryBeginWrite(Cancel))
+				return; // Operation cancelled.
+
 			try
 			{
 				await this.BeforeWrite();
@@ -194,28 +199,33 @@ namespace Waher.Networking.Sniffers
 		/// Processes a binary transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
-			return this.HexOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Tx");
+			return this.HexOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Tx", Cancel);
 		}
 
 		/// <summary>
 		/// Processes a text reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
-			return this.WriteLine(Event.Timestamp, "Rx", Event.Text);
+			return this.WriteLine(Event.Timestamp, "Rx", Event.Text, Cancel);
 		}
 
-		private async Task WriteLine(DateTime Timestamp, string TagName, string Text)
+		private async Task WriteLine(DateTime Timestamp, string TagName, string Text, 
+			CancellationToken Cancel)
 		{
 			if (this.disposed)
 				return;
 
 			Text = CommunicationLayer.EncodeControlCharacters(Text);
 
-			await this.semaphore.BeginWrite();
+			if (!await this.semaphore.TryBeginWrite(Cancel))
+				return;	// Operation cancelled.
+
 			try
 			{
 				try
@@ -268,45 +278,50 @@ namespace Waher.Networking.Sniffers
 		/// Processes a text transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
-			return this.WriteLine(Event.Timestamp, "Tx", Event.Text);
+			return this.WriteLine(Event.Timestamp, "Tx", Event.Text, Cancel);
 		}
 
 		/// <summary>
 		/// Processes an information event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferInformation Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
-			return this.WriteLine(Event.Timestamp, "Info", Event.Text);
+			return this.WriteLine(Event.Timestamp, "Info", Event.Text, Cancel);
 		}
 
 		/// <summary>
 		/// Processes a warning event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferWarning Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
-			return this.WriteLine(Event.Timestamp, "Warning", Event.Text);
+			return this.WriteLine(Event.Timestamp, "Warning", Event.Text, Cancel);
 		}
 
 		/// <summary>
 		/// Processes an error event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferError Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
-			return this.WriteLine(Event.Timestamp, "Error", Event.Text);
+			return this.WriteLine(Event.Timestamp, "Error", Event.Text, Cancel);
 		}
 
 		/// <summary>
 		/// Processes an exception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferException Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
-			return this.WriteLine(Event.Timestamp, "Exception", Event.Text);
+			return this.WriteLine(Event.Timestamp, "Exception", Event.Text, Cancel);
 		}
 
 		/// <summary>

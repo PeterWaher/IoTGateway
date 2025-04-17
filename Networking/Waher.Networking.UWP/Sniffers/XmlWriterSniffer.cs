@@ -74,7 +74,7 @@ namespace Waher.Networking.Sniffers
 			return this.HexOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Rx", Cancel);
 		}
 
-		private async Task HexOutput(DateTime Timestamp, byte[] Data, int Offset, int Count, 
+		private async Task HexOutput(DateTime Timestamp, byte[] Data, int Offset, int Count,
 			string TagName, CancellationToken Cancel)
 		{
 			if (this.disposed)
@@ -215,7 +215,7 @@ namespace Waher.Networking.Sniffers
 			return this.WriteLine(Event.Timestamp, "Rx", Event.Text, Cancel);
 		}
 
-		private async Task WriteLine(DateTime Timestamp, string TagName, string Text, 
+		private async Task WriteLine(DateTime Timestamp, string TagName, string Text,
 			CancellationToken Cancel)
 		{
 			if (this.disposed)
@@ -224,7 +224,7 @@ namespace Waher.Networking.Sniffers
 			Text = CommunicationLayer.EncodeControlCharacters(Text);
 
 			if (!await this.semaphore.TryBeginWrite(Cancel))
-				return;	// Operation cancelled.
+				return; // Operation cancelled.
 
 			try
 			{
@@ -341,23 +341,20 @@ namespace Waher.Networking.Sniffers
 		{
 			if (!this.disposed)
 			{
-				await this.semaphore.BeginWrite();
+				this.disposed = true;
+
 				try
 				{
-					if (!this.disposed)
-					{
-						this.disposed = true;
-
-						await base.DisposeAsync();
-
-						this.DisposeOutput();
-						this.semaphore.Dispose();   // End writing
-					}
+					await base.DisposeAsync();
+					this.DisposeOutput();
 				}
 				catch (Exception ex)
 				{
-					await this.semaphore.EndWrite();    // Only needed in case there's an Exception
 					Log.Exception(ex);
+				}
+				finally
+				{
+					this.semaphore.Dispose();   // End writing
 				}
 			}
 		}

@@ -113,18 +113,20 @@ namespace Waher.Runtime.Queue
 			for (int i = 0; i < this.nrProcessors; i++)
 				this.cancelWaitSources[i]?.Cancel();
 
-			if (Timeout > 0 && Timeout < int.MaxValue)
-			{
-				_ = Task.Delay(Timeout).ContinueWith((_) =>
-				{
-					for (int i = 0; i < this.nrProcessors; i++)
-						this.cancelWorkSources[i]?.Cancel();
-				});
-			}
-
 			if (!this.terminated)
 			{
-				await Task.WhenAll(this.processors);
+				if (Timeout > 0 && Timeout < int.MaxValue)
+				{
+					_ = Task.Delay(Timeout).ContinueWith((_) =>
+					{
+						for (int i = 0; i < this.nrProcessors; i++)
+							this.cancelWorkSources[i]?.Cancel();
+					});
+				}
+
+				if (WaitForCompletion)
+					await Task.WhenAll(this.processors);
+
 				this.terminated = true;
 			}
 		}

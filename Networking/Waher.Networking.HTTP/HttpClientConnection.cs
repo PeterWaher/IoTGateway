@@ -2068,7 +2068,9 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				if (NetworkingModule.Stopping)
+				if (this.client is null)
+					return false;
+				else if (NetworkingModule.Stopping)
 				{
 					await this.SendResponse(Request, null, new ServiceUnavailableException("Service is shutting down. Please try again later."), true,
 						new KeyValuePair<string, string>("Retry-After", "300"));    // Try again in 5 minutes.

@@ -30,7 +30,7 @@ namespace Waher.Client.WPF.Model
 
 			MenuItem Item;
 
-			this.GroupSeparator(ref CurrentGroup, "XMPP", Menu);
+			GroupSeparator(ref CurrentGroup, "XMPP", Menu);
 
 			Menu.Items.Add(Item = new MenuItem()
 			{

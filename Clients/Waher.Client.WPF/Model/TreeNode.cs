@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
@@ -13,29 +14,23 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things.DisplayableParameters;
-using Waher.Networking;
 
 namespace Waher.Client.WPF.Model
 {
 	/// <summary>
 	/// Abstract base class for tree nodes in the connection view.
 	/// </summary>
-	public abstract class TreeNode : SelectableItem, IDisposable
+	/// <remarks>
+	/// Abstract base class for tree nodes in the connection view.
+	/// </remarks>
+	/// <param name="Parent">Parent node.</param>
+	public abstract class TreeNode(TreeNode Parent) : SelectableItem, IDisposable
 	{
-		private readonly TreeNode parent;
-		protected DisplayableParameters parameters = null;
-		protected SortedDictionary<string, TreeNode> children = null;
-		private object tag = null;
+		private readonly TreeNode parent = Parent;
+		protected DisplayableParameters? parameters = null;
+		protected SortedDictionary<string, TreeNode>? children = null;
+		private object? tag = null;
 		private bool expanded = false;
-
-		/// <summary>
-		/// Abstract base class for tree nodes in the connection view.
-		/// </summary>
-		/// <param name="Parent">Parent node.</param>
-		public TreeNode(TreeNode Parent)
-		{
-			this.parent = Parent;
-		}
 
 		/// <summary>
 		/// Key in parent child collection.
@@ -68,7 +63,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Children of the node. If null, children are not loaded.
 		/// </summary>
-		public TreeNode[] Children
+		public TreeNode[]? Children
 		{
 			get
 			{
@@ -93,8 +88,14 @@ namespace Waher.Client.WPF.Model
 		/// <param name="ChildKey">Child Key</param>
 		/// <param name="Child">Child, if found, or null otherwise.</param>
 		/// <returns>If a child with the given key was found.</returns>
-		public bool TryGetChild(string ChildKey, out TreeNode Child)
+		public bool TryGetChild(string ChildKey, [NotNullWhen(true)] out TreeNode? Child)
 		{
+			if (this.children is null)
+			{
+				Child = null;
+				return false;
+			}
+
 			lock (this.children)
 			{
 				return this.children.TryGetValue(ChildKey, out Child);
@@ -109,7 +110,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Object tagged to the node.
 		/// </summary>
-		public object Tag
+		public object? Tag
 		{
 			get => this.tag;
 			set => this.tag = value;
@@ -155,7 +156,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Secondary image resource for the node.
 		/// </summary>
-		public virtual ImageSource ImageResource2
+		public virtual ImageSource? ImageResource2
 		{
 			get { return null; }
 		}
@@ -193,7 +194,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				if (!(this.parameters is null))
+				if (this.parameters is not null)
 					return this.parameters[DisplayableParameter];
 				else
 					return string.Empty;
@@ -211,12 +212,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Gets available displayable parameters.
 		/// </summary>
-		public virtual DisplayableParameters DisplayableParameters => this.parameters;
+		public virtual DisplayableParameters? DisplayableParameters => this.parameters;
 
 		/// <summary>
 		/// Raised when the node has been updated. The sender argument will contain a reference to the node.
 		/// </summary>
-		public event EventHandler Updated = null;
+		public event EventHandler? Updated = null;
 
 		/// <summary>
 		/// Raises the <see cref="Updated"/> event.
@@ -249,12 +250,12 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Event raised when the node has been expanded.
 		/// </summary>
-		public event EventHandler Expanded = null;
+		public event EventHandler? Expanded = null;
 
 		/// <summary>
 		/// Event raised when the node has been collapsed.
 		/// </summary>
-		public event EventHandler Collapsed = null;
+		public event EventHandler? Collapsed = null;
 
 		/// <summary>
 		/// Raises the <see cref="Expanded"/> event.
@@ -309,7 +310,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		protected virtual void UnloadGrandchildren()
 		{
-			if (!(this.children is null))
+			if (this.children is not null)
 			{
 				foreach (TreeNode Node in this.children.Values)
 					Node.UnloadChildren();
@@ -451,7 +452,7 @@ namespace Waher.Client.WPF.Model
 		/// <returns>If the node was found and removed.</returns>
 		public virtual bool RemoveChild(TreeNode Node)
 		{
-			if (!(this.children is null))
+			if (this.children is not null)
 			{
 				lock (this.children)
 				{
@@ -464,7 +465,7 @@ namespace Waher.Client.WPF.Model
 
 		internal void RenameChild(string OldKey, string NewKey, TreeNode Node)
 		{
-			if (!(this.children is null))
+			if (this.children is not null)
 			{
 				lock (this.children)
 				{
@@ -588,10 +589,10 @@ namespace Waher.Client.WPF.Model
 			Mouse.OverrideCursor = Cursors.Wait;
 			this.GetConfigurationForm((Sender, e2) =>
 			{
-				if (e2.Ok && !(e2.Form is null))
-					MainWindow.UpdateGui(MainWindow.currentInstance.ShowForm, e2.Form);
+				if (e2.Ok && e2.Form is not null)
+					MainWindow.UpdateGui(MainWindow.currentInstance!.ShowForm, e2.Form);
 				else
-					MainWindow.UpdateGui(MainWindow.currentInstance.ShowError, e2);
+					MainWindow.UpdateGui(MainWindow.currentInstance!.ShowError, e2);
 
 				return Task.CompletedTask;
 			}, null);
@@ -603,7 +604,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object State)
+		public virtual Task GetConfigurationForm(EventHandlerAsync<DataFormEventArgs> Callback, object? State)
 		{
 			throw new NotSupportedException();
 		}
@@ -648,7 +649,7 @@ namespace Waher.Client.WPF.Model
 				});
 			}
 
-			if (!(this.Parent is null) && this.Parent.CanDelete)
+			if (this.Parent is not null && this.Parent.CanDelete)
 			{
 				CurrentGroup = "Edit";
 				Menu.Items.Add(new MenuItem()
@@ -700,7 +701,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.CanRecycle)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Connection", Menu);
+				GroupSeparator(ref CurrentGroup, "Connection", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "_Refresh",
@@ -717,7 +718,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.IsSniffable)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Connection", Menu);
+				GroupSeparator(ref CurrentGroup, "Connection", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "_Sniff...",
@@ -734,7 +735,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.CanChat)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				GroupSeparator(ref CurrentGroup, "Communication", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "C_hat...",
@@ -751,7 +752,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.CanReadSensorData)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				GroupSeparator(ref CurrentGroup, "Communication", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "Read _Momentary Values...",
@@ -781,7 +782,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.CanSubscribeToSensorData)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				GroupSeparator(ref CurrentGroup, "Communication", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "Su_bscribe to Momentary Values...",
@@ -798,7 +799,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.CanConfigure)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Communication", Menu);
+				GroupSeparator(ref CurrentGroup, "Communication", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "Configure _Parameters...",
@@ -815,7 +816,7 @@ namespace Waher.Client.WPF.Model
 
 			if (this.CanSearch)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+				GroupSeparator(ref CurrentGroup, "Database", Menu);
 				Menu.Items.Add(new MenuItem()
 				{
 					Header = "_Search",
@@ -840,7 +841,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		protected void GroupSeparator(ref string CurrentGroup, string Group, ContextMenu Menu)
+		protected static void GroupSeparator(ref string CurrentGroup, string Group, ContextMenu Menu)
 		{
 			if (CurrentGroup != Group)
 			{

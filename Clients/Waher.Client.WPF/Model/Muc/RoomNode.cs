@@ -595,7 +595,7 @@ namespace Waher.Client.WPF.Model.Muc
 			MenuItem Item;
 			MenuItem Item2;
 
-			this.GroupSeparator(ref CurrentGroup, "MUC", Menu);
+			GroupSeparator(ref CurrentGroup, "MUC", Menu);
 
 			Menu.Items.Add(Item = new MenuItem()
 			{

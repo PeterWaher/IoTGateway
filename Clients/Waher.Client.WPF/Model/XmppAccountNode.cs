@@ -1486,7 +1486,7 @@ namespace Waher.Client.WPF.Model
 
 			if (Node == this)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Connection", Menu);
+				GroupSeparator(ref CurrentGroup, "Connection", Menu);
 
 				Menu.Items.Add(Item = new MenuItem()
 				{

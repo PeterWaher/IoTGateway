@@ -251,7 +251,7 @@ namespace Waher.Client.WPF.Model.Muc
 			MenuItem Affiliation;
 			MenuItem Role;
 
-			this.GroupSeparator(ref CurrentGroup, "MUC", Menu);
+			GroupSeparator(ref CurrentGroup, "MUC", Menu);
 
 			Menu.Items.Add(Affiliation = new MenuItem()
 			{

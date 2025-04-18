@@ -457,7 +457,7 @@ namespace Waher.Client.WPF.Model.PubSub
 
 			base.AddContexMenuItems(ref CurrentGroup, Menu);
 
-			this.GroupSeparator(ref CurrentGroup, "PubSubNode", Menu);
+			GroupSeparator(ref CurrentGroup, "PubSubNode", Menu);
 
 			Menu.Items.Add(MenuItem = new MenuItem()
 			{

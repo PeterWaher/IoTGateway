@@ -747,7 +747,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 		private byte[] CreateFrame(byte[] Bin, WebSocketOpcode OpCode, bool More)
 		{
-			if (this.connection.HasSniffers)
+			if (this.connection?.HasSniffers ?? false)
 				this.connection.Information(OpCode.ToString());
 
 			int Len = Bin?.Length ?? 0;

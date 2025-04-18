@@ -298,9 +298,13 @@ namespace Waher.Client.WPF.Model
 			string HTML = HtmlDocument.GetBody(await Markdown.GenerateHTML()).Trim();
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append("<body>");
-			sb.Append(XML.Encode(PlainText));
-			sb.Append("</body>");
+			if (!string.IsNullOrEmpty(PlainText))
+			{
+				sb.Append("<body>");
+				sb.Append(XML.Encode(PlainText));
+				sb.Append("</body>");
+			}
+
 			sb.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
 			sb.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
 			sb.Append(HTML);

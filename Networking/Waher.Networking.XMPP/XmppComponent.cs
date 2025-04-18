@@ -2292,9 +2292,12 @@ namespace Waher.Networking.XMPP
 				Xml.Append("</subject>");
 			}
 
-			Xml.Append("<body>");
-			Xml.Append(XML.Encode(Body));
-			Xml.Append("</body>");
+			if (!string.IsNullOrEmpty(Body))
+			{
+				Xml.Append("<body>");
+				Xml.Append(XML.Encode(Body));
+				Xml.Append("</body>");
+			}
 
 			if (!string.IsNullOrEmpty(ThreadId))
 			{

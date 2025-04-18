@@ -37,7 +37,7 @@ namespace Waher.Security.SPF.Mechanisms
 
 			try
 			{
-				IPAddress[] Addresses = await DnsResolver.LookupIP4Addresses(Domain);   // Always IPv4, regardless of connection type.
+				IPAddress[] Addresses = await DnsResolver.TryLookupIP4Addresses(Domain);   // Always IPv4, regardless of connection type.
 				if (Addresses is null || Addresses.Length == 0)
 					return SpfResult.Fail;
 				else

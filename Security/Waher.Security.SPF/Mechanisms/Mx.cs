@@ -32,20 +32,22 @@ namespace Waher.Security.SPF.Mechanisms
 				throw new Exception("DNS Lookup maximum reached.");
 
 			string TargetDomain = this.TargetDomain;
-			string[] Exchanges = await DnsResolver.LookupMailExchange(TargetDomain);
+			string[] Exchanges = await DnsResolver.TryLookupMailExchange(TargetDomain);
+			if (Exchanges is null)
+				return SpfResult.Fail;
 
 			foreach (string Exchange in Exchanges)
 			{
 				IPAddress[] Addresses;
 				int Cidr;
-			
+
 				switch (this.term.ip.AddressFamily)
 				{
 					case AddressFamily.InterNetwork:
 						if (this.term.dnsLookupsLeft-- <= 0)
 							throw new Exception("DNS Lookup maximum reached.");
 
-						Addresses = await DnsResolver.LookupIP4Addresses(Exchange);
+						Addresses = await DnsResolver.TryLookupIP4Addresses(Exchange);
 						Cidr = this.ip4Cidr;
 						break;
 
@@ -53,13 +55,16 @@ namespace Waher.Security.SPF.Mechanisms
 						if (this.term.dnsLookupsLeft-- <= 0)
 							throw new Exception("DNS Lookup maximum reached.");
 
-						Addresses = await DnsResolver.LookupIP6Addresses(Exchange);
+						Addresses = await DnsResolver.TryLookupIP6Addresses(Exchange);
 						Cidr = this.ip6Cidr;
 						break;
 
 					default:
 						return SpfResult.Fail;
 				}
+
+				if (Addresses is null)
+					return SpfResult.Fail;
 
 				if (Matches(Addresses, this.term, Cidr))
 					return SpfResult.Pass;

@@ -44,7 +44,9 @@ namespace Waher.Security.SPF.Mechanisms
 					throw new Exception("DNS Lookup maximum reached.");
 
 				string TargetDomain = this.TargetDomain;
-				string[] DomainNames = await DnsResolver.LookupDomainName(this.term.ip);
+				string[] DomainNames = await DnsResolver.TryLookupDomainName(this.term.ip);
+				if (DomainNames is null)
+					return SpfResult.Fail;
 
 				// First check if domain is found.
 

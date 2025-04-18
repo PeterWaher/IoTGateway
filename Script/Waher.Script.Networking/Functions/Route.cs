@@ -90,9 +90,11 @@ namespace Waher.Script.Networking.Functions
 
 				try
 				{
-					string[] Names = await DnsResolver.ReverseDns(Response.Address);
+					string[] Names = await DnsResolver.TryReverseDns(Response.Address);
 
-					if (Names.Length == 1)
+					if (Names is null)
+						E = ObjectValue.Null;
+					else if (Names.Length == 1)
 						E = new StringValue(Names[0]);
 					else
 						E = new ObjectVector(Names);

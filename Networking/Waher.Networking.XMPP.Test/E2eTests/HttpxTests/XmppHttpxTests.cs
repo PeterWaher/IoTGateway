@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.webServer = new HttpServer(8081);
+			this.webServer = new HttpServer(8083);
 
 			this.webServer.Register("/Hello", (Request, Response) =>
 			{

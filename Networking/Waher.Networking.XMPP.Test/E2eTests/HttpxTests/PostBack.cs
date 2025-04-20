@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 				this.queries[string.Empty] = new KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>(null, null);    // Keep cache active to avoid multiple recreation when a series of requests occur in sequence.
 			}
 
-			return Task.FromResult("http://localhost:8081" + this.ResourceName + "/" + Key);
+			return Task.FromResult("http://localhost:8083" + this.ResourceName + "/" + Key);
 		}
 
 		private Task Queries_Removed(object Sender, CacheItemEventArgs<string, KeyValuePair<EventHandlerAsync<PostBackEventArgs>, object>> e)

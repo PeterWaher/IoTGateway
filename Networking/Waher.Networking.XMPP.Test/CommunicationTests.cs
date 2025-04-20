@@ -148,7 +148,10 @@ namespace Waher.Networking.XMPP.Test
 		{
 			return new XmppCredentials()
 			{
-				Host = "waher.se",
+				//Host = "waher.se",
+				//TrustServer = false,
+				Host = "localhost",
+				TrustServer = true,
 				Port = 5222,
 				Account = "xmppclient.test01",
 				Password = "testpassword"
@@ -159,7 +162,10 @@ namespace Waher.Networking.XMPP.Test
 		{
 			return new XmppCredentials()
 			{
-				Host = "waher.se",
+				//Host = "waher.se",
+				//TrustServer = false,
+				Host = "localhost",
+				TrustServer = true,
 				Port = 5222,
 				Account = "xmppclient.test02",
 				Password = "testpassword"

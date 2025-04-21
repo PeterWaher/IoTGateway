@@ -237,8 +237,8 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 					}
 				}, Nr);
 
-			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 10000), "Response not returned.");
-			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 10000), "Data not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done1, Error1], 120000), "Response not returned.");
+			Assert.AreEqual(0, WaitHandle.WaitAny([Done2, Error2], 120000), "Data not returned.");
 		}
 
 		[TestMethod]

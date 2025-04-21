@@ -425,8 +425,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				StanzaSent.TrySetResult(true);
 				return Task.CompletedTask;
-			}
-			;
+			};
 
 			if (!(this.e2e is null))
 			{
@@ -922,7 +921,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.client.Information("Accepting SOCKS5 stream from " + e.From);
 #endif
 				e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId,
-					ClientRec.from, ClientRec.to, ClientRec.e2e, ClientRec.endpointReference, ClientRec.symmetricCipher));
+					ClientRec.From, ClientRec.To, ClientRec.E2e, ClientRec.EndpointReference, ClientRec.SymmetricCipher));
 			}
 		}
 

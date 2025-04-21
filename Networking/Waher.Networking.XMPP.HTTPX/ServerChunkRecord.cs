@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Temporary;
@@ -7,22 +9,24 @@ namespace Waher.Networking.XMPP.HTTPX
 {
 	internal class ServerChunkRecord : ChunkRecord
 	{
-		internal HttpxServer server;
-		internal HttpRequest request;
-		internal IEndToEndEncryption e2e;
-		internal SortedDictionary<int, Chunk> chunks = null;
-		internal TemporaryStream file;
-		internal string id;
-		internal string from;
-		internal string to;
-		internal string e2eReference;
-		internal string postResource;
-		internal int nextChunk = 0;
-		internal int maxChunkSize;
-		internal bool sipub;
-		internal bool ibb;
-		internal bool s5;
-		internal bool jingle;
+		private readonly HttpxServer server;
+		private readonly IEndToEndEncryption e2e;
+		private readonly string id;
+		private readonly string from;
+		private readonly string to;
+		private readonly string e2eReference;
+		private readonly string postResource;
+		private readonly int maxChunkSize;
+		private readonly bool sipub;
+		private readonly bool ibb;
+		private readonly bool s5;
+		private readonly bool jingle;
+		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
+		private HttpRequest request;
+		private SortedDictionary<int, Chunk> chunks = null;
+		private TemporaryStream file;
+		private int nextChunk = 0;
+		private bool disposed = false;
 
 		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request,
 			IEndToEndEncryption E2e, string EndpointReference, TemporaryStream File, int MaxChunkSize, bool Sipub, bool Ibb,
@@ -47,54 +51,62 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal override async Task<bool> ChunkReceived(int Nr, bool Last, bool ConstantBuffer, byte[] Data)
 		{
-			if (Nr == this.nextChunk)
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(ClientChunkRecord));
+
+			await this.synchObj.WaitAsync();
+			try
 			{
-				this.file?.Write(Data, 0, Data.Length);
-				this.nextChunk++;
-
-				if (Last)
-					await this.Done();
-				else
+				if (Nr == this.nextChunk)
 				{
-					while (!(this.chunks is null))
+					this.file?.Write(Data, 0, Data.Length);
+					this.nextChunk++;
+
+					if (Last)
+						await this.DoneLocked();
+					else
 					{
-						if (this.chunks.Count == 0)
-							this.chunks = null;
-						else
+						while (!(this.chunks is null))
 						{
-							foreach (Chunk Chunk in this.chunks.Values)
+							if (this.chunks.Count == 0)
+								this.chunks = null;
+							else
 							{
-								if (Chunk.Nr == this.nextChunk)
+								foreach (Chunk Chunk in this.chunks.Values)
 								{
-									await this.file?.WriteAsync(Chunk.Data, 0, Chunk.Data.Length);
-									this.nextChunk++;
-									this.chunks.Remove(Chunk.Nr);
-
-									if (Chunk.Last)
+									if (Chunk.Nr == this.nextChunk)
 									{
-										await this.Done();
-										this.chunks.Clear();
-									}
+										await this.file?.WriteAsync(Chunk.Data, 0, Chunk.Data.Length);
+										this.nextChunk++;
+										this.chunks.Remove(Chunk.Nr);
 
-									break;
+										if (Chunk.Last)
+											await this.DoneLocked();
+
+										break;
+									}
+									else
+										return true;
 								}
-								else
-									return true;
 							}
 						}
 					}
 				}
-			}
-			else if (Nr > this.nextChunk)
-			{
-				this.chunks ??= new SortedDictionary<int, Chunk>();
-				this.chunks[Nr] = new Chunk(Nr, Last, ConstantBuffer, Data);
-			}
+				else if (Nr > this.nextChunk)
+				{
+					this.chunks ??= new SortedDictionary<int, Chunk>();
+					this.chunks[Nr] = new Chunk(Nr, Last, ConstantBuffer, Data);
+				}
 
-			return true;
+				return true;
+			}
+			finally
+			{
+				this.synchObj.Release();
+			}
 		}
 
-		private Task Done()
+		private async Task DoneLocked()
 		{
 			if (!(this.file is null))
 			{
@@ -102,27 +114,49 @@ namespace Waher.Networking.XMPP.HTTPX
 				this.file = null;
 			}
 
-			return this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
+			await this.server.Process(this.id, this.from, this.to, this.request, this.e2e, this.e2eReference, this.maxChunkSize,
 				this.postResource, this.ibb, this.s5);
-		}
-
-		internal override Task Fail(string Message)
-		{
-			this.file?.Dispose();
-			this.file = null;
-
-			return Task.CompletedTask;
-		}
-
-		public override Task DisposeAsync()
-		{
-			this.request?.Dispose();
-			this.request = null;
-
+		
 			this.chunks?.Clear();
-			this.chunks = null;
+		}
 
-			return Task.CompletedTask;
+		internal override async Task Fail(string Message)
+		{
+			if (this.disposed)
+				throw new ObjectDisposedException(nameof(ClientChunkRecord));
+
+			await this.synchObj.WaitAsync();
+			try
+			{
+				this.file?.Dispose();
+				this.file = null;
+			}
+			finally
+			{
+				this.synchObj.Release();
+			}
+		}
+
+		public override async Task DisposeAsync()
+		{
+			if (!this.disposed)
+			{
+				this.disposed = true;
+
+				await this.synchObj.WaitAsync();
+				try
+				{
+					this.request?.Dispose();
+					this.request = null;
+
+					this.chunks?.Clear();
+					this.chunks = null;
+				}
+				finally
+				{
+					this.synchObj.Dispose();
+				}
+			}
 		}
 	}
 }

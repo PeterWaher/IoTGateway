@@ -1261,7 +1261,7 @@ namespace Waher.Networking
 		{
 			bool DoDispose = false;
 			Rec Rec = null;
-			bool ReleaseWaiting = false;
+			TaskCompletionSource<bool>[] ReleaseWaiting = null;
 			bool CancelOutput = false;
 
 			try
@@ -1275,7 +1275,7 @@ namespace Waher.Networking
 				{
 					lock (this.synchObj)
 					{
-						if (this.disposing || 
+						if (this.disposing ||
 							this.disposed ||
 							!this.outputQueue.HasFirstItem)
 						{
@@ -1289,16 +1289,14 @@ namespace Waher.Networking
 							break;
 						}
 
-						if (ReleaseWaiting)
-						{
-							while (this.waitingQueue?.HasFirstItem ?? false)
-								this.waitingQueue.RemoveFirst().TrySetResult(true);
-
-							ReleaseWaiting = false;
-						}
-
 						Rec = this.outputQueue.RemoveFirst();
 						this.outputQueueSize -= Rec.Count;
+
+						if (this.waitingQueue?.HasFirstItem ?? false)
+						{
+							ReleaseWaiting = this.waitingQueue.ToArray();
+							this.waitingQueue.Clear();
+						}
 #if WINDOWS_UWP
 						DataWriter = this.dataWriter;
 						if (DataWriter is null)
@@ -1366,7 +1364,13 @@ namespace Waher.Networking
 						break;
 					}
 #endif
-					ReleaseWaiting = true;
+					if (!(ReleaseWaiting is null))
+					{
+						foreach (TaskCompletionSource<bool> Wait in ReleaseWaiting)
+							Wait.TrySetResult(true);
+
+						ReleaseWaiting = null;
+					}
 				}
 
 				if (!this.disposed)
@@ -1415,6 +1419,14 @@ namespace Waher.Networking
 			{
 				if (CancelOutput)
 					await this.CancelOutputQueue();
+
+				if (!(ReleaseWaiting is null))
+				{
+					foreach (TaskCompletionSource<bool> Wait in ReleaseWaiting)
+						Wait.TrySetResult(true);
+
+					ReleaseWaiting = null;
+				}
 
 				if (DoDispose)
 				{

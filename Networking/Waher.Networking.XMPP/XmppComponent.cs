@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Threading;
@@ -11,10 +11,9 @@ using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.StreamErrors;
 using Waher.Runtime.Cache;
-using Waher.Security;
-using Waher.Networking.XMPP.Events;
 using Waher.Networking.Sniffers;
-using System.Runtime.CompilerServices;
+using Waher.Networking.XMPP.Events;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP
 {

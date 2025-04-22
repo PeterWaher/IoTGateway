@@ -147,7 +147,7 @@ namespace Waher.Reports
 		/// <returns>If the node can be edited by the caller.</returns>
 		public Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult(false);
+			return this.CanViewAsync(Caller);	// To be able to execute report commands.
 		}
 
 		/// <summary>

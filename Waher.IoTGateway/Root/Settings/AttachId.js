@@ -89,7 +89,8 @@ function DisplayAttachIdQR() {
             "tab": TabID,
             "mode": Mode,
             "purpose": Purpose,
-            "propertiesFilter": "PNR,COUNTRY"
+            "propertiesFilter": "PNR,COUNTRY",
+            "attachmentFilter": ""
         }));
 }
 

@@ -90,7 +90,6 @@ namespace Waher.Reports.Files
 			if (Report.Privileges.Length == 0)
 				return Task.FromResult(true);
 
-
 			foreach (string Privilege in Report.Privileges)
 			{
 				if (!Caller.HasPrivilege(Privilege))

@@ -2162,6 +2162,9 @@ namespace Waher.Networking
 		{
 			lock (this.synchObj)
 			{
+				if (this.disposed)
+					throw new ObjectDisposedException(nameof(BinaryTcpClient));
+
 				if (this.reading)
 					throw new InvalidOperationException("Connection cannot be upgraded to TLS while in a reading state.");
 

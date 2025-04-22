@@ -1143,10 +1143,16 @@ namespace Waher.Networking
 			object State)
 		{
 			if (Buffer is null)
-				throw new ArgumentException("Cannot be null.", nameof(Buffer));
+			{
+				Task.TrySetException(new ArgumentException("Cannot be null.", nameof(Buffer)));
+				return;
+			}
 
 			if (Count < 0)
-				throw new ArgumentException("Count cannot be negative.", nameof(Count));
+			{
+				Task.TrySetException(new ArgumentException("Count cannot be negative.", nameof(Count)));
+				return;
+			}
 
 			if (Count == 0)
 			{
@@ -1160,10 +1166,16 @@ namespace Waher.Networking
 
 			int c = Buffer.Length;
 			if (Offset < 0 || Offset >= c)
-				throw new ArgumentOutOfRangeException("Invalid offset.", nameof(Offset));
+			{
+				Task.TrySetException(new ArgumentOutOfRangeException("Invalid offset.", nameof(Offset)));
+				return;
+			}
 
 			if (Count < 0 || Offset + Count > c)
-				throw new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count));
+			{
+				Task.TrySetException(new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count)));
+				return;
+			}
 
 			Rec Item;
 
@@ -1210,7 +1222,10 @@ namespace Waher.Networking
 					}
 
 					if (!this.connected)
-						throw new InvalidOperationException("Not connected.");
+					{
+						Task.TrySetException(new InvalidOperationException("Not connected."));
+						return;
+					}
 
 					if (this.sending)
 					{

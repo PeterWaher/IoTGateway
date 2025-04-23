@@ -143,7 +143,7 @@ namespace Waher.Content.Markdown.Rendering.CodeContent
 				Output.Append(ClassName);
 
 			Output.Append("\">");
-			Output.Append(Text);
+			Output.Append(XML.Encode(Text));
 			Output.AppendLine("</code></pre>");
 
 			return Task.FromResult(true);

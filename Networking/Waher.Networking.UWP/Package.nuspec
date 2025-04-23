@@ -22,7 +22,7 @@
 			<dependency id="Waher.Runtime.Inventory" version="1.4.2"/>
 			<dependency id="Waher.Runtime.IO" version="1.0.4"/>
 			<dependency id="Waher.Runtime.Threading" version="2.1.1"/>
-			<dependency id="Waher.Runtime.Queue" version="3.2.0"/>
+			<dependency id="Waher.Runtime.Queue" version="3.2.1"/>
 			<dependency id="Waher.Security" version="1.0.13"/>
 		</dependencies>
   </metadata>

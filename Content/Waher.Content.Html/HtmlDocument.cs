@@ -2062,10 +2062,13 @@ namespace Waher.Content.Html
 			if (string.IsNullOrEmpty(Html))
 				return Html;
 
-			if (Html.StartsWith("<section>", StringComparison.CurrentCultureIgnoreCase) &&
+			if (Html.StartsWith("<section", StringComparison.CurrentCultureIgnoreCase) &&
 				Html.EndsWith("</section>", StringComparison.CurrentCultureIgnoreCase))
 			{
-				Html = Html.Substring(9, Html.Length - 19).Trim();
+				string Html2 = Html.Substring(9, Html.Length - 19).Trim();
+
+				if (Html2.IndexOf("</section>", StringComparison.CurrentCultureIgnoreCase) < 0)
+					Html = Html2;
 			}
 
 			return Html;

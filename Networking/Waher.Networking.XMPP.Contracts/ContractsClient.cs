@@ -36,7 +36,6 @@ using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -78,6 +77,16 @@ namespace Waher.Networking.XMPP.Contracts
 		};
 
 		/// <summary>
+		/// If a namespace corresponds to a legal identity namespace.
+		/// </summary>
+		/// <param name="Namespace">Namespace</param>
+		/// <returns>If the namespace corresponds to a legal identity namespace.</returns>
+		public static bool IsNamespaceLegalIdentity(string Namespace)
+		{
+			return Array.IndexOf(NamespacesLegalIdentities, Namespace) >= 0;
+		}
+
+		/// <summary>
 		/// urn:ieee:iot:leg:sc:1.0
 		/// </summary>
 		public const string NamespaceSmartContractsIeeeV1 = "urn:ieee:iot:leg:sc:1.0";
@@ -100,6 +109,16 @@ namespace Waher.Networking.XMPP.Contracts
 			NamespaceSmartContractsIeeeV1,
 			NamespaceSmartContractsNeuroFoundationV1
 		};
+
+		/// <summary>
+		/// If a namespace corresponds to a smart contract namespace.
+		/// </summary>
+		/// <param name="Namespace">Namespace</param>
+		/// <returns>If the namespace corresponds to a smart contract namespace.</returns>
+		public static bool IsNamespaceSmartContract(string Namespace)
+		{
+			return Array.IndexOf(NamespacesSmartContracts, Namespace) >= 0;
+		}
 
 		/// <summary>
 		/// http://waher.se/schema/Onboarding/v1.xsd
@@ -6182,6 +6201,8 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			ChunkedList<string> PropertyList = null;
 			ChunkedList<string> AttachmentList = null;
+			bool IsIdentityNamespace = IsNamespaceLegalIdentity(Query.NamespaceURI);
+			bool IsContractNamespace = IsNamespaceSmartContract(Query.NamespaceURI);
 			Context = null;
 			Properties = null;
 			Attachments = null;
@@ -6193,55 +6214,68 @@ namespace Waher.Networking.XMPP.Contracts
 				if (!(N is XmlElement E))
 					continue;
 
-				if (E.NamespaceURI == Query.NamespaceURI)
+				if (IsIdentityNamespace)
 				{
-					switch (E.LocalName)
-					{
-						case "identity":
-							Identity = LegalIdentity.Parse(E);
-							continue;
+					if (!IsNamespaceLegalIdentity(E.NamespaceURI))
+						continue;
+				}
+				else if (IsContractNamespace)
+				{
+					if (!IsNamespaceSmartContract(E.NamespaceURI))
+						continue;
+				}
+				else
+				{
+					if (E.NamespaceURI != Query.NamespaceURI)
+						continue;
+				}
 
-						case "content":
-							if (string.IsNullOrEmpty(Content))
-							{
-								Content = E.InnerText;
+				switch (E.LocalName)
+				{
+					case "identity":
+						Identity = LegalIdentity.Parse(E);
+						continue;
+
+					case "content":
+						if (string.IsNullOrEmpty(Content))
+						{
+							Content = E.InnerText;
+							continue;
+						}
+						else
+							return false;
+
+					case "properties":
+						foreach (XmlNode N2 in E.ChildNodes)
+						{
+							if (!(N2 is XmlElement E2))
 								continue;
+
+							if (E2.LocalName == "property")
+							{
+								PropertyList ??= new ChunkedList<string>();
+								PropertyList.Add(E2.InnerText);
 							}
 							else
 								return false;
+						}
+						continue;
 
-						case "properties":
-							foreach (XmlNode N2 in E.ChildNodes)
+					case "attachments":
+						foreach (XmlNode N2 in E.ChildNodes)
+						{
+							if (!(N2 is XmlElement E2))
+								continue;
+
+							if (E2.LocalName == "attachment")
 							{
-								if (!(N2 is XmlElement E2))
-									continue;
-
-								if (E2.LocalName == "property")
-								{
-									PropertyList ??= new ChunkedList<string>();
-									PropertyList.Add(E2.InnerText);
-								}
-								else
-									return false;
+								AttachmentList ??= new ChunkedList<string>();
+								AttachmentList.Add(E2.InnerText);
 							}
-							continue;
-
-						case "attachments":
-							foreach (XmlNode N2 in E.ChildNodes)
-							{
-								if (!(N2 is XmlElement E2))
-									continue;
-
-								if (E2.LocalName == "attachment")
-								{
-									AttachmentList ??= new ChunkedList<string>();
-									AttachmentList.Add(E2.InnerText);
-								}
-								else
-									return false;
-							}
-							continue;
-					}
+							else
+								return false;
+						}
+						continue;
 				}
 
 				if (Context is null)

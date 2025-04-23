@@ -1855,7 +1855,7 @@ namespace Waher.Networking.HTTP
 			if (this.HasSniffers)
 			{
 				Task<int> T = this.flowControl.RequestResources(StreamId, Count, 
-					this.client.CurrenntCancellationToken);
+					this.client.CurrentCancellationToken);
 
 				if (!T.IsCompleted)
 				{
@@ -1869,7 +1869,7 @@ namespace Waher.Networking.HTTP
 			else
 			{
 				NrBytes = await this.flowControl.RequestResources(StreamId, Count, 
-					this.client.CurrenntCancellationToken);
+					this.client.CurrentCancellationToken);
 			}
 #else
 			NrBytes = await this.flowControl.RequestResources(StreamId, Count, 

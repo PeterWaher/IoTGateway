@@ -420,7 +420,7 @@ namespace Waher.Networking
 		/// <summary>
 		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CurrenntCancellationToken => CancellationToken.None;
+		public CancellationToken CurrentCancellationToken => CancellationToken.None;
 #else
 		/// <summary>
 		/// Current Cancellation token for the current read operation.

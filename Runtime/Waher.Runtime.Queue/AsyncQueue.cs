@@ -326,7 +326,7 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed.</returns>
 		public Task<T> Wait()
 		{
-			return this.Wait(CancellationToken.None, null);
+			return this.DoWait(CancellationToken.None, null);
 		}
 
 
@@ -338,7 +338,7 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed.</returns>
 		public Task<T> Wait(int Timeout)
 		{
-			return this.Wait(CancellationToken.None, Timeout);
+			return this.DoWait(CancellationToken.None, Timeout);
 		}
 
 		/// <summary>
@@ -350,7 +350,7 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
 		public Task<T> Wait(CancellationToken Cancel)
 		{
-			return this.Wait(Cancel, null);
+			return this.DoWait(Cancel, null);
 		}
 
 		/// <summary>
@@ -363,7 +363,7 @@ namespace Waher.Runtime.Queue
 		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
 		public Task<T> Wait(CancellationToken Cancel, int Timeout)
 		{
-			return this.Wait(Cancel, Timeout);
+			return this.DoWait(Cancel, Timeout);
 		}
 
 		/// <summary>
@@ -374,7 +374,7 @@ namespace Waher.Runtime.Queue
 		/// <param name="Cancel">Cancellation token</param>
 		/// <param name="Timeout">Optional timeout, in milliseconds.</param>
 		/// <returns>Item to process, or null if queue is disposed, or task is cancelled.</returns>
-		private Task<T> Wait(CancellationToken Cancel, int? Timeout)
+		private Task<T> DoWait(CancellationToken Cancel, int? Timeout)
 		{
 			EventHandler h = null;
 			Task<T> Result;

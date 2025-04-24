@@ -1620,9 +1620,8 @@ namespace Waher.Script.Graphs
 					return false;
 				}
 
-				if ((Node is NamedMember) ||
-					(Node is NamedMemberAssignment) ||
-					(Node is LambdaDefinition) ||
+				if (Node is NamedMemberAssignment ||
+					Node is LambdaDefinition ||
 					Node is NamedMethodCall ||
 					Node is DynamicFunctionCall ||
 					Node is DynamicMember ||
@@ -1630,11 +1629,31 @@ namespace Waher.Script.Graphs
 					Node is Create ||
 					Node is Destroy ||
 					Node is Error ||
-					Node is ImplicitPrint ||
-					Node is Function)
+					Node is ImplicitPrint)
 				{
 					Prohibited = Node;
 					return false;
+				}
+				else if (Node is NamedMember Property)
+				{
+					ScriptNode Loop = Property.Operand;
+
+					while (Loop is NamedMember Property2)
+						Loop = Property2.Operand;
+
+					if (!(Loop is VariableReference))	// Enum values are permitted.
+					{
+						Prohibited = Node;
+						return false;
+					}
+				}
+				else if (Node is Function)
+				{
+					if (Node.GetType().Namespace != typeof(Script.Functions.DateAndTime.DateTimeUtc).Namespace)
+					{
+						Prohibited = Node;
+						return false;
+					}
 				}
 
 				return true;

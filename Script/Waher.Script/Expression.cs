@@ -4037,7 +4037,7 @@ namespace Waher.Script
 					Start2 = ++this.pos;
 				}
 				else
-					throw new SyntaxException("Invalid numberical base.", this.pos, this.script);
+					throw new SyntaxException("Invalid numerical base.", this.pos, this.script);
 
 				BigInteger n = BigInteger.Zero;
 

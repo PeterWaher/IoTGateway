@@ -649,13 +649,18 @@ namespace Waher.Content.Markdown.GraphViz
 					}
 					else
 					{
-						string Map = await Files.ReadAllTextAsync(Result.MapFileName);
-						string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
-						if (MapRows.Length <= 2)
+						if (File.Exists(Result.MapFileName))
 						{
-							File.Delete(Result.MapFileName);
-							Result.MapFileName = null;
+							string Map = await Files.ReadAllTextAsync(Result.MapFileName);
+							string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+							if (MapRows.Length <= 2)
+							{
+								File.Delete(Result.MapFileName);
+								Result.MapFileName = null;
+							}
 						}
+						else
+							Result.MapFileName = null;
 
 						ResultSource.TrySetResult(Result);
 					}

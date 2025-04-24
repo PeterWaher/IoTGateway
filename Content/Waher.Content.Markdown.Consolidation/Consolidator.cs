@@ -512,19 +512,22 @@ namespace Waher.Content.Markdown.Consolidation
 								bool First = true;
 
 								Markdown.AppendLine();
-								Markdown.Append("{{Legend([");
+
+								StringBuilder Legend = new StringBuilder();
+
+								Legend.Append("Legend([");
 
 								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
 								{
 									if (First)
 										First = false;
 									else
-										Markdown.Append(',');
+										Legend.Append(',');
 
-									Markdown.Append(Expression.ToString(P.Key));
+									Legend.Append(Expression.ToString(P.Key));
 								}
 
-								Markdown.Append("],[");
+								Legend.Append("],[");
 								First = true;
 
 								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
@@ -532,12 +535,30 @@ namespace Waher.Content.Markdown.Consolidation
 									if (First)
 										First = false;
 									else
-										Markdown.Append(',');
+										Legend.Append(',');
 
-									Markdown.Append(Graph.ToRGBAStyle(P.Value.Key));
+									Legend.Append(Graph.ToRGBAStyle(P.Value.Key));
 								}
 
-								Markdown.AppendLine("],4)}}");
+								Legend.Append("],4)");
+
+								try
+								{
+									object Obj = await Expression.EvalAsync(Legend.ToString(), new Variables());
+
+									if (Obj is Graph LegendGraph)
+									{
+										Markdown.AppendLine("```Graph");
+										LegendGraph.ToXml(Markdown);
+										Markdown.AppendLine();
+										Markdown.AppendLine("```");
+										Markdown.AppendLine();
+									}
+								}
+								catch (Exception ex)
+								{
+									Log.Exception(ex);
+								}
 							}
 
 							Markdown.AppendLine();

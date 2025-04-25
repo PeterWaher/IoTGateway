@@ -180,6 +180,7 @@ namespace Waher.Content.Markdown.Latex
 			this.Output.AppendLine("\\usepackage{multirow}");
 			this.Output.AppendLine("\\usepackage{ragged2e}");
 			this.Output.AppendLine("\\usepackage{textcomp}");
+			this.Output.AppendLine("\\usepackage{spverbatim}");
 			this.Output.AppendLine("\\newlist{tasklist}{itemize}{2}");
 			this.Output.AppendLine("\\setlist[tasklist]{label=$\\square$}");
 			this.Output.AppendLine("\\newcommand{\\checkmarksymbol}{\\ding{51}}");
@@ -2679,17 +2680,18 @@ namespace Waher.Content.Markdown.Latex
 				}
 			}
 
-			this.Output.Append("\\texttt{");
+			this.Output.AppendLine("\\begin{spverbatim}");
 
 			int i;
-
+			
 			for (i = Element.Start; i <= Element.End; i++)
 			{
 				this.Output.Append(Element.IndentString);
 				this.Output.AppendLine(Element.Rows[i]);
 			}
 
-			this.Output.AppendLine("}");
+			this.Output.AppendLine();
+			this.Output.AppendLine("\\end{spverbatim}");
 			this.Output.AppendLine();
 		}
 

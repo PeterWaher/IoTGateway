@@ -18,19 +18,19 @@
 			<group targetFramework="UAP10.0">
 				<dependency id="Waher.Content" version="3.3.2"/>
 				<dependency id="Waher.Content.Emoji" version="2.0.2"/>
-				<dependency id="Waher.Content.Html" version="3.2.0"/>
-				<dependency id="Waher.Content.Markdown" version="6.0.2"/>
+				<dependency id="Waher.Content.Html" version="3.2.1"/>
+				<dependency id="Waher.Content.Markdown" version="6.0.3"/>
 				<dependency id="Waher.Content.Markdown.Contracts" version="5.0.1"/>
-				<dependency id="Waher.Content.Markdown.JavaScript" version="5.0.0"/>
-				<dependency id="Waher.Content.Markdown.Latex" version="5.0.0"/>
+				<dependency id="Waher.Content.Markdown.JavaScript" version="5.0.1"/>
+				<dependency id="Waher.Content.Markdown.Latex" version="5.0.1"/>
 				<dependency id="Waher.Content.Markdown.Wpf" version="5.0.1"/>
 				<dependency id="Waher.Content.Markdown.Xamarin" version="5.0.1"/>
 				<dependency id="Waher.Content.Markdown.Xml" version="4.0.0"/>
 				<dependency id="Waher.Events" version="1.4.3"/>
-				<dependency id="Waher.Networking.HTTP.UWP" version="4.3.2"/>
+				<dependency id="Waher.Networking.HTTP.UWP" version="4.3.3"/>
 				<dependency id="Waher.Runtime.Inventory" version="1.4.2"/>
 				<dependency id="Waher.Runtime.IO" version="1.0.4"/>
-				<dependency id="Waher.Script" version="2.11.1"/>
+				<dependency id="Waher.Script" version="2.11.2"/>
 				<dependency id="Waher.Security" version="1.0.13"/>
 			</group>
 		</dependencies>

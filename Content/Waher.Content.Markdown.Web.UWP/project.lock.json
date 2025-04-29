@@ -1558,7 +1558,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -1590,7 +1590,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1600,12 +1600,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -1615,27 +1615,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -1645,7 +1645,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -1655,7 +1655,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -1665,7 +1665,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -1678,7 +1678,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -1733,7 +1733,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -1766,7 +1766,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1850,10 +1850,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1864,7 +1864,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1872,7 +1872,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -3767,7 +3767,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -3799,7 +3799,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -3809,12 +3809,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -3824,27 +3824,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -3854,7 +3854,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -3864,7 +3864,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -3874,7 +3874,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -3887,7 +3887,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -3942,7 +3942,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -3975,7 +3975,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -4059,10 +4059,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -4073,7 +4073,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -4081,7 +4081,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -6081,7 +6081,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -6113,7 +6113,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6123,12 +6123,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -6138,27 +6138,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -6168,7 +6168,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -6178,7 +6178,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -6188,7 +6188,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -6201,7 +6201,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -6256,7 +6256,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -6289,7 +6289,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6373,10 +6373,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6387,7 +6387,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -6395,7 +6395,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -8290,7 +8290,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -8322,7 +8322,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8332,12 +8332,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -8347,27 +8347,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -8377,7 +8377,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -8387,7 +8387,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -8397,7 +8397,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -8410,7 +8410,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -8465,7 +8465,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -8498,7 +8498,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8582,10 +8582,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8596,7 +8596,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -8604,7 +8604,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -10604,7 +10604,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -10636,7 +10636,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10646,12 +10646,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -10661,27 +10661,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -10691,7 +10691,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -10701,7 +10701,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -10711,7 +10711,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -10724,7 +10724,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -10779,7 +10779,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -10812,7 +10812,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10896,10 +10896,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10910,7 +10910,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -10918,7 +10918,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -12813,7 +12813,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -12845,7 +12845,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -12855,12 +12855,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -12870,27 +12870,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -12900,7 +12900,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -12910,7 +12910,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -12920,7 +12920,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -12933,7 +12933,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -12988,7 +12988,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -13021,7 +13021,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -13105,10 +13105,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -13119,7 +13119,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -13127,7 +13127,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -15127,7 +15127,7 @@
           "Waher.Runtime.IO": "1.0.4",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Temporary": "1.1.0",
-          "Waher.Script": "2.11.1",
+          "Waher.Script": "2.11.2",
           "Waher.Security": "1.0.13"
         }
       },
@@ -15159,7 +15159,7 @@
           "Waher.Content": "3.3.2"
         }
       },
-      "Waher.Content.Markdown/6.0.2": {
+      "Waher.Content.Markdown/6.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15169,12 +15169,12 @@
           "Waher.Content": "3.3.2",
           "Waher.Content.Emoji": "2.0.2",
           "Waher.Content.Html": "3.2.1",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
           "Waher.Runtime.Threading": "2.1.1",
-          "Waher.Script": "2.11.1",
-          "Waher.Script.Graphs": "2.3.1"
+          "Waher.Script": "2.11.2",
+          "Waher.Script.Graphs": "2.3.2"
         }
       },
       "Waher.Content.Markdown.Contracts/5.0.1": {
@@ -15184,27 +15184,27 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
-      "Waher.Content.Markdown.JavaScript/5.0.0": {
+      "Waher.Content.Markdown.JavaScript/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Content": "3.3.2",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
-      "Waher.Content.Markdown.Latex/5.0.0": {
+      "Waher.Content.Markdown.Latex/5.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "Waher.Content.Images": "3.0.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Runtime.IO": "1.0.4"
         }
       },
@@ -15214,7 +15214,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -15224,7 +15224,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2",
+          "Waher.Content.Markdown": "6.0.3",
           "Waher.Content.Xml": "3.1.1"
         }
       },
@@ -15234,7 +15234,7 @@
         "dependencies": {
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
-          "Waher.Content.Markdown": "6.0.2"
+          "Waher.Content.Markdown": "6.0.3"
         }
       },
       "Waher.Content.Xml/3.1.1": {
@@ -15247,7 +15247,7 @@
           "Waher.Content": "3.3.2",
           "Waher.Runtime.Inventory": "1.4.2",
           "Waher.Runtime.Text": "1.2.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Events/1.4.3": {
@@ -15302,7 +15302,7 @@
           "System.Private.Uri": "4.3.2",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0",
+          "Waher.Runtime.Cache": "2.1.1",
           "Waher.Runtime.Collections": "1.0.3",
           "Waher.Runtime.Console": "1.2.0",
           "Waher.Runtime.IO": "1.0.4",
@@ -15335,7 +15335,7 @@
           "Waher.Runtime.Profiling": "1.1.0"
         }
       },
-      "Waher.Runtime.Cache/2.1.0": {
+      "Waher.Runtime.Cache/2.1.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15419,10 +15419,10 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "Waher.Events": "1.4.3",
-          "Waher.Runtime.Cache": "2.1.0"
+          "Waher.Runtime.Cache": "2.1.1"
         }
       },
-      "Waher.Script/2.11.1": {
+      "Waher.Script/2.11.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15433,7 +15433,7 @@
           "Waher.Runtime.Inventory": "1.4.2"
         }
       },
-      "Waher.Script.Graphs/2.3.1": {
+      "Waher.Script.Graphs/2.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -15441,7 +15441,7 @@
           "System.Net.Http": "4.3.4",
           "System.Text.RegularExpressions": "4.3.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Script": "2.11.1"
+          "Waher.Script": "2.11.2"
         }
       },
       "Waher.Security/1.0.13": {
@@ -23134,7 +23134,7 @@
       "path": "../Waher.Content.Images/Waher.Content.Images.csproj",
       "msbuildProject": "../Waher.Content.Images/Waher.Content.Images.csproj"
     },
-    "Waher.Content.Markdown/6.0.2": {
+    "Waher.Content.Markdown/6.0.3": {
       "type": "project",
       "path": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../Waher.Content.Markdown/Waher.Content.Markdown.csproj"
@@ -23144,12 +23144,12 @@
       "path": "../Waher.Content.Markdown.Contracts/Waher.Content.Markdown.Contracts.csproj",
       "msbuildProject": "../Waher.Content.Markdown.Contracts/Waher.Content.Markdown.Contracts.csproj"
     },
-    "Waher.Content.Markdown.JavaScript/5.0.0": {
+    "Waher.Content.Markdown.JavaScript/5.0.1": {
       "type": "project",
       "path": "../Waher.Content.Markdown.JavaScript/Waher.Content.Markdown.JavaScript.csproj",
       "msbuildProject": "../Waher.Content.Markdown.JavaScript/Waher.Content.Markdown.JavaScript.csproj"
     },
-    "Waher.Content.Markdown.Latex/5.0.0": {
+    "Waher.Content.Markdown.Latex/5.0.1": {
       "type": "project",
       "path": "../Waher.Content.Markdown.Latex/Waher.Content.Markdown.Latex.csproj",
       "msbuildProject": "../Waher.Content.Markdown.Latex/Waher.Content.Markdown.Latex.csproj"
@@ -23204,7 +23204,7 @@
       "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"
     },
-    "Waher.Runtime.Cache/2.1.0": {
+    "Waher.Runtime.Cache/2.1.1": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Cache/Waher.Runtime.Cache.csproj"
@@ -23254,12 +23254,12 @@
       "path": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj"
     },
-    "Waher.Script/2.11.1": {
+    "Waher.Script/2.11.2": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
-    "Waher.Script.Graphs/2.3.1": {
+    "Waher.Script.Graphs/2.3.2": {
       "type": "project",
       "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
       "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"

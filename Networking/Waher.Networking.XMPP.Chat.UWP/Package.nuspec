@@ -32,7 +32,7 @@
 			<dependency id="Waher.Script" version="2.11.2"/>
 			<dependency id="Waher.Script.Graphs" version="2.3.2"/>
 			<dependency id="Waher.Security" version="1.0.13"/>
-			<dependency id="Waher.Things" version="3.2.1"/>
+			<dependency id="Waher.Things" version="3.2.2"/>
 		</dependencies>
 	</metadata>
 	<files>

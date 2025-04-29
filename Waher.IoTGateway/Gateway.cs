@@ -2321,6 +2321,9 @@ namespace Waher.IoTGateway
 				scheduler?.Dispose();
 				scheduler = null;
 
+				await PlantUml.Terminate();
+				await GraphViz.Terminate();
+
 				await Script.Threading.Functions.Background.TerminateTasks(10000);
 				await Types.StopAllModules();
 

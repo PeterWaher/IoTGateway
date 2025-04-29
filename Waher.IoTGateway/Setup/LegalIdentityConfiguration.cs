@@ -484,7 +484,7 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
-					await this.GetLegalIdentities();
+					await this.GetLegalIdentities(null);
 			}
 		}
 
@@ -494,12 +494,12 @@ namespace Waher.IoTGateway.Setup
 		private async Task XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{
 			if (NewState == XmppState.Connected)
-				await this.GetLegalIdentities();
+				await this.GetLegalIdentities(null);
 		}
 
-		private Task GetLegalIdentities()
+		private Task GetLegalIdentities(object P)
 		{
-			if (Gateway.ContractsClient is null)
+			if (Gateway.ContractsClient is null || Gateway.XmppClient.State != XmppState.Connected)
 				return Task.CompletedTask;
 
 			return Gateway.ContractsClient.GetLegalIdentities((Sender, e) =>
@@ -509,6 +509,8 @@ namespace Waher.IoTGateway.Setup
 					approvedIdentities = this.SetLegalIdentities(e.Identities, null, false);
 					allIdentities = this.SetLegalIdentities(e.Identities, null, true);
 				}
+				else
+					Gateway.ScheduleEvent(this.GetLegalIdentities, DateTime.Now.AddMinutes(1), null);
 
 				return Task.CompletedTask;
 

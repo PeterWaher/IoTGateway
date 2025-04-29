@@ -1452,7 +1452,7 @@ namespace Waher.IoTGateway
 						foreach (IModule Module in FailedModules)
 						{
 							sb.Append("* `");
-							sb.Append(typeof(Module).FullName);
+							sb.Append(Module.GetType().FullName);
 							sb.AppendLine("`");
 						}
 

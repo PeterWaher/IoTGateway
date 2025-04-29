@@ -1,4 +1,4 @@
-﻿//#define INFO_IN_SNIFFERS
+﻿#define INFO_IN_SNIFFERS
 
 using System;
 using System.Collections.Generic;
@@ -1394,12 +1394,7 @@ namespace Waher.Networking.HTTP
 						else
 							this.flowControl.RemoteSettingsUpdated();
 
-						if (this.localSettings.AcknowledgedOrSent)
-						{
-							if (!await this.SendHttp2Frame(FrameType.Settings, 1, false, 0, null))   // Ack
-								return false;
-						}
-						else
+						if (!this.localSettings.AcknowledgedOrSent)
 						{
 							this.localSettings.AcknowledgedOrSent = true;
 
@@ -1409,6 +1404,9 @@ namespace Waher.Networking.HTTP
 							if (!(sb is null))
 								this.TransmitText(sb.ToString().Trim());
 						}
+
+						if (!await this.SendHttp2Frame(FrameType.Settings, 1, false, 0, null))   // Ack
+							return false;
 						break;
 
 					case FrameType.PushPromise:

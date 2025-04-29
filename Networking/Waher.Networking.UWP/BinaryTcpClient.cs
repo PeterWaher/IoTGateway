@@ -1461,8 +1461,8 @@ namespace Waher.Networking
 		{
 			if (!(this.idleQueue is null))
 			{
-				while (this.idleQueue.HasFirstItem)
-					this.idleQueue.RemoveFirst().TrySetResult(true);
+				while (this.idleQueue?.HasFirstItem ?? false)
+					this.idleQueue?.RemoveFirst().TrySetResult(true);
 
 				this.idleQueue = null;
 			}
@@ -1472,8 +1472,8 @@ namespace Waher.Networking
 		{
 			if (!(this.cancelledQueue is null))
 			{
-				while (this.cancelledQueue.HasFirstItem)
-					this.cancelledQueue.RemoveFirst().TrySetResult(true);
+				while (this.cancelledQueue?.HasFirstItem ?? false)
+					this.cancelledQueue?.RemoveFirst().TrySetResult(true);
 
 				this.cancelledQueue = null;
 			}

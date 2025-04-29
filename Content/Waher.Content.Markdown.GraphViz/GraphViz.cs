@@ -600,11 +600,10 @@ namespace Waher.Content.Markdown.GraphViz
 				return null;
 
 			ChartRecord Rec = new ChartRecord(Result, Language, GraphText, GraphFgColor, GraphBgColor, Type);
-			if (!await queue.Forward(Rec))
-				throw new Exception("Unable to process GraphViz chart.");
+			queue.Queue(Rec);
 
 			if (!await Rec.Wait())
-				throw new Exception("Unable to process GraphViz chart. See log for more information.");
+				throw new Exception("Unable to process GraphViz chart.");
 
 			return Result;
 		}

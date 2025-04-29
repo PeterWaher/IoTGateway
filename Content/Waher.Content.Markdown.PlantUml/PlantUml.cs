@@ -375,11 +375,10 @@ namespace Waher.Content.Markdown.PlantUml
 		private static async Task ExecutePlantUml(ResultType Type, params GraphInfo[] Files)
 		{
 			ChartRecord Rec = new ChartRecord(Type, Files);
-			if (!await queue.Forward(Rec))
-				throw new Exception("Unable to process PlantUML chart.");
+			queue.Queue(Rec);
 
 			if (!await Rec.Wait())
-				throw new Exception("Unable to process PlantUML chart. See log for more information.");
+				throw new Exception("Unable to process PlantUML chart.");
 		}
 
 		private class ChartRecord : IWorkItem

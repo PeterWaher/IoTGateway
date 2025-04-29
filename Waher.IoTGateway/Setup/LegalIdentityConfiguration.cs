@@ -610,10 +610,10 @@ namespace Waher.IoTGateway.Setup
 						foreach (Property P in ID.Properties)
 							ID2[P.Name] = P.Value;
 
-						ID2["FIRST"] = ID2["FIRST"];
-						ID2["MIDDLE"] = ID2["MIDDLE"];
-						ID2["LAST"] = ID2["LAST"];
-						ID2["FULLNAME"] = ID2["FULLNAME"];
+						ID2["FIRST"] = ID["FIRST"];
+						ID2["MIDDLE"] = ID["MIDDLE"];
+						ID2["LAST"] = ID["LAST"];
+						ID2["FULLNAME"] = ID["FULLNAME"];
 
 						Result.Add(ID2);
 					}

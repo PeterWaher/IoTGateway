@@ -2793,7 +2793,7 @@ namespace Waher.IoTGateway
 				if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 					From = "/";
 
-				if (Request.Session.TryGetVariable("User", out v) && 
+				if (Request.Session.TryGetVariable("User", out v) &&
 					v.ValueObject is IUser &&
 					!string.IsNullOrEmpty(From) &&
 					!From.Contains("Login"))
@@ -3622,7 +3622,7 @@ namespace Waher.IoTGateway
 				throw new ArgumentException("Number of bytes must be non-negative.", nameof(NrBytes));
 
 			byte[] Result = new byte[NrBytes];
-			
+
 			lock (rnd)
 			{
 				rnd.GetBytes(Result);
@@ -5397,10 +5397,11 @@ namespace Waher.IoTGateway
 
 		#region Profiling
 
-		private static async Task WebServer_ConnectionProfiled(object Sender, Profiler Profiler)
+		private static async Task WebServer_ConnectionProfiled(object Sender, ProfilingEventArgs e)
 		{
 			try
 			{
+				Profiler Profiler = e.Profiler;
 				DateTime Now = DateTime.UtcNow;
 				StringBuilder sb = new StringBuilder();
 
@@ -5430,10 +5431,19 @@ namespace Waher.IoTGateway
 					httpProfilingFolderChecked = true;
 				}
 
-				string FileName = Path.Combine(Folder, sb.ToString());
+				int NrNodes = 0;
+				string BaseFileName = sb.ToString();
+				string FileName = Path.Combine(Folder, BaseFileName);
 				string Uml = Profiler.ExportPlantUml(TimeUnit.Seconds);
+				string Uml2 = e.FlowControl?.ExportPlantUml(out NrNodes);
 
 				await Files.WriteAllTextAsync(FileName, Uml);
+
+				if (NrNodes > 0)
+				{
+					FileName = Path.Combine(Folder, BaseFileName.Replace("Profiling ", "States "));
+					await Files.WriteAllTextAsync(FileName, Uml2);
+				}
 
 				StringBuilder Markdown = new StringBuilder();
 
@@ -5442,6 +5452,16 @@ namespace Waher.IoTGateway
 				Markdown.AppendLine("```");
 
 				await SendNotification(Markdown.ToString());
+
+				if (NrNodes > 0)
+				{
+					Markdown.Clear();
+					Markdown.AppendLine("```uml");
+					Markdown.AppendLine(Uml.TrimEnd());
+					Markdown.AppendLine("```");
+
+					await SendNotification(Markdown.ToString());
+				}
 			}
 			catch (Exception ex)
 			{

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Profiling;
@@ -11,7 +13,9 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// </summary>
 	public class FlowControlRfc9218 : FlowControlConnection
 	{
-		private readonly LinkedList<PriorityNodeRfc9218>[] priorities = new LinkedList<PriorityNodeRfc9218>[8];
+		private const int priorityLevels = 8;
+
+		private readonly LinkedList<PriorityNodeRfc9218>[] priorities = new LinkedList<PriorityNodeRfc9218>[priorityLevels];
 		private readonly Dictionary<int, StreamRec> streams = new Dictionary<int, StreamRec>();
 		private readonly PriorityNodeRfc9218 root;
 		private readonly Profiler profiler;
@@ -222,7 +226,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					return -1;
 
 				int Priority = Stream.Rfc9218Priority;
-				if (Priority < 0 || Priority > 7)
+				if (Priority < 0 || Priority >= priorityLevels)
 					Priority = 3;
 
 				PriorityNodeRfc9218 Node = new PriorityNodeRfc9218(Stream, this, this.profiler);
@@ -272,7 +276,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Rfc9218Priority.HasValue)
 				{
 					int Priority = Rfc9218Priority.Value;
-					if (Priority < 0 || Priority > 7)
+					if (Priority < 0 || Priority >= priorityLevels)
 						Priority = 3;
 
 					if (Priority != Rec.Priority)
@@ -424,7 +428,7 @@ namespace Waher.Networking.HTTP.HTTP2
 					this.ConnectionWindowSize = Available;
 
 				int Left = Available;
-				for (int i = 0; i < 8; i++)
+				for (int i = 0; i < priorityLevels; i++)
 				{
 					LinkedList<PriorityNodeRfc9218> Queue = this.priorities[i];
 					if (!(Queue is null))
@@ -511,6 +515,85 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (!(Thread is null))
 					Thread.Label = Thread.Label + " (" + Label + ")";
 			}
+		}
+
+		/// <summary>
+		/// Gets an enumerator of available priority nodes.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public override IEnumerator<IPriorityNode> GetEnumerator()
+		{
+			return new PriorityNodeEnumerator(this);
+		}
+
+		private class PriorityNodeEnumerator : IEnumerator<IPriorityNode> 
+		{
+			private readonly FlowControlRfc9218 flowControl;
+			private LinkedListNode<PriorityNodeRfc9218> currentNode = null;
+			private int index = -1;
+
+			internal PriorityNodeEnumerator(FlowControlRfc9218 FlowControl)
+			{
+				this.flowControl = FlowControl;
+			}
+
+			public IPriorityNode Current
+			{
+				get
+				{
+					if (this.currentNode is null)
+						throw new System.InvalidOperationException();
+					else
+						return this.currentNode.Value;
+				}
+			}
+
+			object IEnumerator.Current => this.Current;
+
+			public void Dispose()
+			{
+				this.Reset();
+			}
+
+			public bool MoveNext()
+			{
+				if (!(this.currentNode is null))
+				{
+					this.currentNode = this.currentNode.Next;
+					if (!(this.currentNode is null))
+						return true;
+				}
+
+				if (this.index >= priorityLevels)
+					return false;
+
+				do
+				{
+					this.index++;
+					if (this.index >= priorityLevels)
+						return false;
+
+					this.currentNode = this.flowControl.priorities[this.index]?.First;
+				}
+				while (this.currentNode is null);
+
+				return true;
+			}
+
+			public void Reset()
+			{
+				this.index = -1;
+				this.currentNode = null;
+			}
+		}
+
+		/// <summary>
+		/// Exports a PlantUML header.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		protected override void ExportPlantUmlHeader(StringBuilder Output)
+		{
+			this.root?.ExportPlantUml(Output);
 		}
 
 	}

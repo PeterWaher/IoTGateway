@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -219,5 +221,71 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Label">Label to set.</param>
 		public abstract void SetProfilerStreamLabel(int StreamId, string Label);
+
+		/// <summary>
+		/// Gets an enumerator of available priority nodes.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public abstract IEnumerator<IPriorityNode> GetEnumerator();
+
+		/// <summary>
+		/// Gets an enumerator of available priority nodes.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Exports current flow control tree to PlantUML format.
+		/// </summary>
+		/// <param name="NrNodes">Number of nodes output.</param>
+		/// <returns>UML diagram</returns>
+		public string ExportPlantUml(out int NrNodes)
+		{
+			StringBuilder Output = new StringBuilder();
+			this.ExportPlantUml(Output, out NrNodes);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports current flow control tree to PlantUML format.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		/// <param name="NrNodes">Number of nodes output.</param>
+		public void ExportPlantUml(StringBuilder Output, out int NrNodes)
+		{
+			IEnumerator<IPriorityNode> e = this.GetEnumerator();
+			NrNodes = 0;
+
+			this.ExportPlantUmlHeader(Output);
+
+			while (e.MoveNext())
+			{
+				NrNodes++;
+				e.Current.ExportPlantUml(Output);
+			}
+
+			this.ExportPlantUmlFooter(Output);
+		}
+
+		/// <summary>
+		/// Exports a PlantUML header.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		protected virtual void ExportPlantUmlHeader(StringBuilder Output)
+		{
+			Output.AppendLine("@startuml");
+		}
+
+		/// <summary>
+		/// Exports a PlantUML footer.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		protected virtual void ExportPlantUmlFooter(StringBuilder Output)
+		{
+			Output.AppendLine("@enduml");
+		}
 	}
 }

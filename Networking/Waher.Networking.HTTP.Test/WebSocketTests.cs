@@ -64,7 +64,7 @@ namespace Waher.Networking.HTTP.Test
 
 			this.server.ConnectionProfiled += async (sender, e) =>
 			{
-				string Uml = e.ExportPlantUml(TimeUnit.MilliSeconds);
+				string Uml = e.Profiler.ExportPlantUml(TimeUnit.MilliSeconds);
 				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, "uml"), Uml);
 			};
 

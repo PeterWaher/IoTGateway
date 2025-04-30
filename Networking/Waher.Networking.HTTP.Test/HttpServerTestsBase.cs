@@ -47,7 +47,7 @@ namespace Waher.Networking.HTTP.Test
 			this.server.ConnectionProfiled += async (sender, e) =>
 			{
 				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, ".uml"),
-					e.ExportPlantUml(Runtime.Profiling.TimeUnit.MilliSeconds));
+					e.Profiler.ExportPlantUml(Runtime.Profiling.TimeUnit.MilliSeconds));
 			};
 
 			DeflateContentEncoding DeflateContentEncoding = new();

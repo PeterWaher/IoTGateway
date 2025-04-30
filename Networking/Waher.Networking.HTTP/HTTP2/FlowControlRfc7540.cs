@@ -515,5 +515,23 @@ namespace Waher.Networking.HTTP.HTTP2
 			}
 		}
 
+		/// <summary>
+		/// Gets an enumerator of available priority nodes.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public override IEnumerator<IPriorityNode> GetEnumerator()
+		{
+			return this.nodes.Values.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Exports a PlantUML header.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		protected override void ExportPlantUmlHeader(StringBuilder Output)
+		{
+			this.root?.ExportPlantUml(Output);
+		}
+
 	}
 }

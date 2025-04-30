@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -578,6 +580,66 @@ namespace Waher.Networking.HTTP.HTTP2
 					this.windowThread.NewSample(this.windowSize);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Exports the priorty node to PlantUML format.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		public void ExportPlantUml(StringBuilder Output)
+		{
+			Output.Append("object \"Stream ");
+			Output.Append(this.Stream?.StreamId.ToString());
+			Output.Append("\" as S");
+			Output.Append(this.Stream?.StreamId.ToString());
+			Output.AppendLine(" {");
+			Output.Append("resource = \"");
+			Output.Append(GetResourceFromLabel(this.Stream?.StreamThread?.Label));
+			Output.AppendLine("\"");
+			Output.Append("pendingRequests = ");
+			Output.AppendLine(this.pendingRequests?.Count.ToString() ?? "0");
+			Output.Append("childNodes = ");
+			Output.AppendLine(this.childNodes?.Count.ToString() ?? "0");
+			Output.Append("maxFrameSize = ");
+			Output.AppendLine(this.maxFrameSize.ToString());
+			Output.Append("resourceFraction = ");
+			Output.AppendLine(CommonTypes.Encode(this.resourceFraction));
+			Output.Append("totalChildWeights = ");
+			Output.AppendLine(this.totalChildWeights.ToString());
+			Output.Append("windowSize0 = ");
+			Output.AppendLine(this.windowSize0.ToString());
+			Output.Append("windowSize = ");
+			Output.AppendLine(this.windowSize.ToString());
+			Output.Append("windowSizeFraction = ");
+			Output.AppendLine(this.windowSizeFraction.ToString());
+			Output.Append("weight = ");
+			Output.AppendLine(this.weight.ToString());
+			Output.AppendLine("}");
+			Output.AppendLine();
+
+			Output.Append('S');
+			Output.Append((this.dependentOn ?? this.root)?.Stream?.StreamId.ToString());
+			Output.Append(" *-- S");
+			Output.AppendLine(this.Stream?.StreamId.ToString());
+			Output.AppendLine();
+		}
+
+		internal static string GetResourceFromLabel(string Label)
+		{
+			if (string.IsNullOrEmpty(Label))
+				return string.Empty;
+
+			int i = Label.IndexOf('(');
+			if (i >= 0)
+				Label = Label.Substring(i + 1).TrimStart();
+			else
+				return Label;
+
+			i = Label.LastIndexOf(')');
+			if (i > 0)
+				Label = Label.Substring(0, i).TrimEnd();
+
+			return Label;
 		}
 	}
 }

@@ -27,7 +27,6 @@ using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
-using Waher.Runtime.Profiling;
 using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
@@ -1069,7 +1068,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when an HTTP/2 connection profile has been completed.
 		/// </summary>
-		public event EventHandlerAsync<Profiler> ConnectionProfiled;
+		public event EventHandlerAsync<ProfilingEventArgs> ConnectionProfiled;
 
 		#endregion
 
@@ -1335,13 +1334,21 @@ namespace Waher.Networking.HTTP
 				}
 			}
 			else
+			{
+				if (this.HasSniffers)
+					this.Error("Connection closed. Remote endpoint not allowed to start TLS: " + RemoteEndpoint);
+
 				await Client.DisposeAsync();
+			}
 		}
 
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
 		{
 			Exception ex2 = Log.UnnestException(ex);
 			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
+
+			if (this.HasSniffers)
+				this.Error("Connection closed (authentication failed).");
 
 			await Client.DisposeAsync();
 		}
@@ -1357,7 +1364,10 @@ namespace Waher.Networking.HTTP
 			}
 
 			if (!(Connection.Http2Profiler is null))
-				await this.ConnectionProfiled.Raise(this, Connection.Http2Profiler);
+			{
+				ProfilingEventArgs e = new ProfilingEventArgs(Connection.Http2Profiler, Connection.FlowControl);
+				await this.ConnectionProfiled.Raise(this, e);
+			}
 
 			return Result;
 		}

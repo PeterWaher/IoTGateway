@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Profiling;
@@ -52,5 +53,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// Window Data thread, if any.
 		/// </summary>
 		ProfilerThread DataThread { get; }
+
+		/// <summary>
+		/// Exports the priorty node to PlantUML format.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		void ExportPlantUml(StringBuilder Output);
 	}
 }

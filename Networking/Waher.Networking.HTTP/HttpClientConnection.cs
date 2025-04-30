@@ -1381,7 +1381,7 @@ namespace Waher.Networking.HTTP
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Maximum frame size cannot be less than originally stated.", StreamThread);
 
 							this.localSettings.EnablePush &= this.remoteSettings.EnablePush;
-							this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
+							//this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
 						}
 
 						if (this.flowControl is null)

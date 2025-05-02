@@ -248,6 +248,7 @@ namespace Waher.Networking.HTTP.HTTP2
 				}
 
 				Nodes.AddLast(Rec.Node);
+				Node.CheckProfilerThreads();
 
 				return Rec.Node.AvailableResources;
 			}
@@ -593,6 +594,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Output">UML diagram will be exported here.</param>
 		protected override void ExportPlantUmlHeader(StringBuilder Output)
 		{
+			base.ExportPlantUmlHeader(Output);
+
 			this.root?.ExportPlantUml(Output);
 		}
 

@@ -212,7 +212,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		public int ConnectionWindowSize
 		{
 			get => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
-			internal set => this.connectionWindowSize = this.connectionBytesCommunicated + value;
+			internal set
+			{
+				this.connectionWindowSize = this.connectionBytesCommunicated + value;
+				this.remoteSettings.InitialWindowSize = value;
+			}
 		}
 
 		/// <summary>
@@ -277,6 +281,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		protected virtual void ExportPlantUmlHeader(StringBuilder Output)
 		{
 			Output.AppendLine("@startuml");
+			Output.AppendLine("left to right direction");
+			Output.AppendLine();
 		}
 
 		/// <summary>

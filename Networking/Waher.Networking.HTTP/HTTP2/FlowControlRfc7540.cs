@@ -236,6 +236,8 @@ namespace Waher.Networking.HTTP.HTTP2
 						this.MoveChildrenLocked(DependentOn, Node);
 
 					Parent.AddChildDependency(Node);
+					Node.CheckProfilerThreads();
+
 					this.nodes[Stream.StreamId] = Node;
 				}
 
@@ -530,6 +532,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Output">UML diagram will be exported here.</param>
 		protected override void ExportPlantUmlHeader(StringBuilder Output)
 		{
+			base.ExportPlantUmlHeader(Output);
+
 			this.root?.ExportPlantUml(Output);
 		}
 

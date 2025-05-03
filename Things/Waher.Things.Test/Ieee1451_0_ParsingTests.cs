@@ -22,10 +22,14 @@ namespace Waher.Things.Test
 		}
 
 		[DataTestMethod]
-		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk4LjE1AAAAZwFGxwD/sRM=")]   // Source: ubi.pt
-		public void Test_01_ParseMessage(string Base64Encoded)
+		[DataRow("AgECAEUAAAAwOQAwOQAwOQfoBUk2WZAAMDkAMDkAMDkH6AVJOC5QhiWKC3L2EtaHB+gFSRHc8AABMjk4LjE1AAAAZwFGxwD/sRM=", false)]   // Source: ubi.pt
+		[DataRow("MFsAHV8xNDUxLjEuNi9EMC85OUJJTkRURVNUL25jYXAwAQgCAAAAPMK/wrfDpyVzZsK8wrbDlAkAAAAAAAAAAAAAAAAAAAAAbmNhcDAAAAAAAAAAAAAAAAEKAQEB", true)]   // Source Nishisan
+		public void Test_01_ParseMessage(string Base64Encoded, bool IncludesMqttPackage)
 		{
 			byte[] Bin = Convert.FromBase64String(Base64Encoded);
+			if (IncludesMqttPackage)
+				ProcessMqttPackage(ref Bin);
+
 			Console.Out.WriteLine("Length: " + Bin.Length.ToString());
 
 			Message Message;

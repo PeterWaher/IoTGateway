@@ -31,14 +31,16 @@ namespace Waher.Networking.HTTP.HTTP2
 			CancellationToken? CancellationToken);
 
 		/// <summary>
-		/// Releases stream resources back to the stream.
+		/// Releases stream resources back to the stream, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID > 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
 		int ReleaseStreamResources(int Resources);
 
 		/// <summary>
-		/// Releases connection resources back.
+		/// Releases connection resources back, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID = 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>

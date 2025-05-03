@@ -60,7 +60,7 @@ namespace Waher.Networking.HTTP.Test
 				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
 				this.xmlSniffer);
 
-			this.server.SetHttp2ConnectionSettings(true, 65535, 16384, 100, 8192, false, false, true, false);
+			this.server.SetHttp2ConnectionSettings(true, 65535, 65535, 16384, 100, 8192, false, false, true, false);
 
 			this.server.ConnectionProfiled += async (sender, e) =>
 			{

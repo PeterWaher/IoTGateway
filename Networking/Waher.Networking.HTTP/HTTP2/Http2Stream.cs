@@ -39,14 +39,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// HTTP/2 stream, for testing purposes.
 		/// </summary>
 		/// <param name="StreamId">Stream ID</param>
-		/// <param name="Settings">Settings.</param>
-		internal Http2Stream(int StreamId, ConnectionSettings Settings)
+		/// <param name="LocalSettings">Local Settings.</param>
+		internal Http2Stream(int StreamId, ConnectionSettings LocalSettings)
 		{
 			this.streamId = StreamId;
 			this.connection = null;
 			this.streamThread = null;
-			this.dataInputWindowSize = Settings.InitialWindowSize;
-			this.headerInputWindowSize = Settings.MaxHeaderListSize;
+			this.headerInputWindowSize = LocalSettings.MaxHeaderListSize;
+			this.dataInputWindowSize = LocalSettings.InitialStreamWindowSize;
 		}
 
 		/// <summary>
@@ -60,8 +60,8 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.streamId = StreamId;
 			this.connection = Connection;
 			this.streamThread = StreamThread;
-			this.dataInputWindowSize = this.connection.LocalSettings.InitialWindowSize;
 			this.headerInputWindowSize = Connection.LocalSettings.MaxHeaderListSize;
+			this.dataInputWindowSize = this.connection.LocalSettings.InitialStreamWindowSize;
 
 			this.streamThread?.NewState(this.state.ToString());
 		}

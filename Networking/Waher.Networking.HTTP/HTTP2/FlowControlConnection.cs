@@ -15,8 +15,9 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly ConnectionSettings localSettings;
 		private readonly ConnectionSettings remoteSettings;
 		private readonly HttpClientConnection connection;
-		private long connectionWindowSize;
-		private long connectionBytesCommunicated = 0;
+		private int rxConnectionWindowSize;
+		private long txConnectionWindowSize;
+		private long connectionBytesTransmitted = 0;
 		private bool hasPendingIncrements = false;
 
 		/// <summary>
@@ -40,7 +41,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			this.localSettings = LocalSettings;
 			this.remoteSettings = RemoteSettings;
-			this.connectionWindowSize = LocalSettings.InitialWindowSize;
+			this.rxConnectionWindowSize = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
+			this.txConnectionWindowSize = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
 			this.connection = Connection;
 		}
 
@@ -60,7 +62,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		internal HttpClientConnection Connection => this.connection;
 
 		/// <summary>
-		/// Called when connection settings have been updated.
+		/// Called when the remote connection settings have been updated.
 		/// </summary>
 		public abstract void RemoteSettingsUpdated();
 
@@ -107,7 +109,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		public abstract Task<int> RequestResources(int StreamId, int RequestedResources, CancellationToken? CancellationToken);
 
 		/// <summary>
-		/// Releases stream resources back to the stream.
+		/// Releases stream resources back to the stream, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID > 0.
 		/// </summary>
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
@@ -115,7 +118,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		public abstract int ReleaseStreamResources(int StreamId, int Resources);
 
 		/// <summary>
-		/// Releases connection resources back.
+		/// Releases connection resources back, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID = 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
@@ -187,12 +191,11 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (Increment <= 0 || Increment > int.MaxValue - 1)
 				return false;
 
-			long Size = this.connectionWindowSize + Increment;
-
+			long Size = this.txConnectionWindowSize + Increment - this.connectionBytesTransmitted;
 			if (Size < 0 || Size > int.MaxValue - 1)
 				return false;
 
-			this.connectionWindowSize = Size;
+			this.txConnectionWindowSize += Increment;
 
 			return true;
 		}
@@ -203,20 +206,24 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Increment">Increment</param>
 		public void DataBytesSentLocked(int Increment)
 		{
-			this.connectionBytesCommunicated += Increment;
+			this.connectionBytesTransmitted += Increment;
 		}
 
 		/// <summary>
-		/// Connection window size
+		/// Connection transmission window size
 		/// </summary>
-		public int ConnectionWindowSize
+		public int TxConnectionWindowSize
 		{
-			get => (int)(this.connectionWindowSize - this.connectionBytesCommunicated);
-			internal set
-			{
-				this.connectionWindowSize = this.connectionBytesCommunicated + value;
-				this.remoteSettings.InitialWindowSize = value;
-			}
+			get => (int)(this.txConnectionWindowSize - this.connectionBytesTransmitted);
+		}
+
+		/// <summary>
+		/// Connection Window size for receiving data.
+		/// </summary>
+		public int RxConnectionWindowSize
+		{
+			get => this.rxConnectionWindowSize;
+			internal set => this.rxConnectionWindowSize = value;
 		}
 
 		/// <summary>

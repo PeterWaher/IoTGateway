@@ -105,7 +105,8 @@ namespace Waher.Networking.HTTP
 
 		// HTTP/2 default settings
 
-		private int http2InitialWindowSize = ConnectionSettings.DefaultHttp2InitialWindowSize;
+		private int http2InitialStreamWindowSize = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
+		private int http2InitialConnectionWindowSize = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
 		private int http2MaxFrameSize = ConnectionSettings.DefaultHttp2MaxFrameSize;
 		private int http2MaxConcurrentStreams = ConnectionSettings.DefaultHttp2MaxConcurrentStreams;
 		private int http2HeaderTableSize = ConnectionSettings.DefaultHttp2HeaderTableSize;
@@ -967,9 +968,14 @@ namespace Waher.Networking.HTTP
 		public bool Http2Enabled => this.http2Enabled;
 
 		/// <summary>
-		/// HTTP/2: Initial window size.
+		/// HTTP/2: Initial stream window size.
 		/// </summary>
-		public int Http2InitialWindowSize => this.http2InitialWindowSize;
+		public int Http2InitialStreamWindowSize => this.http2InitialStreamWindowSize;
+
+		/// <summary>
+		/// HTTP/2: Initial connection window size.
+		/// </summary>
+		public int Http2InitialConnectionWindowSize => this.http2InitialConnectionWindowSize;
 
 		/// <summary>
 		/// HTTP/2: Maximum frame size.
@@ -1000,18 +1006,20 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
+		/// <param name="InitialConnectionWindowSize">Initial connection window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
-			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
-			bool NoRfc7540Priorities, bool Lock)
+		public void SetHttp2ConnectionSettings(int InitialStreamWindowSize, 
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Lock)
 		{
-			this.SetHttp2ConnectionSettings(true, InitialWindowSize, MaxFrameSize, MaxConcurrentStreams,
+			this.SetHttp2ConnectionSettings(true, InitialStreamWindowSize, 
+				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams,
 				HeaderTableSize, EnablePush, NoRfc7540Priorities, Lock);
 		}
 
@@ -1019,27 +1027,29 @@ namespace Waher.Networking.HTTP
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		/// <param name="Http2Enabled">If HTTP/2 is enabled or not.</param>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
+		/// <param name="InitialConnectionWindowSize">Initial connection window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialWindowSize,
-			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
-			bool NoRfc7540Priorities, bool Lock)
+		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialStreamWindowSize,
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Lock)
 		{
-			this.SetHttp2ConnectionSettings(Http2Enabled, InitialWindowSize, MaxFrameSize, 
-				MaxConcurrentStreams, HeaderTableSize, EnablePush, NoRfc7540Priorities, 
-				false, Lock);
+			this.SetHttp2ConnectionSettings(Http2Enabled, InitialStreamWindowSize, 
+				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams, 
+				HeaderTableSize, EnablePush, NoRfc7540Priorities, false, Lock);
 		}
 
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		/// <param name="Http2Enabled">If HTTP/2 is enabled or not.</param>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
+		/// <param name="InitialConnectionWindowSize">Initial connection window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
@@ -1047,15 +1057,17 @@ namespace Waher.Networking.HTTP
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Profiling">Enables HTTP/2 connection profiling for performance analysis.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialWindowSize,
-			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
-			bool NoRfc7540Priorities, bool Profiling, bool Lock)
+		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialStreamWindowSize,
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Profiling, 
+			bool Lock)
 		{
 			if (this.http2SettingsLocked)
 				throw new InvalidOperationException("HTTP/2 settings locked.");
 
 			this.http2Enabled = Http2Enabled;
-			this.http2InitialWindowSize = InitialWindowSize;
+			this.http2InitialStreamWindowSize = InitialStreamWindowSize;
+			this.http2InitialConnectionWindowSize = InitialConnectionWindowSize;
 			this.http2MaxFrameSize = MaxFrameSize;
 			this.http2MaxConcurrentStreams = MaxConcurrentStreams;
 			this.http2HeaderTableSize = HeaderTableSize;

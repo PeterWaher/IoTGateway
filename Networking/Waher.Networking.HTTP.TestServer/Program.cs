@@ -225,7 +225,7 @@ internal class Program
 
 			int ProfilerIndex = 0;
 
-			WebServer.SetHttp2ConnectionSettings(true, 2500000, 16384, 100, 8192, false, No7540prio, true, true);
+			WebServer.SetHttp2ConnectionSettings(true, 2500000, 5000000, 16384, 100, 8192, false, No7540prio, true, true);
 			WebServer.ConnectionProfiled += (Sender, e) =>
 			{
 				if (!Directory.Exists("Profiler"))

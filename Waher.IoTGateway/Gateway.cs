@@ -374,12 +374,16 @@ namespace Waher.IoTGateway
 				bool TrustClientCertificates = false;
 				Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificMTlsSettings = null;
 				bool Http2Enabled = true;
-				int Http2InitialWindowSize = 2500000;
+				int Http2InitialStreamWindowSize = 2500000;
+				int Http2InitialConnectionWindowSize = 5000000;
 				int Http2MaxFrameSize = 16384;
 				int Http2MaxConcurrentStreams = 100;
 				int Http2HeaderTableSize = 8192;
 				bool Http2NoRfc7540Priorities = false;
 				bool Http2Profiling = false;
+
+				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
+				// to avoid congestion.
 
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
@@ -416,7 +420,8 @@ namespace Waher.IoTGateway
 
 							case "Http2Settings":
 								Http2Enabled = XML.Attribute(E, "enabled", Http2Enabled);
-								Http2InitialWindowSize = XML.Attribute(E, "initialWindowSize", Http2InitialWindowSize);
+								Http2InitialStreamWindowSize = XML.Attribute(E, "initialWindowSize", Http2InitialStreamWindowSize);
+								Http2InitialConnectionWindowSize = XML.Attribute(E, "initialConnectionWindowSize", Http2InitialConnectionWindowSize);
 								Http2MaxFrameSize = XML.Attribute(E, "maxFrameSize", Http2MaxFrameSize);
 								Http2MaxConcurrentStreams = XML.Attribute(E, "maxConcurrentStreams", Http2MaxConcurrentStreams);
 								Http2HeaderTableSize = XML.Attribute(E, "headerTableSize", Http2HeaderTableSize);
@@ -1078,12 +1083,9 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
-				// to avoid congestion.
-
-				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialWindowSize,
-					Http2MaxFrameSize, Http2MaxConcurrentStreams, Http2HeaderTableSize,
-					false, Http2NoRfc7540Priorities, Http2Profiling, true);
+				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialStreamWindowSize,
+					Http2InitialConnectionWindowSize, Http2MaxFrameSize, Http2MaxConcurrentStreams, 
+					Http2HeaderTableSize, false, Http2NoRfc7540Priorities, Http2Profiling, true);
 
 				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
 

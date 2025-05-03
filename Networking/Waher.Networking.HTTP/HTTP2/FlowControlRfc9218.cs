@@ -21,7 +21,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly Profiler profiler;
 		private readonly object synchObj = new object();
 		private int lastNodeStreamId = -1;
-		private int lastRemoteInitialWindowSize = 0;
+		private int lastRemoteStreamWindowSize = 0;
 		private StreamRec lastRec = null;
 		private bool disposed = false;
 
@@ -59,7 +59,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.root = new PriorityNodeRfc9218(null, this, this.profiler);
 			this.root.CheckProfilerThreads();
 
-			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
+			this.lastRemoteStreamWindowSize = this.RemoteSettings.InitialStreamWindowSize;
 		}
 
 		/// <summary>
@@ -68,26 +68,26 @@ namespace Waher.Networking.HTTP.HTTP2
 		public PriorityNodeRfc9218 Root => this.root;
 
 		/// <summary>
-		/// Called when connection settings have been updated.
+		/// Called when the remote connection settings have been updated.
 		/// </summary>
 		public override void RemoteSettingsUpdated()
 		{
-			int Size = this.RemoteSettings.InitialWindowSize;
-			int WindowSizeDiff = Size - this.lastRemoteInitialWindowSize;
-			this.lastRemoteInitialWindowSize = Size;
+			int Size = this.RemoteSettings.InitialStreamWindowSize;
 
-			if (WindowSizeDiff != 0)
+			if (this.lastRemoteStreamWindowSize != Size)
 			{
+				this.lastRemoteStreamWindowSize = Size;
+
 				lock (this.synchObj)
 				{
-					this.root.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size, false);
+					this.root.SetNewWindowSize(this.root.OutputWindowSize, Size, false);
 
 					foreach (LinkedList<PriorityNodeRfc9218> Nodes in this.priorities)
 					{
 						if (!(Nodes is null))
 						{
 							foreach (PriorityNodeRfc9218 Node in Nodes)
-								Node.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size, true);
+								Node.SetNewWindowSize(this.root.OutputWindowSize, Size, true);
 						}
 					}
 				}
@@ -172,7 +172,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>Size of window associated with stream. Negative = error</returns>
 		public int AddStreamForTest(int StreamId, int Rfc9218Priority, bool Rfc9218Incremental)
 		{
-			return this.AddStreamForTest(StreamId, this.RemoteSettings, Rfc9218Priority, Rfc9218Incremental);
+			return this.AddStreamForTest(StreamId, this.LocalSettings, Rfc9218Priority, 
+				Rfc9218Incremental);
 		}
 
 		/// <summary>
@@ -180,25 +181,25 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// default priority settings.
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
-		/// <param name="Settings">Settings to use.</param>
+		/// <param name="LocalSettings">Local Settings to use.</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId, ConnectionSettings Settings)
+		public int AddStreamForTest(int StreamId, ConnectionSettings LocalSettings)
 		{
-			return this.AddStreamForTest(StreamId, Settings, 3, false);
+			return this.AddStreamForTest(StreamId, LocalSettings, 3, false);
 		}
 
 		/// <summary>
 		/// Tries to add a stream to flow control for testing purposes.
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
-		/// <param name="Settings">Settings to use.</param>
+		/// <param name="LocalSettings">Local Settings to use.</param>
 		/// <param name="Rfc9218Priority">Priority, as defined by RFC 9218.</param>
 		/// <param name="Rfc9218Incremental">If stream is incremental</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId, ConnectionSettings Settings,
+		public int AddStreamForTest(int StreamId, ConnectionSettings LocalSettings,
 			int Rfc9218Priority, bool Rfc9218Incremental)
 		{
-			Http2Stream Stream = new Http2Stream(StreamId, Settings)
+			Http2Stream Stream = new Http2Stream(StreamId, LocalSettings)
 			{
 				Rfc9218Priority = Rfc9218Priority,
 				Rfc9218Incremental = Rfc9218Incremental
@@ -384,7 +385,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Releases stream resources back to the stream.
+		/// Releases stream resources back to the stream, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID > 0.
 		/// </summary>
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
@@ -412,7 +414,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Releases connection resources back.
+		/// Releases connection resources back, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID = 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
@@ -424,9 +427,6 @@ namespace Waher.Networking.HTTP.HTTP2
 			lock (this.synchObj)
 			{
 				int Available = this.root.ReleaseConnectionResources(Resources);
-
-				if (Available > this.ConnectionWindowSize)
-					this.ConnectionWindowSize = Available;
 
 				int Left = Available;
 				for (int i = 0; i < priorityLevels; i++)

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
@@ -71,7 +70,7 @@ namespace Waher.Networking.HTTP
 		private FrameType http2FrameType = 0;
 		private ConnectionSettings localSettings = null;
 		private ConnectionSettings remoteSettings = null;
-		private IFlowControl flowControl = null;
+		private FlowControlConnection flowControl = null;
 		private HeaderReader http2HeaderReader = null;
 		private HeaderWriter http2HeaderWriter = null;
 		private Dictionary<int, PrioritySettings> rfc9218PrioritySettings = null;
@@ -223,7 +222,7 @@ namespace Waher.Networking.HTTP
 					this.client.OnReceivedReset(this.Client_OnReceivedHttp2Init);
 
 					this.localSettings = new ConnectionSettings(
-						this.server.Http2InitialWindowSize,
+						this.server.Http2InitialStreamWindowSize,
 						this.server.Http2MaxFrameSize,
 						this.server.Http2MaxConcurrentStreams,
 						this.server.Http2HeaderTableSize,
@@ -254,7 +253,7 @@ namespace Waher.Networking.HTTP
 								this.remoteSettings = Settings;
 								this.http2InitialMaxFrameSize = this.remoteSettings.MaxFrameSize;
 								this.localSettings = new ConnectionSettings(
-									this.server.Http2InitialWindowSize,
+									this.server.Http2InitialStreamWindowSize,
 									this.server.Http2MaxFrameSize,
 									this.server.Http2MaxConcurrentStreams,
 									this.server.Http2HeaderTableSize,
@@ -1407,6 +1406,19 @@ namespace Waher.Networking.HTTP
 
 						if (!await this.SendHttp2Frame(FrameType.Settings, 1, false, 0, null))   // Ack
 							return false;
+
+						if (this.flowControl.RxConnectionWindowSize != this.server.Http2InitialConnectionWindowSize)
+						{
+							int Diff = this.server.Http2InitialConnectionWindowSize - this.flowControl.RxConnectionWindowSize;
+							HTTP2.BinaryWriter w = new HTTP2.BinaryWriter(4);
+
+							w.WriteUInt32((uint)Diff);
+
+							if (!await this.SendHttp2Frame(FrameType.WindowUpdate, 0, false, 0, null, w.ToArray()))
+								return false;
+
+							this.flowControl.RxConnectionWindowSize = this.server.Http2InitialConnectionWindowSize;
+						}
 						break;
 
 					case FrameType.PushPromise:
@@ -1852,13 +1864,15 @@ namespace Waher.Networking.HTTP
 #if INFO_IN_SNIFFERS
 			if (this.HasSniffers)
 			{
-				Task<int> T = this.flowControl.RequestResources(StreamId, Count, 
+				Task<int> T = this.flowControl.RequestResources(StreamId, Count,
 					this.client.CurrentCancellationToken);
 
 				if (!T.IsCompleted)
 				{
+					Stream.StreamThread?.Event("Pause");
 					this.Information("Output paused for stream " + StreamId.ToString());
 					NrBytes = await T;
+					Stream.StreamThread?.Event("Resume");
 					this.Information("Output resumed for stream " + StreamId.ToString());
 				}
 				else
@@ -1866,7 +1880,7 @@ namespace Waher.Networking.HTTP
 			}
 			else
 			{
-				NrBytes = await this.flowControl.RequestResources(StreamId, Count, 
+				NrBytes = await this.flowControl.RequestResources(StreamId, Count,
 					this.client.CurrentCancellationToken);
 			}
 #else
@@ -1937,11 +1951,36 @@ namespace Waher.Networking.HTTP
 				sb.Append(Count.ToString());
 				sb.Append(" bytes");
 
-				if (Type == FrameType.Data && !(Stream is null))
+				switch (Type)
 				{
-					sb.Append(" (total transmitted: ");
-					sb.Append((Stream.DataBytesTransmitted + Count).ToString());
-					sb.Append(')');
+					case FrameType.Data:
+						if (!(Stream is null))
+						{
+							sb.Append(" (total transmitted: ");
+							sb.Append((Stream.DataBytesTransmitted + Count).ToString());
+							sb.Append(')');
+						}
+						break;
+
+					case FrameType.WindowUpdate:
+						if (Count == 4)
+						{
+							int i = Data[Offset];
+							i <<= 8;
+							i |= Data[Offset + 1];
+							i <<= 8;
+							i |= Data[Offset + 2];
+							i <<= 8;
+							i |= Data[Offset + 3];
+
+							sb.Append(" (");
+							if (i > 0)
+								sb.Append("+");
+
+							sb.Append(i);
+							sb.Append(')');
+						}
+						break;
 				}
 
 				this.Information(sb.ToString());

@@ -6,6 +6,7 @@ Master: /Master.md
 JavaScript: /Settings/Next.js
 JavaScript: /Settings/XMPP.js
 JavaScript: /Events.js
+JavaScript: /Settings/AttachId.js
 CSS: /Settings/Config.cssx
 Cache-Control: max-age=0, no-cache, no-store
 UserVariable: User
@@ -96,34 +97,44 @@ empty(Item.UserName) ? "Add new user" : Item.UserName
 <fieldset>
 <legend>User definition</legend>
 
-{{if Add then ]]
-<p>
-<label for="UserName">User Name:</label>  
-<input type="text" id="UserName" name="UserName" value="((Item.UserName))" autofocus required/>
-</p>
-[[}}
 
-<p>
-<label for="LegalId">Legal ID:</label>  
-<input type="text" id="LegalId" name="LegalId" value="{{Item.LegalId}}"/>
-</p>
 
-<p>
-<label for="PersonalNumber">Personal Number:</label>  
-<input type="text" id="PersonalNumber" name="PersonalNumber" value="{{Item.PersonalNumber}}"/>
-</p>
+<div class="menuSplit">
+	<div class="menuItemExpand">
+		{{if Add then ]]
+		<p>
+		<label for="UserName">User Name:</label>  
+		<input type="text" id="UserName" name="UserName" value="((Item.UserName))" autofocus required/>
+		</p>
+		[[}}
 
-<p>
-<label for="Country">Country Code:</label>  
-<input type="text" id="Country" name="Country" value="{{Item.Country}}"/>
-</p>
+		<p>
+		<label for="LegalId">Legal ID:</label>  
+		<input type="text" id="LegalId" name="LegalId" value="{{Item.LegalId}}"/>
+		</p>
 
-<p>
-<label for="Password">Password:</label>  
-<input type="password" id="Password" name="Password" value='{{Item.PasswordHash}}' required/>
-</p>
+		<p>
+		<label for="PersonalNumber">Personal Number:</label>  
+		<input type="text" id="PersonalNumber" name="PersonalNumber" value="{{Item.PersonalNumber}}"/>
+		</p>
 
-<button type='button' onclick='RandomizePassword()'>Create Random Password</button>
+		<p>
+		<label for="Country">Country Code:</label>  
+		<input type="text" id="Country" name="Country" value="{{Item.Country}}"/>
+		</p>
+
+		<p>
+		<label for="Password">Password:</label>  
+		<input type="password" id="Password" name="Password" value='{{Item.PasswordHash}}' required/>
+		</p>
+
+		<button type='button' onclick='RandomizePassword()'>Create Random Password</button>
+
+	</div>
+	<div class="margin">
+		<div id="attachIdCode" data-mode="image" data-purpose="To attach id to a user on {{Waher.IoTGateway.Gateway.Domain}}."></div>
+	</div>
+</div>
 
 <p>
 <label for="Roles">Roles:</label>  

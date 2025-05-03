@@ -154,6 +154,8 @@
 	<Folder name="Root">
 		<Content fileName="Admin.cssx"/>
 		<Content fileName="Admin.md"/>
+		<Content fileName="AdminDropdown.md"/>
+		<Content fileName="AdminDropdownComponent.md"/>
 		<Content fileName="AlertPopup.md"/>
 		<Content fileName="ConfirmPopup.md"/>
 		<Content fileName="Emojis.md"/>
@@ -167,7 +169,7 @@
 		<Content fileName="MarkdownEditor.cssx"/>
 		<Content fileName="MarkdownEditor.js"/>
 		<Content fileName="MarkdownEditor.md"/>
-		<Content fileName="Master.js"/>
+		<Content fileName="GlobalComponents.js"/>
 		<Content fileName="Master.md"/>
 		<Content fileName="Prompt.js"/>
 		<Content fileName="Prompt.md"/>
@@ -194,6 +196,7 @@
 			</Folder>
 		</Folder>
 		<Folder name="Images">
+			<Content fileName="ArrowUp.svg"/>
 			<Content fileName="GraphVizExample.gv"/>
 			<Content fileName="Layout2DExample.xml"/>
 			<Content fileName="logo-WaherDataAB-500x97.png"/>

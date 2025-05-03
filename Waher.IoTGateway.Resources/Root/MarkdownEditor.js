@@ -13,6 +13,11 @@ function MarkdownEditorUnderline(Button)
 	ToggleInlineFormat(Button, "_");
 }
 
+function MarkdownEditorTabKey(Button)
+{
+	InsertText(Button, "\t");
+}
+
 function MarkdownEditorStrikeThrough(Button)
 {
 	ToggleInlineFormat(Button, "~");
@@ -205,8 +210,6 @@ function MarkdownKeyDown(Control, Event)
 {
 	return MarkdownEditorKeyDown(Control, Event);
 }
-
-
 
 function ToggleSidePreview(Button, on)
 {
@@ -466,6 +469,34 @@ function ToggleInlineFormat(Button, LeftDelimiter, RightDelimiter, InsertOffset)
 	TextArea.setSelectionRange(SelectionStart, SelectionEnd);
 
 	TextArea.focus();
+}
+
+function InsertText(Button, text)
+{
+	var TextArea = GetTextArea(Button);
+
+	const Start = TextArea.selectionStart;
+	const End = TextArea.selectionEnd
+
+	var Start0 = TextArea.selectionStart;
+	var End0 = TextArea.selectionEnd;
+
+	if (End0 < Start0)
+	{
+		var Temp = Start0;
+		Start0 = End0;
+		End0 = Temp;
+	}
+
+	console.log(End, Start)
+
+	const CurrentText = TextArea.value;
+	SetTextAreaValue(TextArea, CurrentText.substring(0, Start) + text + CurrentText.substring(End, CurrentText.length));
+
+	if (End === Start)
+		TextArea.setSelectionRange(End0 + text.length, End0 + text.length)
+	else
+		TextArea.setSelectionRange(Start0, End0 + text.length)
 }
 
 function ToggleLineFormat(Button, LeftDelimiter, RightDelimiter)
@@ -799,6 +830,19 @@ function MarkdownEditorKeyDown(Control, Event)
 	if (Control.getAttribute("data-preview"))
 		InitMarkdownEditorPreview(Control);
 
+	console.log(Event)
+	if (!Event.altKey && !Event.ctrlKey && Event.shiftKey)
+	{
+		switch (Event.keyCode)
+		{
+			case 9:
+				MarkdownEditorTabKey(Control)
+				Event.preventDefault()
+				return false
+		}
+	}
+
+
 	if (Event.altKey && !Event.ctrlKey && !Event.shiftKey)
 	{
 		switch (Event.keyCode)
@@ -987,10 +1031,15 @@ function InitializeMarkdownEditor(container)
 	const textInput = container.nextElementSibling || container.parentElement.getElementsByTagName("TEXTAREA")[0]
 	textInput.setAttribute("data-visible", "")
 	container.appendChild(textInput)
-	textInput.addEventListener("input", e => MarkdownKeyDown(e.target, e))
+	textInput.addEventListener("keydown", e => MarkdownKeyDown(e.target, e))
 	
 	if (container.getAttribute("data-scale") === "true")
-		textInput.addEventListener("input", e => AdaptSize(e.target))
+	{
+		textInput.addEventListener("input", e => {AdaptSize(e.target)})
+		requestAnimationFrame(() => {
+			AdaptSize(container.getElementsByTagName("textarea")[0])
+		})
+	}
 
 	const preview = document.createElement("div")
 	preview.classList.add("MarkdownPreview")
@@ -1005,7 +1054,7 @@ function MarkdownEditorInitializeHack(event, previewOn)
 	setTimeout(() => {
 		InitializeMarkdownEditor(container)
 		if (previewOn)
-		{
+			{
 			setTimeout(() => {
 				MarkdownEditorBottomPreviewAndEdit(container.getElementsByClassName("MarkdownEditorBottomPreviewAndEdit")[0])
 			}, 0)
@@ -1025,3 +1074,4 @@ function AdaptSize(Control)
 			Control.style.height = h + "px";
 	}
 }
+

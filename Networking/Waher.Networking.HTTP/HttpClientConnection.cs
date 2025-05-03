@@ -1380,7 +1380,7 @@ namespace Waher.Networking.HTTP
 								return await this.ReturnHttp2Error(Http2Error.ProtocolError, 0, "Maximum frame size cannot be less than originally stated.", StreamThread);
 
 							this.localSettings.EnablePush &= this.remoteSettings.EnablePush;
-							//this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
+							this.localSettings.NoRfc7540Priorities |= this.remoteSettings.NoRfc7540Priorities;
 						}
 
 						if (this.flowControl is null)
@@ -1965,13 +1965,13 @@ namespace Waher.Networking.HTTP
 					case FrameType.WindowUpdate:
 						if (Count == 4)
 						{
-							int i = Data[Offset];
+							int i = Payload[Offset];
 							i <<= 8;
-							i |= Data[Offset + 1];
+							i |= Payload[Offset + 1];
 							i <<= 8;
-							i |= Data[Offset + 2];
+							i |= Payload[Offset + 2];
 							i <<= 8;
-							i |= Data[Offset + 3];
+							i |= Payload[Offset + 3];
 
 							sb.Append(" (");
 							if (i > 0)

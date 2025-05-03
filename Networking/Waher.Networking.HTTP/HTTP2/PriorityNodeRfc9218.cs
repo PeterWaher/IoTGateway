@@ -108,14 +108,21 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Available > this.outputMaxFrameSize)
 					Available = this.outputMaxFrameSize;
 
-				this.outputWindowSize -= Available;
-				this.root.outputWindowSize -= Available;
-
 				if (this.hasProfiler)
 				{
 					if (this.windowThread is null)
 						this.CheckProfilerThreads();
 
+					this.windowThread.NewSample(this.AvailableResources);
+					this.root.windowThread.NewSample(this.root.outputWindowSize);
+					this.dataThread.NewSample(Available);
+				}
+
+				this.outputWindowSize -= Available;
+				this.root.outputWindowSize -= Available;
+
+				if (this.hasProfiler)
+				{
 					this.windowThread.NewSample(this.AvailableResources);
 					this.root.windowThread.NewSample(this.root.outputWindowSize);
 					this.dataThread.NewSample(Available);
@@ -137,19 +144,22 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
 				return -2;
 
+			if (this.hasProfiler)
+			{
+				if (this.windowThread is null)
+					this.CheckProfilerThreads();
+
+				this.windowThread.NewSample(this.AvailableResources);
+				this.windowThread.Event("StreamWindowUpdate");
+			}
+
 			this.outputWindowSize = NewSize;
 
 			if (NewSize > this.outputWindowSize0)
 				this.outputWindowSize0 = NewSize;
 
 			if (this.hasProfiler)
-			{
-				if (this.windowThread is null)
-					this.CheckProfilerThreads();
-
-				this.windowThread.Event("StreamWindowUpdate");
 				this.windowThread.NewSample(this.AvailableResources);
-			}
 
 			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
@@ -176,14 +186,20 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.outputMaxFrameSize < i)
 					i = this.outputMaxFrameSize;
 
-				this.outputWindowSize -= i;
-				this.root.outputWindowSize -= i;
-
 				if (this.hasProfiler)
 				{
 					if (this.windowThread is null)
 						this.CheckProfilerThreads();
 
+					this.windowThread.NewSample(this.AvailableResources);
+					this.root.windowThread.NewSample(this.root.outputWindowSize);
+				}
+
+				this.outputWindowSize -= i;
+				this.root.outputWindowSize -= i;
+
+				if (this.hasProfiler)
+				{
 					this.windowThread.NewSample(this.AvailableResources);
 					this.root.windowThread.NewSample(this.root.outputWindowSize);
 				}
@@ -216,19 +232,22 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
 				return -1;
 
+			if (this.hasProfiler)
+			{
+				if (this.windowThread is null)
+					this.CheckProfilerThreads();
+
+				this.windowThread.NewSample(this.AvailableResources);
+				this.windowThread.Event("ConnectionWindowUpdate");
+			}
+
 			this.outputWindowSize = NewSize;
 
 			if (NewSize > this.outputWindowSize0)
 				this.outputWindowSize0 = NewSize;
 
 			if (this.hasProfiler)
-			{
-				if (this.windowThread is null)
-					this.CheckProfilerThreads();
-
-				this.windowThread.Event("ConnectionWindowUpdate");
 				this.windowThread.NewSample(this.AvailableResources);
-			}
 
 			return NewSize;
 		}

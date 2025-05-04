@@ -348,12 +348,10 @@ namespace Waher.Networking.HTTP.HTTP2
 			if (NewSize > this.outputWindowSize0)
 			{
 				this.outputWindowSize0 = NewSize;
+				this.outputWindowSizeFraction = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
 
-				int Size = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
-				if (this.isStream)
-					Size = Math.Min(this.flowControl.RemoteSettings.InitialStreamWindowSize, Size);
-
-				this.outputWindowSizeFraction = Size;
+				// Note: Client allowed to increase a particular stream's window size beyond
+				//       the initial stream size defined for the connection.
 			}
 
 			Resources = Math.Min(this.root.AvailableResources, NewSize);

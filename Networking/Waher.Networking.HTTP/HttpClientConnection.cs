@@ -1,4 +1,4 @@
-﻿#define INFO_IN_SNIFFERS
+﻿//#define INFO_IN_SNIFFERS
 
 using System;
 using System.Collections.Generic;
@@ -884,8 +884,10 @@ namespace Waher.Networking.HTTP
 				{
 					string s = this.http2StreamId.ToString();
 
-					StreamThread = this.http2Profiler.TryGetThread(s)
-						?? this.CreateProfilerThread(this.http2StreamId);
+					StreamThread = this.http2Profiler.TryGetThread(s);
+
+					if (StreamThread is null && this.http2FrameType != FrameType.ResetStream)
+						StreamThread = this.CreateProfilerThread(this.http2StreamId);
 				}
 
 				if (this.http2StreamId > this.http2LastPermittedStreamId)

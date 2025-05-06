@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
@@ -398,7 +397,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal async Task<ContentStreamResponse> GetLocalTempStreamAsync(string LocalUrl, TemporaryStream Destination)
 		{
-			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, new Script.Variables());
+			Tuple<int, string, byte[]> T = await this.server.GET(LocalUrl, new SessionVariables());
 			int Code = T.Item1;
 			string ContentType = T.Item2;
 			byte[] Bin = T.Item3;

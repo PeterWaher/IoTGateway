@@ -26,7 +26,7 @@ namespace Waher.Networking.HTTP
 		private readonly string localEndPoint;
 		private readonly Http2Stream http2Stream;
 		private IUser user = null;
-		private Variables session = null;
+		private SessionVariables session = null;
 		private string subPath = string.Empty;
 		private HttpResource resource = null;
 		private HttpResponse response = null;
@@ -196,7 +196,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Contains session states, if the resource requires sessions, or null otherwise.
 		/// </summary>
-		public Variables Session
+		public SessionVariables Session
 		{
 			get => this.session;
 			set => this.session = value;

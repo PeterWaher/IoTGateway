@@ -105,9 +105,9 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			Variables v = Request.Session ?? new Variables();
-			v["Request"] = Request;
-			v["Response"] = Response;
+			SessionVariables v = Request.Session ?? new SessionVariables();
+			v.CurrentRequest = Request;
+			v.CurrentResponse = Response;
 
 			object Result;
 

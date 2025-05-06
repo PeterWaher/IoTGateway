@@ -3,9 +3,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
-using Waher.Content.Markdown.Web.ScriptExtensions;
 using Waher.Content.Xml;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Script;
 

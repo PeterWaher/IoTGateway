@@ -285,7 +285,7 @@ namespace Waher.IoTGateway.Setup
 		{
 			string FileName = Path.Combine(Gateway.RootFolder, "Settings", "RosterItems.md");
 			string Markdown = await Files.ReadAllTextAsync(FileName);
-			Variables v = HttpServer.CreateVariables();
+			Variables v = HttpServer.CreateSessionVariables();
 			v["Contacts"] = Contacts;
 			v["Requests"] = SubscriptionRequests;
 

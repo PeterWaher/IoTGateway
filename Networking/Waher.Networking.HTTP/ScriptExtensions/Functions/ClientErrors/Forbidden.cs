@@ -34,10 +34,10 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			if (Variables.TryGetVariable("Request", out Variable v) &&
-				v.ValueObject is HttpRequest Request)
+			if (Variables is SessionVariables SessionVariables &&
+				!(SessionVariables.CurrentRequest is null))
 			{
-				throw new ForbiddenException(Request, Argument.AssociatedObjectValue);
+				throw new ForbiddenException(SessionVariables.CurrentRequest, Argument.AssociatedObjectValue);
 			}
 			else
 				throw new ForbiddenException(Argument.AssociatedObjectValue);

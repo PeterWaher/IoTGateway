@@ -113,7 +113,7 @@ namespace Waher.IoTGateway.Setup
 			return base.UnregisterSetup(WebServer);
 		}
 
-		private Task WebServer_SessionRemoved(object Sender, CacheItemEventArgs<string, Variables> e)
+		private Task WebServer_SessionRemoved(object Sender, CacheItemEventArgs<string, SessionVariables> e)
 		{
 			RemoveFile(e.Key, this.backupFilePerSession);
 			RemoveFile(e.Key, this.keyFilePerSession);

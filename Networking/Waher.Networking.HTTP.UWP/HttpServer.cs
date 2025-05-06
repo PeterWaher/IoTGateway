@@ -27,7 +27,6 @@ using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
-using Waher.Runtime.Profiling;
 using Waher.Runtime.IO;
 
 namespace Waher.Networking.HTTP
@@ -57,13 +56,6 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public const int DefaultBufferSize = 16384;
 
-		internal static readonly Variables globalVariables = new Variables();
-
-		/// <summary>
-		/// Reference to global collection of variables.
-		/// </summary>
-		public static Variables GlobalVariables => globalVariables;
-
 #if WINDOWS_UWP
 		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
 #else
@@ -78,7 +70,7 @@ namespace Waher.Networking.HTTP
 		private TimeSpan sessionTimeout = TimeSpan.FromMinutes(20);
 		private TimeSpan requestTimeout = TimeSpan.FromMinutes(2);
 		private Cache<HttpRequest, RequestInfo> currentRequests;
-		private Cache<string, Variables> sessions;
+		private Cache<string, SessionVariables> sessions;
 		private string resourceOverride = null;
 		private Regex resourceOverrideFilter = null;
 		private readonly object statSynch = new object();
@@ -106,7 +98,8 @@ namespace Waher.Networking.HTTP
 
 		// HTTP/2 default settings
 
-		private int http2InitialWindowSize = ConnectionSettings.DefaultHttp2InitialWindowSize;
+		private int http2InitialStreamWindowSize = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
+		private int http2InitialConnectionWindowSize = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
 		private int http2MaxFrameSize = ConnectionSettings.DefaultHttp2MaxFrameSize;
 		private int http2MaxConcurrentStreams = ConnectionSettings.DefaultHttp2MaxConcurrentStreams;
 		private int http2HeaderTableSize = ConnectionSettings.DefaultHttp2HeaderTableSize;
@@ -240,7 +233,7 @@ namespace Waher.Networking.HTTP
 			this.portSpecificMTlsSettings = PortSpecificSettings;
 			this.clientCertificateSettingsLocked = LockSettings;
 #endif
-			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
+			this.sessions = new Cache<string, SessionVariables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
 			this.sessions.Removed += this.Sessions_Removed;
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout, true);
 			this.currentRequests.Removed += this.CurrentRequests_Removed;
@@ -968,9 +961,14 @@ namespace Waher.Networking.HTTP
 		public bool Http2Enabled => this.http2Enabled;
 
 		/// <summary>
-		/// HTTP/2: Initial window size.
+		/// HTTP/2: Initial stream window size.
 		/// </summary>
-		public int Http2InitialWindowSize => this.http2InitialWindowSize;
+		public int Http2InitialStreamWindowSize => this.http2InitialStreamWindowSize;
+
+		/// <summary>
+		/// HTTP/2: Initial connection window size.
+		/// </summary>
+		public int Http2InitialConnectionWindowSize => this.http2InitialConnectionWindowSize;
 
 		/// <summary>
 		/// HTTP/2: Maximum frame size.
@@ -1001,18 +999,20 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
+		/// <param name="InitialConnectionWindowSize">Initial connection window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
-			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
-			bool NoRfc7540Priorities, bool Lock)
+		public void SetHttp2ConnectionSettings(int InitialStreamWindowSize, 
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Lock)
 		{
-			this.SetHttp2ConnectionSettings(true, InitialWindowSize, MaxFrameSize, MaxConcurrentStreams,
+			this.SetHttp2ConnectionSettings(true, InitialStreamWindowSize, 
+				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams,
 				HeaderTableSize, EnablePush, NoRfc7540Priorities, Lock);
 		}
 
@@ -1020,27 +1020,29 @@ namespace Waher.Networking.HTTP
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		/// <param name="Http2Enabled">If HTTP/2 is enabled or not.</param>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
+		/// <param name="InitialConnectionWindowSize">Initial connection window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialWindowSize,
-			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
-			bool NoRfc7540Priorities, bool Lock)
+		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialStreamWindowSize,
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Lock)
 		{
-			this.SetHttp2ConnectionSettings(Http2Enabled, InitialWindowSize, MaxFrameSize, 
-				MaxConcurrentStreams, HeaderTableSize, EnablePush, NoRfc7540Priorities, 
-				false, Lock);
+			this.SetHttp2ConnectionSettings(Http2Enabled, InitialStreamWindowSize, 
+				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams, 
+				HeaderTableSize, EnablePush, NoRfc7540Priorities, false, Lock);
 		}
 
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
 		/// <param name="Http2Enabled">If HTTP/2 is enabled or not.</param>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
+		/// <param name="InitialConnectionWindowSize">Initial connection window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
@@ -1048,15 +1050,17 @@ namespace Waher.Networking.HTTP
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Profiling">Enables HTTP/2 connection profiling for performance analysis.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialWindowSize,
-			int MaxFrameSize, int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
-			bool NoRfc7540Priorities, bool Profiling, bool Lock)
+		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialStreamWindowSize,
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Profiling, 
+			bool Lock)
 		{
 			if (this.http2SettingsLocked)
 				throw new InvalidOperationException("HTTP/2 settings locked.");
 
 			this.http2Enabled = Http2Enabled;
-			this.http2InitialWindowSize = InitialWindowSize;
+			this.http2InitialStreamWindowSize = InitialStreamWindowSize;
+			this.http2InitialConnectionWindowSize = InitialConnectionWindowSize;
 			this.http2MaxFrameSize = MaxFrameSize;
 			this.http2MaxConcurrentStreams = MaxConcurrentStreams;
 			this.http2HeaderTableSize = HeaderTableSize;
@@ -1069,7 +1073,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when an HTTP/2 connection profile has been completed.
 		/// </summary>
-		public event EventHandlerAsync<Profiler> ConnectionProfiled;
+		public event EventHandlerAsync<ProfilingEventArgs> ConnectionProfiled;
 
 		#endregion
 
@@ -1335,13 +1339,21 @@ namespace Waher.Networking.HTTP
 				}
 			}
 			else
+			{
+				if (this.HasSniffers)
+					this.Error("Connection closed. Remote endpoint not allowed to start TLS: " + RemoteEndpoint);
+
 				await Client.DisposeAsync();
+			}
 		}
 
 		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
 		{
 			Exception ex2 = Log.UnnestException(ex);
 			Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
+
+			if (this.HasSniffers)
+				this.Error("Connection closed (authentication failed).");
 
 			await Client.DisposeAsync();
 		}
@@ -1357,7 +1369,10 @@ namespace Waher.Networking.HTTP
 			}
 
 			if (!(Connection.Http2Profiler is null))
-				await this.ConnectionProfiled.Raise(this, Connection.Http2Profiler);
+			{
+				ProfilingEventArgs e = new ProfilingEventArgs(Connection.Http2Profiler, Connection.FlowControl);
+				await this.ConnectionProfiled.Raise(this, e);
+			}
 
 			return Result;
 		}
@@ -1757,7 +1772,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="SessionId">Session ID</param>
 		/// <returns>Session states.</returns>
-		public Variables GetSession(string SessionId)
+		public SessionVariables GetSession(string SessionId)
 		{
 			return this.GetSession(SessionId, true);
 		}
@@ -1768,17 +1783,17 @@ namespace Waher.Networking.HTTP
 		/// <param name="SessionId">Session ID</param>
 		/// <param name="CreateIfNotFound">If a sesion should be created if not found.</param>
 		/// <returns>Session states, or null if not found and not crerated.</returns>
-		public Variables GetSession(string SessionId, bool CreateIfNotFound)
+		public SessionVariables GetSession(string SessionId, bool CreateIfNotFound)
 		{
 			if (this.sessions is null)
 				return null;
 
-			if (this.sessions.TryGetValue(SessionId, out Variables Result))
+			if (this.sessions.TryGetValue(SessionId, out SessionVariables Result))
 				return Result;
 
 			if (CreateIfNotFound)
 			{
-				Result = CreateVariables();
+				Result = CreateSessionVariables();
 				this.sessions.Add(SessionId, Result);
 				return Result;
 			}
@@ -1790,17 +1805,14 @@ namespace Waher.Networking.HTTP
 		/// Creates a new collection of variables, that contains access to the global set of variables.
 		/// </summary>
 		/// <returns>Variables collection.</returns>
-		public static Variables CreateVariables()
+		public static SessionVariables CreateSessionVariables()
 		{
-			return new Variables()
-			{
-				{ "Global", globalVariables }
-			};
+			return new SessionVariables();
 		}
 
-		internal Variables SetSession(string SessionId, Variables Variables)
+		internal SessionVariables SetSession(string SessionId, SessionVariables Variables)
 		{
-			if (this.sessions.TryGetValue(SessionId, out Variables Variables2))
+			if (this.sessions.TryGetValue(SessionId, out SessionVariables Variables2))
 				return Variables2;
 			else
 			{
@@ -1810,7 +1822,7 @@ namespace Waher.Networking.HTTP
 		}
 
 
-		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, SessionVariables> e)
 		{
 			return this.SessionRemoved.Raise(this, e);
 		}
@@ -1818,7 +1830,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when a session has been closed.
 		/// </summary>
-		public event EventHandlerAsync<CacheItemEventArgs<string, Variables>> SessionRemoved = null;
+		public event EventHandlerAsync<CacheItemEventArgs<string, SessionVariables>> SessionRemoved = null;
 
 		/// <summary>
 		/// Event raised before sending an error back to a client. Allows the server to prepare custom error pages.
@@ -2046,7 +2058,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="LocalUrl">Local URL</param>
 		/// <param name="Session">Session variables, if available, or null if not.</param>
 		/// <returns>Status Code, Content-Type and binary representation of resource, if available.</returns>
-		public async Task<Tuple<int, string, byte[]>> GET(string LocalUrl, Variables Session)
+		public async Task<Tuple<int, string, byte[]>> GET(string LocalUrl, SessionVariables Session)
 		{
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');

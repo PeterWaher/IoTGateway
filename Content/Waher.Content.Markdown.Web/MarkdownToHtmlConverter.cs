@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Content.Html;
 using Waher.Content.Markdown.Rendering;
-using Waher.Content.Markdown.Web.ScriptExtensions;
 using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
@@ -103,44 +103,42 @@ namespace Waher.Content.Markdown.Web
 				Markdown = rd.ReadToEnd();
 			}
 
-			if (!(State.Session is null) && State.Session.TryGetVariable("Request", out Variable v))
+			if (State.Session is SessionVariables SessionVariables &&
+				!(SessionVariables.CurrentRequest is null))
 			{
-				Request = v.ValueObject as HttpRequest;
+				Request = SessionVariables.CurrentRequest;
 
-				if (!(Request is null))
+				Page.GetPageVariables(SessionVariables, Request.Header.ResourcePart);
+
+				int i = Markdown.IndexOf("\r\n\r\n");
+				if (i < 0)
+					i = Markdown.IndexOf("\n\n");
+
+				if (i > 0)
 				{
-					Page.GetPageVariables(State.Session, Request.Header.ResourcePart);
+					HttpRequestHeader RequestHeader = Request.Header;
+					Variables Variables = State.Session;
+					string Header = Markdown.Substring(0, i);
+					string Parameter;
 
-					int i = Markdown.IndexOf("\r\n\r\n");
-					if (i < 0)
-						i = Markdown.IndexOf("\n\n");
-
-					if (i > 0)
+					foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
 					{
-						HttpRequestHeader RequestHeader = Request.Header;
-						Variables Variables = State.Session;
-						string Header = Markdown.Substring(0, i);
-						string Parameter;
+						if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
+							continue;
 
-						foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
+						Parameter = Row.Substring(10).Trim();
+						if (RequestHeader.TryGetQueryParameter(Parameter, out string Value))
 						{
-							if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
-								continue;
-
-							Parameter = Row.Substring(10).Trim();
-							if (RequestHeader.TryGetQueryParameter(Parameter, out string Value))
-							{
-								Value = System.Net.WebUtility.UrlDecode(Value);
-								if (CommonTypes.TryParse(Value, out double d))
-									Variables[Parameter] = d;
-								else if (bool.TryParse(Value, out b))
-									Variables[Parameter] = b;
-								else
-									Variables[Parameter] = Value;
-							}
+							Value = System.Net.WebUtility.UrlDecode(Value);
+							if (CommonTypes.TryParse(Value, out double d))
+								Variables[Parameter] = d;
+							else if (bool.TryParse(Value, out b))
+								Variables[Parameter] = b;
 							else
-								Variables[Parameter] = string.Empty;
+								Variables[Parameter] = Value;
 						}
+						else
+							Variables[Parameter] = string.Empty;
 					}
 				}
 			}
@@ -181,7 +179,7 @@ namespace Waher.Content.Markdown.Web
 						break;
 					}
 
-					if (State.Session.TryGetVariable(P.Key, out v) && !(v.ValueObject is null))
+					if (State.Session.TryGetVariable(P.Key, out Variable v) && !(v.ValueObject is null))
 						User = v.ValueObject;
 					else
 					{

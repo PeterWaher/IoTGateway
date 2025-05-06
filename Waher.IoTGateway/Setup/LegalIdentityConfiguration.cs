@@ -737,7 +737,7 @@ namespace Waher.IoTGateway.Setup
 				if (File.Exists(FileName))
 				{
 					string Markdown = await Files.ReadAllTextAsync(FileName);
-					Variables v = HttpServer.CreateVariables();
+					Variables v = HttpServer.CreateSessionVariables();
 					v["Config"] = this;
 
 					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, new MarkdownSettings(Gateway.Emoji1_24x24, true, v));

@@ -29,6 +29,7 @@
 			<dependency id="Waher.Runtime.Cache" version="2.1.1"/>
 			<dependency id="Waher.Runtime.Collections" version="1.0.3"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.4.2"/>
+			<dependency id="Waher.Runtime.Threading" version="2.1.1"/>
 			<dependency id="Waher.Script" version="2.11.2"/>
 			<dependency id="Waher.Script.Graphs" version="2.3.2"/>
 			<dependency id="Waher.Security" version="1.0.13"/>

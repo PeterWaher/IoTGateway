@@ -4618,7 +4618,7 @@ namespace Waher.IoTGateway
 					if (i > 0)
 						Markdown = Markdown[..i].TrimEnd();
 
-					Variables Variables = HttpServer.CreateVariables();
+					Variables Variables = HttpServer.CreateSessionVariables();
 					Variables["RequestId"] = Request.ObjectId;
 					Variables["Request"] = Request;
 
@@ -4910,11 +4910,11 @@ namespace Waher.IoTGateway
 						Settings = new MarkdownSettings(emoji1_24x24, true)
 						{
 							RootFolder = rootFolder,
-							Variables = Request.Session ?? HttpServer.CreateVariables()
+							Variables = Request.Session ?? HttpServer.CreateSessionVariables()
 						};
 
-						if (!Settings.Variables.ContainsVariable("Request"))
-							Settings.Variables["Request"] = Request;
+						if (Settings.Variables is SessionVariables SessionVariables)
+							SessionVariables.CurrentRequest = Request;
 
 						Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, RootFolder, string.Empty, string.Empty);
 
@@ -5371,7 +5371,7 @@ namespace Waher.IoTGateway
 
 						case "StartupScript":           // Always execute
 							Expression Exp = new Expression(E.InnerText);
-							Variables v = HttpServer.CreateVariables();
+							Variables v = HttpServer.CreateSessionVariables();
 							await Exp.EvaluateAsync(v);
 							break;
 
@@ -5379,7 +5379,7 @@ namespace Waher.IoTGateway
 							if (ExecuteInitScript)
 							{
 								Exp = new Expression(E.InnerText);
-								v = HttpServer.CreateVariables();
+								v = HttpServer.CreateSessionVariables();
 								await Exp.EvaluateAsync(v);
 							}
 							break;

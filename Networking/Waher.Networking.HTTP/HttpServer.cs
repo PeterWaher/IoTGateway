@@ -56,13 +56,6 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public const int DefaultBufferSize = 16384;
 
-		internal static readonly Variables globalVariables = new Variables();
-
-		/// <summary>
-		/// Reference to global collection of variables.
-		/// </summary>
-		public static Variables GlobalVariables => globalVariables;
-
 #if WINDOWS_UWP
 		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
 #else
@@ -77,7 +70,7 @@ namespace Waher.Networking.HTTP
 		private TimeSpan sessionTimeout = TimeSpan.FromMinutes(20);
 		private TimeSpan requestTimeout = TimeSpan.FromMinutes(2);
 		private Cache<HttpRequest, RequestInfo> currentRequests;
-		private Cache<string, Variables> sessions;
+		private Cache<string, SessionVariables> sessions;
 		private string resourceOverride = null;
 		private Regex resourceOverrideFilter = null;
 		private readonly object statSynch = new object();
@@ -240,7 +233,7 @@ namespace Waher.Networking.HTTP
 			this.portSpecificMTlsSettings = PortSpecificSettings;
 			this.clientCertificateSettingsLocked = LockSettings;
 #endif
-			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
+			this.sessions = new Cache<string, SessionVariables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
 			this.sessions.Removed += this.Sessions_Removed;
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout, true);
 			this.currentRequests.Removed += this.CurrentRequests_Removed;
@@ -1779,7 +1772,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="SessionId">Session ID</param>
 		/// <returns>Session states.</returns>
-		public Variables GetSession(string SessionId)
+		public SessionVariables GetSession(string SessionId)
 		{
 			return this.GetSession(SessionId, true);
 		}
@@ -1790,17 +1783,17 @@ namespace Waher.Networking.HTTP
 		/// <param name="SessionId">Session ID</param>
 		/// <param name="CreateIfNotFound">If a sesion should be created if not found.</param>
 		/// <returns>Session states, or null if not found and not crerated.</returns>
-		public Variables GetSession(string SessionId, bool CreateIfNotFound)
+		public SessionVariables GetSession(string SessionId, bool CreateIfNotFound)
 		{
 			if (this.sessions is null)
 				return null;
 
-			if (this.sessions.TryGetValue(SessionId, out Variables Result))
+			if (this.sessions.TryGetValue(SessionId, out SessionVariables Result))
 				return Result;
 
 			if (CreateIfNotFound)
 			{
-				Result = CreateVariables();
+				Result = CreateSessionVariables();
 				this.sessions.Add(SessionId, Result);
 				return Result;
 			}
@@ -1812,17 +1805,14 @@ namespace Waher.Networking.HTTP
 		/// Creates a new collection of variables, that contains access to the global set of variables.
 		/// </summary>
 		/// <returns>Variables collection.</returns>
-		public static Variables CreateVariables()
+		public static SessionVariables CreateSessionVariables()
 		{
-			return new Variables()
-			{
-				{ "Global", globalVariables }
-			};
+			return new SessionVariables();
 		}
 
-		internal Variables SetSession(string SessionId, Variables Variables)
+		internal SessionVariables SetSession(string SessionId, SessionVariables Variables)
 		{
-			if (this.sessions.TryGetValue(SessionId, out Variables Variables2))
+			if (this.sessions.TryGetValue(SessionId, out SessionVariables Variables2))
 				return Variables2;
 			else
 			{
@@ -1832,7 +1822,7 @@ namespace Waher.Networking.HTTP
 		}
 
 
-		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		private Task Sessions_Removed(object Sender, CacheItemEventArgs<string, SessionVariables> e)
 		{
 			return this.SessionRemoved.Raise(this, e);
 		}
@@ -1840,7 +1830,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Event raised when a session has been closed.
 		/// </summary>
-		public event EventHandlerAsync<CacheItemEventArgs<string, Variables>> SessionRemoved = null;
+		public event EventHandlerAsync<CacheItemEventArgs<string, SessionVariables>> SessionRemoved = null;
 
 		/// <summary>
 		/// Event raised before sending an error back to a client. Allows the server to prepare custom error pages.
@@ -2068,7 +2058,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="LocalUrl">Local URL</param>
 		/// <param name="Session">Session variables, if available, or null if not.</param>
 		/// <returns>Status Code, Content-Type and binary representation of resource, if available.</returns>
-		public async Task<Tuple<int, string, byte[]>> GET(string LocalUrl, Variables Session)
+		public async Task<Tuple<int, string, byte[]>> GET(string LocalUrl, SessionVariables Session)
 		{
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');

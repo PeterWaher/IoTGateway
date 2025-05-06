@@ -2198,7 +2198,7 @@ namespace Waher.Networking.HTTP
 
 								if (Request.Session is null)
 								{
-									Request.Session = HttpServer.CreateVariables();
+									Request.Session = HttpServer.CreateSessionVariables();
 									Request.tempSession = true;
 								}
 							}

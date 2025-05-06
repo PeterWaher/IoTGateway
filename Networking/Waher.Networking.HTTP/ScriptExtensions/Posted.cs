@@ -33,28 +33,31 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
-			if (!Variables.TryGetVariable(" LastPost ", out Variable v))
-				return ObjectValue.Null;
-
-			if (!(v.ValueObject is PostedInformation PostedInfo))
+			if (!(Variables is SessionVariables SessionVariables))
 			{
-				Variables.Remove(" LastPost ");
-				return ObjectValue.Null;
+				if (Variables.ContextVariables is SessionVariables SessionVariables2)
+					SessionVariables = SessionVariables2;
+				else
+					return ObjectValue.Null;
 			}
 
-			if (!Variables.TryGetVariable("Request", out v) ||
-				!(v.ValueObject is HttpRequest Request) ||
-				string.Compare(PostedInfo.Resource, Request.SubPath, true) != 0)
+			PostedInformation PostedInfo;
+
+			if ((PostedInfo = SessionVariables.LastPost) is null)
+				return ObjectValue.Null;
+
+			if (SessionVariables.CurrentRequest is null ||
+				string.Compare(PostedInfo.Resource, SessionVariables.CurrentRequest.SubPath, true) != 0)
 			{
-				Variables.Remove(" LastPost ");
+				SessionVariables.LastPost = null;
 				return ObjectValue.Null;
 			}
 
 			if (!PostedInfo.RequestId.HasValue)
-				PostedInfo.RequestId = Request.RequestId;
-			else if (PostedInfo.RequestId.Value != Request.RequestId)
+				PostedInfo.RequestId = SessionVariables.CurrentRequest.RequestId;
+			else if (PostedInfo.RequestId.Value != SessionVariables.CurrentRequest.RequestId)
 			{
-				Variables.Remove(" LastPost ");
+				SessionVariables.LastPost = null;
 				return ObjectValue.Null;
 			}
 

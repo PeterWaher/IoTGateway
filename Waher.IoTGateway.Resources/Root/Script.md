@@ -2437,15 +2437,15 @@ The following functions return HTTP server error responses back to he client:
 
 ##### Special Web Variables
 
-The following predefined variables are available when processing web requests:
+The following predefined variables or constants are available when processing web requests:
 
-| Variable       | Description                                              |
-|:--------------:|----------------------------------------------------------|
-| `Request`      | The current HttpRequest object.                          |
-| `Response`     | The current HttpResponse object.                         |
-| `Posted`       | Any decoded data posted to the resource.                 |
-| `Global`       | Global variables.                                        |
-| `Page`         | Page-local variables.                                    |
+| Variable   | Description                              |
+|:----------:|------------------------------------------|
+| `Request`  | The current HttpRequest object.          |
+| `Response` | The current HttpResponse object.         |
+| `Posted`   | Any decoded data posted to the resource. |
+| `Global`   | Global variables.                        |
+| `Page`     | Page-local variables.                    |
 
 #### JWS Extensions (Waher.Security.JWS)
 

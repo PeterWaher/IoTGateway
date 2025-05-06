@@ -37,7 +37,7 @@ namespace Waher.WebService.Script
 		private readonly string tag;
 		private readonly Stopwatch watch = new Stopwatch();
 		private readonly int timeout;
-		private readonly Variables variables;
+		private readonly SessionVariables variables;
 		private readonly StringBuilder printOutput;
 		private readonly object synchObj = new object();
 		private Expression expression;
@@ -71,11 +71,12 @@ namespace Waher.WebService.Script
 			this.previewing = false;
 			this.counter = 0;
 
-			this.variables = new Variables();
+			this.variables = new SessionVariables()
+			{
+				CurrentRequest = Request,
+				CurrentResponse = Response
+			};
 			Request.Session.CopyTo(this.variables);
-
-			this.variables["Request"] = Request;
-			this.variables["Response"] = Response;
 
 			this.printOutput = new StringBuilder();
 			this.variables.ConsoleOut = new StringWriter(this.printOutput);

@@ -63,17 +63,17 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 					return await Translator.GetLanguageAsync(LanguageCode);
 			}
 
-			if (Session.TryGetVariable("Request", out v) &&
-				v.ValueObject is HttpRequest Request)
+			if (Session is SessionVariables SessionVariables &&
+				!(SessionVariables.CurrentRequest is null))
 			{
-				if (!(Request.Header.AcceptLanguage is null))
+				if (!(SessionVariables.CurrentRequest.Header.AcceptLanguage is null))
 				{
 					List<string> Alternatives = new List<string>();
 
 					foreach (Waher.Runtime.Language.Language Language in await Translator.GetLanguagesAsync())
 						Alternatives.Add(Language.Code);
 
-					string Best = Request.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());
+					string Best = SessionVariables.CurrentRequest.Header.AcceptLanguage.GetBestAlternative(Alternatives.ToArray());
 					if (!string.IsNullOrEmpty(Best))
 						return await Translator.GetLanguageAsync(Best);
 				}

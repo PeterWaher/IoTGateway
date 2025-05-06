@@ -60,10 +60,9 @@ namespace Waher.Content.Markdown.Functions
 				ParseMetaData = false
 			};
 
-			KeyValuePair<string, bool> P = await MarkdownDocument.Preprocess(Argument, Settings, string.Empty, false);
+			KeyValuePair<string, bool> P = await MarkdownDocument.Preprocess(Argument, Settings, string.Empty);
 
 			return new StringValue(P.Key);
         }
-
     }
 }

@@ -926,6 +926,7 @@ namespace Waher.Networking.HTTP
 						Stream f2 = null;
 						Stream f = File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 						bool Ok = false;
+						bool SessionLocked = false;
 
 						try
 						{
@@ -933,8 +934,11 @@ namespace Waher.Networking.HTTP
 
 							if (!(Request.Session is null))
 							{
-								Request.Session["Request"] = Request;
-								Request.Session["Response"] = Response;
+								await Request.Session.LockAsync();
+								SessionLocked = true;
+
+								Request.Session.CurrentRequest = Request;
+								Request.Session.CurrentResponse = Response;
 							}
 
 							List<string> Alternatives = null;
@@ -978,6 +982,9 @@ namespace Waher.Networking.HTTP
 						}
 						finally
 						{
+							if (SessionLocked)
+								Request.Session.Release();
+
 							if (f2 is null)
 								f.Dispose();
 							else if (!Ok)
@@ -1090,14 +1097,13 @@ namespace Waher.Networking.HTTP
 						await this.Response.WriteLine("--" + this.Boundary + "--");
 					}
 
-					Variables Session;
+					SessionVariables Session;
 
 					if (!(this.Request is null) &&
 						this.Request.Header.Method == "GET" &&
-						!((Session = this.Request.Session) is null) &&
-						Session.ContainsVariable(" LastPost "))
+						!((Session = this.Request.Session) is null))
 					{
-						Session.Remove(" LastPost ");
+						Session.LastPost = null;
 					}
 
 					await this.Dispose();
@@ -1505,7 +1511,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
-			Variables Session = Request.Session;
+			SessionVariables Session = Request.Session;
 			if (Session is null)
 			{
 				await Response.SendResponse(new ForbiddenException(Request, "Session required."));
@@ -1520,7 +1526,7 @@ namespace Waher.Networking.HTTP
 				return;
 			}
 
-			Session[" LastPost "] = new PostedInformation()
+			Session.LastPost = new PostedInformation()
 			{
 				DecodedContent = Expression.Encapsulate(Content.Decoded),
 				Resource = Request.SubPath,

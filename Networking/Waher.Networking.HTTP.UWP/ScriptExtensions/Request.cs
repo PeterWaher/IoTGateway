@@ -6,21 +6,21 @@ using Waher.Script.Objects;
 namespace Waher.Networking.HTTP.ScriptExtensions
 {
 	/// <summary>
-	/// Decoded data posted to the resource
+	/// Access to the current request.
 	/// </summary>
-	public class Posted : IConstant
+	public class Request : IConstant
 	{
 		/// <summary>
-		/// Decoded data posted to the resource
+		/// Access to the current request.
 		/// </summary>
-		public Posted()
+		public Request()
 		{
 		}
 
 		/// <summary>
 		/// Name of the constant
 		/// </summary>
-		public string ConstantName => nameof(Posted);
+		public string ConstantName => nameof(Request);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the constant, null is returned.
@@ -41,28 +41,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 					return ObjectValue.Null;
 			}
 
-			PostedInformation PostedInfo;
-
-			if ((PostedInfo = SessionVariables.LastPost) is null)
-				return ObjectValue.Null;
-
-			if (SessionVariables.CurrentRequest is null ||
-				string.Compare(PostedInfo.Resource, SessionVariables.CurrentRequest.SubPath, true) != 0)
-			{
-				SessionVariables.LastPost = null;
-				return ObjectValue.Null;
-			}
-
-			if (!PostedInfo.RequestId.HasValue)
-				PostedInfo.RequestId = SessionVariables.CurrentRequest.RequestId;
-			else if (PostedInfo.RequestId.Value != SessionVariables.CurrentRequest.RequestId)
-			{
-				SessionVariables.LastPost = null;
-				return ObjectValue.Null;
-			}
-
-			return PostedInfo.DecodedContent;
+			return new ObjectValue(SessionVariables.CurrentRequest);
 		}
-
 	}
 }

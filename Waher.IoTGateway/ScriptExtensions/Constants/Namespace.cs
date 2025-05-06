@@ -39,9 +39,9 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 			if (Variables.TryGetVariable("Namespace", out Variable v) &&
 				v.ValueObject is Waher.Runtime.Language.Namespace Namespace)
 			{
-				if (Variables.TryGetVariable("Request", out v) &&
-					v.ValueObject is HttpRequest Request &&
-					Request.Resource.ResourceName == Namespace.Name)
+				if (Variables is SessionVariables SessionVariables &&
+					!(SessionVariables.CurrentRequest is null) &&
+					SessionVariables.CurrentRequest.Resource.ResourceName == Namespace.Name)
 				{
 					return new ObjectValue(Namespace);
 				}
@@ -72,10 +72,10 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 					return await Language.GetNamespaceAsync(NamespaceCode);
 			}
 
-			if (Session.TryGetVariable("Request", out v) &&
-				v.ValueObject is HttpRequest Request)
+			if (Session is SessionVariables SessionVariables &&
+				!(SessionVariables.CurrentRequest is null))
 			{
-				return await Language.GetNamespaceAsync(Request.Resource.ResourceName);
+				return await Language.GetNamespaceAsync(SessionVariables.CurrentRequest.Resource.ResourceName);
 			}
 
 			return null;

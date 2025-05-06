@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using SkiaSharp;
 using Waher.Content;
 using Waher.IoTGateway.Setup;
+using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -45,7 +46,8 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		{
 			ThemeDefinition Def = currentDefinition;
 
-			if (Variables.TryGetVariable("Request", out Variable v) && v.ValueObject is IHostReference HostRef)
+			if (Variables is SessionVariables SessionVariables &&
+				SessionVariables.CurrentRequest is IHostReference HostRef)
 			{
 				string Host = DomainSettings.IsAlternativeDomain(HostRef.Host);
 				if (!string.IsNullOrEmpty(Host))
@@ -66,13 +68,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// </summary>
 		/// <param name="Variables">Session variables.</param>
 		/// <returns>Theme definition</returns>
-		public static ThemeDefinition GetCurrentTheme(Variables Variables)
+		public static ThemeDefinition GetCurrentTheme(SessionVariables Variables)
 		{
 			ThemeDefinition Def = currentDefinition;
 
 			if (!(Variables is null) &&
-				Variables.TryGetVariable("Request", out Variable v) && 
-				v.ValueObject is IHostReference HostRef)
+				Variables.CurrentRequest is IHostReference HostRef)
 			{
 				string Host = DomainSettings.IsAlternativeDomain(HostRef.Host);
 				if (!string.IsNullOrEmpty(Host))

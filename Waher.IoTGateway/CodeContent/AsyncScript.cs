@@ -104,7 +104,7 @@ namespace Waher.IoTGateway.CodeContent
 			{
 				Id = await asyncHtmlOutput.GenerateStub(MarkdownOutputType.Html, Renderer.Output, Title, Document),
 				Script = this.BuildExpression(Rows),
-				Variables = HttpServer.CreateVariables(),
+				Variables = HttpServer.CreateSessionVariables(),
 				ImplicitPrint = new StringBuilder()
 			};
 
@@ -233,7 +233,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
+			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateSessionVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await Renderer.RenderObject(Result, true, Variables);
@@ -253,7 +253,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
+			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateSessionVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await Renderer.RenderObject(Result, true);
@@ -273,7 +273,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
+			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateSessionVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await Renderer.RenderObject(Result, true, Variables);
@@ -293,7 +293,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
+			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateSessionVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await Renderer.RenderObject(Result, true, Variables);
@@ -313,7 +313,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
+			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateSessionVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await Renderer.RenderObject(Result, true, Variables);
@@ -333,7 +333,7 @@ namespace Waher.IoTGateway.CodeContent
 		public async Task<bool> RenderContractXml(ContractsRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
-			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateVariables();
+			Variables Variables = Document.Settings.Variables ?? HttpServer.CreateSessionVariables();
 			object Result = await this.Evaluate(Script, Variables);
 
 			await Renderer.RenderObject(Result, true, Variables);

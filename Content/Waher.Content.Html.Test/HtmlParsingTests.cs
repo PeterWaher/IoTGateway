@@ -28,6 +28,10 @@ namespace Waher.Content.Html.Test
 			Client.Timeout = TimeSpan.FromMilliseconds(30000);
 			Client.DefaultRequestHeaders.ExpectContinue = false;
 			Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36 Edg/94.0.992.31");
+			Client.DefaultRequestHeaders.Add("Referer", "https://www.science.org/");
+			Client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+			Client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.5");
+			Client.DefaultRequestHeaders.Add("Connection", "keep-alive");
 
 			HttpResponseMessage Response = await Client.GetAsync(Url);
 			if (!Response.IsSuccessStatusCode)
@@ -130,6 +134,12 @@ namespace Waher.Content.Html.Test
 		public async Task HtmlParseTest_05_Amgreatness()
 		{
 			await LoadAndParse("https://amgreatness.com/2021/09/24/over-3000-doctors-and-scientists-sign-declaration-accusing-covid-policy-makers-of-crimes-against-humanity/");
+		}
+
+		[TestMethod]
+		public async Task HtmlParseTest_06_Science()
+		{
+			await LoadAndParse("https://www.science.org/content/article/astronomers-searching-planet-nine-find-possible-hints-different-planet");
 		}
 	}
 }

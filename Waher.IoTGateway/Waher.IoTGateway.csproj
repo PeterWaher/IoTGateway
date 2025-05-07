@@ -382,6 +382,7 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Geo\Waher.Runtime.Geo.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />

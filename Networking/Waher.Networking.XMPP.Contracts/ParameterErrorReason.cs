@@ -73,6 +73,11 @@
 		/// <summary>
 		/// Value to too long.
 		/// </summary>
-		TooLong
+		TooLong,
+
+		/// <summary>
+		/// Value outside of allowed range.
+		/// </summary>
+		Outside
 	}
 }

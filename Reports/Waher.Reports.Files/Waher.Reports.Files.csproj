@@ -17,9 +17,9 @@
 		<RepositoryType>GitHub</RepositoryType>
 		<PackageTags>reports files script</PackageTags>
 		<NeutralLanguage>English</NeutralLanguage>
-		<AssemblyVersion>1.0.1</AssemblyVersion>
-		<FileVersion>1.0.1</FileVersion>
-		<Version>1.0.1</Version>
+		<AssemblyVersion>1.0.2</AssemblyVersion>
+		<FileVersion>1.0.2</FileVersion>
+		<Version>1.0.2</Version>
 		<PackageIconUrl />
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageIcon>Icon_64x64.png</PackageIcon>

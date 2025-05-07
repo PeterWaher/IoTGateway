@@ -1,12 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Threading;
-using Waher.Script.Exceptions;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
-using Waher.Script.Abstraction.Elements;
 using Waher.Events;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 
 namespace Waher.Script
 {
@@ -30,7 +29,6 @@ namespace Waher.Script
 		private Stack<Dictionary<string, Variable>> stack = null;
 		private TextWriter consoleOut = null;
 		private IContextVariables contextVariables = null;
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private volatile bool active = true;
 		private ValuePrinter printer = null;
 
@@ -241,76 +239,6 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
-		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
-		/// state call this method also.
-		/// 
-		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
-		/// </summary>
-		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
-		[Obsolete("Use the LockAsync method for better performance of processing asynchronous tasks.")]
-		public void Lock()
-		{
-			this.Lock(30000);
-		}
-
-		/// <summary>
-		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
-		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
-		/// state call this method also.
-		/// 
-		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
-		/// </summary>
-		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
-		public Task LockAsync()
-		{
-			return this.LockAsync(30000);
-		}
-
-		/// <summary>
-		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
-		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
-		/// state call this method also.
-		/// 
-		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
-		/// </summary>
-		/// <param name="Timeout">Timeout, in milliseconds. Default timeout is 30000 milliseconds (30 s).</param>
-		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
-		[Obsolete("Use the LockAsync method for better performance of processing asynchronous tasks.")]
-		public void Lock(int Timeout)
-		{
-			this.LockAsync(Timeout).Wait();
-		}
-
-		/// <summary>
-		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
-		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
-		/// state call this method also.
-		/// 
-		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
-		/// </summary>
-		/// <param name="Timeout">Timeout, in milliseconds. Default timeout is 30000 milliseconds (30 s).</param>
-		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
-		public async Task LockAsync(int Timeout)
-		{
-			if (this.active)
-			{
-				if (!await this.semaphore.WaitAsync(Timeout))
-					throw new TimeoutException("Unique access to variables connection was not granted.");
-			}
-			else
-				throw new ScriptAbortedException();
-		}
-
-		/// <summary>
-		/// Releases the collection, previously locked through a call to <see cref="Lock()"/>.
-		/// </summary>
-		public void Release()
-		{
-			this.semaphore.Release();
-		}
-
-		/// <summary>
 		/// Returns an array of available variables.
 		/// </summary>
 		public Variable[] AvailableVariables
@@ -426,6 +354,16 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// If the script has been aborted.
+		/// </summary>
+		public bool Aborted => !this.active;
+
+		/// <summary>
+		/// If script is still active (i.e. has not been aborted).
+		/// </summary>
+		public bool Active => this.active;
+
+		/// <summary>
 		/// Event raised when there is a new value to preview.
 		/// </summary>
 		public event EventHandlerAsync<PreviewEventArgs> OnPreview;
@@ -479,10 +417,7 @@ namespace Waher.Script
 		/// <summary>
 		/// If status messages are desired.
 		/// </summary>
-		public bool HandlesStatus
-		{
-			get { return !(this.OnStatus is null); }
-		}
+		public bool HandlesStatus => !(this.OnStatus is null);
 
 		/// <summary>
 		/// Event raised when a status message has been reported.

@@ -96,7 +96,12 @@
 						</xs:attribute>
 						<xs:attribute name="initialWindowSize" type="xs:int" use="optional" default="2500000">
 							<xs:annotation>
-								<xs:documentation>Initial Window Size, in bytes.</xs:documentation>
+								<xs:documentation>Initial Stream Window Size, in bytes.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="initialConnectionWindowSize" type="xs:int" use="optional" default="5000000">
+							<xs:annotation>
+								<xs:documentation>Initial Connection Window Size, in bytes.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
 						<xs:attribute name="maxFrameSize" type="xs:int" use="optional" default="16384">

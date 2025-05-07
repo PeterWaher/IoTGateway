@@ -70,7 +70,7 @@ namespace Waher.Client.WPF.Model.Legal
 
 			MenuItem Item;
 
-			this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+			GroupSeparator(ref CurrentGroup, "Database", Menu);
 
 			Menu.Items.Add(Item = new MenuItem()
 			{

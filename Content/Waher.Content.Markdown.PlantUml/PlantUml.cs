@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Images;
@@ -20,6 +21,7 @@ using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
+using Waher.Runtime.Queue;
 using Waher.Runtime.Timing;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -51,6 +53,9 @@ namespace Waher.Content.Markdown.PlantUml
 	public class PlantUml : IImageCodeContent, ICodeContentHtmlRenderer, ICodeContentTextRenderer, ICodeContentMarkdownRenderer,
 		ICodeContentContractsRenderer, ICodeContentLatexRenderer, ICodeContentWpfXamlRenderer, ICodeContentXamarinFormsXamlRenderer
 	{
+		private const int chartGenerationTimeout = 30000;
+
+		private static readonly AsyncProcessor<ChartRecord> queue = new AsyncProcessor<ChartRecord>(1);
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
 		private static string jarPath = null;
@@ -111,6 +116,23 @@ namespace Waher.Content.Markdown.PlantUml
 
 					asyncHtmlOutput = Types.FindBest<IMarkdownAsynchronousOutput, MarkdownOutputType>(MarkdownOutputType.Html);
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Terminates PlantUML processing.
+		/// </summary>
+		/// <returns></returns>
+		public static async Task Terminate()
+		{
+			try
+			{
+				await queue.CloseForTermination(true, chartGenerationTimeout);
+				await queue.DisposeAsync();
 			}
 			catch (Exception ex)
 			{
@@ -352,67 +374,139 @@ namespace Waher.Content.Markdown.PlantUml
 
 		private static async Task ExecutePlantUml(ResultType Type, params GraphInfo[] Files)
 		{
-			StringBuilder Arguments = new StringBuilder();
-			Arguments.Append("-jar \"");
-			Arguments.Append(jarPath);
-			Arguments.Append("\" -quiet -charset UTF-8 -t");
-			Arguments.Append(Type.ToString().ToLower());
+			ChartRecord Rec = new ChartRecord(Type, Files);
+			queue.Queue(Rec);
 
-			foreach (GraphInfo Info in Files)
+			if (!await Rec.Wait())
+				throw new Exception("Unable to process PlantUML chart.");
+		}
+
+		private class ChartRecord : IWorkItem
+		{
+			private readonly TaskCompletionSource<bool> result = new TaskCompletionSource<bool>();
+			private readonly ResultType type;
+			private readonly GraphInfo[] files;
+
+			public ChartRecord(ResultType Type, params GraphInfo[] Files)
 			{
-				Arguments.Append(" \"");
-				Arguments.Append(Info.TxtFileName);
-				Arguments.Append('"');
+				this.type = Type;
+				this.files = Files;
 			}
 
-			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+			/// <summary>
+			/// Executes the operation.
+			/// </summary>
+			public Task Execute()
 			{
-				FileName = javaPath,
-				Arguments = Arguments.ToString(),
-				UseShellExecute = false,
-				RedirectStandardError = true,
-				RedirectStandardOutput = true,
-				RedirectStandardInput = false,
-				WorkingDirectory = Files[0].PlantUmlFolder,
-				CreateNoWindow = true,
-				WindowStyle = ProcessWindowStyle.Hidden
-			};
+				return this.Execute(CancellationToken.None);
+			}
 
-			Process P = new Process();
-			TaskCompletionSource<int> ExitSource = new TaskCompletionSource<int>();
-			StringBuilder StandardOutput = new StringBuilder();
-			StringBuilder ErrorOutput = new StringBuilder();
-
-			P.ErrorDataReceived += (Sender, e) =>
+			/// <summary>
+			/// Executes the operation.
+			/// </summary>
+			/// <param name="Cancel">Cancellation token.</param>
+			public async Task Execute(CancellationToken Cancel)
 			{
-				ErrorOutput.AppendLine(e.Data);
-			};
+				StringBuilder Arguments = new StringBuilder();
+				Arguments.Append("-jar \"");
+				Arguments.Append(jarPath);
+				Arguments.Append("\" -quiet -charset UTF-8 -t");
+				Arguments.Append(this.type.ToString().ToLower());
 
-			P.OutputDataReceived += (Sender, e) =>
+				foreach (GraphInfo Info in this.files)
+				{
+					Arguments.Append(" \"");
+					Arguments.Append(Info.TxtFileName);
+					Arguments.Append('"');
+				}
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+				{
+					FileName = javaPath,
+					Arguments = Arguments.ToString(),
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					RedirectStandardInput = false,
+					WorkingDirectory = this.files[0].PlantUmlFolder,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
+
+				Process P = new Process();
+				TaskCompletionSource<int> ExitSource = new TaskCompletionSource<int>();
+
+				P.Exited += (Sender, e) =>
+				{
+					ExitSource.TrySetResult(P.ExitCode);
+				};
+
+				Task _ = Task.Delay(chartGenerationTimeout).ContinueWith(Prev =>
+				{
+					try
+					{
+						P.Kill();
+
+						foreach (GraphInfo Info in this.files)
+						{
+							if (File.Exists(Info.ImageFileName))
+								File.Delete(Info.ImageFileName);
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+					finally
+					{
+						ExitSource.TrySetException(new TimeoutException("PlantUML process did not terminate properly."));
+					}
+
+					return Task.CompletedTask;
+				});
+
+				P.StartInfo = ProcessInformation;
+				P.EnableRaisingEvents = true;
+				P.Start();
+
+				int ExitCode = await ExitSource.Task;
+
+				if (ExitCode != 0)
+				{
+					string Error = P.StandardError.ReadToEnd();
+					this.result.TrySetException(new Exception(Error));
+				}
+			}
+
+			/// <summary>
+			/// Flags the item as processed.
+			/// </summary>
+			/// <returns>If item was processed successfully.</returns>
+			public void Processed(bool Result)
 			{
-				StandardOutput.AppendLine(e.Data);
-			};
+				this.result.TrySetResult(Result);
+			}
 
-			P.Exited += (Sender, e) =>
+			/// <summary>
+			/// Waits for the item to be processed.
+			/// </summary>
+			/// <returns>If item was processed successfully.</returns>
+			public Task<bool> Wait()
 			{
-				ExitSource.TrySetResult(P.ExitCode);
-			};
+				return this.result.Task;
+			}
 
-			Task _ = Task.Delay(10000).ContinueWith(Prev =>
+			/// <summary>
+			/// Waits for the item to be processed.
+			/// </summary>
+			/// <param name="Cancel">Cancellation token.</param>
+			/// <returns>If item was processed successfully.</returns>
+			public Task<bool> Wait(CancellationToken Cancel)
 			{
-				ExitSource.TrySetException(new TimeoutException("PlantUML process did not terminate properly."));
-			});
-
-			P.StartInfo = ProcessInformation;
-			P.EnableRaisingEvents = true;
-			P.Start();
-
-			int ExitCode = await ExitSource.Task;
-
-			if (ExitCode != 0)
-			{
-				string Error = P.StandardError.ReadToEnd();
-				throw new Exception(Error);
+				if (Cancel.CanBeCanceled)
+					Cancel.Register(() => this.result.TrySetException(new OperationCanceledException(Cancel)));
+					
+				return this.result.Task;
 			}
 		}
 

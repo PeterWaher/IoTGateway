@@ -8,12 +8,14 @@ using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Collections;
+using System.Diagnostics;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
 	/// This class manages an index file to a <see cref="ObjectBTreeFile"/>.
 	/// </summary>
+	[DebuggerDisplay("{CollectionName}, Index: {FieldNamesDisplayable}")]
 	public class IndexBTreeFile : IDisposable
 	{
 		private GenericObjectSerializer genericSerializer;
@@ -88,6 +90,30 @@ namespace Waher.Persistence.Files
 		/// Access to underlying Index file. Should only be accessed when the main file is properly locked.
 		/// </summary>
 		public ObjectBTreeFile IndexFileLocked => this.indexFile;
+
+		/// <summary>
+		/// Displayable sequence of field names, delimited by commas.
+		/// </summary>
+		public string FieldNamesDisplayable
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (string FieldName in this.FieldNames)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(", ");
+
+					sb.Append(FieldName);
+				}
+
+				return sb.ToString();
+			}
+		}
 
 		internal FilesProvider Provider => this.objectFile.Provider;
 		internal uint BlockLimit => this.indexFile?.BlockLimit ?? uint.MaxValue;

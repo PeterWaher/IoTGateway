@@ -696,4 +696,223 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name='clientMessage'>
+		<xs:annotation>
+			<xs:documentation>Contains information message about an identity application.</xs:documentation>
+			<xs:documentation>The default message text is available in the message body, not in the element itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base='IdentityApplicationResult'>
+					<xs:attribute name='code' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>A machine-readable code corresponding to the message for localization purposes.</xs:documentation>
+							<xs:documentation>Different services can use their own different codes.</xs:documentation>
+							<xs:documentation>If a code is not recognized, the default message should be displayed.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='type' type='ValidationErrorType' use='required'>
+						<xs:annotation>
+							<xs:documentation>Type of validation error message.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='identityReview'>
+		<xs:annotation>
+			<xs:documentation>Contains information about an identity review.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base='IdentityApplicationResult'/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name='IdentityApplicationResult'>
+		<xs:annotation>
+			<xs:documentation>Contains detailed information about the processing of an identity application.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name='invalidClaim' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a claim that was determined invalid.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='claim' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Identity claim key.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='message' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Default message text explaining the reason for invalidating the claim.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='code' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>A machine-readable key for localization of message text.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='service' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>Reference to service where message originated.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='invalidPhoto' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a photo that was determined invalid.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='fileName' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>File name of photo.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='message' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Default message text explaining the reason for invalidating the photo.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='code' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>A machine-readable key for localization of message text.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='service' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>Reference to service where message originated.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='error' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a processing error.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name='tag' minOccurs='0' maxOccurs='unbounded'>
+							<xs:complexType>
+								<xs:attribute name='name' type='xs:string' use='required'>
+									<xs:annotation>
+										<xs:documentation>Name of a meta-data tag.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name='value' type='xs:string' use='required'>
+									<xs:annotation>
+										<xs:documentation>Value of a meta-data tag.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+								<xs:attribute name='type' type='xs:string' use='optional'>
+									<xs:annotation>
+										<xs:documentation>XML Data Type of the encoded value in the value attribute.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name='message' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Default message text explaining the reason for invalidating the photo.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='type' type='ValidationErrorType' use='required'>
+						<xs:annotation>
+							<xs:documentation>Type of validation error message.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='code' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>A machine-readable key for localization of message text.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name='service' type='xs:string' use='optional'>
+						<xs:annotation>
+							<xs:documentation>Reference to service where message originated.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='validatedClaim' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a claim that was determined valid.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='claim' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Identity claim key.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='validatedPhoto' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a photo that was determined valid.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='fileName' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>File name of photo.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='unvalidatedClaim' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a claim that has not been processed for validation.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='claim' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>Identity claim key.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name='unvalidatedPhoto' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Contains information about a photo that has not been processed for validation.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name='fileName' type='xs:string' use='required'>
+						<xs:annotation>
+							<xs:documentation>File name of photo.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='id' type='xs:string' use='required'>
+			<xs:annotation>
+				<xs:documentation>Identifier of the referenced legal identity.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name='ValidationErrorType'>
+		<xs:restriction base='xs:string'>
+			<xs:enumeration value='Client'>
+				<xs:annotation>
+					<xs:documentation>Error caused by the client.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Server'>
+				<xs:annotation>
+					<xs:documentation>Error caused by the server.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Service'>
+				<xs:annotation>
+					<xs:documentation>Error caused by a service.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
 </xs:schema>

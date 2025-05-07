@@ -22,6 +22,7 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Threading;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -1385,117 +1386,118 @@ namespace Waher.Networking.XMPP.Chat
 			TextWriter Bak = Variables.ConsoleOut;
 			StringBuilder sb = new StringBuilder();
 
-			await Variables.LockAsync();
-			Variables.ConsoleOut = new StringWriter(sb);
-			try
+			using (await Semaphores.BeginWrite("Chat.Session." + From))
 			{
-				if (CheckAuthorization && 
-					(!Variables.TryGetVariable(" User ", out Variable v) ||
-					!(v.ValueObject is IUser User) ||
-					!Exp.ForAll(this.IsAuthorized, User, SearchMethod.TreeOrder)))
-				{
-					throw new Exception("Unauthorized to execute expression.");
-				}
-
-				IElement Result;
-
+				Variables.ConsoleOut = new StringWriter(sb);
 				try
 				{
-					Result = await Exp.Root.EvaluateAsync(Variables);
-				}
-				catch (ScriptReturnValueException ex)
-				{
-					Result = ex.ReturnValue;
-				}
-				catch (Exception ex)
-				{
-					Result = new ObjectValue(ex);
-				}
-
-				Variables["Ans"] = Result;
-
-				if (Result is Graph G)
-				{
-					PixelInformation Pixels = G.CreatePixels(G.Settings);
-					await this.ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
-					return;
-				}
-				else if (Result.AssociatedObjectValue is SKImage Img)
-				{
-					await this.ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
-					return;
-				}
-				else if (Result.AssociatedObjectValue is Exception ex)
-				{
-					ex = Log.UnnestException(ex);
-
-					if (ex is AggregateException ex2)
+					if (CheckAuthorization &&
+						(!Variables.TryGetVariable(" User ", out Variable v) ||
+						!(v.ValueObject is IUser User) ||
+						!Exp.ForAll(this.IsAuthorized, User, SearchMethod.TreeOrder)))
 					{
-						foreach (Exception ex3 in ex2.InnerExceptions)
-							await this.Error(From, ex3.Message, Support, OrgSubject, OrgCommand, false);
-					}
-					else
-						await this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
-				}
-				else if (Result.AssociatedObjectValue is ObjectMatrix M && !(M.ColumnNames is null))
-				{
-					StringBuilder Markdown = new StringBuilder();
-
-					foreach (string s2 in M.ColumnNames)
-					{
-						Markdown.Append("| ");
-						Markdown.Append(MarkdownDocument.Encode(s2));
+						throw new Exception("Unauthorized to execute expression.");
 					}
 
-					Markdown.AppendLine(" |");
+					IElement Result;
 
-					foreach (string s2 in M.ColumnNames)
-						Markdown.Append("|---");
-
-					Markdown.AppendLine("|");
-
-					int x, y;
-
-					for (y = 0; y < M.Rows; y++)
+					try
 					{
-						for (x = 0; x < M.Columns; x++)
+						Result = await Exp.Root.EvaluateAsync(Variables);
+					}
+					catch (ScriptReturnValueException ex)
+					{
+						Result = ex.ReturnValue;
+					}
+					catch (Exception ex)
+					{
+						Result = new ObjectValue(ex);
+					}
+
+					Variables["Ans"] = Result;
+
+					if (Result is Graph G)
+					{
+						PixelInformation Pixels = G.CreatePixels(G.Settings);
+						await this.ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
+						return;
+					}
+					else if (Result.AssociatedObjectValue is SKImage Img)
+					{
+						await this.ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
+						return;
+					}
+					else if (Result.AssociatedObjectValue is Exception ex)
+					{
+						ex = Log.UnnestException(ex);
+
+						if (ex is AggregateException ex2)
+						{
+							foreach (Exception ex3 in ex2.InnerExceptions)
+								await this.Error(From, ex3.Message, Support, OrgSubject, OrgCommand, false);
+						}
+						else
+							await this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
+					}
+					else if (Result.AssociatedObjectValue is ObjectMatrix M && !(M.ColumnNames is null))
+					{
+						StringBuilder Markdown = new StringBuilder();
+
+						foreach (string s2 in M.ColumnNames)
 						{
 							Markdown.Append("| ");
-
-							object Item = M.GetElement(x, y).AssociatedObjectValue;
-							if (!(Item is null))
-							{
-								if (!(Item is string s2))
-									s2 = Expression.ToString(Item);
-
-								s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
-								Markdown.Append(MarkdownDocument.Encode(s2));
-							}
+							Markdown.Append(MarkdownDocument.Encode(s2));
 						}
 
 						Markdown.AppendLine(" |");
+
+						foreach (string s2 in M.ColumnNames)
+							Markdown.Append("|---");
+
+						Markdown.AppendLine("|");
+
+						int x, y;
+
+						for (y = 0; y < M.Rows; y++)
+						{
+							for (x = 0; x < M.Columns; x++)
+							{
+								Markdown.Append("| ");
+
+								object Item = M.GetElement(x, y).AssociatedObjectValue;
+								if (!(Item is null))
+								{
+									if (!(Item is string s2))
+										s2 = Expression.ToString(Item);
+
+									s2 = s2.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+									Markdown.Append(MarkdownDocument.Encode(s2));
+								}
+							}
+
+							Markdown.AppendLine(" |");
+						}
+
+						await this.SendChatMessage(From, OrgSubject, OrgCommand, Markdown.ToString(), Support, Last);
 					}
-
-					await this.SendChatMessage(From, OrgSubject, OrgCommand, Markdown.ToString(), Support, Last);
+					else
+					{
+						s = Result.ToString();
+						await this.SendChatMessage(From, OrgSubject, OrgCommand, MarkdownDocument.Encode(s), Support, Last);
+					}
 				}
-				else
+				catch (Exception ex)
 				{
-					s = Result.ToString();
-					await this.SendChatMessage(From, OrgSubject, OrgCommand, MarkdownDocument.Encode(s), Support, Last);
-				}
-			}
-			catch (Exception ex)
-			{
-				ex = Log.UnnestException(ex);
+					ex = Log.UnnestException(ex);
 
-				await this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
-				await this.Que(From, Support, OrgSubject, string.Empty, Last);
-			}
-			finally
-			{
-				Variables.ConsoleOut.Flush();
-				Variables.ConsoleOut = Bak;
-				Variables.Release();
+					await this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
+					await this.Que(From, Support, OrgSubject, string.Empty, Last);
+				}
+				finally
+				{
+					Variables.ConsoleOut.Flush();
+					Variables.ConsoleOut = Bak;
+				}
 			}
 		}
 

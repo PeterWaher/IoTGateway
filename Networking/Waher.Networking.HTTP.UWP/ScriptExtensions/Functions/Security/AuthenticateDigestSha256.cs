@@ -97,17 +97,17 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 				if (Obj is bool UseEncryption)
 				{
 					if (UseEncryption && !Request.Encrypted)
-						throw new ForbiddenException("Access to resource requires encryption.");
+						throw new ForbiddenException(Request, "Access to resource requires encryption.");
 				}
 				else
 				{
 					double MinStrength = Expression.ToDouble(Obj);
 
 					if (!Request.Encrypted)
-						throw new ForbiddenException("Access to resource requires encryption.");
+						throw new ForbiddenException(Request, "Access to resource requires encryption.");
 
 					if (Request.CipherStrength < MinStrength)
-						throw new ForbiddenException("Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
+						throw new ForbiddenException(Request, "Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
 				}
 			}
 
@@ -131,7 +131,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 			{
 				IUser User = await Mechanism.IsAuthenticated(Request);
 				if (User is null)
-					throw new ForbiddenException("Invalid user name or password.");
+					throw new ForbiddenException(Request, "Invalid user name or password.");
 
 				return new ObjectValue(User);
 			}

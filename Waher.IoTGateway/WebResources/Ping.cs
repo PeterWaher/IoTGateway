@@ -7,7 +7,6 @@ using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Runtime.IO;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -61,7 +60,7 @@ namespace Waher.IoTGateway.WebResources
 
 				StringBuilder Json = new StringBuilder();
 
-				Json.Append("{'ServerTimeMs':");
+				Json.Append("{\"ServerTimeMs\":");
 				Json.Append((long)(DateTime.UtcNow.Subtract(JSON.UnixEpoch).TotalMilliseconds + 0.5));
 				Json.Append('}');
 

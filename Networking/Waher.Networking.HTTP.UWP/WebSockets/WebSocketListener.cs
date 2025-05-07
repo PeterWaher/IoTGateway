@@ -149,7 +149,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			}
 
 			if (Request.clientConnection is null)
-				throw new ForbiddenException("Invalid connection.");
+				throw new ForbiddenException(Request, "Invalid connection.");
 
 			WebSocket Socket = new WebSocket(this, Request, Response);
 
@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			int i;
 
 			Http2Stream Stream = Request.Http2Stream
-				?? throw new ForbiddenException("Expected HTTP/2 or later.");
+				?? throw new ForbiddenException(Request, "Expected HTTP/2 or later.");
 
 			if (Stream.Headers.TryGetHeaderField("Sec-WebSocket-Protocol", out HttpField Field))
 			{

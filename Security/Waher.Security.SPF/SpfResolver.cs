@@ -54,22 +54,26 @@ namespace Waher.Security.SPF
 
 			try
 			{
-				string[] TXT = await DnsResolver.LookupText(Term.domain);
-
-				foreach (string Row in TXT)
+				string[] TXT = await DnsResolver.TryLookupText(Term.domain);
+				if (TXT is null)
+					TermStrings = null;
+				else
 				{
-					s = Row.Trim();
+					foreach (string Row in TXT)
+					{
+						s = Row.Trim();
 
-					if (s.Length > 1 && s[0] == '"' && s[s.Length - 1] == '"')
-						s = s.Substring(1, s.Length - 2);
+						if (s.Length > 1 && s[0] == '"' && s[s.Length - 1] == '"')
+							s = s.Substring(1, s.Length - 2);
 
-					if (!s.StartsWith("v=spf1"))
-						continue;
+						if (!s.StartsWith("v=spf1"))
+							continue;
 
-					if (!(TermStrings is null))
-						return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Multiple SPF records found for " + Term.domain + ".");
+						if (!(TermStrings is null))
+							return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, "Multiple SPF records found for " + Term.domain + ".");
 
-					TermStrings = s.Substring(6).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
+						TermStrings = s.Substring(6).Trim().Split(space, StringSplitOptions.RemoveEmptyEntries);
+					}
 				}
 			}
 			catch (Exception)

@@ -91,6 +91,8 @@ using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
 using Waher.Reports;
 using Waher.Reports.Files;
+using System.Runtime.CompilerServices;
+using Waher.Runtime.Collections;
 
 namespace Waher.IoTGateway
 {
@@ -181,6 +183,7 @@ namespace Waher.IoTGateway
 		private static CaseInsensitiveString[] alternativeDomains = null;
 		private static CaseInsensitiveString ownerJid = null;
 		private static Dictionary<string, string> defaultPageByHostName = null;
+		private static CommunicationLayer firstChanceExceptions = new CommunicationLayer(true);
 		private static string instance;
 		private static string appDataFolder;
 		private static string runtimeFolder;
@@ -371,12 +374,16 @@ namespace Waher.IoTGateway
 				bool TrustClientCertificates = false;
 				Dictionary<int, KeyValuePair<ClientCertificates, bool>> PortSpecificMTlsSettings = null;
 				bool Http2Enabled = true;
-				int Http2InitialWindowSize = 2500000;
+				int Http2InitialStreamWindowSize = 2500000;
+				int Http2InitialConnectionWindowSize = 5000000;
 				int Http2MaxFrameSize = 16384;
 				int Http2MaxConcurrentStreams = 100;
 				int Http2HeaderTableSize = 8192;
 				bool Http2NoRfc7540Priorities = false;
 				bool Http2Profiling = false;
+
+				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
+				// to avoid congestion.
 
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
@@ -413,7 +420,8 @@ namespace Waher.IoTGateway
 
 							case "Http2Settings":
 								Http2Enabled = XML.Attribute(E, "enabled", Http2Enabled);
-								Http2InitialWindowSize = XML.Attribute(E, "initialWindowSize", Http2InitialWindowSize);
+								Http2InitialStreamWindowSize = XML.Attribute(E, "initialWindowSize", Http2InitialStreamWindowSize);
+								Http2InitialConnectionWindowSize = XML.Attribute(E, "initialConnectionWindowSize", Http2InitialConnectionWindowSize);
 								Http2MaxFrameSize = XML.Attribute(E, "maxFrameSize", Http2MaxFrameSize);
 								Http2MaxConcurrentStreams = XML.Attribute(E, "maxConcurrentStreams", Http2MaxConcurrentStreams);
 								Http2HeaderTableSize = XML.Attribute(E, "headerTableSize", Http2HeaderTableSize);
@@ -587,6 +595,9 @@ namespace Waher.IoTGateway
 													exceptionFile.Write(sb.ToString());
 													exceptionFile.Flush();
 												}
+
+												if (firstChanceExceptions?.HasSniffers ?? false)
+													firstChanceExceptions.Exception(e.Exception);
 											}
 										};
 									}
@@ -1072,12 +1083,9 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				// Bandwidth Delay Product, 100 MBit/s * 200 ms = 20 MBit = 2.5 MB window size
-				// to avoid congestion.
-
-				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialWindowSize,
-					Http2MaxFrameSize, Http2MaxConcurrentStreams, Http2HeaderTableSize,
-					false, Http2NoRfc7540Priorities, Http2Profiling, true);
+				webServer.SetHttp2ConnectionSettings(Http2Enabled, Http2InitialStreamWindowSize,
+					Http2InitialConnectionWindowSize, Http2MaxFrameSize, Http2MaxConcurrentStreams, 
+					Http2HeaderTableSize, false, Http2NoRfc7540Priorities, Http2Profiling, true);
 
 				webServer.ConnectionProfiled += WebServer_ConnectionProfiled;
 
@@ -1432,10 +1440,26 @@ namespace Waher.IoTGateway
 						}
 					}
 
-					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
+					ChunkedList<IModule> FailedModules = new ChunkedList<IModule>();
+
+					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder(), null, FailedModules))
 						Log.Informational("Server started.");
 					else
-						Log.Critical("Unable to start all modules.");
+					{
+						StringBuilder sb = new StringBuilder();
+
+						sb.AppendLine("Unable to start all modules. The following modules failed to load:");
+						sb.AppendLine();
+
+						foreach (IModule Module in FailedModules)
+						{
+							sb.Append("* `");
+							sb.Append(Module.GetType().FullName);
+							sb.AppendLine("`");
+						}
+
+						Log.Critical(sb.ToString());
+					}
 
 					await ProcessServiceConfigurations(false);
 
@@ -2151,6 +2175,11 @@ namespace Waher.IoTGateway
 		public static event EventHandlerAsync<GetDataSourcesEventArgs> GetDataSources = null;
 
 		/// <summary>
+		/// Observable layer where first chance exceptions can be monitored.
+		/// </summary>
+		public static CommunicationLayer FirstChanceExceptions => firstChanceExceptions;
+
+		/// <summary>
 		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).
 		/// </summary>
 		private static void Initialize()
@@ -2294,6 +2323,9 @@ namespace Waher.IoTGateway
 				scheduler?.Dispose();
 				scheduler = null;
 
+				await PlantUml.Terminate();
+				await GraphViz.Terminate();
+
 				await Script.Threading.Functions.Background.TerminateTasks(10000);
 				await Types.StopAllModules();
 
@@ -2410,6 +2442,7 @@ namespace Waher.IoTGateway
 					lock (exceptionFile)
 					{
 						exportExceptions = false;
+						firstChanceExceptions = null;
 
 						exceptionFile.WriteLine(new string('-', 80));
 						exceptionFile.Write("End of export: ");
@@ -2762,7 +2795,7 @@ namespace Waher.IoTGateway
 				if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
 					From = "/";
 
-				if (Request.Session.TryGetVariable("User", out v) && 
+				if (Request.Session.TryGetVariable("User", out v) &&
 					v.ValueObject is IUser &&
 					!string.IsNullOrEmpty(From) &&
 					!From.Contains("Login"))
@@ -3591,7 +3624,7 @@ namespace Waher.IoTGateway
 				throw new ArgumentException("Number of bytes must be non-negative.", nameof(NrBytes));
 
 			byte[] Result = new byte[NrBytes];
-			
+
 			lock (rnd)
 			{
 				rnd.GetBytes(Result);
@@ -4184,16 +4217,34 @@ namespace Waher.IoTGateway
 				Xml.Append("<body/>");
 			else
 			{
-				Xml.Append("<body><![CDATA[");
-				Xml.Append(Text.Replace("]]>", "]] >"));
-				Xml.Append("]]></body>");
+				Xml.Append("<body>");
+
+				if (Text.Contains("]]>"))
+					Xml.Append(XML.Encode(Text));
+				else
+				{
+					Xml.Append("<![CDATA[");
+					Xml.Append(Text);
+					Xml.Append("]]>");
+				}
+
+				Xml.Append("</body>");
 			}
 
 			if (!string.IsNullOrEmpty(Markdown))
 			{
-				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\"><![CDATA[");
-				Xml.Append(Markdown.Replace("]]>", "]] >"));
-				Xml.Append("]]></content>");
+				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
+
+				if (Markdown.Contains("]]>"))
+					Xml.Append(XML.Encode(Markdown));
+				else
+				{
+					Xml.Append("<![CDATA[");
+					Xml.Append(Markdown);
+					Xml.Append("]]>");
+				}
+
+				Xml.Append("</content>");
 			}
 
 			if (!string.IsNullOrEmpty(Html))
@@ -4567,7 +4618,7 @@ namespace Waher.IoTGateway
 					if (i > 0)
 						Markdown = Markdown[..i].TrimEnd();
 
-					Variables Variables = HttpServer.CreateVariables();
+					Variables Variables = HttpServer.CreateSessionVariables();
 					Variables["RequestId"] = Request.ObjectId;
 					Variables["Request"] = Request;
 
@@ -4607,11 +4658,13 @@ namespace Waher.IoTGateway
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
 		public static Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
-			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
-			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Callback, Timeout);
+			return LegalIdentityConfiguration.Instance.PetitionLegalIdentity(LegalId, PetitionId, Purpose, Callback, Timeout, Request);
 		}
 
 		/// <summary>
@@ -4638,11 +4691,13 @@ namespace Waher.IoTGateway
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
 		public static Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
-			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
-			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Callback, Timeout);
+			return LegalIdentityConfiguration.Instance.PetitionContract(ContractId, PetitionId, Purpose, Callback, Timeout, Request);
 		}
 
 		/// <summary>
@@ -4855,11 +4910,11 @@ namespace Waher.IoTGateway
 						Settings = new MarkdownSettings(emoji1_24x24, true)
 						{
 							RootFolder = rootFolder,
-							Variables = Request.Session ?? HttpServer.CreateVariables()
+							Variables = Request.Session ?? HttpServer.CreateSessionVariables()
 						};
 
-						if (!Settings.Variables.ContainsVariable("Request"))
-							Settings.Variables["Request"] = Request;
+						if (Settings.Variables is SessionVariables SessionVariables)
+							SessionVariables.CurrentRequest = Request;
 
 						Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, RootFolder, string.Empty, string.Empty);
 
@@ -5316,7 +5371,7 @@ namespace Waher.IoTGateway
 
 						case "StartupScript":           // Always execute
 							Expression Exp = new Expression(E.InnerText);
-							Variables v = HttpServer.CreateVariables();
+							Variables v = HttpServer.CreateSessionVariables();
 							await Exp.EvaluateAsync(v);
 							break;
 
@@ -5324,7 +5379,7 @@ namespace Waher.IoTGateway
 							if (ExecuteInitScript)
 							{
 								Exp = new Expression(E.InnerText);
-								v = HttpServer.CreateVariables();
+								v = HttpServer.CreateSessionVariables();
 								await Exp.EvaluateAsync(v);
 							}
 							break;
@@ -5344,10 +5399,11 @@ namespace Waher.IoTGateway
 
 		#region Profiling
 
-		private static async Task WebServer_ConnectionProfiled(object Sender, Profiler Profiler)
+		private static async Task WebServer_ConnectionProfiled(object Sender, ProfilingEventArgs e)
 		{
 			try
 			{
+				Profiler Profiler = e.Profiler;
 				DateTime Now = DateTime.UtcNow;
 				StringBuilder sb = new StringBuilder();
 
@@ -5377,10 +5433,19 @@ namespace Waher.IoTGateway
 					httpProfilingFolderChecked = true;
 				}
 
-				string FileName = Path.Combine(Folder, sb.ToString());
+				int NrNodes = 0;
+				string BaseFileName = sb.ToString();
+				string FileName = Path.Combine(Folder, BaseFileName);
 				string Uml = Profiler.ExportPlantUml(TimeUnit.Seconds);
+				string Uml2 = e.FlowControl?.ExportPlantUml(out NrNodes);
 
 				await Files.WriteAllTextAsync(FileName, Uml);
+
+				if (NrNodes > 0)
+				{
+					FileName = Path.Combine(Folder, BaseFileName.Replace("Profiling ", "States "));
+					await Files.WriteAllTextAsync(FileName, Uml2);
+				}
 
 				StringBuilder Markdown = new StringBuilder();
 
@@ -5389,6 +5454,16 @@ namespace Waher.IoTGateway
 				Markdown.AppendLine("```");
 
 				await SendNotification(Markdown.ToString());
+
+				if (NrNodes > 0)
+				{
+					Markdown.Clear();
+					Markdown.AppendLine("```uml");
+					Markdown.AppendLine(Uml.TrimEnd());
+					Markdown.AppendLine("```");
+
+					await SendNotification(Markdown.ToString());
+				}
 			}
 			catch (Exception ex)
 			{

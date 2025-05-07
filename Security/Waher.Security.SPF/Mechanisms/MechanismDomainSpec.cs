@@ -195,28 +195,18 @@ namespace Waher.Security.SPF.Mechanisms
 										if (this.term.dnsLookupsLeft-- <= 0)
 											throw new Exception("DNS Lookup maximum reached.");
 
-										string[] DomainNames = await DnsResolver.LookupDomainName(this.term.ip);
+										string[] DomainNames = await DnsResolver.TryLookupDomainName(this.term.ip);
 
-										// First check if domain is found.
-
-										s = null;
-										foreach (string DomainName in DomainNames)
+										if (DomainNames is null)
+											s = "unknown";
+										else
 										{
-											if (string.Compare(DomainName, this.term.domain, true) == 0 &&
-												await this.MatchReverseIp(DomainName))
-											{
-												s = DomainName;
-												break;
-											}
-										}
+											// First check if domain is found.
 
-										if (s is null)
-										{
-											// Second, check if sub-domain is found.
-
+											s = null;
 											foreach (string DomainName in DomainNames)
 											{
-												if (DomainName.EndsWith("." + this.term.domain, StringComparison.CurrentCultureIgnoreCase) &&
+												if (string.Compare(DomainName, this.term.domain, true) == 0 &&
 													await this.MatchReverseIp(DomainName))
 												{
 													s = DomainName;
@@ -226,10 +216,25 @@ namespace Waher.Security.SPF.Mechanisms
 
 											if (s is null)
 											{
-												if (DomainNames.Length == 0)
-													s = "unknown";
-												else
-													s = DomainNames[DnsResolver.Next(DomainNames.Length)];
+												// Second, check if sub-domain is found.
+
+												foreach (string DomainName in DomainNames)
+												{
+													if (DomainName.EndsWith("." + this.term.domain, StringComparison.CurrentCultureIgnoreCase) &&
+														await this.MatchReverseIp(DomainName))
+													{
+														s = DomainName;
+														break;
+													}
+												}
+
+												if (s is null)
+												{
+													if (DomainNames.Length == 0)
+														s = "unknown";
+													else
+														s = DomainNames[DnsResolver.Next(DomainNames.Length)];
+												}
 											}
 										}
 									}
@@ -338,16 +343,19 @@ namespace Waher.Security.SPF.Mechanisms
 			switch (this.term.ip.AddressFamily)
 			{
 				case AddressFamily.InterNetwork:
-					Addresses = await DnsResolver.LookupIP4Addresses(DomainName);
+					Addresses = await DnsResolver.TryLookupIP4Addresses(DomainName);
 					break;
 
 				case AddressFamily.InterNetworkV6:
-					Addresses = await DnsResolver.LookupIP6Addresses(DomainName);
+					Addresses = await DnsResolver.TryLookupIP6Addresses(DomainName);
 					break;
 
 				default:
 					throw new Exception("Invalid client address.");
 			}
+
+			if (Addresses is null)
+				return false;
 
 			string Temp = this.term.ip.ToString();
 

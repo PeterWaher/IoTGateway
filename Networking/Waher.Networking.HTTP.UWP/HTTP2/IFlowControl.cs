@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,7 +9,7 @@ namespace Waher.Networking.HTTP.HTTP2
 	/// <summary>
 	/// Interface for managing HTTP/2 flow control.
 	/// </summary>
-	public interface IFlowControl : IDisposable
+	public interface IFlowControl : IEnumerable<IPriorityNode>, IDisposable
 	{
 		/// <summary>
 		/// Local Connection settings.
@@ -67,7 +69,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		Task<int> RequestResources(int StreamId, int RequestedResources, CancellationToken? CancellationToken);
 
 		/// <summary>
-		/// Releases stream resources back to the stream.
+		/// Releases stream resources back to the stream, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID > 0.
 		/// </summary>
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
@@ -75,7 +78,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		int ReleaseStreamResources(int StreamId, int Resources);
 
 		/// <summary>
-		/// Releases connection resources back.
+		/// Releases connection resources back, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID = 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
@@ -112,5 +116,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamId">Stream ID</param>
 		/// <param name="Label">Label to set.</param>
 		void SetProfilerStreamLabel(int StreamId, string Label);
+
+		/// <summary>
+		/// Exports current flow control tree to PlantUML format.
+		/// </summary>
+		/// <param name="NrNodes">Number of nodes output.</param>
+		/// <returns>UML diagram</returns>
+		string ExportPlantUml(out int NrNodes);
+
+		/// <summary>
+		/// Exports current flow control tree to PlantUML format.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		/// <param name="NrNodes">Number of nodes output.</param>
+		void ExportPlantUml(StringBuilder Output, out int NrNodes);
 	}
 }

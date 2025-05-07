@@ -522,7 +522,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			if (this.supportsProvisioning)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Database", Menu);
+				GroupSeparator(ref CurrentGroup, "Database", Menu);
 
 				Menu.Items.Add(Item = new MenuItem()
 				{
@@ -555,7 +555,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 			if (this.supportsSoftwareUpdates)
 			{
-				this.GroupSeparator(ref CurrentGroup, "Software", Menu);
+				GroupSeparator(ref CurrentGroup, "Software", Menu);
 
 				Menu.Items.Add(Item = new MenuItem()
 				{
@@ -630,7 +630,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			{
 				if (this.registryClient is not null)
 				{
-					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+					GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
 					Menu.Items.Add(Item = new MenuItem()
 					{
@@ -650,7 +650,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				if (this.provisioningClient is not null)
 				{
-					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+					GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
 					Menu.Items.Add(Item = new MenuItem()
 					{
@@ -687,7 +687,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 			{
 				if (this.registryClient is not null)
 				{
-					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+					GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
 					Menu.Items.Add(Item = new MenuItem()
 					{
@@ -707,7 +707,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 
 				if (this.provisioningClient is not null)
 				{
-					this.GroupSeparator(ref CurrentGroup, "Registry", Menu);
+					GroupSeparator(ref CurrentGroup, "Registry", Menu);
 
 					Menu.Items.Add(Item = new MenuItem()
 					{

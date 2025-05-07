@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Default Initial Window Size for an HTTP/2 connection (65535).
 		/// </summary>
-		public const int DefaultHttp2InitialWindowSize = 65535;
+		public const int DefaultHttp2InitialConnectionWindowSize = 65535;
 
 		/// <summary>
 		/// Default Maximum Frame Size for an HTTP/2 connection (4096).
@@ -49,7 +49,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 		private int headerTableSize;
 		private int maxConcurrentStreams;
-		private int initialWindowSize;
+		private int initialStreamWindowSize;
 		private int maxFrameSize;
 		private int maxHeaderListSize = HttpClientConnection.MaxHeaderSize;
 		private bool enablePush;
@@ -61,7 +61,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// </summary>
 		public ConnectionSettings()
 		{
-			this.initialWindowSize = DefaultHttp2InitialWindowSize;
+			this.initialStreamWindowSize = DefaultHttp2InitialConnectionWindowSize;
 			this.maxFrameSize = DefaultHttp2MaxFrameSize;
 			this.maxConcurrentStreams = DefaultHttp2MaxConcurrentStreams;
 			this.headerTableSize = DefaultHttp2HeaderTableSize;
@@ -73,17 +73,17 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// HTTP/2 connection settings (SETTINGS).
 		/// </summary>
-		/// <param name="InitialWindowSize">Initial window size.</param>
+		/// <param name="InitialStreamWindowSize">Initial stream window size.</param>
 		/// <param name="MaxFrameSize">Maximum frame size.</param>
 		/// <param name="MaxConcurrentStreams">Maximum number of concurrent streams.</param>
 		/// <param name="HeaderTableSize">Header table size.</param>
 		/// <param name="EnablePush">If push promises are enabled.</param>
 		/// <param name="NoRfc7540Priorities">If RFC7540 priorities are obsoleted.</param>
-		public ConnectionSettings(int InitialWindowSize, int MaxFrameSize,
+		public ConnectionSettings(int InitialStreamWindowSize, int MaxFrameSize,
 			int MaxConcurrentStreams, int HeaderTableSize, bool EnablePush,
 			bool NoRfc7540Priorities)
 		{
-			this.initialWindowSize = InitialWindowSize;
+			this.initialStreamWindowSize = InitialStreamWindowSize;
 			this.maxFrameSize = MaxFrameSize;
 			this.maxConcurrentStreams = MaxConcurrentStreams;
 			this.headerTableSize = HeaderTableSize;
@@ -163,10 +163,10 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// be treated as a connection error(Section 5.4.1) of type
 		/// FLOW_CONTROL_ERROR.
 		/// </summary>
-		public int InitialWindowSize
+		public int InitialStreamWindowSize
 		{
-			get => this.initialWindowSize;
-			internal set => this.initialWindowSize = value;
+			get => this.initialStreamWindowSize;
+			internal set => this.initialStreamWindowSize = value;
 		}
 
 		/// <summary>
@@ -325,7 +325,7 @@ namespace Waher.Networking.HTTP.HTTP2
 						if (Value > 0x7fffffff)
 							return Http2Error.FlowControlError;
 
-						Settings.initialWindowSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
+						Settings.initialStreamWindowSize = Value > int.MaxValue ? int.MaxValue : (int)Value;
 						break;
 
 					case 5:
@@ -401,8 +401,8 @@ namespace Waher.Networking.HTTP.HTTP2
 			w.WriteKeyValue(3, (uint)this.MaxConcurrentStreams);
 			SnifferOutput?.AppendLine("SETTINGS_MAX_CONCURRENT_STREAMS = " + this.MaxConcurrentStreams.ToString());
 			
-			w.WriteKeyValue(4, (uint)this.InitialWindowSize);
-			SnifferOutput?.AppendLine("SETTINGS_INITIAL_WINDOW_SIZE = " + this.InitialWindowSize.ToString());
+			w.WriteKeyValue(4, (uint)this.InitialStreamWindowSize);
+			SnifferOutput?.AppendLine("SETTINGS_INITIAL_WINDOW_SIZE = " + this.InitialStreamWindowSize.ToString());
 			
 			w.WriteKeyValue(5, (uint)this.MaxFrameSize);
 			SnifferOutput?.AppendLine("SETTINGS_MAX_FRAME_SIZE = " + this.MaxFrameSize.ToString());

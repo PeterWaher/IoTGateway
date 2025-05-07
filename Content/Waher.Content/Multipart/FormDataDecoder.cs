@@ -200,7 +200,7 @@ namespace Waher.Content.Multipart
 
 				Array.Copy(Data, j + 4, Data2, 0, NrBytes);
 
-				string[] Rows = Header.Split(CommonTypes.CRLF);
+				string[] Rows = Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 				l = Rows.Length;
 				m = -1;
 

@@ -34,7 +34,7 @@ namespace Waher.Networking
 	{
 		private const int BufferSize = 65536;
 
-		private readonly ChunkedList<Rec> queue = new ChunkedList<Rec>();
+		private readonly ChunkedList<Rec> outputQueue = new ChunkedList<Rec>();
 		private ChunkedList<TaskCompletionSource<bool>> idleQueue = null;
 		private ChunkedList<TaskCompletionSource<bool>> cancelledQueue = null;
 		private ChunkedList<TaskCompletionSource<bool>> waitingQueue = null;
@@ -420,12 +420,12 @@ namespace Waher.Networking
 		/// <summary>
 		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CurrenntCancellationToken => CancellationToken.None;
+		public CancellationToken CurrentCancellationToken => CancellationToken.None;
 #else
 		/// <summary>
 		/// Current Cancellation token for the current read operation.
 		/// </summary>
-		public CancellationToken CurrenntCancellationToken => this.currentCancelReading?.Token ?? CancellationToken.None;
+		public CancellationToken CurrentCancellationToken => this.currentCancelReading?.Token ?? CancellationToken.None;
 #endif
 
 		private void PreConnect()
@@ -610,11 +610,14 @@ namespace Waher.Networking
 
 			await this.CancelOutputQueue();
 
-			this.queue.Clear();
+			this.outputQueue.Clear();
 			this.outputQueueSize = 0;
 
-			this.EmptyIdleQueueLocked();
-			this.EmptyCancelQueueLocked();
+			lock (this.synchObj)
+			{
+				this.EmptyIdleQueueLocked();
+				this.EmptyCancelQueueLocked();
+			}
 
 #if WINDOWS_UWP
 			this.client.Dispose();
@@ -1131,19 +1134,25 @@ namespace Waher.Networking
 			EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.BeginSend(ConstantBuffer, Buffer, Offset, Count, Priority, Result, Callback, State, true);
+			await this.QueueForOutput(ConstantBuffer, Buffer, Offset, Count, Priority, Result, Callback, State);
 			return await Result.Task;
 		}
 
-		private async Task BeginSend(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
+		private async Task QueueForOutput(bool ConstantBuffer, byte[] Buffer, int Offset, int Count, bool Priority,
 			TaskCompletionSource<bool> Task, EventHandlerAsync<DeliveryEventArgs> Callback,
-			object State, bool CheckSending)
+			object State)
 		{
 			if (Buffer is null)
-				throw new ArgumentException("Cannot be null.", nameof(Buffer));
+			{
+				Task.TrySetException(new ArgumentException("Cannot be null.", nameof(Buffer)));
+				return;
+			}
 
 			if (Count < 0)
-				throw new ArgumentException("Count cannot be negative.", nameof(Count));
+			{
+				Task.TrySetException(new ArgumentException("Count cannot be negative.", nameof(Count)));
+				return;
+			}
 
 			if (Count == 0)
 			{
@@ -1157,12 +1166,119 @@ namespace Waher.Networking
 
 			int c = Buffer.Length;
 			if (Offset < 0 || Offset >= c)
-				throw new ArgumentOutOfRangeException("Invalid offset.", nameof(Offset));
+			{
+				Task.TrySetException(new ArgumentOutOfRangeException("Invalid offset.", nameof(Offset)));
+				return;
+			}
 
 			if (Count < 0 || Offset + Count > c)
-				throw new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count));
+			{
+				Task.TrySetException(new ArgumentOutOfRangeException("Invalid number of bytes.", nameof(Count)));
+				return;
+			}
 
+			Rec Item;
+
+			if (ConstantBuffer)
+			{
+				Item = new Rec()
+				{
+					Data = Buffer,
+					Offset = Offset,
+					Count = Count,
+					Callback = Callback,
+					State = State,
+					Task = Task
+				};
+			}
+			else
+			{
+				Item = new Rec()
+				{
+					Data = new byte[Count],
+					Offset = 0,
+					Count = Count,
+					Callback = Callback,
+					State = State,
+					Task = Task
+				};
+
+				Array.Copy(Buffer, Offset, Item.Data, 0, Count);
+			}
+
+			TaskCompletionSource<bool> Wait;
+
+			while (true)
+			{
+				Wait = null;
+
+				lock (this.synchObj)
+				{
+					if (this.disposing || this.disposed)
+					{
+						Task.TrySetResult(false);
+						this.sending = false;
+						break;
+					}
+
+					if (!this.connected)
+					{
+						Task.TrySetException(new InvalidOperationException("Not connected."));
+						return;
+					}
+
+					if (this.sending)
+					{
+						if (this.outputQueueSize > 0 && this.outputQueueSize + Count > this.maxOutputQueueSize)
+						{
+							Wait = new TaskCompletionSource<bool>();
+
+							if (this.waitingQueue is null)
+								this.waitingQueue = new ChunkedList<TaskCompletionSource<bool>>();
+
+							this.waitingQueue.AddLastItem(Wait);
+						}
+						else
+						{
+							if (Priority)
+								this.outputQueue.AddFirstItem(Item);
+							else
+								this.outputQueue.Add(Item);
+
+							this.outputQueueSize += Count;
+							return;
+						}
+					}
+					else
+					{
+						this.outputQueue.Add(Item);
+						this.outputQueueSize += Count;
+						this.sending = true;
+					}
+				}
+
+				if (Wait is null)
+				{
+					this.SendTask();
+					return;
+				}
+				else
+				{
+					this.Information("Limiting output...");
+
+					await Wait.Task;
+					continue;
+				}
+			}
+		}
+
+		private async void SendTask()
+		{
 			bool DoDispose = false;
+			Rec Rec = null;
+			TaskCompletionSource<bool>[] ReleaseWaiting = null;
+			bool CancelOutput = false;
+
 			try
 			{
 #if WINDOWS_UWP
@@ -1170,113 +1286,32 @@ namespace Waher.Networking
 #else
 				Stream Stream;
 #endif
-				TaskCompletionSource<bool> Wait;
-
 				while (true)
 				{
-					Wait = null;
-
 					lock (this.synchObj)
 					{
-						if (this.disposing || this.disposed)
+						if (this.disposing ||
+							this.disposed ||
+							!this.outputQueue.HasFirstItem)
 						{
-							Task.TrySetResult(false);
 							this.sending = false;
+							this.EmptyIdleQueueLocked();
+
+							if (this.disposing && !this.reading)
+								DoDispose = true;
+
+							CancelOutput = true;
 							break;
 						}
 
-						if (CheckSending)
+						Rec = this.outputQueue.RemoveFirst();
+						this.outputQueueSize -= Rec.Count;
+
+						if (this.waitingQueue?.HasFirstItem ?? false)
 						{
-							if (!this.connected)
-								throw new InvalidOperationException("Not connected.");
-
-							if (this.sending)
-							{
-								if (this.outputQueueSize > 0 && this.outputQueueSize + Count > this.maxOutputQueueSize)
-								{
-									Wait = new TaskCompletionSource<bool>();
-
-									if (this.waitingQueue is null)
-										this.waitingQueue = new ChunkedList<TaskCompletionSource<bool>>();
-
-									this.waitingQueue.AddLastItem(Wait);
-								}
-								else
-								{
-									Rec Item;
-
-									if (ConstantBuffer)
-									{
-										Item = new Rec()
-										{
-											Data = Buffer,
-											Offset = Offset,
-											Count = Count,
-											Callback = Callback,
-											State = State,
-											Task = Task
-										};
-									}
-									else
-									{
-										Item = new Rec()
-										{
-											Data = new byte[Count],
-											Offset = 0,
-											Count = Count,
-											Callback = Callback,
-											State = State,
-											Task = Task
-										};
-
-										Array.Copy(Buffer, Offset, Item.Data, 0, Count);
-									}
-
-									if (Priority)
-										this.queue.AddFirstItem(Item);
-									else
-										this.queue.Add(Item);
-
-									this.outputQueueSize += Count;
-									return;
-								}
-							}
-							else
-							{
-								this.sending = true;
-								CheckSending = false;
-							}
+							ReleaseWaiting = this.waitingQueue.ToArray();
+							this.waitingQueue.Clear();
 						}
-						else
-						{
-							while (this.waitingQueue?.HasFirstItem ?? false)
-								this.waitingQueue.RemoveFirst().TrySetResult(true);
-
-							if (!this.queue.HasFirstItem)
-							{
-								this.sending = false;
-								this.EmptyIdleQueueLocked();
-
-								if (this.disposing && !this.reading)
-									DoDispose = true;
-
-								break;
-							}
-							else
-							{
-								Rec Rec = this.queue.RemoveFirst();
-								this.outputQueueSize -= Rec.Count;
-
-								Buffer = Rec.Data;
-								Offset = Rec.Offset;
-								Count = Rec.Count;
-								Callback = Rec.Callback;
-								State = Rec.State;
-								Task = Rec.Task;
-								ConstantBuffer = true;
-							}
-						}
-
 #if WINDOWS_UWP
 						DataWriter = this.dataWriter;
 						if (DataWriter is null)
@@ -1286,65 +1321,71 @@ namespace Waher.Networking
 #endif
 						{
 							this.sending = false;
+							CancelOutput = true;
 							break;
 						}
 					}
-
-					if (!(Wait is null))
-					{
-						await Wait.Task;
-						continue;
-					}
-
 #if WINDOWS_UWP
-					if (Offset > 0 || Count < c)
-					{
-						Buffer = SnifferBase.CloneSection(Buffer, Offset, Count);
-						Offset = 0;
-						Count = c;
-					}
+					byte[] Buffer;
+
+					if (Rec.Offset > 0 || Rec.Count < Rec.Data.Length)
+						Buffer = SnifferBase.CloneSection(Rec.Data, Rec.Offset, Rec.Count);
+					else
+						Buffer = Rec.Data;
 
 					DataWriter.WriteBytes(Buffer);
 					await this.dataWriter.StoreAsync();
+
+					Rec.Task.TrySetResult(true);
+
+					if (!(Rec.Callback is null))
+						await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, true));
 #else
 					if (this.tcpClient?.Client.Connected ?? false)
 					{
-						await Stream.WriteAsync(Buffer, Offset, Count);
+						await Stream.WriteAsync(Rec.Data, Rec.Offset, Rec.Count);
 
 						try
 						{
-							await this.BinaryDataSent(ConstantBuffer, Buffer, Offset, Count);
+							await this.BinaryDataSent(true, Rec.Data, Rec.Offset, Rec.Count);
 						}
 						catch (Exception ex)
 						{
 							this.Exception(ex);
 						}
 
-						Task.TrySetResult(true);
+						Rec.Task.TrySetResult(true);
 
-						if (!(Callback is null))
-							await Callback.Raise(this, new DeliveryEventArgs(State, true));
+						if (!(Rec.Callback is null))
+							await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, true));
 					}
 					else
 					{
 						this.Error("Connection closed.");
-						Task?.TrySetResult(false);
-					
-						if (!(Callback is null))
-							await Callback.Raise(this, new DeliveryEventArgs(State, false));
-					
+						Rec.Task?.TrySetResult(false);
+
+						if (!(Rec.Callback is null))
+							await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, false));
+
 						lock (this.synchObj)
 						{
 							this.sending = false;
 							this.EmptyIdleQueueLocked();
-					
+
 							DoDispose = this.disposing && !this.reading;
 						}
-					
-						await this.CancelOutputQueue();
+
+						CancelOutput = true;
 						break;
 					}
 #endif
+					if (!(ReleaseWaiting is null))
+					{
+						foreach (TaskCompletionSource<bool> Wait in ReleaseWaiting)
+							Wait.TrySetResult(true);
+
+						ReleaseWaiting = null;
+					}
 				}
 
 				if (!this.disposed)
@@ -1358,6 +1399,7 @@ namespace Waher.Networking
 #endif
 					if (this.disposeWhenDone)
 					{
+						this.sending = false;
 						await this.DisposeAsync();
 						return;
 					}
@@ -1369,10 +1411,14 @@ namespace Waher.Networking
 			catch (Exception ex)
 			{
 				this.Exception(ex.Message);
-				Task?.TrySetResult(false);
 
-				if (!(Callback is null))
-					await Callback.Raise(this, new DeliveryEventArgs(State, false));
+				if (!(Rec is null))
+				{
+					Rec.Task.TrySetResult(false);
+
+					if (!(Rec.Callback is null))
+						await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, false));
+				}
 
 				lock (this.synchObj)
 				{
@@ -1386,6 +1432,17 @@ namespace Waher.Networking
 			}
 			finally
 			{
+				if (CancelOutput)
+					await this.CancelOutputQueue();
+
+				if (!(ReleaseWaiting is null))
+				{
+					foreach (TaskCompletionSource<bool> Wait in ReleaseWaiting)
+						Wait.TrySetResult(true);
+
+					ReleaseWaiting = null;
+				}
+
 				if (DoDispose)
 				{
 					try
@@ -1404,8 +1461,8 @@ namespace Waher.Networking
 		{
 			if (!(this.idleQueue is null))
 			{
-				while (this.idleQueue.HasFirstItem)
-					this.idleQueue.RemoveFirst().TrySetResult(true);
+				while (this.idleQueue?.HasFirstItem ?? false)
+					this.idleQueue?.RemoveFirst().TrySetResult(true);
 
 				this.idleQueue = null;
 			}
@@ -1415,8 +1472,8 @@ namespace Waher.Networking
 		{
 			if (!(this.cancelledQueue is null))
 			{
-				while (this.cancelledQueue.HasFirstItem)
-					this.cancelledQueue.RemoveFirst().TrySetResult(true);
+				while (this.cancelledQueue?.HasFirstItem ?? false)
+					this.cancelledQueue?.RemoveFirst().TrySetResult(true);
 
 				this.cancelledQueue = null;
 			}
@@ -1430,13 +1487,13 @@ namespace Waher.Networking
 			{
 				lock (this.synchObj)
 				{
-					if (this.queue is null)
+					if (this.outputQueue is null)
 						break;
 
-					if (!this.queue.HasFirstItem)
+					if (!this.outputQueue.HasFirstItem)
 						break;
 
-					Rec = this.queue.RemoveFirst();
+					Rec = this.outputQueue.RemoveFirst();
 					this.outputQueueSize -= Rec.Count;
 				}
 
@@ -2120,6 +2177,9 @@ namespace Waher.Networking
 		{
 			lock (this.synchObj)
 			{
+				if (this.disposed)
+					throw new ObjectDisposedException(nameof(BinaryTcpClient));
+
 				if (this.reading)
 					throw new InvalidOperationException("Connection cannot be upgraded to TLS while in a reading state.");
 

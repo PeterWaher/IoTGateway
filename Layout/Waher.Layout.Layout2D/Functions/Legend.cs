@@ -109,7 +109,25 @@ namespace Waher.Layout.Layout2D.Functions
 		/// <exception cref="ArgumentNullException">If any of the arrays are null.</exception>
 		/// <exception cref="ArgumentException">If the array lengths do not match.</exception>
 		/// <exception cref="ArgumentOutOfRangeException">If the number of columns is zero or negative.</exception>
-		public static async Task<GraphBitmap> CreateAsync(string[] Labels, SKColor[] Colors, SKColor FgColor, int NrColumns, Variables Variables)
+		public static Task<GraphBitmap> CreateAsync(string[] Labels, SKColor[] Colors, SKColor FgColor, int NrColumns, Variables Variables)
+		{
+			string LayoutXml = CreateLayout(Labels, Colors, FgColor, NrColumns, Variables);
+			return Layout.FromLayout(LayoutXml, Variables);
+		}
+
+		/// <summary>
+		/// Creates a graph bitmap containing a legend.
+		/// </summary>
+		/// <param name="Labels">Labels</param>
+		/// <param name="Colors">Colors</param>
+		/// <param name="FgColor">Foreground color.</param>
+		/// <param name="NrColumns">Number of columns.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Graph bitmap.</returns>
+		/// <exception cref="ArgumentNullException">If any of the arrays are null.</exception>
+		/// <exception cref="ArgumentException">If the array lengths do not match.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">If the number of columns is zero or negative.</exception>
+		public static string CreateLayout(string[] Labels, SKColor[] Colors, SKColor FgColor, int NrColumns, Variables Variables)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -176,7 +194,7 @@ namespace Waher.Layout.Layout2D.Functions
 			sb.AppendLine("</Grid>");
 			sb.AppendLine("</Layout2D>");
 
-			return await Layout.FromLayout(sb.ToString(), Variables);
+			return sb.ToString();
 		}
 
 		private static void Append(StringBuilder sb, SKColor Color)

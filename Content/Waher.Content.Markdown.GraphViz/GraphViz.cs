@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Html.Elements;
 using Waher.Content.Images;
 using Waher.Content.Markdown.Contracts;
 using Waher.Content.Markdown.Latex;
@@ -19,6 +21,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
+using Waher.Runtime.Queue;
 using Waher.Runtime.Timing;
 using Waher.Script;
 using Waher.Script.Graphs;
@@ -35,6 +38,7 @@ namespace Waher.Content.Markdown.GraphViz
 	internal class GraphInfo
 	{
 		public string FileName;
+		public string TextFileName;
 		public string Title;
 		public string MapFileName;
 		public string Hash;
@@ -46,6 +50,9 @@ namespace Waher.Content.Markdown.GraphViz
 	public class GraphViz : IImageCodeContent, ICodeContentMarkdownRenderer, ICodeContentHtmlRenderer, ICodeContentTextRenderer,
 		ICodeContentContractsRenderer, ICodeContentLatexRenderer, ICodeContentWpfXamlRenderer, ICodeContentXamarinFormsXamlRenderer
 	{
+		private const int chartGenerationTimeout = 30000;
+
+		private static readonly AsyncProcessor<ChartRecord> queue = new AsyncProcessor<ChartRecord>(1);
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
 		private static string installationFolder = null;
@@ -115,6 +122,23 @@ namespace Waher.Content.Markdown.GraphViz
 
 					asyncHtmlOutput = Types.FindBest<IMarkdownAsynchronousOutput, MarkdownOutputType>(MarkdownOutputType.Html);
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
+			}
+		}
+
+		/// <summary>
+		/// Terminates GraphViz processing.
+		/// </summary>
+		/// <returns></returns>
+		public static async Task Terminate()
+		{
+			try
+			{
+				await queue.CloseForTermination(true, chartGenerationTimeout);
+				await queue.DisposeAsync();
 			}
 			catch (Exception ex)
 			{
@@ -561,6 +585,7 @@ namespace Waher.Content.Markdown.GraphViz
 					break;
 			}
 
+			Result.TextFileName = FileName + ".txt";
 			Result.MapFileName = FileName + ".map";
 
 			if (File.Exists(Result.FileName))
@@ -574,105 +599,204 @@ namespace Waher.Content.Markdown.GraphViz
 			if (!GenerateIfNotExists)
 				return null;
 
-			string TxtFileName = FileName + ".txt";
-			await Files.WriteAllTextAsync(TxtFileName, GraphText, Encoding.Default);	// Use UTF-8 ?
+			ChartRecord Rec = new ChartRecord(Result, Language, GraphText, GraphFgColor, GraphBgColor, Type);
+			queue.Queue(Rec);
 
-			StringBuilder Arguments = new StringBuilder();
+			if (!await Rec.Wait())
+				throw new Exception("Unable to process GraphViz chart.");
 
-			Arguments.Append("-Tcmapx -o\"");
-			Arguments.Append(Result.MapFileName);
-			Arguments.Append("\" -T");
-			Arguments.Append(Type.ToString().ToLower());
+			return Result;
+		}
 
-			if (!string.IsNullOrEmpty(GraphBgColor))
+		private class ChartRecord : IWorkItem
+		{
+			private readonly GraphInfo info;
+			private readonly TaskCompletionSource<bool> result;
+			private readonly string language;
+			private readonly string graphText;
+			private readonly string graphFgColor;
+			private readonly string graphBgColor;
+			private readonly ResultType type;
+
+			public ChartRecord(GraphInfo Result, string Language, string GraphText,
+				string GraphFgColor, string GraphBgColor, ResultType Type)
 			{
-				Arguments.Append(" -Gbgcolor=\"");
-				Arguments.Append(GraphBgColor);
-				Arguments.Append('"');
+				this.result = new TaskCompletionSource<bool>();
+				this.info = Result;
+				this.language = Language;
+				this.graphText = GraphText;
+				this.graphFgColor = GraphFgColor;
+				this.graphBgColor = GraphBgColor;
+				this.type = Type;
 			}
 
-			if (!string.IsNullOrEmpty(GraphFgColor))
+			/// <summary>
+			/// Executes the operation.
+			/// </summary>
+			public Task Execute()
 			{
-				Arguments.Append(" -Gcolor=\"");
-				Arguments.Append(GraphFgColor);
-				//Arguments.Append("\" -Nfillcolor=\"");
-				//Arguments.Append(defaultFgColor);
-				Arguments.Append("\" -Nfontcolor=\"");
-				Arguments.Append(GraphFgColor);
-				Arguments.Append("\" -Nlabelfontcolor=\"");
-				Arguments.Append(GraphFgColor);
-				Arguments.Append("\" -Npencolor=\"");
-				Arguments.Append(GraphFgColor);
-				Arguments.Append("\" -Efontcolor=\"");
-				Arguments.Append(GraphFgColor);
-				Arguments.Append("\" -Elabelfontcolor=\"");
-				Arguments.Append(GraphFgColor);
-				Arguments.Append("\" -Epencolor=\"");
-				Arguments.Append(GraphFgColor);
-				Arguments.Append("\"");
+				return this.Execute(CancellationToken.None);
 			}
 
-			Arguments.Append(" -q -o\"");
-			Arguments.Append(Result.FileName);
-			Arguments.Append("\" \"");
-			Arguments.Append(TxtFileName + "\"");
-
-			ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+			/// <summary>
+			/// Executes the operation.
+			/// </summary>
+			/// <param name="Cancel">Cancellation token.</param>
+			public async Task Execute(CancellationToken Cancel)
 			{
-				FileName = Path.Combine(binFolder, Language.ToLower() + FileSystem.ExecutableExtension),
-				Arguments = Arguments.ToString(),
-				UseShellExecute = false,
-				RedirectStandardError = true,
-				RedirectStandardOutput = true,
-				RedirectStandardInput = false,
-				WorkingDirectory = GraphVizFolder,
-				CreateNoWindow = true,
-				WindowStyle = ProcessWindowStyle.Hidden
-			};
+				await Files.WriteAllTextAsync(this.info.TextFileName, this.graphText, Encoding.Default);    // Use UTF-8 ?
 
-			Process P = new Process();
-			TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
+				StringBuilder Arguments = new StringBuilder();
 
-			P.ErrorDataReceived += (Sender, e) =>
-			{
-				ResultSource.TrySetException(new Exception("Unable to generate graph:\r\n\r\n" + e.Data));
-			};
+				Arguments.Append("-Tcmapx -o\"");
+				Arguments.Append(this.info.MapFileName);
+				Arguments.Append("\" -T");
+				Arguments.Append(this.type.ToString().ToLower());
 
-			P.Exited += async (Sender, e) =>
-			{
+				if (!string.IsNullOrEmpty(this.graphBgColor))
+				{
+					Arguments.Append(" -Gbgcolor=\"");
+					Arguments.Append(this.graphBgColor);
+					Arguments.Append('"');
+				}
+
+				if (!string.IsNullOrEmpty(this.graphFgColor))
+				{
+					Arguments.Append(" -Gcolor=\"");
+					Arguments.Append(this.graphFgColor);
+					//Arguments.Append("\" -Nfillcolor=\"");
+					//Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Nfontcolor=\"");
+					Arguments.Append(this.graphFgColor);
+					Arguments.Append("\" -Nlabelfontcolor=\"");
+					Arguments.Append(this.graphFgColor);
+					Arguments.Append("\" -Npencolor=\"");
+					Arguments.Append(this.graphFgColor);
+					Arguments.Append("\" -Efontcolor=\"");
+					Arguments.Append(this.graphFgColor);
+					Arguments.Append("\" -Elabelfontcolor=\"");
+					Arguments.Append(this.graphFgColor);
+					Arguments.Append("\" -Epencolor=\"");
+					Arguments.Append(this.graphFgColor);
+					Arguments.Append("\"");
+				}
+
+				Arguments.Append(" -q -o\"");
+				Arguments.Append(this.info.FileName);
+				Arguments.Append("\" \"");
+				Arguments.Append(this.info.TextFileName + "\"");
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+				{
+					FileName = Path.Combine(binFolder, this.language.ToLower() + FileSystem.ExecutableExtension),
+					Arguments = Arguments.ToString(),
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					RedirectStandardInput = false,
+					WorkingDirectory = graphVizFolder,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
+
+				Process P = new Process();
+				TaskCompletionSource<int> ExitSource = new TaskCompletionSource<int>();
+
+				P.Exited += (Sender, e) =>
+				{
+					ExitSource.TrySetResult(P.ExitCode);
+				};
+
+				Task _ = Task.Delay(chartGenerationTimeout).ContinueWith(Prev =>
+				{
+					try
+					{
+						P.Kill();
+
+						if (File.Exists(this.info.FileName))
+							File.Delete(this.info.FileName);
+
+						if (!string.IsNullOrEmpty(this.info.MapFileName) &&
+						File.Exists(this.info.MapFileName))
+						{
+							File.Delete(this.info.MapFileName);
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Exception(ex);
+					}
+					finally
+					{
+						ExitSource.TrySetException(new TimeoutException("GraphViz process did not terminate properly."));
+					}
+
+					return Task.CompletedTask;
+				});
+
+				P.StartInfo = ProcessInformation;
+				P.EnableRaisingEvents = true;
+				P.Start();
+
+				int ExitCode = await ExitSource.Task;
+
+				if (ExitCode != 0)
+				{
+					string Error = P.StandardError.ReadToEnd();
+					this.result.TrySetException(new Exception(Error));
+				}
+
 				try
 				{
-					if (P.ExitCode != 0)
+					if (File.Exists(this.info.MapFileName))
 					{
-						string ErrorText = await P.StandardError.ReadToEndAsync();
-						ResultSource.TrySetException(new Exception("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText));
-					}
-					else
-					{
-						string Map = await Files.ReadAllTextAsync(Result.MapFileName);
+						string Map = await Files.ReadAllTextAsync(this.info.MapFileName);
 						string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 						if (MapRows.Length <= 2)
 						{
-							File.Delete(Result.MapFileName);
-							Result.MapFileName = null;
+							File.Delete(this.info.MapFileName);
+							this.info.MapFileName = null;
 						}
-
-						ResultSource.TrySetResult(Result);
 					}
+					else
+						this.info.MapFileName = null;
 				}
 				catch (Exception ex)
 				{
 					Log.Exception(ex);
 				}
-			};
+			}
 
-			Task _ = Task.Delay(10000).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("GraphViz process did not terminate properly.")));
+			/// <summary>
+			/// Flags the item as processed.
+			/// </summary>
+			/// <returns>If item was processed successfully.</returns>
+			public void Processed(bool Result)
+			{
+				this.result.TrySetResult(Result);
+			}
 
-			P.StartInfo = ProcessInformation;
-			P.EnableRaisingEvents = true;
-			P.Start();
+			/// <summary>
+			/// Waits for the item to be processed.
+			/// </summary>
+			/// <returns>If item was processed successfully.</returns>
+			public Task<bool> Wait()
+			{
+				return this.result.Task;
+			}
 
-			return await ResultSource.Task;
+			/// <summary>
+			/// Waits for the item to be processed.
+			/// </summary>
+			/// <param name="Cancel">Cancellation token.</param>
+			/// <returns>If item was processed successfully.</returns>
+			public Task<bool> Wait(CancellationToken Cancel)
+			{
+				if (Cancel.CanBeCanceled)
+					Cancel.Register(() => this.result.TrySetException(new OperationCanceledException(Cancel)));
+
+				return this.result.Task;
+			}
 		}
 
 		private static string GetColor(string VariableName, Variables Variables)

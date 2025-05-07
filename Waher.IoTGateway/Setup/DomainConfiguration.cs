@@ -688,7 +688,7 @@ namespace Waher.IoTGateway.Setup
 
 			await Status.Raise(this, "Checking current IP Address.");
 
-			Variables Variables = HttpServer.CreateVariables();
+			Variables Variables = HttpServer.CreateSessionVariables();
 			object Result;
 
 			try

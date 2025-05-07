@@ -484,7 +484,7 @@ namespace Waher.IoTGateway.Setup
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
 
 				if (Gateway.XmppClient.State == XmppState.Connected)
-					await this.GetLegalIdentities();
+					await this.GetLegalIdentities(null);
 			}
 		}
 
@@ -494,12 +494,12 @@ namespace Waher.IoTGateway.Setup
 		private async Task XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{
 			if (NewState == XmppState.Connected)
-				await this.GetLegalIdentities();
+				await this.GetLegalIdentities(null);
 		}
 
-		private Task GetLegalIdentities()
+		private Task GetLegalIdentities(object P)
 		{
-			if (Gateway.ContractsClient is null)
+			if (Gateway.ContractsClient is null || Gateway.XmppClient.State != XmppState.Connected)
 				return Task.CompletedTask;
 
 			return Gateway.ContractsClient.GetLegalIdentities((Sender, e) =>
@@ -509,6 +509,8 @@ namespace Waher.IoTGateway.Setup
 					approvedIdentities = this.SetLegalIdentities(e.Identities, null, false);
 					allIdentities = this.SetLegalIdentities(e.Identities, null, true);
 				}
+				else
+					Gateway.ScheduleEvent(this.GetLegalIdentities, DateTime.Now.AddMinutes(1), null);
 
 				return Task.CompletedTask;
 
@@ -610,10 +612,10 @@ namespace Waher.IoTGateway.Setup
 						foreach (Property P in ID.Properties)
 							ID2[P.Name] = P.Value;
 
-						ID2["FIRST"] = ID2["FIRST"];
-						ID2["MIDDLE"] = ID2["MIDDLE"];
-						ID2["LAST"] = ID2["LAST"];
-						ID2["FULLNAME"] = ID2["FULLNAME"];
+						ID2["FIRST"] = ID["FIRST"];
+						ID2["MIDDLE"] = ID["MIDDLE"];
+						ID2["LAST"] = ID["LAST"];
+						ID2["FULLNAME"] = ID["FULLNAME"];
 
 						Result.Add(ID2);
 					}
@@ -735,7 +737,7 @@ namespace Waher.IoTGateway.Setup
 				if (File.Exists(FileName))
 				{
 					string Markdown = await Files.ReadAllTextAsync(FileName);
-					Variables v = HttpServer.CreateVariables();
+					Variables v = HttpServer.CreateSessionVariables();
 					v["Config"] = this;
 
 					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, new MarkdownSettings(Gateway.Emoji1_24x24, true, v));
@@ -1409,12 +1411,14 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the legal identity of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a legal identity was found that could be used to sign the petition.</returns>
 		public Task<bool> PetitionLegalIdentity(string LegalId, string PetitionId, string Purpose,
-			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<LegalIdentityPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
 			if (this.protectWithPassword)
-				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
+				throw new ForbiddenException(Request, "Petitioning legal identities is protected using passwords on this machine.");
 
 			return this.PetitionLegalIdentity(LegalId, PetitionId, Purpose, string.Empty, Callback, Timeout);
 		}
@@ -1476,17 +1480,20 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Petitions information about a smart contract from its owner.
 		/// </summary>
+		/// 
 		/// <param name="ContractId">ID of petitioned smart contract.</param>
 		/// <param name="PetitionId">A petition ID string used to contract request when response is returned.</param>
 		/// <param name="Purpose">String containing purpose of petition. Can be seen by owner, as well as the smart contract of the current machine.</param>
 		/// <param name="Callback">Method to call when response is returned. If timed out, or declined, identity will be null.</param>
 		/// <param name="Timeout">Maximum time to wait for a response.</param>
+		/// <param name="Request">Optional HTTP Request object.</param>
 		/// <returns>If a smart contract was found that could be used to sign the petition.</returns>
 		public Task<bool> PetitionContract(string ContractId, string PetitionId, string Purpose,
-			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout)
+			EventHandlerAsync<ContractPetitionResponseEventArgs> Callback, TimeSpan Timeout,
+			HttpRequest Request)
 		{
 			if (this.protectWithPassword)
-				throw new ForbiddenException("Petitioning legal identities is protected using passwords on this machine.");
+				throw new ForbiddenException(Request, "Petitioning legal identities is protected using passwords on this machine.");
 
 			return this.PetitionContract(ContractId, PetitionId, Purpose, string.Empty, Callback, Timeout);
 		}

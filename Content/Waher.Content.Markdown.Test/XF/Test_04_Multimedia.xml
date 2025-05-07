@@ -29,4 +29,29 @@
 	<MediaElement Source="video1.mp4" WidthRequest="320" HeightRequest="200" />
 	<WebView Source="http://google.com/" WidthRequest="1200" HeightRequest="300" />
 	<Image Source="C:\Users\peter\AppData\Local\Temp\tmp51NK-WrMQ8yqmWVwT0w-4mqxzKJ1hi4OP-sVg1B-e6c.tmp" WidthRequest="128" HeightRequest="128" />
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<StackLayout Orientation="Vertical">
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&lt;identityReview xmlns=&quot;urn:nf:iot:leg:id:1.0&quot; id=&quot;2f924a41-2664-df86-740c-6ae6f348b6a9@legal.neuron.kikkin.io&quot;&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;ID&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;Account&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;Provider&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;State&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;Created&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;Updated&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;From&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;To&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;JID&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;EMAIL&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;PHONE&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;AGENT&quot; service=&quot;Waher.Service.IoTBroker.Legal.LegalComponent&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;FULLNAME&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;PNR&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;COUNTRY&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;ADDR&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;CITY&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedClaim claim=&quot;REGION&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&#x9;&lt;validatedPhoto fileName=&quot;ProfilePhoto.jpeg&quot; service=&quot;TAG.Identity.Serpro.ServiceModule&quot; /&gt;" />
+			<Label LineBreakMode="NoWrap" HorizontalTextAlignment="Start" FontFamily="Courier New" Text="&lt;/identityReview&gt;" />
+		</StackLayout>
+	</ContentView>
 </StackLayout>

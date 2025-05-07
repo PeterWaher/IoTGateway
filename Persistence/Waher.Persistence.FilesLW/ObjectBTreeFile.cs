@@ -18,12 +18,14 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using Waher.Runtime.Collections;
+using System.Diagnostics;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
 	/// This class manages a binary file where objects are persisted in a B-tree.
 	/// </summary>
+	[DebuggerDisplay("{CollectionName}, Searches: {nrSearches}, Block Loads: {nrBlockLoads}, Block Saves: {nrBlockSaves}")]
 	public class ObjectBTreeFile : IDisposable
 	{
 		internal const int BlockHeaderSize = 14;
@@ -253,7 +255,11 @@ namespace Waher.Persistence.Files
 
 			this.provider.RemoveBlocks(this.id);
 
-			this.fileAccess?.Dispose();
+			if (!(this.fileAccess is null))
+			{
+				if (!this.fileAccess.Disposed)	// Object shared between object file and index files.
+					this.fileAccess.Dispose();
+			}
 		}
 
 		internal IRecordHandler RecordHandler => this.recordHandler;

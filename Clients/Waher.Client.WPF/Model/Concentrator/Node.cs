@@ -728,7 +728,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 					if (Command.Command == "Search")
 						continue;
 
-					this.GroupSeparator(ref CurrentGroup, Command.SortCategory, Menu);
+					GroupSeparator(ref CurrentGroup, Command.SortCategory, Menu);
 
 					Menu.Items.Add(Item = new MenuItem()
 					{

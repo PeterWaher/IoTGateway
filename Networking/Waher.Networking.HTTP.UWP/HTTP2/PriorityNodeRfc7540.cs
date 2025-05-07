@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.HTTP.HTTP2
@@ -18,14 +20,15 @@ namespace Waher.Networking.HTTP.HTTP2
 		private ProfilerThread windowThread;
 		private readonly Profiler profiler;
 		private readonly PriorityNodeRfc7540 root;
-		private readonly HttpClientConnection connection;
-		private readonly int maxFrameSize;
+		private readonly FlowControlRfc7540 flowControl;
+		private readonly int outputMaxFrameSize;
 		private readonly bool hasProfiler;
+		private readonly bool isStream;
 		private double resourceFraction = 1;
 		private int totalChildWeights = 0;
-		private int windowSize0;
-		private int windowSize;
-		private int windowSizeFraction;
+		private int outputWindowSize0;
+		private int outputWindowSize;
+		private int outputWindowSizeFraction;
 		private byte weight;
 		private bool disposed = false;
 
@@ -41,17 +44,22 @@ namespace Waher.Networking.HTTP.HTTP2
 		public PriorityNodeRfc7540(PriorityNodeRfc7540 DependentNode, PriorityNodeRfc7540 Root, Http2Stream Stream, byte Weight,
 			FlowControlRfc7540 FlowControl, Profiler Profiler)
 		{
-			ConnectionSettings Settings = Stream is null ? FlowControl.LocalSettings : FlowControl.RemoteSettings;
+			this.isStream = !(Stream is null);
+		
+			if (this.isStream)
+				this.outputWindowSize0 = FlowControl.RemoteSettings.InitialStreamWindowSize;
+			else
+				this.outputWindowSize0 = ConnectionSettings.DefaultHttp2InitialConnectionWindowSize;
 
 			this.dependentOn = DependentNode;
 			this.root = Root;
 			this.Stream = Stream;
 			this.weight = Weight;
-			this.windowSize = this.windowSize0 = this.windowSizeFraction = Settings.InitialWindowSize;
-			this.maxFrameSize = Settings.MaxFrameSize;
+			this.outputWindowSize = this.outputWindowSizeFraction = this.outputWindowSize0;
+			this.outputMaxFrameSize = FlowControl.RemoteSettings.MaxFrameSize;
 			this.profiler = Profiler;
 			this.hasProfiler = !(this.profiler is null);
-			this.connection = FlowControl.Connection;
+			this.flowControl = FlowControl;
 		}
 
 		/// <summary>
@@ -86,20 +94,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// HTTP/2 client connection object.
 		/// </summary>
-		internal HttpClientConnection Connection => this.connection;
-
-		/// <summary>
-		/// Fraction of the resources the node can use.
-		/// </summary>
-		public double ResourceFraction
-		{
-			get => this.resourceFraction;
-			internal set
-			{
-				this.resourceFraction = value;
-				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
-			}
-		}
+		internal HttpClientConnection Connection => this.flowControl.Connection;
 
 		internal LinkedList<PriorityNodeRfc7540> MoveChildrenFrom()
 		{
@@ -129,7 +124,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <summary>
 		/// Currently available resources
 		/// </summary>
-		public int AvailableResources => this.windowSize + this.windowSizeFraction - this.windowSize0;
+		public int AvailableResources => this.outputWindowSize + this.outputWindowSizeFraction - this.outputWindowSize0;
 
 		/// <summary>
 		/// Weight assigned to the node.
@@ -141,13 +136,12 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				if (this.weight != value)
 				{
+					if (!(this.dependentOn is null))
+						this.dependentOn.totalChildWeights += value - this.weight;
+
 					this.weight = value;
 
-					if (!(this.dependentOn is null))
-					{
-						this.dependentOn.totalChildWeights += value - this.weight;
-						this.ResourceFraction = this.dependentOn.ResourceFraction * this.weight / this.dependentOn.TotalChildWeights;
-					}
+					this.dependentOn?.RecalculateChildFractions();
 				}
 			}
 		}
@@ -228,17 +222,27 @@ namespace Waher.Networking.HTTP.HTTP2
 			{
 				LinkedListNode<PriorityNodeRfc7540> Loop = this.childNodes.First;
 				PriorityNodeRfc7540 Child;
+				int MaxStreamWindow = this.flowControl.RemoteSettings.InitialStreamWindowSize;
+				int Size;
 
 				while (!(Loop is null))
 				{
 					Child = Loop.Value;
-					Child.ResourceFraction = this.ResourceFraction * Child.weight / this.totalChildWeights;
+
+					Child.resourceFraction = this.resourceFraction * Child.weight / this.totalChildWeights;
+					
+					Size = (int)Math.Floor(this.outputWindowSize0 * Child.resourceFraction);
+					if (Child.isStream && Size > MaxStreamWindow)
+						Size = MaxStreamWindow;
+
+					Child.outputWindowSizeFraction = Size;
+
 					Loop = Loop.Next;
 				}
 			}
 		}
 
-		private void RecalculateChildWindows(int ConnectionWindowSize, int StreamWindowSize)
+		private void RecalculateChildWindows(int ConnectionWindowSize, int StreamWindowSize, bool Trigger)
 		{
 			if (!(this.childNodes is null) && this.totalChildWeights > 0)
 			{
@@ -248,7 +252,9 @@ namespace Waher.Networking.HTTP.HTTP2
 				while (!(Loop is null))
 				{
 					Child = Loop.Value;
-					Child.SetNewWindowSize(ConnectionWindowSize, (int)(StreamWindowSize * this.ResourceFraction * Child.weight / this.totalChildWeights), false);
+
+					Child.SetNewWindowSize(ConnectionWindowSize, Math.Min(StreamWindowSize,
+						(int)(ConnectionWindowSize * this.resourceFraction * Child.weight / this.totalChildWeights)), Trigger);
 					Loop = Loop.Next;
 				}
 			}
@@ -275,37 +281,37 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.pendingRequests.AddLast(Request);
 
-				if (CancellationToken.HasValue)
+				if (CancellationToken.HasValue && CancellationToken.Value.CanBeCanceled)
 					CancellationToken.Value.Register(() => Request.Request.TrySetException(new OperationCanceledException()));
 
 				return Request.Request.Task;
 			}
 			else
 			{
-				if (Available > this.maxFrameSize)
-					Available = this.maxFrameSize;
+				if (Available > this.outputMaxFrameSize)
+					Available = this.outputMaxFrameSize;
 
 				if (this.hasProfiler)
 				{
 					if (this.windowThread is null)
 						this.CheckProfilerThreads();
 
-					this.windowThread.NewSample(this.windowSize);
-					this.root.windowThread.NewSample(this.root.windowSize);
+					this.windowThread.NewSample(this.AvailableResources);
+					this.root.windowThread.NewSample(this.root.outputWindowSize);
 
-					this.windowSize -= Available;
-					this.root.windowSize -= Available;
+					this.outputWindowSize -= Available;
+					this.root.outputWindowSize -= Available;
 
-					this.windowThread.NewSample(this.windowSize);
-					this.root.windowThread.NewSample(this.root.windowSize);
+					this.windowThread.NewSample(this.AvailableResources);
+					this.root.windowThread.NewSample(this.root.outputWindowSize);
 
 					this.dataThread.NewSample(0);
 					this.dataThread.NewSample(Available);
 				}
 				else
 				{
-					this.windowSize -= Available;
-					this.root.windowSize -= Available;
+					this.outputWindowSize -= Available;
+					this.root.outputWindowSize -= Available;
 				}
 
 				return Task.FromResult(Available);
@@ -313,13 +319,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Releases stream resources back to the stream.
+		/// Releases stream resources back to the stream, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID > 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
 		public int ReleaseStreamResources(int Resources)
 		{
-			int NewSize = this.windowSize + Resources;
+			int NewSize = this.outputWindowSize + Resources;
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
 				return -2;
 
@@ -328,26 +335,29 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.windowThread is null)
 					this.CheckProfilerThreads();
 
-				this.windowThread.NewSample(this.windowSize);
-
-				this.windowSize = NewSize;
-
+				this.windowThread.NewSample(this.AvailableResources);
 				this.windowThread.Event("StreamWindowUpdate");
-				this.windowThread.NewSample(this.windowSize);
+
+				this.outputWindowSize = NewSize;
+
+				this.windowThread.NewSample(this.AvailableResources);
 			}
 			else
-				this.windowSize = NewSize;
+				this.outputWindowSize = NewSize;
 
-			if (NewSize > this.windowSize0)
+			if (NewSize > this.outputWindowSize0)
 			{
-				this.windowSize0 = NewSize;
-				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
+				this.outputWindowSize0 = NewSize;
+				this.outputWindowSizeFraction = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
+
+				// Note: Client allowed to increase a particular stream's window size beyond
+				//       the initial stream size defined for the connection.
 			}
 
 			Resources = Math.Min(this.root.AvailableResources, NewSize);
 			this.TriggerPending(ref Resources);
 
-			return this.windowSize;
+			return this.outputWindowSize;
 		}
 
 		private void TriggerPending(ref int Resources)
@@ -365,27 +375,27 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (Resources < i)
 					i = Resources;
 
-				if (this.maxFrameSize < i)
-					i = this.maxFrameSize;
+				if (this.outputMaxFrameSize < i)
+					i = this.outputMaxFrameSize;
 
 				if (this.hasProfiler)
 				{
 					if (this.windowThread is null)
 						this.CheckProfilerThreads();
 
-					this.windowThread.NewSample(this.windowSize);
-					this.root.windowThread.NewSample(this.root.windowSize);
+					this.windowThread.NewSample(this.AvailableResources);
+					this.root.windowThread.NewSample(this.root.outputWindowSize);
 
-					this.windowSize -= i;
-					this.root.windowSize -= i;
+					this.outputWindowSize -= i;
+					this.root.outputWindowSize -= i;
 
-					this.windowThread.NewSample(this.windowSize);
-					this.root.windowThread.NewSample(this.root.windowSize);
+					this.windowThread.NewSample(this.AvailableResources);
+					this.root.windowThread.NewSample(this.root.outputWindowSize);
 				}
 				else
 				{
-					this.windowSize -= i;
-					this.root.windowSize -= i;
+					this.outputWindowSize -= i;
+					this.root.outputWindowSize -= i;
 				}
 
 				if (ToRelease is null)
@@ -404,13 +414,14 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Releases connection resources back.
+		/// Releases connection resources back, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID = 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
 		public int ReleaseConnectionResources(int Resources)
 		{
-			int NewSize = this.windowSize + Resources;
+			int NewSize = this.outputWindowSize + Resources;
 			if (NewSize < 0 || NewSize > int.MaxValue - 1)
 				return -1;
 
@@ -419,28 +430,39 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.windowThread is null)
 					this.CheckProfilerThreads();
 
-				this.windowThread.NewSample(this.windowSize);
-
-				this.windowSize = NewSize;
-
+				this.windowThread.NewSample(this.AvailableResources);
 				this.windowThread.Event("ConnectionWindowUpdate");
-				this.windowThread.NewSample(this.windowSize);
+
+				this.outputWindowSize = NewSize;
+
+				this.windowThread.NewSample(this.AvailableResources);
 			}
 			else
-				this.windowSize = NewSize;
+				this.outputWindowSize = NewSize;
 
-			if (NewSize > this.windowSize0)
+			if (NewSize > this.outputWindowSize0)
 			{
-				this.windowSize0 = NewSize;
-				this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
-			}
+				this.outputWindowSize0 = NewSize;
 
+				int Size = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
+				if (this.isStream)
+					Size = Math.Min(this.flowControl.RemoteSettings.InitialStreamWindowSize, Size);
+
+				this.outputWindowSizeFraction = Size;
+
+				this.RecalculateChildWindows(this.outputWindowSize0, this.outputWindowSizeFraction, true);
+			}
 
 			Resources = NewSize;
 			this.TriggerPendingIfAvailbleDown(ref Resources);
 
 			return NewSize;
 		}
+
+		/// <summary>
+		/// Current output window size.
+		/// </summary>
+		public int OutputWindowSize => this.outputWindowSize0;
 
 		/// <summary>
 		/// Sets a new window size.
@@ -450,27 +472,29 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="Trigger">If pending streams should be triggered.</param>
 		public void SetNewWindowSize(int ConnectionWindowSize, int StreamWindowSize, bool Trigger)
 		{
-			int WindowSize = this.Stream is null ? ConnectionWindowSize : StreamWindowSize;
-			int Diff = WindowSize - this.windowSize0;
-			this.windowSize0 = WindowSize;
-			this.windowSizeFraction = (int)Math.Ceiling(this.windowSize0 * this.resourceFraction);
+			int WindowSize = this.isStream ? StreamWindowSize : ConnectionWindowSize;
+			int Diff = WindowSize - this.outputWindowSize0;
+			this.outputWindowSize0 = WindowSize;
+
+			int Size = (int)Math.Floor(this.outputWindowSize0 * this.resourceFraction);
+			if (this.isStream)
+				Size = Math.Min(this.flowControl.RemoteSettings.InitialStreamWindowSize, Size);
+
+			this.outputWindowSizeFraction = Size;
 
 			if (this.hasProfiler)
 			{
-				if (this.windowThread is null)
-					this.CheckProfilerThreads();
+				this.windowThread?.NewSample(this.AvailableResources);
 
-				this.windowThread.NewSample(this.windowSize);
+				this.outputWindowSize += Diff;
 
-				this.windowSize += Diff;
-
-				this.windowThread.Event("Settings");
-				this.windowThread.NewSample(this.windowSize);
+				this.windowThread?.Event("Settings");
+				this.windowThread?.NewSample(this.AvailableResources);
 			}
 			else
-				this.windowSize += Diff;
+				this.outputWindowSize += Diff;
 
-			this.RecalculateChildWindows(ConnectionWindowSize, StreamWindowSize);
+			this.RecalculateChildWindows(ConnectionWindowSize, StreamWindowSize, false);
 
 			if (Trigger)
 			{
@@ -543,12 +567,12 @@ namespace Waher.Networking.HTTP.HTTP2
 
 				this.childNodes = null;
 
-				if (!(this.Stream is null))
+				if (this.isStream)
 					this.Stream.State = StreamState.Closed;
 
 				if (this.hasProfiler)
 				{
-					this.windowThread?.NewSample(this.windowSize);
+					this.windowThread?.NewSample(this.outputWindowSize);
 					this.windowThread?.Idle();
 					this.windowThread?.Stop();
 
@@ -566,7 +590,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		{
 			if (this.hasProfiler)
 			{
-				if (this.dataThread is null && !(this.Stream is null))
+				if (this.dataThread is null && this.isStream)
 				{
 					this.dataThread = HttpClientConnection.CreateProfilerDataThread(this.profiler, this.Stream.StreamId);
 					this.dataThread.NewSample(0);
@@ -575,9 +599,77 @@ namespace Waher.Networking.HTTP.HTTP2
 				if (this.windowThread is null)
 				{
 					this.windowThread = HttpClientConnection.CreateProfilerWindowThread(this.profiler, this.Stream?.StreamId ?? 0);
-					this.windowThread.NewSample(this.windowSize);
+					this.windowThread.NewSample(this.AvailableResources);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Exports the priorty node to PlantUML format.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		public void ExportPlantUml(StringBuilder Output)
+		{
+			if (this.isStream)
+			{
+				Output.Append("object \"Stream ");
+				Output.Append(this.Stream.StreamId.ToString());
+				Output.Append("\" as S");
+				Output.Append(this.Stream.StreamId.ToString());
+				Output.AppendLine(" {");
+				Output.Append("resource = \"");
+				Output.Append(GetResourceFromLabel(this.Stream.StreamThread?.Label));
+				Output.AppendLine("\"");
+				Output.Append("pendingRequests = ");
+				Output.AppendLine(this.pendingRequests?.Count.ToString() ?? "0");
+			}
+			else
+				Output.AppendLine("object \"Root\" as S {");
+
+			Output.Append("childNodes = ");
+			Output.AppendLine(this.childNodes?.Count.ToString() ?? "0");
+			Output.Append("maxFrameSize = ");
+			Output.AppendLine(this.outputMaxFrameSize.ToString());
+			Output.Append("resourceFraction = ");
+			Output.AppendLine(CommonTypes.Encode(this.resourceFraction));
+			Output.Append("totalChildWeights = ");
+			Output.AppendLine(this.totalChildWeights.ToString());
+			Output.Append("windowSize0 = ");
+			Output.AppendLine(this.outputWindowSize0.ToString());
+			Output.Append("windowSize = ");
+			Output.AppendLine(this.outputWindowSize.ToString());
+			Output.Append("windowSizeFraction = ");
+			Output.AppendLine(this.outputWindowSizeFraction.ToString());
+			Output.Append("weight = ");
+			Output.AppendLine(this.weight.ToString());
+			Output.Append("AvailableResources = ");
+			Output.AppendLine(this.AvailableResources.ToString());
+			Output.AppendLine("}");
+			Output.AppendLine();
+
+			Output.Append('S');
+			Output.Append((this.dependentOn ?? this.root)?.Stream?.StreamId.ToString());
+			Output.Append(" *-- S");
+			Output.AppendLine(this.Stream?.StreamId.ToString());
+			Output.AppendLine();
+		}
+
+		internal static string GetResourceFromLabel(string Label)
+		{
+			if (string.IsNullOrEmpty(Label))
+				return string.Empty;
+
+			int i = Label.IndexOf('(');
+			if (i >= 0)
+				Label = Label.Substring(i + 1).TrimStart();
+			else
+				return Label;
+
+			i = Label.LastIndexOf(')');
+			if (i > 0)
+				Label = Label.Substring(0, i).TrimEnd();
+
+			return Label;
 		}
 	}
 }

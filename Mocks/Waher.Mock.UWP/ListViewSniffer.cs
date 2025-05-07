@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 using Waher.Networking.Sniffers.Model;
@@ -62,7 +63,8 @@ namespace Waher.Mock
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.DataReceived, 
 				HexToString(Event.Data, Event.Offset, Event.Count), 
@@ -73,7 +75,8 @@ namespace Waher.Mock
 		/// Processes a binary transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.DataTransmitted, 
 				HexToString(Event.Data, Event.Offset, Event.Count), 
@@ -112,7 +115,8 @@ namespace Waher.Mock
 		/// Processes a text reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.TextReceived, Event.Text, null, Colors.White, Colors.Navy));
 		}
@@ -121,7 +125,8 @@ namespace Waher.Mock
 		/// Processes a text transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.TextTransmitted, Event.Text, null, Colors.Black, Colors.White));
 		}
@@ -130,7 +135,8 @@ namespace Waher.Mock
 		/// Processes an information event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferInformation Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Information, Event.Text, null, Colors.Yellow, Colors.DarkGreen));
 		}
@@ -139,7 +145,8 @@ namespace Waher.Mock
 		/// Processes a warning event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferWarning Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Warning, Event.Text, null, Colors.Black, Colors.Yellow));
 		}
@@ -148,7 +155,8 @@ namespace Waher.Mock
 		/// Processes an error event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferError Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Error, Event.Text, null, Colors.White, Colors.Red));
 		}
@@ -157,7 +165,8 @@ namespace Waher.Mock
 		/// Processes an exception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferException Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
 			return this.Add(new SniffItem(Event.Timestamp, SniffItemType.Exception, Event.Text, null, Colors.White, Colors.DarkRed));
 		}

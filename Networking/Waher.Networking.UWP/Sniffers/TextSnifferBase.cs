@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers.Model;
 
@@ -56,7 +57,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			return this.HexOutput(Event.Data, Event.Offset, Event.Count, this.Prefix(Event.Timestamp, "Rx"));
 		}
@@ -123,7 +125,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a binary transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
 			return this.HexOutput(Event.Data, Event.Offset, Event.Count, this.Prefix(Event.Timestamp, "Tx"));
 		}
@@ -132,7 +135,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a text reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
 			return this.WriteLine(this.Prefix(Event.Timestamp, "Rx") + Event.Text);
 		}
@@ -147,7 +151,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a text transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
 			return this.WriteLine(this.Prefix(Event.Timestamp, "Tx") + Event.Text);
 		}
@@ -156,7 +161,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes an information event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferInformation Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
 			return this.WriteLine(this.Prefix(Event.Timestamp, "Info") + Event.Text);
 		}
@@ -165,7 +171,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a warning event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferWarning Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
 			return this.WriteLine(this.Prefix(Event.Timestamp, "Warning") + Event.Text);
 		}
@@ -174,7 +181,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes an error event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferError Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
 			return this.WriteLine(this.Prefix(Event.Timestamp, "Error") + Event.Text);
 		}
@@ -183,7 +191,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes an exception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferException Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
 			return this.WriteLine(this.Prefix(Event.Timestamp, "Exception") + Event.Text);
 		}

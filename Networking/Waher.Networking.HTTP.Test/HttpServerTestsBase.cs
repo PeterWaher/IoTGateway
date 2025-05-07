@@ -42,12 +42,15 @@ namespace Waher.Networking.HTTP.Test
 			if (UseConsoleSniffer)
 				this.server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine));
 
-			this.server.SetHttp2ConnectionSettings(true, 2500000, 16384, 100, 8192, false, NoRfc7540Priorities, true, false);
+			this.server.SetHttp2ConnectionSettings(true, 2500000, 5000000, 16384, 100, 8192, false, NoRfc7540Priorities, true, false);
 
 			this.server.ConnectionProfiled += async (sender, e) =>
 			{
 				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, ".uml"),
-					e.ExportPlantUml(Runtime.Profiling.TimeUnit.MilliSeconds));
+					e.Profiler.ExportPlantUml(Runtime.Profiling.TimeUnit.MilliSeconds));
+
+				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, "2.uml"),
+					e.FlowControl.ExportPlantUml(out _));
 			};
 
 			DeflateContentEncoding DeflateContentEncoding = new();

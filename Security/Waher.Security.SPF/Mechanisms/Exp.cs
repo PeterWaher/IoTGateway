@@ -53,8 +53,11 @@ namespace Waher.Security.SPF.Mechanisms
 				await this.Expand();
 
 				StringBuilder sb = new StringBuilder();
+				string[] Texts = await DnsResolver.TryLookupText(this.Domain);
+				if (Texts is null)
+					return null;
 
-				foreach (string Text in await DnsResolver.LookupText(this.Domain))
+				foreach (string Text in Texts)
 					sb.Append(Text);    // No white-space delimiter
 
 				this.term.Reset("=" + sb.ToString());

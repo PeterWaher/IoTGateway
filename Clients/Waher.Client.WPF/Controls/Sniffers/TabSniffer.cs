@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using Waher.Networking.Sniffers;
@@ -22,7 +22,7 @@ namespace Waher.Client.WPF.Controls.Sniffers
 
 		public override BinaryPresentationMethod BinaryPresentationMethod => BinaryPresentationMethod.Hexadecimal;
 
-		public override Task Process(SnifferRxBinary Event)
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.DataReceived, HexToString(Event.Data, Event.Offset, Event.Count), 
 				CloneSection(Event.Data, Event.Offset, Event.Count), Colors.White, Colors.Navy));
@@ -30,7 +30,7 @@ namespace Waher.Client.WPF.Controls.Sniffers
 			return Task.CompletedTask;
 		}
 
-		public override Task Process(SnifferTxBinary Event)
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.DataTransmitted, HexToString(Event.Data, Event.Offset, Event.Count), 
 				CloneSection(Event.Data, Event.Offset, Event.Count), Colors.Black, Colors.White));
@@ -66,37 +66,37 @@ namespace Waher.Client.WPF.Controls.Sniffers
 			}
 		}
 
-		public override Task Process(SnifferRxText Event)
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.TextReceived, Event.Text, null, Colors.White, Colors.Navy));
 			return Task.CompletedTask;
 		}
 
-		public override Task Process(SnifferTxText Event)
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.TextTransmitted, Event.Text, null, Colors.Black, Colors.White));
 			return Task.CompletedTask;
 		}
 
-		public override Task Process(SnifferInformation Event)
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.Information,	Event.Text, null, Colors.Yellow, Colors.DarkGreen));
 			return Task.CompletedTask;
 		}
 
-		public override Task Process(SnifferWarning Event)
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.Warning, Event.Text, null, Colors.Black, Colors.Yellow));
 			return Task.CompletedTask;
 		}
 
-		public override Task Process(SnifferError Event)
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.Error, Event.Text, null, Colors.White, Colors.Red));
 			return Task.CompletedTask;
 		}
 
-		public override Task Process(SnifferException Event)
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
 			this.view.Add(new SniffItem(Event.Timestamp, SniffItemType.Exception, Event.Text, null, Colors.White, Colors.DarkRed));
 			return Task.CompletedTask;

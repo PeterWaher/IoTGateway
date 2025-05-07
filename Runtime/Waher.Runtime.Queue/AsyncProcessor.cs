@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -12,10 +11,13 @@ namespace Waher.Runtime.Queue
 	public class AsyncProcessor<T> : IDisposableAsync
 		where T : class, IWorkItem
 	{
-		private readonly CancellationTokenSource[] cancelSources;
+		private readonly CancellationTokenSource[] cancelWaitSources;
+		private readonly CancellationTokenSource[] cancelWorkSources;
+		private readonly T[] currentWorkItem;
 		private readonly Task[] processors;
 		private readonly int nrProcessors;
 		private AsyncQueue<T> queue = new AsyncQueue<T>();
+		private int nrProcessorsRunning;
 		private bool terminating = false;
 		private bool terminated = false;
 		private bool idle = true;
@@ -29,15 +31,17 @@ namespace Waher.Runtime.Queue
 			if (NrProcessors <= 0)
 				throw new ArgumentException("Number of processors must be positive.", nameof(NrProcessors));
 
-			List<Task> Processors = new List<Task>();
 			int i;
 
-			this.nrProcessors = NrProcessors;
-			this.cancelSources = new CancellationTokenSource[NrProcessors];
-			for (i = 0; i < this.nrProcessors; i++)
-				Processors.Add(this.PerformWork(i));
+			this.nrProcessors = this.nrProcessorsRunning = NrProcessors;
+			this.processors = new Task[NrProcessors];
 
-			this.processors = Processors.ToArray();
+			this.cancelWaitSources = new CancellationTokenSource[NrProcessors];
+			this.cancelWorkSources = new CancellationTokenSource[NrProcessors];
+			this.currentWorkItem = new T[NrProcessors];
+
+			for (i = 0; i < this.nrProcessors; i++)
+				this.processors[i] = this.PerformWork(i);
 		}
 
 		/// <summary>
@@ -56,14 +60,20 @@ namespace Waher.Runtime.Queue
 		{
 			this.terminating = true;
 
-			for (int i = 0; i < this.nrProcessors; i++)
-				this.cancelSources[i]?.Cancel();
+			if (!this.terminated)
+			{
+				for (int i = 0; i < this.nrProcessors; i++)
+				{
+					this.cancelWaitSources[i]?.Cancel();
+					this.cancelWorkSources[i]?.Cancel();
+				}
 
-			await Task.WhenAll(this.processors);
+				await Task.WhenAll(this.processors);
+				this.terminated = true;
+			}
 
 			this.queue?.Dispose();
 			this.queue = null;
-			this.terminated = true;
 		}
 
 		/// <summary>
@@ -72,6 +82,53 @@ namespace Waher.Runtime.Queue
 		public void CloseForTermination()
 		{
 			this.terminating = true;
+
+			for (int i = 0; i < this.nrProcessors; i++)
+				this.cancelWaitSources[i]?.Cancel();
+		}
+
+		/// <summary>
+		/// Closes the processor for new items. If <paramref name="WaitForCompletion"/> is
+		/// true, the method waits for queued items to be processed.
+		/// </summary>
+		/// <param name="WaitForCompletion">If the method should wait for queued items
+		/// to be processed.</param>
+		public Task CloseForTermination(bool WaitForCompletion)
+		{
+			return this.CloseForTermination(WaitForCompletion, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Closes the processor for new items. If <paramref name="WaitForCompletion"/> is
+		/// true, the method waits for queued items to be processed.
+		/// </summary>
+		/// <param name="WaitForCompletion">If the method should wait for queued items
+		/// to be processed.</param>
+		/// <param name="Timeout">Timeout, in milliseconds. If this time is reached,
+		/// current workers will be cancelled.</param>
+		public async Task CloseForTermination(bool WaitForCompletion, int Timeout)
+		{
+			this.terminating = true;
+
+			for (int i = 0; i < this.nrProcessors; i++)
+				this.cancelWaitSources[i]?.Cancel();
+
+			if (!this.terminated)
+			{
+				if (Timeout > 0 && Timeout < int.MaxValue)
+				{
+					_ = Task.Delay(Timeout).ContinueWith((_) =>
+					{
+						for (int i = 0; i < this.nrProcessors; i++)
+							this.cancelWorkSources[i]?.Cancel();
+					});
+				}
+
+				if (WaitForCompletion)
+					await Task.WhenAll(this.processors);
+
+				this.terminated = true;
+			}
 		}
 
 		/// <summary>
@@ -138,40 +195,59 @@ namespace Waher.Runtime.Queue
 
 				while (true)
 				{
-					using (CancellationTokenSource Cancel = new CancellationTokenSource())
+					if (this.terminating)
 					{
-						this.cancelSources[ProcessorIndex] = Cancel;
-						try
+						if (!(this.queue?.TryGetItem(out Item) ?? false))
+							break;
+					}
+					else
+					{
+						using (CancellationTokenSource Cancel = new CancellationTokenSource())
 						{
-							Task = this.queue?.Wait(Cancel.Token);
-							if (Task is null)
-								break;
-
-							if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
-							{
-								this.idle = true;
-								await this.OnIdle.Raise(this, e);
-							}
-
-							Item = await Task;
-							if (Item is null)
-								break;
-
-							this.idle = false;
+							this.cancelWaitSources[ProcessorIndex] = Cancel;
 							try
 							{
-								await Item.Execute(Cancel.Token);
-								Item.Processed(!Cancel.IsCancellationRequested);
+								Task = this.queue?.Wait(Cancel.Token);
+								if (Task is null)
+									break;
+
+								if (!Task.IsCompleted && this.queue.CountSubscribers == this.nrProcessors)
+								{
+									this.idle = true;
+									await this.OnIdle.Raise(this, e);
+								}
+
+								Item = await Task;
+								if (Item is null)
+									break;
 							}
-							catch (Exception ex)
+							finally
 							{
-								Item.Processed(false);
-								Log.Exception(ex);
+								this.cancelWaitSources[ProcessorIndex] = null;
 							}
+						}
+					}
+
+					this.idle = false;
+
+					using (CancellationTokenSource Cancel = new CancellationTokenSource())
+					{
+						this.cancelWorkSources[ProcessorIndex] = Cancel;
+						this.currentWorkItem[ProcessorIndex] = Item;
+						try
+						{
+							await Item.Execute(Cancel.Token);
+							Item.Processed(!Cancel.IsCancellationRequested);
+						}
+						catch (Exception ex)
+						{
+							Item.Processed(false);
+							Log.Exception(ex);
 						}
 						finally
 						{
-							this.cancelSources[ProcessorIndex] = null;
+							this.cancelWorkSources[ProcessorIndex] = null;
+							this.currentWorkItem[ProcessorIndex] = default;
 						}
 					}
 				}
@@ -180,6 +256,9 @@ namespace Waher.Runtime.Queue
 			{
 				Log.Exception(ex);
 			}
+
+			if (--this.nrProcessorsRunning == 0)
+				this.terminated = true;
 		}
 
 		/// <summary>

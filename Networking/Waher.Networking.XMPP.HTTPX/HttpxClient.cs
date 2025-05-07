@@ -198,7 +198,8 @@ namespace Waher.Networking.XMPP.HTTPX
 					DataStream = null;
 
 					return Callback.Raise(Sender, e);
-				};
+				}
+				;
 
 				await this.POST(To, Resource, DataStream, ContentType, ResponseReceived, DataCallback, State, Headers);
 			}
@@ -397,7 +398,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				StanzaSent.TrySetResult(true);
 				return Task.CompletedTask;
-			};
+			}
+			;
 
 			if (!(this.e2e is null))
 			{
@@ -406,7 +408,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else
 			{
-				await this.client.SendIqSet(To, Xml, this.ResponseHandler, ResponseState, 
+				await this.client.SendIqSet(To, Xml, this.ResponseHandler, ResponseState,
 					60000, 0, FlagStanzaAsSent);
 			}
 
@@ -443,7 +445,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			await StanzaSent.Task;  // By waiting for chunk to have been sent, transmission is throttled to the network bandwidth.
 		}
 
-		private class ResponseState : IDisposable
+		internal class ResponseState : IDisposable
 		{
 			public EventHandlerAsync<HttpxResponseEventArgs> Callback;
 			public EventHandlerAsync<HttpxResponseDataEventArgs> DataCallback;
@@ -625,7 +627,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							Count -= BufSize;
 
-							HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(this.HttpxResponse, 
+							HttpxResponseDataEventArgs e = new HttpxResponseDataEventArgs(this.HttpxResponse,
 								true, Buf, string.Empty, Count <= 0, this.State);
 
 							await this.DataCallback.Raise(Sender, e, false);
@@ -679,6 +681,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			byte[] Data = null;
 			bool HasData = false;
 			bool DisposeResponse = true;
+			ClientChunkRecord Record = null;
+			PendingChunkRecord PendingRecord = null;
 
 			if (e.Ok && !(E is null) && E.LocalName == "resp" && E.NamespaceURI == Namespace)
 			{
@@ -686,6 +690,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				StatusCode = XML.Attribute(E, "statusCode", 0);
 				StatusMessage = XML.Attribute(E, "statusMessage");
 				Response = new HttpResponse();
+
 
 				foreach (XmlNode N in E.ChildNodes)
 				{
@@ -743,9 +748,11 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, true, null);
 
-										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											ResponseState.HttpxResponse, Response, ResponseState.DataCallback, ResponseState.State,
-											StreamId, e.From, e.To, false, null, null));
+										Record = new ClientChunkRecord(this, ResponseState.HttpxResponse,
+											Response, ResponseState.DataCallback, ResponseState.State, StreamId, e.From,
+											e.To, false, null, null);
+
+										PendingRecord = await HttpxChunks.Add(e.From + " " + StreamId, Record);
 
 										DisposeResponse = false;
 										HasData = true;
@@ -756,9 +763,11 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, true, null);
 
-										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											ResponseState.HttpxResponse, Response, ResponseState.DataCallback, ResponseState.State,
-											StreamId, e.From, e.To, false, null, null));
+										Record = new ClientChunkRecord(this, ResponseState.HttpxResponse,
+											Response, ResponseState.DataCallback, ResponseState.State, StreamId, e.From,
+											e.To, false, null, null);
+
+										PendingRecord = await HttpxChunks.Add(e.From + " " + StreamId, Record);
 
 										DisposeResponse = false;
 										HasData = true;
@@ -770,9 +779,11 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										ResponseState.HttpxResponse = new HttpxResponseEventArgs(e, Response, ResponseState.State, Version, StatusCode, StatusMessage, true, true, null);
 
-										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											ResponseState.HttpxResponse, Response, ResponseState.DataCallback, ResponseState.State,
-											StreamId, e.From, e.To, E2e, e.E2eReference, e.E2eSymmetricCipher));
+										Record = new ClientChunkRecord(this, ResponseState.HttpxResponse,
+											Response, ResponseState.DataCallback, ResponseState.State, StreamId, e.From,
+											e.To, E2e, e.E2eReference, e.E2eSymmetricCipher);
+
+										PendingRecord = await HttpxChunks.Add(e.From + " " + StreamId, Record);
 
 										DisposeResponse = false;
 										HasData = true;
@@ -817,6 +828,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			try
 			{
 				await ResponseState.Callback.Raise(this, e2, false);
+
+				if (!(PendingRecord is null) && !(Record is null))
+					await PendingRecord.Replay(Record);
 			}
 			finally
 			{
@@ -833,9 +847,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="To">The sender of the stream.</param>
 		/// <param name="StreamId">Stream ID.</param>
-		public Task CancelTransfer(string To, string StreamId)
+		public async Task CancelTransfer(string To, string StreamId)
 		{
-			HttpxChunks.chunkedStreams.Remove(To + " " + StreamId);
+			await HttpxChunks.Cancel(To + " " + StreamId);
 
 			StringBuilder Xml = new StringBuilder();
 
@@ -847,22 +861,20 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (!(this.e2e is null))
 			{
-				return this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
+				await this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
 					MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
 					string.Empty, string.Empty, null, null);
 			}
 			else
-				return this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+				await this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 
-		private Task IbbClient_OnOpen(object Sender, InBandBytestreams.ValidateStreamEventArgs e)
+		private async Task IbbClient_OnOpen(object Sender, InBandBytestreams.ValidateStreamEventArgs e)
 		{
 			string Key = e.From + " " + e.StreamId;
 
-			if (HttpxChunks.chunkedStreams.ContainsKey(Key))
+			if (await HttpxChunks.Contains(Key))
 				e.AcceptStream(this.IbbDataReceived, this.IbbStreamClosed, new object[] { Key, -1, true, null });
-
-			return Task.CompletedTask;
 		}
 
 		private async Task IbbDataReceived(object Sender, InBandBytestreams.DataReceivedEventArgs e)
@@ -873,11 +885,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			bool ConstantBuffer = (bool)P[2];
 			byte[] PrevData = (byte[])P[3];
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
+			if (await HttpxChunks.Received(Key, Nr, false, ConstantBuffer, PrevData))
 			{
-				if (!(PrevData is null))
-					await Rec.ChunkReceived(Nr, false, ConstantBuffer, PrevData);
-
 				Nr++;
 				P[1] = Nr;
 				P[2] = e.ConstantBuffer;
@@ -893,42 +902,27 @@ namespace Waher.Networking.XMPP.HTTPX
 			bool ConstantBuffer = (bool)P[2];
 			byte[] PrevData = (byte[])P[3];
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
+			if (e.Reason == InBandBytestreams.CloseReason.Done)
 			{
-				if (e.Reason == InBandBytestreams.CloseReason.Done)
-				{
-					if (!(PrevData is null))
-						await Rec.ChunkReceived(Nr, true, ConstantBuffer, PrevData);
-					else
-						await Rec.ChunkReceived(Nr, true, true, Array.Empty<byte>());
-
-					P[2] = null;
-				}
-				else
-					HttpxChunks.chunkedStreams.Remove(Key);
+				await HttpxChunks.Received(Key, Nr, true, ConstantBuffer, PrevData);
+				P[2] = null;
 			}
+			else
+				await HttpxChunks.Cancel(Key);
 		}
 
-		private Task Socks5Proxy_OnOpen(object Sender, P2P.SOCKS5.ValidateStreamEventArgs e)
+		private async Task Socks5Proxy_OnOpen(object Sender, P2P.SOCKS5.ValidateStreamEventArgs e)
 		{
 			string Key = e.From + " " + e.StreamId;
-			ClientChunkRecord ClientRec;
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
+			if (await HttpxChunks.TryGetRecord(Key, false) is ClientChunkRecord ClientRec)
 			{
-				ClientRec = Rec as ClientChunkRecord;
-
-				if (!(ClientRec is null))
-				{
 #if LOG_SOCKS5_EVENTS
-					this.client.Information("Accepting SOCKS5 stream from " + e.From);
+				this.client.Information("Accepting SOCKS5 stream from " + e.From);
 #endif
-					e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId,
-						ClientRec.from, ClientRec.to, ClientRec.e2e, ClientRec.endpointReference, ClientRec.symmetricCipher));
-				}
+				e.AcceptStream(this.Socks5DataReceived, this.Socks5StreamClosed, new Socks5Receiver(Key, e.StreamId,
+					ClientRec.From, ClientRec.To, ClientRec.E2e, ClientRec.EndpointReference, ClientRec.SymmetricCipher));
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private class Socks5Receiver
@@ -962,8 +956,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		private async Task Socks5DataReceived(object Sender, P2P.SOCKS5.DataReceivedEventArgs e)
 		{
 			Socks5Receiver Rx = (Socks5Receiver)e.State;
+			ChunkRecord Rec = await HttpxChunks.TryGetRecord(Rx.Key, false);
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
+			if (!(Rec is null))
 			{
 #if LOG_SOCKS5_EVENTS
 				this.client.Information(e.Count.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + ".");
@@ -990,7 +985,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							if (Rx.BlockSize == 0)
 							{
-								HttpxChunks.chunkedStreams.Remove(Rx.Key);
+								await HttpxChunks.Cancel(Rx.Key);
 								await Rec.ChunkReceived(Rx.Nr++, true, true, Array.Empty<byte>());
 								await e.Stream.DisposeAsync();
 								return;
@@ -1055,12 +1050,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.client.Information("SOCKS5 stream closed.");
 #endif
 			Socks5Receiver Rx = (Socks5Receiver)e.State;
+			ChunkRecord Rec = await HttpxChunks.TryGetRecord(Rx.Key, true);
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
-			{
-				HttpxChunks.chunkedStreams.Remove(Rx.Key);
+			if (!(Rec is null))
 				await Rec.ChunkReceived(Rx.Nr++, true, true, Array.Empty<byte>());
-			}
 		}
 
 		/// <summary>

@@ -279,7 +279,7 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
-				Variables Session = Request.Session;
+				SessionVariables Session = Request.Session;
 
 				if (this.useSession)
 				{

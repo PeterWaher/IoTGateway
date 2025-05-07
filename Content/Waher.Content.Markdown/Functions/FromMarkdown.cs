@@ -186,7 +186,7 @@ namespace Waher.Content.Markdown.Functions
 						if (Renderer is IImageCodeContent ImageCodeContent)
 						{
 							PixelInformation Pixels = await ImageCodeContent.GenerateImage(CodeBlock.Rows, Language, Element.Document);
-							return new GraphBitmap(Element.Document.Settings.Variables, Pixels);
+							return new GraphBitmap(Element.Document.Settings.Variables ?? new Variables(), Pixels);
 						}
 						break;
 				}

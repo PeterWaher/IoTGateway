@@ -382,6 +382,11 @@
 					<xs:documentation>Duration parameter.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name='geoParameter' type='GeoParameter'>
+				<xs:annotation>
+					<xs:documentation>Geo-spatial parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name='calcParameter' type='CalcParameter'>
 				<xs:annotation>
 					<xs:documentation>Calculation parameter.</xs:documentation>
@@ -723,6 +728,58 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+
+	<xs:complexType name='GeoParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a geo-spatial contractual parameter.</xs:documentation>
+			<xs:documentation>The Value contains two or three floating-point coordiate values separated by commas (lat,long) or (lat,long,alt).</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:attribute name='value' type='GeoSpatial' use='optional'>
+					<xs:annotation>
+						<xs:documentation>The value of the parameter.</xs:documentation>
+						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='min' type='GeoSpatial' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Optional minimum value of the parameter.</xs:documentation>
+						<xs:documentation>Corresponds to the upper-left-hand corner of a square, on the Mercator map.</xs:documentation>
+						<xs:documentation>If max.lat>min.lat, or max.long>min.long, the square wraps around the edges of the map.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='minIncluded' type='xs:boolean' use='optional' default='true'>
+					<xs:annotation>
+						<xs:documentation>If the `min` value is part of the valid range or not.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='max' type='GeoSpatial' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Optional maximum value of the parameter.</xs:documentation>
+						<xs:documentation>Corresponds to the lower-right-hand corner of a square, on the Mercator map.</xs:documentation>
+						<xs:documentation>If max.lat>min.lat, or max.long>min.long, the square wraps around the edges of the map.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='maxIncluded' type='xs:boolean' use='optional' default='true'>
+					<xs:annotation>
+						<xs:documentation>If the `max` value is part of the valid range or not.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:simpleType name='GeoSpatial'>
+		<xs:annotation>
+			<xs:documentation>Simple type representing a geo-spatial value.</xs:documentation>
+			<xs:documentation>The Value contains two or three floating-point coordiate values separated by commas (lat,long) or (lat,long,alt). The period character is used as decimal point.</xs:documentation>
+			<xs:documentation>The floating-point values are not validated to be in the ranges [-90,90] and [-180,180] by the regular expression. Software must perform such validation separately.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base='xs:string'>
+			<xs:pattern value="(?'Lat'-?\d+(\.\d+)?),(?'Long'-?\d+(\.\d+)?)(,(?'Alt'-?\d+(\.\d+)?))?"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 	<xs:complexType name='CalcParameter'>
 		<xs:annotation>

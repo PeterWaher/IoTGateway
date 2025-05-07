@@ -1036,6 +1036,8 @@ namespace Waher.Networking.HTTP
 										this.contentLength.HasValue ? this.eTag : null);
 								}
 							}
+							else if (this.contentLength.HasValue)
+								w.WriteHeader("content-length", this.contentLength.Value.ToString(), IndexMode.NotIndexed, true);
 						}
 						else
 						{

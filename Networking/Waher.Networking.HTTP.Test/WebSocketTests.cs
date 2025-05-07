@@ -60,11 +60,11 @@ namespace Waher.Networking.HTTP.Test
 				new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.NewLine),
 				this.xmlSniffer);
 
-			this.server.SetHttp2ConnectionSettings(true, 65535, 16384, 100, 8192, false, false, true, false);
+			this.server.SetHttp2ConnectionSettings(true, 65535, 65535, 16384, 100, 8192, false, false, true, false);
 
 			this.server.ConnectionProfiled += async (sender, e) =>
 			{
-				string Uml = e.ExportPlantUml(TimeUnit.MilliSeconds);
+				string Uml = e.Profiler.ExportPlantUml(TimeUnit.MilliSeconds);
 				await Files.WriteAllTextAsync(Path.ChangeExtension(SnifferFileName, "uml"), Uml);
 			};
 

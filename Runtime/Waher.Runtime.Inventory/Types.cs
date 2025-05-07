@@ -467,7 +467,24 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Order">Order in which modules should be started.</param>
 		/// <returns>If all modules have been successfully started (true), or if at least one has not been
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
-		public static async Task<bool> StartAllModules(int Timeout, IComparer<IModule> Order)
+		public static Task<bool> StartAllModules(int Timeout, IComparer<IModule> Order)
+		{
+			return StartAllModules(Timeout, Order, null, null);
+		}
+
+		/// <summary>
+		/// Starts all loaded modules.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="Order">Order in which modules should be started.</param>
+		/// <param name="LoadedModules">Optional list that will be filled with all
+		/// modules that were successfully loaded.</param>
+		/// <param name="FailedModules">Optional list that will be filled with all
+		/// modules that failed to load.</param>
+		/// <returns>If all modules have been successfully started (true), or if at least one has not been
+		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
+		public static async Task<bool> StartAllModules(int Timeout, IComparer<IModule> Order,
+			ChunkedList<IModule> LoadedModules, ChunkedList<IModule> FailedModules)
 		{
 			if (modules is null || modules.Length == 0)
 			{
@@ -478,13 +495,19 @@ namespace Waher.Runtime.Inventory
 				{
 					try
 					{
-						if (!await StartModule(Module2, Timeout))       // 1 min timeout
+						if (await StartModule(Module2, Timeout))       // 1 min timeout
+							LoadedModules?.Add(Module2);
+						else
+						{
 							Ok = false;
+							FailedModules?.Add(Module2);
+						}
 					}
 					catch (Exception ex)
 					{
 						Log.Exception(ex);
 						Ok = false;
+						FailedModules?.Add(Module2);
 					}
 				}
 

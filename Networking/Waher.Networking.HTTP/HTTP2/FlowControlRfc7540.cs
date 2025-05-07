@@ -18,7 +18,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		private readonly PriorityNodeRfc7540 root;
 		private readonly Profiler profiler;
 		private int lastNodeStreamId = -1;
-		private int lastRemoteInitialWindowSize = 0;
+		private int lastRemoteStreamWindowSize = 0;
 		private PriorityNodeRfc7540 lastNode = null;
 		private bool disposed = false;
 
@@ -49,7 +49,7 @@ namespace Waher.Networking.HTTP.HTTP2
 			this.root = new PriorityNodeRfc7540(null, null, null, 1, this, this.profiler);
 			this.root.CheckProfilerThreads();
 
-			this.lastRemoteInitialWindowSize = this.RemoteSettings.InitialWindowSize;
+			this.lastRemoteStreamWindowSize = this.RemoteSettings.InitialStreamWindowSize;
 		}
 
 		/// <summary>
@@ -58,19 +58,19 @@ namespace Waher.Networking.HTTP.HTTP2
 		public PriorityNodeRfc7540 Root => this.root;
 
 		/// <summary>
-		/// Called when connection settings have been updated.
+		/// Called when the remote connection settings have been updated.
 		/// </summary>
 		public override void RemoteSettingsUpdated()
 		{
-			int Size = this.RemoteSettings.InitialWindowSize;
-			int WindowSizeDiff = Size - this.lastRemoteInitialWindowSize;
-			this.lastRemoteInitialWindowSize = Size;
+			int Size = this.RemoteSettings.InitialStreamWindowSize;
 
-			if (WindowSizeDiff != 0)
+			if (this.lastRemoteStreamWindowSize != Size)
 			{
+				this.lastRemoteStreamWindowSize = Size;
+
 				lock (this.synchObj)
 				{
-					this.root.SetNewWindowSize(this.LocalSettings.InitialWindowSize, Size, true);
+					this.root.SetNewWindowSize(this.root.OutputWindowSize, Size, true);
 				}
 			}
 		}
@@ -137,7 +137,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>If the stream could be added.</returns>
 		public int AddStreamForTest(int StreamId)
 		{
-			return this.AddStreamForTest(StreamId, this.RemoteSettings, 16, 0, false);
+			return this.AddStreamForTest(StreamId, this.LocalSettings, 16, 0, false);
 		}
 
 		/// <summary>
@@ -145,11 +145,11 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// default priority settings.
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
-		/// <param name="Settings">Settings to use.</param>
+		/// <param name="LocalSettings">Local Settings to use.</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId, ConnectionSettings Settings)
+		public int AddStreamForTest(int StreamId, ConnectionSettings LocalSettings)
 		{
-			return this.AddStreamForTest(StreamId, Settings, 16, 0, false);
+			return this.AddStreamForTest(StreamId, LocalSettings, 16, 0, false);
 		}
 
 		/// <summary>
@@ -160,24 +160,26 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency, bool Exclusive)
+		public int AddStreamForTest(int StreamId, byte Weight, int StreamIdDependency,
+			bool Exclusive)
 		{
-			return this.AddStreamForTest(StreamId, this.RemoteSettings, Weight, StreamIdDependency, Exclusive);
+			return this.AddStreamForTest(StreamId, this.LocalSettings, Weight, 
+				StreamIdDependency, Exclusive);
 		}
 
 		/// <summary>
 		/// Tries to add a stream to flow control for testing purposes.
 		/// </summary>
 		/// <param name="StreamId">ID of stream to add.</param>
-		/// <param name="Settings">Settings to use.</param>
+		/// <param name="LocalSettings">Local Settings to use.</param>
 		/// <param name="Weight">Weight</param>
 		/// <param name="StreamIdDependency">ID of stream dependency, if any. 0 = root.</param>
 		/// <param name="Exclusive">If the stream is exclusive child.</param>
 		/// <returns>Size of window associated with stream. Negative = error</returns>
-		public int AddStreamForTest(int StreamId, ConnectionSettings Settings,
+		public int AddStreamForTest(int StreamId, ConnectionSettings LocalSettings,
 			byte Weight, int StreamIdDependency, bool Exclusive)
 		{
-			Http2Stream Stream = new Http2Stream(StreamId, Settings);
+			Http2Stream Stream = new Http2Stream(StreamId, LocalSettings);
 			return this.AddStream(Stream, Weight, StreamIdDependency, Exclusive);
 		}
 
@@ -236,6 +238,8 @@ namespace Waher.Networking.HTTP.HTTP2
 						this.MoveChildrenLocked(DependentOn, Node);
 
 					Parent.AddChildDependency(Node);
+					Node.CheckProfilerThreads();
+
 					this.nodes[Stream.StreamId] = Node;
 				}
 
@@ -397,7 +401,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Releases stream resources back to the stream.
+		/// Releases stream resources back to the stream, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID > 0.
 		/// </summary>
 		/// <param name="StreamId">ID of stream releasing resources.</param>
 		/// <param name="Resources">Amount of resources released back</param>
@@ -425,7 +430,8 @@ namespace Waher.Networking.HTTP.HTTP2
 		}
 
 		/// <summary>
-		/// Releases connection resources back.
+		/// Releases connection resources back, as a result of a client sending a
+		/// WINDOW_UPDATE frame with Stream ID = 0.
 		/// </summary>
 		/// <param name="Resources">Amount of resources released back</param>
 		/// <returns>Size of current window. Negative = error</returns>
@@ -436,12 +442,7 @@ namespace Waher.Networking.HTTP.HTTP2
 
 			lock (this.synchObj)
 			{
-				int Available = this.root.ReleaseConnectionResources(Resources);
-
-				if (Available > this.ConnectionWindowSize)
-					this.ConnectionWindowSize = Available;
-
-				return Available;
+				return this.root.ReleaseConnectionResources(Resources);
 			}
 		}
 
@@ -513,6 +514,26 @@ namespace Waher.Networking.HTTP.HTTP2
 					Thread.Label = sb.ToString();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets an enumerator of available priority nodes.
+		/// </summary>
+		/// <returns>Enumerator</returns>
+		public override IEnumerator<IPriorityNode> GetEnumerator()
+		{
+			return this.nodes.Values.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Exports a PlantUML header.
+		/// </summary>
+		/// <param name="Output">UML diagram will be exported here.</param>
+		protected override void ExportPlantUmlHeader(StringBuilder Output)
+		{
+			base.ExportPlantUmlHeader(Output);
+
+			this.root?.ExportPlantUml(Output);
 		}
 
 	}

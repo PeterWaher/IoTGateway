@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
@@ -97,7 +98,8 @@ namespace Waher.Networking.XMPP
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -145,7 +147,8 @@ namespace Waher.Networking.XMPP
 		/// Processes a binary transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -172,7 +175,8 @@ namespace Waher.Networking.XMPP
 		/// Processes a text reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -190,7 +194,8 @@ namespace Waher.Networking.XMPP
 		/// Processes a text transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -208,7 +213,8 @@ namespace Waher.Networking.XMPP
 		/// Processes an information event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferInformation Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -226,7 +232,8 @@ namespace Waher.Networking.XMPP
 		/// Processes a warning event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferWarning Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -244,7 +251,8 @@ namespace Waher.Networking.XMPP
 		/// Processes an error event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferError Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;
@@ -262,7 +270,8 @@ namespace Waher.Networking.XMPP
 		/// Processes an exception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferException Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
 			if (this.HasExpired(Event.Timestamp))
 				return Task.CompletedTask;

@@ -3,17 +3,27 @@
 namespace Waher.Networking.HTTP.HTTP2
 {
 	/// <summary>
-	/// Deserializes binary data
+	/// Serializes binary data
 	/// </summary>
 	public class BinaryWriter
 	{
-		private readonly MemoryStream ms = new MemoryStream();
+		private readonly MemoryStream ms;
 
 		/// <summary>
-		/// Deserializes binary data
+		/// Serializes binary data
 		/// </summary>
 		public BinaryWriter()
 		{
+			this.ms = new MemoryStream();
+		}
+
+		/// <summary>
+		/// Serializes binary data
+		/// </summary>
+		/// <param name="Capacity">Initial capacity</param>
+		public BinaryWriter(int Capacity)
+		{
+			this.ms = new MemoryStream(Capacity);
 		}
 
 		/// <summary>
@@ -22,7 +32,7 @@ namespace Waher.Networking.HTTP.HTTP2
 		/// <returns>Byte array</returns>
 		public byte[] ToArray()
 		{
-			return ms.ToArray();
+			return this.ms.ToArray();
 		}
 
 		/// <summary>

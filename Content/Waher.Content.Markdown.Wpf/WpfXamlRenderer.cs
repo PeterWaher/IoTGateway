@@ -13,7 +13,6 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Collections;
 using Waher.Script;
-using Waher.Script.Constants;
 using Waher.Script.Graphs;
 using Waher.Script.Operators.Matrices;
 

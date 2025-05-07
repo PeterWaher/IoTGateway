@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Content.Html.Css;
 using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.IoTGateway.Setup;
+using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
@@ -113,14 +114,11 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="State">Conversion state, if available.</param>
 		/// <param name="Session">Current session</param>
 		/// <param name="FileName">Source file name.</param>
-		/// <param name="LockSession">If the session should be locked (true),
-		/// or if the caller has already locked the session (false).</param>
+		/// <param name="PreserveVariables">If variables should be preserved.</param>
 		/// <returns>CSS</returns>
 		internal static async Task<string> Convert(string WebContent, string StartDelimiter, string StopDelimiter, ConversionState State, 
-			Variables Session, string FileName, bool LockSession)
+			Variables Session, string FileName, bool PreserveVariables)
 		{
-			bool Pushed = false;
-
 			if (Session is null)
 			{
 				Exception ex = new ArgumentNullException("No session defined.", nameof(Session));
@@ -134,17 +132,11 @@ namespace Waher.IoTGateway.Cssx
 				}
 			}
 
-			if (LockSession)
-				await Session.LockAsync();
+			if (PreserveVariables)
+				Session.Push();
 			try
 			{
-				if (LockSession)
-				{
-					Session.Push();
-					Pushed = true;
-				}
-
-				ThemeDefinition Def = Theme.GetCurrentTheme(Session);
+				ThemeDefinition Def = Theme.GetCurrentTheme(Session as SessionVariables);
 				Def?.Prepare(Session);
 
 				StringBuilder Result = new StringBuilder();
@@ -209,13 +201,8 @@ namespace Waher.IoTGateway.Cssx
 			}
 			finally
 			{
-				if (LockSession)
-				{
-					if (Pushed)
-						Session.Pop();
-
-					Session.Release();
-				}
+				if (PreserveVariables)
+					Session.Pop();
 			}
 		}
 	}

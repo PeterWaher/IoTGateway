@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.webServer = new HttpServer(8081);
+			this.webServer = new HttpServer(8083);
 
 			this.webServer.Register("/Hello", (Request, Response) =>
 			{
@@ -75,8 +75,11 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		[TestCleanup]
 		public async Task TestCleanup()
 		{
-			this.webServer?.Dispose();
-			this.webServer = null;
+			if (this.webServer is not null)
+			{
+				await this.webServer.DisposeAsync();
+				this.webServer = null;
+			}
 
 			await this.DisposeClients();
 		}

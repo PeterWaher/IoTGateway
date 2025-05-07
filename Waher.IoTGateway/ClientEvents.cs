@@ -237,7 +237,7 @@ namespace Waher.IoTGateway
 			Uri Uri = new Uri(Location);
 			string Resource = Uri.LocalPath;
 			(string, string, string)[] Query = null;
-			Variables Session = Request.Session;
+			SessionVariables Session = Request.Session;
 			string s;
 
 			if (!string.IsNullOrEmpty(Uri.Query))
@@ -471,7 +471,7 @@ namespace Waher.IoTGateway
 		{
 			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 			{
-				Queue = new TabQueue(TabID, string.Empty, new Variables());
+				Queue = new TabQueue(TabID, string.Empty, new SessionVariables());
 				eventsByTabID[TabID] = Queue;
 			}
 
@@ -1279,7 +1279,7 @@ namespace Waher.IoTGateway
 			/// <summary>
 			/// Session variables
 			/// </summary>
-			public Variables Session { get; }
+			public SessionVariables Session { get; }
 
 			/// <summary>
 			/// URI being viewed
@@ -1296,7 +1296,7 @@ namespace Waher.IoTGateway
 		{
 			public string TabID;
 			public string SessionID;
-			public Variables Session;
+			public SessionVariables Session;
 			public MultiReadSingleWriteObject SyncObj;
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
@@ -1305,7 +1305,7 @@ namespace Waher.IoTGateway
 			public DateTime KeepAliveUntil = DateTime.MinValue;
 			public (string, string, string)[] Query = null;
 
-			public TabQueue(string ID, string SessionID, Variables Session)
+			public TabQueue(string ID, string SessionID, SessionVariables Session)
 			{
 				this.SyncObj = new MultiReadSingleWriteObject(this);
 				this.TabID = ID;

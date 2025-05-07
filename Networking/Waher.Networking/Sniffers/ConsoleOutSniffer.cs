@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers.Model;
 using Waher.Runtime.Console;
@@ -47,7 +48,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a text transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
 			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Black, ConsoleColor.White);
 			return Task.CompletedTask;
@@ -57,7 +59,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a text reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
 			this.Output(Event.Timestamp, Event.Text, ConsoleColor.White, ConsoleColor.DarkBlue);
 			return Task.CompletedTask;
@@ -67,7 +70,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a binary transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
 			this.BinaryOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, ConsoleColor.Black, ConsoleColor.White);
 			return Task.CompletedTask;
@@ -77,7 +81,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			this.BinaryOutput(Event.Timestamp, Event.Data, Event.Offset, Event.Count, ConsoleColor.White, ConsoleColor.DarkBlue);
 			return Task.CompletedTask;
@@ -127,7 +132,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes an information event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferInformation Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
 			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
 			return Task.CompletedTask;
@@ -137,7 +143,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes a warning event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferWarning Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
 			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Black, ConsoleColor.Yellow);
 			return Task.CompletedTask;
@@ -147,7 +154,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes an error event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferError Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
 			this.Output(Event.Timestamp, Event.Text, ConsoleColor.Yellow, ConsoleColor.Red);
 			return Task.CompletedTask;
@@ -157,7 +165,8 @@ namespace Waher.Networking.Sniffers
 		/// Processes an exception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferException Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
 			this.Output(Event.Timestamp, Event.Text, ConsoleColor.White, ConsoleColor.DarkRed);
 			return Task.CompletedTask;

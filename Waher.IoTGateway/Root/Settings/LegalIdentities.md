@@ -73,6 +73,6 @@ JoinOther(Properties[],Attachments[]):=
 
 foreach ID in (Config.AllIdentitiesJSON ?? []) do
 	]]| `((ID.Id))` ||||||||||
-|  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(ID["FULLNAME"])) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties,ID.Attachments) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
+|  | ((MarkdownEncode(ID.Created.ToShortDateString() ) )) | ((MarkdownEncode(ID.Created.ToLongTimeString() ) )) | ((MarkdownEncode(ID["FULLNAME"]) )) | ((MarkdownEncode(ID["PNR"]) )) | ((JoinResidence(ID) )) | ((JoinOther(ID.Properties,ID.Attachments) )) | ((MarkdownEncode(ID.From.ToShortDateString() ) )) | ((MarkdownEncode(ID.To.ToShortDateString() ) )) | ((ID.State.ToString() )) |
 [[;
 }}

@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Layout.Layout2D.Functions;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Threading;
 using Waher.Script;
@@ -509,35 +510,23 @@ namespace Waher.Content.Markdown.Consolidation
 							{
 								string[] Labels = new string[this.legend.Count];
 								SKColor[] Colors = new SKColor[this.legend.Count];
-								bool First = true;
-
+								
+								i = 0;
 								Markdown.AppendLine();
-								Markdown.Append("{{Legend([");
 
 								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
 								{
-									if (First)
-										First = false;
-									else
-										Markdown.Append(',');
-
-									Markdown.Append(Expression.ToString(P.Key));
+									Labels[i] = P.Key;
+									Colors[i] = P.Value.Key;
+									i++;
 								}
 
-								Markdown.Append("],[");
-								First = true;
+								string LegandXml = Legend.CreateLayout(Labels, Colors, SKColors.Black, 4, new Variables());
 
-								foreach (KeyValuePair<string, KeyValuePair<SKColor, int>> P in this.legend)
-								{
-									if (First)
-										First = false;
-									else
-										Markdown.Append(',');
-
-									Markdown.Append(Graph.ToRGBAStyle(P.Value.Key));
-								}
-
-								Markdown.AppendLine("],4)}}");
+								Markdown.AppendLine("```layout");
+								Markdown.AppendLine(LegandXml);
+								Markdown.AppendLine("```");
+								Markdown.AppendLine();
 							}
 
 							Markdown.AppendLine();

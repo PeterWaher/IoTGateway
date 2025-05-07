@@ -45,7 +45,10 @@ namespace Waher.Security.SPF.Mechanisms
 					if (Term.dnsLookupsLeft-- <= 0)
 						throw new Exception("DNS Lookup maximum reached.");
 
-					Addresses = await DnsResolver.LookupIP4Addresses(Domain);
+					Addresses = await DnsResolver.TryLookupIP4Addresses(Domain);
+					if (Addresses is null)
+						return false;
+
 					Cidr = Cidr4;
 					break;
 
@@ -53,7 +56,10 @@ namespace Waher.Security.SPF.Mechanisms
 					if (Term.dnsLookupsLeft-- <= 0)
 						throw new Exception("DNS Lookup maximum reached.");
 
-					Addresses = await DnsResolver.LookupIP6Addresses(Domain);
+					Addresses = await DnsResolver.TryLookupIP6Addresses(Domain);
+					if (Addresses is null)
+						return false;
+
 					Cidr = Cidr6;
 					break;
 

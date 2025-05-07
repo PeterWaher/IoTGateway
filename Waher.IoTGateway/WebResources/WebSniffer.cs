@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -206,7 +207,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes an error event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferError Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferError Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Text, "Error");
 		}
@@ -215,7 +217,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes an exception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferException Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferException Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Text, "Exception");
 		}
@@ -224,7 +227,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes an information event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferInformation Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferInformation Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Text, "Information");
 		}
@@ -233,7 +237,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes a binary reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxBinary Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Rx");
 		}
@@ -242,7 +247,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes a text reception event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferRxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferRxText Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Text, "Rx");
 		}
@@ -251,7 +257,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes a binary transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxBinary Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxBinary Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Data, Event.Offset, Event.Count, "Tx");
 		}
@@ -260,7 +267,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes a text transmission event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferTxText Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferTxText Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Text, "Tx");
 		}
@@ -269,7 +277,8 @@ namespace Waher.IoTGateway.WebResources
 		/// Processes a warning event.
 		/// </summary>
 		/// <param name="Event">Sniffer event.</param>
-		public override Task Process(SnifferWarning Event)
+		/// <param name="Cancel">Cancellation token.</param>
+		public override Task Process(SnifferWarning Event, CancellationToken Cancel)
 		{
 			return this.Process(Event.Timestamp, Event.Text, "Warning");
 		}

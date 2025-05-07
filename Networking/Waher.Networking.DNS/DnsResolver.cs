@@ -185,9 +185,67 @@ namespace Waher.Networking.DNS
 		/// <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
 		/// <param name="CLASS">Resource Record Class of interest.</param>
 		/// <param name="Thread">Optional profiling thread.</param>
-		/// <returns>Answer to the query</returns>
-		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
 		public static async Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS, ProfilerThread Thread)
+		{
+			ResourceRecord[] Result = await TryResolve(Name, TYPE, ExceptionType, CLASS, Thread)
+				?? throw new GenericException("Unable to resolve DNS query: " + Name,
+				null, Name, null, null, null, null, null,
+				new KeyValuePair<string, object>("Name", Name),
+				new KeyValuePair<string, object>("TYPE", TYPE),
+				new KeyValuePair<string, object>("CLASS", CLASS));
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Tries to resolve a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
+		public static Task<ResourceRecord[]> TryResolve(string Name, QTYPE TYPE, QCLASS CLASS)
+		{
+			return TryResolve(Name, TYPE, null, CLASS, null);
+		}
+
+		/// <summary>
+		/// Tries to resolve a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
+		public static Task<ResourceRecord[]> TryResolve(string Name, QTYPE TYPE, QCLASS CLASS, ProfilerThread Thread)
+		{
+			return TryResolve(Name, TYPE, null, CLASS, Thread);
+		}
+
+		/// <summary>
+		/// Tries to resolve a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
+		public static Task<ResourceRecord[]> TryResolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS)
+		{
+			return TryResolve(Name, TYPE, ExceptionType, CLASS, null);
+		}
+
+		/// <summary>
+		/// Tries to resolve a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
+		public static async Task<ResourceRecord[]> TryResolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS, ProfilerThread Thread)
 		{
 			LinkedList<KeyValuePair<string, IPEndPoint>> Backup = null;
 			TYPE? ExpectedType;
@@ -222,14 +280,14 @@ namespace Waher.Networking.DNS
 				{
 					Thread?.NewState("Query");
 
-					DnsResponse Response = await Query(Name, TYPE, CLASS, Timeout, Destination, false, Thread);
+					DnsResponse Response = await TryQuery(Name, TYPE, CLASS, Timeout, Destination, false, Thread);
 					string CName = null;
 
 					if (Response is null)
 					{
 						Destination = await NextDestination(Backup);
 						if (Destination is null)
-							throw new IOException("Unable to resolve DNS query: " + Name + ", " + TYPE.ToString() + ", " + CLASS.ToString());
+							return null;
 
 						continue;   // Check an alternative
 					}
@@ -304,10 +362,14 @@ namespace Waher.Networking.DNS
 
 					Destination = await NextDestination(Backup);
 					if (Destination is null)
-						throw new IOException("Unable to resolve DNS query: " + Name + ", " + TYPE.ToString() + ", " + CLASS.ToString());
+						return null;
 
 					Timeout = 5000;
 				}
+			}
+			catch (Exception)
+			{
+				return null;
 			}
 			finally
 			{
@@ -319,7 +381,7 @@ namespace Waher.Networking.DNS
 		}
 
 		/// <summary>
-		/// Resolves a DNS name.
+		/// Queries a DNS name.
 		/// </summary>
 		/// <param name="Name">Domain Name to resolve</param>
 		/// <param name="TYPE">Resource Record Type of interest.</param>
@@ -332,7 +394,7 @@ namespace Waher.Networking.DNS
 		}
 
 		/// <summary>
-		/// Resolves a DNS name.
+		/// Queries a DNS name.
 		/// </summary>
 		/// <param name="Name">Domain Name to resolve</param>
 		/// <param name="TYPE">Resource Record Type of interest.</param>
@@ -340,7 +402,39 @@ namespace Waher.Networking.DNS
 		/// <param name="Thread">Optional profiling thread.</param>
 		/// <returns>Answer to the query</returns>
 		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
-		public static Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, ProfilerThread Thread)
+		public static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, ProfilerThread Thread)
+		{
+			DnsResponse Result = await TryQuery(Name, TYPE, CLASS, Thread)
+				?? throw new GenericException("Domain name not found: " + Name,
+				null, Name, null, null, null, null, null,
+				new KeyValuePair<string, object>("Name", Name),
+				new KeyValuePair<string, object>("TYPE", TYPE),
+				new KeyValuePair<string, object>("CLASS", CLASS));
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Tries to query a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
+		public static Task<DnsResponse> TryQuery(string Name, QTYPE TYPE, QCLASS CLASS)
+		{
+			return TryQuery(Name, TYPE, CLASS, null);
+		}
+
+		/// <summary>
+		/// Tries to query a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Answer to the query, if able, null otherwise.</returns>
+		public static Task<DnsResponse> TryQuery(string Name, QTYPE TYPE, QCLASS CLASS, ProfilerThread Thread)
 		{
 			lock (synchObject)
 			{
@@ -359,7 +453,7 @@ namespace Waher.Networking.DNS
 
 			try
 			{
-				return Query(Name, TYPE, CLASS, 2000, null, true, Thread);
+				return TryQuery(Name, TYPE, CLASS, 2000, null, true, Thread);
 			}
 			finally
 			{
@@ -370,7 +464,7 @@ namespace Waher.Networking.DNS
 			}
 		}
 
-		private static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination,
+		private static async Task<DnsResponse> TryQuery(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination,
 			bool ReturnRaw, ProfilerThread Thread)
 		{
 			DnsResponse Response;
@@ -444,7 +538,7 @@ namespace Waher.Networking.DNS
 							if (ReturnRaw)
 								Save = false;
 							else
-								throw new GenericException("Domain name not found: " + Name, Object: Name);
+								return null;
 							break;
 					}
 				}
@@ -577,11 +671,37 @@ namespace Waher.Networking.DNS
 		/// <returns>IPv4 address found related to the domain name.</returns>
 		/// <exception cref="ArgumentException">If the name does not exist.</exception>
 		/// <exception cref="IOException">If the name could not be resolved.</exception>
-		public static async Task<IPAddress[]> LookupIP4Addresses(string DomainName)
+		public static Task<IPAddress[]> LookupIP4Addresses(string DomainName)
 		{
+			return LookupIP4Addresses(DomainName, false);
+		}
+
+		/// <summary>
+		/// Tries to look up the IPv4 addresses related to a given domain name.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <returns>IPv4 address found related to the domain name, or null if not found.</returns>
+		public static Task<IPAddress[]> TryLookupIP4Addresses(string DomainName)
+		{
+			return LookupIP4Addresses(DomainName, true);
+		}
+
+		private static async Task<IPAddress[]> LookupIP4Addresses(string DomainName, bool Try)
+		{
+			ResourceRecord[] Records;
+
+			if (Try)
+			{
+				Records = await TryResolve(DomainName, QTYPE.A, QCLASS.IN);
+				if (Records is null)
+					return null;
+			}
+			else
+				Records = await Resolve(DomainName, QTYPE.A, QCLASS.IN);
+
 			List<IPAddress> Result = new List<IPAddress>();
 
-			foreach (ResourceRecord RR in await Resolve(DomainName, QTYPE.A, QCLASS.IN))
+			foreach (ResourceRecord RR in Records)
 			{
 				if (RR is A A)
 					Result.Add(A.Address);
@@ -597,8 +717,34 @@ namespace Waher.Networking.DNS
 		/// <returns>IPv6 address found related to the domain name.</returns>
 		/// <exception cref="ArgumentException">If the name does not exist.</exception>
 		/// <exception cref="IOException">If the name could not be resolved.</exception>
-		public static async Task<IPAddress[]> LookupIP6Addresses(string DomainName)
+		public static Task<IPAddress[]> LookupIP6Addresses(string DomainName)
 		{
+			return LookupIP6Addresses(DomainName, false);
+		}
+
+		/// <summary>
+		/// Tries to look up the IPv6 addresses related to a given domain name.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <returns>IPv6 address found related to the domain name, or null if not found.</returns>
+		public static Task<IPAddress[]> TryLookupIP6Addresses(string DomainName)
+		{
+			return LookupIP6Addresses(DomainName, true);
+		}
+
+		private static async Task<IPAddress[]> LookupIP6Addresses(string DomainName, bool Try)
+		{
+			ResourceRecord[] Records;
+
+			if (Try)
+			{
+				Records = await TryResolve(DomainName, QTYPE.AAAA, QCLASS.IN);
+				if (Records is null)
+					return null;
+			}
+			else
+				Records = await Resolve(DomainName, QTYPE.AAAA, QCLASS.IN);
+
 			List<IPAddress> Result = new List<IPAddress>();
 
 			foreach (ResourceRecord RR in await Resolve(DomainName, QTYPE.AAAA, QCLASS.IN))
@@ -617,10 +763,35 @@ namespace Waher.Networking.DNS
 		/// <returns>Mail Exchanges found related to the domain name.</returns>
 		/// <exception cref="ArgumentException">If the name does not exist.</exception>
 		/// <exception cref="IOException">If the name could not be resolved.</exception>
-		public static async Task<string[]> LookupMailExchange(string DomainName)
+		public static Task<string[]> LookupMailExchange(string DomainName)
 		{
+			return LookupMailExchange(DomainName, false);
+		}
+
+		/// <summary>
+		/// Tries to look up the Mail Exchanges related to a given domain name.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <returns>Mail Exchanges found related to the domain name, or null if not found.</returns>
+		public static Task<string[]> TryLookupMailExchange(string DomainName)
+		{
+			return LookupMailExchange(DomainName, true);
+		}
+
+		private static async Task<string[]> LookupMailExchange(string DomainName, bool Try)
+		{
+			ResourceRecord[] RRs;
+
+			if (Try)
+			{
+				RRs = await TryResolve(DomainName, QTYPE.MX, TYPE.A, QCLASS.IN);
+				if (RRs is null)
+					return null;
+			}
+			else
+				RRs = await Resolve(DomainName, QTYPE.MX, TYPE.A, QCLASS.IN);
+
 			List<MX> Records = new List<MX>();
-			ResourceRecord[] RRs = await Resolve(DomainName, QTYPE.MX, TYPE.A, QCLASS.IN);
 
 			foreach (ResourceRecord RR in RRs)
 			{
@@ -723,12 +894,40 @@ namespace Waher.Networking.DNS
 		/// </summary>
 		/// <param name="Address">IP Address</param>
 		/// <returns>Domain Name pointing to the address</returns>
-		public static async Task<string[]> LookupDomainName(IPAddress Address)
+		public static Task<string[]> LookupDomainName(IPAddress Address)
+		{
+			return LookupDomainName(Address, false);
+		}
+
+		/// <summary>
+		/// Tries to look up the domain name pointing to a specific IP address.
+		/// 
+		/// Note: The response is not necessarily unique or authoritative.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <returns>Domain Name pointing to the address, or null if not found.</returns>
+		public static Task<string[]> TryLookupDomainName(IPAddress Address)
+		{
+			return LookupDomainName(Address, true);
+		}
+
+		private static async Task<string[]> LookupDomainName(IPAddress Address, bool Try)
 		{
 			string Name = AddressToName(Address, "IN-ADDR.ARPA", "IP6.ARPA");
+			ResourceRecord[] Records;
+
+			if (Try)
+			{
+				Records = await TryResolve(Name, QTYPE.PTR, QCLASS.IN);
+				if (Records is null)
+					return null;
+			}
+			else
+				Records = await Resolve(Name, QTYPE.PTR, QCLASS.IN);
+
 			List<string> Result = new List<string>();
 
-			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.PTR, QCLASS.IN))
+			foreach (ResourceRecord RR in Records)
 			{
 				if (RR is PTR PTR)
 					Result.Add(PTR.Name2);
@@ -742,11 +941,37 @@ namespace Waher.Networking.DNS
 		/// </summary>
 		/// <param name="Name">Domain name.</param>
 		/// <returns>Available text.</returns>
-		public static async Task<string[]> LookupText(string Name)
+		public static Task<string[]> LookupText(string Name)
 		{
+			return LookupText(Name, false);
+		}
+
+		/// <summary>
+		/// Tries to look up text (TXT) records for a name.
+		/// </summary>
+		/// <param name="Name">Domain name.</param>
+		/// <returns>Available text, or null if not found..</returns>
+		public static Task<string[]> TryLookupText(string Name)
+		{
+			return LookupText(Name, true);
+		}
+
+		private static async Task<string[]> LookupText(string Name, bool Try)
+		{
+			ResourceRecord[] Records;
+
+			if (Try)
+			{
+				Records = await TryResolve(Name, QTYPE.TXT, QCLASS.IN);
+				if (Records is null)
+					return null;
+			}
+			else
+				Records = await Resolve(Name, QTYPE.TXT, QCLASS.IN);
+
 			List<string> Result = new List<string>();
 
-			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.TXT, QCLASS.IN))
+			foreach (ResourceRecord RR in Records)
 			{
 				if (RR is TXT TXT)
 					Result.AddRange(TXT.Text);
@@ -761,26 +986,21 @@ namespace Waher.Networking.DNS
 		/// <param name="Address">IP Address</param>
 		/// <param name="BlackListDomainName">Black List Domain Name.</param>
 		/// <returns>null, if IP Address is NOT on list. Otherwise, it contains the reasons why it is on the list.</returns>
-		/// <exception cref="ArgumentOutOfRangeException">IP Address not supported.</exception>
 		public static async Task<string[]> LookupBlackList(IPAddress Address, string BlackListDomainName)
 		{
 			string Name = AddressToName(Address, BlackListDomainName, null);
 			ResourceRecord[] As;
 
-			try
-			{
-				As = await Resolve(Name, QTYPE.A, QCLASS.IN);
-			}
-			catch (ArgumentException)
-			{
+			As = await TryResolve(Name, QTYPE.A, QCLASS.IN);
+			if (As is null)
 				return null;
-			}
 
 			List<string> Result = null;
 
-			try
+			ResourceRecord[] Records = await TryResolve(Name, QTYPE.TXT, QCLASS.IN);
+			if (!(Records is null))
 			{
-				foreach (ResourceRecord RR in await Resolve(Name, QTYPE.TXT, QCLASS.IN))
+				foreach (ResourceRecord RR in Records)
 				{
 					if (RR is TXT TXT)
 					{
@@ -790,14 +1010,10 @@ namespace Waher.Networking.DNS
 						Result.AddRange(TXT.Text);
 					}
 				}
+			}
 
-				if (!(Result is null))
-					return Result.ToArray();
-			}
-			catch (Exception)
-			{
-				// Ignore
-			}
+			if (!(Result is null))
+				return Result.ToArray();
 
 			foreach (ResourceRecord RR in As)
 			{
@@ -824,7 +1040,7 @@ namespace Waher.Networking.DNS
 		/// <exception cref="IOException">If service endpoint could not be resolved.</exception>
 		public static Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol)
 		{
-			return LookupServiceEndpoint(DomainName, ServiceName, Protocol, null);
+			return LookupServiceEndpoint(DomainName, ServiceName, Protocol, null, false);
 		}
 
 		/// <summary>
@@ -837,15 +1053,58 @@ namespace Waher.Networking.DNS
 		/// <param name="Thread">Optional profiling thread.</param>
 		/// <returns>Service Endpoint for service.</returns>
 		/// <exception cref="IOException">If service endpoint could not be resolved.</exception>
-		public static async Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol, ProfilerThread Thread)
+		public static Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol, ProfilerThread Thread)
+		{
+			return LookupServiceEndpoint(DomainName, ServiceName, Protocol, Thread, false);
+		}
+
+		/// <summary>
+		/// Tries to look up a service endpoint for a domain. If multiple are available,
+		/// an appropriate one is selected as defined by RFC 2782.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <param name="ServiceName">Service name.</param>
+		/// <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+		/// <returns>Service Endpoint for service, or null if not found.</returns>
+		public static Task<SRV> TryLookupServiceEndpoint(string DomainName, string ServiceName, string Protocol)
+		{
+			return LookupServiceEndpoint(DomainName, ServiceName, Protocol, null, true);
+		}
+
+		/// <summary>
+		/// Tries to look up a service endpoint for a domain. If multiple are available,
+		/// an appropriate one is selected as defined by RFC 2782.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <param name="ServiceName">Service name.</param>
+		/// <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Service Endpoint for service, or null if not found.</returns>
+		public static Task<SRV> TryLookupServiceEndpoint(string DomainName, string ServiceName, string Protocol, ProfilerThread Thread)
+		{
+			return LookupServiceEndpoint(DomainName, ServiceName, Protocol, Thread, true);
+		}
+
+		private static async Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol, ProfilerThread Thread, bool Try)
 		{
 			Thread?.NewState("Resolve");
 
 			string Name = "_" + ServiceName + "._" + Protocol.ToLower() + "." + DomainName;
+			ResourceRecord[] Records;
+
+			if (Try)
+			{
+				Records = await TryResolve(Name, QTYPE.SRV, QCLASS.IN, Thread);
+				if (Records is null)
+					return null;
+			}
+			else
+				Records = await Resolve(Name, QTYPE.SRV, QCLASS.IN, Thread);
+
 			SortedDictionary<ushort, List<SRV>> ServicesByPriority = new SortedDictionary<ushort, List<SRV>>();
 			List<SRV> SamePriority;
 
-			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.SRV, QCLASS.IN, Thread))
+			foreach (ResourceRecord RR in Records)
 			{
 				if (RR is SRV SRV)
 				{
@@ -934,7 +1193,24 @@ namespace Waher.Networking.DNS
 		/// <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
 		/// <returns>Service Endpoints for service.</returns>
 		/// <exception cref="IOException">If service endpoint could not be resolved.</exception>
-		public static async Task<SRV[]> LookupServiceEndpoints(string DomainName, string ServiceName, string Protocol)
+		public static Task<SRV[]> LookupServiceEndpoints(string DomainName, string ServiceName, string Protocol)
+		{
+			return LookupServiceEndpoints(DomainName, ServiceName, Protocol, false);
+		}
+
+		/// <summary>
+		/// Tries to look up available service endpoints for a domain.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <param name="ServiceName">Service name.</param>
+		/// <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+		/// <returns>Service Endpoints for service, or null if not found.</returns>
+		public static Task<SRV[]> TryLookupServiceEndpoints(string DomainName, string ServiceName, string Protocol)
+		{
+			return LookupServiceEndpoints(DomainName, ServiceName, Protocol, true);
+		}
+
+		private static async Task<SRV[]> LookupServiceEndpoints(string DomainName, string ServiceName, string Protocol, bool Try)
 		{
 			string Name = "_" + ServiceName + "._" + Protocol.ToLower() + "." + DomainName;
 			List<SRV> Result = new List<SRV>();
@@ -970,7 +1246,22 @@ namespace Waher.Networking.DNS
 		/// </summary>
 		/// <param name="Address">IP Address</param>
 		/// <returns>Names associated with IP Address.</returns>
-		public static async Task<string[]> ReverseDns(IPAddress Address)
+		public static Task<string[]> ReverseDns(IPAddress Address)
+		{
+			return ReverseDns(Address, false);
+		}
+
+		/// <summary>
+		/// Tries to perform a reverse DNS lookup of an IP address.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <returns>Names associated with IP Address, or null if not found.</returns>
+		public static Task<string[]> TryReverseDns(IPAddress Address)
+		{
+			return ReverseDns(Address, true);
+		}
+
+		private static async Task<string[]> ReverseDns(IPAddress Address, bool Try)
 		{
 			StringBuilder sb = new StringBuilder();
 			byte[] Bytes = Address.GetAddressBytes();
@@ -1006,7 +1297,17 @@ namespace Waher.Networking.DNS
 			else
 				throw new ArgumentException("Unsupported address family.", nameof(Address));
 
-			ResourceRecord[] Records = await Resolve(sb.ToString(), QTYPE.PTR, QCLASS.IN);
+			ResourceRecord[] Records;
+			
+			if (Try)
+			{
+				Records = await TryResolve(sb.ToString(), QTYPE.PTR, QCLASS.IN);
+				if (Records is null)
+					return null;
+			}
+			else
+				Records = await Resolve(sb.ToString(), QTYPE.PTR, QCLASS.IN);
+
 			List<string> Names = new List<string>();
 
 			foreach (ResourceRecord Rec in Records)

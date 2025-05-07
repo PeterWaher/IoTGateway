@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.HTTP.HTTP2;
+using Waher.Runtime.Collections;
 using Waher.Runtime.IO;
 using Waher.Runtime.Temporary;
 
@@ -476,12 +476,13 @@ namespace Waher.Networking.HTTP.WebSockets
 				{
 					if (this.writing)
 					{
-						this.queue.AddLast(new OutputRec()
+						this.queue.Add(new OutputRec()
 						{
 							Data = Frame,
 							Callback = Callback,
 							State = State
 						});
+
 						return;
 					}
 					else
@@ -500,6 +501,14 @@ namespace Waher.Networking.HTTP.WebSockets
 								this.queue.Clear();
 							}
 
+							try
+							{
+								await this.DisposeAsync();
+							}
+							catch (Exception ex2)
+							{
+								Log.Exception(ex2);
+							}
 							return;
 						}
 					}
@@ -511,19 +520,17 @@ namespace Waher.Networking.HTTP.WebSockets
 
 					lock (this.queue)
 					{
-						LinkedListNode<OutputRec> Next;
-
-						if ((Next = this.queue.First) is null)
+						if (this.queue.HasFirstItem)
 						{
-							this.writing = false;
-							Frame = null;
+							OutputRec Next = this.queue.RemoveFirst();
+							Frame = Next.Data;
+							Callback = Next.Callback;
+							State = Next.State;
 						}
 						else
 						{
-							Frame = Next.Value.Data;
-							Callback = Next.Value.Callback;
-							State = Next.Value.State;
-							this.queue.RemoveFirst();
+							this.writing = false;
+							Frame = null;
 						}
 					}
 				}
@@ -537,10 +544,19 @@ namespace Waher.Networking.HTTP.WebSockets
 					this.writing = false;
 					this.queue.Clear();
 				}
+
+				try
+				{
+					await this.DisposeAsync();
+				}
+				catch (Exception ex2)
+				{
+					Log.Exception(ex2);
+				}
 			}
 		}
 
-		private readonly LinkedList<OutputRec> queue = new LinkedList<OutputRec>();
+		private readonly ChunkedList<OutputRec> queue = new ChunkedList<OutputRec>();
 		private bool writing = false;
 
 		private class OutputRec
@@ -731,7 +747,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 		private byte[] CreateFrame(byte[] Bin, WebSocketOpcode OpCode, bool More)
 		{
-			if (this.connection.HasSniffers)
+			if (this.connection?.HasSniffers ?? false)
 				this.connection.Information(OpCode.ToString());
 
 			int Len = Bin?.Length ?? 0;

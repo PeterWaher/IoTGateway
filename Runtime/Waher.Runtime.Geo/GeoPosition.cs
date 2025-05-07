@@ -161,6 +161,55 @@ namespace Waher.Runtime.Geo
 			}
 		}
 
+		/// <summary>
+		/// Human-readable string-representation of the geo-position.
+		/// </summary>
+		public string HumanReadable
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				Append(this.latitude, 'N', 'S', sb);
+				sb.Append(' ');
+				Append(this.longitude, 'E', 'W', sb);
+
+				return sb.ToString();
+			}
+		}
+
+		private static void Append(double Lat, char PosChar, char NegChar, StringBuilder sb)
+		{
+			int i;
+			char Char;
+
+			if (Lat >= 0)
+				Char = PosChar;
+			else
+			{
+				Char = NegChar;
+				Lat = -Lat;
+			}
+
+			i = (int)Lat;
+			Lat -= i;
+			Lat *= 60;
+
+			sb.Append(i);
+			sb.Append("° ");
+
+			i = (int)Lat;
+			Lat -= i;
+			Lat *= 60;
+
+			sb.Append(i);
+			sb.Append("' ");
+
+			sb.Append(Lat.ToString().Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
+			sb.Append("\" ");
+			sb.Append(Char);
+		}
+
 		/// <inheritdoc/>
 		public override string ToString()
 		{

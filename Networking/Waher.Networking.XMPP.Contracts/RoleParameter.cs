@@ -1,11 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Content.Xml;
-using Waher.Script;
-using Waher.Networking.XMPP.Contracts.HumanReadable;
-using System;
 using System.Xml;
+using Waher.Content.Xml;
+using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
 {

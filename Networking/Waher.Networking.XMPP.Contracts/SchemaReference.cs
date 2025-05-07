@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts
+﻿namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
 	/// References a XML Schema used for validating machine-readable contents in smart contracts.

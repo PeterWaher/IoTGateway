@@ -79,7 +79,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 						if (Segment[0] == ' ')
 						{
 							Markdown.Append("&nbsp;");
-							Segment = Segment.Substring(1);
+							Segment = Segment[1..];
 						}
 
 						Markdown.Append(Segment);

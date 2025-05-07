@@ -297,11 +297,8 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					if (this.parsed is null)
-						this.parsed = new Regex(this.regEx, RegexOptions.Singleline);
-
-					if (this.match is null)
-						this.match = this.parsed.Match(this.@value);
+					this.parsed ??= new Regex(this.regEx, RegexOptions.Singleline);
+					this.match ??= this.parsed.Match(this.@value);
 
 					if (!this.match.Success || this.match.Index > 0 || this.match.Length < this.@value.Length)
 					{
@@ -332,11 +329,8 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					if (this.parsed is null)
-						this.parsed = new Regex(this.regEx, RegexOptions.Singleline);
-
-					if (this.match is null)
-						this.match = this.parsed.Match(this.@value);
+					this.parsed ??= new Regex(this.regEx, RegexOptions.Singleline);
+					this.match ??= this.parsed.Match(this.@value);
 
 					if (this.match.Success && this.match.Index == 0 && this.match.Length == this.@value.Length)
 					{

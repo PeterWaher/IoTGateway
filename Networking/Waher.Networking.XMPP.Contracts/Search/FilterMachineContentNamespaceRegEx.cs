@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.Search
+﻿namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Return public contracts in which the namespace of the contents matches this regular expression.

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.Search
+﻿namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Limits searches to items with values greater than this value.

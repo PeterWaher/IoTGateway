@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.Search
+﻿namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Return public contracts based on a template that is equal to this value.

@@ -45,15 +45,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 				{
 					if (E is InlineElement InlineElement)
 					{
-						if (InlineElements is null)
-							InlineElements = new List<InlineElement>();
-
+						InlineElements ??= new List<InlineElement>();
 						InlineElements.Add(InlineElement);
 					}
 					else if (E is BlockElement BlockElement)
 					{
-						if (BlockElements is null)
-							BlockElements = new List<BlockElement>();
+						BlockElements ??= new List<BlockElement>();
 
 						if (!(InlineElements is null))
 						{

@@ -95,11 +95,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 							Value = Parameter.ObjectValue;
 						}
 						else if ((i = this.name.IndexOf('.')) > 0 &&
-							Settings.Contract.TryGetParameter(this.name.Substring(0, i), out Parameter) &&
+							Settings.Contract.TryGetParameter(this.name[..i], out Parameter) &&
 							Parameter is ContractReferenceParameter ContractReferenceParameter)
 						{
 							if (ContractReferenceParameter.Reference is null ||
-								!ContractReferenceParameter.Reference.TryGetParameter(this.name.Substring(i + 1), out Parameter))
+								!ContractReferenceParameter.Reference.TryGetParameter(this.name[(i + 1)..], out Parameter))
 							{
 								Value = null;
 							}

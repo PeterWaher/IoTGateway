@@ -7,7 +7,6 @@ using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Runtime.Geo;
 using Waher.Script;
-using Waher.Script.Functions.DateAndTime;
 
 namespace Waher.Networking.XMPP.Contracts
 {

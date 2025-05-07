@@ -205,8 +205,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get
 			{
-				if (this.parsed is null)
-					this.parsed = new Expression(this.exp);
+				this.parsed ??= new Expression(this.exp);
 
 				return this.parsed;
 			}

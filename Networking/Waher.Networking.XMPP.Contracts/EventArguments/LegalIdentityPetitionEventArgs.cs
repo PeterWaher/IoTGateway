@@ -1,5 +1,4 @@
-﻿using System.Net.Mail;
-using System.Xml;
+﻿using System.Xml;
 using Waher.Networking.XMPP.Events;
 
 namespace Waher.Networking.XMPP.Contracts.EventArguments

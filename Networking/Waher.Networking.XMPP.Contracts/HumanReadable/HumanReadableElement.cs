@@ -142,17 +142,14 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 							return new KeyValuePair<InlineElement[], BlockElement[]>(null, null);
 						else
 						{
-							if (BlockElements is null)
-								BlockElements = new List<BlockElement>();
+							BlockElements ??= new List<BlockElement>();
 
 							BlockElements.Add(BlockElement);
 						}
 					}
 					else
 					{
-						if (InlineElements is null)
-							InlineElements = new List<InlineElement>();
-
+						InlineElements ??= new List<InlineElement>();
 						InlineElements.Add(InlineElement);
 					}
 				}

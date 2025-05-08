@@ -41,6 +41,8 @@ namespace Waher.Runtime.Geo.Test
 			Match M = GeoPosition.XmlGeoPositionPattern.Match(Value);
 
 			Assert.IsTrue(M.Success);
+			Assert.AreEqual(0, M.Index);
+			Assert.AreEqual(Value.Length, M.Length);
 
 			Assert.IsTrue(Expression.TryParse(M.Groups["Lat"].Value, out double Lat));
 			Assert.AreEqual(Latitude, Lat);
@@ -93,5 +95,177 @@ namespace Waher.Runtime.Geo.Test
 				Assert.AreEqual(Altitude, Pos.Altitude.Value);
 			}
 		}
+
+		[DataTestMethod]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E 100.1")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E 100.1")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W 100.1")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E -100.1")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W -100.1")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E 100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E -100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W -100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E 100.1 ft")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E 100.1 ft")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W 100.1 ft")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E -100.1 ft")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W -100.1 ft")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E, Altitude: 100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E, Altitude: 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W, Altitude: 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E, Altitude: -100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W, Altitude: -100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E Altitude: 100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E Altitude: 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W Altitude: 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E Altitude: -100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W Altitude: -100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E Altitude 100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E Altitude 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W Altitude 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E Altitude -100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W Altitude -100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E Alt: 100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E Alt: 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W Alt: 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E Alt: -100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W Alt: -100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E, 100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" E, 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" W, 100.1 m")]
+		[DataRow("10° 12' 18.0\" N 20° 18' 24.0\" E, -100.1 m")]
+		[DataRow("10° 12' 18.0\" S 20° 18' 24.0\" W, -100.1 m")]
+		[DataRow("10° 12' 18\" N 20° 18' 24\" E 100.1")]
+		[DataRow("10° 12' 18\" S 20° 18' 24\" E 100.1")]
+		[DataRow("10° 12' 18\" N 20° 18' 24\" W 100.1")]
+		[DataRow("10° 12' 18\" N 20° 18' 24\" E -100.1")]
+		[DataRow("10° 12' 18\" S 20° 18' 24\" W -100.1")]
+		[DataRow("10° 12' 18\" N 20° 18' 24\" E")]
+		[DataRow("10° 12' 18\" S 20° 18' 24\" E")]
+		[DataRow("10° 12' 18\" N 20° 18' 24\" W")]
+		[DataRow("10° 12' 18\" S 20° 18' 24\" W")]
+		[DataRow("10° 12' N 20° 18' E 100.1")]
+		[DataRow("10° 12' S 20° 18' E 100.1")]
+		[DataRow("10° 12' N 20° 18' W 100.1")]
+		[DataRow("10° 12' N 20° 18' E -100.1")]
+		[DataRow("10° 12' S 20° 18' W -100.1")]
+		[DataRow("10° 12' N 20° 18' E")]
+		[DataRow("10° 12' S 20° 18' E")]
+		[DataRow("10° 12' N 20° 18' W")]
+		[DataRow("10° 12' S 20° 18' W")]
+		[DataRow("10° N 20° E 100")]
+		[DataRow("10° S 20° E 100")]
+		[DataRow("10° N 20° W 100")]
+		[DataRow("10° N 20° E -100")]
+		[DataRow("10° S 20° W -100")]
+		[DataRow("10° N 20° E")]
+		[DataRow("10° S 20° E")]
+		[DataRow("10° N 20° W")]
+		[DataRow("10° N 20° E")]
+		[DataRow("10° S 20° W")]
+		public void Test_03_GPS_RegEx(string Value)
+		{
+			Match M = GeoPosition.GpsGeoPositionPattern.Match(Value);
+
+			Assert.IsTrue(M.Success);
+			Assert.AreEqual(0, M.Index);
+			Assert.AreEqual(Value.Length, M.Length);
+		}
+
+		[DataTestMethod]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E 100.1", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E 100.1", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W 100.1", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E -100.1", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W -100.1", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E", 10.205, 20.31, double.NaN)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E", -10.205, 20.31, double.NaN)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W", 10.205, -20.31, double.NaN)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W", -10.205, -20.31, double.NaN)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E 100.1 m", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E 100.1 m", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W 100.1 m", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E -100.1 m", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W -100.1 m", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E 100.1 ft", 10.205, 20.31, 100.1 * 0.3048)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E 100.1 ft", -10.205, 20.31, 100.1 * 0.3048)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W 100.1 ft", 10.205, -20.31, 100.1 * 0.3048)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E -100.1 ft", 10.205, 20.31, -100.1 * 0.3048)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W -100.1 ft", -10.205, -20.31, -100.1 * 0.3048)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E, Altitude: 100.1 m", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E, Altitude: 100.1 m", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W, Altitude: 100.1 m", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E, Altitude: -100.1 m", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W, Altitude: -100.1 m", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E Altitude: 100.1 m", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E Altitude: 100.1 m", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W Altitude: 100.1 m", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E Altitude: -100.1 m", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W Altitude: -100.1 m", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E Altitude 100.1 m", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E Altitude 100.1 m", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W Altitude 100.1 m", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E Altitude -100.1 m", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W Altitude -100.1 m", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E Alt: 100.1 m", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E Alt: 100.1 m", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W Alt: 100.1 m", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E Alt: -100.1 m", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W Alt: -100.1 m", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E, 100.1 m", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" E, 100.1 m", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" W, 100.1 m", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18.0\" N 20° 18' 36.0\" E, -100.1 m", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18.0\" S 20° 18' 36.0\" W, -100.1 m", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18\" N 20° 18' 36\" E 100.1", 10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18\" S 20° 18' 36\" E 100.1", -10.205, 20.31, 100.1)]
+		[DataRow("10° 12' 18\" N 20° 18' 36\" W 100.1", 10.205, -20.31, 100.1)]
+		[DataRow("10° 12' 18\" N 20° 18' 36\" E -100.1", 10.205, 20.31, -100.1)]
+		[DataRow("10° 12' 18\" S 20° 18' 36\" W -100.1", -10.205, -20.31, -100.1)]
+		[DataRow("10° 12' 18\" N 20° 18' 36\" E", 10.205, 20.31, double.NaN)]
+		[DataRow("10° 12' 18\" S 20° 18' 36\" E", -10.205, 20.31, double.NaN)]
+		[DataRow("10° 12' 18\" N 20° 18' 36\" W", 10.205, -20.31, double.NaN)]
+		[DataRow("10° 12' 18\" S 20° 18' 36\" W", -10.205, -20.31, double.NaN)]
+		[DataRow("10° 12' N 20° 18' E 100.1", 10.2, 20.3, 100.1)]
+		[DataRow("10° 12' S 20° 18' E 100.1", -10.2, 20.3, 100.1)]
+		[DataRow("10° 12' N 20° 18' W 100.1", 10.2, -20.3, 100.1)]
+		[DataRow("10° 12' N 20° 18' E -100.1", 10.2, 20.3, -100.1)]
+		[DataRow("10° 12' S 20° 18' W -100.1", -10.2, -20.3, -100.1)]
+		[DataRow("10° 12' N 20° 18' E", 10.2, 20.3, double.NaN)]
+		[DataRow("10° 12' S 20° 18' E", -10.2, 20.3, double.NaN)]
+		[DataRow("10° 12' N 20° 18' W", 10.2, -20.3, double.NaN)]
+		[DataRow("10° 12' S 20° 18' W", -10.2, -20.3, double.NaN)]
+		[DataRow("10° N 20° E 100", 10, 20, 100)]
+		[DataRow("10° S 20° E 100", -10, 20, 100)]
+		[DataRow("10° N 20° W 100", 10, -20, 100)]
+		[DataRow("10° N 20° E -100", 10, 20, -100)]
+		[DataRow("10° S 20° W -100", -10, -20, -100)]
+		[DataRow("10° N 20° E", 10, 20, double.NaN)]
+		[DataRow("10° S 20° E", -10, 20, double.NaN)]
+		[DataRow("10° N 20° W", 10, -20, double.NaN)]
+		[DataRow("10° N 20° E", 10, 20, double.NaN)]
+		[DataRow("10° S 20° W", -10, -20, double.NaN)]
+		public void Test_04_GPS_TryParse(string Value, double Latitude, double Longitude, double Altitude)
+		{
+			Assert.IsTrue(GeoPosition.TryParseGps(Value, out GeoPosition Pos));
+
+			Assert.AreEqual(Latitude, Pos.Latitude);
+			Assert.AreEqual(Longitude, Pos.Longitude);
+
+			if (double.IsNaN(Altitude))
+				Assert.IsFalse(Pos.Altitude.HasValue);
+			else
+			{
+				Assert.IsTrue(Pos.Altitude.HasValue);
+				Assert.AreEqual(Altitude, Pos.Altitude.Value);
+			}
+		}
+
 	}
 }

@@ -406,6 +406,8 @@ The folder also contains the following unit test projects:
 
 | Project                            | Type     | Project description |
 |------------------------------------|----------|---------------------|
+| **Waher.Runtime.Collections.Test** | .NET 8.0 | The [Waher.Runtime.Collections.Test](Runtime/Waher.Runtime.Collections.Test) project contains unit tests for the [Waher.Runtime.Collections](Runtime/Waher.Runtime.Collections) project. |
+| **Waher.Runtime.Geo.Test**         | .NET 8.0 | The [Waher.Runtime.Geo.Test](Runtime/Waher.Runtime.Geo.Test) project contains unit tests for the [Waher.Runtime.Geo](Runtime/Waher.Runtime.Geo) project. |
 | **Waher.Runtime.Inventory.Test**   | .NET 8.0 | The [Waher.Runtime.Inventory.Test](Runtime/Waher.Runtime.Inventory.Test) project contains unit tests for the [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project. |
 | **Waher.Runtime.Language.Test**    | .NET 8.0 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
 | **Waher.Runtime.Profiling.Test**   | .NET 8.0 | The [Waher.Runtime.Profiling.Test](Runtime/Waher.Runtime.Profiling.Test) project contains unit tests for the [Waher.Runtime.Profiling](Runtime/Waher.Runtime.Profiling) project. |

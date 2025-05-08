@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Waher.Runtime.Geo
 {
@@ -10,6 +11,12 @@ namespace Waher.Runtime.Geo
 	[DebuggerDisplay("{XmlValue}")]
 	public sealed class GeoPosition
 	{
+		/// <summary>
+		/// Pattern for parsing a geo-position XML values. The names groups Lat, Lon and Alt 
+		/// can be used to extract the latitude, longitude and altitude values respectively.
+		/// </summary>
+		public static readonly Regex XmlGeoPositionPattern = new Regex(@"(?'Lat'-?\d+(\.\d+)?),(?'Lon'-?\d+(\.\d+)?)(,(?'Alt'-?\d+(\.\d+)?))?", RegexOptions.Singleline | RegexOptions.Compiled);
+
 		private double latitude;
 		private double longitude;
 		private double? altitude;
@@ -85,6 +92,20 @@ namespace Waher.Runtime.Geo
 		/// <param name="Value">Parsed geo-position.</param>
 		/// <returns>If the string could be parsed.</returns>
 		public static bool TryParse(string s, out GeoPosition Value)
+		{
+			if (TryParseXml(s, out Value))
+				return true;
+
+			return false;
+		}
+
+		/// <summary>
+		/// Tries to parse a string representation of a GeoPosition.
+		/// </summary>
+		/// <param name="s">String value.</param>
+		/// <param name="Value">Parsed geo-position.</param>
+		/// <returns>If the string could be parsed.</returns>
+		public static bool TryParseXml(string s, out GeoPosition Value)
 		{
 			int i = s.IndexOf(',');
 			if (i < 0 ||

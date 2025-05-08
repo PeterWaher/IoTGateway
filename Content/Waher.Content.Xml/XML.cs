@@ -1130,6 +1130,32 @@ namespace Waher.Content.Xml
 		/// </summary>
 		/// <param name="E">XML Element</param>
 		/// <param name="Name">Name of attribute</param>
+		/// <param name="IgnoreCase">If case should be ignored.</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static T Attribute<T>(XmlElement E, string Name, bool IgnoreCase, T DefaultValue)
+			where T : Enum
+		{
+			if (E.HasAttribute(Name))
+			{
+				try
+				{
+					return (T)Enum.Parse(DefaultValue.GetType(), E.GetAttribute(Name), IgnoreCase);
+				}
+				catch (Exception)
+				{
+					return DefaultValue;
+				}
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
 		/// <param name="DefaultValue">Default value.</param>
 		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
 		public static Duration Attribute(XmlElement E, string Name, Duration DefaultValue)

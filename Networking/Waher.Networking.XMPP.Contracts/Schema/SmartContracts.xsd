@@ -766,6 +766,30 @@
 						<xs:documentation>If the `max` value is part of the valid range or not.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
+				<xs:attribute name='altitude' use='optional' default='optional'>
+					<xs:annotation>
+						<xs:documentation>Defines how to handle altitude in the position.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base='xs:string'>
+							<xs:enumeration value='required'>
+								<xs:annotation>
+									<xs:documentation>Altitude is required by the parameter.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value='optional'>
+								<xs:annotation>
+									<xs:documentation>Altitude is optional by the parameter.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value='prohibited'>
+								<xs:annotation>
+									<xs:documentation>Altitude is prohibited by the parameter.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

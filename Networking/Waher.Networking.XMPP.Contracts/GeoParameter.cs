@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class GeoParameter : Parameter
 	{
+		private AltitudeUse altitude = AltitudeUse.Optional;
 		private GeoPosition value;
 		private GeoPosition min = null;
 		private GeoPosition max = null;
@@ -71,6 +72,15 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// How altitudes are managed by the parameter
+		/// </summary>
+		public AltitudeUse Altitude
+		{
+			get => this.altitude;
+			set => this.altitude = value;
+		}
+
+		/// <summary>
 		/// Parameter value.
 		/// </summary>
 		public override object ObjectValue => this.@value;
@@ -84,7 +94,14 @@ namespace Waher.Networking.XMPP.Contracts
 			set
 			{
 				if (GeoPosition.TryParse(value, out GeoPosition D))
-					this.Value = D;
+				{
+					if (this.altitude == AltitudeUse.Prohibited && D.Altitude.HasValue)
+						this.Value = null;
+					else if (this.altitude == AltitudeUse.Required && !D.Altitude.HasValue)
+						this.Value = null;
+					else
+						this.Value = D;
+				}
 				else
 					this.Value = null;
 			}
@@ -106,6 +123,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (!UsingTemplate)
 			{
+				Xml.Append(" altitude=\"");
+				Xml.Append(this.altitude.ToString().ToLower());
+				Xml.Append('"');
+
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
 					Xml.Append(" exp=\"");
@@ -260,6 +281,29 @@ namespace Waher.Networking.XMPP.Contracts
 				return Task.FromResult(false);
 			}
 
+			switch (this.altitude)
+			{
+				case AltitudeUse.Required:
+					if (!this.value.Altitude.HasValue)
+					{
+						this.ErrorReason = ParameterErrorReason.Outside;
+						this.ErrorText = null;
+
+						return Task.FromResult(false);
+					}
+					break;
+
+				case AltitudeUse.Prohibited:
+					if (this.value.Altitude.HasValue)
+					{
+						this.ErrorReason = ParameterErrorReason.Outside;
+						this.ErrorText = null;
+
+						return Task.FromResult(false);
+					}
+					break;
+			}
+
 			return base.IsParameterValid(Variables, Client);
 		}
 
@@ -275,6 +319,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.MinIncluded = XML.Attribute(Xml, "minIncluded", true);
 			this.Max = GeoPositionAttribute(Xml, "max");
 			this.MaxIncluded = XML.Attribute(Xml, "maxIncluded", true);
+			this.altitude = XML.Attribute(Xml, "altitude", true, AltitudeUse.Optional);
 
 			return base.Import(Xml);
 		}

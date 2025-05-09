@@ -32,6 +32,7 @@ Script Syntax: https://waher.se/Script.md#statisticsRelatedFunctionsWaherScriptS
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
   <ItemGroup>

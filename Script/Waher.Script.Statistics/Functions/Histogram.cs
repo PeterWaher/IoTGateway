@@ -1,7 +1,7 @@
 ﻿using System;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Constants;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 
@@ -202,111 +202,18 @@ namespace Waher.Script.Statistics.Functions
 			string[] Labels = new string[N];
 			string CurrentLabel;
 			double Next = Min;
-			string NextLabel = TrimLabel(Expression.ToString(Next));
+			string NextLabel = Graph.TrimLabel(Expression.ToString(Next));
 			int i;
 
 			for (i = 0; i < N; i++)
 			{
 				CurrentLabel = NextLabel;
 				Next = ((i + 1) * Diff) / N + Min;
-				NextLabel = TrimLabel(Expression.ToString(Next));
+				NextLabel = Graph.TrimLabel(Expression.ToString(Next));
 				Labels[i] = CurrentLabel + "-" + NextLabel;
 			}
 
 			return Labels;
-		}
-
-		/// <summary>
-		/// Trims a numeric label, removing apparent roundoff errors.
-		/// </summary>
-		/// <param name="Label">Numeric label.</param>
-		/// <returns>Trimmed label.</returns>
-		public static string TrimLabel(string Label)
-		{
-			int i = Label.IndexOf('.');
-			if (i < 0)
-				return Label;
-
-			int j = Label.LastIndexOf("00000");
-			if (j > i)
-			{
-				i = Label.Length - 5;
-				while (Label[i] == '0')
-					i--;
-
-				if (Label[i] == '.')
-					i--;
-
-				return Label.Substring(0, i + 1);
-			}
-
-			j = Label.LastIndexOf("99999");
-			if (j > i)
-			{
-				bool DecimalSection = true;
-
-				i = j;
-				while (Label[i] == '9')
-					i--;
-
-				if (Label[i] == '.')
-				{
-					i--;
-					DecimalSection = false;
-				}
-
-				char[] ch = Label.Substring(0, i + 1).ToCharArray();
-				char ch2;
-				bool CheckOne = true;
-
-				while (i >= 0)
-				{
-					ch2 = ch[i];
-					if (ch2 == '9')
-					{
-						ch[i] = '0';
-						i--;
-					}
-					else if (ch2 == '.')
-					{
-						i--;
-						DecimalSection = false;
-					}
-					else if (ch2 >= '0' && ch2 <= '8')
-					{
-						ch[i]++;
-						CheckOne = false;
-						break;
-					}
-					else
-						break;
-				}
-
-				if (CheckOne)
-				{
-					int c = ch.Length;
-					i++;
-					Array.Resize(ref ch, c + 1);
-					Array.Copy(ch, i, ch, i + 1, c - i);
-					ch[i] = '1';
-				}
-				else if (DecimalSection)
-				{
-					i = ch.Length - 1;
-					while (i >= 0 && ch[i] == '0')
-						i--;
-
-					if (ch[i] == '.')
-						i--;
-
-					if (i < ch.Length - 1)
-						Array.Resize(ref ch, i + 1);
-				}
-
-				Label = new string(ch);
-			}
-
-			return Label;
 		}
 
 	}

@@ -2,7 +2,6 @@
 using System;
 using Waher.Runtime.Console;
 using Waher.Script.Statistics;
-using Waher.Script.Statistics.Functions;
 
 namespace Waher.Script.Test
 {
@@ -73,38 +72,6 @@ namespace Waher.Script.Test
 		 * plot2dcurve(x,ugamma(2.5,x),"Orange")+
 		 * plot2dcurve(x,ugamma(3,x),"Purple")
 		 */
-
-		[TestMethod]
-		public void Test_03_Labels()
-		{
-			Assert.AreEqual("0", Histogram.TrimLabel("0.00000000000000000001"));
-			Assert.AreEqual("0.1", Histogram.TrimLabel("0.10000000000000000001"));
-			Assert.AreEqual("0.01", Histogram.TrimLabel("0.01000000000000000001"));
-			Assert.AreEqual("0.001", Histogram.TrimLabel("0.00100000000000000001"));
-			Assert.AreEqual("0.0001", Histogram.TrimLabel("0.00010000000000000001"));
-
-			Assert.AreEqual("-0", Histogram.TrimLabel("-0.00000000000000000001"));
-			Assert.AreEqual("-0.1", Histogram.TrimLabel("-0.10000000000000000001"));
-			Assert.AreEqual("-0.01", Histogram.TrimLabel("-0.01000000000000000001"));
-			Assert.AreEqual("-0.001", Histogram.TrimLabel("-0.00100000000000000001"));
-			Assert.AreEqual("-0.0001", Histogram.TrimLabel("-0.00010000000000000001"));
-
-			Assert.AreEqual("40", Histogram.TrimLabel("39.99999999999999999999"));
-			Assert.AreEqual("10", Histogram.TrimLabel("9.99999999999999999999"));
-			Assert.AreEqual("1", Histogram.TrimLabel("0.99999999999999999999"));
-			Assert.AreEqual("0.1", Histogram.TrimLabel("0.09999999999999999999"));
-			Assert.AreEqual("0.01", Histogram.TrimLabel("0.00999999999999999999"));
-			Assert.AreEqual("0.001", Histogram.TrimLabel("0.000999999999999999999"));
-			Assert.AreEqual("0.0001", Histogram.TrimLabel("0.000099999999999999999"));
-
-			Assert.AreEqual("-40", Histogram.TrimLabel("-39.99999999999999999999"));
-			Assert.AreEqual("-10", Histogram.TrimLabel("-9.99999999999999999999"));
-			Assert.AreEqual("-1", Histogram.TrimLabel("-0.99999999999999999999"));
-			Assert.AreEqual("-0.1", Histogram.TrimLabel("-0.09999999999999999999"));
-			Assert.AreEqual("-0.01", Histogram.TrimLabel("-0.00999999999999999999"));
-			Assert.AreEqual("-0.001", Histogram.TrimLabel("-0.000999999999999999999"));
-			Assert.AreEqual("-0.0001", Histogram.TrimLabel("-0.000099999999999999999"));
-		}
 
 	}
 }

@@ -15,8 +15,8 @@ function NativeHeaderHandler() {
             button.addEventListener("click", () => {
                 subMenu.toggleAttribute("expanded");
             })
-            subMenu.parentElement.appendChild(button)
-            
+            subMenu.parentElement.insertBefore(button, subMenu.previousElementSibling)
+
             if (menueItemText.tagName === "P") {
                 menueItemText.addEventListener("click", event => {
                     event.preventDefault();
@@ -38,20 +38,22 @@ function NativeHeaderHandler() {
                 // cancled when on mobile view
                 if (window.matchMedia("screen and (max-width: 900px)").matches)
                     return
-    
+
                 subMenu.setAttribute("expanded", "")
-    
+
                 // set set max height to prevent vertical overflow
                 if (subMenu.getBoundingClientRect().bottom > window.innerHeight) {
                     subMenu.style.height = `${window.innerHeight - subMenu.getBoundingClientRect().top}px`
                 }
-    
+
+                const html = document.getElementsByTagName("html")[0]
+                const pageWidth = html.clientWidth
+
                 // if overflowing to the righ, offset the top submenue to the left to not
-                if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > window.innerWidth) {
-                    topSubmenue.style.left = `${window.innerWidth - topSubmenue.offsetWidth}px`
+                if (topSubmenue.offsetWidth + topSubmenue.offsetLeft > pageWidth) {
+                    topSubmenue.style.left = `${pageWidth - topSubmenue.offsetWidth - 10}px`
                 }
-    
-    
+
                 // normalise list item width
                 const textElements = []
                 maxWidth = 0
@@ -65,27 +67,27 @@ function NativeHeaderHandler() {
                     }
                 }
                 textElements.forEach(el => el.style.width = `${Math.ceil(maxWidth)}px`)
-    
+
                 // fix item heights
                 const menueItems = subMenu.children
                 for (let i = 0; i < menueItems.length; i++) {
                     if (menueItems[i].children[0])
                         menueItems[i].children[0].style.height = Math.ceil(menueItems[i].getBoundingClientRect().height) + "px"
                 }
-    
+
                 // offset sibling elements (underneeth) to position over to not have gaps between list items
                 const offsetParentsSiblings = (listItem) => {
                     const text = listItem.children[0]
                     listItem.style.height = "";
                     const siblingHeightOffset = listItem.getBoundingClientRect().height - text.getBoundingClientRect().height
-    
+
                     let listItemSibling = listItem.nextElementSibling
                     while (listItemSibling) {
                         listItemSibling.style.transform = `translateY(-${siblingHeightOffset}px)`
                         listItemSibling = listItemSibling.nextElementSibling
                     }
                 }
-    
+
                 let listItem = subMenu.parentElement
                 while (true) {
                     if (listItem.parentElement.parentElement.tagName.toLocaleLowerCase() !== "nav") {
@@ -101,8 +103,10 @@ function NativeHeaderHandler() {
 
         // close submenu
         subMenu.parentElement.addEventListener("mouseleave", () => {
+            if (!subMenu.hasAttribute("expanded"))
+                return
+                
             count--
-
             if (count < 1) {
                 topSubmenue.style.left = ""
             }
@@ -147,8 +151,7 @@ function NativeHeaderHandler() {
     }
 }
 
-function NativeFaviconHandler()
-{
+function NativeFaviconHandler() {
     let faviconDotActive = false
     const favicon = document.querySelector("link[rel~='icon']");
     const originalFavicon = favicon.href
@@ -166,29 +169,29 @@ function NativeFaviconHandler()
         if (faviconDotActive)
             return;
 
-        faviconDotActive =  true
-    
+        faviconDotActive = true
+
         let canvas = document.createElement("canvas");
         let ctx = canvas.getContext("2d");
-    
+
         let img = new Image();
         img.src = favicon.href;
         img.onload = () => {
             // Set canvas size to match the favicon
-            const dotRadius = img.width/4.0;
-            const dotMargin = img.width/16.0
+            const dotRadius = img.width / 4.0;
+            const dotMargin = img.width / 16.0
             canvas.width = img.width;
             canvas.height = img.height;
-    
+
             // Draw the original favicon
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            
+
             // Draw a red dot (top-right corner)
             ctx.fillStyle = "red";
             ctx.beginPath();
             ctx.arc(canvas.width - dotRadius - dotMargin, dotRadius + dotMargin, dotRadius, 0, 2 * Math.PI); // Adjust position/size if needed
             ctx.fill();
-    
+
             // Replace the favicon
             favicon.href = canvas.toDataURL("image/png")
         };
@@ -200,8 +203,7 @@ function NativeFaviconHandler()
     }
 }
 
-function NativeBackdropHandler()
-{
+function NativeBackdropHandler() {
     const BACKDROP_ID = "native-backdrop"
 
     // create backdrop
@@ -217,7 +219,7 @@ function NativeBackdropHandler()
     function HideBackdrop() {
         backdrop.style.display = "none"
     }
-    
+
     return {
         ShowBackdrop,
         HideBackdrop
@@ -240,35 +242,29 @@ function PopupHandler() {
     let focusFunction = null;
 
     popupContainer.addEventListener("keydown", event => {
-        if (event.key === "Enter")
-        {
+        if (event.key === "Enter") {
             const enterFunction = GetPopupProperty("enterFunction")
-            if (enterFunction)
-            {
-                enterFunction()
-                event.preventDefault()
+            if (enterFunction) {
+                if (enterFunction() !== false)
+                    event.preventDefault()
             }
         }
-        if (event.key === "Escape")
-        {
+        if (event.key === "Escape") {
             const escapeFunction = GetPopupProperty("escapeFunction")
-            if (escapeFunction)
-            {
-                escapeFunction()
-                event.preventDefault()
+            if (escapeFunction) {
+                if (escapeFunction() !== false)
+                    event.preventDefault()
             }
         }
     })
 
-    function ActivePopup()
-    {
+    function ActivePopup() {
         if (popupStack.length < 1)
             return undefined
         return popupStack[popupStack.length - 1];
     }
 
-    function GetPopupProperty(property)
-    {
+    function GetPopupProperty(property) {
         const activePoup = ActivePopup()
         return activePoup ? activePoup[property] : undefined
     }
@@ -341,22 +337,18 @@ function PopupHandler() {
         focusFunction = null;
     }
 
-    function SoftUpdate(html, uuid)
-    {
-        for (let i = 0; i < popupStack.length; i++)
-            {
-                if (popupStack[i].uuid === uuid)
-                {
-                    updated = true
-                    popupStack[i].html = html
-                    return true
-                }
+    function SoftUpdate(html, uuid) {
+        for (let i = 0; i < popupStack.length; i++) {
+            if (popupStack[i].uuid === uuid) {
+                updated = true
+                popupStack[i].html = html
+                return true
             }
+        }
         return false
     }
 
-    function PopupObject(html, enterFunction, escapeFunction, uuid, OnPop, OnShow)
-    {
+    function PopupObject(html, enterFunction, escapeFunction, uuid, OnPop, OnShow) {
         return {
             html: html,
             enterFunction: enterFunction,
@@ -385,16 +377,15 @@ function PopupHandler() {
         }
     }
 
-    function Focus()
-    {
+    function Focus() {
         popupContainer.focus()
     }
 
     /////////// Alert
 
-    async function Alert(message, returnControlObject=false) {
+    async function Alert(message, returnControlObject = false) {
         const html = CreateHTMLAlertPopup({ Message: `<p id="native-popup-message">${message}</p>` });
-        
+
         const controlObject = Popup(html, {
             enterFunction: AlertOk,
             escapeFunction: AlertOk,
@@ -418,11 +409,15 @@ function PopupHandler() {
 
     /////////// Confirm
 
-    async function Confirm(message, returnControlObject=false) {
+    async function Confirm(message, returnControlObject = false) {
         const html = CreateHTMLConfirmPopup({ Message: `<p id="native-popup-message">${message}</p>` });
 
         const controlObject = Popup(html, {
-            enterFunction: ConfirmYes,
+            enterFunction: () => {
+                if (document.activeElement.tagName === "BUTTON")
+                    return false
+                ConfirmYes()
+            },
             escapeFunction: ConfirmNo,
             OnShow: Focus,
         });
@@ -449,7 +444,7 @@ function PopupHandler() {
 
     /////////// Prompt
 
-    async function Prompt(message, returnControlObject=false) {
+    async function Prompt(message, returnControlObject = false) {
         const html = CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${message}</p>` });
 
         const controlObject = Popup(html, {
@@ -490,6 +485,7 @@ function Carousel(containerId) {
 
     let carouselIndex = 0;
     let carouselCount = 0;
+    let height = 0
 
     const previousButton = document.querySelector(`*[data-carousel=${containerId}][data-carousel-previous]`);
     const nextButton = document.querySelector(`*[data-carousel=${containerId}][data-carousel-next]`);
@@ -509,6 +505,7 @@ function Carousel(containerId) {
     }
 
     function SetCarouselIndex(index) {
+        console.log(1)
         if (carouselButtons.length > 0) {
             if (carouselIndex >= 0)
                 carouselButtons[carouselIndex].classList.remove("buttonSelected")
@@ -562,8 +559,10 @@ function Carousel(containerId) {
             max = Math.max(max, x.getBoundingClientRect().height)
             x.style.display = ""
         })
-
-        carouselContainer.style.height = max + "px";
+        if (max !== height) {
+            height = max;
+            carouselContainer.style.height = max + "px";
+        }
     }
 
     function Initialize() {
@@ -596,10 +595,12 @@ function Carousel(containerId) {
         }
 
         if (carouselCount < 2) {
-            previousButton.remove()
-            nextButton.remove()
+            if (previousButton)
+                previousButton.remove()
+            if (nextButton)
+                nextButton.remove()
         }
-            
+
     }
 
     Initialize()
@@ -607,7 +608,7 @@ function Carousel(containerId) {
     return {
         get current() { return carouselContainer.children[carouselIndex] },
         get container() { return carouselContainer },
-        
+
         CalibrateHeight,
     }
 }

@@ -94,6 +94,15 @@ main
 
 /* #endregion util */
 
+/* #region login*/
+
+#LoginForm
+{
+    padding-block: 3rem;
+}
+
+/* #endregion login*/
+
 /* #region dropdown*/
 
 .native-dropdown-button
@@ -175,12 +184,12 @@ section a:active
 
 .native-carousel > *[data-carousel-right]
 {
-    transform: translateX(20rem);
+    transform: translateX(100%);
     transition: opacity 0.1s, transform 0.2s;
 }
 .native-carousel > *[data-carousel-left]
 {
-    transform: translateX(-20rem);
+    transform: translateX(-100%);
     transition: opacity 0.1s, transform 0.2s;
 }
 
@@ -327,6 +336,7 @@ div.footnotes + p
     margin: 0;
     text-decoration: none;
     color: ¤MenuTextColor¤;
+    font-variant-numeric: tabular-nums;
 }
 
 header#native-header a
@@ -1055,7 +1065,8 @@ select:focus
     #native-header nav > ul > li > ul[expanded]
     {
         display:block;
-        position:fixed;
+        position: fixed;
+        width: max-content;
         margin: 0;
         padding: 0;
     }
@@ -1191,8 +1202,6 @@ select:focus
     #native-header > nav > ul {
         flex-shrink: 1;
     }
-
-
     
     #native-header[data-visible] > nav > div {
         margin-bottom: 1rem;
@@ -1254,6 +1263,12 @@ select:focus
     header#native-header  li > ul[expanded]
     {
         display: block;
+    }
+
+    #native-header nav > ul > li button + p,
+    #native-header nav > ul > li button + a
+    {
+        max-width:90%;
     }
 
     /* #endregion Header */

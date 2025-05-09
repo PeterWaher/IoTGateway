@@ -68,7 +68,6 @@ function DisplayAttachIdQR() {
                     LoginTimer = window.setTimeout(DisplayAttachIdQR, 2000);
                 }
                 catch (e) {
-                    console.log(e);
                     console.log(xhttp.responseText);
                 }
             }
@@ -95,8 +94,6 @@ function DisplayAttachIdQR() {
 }
 
 function SignatureReceived(Data) {
-    console.log(Data)
-
     if (!Data)
         return
 

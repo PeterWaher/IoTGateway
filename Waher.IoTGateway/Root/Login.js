@@ -37,6 +37,7 @@
 
                     A.setAttribute("href", Data.signUrl);
 
+                    var Img = document.getElementById("quickLoginImg");
                     if (Data.text)
                     {
                         var Pre = document.getElementById("quickLoginPre");
@@ -50,14 +51,11 @@
 
                         Pre.innerText = Data.text;
 
-                        var Img = document.getElementById("quickLoginImg");
                         if (Img)
                             Img.parentNode.removeChild(Img);
                     }
                     else
                     {
-                        var Img = document.getElementById("quickLoginImg");
-
                         if (!Img)
                         {
                             Img = document.createElement("IMG");
@@ -70,18 +68,14 @@
                         else if (Data.src)
                             Img.setAttribute("src", Data.src + "&fg=Theme&bg=Theme");
 
-                        Img.setAttribute("width", Data.width);
-                        Img.setAttribute("height", Data.height);
-
                         var Pre = document.getElementById("quickLoginPre");
                         if (Pre)
                             Pre.parentNode.removeChild(Pre);
                     }
-                    if (!hightCalibraded)
-                    {
+
+                    Img.addEventListener("load", () => {
                         loginCarousel.CalibrateHeight()
-                        hightCalibraded = true
-                    }
+                    })
 
                     LoginTimer = window.setTimeout(DisplayQuickLogin, 2000);
                 }
@@ -121,13 +115,12 @@ function SignatureReceivedBE(Empty)
         window.location.href = unescape(s);
     }
     else {
-        window.location = ""
+        window.location.reload();
     }
 }
 
 
 var LoginTimer = null;
-let hightCalibraded = false;
 let loginCarousel = null;
 const virtualTimerInterval = 1000/5.0
 let virtualTimerIntervalLastTimeStamp = -1

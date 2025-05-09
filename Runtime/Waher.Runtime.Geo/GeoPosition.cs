@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using Waher.Persistence.Attributes;
+using Waher.Script.Graphs;
 
 namespace Waher.Runtime.Geo
 {
@@ -185,7 +186,9 @@ namespace Waher.Runtime.Geo
 
 		private static string ToString(double Value)
 		{
-			return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			string s = Value.ToString();
+			s = s.Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return Graph.TrimLabel(s);
 		}
 
 		/// <summary>
@@ -328,7 +331,7 @@ namespace Waher.Runtime.Geo
 				if (this.altitude.HasValue)
 				{
 					sb.Append(", ");
-					sb.Append(this.altitude.Value.ToString().Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
+					sb.Append(ToString(this.altitude.Value));
 					sb.Append(" m");
 				}
 
@@ -336,34 +339,34 @@ namespace Waher.Runtime.Geo
 			}
 		}
 
-		private static void Append(double Lat, char PosChar, char NegChar, StringBuilder sb)
+		private static void Append(double Nr, char PosChar, char NegChar, StringBuilder sb)
 		{
 			int i;
 			char Char;
 
-			if (Lat >= 0)
+			if (Nr >= 0)
 				Char = PosChar;
 			else
 			{
 				Char = NegChar;
-				Lat = -Lat;
+				Nr = -Nr;
 			}
 
-			i = (int)Lat;
-			Lat -= i;
-			Lat *= 60;
+			i = (int)Nr;
+			Nr -= i;
+			Nr *= 60;
 
 			sb.Append(i);
 			sb.Append("° ");
 
-			i = (int)Lat;
-			Lat -= i;
-			Lat *= 60;
+			i = (int)Nr;
+			Nr -= i;
+			Nr *= 60;
 
 			sb.Append(i);
 			sb.Append("' ");
 
-			sb.Append(Lat.ToString().Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
+			sb.Append(ToString(Nr));
 			sb.Append("\" ");
 			sb.Append(Char);
 		}

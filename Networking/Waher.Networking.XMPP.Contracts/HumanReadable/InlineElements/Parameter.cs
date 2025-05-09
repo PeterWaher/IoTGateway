@@ -94,6 +94,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 							}
 
 							Value = Parameter.ObjectValue;
+
+							if (Parameter is AttachmentParameter AttachmentParameter)
+							{
+								// TODO: Use attachment as value.
+							}
 						}
 						else if ((i = this.name.IndexOf('.')) > 0 &&
 							Settings.Contract.TryGetParameter(this.name[..i], out Parameter) &&

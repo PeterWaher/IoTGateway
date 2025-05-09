@@ -945,6 +945,10 @@ namespace Waher.Networking.XMPP.Contracts
 										P2 = new ContractReferenceParameter();
 										break;
 
+									case "attachmentParameter":
+										P2 = new AttachmentParameter();
+										break;
+
 									default:
 										if (ExceptionIfError)
 											throw new Exception("Unrecognized parameter type: " + E2.Name);

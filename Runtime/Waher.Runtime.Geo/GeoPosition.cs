@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Runtime.Geo
 {
@@ -9,6 +10,7 @@ namespace Waher.Runtime.Geo
 	/// Contains information about a position in a geo-spatial coordinate system.
 	/// </summary>
 	[DebuggerDisplay("{XmlValue}")]
+	[TypeName(TypeNameSerialization.None)]
 	public sealed class GeoPosition
 	{
 		/// <summary>
@@ -26,6 +28,13 @@ namespace Waher.Runtime.Geo
 		private double latitude;
 		private double longitude;
 		private double? altitude;
+
+		/// <summary>
+		/// Contains information about a position in a geo-spatial coordinate system.
+		/// </summary>
+		public GeoPosition()
+		{
+		}
 
 		/// <summary>
 		/// Contains information about a position in a geo-spatial coordinate system.

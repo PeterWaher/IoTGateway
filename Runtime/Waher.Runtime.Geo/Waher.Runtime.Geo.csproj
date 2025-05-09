@@ -37,5 +37,8 @@
 			<PackagePath />
 		</None>
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+	</ItemGroup>
 
 </Project>

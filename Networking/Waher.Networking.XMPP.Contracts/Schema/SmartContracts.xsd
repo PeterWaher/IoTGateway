@@ -747,6 +747,11 @@
 						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
+				<xs:attribute name='contractLocation' type='xs:boolean' use='optional' default='false'>
+					<xs:annotation>
+						<xs:documentation>If the parameter represents the location of the actual contract, or contents of the contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 				<xs:attribute name='min' type='GeoSpatial' use='optional'>
 					<xs:annotation>
 						<xs:documentation>Optional minimum value of the parameter.</xs:documentation>

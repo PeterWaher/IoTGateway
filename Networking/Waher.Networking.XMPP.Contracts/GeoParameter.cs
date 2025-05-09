@@ -19,6 +19,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private GeoPosition value;
 		private GeoPosition min = null;
 		private GeoPosition max = null;
+		private bool contractLocation = false;
 		private bool minIncluded = true;
 		private bool maxIncluded = true;
 
@@ -33,6 +34,15 @@ namespace Waher.Networking.XMPP.Contracts
 				this.@value = value;
 				this.ProtectedValue = null;
 			}
+		}
+
+		/// <summary>
+		/// If the parameter represents the location of the actual contract, or contents of the contract.
+		/// </summary>
+		public bool ContractLocation
+		{
+			get => this.contractLocation;
+			set => this.contractLocation = value;
 		}
 
 		/// <summary>
@@ -126,6 +136,9 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append(" altitude=\"");
 				Xml.Append(this.altitude.ToString().ToLower());
 				Xml.Append('"');
+
+				if (this.contractLocation)
+					Xml.Append(" contractLocation=\"true\"");
 
 				if (!string.IsNullOrEmpty(this.Expression))
 				{
@@ -315,6 +328,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public override Task<bool> Import(XmlElement Xml)
 		{
 			this.Value = GeoPositionAttribute(Xml, "value");
+			this.contractLocation = XML.Attribute(Xml, "contractLocation", false);
 			this.Min = GeoPositionAttribute(Xml, "min");
 			this.MinIncluded = XML.Attribute(Xml, "minIncluded", true);
 			this.Max = GeoPositionAttribute(Xml, "max");

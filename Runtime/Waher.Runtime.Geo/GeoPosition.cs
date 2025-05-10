@@ -102,6 +102,20 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
+		/// Parse a string representation of a GeoPosition. If first attempts the
+		/// XML format. If not successful, it tries the GPS format.
+		/// </summary>
+		/// <returns>Parsed geo-position.</returns>
+		/// <exception cref="FormatException">If the string could not be parsed.</exception>
+		public static GeoPosition Parse(string s)
+		{
+			if (TryParse(s, out GeoPosition Value))
+				return Value;
+			else
+				throw new FormatException("Invalid geo-position string: " + s);
+		}
+
+		/// <summary>
 		/// Tries to parse a string representation of a GeoPosition. If first attempts the
 		/// XML format. If not successful, it tries the GPS format.
 		/// </summary>

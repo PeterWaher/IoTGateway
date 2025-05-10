@@ -27,8 +27,8 @@
 		/// <param name="Position">Geo-spatial position</param>
 		/// <param name="Min">Lower-left corner of bounding box.</param>
 		/// <param name="Max">Upper-right corner of bounding box.</param>
-		/// <param name="IncludeMin">If the min latitude/longitude should be considered as outside.</param>
-		/// <param name="IncludeMax">If the max latitude/longitude should be considered as outside.</param>
+		/// <param name="IncludeMin">If the min latitude/longitude/altitude should be considered as outside.</param>
+		/// <param name="IncludeMax">If the max latitude/longitude/altitude should be considered as outside.</param>
 		/// <returns>If the position lies outside of the box.</returns>
 		public static bool LiesOutside(this GeoPosition Position, GeoPosition Min, GeoPosition Max,
 			bool IncludeMin, bool IncludeMax)
@@ -56,6 +56,15 @@
 
 			if (MaxLong > 0 || IncludeMax && MaxLong == 0)
 				return true;
+
+			if (Position.Altitude.HasValue && Min.Altitude.HasValue && Max.Altitude.HasValue)
+			{
+				if (Position.Altitude.Value < Min.Altitude.Value ||
+					Position.Altitude.Value > Max.Altitude.Value)
+				{
+					return true;
+				}
+			}
 
 			return false;
 		}

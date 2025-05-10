@@ -431,7 +431,7 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
-		/// Checks if two geo-positions are equal.
+		/// Checks if two geo-positions are not equal.
 		/// </summary>
 		/// <param name="A">Geo-position A</param>
 		/// <param name="B">Geo-position B</param>

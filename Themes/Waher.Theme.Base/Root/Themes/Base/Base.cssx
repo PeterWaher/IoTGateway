@@ -120,12 +120,6 @@ main
     background-position: center center;
 }
 
-ul[expanded] ~ .native-dropdown-button
-{
-    rotate: 180deg;
-}
-
-
 /* #endregion dropdown*/
 
 /* #region links */

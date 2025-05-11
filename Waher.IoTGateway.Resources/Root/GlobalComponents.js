@@ -13,14 +13,20 @@ function NativeHeaderHandler() {
             const button = document.createElement("button")
             button.classList.add("native-dropdown-button")
             button.addEventListener("click", () => {
-                subMenu.toggleAttribute("expanded");
+                if (subMenu.toggleAttribute("expanded"))
+                    button.style.rotate = "180deg"
+                else    
+                    button.style.rotate = "0deg"
             })
             subMenu.parentElement.insertBefore(button, subMenu.previousElementSibling)
 
             if (menueItemText.tagName === "P") {
                 menueItemText.addEventListener("click", event => {
                     event.preventDefault();
-                    subMenu.toggleAttribute("expanded");
+                    if (subMenu.toggleAttribute("expanded"))
+                        button.style.rotate = "180deg"
+                    else    
+                        button.style.rotate = "0deg"
                 })
             }
         }

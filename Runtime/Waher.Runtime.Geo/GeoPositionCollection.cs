@@ -8,7 +8,7 @@ namespace Waher.Runtime.Geo
 	/// <summary>
 	/// In-memory thread-safe geo-spatial collection
 	/// </summary>
-	public class GeoCollection<T> : ICollection<T>
+	public class GeoPositionCollection<T> : ICollection<T>
 		where T : IGeoSpatialObjectReference
 	{
 		private readonly Dictionary<string, GeoNode> nodesById = new Dictionary<string, GeoNode>();
@@ -35,7 +35,7 @@ namespace Waher.Runtime.Geo
 		/// <summary>
 		/// In-memory thread-safe geo-spatial collection
 		/// </summary>
-		public GeoCollection()
+		public GeoPositionCollection()
 		{
 		}
 
@@ -248,10 +248,10 @@ namespace Waher.Runtime.Geo
 		private class GeoObjectEnumerator : IEnumerator<T>
 		{
 			private readonly IEnumerator<GeoNode> e;
-			private readonly GeoCollection<T> collection;
+			private readonly GeoPositionCollection<T> collection;
 			private readonly int token;
 
-			public GeoObjectEnumerator(GeoCollection<T> Collection, IEnumerator<GeoNode> Enumerator)
+			public GeoObjectEnumerator(GeoPositionCollection<T> Collection, IEnumerator<GeoNode> Enumerator)
 			{
 				this.collection = Collection;
 				this.token = Collection.token;

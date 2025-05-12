@@ -1,12 +1,12 @@
 ﻿namespace Waher.Runtime.Geo.Test
 {
 	[TestClass]
-	public sealed class GeoCollectionTests
+	public sealed class GeoPositionCollectionTests
 	{
 		[TestMethod]
 		public void Test_01_Add_SingleObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			Collection.Add(Object);
@@ -21,7 +21,7 @@
 		[TestMethod]
 		public void Test_02_Add_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -42,7 +42,7 @@
 		[TestMethod]
 		public void Test_03_Add_DuplicateObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject DuplicateObject = new("37.7749,-122.4194", true);
 
@@ -53,7 +53,7 @@
 		[TestMethod]
 		public void Test_04_Add_ManyObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			int ObjectCount = 1000;
 
 			for (int i = 0; i < ObjectCount; i++)
@@ -80,7 +80,7 @@
 		[TestMethod]
 		public void Test_05_Add_BoundaryConditions()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 
 			// Add objects with extreme GPS coordinates
 			GeoSpatialObject ObjectMin = new("-90.0000,-180.0000", true);
@@ -100,7 +100,7 @@
 		[TestMethod]
 		public void Test_06_Add_EnumerateObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -124,7 +124,7 @@
 		[TestMethod]
 		public void Test_07_Clear_EmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 
 			// Ensure the collection is initially empty
 			Assert.AreEqual(0, Collection.Count);
@@ -143,7 +143,7 @@
 		[TestMethod]
 		public void Test_08_Clear_SingleObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add a single object
@@ -164,7 +164,7 @@
 		[TestMethod]
 		public void Test_09_Clear_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -189,7 +189,7 @@
 		[TestMethod]
 		public void Test_10_Clear_ManyObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			int ObjectCount = 1000;
 
 			// Add many objects
@@ -212,7 +212,7 @@
 		[TestMethod]
 		public void Test_11_Clear_ThenAddObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 
@@ -239,7 +239,7 @@
 		[TestMethod]
 		public void Test_12_Contains_ObjectExists()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add the object to the collection
@@ -252,7 +252,7 @@
 		[TestMethod]
 		public void Test_13_Contains_ObjectDoesNotExist()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Do not add the object to the collection
@@ -264,7 +264,7 @@
 		[TestMethod]
 		public void Test_14_Contains_EmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Verify that the object does not exist in an empty collection
@@ -274,7 +274,7 @@
 		[TestMethod]
 		public void Test_15_Contains_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -294,7 +294,7 @@
 		[TestMethod]
 		public void Test_16_Contains_DuplicateGeoIdDifferentObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("37.7749,-122.4194", true); // Same GeoId, different instance
 
@@ -311,7 +311,7 @@
 		[TestMethod]
 		public void Test_17_Contains_AfterClear()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add the object to the collection
@@ -327,7 +327,7 @@
 		[TestMethod]
 		public void Test_18_Contains_AfterRemove()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add the object to the collection
@@ -343,7 +343,7 @@
 		[TestMethod]
 		public void Test_19_CopyTo_EmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObjectReference[] Destination = new GeoSpatialObjectReference[10];
 
 			// Copy from an empty collection
@@ -359,7 +359,7 @@
 		[TestMethod]
 		public void Test_20_CopyTo_SingleObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add a single object to the collection
@@ -385,7 +385,7 @@
 		[TestMethod]
 		public void Test_21_CopyTo_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -416,7 +416,7 @@
 		[TestMethod]
 		public void Test_22_CopyTo_WithOffset()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 
@@ -447,7 +447,7 @@
 		[TestMethod]
 		public void Test_23_CopyTo_NullDestination()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add an object to the collection
@@ -460,7 +460,7 @@
 		[TestMethod]
 		public void Test_24_CopyTo_NegativeOffset()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add an object to the collection
@@ -475,7 +475,7 @@
 		[TestMethod]
 		public void Test_25_CopyTo_InsufficientArraySize()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 
@@ -492,7 +492,7 @@
 		[TestMethod]
 		public void Test_26_ToArray_EmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 
 			// Convert an empty collection to an array
 			IGeoSpatialObjectReference[] Result = [.. Collection];
@@ -504,7 +504,7 @@
 		[TestMethod]
 		public void Test_27_ToArray_SingleObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add a single object to the collection
@@ -521,7 +521,7 @@
 		[TestMethod]
 		public void Test_28_ToArray_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -544,7 +544,7 @@
 		[TestMethod]
 		public void Test_29_ToArray_AfterClear()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add an object to the collection
@@ -563,7 +563,7 @@
 		[TestMethod]
 		public void Test_30_ToArray_AfterRemove()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new(new GeoPosition(37.7749, -122.4194));
 
 			// Add an object to the collection
@@ -582,7 +582,7 @@
 		[TestMethod]
 		public void Test_31_ToArray_ManyObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			int ObjectCount = 1000;
 
 			// Add many objects to the collection
@@ -614,7 +614,7 @@
 		[TestMethod]
 		public void Test_32_Enumeration_EmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 
 			// Enumerate an empty collection
 			List<IGeoSpatialObjectReference> EnumeratedObjects = [];
@@ -630,7 +630,7 @@
 		[TestMethod]
 		public void Test_33_Enumeration_SingleObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add a single object to the collection
@@ -651,7 +651,7 @@
 		[TestMethod]
 		public void Test_34_Enumeration_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -678,7 +678,7 @@
 		[TestMethod]
 		public void Test_35_Enumeration_ModifyDuringEnumeration_Add()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new(new GeoPosition(37.7749, -122.4194));
 			GeoSpatialObject Object2 = new(new GeoPosition(34.0522, -118.2437));
 
@@ -696,7 +696,7 @@
 		[TestMethod]
 		public void Test_36_Enumeration_ModifyDuringEnumeration_Remove()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new(new GeoPosition(37.7749, -122.4194));
 
 			// Add an object to the collection
@@ -713,7 +713,7 @@
 		[TestMethod]
 		public void Test_37_Enumeration_AfterModification()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 
@@ -750,7 +750,7 @@
 		[TestMethod]
 		public void Test_38_Remove_ExistingObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add the object to the collection
@@ -768,7 +768,7 @@
 		[TestMethod]
 		public void Test_39_Remove_NonExistentObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Attempt to remove an object that was not added
@@ -782,7 +782,7 @@
 		[TestMethod]
 		public void Test_40_Remove_FromEmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Attempt to remove an object from an empty collection
@@ -796,7 +796,7 @@
 		[TestMethod]
 		public void Test_41_Remove_MultipleObjects()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("34.0522,-118.2437", true);
 			GeoSpatialObject Object3 = new("40.7128,-74.0060", true);
@@ -822,7 +822,7 @@
 		[TestMethod]
 		public void Test_42_Remove_DuplicateGeoIdDifferentObject()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object1 = new("37.7749,-122.4194", true);
 			GeoSpatialObject Object2 = new("37.7749,-122.4194", true); // Same GeoId, different instance
 
@@ -841,7 +841,7 @@
 		[TestMethod]
 		public void Test_43_Remove_AfterClear()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add the object to the collection
@@ -861,7 +861,7 @@
 		[TestMethod]
 		public void Test_44_Remove_AfterReAdd()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 			GeoSpatialObject Object = new("37.7749,-122.4194", true);
 
 			// Add and remove the object
@@ -883,7 +883,7 @@
 		[TestMethod]
 		public void Test_45_Find_AllPointsInBoundingBox()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0)),
@@ -903,7 +903,7 @@
 		[TestMethod]
 		public void Test_46_Find_NoPointsInBoundingBox()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0)),
@@ -919,7 +919,7 @@
 		[TestMethod]
 		public void Test_47_Find_PointsInSpecificQuadrants()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("NW", new GeoPosition(15.0, -15.0)),
 				new GeoSpatialObject("NE", new GeoPosition(15.0, 15.0)),
@@ -941,7 +941,7 @@
 		[TestMethod]
 		public void Test_48_Find_BoundingBoxExcludesEdges()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("PointOnMin", new GeoPosition(10.0, 20.0)),
 				new GeoSpatialObject("PointOnMax", new GeoPosition(30.0, 40.0)),
@@ -959,7 +959,7 @@
 		[TestMethod]
 		public void Test_49_Find_BoundingBoxIncludesEdges()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("PointOnMin", new GeoPosition(10.0, 20.0)),
 				new GeoSpatialObject("PointOnMax", new GeoPosition(30.0, 40.0)),
@@ -979,7 +979,7 @@
 		[TestMethod]
 		public void Test_50_Find_EmptyCollection()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection = [];
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
 
 			GeoBoundingBox Box = new(new GeoPosition(10.0, 20.0), new GeoPosition(30.0, 40.0));
 
@@ -991,7 +991,7 @@
 		[TestMethod]
 		public void Test_51_Find_BoundingBoxWithExtremeCoordinates()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("PointMin", new GeoPosition(-90.0, -180.0)),
 				new GeoSpatialObject("PointMax", new GeoPosition(90.0, 180.0)),
@@ -1009,7 +1009,7 @@
 		[TestMethod]
 		public void Test_52_Find_AltitudeWithinRange()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
@@ -1027,7 +1027,7 @@
 		[TestMethod]
 		public void Test_53_Find_AltitudeOutsideRange()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
@@ -1044,7 +1044,7 @@
 		[TestMethod]
 		public void Test_54_Find_AltitudeOnBoundary_Inclusive()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
@@ -1064,7 +1064,7 @@
 		[TestMethod]
 		public void Test_55_Find_AltitudeOnBoundary_Exclusive()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
@@ -1082,7 +1082,7 @@
 		[TestMethod]
 		public void Test_56_Find_AltitudeMixedRange()
 		{
-			GeoCollection<GeoSpatialObjectReference> Collection =
+			GeoPositionCollection<GeoSpatialObjectReference> Collection =
 			[
 				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 50.0)),
 				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 150.0)),

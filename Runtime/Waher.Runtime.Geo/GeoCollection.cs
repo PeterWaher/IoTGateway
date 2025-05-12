@@ -382,6 +382,7 @@ namespace Waher.Runtime.Geo
 			ChunkedList<GeoNode> Queue;
 			GeoPosition Pos;
 			GeoNode Loop;
+			T Obj;
 			int i;
 
 			lock (this.synchObj)
@@ -394,7 +395,8 @@ namespace Waher.Runtime.Geo
 				while (Queue.HasFirstItem)
 				{
 					Loop = Queue.RemoveFirst();
-					Pos = Loop.Object.Location;
+					Obj = Loop.Object;
+					Pos = Obj.Location;
 
 					i = 15; // 1 = NW, 2 = NE, 4 = SW, 8 = SE
 
@@ -412,12 +414,12 @@ namespace Waher.Runtime.Geo
 
 					if (i != 0)
 					{
-						if (i == 15)
+						if (i == 15 && Pos.AltitudeCheck(Box))
 						{
 							if (Result is null)
 								Result = new ChunkedList<T>();
 
-							Result.Add(Loop.Object);
+							Result.Add(Obj);
 						}
 
 						if ((i & 1) != 0 && !(Loop.NW is null))

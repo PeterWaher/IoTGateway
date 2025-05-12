@@ -1005,5 +1005,99 @@
 			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointMin"));
 			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointMax"));
 		}
+
+		[TestMethod]
+		public void Test_52_Find_AltitudeWithinRange()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
+				new GeoSpatialObject("Point3", new GeoPosition(20.0, 30.0, 300.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(5.0, 15.0, 150.0), new GeoPosition(25.0, 35.0, 250.0));
+
+			var Results = Collection.Find(Box);
+
+			Assert.AreEqual(1, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+		}
+
+		[TestMethod]
+		public void Test_53_Find_AltitudeOutsideRange()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
+				new GeoSpatialObject("Point3", new GeoPosition(20.0, 30.0, 300.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(5.0, 15.0, 400.0), new GeoPosition(25.0, 35.0, 500.0));
+
+			var Results = Collection.Find(Box);
+
+			Assert.AreEqual(0, Results.Length);
+		}
+
+		[TestMethod]
+		public void Test_54_Find_AltitudeOnBoundary_Inclusive()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
+				new GeoSpatialObject("Point3", new GeoPosition(20.0, 30.0, 300.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(5.0, 15.0, 100.0), new GeoPosition(25.0, 35.0, 300.0), true, true);
+
+			var Results = Collection.Find(Box);
+
+			Assert.AreEqual(3, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point1"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
+		}
+
+		[TestMethod]
+		public void Test_55_Find_AltitudeOnBoundary_Exclusive()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 100.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 200.0)),
+				new GeoSpatialObject("Point3", new GeoPosition(20.0, 30.0, 300.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(5.0, 15.0, 100.0), new GeoPosition(25.0, 35.0, 300.0), false, false);
+
+			var Results = Collection.Find(Box);
+
+			Assert.AreEqual(1, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+		}
+
+		[TestMethod]
+		public void Test_56_Find_AltitudeMixedRange()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0, 50.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0, 150.0)),
+				new GeoSpatialObject("Point3", new GeoPosition(20.0, 30.0, 250.0)),
+				new GeoSpatialObject("Point4", new GeoPosition(25.0, 35.0, 350.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(5.0, 15.0, 100.0), new GeoPosition(30.0, 40.0, 300.0));
+
+			var Results = Collection.Find(Box);
+
+			Assert.AreEqual(2, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
+		}
+
 	}
 }

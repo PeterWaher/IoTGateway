@@ -51,39 +51,49 @@
 		public static bool LiesOutside(this GeoPosition Position, GeoPosition Min, GeoPosition Max,
 			bool IncludeMin, bool IncludeMax, bool IgnoreAltitude)
 		{
-			int MinLat = Min is null ? 1 : Position.Latitude.CompareTo(Min.Latitude);
-			int MaxLat = Max is null ? -1 : Position.Latitude.CompareTo(Max.Latitude);
+			int MinComp = Min is null ? 1 : Position.Latitude.CompareTo(Min.Latitude);
+			int MaxComp = Max is null ? -1 : Position.Latitude.CompareTo(Max.Latitude);
 
-			if (MinLat < 0 || IncludeMin && MinLat == 0)
+			if (MinComp < 0 || IncludeMin && MinComp == 0)
 				return true;
 
-			if (MaxLat > 0 || IncludeMax && MaxLat == 0)
+			if (MaxComp > 0 || IncludeMax && MaxComp == 0)
 				return true;
 
-			int MinLong = Min is null ? 1 : Position.Longitude.CompareTo(Min.Longitude);
-			int MaxLong = Max is null ? -1 : Position.Longitude.CompareTo(Max.Longitude);
+			MinComp = Min is null ? 1 : Position.Longitude.CompareTo(Min.Longitude);
+			MaxComp = Max is null ? -1 : Position.Longitude.CompareTo(Max.Longitude);
 
 			if (!(Min is null || Max is null) && Min.Longitude > Max.Longitude)
 			{
-				MinLong = -MinLong;
-				MaxLong = -MaxLong;
+				MinComp = -MinComp;
+				MaxComp = -MaxComp;
 			}
 
-			if (MinLong < 0 || IncludeMin && MinLong == 0)
+			if (MinComp < 0 || IncludeMin && MinComp == 0)
 				return true;
 
-			if (MaxLong > 0 || IncludeMax && MaxLong == 0)
+			if (MaxComp > 0 || IncludeMax && MaxComp == 0)
 				return true;
 
 			if (IgnoreAltitude)
 				return false;
 
-			if (Position.Altitude.HasValue && Min.Altitude.HasValue && Max.Altitude.HasValue)
+			if (Position.Altitude.HasValue)
 			{
-				if (Position.Altitude.Value < Min.Altitude.Value ||
-					Position.Altitude.Value > Max.Altitude.Value)
+				if (Min.Altitude.HasValue)
 				{
-					return true;
+					MinComp = Position.Altitude.Value.CompareTo(Min.Altitude.Value);
+
+					if (MinComp < 0 || (IncludeMin && MinComp == 0))
+						return true;
+				}
+
+				if (Max.Altitude.HasValue)
+				{
+					MaxComp = Position.Altitude.Value.CompareTo(Max.Altitude.Value);
+
+					if (MaxComp > 0 || (IncludeMax && MaxComp == 0))
+						return true;
 				}
 			}
 
@@ -202,6 +212,39 @@
 				return Position.WestOf(Reference.Max, !Reference.IncludeMax);
 			else
 				return Position.WestOf(Reference.Min, !Reference.IncludeMin);
+		}
+
+		/// <summary>
+		/// If the altitude defined by <paramref name="Position"/> (if any) lies within
+		/// the scope of the bounding box <paramref name="Reference"/> (if defined).
+		/// </summary>
+		/// <param name="Position">Position.</param>
+		/// <param name="Reference">Reference bounding box.</param>
+		/// <returns>If Position altitude is within the bounding box (if defined).</returns>
+		public static bool AltitudeCheck(this GeoPosition Position, GeoBoundingBox Reference)
+		{
+			if (Position.Altitude.HasValue)
+			{
+				int i;
+
+				if (Reference.Min.Altitude.HasValue)
+				{
+					i = Position.Altitude.Value.CompareTo(Reference.Min.Altitude.Value);
+
+					if (i < 0 || ((!Reference.IncludeMin) && i == 0))
+						return false;
+				}
+
+				if (Reference.Max.Altitude.HasValue)
+				{
+					i = Position.Altitude.Value.CompareTo(Reference.Max.Altitude.Value);
+
+					if (i > 0 || ((!Reference.IncludeMax) && i == 0))
+						return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }

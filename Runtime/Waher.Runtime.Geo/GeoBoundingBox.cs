@@ -27,8 +27,8 @@ namespace Waher.Runtime.Geo
 		/// </summary>
 		/// <param name="Min">Lower-left corner of bounding box.</param>
 		/// <param name="Max">Upper-right corner of bounding box.</param>
-		/// <param name="IncludeMin">If the min latitude/longitude/altitude should be considered as outside.</param>
-		/// <param name="IncludeMax">If the max latitude/longitude/altitude should be considered as outside.</param>
+		/// <param name="IncludeMin">If the min latitude/longitude/altitude should be considered as included in the boundoing box.</param>
+		/// <param name="IncludeMax">If the max latitude/longitude/altitude should be considered as included in the boundoing box.</param>
 		public GeoBoundingBox(GeoPosition Min, GeoPosition Max, bool IncludeMin, bool IncludeMax)
 		{
 			this.min = Min;
@@ -48,23 +48,48 @@ namespace Waher.Runtime.Geo
 		public GeoPosition Max => this.max;
 
 		/// <summary>
-		/// If the min latitude/longitude/altitude should be considered as outside.
+		/// If the min latitude/longitude/altitude should be considered as included in the boundoing box.
 		/// </summary>
 		public bool IncludeMin => this.includeMin;
 
 		/// <summary>
-		/// If the max latitude/longitude/altitude should be considered as outside.
+		/// If the max latitude/longitude/altitude should be considered as included in the boundoing box.
 		/// </summary>
 		public bool IncludeMax => this.includeMax;
+
+		/// <summary>
+		/// If the bounding box is longitude-wrapped, i.e. if the box passes the +-180 degrees
+		/// longitude.
+		/// </summary>
+		public bool LongitudeWrapped
+		{
+			get
+			{
+				return
+					!(this.min is null) && 
+					!(this.max is null) && 
+					this.min.Longitude > this.max.Longitude;
+			}
+		}
 
 		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
 
+			if (this.includeMin)
+				sb.Append('[');
+			else
+				sb.Append('(');
+
 			sb.Append(this.min?.ToString());
 			sb.Append(" - ");
 			sb.Append(this.max?.ToString());
+
+			if (this.includeMax)
+				sb.Append(']');
+			else
+				sb.Append(')');
 
 			return sb.ToString();
 		}
@@ -133,6 +158,17 @@ namespace Waher.Runtime.Geo
 		public bool Contains(GeoPosition Location)
 		{
 			return !Location.LiesOutside(this.min, this.max, !this.includeMin, !this.includeMax);
+		}
+
+		/// <summary>
+		/// If the bounding box contains a location.
+		/// </summary>
+		/// <param name="Location">Location</param>
+		/// <param name="IgnoreAltitude">If altitude component should be ignored.</param>
+		/// <returns>If the bounding box contains the location.</returns>
+		public bool Contains(GeoPosition Location, bool IgnoreAltitude)
+		{
+			return !Location.LiesOutside(this.min, this.max, !this.includeMin, !this.includeMax, IgnoreAltitude);
 		}
 
 	}

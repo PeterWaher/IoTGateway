@@ -129,7 +129,7 @@
 
 			GeoBoundingBox BoundingBox = new(Min, Max);
 
-			string Expected = $"{Min} - {Max}";
+			string Expected = $"[{Min} - {Max}]";
 			Assert.AreEqual(Expected, BoundingBox.ToString());
 		}
 
@@ -144,5 +144,78 @@
 
 			Assert.AreEqual(Box1.GetHashCode(), Box2.GetHashCode());
 		}
+
+		[TestMethod]
+		public void Test_11_GeoBoundingBox_Contains_PointOnMinBoundary_ExcludeMin()
+		{
+			GeoPosition Min = new(10.0, 20.0);
+			GeoPosition Max = new(30.0, 40.0);
+
+			GeoBoundingBox BoundingBox = new(Min, Max, false, true);
+
+			GeoPosition MinBoundaryPoint = new(10.0, 20.0);
+
+			// Min boundary point should not be included
+			Assert.IsFalse(BoundingBox.Contains(MinBoundaryPoint));
+		}
+
+		[TestMethod]
+		public void Test_12_GeoBoundingBox_Contains_PointOnMaxBoundary_ExcludeMax()
+		{
+			GeoPosition Min = new(10.0, 20.0);
+			GeoPosition Max = new(30.0, 40.0);
+
+			GeoBoundingBox BoundingBox = new(Min, Max, true, false);
+
+			GeoPosition MaxBoundaryPoint = new(30.0, 40.0);
+
+			// Max boundary point should not be included
+			Assert.IsFalse(BoundingBox.Contains(MaxBoundaryPoint));
+		}
+
+		[TestMethod]
+		public void Test_13_GeoBoundingBox_Contains_PointOnBothBoundaries_ExcludeMinAndMax()
+		{
+			GeoPosition Min = new(10.0, 20.0);
+			GeoPosition Max = new(30.0, 40.0);
+
+			GeoBoundingBox BoundingBox = new(Min, Max, false, false);
+
+			GeoPosition MinBoundaryPoint = new(10.0, 20.0);
+			GeoPosition MaxBoundaryPoint = new(30.0, 40.0);
+
+			// Neither Min nor Max boundary points should be included
+			Assert.IsFalse(BoundingBox.Contains(MinBoundaryPoint));
+			Assert.IsFalse(BoundingBox.Contains(MaxBoundaryPoint));
+		}
+
+		[TestMethod]
+		public void Test_14_GeoBoundingBox_Contains_PointInside_ExcludeMinAndMax()
+		{
+			GeoPosition Min = new(10.0, 20.0);
+			GeoPosition Max = new(30.0, 40.0);
+
+			GeoBoundingBox BoundingBox = new(Min, Max, false, false);
+
+			GeoPosition InsidePoint = new(20.0, 30.0);
+
+			// Point inside the bounding box should still be included
+			Assert.IsTrue(BoundingBox.Contains(InsidePoint));
+		}
+
+		[TestMethod]
+		public void Test_15_GeoBoundingBox_Contains_PointOutside_ExcludeMinAndMax()
+		{
+			GeoPosition Min = new(10.0, 20.0);
+			GeoPosition Max = new(30.0, 40.0);
+
+			GeoBoundingBox BoundingBox = new(Min, Max, false, false);
+
+			GeoPosition OutsidePoint = new(5.0, 15.0);
+
+			// Point outside the bounding box should not be included
+			Assert.IsFalse(BoundingBox.Contains(OutsidePoint));
+		}
+
 	}
 }

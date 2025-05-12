@@ -40,6 +40,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
 	  <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+	  <ProjectReference Include="..\Waher.Runtime.Collections\Waher.Runtime.Collections.csproj" />
 	</ItemGroup>
 
 </Project>

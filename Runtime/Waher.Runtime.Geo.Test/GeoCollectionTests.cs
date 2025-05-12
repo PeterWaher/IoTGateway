@@ -879,5 +879,131 @@
 			Assert.AreEqual(0, Collection.Count);
 			Assert.IsFalse(Collection.Contains(new GeoSpatialObjectReference(Object)));
 		}
+
+		[TestMethod]
+		public void Test_45_Find_AllPointsInBoundingBox()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0)),
+				new GeoSpatialObject("Point3", new GeoPosition(20.0, 30.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(5.0, 15.0), new GeoPosition(25.0, 35.0));
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(3, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point1"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point2"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
+		}
+
+		[TestMethod]
+		public void Test_46_Find_NoPointsInBoundingBox()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("Point1", new GeoPosition(10.0, 20.0)),
+				new GeoSpatialObject("Point2", new GeoPosition(15.0, 25.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(30.0, 40.0), new GeoPosition(35.0, 45.0));
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(0, Results.Length);
+		}
+
+		[TestMethod]
+		public void Test_47_Find_PointsInSpecificQuadrants()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("NW", new GeoPosition(15.0, -15.0)),
+				new GeoSpatialObject("NE", new GeoPosition(15.0, 15.0)),
+				new GeoSpatialObject("SW", new GeoPosition(-15.0, -15.0)),
+				new GeoSpatialObject("SE", new GeoPosition(-15.0, 15.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(-20.0, -20.0), new GeoPosition(20.0, 20.0));
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(4, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "NW"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "NE"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "SW"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "SE"));
+		}
+
+		[TestMethod]
+		public void Test_48_Find_BoundingBoxExcludesEdges()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("PointOnMin", new GeoPosition(10.0, 20.0)),
+				new GeoSpatialObject("PointOnMax", new GeoPosition(30.0, 40.0)),
+				new GeoSpatialObject("PointInside", new GeoPosition(20.0, 30.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(10.0, 20.0), new GeoPosition(30.0, 40.0), false, false);
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(1, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointInside"));
+		}
+
+		[TestMethod]
+		public void Test_49_Find_BoundingBoxIncludesEdges()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("PointOnMin", new GeoPosition(10.0, 20.0)),
+				new GeoSpatialObject("PointOnMax", new GeoPosition(30.0, 40.0)),
+				new GeoSpatialObject("PointInside", new GeoPosition(20.0, 30.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(10.0, 20.0), new GeoPosition(30.0, 40.0), true, true);
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(3, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointOnMin"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointOnMax"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointInside"));
+		}
+
+		[TestMethod]
+		public void Test_50_Find_EmptyCollection()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection = [];
+
+			GeoBoundingBox Box = new(new GeoPosition(10.0, 20.0), new GeoPosition(30.0, 40.0));
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(0, Results.Length);
+		}
+
+		[TestMethod]
+		public void Test_51_Find_BoundingBoxWithExtremeCoordinates()
+		{
+			GeoCollection<GeoSpatialObjectReference> Collection =
+			[
+				new GeoSpatialObject("PointMin", new GeoPosition(-90.0, -180.0)),
+				new GeoSpatialObject("PointMax", new GeoPosition(90.0, 180.0)),
+			];
+
+			GeoBoundingBox Box = new(new GeoPosition(-90.0, -180.0), new GeoPosition(90.0, 180.0));
+
+			GeoSpatialObjectReference[] Results = Collection.Find(Box);
+
+			Assert.AreEqual(2, Results.Length);
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointMin"));
+			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "PointMax"));
+		}
 	}
 }

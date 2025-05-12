@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Waher.Script.Functions.Matrices;
+using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Geo
 {
@@ -369,6 +369,73 @@ namespace Waher.Runtime.Geo
 
 				return true;
 			}
+		}
+
+		/// <summary>
+		/// Finds items that reside inside a geo-spatial bounding box.
+		/// </summary>
+		/// <param name="Box">Geo-spatial bounding box.</param>
+		/// <returns>Array of items found that reside inside the bounding box.</returns>
+		public T[] Find(GeoBoundingBox Box)
+		{
+			ChunkedList<T> Result = null;
+			ChunkedList<GeoNode> Queue;
+			GeoPosition Pos;
+			GeoNode Loop;
+			int i;
+
+			lock (this.synchObj)
+			{
+				if (this.root is null)
+					return Array.Empty<T>();
+
+				Queue = new ChunkedList<GeoNode>() { this.root };
+
+				while (Queue.HasFirstItem)
+				{
+					Loop = Queue.RemoveFirst();
+					Pos = Loop.Object.Location;
+
+					i = 15; // 1 = NW, 2 = NE, 4 = SW, 8 = SE
+
+					if (Pos.NorthOf(Box))
+						i &= 12;
+
+					if (Pos.SouthOf(Box))
+						i &= 3;
+
+					if (Pos.EastOf(Box))
+						i &= 5;
+
+					if (Pos.WestOf(Box))
+						i &= 10;
+
+					if (i != 0)
+					{
+						if (i == 15)
+						{
+							if (Result is null)
+								Result = new ChunkedList<T>();
+
+							Result.Add(Loop.Object);
+						}
+
+						if ((i & 1) != 0 && !(Loop.NW is null))
+							Queue.Add(Loop.NW);
+
+						if ((i & 2) != 0 && !(Loop.NE is null))
+							Queue.Add(Loop.NE);
+
+						if ((i & 4) != 0 && !(Loop.SW is null))
+							Queue.Add(Loop.SW);
+
+						if ((i & 8) != 0 && !(Loop.SE is null))
+							Queue.Add(Loop.SE);
+					}
+				}
+			}
+
+			return Result?.ToArray() ?? Array.Empty<T>();
 		}
 	}
 }

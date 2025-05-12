@@ -6,7 +6,7 @@ using Waher.Runtime.Collections;
 namespace Waher.Runtime.Geo
 {
 	/// <summary>
-	/// In-memory thread-safe geo-spatial collection
+	/// In-memory thread-safe geo-spatial collection of points (positions).
 	/// </summary>
 	public class GeoPositionCollection<T> : ICollection<T>
 		where T : IGeoSpatialObjectReference
@@ -33,7 +33,7 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
-		/// In-memory thread-safe geo-spatial collection
+		/// In-memory thread-safe geo-spatial collection of points (positions).
 		/// </summary>
 		public GeoPositionCollection()
 		{

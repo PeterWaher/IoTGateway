@@ -1,6 +1,8 @@
 ﻿using System.Text.RegularExpressions;
+using Waher.Layout.Layout2D.Functions;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Graphs;
 
 namespace Waher.Runtime.Geo.Test
 {
@@ -12,6 +14,8 @@ namespace Waher.Runtime.Geo.Test
 		{
 			Types.Initialize(
 				typeof(Expression).Assembly,
+				typeof(Graph).Assembly,
+				typeof(Legend).Assembly,
 				typeof(GeoPosition).Assembly);
 		}
 

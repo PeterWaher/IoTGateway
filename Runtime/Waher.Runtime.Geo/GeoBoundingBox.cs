@@ -1,14 +1,16 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Waher.Runtime.Geo
 {
 	/// <summary>
 	/// Contains information about a geo-spatial bounding box using the Mercator Projection.
 	/// </summary>
-	public sealed class GeoBoundingBox
+	public sealed class GeoBoundingBox : IGeoBoundingBox
 	{
 		private readonly GeoPosition min;
 		private readonly GeoPosition max;
+		private readonly string boxId;
 		private readonly bool includeMin;
 		private readonly bool includeMax;
 
@@ -30,12 +32,41 @@ namespace Waher.Runtime.Geo
 		/// <param name="IncludeMin">If the min latitude/longitude/altitude should be considered as included in the boundoing box.</param>
 		/// <param name="IncludeMax">If the max latitude/longitude/altitude should be considered as included in the boundoing box.</param>
 		public GeoBoundingBox(GeoPosition Min, GeoPosition Max, bool IncludeMin, bool IncludeMax)
+			: this(Guid.NewGuid().ToString(), Min, Max, IncludeMin, IncludeMax)
 		{
+		}
+
+		/// <summary>
+		/// Contains information about a position in a geo-spatial coordinate system.
+		/// </summary>
+		/// <param name="BoxId">The ID of the geo-spatial object.</param>
+		/// <param name="Min">Lower-left corner of bounding box.</param>
+		/// <param name="Max">Upper-right corner of bounding box.</param>
+		public GeoBoundingBox(string BoxId, GeoPosition Min, GeoPosition Max)
+			: this(BoxId, Min, Max, true, true)
+		{
+		}
+
+		/// <summary>
+		/// Contains information about a position in a geo-spatial coordinate system.
+		/// </summary>
+		/// <param name="BoxId">The ID of the geo-spatial object.</param>
+		/// <param name="Min">Lower-left corner of bounding box.</param>
+		/// <param name="Max">Upper-right corner of bounding box.</param>
+		/// <param name="IncludeMin">If the min latitude/longitude/altitude should be considered as included in the boundoing box.</param>
+		/// <param name="IncludeMax">If the max latitude/longitude/altitude should be considered as included in the boundoing box.</param>
+		public GeoBoundingBox(string BoxId, GeoPosition Min, GeoPosition Max, bool IncludeMin, bool IncludeMax)
+		{
+			this.boxId = BoxId;
 			this.min = Min;
 			this.max = Max;
 			this.includeMin = IncludeMin;
 			this.includeMax = IncludeMax;
 		}
+		/// <summary>
+		/// The ID of the geo-spatial bounding box.
+		/// </summary>
+		public string BoxId => this.boxId;
 
 		/// <summary>
 		/// Lower-left corner of bounding box.
@@ -170,6 +201,5 @@ namespace Waher.Runtime.Geo
 		{
 			return !Location.LiesOutside(this.min, this.max, !this.includeMin, !this.includeMax, IgnoreAltitude);
 		}
-
 	}
 }

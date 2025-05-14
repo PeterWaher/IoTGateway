@@ -195,7 +195,6 @@ namespace Waher.Runtime.Geo
 			if (Offset < 0 || Offset >= Destination.Length)
 				throw new ArgumentOutOfRangeException(nameof(Offset), "Offset must be a non-negative number  less than the size of the destination array.");
 
-
 			lock (this.synchObj)
 			{
 				if (Offset + this.nodesById.Count > Destination.Length)

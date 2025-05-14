@@ -102,6 +102,34 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
+		/// Normalized longitude. The range [-90,90] is linearly mapped to [0,1].
+		/// </summary>
+		public double NormalizedLatitude
+		{
+			get
+			{
+				if (this.latitude < -90 || this.latitude > 90)
+					throw new InvalidOperationException("Latitude must be between -90 and 90 degrees.");
+
+				return (this.latitude + 90) / 180;
+			}
+		}
+
+		/// <summary>
+		/// Normalized longitude. The range [-180,180] is linearly mapped to [0,1].
+		/// </summary>
+		public double NormalizedLongitude
+		{
+			get
+			{
+				if (this.longitude < -180 || this.longitude > 180)
+					throw new InvalidOperationException("Longitude must be between -180 and 180 degrees.");
+
+				return (this.longitude + 180) / 360;
+			}
+		}
+
+		/// <summary>
 		/// Parse a string representation of a GeoPosition. If first attempts the
 		/// XML format. If not successful, it tries the GPS format.
 		/// </summary>

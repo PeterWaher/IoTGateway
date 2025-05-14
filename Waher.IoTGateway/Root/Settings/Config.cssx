@@ -206,3 +206,26 @@ ul.suggestionDropDown > li:hover
 {
     background-color: rgba(0,0,0,0.1);
 }
+
+
+#attachIdCode
+{
+    margin-inline: 2rem;
+}
+
+.menuSplit {
+    display: flex;
+}
+
+.menuItemExpand
+{
+    flex: 1;
+}
+
+@media screen and (max-width: 900px)
+{
+    .menuSplit
+    {
+        display: block;
+    }
+}

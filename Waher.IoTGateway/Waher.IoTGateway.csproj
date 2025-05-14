@@ -40,6 +40,7 @@
     <None Remove="Root\Copyright.md" />
     <None Remove="Root\Events.js" />
     <None Remove="Root\Login.md" />
+    <None Remove="Root\LoginMethod.ws" />
     <None Remove="Root\ProposeContract.js" />
     <None Remove="Root\ProposeContract.md" />
     <None Remove="Root\Settings\ChangePassword.md" />
@@ -127,6 +128,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Login.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\LoginMethod.ws">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Settings\PersonalData\EventLogs.md">

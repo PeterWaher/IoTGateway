@@ -3,9 +3,11 @@
     box-sizing: border-box;
 }
 
-
 h1, h2, h3, h4, h5, h6
 {
+    color:¤HeaderTextColor¤;
+    margin-block: 1em 0.5em;
+    font-weight: 500;
     word-wrap: break-word;
 }
 
@@ -14,14 +16,15 @@ img
     max-width:100%;
 }
 
-a
+p
 {
-    word-wrap: break-word;
+    margin: 0.5em 0em 0.5em 0em;
 }
 
-iframe
+section
 {
-    max-width: 100%;
+    padding: min(2em, 5%);
+    margin: 3em 0 3em 0;
 }
 
 body
@@ -44,6 +47,154 @@ main
     margin-top: 5em;
     z-index:2;
 }
+
+/* #region util */
+
+.horizontalAlignLeft
+{
+    text-align:start;
+}
+
+.horizontalAlignRight
+{
+    text-align:end;
+}
+
+.horizontalAlignCenter
+{
+    text-align:center;
+}
+
+.horizontalAlignMargins
+{
+    text-align:justify;
+}
+
+.flex-centering
+{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.text-center
+{
+    text-align: center;
+}
+
+.unselectable:hover {
+  user-drag: none; 
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+
+/* #endregion util */
+
+/* #region login*/
+
+#LoginForm
+{
+    padding-block: 3rem;
+}
+
+/* #endregion login*/
+
+/* #region dropdown*/
+
+.native-dropdown-button
+{
+    position: absolute;
+    right: 1rem;
+    background-image: url(/Images/ArrowUp.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 2rem;
+    padding: 0;
+    top: 0;
+    background-position: center center;
+}
+
+/* #endregion dropdown*/
+
+/* #region links */
+
+a
+{
+    word-wrap: break-word;
+    color: ¤LinkColorUnvisited¤;
+}
+
+a:hover
+{
+    color: ¤LinkColorHot¤;
+}
+
+section a:link
+{
+    color: ¤LinkColorUnvisited¤;
+}
+
+section a:visited
+{
+    color: ¤LinkColorVisited¤;
+}
+
+section a:hover
+{
+    color: ¤LinkColorHot¤;
+}
+
+section a:active
+{
+    color: ¤LinkColorHot¤;
+}
+
+/* #endregion links */
+
+/* #region Carousel*/
+
+.native-carousel
+{
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.native-carousel > * {
+    position: absolute;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.2s;
+    opacity: 0;
+}
+
+.native-carousel > *[data-carousel-right]
+{
+    transform: translateX(100%);
+    transition: opacity 0.1s, transform 0.2s;
+}
+.native-carousel > *[data-carousel-left]
+{
+    transform: translateX(-100%);
+    transition: opacity 0.1s, transform 0.2s;
+}
+
+.native-carousel > *[data-carousel-active]
+{
+    opacity: 1;
+    pointer-events: initial;
+}
+
+/* #endregion Carousel*/
+
 
 /* #region Backdrop */
 #native-backdrop
@@ -72,7 +223,7 @@ main
     overflow: hidden;
     position: fixed;
     background: ¤Alpha(BackgroundColor, 255)¤;
-    width: 20rem;
+    min-width: min(20rem, 90%);
     max-width: 90%;
     padding: 1.5rem;
     border-radius: 1rem;
@@ -90,6 +241,27 @@ main
 }
 
 /* #endregion Popups */
+
+/*#region Footer */
+
+footer
+{
+    color: ¤MenuTextColor¤;
+    padding:0.6em;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align:center;
+    z-index:3;
+}
+
+footer > span
+{
+    background-color:rgba(0,0,0,0.5);
+    padding: 0.2em 2em 0.2em 2em;
+}
+
+/*#endregion Footer */
 
 /*#region Footnotes*/
 
@@ -130,7 +302,7 @@ div.footnotes + p
 
 /*#endregion Footnotes*/
 
-/* region Header */
+/* #region Header */
 
 #native-header
 {
@@ -150,6 +322,17 @@ div.footnotes + p
 	display:flex;
 }
 
+#native-header nav > ul > li p,
+#native-header nav > ul > li a
+{
+    display: block;
+    padding: 0.9em 1em;
+    margin: 0;
+    text-decoration: none;
+    color: ¤MenuTextColor¤;
+    font-variant-numeric: tabular-nums;
+}
+
 header#native-header a
 {
     text-decoration: none;
@@ -167,6 +350,11 @@ header#native-header
     left: 0;
     right: 0;
     z-index:3;
+}
+
+header#native-header nav > ul > li > ul
+{
+    display:none;
 }
 
 #native-header #toggle-nav {
@@ -234,8 +422,11 @@ header#native-header
 /* endregion Header */
 
 
+/* #region table */
+
 table 
 {
+    display: block;
     max-width: 100%;
     margin-bottom: 1.5em;
     border-collapse: collapse;
@@ -243,6 +434,8 @@ table
     border-width: 0;
     border-spacing:0;
     overflow-x: auto;
+    width: fit-content;
+    border-radius: 8px;
 }
 
 table > colgroup {
@@ -255,19 +448,53 @@ table, th, td
 }
 
 
-table 
+.noScrollClip
 {
-    display: block;
-    max-width: 100%;
-    width: fit-content;
-    border-radius: 8px;
+    overflow-x: clip;
 }
-/* region MISC */
 
-section
+.noScrollClip > table
 {
-    padding: min(2em, 5%);
-    margin: 3em 0 3em 0;
+    display: table;
+}
+
+.noScrollBreak
+{
+    overflow-x: clip;
+}
+
+.noScrollBreak > table td {
+    word-break: break-all;
+}
+
+/* #endregion table */
+
+
+/* #region MISC */
+
+ins
+{
+    background-color:¤InsertColor¤;
+}
+
+del
+{
+    background-color:¤DeleteColor¤;
+}
+
+iframe
+{
+    max-width: 100%;
+}
+
+video
+{
+    max-width: 100%;
+}
+
+code
+{
+    word-break: break-word;
 }
 
 fieldset
@@ -280,6 +507,11 @@ fieldset
 	break-inside: avoid;
 }
 
+.active
+{
+    font-weight:600;
+    cursor: not-allowed;
+}
 
 html body fieldset
 {
@@ -287,25 +519,553 @@ html body fieldset
     min-inline-size: unset;
 }
 
-/* endregion MISC */
+/* #endregion MISC */
+
+/* #region Headers */
+
+h1
+{
+    font-size: 1.8em;
+    line-height: 1.25em;
+}
+
+section h1:first-child
+{
+    margin-top:0.75em;
+    -webkit-column-span: all;
+    column-span: all;
+}
+
+h1::before
+{
+    display: block; 
+    content: " ";
+    visibility: hidden;
+}
+
+h1:not(:first-child)::before
+{
+    margin-top: -4em;
+    height: 4em;
+}
+
+h2
+{
+    font-size: 1.5em;
+    line-height: 1.1em;
+}
+
+section h2:first-child
+{
+    margin-top:0.75em;
+}
+
+h2::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h3
+{
+    font-size: 1.4em;
+    line-height: 1em;
+}
+
+section h3:first-child
+{
+    margin-top:0.75em;
+}
+
+h3::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h4
+{
+    font-size: 1.3em;
+    line-height: 0.9em;
+}
+
+section h4:first-child
+{
+    margin-top:0.75em;
+}
+
+h4::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h5
+{
+    font-size: 1.2em;
+    line-height: 0.85em;
+}
+
+section h5:first-child
+{
+    margin-top:0.75em;
+}
+
+h5::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h6
+{
+    font-size: 1.1em;
+    line-height: 0.8em;
+}
+
+section h6:first-child
+{
+    margin-top:0.75em;
+}
+
+h6::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h7
+{
+    font-size: 1.5em;
+    line-height: 0.75em;
+}
+
+section h7:first-child
+{
+    margin-top:0.75em;
+}
+
+h7::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h8
+{
+    font-size: 1.4em;
+    line-height: 0.7em;
+}
+
+section h8:first-child
+{
+    margin-top:0.75em;
+}
+
+h8::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+h9
+{
+    font-size: 1.3em;
+    line-height: 0.65em;
+}
+
+section h9:first-child
+{
+    margin-top:0.75em;
+}
+
+h9::before
+{
+    display: block; 
+    content: " ";
+    margin-top: -4em;
+    height: 4em;
+    visibility: hidden;
+}
+
+/* #region Headers */
+
+/* #region Text Vanity */
+
+mark
+{
+    background-color:¤TagColor¤;
+    color: #FFF;
+    font-family: ¤FontFamily¤;
+    border-radius: 0.3em;
+    padding: 0.1em 0.3em;
+}
+
+abbr
+{
+    cursor: help;
+    position: relative;
+    text-decoration-color: ¤TagColor¤;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 2px;
+}
+
+abbr:hover::after 
+{
+    position: absolute;
+    top: 125%;
+    left: 25%;
+    display: block;
+    padding: 0.25em 0.5em;
+    background: ¤Blend(ButtonColor,BackgroundColor,0.75)¤;
+    border: 1px solid ¤ButtonColor¤;
+    color:¤Theme.TextColor¤;
+    content: attr(data-title);
+}
+
+/* #endregion Text Vanity */
+
+/* #region input */
+
+
+option
+{
+    color:¤Theme.TextColor¤;
+    background-color:¤BackgroundColor¤;
+}
+
+option[selected]
+{
+    color:¤HeaderTextColor¤ !important;
+    background-color:¤HeaderColor¤ !important;
+}
+
+textarea 
+{
+	width: 100%;
+	height:6em;
+	overflow:auto;
+    padding: 6px 10px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 2px solid ¤ButtonColor¤;
+    border-radius: 4px;
+	resize:none;
+	-moz-tab-size : 3;
+	-o-tab-size : 3;
+	tab-size : 3;
+    background-color: ¤GraphBgColor¤;
+    color:¤Theme.TextColor¤;
+}
+
+textarea:focus
+{
+    border: 3px solid ¤ButtonColor¤;
+}
+
+input[type=button], input[type=submit], input[type=reset], button
+{
+    transition: color 100ms, background-color 100ms;
+    background-color: ¤ButtonColor¤;
+    font-weight: bold;
+    border: none;
+    color: ¤ButtonTextColor¤;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    -webkit-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    border-radius: 4px;
+}
+
+
+
+input[type="checkbox"]
+{
+	display:none;
+}
+
+input[type="checkbox"] + label
+{
+	display: inline-block;
+    cursor: pointer;
+    position: relative;
+    padding-left: 2.5em;
+	padding-bottom:0.3em;
+    margin-right: 1em;
+}
+
+input[type="checkbox"] + label:before
+{
+	content: "";
+    display: inline-block;
+ 
+    width: 1em;
+    height: 1em;
+ 
+    margin-right: 1em;
+    position: absolute;
+    left: 0;
+    vertical-align:center;
+    top: 1px;
+    bottom: 1px;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    border-radius: 0.15em;
+    font-size: 1.75em;
+    box-sizing: border-box;
+    border: 2px solid ¤ButtonColor¤;
+    background-color: ¤GraphBgColor¤;
+    color:¤Theme.TextColor¤;
+}
+
+input[type="checkbox"] + label:before:focus
+{
+    border: 3px solid ¤ButtonColor¤;
+}
+
+input[type="checkbox"]:checked + label:before
+{
+    content: "\2713";
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    color: ¤Theme.TextColor¤;
+    text-align: center;
+    line-height: 0.75em;
+}
+
+input[type="radio"]
+{
+	display:none;
+}
+
+input[type="radio"] + label
+{
+	display: inline-block;
+    cursor: pointer;
+    position: relative;
+    padding-left: 2.5em;
+	padding-bottom:0.3em;
+    margin-right: 1em;
+}
+
+input[type="radio"] + label:before
+{
+	content: "";
+    display: inline-block;
+ 
+    width: 1em;
+    height: 1em;
+ 
+    margin-right: 1em;
+    position: absolute;
+    left: 0;
+    vertical-align:center;
+    top: 1px;
+    bottom: 1px;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    border-radius: 1em;
+    font-size: 1.75em;
+    box-sizing: border-box;
+    border: 2px solid ¤ButtonColor¤;
+}
+
+input[type="radio"] + label:before:focus
+{
+    border: 3px solid ¤ButtonColor¤;
+}
+
+input[type="radio"]:checked + label:before
+{
+    content: "\2022";
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    color: ¤ButtonColor¤;
+    text-align: center;
+    line-height: 0.75em;
+}
+
+.clickable 
+{
+	cursor:pointer;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+}
+
+.clickable:hover
+{
+	cursor:pointer;
+    background-color: rgba(0,0,0,0.1);
+}
+
+fieldset
+{
+    border:0.1em solid ¤HeaderColor¤;
+    background-color: ¤Alpha(HeaderColor,6)¤;
+    border-radius: 8px;
+}
+
+fieldset > legend
+{
+    color:¤HeaderTextColor¤;
+    font-size: 1.25em;
+	padding: 0.25em 1em 0.25em 1em;
+	border-radius: 8px;
+	background-color:¤HeaderColor¤;
+}
+
+.posButton 
+{
+	background-color: ¤PosColor¤;
+    font-family: ¤FontFamily¤;
+}
+
+.posButton:hover, .posButtonPressed
+{
+	background-color:¤PosSelectedColor¤;
+}
+
+.negButton 
+{
+	background-color:¤NegColor¤;
+}
+
+.negButton:hover, .negButtonPressed
+{
+	background-color:¤NegSelectedColor¤;
+}
+
+.posButtonSm
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	background-color:¤PosColor¤;
+	width:7em;
+}
+
+.posButtonSmPressed
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	width:7em;
+	background-color:¤PosSelectedColor¤;
+}
+
+.negButtonSm
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	background-color:¤NegColor¤;
+	width:7em;
+}
+
+.negButtonSmPressed
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	width:7em;
+	background-color:¤NegSelectedColor¤;
+}
+
+.disabledButton
+{
+	background-color:¤Blend(Theme.TextColor,BackgroundColor,0.75)¤;
+}
+
+input
+{
+	width: 100%;
+    padding: 6px 10px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 2px solid ¤ButtonColor¤;
+    border-radius: 4px;
+    background-color: ¤GraphBgColor¤;
+    color:¤Theme.TextColor¤;
+}
+
+input:focus
+{
+    border: 3px solid ¤ButtonColor¤;
+}
+
+select
+{
+	width: 100%;
+    padding: 6px 10px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 2px solid ¤ButtonColor¤;
+    border-radius: 4px;
+    background-color: ¤GraphBgColor¤;
+    color:¤Theme.TextColor¤;
+}
+
+select:focus
+{
+    border: 3px solid ¤ButtonColor¤;
+}
+
+
+.buttonSelected
+{
+    background-color: ¤if GrayScale(ButtonColor).Red > 100 then Blend(ButtonColor, "black", 0.2) else Blend(ButtonColor, "white", 0.2)¤;
+}
+
+/* #endregion input */
 
 
 @media screen and (min-width: 901px) {
-    /* region Header */
+    /* #region Header */
 
+    #native-header 
+    {
+        padding-block: 1rem;
+    }
+
+    #native-header > nav > ul > li > p
     #native-header > nav > ul > li > a
     {
         height: 100%;
     }
 
-    #native-header nav > ul > li:hover > ul
+    #native-header nav > ul > li > ul[expanded]
     {
         display:block;
-        position:fixed;
+        position: fixed;
+        width: max-content;
         margin: 0;
         padding: 0;
     }
 
+    #native-header nav ul > li > p
     #native-header nav ul > li > a
     {
         text-align: left;
@@ -321,7 +1081,6 @@ html body fieldset
         display: flex;
         flex-direction: row-reverse;
         background-color: transparent;
-        position: relative;
         overflow: visible;
         border-bottom: none;
         width: fit-content;
@@ -329,16 +1088,23 @@ html body fieldset
     }
 
 
-    /* endregion Header */
+    /* #endregion Header */
 
 
     /*#region Dropdown*/
 
+    .native-dropdown-button
+    {
+        display: none;
+    }
+
+    #native-header li:hover > p
     #native-header li:hover > a 
     {
         color: inherit !important;
     }
 
+    #native-header li > ul > li > p
     #native-header li > ul > li > a 
     {
         height: 100%;
@@ -346,7 +1112,7 @@ html body fieldset
 
     #native-header nav > ul > li > ul
     {
-        border-top: 1px transparent solid
+        border-top: 1px transparent solid;
     }
 
     #native-header li > ul
@@ -356,6 +1122,13 @@ html body fieldset
         overflow-y: auto;
         direction:rtl; 
     }
+
+    header#native-header li > ul > li:not(:last-of-type) > p
+    header#native-header li > ul > li:not(:last-of-type) > a
+    {
+        border-bottom: none;
+    }
+    
     
     #native-header li > ul > li > ul[expanded]
     {
@@ -368,6 +1141,13 @@ html body fieldset
         display: none;
     }
 
+    #native-header > nav a,
+    #native-header > nav p,
+    {
+        text-align: center;
+    }
+
+
     /*#endregion Dropdown*/
 }
 
@@ -377,7 +1157,7 @@ html body fieldset
         width: 100%;
     }
 
-    /* region TOC */
+    /* #region TOC */
 
     .toc
     {
@@ -390,9 +1170,9 @@ html body fieldset
         padding-left: 0.5rem;
     }
 
-    /* region TOC */
+    /* #region TOC */
 
-    /* region Header */
+    /* #region Header */
 
     body #native-header {
         max-height: 100%;
@@ -403,14 +1183,14 @@ html body fieldset
         background-repeat: initial;
         background-size: initial;
         padding-top: 0;
-        padding-bottom: 1.5em;
+        padding-bottom: 1rem;
     }
 
     #native-header > nav {
         display: flex;
         flex-direction: column;
         max-height: 100vh;
-        padding-top: 1.5em;
+        padding-top: 1rem;
     }
     
     #native-header > nav > ul {
@@ -431,9 +1211,10 @@ html body fieldset
         text-align: left;
     }
     
-    header#native-header > nav > ul > li
+    header#native-header > nav  ul > li
     {
         opacity:1;
+        position: relative;
     }
 
     #native-header #small-pagpage-name {
@@ -478,7 +1259,13 @@ html body fieldset
         display: block;
     }
 
-    /* endregion Header */
+    #native-header nav > ul > li button + p,
+    #native-header nav > ul > li button + a
+    {
+        max-width:90%;
+    }
+
+    /* #endregion Header */
 
     img
     {

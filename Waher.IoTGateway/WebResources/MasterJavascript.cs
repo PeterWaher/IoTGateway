@@ -22,7 +22,7 @@ namespace Waher.IoTGateway.WebResources
 	public class MasterJavascript : HttpSynchronousResource, IHttpGetMethod
 	{
 		private IResourceMap resourceMap;
-		private string masterJsFileName = null;
+		private string globalComponentsJsFileName = null;
 		private string alertPopupMdFileName = null;
 		private string confirmPopupMdFileName = null;
 		private string promptPopupMdFileName = null;
@@ -87,10 +87,10 @@ namespace Waher.IoTGateway.WebResources
 			DateTime TP;
 			bool Modified = false;
 
-			if (string.IsNullOrEmpty(this.masterJsFileName))
+            if (string.IsNullOrEmpty(this.globalComponentsJsFileName))
 			{
-				if (!this.resourceMap.TryGetFileName("/Master.js", out this.masterJsFileName))
-					this.masterJsFileName = Path.Combine(Gateway.RootFolder, "Master.js");
+				if (!this.resourceMap.TryGetFileName("/GlobalComponents.js", out this.globalComponentsJsFileName))
+					this.globalComponentsJsFileName = Path.Combine(Gateway.RootFolder, "GlobalComponents.js");
 			}
 
 			if (string.IsNullOrEmpty(this.alertPopupMdFileName))
@@ -111,10 +111,10 @@ namespace Waher.IoTGateway.WebResources
 					this.promptPopupMdFileName = Path.Combine(Gateway.RootFolder, "PromptPopup.md");
 			}
 
-			if ((TP = File.GetLastWriteTimeUtc(this.masterJsFileName)) > this.masterJsLastModified ||
+			if ((TP = File.GetLastWriteTimeUtc(this.globalComponentsJsFileName)) > this.masterJsLastModified ||
 				this.masterJs is null)
 			{
-				this.masterJs = await File.ReadAllTextAsync(this.masterJsFileName);
+				this.masterJs = await File.ReadAllTextAsync(this.globalComponentsJsFileName);
 				this.masterJsLastModified = TP;
 				Modified = true;
 

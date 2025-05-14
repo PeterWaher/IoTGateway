@@ -1,11 +1,9 @@
-﻿function DisplayQuickLogin()
-{
-    var Div = document.getElementById("quickLoginCode");
+function DisplayAttachIdQR() {
+    var Div = document.getElementById("attachIdCode");
     if (!Div)
         return;
 
-    if (!Div.hasAttribute("data-done"))
-    {
+    if (!Div.hasAttribute("data-done")) {
         Div.className = "QuickLogin";
         Div.setAttribute("data-done", "0");
     }
@@ -15,21 +13,15 @@
     var Mode = Div.getAttribute("data-mode");
     var Purpose = Div.getAttribute("data-purpose");
     var ServiceId = Div.hasAttribute("data-serviceId") ? Div.getAttribute("data-serviceId") : "";
-
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function ()
-    {
-        if (xhttp.readyState === 4)
-        {
-            if (xhttp.status === 200)
-            {
-                try
-                {
+    xhttp.onreadystatechange = function () {
+        if (xhttp.readyState === 4) {
+            if (xhttp.status === 200) {
+                try {
                     var Data = JSON.parse(xhttp.responseText);
                     var A = document.getElementById("quickLoginA");
 
-                    if (!A)
-                    {
+                    if (!A) {
                         A = document.createElement("A");
                         A.setAttribute("id", "quickLoginA");
                         Div.appendChild(A);
@@ -37,13 +29,10 @@
 
                     A.setAttribute("href", Data.signUrl);
 
-                    var Img = document.getElementById("quickLoginImg");
-                    if (Data.text)
-                    {
+                    if (Data.text) {
                         var Pre = document.getElementById("quickLoginPre");
 
-                        if (!Pre)
-                        {
+                        if (!Pre) {
                             Pre = document.createElement("PRE");
                             Pre.setAttribute("id", "quickLoginPre");
                             A.appendChild(Pre);
@@ -51,13 +40,14 @@
 
                         Pre.innerText = Data.text;
 
+                        var Img = document.getElementById("quickLoginImg");
                         if (Img)
                             Img.parentNode.removeChild(Img);
                     }
-                    else
-                    {
-                        if (!Img)
-                        {
+                    else {
+                        var Img = document.getElementById("quickLoginImg");
+
+                        if (!Img) {
                             Img = document.createElement("IMG");
                             Img.setAttribute("id", "quickLoginImg");
                             A.appendChild(Img);
@@ -68,20 +58,16 @@
                         else if (Data.src)
                             Img.setAttribute("src", Data.src + "&fg=Theme&bg=Theme");
 
+
                         var Pre = document.getElementById("quickLoginPre");
                         if (Pre)
                             Pre.parentNode.removeChild(Pre);
                     }
 
-                    Img.addEventListener("load", () => {
-                        loginCarousel.CalibrateHeight()
-                    })
 
-                    LoginTimer = window.setTimeout(DisplayQuickLogin, 2000);
+                    LoginTimer = window.setTimeout(DisplayAttachIdQR, 2000);
                 }
-                catch (e)
-                {
-                    console.log(e);
+                catch (e) {
                     console.log(xhttp.responseText);
                 }
             }
@@ -90,7 +76,9 @@
         };
     }
 
-    var Uri = window.location.protocol + "//" + FindNeuronDomain() + "/QuickLogin";
+    var Domain = FindNeuronDomain();
+    var Protocol = Domain === "localhost" || Domain.indexOf("localhost:") === 0 ? "http" : "https";
+    var Uri = Protocol + "://" + Domain + "/QuickLogin";
 
     xhttp.open("POST", Uri, true);
     xhttp.setRequestHeader("Content-Type", "application/json");
@@ -99,60 +87,36 @@
             "serviceId": ServiceId,
             "tab": TabID,
             "mode": Mode,
-            "purpose": Purpose
+            "purpose": Purpose,
+            "propertyFilter": "PNR,COUNTRY",
+            "attachmentFilter": ""
         }));
 }
 
-function SignatureReceivedBE(Empty)
-{
-    if (LoginTimer)
-        window.clearTimeout(LoginTimer);
+function SignatureReceived(Data) {
+    if (!Data)
+        return
 
-    var s = window.location.href;
-    var i = s.indexOf("from=");
-    if (i > 0) {
-        s = s.substring(i + 5);
-        window.location.href = unescape(s);
+    if (Data.Id)
+    {
+        document.getElementById("LegalId").value = Data.Id
     }
-    else {
-        window.location.reload();
-    }
+
+    if (!Data.Properties)
+        return
+
+    if (Data.Properties.PNR)
+        document.getElementById("PersonalNumber").value = Data.Properties.PNR
+
+    if (Data.Properties.COUNTRY)
+        document.getElementById("Country").value = Data.Properties.COUNTRY
 }
 
-
 var LoginTimer = null;
-let loginCarousel = null;
-const virtualTimerInterval = 1000/5.0
-let virtualTimerIntervalLastTimeStamp = -1
 
-window.addEventListener("load", () => {
-
-    function SetLoginMethod(method) 
-    {
-        fetch("/LoginMethod.ws", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            body: JSON.stringify({method:method})
-        })
-
-    }
-
-    DisplayQuickLogin();
-    loginCarousel = Carousel("login-carousel")
-    loginCarousel.container.addEventListener("elementchanged", () => {
-        const method = loginCarousel.current.getAttribute("data-login-method")
-
-        if (typeof method === "string" && method !== "")
-            SetLoginMethod(method)
-    })
-
-    document.addEventListener("visibilitychange", () => {
-        location.reload()
-    })
-});
+window.addEventListener("load", async () => {
+    DisplayAttachIdQR()
+})
 
 setTimeout(() => {
     location.href = "/"

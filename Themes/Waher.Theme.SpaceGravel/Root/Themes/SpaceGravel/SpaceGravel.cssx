@@ -2,10 +2,6 @@
 
 /* region Header*/
 
-header#native-header
-{
-    padding: 1.5rem;
-}
 #native-header nav > ul
 {
     background-color: rgba(0,0,0,0.9);
@@ -995,35 +991,22 @@ abbr:hover::after
 }
 
 @media screen and (min-width: 901px) {
-    
     /* region Header */
 
-    nav li > ul > li:hover > a
+    #native-header li > ul > li > p,
+    #native-header li > ul > li > a
     {
-        background-color: rgba(0,0,0,0.5);
+        border: 1px solid white;
+        background-color: rgba(0, 0, 0, 0.75);
     }
 
-    nav li > ul > li > a
+    #native-header li > ul > li:hover > p,
+    #native-header li > ul > li:hover > a
     {
-        display: block;
-        text-align: center;
-        background-color: rgba(0,0,0,0.5);
-        color: ¤MenuTextColor¤;
-    }
-
-    nav li > ul > li > a
-    {
-        border-left: 1px solid rgba(255,255,255,0.7);
-        border-bottom: 1px solid rgba(255,255,255,0.7);
-        border-right: 1px solid rgba(255,255,255,0.7);
-        background-color: rgba(0,0,0,0.75);
-        white-space:nowrap;
-        transition: opacity 0.25s ease-out;
-        color:white;
+        background-color: rgba(0, 0, 0, 0.95);
     }
 
     /* endregion Header */
-
 }
 
 @media screen and (max-width: 900px) {

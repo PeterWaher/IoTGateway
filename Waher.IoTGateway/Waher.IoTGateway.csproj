@@ -39,10 +39,13 @@
     <None Remove="Root\Controls\SimpleTree.js" />
     <None Remove="Root\Copyright.md" />
     <None Remove="Root\Events.js" />
+    <None Remove="Root\Images\quick-login-login-icon.svg" />
+    <None Remove="Root\Images\user-password-login-icon.svg" />
     <None Remove="Root\Login.md" />
     <None Remove="Root\LoginMethod.ws" />
     <None Remove="Root\ProposeContract.js" />
     <None Remove="Root\ProposeContract.md" />
+    <None Remove="Root\Settings\AttachId.js" />
     <None Remove="Root\Settings\ChangePassword.md" />
     <None Remove="Root\Settings\Config.cssx" />
     <None Remove="Root\Settings\Database.js" />
@@ -125,6 +128,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Controls\SimpleTree.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Images\user-password-login-icon.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Login.js">
@@ -315,6 +321,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Root\Images\quick-login-login-icon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Root\Settings\AttachId.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Schema\ServiceConfiguration.xsd" />
     <EmbeddedResource Include="Schema\Theme.xsd" />
     <EmbeddedResource Include="Schema\GatewayConfiguration.xsd" />

@@ -188,6 +188,7 @@
 		<None Remove="Root\GraphVizLab\GraphVizLab.js" />
 		<None Remove="Root\GraphVizLab\GraphVizLab.md" />
 		<None Remove="Root\GraphVizLab\GraphVizLabGraph.md" />
+		<None Remove="Root\Images\ArrowUp.svg" />
 		<None Remove="Root\Images\Banner1 - 1400x425.png" />
 		<None Remove="Root\Images\Banner1 - 1900x500.png" />
 		<None Remove="Root\Images\Banner1 - 2000x600.png" />
@@ -997,6 +998,11 @@
 		<Content Include="Waher.IoTGateway.Resources.manifest">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="Root\Images\ArrowUp.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />

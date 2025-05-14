@@ -282,10 +282,10 @@
 			// Add boxes that each fit into a different cell, then add more to one cell to force a split
 			var boxes = new List<GeoBoundingBox>
 			{
-				new GeoBoundingBox(new GeoPosition(0, 0), new GeoPosition(10, 10)),   // Cell 1
-				new GeoBoundingBox(new GeoPosition(0, 10), new GeoPosition(10, 20)),  // Cell 2
-				new GeoBoundingBox(new GeoPosition(10, 0), new GeoPosition(20, 10)),  // Cell 3
-				new GeoBoundingBox(new GeoPosition(10, 10), new GeoPosition(20, 20)), // Cell 4
+				new(new GeoPosition(0, 0), new GeoPosition(10, 10)),   // Cell 1
+				new(new GeoPosition(0, 10), new GeoPosition(10, 20)),  // Cell 2
+				new(new GeoPosition(10, 0), new GeoPosition(20, 10)),  // Cell 3
+				new(new GeoPosition(10, 10), new GeoPosition(20, 20)), // Cell 4
 			};
 
 			foreach (var box in boxes)
@@ -304,7 +304,7 @@
 			Assert.AreEqual(4 + maxCellCount + 1, collection.Count);
 
 			// All boxes should be found by a point in their respective regions
-			Assert.IsTrue(collection.Find(new GeoPosition(5, 5)).Length >= maxCellCount + 1); // Overlapping cell 1
+			Assert.IsTrue(collection.Find(new GeoPosition(5, 5)).Length == 1); // Cell 1
 			Assert.IsTrue(collection.Find(new GeoPosition(5, 15)).Length == 1); // Cell 2
 			Assert.IsTrue(collection.Find(new GeoPosition(15, 5)).Length == 1); // Cell 3
 			Assert.IsTrue(collection.Find(new GeoPosition(15, 15)).Length == 1); // Cell 4

@@ -129,7 +129,7 @@ namespace Waher.Runtime.Geo
 				}
 				else if (!(Cell.Grid is null))
 					Cell.Grid.Add(Box);
-				else if (Cell.List.Count >= this.MaxCellCount && Box.CanIncreaseScale(this.Height))
+				else if (Cell.List.Count >= this.MaxCellCount && this.Box.CanIncreaseScale(this.Height))
 				{
 					Cell.Grid = new BoxGrid(new NormalizedBox(default)
 					{
@@ -140,22 +140,22 @@ namespace Waher.Runtime.Geo
 						Scale = this.Box.Scale * this.Height,
 					}, this.Height, this.Height, this.MaxCellCount);
 
-					foreach (NormalizedBox PrevBox in Cell.List)
-					{
-						ChunkedList<BoxReference> References = new ChunkedList<BoxReference>(PrevBox.Node.References.Count);
-
-						foreach (BoxReference Reference in PrevBox.Node.References)
-						{
-							if (Reference.X != x || Reference.Y != y || Reference.Grid != this)
-								References.Add(Reference);
-						}
-
-						PrevBox.Node.References = References;
-
-						Cell.Grid.Add(PrevBox);
-					}
-
-					Cell.List = null;
+					//foreach (NormalizedBox PrevBox in Cell.List)
+					//{
+					//	ChunkedList<BoxReference> References = new ChunkedList<BoxReference>(PrevBox.Node.References.Count);
+					//
+					//	foreach (BoxReference Reference in PrevBox.Node.References)
+					//	{
+					//		if (Reference.X != x || Reference.Y != y || Reference.Grid != this)
+					//			References.Add(Reference);
+					//	}
+					//
+					//	PrevBox.Node.References = References;
+					//
+					//	Cell.Grid.Add(PrevBox);
+					//}
+					//
+					//Cell.List = null;
 					Cell.Grid.Add(Box);
 				}
 				else
@@ -188,28 +188,28 @@ namespace Waher.Runtime.Geo
 					if (Cell is null)
 						return false;
 
-					if (Cell.List is null)
-					{
-						if (!Cell.Grid.Remove(Reference))
-							return false;
+					bool Removed = false;
 
-						if (Cell.Grid.Count == 0)
-						{
-							Cell.Grid = null;
-							this.Grid[Reference.X, Reference.Y] = null;
-						}
-					}
-					else
+					if (Cell.List?.Remove(Reference.Box) ?? false)
 					{
-						if (!Cell.List.Remove(Reference.Box))
-							return false;
-
+						Removed = true;
 						if (Cell.List.Count == 0)
-						{
 							Cell.List = null;
-							this.Grid[Reference.X, Reference.Y] = null;
-						}
 					}
+
+					if (Cell.Grid?.Remove(Reference) ?? false)
+					{
+						Removed = true;
+					
+						if (Cell.Grid.Count == 0)
+							Cell.Grid = null;
+					}
+
+					if (!Removed)
+						return false;
+
+					if (Cell.List is null && Cell.Grid is null)
+						this.Grid[Reference.X, Reference.Y] = null;
 				}
 
 				this.Count--;
@@ -241,9 +241,7 @@ namespace Waher.Runtime.Geo
 
 					if (!(Cell is null))
 					{
-						if (Cell.List is null)
-							Cell.Grid?.Find(Position, ref Result);
-						else
+						if (!(Cell.List is null))
 						{
 							foreach (NormalizedBox Box in Cell.List)
 							{
@@ -256,6 +254,8 @@ namespace Waher.Runtime.Geo
 								}
 							}
 						}
+
+						Cell.Grid?.Find(Position, ref Result);
 					}
 				}
 			}

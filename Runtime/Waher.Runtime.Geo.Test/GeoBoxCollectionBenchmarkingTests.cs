@@ -6,7 +6,7 @@ using Waher.Script.Graphs;
 namespace Waher.Runtime.Geo.Test
 {
 	[TestClass]
-	public class GeoPositionCollectionBenchmarkingTests
+	public class GeoBoxCollectionBenchmarkingTests
 	{
 		private static readonly int[] smallNumberOfItems =
 		[
@@ -54,17 +54,20 @@ namespace Waher.Runtime.Geo.Test
 			5000,
 			10000,
 			20000,
+			30000,
+			40000,
 			50000,
-			100000,
-			200000,
-			300000,
-			400000,
-			500000,
-			600000,
-			700000,
-			800000,
-			900000,
-			1000000
+			60000,
+			//100000,
+			//200000,
+			//300000,
+			//400000,
+			//500000,
+			//600000,
+			//700000,
+			//800000,
+			//900000,
+			//1000000
 		];
 		private static readonly object syncObj = new();
 
@@ -83,19 +86,22 @@ namespace Waher.Runtime.Geo.Test
 		private static async Task Test_Add(string Name, int[] NumberOfItems)
 		{
 			Benchmarker2D Benchmarker = new();
-			GeoPositionCollection<GeoSpatialObjectReference> GeoPositionCollection;
+			GeoBoxCollection<GeoBoundingBox> GeoBoxCollection;
 			int i;
 
 			lock (syncObj)
 			{
 				foreach (int N in NumberOfItems)
 				{
-					GeoPositionCollection = [];
+					GeoBoxCollection = [];
 
-					using Benchmarking Test = Benchmarker.Start("GeoPositionCollection", N);
-					
+					using Benchmarking Test = Benchmarker.Start("GeoBoxCollection", N);
+
 					for (i = 0; i < N; i++)
-						GeoPositionCollection.Add(RandomPosition());
+					{
+						GeoBoundingBox Box = GeoPositionCollectionBenchmarkingTests.RandomBoundingBox(10, 10);
+						GeoBoxCollection.Add(Box);
+					}
 				}
 			}
 
@@ -103,17 +109,6 @@ namespace Waher.Runtime.Geo.Test
 
 			await OutputResults(Benchmarker, Name, "Add()");
 		}
-
-		public static GeoSpatialObjectReference RandomPosition()
-		{
-			return new GeoSpatialObjectReference(
-				new GeoSpatialObject(
-					Guid.NewGuid().ToString(),
-					new GeoPosition(rnd.NextDouble() * 180 - 90, rnd.NextDouble() * 360 - 180),
-					true));
-		}
-
-		private static readonly Random rnd = new();
 
 		[TestMethod]
 		public Task Test_03_Enumerate_Small()
@@ -130,21 +125,21 @@ namespace Waher.Runtime.Geo.Test
 		private static async Task Test_Enumerate(string Name, int[] NumberOfItems)
 		{
 			Benchmarker2D Benchmarker = new();
-			GeoPositionCollection<GeoSpatialObjectReference> GeoPositionCollection;
+			GeoBoxCollection<GeoBoundingBox> GeoBoxCollection;
 			int i;
 
 			lock (syncObj)
 			{
 				foreach (int N in NumberOfItems)
 				{
-					GeoPositionCollection = [];
+					GeoBoxCollection = [];
 
 					for (i = 0; i < N; i++)
-						GeoPositionCollection.Add(RandomPosition());
+						GeoBoxCollection.Add(GeoPositionCollectionBenchmarkingTests.RandomBoundingBox(10, 10));
 
-					using Benchmarking Test = Benchmarker.Start("GeoPositionCollection", N);
+					using Benchmarking Test = Benchmarker.Start("GeoBoxCollection", N);
 
-					foreach (GeoSpatialObjectReference _ in GeoPositionCollection)
+					foreach (GeoBoundingBox _ in GeoBoxCollection)
 						;
 				}
 			}
@@ -169,51 +164,28 @@ namespace Waher.Runtime.Geo.Test
 		private static async Task Test_Find(string Name, int[] NumberOfItems, int NrFind)
 		{
 			Benchmarker2D Benchmarker = new();
-			GeoPositionCollection<GeoSpatialObjectReference> GeoPositionCollection;
+			GeoBoxCollection<GeoBoundingBox> GeoBoxCollection;
 			int i;
 
 			lock (syncObj)
 			{
 				foreach (int N in NumberOfItems)
 				{
-					GeoPositionCollection = [];
+					GeoBoxCollection = [];
 
 					for (i = 0; i < N; i++)
-						GeoPositionCollection.Add(RandomPosition());
+						GeoBoxCollection.Add(GeoPositionCollectionBenchmarkingTests.RandomBoundingBox(10, 10));
 
-					using Benchmarking Test = Benchmarker.Start("GeoPositionCollection", N);
+					using Benchmarking Test = Benchmarker.Start("GeoBoxCollection", N);
 
 					for (i = 0; i < NrFind; i++)
-						GeoPositionCollection.Find(RandomBoundingBox(10, 10));
+						GeoBoxCollection.Find(GeoPositionCollectionBenchmarkingTests.RandomPosition().Location);
 				}
 			}
 
 			Benchmarker.Remove(NumberOfItems[0]);   // May be affected by JIT compilation.
 
 			await OutputResults(Benchmarker, Name, "Find() ⨯ " + NrFind.ToString());
-		}
-
-		public static GeoBoundingBox RandomBoundingBox(int MaxDeltaLat, int MaxDeltaLong)
-		{
-			double MinLat, MinLong;
-			double MaxLat, MaxLong;
-
-			do
-			{
-				MinLat = rnd.NextDouble() * 180 - 90;
-				MinLong = rnd.NextDouble() * 360 - 180;
-
-				MaxLat = MinLat + rnd.NextDouble() * MaxDeltaLat;
-				MaxLong = MinLong + rnd.NextDouble() * MaxDeltaLong;
-			}
-			while (MaxLat > 90);
-
-			if (MaxLong > 180)
-				MaxLong -= 360;
-
-			return new GeoBoundingBox(
-				new GeoPosition(MinLat, MinLong),
-				new GeoPosition(MaxLat, MaxLong));
 		}
 
 		private static async Task OutputResults(Benchmarker2D Benchmarker, string BaseFileName,
@@ -235,14 +207,14 @@ namespace Waher.Runtime.Geo.Test
 			Script.Append("G.Title:=\"");
 			Script.Append(Title);
 			Script.AppendLine("\";");
-			Script.Append("L:=legend([\"GeoPositionCollection\"");
+			Script.Append("L:=legend([\"GeoBoxCollection\"");
 			Script.Append("],[\"Red\"");
 			Script.AppendLine("],\"White\",1);");
 
-			if (!Directory.Exists("OutputPosition"))
-				Directory.CreateDirectory("OutputPosition");
+			if (!Directory.Exists("OutputBox"))
+				Directory.CreateDirectory("OutputBox");
 
-			File.WriteAllText("OutputPosition\\Script_" + BaseFileName + ".script", Script.ToString());
+			File.WriteAllText("OutputBox\\Script_" + BaseFileName + ".script", Script.ToString());
 
 			Variables Variables = [];
 
@@ -256,12 +228,12 @@ namespace Waher.Runtime.Geo.Test
 				Height = 720
 			};
 
-			await File.WriteAllBytesAsync("OutputPosition\\G_" + BaseFileName + ".png",
+			await File.WriteAllBytesAsync("OutputBox\\G_" + BaseFileName + ".png",
 				G.CreatePixels(Settings).EncodeAsPng());
 
-			if (!File.Exists("OutputPosition\\Legend.png"))
+			if (!File.Exists("OutputBox\\Legend.png"))
 			{
-				await File.WriteAllBytesAsync("OutputPosition\\Legend.png",
+				await File.WriteAllBytesAsync("OutputBox\\Legend.png",
 					Legend.CreatePixels().EncodeAsPng());
 			}
 		}

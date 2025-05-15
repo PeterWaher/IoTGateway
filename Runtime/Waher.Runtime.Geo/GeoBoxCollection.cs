@@ -82,10 +82,10 @@ namespace Waher.Runtime.Geo
 					this.Fill(Box);
 				else
 				{
-					int x0 = (int)(Box.MinLongitude - this.Box.MinLongitude) * this.Box.Scale;
-					int x1 = (int)(Box.MaxLongitude - this.Box.MinLongitude) * this.Box.Scale;
-					int y0 = (int)(Box.MinLatitude - this.Box.MinLatitude) * this.Box.Scale;
-					int y1 = (int)(Box.MaxLatitude - this.Box.MinLatitude) * this.Box.Scale;
+					int x0 = (int)((Box.MinLongitude - this.Box.MinLongitude) * this.Box.Scale * this.Width);
+					int x1 = (int)((Box.MaxLongitude - this.Box.MinLongitude) * this.Box.Scale * this.Width);
+					int y0 = (int)((Box.MinLatitude - this.Box.MinLatitude) * this.Box.Scale * this.Height);
+					int y1 = (int)((Box.MaxLatitude - this.Box.MinLatitude) * this.Box.Scale * this.Height);
 
 					if (x0 < 0)
 						x0 = 0;
@@ -96,6 +96,16 @@ namespace Waher.Runtime.Geo
 						y0 = 0;
 					else if (y0 >= this.Height)
 						y0 = this.Height - 1;
+
+					if (x1 < 0)
+						x1 = 0;
+					else if (x1 >= this.Width)
+						x1 = this.Width - 1;
+
+					if (y1 < 0)
+						y1 = 0;
+					else if (y1 >= this.Height)
+						y1 = this.Height - 1;
 
 					if (Box.Node.References is null)
 						Box.Node.References = new ChunkedList<BoxReference>((x1 - x0 + 1) * (y1 - y0 + 1));
@@ -218,8 +228,8 @@ namespace Waher.Runtime.Geo
 
 			public void Find(GeoPosition Position, ref ChunkedList<T> Result)
 			{
-				int x = (int)(Position.NormalizedLongitude - this.Box.MinLongitude) * this.Box.Scale;
-				int y = (int)(Position.NormalizedLatitude - this.Box.MinLatitude) * this.Box.Scale;
+				int x = (int)((Position.NormalizedLongitude - this.Box.MinLongitude) * this.Box.Scale * this.Width);
+				int y = (int)((Position.NormalizedLatitude - this.Box.MinLatitude) * this.Box.Scale * this.Height);
 
 				if (x >= 0 && x < this.Width && y >= 0 && y < this.Height)
 				{

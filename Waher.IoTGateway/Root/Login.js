@@ -152,6 +152,8 @@ window.addEventListener("load", () => {
             SetLoginMethod(method)
     })
 
+    SetLoginMethod(loginCarousel.current.getAttribute("data-login-method"))
+
     document.addEventListener("visibilitychange", () => {
         location.reload()
     })

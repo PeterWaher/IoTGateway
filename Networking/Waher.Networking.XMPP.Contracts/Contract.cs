@@ -860,9 +860,7 @@ namespace Waher.Networking.XMPP.Contracts
 												return null;
 										}
 
-										if (Parts is null)
-											Parts = new List<Part>();
-
+										Parts ??= new List<Part>();
 										Parts.Add(new Part()
 										{
 											LegalId = LegalId,
@@ -931,6 +929,10 @@ namespace Waher.Networking.XMPP.Contracts
 										P2 = new DurationParameter();
 										break;
 
+									case "geoParameter":
+										P2 = new GeoParameter();
+										break;
+
 									case "calcParameter":
 										P2 = new CalcParameter();
 										break;
@@ -941,6 +943,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 									case "contractReferenceParameter":
 										P2 = new ContractReferenceParameter();
+										break;
+
+									case "attachmentParameter":
+										P2 = new AttachmentParameter();
 										break;
 
 									default:
@@ -1333,17 +1339,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
-				if (Attributes is null)
-					Attributes = new SortedDictionary<string, string>();
-
+				Attributes ??= new SortedDictionary<string, string>();
 				Attributes[Attr.Name.Normalize(NormalizationForm.FormC)] = Attr.Value.Normalize(NormalizationForm.FormC);
 			}
 
 			if (Xml.NamespaceURI != CurrentNamespace && string.IsNullOrEmpty(Xml.Prefix))
 			{
-				if (Attributes is null)
-					Attributes = new SortedDictionary<string, string>();
-
+				Attributes ??= new SortedDictionary<string, string>();
 				Attributes["xmlns"] = Xml.NamespaceURI;
 				CurrentNamespace = Xml.NamespaceURI;
 			}
@@ -1486,9 +1488,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 						if (!Found)
 						{
-							if (MissingParts is null)
-								MissingParts = new LinkedList<Part>();
-
+							MissingParts ??= new LinkedList<Part>();
 							MissingParts.AddLast(Part);
 						}
 					}
@@ -1665,9 +1665,7 @@ namespace Waher.Networking.XMPP.Contracts
 						RoleParameter.ObjectValue is string RoleParameterValue &&
 						!string.IsNullOrEmpty(RoleParameterValue))
 					{
-						if (RoleParameters is null)
-							RoleParameters = new LinkedList<RoleParameter>();
-
+						RoleParameters ??= new LinkedList<RoleParameter>();
 						RoleParameters.AddLast(RoleParameter);
 					}
 				}
@@ -2065,8 +2063,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (string.Compare(T.Language, Language, StringComparison.CurrentCultureIgnoreCase) == 0)
 					return T;
 
-				if (First is null)
-					First = T;
+				First ??= T;
 			}
 
 			return First;
@@ -2090,8 +2087,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (string.Compare(T.Language, Language, StringComparison.CurrentCultureIgnoreCase) == 0)
 					return T;
 
-				if (First is null)
-					First = T;
+				First ??= T;
 			}
 
 			return First;
@@ -2196,8 +2192,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.parameters is null)
 				return;
 
-			if (this.nonce is null)
-				this.nonce = Guid.NewGuid().ToByteArray();
+			this.nonce ??= Guid.NewGuid().ToByteArray();
 
 			uint i, c = (uint)this.parameters.Length;
 

@@ -2,7 +2,6 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
-using Waher.Script.Functions.Vectors;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.Contracts

@@ -196,8 +196,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 						Markdown.Append(Rows[0]);
 					else
 					{
-						if (Notes is null)
-							Notes = new LinkedList<KeyValuePair<string, string[]>>();
+						Notes ??= new LinkedList<KeyValuePair<string, string[]>>();
 
 						string Key = "n" + Guid.NewGuid().ToString().Replace("-", string.Empty);
 

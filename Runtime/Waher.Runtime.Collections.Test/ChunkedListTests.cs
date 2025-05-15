@@ -116,10 +116,10 @@ namespace Waher.Runtime.Collections.Test
 			ChunkedList<int> List = [];
 			List.Add(1);
 			List.Add(2);
-			var array = new int[2];
-			List.CopyTo(array, 0);
-			Assert.AreEqual(1, array[0]);
-			Assert.AreEqual(2, array[1]);
+			int[] Array = new int[2];
+			List.CopyTo(Array, 0);
+			Assert.AreEqual(1, Array[0]);
+			Assert.AreEqual(2, Array[1]);
 		}
 
 		[TestMethod]

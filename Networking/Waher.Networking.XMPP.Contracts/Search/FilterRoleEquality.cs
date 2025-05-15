@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.Search
+﻿namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Return public contracts defining a role equal to this value.

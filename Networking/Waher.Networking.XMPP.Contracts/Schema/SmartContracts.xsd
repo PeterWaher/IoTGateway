@@ -402,6 +402,11 @@
 					<xs:documentation>Contract reference parameter.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name='attachmentParameter' type='AttachmentParameter'>
+				<xs:annotation>
+					<xs:documentation>Attachment reference parameter.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
 	</xs:complexType>
 
@@ -742,6 +747,11 @@
 						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
+				<xs:attribute name='contractLocation' type='xs:boolean' use='optional' default='false'>
+					<xs:annotation>
+						<xs:documentation>If the parameter represents the location of the actual contract, or contents of the contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
 				<xs:attribute name='min' type='GeoSpatial' use='optional'>
 					<xs:annotation>
 						<xs:documentation>Optional minimum value of the parameter.</xs:documentation>
@@ -765,6 +775,30 @@
 					<xs:annotation>
 						<xs:documentation>If the `max` value is part of the valid range or not.</xs:documentation>
 					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='altitude' use='optional' default='optional'>
+					<xs:annotation>
+						<xs:documentation>Defines how to handle altitude in the position.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base='xs:string'>
+							<xs:enumeration value='required'>
+								<xs:annotation>
+									<xs:documentation>Altitude is required by the parameter.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value='optional'>
+								<xs:annotation>
+									<xs:documentation>Altitude is optional by the parameter.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+							<xs:enumeration value='prohibited'>
+								<xs:annotation>
+									<xs:documentation>Altitude is prohibited by the parameter.</xs:documentation>
+								</xs:annotation>
+							</xs:enumeration>
+						</xs:restriction>
+					</xs:simpleType>
 				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
@@ -884,6 +918,62 @@
 				<xs:attribute name='creatorRole' type='xs:string' use='optional'>
 					<xs:annotation>
 						<xs:documentation>Restriction on the role the creator must have in the referenced contract.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='AttachmentParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a reference to an attachment that must be uploaded before the contract can be signed.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:attribute name='value' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>The file name of the attachment to upload.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='required' type='xs:boolean' use='optional' default='false'>
+					<xs:annotation>
+						<xs:documentation>If the attachment is required or not.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='contentType' type='xs:string' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Restriction on the Content-Type of the attachment.</xs:documentation>
+						<xs:documentation>Wildcards are permitted.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='minSize' type='xs:positiveInteger' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Smallest acceptable size of attachment, in bytes.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='maxSize' type='xs:positiveInteger' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Largest acceptable size of attachment, in bytes.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='minWidth' type='xs:positiveInteger' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Smallest acceptable width of attachment, in pixels, if relevant.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='maxWidth' type='xs:positiveInteger' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Largest acceptable width of attachment, in pixels, if relevant.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='minHeight' type='xs:positiveInteger' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Smallest acceptable height of attachment, in pixels, if relevant.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name='maxHeight' type='xs:positiveInteger' use='optional'>
+					<xs:annotation>
+						<xs:documentation>Largest acceptable height of attachment, in pixels, if relevant.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>

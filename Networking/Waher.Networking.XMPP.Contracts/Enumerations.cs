@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts
+﻿namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
 	/// Recognized contract states

@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Persistence;
+using Waher.Runtime.Geo;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 {
@@ -93,13 +94,18 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 							}
 
 							Value = Parameter.ObjectValue;
+
+							if (Parameter is AttachmentParameter AttachmentParameter)
+							{
+								// TODO: Use attachment as value.
+							}
 						}
 						else if ((i = this.name.IndexOf('.')) > 0 &&
-							Settings.Contract.TryGetParameter(this.name.Substring(0, i), out Parameter) &&
+							Settings.Contract.TryGetParameter(this.name[..i], out Parameter) &&
 							Parameter is ContractReferenceParameter ContractReferenceParameter)
 						{
 							if (ContractReferenceParameter.Reference is null ||
-								!ContractReferenceParameter.Reference.TryGetParameter(this.name.Substring(i + 1), out Parameter))
+								!ContractReferenceParameter.Reference.TryGetParameter(this.name[(i + 1)..], out Parameter))
 							{
 								Value = null;
 							}
@@ -141,6 +147,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 							s = BooleanValue ? "[X]" : "[ ]";
 						else if (Value is DateTime TP && TP.TimeOfDay == TimeSpan.Zero)
 							s = TP.ToShortDateString();
+						else if (Value is GeoPosition Position)
+							s = Position.HumanReadable;
 						else
 							s = Value.ToString();
 

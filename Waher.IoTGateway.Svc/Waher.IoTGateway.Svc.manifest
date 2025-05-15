@@ -456,6 +456,9 @@
 	<Assembly fileName="Waher.Runtime.Counters.dll" />
 	<Assembly fileName="Waher.Runtime.Counters.pdb" />
 	<Assembly fileName="Waher.Runtime.Counters.xml" />
+	<Assembly fileName="Waher.Runtime.Geo.dll"/>
+	<Assembly fileName="Waher.Runtime.Geo.pdb"/>
+	<Assembly fileName="Waher.Runtime.Geo.xml"/>
 	<Assembly fileName="Waher.Runtime.Inventory.dll" />
 	<Assembly fileName="Waher.Runtime.Inventory.pdb" />
 	<Assembly fileName="Waher.Runtime.Inventory.xml" />

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.Contracts.Search
+﻿namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Abstract base class for search filters relating to the namespace of the machine-readable content of contracts.

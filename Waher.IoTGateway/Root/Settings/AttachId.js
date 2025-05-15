@@ -57,7 +57,9 @@ function DisplayAttachIdQR() {
                             Img.setAttribute("src", "data:" + Data.contentType + ";base64," + Data.base64) + "&fg=Theme&bg=Theme";
                         else if (Data.src)
                             Img.setAttribute("src", Data.src + "&fg=Theme&bg=Theme");
-
+                        
+                        Img.setAttribute("width", Data.width);
+                        Img.setAttribute("height", Data.height);
 
                         var Pre = document.getElementById("quickLoginPre");
                         if (Pre)
@@ -98,9 +100,7 @@ function SignatureReceived(Data) {
         return
 
     if (Data.Id)
-    {
         document.getElementById("LegalId").value = Data.Id
-    }
 
     if (!Data.Properties)
         return

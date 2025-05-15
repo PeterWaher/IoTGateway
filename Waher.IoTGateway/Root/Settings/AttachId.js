@@ -100,9 +100,7 @@ function SignatureReceived(Data) {
         return
 
     if (Data.Id)
-    {
         document.getElementById("LegalId").value = Data.Id
-    }
 
     if (!Data.Properties)
         return

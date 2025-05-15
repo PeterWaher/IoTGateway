@@ -116,8 +116,9 @@ function NativeHeaderHandler() {
             if (count < 1) {
                 topSubmenue.style.left = ""
             }
-            // to use this you "need" a mouse
-            if (!matchMedia('(pointer:fine)').matches)
+            
+            // cancled when on mobile view
+            if (window.matchMedia("screen and (max-width: 900px)").matches)
                 return
 
             subMenu.removeAttribute("expanded")

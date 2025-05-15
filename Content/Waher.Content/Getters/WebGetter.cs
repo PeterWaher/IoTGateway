@@ -176,8 +176,33 @@ namespace Waher.Content.Getters
 
 				if (e.IsValid.HasValue)
 					return e.IsValid.Value;
+				else if (SslPolicyErrors == SslPolicyErrors.None)
+					return true;
 				else
-					return SslPolicyErrors == SslPolicyErrors.None;
+				{
+					// Check for incomplete revocation check in the chain
+
+					if (SslPolicyErrors.HasFlag(SslPolicyErrors.RemoteCertificateChainErrors) && Chain != null)
+					{
+						foreach (X509ChainStatus Status in Chain.ChainStatus)
+						{
+							// Apple-specific error code for incomplete revocation check
+							
+							if (Status.Status == X509ChainStatusFlags.RevocationStatusUnknown ||
+								Status.Status == X509ChainStatusFlags.OfflineRevocation)
+							{
+								continue; // Ignore this error
+							}
+
+							if (Status.Status != X509ChainStatusFlags.NoError)
+								return false; // Fail on other errors
+						}
+
+						return true; // Only revocation check failed, allow
+					}
+
+					return false;
+				}
 			}
 		}
 

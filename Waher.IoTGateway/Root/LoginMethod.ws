@@ -4,5 +4,5 @@ if !(Posted matches
 }
 )then BadRequest("Invalid posted data.");
 
-C:=Create(HTTP.Cookie, "login-method", PMethod, Split(Domain, ":")[0], "/", 3600 * 24 * 7, true, true);
+C:=Create(HTTP.Cookie, "login-method", PMethod, Split(Domain, ":")[0], "/", 60 * 60 * 24 * 365, true, true);
 Response.SetCookie(C);

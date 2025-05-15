@@ -68,6 +68,9 @@
                         else if (Data.src)
                             Img.setAttribute("src", Data.src + "&fg=Theme&bg=Theme");
 
+                        Img.setAttribute("width", Data.width);
+                        Img.setAttribute("height", Data.height);
+
                         var Pre = document.getElementById("quickLoginPre");
                         if (Pre)
                             Pre.parentNode.removeChild(Pre);
@@ -148,6 +151,8 @@ window.addEventListener("load", () => {
         if (typeof method === "string" && method !== "")
             SetLoginMethod(method)
     })
+
+    SetLoginMethod(loginCarousel.current.getAttribute("data-login-method"))
 
     document.addEventListener("visibilitychange", () => {
         location.reload()

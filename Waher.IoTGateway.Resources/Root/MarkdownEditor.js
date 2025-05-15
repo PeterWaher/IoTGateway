@@ -830,7 +830,6 @@ function MarkdownEditorKeyDown(Control, Event)
 	if (Control.getAttribute("data-preview"))
 		InitMarkdownEditorPreview(Control);
 
-	console.log(Event)
 	if (!Event.altKey && !Event.ctrlKey && Event.shiftKey)
 	{
 		switch (Event.keyCode)
@@ -1054,7 +1053,7 @@ function MarkdownEditorInitializeHack(event, previewOn)
 	setTimeout(() => {
 		InitializeMarkdownEditor(container)
 		if (previewOn)
-			{
+		{
 			setTimeout(() => {
 				MarkdownEditorBottomPreviewAndEdit(container.getElementsByClassName("MarkdownEditorBottomPreviewAndEdit")[0])
 			}, 0)

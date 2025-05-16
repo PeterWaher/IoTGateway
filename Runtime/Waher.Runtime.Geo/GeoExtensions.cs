@@ -1,4 +1,6 @@
-﻿namespace Waher.Runtime.Geo
+﻿using System.Runtime.InteropServices;
+
+namespace Waher.Runtime.Geo
 {
 	/// <summary>
 	/// Extension methods for geo-spatial calculations.
@@ -7,7 +9,7 @@
 	{
 		/// <summary>
 		/// Checks if a position lies outside a given bounding box, using the Mercator projection.
-		/// If Min.Longitude > Max.Longitude, the bounding box is considered to pass the +-180 longitude.
+		/// If Min.Longitude > Max?.Longitude, the bounding box is considered to pass the +-180 longitude.
 		/// If any of the Min or Max coordinates are null, the corresponding coordinate is ignored.
 		/// </summary>
 		/// <param name="Position">Geo-spatial position</param>
@@ -21,7 +23,7 @@
 
 		/// <summary>
 		/// Checks if a position lies outside a given bounding box, using the Mercator projection.
-		/// If Min.Longitude > Max.Longitude, the bounding box is considered to pass the +-180 longitude.
+		/// If Min.Longitude > Max?.Longitude, the bounding box is considered to pass the +-180 longitude.
 		/// If any of the Min or Max coordinates are null, the corresponding coordinate is ignored.
 		/// </summary>
 		/// <param name="Position">Geo-spatial position</param>
@@ -38,7 +40,7 @@
 
 		/// <summary>
 		/// Checks if a position lies outside a given bounding box, using the Mercator projection.
-		/// If Min.Longitude > Max.Longitude, the bounding box is considered to pass the +-180 longitude.
+		/// If Min.Longitude > Max?.Longitude, the bounding box is considered to pass the +-180 longitude.
 		/// If any of the Min or Max coordinates are null, the corresponding coordinate is ignored.
 		/// </summary>
 		/// <param name="Position">Geo-spatial position</param>
@@ -51,53 +53,60 @@
 		public static bool LiesOutside(this GeoPosition Position, GeoPosition Min, GeoPosition Max,
 			bool IncludeMin, bool IncludeMax, bool IgnoreAltitude)
 		{
-			int MinComp = Min is null ? 1 : Position.Latitude.CompareTo(Min.Latitude);
-			int MaxComp = Max is null ? -1 : Position.Latitude.CompareTo(Max.Latitude);
-
-			if (MinComp < 0 || IncludeMin && MinComp == 0)
+			if (Position.Latitude.OutOfRange(Min?.Latitude, Max?.Latitude, IncludeMin, IncludeMax))
 				return true;
 
-			if (MaxComp > 0 || IncludeMax && MaxComp == 0)
-				return true;
-
-			MinComp = Min is null ? 1 : Position.Longitude.CompareTo(Min.Longitude);
-			MaxComp = Max is null ? -1 : Position.Longitude.CompareTo(Max.Longitude);
-
-			if (!(Min is null || Max is null) && Min.Longitude > Max.Longitude)
+			if (!(Min is null) && !(Max is null) && Min.Longitude > Max.Longitude)
 			{
-				MinComp = -MinComp;
-				MaxComp = -MaxComp;
+				if (!Position.Longitude.OutOfRange(Max.Longitude, Min.Longitude, !IncludeMin, !IncludeMax))
+					return true;
 			}
-
-			if (MinComp < 0 || IncludeMin && MinComp == 0)
-				return true;
-
-			if (MaxComp > 0 || IncludeMax && MaxComp == 0)
-				return true;
+			else
+			{
+				if (Position.Longitude.OutOfRange(Min?.Longitude, Max?.Longitude, IncludeMin, IncludeMax))
+					return true;
+			}
 
 			if (IgnoreAltitude)
 				return false;
 
-			if (Position.Altitude.HasValue)
+			if (Position.Altitude.HasValue &&
+				Position.Altitude.Value.OutOfRange(Min?.Altitude, Max?.Altitude, IncludeMin, IncludeMax))
 			{
-				if (Min.Altitude.HasValue)
-				{
-					MinComp = Position.Altitude.Value.CompareTo(Min.Altitude.Value);
-
-					if (MinComp < 0 || (IncludeMin && MinComp == 0))
-						return true;
-				}
-
-				if (Max.Altitude.HasValue)
-				{
-					MaxComp = Position.Altitude.Value.CompareTo(Max.Altitude.Value);
-
-					if (MaxComp > 0 || (IncludeMax && MaxComp == 0))
-						return true;
-				}
+				return true;
 			}
 
 			return false;
+		}
+
+		private static bool OutOfRange(this double Value, double? Min, double? Max,
+			bool IncludeMin, bool IncludeMax)
+		{
+			int MinComp = Min.HasValue ? Value.CompareTo(Min.Value) : 1;
+			int MaxComp = Max.HasValue ? Value.CompareTo(Max.Value) : -1;
+
+			if (MinComp < 0 || IncludeMin && MinComp == 0)
+				return true;
+
+			if (MaxComp > 0 || IncludeMax && MaxComp == 0)
+				return true;
+
+			return false;
+		}
+
+		private static bool InRange(this double Value, double? Min, double? Max,
+			bool IncludeMin, bool IncludeMax)
+		{
+			int MinComp = Min.HasValue ? Value.CompareTo(Min.Value) : 1;
+			int MaxComp = Max.HasValue ? Value.CompareTo(Max.Value) : -1;
+
+			if (MinComp < 0 || (!IncludeMin && MinComp == 0))
+				return false;
+
+			if (MaxComp > 0 || (!IncludeMax && MaxComp == 0))
+				return false;
+
+			return true;
 		}
 
 		/// <summary>
@@ -225,23 +234,8 @@
 		{
 			if (Position.Altitude.HasValue)
 			{
-				int i;
-
-				if (Reference.Min.Altitude.HasValue)
-				{
-					i = Position.Altitude.Value.CompareTo(Reference.Min.Altitude.Value);
-
-					if (i < 0 || ((!Reference.IncludeMin) && i == 0))
-						return false;
-				}
-
-				if (Reference.Max.Altitude.HasValue)
-				{
-					i = Position.Altitude.Value.CompareTo(Reference.Max.Altitude.Value);
-
-					if (i > 0 || ((!Reference.IncludeMax) && i == 0))
-						return false;
-				}
+				return Position.Altitude.Value.InRange(Reference.Min?.Altitude, Reference.Max?.Altitude,
+					Reference.IncludeMin, Reference.IncludeMax);
 			}
 
 			return true;

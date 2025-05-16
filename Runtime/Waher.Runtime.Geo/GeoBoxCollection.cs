@@ -400,7 +400,18 @@ namespace Waher.Runtime.Geo
 				Output.WriteAttributeString("scale", this.Scale.ToString());
 
 				if (!(this.Node is null))
+				{
 					Output.WriteAttributeString("boxId", this.Node.Box.BoxId);
+
+					Output.WriteStartElement("Box");
+					Output.WriteAttributeString("minLat", GeoPosition.ToString(this.Node.Box.Min.Latitude));
+					Output.WriteAttributeString("maxLat", GeoPosition.ToString(this.Node.Box.Max.Latitude));
+					Output.WriteAttributeString("minLong", GeoPosition.ToString(this.Node.Box.Min.Longitude));
+					Output.WriteAttributeString("maxLong", GeoPosition.ToString(this.Node.Box.Max.Longitude));
+					Output.WriteAttributeString("minIncl", GeoPosition.ToString(this.Node.Box.IncludeMin));
+					Output.WriteAttributeString("maxIncl", GeoPosition.ToString(this.Node.Box.IncludeMax));
+					Output.WriteEndElement();
+				}
 
 				Output.WriteEndElement();
 			}

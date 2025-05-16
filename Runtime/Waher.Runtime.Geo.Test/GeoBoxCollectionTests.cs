@@ -1,4 +1,6 @@
-﻿namespace Waher.Runtime.Geo.Test
+﻿using System.Security.Authentication;
+
+namespace Waher.Runtime.Geo.Test
 {
 	[TestClass]
 	public sealed class GeoBoxCollectionTests
@@ -354,27 +356,26 @@
 		}
 
 		[DataTestMethod]
-		[DataRow(100, 4, 4, true)]
-		//[DataRow(100, 2, 2, false)]
-		//[DataRow(100, 4, 4, false)]
-		//[DataRow(100, 8, 8, false)]
-		//[DataRow(100, 12, 12, false)]
-		//[DataRow(100, 16, 16, false)]
-		//[DataRow(500, 2, 2, false)]
-		//[DataRow(500, 4, 4, false)]
-		//[DataRow(500, 8, 8, false)]
-		//[DataRow(500, 12, 12, false)]
-		//[DataRow(500, 16, 16, false)]
-		//[DataRow(1000, 2, 2, false)]
-		//[DataRow(1000, 4, 4, false)]
-		//[DataRow(1000, 8, 8, false)]
-		//[DataRow(1000, 12, 12, false)]
-		//[DataRow(1000, 16, 16, false)]
-		//[DataRow(5000, 2, 2, false)]
-		//[DataRow(5000, 4, 4, false)]
-		//[DataRow(5000, 8, 8, false)]
-		//[DataRow(5000, 12, 12, false)]
-		//[DataRow(5000, 16, 16, false)]
+		[DataRow(100, 2, 2, false)]
+		[DataRow(100, 4, 4, false)]
+		[DataRow(100, 8, 8, false)]
+		[DataRow(100, 12, 12, false)]
+		[DataRow(100, 16, 16, false)]
+		[DataRow(500, 2, 2, false)]
+		[DataRow(500, 4, 4, false)]
+		[DataRow(500, 8, 8, false)]
+		[DataRow(500, 12, 12, false)]
+		[DataRow(500, 16, 16, false)]
+		[DataRow(1000, 2, 2, false)]
+		[DataRow(1000, 4, 4, false)]
+		[DataRow(1000, 8, 8, false)]
+		[DataRow(1000, 12, 12, false)]
+		[DataRow(1000, 16, 16, false)]
+		[DataRow(5000, 2, 2, false)]
+		[DataRow(5000, 4, 4, false)]
+		[DataRow(5000, 8, 8, false)]
+		[DataRow(5000, 12, 12, false)]
+		[DataRow(5000, 16, 16, false)]
 		public void Test_19_IntegrityCheck(int N, int GridSize, int MaxCellCount, bool Export)
 		{
 			GeoBoxCollection<GeoBoundingBox> Collection = new(GridSize, MaxCellCount);
@@ -432,9 +433,6 @@
 					Assert.IsTrue(Collection.Contains(Boxes[i]), "Box expected in collection.");
 			}
 
-			if (Export)
-				Console.Out.WriteLine(Collection.Export());
-
 			for (i = 0; i < N; i++)
 			{
 				GeoSpatialObjectReference Pos = GeoPositionCollectionBenchmarkingTests.RandomPosition();
@@ -455,12 +453,20 @@
 					bool ShouldContain = ((j & 1) != 0) && Box2.Contains(Pos.Location);
 					bool Contains = Array.Exists(Result, p => p.BoxId == Box2.BoxId);
 
-					Assert.AreEqual(ShouldContain, Contains, (ShouldContain ?
-						"Box that should be found, was not found: " :
-						"Box that should not be found, was found: ") + Box2.BoxId);
-				}
+					if (ShouldContain ^ Contains)
+					{
+						if (!Export)
+						{
+							Console.Out.WriteLine("Position: " + Pos.Location.ToString());
+							Console.Out.WriteLine();
+							Console.Out.WriteLine(Collection.Export());
+						}
 
-				Assert.AreEqual(j, N);
+						Assert.Fail((ShouldContain ?
+							"Box that should be found, was not found: " :
+							"Box that should not be found, was found: ") + Box2.BoxId);
+					}
+				}
 			}
 
 			// TODO: Test altitudes as well

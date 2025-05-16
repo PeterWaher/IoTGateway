@@ -233,6 +233,11 @@ namespace Waher.Runtime.Geo
 			return Graph.TrimLabel(s);
 		}
 
+		internal static string ToString(bool Value)
+		{
+			return Value ? "true" : "false";
+		}
+
 		/// <summary>
 		/// Tries to parse a GPS string representation of a GeoPosition.
 		/// </summary>

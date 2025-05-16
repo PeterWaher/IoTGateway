@@ -356,27 +356,27 @@ namespace Waher.Runtime.Geo.Test
 		}
 
 		[DataTestMethod]
-		[DataRow(100, 2, 2, false)]
-		[DataRow(100, 4, 4, false)]
-		[DataRow(100, 8, 8, false)]
-		[DataRow(100, 12, 12, false)]
-		[DataRow(100, 16, 16, false)]
-		[DataRow(500, 2, 2, false)]
-		[DataRow(500, 4, 4, false)]
-		[DataRow(500, 8, 8, false)]
-		[DataRow(500, 12, 12, false)]
-		[DataRow(500, 16, 16, false)]
-		[DataRow(1000, 2, 2, false)]
-		[DataRow(1000, 4, 4, false)]
-		[DataRow(1000, 8, 8, false)]
-		[DataRow(1000, 12, 12, false)]
-		[DataRow(1000, 16, 16, false)]
-		[DataRow(5000, 2, 2, false)]
-		[DataRow(5000, 4, 4, false)]
-		[DataRow(5000, 8, 8, false)]
-		[DataRow(5000, 12, 12, false)]
-		[DataRow(5000, 16, 16, false)]
-		public void Test_19_IntegrityCheck(int N, int GridSize, int MaxCellCount, bool Export)
+		[DataRow(100, 2, 2)]
+		[DataRow(100, 4, 4)]
+		[DataRow(100, 8, 8)]
+		[DataRow(100, 12, 12)]
+		[DataRow(100, 16, 16)]
+		[DataRow(500, 2, 2)]
+		[DataRow(500, 4, 4)]
+		[DataRow(500, 8, 8)]
+		[DataRow(500, 12, 12)]
+		[DataRow(500, 16, 16)]
+		[DataRow(1000, 2, 2)]
+		[DataRow(1000, 4, 4)]
+		[DataRow(1000, 8, 8)]
+		[DataRow(1000, 12, 12)]
+		[DataRow(1000, 16, 16)]
+		[DataRow(5000, 2, 2)]
+		[DataRow(5000, 4, 4)]
+		[DataRow(5000, 8, 8)]
+		[DataRow(5000, 12, 12)]
+		[DataRow(5000, 16, 16)]
+		public void Test_19_IntegrityCheck(int N, int GridSize, int MaxCellCount)
 		{
 			GeoBoxCollection<GeoBoundingBox> Collection = new(GridSize, MaxCellCount);
 			GeoBoundingBox[] Boxes = new GeoBoundingBox[N];
@@ -389,17 +389,6 @@ namespace Waher.Runtime.Geo.Test
 				Boxes[i] = Box;
 
 				Collection.Add(Box);
-
-				if (Export)
-				{
-					Console.Out.WriteLine();
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Adding: " + Box.BoxId + " (" + Box.ToString() + ")");
-					Console.Out.WriteLine(new string('=', 80));
-					Console.Out.WriteLine();
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(Collection.Export());
-				}
 			}
 
 			Assert.AreEqual(N, Collection.Count);
@@ -408,20 +397,7 @@ namespace Waher.Runtime.Geo.Test
 				Assert.IsTrue(Collection.Contains(Boxes[i]));
 
 			for (i = 0; i < N; i += 2)
-			{
 				Assert.IsTrue(Collection.Remove(Boxes[i]));
-
-				if (Export)
-				{
-					Console.Out.WriteLine();
-					Console.Out.WriteLine();
-					Console.Out.WriteLine("Removing: " + Boxes[i].BoxId + " (" + Boxes[i].ToString() + ")");
-					Console.Out.WriteLine(new string('=', 80));
-					Console.Out.WriteLine();
-					Console.Out.WriteLine();
-					Console.Out.WriteLine(Collection.Export());
-				}
-			}
 
 			Assert.AreEqual(N / 2, Collection.Count);
 
@@ -455,12 +431,10 @@ namespace Waher.Runtime.Geo.Test
 
 					if (ShouldContain ^ Contains)
 					{
-						if (!Export)
-						{
-							Console.Out.WriteLine("Position: " + Pos.Location.ToString());
-							Console.Out.WriteLine();
-							Console.Out.WriteLine(Collection.Export());
-						}
+						Console.Out.WriteLine("Position: " + Pos.Location.ToString());
+						Console.Out.WriteLine("Box: " + Box2.ToString());
+						Console.Out.WriteLine();
+						Console.Out.WriteLine(Collection.Export());
 
 						Assert.Fail((ShouldContain ?
 							"Box that should be found, was not found: " :

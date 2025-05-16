@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Runtime.Geo
 {
@@ -97,8 +98,8 @@ namespace Waher.Runtime.Geo
 			get
 			{
 				return
-					!(this.min is null) && 
-					!(this.max is null) && 
+					!(this.min is null) &&
+					!(this.max is null) &&
 					this.min.Longitude > this.max.Longitude;
 			}
 		}

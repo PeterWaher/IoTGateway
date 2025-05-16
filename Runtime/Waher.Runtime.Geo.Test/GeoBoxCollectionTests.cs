@@ -11,6 +11,8 @@
 
 			collection.Add(box);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(1, collection.Count);
 			Assert.IsTrue(collection.Contains(box));
 		}
@@ -26,6 +28,8 @@
 			collection.Add(box1);
 			collection.Add(box2);
 			collection.Add(box3);
+
+			Console.WriteLine(collection.Export());
 
 			Assert.AreEqual(3, collection.Count);
 			Assert.IsTrue(collection.Contains(box1));
@@ -43,6 +47,8 @@
 			// Adding the same box again should not throw or increase count
 			collection.Add(box);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(1, collection.Count);
 		}
 
@@ -54,6 +60,9 @@
 			var box2 = new GeoBoundingBox(box1.BoxId, new GeoPosition(11, 20), new GeoPosition(30, 40));
 
 			collection.Add(box1);
+
+			Console.WriteLine(collection.Export());
+
 			Assert.ThrowsException<ArgumentException>(() => collection.Add(box2));
 		}
 
@@ -65,6 +74,8 @@
 
 			collection.Add(box);
 			bool removed = collection.Remove(box);
+
+			Console.WriteLine(collection.Export());
 
 			Assert.IsTrue(removed);
 			Assert.AreEqual(0, collection.Count);
@@ -78,6 +89,8 @@
 			var box = new GeoBoundingBox(new GeoPosition(10, 20), new GeoPosition(30, 40));
 
 			bool removed = collection.Remove(box);
+
+			Console.WriteLine(collection.Export());
 
 			Assert.IsFalse(removed);
 			Assert.AreEqual(0, collection.Count);
@@ -94,6 +107,8 @@
 
 			collection.Clear();
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(0, collection.Count);
 		}
 
@@ -108,6 +123,8 @@
 
 			var array = new GeoBoundingBox[5];
 			collection.CopyTo(array, 1);
+
+			Console.WriteLine(collection.Export());
 
 			Assert.IsNull(array[0]);
 			Assert.IsNotNull(array[1]);
@@ -129,6 +146,8 @@
 
 			var array = collection.ToArray();
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(2, array.Length);
 			Assert.IsTrue(Array.Exists(array, b => b.Equals(box1)));
 			Assert.IsTrue(Array.Exists(array, b => b.Equals(box2)));
@@ -147,6 +166,8 @@
 			foreach (var box in collection)
 				found.Add(box);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(2, found.Count);
 			Assert.IsTrue(found.Exists(b => b.Equals(box1)));
 			Assert.IsTrue(found.Exists(b => b.Equals(box2)));
@@ -162,6 +183,8 @@
 			var pos = new GeoPosition(20, 30);
 			var results = collection.Find(pos);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(1, results.Length);
 			Assert.IsTrue(results[0].Equals(box));
 		}
@@ -176,6 +199,8 @@
 			var pos = new GeoPosition(50, 60);
 			var results = collection.Find(pos);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(0, results.Length);
 		}
 
@@ -188,6 +213,8 @@
 
 			var pos = new GeoPosition(10, 20);
 			var results = collection.Find(pos);
+
+			Console.WriteLine(collection.Export());
 
 			Assert.AreEqual(1, results.Length);
 			Assert.IsTrue(results[0].Equals(box));
@@ -202,6 +229,8 @@
 
 			var pos = new GeoPosition(10, 20);
 			var results = collection.Find(pos);
+
+			Console.WriteLine(collection.Export());
 
 			Assert.AreEqual(0, results.Length);
 		}
@@ -220,6 +249,8 @@
 			var pos = new GeoPosition(25, 25);
 			var results = collection.Find(pos);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(3, results.Length);
 			Assert.IsTrue(Array.Exists(results, b => b.Equals(box1)));
 			Assert.IsTrue(Array.Exists(results, b => b.Equals(box2)));
@@ -234,41 +265,51 @@
 
 			var results = collection.Find(pos);
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(0, results.Length);
 		}
 		[TestMethod]
 		public void Test_17_Add_Boxes_Exceeding_MaxCellCount_CreatesSubGrid()
 		{
 			// Use a small grid and cell size to force sub-grid creation quickly
-			int gridSize = 2;
-			int maxCellCount = 2;
-			var collection = new GeoBoxCollection<GeoBoundingBox>(gridSize, maxCellCount);
+
+			int GridSize = 2;
+			int MaxCellCount = 2;
+			GeoBoxCollection<GeoBoundingBox> Collection = new(GridSize, MaxCellCount);
 
 			// All boxes overlap the same cell, so adding more than maxCellCount should trigger a sub-grid
-			var baseMin = new GeoPosition(10, 10);
-			var baseMax = new GeoPosition(20, 20);
 
-			var boxes = new List<GeoBoundingBox>();
-			for (int i = 0; i < maxCellCount + 2; i++)
+			GeoPosition BaseMin = new(10, 10);
+			GeoPosition BaseMax = new(20, 20);
+			List<GeoBoundingBox> Boxes = [];
+
+			for (int i = 0; i < MaxCellCount + 2; i++)
 			{
 				// Slightly offset each box to ensure they all overlap the same cell
-				var min = new GeoPosition(10 + i * 0.01, 10 + i * 0.01);
-				var max = new GeoPosition(20 - i * 0.01, 20 - i * 0.01);
-				var box = new GeoBoundingBox(min, max);
-				boxes.Add(box);
-				collection.Add(box);
+
+				GeoPosition Min = new(10 + i * 0.01, 10 + i * 0.01);
+				GeoPosition Max = new(20 - i * 0.01, 20 - i * 0.01);
+				GeoBoundingBox Box = new(Min, Max);
+
+				Boxes.Add(Box);
+				Collection.Add(Box);
 			}
 
+			Console.WriteLine(Collection.Export());
+
 			// All boxes should be present in the collection
-			Assert.AreEqual(maxCellCount + 2, collection.Count);
-			foreach (var box in boxes)
-				Assert.IsTrue(collection.Contains(box));
+
+			Assert.AreEqual(MaxCellCount + 2, Collection.Count);
+
+			foreach (var box in Boxes)
+				Assert.IsTrue(Collection.Contains(box));
 
 			// All boxes should be found by a point in the overlapping region
 			var testPoint = new GeoPosition(15, 15);
-			var found = collection.Find(testPoint);
-			Assert.AreEqual(maxCellCount + 2, found.Length);
-			foreach (var box in boxes)
+			var found = Collection.Find(testPoint);
+			Assert.AreEqual(MaxCellCount + 2, found.Length);
+			foreach (var box in Boxes)
 				Assert.IsTrue(Array.Exists(found, b => b.Equals(box)));
 		}
 
@@ -301,6 +342,8 @@
 				boxes.Add(box);
 			}
 
+			Console.WriteLine(collection.Export());
+
 			Assert.AreEqual(4 + maxCellCount + 1, collection.Count);
 
 			// All boxes should be found by a point in their respective regions
@@ -308,6 +351,119 @@
 			Assert.IsTrue(collection.Find(new GeoPosition(5, 15)).Length == 1); // Cell 2
 			Assert.IsTrue(collection.Find(new GeoPosition(15, 5)).Length == 1); // Cell 3
 			Assert.IsTrue(collection.Find(new GeoPosition(15, 15)).Length == 1); // Cell 4
+		}
+
+		[DataTestMethod]
+		[DataRow(100, 4, 4, true)]
+		//[DataRow(100, 2, 2, false)]
+		//[DataRow(100, 4, 4, false)]
+		//[DataRow(100, 8, 8, false)]
+		//[DataRow(100, 12, 12, false)]
+		//[DataRow(100, 16, 16, false)]
+		//[DataRow(500, 2, 2, false)]
+		//[DataRow(500, 4, 4, false)]
+		//[DataRow(500, 8, 8, false)]
+		//[DataRow(500, 12, 12, false)]
+		//[DataRow(500, 16, 16, false)]
+		//[DataRow(1000, 2, 2, false)]
+		//[DataRow(1000, 4, 4, false)]
+		//[DataRow(1000, 8, 8, false)]
+		//[DataRow(1000, 12, 12, false)]
+		//[DataRow(1000, 16, 16, false)]
+		//[DataRow(5000, 2, 2, false)]
+		//[DataRow(5000, 4, 4, false)]
+		//[DataRow(5000, 8, 8, false)]
+		//[DataRow(5000, 12, 12, false)]
+		//[DataRow(5000, 16, 16, false)]
+		public void Test_19_IntegrityCheck(int N, int GridSize, int MaxCellCount, bool Export)
+		{
+			GeoBoxCollection<GeoBoundingBox> Collection = new(GridSize, MaxCellCount);
+			GeoBoundingBox[] Boxes = new GeoBoundingBox[N];
+			GeoBoundingBox Box;
+			int i, j;
+
+			for (i = 0; i < N; i++)
+			{
+				Box = GeoPositionCollectionBenchmarkingTests.RandomBoundingBox(10, 10);
+				Boxes[i] = Box;
+
+				Collection.Add(Box);
+
+				if (Export)
+				{
+					Console.Out.WriteLine();
+					Console.Out.WriteLine();
+					Console.Out.WriteLine("Adding: " + Box.BoxId + " (" + Box.ToString() + ")");
+					Console.Out.WriteLine(new string('=', 80));
+					Console.Out.WriteLine();
+					Console.Out.WriteLine();
+					Console.Out.WriteLine(Collection.Export());
+				}
+			}
+
+			Assert.AreEqual(N, Collection.Count);
+
+			for (i = 0; i < N; i++)
+				Assert.IsTrue(Collection.Contains(Boxes[i]));
+
+			for (i = 0; i < N; i += 2)
+			{
+				Assert.IsTrue(Collection.Remove(Boxes[i]));
+
+				if (Export)
+				{
+					Console.Out.WriteLine();
+					Console.Out.WriteLine();
+					Console.Out.WriteLine("Removing: " + Boxes[i].BoxId + " (" + Boxes[i].ToString() + ")");
+					Console.Out.WriteLine(new string('=', 80));
+					Console.Out.WriteLine();
+					Console.Out.WriteLine();
+					Console.Out.WriteLine(Collection.Export());
+				}
+			}
+
+			Assert.AreEqual(N / 2, Collection.Count);
+
+			for (i = 0; i < N; i++)
+			{
+				if ((i & 1) == 0)
+					Assert.IsFalse(Collection.Contains(Boxes[i]), "Box not expected in collection after removal.");
+				else
+					Assert.IsTrue(Collection.Contains(Boxes[i]), "Box expected in collection.");
+			}
+
+			if (Export)
+				Console.Out.WriteLine(Collection.Export());
+
+			for (i = 0; i < N; i++)
+			{
+				GeoSpatialObjectReference Pos = GeoPositionCollectionBenchmarkingTests.RandomPosition();
+				GeoBoundingBox[] Result = Collection.Find(Pos.Location);
+				SortedDictionary<string, bool> Found = [];
+
+				foreach (GeoBoundingBox Box2 in Result)
+				{
+					Assert.IsTrue(Box2.Contains(Pos.Location));
+					Assert.IsFalse(Found.ContainsKey(Box2.BoxId), "Box found twice.");
+					Found[Box2.BoxId] = true;
+				}
+
+				for (j = 0; j < N; j++)
+				{
+					GeoBoundingBox Box2 = Boxes[j];
+
+					bool ShouldContain = ((j & 1) != 0) && Box2.Contains(Pos.Location);
+					bool Contains = Array.Exists(Result, p => p.BoxId == Box2.BoxId);
+
+					Assert.AreEqual(ShouldContain, Contains, (ShouldContain ?
+						"Box that should be found, was not found: " :
+						"Box that should not be found, was found: ") + Box2.BoxId);
+				}
+
+				Assert.AreEqual(j, N);
+			}
+
+			// TODO: Test altitudes as well
 		}
 
 	}

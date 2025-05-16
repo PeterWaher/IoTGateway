@@ -1099,45 +1099,53 @@
 			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
 		}
 
-		[TestMethod]
-		public void Test_57_IntegrityCheck()
+		[DataTestMethod]
+		[DataRow(100)]
+		[DataRow(500)]
+		[DataRow(1000)]
+		[DataRow(5000)]
+		[DataRow(10000)]
+		public void Test_57_IntegrityCheck(int N)
 		{
 			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
-			GeoSpatialObjectReference[] Positions = new GeoSpatialObjectReference[10000];
+			GeoSpatialObjectReference[] Positions = new GeoSpatialObjectReference[N];
 			GeoSpatialObjectReference Ref;
 			int i;
 
-			for (i = 0; i < 10000; i++)
+			for (i = 0; i < N; i++)
 			{
 				Ref = GeoPositionCollectionBenchmarkingTests.RandomPosition();
 				Positions[i] = Ref;
 				Collection.Add(Ref);
 			}
 
-			Assert.AreEqual(10000, Collection.Count);
+			Assert.AreEqual(N, Collection.Count);
 
 			GeoSpatialObjectReference[] Result = Collection.Find(new GeoBoundingBox(new GeoPosition(-90, -180), new GeoPosition(90, 180)));
-			Assert.AreEqual(10000, Result.Length);
+			Assert.AreEqual(N, Result.Length);
 
-			for (i = 0; i < 10000; i++)
+			for (i = 0; i < N; i++)
 			{
 				Assert.IsTrue(Collection.Contains(Positions[i]));
 				Assert.IsTrue(Array.Exists(Result, p => p.GeoId == Positions[i].GeoId));
 			}
 
-			for (i = 0; i < 10000; i += 2)
+			for (i = 0; i < N; i += 2)
 				Assert.IsTrue(Collection.Remove(Positions[i]));
 
-			Assert.AreEqual(5000, Collection.Count);
+			Assert.AreEqual(N / 2, Collection.Count);
+
+			for (i = 0; i < N; i++)
+				Assert.AreEqual((i & 1) != 0, Collection.Contains(Positions[i]));
 
 			Result = Collection.Find(new GeoBoundingBox(new GeoPosition(-90, -180), new GeoPosition(90, 180)));
-			Assert.AreEqual(5000, Result.Length);
+			Assert.AreEqual(N / 2, Result.Length);
 
-			for (i = 0; i < 10000; i++)
+			for (i = 0; i < N; i++)
 			{
 				bool ShouldExist = (i & 1) != 0;
-				Assert.AreEqual(ShouldExist, Collection.Contains(Positions[i]), i.ToString());
-				Assert.AreEqual(ShouldExist, Array.Exists(Result, p => p.GeoId == Positions[i].GeoId), i.ToString());
+				Assert.AreEqual(ShouldExist, Collection.Contains(Positions[i]));
+				Assert.AreEqual(ShouldExist, Array.Exists(Result, p => p.GeoId == Positions[i].GeoId));
 			}
 		}
 

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using System.Xml;
 using Waher.Runtime.Collections;
 
 namespace Waher.Runtime.Geo
@@ -25,10 +28,10 @@ namespace Waher.Runtime.Geo
 		private class BoxNode
 		{
 			public T Box;
-			public ChunkedList<BoxReference> References;
+			public ChunkedList<BoxListReference> References;
 		}
 
-		private class BoxReference
+		private class BoxListReference
 		{
 			public BoxGrid Grid;
 			public NormalizedBox Box;
@@ -40,19 +43,25 @@ namespace Waher.Runtime.Geo
 		{
 			public ChunkedList<NormalizedBox> EntireArea;
 			public Cell[,] Grid;
-			public int Count;
+			public readonly BoxGrid Parent;
 			public readonly NormalizedBox Box;
 			public readonly int Width;
 			public readonly int Height;
 			public readonly int MaxCellCount;
+			public readonly int X;
+			public readonly int Y;
 
-			public BoxGrid(NormalizedBox Box, int Width, int Height, int MaxCellCount)
+			public BoxGrid(BoxGrid Parent, NormalizedBox Box, int Width, int Height,
+				int MaxCellCount, int X, int Y)
 			{
+				this.Parent = Parent;
 				this.Box = Box;
 				this.Width = Width;
 				this.Height = Height;
 				this.MaxCellCount = MaxCellCount;
 				this.Grid = new Cell[this.Width, this.Height];
+				this.X = X;
+				this.Y = Y;
 			}
 
 			public void Fill(NormalizedBox Box)
@@ -63,9 +72,9 @@ namespace Waher.Runtime.Geo
 				this.EntireArea.Add(Box);
 
 				if (Box.Node.References is null)
-					Box.Node.References = new ChunkedList<BoxReference>(1);
+					Box.Node.References = new ChunkedList<BoxListReference>(1);
 
-				Box.Node.References.Add(new BoxReference()
+				Box.Node.References.Add(new BoxListReference()
 				{
 					Grid = this,
 					Box = Box,
@@ -76,16 +85,26 @@ namespace Waher.Runtime.Geo
 
 			public void Add(NormalizedBox Box)
 			{
-				this.Count++;
-
 				if (Box.Contains(this.Box))
 					this.Fill(Box);
 				else
 				{
-					int x0 = (int)((Box.MinLongitude - this.Box.MinLongitude) * this.Box.Scale * this.Width);
-					int x1 = (int)((Box.MaxLongitude - this.Box.MinLongitude) * this.Box.Scale * this.Width);
-					int y0 = (int)((Box.MinLatitude - this.Box.MinLatitude) * this.Box.Scale * this.Height);
-					int y1 = (int)((Box.MaxLatitude - this.Box.MinLatitude) * this.Box.Scale * this.Height);
+					int ScaleX = this.Width;
+					int ScaleY = this.Height;
+					int Scale = this.Box.Scale;
+
+					if (Scale > 1)
+					{
+						ScaleX *= Scale;
+						ScaleY *= Scale;
+
+						ScaleX <<= 1;
+					}
+
+					int x0 = (int)((Box.MinLongitude - this.Box.MinLongitude) * ScaleX);
+					int x1 = (int)((Box.MaxLongitude - this.Box.MinLongitude) * ScaleX);
+					int y0 = (int)((Box.MinLatitude - this.Box.MinLatitude) * ScaleY);
+					int y1 = (int)((Box.MaxLatitude - this.Box.MinLatitude) * ScaleY);
 
 					if (x0 < 0)
 						x0 = 0;
@@ -108,7 +127,7 @@ namespace Waher.Runtime.Geo
 						y1 = this.Height - 1;
 
 					if (Box.Node.References is null)
-						Box.Node.References = new ChunkedList<BoxReference>((x1 - x0 + 1) * (y1 - y0 + 1));
+						Box.Node.References = new ChunkedList<BoxListReference>((x1 - x0 + 1) * (y1 - y0 + 1));
 
 					for (int y = y0; y <= y1; y++)
 					{
@@ -129,7 +148,7 @@ namespace Waher.Runtime.Geo
 						List = new ChunkedList<NormalizedBox>(1) { Box }
 					};
 
-					Box.Node.References.Add(new BoxReference()
+					Box.Node.References.Add(new BoxListReference()
 					{
 						Grid = this,
 						Box = Box,
@@ -141,38 +160,25 @@ namespace Waher.Runtime.Geo
 					Cell.Grid.Add(Box);
 				else if (Cell.List.Count >= this.MaxCellCount && this.Box.CanIncreaseScale(this.Height))
 				{
-					Cell.Grid = new BoxGrid(new NormalizedBox(default)
-					{
-						MinLatitude = this.Box.MinLatitude + ((double)x) / this.Width,
-						MaxLatitude = this.Box.MinLatitude + ((double)(x + 1)) / this.Width,
-						MinLongitude = this.Box.MinLongitude + ((double)y) / this.Height,
-						MaxLongitude = this.Box.MinLongitude + ((double)(y + 1)) / this.Height,
-						Scale = this.Box.Scale * this.Height,
-					}, this.Height, this.Height, this.MaxCellCount);
+					double DeltaLat = this.Box.DeltaLatitude / this.Height;
+					double DeltaLong = this.Box.DeltaLongitude / this.Width;
 
-					//foreach (NormalizedBox PrevBox in Cell.List)
-					//{
-					//	ChunkedList<BoxReference> References = new ChunkedList<BoxReference>(PrevBox.Node.References.Count);
-					//
-					//	foreach (BoxReference Reference in PrevBox.Node.References)
-					//	{
-					//		if (Reference.X != x || Reference.Y != y || Reference.Grid != this)
-					//			References.Add(Reference);
-					//	}
-					//
-					//	PrevBox.Node.References = References;
-					//
-					//	Cell.Grid.Add(PrevBox);
-					//}
-					//
-					//Cell.List = null;
+					Cell.Grid = new BoxGrid(this, new NormalizedBox(default)
+					{
+						MinLatitude = this.Box.MinLatitude + y * DeltaLat,
+						MaxLatitude = this.Box.MinLatitude + (y + 1) * DeltaLat,
+						MinLongitude = this.Box.MinLongitude + x * DeltaLong,
+						MaxLongitude = this.Box.MinLongitude + (x + 1) * DeltaLong,
+						Scale = this.Box.Scale * this.Height,
+					}, this.Height, this.Height, this.MaxCellCount, x, y);    // Only first level grids have different widths and heights, deeper levels are square.
+
 					Cell.Grid.Add(Box);
 				}
 				else
 				{
 					Cell.List.Add(Box);
 
-					Box.Node.References.Add(new BoxReference()
+					Box.Node.References.Add(new BoxListReference()
 					{
 						Grid = this,
 						Box = Box,
@@ -182,7 +188,27 @@ namespace Waher.Runtime.Geo
 				}
 			}
 
-			public bool Remove(BoxReference Reference)
+			public bool Remove(BoxGrid Grid)
+			{
+				if (this.Grid is null)
+					return false;
+
+				Cell Cell = this.Grid[Grid.X, Grid.Y];
+				if (Cell is null)
+					return false;
+
+				if (!(Cell.Grid == Grid))
+					return false;
+
+				Cell.Grid = null;
+
+				if (Cell.List is null)
+					this.Grid[Grid.X, Grid.Y] = null;
+
+				return true;
+			}
+
+			public bool Remove(BoxListReference Reference)
 			{
 				if (Reference.X < 0 || Reference.Y < 0)
 				{
@@ -198,55 +224,67 @@ namespace Waher.Runtime.Geo
 					if (Cell is null)
 						return false;
 
-					bool Removed = false;
-
-					if (Cell.List?.Remove(Reference.Box) ?? false)
-					{
-						Removed = true;
-						if (Cell.List.Count == 0)
-							Cell.List = null;
-					}
-
-					if (Cell.Grid?.Remove(Reference) ?? false)
-					{
-						Removed = true;
-					
-						if (Cell.Grid.Count == 0)
-							Cell.Grid = null;
-					}
-
-					if (!Removed)
+					if (!(Cell.List?.Remove(Reference.Box) ?? false))
 						return false;
 
-					if (Cell.List is null && Cell.Grid is null)
-						this.Grid[Reference.X, Reference.Y] = null;
+					if (Cell.List.Count == 0)
+					{
+						Cell.List = null;
+
+						if (Cell.Grid is null)
+						{
+							this.Grid[Reference.X, Reference.Y] = null;
+
+							for (int y = 0; y < this.Height; y++)
+							{
+								for (int x = 0; x < this.Width; x++)
+								{
+									if (!(this.Grid[x, y] is null))
+										return true;
+								}
+							}
+
+							this.Parent?.Remove(this);
+						}
+					}
 				}
 
-				this.Count--;
 				return true;
 			}
 
 			public void Find(GeoPosition Position, ref ChunkedList<T> Result)
 			{
-				int x = (int)((Position.NormalizedLongitude - this.Box.MinLongitude) * this.Box.Scale * this.Width);
-				int y = (int)((Position.NormalizedLatitude - this.Box.MinLatitude) * this.Box.Scale * this.Height);
+				if (!(this.EntireArea is null))
+				{
+					foreach (NormalizedBox Box in this.EntireArea)
+					{
+						if (Box.Node.Box.Contains(Position))
+						{
+							if (Result is null)
+								Result = new ChunkedList<T>();
+
+							Result.Add(Box.Node.Box);
+						}
+					}
+				}
+
+				int ScaleX = this.Width;
+				int ScaleY = this.Height;
+				int Scale = this.Box.Scale;
+
+				if (Scale > 1)
+				{
+					ScaleX *= Scale;
+					ScaleY *= Scale;
+
+					ScaleX <<= 1;
+				}
+
+				int x = (int)((Position.NormalizedLongitude - this.Box.MinLongitude) * ScaleX);
+				int y = (int)((Position.NormalizedLatitude - this.Box.MinLatitude) * ScaleY);
 
 				if (x >= 0 && x < this.Width && y >= 0 && y < this.Height)
 				{
-					if (!(this.EntireArea is null))
-					{
-						foreach (NormalizedBox Box in this.EntireArea)
-						{
-							if (Box.Node.Box.Contains(Position))
-							{
-								if (Result is null)
-									Result = new ChunkedList<T>();
-
-								Result.Add(Box.Node.Box);
-							}
-						}
-					}
-
 					Cell Cell = this.Grid[x, y];
 
 					if (!(Cell is null))
@@ -269,14 +307,54 @@ namespace Waher.Runtime.Geo
 					}
 				}
 			}
+
+			public void Export(XmlWriter Output)
+			{
+				Output.WriteStartElement("Grid");
+				Output.WriteAttributeString("width", this.Width.ToString());
+				Output.WriteAttributeString("height", this.Height.ToString());
+
+				this.Box.Export(Output, "GridNBox");
+
+				if (!(this.EntireArea is null))
+				{
+					foreach (NormalizedBox Box in this.EntireArea)
+						Box.Export(Output, "FullNBox");
+				}
+
+				for (int y = 0; y < this.Height; y++)
+				{
+					for (int x = 0; x < this.Width; x++)
+						this.Grid[x, y]?.Export(Output, x, y);
+				}
+
+				Output.WriteEndElement();
+			}
 		}
 
 		private class Cell
 		{
 			public ChunkedList<NormalizedBox> List;
 			public BoxGrid Grid;
+
+			public void Export(XmlWriter Output, int X, int Y)
+			{
+				Output.WriteStartElement("Cell");
+				Output.WriteAttributeString("x", X.ToString());
+				Output.WriteAttributeString("y", Y.ToString());
+
+				if (!(this.List is null))
+				{
+					foreach (NormalizedBox Box in this.List)
+						Box.Export(Output, "NBoxRef");
+				}
+
+				this.Grid?.Export(Output);
+				Output.WriteEndElement();
+			}
 		}
 
+		[DebuggerDisplay("{MinLatitude},{MinLongitude} - {MaxLatitude},{MaxLongitude}")]
 		private class NormalizedBox
 		{
 			public NormalizedBox(BoxNode Node)
@@ -291,6 +369,9 @@ namespace Waher.Runtime.Geo
 			public double MaxLongitude;
 			public int Scale;
 
+			public double DeltaLatitude => this.MaxLatitude - this.MinLatitude;
+			public double DeltaLongitude => this.MaxLongitude - this.MinLongitude;
+
 			public bool Contains(NormalizedBox Box)
 			{
 				return
@@ -304,8 +385,24 @@ namespace Waher.Runtime.Geo
 			{
 				long x = this.Scale;
 				x *= Factor;
+				x <<= 1;
 
 				return ((int)x) == x;
+			}
+
+			public void Export(XmlWriter Output, string ElementName)
+			{
+				Output.WriteStartElement(ElementName);
+				Output.WriteAttributeString("minLat", GeoPosition.ToString(this.MinLatitude));
+				Output.WriteAttributeString("maxLat", GeoPosition.ToString(this.MaxLatitude));
+				Output.WriteAttributeString("minLong", GeoPosition.ToString(this.MinLongitude));
+				Output.WriteAttributeString("maxLong", GeoPosition.ToString(this.MaxLongitude));
+				Output.WriteAttributeString("scale", this.Scale.ToString());
+
+				if (!(this.Node is null))
+					Output.WriteAttributeString("boxId", this.Node.Box.BoxId);
+
+				Output.WriteEndElement();
 			}
 		}
 
@@ -390,7 +487,7 @@ namespace Waher.Runtime.Geo
 					{
 						MinLatitude = MinLat,
 						MaxLatitude = MaxLat,
-						MinLongitude = -1,
+						MinLongitude = 0,
 						MaxLongitude = Box.Max.NormalizedLongitude,
 						Scale = 1
 					});
@@ -419,14 +516,14 @@ namespace Waher.Runtime.Geo
 		{
 			lock (this.synchObj)
 			{
-				this.root = new BoxGrid(new NormalizedBox(default)
+				this.root = new BoxGrid(null, new NormalizedBox(default)
 				{
 					MinLatitude = 0,
 					MaxLatitude = 1,
 					MinLongitude = 0,
 					MaxLongitude = 1,
 					Scale = 1
-				}, 2 * this.gridSize, this.gridSize, this.maxCellCount);
+				}, 2 * this.gridSize, this.gridSize, this.maxCellCount, 0, 0);
 
 				this.boxesById.Clear();
 				this.count = 0;
@@ -600,7 +697,7 @@ namespace Waher.Runtime.Geo
 
 				if (!(Node.References is null))
 				{
-					foreach (BoxReference Reference in Node.References)
+					foreach (BoxListReference Reference in Node.References)
 					{
 						if (Reference.Grid.Remove(Reference))
 							Result = true;
@@ -629,6 +726,58 @@ namespace Waher.Runtime.Geo
 			}
 
 			return Result?.ToArray() ?? Array.Empty<T>();
+		}
+
+		/// <summary>
+		/// Outputs the contents of the collection to XML.
+		/// </summary>
+		/// <returns>XML output.</returns>
+		public string Export()
+		{
+			StringBuilder Output = new StringBuilder();
+			this.Export(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Outputs the contents of the collection to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public void Export(StringBuilder Output)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings()
+			{
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = Environment.NewLine,
+				OmitXmlDeclaration = true
+			};
+
+			using (XmlWriter w = XmlWriter.Create(Output, Settings))
+			{
+				this.Export(w);
+				w.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Outputs the contents of the collection to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		public void Export(XmlWriter Output)
+		{
+			lock (this.synchObj)
+			{
+				Output.WriteStartElement("Boxes");
+				Output.WriteAttributeString("gridSize", this.gridSize.ToString());
+				Output.WriteAttributeString("maxCellCount", this.maxCellCount.ToString());
+				Output.WriteAttributeString("count", this.count.ToString());
+				Output.WriteAttributeString("token", this.token.ToString());
+
+				this.root.Export(Output);
+
+				Output.WriteEndElement();
+			}
 		}
 	}
 }

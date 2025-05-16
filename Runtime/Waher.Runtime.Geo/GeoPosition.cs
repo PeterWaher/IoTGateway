@@ -226,7 +226,7 @@ namespace Waher.Runtime.Geo
 			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
-		private static string ToString(double Value)
+		internal static string ToString(double Value)
 		{
 			string s = Value.ToString();
 			s = s.Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");

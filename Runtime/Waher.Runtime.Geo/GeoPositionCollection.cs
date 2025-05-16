@@ -337,6 +337,8 @@ namespace Waher.Runtime.Geo
 					else if (Parent.SE == Node)
 						Parent.SE = null;
 				}
+				else
+					this.root = null;
 
 				if (!(Node.NW is null))
 				{

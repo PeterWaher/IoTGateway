@@ -237,5 +237,67 @@ namespace Waher.Runtime.Geo.Test
 					Legend.CreatePixels().EncodeAsPng());
 			}
 		}
+
+		[TestMethod]
+		public async Task Test_07_Configuration()
+		{
+			Benchmarker3D Benchmarker = new();
+
+			lock (syncObj)
+			{
+				ConfigTest(Benchmarker, "JIT", 2, 2, 10);
+
+				for (int GridSize = 2; GridSize <= 8; GridSize++)
+				{
+					for (int MaxCellCount = 1; MaxCellCount <= 8; MaxCellCount++)
+					{
+						for (int N = 100; N <= 5000; N *= 2)
+						{
+							ConfigTest(Benchmarker, "GeoBoxCollection(" +
+								N.ToString() + ")", GridSize, MaxCellCount, N);
+						}
+					}
+				}
+			}
+
+			Benchmarker.Remove("JID");   // May be affected by JIT compilation.
+
+			await OutputResults(Benchmarker, "Test_07_Configuration", "Configuration");
+		}
+
+		private static void ConfigTest(Benchmarker3D Benchmarker, string Name, int GridSize,
+			int MaxCellCount, int N)
+		{
+			GeoBoxCollection<GeoBoundingBox> GeoBoxCollection = new(GridSize, MaxCellCount);
+			int i;
+
+			using Benchmarking Test = Benchmarker.Start(Name, GridSize, MaxCellCount);
+
+			for (i = 0; i < N; i++)
+				GeoBoxCollection.Add(GeoPositionCollectionBenchmarkingTests.RandomBoundingBox(10, 10));
+
+			for (i = 0; i < 10000; i++)
+				GeoBoxCollection.Find(GeoPositionCollectionBenchmarkingTests.RandomPosition().Location);
+		}
+
+		private static async Task OutputResults(Benchmarker3D Benchmarker, string BaseFileName,
+			string Title)
+		{
+			StringBuilder Script = new();
+
+			Script.Append("M:=");
+			Script.Append(Benchmarker.GetResultScriptMilliseconds());
+			Script.AppendLine(";");
+
+			if (!Directory.Exists("OutputBox"))
+				Directory.CreateDirectory("OutputBox");
+
+			File.WriteAllText("OutputBox\\Script_" + BaseFileName + ".script", Script.ToString());
+
+			Variables Variables = [];
+
+			await Expression.EvalAsync(Script.ToString(), Variables);
+		}
+
 	}
 }

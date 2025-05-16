@@ -1099,5 +1099,47 @@
 			Assert.IsTrue(Array.Exists(Results, p => p.GeoId == "Point3"));
 		}
 
+		[TestMethod]
+		public void Test_57_IntegrityCheck()
+		{
+			GeoPositionCollection<GeoSpatialObjectReference> Collection = [];
+			GeoSpatialObjectReference[] Positions = new GeoSpatialObjectReference[10000];
+			GeoSpatialObjectReference Ref;
+			int i;
+
+			for (i = 0; i < 10000; i++)
+			{
+				Ref = GeoPositionCollectionBenchmarkingTests.RandomPosition();
+				Positions[i] = Ref;
+				Collection.Add(Ref);
+			}
+
+			Assert.AreEqual(10000, Collection.Count);
+
+			GeoSpatialObjectReference[] Result = Collection.Find(new GeoBoundingBox(new GeoPosition(-90, -180), new GeoPosition(90, 180)));
+			Assert.AreEqual(10000, Result.Length);
+
+			for (i = 0; i < 10000; i++)
+			{
+				Assert.IsTrue(Collection.Contains(Positions[i]));
+				Assert.IsTrue(Array.Exists(Result, p => p.GeoId == Positions[i].GeoId));
+			}
+
+			for (i = 0; i < 10000; i += 2)
+				Assert.IsTrue(Collection.Remove(Positions[i]));
+
+			Assert.AreEqual(5000, Collection.Count);
+
+			Result = Collection.Find(new GeoBoundingBox(new GeoPosition(-90, -180), new GeoPosition(90, 180)));
+			Assert.AreEqual(5000, Result.Length);
+
+			for (i = 0; i < 10000; i++)
+			{
+				bool ShouldExist = (i & 1) != 0;
+				Assert.AreEqual(ShouldExist, Collection.Contains(Positions[i]), i.ToString());
+				Assert.AreEqual(ShouldExist, Array.Exists(Result, p => p.GeoId == Positions[i].GeoId), i.ToString());
+			}
+		}
+
 	}
 }

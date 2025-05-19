@@ -482,58 +482,63 @@ namespace Waher.Runtime.Geo
 		{
 			lock (this.synchObj)
 			{
-				if (this.boxesById.TryGetValue(Box.BoxId, out BoxNode Node))
-				{
-					if (Node.Box.Equals(Box))
-						return;
-					else
-						throw new ArgumentException("An bounding box with the same ID already exists in the collection.", nameof(Box));
-				}
-
-				Node = new BoxNode()
-				{
-					Box = Box
-				};
-				this.boxesById[Box.BoxId] = Node;
-
-				if (Box.LongitudeWrapped)
-				{
-					double MinLat = Box.Min.NormalizedLatitude;
-					double MaxLat = Box.Max.NormalizedLatitude;
-
-					this.root.Add(new NormalizedBox(Node)
-					{
-						MinLatitude = MinLat,
-						MaxLatitude = MaxLat,
-						MinLongitude = Box.Min.NormalizedLongitude,
-						MaxLongitude = 1,
-						Scale = 1
-					});
-
-					this.root.Add(new NormalizedBox(Node)
-					{
-						MinLatitude = MinLat,
-						MaxLatitude = MaxLat,
-						MinLongitude = 0,
-						MaxLongitude = Box.Max.NormalizedLongitude,
-						Scale = 1
-					});
-				}
-				else
-				{
-					this.root.Add(new NormalizedBox(Node)
-					{
-						MinLatitude = Box.Min.NormalizedLatitude,
-						MaxLatitude = Box.Max.NormalizedLatitude,
-						MinLongitude = Box.Min.NormalizedLongitude,
-						MaxLongitude = Box.Max.NormalizedLongitude,
-						Scale = 1
-					});
-				}
-
-				this.token++;
-				this.count++;
+				this.AddLocked(Box);
 			}
+		}
+
+		private void AddLocked(T Box)
+		{
+			if (this.boxesById.TryGetValue(Box.BoxId, out BoxNode Node))
+			{
+				if (Node.Box.Equals(Box))
+					return;
+				else
+					throw new ArgumentException("An bounding box with the same ID already exists in the collection.", nameof(Box));
+			}
+
+			Node = new BoxNode()
+			{
+				Box = Box
+			};
+			this.boxesById[Box.BoxId] = Node;
+
+			if (Box.LongitudeWrapped)
+			{
+				double MinLat = Box.Min.NormalizedLatitude;
+				double MaxLat = Box.Max.NormalizedLatitude;
+
+				this.root.Add(new NormalizedBox(Node)
+				{
+					MinLatitude = MinLat,
+					MaxLatitude = MaxLat,
+					MinLongitude = Box.Min.NormalizedLongitude,
+					MaxLongitude = 1,
+					Scale = 1
+				});
+
+				this.root.Add(new NormalizedBox(Node)
+				{
+					MinLatitude = MinLat,
+					MaxLatitude = MaxLat,
+					MinLongitude = 0,
+					MaxLongitude = Box.Max.NormalizedLongitude,
+					Scale = 1
+				});
+			}
+			else
+			{
+				this.root.Add(new NormalizedBox(Node)
+				{
+					MinLatitude = Box.Min.NormalizedLatitude,
+					MaxLatitude = Box.Max.NormalizedLatitude,
+					MinLongitude = Box.Min.NormalizedLongitude,
+					MaxLongitude = Box.Max.NormalizedLongitude,
+					Scale = 1
+				});
+			}
+
+			this.token++;
+			this.count++;
 		}
 
 		/// <summary>
@@ -710,31 +715,57 @@ namespace Waher.Runtime.Geo
 		{
 			lock (this.synchObj)
 			{
-				if (!this.boxesById.TryGetValue(Box.BoxId, out BoxNode Node))
-					return false;
+				return this.RemoveLocked(Box);
+			}
+		}
 
-				if (!Node.Box.Equals(Box))
-					return false;
+		private bool RemoveLocked(T Box)
+		{
+			if (!this.boxesById.TryGetValue(Box.BoxId, out BoxNode Node))
+				return false;
 
-				this.boxesById.Remove(Box.BoxId);
-				this.count--;
-				this.token++;
+			if (!Node.Box.Equals(Box))
+				return false;
 
-				bool Result = false;
+			this.boxesById.Remove(Box.BoxId);
+			this.count--;
+			this.token++;
 
-				if (!(Node.References is null))
+			bool Result = false;
+
+			if (!(Node.References is null))
+			{
+				foreach (BoxListReference Reference in Node.References)
 				{
-					foreach (BoxListReference Reference in Node.References)
-					{
-						if (Reference.Grid.Remove(Reference))
-							Result = true;
-					}
-
-					Node.References.Clear();
-					Node.References = null;
+					if (Reference.Grid.Remove(Reference))
+						Result = true;
 				}
 
-				return Result;
+				Node.References.Clear();
+				Node.References = null;
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Each time a box has moved (and/or been resized), the collection must be notified. 
+		/// This is done by calling this method. The method will return true if the box was 
+		/// found, and consequently moved (and/or been resized), and false if the box was not
+		/// found, and therefore not moved (and/or been resized).
+		/// </summary>
+		/// <param name="Box">Box that has moved (and/or been resized).</param>
+		/// <returns>If the box was found and moved (and/or been resized).</returns>
+		public bool Moved(T Box)
+		{
+			lock (this.synchObj)
+			{
+				if (!this.RemoveLocked(Box))
+					return false;
+
+				this.AddLocked(Box);
+
+				return true;
 			}
 		}
 

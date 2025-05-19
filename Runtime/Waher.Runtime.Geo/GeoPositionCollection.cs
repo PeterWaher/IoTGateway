@@ -66,20 +66,25 @@ namespace Waher.Runtime.Geo
 		{
 			lock (this.synchObj)
 			{
-				if (this.nodesById.TryGetValue(Object.GeoId, out GeoNode Node))
-				{
-					if (Node.Object.Equals(Object))
-						return;
-					else
-						throw new ArgumentException("An object with the same ID already exists in the collection.", nameof(Object));
-				}
-
-				Node = new GeoNode(Object);
-				this.nodesById[Object.GeoId] = Node;
-				this.AddNodeLocked(Node);
-				this.token++;
-				this.count++;
+				this.AddLocked(Object);
 			}
+		}
+
+		private void AddLocked(T Object)
+		{
+			if (this.nodesById.TryGetValue(Object.GeoId, out GeoNode Node))
+			{
+				if (Node.Object.Equals(Object))
+					return;
+				else
+					throw new ArgumentException("An object with the same ID already exists in the collection.", nameof(Object));
+			}
+
+			Node = new GeoNode(Object);
+			this.nodesById[Object.GeoId] = Node;
+			this.AddNodeLocked(Node);
+			this.token++;
+			this.count++;
 		}
 
 		private void AddNodeLocked(GeoNode Node)
@@ -313,60 +318,86 @@ namespace Waher.Runtime.Geo
 		{
 			lock (this.synchObj)
 			{
-				if (!this.nodesById.TryGetValue(Object.GeoId, out GeoNode Node))
+				return this.RemoveLocked(Object);
+			}
+		}
+
+		private bool RemoveLocked(T Object)
+		{
+			if (!this.nodesById.TryGetValue(Object.GeoId, out GeoNode Node))
+				return false;
+
+			if (!Node.Object.Equals(Object))
+				return false;
+
+			this.nodesById.Remove(Object.GeoId);
+			this.count--;
+			this.token++;
+
+			GeoNode Parent = Node.Parent;
+			if (!(Parent is null))
+			{
+				Node.Parent = null;
+
+				if (Parent.NW == Node)
+					Parent.NW = null;
+				else if (Parent.NE == Node)
+					Parent.NE = null;
+				else if (Parent.SW == Node)
+					Parent.SW = null;
+				else if (Parent.SE == Node)
+					Parent.SE = null;
+			}
+			else
+				this.root = null;
+
+			if (!(Node.NW is null))
+			{
+				Node.NW.Parent = null;
+				this.AddNodeLocked(Node.NW);
+				Node.NW = null;
+			}
+
+			if (!(Node.NE is null))
+			{
+				Node.NE.Parent = null;
+				this.AddNodeLocked(Node.NE);
+				Node.NE = null;
+			}
+
+			if (!(Node.SW is null))
+			{
+				Node.SW.Parent = null;
+				this.AddNodeLocked(Node.SW);
+				Node.SW = null;
+			}
+
+			if (!(Node.SE is null))
+			{
+				Node.SE.Parent = null;
+				this.AddNodeLocked(Node.SE);
+				Node.SE = null;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Each time an object has moved, the collection must be notified. This is done
+		/// by calling this method. The method will return true if the object was found,
+		/// and consequently moved, and false if the object was not found, and therefore
+		/// not moved.
+		/// </summary>
+		/// <param name="Object">Object that has moved.</param>
+		/// <returns>If the object was found and moved.</returns>
+		public bool Moved(T Object)
+		{
+			lock (this.synchObj)
+			{
+				if (!this.RemoveLocked(Object))
 					return false;
 
-				if (!Node.Object.Equals(Object))
-					return false;
-
-				this.nodesById.Remove(Object.GeoId);
-				this.count--;
-				this.token++;
-
-				GeoNode Parent = Node.Parent;
-				if (!(Parent is null))
-				{
-					Node.Parent = null;
-
-					if (Parent.NW == Node)
-						Parent.NW = null;
-					else if (Parent.NE == Node)
-						Parent.NE = null;
-					else if (Parent.SW == Node)
-						Parent.SW = null;
-					else if (Parent.SE == Node)
-						Parent.SE = null;
-				}
-				else
-					this.root = null;
-
-				if (!(Node.NW is null))
-				{
-					Node.NW.Parent = null;
-					this.AddNodeLocked(Node.NW);
-					Node.NW = null;
-				}
-
-				if (!(Node.NE is null))
-				{
-					Node.NE.Parent = null;
-					this.AddNodeLocked(Node.NE);
-					Node.NE = null;
-				}
-
-				if (!(Node.SW is null))
-				{
-					Node.SW.Parent = null;
-					this.AddNodeLocked(Node.SW);
-					Node.SW = null;
-				}
-
-				if (!(Node.SE is null))
-				{
-					Node.SE.Parent = null;
-					this.AddNodeLocked(Node.SE);
-					Node.SE = null;
-				}
+				this.AddLocked(Object);
 
 				return true;
 			}

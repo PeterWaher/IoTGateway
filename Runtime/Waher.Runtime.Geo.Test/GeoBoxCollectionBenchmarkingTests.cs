@@ -260,7 +260,7 @@ namespace Waher.Runtime.Geo.Test
 				}
 			}
 
-			Benchmarker.Remove("JID");   // May be affected by JIT compilation.
+			Benchmarker.Remove("JIT");   // May be affected by JIT compilation.
 
 			await OutputResults(Benchmarker, "Test_07_Configuration", "Configuration");
 		}

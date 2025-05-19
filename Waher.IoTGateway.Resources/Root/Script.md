@@ -1160,6 +1160,7 @@ The following functions operate on matrices:
 | Function                 | Description                                                                                                                                       | Example                    |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
 | `Columns(M)`             | Returns the number of columns in the matrix `M`. (From the Waher.Script.Graphs3D extension.)                                                      | `Columns(Identity(3))=3`   |
+| `Columns(v[,SecondDim])` | Creates a matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector.                    | `Columns(X)`               |
 | `Determinant(M)`         | Returns the determinant of a matrix `M`.                                                                                                          | `Determinant(Identity(3))` |
 | `Det(M)`                 | Alias for `Determinant(M)`.                                                                                                                       | `det(Identity(3))`         |
 | `Diagonal(M)`            | Returns the diagonal vector of a matrix `M`.                                                                                                      | `Diagonal(Identity(3))`    |
@@ -1174,6 +1175,7 @@ The following functions operate on matrices:
 | `Rank(M)`                | Computes the rank of the matrix `M`.                                                                                                              | `Rank(M)=Rows(M)`          |
 | `Reduce(M)`              | Reduces the rows in the matrix `M`. (Also called Gauss-elimination, or row reduction of a matrix.)                                                | `Reduce(M)`                |
 | `Rows(M)`                | Returns the number of rows in the matrix `M`. (From the Waher.Script.Graphs3D extension.)                                                         | `Rows(Identity(3))=3`      |
+| `Rows(v[,SecondDim])`    | Creates a matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector.                       | `Rows(Z)`                  |
 | `Trace(M)`               | Returns the sum of the elements on the diagonal of a matrix `M`.                                                                                  | `Trace(Identity(3))`       |
 | `Tr(M)`                  | Alias for `Trace(M)`.                                                                                                                             | `tr(Identity(3))`          |
 | `Zeroes(Rows,Columns)`   | Creates an MxN-matrix with all elements set to 0.                                                                                                 | `Zeroes(5,4)`              |

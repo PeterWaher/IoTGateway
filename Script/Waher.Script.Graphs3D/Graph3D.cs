@@ -1158,11 +1158,11 @@ namespace Waher.Script.Graphs3D
 			double[,] Y = Scale(MatrixY, MinY, MaxY, OffsetY, Height, YLabelPositions);
 			double[,] Z = Scale(MatrixZ, MinZ, MaxZ, OffsetZ, Depth, ZLabelPositions);
 			int i, j;
-			Vector4[,] Points = new Vector4[Columns, Rows];
+			Vector4[,] Points = new Vector4[Rows, Columns];
 
-			for (i = 0; i < Columns; i++)
+			for (i = 0; i < Rows; i++)
 			{
-				for (j = 0; j < Rows; j++)
+				for (j = 0; j < Columns; j++)
 					Points[i, j] = new Vector4((float)X[i, j], (float)Y[i, j], (float)Z[i, j], 1);
 			}
 

@@ -363,6 +363,29 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
+		/// String-representation of the normalized geo-position.
+		/// </summary>
+		public string NormalizedValue
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(ToString(this.NormalizedLatitude));
+				sb.Append(',');
+				sb.Append(ToString(this.NormalizedLongitude));
+
+				if (this.altitude.HasValue)
+				{
+					sb.Append(',');
+					sb.Append(ToString(this.altitude.Value));
+				}
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
 		/// Human-readable string-representation of the geo-position.
 		/// </summary>
 		public string HumanReadable

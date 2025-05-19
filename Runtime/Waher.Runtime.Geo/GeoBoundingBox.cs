@@ -127,6 +127,28 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <inheritdoc/>
+		public string ToNormalizedString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			if (this.includeMin)
+				sb.Append('[');
+			else
+				sb.Append('(');
+
+			sb.Append(this.min?.NormalizedValue);
+			sb.Append(" - ");
+			sb.Append(this.max?.NormalizedValue);
+
+			if (this.includeMax)
+				sb.Append(']');
+			else
+				sb.Append(')');
+
+			return sb.ToString();
+		}
+
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return

@@ -216,7 +216,20 @@ namespace Waher.Runtime.Geo
 						return false;
 
 					if (this.EntireArea.Count == 0)
+					{
 						this.EntireArea = null;
+
+						for (int y = 0; y < this.Height; y++)
+						{
+							for (int x = 0; x < this.Width; x++)
+							{
+								if (!(this.Grid[x, y] is null))
+									return true;
+							}
+						}
+
+						this.Parent?.Remove(this);
+					}
 				}
 				else
 				{
@@ -235,16 +248,19 @@ namespace Waher.Runtime.Geo
 						{
 							this.Grid[Reference.X, Reference.Y] = null;
 
-							for (int y = 0; y < this.Height; y++)
+							if (this.EntireArea is null)
 							{
-								for (int x = 0; x < this.Width; x++)
+								for (int y = 0; y < this.Height; y++)
 								{
-									if (!(this.Grid[x, y] is null))
-										return true;
+									for (int x = 0; x < this.Width; x++)
+									{
+										if (!(this.Grid[x, y] is null))
+											return true;
+									}
 								}
-							}
 
-							this.Parent?.Remove(this);
+								this.Parent?.Remove(this);
+							}
 						}
 					}
 				}

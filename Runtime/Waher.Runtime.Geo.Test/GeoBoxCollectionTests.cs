@@ -376,6 +376,11 @@ namespace Waher.Runtime.Geo.Test
 		[DataRow(5000, 8, 8)]
 		[DataRow(5000, 12, 12)]
 		[DataRow(5000, 16, 16)]
+		[DataRow(10000, 2, 2)]
+		[DataRow(10000, 4, 4)]
+		[DataRow(10000, 8, 8)]
+		[DataRow(10000, 12, 12)]
+		[DataRow(10000, 16, 16)]
 		public void Test_19_IntegrityCheck(int N, int GridSize, int MaxCellCount)
 		{
 			GeoBoxCollection<GeoBoundingBox> Collection = new(GridSize, MaxCellCount);
@@ -432,9 +437,13 @@ namespace Waher.Runtime.Geo.Test
 					if (ShouldContain ^ Contains)
 					{
 						Console.Out.WriteLine("Position: " + Pos.Location.ToString());
+						Console.Out.WriteLine("Normalized Position: " + Pos.Location.NormalizedValue);
 						Console.Out.WriteLine("Box: " + Box2.ToString());
+						Console.Out.WriteLine("Normalized Box: " + Box2.ToNormalizedString());
 						Console.Out.WriteLine();
 						Console.Out.WriteLine(Collection.Export());
+
+						Collection.Find(Pos.Location);
 
 						Assert.Fail((ShouldContain ?
 							"Box that should be found, was not found: " :

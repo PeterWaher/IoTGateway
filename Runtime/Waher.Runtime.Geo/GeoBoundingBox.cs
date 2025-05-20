@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Xml;
 
 namespace Waher.Runtime.Geo
 {

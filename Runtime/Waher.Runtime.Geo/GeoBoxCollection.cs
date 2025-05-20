@@ -585,6 +585,42 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
+		/// Checks if the collection contains a geo-spatial bounding box.
+		/// </summary>
+		/// <param name="BoxId">ID of Geo-spatial bounding box.</param>
+		/// <returns>If the collection contains the bounding box.</returns>
+		public bool Contains(string BoxId)
+		{
+			lock (this.synchObj)
+			{
+				return this.boxesById.ContainsKey(BoxId);
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a geo-spatial bounding box, given its ID.
+		/// </summary>
+		/// <param name="BoxId">ID of Geo-spatial bounding box.</param>
+		/// <param name="Box">Bounding box, if found.</param>
+		/// <returns>If a geo-spatial bounding box was found.</returns>
+		public bool TryGetBox(string BoxId, out T Box)
+		{
+			lock (this.synchObj)
+			{
+				if (!this.boxesById.TryGetValue(BoxId, out BoxNode Node))
+				{
+					Box = default;
+					return false;
+				}
+				else
+				{
+					Box = Node.Box;
+					return true;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Copies the contents of the collection to a destination array.
 		/// </summary>
 		/// <param name="Destination">Destination array</param>
@@ -719,6 +755,40 @@ namespace Waher.Runtime.Geo
 			}
 		}
 
+		/// <summary>
+		/// Removes a bounding box from the collection, given its ID.
+		/// </summary>
+		/// <param name="BoxId">ID of bounding box to remove.</param>
+		/// <returns>If the bounding box was found and moved.</returns>
+		public bool Remove(string BoxId)
+		{
+			return this.Remove(BoxId, out _);
+		}
+
+		/// <summary>
+		/// Removes a bounding box from the collection, given its ID.
+		/// </summary>
+		/// <param name="BoxId">ID of bounding box to remove.</param>
+		/// <param name="Box">Bounding box that was removed.</param>
+		/// <returns>If the bounding box was found and moved.</returns>
+		public bool Remove(string BoxId, out T Box)
+		{
+			lock (this.synchObj)
+			{
+				if (!this.boxesById.TryGetValue(BoxId, out BoxNode Node) ||
+					!this.RemoveLocked(Node))
+				{
+					Box = default;
+					return false;
+				}
+				else
+				{
+					Box = Node.Box;
+					return true;
+				}
+			}
+		}
+
 		private bool RemoveLocked(T Box)
 		{
 			if (!this.boxesById.TryGetValue(Box.BoxId, out BoxNode Node))
@@ -726,6 +796,13 @@ namespace Waher.Runtime.Geo
 
 			if (!Node.Box.Equals(Box))
 				return false;
+
+			return this.RemoveLocked(Node);
+		}
+
+		private bool RemoveLocked(BoxNode Node)
+		{
+			T Box = Node.Box;
 
 			this.boxesById.Remove(Box.BoxId);
 			this.count--;

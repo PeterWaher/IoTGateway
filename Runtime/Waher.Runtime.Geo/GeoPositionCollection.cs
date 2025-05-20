@@ -167,9 +167,9 @@ namespace Waher.Runtime.Geo
 		}
 
 		/// <summary>
-		/// Checks if the collection contains a geo-spatial object.
+		/// Checks if the collection contains a geo-spatial object reference.
 		/// </summary>
-		/// <param name="Object">Geo-spatial object.</param>
+		/// <param name="Object">Geo-spatial object reference.</param>
 		/// <returns>If the collection contains the object.</returns>
 		public bool Contains(T Object)
 		{
@@ -184,6 +184,42 @@ namespace Waher.Runtime.Geo
 				}
 				else
 					return false;
+			}
+		}
+
+		/// <summary>
+		/// Checks if the collection contains a geo-spatial object reference with a given ID.
+		/// </summary>
+		/// <param name="GeoId">ID of Geo-spatial object reference.</param>
+		/// <returns>If the collection contains an object with the corresponding ID.</returns>
+		public bool Contains(string GeoId)
+		{
+			lock (this.synchObj)
+			{
+				return this.nodesById.ContainsKey(GeoId);
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a geo-spatial object reference, given its ID.
+		/// </summary>
+		/// <param name="GeoId">ID of geo-spatial object reference.</param>
+		/// <param name="Object">Object, if found.</param>
+		/// <returns>If a geo-spatial object reference was found.</returns>
+		public bool TryGetObject(string GeoId, out T Object)
+		{
+			lock (this.synchObj)
+			{
+				if (!this.nodesById.TryGetValue(GeoId, out GeoNode Node))
+				{
+					Object = default;
+					return false;
+				}
+				else
+				{
+					Object = Node.Object;
+					return true;
+				}
 			}
 		}
 
@@ -322,6 +358,40 @@ namespace Waher.Runtime.Geo
 			}
 		}
 
+		/// <summary>
+		/// Removes an object from the collection, given its ID.
+		/// </summary>
+		/// <param name="GeoId">ID of Object to remove.</param>
+		/// <returns>If the object was found and moved.</returns>
+		public bool Remove(string GeoId)
+		{
+			return this.Remove(GeoId, out _);
+		}
+
+		/// <summary>
+		/// Removes an object from the collection, given its ID.
+		/// </summary>
+		/// <param name="GeoId">ID of Object to remove.</param>
+		/// <param name="Object">Object that was removed.</param>
+		/// <returns>If the object was found and moved.</returns>
+		public bool Remove(string GeoId, out T Object)
+		{
+			lock (this.synchObj)
+			{
+				if (!this.nodesById.TryGetValue(GeoId, out GeoNode Node) ||
+					!this.RemoveLocked(Node))
+				{
+					Object = default;
+					return false;
+				}
+				else
+				{
+					Object = Node.Object;
+					return true;
+				}
+			}
+		}
+
 		private bool RemoveLocked(T Object)
 		{
 			if (!this.nodesById.TryGetValue(Object.GeoId, out GeoNode Node))
@@ -329,6 +399,13 @@ namespace Waher.Runtime.Geo
 
 			if (!Node.Object.Equals(Object))
 				return false;
+
+			return this.RemoveLocked(Node);
+		}
+
+		private bool RemoveLocked(GeoNode Node)
+		{
+			T Object = Node.Object;
 
 			this.nodesById.Remove(Object.GeoId);
 			this.count--;

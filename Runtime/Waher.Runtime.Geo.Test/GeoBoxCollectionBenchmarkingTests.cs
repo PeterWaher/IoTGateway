@@ -247,11 +247,11 @@ namespace Waher.Runtime.Geo.Test
 			{
 				ConfigTest(Benchmarker, "JIT", 2, 2, 10);
 
-				for (int GridSize = 2; GridSize <= 8; GridSize++)
+				for (int GridSize = 2; GridSize <= 12; GridSize++)
 				{
-					for (int MaxCellCount = 1; MaxCellCount <= 8; MaxCellCount++)
+					for (int MaxCellCount = 1; MaxCellCount <= 12; MaxCellCount++)
 					{
-						for (int N = 100; N <= 5000; N *= 2)
+						for (int N = 1000; N <= 20000; N *= 2)
 						{
 							ConfigTest(Benchmarker, "GeoBoxCollection(" +
 								N.ToString() + ")", GridSize, MaxCellCount, N);
@@ -288,8 +288,8 @@ namespace Waher.Runtime.Geo.Test
 			Script.Append("M:=");
 			Script.Append(Benchmarker.GetResultScriptMilliseconds());
 			Script.AppendLine(";");
-			Script.AppendLine("GraphWidth:=1024;");
-			Script.AppendLine("GraphHeight:=1024;");
+			Script.AppendLine("GraphWidth:=1280;");
+			Script.AppendLine("GraphHeight:=768;");
 			Script.AppendLine();
 			Script.AppendLine("foreach P in M do");
 			Script.AppendLine("(");
@@ -304,6 +304,15 @@ namespace Waher.Runtime.Geo.Test
 			Script.AppendLine("	G.Title:=P.Key;");
 			Script.AppendLine();
 			Script.AppendLine("	SaveFile(G,\"OutputBox\\\"+P.Key+\".png\");");
+			Script.AppendLine();
+			Script.AppendLine("\tMinValue:=Min(Times);");
+			Script.AppendLine("	[MinC,MinR]:=IndexOf(Times,MinValue);");
+			Script.AppendLine("	printline(P.Key+\", Min: \"+MinValue+\", Column: \"+MinC+\", Row: \"+MinR+\", GridSize: \"+GridSizes[MinC]+\", MaxCellCount: \"+MaxCellCounts[MinR]);");
+			Script.AppendLine();
+			Script.AppendLine("	MaxValue:=Max(Times);");
+			Script.AppendLine("	[MaxC,MaxR]:=IndexOf(Times,MaxValue);");
+			Script.AppendLine("	printline(P.Key+\", Max: \"+MaxValue+\", Column: \"+MaxC+\", Row: \"+MaxR+\", GridSize: \"+GridSizes[MaxC]+\", MaxCellCount: \"+MaxCellCounts[MaxR]);");
+			Script.AppendLine("	printline();");
 			Script.AppendLine(")");
 
 			if (!Directory.Exists("OutputBox"))
@@ -312,6 +321,7 @@ namespace Waher.Runtime.Geo.Test
 			File.WriteAllText("OutputBox\\Script_" + BaseFileName + ".script", Script.ToString());
 
 			Variables Variables = [];
+			Variables.ConsoleOut = Console.Out;
 
 			await Expression.EvalAsync(Script.ToString(), Variables);
 		}

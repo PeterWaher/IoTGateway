@@ -288,6 +288,23 @@ namespace Waher.Runtime.Geo.Test
 			Script.Append("M:=");
 			Script.Append(Benchmarker.GetResultScriptMilliseconds());
 			Script.AppendLine(";");
+			Script.AppendLine("GraphWidth:=1024;");
+			Script.AppendLine("GraphHeight:=1024;");
+			Script.AppendLine();
+			Script.AppendLine("foreach P in M do");
+			Script.AppendLine("(");
+			Script.AppendLine("	A:=P.Value;");
+			Script.AppendLine("	GridSizes:=A[0,1..(A.Rows-1)];");
+			Script.AppendLine("	MaxCellCounts:=A[1..(A.Columns-1),0];");
+			Script.AppendLine("	Times:=A[1..(A.Columns-1),1..(A.Rows-1)];");
+			Script.AppendLine("	G:=VerticalBars3D(Columns(MaxCellCounts,count(GridSizes)),Times,Rows(GridSizes,count(MaxCellCounts)));");
+			Script.AppendLine("	G.LabelX:=\"Grid Size\";");
+			Script.AppendLine("	G.LabelY:=\"Time (ms)\";");
+			Script.AppendLine("	G.LabelZ:=\"Max Cell Count\";");
+			Script.AppendLine("	G.Title:=P.Key;");
+			Script.AppendLine();
+			Script.AppendLine("	SaveFile(G,\"OutputBox\\\"+P.Key+\".png\");");
+			Script.AppendLine(")");
 
 			if (!Directory.Exists("OutputBox"))
 				Directory.CreateDirectory("OutputBox");

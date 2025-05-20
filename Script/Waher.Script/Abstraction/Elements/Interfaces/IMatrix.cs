@@ -1,6 +1,4 @@
-﻿using Waher.Script.Functions.DateAndTime;
-
-namespace Waher.Script.Abstraction.Elements
+﻿namespace Waher.Script.Abstraction.Elements
 {
 	/// <summary>
 	/// Basic interface for matrices.
@@ -90,5 +88,49 @@ namespace Waher.Script.Abstraction.Elements
 		/// <param name="Column">Zero-based column index into the matrix.</param>
 		/// <param name="Vector">New column vector.</param>
 		void SetColumn(int Column, IVector Vector);
+
+		/// <summary>
+		/// Tries to find an element in the matrix. Search is done, left to right,
+		/// top to bottom.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		bool TryFind(IElement Element, out int Column, out int Row);
+
+		/// <summary>
+		/// Tries to find an element in the matrix, continuing search from a given
+		/// position in the matrix. Search is done, left to right, top to bottom.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="FromColumn">Start searching on this column.</param>
+		/// <param name="FromRow">Start searching on this row.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		bool TryFind(IElement Element, int FromColumn, int FromRow, out int Column, out int Row);
+
+		/// <summary>
+		/// Tries to find the last element in the matrix. Search is done, right to left,
+		/// bottom to top.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		bool TryFindLast(IElement Element, out int Column, out int Row);
+
+		/// <summary>
+		/// Tries to find the last element in the matrix, continuing search from a given
+		/// position in the matrix. Search is done, right to left, bottom to top.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="FromColumn">Start searching on this column.</param>
+		/// <param name="FromRow">Start searching on this row.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		bool TryFindLast(IElement Element, int FromColumn, int FromRow, out int Column, out int Row);
 	}
 }

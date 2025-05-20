@@ -956,5 +956,146 @@ namespace Waher.Script.Objects.Matrices
 			foreach (IElement E in Vector.VectorElements)
 				M[i++, Column] = E;
 		}
+
+		/// <summary>
+		/// Tries to find an element in the matrix. Search is done, left to right,
+		/// top to bottom.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		public bool TryFind(IElement Element, out int Column, out int Row)
+		{
+			return this.TryFind(Element, 0, 0, out Column, out Row);
+		}
+
+		/// <summary>
+		/// Tries to find an element in the matrix, continuing search from a given
+		/// position in the matrix. Search is done, left to right, top to bottom.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="FromColumn">Start searching on this column.</param>
+		/// <param name="FromRow">Start searching on this row.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		public bool TryFind(IElement Element, int FromColumn, int FromRow, out int Column, out int Row)
+		{
+			return this.TryFind(Element.AssociatedObjectValue, FromColumn, FromRow, out Column, out Row);
+		}
+
+		/// <summary>
+		/// Tries to find an element in the matrix, continuing search from a given
+		/// position in the matrix. Search is done, left to right, top to bottom.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="FromColumn">Start searching on this column.</param>
+		/// <param name="FromRow">Start searching on this row.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		public bool TryFind(object Element, int FromColumn, int FromRow, out int Column, out int Row)
+		{
+			object[,] Values = this.Values;
+			object Item;
+
+			while (FromRow < this.rows)
+			{
+				while (FromColumn < this.columns)
+				{
+					Item = Values[FromRow, FromColumn];
+
+					if (Item?.Equals(Element) ?? (Element is null))
+					{
+						Column = FromColumn;
+						Row = FromRow;
+
+						return true;
+					}
+
+					FromColumn++;
+				}
+
+				FromColumn = 0;
+				FromRow++;
+			}
+
+			Column = -1;
+			Row = -1;
+
+			return false;
+		}
+
+		/// <summary>
+		/// Tries to find the last element in the matrix. Search is done, right to left,
+		/// bottom to top.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		public bool TryFindLast(IElement Element, out int Column, out int Row)
+		{
+			return this.TryFindLast(Element, this.columns - 1, this.rows - 1, out Column, out Row);
+		}
+
+		/// <summary>
+		/// Tries to find the last element in the matrix, continuing search from a given
+		/// position in the matrix. Search is done, right to left, bottom to top.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="FromColumn">Start searching on this column.</param>
+		/// <param name="FromRow">Start searching on this row.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		public bool TryFindLast(IElement Element, int FromColumn, int FromRow, out int Column, out int Row)
+		{
+			return this.TryFindLast(Element.AssociatedObjectValue, FromColumn, FromRow, out Column, out Row);
+		}
+
+		/// <summary>
+		/// Tries to find the last element in the matrix, continuing search from a given
+		/// position in the matrix. Search is done, right to left, bottom to top.
+		/// </summary>
+		/// <param name="Element">Element to search form.</param>
+		/// <param name="FromColumn">Start searching on this column.</param>
+		/// <param name="FromRow">Start searching on this row.</param>
+		/// <param name="Column">Column, if found.</param>
+		/// <param name="Row">Row, if found.</param>
+		/// <returns>If element was found.</returns>
+		public bool TryFindLast(object Element, int FromColumn, int FromRow, out int Column, out int Row)
+		{
+			object[,] Values = this.Values;
+			object Item;
+
+			while (FromRow >= 0)
+			{
+				while (FromColumn >= 0)
+				{
+					Item = Values[FromRow, FromColumn];
+
+					if (Item?.Equals(Element) ?? (Element is null))
+					{
+						Column = FromColumn;
+						Row = FromRow;
+
+						return true;
+					}
+
+					FromColumn--;
+				}
+
+				FromColumn = this.columns - 1;
+				FromRow--;
+			}
+
+			Column = -1;
+			Row = -1;
+
+			return false;
+		}
+
 	}
 }

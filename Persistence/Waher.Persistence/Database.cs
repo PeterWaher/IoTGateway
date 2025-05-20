@@ -1145,7 +1145,7 @@ namespace Waher.Persistence
 		/// <param name="Recipient">Recipient of iterated objects.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public static Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames)
+		public static Task Iterate<T>(IDatabaseIteration<T> Recipient, params string[] CollectionNames)
 			where T : class
 		{
 			return Provider.Iterate(Recipient, CollectionNames);

@@ -485,7 +485,7 @@ namespace Waher.Runtime.Geo
 		/// </summary>
 		/// <param name="Box">Geo-spatial bounding box.</param>
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
-		public T[] Find(GeoBoundingBox Box)
+		public T[] Find(IGeoBoundingBox Box)
 		{
 			ChunkedList<T> Result = null;
 			ChunkedList<GeoNode> Queue;

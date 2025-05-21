@@ -176,7 +176,7 @@ namespace Waher.Runtime.Geo
 		/// <param name="Position">Position.</param>
 		/// <param name="Reference">Reference bounding box.</param>
 		/// <returns>If Position is north of reference bounding box.</returns>
-		public static bool NorthOf(this GeoPosition Position, GeoBoundingBox Reference)
+		public static bool NorthOf(this GeoPosition Position, IGeoBoundingBox Reference)
 		{
 			return Position.NorthOf(Reference.Max, !Reference.IncludeMax);
 		}
@@ -188,7 +188,7 @@ namespace Waher.Runtime.Geo
 		/// <param name="Position">Position.</param>
 		/// <param name="Reference">Reference bounding box.</param>
 		/// <returns>If Position is south of reference bounding box.</returns>
-		public static bool SouthOf(this GeoPosition Position, GeoBoundingBox Reference)
+		public static bool SouthOf(this GeoPosition Position, IGeoBoundingBox Reference)
 		{
 			return Position.SouthOf(Reference.Min, !Reference.IncludeMin);
 		}
@@ -200,7 +200,7 @@ namespace Waher.Runtime.Geo
 		/// <param name="Position">Position.</param>
 		/// <param name="Reference">Reference bounding box.</param>
 		/// <returns>If Position is east of reference bounding box.</returns>
-		public static bool EastOf(this GeoPosition Position, GeoBoundingBox Reference)
+		public static bool EastOf(this GeoPosition Position, IGeoBoundingBox Reference)
 		{
 			if (Reference.LongitudeWrapped)
 				return Position.EastOf(Reference.Min, !Reference.IncludeMin);
@@ -215,7 +215,7 @@ namespace Waher.Runtime.Geo
 		/// <param name="Position">Position.</param>
 		/// <param name="Reference">Reference bounding box.</param>
 		/// <returns>If Position is west of reference bounding box.</returns>
-		public static bool WestOf(this GeoPosition Position, GeoBoundingBox Reference)
+		public static bool WestOf(this GeoPosition Position, IGeoBoundingBox Reference)
 		{
 			if (Reference.LongitudeWrapped)
 				return Position.WestOf(Reference.Max, !Reference.IncludeMax);
@@ -230,7 +230,7 @@ namespace Waher.Runtime.Geo
 		/// <param name="Position">Position.</param>
 		/// <param name="Reference">Reference bounding box.</param>
 		/// <returns>If Position altitude is within the bounding box (if defined).</returns>
-		public static bool AltitudeCheck(this GeoPosition Position, GeoBoundingBox Reference)
+		public static bool AltitudeCheck(this GeoPosition Position, IGeoBoundingBox Reference)
 		{
 			if (Position.Altitude.HasValue)
 			{

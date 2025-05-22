@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Text.RegularExpressions;
 
 namespace Waher.Runtime.Geo
 {
@@ -239,6 +239,19 @@ namespace Waher.Runtime.Geo
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// If the Geo-spatial ID matches a given pattern, defined as a regular expression.
+		/// </summary>
+		/// <param name="GeoId">Geo-spatial ID</param>
+		/// <param name="Pattern">Optional regular expression</param>
+		/// <returns>If the ID matches.</returns>
+		public static bool GeoIdPatternCheck(this string GeoId, Regex Pattern)
+		{
+			Match M = Pattern.Match(GeoId);
+
+			return M.Success && M.Index == 0 && M.Length == GeoId.Length;
 		}
 	}
 }

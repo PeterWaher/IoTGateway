@@ -159,7 +159,7 @@ namespace Waher.Networking.XMPP.Geo
 		/// the connection is dropped (for a local subscription) or subscription is updated.</param>
 		/// <param name="Callback">Called when a response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public Task Subscribe(string SubscriptionId, GeoPosition Min, GeoPosition Max, int? Ttl, 
+		public Task Subscribe(string SubscriptionId, GeoPosition Min, GeoPosition Max, int? Ttl,
 			EventHandlerAsync<SubscribedEventArgs> Callback, object State)
 		{
 			return this.Subscribe(this.componentAddress, SubscriptionId, Min, Max, Ttl, Callback, State);
@@ -202,7 +202,7 @@ namespace Waher.Networking.XMPP.Geo
 			if (!string.IsNullOrEmpty(SubscriptionId))
 			{
 				Xml.Append("' id='");
-				Xml.Append(XML.Encode(ComponentAddress));
+				Xml.Append(XML.Encode(SubscriptionId));
 			}
 
 			Xml.Append("' minLat='");
@@ -347,21 +347,82 @@ namespace Waher.Networking.XMPP.Geo
 
 		#endregion
 
-		#region Unsubscribe 
+		#region Unsubscribe
 
-		public async Task Unsubscribe()
+		/// <summary>
+		/// Unsubscribes an existing subscription.
+		/// </summary>
+		/// <param name="SubscriptionId">Identifier of existing subscription.</param>
+		/// <param name="Callback">Called when a response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public Task Unsubscribe(string SubscriptionId,
+			EventHandlerAsync<UnsubscribedEventArgs> Callback, object State)
 		{
-			// TODO
+			return this.Unsubscribe(this.componentAddress, SubscriptionId, Callback, State);
 		}
 
-		public async Task UnsubscribeAsync()
+		/// <summary>
+		/// Unsubscribes an existing subscription.
+		/// </summary>
+		/// <param name="ComponentAddress">Geo-spatial component address.</param>
+		/// <param name="SubscriptionId">Identifier of existing subscription.</param>
+		/// <param name="Callback">Called when a response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async Task Unsubscribe(string ComponentAddress, string SubscriptionId,
+			EventHandlerAsync<UnsubscribedEventArgs> Callback, object State)
 		{
-			// TODO
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<unsubscribe xmlns='");
+			Xml.Append(NamespaceGeoSpatialNeuroFoundationV1);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(SubscriptionId));
+			Xml.Append("'/>");
+
+			await this.client.SendIqSet(ComponentAddress, Xml.ToString(), async (sender, e) =>
+			{
+				await Callback.Raise(this, new UnsubscribedEventArgs(e));
+			}, State);
+		}
+
+		/// <summary>
+		/// Unsubscribes an existing subscription.
+		/// </summary>
+		/// <param name="SubscriptionId">Identifier of existing subscription.</param>
+		/// <returns>Unsubscription result.</returns>
+		/// <exception cref="Exception">In case an error is returned.</exception>
+		public Task<UnsubscribedEventArgs> UnsubscribeAsync(string SubscriptionId)
+		{
+			return this.UnsubscribeAsync(this.componentAddress, SubscriptionId);
+		}
+
+		/// <summary>
+		/// Unsubscribes an existing subscription.
+		/// </summary>
+		/// <param name="ComponentAddress">Geo-spatial component address.</param>
+		/// <param name="SubscriptionId">Identifier of existing subscription.</param>
+		/// <returns>Unsubscription result.</returns>
+		/// <exception cref="Exception">In case an error is returned.</exception>
+		public async Task<UnsubscribedEventArgs> UnsubscribeAsync(string ComponentAddress, string SubscriptionId)
+		{
+			TaskCompletionSource<UnsubscribedEventArgs> Result = new TaskCompletionSource<UnsubscribedEventArgs>();
+
+			await this.Unsubscribe(ComponentAddress, SubscriptionId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to perform unsubscription."));
+
+				return Task.CompletedTask;
+			}, null);
+
+			return await Result.Task;
 		}
 
 		#endregion
 
-		#region Publications
+		#region publish
 
 		public async Task Publish()
 		{
@@ -372,6 +433,10 @@ namespace Waher.Networking.XMPP.Geo
 		{
 			// TODO
 		}
+
+		#endregion
+
+		#region Delete
 
 		public async Task Delete()
 		{

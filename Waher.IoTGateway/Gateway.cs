@@ -52,6 +52,7 @@ using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Events;
+using Waher.Networking.XMPP.Geo;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.MUC;
@@ -65,8 +66,14 @@ using Waher.Networking.XMPP.PubSub.Events;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
+using Waher.Reports;
+using Waher.Reports.Files;
+using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
+using Waher.Runtime.IO;
 using Waher.Runtime.Language;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.ServiceRegistration;
@@ -74,8 +81,6 @@ using Waher.Runtime.Settings;
 using Waher.Runtime.Threading;
 using Waher.Runtime.Threading.Sync;
 using Waher.Runtime.Timing;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
@@ -87,12 +92,7 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
-using Waher.Runtime.IO;
 using Waher.Things.SourceEvents;
-using Waher.Reports;
-using Waher.Reports.Files;
-using System.Runtime.CompilerServices;
-using Waher.Runtime.Collections;
 
 namespace Waher.IoTGateway
 {
@@ -162,6 +162,7 @@ namespace Waher.IoTGateway
 		private static MultiUserChatClient mucClient = null;
 		private static ContractsClient contractsClient = null;
 		private static SoftwareUpdateClient softwareUpdateClient = null;
+		private static GeoClient geoClient = null;
 		private static MailClient mailClient = null;
 		private static X509Certificate2 certificate = null;
 		private static DateTime checkCertificate = DateTime.MinValue;
@@ -1967,6 +1968,11 @@ namespace Waher.IoTGateway
 			else
 				softwareUpdateClient = null;
 
+			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.Geo))
+				geoClient = new GeoClient(xmppClient, XmppConfiguration.Instance.Geo);
+			else
+				geoClient = null;
+
 			mailClient = new MailClient(xmppClient);
 			mailClient.MailReceived += MailClient_MailReceived;
 		}
@@ -2415,6 +2421,9 @@ namespace Waher.IoTGateway
 
 				softwareUpdateClient?.Dispose();
 				softwareUpdateClient = null;
+
+				geoClient?.Dispose();
+				geoClient = null;
 
 				if (!(xmppClient is null))
 				{
@@ -3389,6 +3398,11 @@ namespace Waher.IoTGateway
 		/// XMPP Software Updates Client, if such a compoent is available on the XMPP broker.
 		/// </summary>
 		public static SoftwareUpdateClient SoftwareUpdateClient => softwareUpdateClient;
+
+		/// <summary>
+		/// XMPP Geo-spatial Publish/Subscribe Client, if such a compoent is available on the XMPP broker.
+		/// </summary>
+		public static GeoClient GeoClient => geoClient;
 
 		/// <summary>
 		/// XMPP Mail Client, if support for mail-extensions is available on the XMPP broker.

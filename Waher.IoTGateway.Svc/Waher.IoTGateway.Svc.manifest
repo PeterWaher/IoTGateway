@@ -387,6 +387,9 @@
 	<Assembly fileName="Waher.Networking.XMPP.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.xml" />
+	<Assembly fileName="Waher.Networking.XMPP.Geo.dll" />
+	<Assembly fileName="Waher.Networking.XMPP.Geo.pdb" />
+	<Assembly fileName="Waher.Networking.XMPP.Geo.xml" />
 	<Assembly fileName="Waher.Networking.XMPP.HTTPX.dll" />
 	<Assembly fileName="Waher.Networking.XMPP.HTTPX.pdb" />
 	<Assembly fileName="Waher.Networking.XMPP.HTTPX.xml" />

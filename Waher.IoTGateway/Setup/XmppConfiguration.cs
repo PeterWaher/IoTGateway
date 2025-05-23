@@ -77,6 +77,7 @@ namespace Waher.IoTGateway.Setup
 		private string pubSub = string.Empty;
 		private string legal = string.Empty;
 		private string software = string.Empty;
+		private string geo = string.Empty;
 		private string bareJid = string.Empty;
 		private bool sniffer = false;
 		private bool trustServer = false;
@@ -257,6 +258,16 @@ namespace Waher.IoTGateway.Setup
 		{
 			get => this.software;
 			set => this.software = value;
+		}
+
+		/// <summary>
+		/// JID of geo-spatial publish/subscribe component.
+		/// </summary>
+		[DefaultValueStringEmpty]
+		public string Geo
+		{
+			get => this.geo;
+			set => this.geo = value;
 		}
 
 		/// <summary>
@@ -822,6 +833,7 @@ namespace Waher.IoTGateway.Setup
 						this.pubSub = string.Empty;
 						this.legal = string.Empty;
 						this.software = string.Empty;
+						this.geo = string.Empty;
 
 						if (e2.Ok)
 						{
@@ -852,6 +864,9 @@ namespace Waher.IoTGateway.Setup
 
 								if (e.HasAnyFeature(Networking.XMPP.Software.SoftwareUpdateClient.NamespacesSoftwareUpdates))
 									this.software = Item.JID;
+
+								if (e.HasAnyFeature(Networking.XMPP.Geo.GeoClient.NamespacesGeoSpatial))
+									this.geo = Item.JID;
 							}
 						}
 
@@ -871,7 +886,8 @@ namespace Waher.IoTGateway.Setup
 							{ "pubSub", this.pubSub },
 							{ "muc", this.muc },
 							{ "legal", this.legal },
-							{ "software", this.software }
+							{ "software", this.software },
+							{ "geo", this.geo }
 						};
 
 						if (!string.IsNullOrEmpty(TabID))

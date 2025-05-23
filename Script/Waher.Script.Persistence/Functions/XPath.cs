@@ -162,7 +162,7 @@ namespace Waher.Script.Persistence.Functions
 							}
 						}
 
-						if (!string.IsNullOrEmpty(Namespace) && !NamespaceManager.HasNamespace(Namespace))
+						if (!string.IsNullOrEmpty(Namespace) && !NamespaceManager.HasNamespace("defualt"))
 							NamespaceManager.AddNamespace("default", Namespace);
 					}
 

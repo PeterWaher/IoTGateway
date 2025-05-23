@@ -488,7 +488,7 @@ namespace Waher.Runtime.Geo
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
 		public T[] Find(IGeoBoundingBox Box)
 		{
-			return this.Find(Box, int.MaxValue, null);
+			return this.Find(Box, 0, int.MaxValue, null, null);
 		}
 
 		/// <summary>
@@ -499,7 +499,7 @@ namespace Waher.Runtime.Geo
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
 		public T[] Find(IGeoBoundingBox Box, int MaxCount)
 		{
-			return this.Find(Box, 0, MaxCount, null);
+			return this.Find(Box, 0, MaxCount, null, null);
 		}
 
 		/// <summary>
@@ -511,7 +511,7 @@ namespace Waher.Runtime.Geo
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
 		public T[] Find(IGeoBoundingBox Box, int Offset, int MaxCount)
 		{
-			return this.Find(Box, Offset, MaxCount, null);
+			return this.Find(Box, Offset, MaxCount, null, null);
 		}
 
 		/// <summary>
@@ -523,7 +523,7 @@ namespace Waher.Runtime.Geo
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
 		public T[] Find(IGeoBoundingBox Box, Regex GeoIdPattern)
 		{
-			return this.Find(Box, 0, int.MaxValue, GeoIdPattern);
+			return this.Find(Box, 0, int.MaxValue, GeoIdPattern, null);
 		}
 
 		/// <summary>
@@ -536,7 +536,7 @@ namespace Waher.Runtime.Geo
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
 		public T[] Find(IGeoBoundingBox Box, int MaxCount, Regex GeoIdPattern)
 		{
-			return this.Find(Box, 0, MaxCount, GeoIdPattern);
+			return this.Find(Box, 0, MaxCount, GeoIdPattern, null);
 		}
 
 		/// <summary>
@@ -549,6 +549,23 @@ namespace Waher.Runtime.Geo
 		/// this regular expression.</param>
 		/// <returns>Array of items found that reside inside the bounding box.</returns>
 		public T[] Find(IGeoBoundingBox Box, int Offset, int MaxCount, Regex GeoIdPattern)
+		{
+			return this.Find(Box, Offset, MaxCount, GeoIdPattern, null);
+		}
+
+		/// <summary>
+		/// Finds items that reside inside a geo-spatial bounding box.
+		/// </summary>
+		/// <param name="Box">Geo-spatial bounding box.</param>
+		/// <param name="Offset">Offset of first item to return.</param>
+		/// <param name="MaxCount">Maximum number of items in the result.</param>
+		/// <param name="GeoIdPattern">Restricting search to items with IDs matching
+		/// this regular expression.</param>
+		/// <param name="CustomFilter">Custom filter applied to object references matching
+		/// other filters.</param>
+		/// <returns>Array of items found that reside inside the bounding box.</returns>
+		public T[] Find(IGeoBoundingBox Box, int Offset, int MaxCount, Regex GeoIdPattern,
+			Predicate<T> CustomFilter)
 		{
 			if (Offset < 0)
 				throw new ArgumentOutOfRangeException(nameof(Offset), "Offset must be a non-negative number.");
@@ -594,7 +611,8 @@ namespace Waher.Runtime.Geo
 					{
 						if (i == 15 &&
 							Pos.AltitudeCheck(Box) &&
-							(GeoIdPattern is null || Obj.GeoId.GeoIdPatternCheck(GeoIdPattern)))
+							(GeoIdPattern is null || Obj.GeoId.GeoIdPatternCheck(GeoIdPattern)) &&
+							(CustomFilter is null || CustomFilter(Obj)))
 						{
 							if (Offset >= 0)
 							{

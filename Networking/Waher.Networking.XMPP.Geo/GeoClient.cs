@@ -424,7 +424,8 @@ namespace Waher.Networking.XMPP.Geo
 
 		#region publish
 
-		public async Task Publish()
+		public async Task Publish(string GeoId, GeoPosition Location, int? Ttl,
+			DateTime? From, DateTime? To, string CustomXml)
 		{
 			// TODO
 		}

@@ -488,7 +488,7 @@ namespace Waher.Things.Virtual
 		/// <param name="Fields">Parsed fields.</param>
 		public void ReportSensorData(params SensorData.Field[] Fields)
 		{
-			if (scheduler is null && Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+			if (scheduler is null && Types.TryGetModuleParameter("Scheduler", out Scheduler Scheduler))
 				scheduler = Scheduler;
 
 			lock (this.fields)

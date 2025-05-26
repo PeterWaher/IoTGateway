@@ -81,7 +81,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			string FullJid;
 			string LocalUrl;
 
-			if (Types.TryGetModuleParameter("HTTPX", out object Obj) && Obj is HttpxProxy Proxy)
+			if (Types.TryGetModuleParameter("HTTPX", out HttpxProxy Proxy))
 			{
 				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
 					return new ContentResponse(new InvalidOperationException("Service is being shut down."));
@@ -93,7 +93,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				HttpxClient = Rec.HttpxClient;
 				LocalUrl = Rec.LocalUrl;
 			}
-			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
+			else if (Types.TryGetModuleParameter("XMPP", out XmppClient XmppClient))
 			{
 				if (XmppClient.Disposed)
 					return new ContentResponse(new InvalidOperationException("Service is being shut down."));

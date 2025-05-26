@@ -3342,7 +3342,7 @@ namespace Waher.Persistence.Serialization
 
 				string CsFolder;
 
-				if (Types.TryGetModuleParameter("Data", out object Obj) && Obj is string DataFolder)
+				if (Types.TryGetModuleParameter("Data", out string DataFolder))
 				{
 					try
 					{

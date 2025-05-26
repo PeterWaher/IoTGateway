@@ -217,7 +217,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>If a source with the given ID was found.</returns>
 		public static bool TryGetDataSource(string SourceId, out IDataSource Source)
 		{
-			if (!Types.TryGetModuleParameter("Sources", out object Obj) || !(Obj is IDataSource[] Sources))
+			if (!Types.TryGetModuleParameter("Sources", out IDataSource[] Sources))
 			{
 				Source = null;
 				return false;

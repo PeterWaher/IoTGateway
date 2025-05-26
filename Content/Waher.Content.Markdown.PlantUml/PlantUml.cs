@@ -84,7 +84,7 @@ namespace Waher.Content.Markdown.PlantUml
 
 				if (scheduler is null)
 				{
-					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+					if (Types.TryGetModuleParameter("Scheduler", out Scheduler Scheduler))
 						scheduler = Scheduler;
 					else
 					{
@@ -227,7 +227,7 @@ namespace Waher.Content.Markdown.PlantUml
 				SpecialFolder.ProgramFilesX86
 			}));
 
-			if (Types.TryGetModuleParameter("Runtime", out object Obj) && Obj is string RuntimeFolder)
+			if (Types.TryGetModuleParameter("Runtime", out string RuntimeFolder))
 			{
 				Folders.Add(Path.Combine(RuntimeFolder, SpecialFolder.ProgramFiles.ToString()));
 				Folders.Add(Path.Combine(RuntimeFolder, SpecialFolder.ProgramFilesX86.ToString()));

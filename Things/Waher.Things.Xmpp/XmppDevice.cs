@@ -39,7 +39,7 @@ namespace Waher.Things.Xmpp
 
 			if (!(BrokerNode is null))
 				return (await BrokerNode.GetBroker()).Client;
-			else if (Types.TryGetModuleParameter("XMPP", out object Obj) && Obj is XmppClient Client)
+			else if (Types.TryGetModuleParameter("XMPP", out XmppClient Client))
 				return Client;
 			else
 				throw new Exception("No XMPP Client associated with node.");

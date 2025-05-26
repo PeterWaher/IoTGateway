@@ -292,16 +292,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Default source of nodes, if no source is explicitly provided.
 		/// </summary>
-		public static string DefaultSource
-		{
-			get
-			{
-				if (Types.TryGetModuleParameter("DefaultSource", out object Obj) && Obj is string Source)
-					return Source;
-				else
-					return string.Empty;
-			}
-		}
+		public static string DefaultSource => Types.TryGetModuleParameter<string>("DefaultSource") ?? string.Empty;
 
 		/// <summary>
 		/// Tries to get a data source, from its data source ID.
@@ -311,7 +302,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>If a source with the given ID was found.</returns>
 		public static bool TryGetDataSource(string SourceId, out IDataSource Source)
 		{
-			if (!Types.TryGetModuleParameter("Sources", out object Obj) || !(Obj is IDataSource[] Sources))
+			if (!Types.TryGetModuleParameter("Sources", out IDataSource[] Sources))
 			{
 				Source = null;
 				return false;

@@ -47,6 +47,7 @@ using Waher.Networking.HTTP.ContentEncodings;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Avatar;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.Contracts.EventArguments;
@@ -1350,6 +1351,7 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 				Types.SetModuleParameter("Registry", thingRegistryClient);
 				Types.SetModuleParameter("Provisioning", provisioningClient);
+				Types.SetModuleParameter("Contracts", contractsClient);
 				Types.SetModuleParameter("Avatar", avatarClient);
 				Types.SetModuleParameter("Scheduler", scheduler);
 
@@ -2476,7 +2478,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Domain certificate.
 		/// </summary>
-		public static X509Certificate2 Certificate => certificate;
+		public static X509Certificate2 Certificate => certificate ?? Types.TryGetModuleParameter<X509Certificate2>("X509");
 
 		/// <summary>
 		/// Domain name.
@@ -2496,22 +2498,22 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Application data folder.
 		/// </summary>
-		public static string AppDataFolder => appDataFolder;
+		public static string AppDataFolder => appDataFolder ?? Types.TryGetModuleParameter<string>("AppData");
 
 		/// <summary>
 		/// Runtime folder.
 		/// </summary>
-		public static string RuntimeFolder => runtimeFolder;
+		public static string RuntimeFolder => runtimeFolder ?? Types.TryGetModuleParameter<string>("Runtime");
 
 		/// <summary>
 		/// Web root folder.
 		/// </summary>
-		public static string RootFolder => rootFolder;
+		public static string RootFolder => rootFolder ?? Types.TryGetModuleParameter<string>("Root");
 
 		/// <summary>
 		/// Reports folder.
 		/// </summary>
-		public static string ReportsFolder => reportsFolder;
+		public static string ReportsFolder => reportsFolder ?? Types.TryGetModuleParameter<string>("Reports");
 
 		/// <summary>
 		/// Root folder resource.
@@ -3337,27 +3339,27 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// XMPP Client connection of gateway.
 		/// </summary>
-		public static XmppClient XmppClient => xmppClient;
+		public static XmppClient XmppClient => xmppClient ?? Types.TryGetModuleParameter<XmppClient>("XMPP");
 
 		/// <summary>
 		/// XMPP Thing Registry Client.
 		/// </summary>
-		public static ThingRegistryClient ThingRegistryClient => thingRegistryClient;
+		public static ThingRegistryClient ThingRegistryClient => thingRegistryClient ?? Types.TryGetModuleParameter<ThingRegistryClient>("Registry");
 
 		/// <summary>
 		/// XMPP Provisioning Client.
 		/// </summary>
-		public static ProvisioningClient ProvisioningClient => provisioningClient;
+		public static ProvisioningClient ProvisioningClient => provisioningClient ?? Types.TryGetModuleParameter<ProvisioningClient>("Provisioning");
 
 		/// <summary>
 		/// XMPP Concentrator Server.
 		/// </summary>
-		public static ConcentratorServer ConcentratorServer => concentratorServer;
+		public static ConcentratorServer ConcentratorServer => concentratorServer ?? Types.TryGetModuleParameter<ConcentratorServer>("Concentrator");
 
 		/// <summary>
 		/// XMPP Concentrator Server.
 		/// </summary>
-		public static Networking.XMPP.Avatar.AvatarClient AvatarClient => avatarClient;
+		public static AvatarClient AvatarClient => avatarClient ?? Types.TryGetModuleParameter<AvatarClient>("Avatar");
 
 		/// <summary>
 		/// XMPP Sensor Client.
@@ -3412,27 +3414,27 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// HTTP Server
 		/// </summary>
-		public static HttpServer HttpServer => webServer;
+		public static HttpServer HttpServer => webServer ?? Types.TryGetModuleParameter<HttpServer>("HTTP");
 
 		/// <summary>
 		/// HTTPX Server
 		/// </summary>
-		public static HttpxServer HttpxServer => httpxServer;
+		public static HttpxServer HttpxServer => httpxServer ?? Types.TryGetModuleParameter<HttpxServer>("HTTPXS");
 
 		/// <summary>
 		/// HTTPX Proxy resource
 		/// </summary>
-		public static HttpxProxy HttpxProxy => httpxProxy;
+		public static HttpxProxy HttpxProxy => httpxProxy ?? Types.TryGetModuleParameter<HttpxProxy>("HTTPX");
 
 		/// <summary>
 		/// SOCKS5 Proxy
 		/// </summary>
-		public static Socks5Proxy Socks5Proxy => socksProxy;
+		public static Socks5Proxy Socks5Proxy => socksProxy ?? Types.TryGetModuleParameter<Socks5Proxy>("SOCKS5");
 
 		/// <summary>
 		/// CoAP Endpoint
 		/// </summary>
-		public static CoapEndpoint CoapEndpoint => coapEndpoint;
+		public static CoapEndpoint CoapEndpoint => coapEndpoint ?? Types.TryGetModuleParameter<CoapEndpoint>("CoAP");
 
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/
 
@@ -3524,10 +3526,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Service command number related to the BeforeUninstall Service command registered by the gateway.
 		/// </summary>
-		public static int BeforeUninstallCommandNr
-		{
-			get { return beforeUninstallCommandNr; }
-		}
+		public static int BeforeUninstallCommandNr => beforeUninstallCommandNr;
 
 		/// <summary>
 		/// Event raised before the application is uninstalled.
@@ -4513,7 +4512,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static ContractsClient ContractsClient
 		{
-			get { return contractsClient; }
+			get => contractsClient ?? Types.TryGetModuleParameter<ContractsClient>("Contracts");
 			set
 			{
 				if (contractsClient is null ||
@@ -4530,10 +4529,7 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Latest approved Legal Identity ID.
 		/// </summary>
-		public static string LatestApprovedLegalIdentityId
-		{
-			get { return LegalIdentityConfiguration.LatestApprovedLegalIdentityId; }
-		}
+		public static string LatestApprovedLegalIdentityId => LegalIdentityConfiguration.LatestApprovedLegalIdentityId;
 
 		/// <summary>
 		/// Requests the operator to sign a smart contract.

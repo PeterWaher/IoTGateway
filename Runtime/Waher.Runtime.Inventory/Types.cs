@@ -613,6 +613,46 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
+		/// Tries to get a typed module parameter value.
+		/// </summary>
+		/// <param name="Name">Name of module parameter.</param>
+		/// <param name="Value">Value of module parameter.</param>
+		/// <returns>If a module parameter with the same name was found.</returns>
+		public static bool TryGetModuleParameter<T>(string Name, out T Value)
+		{
+			lock (moduleParameters)
+			{
+				if (moduleParameters.TryGetValue(Name, out object Obj) && Obj is T Typed)
+				{
+					Value = Typed;
+					return true;
+				}
+				else
+				{
+					Value = default;
+					return false;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a typed module parameter value.
+		/// </summary>
+		/// <param name="Name">Name of module parameter.</param>
+		/// <returns>Typed value of module parameter, if found, null otherwise.</returns>
+		public static T TryGetModuleParameter<T>(string Name)
+			where T : class
+		{
+			lock (moduleParameters)
+			{
+				if (moduleParameters.TryGetValue(Name, out object Value) && Value is T TypedValue)
+					return TypedValue;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
 		/// If the inventory has been initialized.
 		/// </summary>
 		public static bool IsInitialized => isInitialized;

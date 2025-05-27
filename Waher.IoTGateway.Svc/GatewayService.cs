@@ -301,7 +301,7 @@ namespace Waher.IoTGateway.Svc
 					break;
 			}
 
-			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain))
+			if (!Gateway.HasDomain)
 				Log.Notice(Message, [.. Tags]);
 			else
 			{

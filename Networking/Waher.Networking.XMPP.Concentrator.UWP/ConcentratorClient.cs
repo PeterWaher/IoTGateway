@@ -71,8 +71,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1 handlers
 
 			this.Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentratorNeuroFoundationV1, this.QueryProgressHandler, false);
@@ -98,6 +96,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentratorIeeeV1, this.NodeMovedDownMessageHandler, false);
 
 			#endregion
+		
+			base.Dispose();
 		}
 
 		/// <summary>

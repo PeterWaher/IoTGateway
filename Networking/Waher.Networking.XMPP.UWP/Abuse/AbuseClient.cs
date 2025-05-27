@@ -117,13 +117,13 @@ namespace Waher.Networking.XMPP.Abuse
         /// </summary>
         public override void Dispose()
         {
-			base.Dispose();
-
 			this.client.UnregisterIqSetHandler("block", NamespaceBlocking, this.BlockPushHandler, true);
             this.client.UnregisterIqSetHandler("unblock", NamespaceBlocking, this.UnblockPushHandler, false);
-        }
 
-        private Task BlockPushHandler(object Sender, IqEventArgs e)
+			base.Dispose();
+		}
+
+		private Task BlockPushHandler(object Sender, IqEventArgs e)
         {
             XmlElement E;
             string JID;

@@ -300,8 +300,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1 handlers
 
 			this.client.UnregisterIqGetHandler("getCapabilities", NamespaceConcentratorNeuroFoundationV1, this.GetCapabilitiesHandler, true);                                      // ConcentratorClient.GetCapabilities
@@ -436,6 +434,8 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.controlServer?.Dispose();
 			this.controlServer = null;
+		
+			base.Dispose();
 		}
 
 		/// <summary>

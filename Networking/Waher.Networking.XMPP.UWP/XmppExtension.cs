@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP
@@ -16,7 +15,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		protected XmppClient client;
 
-		private bool clientDisposed = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Base class for XMPP Extensions.
@@ -26,13 +25,6 @@ namespace Waher.Networking.XMPP
 		{
 			this.client = Client;
 			this.client.RegisterExtension(this);
-			this.client.OnDisposed += this.Client_OnDisposed;
-		}
-
-		private Task Client_OnDisposed(object Sender, EventArgs e)
-		{
-			this.clientDisposed = true;
-			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -51,15 +43,24 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// If the client has been disposed.
 		/// </summary>
-		public bool ClientDisposed => this.clientDisposed;
+		public bool ClientDisposed => this.client.Disposed;
 
 		/// <summary>
 		/// Disposes of the extension.
 		/// </summary>
 		public virtual void Dispose()
 		{
-			this.client.UnregisterExtension(this);
+			if (!this.disposed)
+			{
+				this.disposed = true;
+				this.client.UnregisterExtension(this);
+			}
 		}
+
+		/// <summary>
+		/// If extension has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
 
 		#region ICommunicationLayer
 

@@ -90,8 +90,6 @@ namespace Waher.Networking.XMPP.Software
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1
 
 			this.Client.UnregisterMessageHandler("packageInfo", NamespaceSoftwareUpdatesNeuroFoundationV1, this.PackageNotificationHandler, true);
@@ -105,6 +103,8 @@ namespace Waher.Networking.XMPP.Software
 			this.Client.UnregisterMessageHandler("packageDeleted", NamespaceSoftwareUpdatesIeeeV1, this.PackageDeletedNotificationHandler, false);
 
 			#endregion
+		
+			base.Dispose();
 		}
 
 		/// <summary>

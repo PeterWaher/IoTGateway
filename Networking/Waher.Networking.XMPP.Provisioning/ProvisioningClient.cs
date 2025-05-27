@@ -177,8 +177,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1
 
 			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioningTokenNeuroFoundationV1, this.TokenChallengeHandler, true);
@@ -209,6 +207,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			this.client.OnPresenceSubscribe -= this.Client_OnPresenceSubscribe;
 			this.client.OnPresenceUnsubscribe -= this.Client_OnPresenceUnsubscribe;
+		
+			base.Dispose();
 		}
 
 		/// <summary>

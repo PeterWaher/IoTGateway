@@ -100,8 +100,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1
 
 			this.client.UnregisterMessageHandler("started", NamespaceSensorDataNeuroFoundationV1, this.StartedHandler, false);
@@ -117,6 +115,8 @@ namespace Waher.Networking.XMPP.Sensor
 			this.client.UnregisterMessageHandler("resp", NamespaceSensorDataIeeeV1, this.FieldsHandler, false);
 
 			#endregion
+		
+			base.Dispose();
 		}
 
 		/// <summary>

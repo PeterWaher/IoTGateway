@@ -43,11 +43,9 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			this.client.UnregisterIqGetHandler("data", Namespace, this.GetData, true);
-
 			this.DeleteAll();
+			base.Dispose();
 		}
 
 		/// <summary>

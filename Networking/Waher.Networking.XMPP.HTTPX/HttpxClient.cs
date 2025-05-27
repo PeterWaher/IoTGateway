@@ -133,9 +133,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			HttpxChunks.UnregisterChunkReceiver(this.client);
+			base.Dispose();
 		}
 
 		/// <summary>

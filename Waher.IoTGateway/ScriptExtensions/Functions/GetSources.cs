@@ -37,7 +37,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			if (Types.TryGetModuleParameter("Sources", out object Obj) && Obj is IDataSource[] Sources)
+			if (Types.TryGetModuleParameter("Sources", out IDataSource[] Sources))
 				return new ObjectValue(Sources);
 			else
 				return ObjectValue.Null;

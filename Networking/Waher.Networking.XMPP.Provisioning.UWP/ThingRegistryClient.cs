@@ -931,7 +931,6 @@ namespace Waher.Networking.XMPP.Provisioning
 			bool First = true;
 			bool ContainsR = false;
 
-
 			foreach (MetaDataTag Tag in MetaData)
 			{
 				if (First)

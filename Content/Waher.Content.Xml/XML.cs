@@ -1594,14 +1594,7 @@ namespace Waher.Content.Xml
 
 			Doc.LoadXml(Xml);
 
-			StringBuilder sb = new StringBuilder();
-
-			using (XmlWriter w = XmlWriter.Create(sb, WriterSettings(true, true)))
-			{
-				Doc.WriteTo(w);
-			}
-
-			return sb.ToString();
+			return PrettyXml(Doc);
 		}
 
 		/// <summary>

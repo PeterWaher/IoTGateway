@@ -569,7 +569,7 @@ namespace Waher.IoTGateway.Svc
 
 		internal static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)
 		{
-			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out object Obj) && Obj is ThingRegistryClient ThingRegistryClient)
+			if (!e.IsClaimed && Types.TryGetModuleParameter("Registry", out ThingRegistryClient ThingRegistryClient))
 			{
 				string ClaimUrl = ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData);
 				string FilePath = Path.Combine(Gateway.AppDataFolder, "Gateway.iotdisco");

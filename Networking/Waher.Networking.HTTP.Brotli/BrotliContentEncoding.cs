@@ -106,7 +106,7 @@ namespace Waher.Networking.HTTP.Brotli
 
 				if (scheduler is null)
 				{
-					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+					if (Types.TryGetModuleParameter("Scheduler", out Scheduler Scheduler))
 						scheduler = Scheduler;
 					else
 					{

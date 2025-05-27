@@ -87,7 +87,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 				if (scheduler is null)
 				{
-					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+					if (Types.TryGetModuleParameter("Scheduler", out Scheduler Scheduler))
 						scheduler = Scheduler;
 					else
 					{
@@ -304,7 +304,7 @@ namespace Waher.Content.Markdown.GraphViz
 
 			string Result = SearchForInstallationFolder(Folder);
 
-			if (string.IsNullOrEmpty(Result) && Types.TryGetModuleParameter("Runtime", out object Obj) && Obj is string RuntimeFolder)
+			if (string.IsNullOrEmpty(Result) && Types.TryGetModuleParameter("Runtime", out string RuntimeFolder))
 				Result = SearchForInstallationFolder(Path.Combine(RuntimeFolder, SpecialFolder.ToString()));
 
 			return Result;

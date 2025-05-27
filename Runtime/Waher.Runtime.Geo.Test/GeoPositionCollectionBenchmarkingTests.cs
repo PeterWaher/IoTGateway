@@ -104,7 +104,7 @@ namespace Waher.Runtime.Geo.Test
 			await OutputResults(Benchmarker, Name, "Add()");
 		}
 
-		private static GeoSpatialObjectReference RandomPosition()
+		public static GeoSpatialObjectReference RandomPosition()
 		{
 			return new GeoSpatialObjectReference(
 				new GeoSpatialObject(
@@ -193,7 +193,7 @@ namespace Waher.Runtime.Geo.Test
 			await OutputResults(Benchmarker, Name, "Find() ⨯ " + NrFind.ToString());
 		}
 
-		private static GeoBoundingBox RandomBoundingBox(int MaxDeltaLat, int MaxDeltaLong)
+		public static GeoBoundingBox RandomBoundingBox(int MaxDeltaLat, int MaxDeltaLong)
 		{
 			double MinLat, MinLong;
 			double MaxLat, MaxLong;
@@ -239,10 +239,10 @@ namespace Waher.Runtime.Geo.Test
 			Script.Append("],[\"Red\"");
 			Script.AppendLine("],\"White\",1);");
 
-			if (!Directory.Exists("Output"))
-				Directory.CreateDirectory("Output");
+			if (!Directory.Exists("OutputPosition"))
+				Directory.CreateDirectory("OutputPosition");
 
-			File.WriteAllText("Output\\Script_" + BaseFileName + ".script", Script.ToString());
+			File.WriteAllText("OutputPosition\\Script_" + BaseFileName + ".script", Script.ToString());
 
 			Variables Variables = [];
 
@@ -256,12 +256,12 @@ namespace Waher.Runtime.Geo.Test
 				Height = 720
 			};
 
-			await File.WriteAllBytesAsync("Output\\G_" + BaseFileName + ".png",
+			await File.WriteAllBytesAsync("OutputPosition\\G_" + BaseFileName + ".png",
 				G.CreatePixels(Settings).EncodeAsPng());
 
-			if (!File.Exists("Output\\Legend.png"))
+			if (!File.Exists("OutputPosition\\Legend.png"))
 			{
-				await File.WriteAllBytesAsync("Output\\Legend.png",
+				await File.WriteAllBytesAsync("OutputPosition\\Legend.png",
 					Legend.CreatePixels().EncodeAsPng());
 			}
 		}

@@ -801,7 +801,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Properties">Enumerable set of identity properties.</param>
 		/// <returns>Personal information</returns>
-		internal static PersonalInformation GetPersonalInformation(IEnumerable<Property> Properties)
+		public static PersonalInformation GetPersonalInformation(IEnumerable<Property> Properties)
 		{
 			PersonalInformation Result = new PersonalInformation();
 

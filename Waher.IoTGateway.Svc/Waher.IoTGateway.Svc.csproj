@@ -96,8 +96,9 @@
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj" />
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Mail\Waher.Networking.XMPP.Mail.csproj" />
+		<ProjectReference Include="..\Networking\Waher.Networking.XMPP.Geo\Waher.Networking.XMPP.Geo.csproj" />
+		<ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj" />
+		<ProjectReference Include="..\Networking\Waher.Networking.XMPP.Mail\Waher.Networking.XMPP.Mail.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.MUC\Waher.Networking.XMPP.MUC.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.PEP\Waher.Networking.XMPP.PEP.csproj" />

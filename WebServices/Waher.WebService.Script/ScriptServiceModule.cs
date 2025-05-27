@@ -25,8 +25,7 @@ namespace Waher.WebService.Script
 		/// </summary>
 		public Task Start()
 		{
-			if (Types.TryGetModuleParameter("HTTP", out object Obj) &&
-				Obj is HttpServer WebServer)
+			if (Types.TryGetModuleParameter("HTTP", out HttpServer WebServer))
 			{
 				this.webServer = WebServer;
 				this.instance = new ScriptService("/Evaluate");

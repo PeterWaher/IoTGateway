@@ -191,6 +191,7 @@ limit applications using the server to interoperate accordingly.
 | Multi-User Chat | <span id="Muc">{{empty(Config.MultiUserChat) ? "✗" : "✓"}}</span> | <span id="MucJID">{{Config.MultiUserChat}}</span> |
 | Legal Identities | <span id="Legal">{{empty(Config.LegalIdentities) ? "✗" : "✓"}}</span> | <span id="LegalJID">{{Config.LegalIdentities}}</span> |
 | Software Updates | <span id="Software">{{empty(Config.SoftwareUpdates) ? "✗" : "✓"}}</span> | <span id="SoftwareJID">{{Config.SoftwareUpdates}}</span> |
+| Geo-spatial information | <span id="Geo">{{empty(Config.Geo) ? "✗" : "✓"}}</span> | <span id="GeoJID">{{Config.Geo}}</span> |
 
 </fieldset>
 

@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Waher.Runtime.Geo
+﻿namespace Waher.Runtime.Geo
 {
 	/// <summary>
 	/// Reference to an object with a geo-spatial location
@@ -19,14 +17,8 @@ namespace Waher.Runtime.Geo
 		GeoPosition Location { get; }
 
 		/// <summary>
-		/// Optional reference, if in memory, null otherwise.
+		/// If the location of the geo-spatial object is ephemeral.
 		/// </summary>
-		IGeoSpatialObject Reference { get; }
-
-		/// <summary>
-		/// Gets a reference to the geo-spatial object.
-		/// </summary>
-		/// <returns>Geo-spatial location, if any, or null if none.</returns>
-		Task<IGeoSpatialObject> GetObject();
+		bool EphemeralLocation { get; }
 	}
 }

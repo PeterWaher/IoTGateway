@@ -97,8 +97,8 @@ namespace Waher.Runtime.Geo
 			get
 			{
 				return
-					!(this.min is null) && 
-					!(this.max is null) && 
+					!(this.min is null) &&
+					!(this.max is null) &&
 					this.min.Longitude > this.max.Longitude;
 			}
 		}
@@ -116,6 +116,28 @@ namespace Waher.Runtime.Geo
 			sb.Append(this.min?.ToString());
 			sb.Append(" - ");
 			sb.Append(this.max?.ToString());
+
+			if (this.includeMax)
+				sb.Append(']');
+			else
+				sb.Append(')');
+
+			return sb.ToString();
+		}
+
+		/// <inheritdoc/>
+		public string ToNormalizedString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			if (this.includeMin)
+				sb.Append('[');
+			else
+				sb.Append('(');
+
+			sb.Append(this.min?.NormalizedValue);
+			sb.Append(" - ");
+			sb.Append(this.max?.NormalizedValue);
 
 			if (this.includeMax)
 				sb.Append(']');

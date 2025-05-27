@@ -1,6 +1,6 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
@@ -12,18 +12,34 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 	/// Creates a matrix whose rows have elements of the same value, each defined by 
 	/// the corresponding element in the input vector.
 	/// </summary>
-	public class Rows : FunctionOneVectorVariable
+	public class Rows : FunctionMultiVariate
 	{
 		/// <summary>
 		/// Creates a matrix whose rows have elements of the same value, each defined by 
 		/// the corresponding element in the input vector.
 		/// </summary>
-		/// <param name="Argument">Argument.</param>
+		/// <param name="Vector">Vector.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Rows(ScriptNode Argument, int Start, int Length, Expression Expression)
-			: base(Argument, Start, Length, Expression)
+		public Rows(ScriptNode Vector, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Vector }, argumentTypes1Normal, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates a matrix whose rows have elements of the same value, each defined by 
+		/// the corresponding element in the input vector.
+		/// </summary>
+		/// <param name="Vector">Vector.</param>
+		/// <param name="SecondDimension">Second dimension</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Rows(ScriptNode Vector, ScriptNode SecondDimension, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Vector, SecondDimension },
+				  new ArgumentType[] { ArgumentType.Vector, ArgumentType.Scalar },
+				  Start, Length, Expression)
 		{
 		}
 
@@ -33,112 +49,103 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 		public override string FunctionName => nameof(Rows);
 
 		/// <summary>
-		/// Evaluates the function on a vector argument.
+		/// Default Argument names
 		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateVector(DoubleVector Argument, Variables Variables)
-		{
-			double[] Values = Argument.Values;
-			int c = Values.Length;
-			int i, j;
-			double[,] Elements = new double[c, c];
-			double Value;
-
-			for (i = 0; i < c; i++)
-			{
-				Value = Values[i];
-				for (j = 0; j < c; j++)
-					Elements[j, i] = Value;
-			}
-
-			return new DoubleMatrix(Elements);
-		}
+		public override string[] DefaultArgumentNames => new string[] { "M" };
 
 		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
-		/// <param name="Argument">Function argument.</param>
+		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement Evaluate(IElement Argument, Variables Variables)
+		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			if (Argument is IMatrix M)
+			if (Arguments.Length == 1 && Arguments[0] is IMatrix M)
 				return new DoubleNumber(M.Rows);
+
+			if (!(Arguments[0] is IVector V))
+				throw new ScriptRuntimeException("Expected vector in first argument.", this);
+
+			int SecondDimension;
+
+			if (Arguments.Length == 2)
+			{
+				SecondDimension = (int)Expression.ToDouble(Arguments[1].AssociatedObjectValue);
+				if (SecondDimension <= 0)
+					throw new ScriptRuntimeException("Invalid secondary dimension.", this);
+			}
 			else
-				return base.Evaluate(Argument, Variables);
-		}
+				SecondDimension = V.Dimension;
 
-		/// <summary>
-		/// Evaluates the function on a vector argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateVector(ComplexVector Argument, Variables Variables)
-		{
-			Complex[] Values = Argument.Values;
-			int c = Values.Length;
-			int i, j;
-			Complex[,] Elements = new Complex[c, c];
-			Complex Value;
-
-			for (i = 0; i < c; i++)
+			if (V is DoubleVector DoubleVector)
 			{
-				Value = Values[i];
-				for (j = 0; j < c; j++)
-					Elements[j, i] = Value;
+				double[] Values = DoubleVector.Values;
+				int c = Values.Length;
+				int i, j;
+				double[,] Elements = new double[SecondDimension, c];
+				double Value;
+
+				for (i = 0; i < c; i++)
+				{
+					Value = Values[i];
+					for (j = 0; j < SecondDimension; j++)
+						Elements[j, i] = Value;
+				}
+
+				return new DoubleMatrix(Elements);
 			}
-
-			return new ComplexMatrix(Elements);
-		}
-
-		/// <summary>
-		/// Evaluates the function on a vector argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateVector(BooleanVector Argument, Variables Variables)
-		{
-			Boolean[] Values = Argument.Values;
-			int c = Values.Length;
-			int i, j;
-			Boolean[,] Elements = new Boolean[c, c];
-			Boolean Value;
-
-			for (i = 0; i < c; i++)
+			else if (V is ComplexVector ComplexVector)
 			{
-				Value = Values[i];
-				for (j = 0; j < c; j++)
-					Elements[j, i] = Value;
+				Complex[] Values = ComplexVector.Values;
+				int c = Values.Length;
+				int i, j;
+				Complex[,] Elements = new Complex[SecondDimension, c];
+				Complex Value;
+
+				for (i = 0; i < c; i++)
+				{
+					Value = Values[i];
+					for (j = 0; j < SecondDimension; j++)
+						Elements[j, i] = Value;
+				}
+
+				return new ComplexMatrix(Elements);
 			}
-
-			return new BooleanMatrix(Elements);
-		}
-
-		/// <summary>
-		/// Evaluates the function on a vector argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateVector(IVector Argument, Variables Variables)
-		{
-			int c = Argument.Dimension;
-			int i, j;
-			IElement[,] Elements = new IElement[c, c];
-
-			for (i = 0; i < c; i++)
+			else if (V is BooleanVector BooleanVector)
 			{
-				j = 0;
-				foreach (IElement Value in Argument.VectorElements)
-					Elements[j++, i] = Value;
+				bool[] Values = BooleanVector.Values;
+				int c = Values.Length;
+				int i, j;
+				bool[,] Elements = new bool[SecondDimension, c];
+				bool Value;
+
+				for (i = 0; i < c; i++)
+				{
+					Value = Values[i];
+					for (j = 0; j < SecondDimension; j++)
+						Elements[j, i] = Value;
+				}
+
+				return new BooleanMatrix(Elements);
 			}
+			else
+			{
+				int c = V.Dimension;
+				int i, j;
+				IElement[,] Elements = new IElement[SecondDimension, c];
 
-			return new ObjectMatrix(Elements);
+				i = 0;
+				foreach (IElement Value in V.VectorElements)
+				{
+					for (j = 0; j < SecondDimension; j++)
+						Elements[j, i] = Value;
+
+					i++;
+				}
+
+				return new ObjectMatrix(Elements);
+			}
 		}
-
 	}
 }

@@ -69,7 +69,7 @@ namespace Waher.Content.Markdown.Layout2D
 
 			if (scheduler is null)
 			{
-				if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
+				if (Types.TryGetModuleParameter("Scheduler", out Scheduler Scheduler))
 					scheduler = Scheduler;
 				else
 				{

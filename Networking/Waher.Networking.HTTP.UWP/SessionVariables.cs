@@ -135,5 +135,32 @@ namespace Waher.Networking.HTTP
 			this.semaphore.Release();
 		}
 
+		/// <summary>
+		/// Tries to get a variable object, given its name.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <param name="Variable">Variable, if found, or null otherwise.</param>
+		/// <returns>If a variable with the corresponding name was found.</returns>
+		public override bool TryGetVariable(string Name, out Variable Variable)
+		{
+			if (base.TryGetVariable(Name, out Variable))
+				return true;
+			else
+				return globalVariables.TryGetVariable(Name, out Variable);
+		}
+
+		/// <summary>
+		/// If the collection contains a variable with a given name.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <returns>If a variable with that name exists.</returns>
+		public override bool ContainsVariable(string Name)
+		{
+			if (base.ContainsVariable(Name))
+				return true;
+			else
+				return globalVariables.ContainsVariable(Name);
+		}
+
 	}
 }

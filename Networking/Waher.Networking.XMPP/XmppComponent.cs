@@ -1918,7 +1918,12 @@ namespace Waher.Networking.XMPP
 				}
 
 				if (!string.IsNullOrEmpty(CustomXml))
+				{
+					if (!XML.IsValidXml(CustomXml))
+						throw new ArgumentException("Not valid XML.", nameof(CustomXml));
+
 					Xml.Append(CustomXml);
+				}
 
 				Xml.Append("</presence>");
 
@@ -2315,7 +2320,12 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (!string.IsNullOrEmpty(CustomXml))
+			{
+				if (!XML.IsValidXml(CustomXml))
+					throw new ArgumentException("Not valid XML.", nameof(CustomXml));
+
 				Xml.Append(CustomXml);
+			}
 
 			Xml.Append("</message>");
 

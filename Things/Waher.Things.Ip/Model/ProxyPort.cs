@@ -186,10 +186,8 @@ namespace Waher.Things.Ip.Model
 
 							this.Information("Connection accepted from " + Incoming.RemoteEndPoint + ".");
 
-
-							if (!Types.TryGetModuleParameter("X509", out object Obj) || !(Obj is X509Certificate Certificate))
-								Certificate = null;
-
+							X509Certificate Certificate = Types.TryGetModuleParameter<X509Certificate>("X509");
+								
 							try
 							{
 								Outgoing = new BinaryTcpClient(false);

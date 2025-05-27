@@ -35,7 +35,8 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Contracts\Waher.Networking.XMPP.Contracts.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj" />
-    <ProjectReference Include="..\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj" />
+		<ProjectReference Include="..\Waher.Networking.XMPP.Geo\Waher.Networking.XMPP.Geo.csproj" />
+		<ProjectReference Include="..\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.Mail\Waher.Networking.XMPP.Mail.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />

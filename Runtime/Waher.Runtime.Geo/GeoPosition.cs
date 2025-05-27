@@ -226,11 +226,16 @@ namespace Waher.Runtime.Geo
 			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
 		}
 
-		private static string ToString(double Value)
+		internal static string ToString(double Value)
 		{
 			string s = Value.ToString();
 			s = s.Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 			return Graph.TrimLabel(s);
+		}
+
+		internal static string ToString(bool Value)
+		{
+			return Value ? "true" : "false";
 		}
 
 		/// <summary>
@@ -346,6 +351,29 @@ namespace Waher.Runtime.Geo
 				sb.Append(ToString(this.latitude));
 				sb.Append(',');
 				sb.Append(ToString(this.longitude));
+
+				if (this.altitude.HasValue)
+				{
+					sb.Append(',');
+					sb.Append(ToString(this.altitude.Value));
+				}
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
+		/// String-representation of the normalized geo-position.
+		/// </summary>
+		public string NormalizedValue
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append(ToString(this.NormalizedLatitude));
+				sb.Append(',');
+				sb.Append(ToString(this.NormalizedLongitude));
 
 				if (this.altitude.HasValue)
 				{

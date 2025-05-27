@@ -27,14 +27,6 @@ namespace Waher.Networking.XMPP.Push
 		}
 
 		/// <summary>
-		/// Disposes of the extension.
-		/// </summary>
-		public override void Dispose()
-		{
-			base.Dispose();
-		}
-
-		/// <summary>
 		/// Implemented extensions.
 		/// </summary>
 		public override string[] Extensions => Array.Empty<string>();

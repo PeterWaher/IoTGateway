@@ -54,9 +54,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			this.client.UnregisterIqSetHandler("query", Namespace, this.QueryHandler, true);
+			base.Dispose();
 		}
 
 		/// <summary>

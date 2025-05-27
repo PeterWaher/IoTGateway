@@ -57,7 +57,6 @@ namespace Waher.Networking.XMPP.Geo
 		{
 			this.componentAddress = ComponentAddress;
 
-
 			#region NeuroFoundation V1
 
 			this.client.RegisterMessageHandler("added", NamespaceGeoSpatialNeuroFoundationV1, this.AddedMessageHandler, true);

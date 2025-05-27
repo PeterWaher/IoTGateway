@@ -48,8 +48,6 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			this.client.UnregisterIqSetHandler("open", Namespace, this.OpenHandler, true);
 			this.client.UnregisterIqSetHandler("close", Namespace, this.CloseHandler, false);
 			this.client.UnregisterIqSetHandler("data", Namespace, this.DataHandler, false);
@@ -77,6 +75,8 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 				this.output = null;
 			}
+
+			base.Dispose();
 		}
 
 		/// <summary>

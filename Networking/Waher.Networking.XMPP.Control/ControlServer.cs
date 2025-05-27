@@ -87,8 +87,6 @@ namespace Waher.Networking.XMPP.Control
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			this.controlParameters = null;
 			this.controlParametersByName.Clear();
 
@@ -105,11 +103,13 @@ namespace Waher.Networking.XMPP.Control
 			this.client.UnregisterIqGetHandler("getForm", ControlClient.NamespaceControlIeeeV1, this.GetFormHandler, false);
 
 			#endregion		
+		
+			base.Dispose();
 		}
 
-			/// <summary>
-			/// Implemented extensions.
-			/// </summary>
+		/// <summary>
+		/// Implemented extensions.
+		/// </summary>
 		public override string[] Extensions => new string[] { "XEP-0325" };
 
 		/// <summary>

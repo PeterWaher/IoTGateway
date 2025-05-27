@@ -1002,6 +1002,7 @@ The following table lists available scalar functions:
 | `Dbl(x)`     | Alias for `Double(x)`                     | Asserts `x` is a double-precision floating-point value. | `Dbl("3.14")`     |
 | `Double(x)`  | Converts `x` to a double value.           | Asserts `x` is a double-precision floating-point value. | `Double(pi)`      |
 | `Floor(z)`   | Round `z` down to closest integer.        | Asserts `z` is an Integer.                              | `Floor(pi)`       |
+| `Frac(z)`    | Returns the decimals (fractions) of `z`.  |                                                         | `Frac(pi)`        |
 | `Guid(x)`    | Converts `x` to a GUID value.             | Asserts `x` is a GUID.                                  | `Guid(s)`         |
 | `Int(x)`     | Alias for `Integer(x)`                    | Asserts `x` is an Integer.                              | `Int(pi)`         |
 | `Integer(x)` | Round `x` down to closest integer.        | Asserts `x` is an Integer.                              | `Integer(pi)`     |

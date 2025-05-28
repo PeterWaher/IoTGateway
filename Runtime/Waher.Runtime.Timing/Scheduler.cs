@@ -53,6 +53,11 @@ namespace Waher.Runtime.Timing
 		/// <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
 		public DateTime Add(DateTime When, Action<object> Callback, object State)
 		{
+			bool Utc = When.Kind == DateTimeKind.Utc;
+
+			if (Utc)
+				When = When.ToLocalTime();
+
 			lock (this.events)
 			{
 				while (this.events.ContainsKey(When))
@@ -61,6 +66,9 @@ namespace Waher.Runtime.Timing
 				this.events[When] = new ScheduledEvent(When, Callback, State);
 				this.RecalcTimerLocked();
 			}
+
+			if (Utc)
+				When = When.ToUniversalTime();
 
 			return When;
 		}
@@ -74,6 +82,11 @@ namespace Waher.Runtime.Timing
 		/// <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
 		public DateTime Add(DateTime When, Func<object, Task> Callback, object State)
 		{
+			bool Utc = When.Kind == DateTimeKind.Utc;
+
+			if (Utc)
+				When = When.ToLocalTime();
+
 			lock (this.events)
 			{
 				while (this.events.ContainsKey(When))
@@ -82,6 +95,9 @@ namespace Waher.Runtime.Timing
 				this.events[When] = new ScheduledEvent(When, Callback, State);
 				this.RecalcTimerLocked();
 			}
+
+			if (Utc)
+				When = When.ToUniversalTime();
 
 			return When;
 		}
@@ -169,6 +185,9 @@ namespace Waher.Runtime.Timing
 		/// <returns>If the event was found and removed.</returns>
 		public bool Remove(DateTime When)
 		{
+			if (When.Kind == DateTimeKind.Utc)
+				When = When.ToLocalTime();
+
 			lock (this.events)
 			{
 				if (this.events.Remove(When))

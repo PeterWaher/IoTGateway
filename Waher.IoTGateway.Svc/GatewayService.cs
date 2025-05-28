@@ -188,41 +188,48 @@ namespace Waher.IoTGateway.Svc
 		/// <inheritdoc/>
 		protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
 		{
-			switch (powerStatus)
+			try
 			{
-				case PowerBroadcastStatus.BatteryLow:
-				case PowerBroadcastStatus.OemEvent:
-				case PowerBroadcastStatus.PowerStatusChange:
-				case PowerBroadcastStatus.QuerySuspend:
-					Flush();
-					return true;
+				switch (powerStatus)
+				{
+					case PowerBroadcastStatus.BatteryLow:
+					case PowerBroadcastStatus.OemEvent:
+					case PowerBroadcastStatus.PowerStatusChange:
+					case PowerBroadcastStatus.QuerySuspend:
+						Flush();
+						return true;
 
-				case PowerBroadcastStatus.ResumeAutomatic:
-				case PowerBroadcastStatus.ResumeCritical:
-				case PowerBroadcastStatus.ResumeSuspend:
-					if (this.autoPaused)
-					{
-						this.autoPaused = false;
-
-						if (this.starting)
-							Log.Warning("Gateway is in the process of starting, called from another source.");
-						else
+					case PowerBroadcastStatus.ResumeAutomatic:
+					case PowerBroadcastStatus.ResumeCritical:
+					case PowerBroadcastStatus.ResumeSuspend:
+						if (this.autoPaused)
 						{
-							Log.Notice("Resuming service.");
-							this.OnContinue();
+							this.autoPaused = false;
+
+							if (this.starting)
+								Log.Warning("Gateway is in the process of starting, called from another source.");
+							else
+							{
+								Log.Notice("Resuming service.");
+								this.OnContinue();
+							}
 						}
-					}
-					return true;
+						return true;
 
-				case PowerBroadcastStatus.Suspend:
-					this.autoPaused = true;
-					Log.Notice("Suspending service.");
-					this.OnStop();
-					return true;
+					case PowerBroadcastStatus.Suspend:
+						this.autoPaused = true;
+						Log.Notice("Suspending service.");
+						this.OnStop();
+						return true;
 
-				case PowerBroadcastStatus.QuerySuspendFailed:
-				default:
-					return true;
+					case PowerBroadcastStatus.QuerySuspendFailed:
+					default:
+						return true;
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Exception(ex);
 			}
 		}
 

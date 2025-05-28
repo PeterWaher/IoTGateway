@@ -197,7 +197,7 @@ namespace Waher.IoTGateway.Svc
 					case PowerBroadcastStatus.PowerStatusChange:
 					case PowerBroadcastStatus.QuerySuspend:
 						Flush();
-						return true;
+						break;
 
 					case PowerBroadcastStatus.ResumeAutomatic:
 					case PowerBroadcastStatus.ResumeCritical:
@@ -214,23 +214,25 @@ namespace Waher.IoTGateway.Svc
 								this.OnContinue();
 							}
 						}
-						return true;
+						break;
 
 					case PowerBroadcastStatus.Suspend:
 						this.autoPaused = true;
 						Log.Notice("Suspending service.");
 						this.OnStop();
-						return true;
+						break;
 
 					case PowerBroadcastStatus.QuerySuspendFailed:
 					default:
-						return true;
+						break;
 				}
 			}
 			catch (Exception ex)
 			{
 				Log.Exception(ex);
 			}
+
+			return true;
 		}
 
 		/// <inheritdoc/>

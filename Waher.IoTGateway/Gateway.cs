@@ -2492,7 +2492,7 @@ namespace Waher.IoTGateway
 		{
 			get
 			{
-				if (!DomainConfiguration.Instance.UseDomainName)
+				if (!(DomainConfiguration.Instance?.UseDomainName ?? false))
 					return false;
 
 				if (CaseInsensitiveString.IsNullOrEmpty(domain))

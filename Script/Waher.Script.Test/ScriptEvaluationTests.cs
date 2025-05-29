@@ -1041,6 +1041,11 @@ namespace Waher.Script.Test
 			await Test("exists(error('hej'))", false);
 			await Test("exists(Exception('hej'))", false);
 
+			await Test("Obj:={a:1,b:2};exists(Obj['a'])", true);
+			await Test("Obj:={a:1,b:2};exists(Obj['b'])", true);
+			await Test("Obj:={a:1,b:2};exists(Obj['c'])", false);
+			await Test("Obj:={a:1,b:2};exists(Obj2['a'])", false);
+
 			await Test("print('hej')", "hej");
 			await Test("printline('hej')", "hej");
 			await Test("println('hej')", "hej");

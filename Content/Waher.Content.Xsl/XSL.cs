@@ -46,7 +46,22 @@ namespace Waher.Content.Xsl
 		}
 
 		/// <summary>
-		/// Loads an XML schema from an embedded resource.
+		/// Loads an XML schema from an array of bytes.
+		/// </summary>
+		/// <param name="Input">Schema binary input.</param>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <returns>XML Schema.</returns>
+		/// <exception cref="XmlSchemaException">If a validation exception occurred.</exception>
+		public static XmlSchema LoadSchema(byte[] Input, string ResourceName)
+		{
+			using (MemoryStream ms = new MemoryStream(Input))
+			{
+				return LoadSchema(ms, ResourceName);
+			}
+		}
+
+		/// <summary>
+		/// Loads an XML schema from a stream.
 		/// </summary>
 		/// <param name="Input">Schema Input stream.</param>
 		/// <param name="ResourceName">Resource Name.</param>

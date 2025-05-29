@@ -4622,6 +4622,44 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
+			if (Schema is null)
+			{
+				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(
+					Contract.ForMachinesNamespace,
+					Contract.ContentSchemaDigest,
+					Contract.ContentSchemaHashFunction);
+
+				await GetLocalSchema.Raise(this, e);
+
+				if (!(e.XmlSchema is null))
+				{
+					SchemaBin = e.XmlSchema;
+					Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+				}
+				else
+				{
+					try
+					{
+						SchemaBin = await this.GetSchemaAsync(Contract.ForMachinesNamespace,
+							new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest));
+						Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+					}
+					catch (Exception)
+					{
+						await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State);
+						return;
+					}
+				}
+
+				if (!(Schema is null))
+				{
+					lock (this.schemas)
+					{
+						this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
+					}
+				}
+			}
+
 			if (!(Schema is null))
 				Schemas[Contract.ForMachinesNamespace] = Schema;
 
@@ -4874,6 +4912,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, State);
 		}
+
+		/// <summary>
+		/// Event raised when a local schema reference is requested.
+		/// </summary>
+		public static event EventHandlerAsync<SchemaReferenceEventArgs> GetLocalSchema = null;
 
 		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
 
@@ -5393,8 +5436,29 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task GetSchema(string Address, string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
+		public async Task GetSchema(string Address, string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
+			if (!(Digest is null))
+			{
+				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(Namespace, Digest.Digest, Digest.Function);
+				await GetLocalSchema.Raise(this, e);
+
+				if (!(e.XmlSchema is null))
+				{
+					if (!(Callback is null))
+					{
+						XmlDocument Doc = new XmlDocument();
+						XmlElement Empty = Doc.CreateElement("Local");
+
+						IqResultEventArgs e0 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
+						SchemaEventArgs e2 = new SchemaEventArgs(e0, e.XmlSchema);
+						await Callback.Raise(this, e2);
+					}
+
+					return;
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getSchema xmlns='");
@@ -5413,7 +5477,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("</digest></getSchema>");
 			}
 
-			return this.client.SendIqGet(Address, Xml.ToString(),
+			await this.client.SendIqGet(Address, Xml.ToString(),
 				async (Sender, e) =>
 				{
 					XmlElement E = e.FirstElement;

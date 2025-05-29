@@ -2709,7 +2709,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
 				else
-					Result.TrySetException(e.StanzaError ?? new Exception("Unable to sign data."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to verify signature."));
 
 				return Task.CompletedTask;
 

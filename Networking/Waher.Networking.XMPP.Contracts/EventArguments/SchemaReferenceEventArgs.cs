@@ -1,5 +1,4 @@
 ﻿using System;
-using Waher.Security;
 
 namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
@@ -13,14 +12,11 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// </summary>
 		/// <param name="Namespace">Namespace of schema</param>
 		/// <param name="SchemaDigest">Hash Digest of schema file.</param>
-		/// <param name="SchemaDigestHashFunction">Hash Function used to create the schema digest.</param>
-		public SchemaReferenceEventArgs(string Namespace, byte[] SchemaDigest,
-			HashFunction SchemaDigestHashFunction)
+		public SchemaReferenceEventArgs(string Namespace, SchemaDigest SchemaDigest)
 			: base()
 		{
 			this.Namespace = Namespace;
 			this.SchemaDigest = SchemaDigest;
-			this.SchemaDigestHashFunction = SchemaDigestHashFunction;
 		}
 
 		/// <summary>
@@ -31,12 +27,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// <summary>
 		/// Hash Digest of schema file.
 		/// </summary>
-		public byte[] SchemaDigest { get; }
-
-		/// <summary>
-		/// Hash Function used to create the schema digest.
-		/// </summary>
-		public HashFunction SchemaDigestHashFunction { get; }
+		public SchemaDigest SchemaDigest { get; }
 
 		/// <summary>
 		/// XML Schema definition, if available.

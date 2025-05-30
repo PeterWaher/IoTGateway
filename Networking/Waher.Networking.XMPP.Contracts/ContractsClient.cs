@@ -4625,9 +4625,9 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Schema is null)
 			{
 				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(
-					Contract.ForMachinesNamespace,
-					Contract.ContentSchemaDigest,
-					Contract.ContentSchemaHashFunction);
+					Contract.ForMachinesNamespace, 
+					new SchemaDigest(Contract.ContentSchemaHashFunction, 
+					Contract.ContentSchemaDigest));
 
 				await GetLocalSchema.Raise(this, e);
 
@@ -5438,25 +5438,22 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public async Task GetSchema(string Address, string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
-			if (!(Digest is null))
+			SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(Namespace, Digest);
+			await GetLocalSchema.Raise(this, e, false);
+
+			if (!(e.XmlSchema is null))
 			{
-				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(Namespace, Digest.Digest, Digest.Function);
-				await GetLocalSchema.Raise(this, e);
-
-				if (!(e.XmlSchema is null))
+				if (!(Callback is null))
 				{
-					if (!(Callback is null))
-					{
-						XmlDocument Doc = new XmlDocument();
-						XmlElement Empty = Doc.CreateElement("Local");
+					XmlDocument Doc = new XmlDocument();
+					XmlElement Empty = Doc.CreateElement("Local");
 
-						IqResultEventArgs e0 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
-						SchemaEventArgs e2 = new SchemaEventArgs(e0, e.XmlSchema);
-						await Callback.Raise(this, e2);
-					}
-
-					return;
+					IqResultEventArgs e0 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
+					SchemaEventArgs e2 = new SchemaEventArgs(e0, e.XmlSchema);
+					await Callback.Raise(this, e2);
 				}
+
+				return;
 			}
 
 			StringBuilder Xml = new StringBuilder();

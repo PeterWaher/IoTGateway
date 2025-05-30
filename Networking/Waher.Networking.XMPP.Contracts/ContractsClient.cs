@@ -2646,8 +2646,34 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Digital signature of data</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		public async Task ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature,
+			EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
+			EventHandlerAsync<ValidateSignatureEventArgs> h = ValidateLocalSignature;
+			if (!(h is null))
+			{
+				ValidateSignatureEventArgs e = new ValidateSignatureEventArgs(LegalId, Data, Signature);
+				await h.Raise(this, e, false);
+
+				if (e.Valid.HasValue)
+				{
+					if (!(Callback is null))
+					{
+						XmlDocument Doc = new XmlDocument();
+						XmlElement Empty = Doc.CreateElement("Local");
+
+						IqResultEventArgs e0 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State)
+						{
+							Ok = e.Valid.Value
+						};
+						LegalIdentityEventArgs e2 = new LegalIdentityEventArgs(e0, e.Valid.Value ? e.Identity : null);
+						await Callback.Raise(this, e2);
+					}
+
+					return;
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<validateSignature data=\"");
@@ -2666,7 +2692,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("\"/>");
 
-			return this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
+			await this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -2679,6 +2705,12 @@ namespace Waher.Networking.XMPP.Contracts
 				await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 			}, State);
 		}
+
+		/// <summary>
+		/// Event raised when a signature is to be validate. Allows a local implementation to
+		/// validate local signatures.
+		/// </summary>
+		public static event EventHandlerAsync<ValidateSignatureEventArgs> ValidateLocalSignature = null;
 
 		/// <summary>
 		/// Validates a signature of binary data.
@@ -4625,11 +4657,11 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Schema is null)
 			{
 				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(
-					Contract.ForMachinesNamespace, 
-					new SchemaDigest(Contract.ContentSchemaHashFunction, 
+					Contract.ForMachinesNamespace,
+					new SchemaDigest(Contract.ContentSchemaHashFunction,
 					Contract.ContentSchemaDigest));
 
-				await GetLocalSchema.Raise(this, e);
+				await GetLocalSchema.Raise(this, e, false);
 
 				if (!(e.XmlSchema is null))
 				{

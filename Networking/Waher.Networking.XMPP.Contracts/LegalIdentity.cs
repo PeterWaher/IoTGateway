@@ -208,6 +208,23 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <returns>Legal identity</returns>
+		public static LegalIdentity Parse(string Xml)
+		{
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
+
+			Doc.LoadXml(Xml);
+
+			return Parse(Doc.DocumentElement);
+		}
+
+		/// <summary>
+		/// Parses an identity from its XML representation
+		/// </summary>
+		/// <param name="Xml">XML representation</param>
+		/// <returns>Legal identity</returns>
 		public static LegalIdentity Parse(XmlElement Xml)
 		{
 			List<Property> Properties = new List<Property>();

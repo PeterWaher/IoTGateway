@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
@@ -998,6 +999,28 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
+				EventHandlerAsync<PublicKeyEventArgs> h = GetLocalPublicKey;
+				if (!(h is null))
+				{
+					PublicKeyEventArgs e = new PublicKeyEventArgs(Address);
+					await h.Raise(this, e, false);
+
+					if (!(e.Key is null))
+					{
+						if (!(Callback is null))
+						{
+							XmlDocument Doc = new XmlDocument();
+							XmlElement Empty = Doc.CreateElement("Local");
+
+							IqResultEventArgs e1 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
+							KeyEventArgs e2 = new KeyEventArgs(e1, e.Key);
+							await Callback.Raise(this, e2);
+						}
+
+						return;
+					}
+				}
+
 				await this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
 				{
 					IE2eEndpoint ServerKey = null;
@@ -1034,6 +1057,12 @@ namespace Waher.Networking.XMPP.Contracts
 				}, State);
 			}
 		}
+
+		/// <summary>
+		/// Event raised when a server public key is requested. Allows a local implementation 
+		/// to return a local key.
+		/// </summary>
+		public static event EventHandlerAsync<PublicKeyEventArgs> GetLocalPublicKey = null;
 
 		/// <summary>
 		/// Gets the server public key.

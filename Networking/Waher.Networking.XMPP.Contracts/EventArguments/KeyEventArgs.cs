@@ -7,14 +7,12 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 	/// </summary>
 	public class KeyEventArgs : IqResultEventArgs
 	{
-		private readonly IE2eEndpoint key;
-
 		/// <summary>
 		/// Event arguments for key responses
 		/// </summary>
 		/// <param name="e">IQ response event arguments.</param>
 		public KeyEventArgs(KeyEventArgs e)
-			: this(e, e.key)
+			: this(e, e.Key)
 		{
 		}
 
@@ -26,7 +24,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		public KeyEventArgs(IqResultEventArgs e, IE2eEndpoint Key)
 			: base(e)
 		{
-			this.key = Key;
+			this.Key = Key;
 		}
 
 		/// <summary>
@@ -37,12 +35,12 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		public KeyEventArgs(IE2eEndpoint Key, object State)
 			: base(new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, true, State))
 		{
-			this.key = Key;
+			this.Key = Key;
 		}
 
 		/// <summary>
 		/// Public key of server endpoint.
 		/// </summary>
-		public IE2eEndpoint Key => this.key;
+		public IE2eEndpoint Key { get; }
 	}
 }

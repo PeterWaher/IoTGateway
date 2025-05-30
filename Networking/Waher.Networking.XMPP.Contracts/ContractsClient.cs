@@ -4825,6 +4825,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (ClientSignature Signature in Contract.ClientSignatures)
 			{
+				if (Identities.ContainsKey(Signature.LegalId))
+					continue;
+
 				LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
 				if (Identity is null)
 				{

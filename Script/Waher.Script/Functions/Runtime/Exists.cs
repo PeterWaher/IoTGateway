@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Functions.Runtime
 {
@@ -14,6 +16,7 @@ namespace Waher.Script.Functions.Runtime
 	public class Exists : FunctionOneVariable
 	{
 		private readonly VariableReference varRef;
+		private readonly ScriptNode vectorIndex;
 
 		/// <summary>
 		/// Checks if an expression exists, or has a valid value.
@@ -26,6 +29,14 @@ namespace Waher.Script.Functions.Runtime
 			: base(Argument, Start, Length, Expression)
 		{
 			this.varRef = Argument as VariableReference;
+
+			if (this.varRef is null &&
+				Argument is VectorIndex VectorIndex &&
+				VectorIndex.LeftOperand is VariableReference VRef)
+			{
+				this.varRef = VRef;
+				this.vectorIndex = VectorIndex.RightOperand;
+			}
 		}
 
 		/// <summary>
@@ -40,56 +51,121 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			if (!(this.varRef is null))
+			if (this.varRef is null)
+			{
+				try
+				{
+					IElement E = this.Argument.Evaluate(Variables);
+					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
+				}
+				catch (Exception)
+				{
+					return BooleanValue.False;
+				}
+			}
+			else
 			{
 				string s = this.varRef.VariableName;
+				IElement E;
 
 				if (Variables.TryGetVariable(s, out Variable v))
-					return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
+					E = v.ValueElement;
+				else if (!Expression.TryGetConstant(s, Variables, out E))
+				{
+					if (Types.IsRootNamespace(s))
+					{
+						if (this.vectorIndex is null)
+							return BooleanValue.True;
+						else
+							E = new Namespace(s);
+					}
+					else
+					{
+						ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
+						if (Lambda is null)
+							return BooleanValue.False;
 
-				if (Expression.TryGetConstant(s, Variables, out IElement ConstantValue))
-					return ConstantValue.AssociatedObjectValue is null ? BooleanValue.False : BooleanValue.True;
+						if (this.vectorIndex is null)
+							return BooleanValue.True;
+						else
+							E = new ObjectValue(Lambda);
+					}
+				}
 
-				if (Types.IsRootNamespace(s))
-					return BooleanValue.True;
+				if (this.vectorIndex is null)
+					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
 
-				IElement E = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
-				if (!(E is null))
-					return BooleanValue.True;
-
-				return BooleanValue.False;
-			}
-
-			try
-			{
-				IElement E = this.Argument.Evaluate(Variables);
-				object Obj = E.AssociatedObjectValue;
-
-				if (Obj is null)
+				try
+				{
+					IElement Index = this.vectorIndex.Evaluate(Variables);
+					return this.IsWellDefined(E, Index) ? BooleanValue.True : BooleanValue.False;
+				}
+				catch (Exception)
+				{
 					return BooleanValue.False;
-
-				if (Obj is double d)
-				{
-					if (double.IsNaN(d))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
 				}
-
-				if (Obj is Complex z)
-				{
-					if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
-				}
-
-				return BooleanValue.True;
 			}
-			catch (Exception)
+		}
+
+		/// <summary>
+		/// Checks if an element is well-defined, i.e., not null or NaN, etc.
+		/// </summary>
+		/// <param name="Element">Element</param>
+		/// <returns>If element is well-defined.</returns>
+		public bool IsWellDefined(IElement Element)
+		{
+			return this.IsWellDefined(Element?.AssociatedObjectValue);
+		}
+
+		/// <summary>
+		/// Checks if an object is well-defined, i.e., not null or NaN, etc.
+		/// </summary>
+		/// <param name="Obj">Element</param>
+		/// <returns>If element is well-defined.</returns>
+		public bool IsWellDefined(object Obj)
+		{
+			if (Obj is null)
+				return false;
+
+			if (Obj is double d)
+				return !double.IsNaN(d);
+
+			if (Obj is Complex z)
+				return !double.IsNaN(z.Real) && !double.IsNaN(z.Imaginary);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Checks if an element index is well-defined, i.e., not null or NaN, etc.
+		/// </summary>
+		/// <param name="Element">Element</param>
+		/// <param name="Index">Index into element.</param>
+		/// <returns>If element index is well-defined.</returns>
+		public bool IsWellDefined(IElement Element, IElement Index)
+		{
+			if (!this.IsWellDefined(Element) || !this.IsWellDefined(Index))
+				return false;
+
+			if (Index.AssociatedObjectValue is string StringIndex)
 			{
-				return BooleanValue.False;
+				if (Element.AssociatedObjectValue is IDictionary<string, IElement> Obj)
+				{
+					if (Obj.TryGetValue(StringIndex, out IElement Value))
+						return this.IsWellDefined(Value);
+					else
+						return false;
+				}
+				else if (Element.AssociatedObjectValue is IDictionary<string, object> Obj2)
+				{
+					if (Obj2.TryGetValue(StringIndex, out object Value))
+						return this.IsWellDefined(Value);
+					else
+						return false;
+				}
 			}
+			
+			return this.IsWellDefined(VectorIndex.EvaluateIndex(Element, Index, false, this));
 		}
 
 		/// <summary>
@@ -99,55 +175,59 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			if (!(this.varRef is null))
+			if (this.varRef is null)
+			{
+				try
+				{
+					IElement E = await this.Argument.EvaluateAsync(Variables);
+					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
+				}
+				catch (Exception)
+				{
+					return BooleanValue.False;
+				}
+			}
+			else
 			{
 				string s = this.varRef.VariableName;
+				IElement E;
 
 				if (Variables.TryGetVariable(s, out Variable v))
-					return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
+					E = v.ValueElement;
+				else if (!Expression.TryGetConstant(s, Variables, out E))
+				{
+					if (Types.IsRootNamespace(s))
+					{
+						if (this.vectorIndex is null)
+							return BooleanValue.True;
+						else
+							E = new Namespace(s);
+					}
+					else
+					{
+						ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
+						if (Lambda is null)
+							return BooleanValue.False;
 
-				if (Expression.TryGetConstant(s, Variables, out IElement ConstantValue))
-					return ConstantValue.AssociatedObjectValue is null ? BooleanValue.False : BooleanValue.True;
+						if (this.vectorIndex is null)
+							return BooleanValue.True;
+						else
+							E = new ObjectValue(Lambda);
+					}
+				}
 
-				if (Types.IsRootNamespace(s))
-					return BooleanValue.True;
+				if (this.vectorIndex is null)
+					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
 
-				IElement E = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
-				if (!(E is null))
-					return BooleanValue.True;
-
-				return BooleanValue.False;
-			}
-
-			try
-			{
-				IElement E = await this.Argument.EvaluateAsync(Variables);
-				object Obj = E.AssociatedObjectValue;
-
-				if (Obj is null)
+				try
+				{
+					IElement Index = await this.vectorIndex.EvaluateAsync(Variables);
+					return this.IsWellDefined(E, Index) ? BooleanValue.True : BooleanValue.False;
+				}
+				catch (Exception)
+				{
 					return BooleanValue.False;
-
-				if (Obj is double d)
-				{
-					if (double.IsNaN(d))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
 				}
-
-				if (Obj is Complex z)
-				{
-					if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
-						return BooleanValue.False;
-					else
-						return BooleanValue.True;
-				}
-
-				return BooleanValue.True;
-			}
-			catch (Exception)
-			{
-				return BooleanValue.False;
 			}
 		}
 

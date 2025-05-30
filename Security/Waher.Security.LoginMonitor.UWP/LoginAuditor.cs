@@ -566,11 +566,8 @@ namespace Waher.Security.LoginMonitor
 			{
 				if (instance is null)
 				{
-					if (Types.TryGetModuleParameter("LoginAuditor", out object Obj) &&
-						Obj is LoginAuditor Instance)
-					{
+					if (Types.TryGetModuleParameter("LoginAuditor", out LoginAuditor Instance))
 						instance = Instance;
-					}
 				}
 
 				return instance;

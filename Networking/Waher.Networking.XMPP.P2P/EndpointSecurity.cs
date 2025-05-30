@@ -1490,7 +1490,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (!string.IsNullOrEmpty(CustomXml))
 			{
-				if (!XML.IsValidXml(CustomXml))
+				if (!XML.IsValidXml(CustomXml, true, true, true, true, false, false))
 					throw new ArgumentException("Not valid XML.", nameof(CustomXml));
 
 				Xml.Append(CustomXml);

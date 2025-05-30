@@ -1545,10 +1545,10 @@ namespace Waher.IoTGateway
 			StringBuilder Link = new StringBuilder();
 			Link.Append("https://");
 
-			if (string.IsNullOrEmpty(Domain))
-				Link.Append(XmppClient.Domain);
-			else
+			if (HasDomain)
 				Link.Append(Domain);
+			else
+				Link.Append(XmppClient.Domain);
 
 			Link.Append("/QR/");
 			Link.Append(WebUtility.UrlEncode(e.Text));
@@ -2484,6 +2484,36 @@ namespace Waher.IoTGateway
 		/// Domain name.
 		/// </summary>
 		public static CaseInsensitiveString Domain => domain;
+
+		/// <summary>
+		/// If a domain name is configured.
+		/// </summary>
+		public static bool HasDomain
+		{
+			get
+			{
+				if (!(DomainConfiguration.Instance?.UseDomainName ?? false))
+					return false;
+
+				if (CaseInsensitiveString.IsNullOrEmpty(domain))
+					return false;
+
+				switch (domain.LowerCase)
+				{
+					case "localhost":
+					case "example.com":
+					case "example2.com":
+					case "example3.com":
+					case "example.org":
+					case "example2.org":
+					case "example3.org":
+						return false;
+
+					default:
+						return true;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Alternative domain names

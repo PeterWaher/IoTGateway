@@ -53,10 +53,8 @@ namespace Waher.Security.JWT.Functions
 			{
 				if (factory is null)
 				{
-					if (Types.TryGetModuleParameter("JWT", out object Value) && Value is JwtFactory Factory)
-						factory = Factory;
-					else
-						factory = JwtFactory.CreateHmacSha256();
+					factory = Types.TryGetModuleParameter<JwtFactory>("JWT")
+						?? JwtFactory.CreateHmacSha256();
 				}
 				
 				return factory;

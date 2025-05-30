@@ -1,48 +1,31 @@
-﻿using Waher.Networking.XMPP.Events;
+﻿using System;
 
 namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
 	/// <summary>
-	/// Event arguments for key responses
+	/// Event arguments for public key request events.
 	/// </summary>
-	public class KeyEventArgs : IqResultEventArgs
+	public class PublicKeyEventArgs : EventArgs
 	{
-		private readonly IE2eEndpoint key;
-
 		/// <summary>
-		/// Event arguments for key responses
+		/// Event arguments for public key request events.
 		/// </summary>
-		/// <param name="e">IQ response event arguments.</param>
-		public KeyEventArgs(KeyEventArgs e)
-			: this(e, e.key)
+		/// <param name="Address">Address whose public key is requested</param>
+		public PublicKeyEventArgs(string Address)
+			: base()
 		{
+			this.Address = Address;
+			this.Key = null;
 		}
 
 		/// <summary>
-		/// Event arguments for key responses
+		/// Address whose public key is requested
 		/// </summary>
-		/// <param name="e">IQ response event arguments.</param>
-		/// <param name="Key">Key.</param>
-		public KeyEventArgs(IqResultEventArgs e, IE2eEndpoint Key)
-			: base(e)
-		{
-			this.key = Key;
-		}
+		public string Address { get; }
 
 		/// <summary>
-		/// Event arguments for key responses
+		/// Public key of endpoint corresponding to <see cref="Address"/>.
 		/// </summary>
-		/// <param name="Key">Key.</param>
-		/// <param name="State">State object.</param>
-		public KeyEventArgs(IE2eEndpoint Key, object State)
-			: base(new IqResultEventArgs(null, string.Empty, string.Empty, string.Empty, true, State))
-		{
-			this.key = Key;
-		}
-
-		/// <summary>
-		/// Public key of server endpoint.
-		/// </summary>
-		public IE2eEndpoint Key => this.key;
+		public IE2eEndpoint Key { get; set; }
 	}
 }

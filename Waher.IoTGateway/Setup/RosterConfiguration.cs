@@ -391,7 +391,7 @@ namespace Waher.IoTGateway.Setup
 			Response.ContentType = PlainTextCodec.DefaultContentType;
 
 			string JidToValidate = JID;
-			if (CaseInsensitiveString.IsNullOrEmpty(Gateway.Domain) && JidToValidate.EndsWith("@"))
+			if (!Gateway.HasDomain && JidToValidate.EndsWith("@"))
 				JidToValidate += "example.org";
 
 			if (!XmppClient.BareJidRegEx.IsMatch(JidToValidate))

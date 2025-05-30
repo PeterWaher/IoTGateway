@@ -253,6 +253,9 @@ namespace Waher.Runtime.Profiling
 		/// <returns>Number of ticks, since start of profiling.</returns>
 		public long GetTicks(DateTime Timepoint)
 		{
+			if (Timepoint.Kind == DateTimeKind.Utc)
+				Timepoint = Timepoint.ToLocalTime();
+
 			double Seconds = (Timepoint - this.started).TotalSeconds;
 			return (long)(Seconds * Stopwatch.Frequency + 0.5);
 		}

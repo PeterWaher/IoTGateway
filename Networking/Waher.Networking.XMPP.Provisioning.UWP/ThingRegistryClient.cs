@@ -81,8 +81,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1
 
 			this.client.UnregisterIqSetHandler("claimed", NamespaceDiscoveryNeuroFoundationV1, this.ClaimedHandler, true);
@@ -98,6 +96,8 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.UnregisterIqSetHandler("disowned", NamespaceDiscoveryIeeeV1, this.DisownedHandler, false);
 
 			#endregion
+		
+			base.Dispose();
 		}
 
 		/// <summary>

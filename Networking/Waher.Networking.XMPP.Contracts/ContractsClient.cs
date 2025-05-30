@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Html.Elements;
 using Waher.Content.Xml;
 using Waher.Content.Xml.Text;
 using Waher.Content.Xsl;
@@ -998,6 +999,28 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 			else
 			{
+				EventHandlerAsync<PublicKeyEventArgs> h = GetLocalPublicKey;
+				if (!(h is null))
+				{
+					PublicKeyEventArgs e = new PublicKeyEventArgs(Address);
+					await h.Raise(this, e, false);
+
+					if (!(e.Key is null))
+					{
+						if (!(Callback is null))
+						{
+							XmlDocument Doc = new XmlDocument();
+							XmlElement Empty = Doc.CreateElement("Local");
+
+							IqResultEventArgs e1 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
+							KeyEventArgs e2 = new KeyEventArgs(e1, e.Key);
+							await Callback.Raise(this, e2);
+						}
+
+						return;
+					}
+				}
+
 				await this.client.SendIqGet(Address, "<getPublicKey xmlns=\"" + NamespaceLegalIdentitiesCurrent + "\"/>", async (Sender, e) =>
 				{
 					IE2eEndpoint ServerKey = null;
@@ -1034,6 +1057,12 @@ namespace Waher.Networking.XMPP.Contracts
 				}, State);
 			}
 		}
+
+		/// <summary>
+		/// Event raised when a server public key is requested. Allows a local implementation 
+		/// to return a local key.
+		/// </summary>
+		public static event EventHandlerAsync<PublicKeyEventArgs> GetLocalPublicKey = null;
 
 		/// <summary>
 		/// Gets the server public key.
@@ -2646,8 +2675,34 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Signature">Digital signature of data</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature, EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
+		public async Task ValidateSignature(string Address, string LegalId, byte[] Data, byte[] Signature,
+			EventHandlerAsync<LegalIdentityEventArgs> Callback, object State)
 		{
+			EventHandlerAsync<ValidateSignatureEventArgs> h = ValidateLocalSignature;
+			if (!(h is null))
+			{
+				ValidateSignatureEventArgs e = new ValidateSignatureEventArgs(LegalId, Data, Signature);
+				await h.Raise(this, e, false);
+
+				if (e.Valid.HasValue)
+				{
+					if (!(Callback is null))
+					{
+						XmlDocument Doc = new XmlDocument();
+						XmlElement Empty = Doc.CreateElement("Local");
+
+						IqResultEventArgs e0 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State)
+						{
+							Ok = e.Valid.Value
+						};
+						LegalIdentityEventArgs e2 = new LegalIdentityEventArgs(e0, e.Valid.Value ? e.Identity : null);
+						await Callback.Raise(this, e2);
+					}
+
+					return;
+				}
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<validateSignature data=\"");
@@ -2666,7 +2721,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append(NamespaceLegalIdentitiesCurrent);
 			Xml.Append("\"/>");
 
-			return this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
+			await this.client.SendIqGet(Address, Xml.ToString(), async (Sender, e) =>
 			{
 				LegalIdentity Identity = null;
 				XmlElement E;
@@ -2679,6 +2734,12 @@ namespace Waher.Networking.XMPP.Contracts
 				await Callback.Raise(this, new LegalIdentityEventArgs(e, Identity));
 			}, State);
 		}
+
+		/// <summary>
+		/// Event raised when a signature is to be validate. Allows a local implementation to
+		/// validate local signatures.
+		/// </summary>
+		public static event EventHandlerAsync<ValidateSignatureEventArgs> ValidateLocalSignature = null;
 
 		/// <summary>
 		/// Validates a signature of binary data.
@@ -2709,7 +2770,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (e.Ok)
 					Result.TrySetResult(e.Identity);
 				else
-					Result.TrySetException(e.StanzaError ?? new Exception("Unable to sign data."));
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to verify signature."));
 
 				return Task.CompletedTask;
 
@@ -4622,6 +4683,44 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
+			if (Schema is null)
+			{
+				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(
+					Contract.ForMachinesNamespace,
+					new SchemaDigest(Contract.ContentSchemaHashFunction,
+					Contract.ContentSchemaDigest));
+
+				await GetLocalSchema.Raise(this, e, false);
+
+				if (!(e.XmlSchema is null))
+				{
+					SchemaBin = e.XmlSchema;
+					Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+				}
+				else
+				{
+					try
+					{
+						SchemaBin = await this.GetSchemaAsync(Contract.ForMachinesNamespace,
+							new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest));
+						Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+					}
+					catch (Exception)
+					{
+						await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State);
+						return;
+					}
+				}
+
+				if (!(Schema is null))
+				{
+					lock (this.schemas)
+					{
+						this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
+					}
+				}
+			}
+
 			if (!(Schema is null))
 				Schemas[Contract.ForMachinesNamespace] = Schema;
 
@@ -4726,6 +4825,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (ClientSignature Signature in Contract.ClientSignatures)
 			{
+				if (Identities.ContainsKey(Signature.LegalId))
+					continue;
+
 				LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
 				if (Identity is null)
 				{
@@ -4874,6 +4976,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, State);
 		}
+
+		/// <summary>
+		/// Event raised when a local schema reference is requested.
+		/// </summary>
+		public static event EventHandlerAsync<SchemaReferenceEventArgs> GetLocalSchema = null;
 
 		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
 
@@ -5393,8 +5500,26 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Digest">Specifies a specific schema version. If not provided (or null), the most recently recorded schema will be returned.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public Task GetSchema(string Address, string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
+		public async Task GetSchema(string Address, string Namespace, SchemaDigest Digest, EventHandlerAsync<SchemaEventArgs> Callback, object State)
 		{
+			SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(Namespace, Digest);
+			await GetLocalSchema.Raise(this, e, false);
+
+			if (!(e.XmlSchema is null))
+			{
+				if (!(Callback is null))
+				{
+					XmlDocument Doc = new XmlDocument();
+					XmlElement Empty = Doc.CreateElement("Local");
+
+					IqResultEventArgs e0 = new IqResultEventArgs(Empty, string.Empty, string.Empty, string.Empty, true, State);
+					SchemaEventArgs e2 = new SchemaEventArgs(e0, e.XmlSchema);
+					await Callback.Raise(this, e2);
+				}
+
+				return;
+			}
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<getSchema xmlns='");
@@ -5413,7 +5538,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("</digest></getSchema>");
 			}
 
-			return this.client.SendIqGet(Address, Xml.ToString(),
+			await this.client.SendIqGet(Address, Xml.ToString(),
 				async (Sender, e) =>
 				{
 					XmlElement E = e.FirstElement;

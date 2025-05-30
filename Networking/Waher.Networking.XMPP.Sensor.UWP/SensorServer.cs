@@ -162,8 +162,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <inheritdoc/>
 		public override void Dispose()
 		{
-			base.Dispose();
-
 			#region Neuro-Foundation V1
 
 			this.client.UnregisterIqGetHandler("req", SensorClient.NamespaceSensorDataNeuroFoundationV1, this.ReqHandler, true);
@@ -204,6 +202,8 @@ namespace Waher.Networking.XMPP.Sensor
 				this.client.OnPresenceUnsubscribed -= this.Client_OnPresenceUnsubscribed;
 				this.client.OnPresence -= this.Client_OnPresence;
 			}
+		
+			base.Dispose();
 		}
 
 		/// <summary>

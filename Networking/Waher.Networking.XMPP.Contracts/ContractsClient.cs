@@ -4587,6 +4587,13 @@ namespace Waher.Networking.XMPP.Contracts
 						{ "Duration", Contract.Duration }
 					};
 
+					DateTime? FirstSignature = Contract.FirstSignatureAt;
+					if (FirstSignature.HasValue)
+					{
+						Variables["Now"] = FirstSignature.Value.ToLocalTime();
+						Variables["NowUtc"] = FirstSignature.Value.ToUniversalTime();
+					}
+
 					foreach (Parameter Parameter in Contract.Parameters)
 						Parameter.Populate(Variables);
 

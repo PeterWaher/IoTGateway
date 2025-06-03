@@ -193,7 +193,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 					catch (Exception ex)
 					{
 						ex = Log.UnnestException(ex);
-						Result = ex.Message;
+						Result = FirstRow(ex.Message);
 					}
 
 					if (!string.IsNullOrEmpty(this.cid))
@@ -246,7 +246,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 						{
 							new Label(this.Document, Vertical)
 							{
-								TextAttribute = new StringAttribute("text", ex.Message, this.Document),
+								TextAttribute = new StringAttribute("text", FirstRow(ex.Message), this.Document),
 								FontAttribute = this.FontAttribute
 							},
 							new Margins(this.Document, Vertical)

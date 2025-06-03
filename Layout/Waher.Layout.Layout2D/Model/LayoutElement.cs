@@ -908,5 +908,19 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			// No children by default.
 		}
+
+		/// <summary>
+		/// Extracts the first row of a text string.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <returns>First row of string.</returns>
+		protected static string FirstRow(string s)
+		{
+			int i = s.IndexOfAny(CommonTypes.CRLF);
+			if (i < 0)
+				return s;
+			else
+				return s.Substring(0, i);
+		}
 	}
 }

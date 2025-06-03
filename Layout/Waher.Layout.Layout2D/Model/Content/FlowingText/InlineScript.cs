@@ -124,7 +124,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				catch (Exception ex)
 				{
 					ex = Log.UnnestException(ex);
-					Result = ex.Message;
+					Result = FirstRow(ex.Message);
 				}
 
 				string s = Result?.ToString();

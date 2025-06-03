@@ -1,15 +1,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using SkiaSharp;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Graphs;
 
 namespace Waher.Layout.Layout2D.Test
@@ -28,6 +28,7 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(Log).Assembly,
 				typeof(Expression).Assembly,
 				typeof(Graph).Assembly,
+				typeof(QrEncode).Assembly,
 				typeof(Layout2DDocument).Assembly);
 		}
 

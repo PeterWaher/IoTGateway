@@ -31,9 +31,26 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(Layout2DDocument).Assembly);
 		}
 
-		protected virtual async Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
+		protected Task Test(string FileName)
 		{
-			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), ContentAttachments);
+			return this.Test(FileName, new Variables());
+		}
+
+		protected Task Test(string FileName, params Variable[] Variables)
+		{
+			return this.Test(FileName, new Variables(Variables));
+		}
+
+		protected Task Test(string FileName,
+			params KeyValuePair<string, object>[] ContentAttachments)
+		{
+			return this.Test(FileName, new Variables(), ContentAttachments);
+		}
+
+		protected virtual async Task Test(string FileName, Variables Variables,
+			params KeyValuePair<string, object>[] ContentAttachments)
+		{
+			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), true, Variables, ContentAttachments);
 		}
 
 		[TestMethod]
@@ -379,6 +396,14 @@ namespace Waher.Layout.Layout2D.Test
 		public virtual async Task Test_57_HeightUndefined()
 		{
 			await this.Test("Test_57_HeightUndefined");
+		}
+
+		[TestMethod]
+		public async Task Test_58_Certificate()
+		{
+			await this.Test("Test_58_Certificate",
+				new Variable("VarA", 12),
+				new Variable("VarB", 13));
 		}
 	}
 }

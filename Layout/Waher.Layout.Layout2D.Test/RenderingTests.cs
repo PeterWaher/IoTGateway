@@ -1,10 +1,10 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SkiaSharp;
 using Waher.Content.Images;
 using Waher.Runtime.Text;
 using Waher.Script;
@@ -14,10 +14,10 @@ namespace Waher.Layout.Layout2D.Test
 	[TestClass]
 	public class RenderingTests : ParsingTests
 	{
-		protected override async Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
+		protected override async Task Test(string FileName, Variables Variables, params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			Layout2DDocument Doc = await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), ContentAttachments);
-			RenderSettings Settings = await Doc.GetRenderSettings(new Variables());
+			Layout2DDocument Doc = await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), true, Variables, ContentAttachments);
+			RenderSettings Settings = await Doc.GetRenderSettings([]);
 			string PrevDimXml = null;
 			string PrevPosXml = null;
 			int DimIndex = 1;

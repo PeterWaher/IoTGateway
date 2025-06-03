@@ -108,7 +108,21 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			EvaluationResult<string> URL = await this.url.TryEvaluate(State.Session);
 			if (URL.Ok && !string.IsNullOrEmpty(URL.Result))
+			{
+				if (!this.Document.SupportsAsynchronnousUpdates)
+				{
+					ContentResponse Result = await InternetContent.GetAsync(new Uri(URL.Result),
+						new KeyValuePair<string, string>("Accept", "image/*"));
+
+					if (!Result.HasError && Result.Decoded is SKImage Image)
+					{
+						this.image = Image;
+						return Image;
+					}
+				}
+
 				this.StartLoad(URL.Result);
+			}
 
 			return null;
 		}

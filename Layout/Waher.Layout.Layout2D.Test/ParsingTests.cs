@@ -406,5 +406,11 @@ namespace Waher.Layout.Layout2D.Test
 				new Variable("VarA", 12),
 				new Variable("VarB", 13));
 		}
+
+		[TestMethod]
+		public async Task Test_59_Paragraph_IsVisible()
+		{
+			await this.Test("Test_59_Paragraph_IsVisible");
+		}
 	}
 }

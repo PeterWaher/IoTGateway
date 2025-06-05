@@ -213,7 +213,11 @@ namespace Waher.Layout.Layout2D.Model.Content
 			if (!(this.text is null))
 			{
 				foreach (IFlowingText TextItem in this.text)
-					await TextItem.MeasureSegments(Segments, State);
+				{
+					await TextItem.MeasureDimensions(State);
+					if (TextItem.IsVisible)
+						await TextItem.MeasureSegments(Segments, State);
+				}
 			}
 
 			if (!(this.fontRef is null))

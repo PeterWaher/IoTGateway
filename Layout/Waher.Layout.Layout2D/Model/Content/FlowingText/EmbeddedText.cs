@@ -112,7 +112,11 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			if (!(this.text is null))
 			{
 				foreach (IFlowingText Text in this.text)
-					await Text.MeasureSegments(Segments, State);
+				{
+					await Text.MeasureDimensions(State);
+					if (Text.IsVisible)
+						await Text.MeasureSegments(Segments, State);
+				}
 			}
 		}
 

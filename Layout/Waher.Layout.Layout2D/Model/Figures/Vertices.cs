@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.References;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -37,7 +37,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 		private Vertex[] GetVertices()
 		{
-			List<Vertex> Result = null;
+			ChunkedList<Vertex> Result = null;
 
 			if (this.HasChildren)
 			{
@@ -46,7 +46,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					if (Child is Vertex P)
 					{
 						if (Result is null)
-							Result = new List<Vertex>();
+							Result = new ChunkedList<Vertex>();
 
 						Result.Add(P);
 					}

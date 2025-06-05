@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -9,7 +9,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// </summary>
 	public class OverlayCells : ICellLayout
 	{
-		private readonly List<Padding> measured = new List<Padding>();
+		private readonly ChunkedList<Padding> measured = new ChunkedList<Padding>();
 		private readonly Variables session;
 		private float maxWidth = 0;
 		private float maxHeight = 0;

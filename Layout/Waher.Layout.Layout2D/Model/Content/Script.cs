@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
@@ -10,6 +9,7 @@ using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Layout.Layout2D.Model.Groups;
 using Waher.Layout.Layout2D.Model.Images;
 using Waher.Layout.Layout2D.Model.Transforms;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
@@ -242,7 +242,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 							TranslateYAttribute = this.YAttribute
 						};
 						Vertical Vertical = new Vertical(this.Document, T);
-						List<ILayoutElement> Children = new List<ILayoutElement>()
+						ChunkedList<ILayoutElement> Children = new ChunkedList<ILayoutElement>()
 						{
 							new Label(this.Document, Vertical)
 							{

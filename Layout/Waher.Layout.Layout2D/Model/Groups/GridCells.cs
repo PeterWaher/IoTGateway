@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -10,13 +10,13 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// </summary>
 	public class GridCells : ICellLayout
 	{
-		private readonly List<GridPadding> elements = new List<GridPadding>();
+		private readonly ChunkedList<GridPadding> elements = new ChunkedList<GridPadding>();
 		private readonly Variables session;
 		private readonly int nrColumns;
 		private readonly float[] rights;
 		private readonly float[] widths;
-		private readonly List<float> bottoms;
-		private readonly List<float> heights;
+		private readonly ChunkedList<float> bottoms;
+		private readonly ChunkedList<float> heights;
 		private int x = 0;
 		private int y = 0;
 
@@ -31,8 +31,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			this.nrColumns = NrColumns;
 			this.rights = new float[this.nrColumns];
 			this.widths = new float[this.nrColumns];
-			this.bottoms = new List<float>();
-			this.heights = new List<float>();
+			this.bottoms = new ChunkedList<float>();
+			this.heights = new ChunkedList<float>();
 		}
 
 		private GridPadding GetElement(int X, int Y)
@@ -301,7 +301,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>Array of padded cells.</returns>
 		public Padding[] Align()
 		{
-			List<Padding> Result = new List<Padding>();
+			ChunkedList<Padding> Result = new ChunkedList<Padding>();
 
 			foreach (GridPadding P in this.elements)
 			{

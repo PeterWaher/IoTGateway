@@ -1,9 +1,8 @@
-﻿using SkiaSharp;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -46,7 +45,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		{
 			await base.FromXml(Input);
 
-			List<IFlowingText> Children = new List<IFlowingText>();
+			ChunkedList<IFlowingText> Children = new ChunkedList<IFlowingText>();
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{
@@ -108,7 +107,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// </summary>
 		/// <param name="Segments">List of segments.</param>
 		/// <param name="State">Current drawing state.</param>
-		public virtual async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		public virtual async Task MeasureSegments(ChunkedList<Segment> Segments, DrawingState State)
 		{
 			if (!(this.text is null))
 			{

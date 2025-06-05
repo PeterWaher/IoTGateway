@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using SkiaSharp;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Backgrounds;
 using Waher.Layout.Layout2D.Model.Figures.SegmentNodes;
 using Waher.Layout.Layout2D.Model.References;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -79,7 +79,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 		private ISegment[] GetSegments()
 		{
-			List<ISegment> Segments = null;
+			ChunkedList<ISegment> Segments = null;
 
 			if (this.HasChildren)
 			{
@@ -88,7 +88,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					if (Child is ISegment Segment)
 					{
 						if (Segments is null)
-							Segments = new List<ISegment>();
+							Segments = new ChunkedList<ISegment>();
 
 						Segments.Add(Segment);
 					}

@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {
@@ -106,8 +106,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			// P'(1) = -P₀-2wP₁+2P₂ = 2(P₂-wP₁)-P₀	Note: Error somewhere. Should be 2w(P₂-P₁) for symmetry
 
 			float w2 = this.weight * 2;
-			float dx = w2 * (P1.X - P0.X);
-			float dy = w2 * (P1.Y - P0.Y);
+			float dx = w2 * (this.P1.X - this.P0.X);
+			float dy = w2 * (this.P1.Y - this.P0.Y);
 
 			X = this.P0.X;
 			Y = this.P0.Y;
@@ -126,8 +126,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		public bool TryGetEnd(out float X, out float Y, out float Direction)
 		{
 			float w2 = this.weight * 2;
-			float dx = w2 * (P2.X - P1.X);
-			float dy = w2 * (P2.Y - P1.Y);
+			float dx = w2 * (this.P2.X - this.P1.X);
+			float dy = w2 * (this.P2.Y - this.P1.Y);
 
 			X = this.P2.X;
 			Y = this.P2.Y;

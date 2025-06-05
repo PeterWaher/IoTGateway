@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
@@ -62,14 +62,14 @@ namespace Waher.Layout.Layout2D.Model
 		{
 			await base.FromXml(Input);
 
-			List<ILayoutElement> Children = null;
+			ChunkedList<ILayoutElement> Children = null;
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{
 				if (Node is XmlElement E)
 				{
 					if (Children is null)
-						Children = new List<ILayoutElement>();
+						Children = new ChunkedList<ILayoutElement>();
 
 					Children.Add(await this.Document.CreateElement(E, this));
 				}

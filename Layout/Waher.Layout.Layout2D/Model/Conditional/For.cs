@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 
@@ -140,7 +140,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (this.measured is null)
 			{
-				List<ILayoutElement> Measured = new List<ILayoutElement>();
+				ChunkedList<ILayoutElement> Measured = new ChunkedList<ILayoutElement>();
 				IElement FromValue = await this.from.EvaluateElementAsync(State.Session);
 				IElement ToValue = await this.to.EvaluateElementAsync(State.Session);
 				IElement Step = await this.step.EvaluateElementAsync(State.Session);

@@ -523,7 +523,7 @@ function PopupHandler()
 
         const controlObject = Popup(html, {
             enterFunction: () => PromptSubmit(document.getElementById('native-prompt-input').value),
-            escapeFunction: () => PromptSubmit(undefined),
+            escapeFunction: () => PromptSubmit(null),
             OnShow: () => document.getElementById(PROMPT_INPUT_ID).focus()
         });
 

@@ -339,7 +339,8 @@ function PopupHandler()
         if (activePopup["OnShow"])
             activePopup["OnShow"]()
         NativeBackdrop.ShowBackdrop();
-        NativeFavicon.AddFaviconDot();
+        if (!document.hasFocus())
+            NativeFavicon.AddFaviconDot();
     }
 
     function UpdateFocusTrap()

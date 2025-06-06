@@ -3,4 +3,5 @@
 <div id="native-popup-options">
 <input id="native-prompt-input"/>
 <button onclick="Popup.PromptSubmit(document.getElementById('native-prompt-input').value)">Submit</button>
+<button onclick="Popup.PromptSubmit(null)">Cancel</button>
 </div>

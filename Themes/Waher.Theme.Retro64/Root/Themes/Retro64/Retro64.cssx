@@ -980,7 +980,7 @@ abbr:hover::after
 }
 
 .horizontalAlignMargins
-{
+{http://localhost:8080/Settings/Theme.md
     text-align:justify;
 }
 
@@ -1027,7 +1027,9 @@ abbr:hover::after
     }
 
     #native-header li > ul > li:hover > p,
-    #native-header li > ul > li:hover > a
+    #native-header li > ul > li:hover > a,
+    #native-header li:hover:has(ul) > p,
+    #native-header li:hover:has(ul) > a
     {
         background-color: ¤BackgroundColor¤;
     }

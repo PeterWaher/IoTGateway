@@ -791,7 +791,6 @@ input[type=button], input[type=submit], input[type=reset], button
 {
     transition: color 100ms, background-color 100ms;
     background-color: ¤ButtonColor¤;
-    font-weight: bold;
     border: none;
     color: ¤ButtonTextColor¤;
     padding: 15px 32px;
@@ -946,7 +945,6 @@ fieldset > legend
 .posButton 
 {
 	background-color: ¤PosColor¤;
-    font-family: ¤FontFamily¤;
 }
 
 .posButton:hover, .posButtonPressed

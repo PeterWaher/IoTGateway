@@ -339,7 +339,8 @@ function PopupHandler()
         if (activePopup["OnShow"])
             activePopup["OnShow"]()
         NativeBackdrop.ShowBackdrop();
-        NativeFavicon.AddFaviconDot();
+        if (!document.hasFocus())
+            NativeFavicon.AddFaviconDot();
     }
 
     function UpdateFocusTrap()
@@ -516,13 +517,13 @@ function PopupHandler()
 
     /////////// Prompt
 
-    async function Prompt(message, returnControlObject = false)
+    async function Prompt(message, defaultValue, returnControlObject = false)
     {
-        const html = CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${message}</p>` });
+        const html = CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${message}</p>`, DefaultValue: defaultValue });
 
         const controlObject = Popup(html, {
             enterFunction: () => PromptSubmit(document.getElementById('native-prompt-input').value),
-            escapeFunction: () => PromptSubmit(undefined),
+            escapeFunction: () => PromptSubmit(null),
             OnShow: () => document.getElementById(PROMPT_INPUT_ID).focus()
         });
 

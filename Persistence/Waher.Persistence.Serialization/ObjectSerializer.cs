@@ -812,7 +812,7 @@ namespace Waher.Persistence.Serialization
 				}
 				CSharp.AppendLine("\t\t}");
 				CSharp.AppendLine();
-				CSharp.Append("\t\tpublic override Type ValueType { get { return typeof(");
+				CSharp.Append("\t\tpublic override System.Type ValueType { get { return typeof(");
 				AppendType(Type, CSharp);
 				CSharp.AppendLine("); } }");
 				CSharp.AppendLine();
@@ -876,7 +876,7 @@ namespace Waher.Persistence.Serialization
 					}
 
 					CSharp.AppendLine();
-					CSharp.AppendLine("\t\t\tType DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
+					CSharp.AppendLine("\t\t\tSystem.Type DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
 					CSharp.AppendLine("\t\t\tif (DesiredType is null)");
 					CSharp.AppendLine("\t\t\t\tDesiredType = typeof(GenericObject);");
 					CSharp.AppendLine();
@@ -2194,7 +2194,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\tpublic override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue, object State)");
 				CSharp.AppendLine("\t\t{");
-				CSharp.AppendLine("\t\t\tType T = UntypedValue?.GetType();");
+				CSharp.AppendLine("\t\t\tSystem.Type T = UntypedValue?.GetType();");
 				CSharp.Append("\t\t\tif (!(T is null) && T != typeof(");
 				AppendType(this.type, CSharp);
 				CSharp.AppendLine("))");

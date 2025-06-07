@@ -527,6 +527,15 @@ function PopupHandler()
             OnShow: () => document.getElementById(PROMPT_INPUT_ID).focus()
         });
 
+        if (typeof defaultValue === "string")
+        {
+            setTimeout(() => {
+                document.getElementById('native-prompt-input').value = defaultValue
+                document.getElementById('native-prompt-input').selectionStart = 0
+                document.getElementById('native-prompt-input').selectionEnd = defaultValue.length
+            }, 0)
+        }
+
         if (!returnControlObject)
             return await controlObject.userActionPromise
 

@@ -165,14 +165,15 @@ section a:active
 {
     overflow: hidden;
     position: relative;
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
 
 .native-carousel > * {
-    position: absolute;
+    grid-area: 1 / 1;
+    margin-inline: auto;
     pointer-events: none;
     transition: opacity 0.3s, transform 0.2s;
     opacity: 0;

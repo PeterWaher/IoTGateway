@@ -73,7 +73,9 @@ function NativeHeaderHandler()
 
                 // normalise list item width
                 const textElements = []
-                maxWidth = 0
+                let maxWidth = 0
+                if (subMenu === topSubmenue)
+                    maxWidth = Number(window.getComputedStyle(topSubmenue.previousElementSibling).width.split("px")[0])
                 for (let i = 0; i < subMenu.children.length; i++)
                 {
                     const child = subMenu.children[i]

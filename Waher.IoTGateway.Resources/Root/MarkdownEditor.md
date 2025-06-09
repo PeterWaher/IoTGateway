@@ -50,7 +50,8 @@ a.</button><button type="button" tabindex="-1" class="MarkdownEditorButton Markd
 #</button><span class="MarkdownEditorToolbarSeparator">|</span><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorPreview" onclick="MarkdownEditorPreview(this)" title="Preview (ALT+1)">
 👁</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorBottomPreviewAndEdit" onclick="MarkdownEditorBottomPreviewAndEdit(this)" title="Edit and Bottom Preview (ALT+2)">
 ⌹</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorSidePreviewAndEdit" onclick="MarkdownEditorSidePreviewAndEdit(this)" title="Edit and Side Preview (ALT+2)">
-•|•</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorHelp" onclick="MarkdownEditorHelp(this)" title="Markdown Reference (F1)">
+•|•</button><span class="MarkdownEditorToolbarSeparator">|</span><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorTabNavigation" onclick="MarkdownToggleTabNavigation(this)" title="Tab navigation (Alt+T)">
+↹</button><button type="button" tabindex="-1" class="MarkdownEditorButton MarkdownEditorHelp" onclick="MarkdownEditorHelp(this)" title="Markdown Reference (F1)">
 ?</button>
 </div>
 </div>

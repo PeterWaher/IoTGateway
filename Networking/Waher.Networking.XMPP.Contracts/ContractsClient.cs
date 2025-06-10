@@ -1809,6 +1809,16 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (!HasOldPublicKey)
 					{
+						// TODO: Remove:
+						Log.Debug("Provider Signature Invalid (1).",
+							new KeyValuePair<string, object>("Identity", Identity.Id),
+							new KeyValuePair<string, object>("Provider", Identity.Provider),
+							new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
+							new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
+							new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+
 						await this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
 						return;
 					}
@@ -1823,14 +1833,38 @@ namespace Waher.Networking.XMPP.Contracts
 						if (e2.Ok && !(e2.Key is null))
 						{
 							if (e.Key.Equals(e2.Key))
+							{
+								// TODO: Remove:
+								Log.Debug("Provider Signature Invalid (2).",
+									new KeyValuePair<string, object>("Identity", Identity.Id),
+									new KeyValuePair<string, object>("Provider", Identity.Provider),
+									new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
+									new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
+									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+
 								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+							}
 
 							Valid = e2.Key.Verify(Data, Identity.ServerSignature);
 
 							if (Valid)
 								return this.ReturnStatus(IdentityStatus.Valid, Callback, State);
 							else
+							{
+								// TODO: Remove:
+								Log.Debug("Provider Signature Invalid (3).",
+									new KeyValuePair<string, object>("Identity", Identity.Id),
+									new KeyValuePair<string, object>("Provider", Identity.Provider),
+									new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
+									new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
+									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
+
 								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
+							}
 						}
 						else
 							return this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
@@ -4943,13 +4977,22 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (Valid)
 					{
-
 						await this.ReturnStatus(ContractStatus.Valid, Callback, State);
 						return;
 					}
 
 					if (!HasOldPublicKey)
 					{
+						// TODO: Remove:
+						Log.Debug("Provider Signature Invalid (4).",
+							new KeyValuePair<string, object>("Contract", Contract.ContractId),
+							new KeyValuePair<string, object>("Provider", Contract.Provider),
+							new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
+							new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
+							new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
+						
 						await this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
 						return;
 					}
@@ -4964,14 +5007,38 @@ namespace Waher.Networking.XMPP.Contracts
 						if (e2.Ok && !(e2.Key is null))
 						{
 							if (e.Key.Equals(e2.Key))
+							{
+								// TODO: Remove:
+								Log.Debug("Provider Signature Invalid (5).",
+									new KeyValuePair<string, object>("Contract", Contract.ContractId),
+									new KeyValuePair<string, object>("Provider", Contract.Provider),
+									new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
+									new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
+									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
+
 								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
+							}
 
 							Valid = e2.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
 
 							if (Valid)
 								return this.ReturnStatus(ContractStatus.Valid, Callback, State);
 							else
+							{
+								// TODO: Remove:
+								Log.Debug("Provider Signature Invalid (6).",
+									new KeyValuePair<string, object>("Contract", Contract.ContractId),
+									new KeyValuePair<string, object>("Provider", Contract.Provider),
+									new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
+									new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
+									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
+									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
+
 								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
+							}
 						}
 						else
 							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State);

@@ -803,7 +803,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	
+
 	<xs:simpleType name='GeoSpatial'>
 		<xs:annotation>
 			<xs:documentation>Simple type representing a geo-spatial value.</xs:documentation>
@@ -1513,8 +1513,16 @@
 			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been signed.</xs:documentation>
 			<xs:documentation>It is sent between Trust Providers if the smart contract and the legal identity are hosted on separate brokers. It is also sent to the creator and parts of a contract, if a new signature has been added.</xs:documentation>
 			<xs:documentation>Note: To validate the signature, the contract, and possibly some keys, have to be retrieved and validated.</xs:documentation>
+			<xs:documentation>The signed contract is included in the message.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='contract'>
+					<xs:annotation>
+						<xs:documentation>The contract that was signed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
 			<xs:attribute name='contractId' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>The identity of the contract that has received the signature.</xs:documentation>
@@ -1528,6 +1536,11 @@
 			<xs:attribute name='role' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>The role for which the legal identity has signed the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='signed' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>If the signature resulted the contract to become signed.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>

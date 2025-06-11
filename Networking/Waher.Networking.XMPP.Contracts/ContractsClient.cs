@@ -34,6 +34,7 @@ using Waher.Runtime.Profiling;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Temporary;
 using Waher.Script;
+using Waher.Script.TypeConversion;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
@@ -4028,13 +4029,38 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#region Contract Signature event
 
-		private Task ContractSignedMessageHandler(object Sender, MessageEventArgs e)
+		private async Task ContractSignedMessageHandler(object Sender, MessageEventArgs e)
 		{
 			string ContractId = XML.Attribute(e.Content, "contractId");
 			string LegalId = XML.Attribute(e.Content, "legalId");
 			string Role = XML.Attribute(e.Content, "role");
+			bool Signed = XML.Attribute(e.Content, "signed", false);
 
-			return this.ContractSigned.Raise(this, new ContractSignedEventArgs(ContractId, LegalId, Role));
+			if (XmppClient.GetDomain(ContractId) != e.From)
+			{
+				this.Error("Client signature message ignored. Source domain not equal to contract domain.");
+				return;
+			}
+
+			Contract Contract = null;
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "contract" && IsNamespaceSmartContract(E.NamespaceURI))
+				{
+					ParsedContract ParsedContract = await Contract.Parse(E, this, false);
+					Contract = ParsedContract?.Contract;
+					break;
+				}
+			}
+
+			if (Contract is null)
+			{
+				this.Error("Client signature message ignored. Unable to parse embedded contract.");
+				return;
+			}
+
+			await this.ContractSigned.Raise(this, new ContractSignedEventArgs(ContractId, LegalId, Role, Signed, Contract));
 		}
 
 		/// <summary>

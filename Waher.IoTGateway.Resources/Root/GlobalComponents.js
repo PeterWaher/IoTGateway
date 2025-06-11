@@ -283,6 +283,11 @@ function PopupHandler()
 
     let focusFunction = null;
 
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden)
+            NativeFavicon.RemoveFaviconDot()
+    })
+
     popupContainer.addEventListener("keydown", event =>
     {
         if (event.key === "Enter")

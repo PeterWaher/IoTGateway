@@ -154,10 +154,16 @@ namespace Waher.Content.Xsl
 					throw new XmlSchemaException("Not root element.");
 
 				if (Xml.DocumentElement.LocalName != ExpectedRootElement)
-					throw new XmlSchemaException("Expected root element is " + ExpectedRootElement + ".");
+				{
+					throw new XmlSchemaException("Expected root element is " + ExpectedRootElement +
+						" but was " + Xml.DocumentElement.LocalName + ".");
+				}
 
 				if (Xml.DocumentElement.NamespaceURI != ExpectedRootElementNamespace)
-					throw new XmlSchemaException("Expected root element namespace is " + ExpectedRootElementNamespace + ".");
+				{
+					throw new XmlSchemaException("Expected root element namespace is " + ExpectedRootElementNamespace + 
+						" but was " + Xml.DocumentElement.NamespaceURI + ".");
+				}
 			}
 
 			foreach (XmlSchema Schema in Schemas)

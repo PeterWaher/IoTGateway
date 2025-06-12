@@ -1,5 +1,5 @@
-﻿using System;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {

@@ -7,7 +7,7 @@ Javascript: Login.js
 Javascript: /Events.js
 Parameter: from
 Neuron:
-{{GW:=Waher.IoTGateway.Gateway;Domain:=empty(GW.Domain) ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(x,":") and exists(number(after(x,":"))) then "localhost:"+after(x,":") else "localhost") : GW.Domain}}
+{{GW:=Waher.IoTGateway.Gateway;Domain:=!GW.HasDomain ? (x:=Before(After(GW.GetUrl("/"),"://"),"/");if contains(x,":") and exists(number(after(x,":"))) then "localhost:"+after(x,":") else "localhost") : GW.Domain}}
 
 {{
 	LoginMethod := Request.Header.Cookie["login-method"] ?? "";

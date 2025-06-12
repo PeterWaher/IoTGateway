@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
+					width="1684px"
+					height="1190px"
+					background="WhiteBackground"
+					pen="BlackPen"
+					font="Text"
+					textColor="Black">
+	<SolidPen id="BlackPen" color="Black" width="1px"/>
+	<SolidPen id="WhitePen" color="White" width="1px"/>
+	<SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	<Font id="Label" name="Roboto" size="18pt" color="Black" weight="Normal"/>
+	<Font id="Value" name="Roboto" size="24pt" color="Black" weight="Bold"/>
+	<Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+	<Overlays>
+		<Cell halign="Left" valign="Top" width="100%" height="100%">
+			<ImageUrl url="https://paiwise.tagroot.io/Images/WavyBG_1684x1190.png"
+								 width="1684px"
+								 height="1190px"
+								 fill="WhiteBackground"
+								 keepAspectRatio="true"
+								 x="0px"
+								 y="0px"
+								 x2="1684px"
+								 y2="1190px"/>
+		</Cell>
+		<Cell halign="Left" valign="Top" width="100%" height="100%">
+			<Label font="Label" halign="Left" valign="Top" text="A:" x="600px" y="400px"/>
+			<Script font="Value" halign="Left" valign="Top" expression="VarA" x="600px" y="445px"/>
+			<Label font="Label" halign="Left" valign="Top" text="B:" x="600px" y="530px"/>
+			<Script font="Value" halign="Left" valign="Top" expression="VarB" x="600px" y="575px"/>
+			<Label font="Label" halign="Left" valign="Top" text="A+B:" x="600px" y="660px"/>
+			<Script font="Value" halign="Left" valign="Top" expression="VarA+VarB" x="600px" y="705px"/>
+		</Cell>
+		<Cell halign="Left" valign="Top" width="100%" height="100%">
+			<Margins top="820px" left="100px" right="450px">
+				<Paragraph font="Label">
+					<Text text="This example shows a layout that references two variables "/>
+					<Bold>
+						<Text text="VarA"/>
+					</Bold>
+					<Text text=" and "/>
+					<Bold>
+						<Text text="VarB"/>
+					</Bold>
+					<Text text=". These variables are not defined if you view the layout in "/>
+					<Italic>
+						<Text text="LegalLab"/>
+					</Italic>
+					<Text text=". You can go to the "/>
+					<Italic>
+						<Text text="script tab"/>
+					</Italic>
+					<Text text=" define values for these variables, and return to the "/>
+					<Italic>
+						<Text text="XML"/>
+					</Italic>
+					<Text text=" tab and view how the values affect the layout."/>
+				</Paragraph>
+			</Margins>
+		</Cell>
+		<Cell halign="Left" valign="Top" width="100%" height="100%">
+			<Margins top="400px" left="1200px">
+				<Rectangle fill="WhiteBackground" pen="WhitePen" width="400px" height="400px">
+					<Script expression="(Icon:=CreateMultiQR({'Title':'Layout Example','Description':'Layout Example from the LegalLab repository','Master':'/Master.md','Scheme':'nfeat','ExpiryDate':null,'CountCategory':'LegalLab','CountLimit':null,'Label1':'Example','Text1':'For use with LegalLab to illustrate XML Layouts (see links below).','Link1':'https://github.com/Trust-Anchor-Group/LegalLab/blob/main/ExampleLayouts/BackgroundLayout.xml','Label2':'Trust Anchor Group','Text2':'More information about Trust Anchor Group:','Link2':'https://www.trustanchorgroup.com/'},'/MultiQR.md');QrEncode(Icon.Page,'H',400)) ??? (LogCritical(Exception);QrEncode('https://github.com/Trust-Anchor-Group/LegalLab/blob/main/ExampleLayouts/BackgroundLayout.xml','H',400))"/>
+				</Rectangle>
+			</Margins>
+		</Cell>
+		<Cell halign="Left" valign="Top" width="100%" height="100%">
+			<Label font="Value" halign="Left" valign="Top" text="Scan me" x="1320px" y="820px"/>
+		</Cell>
+	</Overlays>
+</Layout2D>

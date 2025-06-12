@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -13,6 +13,6 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// </summary>
 		/// <param name="Segments">List of segments.</param>
 		/// <param name="State">Current drawing state.</param>
-		Task MeasureSegments(List<Segment> Segments, DrawingState State);
+		Task MeasureSegments(ChunkedList<Segment> Segments, DrawingState State);
 	}
 }

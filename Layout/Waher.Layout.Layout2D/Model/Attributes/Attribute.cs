@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Xml;
-using Waher.Script;
-using Waher.Layout.Layout2D.Exceptions;
 using System.Threading.Tasks;
+using System.Xml;
+using Waher.Layout.Layout2D.Exceptions;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata minClientVersion="3.2">
 		<id>Waher.Security.JWT.UWP</id>
-		<version>1.5.2</version>
+		<version>1.5.4</version>
 		<title>Waher.Security.JWT.UWP</title>
 		<authors>Peter Waher</authors>
 		<owners>Waher Data AB</owners>
@@ -16,13 +16,13 @@
 		<tags>security authentication jwt uwp</tags>
 		<dependencies>
 			<dependency id="Waher.Events" version="1.4.3"/>
-			<dependency id="Waher.Content" version="3.3.2"/>
-			<dependency id="Waher.Networking.HTTP.UWP" version="4.3.3"/>
+			<dependency id="Waher.Content" version="3.3.3"/>
+			<dependency id="Waher.Networking.HTTP.UWP" version="4.4.1"/>
 			<dependency id="Waher.Runtime.Collections" version="1.0.3"/>
-			<dependency id="Waher.Runtime.Inventory" version="1.4.2"/>
+			<dependency id="Waher.Runtime.Inventory" version="1.4.3"/>
 			<dependency id="Waher.Security" version="1.0.13"/>
 			<dependency id="Waher.Security.JWS" version="1.1.4"/>
-			<dependency id="Waher.Security.LoginMonitor.UWP" version="2.2.0"/>
+			<dependency id="Waher.Security.LoginMonitor.UWP" version="2.2.1"/>
 		</dependencies>
 	</metadata>
 	<files>

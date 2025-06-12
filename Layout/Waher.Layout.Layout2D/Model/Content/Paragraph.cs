@@ -1,6 +1,5 @@
 ﻿using SkiaSharp;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
@@ -8,7 +7,7 @@ using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Content.FlowingText;
 using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Layout.Layout2D.Model.Groups;
-using Waher.Script.Graphs.Functions.Canvas;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Content
 {
@@ -90,7 +89,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign", this.Document);
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign", this.Document);
 
-			List<IFlowingText> Children = new List<IFlowingText>();
+			ChunkedList<IFlowingText> Children = new ChunkedList<IFlowingText>();
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{
@@ -195,7 +194,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 					this.fontRef = Font;
 			}
 
-			List<Segment> Segments = new List<Segment>();
+			ChunkedList<Segment> Segments = new ChunkedList<Segment>();
 			SKFont FontBak = State.Font;
 			SKPaint TextBak = State.Text;
 			float LineHeight = 0f;
@@ -214,7 +213,11 @@ namespace Waher.Layout.Layout2D.Model.Content
 			if (!(this.text is null))
 			{
 				foreach (IFlowingText TextItem in this.text)
-					await TextItem.MeasureSegments(Segments, State);
+				{
+					await TextItem.MeasureDimensions(State);
+					if (TextItem.IsVisible)
+						await TextItem.MeasureSegments(Segments, State);
+				}
 			}
 
 			if (!(this.fontRef is null))
@@ -233,7 +236,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 			this.segments = Segments.ToArray();
 
-			List<Row> Rows = new List<Row>();
+			ChunkedList<Row> Rows = new ChunkedList<Row>();
 			Row Row;
 			float RowWidth = 0f;
 			float RowTop = float.MaxValue;

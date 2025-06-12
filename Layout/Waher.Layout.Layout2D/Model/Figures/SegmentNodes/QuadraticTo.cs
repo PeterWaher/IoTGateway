@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {
@@ -96,8 +96,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <returns>If a start position was found.</returns>
 		public bool TryGetStart(out float X, out float Y, out float Direction)
 		{
-			float dx = P1.X - P0.X;
-			float dy = P1.Y - P0.Y;
+			float dx = this.P1.X - this.P0.X;
+			float dy = this.P1.Y - this.P0.Y;
 
 			X = this.P0.X;
 			Y = this.P0.Y;
@@ -115,8 +115,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <returns>If a terminating position was found.</returns>
 		public bool TryGetEnd(out float X, out float Y, out float Direction)
 		{
-			float dx = P2.X - P1.X;
-			float dy = P2.Y - P1.Y;
+			float dx = this.P2.X - this.P1.X;
+			float dy = this.P2.Y - this.P1.Y;
 
 			X = this.P2.X;
 			Y = this.P2.Y;

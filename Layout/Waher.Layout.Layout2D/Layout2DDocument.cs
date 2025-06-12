@@ -483,6 +483,11 @@ namespace Waher.Layout.Layout2D
 		public event EventHandler<UpdatedEventArgs> OnUpdated = null;
 
 		/// <summary>
+		/// If asynchronous updates are supported.
+		/// </summary>
+		public bool SupportsAsynchronnousUpdates => !(this.OnUpdated is null);
+
+		/// <summary>
 		/// Raises the <see cref="OnUpdated"/> event.
 		/// </summary>
 		/// <param name="Element">Element being updated.</param>

@@ -208,7 +208,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			return Best;
 		}
 
-		internal static IXmlVisualizer GetXmlVisualizerHandler(XmlDocument Xml)
+		/// <summary>
+		/// Gets the best XML Visualizer for a given XML document.
+		/// </summary>
+		/// <param name="Xml">Parsed XML Document.</param>
+		/// <returns>XML Visualizer</returns>
+		public static IXmlVisualizer GetXmlVisualizerHandler(XmlDocument Xml)
 		{
 			if (Xml is null || Xml.DocumentElement is null)
 				return null;

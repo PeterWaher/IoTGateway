@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -40,7 +40,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// </summary>
 		/// <param name="Segments">List of segments.</param>
 		/// <param name="State">Current drawing state.</param>
-		public override async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		public override async Task MeasureSegments(ChunkedList<Segment> Segments, DrawingState State)
 		{
 			SKFont Bak = State.Font;
 			SKPaint Bak2 = State.Text;

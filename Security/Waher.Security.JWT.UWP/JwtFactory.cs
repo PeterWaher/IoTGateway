@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Waher.Runtime.Collections;
 using Waher.Security.JWS;
@@ -44,7 +45,12 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Signature invalid
 		/// </summary>
-		InvalidSignature
+		InvalidSignature,
+
+		/// <summary>
+		/// Token has been deprecated
+		/// </summary>
+		Deprecated
 	}
 
 	/// <summary>
@@ -52,6 +58,8 @@ namespace Waher.Security.JWT
 	/// </summary>
 	public class JwtFactory : IDisposable
 	{
+		private static readonly Dictionary<DateTime, ChunkedList<string>> deprecatedByExpiry = new Dictionary<DateTime, ChunkedList<string>>();
+
 		private IJwsAlgorithm algorithm;
 		private TimeSpan timeMargin = TimeSpan.Zero;
 		private readonly KeyValuePair<string, object>[] header = new KeyValuePair<string, object>[]
@@ -234,6 +242,12 @@ namespace Waher.Security.JWT
 				return false;
 			}
 
+			if (IsDeprecated(Token))
+			{
+				Reason = Reason.Deprecated;
+				return false;
+			}
+
 			Reason = Reason.None;
 			return true;
 		}
@@ -311,5 +325,63 @@ namespace Waher.Security.JWT
 			return Header + "." + Payload + "." + Signature;
 		}
 
+		/// <summary>
+		/// Deprecates a token.
+		/// </summary>
+		/// <param name="Token">Token to deprecate.</param>
+		public static void Deprecate(JwtToken Token)
+		{
+			lock (deprecatedByExpiry)
+			{
+				DateTime Expiry = Token.Expiration ?? DateTime.MaxValue;
+
+				if (!deprecatedByExpiry.TryGetValue(Expiry, out ChunkedList<string> List))
+				{
+					List = new ChunkedList<string>();
+					deprecatedByExpiry[Expiry] = List;
+				}
+
+				if (!List.Contains(Token.Token))
+					List.Add(Token.Token);
+
+				ChunkedList<DateTime> ToRemove = null;
+				DateTime Yesterday = DateTime.UtcNow.AddDays(-1);
+
+				foreach (KeyValuePair<DateTime, ChunkedList<string>> P in deprecatedByExpiry)
+				{
+					if (P.Key > Yesterday)
+						break;
+
+					if (ToRemove is null)
+						ToRemove = new ChunkedList<DateTime>();
+
+					ToRemove.Add(P.Key);
+				}
+
+				if (!(ToRemove is null))
+				{
+					foreach (DateTime TP in ToRemove)
+						deprecatedByExpiry.Remove(TP);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Checks if a token is deprecated.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		/// <returns>If token has been deprecated.</returns>
+		public static bool IsDeprecated(JwtToken Token)
+		{
+			lock (deprecatedByExpiry)
+			{
+				DateTime Expiry = Token.Expiration ?? DateTime.MaxValue;
+
+				if (!deprecatedByExpiry.TryGetValue(Expiry, out ChunkedList<string> List))
+					return false;
+
+				return List.Contains(Token.Token);
+			}
+		}
 	}
 }

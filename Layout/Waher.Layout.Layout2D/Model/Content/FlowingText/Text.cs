@@ -1,9 +1,9 @@
 ﻿using SkiaSharp;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -87,7 +87,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// </summary>
 		/// <param name="Segments">List of segments.</param>
 		/// <param name="State">Current drawing state.</param>
-		public async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		public async Task MeasureSegments(ChunkedList<Segment> Segments, DrawingState State)
 		{
 			EvaluationResult<string> Text = await this.text.TryEvaluate(State.Session);
 			if (Text.Ok)
@@ -100,7 +100,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// <param name="Segments">List of segments</param>
 		/// <param name="Text">Text to reduce to segments and add to the list of segments.</param>
 		/// <param name="State">Drawing state.</param>
-		public static void AddSegments(List<Segment> Segments, string Text, DrawingState State)
+		public static void AddSegments(ChunkedList<Segment> Segments, string Text, DrawingState State)
 		{
 			StringBuilder sb = new StringBuilder();
 			bool Empty = true;
@@ -129,7 +129,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				AddSegment(Segments, sb.ToString(), false, State);
 		}
 
-		private static void AddSegment(List<Segment> Segments, string Text, bool SpaceAfter, DrawingState State)
+		private static void AddSegment(ChunkedList<Segment> Segments, string Text, bool SpaceAfter, DrawingState State)
 		{
 			Segment Segment = new Segment()
 			{

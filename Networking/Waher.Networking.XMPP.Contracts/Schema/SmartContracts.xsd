@@ -803,7 +803,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	
+
 	<xs:simpleType name='GeoSpatial'>
 		<xs:annotation>
 			<xs:documentation>Simple type representing a geo-spatial value.</xs:documentation>
@@ -1513,8 +1513,18 @@
 			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been signed.</xs:documentation>
 			<xs:documentation>It is sent between Trust Providers if the smart contract and the legal identity are hosted on separate brokers. It is also sent to the creator and parts of a contract, if a new signature has been added.</xs:documentation>
 			<xs:documentation>Note: To validate the signature, the contract, and possibly some keys, have to be retrieved and validated.</xs:documentation>
+			<xs:documentation>The signed contract is included in the message.</xs:documentation>
+			<xs:documentation>If a contract uses a template from another broker, this message will be sent to the broker hosting the template as well.</xs:documentation>
+			<xs:documentation>If contract reference parameters are available in the contract, the message will also be sent to the brokers hosting the corresponding referenced contracts.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='contract'>
+					<xs:annotation>
+						<xs:documentation>The contract that was signed.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
 			<xs:attribute name='contractId' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>The identity of the contract that has received the signature.</xs:documentation>
@@ -1528,6 +1538,11 @@
 			<xs:attribute name='role' type='xs:string' use='required'>
 				<xs:annotation>
 					<xs:documentation>The role for which the legal identity has signed the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='signed' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>If the signature resulted the contract to become signed.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
@@ -2741,6 +2756,26 @@
 			<xs:attribute name='message' type='xs:string' use='optional'>
 				<xs:annotation>
 					<xs:documentation>An optional message to present to the recipient.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='failContract'>
+		<xs:annotation>
+			<xs:documentation>Can be sent in a message from one broker to another, to indicate the failure of a contract hosted by the recipient.</xs:documentation>
+			<xs:documentation>Only brokers hosting the template of the contract referred to, a contract reference pointed to by the contract, or hosting a signatory of the contract, is allowed to send this message.</xs:documentation>
+			<xs:documentation>The message must be ignored if received from another party.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract that has failed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='reason' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The reason for failing the contract.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>

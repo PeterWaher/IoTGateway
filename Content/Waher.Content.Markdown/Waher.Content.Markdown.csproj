@@ -19,9 +19,9 @@ https://waher.se/Markdown.md</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown Parser Text HTML Difference History</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>6.0.3</AssemblyVersion>
-    <FileVersion>6.0.3</FileVersion>
-    <Version>6.0.3</Version>
+    <AssemblyVersion>6.1.1</AssemblyVersion>
+    <FileVersion>6.1.1</FileVersion>
+    <Version>6.1.1</Version>
     <PackageIconUrl />
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>

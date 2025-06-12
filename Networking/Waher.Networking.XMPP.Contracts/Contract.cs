@@ -348,6 +348,50 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Timestamp of first client signature, if one exists.
+		/// </summary>
+		public DateTime? FirstSignatureAt
+		{
+			get
+			{
+				DateTime? Result = null;
+
+				if (!(this.clientSignatures is null))
+				{
+					foreach (ClientSignature Signature in this.clientSignatures)
+					{
+						if (!Result.HasValue || Result.Value > Signature.Timestamp)
+							Result = Signature.Timestamp;
+					}
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Timestamp of first client signature, if one exists.
+		/// </summary>
+		public DateTime? LastSignatureAt
+		{
+			get
+			{
+				DateTime? Result = null;
+
+				if (!(this.clientSignatures is null))
+				{
+					foreach (ClientSignature Signature in this.clientSignatures)
+					{
+						if (!Result.HasValue || Result.Value < Signature.Timestamp)
+							Result = Signature.Timestamp;
+					}
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// If contract has parameters that require encryption and decryption.
 		/// </summary>
 		public bool HasEncryptedParameters
@@ -1274,6 +1318,13 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				["Duration"] = Result.duration
 			};
+
+			DateTime? FirstSignature = Result.FirstSignatureAt;
+			if (FirstSignature.HasValue)
+			{
+				Variables["Now"] = FirstSignature.Value.ToLocalTime();
+				Variables["NowUtc"] = FirstSignature.Value.ToUniversalTime();
+			}
 
 			foreach (Parameter Parameter in Parameters)
 				Parameter.Populate(Variables);

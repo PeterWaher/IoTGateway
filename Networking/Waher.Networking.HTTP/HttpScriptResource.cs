@@ -106,203 +106,212 @@ namespace Waher.Networking.HTTP
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			SessionVariables v = Request.Session ?? new SessionVariables();
-			v.CurrentRequest = Request;
-			v.CurrentResponse = Response;
 
-			object Result;
-
-			if (!(this.script is null))
-				Result = await this.script.EvaluateAsync(v);
-			else if (!(this.scriptNode is null))
+			await v.LockAsync();
+			try
 			{
-				IElement E;
+				v.CurrentRequest = Request;
+				v.CurrentResponse = Response;
 
-				try
+				object Result;
+
+				if (!(this.script is null))
+					Result = await this.script.EvaluateAsync(v);
+				else if (!(this.scriptNode is null))
 				{
-					if (this.scriptNode.IsAsynchronous)
-						E = await this.scriptNode.EvaluateAsync(v);
-					else
-						E = this.scriptNode.Evaluate(v);
-				}
-				catch (ScriptReturnValueException ex)
-				{
-					E = ex.ReturnValue;
-					//ScriptReturnValueException.Reuse(ex);
-				}
-				catch (ScriptBreakLoopException ex)
-				{
-					E = ex.LoopValue ?? ObjectValue.Null;
-					//ScriptBreakLoopException.Reuse(ex);
-				}
-				catch (ScriptContinueLoopException ex)
-				{
-					E = ex.LoopValue ?? ObjectValue.Null;
-					//ScriptContinueLoopException.Reuse(ex);
-				}
-
-				Result = E.AssociatedObjectValue;
-			}
-			else
-				Result = null;
-
-			if (Response.ResponseSent)
-				return;
-
-			HttpRequestHeader Header = Request.Header;
-			if (Header.Accept is null)
-			{
-				await Response.Return(Result);
-				return;
-			}
-
-			ContentResponse P = await InternetContent.EncodeAsync(Result, Encoding.UTF8);
-			if (P.HasError)
-			{
-				await Response.SendResponse(P.Error);
-				return;
-			}
-
-			byte[] Binary = P.Encoded;
-			string ContentType = P.ContentType;
-
-			bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
-
-			if (!Acceptable || TypeAcceptance == AcceptanceLevel.Wildcard)
-			{
-				IContentConverter Converter = null;
-				string NewContentType = null;
-				int i = ContentType.IndexOf(';');
-				string ContentTypeNoParams = i < 0 ? ContentType : ContentType.Substring(0, i).TrimEnd();
-
-				foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
-				{
-					NewContentType = AcceptRecord.Item;
-					if (NewContentType.EndsWith("/*"))
-					{
-						NewContentType = null;
-						continue;
-					}
-
-					if (InternetContent.CanConvert(ContentTypeNoParams, NewContentType, out Converter))
-					{
-						Acceptable = true;
-						break;
-					}
-				}
-
-				if (Converter is null)
-				{
-					IContentConverter[] Converters = InternetContent.GetConverters(ContentTypeNoParams);
-
-					if (!(Converters is null))
-					{
-						string BestContentType = null;
-						double BestQuality = 0;
-						IContentConverter Best = null;
-						bool Found;
-
-						foreach (IContentConverter Converter2 in Converters)
-						{
-							Found = false;
-
-							foreach (string FromContentType in Converter2.FromContentTypes)
-							{
-								if (ContentTypeNoParams == FromContentType)
-								{
-									Found = true;
-									break;
-								}
-							}
-
-							if (!Found)
-								continue;
-
-							foreach (string ToContentType in Converter2.ToContentTypes)
-							{
-								if (Header.Accept.IsAcceptable(ToContentType, out double Quality2) && Quality > BestQuality)
-								{
-									BestContentType = ToContentType;
-									BestQuality = Quality;
-									Best = Converter2;
-								}
-								else if (BestQuality == 0 && ToContentType == "*")
-								{
-									BestContentType = ContentType;
-									BestQuality = double.Epsilon;
-									Best = Converter2;
-								}
-							}
-						}
-
-						if (!(Best is null) && (!Acceptable || BestQuality >= Quality))
-						{
-							Acceptable = true;
-							Converter = Best;
-							NewContentType = BestContentType;
-						}
-					}
-				}
-
-				if (Acceptable && !(Converter is null))
-				{
-					MemoryStream f2 = null;
-					MemoryStream f = new MemoryStream(Binary);
+					IElement E;
 
 					try
 					{
-						f2 = new MemoryStream();
+						if (this.scriptNode.IsAsynchronous)
+							E = await this.scriptNode.EvaluateAsync(v);
+						else
+							E = this.scriptNode.Evaluate(v);
+					}
+					catch (ScriptReturnValueException ex)
+					{
+						E = ex.ReturnValue;
+						//ScriptReturnValueException.Reuse(ex);
+					}
+					catch (ScriptBreakLoopException ex)
+					{
+						E = ex.LoopValue ?? ObjectValue.Null;
+						//ScriptBreakLoopException.Reuse(ex);
+					}
+					catch (ScriptContinueLoopException ex)
+					{
+						E = ex.LoopValue ?? ObjectValue.Null;
+						//ScriptContinueLoopException.Reuse(ex);
+					}
 
-						List<string> Alternatives = null;
-						string[] Range = Converter.ToContentTypes;
-						bool All = Range.Length == 1 && Range[0] == "*";
+					Result = E.AssociatedObjectValue;
+				}
+				else
+					Result = null;
 
-						foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
+				if (Response.ResponseSent)
+					return;
+
+				HttpRequestHeader Header = Request.Header;
+				if (Header.Accept is null)
+				{
+					await Response.Return(Result);
+					return;
+				}
+
+				ContentResponse P = await InternetContent.EncodeAsync(Result, Encoding.UTF8);
+				if (P.HasError)
+				{
+					await Response.SendResponse(P.Error);
+					return;
+				}
+
+				byte[] Binary = P.Encoded;
+				string ContentType = P.ContentType;
+
+				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
+
+				if (!Acceptable || TypeAcceptance == AcceptanceLevel.Wildcard)
+				{
+					IContentConverter Converter = null;
+					string NewContentType = null;
+					int i = ContentType.IndexOf(';');
+					string ContentTypeNoParams = i < 0 ? ContentType : ContentType.Substring(0, i).TrimEnd();
+
+					foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
+					{
+						NewContentType = AcceptRecord.Item;
+						if (NewContentType.EndsWith("/*"))
 						{
-							if (AcceptRecord.Item.EndsWith("/*") || AcceptRecord.Item == NewContentType)
-								continue;
+							NewContentType = null;
+							continue;
+						}
 
-							if (All || Array.IndexOf(Range, AcceptRecord.Item) >= 0)
+						if (InternetContent.CanConvert(ContentTypeNoParams, NewContentType, out Converter))
+						{
+							Acceptable = true;
+							break;
+						}
+					}
+
+					if (Converter is null)
+					{
+						IContentConverter[] Converters = InternetContent.GetConverters(ContentTypeNoParams);
+
+						if (!(Converters is null))
+						{
+							string BestContentType = null;
+							double BestQuality = 0;
+							IContentConverter Best = null;
+							bool Found;
+
+							foreach (IContentConverter Converter2 in Converters)
 							{
-								if (Alternatives is null)
-									Alternatives = new List<string>();
+								Found = false;
 
-								Alternatives.Add(AcceptRecord.Item);
+								foreach (string FromContentType in Converter2.FromContentTypes)
+								{
+									if (ContentTypeNoParams == FromContentType)
+									{
+										Found = true;
+										break;
+									}
+								}
+
+								if (!Found)
+									continue;
+
+								foreach (string ToContentType in Converter2.ToContentTypes)
+								{
+									if (Header.Accept.IsAcceptable(ToContentType, out double Quality2) && Quality > BestQuality)
+									{
+										BestContentType = ToContentType;
+										BestQuality = Quality;
+										Best = Converter2;
+									}
+									else if (BestQuality == 0 && ToContentType == "*")
+									{
+										BestContentType = ContentType;
+										BestQuality = double.Epsilon;
+										Best = Converter2;
+									}
+								}
+							}
+
+							if (!(Best is null) && (!Acceptable || BestQuality >= Quality))
+							{
+								Acceptable = true;
+								Converter = Best;
+								NewContentType = BestContentType;
 							}
 						}
-
-						ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, this.ResourceName,
-							Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Response.Progress, 
-							Alternatives?.ToArray());
-
-						if (await Converter.ConvertAsync(State))
-							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
-
-						if (State.HasError)
-						{
-							await Response.SendResponse(State.Error);
-							return;
-						}
-
-						NewContentType = State.ToContentType;
-						ContentType = NewContentType;
-						Acceptable = true;
-						Binary = f2.ToArray();
 					}
-					finally
+
+					if (Acceptable && !(Converter is null))
 					{
-						f?.Dispose();
-						f2?.Dispose();
+						MemoryStream f2 = null;
+						MemoryStream f = new MemoryStream(Binary);
+
+						try
+						{
+							f2 = new MemoryStream();
+
+							List<string> Alternatives = null;
+							string[] Range = Converter.ToContentTypes;
+							bool All = Range.Length == 1 && Range[0] == "*";
+
+							foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
+							{
+								if (AcceptRecord.Item.EndsWith("/*") || AcceptRecord.Item == NewContentType)
+									continue;
+
+								if (All || Array.IndexOf(Range, AcceptRecord.Item) >= 0)
+								{
+									if (Alternatives is null)
+										Alternatives = new List<string>();
+
+									Alternatives.Add(AcceptRecord.Item);
+								}
+							}
+
+							ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, this.ResourceName,
+								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Response.Progress,
+								Alternatives?.ToArray());
+
+							if (await Converter.ConvertAsync(State))
+								Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+
+							if (State.HasError)
+							{
+								await Response.SendResponse(State.Error);
+								return;
+							}
+
+							NewContentType = State.ToContentType;
+							ContentType = NewContentType;
+							Acceptable = true;
+							Binary = f2.ToArray();
+						}
+						finally
+						{
+							f?.Dispose();
+							f2?.Dispose();
+						}
 					}
 				}
-			}
 
-			if (!Acceptable)
+				if (!Acceptable)
+				{
+					await Response.SendResponse(new NotAcceptableException());
+					return;
+				}
+
+				await Response.Return(ContentType, true, Binary);
+			}
+			finally
 			{
-				await Response.SendResponse(new NotAcceptableException());
-				return;
+				v.Release();
 			}
-
-			await Response.Return(ContentType, true, Binary);
 		}
 	}
 }

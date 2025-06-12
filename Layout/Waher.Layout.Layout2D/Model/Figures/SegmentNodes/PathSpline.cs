@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SkiaSharp;
+﻿using SkiaSharp;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {
@@ -8,7 +8,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	/// </summary>
 	public class PathSpline : IDirectedElement
 	{
-		private readonly List<SKPoint> vertices;
+		private readonly ChunkedList<SKPoint> vertices;
 
 		/// <summary>
 		/// Represents a spline curve in a path
@@ -17,7 +17,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="Y0">Starting Y-coordinate.</param>
 		public PathSpline(float X0, float Y0)
 		{
-			this.vertices = new List<SKPoint>() { new SKPoint(X0, Y0) };
+			this.vertices = new ChunkedList<SKPoint>() { new SKPoint(X0, Y0) };
 		}
 
 		/// <summary>

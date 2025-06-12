@@ -118,6 +118,7 @@
     <Compile Include="ExternalUser.cs" />
     <Compile Include="Functions\AuthenticateJwt.cs" />
     <Compile Include="Functions\CreateJwt.cs" />
+    <Compile Include="Functions\CreateJwtFactory.cs" />
     <Compile Include="Functions\ValidateJwt.cs" />
     <Compile Include="IUserWithClaims.cs" />
     <Compile Include="JwtAuthentication.cs" />

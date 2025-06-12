@@ -1,15 +1,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using SkiaSharp;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Images;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Script.Content.Functions.Encoding;
 using Waher.Script.Graphs;
 
 namespace Waher.Layout.Layout2D.Test
@@ -28,12 +28,30 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(Log).Assembly,
 				typeof(Expression).Assembly,
 				typeof(Graph).Assembly,
+				typeof(QrEncode).Assembly,
 				typeof(Layout2DDocument).Assembly);
 		}
 
-		protected virtual async Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
+		protected Task Test(string FileName)
 		{
-			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), ContentAttachments);
+			return this.Test(FileName, new Variables());
+		}
+
+		protected Task Test(string FileName, params Variable[] Variables)
+		{
+			return this.Test(FileName, new Variables(Variables));
+		}
+
+		protected Task Test(string FileName,
+			params KeyValuePair<string, object>[] ContentAttachments)
+		{
+			return this.Test(FileName, new Variables(), ContentAttachments);
+		}
+
+		protected virtual async Task Test(string FileName, Variables Variables,
+			params KeyValuePair<string, object>[] ContentAttachments)
+		{
+			await Layout2DDocument.FromFile(Path.Combine("Xml", FileName + ".xml"), true, Variables, ContentAttachments);
 		}
 
 		[TestMethod]
@@ -379,6 +397,20 @@ namespace Waher.Layout.Layout2D.Test
 		public virtual async Task Test_57_HeightUndefined()
 		{
 			await this.Test("Test_57_HeightUndefined");
+		}
+
+		[TestMethod]
+		public async Task Test_58_Certificate()
+		{
+			await this.Test("Test_58_Certificate",
+				new Variable("VarA", 12),
+				new Variable("VarB", 13));
+		}
+
+		[TestMethod]
+		public async Task Test_59_Paragraph_IsVisible()
+		{
+			await this.Test("Test_59_Paragraph_IsVisible");
 		}
 	}
 }

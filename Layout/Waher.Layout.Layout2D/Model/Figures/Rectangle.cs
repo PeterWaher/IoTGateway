@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {

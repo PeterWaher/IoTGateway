@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Conditional
 {
@@ -70,7 +70,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		{
 			await base .FromXml(Input);
 
-			List<Case> Cases = new List<Case>();
+			ChunkedList<Case> Cases = new ChunkedList<Case>();
 
 			foreach (XmlNode Node in Input.ChildNodes)
 			{

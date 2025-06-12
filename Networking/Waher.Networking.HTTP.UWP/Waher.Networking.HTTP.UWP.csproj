@@ -158,6 +158,7 @@
     <Compile Include="HTTP2\StreamState.cs" />
     <Compile Include="HttpRedirectionResource.cs" />
     <Compile Include="Interfaces\IHttpConnectMethod.cs" />
+    <Compile Include="ProfilingEventArgs.cs" />
     <Compile Include="ProxyRequestEventArgs.cs" />
     <Compile Include="CustomErrorEventArgs.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />
@@ -302,7 +303,12 @@
     <Compile Include="ScriptExtensions\Functions\ServerErrors\NotImplemented.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\ServiceUnavailable.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\VariantAlsoNegotiates.cs" />
+    <Compile Include="ScriptExtensions\Global.cs" />
+    <Compile Include="ScriptExtensions\Page.cs" />
     <Compile Include="ScriptExtensions\Posted.cs" />
+    <Compile Include="ScriptExtensions\Request.cs" />
+    <Compile Include="ScriptExtensions\Response.cs" />
+    <Compile Include="SessionVariables.cs" />
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />

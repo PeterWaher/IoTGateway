@@ -1,10 +1,9 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using System.Text;
 using System.Xml;
-using SkiaSharp;
 using Waher.Script;
 using Waher.Script.Graphs;
 

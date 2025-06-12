@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.36105.23 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Layout", "Layout", "{C69C8978-F070-44A4-A386-52A6C1847E6D}"
 EndProject
@@ -30,6 +30,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Graphs", "Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj", "{E76D1952-F8DB-4AEA-A16B-66FE9B6DC4CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Images", "Content\Waher.Content.Images\Waher.Content.Images.csproj", "{F61A0414-EF22-4160-B799-E50F9D4E3AC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.IO", "Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj", "{3B5C27B9-78D4-460E-1659-575E7BB9D4CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{F61A0414-EF22-4160-B799-E50F9D4E3AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F61A0414-EF22-4160-B799-E50F9D4E3AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F61A0414-EF22-4160-B799-E50F9D4E3AC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B5C27B9-78D4-460E-1659-575E7BB9D4CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B5C27B9-78D4-460E-1659-575E7BB9D4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B5C27B9-78D4-460E-1659-575E7BB9D4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B5C27B9-78D4-460E-1659-575E7BB9D4CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{8F03684E-03BD-4872-9B92-1D9845B763FF} = {7F31982A-3145-49C2-B0BA-9BE3C7FDBA55}
 		{E76D1952-F8DB-4AEA-A16B-66FE9B6DC4CD} = {A967C23E-7EFD-4FDD-9237-97124136E43B}
 		{F61A0414-EF22-4160-B799-E50F9D4E3AC6} = {7F31982A-3145-49C2-B0BA-9BE3C7FDBA55}
+		{3B5C27B9-78D4-460E-1659-575E7BB9D4CA} = {14CBB8AD-4570-46D3-8F43-BBB10F84171D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {988B762C-FA18-43FC-83CC-19513C15A4EF}

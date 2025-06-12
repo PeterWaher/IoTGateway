@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.Collections;
 
 namespace Waher.Layout.Layout2D.Model.Conditional
 {
@@ -114,7 +114,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			if (this.measured is null)
 			{
-				List<ILayoutElement> Measured = new List<ILayoutElement>();
+				ChunkedList<ILayoutElement> Measured = new ChunkedList<ILayoutElement>();
 				object Result = await this.expression.EvaluateAsync(State.Session);
 
 				if (Result is IEnumerable Set && this.HasChildren)

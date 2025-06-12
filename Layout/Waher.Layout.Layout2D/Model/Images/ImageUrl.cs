@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.Cache;
 
 namespace Waher.Layout.Layout2D.Model.Images
 {
@@ -13,6 +14,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 	/// </summary>
 	public class ImageUrl : Image
 	{
+		private static readonly Cache<string, SKImage> imageCache = new Cache<string, SKImage>(int.MaxValue, TimeSpan.FromHours(8), TimeSpan.FromMinutes(15));
+
 		private StringAttribute url;
 		private StringAttribute alt;
 
@@ -108,7 +111,29 @@ namespace Waher.Layout.Layout2D.Model.Images
 		{
 			EvaluationResult<string> URL = await this.url.TryEvaluate(State.Session);
 			if (URL.Ok && !string.IsNullOrEmpty(URL.Result))
+			{
+				if (imageCache.TryGetValue(URL.Result, out SKImage Image))
+				{
+					this.image = Image;
+					return Image;
+				}
+
+				if (!this.Document.SupportsAsynchronnousUpdates)
+				{
+					ContentResponse Result = await InternetContent.GetAsync(new Uri(URL.Result),
+						new KeyValuePair<string, string>("Accept", "image/*"));
+
+					if (!Result.HasError && Result.Decoded is SKImage Image2)
+					{
+						imageCache[URL.Result] = Image2;
+
+						this.image = Image2;
+						return Image2;
+					}
+				}
+
 				this.StartLoad(URL.Result);
+			}
 
 			return null;
 		}
@@ -122,6 +147,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 
 				if (!Result.HasError && Result.Decoded is SKImage Image)
 				{
+					imageCache[URL] = Image;
+
 					this.image = Image;
 					this.Document.RaiseUpdated(this);
 				}

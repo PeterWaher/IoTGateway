@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using SkiaSharp;
+﻿using SkiaSharp;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 {
@@ -63,7 +63,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 				this.P0 = Path.LastPoint;
 				this.P1 = PathState.Add(this.xCoordinate, this.yCoordinate);
 				this.P2 = PathState.Add(this.xCoordinate2, this.yCoordinate2);
-				Path.QuadTo(P1, P2);
+				Path.QuadTo(this.P1, this.P2);
 			}
 		
 			return Task.CompletedTask;

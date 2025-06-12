@@ -51,59 +51,52 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			if (this.varRef is null)
+			try
 			{
-				try
+				if (this.varRef is null)
 				{
 					IElement E = this.Argument.Evaluate(Variables);
 					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
 				}
-				catch (Exception)
+				else
 				{
-					return BooleanValue.False;
-				}
-			}
-			else
-			{
-				string s = this.varRef.VariableName;
-				IElement E;
+					string s = this.varRef.VariableName;
+					IElement E;
 
-				if (Variables.TryGetVariable(s, out Variable v))
-					E = v.ValueElement;
-				else if (!Expression.TryGetConstant(s, Variables, out E))
-				{
-					if (Types.IsRootNamespace(s))
+					if (Variables.TryGetVariable(s, out Variable v))
+						E = v.ValueElement;
+					else if (!Expression.TryGetConstant(s, Variables, out E))
 					{
-						if (this.vectorIndex is null)
-							return BooleanValue.True;
+						if (Types.IsRootNamespace(s))
+						{
+							if (this.vectorIndex is null)
+								return BooleanValue.True;
+							else
+								E = new Namespace(s);
+						}
 						else
-							E = new Namespace(s);
+						{
+							ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
+							if (Lambda is null)
+								return BooleanValue.False;
+
+							if (this.vectorIndex is null)
+								return BooleanValue.True;
+							else
+								E = new ObjectValue(Lambda);
+						}
 					}
-					else
-					{
-						ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
-						if (Lambda is null)
-							return BooleanValue.False;
 
-						if (this.vectorIndex is null)
-							return BooleanValue.True;
-						else
-							E = new ObjectValue(Lambda);
-					}
-				}
+					if (this.vectorIndex is null)
+						return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
 
-				if (this.vectorIndex is null)
-					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
-
-				try
-				{
 					IElement Index = this.vectorIndex.Evaluate(Variables);
 					return this.IsWellDefined(E, Index) ? BooleanValue.True : BooleanValue.False;
 				}
-				catch (Exception)
-				{
-					return BooleanValue.False;
-				}
+			}
+			catch (Exception)
+			{
+				return BooleanValue.False;
 			}
 		}
 
@@ -164,7 +157,7 @@ namespace Waher.Script.Functions.Runtime
 						return false;
 				}
 			}
-			
+
 			return this.IsWellDefined(VectorIndex.EvaluateIndex(Element, Index, false, this));
 		}
 
@@ -175,59 +168,52 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			if (this.varRef is null)
+			try
 			{
-				try
+				if (this.varRef is null)
 				{
 					IElement E = await this.Argument.EvaluateAsync(Variables);
 					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
 				}
-				catch (Exception)
+				else
 				{
-					return BooleanValue.False;
-				}
-			}
-			else
-			{
-				string s = this.varRef.VariableName;
-				IElement E;
+					string s = this.varRef.VariableName;
+					IElement E;
 
-				if (Variables.TryGetVariable(s, out Variable v))
-					E = v.ValueElement;
-				else if (!Expression.TryGetConstant(s, Variables, out E))
-				{
-					if (Types.IsRootNamespace(s))
+					if (Variables.TryGetVariable(s, out Variable v))
+						E = v.ValueElement;
+					else if (!Expression.TryGetConstant(s, Variables, out E))
 					{
-						if (this.vectorIndex is null)
-							return BooleanValue.True;
+						if (Types.IsRootNamespace(s))
+						{
+							if (this.vectorIndex is null)
+								return BooleanValue.True;
+							else
+								E = new Namespace(s);
+						}
 						else
-							E = new Namespace(s);
+						{
+							ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
+							if (Lambda is null)
+								return BooleanValue.False;
+
+							if (this.vectorIndex is null)
+								return BooleanValue.True;
+							else
+								E = new ObjectValue(Lambda);
+						}
 					}
-					else
-					{
-						ILambdaExpression Lambda = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
-						if (Lambda is null)
-							return BooleanValue.False;
 
-						if (this.vectorIndex is null)
-							return BooleanValue.True;
-						else
-							E = new ObjectValue(Lambda);
-					}
-				}
+					if (this.vectorIndex is null)
+						return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
 
-				if (this.vectorIndex is null)
-					return this.IsWellDefined(E) ? BooleanValue.True : BooleanValue.False;
-
-				try
-				{
 					IElement Index = await this.vectorIndex.EvaluateAsync(Variables);
 					return this.IsWellDefined(E, Index) ? BooleanValue.True : BooleanValue.False;
 				}
-				catch (Exception)
-				{
-					return BooleanValue.False;
-				}
+			}
+			catch (Exception)
+			{
+				return BooleanValue.False;
 			}
 		}
 

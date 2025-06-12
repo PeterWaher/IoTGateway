@@ -57,8 +57,13 @@ namespace Waher.Networking.XMPP.Contracts
 			get => this.@value;
 			set
 			{
-				this.@value = value;
-				this.ProtectedValue = null;
+				if (this.@value != value)
+				{
+					this.@value = value;
+					this.ProtectedValue = null;
+					this.reference = null;
+					this.referenceStatus = null;
+				}
 			}
 		}
 
@@ -274,7 +279,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					if (this.reference is null || this.reference.ContractId != this.@value)
+					if (this.reference is null || this.@value != this.reference.ContractId)
 					{
 						this.reference = null;
 						this.referenceStatus = null;
@@ -282,9 +287,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 
 					if (this.reference is null)
-					{
 						return false;
-					}
 
 					if (!string.IsNullOrEmpty(this.localName) &&
 						this.localName != this.reference.ForMachinesLocalName)
@@ -431,6 +434,8 @@ namespace Waher.Networking.XMPP.Contracts
 			this.templateId = Xml.HasAttribute("templateId") ? XML.Attribute(Xml, "templateId") : null;
 			this.provider = Xml.HasAttribute("provider") ? XML.Attribute(Xml, "provider") : null;
 			this.creatorRole = Xml.HasAttribute("creatorRole") ? XML.Attribute(Xml, "creatorRole") : null;
+			this.reference = null;
+			this.referenceStatus = null;
 
 			return await base.Import(Xml);
 		}

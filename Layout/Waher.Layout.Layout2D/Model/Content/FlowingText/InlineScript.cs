@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Runtime.Collections;
 using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -90,7 +90,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// </summary>
 		/// <param name="Segments">List of segments.</param>
 		/// <param name="State">Current drawing state.</param>
-		public async Task MeasureSegments(List<Segment> Segments, DrawingState State)
+		public async Task MeasureSegments(ChunkedList<Segment> Segments, DrawingState State)
 		{
 			EvaluationResult<Expression> Parsed = await this.expression.TryEvaluate(State.Session);
 			if (Parsed.Ok)
@@ -124,7 +124,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 				catch (Exception ex)
 				{
 					ex = Log.UnnestException(ex);
-					Result = ex.Message;
+					Result = FirstRow(ex.Message);
 				}
 
 				string s = Result?.ToString();

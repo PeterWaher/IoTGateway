@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Runtime.Collections;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -10,8 +10,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 	/// </summary>
 	public class FlexibleVerticalCells : ICellLayout
 	{
-		private readonly List<Padding> currentColumn = new List<Padding>();
-		private readonly List<Tuple<float, float, Padding[]>> columns = new List<Tuple<float, float, Padding[]>>();
+		private readonly ChunkedList<Padding> currentColumn = new ChunkedList<Padding>();
+		private readonly ChunkedList<Tuple<float, float, Padding[]>> columns = new ChunkedList<Tuple<float, float, Padding[]>>();
 		private readonly Variables session;
 		private readonly float limitHeight;
 		private readonly HorizontalDirection horizontalDirection;
@@ -74,7 +74,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				this.x += this.maxWidth;
 
 				if (this.y > this.maxHeight)
-					this.maxHeight = y;
+					this.maxHeight = this.y;
 			}
 
 			this.maxWidth = 0;
@@ -131,7 +131,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <returns>Array of padded cells.</returns>
 		public Padding[] Align()
 		{
-			List<Padding> Result = new List<Padding>();
+			ChunkedList<Padding> Result = new ChunkedList<Padding>();
 			float X = this.horizontalDirection == HorizontalDirection.LeftRight ? 0 : this.x;
 			float Y;
 			float Diff;

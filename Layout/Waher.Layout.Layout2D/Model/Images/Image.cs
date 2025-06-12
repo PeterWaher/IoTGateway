@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Threading.Tasks;
-using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Figures;
 
 namespace Waher.Layout.Layout2D.Model.Images

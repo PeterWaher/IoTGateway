@@ -17,9 +17,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution web service</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>2.1.3</AssemblyVersion>
-    <FileVersion>2.1.3</FileVersion>
-		<Version>2.1.3</Version>
+    <AssemblyVersion>2.1.4</AssemblyVersion>
+    <FileVersion>2.1.4</FileVersion>
+		<Version>2.1.4</Version>
 		<FileUpgradeFlags>40</FileUpgradeFlags>
 		<UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\WebServices\Waher.WebService.Script\</UpgradeBackupLocation>
 		<OldToolsVersion>2.0</OldToolsVersion>

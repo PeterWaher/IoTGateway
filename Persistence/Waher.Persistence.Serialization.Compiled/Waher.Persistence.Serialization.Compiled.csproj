@@ -19,9 +19,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>object serialization compilation</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.10.1</AssemblyVersion>
-    <FileVersion>1.10.1</FileVersion>
-    <Version>1.10.1</Version>
+    <AssemblyVersion>1.10.2</AssemblyVersion>
+    <FileVersion>1.10.2</FileVersion>
+    <Version>1.10.2</Version>
     <RootNamespace>Waher.Persistence.Serialization</RootNamespace>
   </PropertyGroup>
 	<PropertyGroup>

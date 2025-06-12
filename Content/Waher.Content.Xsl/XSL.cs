@@ -148,12 +148,16 @@ namespace Waher.Content.Xsl
 		public static void Validate(string ObjectID, XmlDocument Xml, string ExpectedRootElement, string ExpectedRootElementNamespace,
 			params XmlSchema[] Schemas)
 		{
-			if (!string.IsNullOrEmpty(ExpectedRootElement) &&
-				(Xml.DocumentElement is null ||
-				Xml.DocumentElement.LocalName != ExpectedRootElement ||
-				Xml.DocumentElement.NamespaceURI != ExpectedRootElementNamespace))
+			if (!string.IsNullOrEmpty(ExpectedRootElement))
 			{
-				throw new XmlSchemaException("Expected root element is " + ExpectedRootElement + " (" + ExpectedRootElementNamespace + ")");
+				if (Xml.DocumentElement is null)
+					throw new XmlSchemaException("Not root element.");
+
+				if (Xml.DocumentElement.LocalName != ExpectedRootElement)
+					throw new XmlSchemaException("Expected root element is " + ExpectedRootElement + ".");
+
+				if (Xml.DocumentElement.NamespaceURI != ExpectedRootElementNamespace)
+					throw new XmlSchemaException("Expected root element namespace is " + ExpectedRootElementNamespace + ".");
 			}
 
 			foreach (XmlSchema Schema in Schemas)

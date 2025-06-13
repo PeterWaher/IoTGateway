@@ -407,7 +407,50 @@
 					<xs:documentation>Attachment reference parameter.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name='recordSet' type='RecordSet'>
+				<xs:annotation>
+					<xs:documentation>Groups a set of parameters into a vector of sets of parameters.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name='RecordSet'>
+		<xs:annotation>
+			<xs:documentation>Contains a set of parameters that form a record.</xs:documentation>
+			<xs:documentation>The record can be repeated forming a set of records, or record set.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name='description' type='HumanReadableText' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Human-readable description of the record set.</xs:documentation>
+					<xs:documentation>Note: Multiple localized descriptions can be provided.</xs:documentation>
+					<xs:documentation>Note: Use the xml:lang attribute to specify language used.</xs:documentation>
+					<xs:documentation>Note: Descriptions are not required, if descriptions are available in the template.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='record' type='Parameters'>
+				<xs:annotation>
+					<xs:documentation>Defines a set of parameters forming one record in the record set.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='name' type='NonEmptyString' use='required'>
+			<xs:annotation>
+				<xs:documentation>The name of the record set.</xs:documentation>
+				<xs:documentation>Note: Names are case-insensitive in searches and references.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='maxRecords' type='xs:positiveInteger' use='required'>
+			<xs:annotation>
+				<xs:documentation>Maximum number of records in the record set.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='minRecords' type='xs:nonNegativeInteger' use='required'>
+			<xs:annotation>
+				<xs:documentation>Minimum number of records in the record set.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name='Parameter' abstract='true'>

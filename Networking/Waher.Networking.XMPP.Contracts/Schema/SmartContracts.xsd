@@ -429,9 +429,14 @@
 					<xs:documentation>Note: Descriptions are not required, if descriptions are available in the template.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name='record' type='Parameters'>
+			<xs:element name='recordDefinition' type='Parameters' minOccurs='1' maxOccurs='1'>
 				<xs:annotation>
 					<xs:documentation>Defines a set of parameters forming one record in the record set.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='record' type='Parameters' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Defines one record of data in the record set.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
@@ -439,6 +444,11 @@
 			<xs:annotation>
 				<xs:documentation>The name of the record set.</xs:documentation>
 				<xs:documentation>Note: Names are case-insensitive in searches and references.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='exp' type='xs:string' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Optional script expression validating the parameter.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name='maxRecords' type='xs:positiveInteger' use='required'>

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Persistence;
 using Waher.Script;
@@ -323,7 +324,10 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 
 					if (!this.referenceStatus.HasValue)
-						this.referenceStatus = await Client.ValidateAsync(this.reference, true);
+					{
+						ContractValidationEventArgs e = await Client.ValidateAsync(this.reference, true);
+						this.referenceStatus = e.Status;
+					}
 
 					if (this.referenceStatus != ContractStatus.Valid)
 					{

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Waher.Networking.XMPP.Contracts.EventArguments
 {
@@ -7,6 +8,7 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 	/// </summary>
 	public class IdentityValidationEventArgs : EventArgs
 	{
+		private readonly KeyValuePair<string, object>[] tags;
 		private readonly IdentityStatus status;
 		private readonly object state;
 
@@ -15,17 +17,25 @@ namespace Waher.Networking.XMPP.Contracts.EventArguments
 		/// </summary>
 		/// <param name="Status">Validation status</param>
 		/// <param name="State">State object</param>
-		public IdentityValidationEventArgs(IdentityStatus Status, object State)
+		/// <param name="Tags">Associated tags with more information.</param>
+		public IdentityValidationEventArgs(IdentityStatus Status, object State,
+			params KeyValuePair<string, object>[] Tags)
 			: base()
 		{
 			this.status = Status;
 			this.state = State;
+			this.tags = Tags;
 		}
 
 		/// <summary>
 		/// Validation status of legal identity.
 		/// </summary>
 		public IdentityStatus Status => this.status;
+
+		/// <summary>
+		/// Associated tags with more information.
+		/// </summary>
+		public KeyValuePair<string, object>[] Tags => this.tags;
 
 		/// <summary>
 		/// State object.

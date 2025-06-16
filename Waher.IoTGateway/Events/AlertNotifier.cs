@@ -43,7 +43,16 @@ namespace Waher.IoTGateway.Events
 			Markdown.AppendLine("| Information ||");
 			Markdown.AppendLine("|:------|:-----|");
 
-			this.AppendLabel("Timestamp", Event.Timestamp.ToShortDateString() + ", " + Event.Timestamp.ToLongTimeString(), Markdown);
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(Event.Timestamp.ToShortDateString());
+			sb.Append(", ");
+			sb.Append(Event.Timestamp.ToLongTimeString());
+
+			if (Event.Timestamp.Kind == DateTimeKind.Utc)
+				sb.Append(" (UTC)");
+
+			this.AppendLabel("Timestamp", sb.ToString(), Markdown);
 			this.AppendLabel("Event ID", Event.EventId, Markdown);
 			this.AppendLabel("Actor", Event.Actor, Markdown);
 			this.AppendLabel("Object", Event.Object, Markdown);
@@ -68,7 +77,7 @@ namespace Waher.IoTGateway.Events
 			Markdown.Append(" | ");
 
 			if (Value.Length > 2 && Value.StartsWith(":") && Value.EndsWith(":") &&
-				EmojiUtilities.TryGetEmoji(Value.Substring(1, Value.Length - 2), out EmojiInfo _))
+				EmojiUtilities.TryGetEmoji(Value[1..^1], out EmojiInfo _))
 			{
 				Markdown.Append(Value);
 			}

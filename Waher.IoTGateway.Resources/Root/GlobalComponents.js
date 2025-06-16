@@ -346,7 +346,7 @@ function PopupHandler()
         if (activePopup["OnShow"])
             activePopup["OnShow"]()
         NativeBackdrop.ShowBackdrop();
-        if (!document.hasFocus())
+        if (document.hidden)
             NativeFavicon.AddFaviconDot();
     }
 
@@ -468,8 +468,10 @@ function PopupHandler()
         if (!returnControlObject)
             return await controlObject.userActionPromise
 
-        controlObject.PushUpdate = (newMessage) =>
+        controlObject.PushUpdate = (newMessage, notify) =>
         {
+            if (notify && document.hidden)
+                NativeFavicon.AddFaviconDot()
             if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
                 document.getElementById("native-popup-message").innerText = newMessage
             return SoftUpdate(CreateHTMLAlertPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
@@ -502,8 +504,10 @@ function PopupHandler()
         if (!returnControlObject)
             return await controlObject.userActionPromise
 
-        controlObject.PushUpdate = (newMessage) =>
+        controlObject.PushUpdate = (newMessage, notify) =>
         {
+            if (notify && document.hidden)
+                NativeFavicon.AddFaviconDot()
             if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
                 document.getElementById("native-popup-message").innerText = newMessage
             return SoftUpdate(CreateHTMLConfirmPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
@@ -546,8 +550,10 @@ function PopupHandler()
         if (!returnControlObject)
             return await controlObject.userActionPromise
 
-        controlObject.PushUpdate = (newMessage) =>
+        controlObject.PushUpdate = (newMessage, notify) =>
         {
+            if (notify && document.hidden)
+                NativeFavicon.AddFaviconDot()
             if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
                 document.getElementById("native-popup-message").innerText = newMessage
             return SoftUpdate(CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)

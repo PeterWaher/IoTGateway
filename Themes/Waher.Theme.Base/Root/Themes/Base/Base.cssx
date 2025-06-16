@@ -22,6 +22,11 @@ p
     margin: 0.5em 0em 0.5em 0em;
 }
 
+p:empty
+{
+    margin: 0;
+}
+
 section
 {
     padding: min(2em, 5%);

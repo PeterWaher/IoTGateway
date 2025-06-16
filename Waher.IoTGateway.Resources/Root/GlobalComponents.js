@@ -73,7 +73,9 @@ function NativeHeaderHandler()
 
                 // normalise list item width
                 const textElements = []
-                maxWidth = 0
+                let maxWidth = 0
+                if (subMenu === topSubmenue)
+                    maxWidth = Number(window.getComputedStyle(topSubmenue.previousElementSibling).width.split("px")[0])
                 for (let i = 0; i < subMenu.children.length; i++)
                 {
                     const child = subMenu.children[i]
@@ -281,6 +283,11 @@ function PopupHandler()
 
     let focusFunction = null;
 
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden)
+            NativeFavicon.RemoveFaviconDot()
+    })
+
     popupContainer.addEventListener("keydown", event =>
     {
         if (event.key === "Enter")
@@ -339,7 +346,7 @@ function PopupHandler()
         if (activePopup["OnShow"])
             activePopup["OnShow"]()
         NativeBackdrop.ShowBackdrop();
-        if (!document.hasFocus())
+        if (document.hidden)
             NativeFavicon.AddFaviconDot();
     }
 
@@ -461,8 +468,10 @@ function PopupHandler()
         if (!returnControlObject)
             return await controlObject.userActionPromise
 
-        controlObject.PushUpdate = (newMessage) =>
+        controlObject.PushUpdate = (newMessage, notify) =>
         {
+            if (notify && document.hidden)
+                NativeFavicon.AddFaviconDot()
             if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
                 document.getElementById("native-popup-message").innerText = newMessage
             return SoftUpdate(CreateHTMLAlertPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
@@ -495,8 +504,10 @@ function PopupHandler()
         if (!returnControlObject)
             return await controlObject.userActionPromise
 
-        controlObject.PushUpdate = (newMessage) =>
+        controlObject.PushUpdate = (newMessage, notify) =>
         {
+            if (notify && document.hidden)
+                NativeFavicon.AddFaviconDot()
             if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
                 document.getElementById("native-popup-message").innerText = newMessage
             return SoftUpdate(CreateHTMLConfirmPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)
@@ -527,11 +538,22 @@ function PopupHandler()
             OnShow: () => document.getElementById(PROMPT_INPUT_ID).focus()
         });
 
+        if (typeof defaultValue === "string")
+        {
+            setTimeout(() => {
+                document.getElementById('native-prompt-input').value = defaultValue
+                document.getElementById('native-prompt-input').selectionStart = 0
+                document.getElementById('native-prompt-input').selectionEnd = defaultValue.length
+            }, 0)
+        }
+
         if (!returnControlObject)
             return await controlObject.userActionPromise
 
-        controlObject.PushUpdate = (newMessage) =>
+        controlObject.PushUpdate = (newMessage, notify) =>
         {
+            if (notify && document.hidden)
+                NativeFavicon.AddFaviconDot()
             if (ActivePopup() && ActivePopup().uuid === controlObject.uuid)
                 document.getElementById("native-popup-message").innerText = newMessage
             return SoftUpdate(CreateHTMLPromptPopup({ Message: `<p id="native-popup-message">${newMessage}</p>` }), controlObject.uuid)

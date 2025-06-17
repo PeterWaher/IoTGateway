@@ -441,7 +441,7 @@ namespace Waher.Script
 
 							VariableReference Ref = In.LeftOperand as VariableReference;
 							if (Ref is null)
-								throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
+								throw new SyntaxException("Variable reference expected", In.LeftOperand.Start, this.script);
 
 							this.SkipWhiteSpace();
 							if (this.PeekNextChar() == ':')
@@ -468,7 +468,7 @@ namespace Waher.Script
 
 								Ref = In.LeftOperand as VariableReference;
 								if (Ref is null)
-									throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
+									throw new SyntaxException("Variable reference expected", In.LeftOperand.Start, this.script);
 
 								this.SkipWhiteSpace();
 								if (this.PeekNextChar() == ':')

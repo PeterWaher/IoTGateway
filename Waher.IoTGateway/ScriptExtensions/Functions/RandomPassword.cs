@@ -102,12 +102,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			/////////////////////////////////////////////////////////////////////
 		}
 
-	/// <summary>
-	/// Evaluates the function.
-	/// </summary>
-	/// <param name="Variables">Variables collection.</param>
-	/// <returns>Function result.</returns>
-	public override IElement Evaluate(Variables Variables)
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement Evaluate(Variables Variables)
 		{
 			return new StringValue(CreateRandomPassword(32, 12));
 		}

@@ -93,7 +93,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			//     NrFail:=0;
 			//     foreach x in 1..100000 do
 			//     (
-			//         Bin:=Base64Decode(Base64Encode(Gateway.NextBytes(32)));
+			//         Bin:=Base64UrlDecode(Base64UrlEncode(Gateway.NextBytes(32)));
 			//         H:=Histogram([foreach x in Bin : x],0,256,12);
 			//         if (Min(H[1])>0) then NrPass++ else NrFail++
 			//     );

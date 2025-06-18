@@ -1,4 +1,6 @@
-﻿using Waher.Script;
+﻿using System;
+using Waher.Persistence;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -64,8 +66,6 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 			if (!(Arguments[0].AssociatedObjectValue is HttpRequest Request))
 				throw new ScriptRuntimeException("Expected an HTTP Request in the first argument.", this);
 
-			string UserVariable = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-
 			if (Arguments.Length > 2)
 			{
 				object Obj = Arguments[2].AssociatedObjectValue;
@@ -87,13 +87,46 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 				}
 			}
 
-			if (!Variables.TryGetVariable(UserVariable, out Variable Variable) ||
-				!(Variable.ValueObject is IUser User))
+			if (Arguments[1].AssociatedObjectValue is string UserVariable)
 			{
+				if (!Variables.TryGetVariable(UserVariable, out Variable Variable) ||
+					!(Variable.ValueObject is IUser User))
+				{
+					throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
+				}
+
+				return new ObjectValue(User);
+			}
+			else if (Arguments[1].AssociatedObjectValue is CaseInsensitiveString UserVariable2)
+			{
+				if (!Variables.TryGetVariable(UserVariable2.Value, out Variable Variable) ||
+					!(Variable.ValueObject is IUser User))
+				{
+					throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
+				}
+
+				return new ObjectValue(User);
+			}
+			else if (Arguments[1] is Array V)
+			{
+				foreach (object Obj in V)
+				{
+					if (Obj is string UserVariable3)
+					{
+						if (Variables.TryGetVariable(UserVariable3, out Variable Variable) &&
+							Variable.ValueObject is IUser User)
+						{
+							return new ObjectValue(User);
+						}
+					}
+					else
+						throw new ScriptRuntimeException("Expected a string or vector of strings in the second argument.", this);
+				}
+
 				throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
 			}
-
-			return new ObjectValue(User);
+			else
+				throw new ScriptRuntimeException("Expected a string or vector of strings in the second argument.", this);
 		}
 	}
 }

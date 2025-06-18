@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Content.Html;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ScriptExtensions;
@@ -162,7 +163,7 @@ namespace Waher.Content.Markdown.Web
 			{
 				object User = null;
 				IUser User2 = null;
-				bool Authorized = true;
+				bool Authorized = !(State.Session is null);
 				string MissingPrivilege = null;
 
 				if (!Doc.TryGetMetaData("Login", out KeyValuePair<string, bool>[] Login))
@@ -171,24 +172,54 @@ namespace Waher.Content.Markdown.Web
 				if (!Doc.TryGetMetaData("Privilege", out KeyValuePair<string, bool>[] Privilege))
 					Privilege = null;
 
-				foreach (KeyValuePair<string, bool> P in MetaValues)
+				if (Authorized)
 				{
-					if (State.Session is null)
+					foreach (KeyValuePair<string, bool> P in MetaValues)
 					{
-						Authorized = false;
-						break;
+						if (!State.Session.TryGetVariable(P.Key, out Variable v) ||
+							v.ValueObject is null)
+						{
+							continue;
+						}
+
+						User = v.ValueObject;
+
+						if (!(Privilege is null))
+						{
+							User2 = User as IUser;
+							if (User2 is null)
+							{
+								User = null;
+								Authorized = false;
+								break;
+							}
+
+							foreach (KeyValuePair<string, bool> P2 in Privilege)
+							{
+								if (!User2.HasPrivilege(P2.Key))
+								{
+									User = null;
+									MissingPrivilege = P2.Key;
+									Authorized = false;
+									break;
+								}
+							}
+						}
+
+						if (!Authorized)
+							break;
 					}
 
-					if (State.Session.TryGetVariable(P.Key, out Variable v) && !(v.ValueObject is null))
-						User = v.ValueObject;
-					else
+					if (Authorized && User is null)
 					{
-						Uri LoginUrl = null;
-						string LoginFileName = null;
-						string FromFolder = Path.GetDirectoryName(State.FromFileName);
-
-						if (!(Login is null))
+						if (Login is null)
+							Authorized = false;
+						else
 						{
+							Uri LoginUrl = null;
+							string FromFolder = Path.GetDirectoryName(State.FromFileName);
+							string LoginFileName = null;
+
 							foreach (KeyValuePair<string, bool> P2 in Login)
 							{
 								LoginFileName = Path.Combine(FromFolder, P2.Key.Replace('/', Path.DirectorySeparatorChar));
@@ -199,49 +230,20 @@ namespace Waher.Content.Markdown.Web
 								else
 									LoginFileName = null;
 							}
-						}
 
-						if (!(LoginFileName is null))
-						{
-							string LoginMarkdown = await Files.ReadAllTextAsync(LoginFileName);
-							MarkdownDocument LoginDoc = await MarkdownDocument.CreateAsync(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
-								LoginUrl.ToString(), typeof(HttpException));
-
-							if (!State.Session.TryGetVariable(P.Key, out v))
+							if (!(LoginFileName is null))
 							{
-								Authorized = false;
-								break;
+								string LoginMarkdown = await Files.ReadAllTextAsync(LoginFileName);
+								await MarkdownDocument.CreateAsync(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
+									LoginUrl.ToString(), typeof(HttpException));
+								
+								if (!State.Session.ContainsVariable("UserVariable"))
+									Authorized = false;
 							}
-						}
-						else
-						{
-							Authorized = false;
-							break;
+							else
+								Authorized = false;
 						}
 					}
-
-					if (!(Privilege is null))
-					{
-						User2 = v.ValueObject as IUser;
-						if (User2 is null)
-						{
-							Authorized = false;
-							break;
-						}
-
-						foreach (KeyValuePair<string, bool> P2 in Privilege)
-						{
-							if (!User2.HasPrivilege(P2.Key))
-							{
-								MissingPrivilege = P2.Key;
-								Authorized = false;
-								break;
-							}
-						}
-					}
-
-					if (!Authorized)
-						break;
 				}
 
 				if (!Authorized)

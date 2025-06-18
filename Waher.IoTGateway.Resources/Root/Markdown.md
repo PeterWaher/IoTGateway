@@ -2692,6 +2692,7 @@ Use this key to provide a title for the document. The title of the page will be 
 
 Name of the variable that will hold a reference to the user object for the currently logged in user. If privileges are defined using the 
 [Privilege](#privilege) meta-data tag, this user object must implement the `IUser` interface (defined in `Waher.Security`).
+If multiple UserVariable meta-data tags are defined, the first one that is found will be used.
 
 ### VideoAutoplay
 

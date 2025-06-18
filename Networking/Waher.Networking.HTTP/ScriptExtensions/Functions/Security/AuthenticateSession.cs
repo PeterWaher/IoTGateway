@@ -107,7 +107,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 
 				return new ObjectValue(User);
 			}
-			else if (Arguments[1] is Array V)
+			else if (Arguments[1].AssociatedObjectValue is Array V)
 			{
 				foreach (object Obj in V)
 				{

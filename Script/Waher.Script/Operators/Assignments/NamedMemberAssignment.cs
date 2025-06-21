@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Functions.Vectors;
 using Waher.Script.Model;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Vectors;
@@ -97,10 +98,17 @@ namespace Waher.Script.Operators.Assignments
 						}
 						else
 						{
-							if (VectorIndex.TryGetIndexProperty(Type, false, true, out this.property, out _))
+							if (VectorIndex.TryGetIndexProperty(Type, false, true, out this.property, 
+								out ParameterInfo[] IndexArguments) &&
+								(IndexArguments?.Length ?? 0) == 1)
 							{
 								if (this.nameIndex is null)
-									this.nameIndex = new string[] { this.name };
+								{
+									if (IndexArguments[0].ParameterType == typeof(string))
+										this.nameIndex = new string[] { this.name };
+									else
+										this.nameIndex = new object[] { Expression.ConvertTo(this.name, IndexArguments[0].ParameterType, this) };
+								}
 							}
 							else
 								this.nameIndex = null;
@@ -136,7 +144,7 @@ namespace Waher.Script.Operators.Assignments
 		private Type type = null;
 		private PropertyInfo property = null;
 		private FieldInfo field = null;
-		private string[] nameIndex = null;
+		private object[] nameIndex = null;
 		private readonly object synchObject = new object();
 
 	}

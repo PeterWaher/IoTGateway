@@ -105,8 +105,12 @@ namespace Waher.Script.Operators.Vectors
 					}
 
 					Type T = Object.GetType();
-					if (!TryGetIndexProperty(T, true, false, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
+					if (!TryGetIndexProperty(T, true, false, out PropertyInfo ItemProperty,
+						out ParameterInfo[] Parameters) ||
+						(Parameters?.Length ?? 0) != 1)
+					{
 						throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
+					}
 
 					return await EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
 				}
@@ -131,7 +135,8 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="PropertyInfo">Property information of index property.</param>
 		/// <param name="Parameters">Parameter definitions of index property.</param>
 		/// <returns>If a one-dimensional index property was found.</returns>
-		public static bool TryGetIndexProperty(Type T, bool ForReading, bool ForWriting, out PropertyInfo PropertyInfo, out ParameterInfo[] Parameters)
+		public static bool TryGetIndexProperty(Type T, bool ForReading, bool ForWriting, 
+			out PropertyInfo PropertyInfo, out ParameterInfo[] Parameters)
 		{
 			lock (indexProperties)
 			{

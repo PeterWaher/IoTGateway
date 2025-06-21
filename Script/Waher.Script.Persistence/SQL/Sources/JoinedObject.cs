@@ -14,7 +14,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 	/// </summary>
 	public class JoinedObject
 	{
-		private readonly Dictionary<string, Rec> properties = new Dictionary<string, Rec>();
+		private readonly Dictionary<string, PropertyRecord> properties = new Dictionary<string, PropertyRecord>();
 		private readonly Type leftType;
 		private readonly Type rightType;
 		private readonly GenericObject leftGen;
@@ -70,7 +70,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				else if (this.hasRightName && string.Compare(Index, this.rightName, true) == 0)
 					return this.right;
 
-				Rec Rec;
+				PropertyRecord Rec;
 
 				lock (this.properties)
 				{
@@ -81,21 +81,21 @@ namespace Waher.Script.Persistence.SQL.Sources
 					}
 				}
 
-				if (!(Rec.PI is null))
+				if (!(Rec.Property is null))
 				{
-					if (Rec.Indexed)
-						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right, new object[] { Index }));   // TODO: Async
+					if (Rec.NrIndexParameters == 1)
+						return ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(Rec.Left ? this.left : this.right, Rec.GetIndexArguments(Index)));   // TODO: Async
 					else
-						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right));   // TODO: Async
+						return ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(Rec.Left ? this.left : this.right));   // TODO: Async
 				}
-				else if (!(Rec.FI is null))
-					return ScriptNode.UnnestPossibleTaskSync(Rec.FI.GetValue(Rec.Left ? this.left : this.right));   // TODO: Async
+				else if (!(Rec.Field is null))
+					return ScriptNode.UnnestPossibleTaskSync(Rec.Field.GetValue(Rec.Left ? this.left : this.right));   // TODO: Async
 				else
 					return null;
 			}
 		}
 
-		private Rec GetRecLocked(string Index)
+		private PropertyRecord GetRecLocked(string Index)
 		{
 			PropertyInfo PI;
 			FieldInfo FI;
@@ -106,22 +106,25 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (!(PI is null))
 				{
 					if (PI.CanRead && PI.GetMethod.IsPublic)
-						return new Rec() { PI = PI, Left = true };
+						return new PropertyRecord(PI, true);
 					else
-						return new Rec();
+						return new PropertyRecord();
 				}
 
 				FI = this.leftType.GetRuntimeField(Index);
 				if (!(FI is null))
 				{
 					if (FI.IsPublic)
-						return new Rec() { FI = FI, Left = true };
+						return new PropertyRecord(FI, true);
 					else
-						return new Rec();
+						return new PropertyRecord();
 				}
 
-				if (VectorIndex.TryGetIndexProperty(this.leftType, true, false, out PI, out _))
-					return new Rec() { PI = PI, Left = true, Indexed = true };
+				if (VectorIndex.TryGetIndexProperty(this.leftType, true, false, out PI,
+					out ParameterInfo[] IndexArguments))
+				{
+					return new PropertyRecord(PI, true, IndexArguments);
+				}
 			}
 
 			if (!(this.rightType is null))
@@ -130,33 +133,118 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (!(PI is null))
 				{
 					if (PI.CanRead && PI.GetMethod.IsPublic)
-						return new Rec() { PI = PI };
+						return new PropertyRecord(PI, false);
 					else
-						return new Rec();
+						return new PropertyRecord();
 				}
 
 				FI = this.rightType.GetRuntimeField(Index);
 				if (!(FI is null))
 				{
 					if (FI.IsPublic)
-						return new Rec() { FI = FI };
+						return new PropertyRecord(FI, false);
 					else
-						return new Rec();
+						return new PropertyRecord();
 				}
 
-				if (VectorIndex.TryGetIndexProperty(this.rightType, true, false, out PI, out _))
-					return new Rec() { PI = PI, Indexed = true };
+				if (VectorIndex.TryGetIndexProperty(this.rightType, true, false, out PI,
+					out ParameterInfo[] IndexArguments))
+				{
+					return new PropertyRecord(PI, false, IndexArguments);
+				}
 			}
 
-			return new Rec();
+			return new PropertyRecord();
 		}
 
-		private class Rec
+		private class PropertyRecord
 		{
-			public PropertyInfo PI;
-			public FieldInfo FI;
+			public PropertyInfo Property;
+			public ParameterInfo[] IndexArguments;
+			public FieldInfo Field;
 			public bool Left;
-			public bool Indexed;
+			public int NrIndexParameters;
+			public bool IsStringIndex;
+
+			public PropertyRecord()
+			{
+				this.Property = null;
+				this.Field = null;
+				this.Left = false;
+				this.IndexArguments = null;
+				this.IsStringIndex = false;
+				this.NrIndexParameters = 0;
+			}
+
+			public PropertyRecord(PropertyInfo Property, bool Left)
+			{
+				this.Property = Property;
+				this.Field = null;
+				this.Left = Left;
+				this.IndexArguments = null;
+				this.IsStringIndex = false;
+				this.NrIndexParameters = 0;
+			}
+
+			public PropertyRecord(FieldInfo Field, bool Left)
+			{
+				this.Property = null;
+				this.Field = Field;
+				this.Left = Left;
+				this.IndexArguments = null;
+				this.IsStringIndex = false;
+				this.NrIndexParameters = 0;
+			}
+
+			public PropertyRecord(PropertyInfo Property, bool Left, ParameterInfo[] IndexArguments)
+			{
+				this.Property = Property;
+				this.Field = null;
+				this.Left = Left;
+				this.IndexArguments = IndexArguments;
+
+				if (IndexArguments is null)
+				{
+					this.NrIndexParameters = 0;
+					this.IsStringIndex = false;
+				}
+				else
+				{
+					this.NrIndexParameters = this.IndexArguments.Length;
+					this.IsStringIndex = this.NrIndexParameters == 1 &&
+						this.IndexArguments[0].ParameterType == typeof(string);
+				}
+			}
+
+			public PropertyRecord(FieldInfo Field, bool Left, ParameterInfo[] IndexArguments)
+			{
+				this.Property = null;
+				this.Field = Field;
+				this.Left = Left;
+				this.IndexArguments = IndexArguments;
+
+				if (IndexArguments is null)
+				{
+					this.NrIndexParameters = 0;
+					this.IsStringIndex = false;
+				}
+				else
+				{
+					this.NrIndexParameters = this.IndexArguments.Length;
+					this.IsStringIndex = this.NrIndexParameters == 1 &&
+						this.IndexArguments[0].ParameterType == typeof(string);
+				}
+			}
+
+			public object[] GetIndexArguments(string Name)
+			{
+				if (this.IsStringIndex)
+					return new object[] { Name };
+
+				object Converted = Expression.ConvertTo(Name, this.IndexArguments[0].ParameterType, null);
+
+				return new object[] { Converted };
+			}
 		}
 
 		/// <summary>

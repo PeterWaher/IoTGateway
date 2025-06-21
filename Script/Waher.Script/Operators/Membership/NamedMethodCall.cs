@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Waher.Runtime.Collections;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -353,7 +354,15 @@ namespace Waher.Script.Operators.Membership
 					break;
 
 				case MethodType.LambdaIndexProperty:
-					Value = Method.Invoke(Instance, new object[] { this.name });
+					object[] Index;
+
+					if (this.methodParametersTypes[0].ParameterType == typeof(string))
+						Index = new object[] { this.name };
+					else
+						Index = new object[] { Expression.ConvertTo(this.name, this.methodParametersTypes[0].ParameterType, this) };
+
+					Value = Method.Invoke(Instance, Index);
+
 					Value = await WaitPossibleTask(Value);
 
 					LambdaExpression = Value as ILambdaExpression;

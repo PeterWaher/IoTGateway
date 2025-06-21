@@ -39,11 +39,11 @@ namespace Waher.Script.Operators.Assignments
 			IElement Right = this.right.Evaluate(Variables);
 
 			if (Middle.IsScalar)
-				return this.Evaluate(Left, Middle, Right, Variables);
+				return this.Evaluate(Left, Middle, Right);
 			else
 			{
 				foreach (IElement MiddleElement in Middle.ChildElements)
-					this.Evaluate(Left, MiddleElement, Right, Variables);
+					this.Evaluate(Left, MiddleElement, Right);
 
 				return Right;
 			}
@@ -64,11 +64,11 @@ namespace Waher.Script.Operators.Assignments
 			IElement Right = await this.right.EvaluateAsync(Variables);
 
 			if (Middle.IsScalar)
-				return this.Evaluate(Left, Middle, Right, Variables);
+				return this.Evaluate(Left, Middle, Right);
 			else
 			{
 				foreach (IElement MiddleElement in Middle.ChildElements)
-					this.Evaluate(Left, MiddleElement, Right, Variables);
+					this.Evaluate(Left, MiddleElement, Right);
 
 				return Right;
 			}
@@ -80,9 +80,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="Left">Object</param>
 		/// <param name="Middle">Member</param>
 		/// <param name="Right">Value to assign.</param>
-		/// <param name="Variables">Variables</param>
 		/// <returns>Result</returns>
-		public IElement Evaluate(IElement Left, IElement Middle, IElement Right, Variables Variables)
+		public IElement Evaluate(IElement Left, IElement Middle, IElement Right)
 		{
 			if (!(Middle.AssociatedObjectValue is string Name))
 				throw new ScriptRuntimeException("Member names must be strings.", this);
@@ -124,15 +123,24 @@ namespace Waher.Script.Operators.Assignments
 				}
 				else
 				{
-					if (VectorIndex.TryGetIndexProperty(Type, false, true, out Property, out _))
+					if (VectorIndex.TryGetIndexProperty(Type, false, true, out Property, 
+						out ParameterInfo[] IndexArguments) &&
+						(IndexArguments?.Length ?? 0) == 1)
 					{
+						object[] Index;
+
+						if (IndexArguments[0].ParameterType == typeof(string))
+							Index = new object[] { Name };
+						else
+							Index = new object[] { Expression.ConvertTo(Name, IndexArguments[0].ParameterType, this) };
+
 						Type = Property.PropertyType;
 						if (Type == typeof(object))
-							Property.SetValue(LeftValue, Right.AssociatedObjectValue, new string[] { Name });
+							Property.SetValue(LeftValue, Right.AssociatedObjectValue, Index);
 						else if (Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
-							Property.SetValue(LeftValue, Right, new string[] { Name });
+							Property.SetValue(LeftValue, Right, Index);
 						else
-							Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), new string[] { Name });
+							Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), Index);
 					}
 					else
 						throw new ScriptRuntimeException("Member '" + Name + "' not found on type '" + Type.FullName + "'.", this);

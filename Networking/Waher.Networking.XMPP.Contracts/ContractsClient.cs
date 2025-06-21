@@ -5099,19 +5099,7 @@ namespace Waher.Networking.XMPP.Contracts
 							if (Valid)
 								return this.ReturnStatus(ContractStatus.Valid, Callback, State);
 							else
-							{
-								// TODO: Remove:
-								Log.Debug("Provider Signature Invalid (6).",
-									new KeyValuePair<string, object>("Contract", Contract.ContractId),
-									new KeyValuePair<string, object>("Provider", Contract.Provider),
-									new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
-									new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
-									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
-									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
-
 								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
-							}
 						}
 						else
 							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,

@@ -782,7 +782,9 @@ namespace Waher.Content
 				{
 					if (!encoders.TryGetValue(T, out Encoder))
 					{
-						Encoder = Types.FindBest<IJsonEncoder, Type>(T);
+						Encoder = Types.FindBest<IJsonEncoder, Type>(T)
+							?? throw new ArgumentException("Unable to encode objects of type " + T.FullName, nameof(Object));
+
 						encoders[T] = Encoder;
 					}
 				}

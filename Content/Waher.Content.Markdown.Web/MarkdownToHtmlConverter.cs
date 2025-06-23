@@ -12,6 +12,7 @@ using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
+using Waher.Script.Graphs.Functions.Plots;
 using Waher.Security;
 
 namespace Waher.Content.Markdown.Web
@@ -219,16 +220,16 @@ namespace Waher.Content.Markdown.Web
 						else
 						{
 							Uri LoginUrl = null;
-							string FromFolder = Path.GetDirectoryName(State.FromFileName);
 							string LoginFileName = null;
 
 							foreach (KeyValuePair<string, bool> P2 in Login)
 							{
-								LoginFileName = Path.Combine(FromFolder, P2.Key.Replace('/', Path.DirectorySeparatorChar));
-								LoginUrl = new Uri(new Uri(State.URL), P2.Key.Replace(Path.DirectorySeparatorChar, '/'));
-
-								if (File.Exists(LoginFileName))
+								if (Request.Server.TryGetFileName(P2.Key, false, out LoginFileName) &&
+									File.Exists(LoginFileName))
+								{
+									LoginUrl = new Uri(new Uri(State.URL), P2.Key.Replace(Path.DirectorySeparatorChar, '/'));
 									break;
+								}
 								else
 									LoginFileName = null;
 							}

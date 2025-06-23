@@ -165,6 +165,7 @@ namespace Waher.Content.Markdown.Web
 				IUser User2 = null;
 				bool Authorized = !(State.Session is null);
 				string MissingPrivilege = null;
+				bool LoggedIn = false;
 
 				if (!Doc.TryGetMetaData("Login", out KeyValuePair<string, bool>[] Login))
 					Login = null;
@@ -183,6 +184,7 @@ namespace Waher.Content.Markdown.Web
 						}
 
 						User = v.ValueObject;
+						LoggedIn = true;
 
 						if (!(Privilege is null))
 						{
@@ -248,7 +250,7 @@ namespace Waher.Content.Markdown.Web
 
 				if (!Authorized)
 				{
-					if (!(Login is null))
+					if (!(Login is null) && !LoggedIn)
 					{
 						foreach (KeyValuePair<string, bool> P in Login)
 						{

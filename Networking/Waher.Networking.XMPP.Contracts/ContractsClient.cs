@@ -1655,7 +1655,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass to callback method.</param>
 		public Task Validate(LegalIdentity Identity, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
-			return this.Validate(Identity, true, Callback, State);
+			return this.Validate(Identity, true, true, Callback, State);
 		}
 
 		/// <summary>
@@ -1665,7 +1665,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task Validate(LegalIdentity Identity, bool ValidateState, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
+		public Task Validate(LegalIdentity Identity, bool ValidateState, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
+		{
+			return this.Validate(Identity, ValidateState, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If attachments should be validated.</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public async Task Validate(LegalIdentity Identity, bool ValidateState, bool ValidateAttachments,
+			EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
 			if (Identity is null)
 			{
@@ -1737,7 +1751,8 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Identity.State == IdentityState.Approved && ValidateState && !(Identity.Attachments is null))
+			if (Identity.State == IdentityState.Approved && ValidateState && 
+				ValidateAttachments && !(Identity.Attachments is null))
 			{
 				foreach (Attachment Attachment in Identity.Attachments)
 				{
@@ -1962,7 +1977,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Status of validation.</returns>
 		public Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity)
 		{
-			return this.ValidateAsync(Identity, true);
+			return this.ValidateAsync(Identity, true, true);
 		}
 
 		/// <summary>
@@ -1971,11 +1986,24 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Identity">Legal identity to validate</param>
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <returns>Status of validation.</returns>
-		public async Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity, bool ValidateState)
+		public Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity, bool ValidateState)
+		{
+			return this.ValidateAsync(Identity, ValidateState, true);
+		}
+
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If attachments should be validated.</param>
+		/// <returns>Status of validation.</returns>
+		public async Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity, 
+			bool ValidateState, bool ValidateAttachments)
 		{
 			TaskCompletionSource<IdentityValidationEventArgs> Result = new TaskCompletionSource<IdentityValidationEventArgs>();
 
-			await this.Validate(Identity, ValidateState, (Sender, e) =>
+			await this.Validate(Identity, ValidateState, ValidateAttachments, (Sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;
@@ -4581,7 +4609,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass to callback method.</param>
 		public Task Validate(Contract Contract, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
-			return this.Validate(Contract, true, Callback, State);
+			return this.Validate(Contract, true, true, true, true, Callback, State);
 		}
 
 		/// <summary>
@@ -4591,7 +4619,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task Validate(Contract Contract, bool ValidateState, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
+		public Task Validate(Contract Contract, bool ValidateState, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
+		{
+			return this.Validate(Contract, ValidateState, true, true, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If contract attachments should be validated.</param>
+		/// <param name="ValidateIdentities">If identities signing the contract should be validated.</param>
+		/// <param name="ValidateIdentityAttachments">If the attachments associated with identities
+		/// signing the contract should be verified.</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public async Task Validate(Contract Contract, bool ValidateState, bool ValidateAttachments,
+			bool ValidateIdentities, bool ValidateIdentityAttachments,
+			EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
 			if (Contract is null)
 			{
@@ -4925,35 +4971,38 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 			Dictionary<string, LegalIdentity> Identities = new Dictionary<string, LegalIdentity>();
 
-			foreach (ClientSignature Signature in Contract.ClientSignatures)
+			if (ValidateIdentities)
 			{
-				if (Identities.ContainsKey(Signature.LegalId))
-					continue;
-
-				LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
-				if (Identity is null)
+				foreach (ClientSignature Signature in Contract.ClientSignatures)
 				{
-					await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State,
-						new KeyValuePair<string, object>("LegalId", Signature.LegalId),
-						new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-						new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Signature.DigitalSignature)));
-					return;
-				}
+					if (Identities.ContainsKey(Signature.LegalId))
+						continue;
 
-				IdentityValidationEventArgs e = await this.ValidateAsync(Identity);
-				if (e.Status != IdentityStatus.Valid)
-				{
-					await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback,
-						State, e.Tags.Join(
-							new KeyValuePair<string, object>("IdentityStatus", e.Status),
-							new KeyValuePair<string, object>("LegalId", Identity.Id)));
-					return;
-				}
+					LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
+					if (Identity is null)
+					{
+						await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State,
+							new KeyValuePair<string, object>("LegalId", Signature.LegalId),
+							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Signature.DigitalSignature)));
+						return;
+					}
 
-				Identities[Signature.LegalId] = Identity;
+					IdentityValidationEventArgs e = await this.ValidateAsync(Identity, true, ValidateIdentityAttachments);
+					if (e.Status != IdentityStatus.Valid)
+					{
+						await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback,
+							State, e.Tags.Join(
+								new KeyValuePair<string, object>("IdentityStatus", e.Status),
+								new KeyValuePair<string, object>("LegalId", Identity.Id)));
+						return;
+					}
+
+					Identities[Signature.LegalId] = Identity;
+				}
 			}
 
-			if (!(Contract.Attachments is null))
+			if (ValidateAttachments && !(Contract.Attachments is null))
 			{
 				foreach (Attachment Attachment in Contract.Attachments)
 				{
@@ -5176,7 +5225,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Validation result.</returns>
 		public Task<ContractValidationEventArgs> ValidateAsync(Contract Contract)
 		{
-			return this.ValidateAsync(Contract, true);
+			return this.ValidateAsync(Contract, true, true, true, true);
 		}
 
 		/// <summary>
@@ -5185,11 +5234,29 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Contract">Contract to validate</param>
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <returns>Validation result.</returns>
-		public async Task<ContractValidationEventArgs> ValidateAsync(Contract Contract, bool ValidateState)
+		public Task<ContractValidationEventArgs> ValidateAsync(Contract Contract, bool ValidateState)
+		{
+			return this.ValidateAsync(Contract, ValidateState, true, true, true);
+		}
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If contract attachments should be validated.</param>
+		/// <param name="ValidateIdentities">If identities signing the contract should be validated.</param>
+		/// <param name="ValidateIdentityAttachments">If the attachments associated with identities
+		/// signing the contract should be verified.</param>
+		/// <returns>Validation result.</returns>
+		public async Task<ContractValidationEventArgs> ValidateAsync(Contract Contract, 
+			bool ValidateState, bool ValidateAttachments,
+			bool ValidateIdentities, bool ValidateIdentityAttachments)
 		{
 			TaskCompletionSource<ContractValidationEventArgs> Result = new TaskCompletionSource<ContractValidationEventArgs>();
 
-			await this.Validate(Contract, ValidateState, (Sender, e) =>
+			await this.Validate(Contract, ValidateState, ValidateAttachments,
+				ValidateIdentities, ValidateIdentityAttachments, (Sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;

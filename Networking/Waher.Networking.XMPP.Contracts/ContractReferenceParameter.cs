@@ -329,7 +329,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (!this.referenceStatus.HasValue)
 					{
-						ContractValidationEventArgs e = await Client.ValidateAsync(this.reference, true);
+						ContractValidationEventArgs e = await Client.ValidateAsync(this.reference, true, false, false, false);
 						this.referenceStatus = e.Status;
 						this.referenceStatusTags = e.Tags;
 					}

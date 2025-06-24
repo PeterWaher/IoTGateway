@@ -8,6 +8,7 @@ using Waher.Networking.XMPP.Contracts.EventArguments;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Persistence;
 using Waher.Script;
+using Waher.Script.Constants;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -20,6 +21,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private CaseInsensitiveString value = CaseInsensitiveString.Empty;
 		private Contract reference = null;
 		private ContractStatus? referenceStatus = null;
+		private KeyValuePair<string, object>[] referenceStatusTags = null;
 		private string localName = string.Empty;
 		private string @namespace = string.Empty;
 		private string templateId = string.Empty;
@@ -64,6 +66,7 @@ namespace Waher.Networking.XMPP.Contracts
 					this.ProtectedValue = null;
 					this.reference = null;
 					this.referenceStatus = null;
+					this.referenceStatusTags = null;
 				}
 			}
 		}
@@ -284,6 +287,7 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						this.reference = null;
 						this.referenceStatus = null;
+						this.referenceStatusTags = null;
 						this.reference = await Client.GetContractAsync(this.@value);
 					}
 
@@ -327,12 +331,224 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						ContractValidationEventArgs e = await Client.ValidateAsync(this.reference, true);
 						this.referenceStatus = e.Status;
+						this.referenceStatusTags = e.Tags;
 					}
 
 					if (this.referenceStatus != ContractStatus.Valid)
 					{
+						StringBuilder sb = new StringBuilder();
+
+						switch (this.referenceStatus)
+						{
+							case ContractStatus.ContractUndefined:
+								sb.Append("Client Contract is not defined.");
+								break;
+
+							case ContractStatus.NotApproved:
+								sb.Append("Contract is not approved (yet) by trust provider.");
+								break;
+
+							case ContractStatus.NotValidYet:
+								sb.Append("Contract is not valid yet.");
+								break;
+
+							case ContractStatus.NotValidAnymore:
+								sb.Append("Contract is not valid anymore.");
+								break;
+
+							case ContractStatus.TemplateOnly:
+								sb.Append("Contract is a template, not a valid legal document.");
+								break;
+
+							case ContractStatus.NotLegallyBinding:
+								sb.Append("The contract is not in a legally binding state. The prerequisites of the contracts are not met.");
+								break;
+
+							case ContractStatus.HumanReadableNotWellDefined:
+								sb.Append("Human-readable section not properly defined.");
+								break;
+
+							case ContractStatus.ParameterValuesNotValid:
+								sb.Append("Parameter Values not valid");
+								break;
+
+							case ContractStatus.MachineReadableNotWellDefined:
+								sb.Append("Machine-readable section not properly defined.");
+								break;
+
+							case ContractStatus.NoSchemaAccess:
+								sb.Append("Unable to get access to schema used to validate the machine-readable section.");
+								break;
+
+							case ContractStatus.CorruptSchema:
+								sb.Append("Corrupt schema used for validating machine-readable part.");
+								break;
+
+							case ContractStatus.FraudulentSchema:
+								sb.Append("Fraudulent schema used for validating machine-readable part.");
+								break;
+
+							case ContractStatus.FraudulentMachineReadable:
+								sb.Append("Fraudulent machine-readable claim. Does not validate against schema.");
+								break;
+
+							case ContractStatus.NoClientSignatures:
+								sb.Append("No client signature found.");
+								break;
+
+							case ContractStatus.ClientSignatureInvalid:
+								sb.Append("One or more of the client signatures are invalid.");
+								break;
+
+							case ContractStatus.ClientIdentityInvalid:
+								sb.Append("One or more of the legal identities used to sign the contract are invalid.");
+								break;
+
+							case ContractStatus.AttachmentLacksUrl:
+								sb.Append("Attachment is missing download URL.");
+								break;
+
+							case ContractStatus.AttachmentUnavailable:
+								sb.Append("Unable to download attachment.");
+								break;
+
+							case ContractStatus.AttachmentInconsistency:
+								sb.Append("Information about attachment is inconsistent.");
+								break;
+
+							case ContractStatus.AttachmentSignatureInvalid:
+								sb.Append("Attachment signature is invalid.");
+								break;
+
+							case ContractStatus.NoTrustProvider:
+								sb.Append("No Trust Provider attesting to the validity of the identity.");
+								break;
+
+							case ContractStatus.NoProviderPublicKey:
+								sb.Append("No provider public key found.");
+								break;
+
+							case ContractStatus.NoProviderSignature:
+								sb.Append("No Trust Provider signature found.");
+								break;
+
+							case ContractStatus.ProviderSignatureInvalid:
+								sb.Append("Provider signature invalid.");
+								break;
+
+							case ContractStatus.ProviderKeyNotRecognized:
+								sb.Append("Provider key not recognized.");
+								break;
+
+							default:
+								sb.Append("Client contract validation failed.");
+								break;
+						}
+
+						if (!(this.referenceStatusTags is null))
+						{
+							bool First = true;
+
+							foreach (KeyValuePair<string, object> Tag in this.referenceStatusTags)
+							{
+								if (First)
+								{
+									sb.AppendLine();
+									First = false;
+								}
+
+								sb.AppendLine();
+
+								switch (Tag.Key)
+								{
+									case "State":
+										sb.Append("State");
+										break;
+
+									case "From":
+										sb.Append("From");
+										break;
+
+									case "To":
+										sb.Append("To");
+										break;
+
+									case "DataBase64":
+										sb.Append("Data (BASE64)");
+										break;
+
+									case "SignatureBase64":
+										sb.Append("Signature (BASE64)");
+										break;
+
+									case "KeyName":
+										sb.Append("Client Key Name");
+										break;
+
+									case "AttachmentId":
+										sb.Append("Attachment ID");
+										break;
+
+									case "AttachmentUrl":
+										sb.Append("Attachment URL");
+										break;
+
+									case "ExpectedContentType":
+										sb.Append("Expected Content-Type");
+										break;
+
+									case "ContentType":
+										sb.Append("Content-Type returned");
+										break;
+
+									case "AttachmentSignatureBase64":
+										sb.Append("Attachment Signature (BASE64)");
+										break;
+
+									case "Error":
+										sb.Append("Error");
+										break;
+
+									case "Provider":
+										sb.Append("Provider");
+										break;
+
+									case "LocalName":
+										sb.Append("Local Name");
+										break;
+
+									case "Namespace":
+										sb.Append("Namespace");
+										break;
+
+									case "PublicKeyBase64":
+										sb.Append("Public Key (BASE64)");
+										break;
+
+									case "Status":
+										sb.Append("Validation Status");
+										break;
+
+									case "LegalId":
+										sb.Append("Legal ID");
+										break;
+
+									case "IdentityStatus":
+										sb.Append("Identity Validation Status");
+										break;
+
+									default:
+										sb.Append(Tag.Key);
+										break;
+								}
+
+								sb.Append(": ");
+								sb.Append(Tag.Value.ToString());
+							}
+						}
+
 						this.ErrorReason = ParameterErrorReason.ContractNotValid;
-						this.ErrorText = this.referenceStatus.ToString();
+						this.ErrorText = sb.ToString();
 
 						return false;
 					}
@@ -440,6 +656,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.creatorRole = Xml.HasAttribute("creatorRole") ? XML.Attribute(Xml, "creatorRole") : null;
 			this.reference = null;
 			this.referenceStatus = null;
+			this.referenceStatusTags = null;
 
 			return await base.Import(Xml);
 		}

@@ -1773,7 +1773,7 @@ namespace Waher.Networking.XMPP.Contracts
 								await this.ReturnStatus(IdentityStatus.AttachmentSignatureInvalid, Callback, State,
 									new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
 									new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
-									new KeyValuePair<string, object>("AttachmentSignature", Convert.ToBase64String(Attachment.Signature)));
+									new KeyValuePair<string, object>("AttachmentSignatureBase64", Convert.ToBase64String(Attachment.Signature)));
 								return;
 							}
 						}
@@ -5009,7 +5009,7 @@ namespace Waher.Networking.XMPP.Contracts
 								await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State,
 									new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
 									new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
-									new KeyValuePair<string, object>("AttachmentSignature", Convert.ToBase64String(Attachment.Signature)));
+									new KeyValuePair<string, object>("AttachmentSignatureBase64", Convert.ToBase64String(Attachment.Signature)));
 								return;
 							}
 						}

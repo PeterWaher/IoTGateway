@@ -5,14 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Content.Html;
-using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Rendering;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.IO;
 using Waher.Script;
-using Waher.Script.Graphs.Functions.Plots;
 using Waher.Security;
 
 namespace Waher.Content.Markdown.Web

@@ -40,6 +40,7 @@ https://waher.se/Script.md#persistenceRelatedFunctionsWaherScriptPersistence</De
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.XmlLedger\Waher.Persistence.XmlLedger.csproj" />
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.HashStore\Waher.Runtime.HashStore.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj" />

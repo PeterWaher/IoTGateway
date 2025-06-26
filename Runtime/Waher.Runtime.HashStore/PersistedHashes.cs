@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.HashStore.HashObjects;
@@ -18,7 +19,18 @@ namespace Waher.Runtime.HashStore
 		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
 		public static Task<bool> AddHash(byte[] Hash)
 		{
-			return AddHash(string.Empty, Hash);
+			return AddHash(string.Empty, DateTime.MaxValue, Hash);
+		}
+
+		/// <summary>
+		/// Persists a hash, using the default (empty) realm.
+		/// </summary>
+		/// <param name="ExpiresUtc">When hash expires.</param>
+		/// <param name="Hash">Hash digest to persist</param>
+		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
+		public static Task<bool> AddHash(DateTime ExpiresUtc, byte[] Hash)
+		{
+			return AddHash(string.Empty, ExpiresUtc, Hash);
 		}
 
 		/// <summary>
@@ -27,7 +39,19 @@ namespace Waher.Runtime.HashStore
 		/// <param name="Realm">Realm of hash value.</param>
 		/// <param name="Hash">Hash digest to persist</param>
 		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
-		public static async Task<bool> AddHash(string Realm, byte[] Hash)
+		public static Task<bool> AddHash(string Realm, byte[] Hash)
+		{
+			return AddHash(Realm, DateTime.MaxValue, Hash);
+		}
+
+		/// <summary>
+		/// Persists a hash.
+		/// </summary>
+		/// <param name="Realm">Realm of hash value.</param>
+		/// <param name="ExpiresUtc">When hash expires.</param>
+		/// <param name="Hash">Hash digest to persist</param>
+		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
+		public static async Task<bool> AddHash(string Realm, DateTime ExpiresUtc, byte[] Hash)
 		{
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("hashrealm:" + Realm))
 			{
@@ -42,6 +66,7 @@ namespace Waher.Runtime.HashStore
 				Obj = new PersistedHash()
 				{
 					Realm = Realm,
+					ExpiresUtc = ExpiresUtc.ToUniversalTime(),
 					Hash = Hash
 				};
 

@@ -1,4 +1,5 @@
-﻿using Waher.Persistence.Attributes;
+﻿using System;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Runtime.HashStore.HashObjects
 {
@@ -8,7 +9,8 @@ namespace Waher.Runtime.HashStore.HashObjects
 	[CollectionName("PersistedHashes")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("Realm", "Hash")]
-	[ArchivingTime()]
+	[Index("ExpiresUtc")]
+	[ArchivingTime(nameof(ArchiveDays))]
 	public class PersistedHash
 	{
 		/// <summary>
@@ -25,6 +27,11 @@ namespace Waher.Runtime.HashStore.HashObjects
 		public string ObjectId { get; set; }
 
 		/// <summary>
+		/// When hash expires and can be removed.
+		/// </summary>
+		public DateTime ExpiresUtc { get; set; }
+
+		/// <summary>
 		/// Realm.
 		/// </summary>
 		public string Realm { get; set; }
@@ -33,5 +40,27 @@ namespace Waher.Runtime.HashStore.HashObjects
 		/// Hash
 		/// </summary>
 		public byte[] Hash { get; set; }
+
+		/// <summary>
+		/// Number of days to archive hash.
+		/// </summary>
+		public int ArchiveDays
+		{
+			get
+			{
+				if (this.ExpiresUtc == DateTime.MaxValue)
+					return int.MaxValue;
+
+				TimeSpan Span = this.ExpiresUtc - DateTime.UtcNow;
+				double Days = Math.Ceiling(Span.TotalDays);
+
+				if (Days < 0)
+					return 0;
+				else if (Days > int.MaxValue)
+					return int.MaxValue;
+				else
+					return (int)Days;
+			}
+		}
 	}
 }

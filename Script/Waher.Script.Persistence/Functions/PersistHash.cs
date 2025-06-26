@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Waher.Runtime.HashStore;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -40,6 +41,22 @@ namespace Waher.Script.Persistence.Functions
 		}
 
 		/// <summary>
+		/// Persists a hash value
+		/// </summary>
+		/// <param name="Realm">Realm</param>
+		/// <param name="Expires">When hash expires.</param>
+		/// <param name="Hash">Counter Key.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public PersistHash(ScriptNode Realm, ScriptNode Expires, ScriptNode Hash, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Realm, Expires, Hash },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Normal },
+				  Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(PersistHash);
@@ -47,7 +64,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "Realm", "Hash" };
+		public override string[] DefaultArgumentNames => new string[] { "Realm", "Expires", "Hash" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -83,9 +100,17 @@ namespace Waher.Script.Persistence.Functions
 			if (Arguments.Length > 1)
 			{
 				if (!(Arguments[0].AssociatedObjectValue is string Realm))
-					throw new ScriptRuntimeException("Expected first argument to be string.", this);
+					throw new ScriptRuntimeException("Expected first argument to be a string.", this);
 
-				Result = await PersistedHashes.AddHash(Realm, Hash);
+				if (Arguments.Length > 2)
+				{
+					if (!(Arguments[1].AssociatedObjectValue is DateTime Expires))
+						throw new ScriptRuntimeException("Expected second argument to be a date and time value.", this);
+
+					Result = await PersistedHashes.AddHash(Realm, Expires.ToUniversalTime(), Hash);
+				}
+				else
+					Result = await PersistedHashes.AddHash(Realm, Hash);
 			}
 			else
 				Result = await PersistedHashes.AddHash(Hash);

@@ -129,6 +129,9 @@ namespace Waher.Networking.XMPP.Contracts
 		private static readonly string KeySettings = typeof(ContractsClient).FullName + ".";
 		private static readonly string ContractKeySettings = typeof(ContractsClient).Namespace + ".Contracts.";
 
+		private const int CacheSchemaDays = 7;
+
+
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
@@ -1751,7 +1754,7 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			if (Identity.State == IdentityState.Approved && ValidateState && 
+			if (Identity.State == IdentityState.Approved && ValidateState &&
 				ValidateAttachments && !(Identity.Attachments is null))
 			{
 				foreach (Attachment Attachment in Identity.Attachments)
@@ -1998,7 +2001,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="ValidateAttachments">If attachments should be validated.</param>
 		/// <returns>Status of validation.</returns>
-		public async Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity, 
+		public async Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity,
 			bool ValidateState, bool ValidateAttachments)
 		{
 			TaskCompletionSource<IdentityValidationEventArgs> Result = new TaskCompletionSource<IdentityValidationEventArgs>();
@@ -4779,6 +4782,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Dictionary<string, XmlSchema> Schemas = new Dictionary<string, XmlSchema>();
 			LinkedList<XmlNode> ToCheck = new LinkedList<XmlNode>();
+			XmlSchema Schema;
 
 			ToCheck.AddLast(Doc.DocumentElement);
 
@@ -4810,65 +4814,30 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			string SchemaKey = Contract.ForMachinesNamespace + "#" + Convert.ToBase64String(Contract.ContentSchemaDigest);
-			byte[] SchemaBin;
-			XmlSchema Schema;
+			Tuple<XmlSchema, ContractStatus?, Exception> SchemaResult;
 
-			lock (this.schemas)
+			SchemaResult = await this.LoadSchema(this.componentAddress, Contract.ForMachinesNamespace,
+				Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest);
+
+			if (SchemaResult.Item2.HasValue)
 			{
-				if (this.schemas.TryGetValue(SchemaKey, out KeyValuePair<byte[], XmlSchema> P))
-				{
-					SchemaBin = P.Key;
-					Schema = P.Value;
-				}
-				else
-				{
-					SchemaBin = null;
-					Schema = null;
-				}
+				await this.ReturnStatus(SchemaResult.Item2.Value, Callback, State,
+					new KeyValuePair<string, object>("Error", SchemaResult.Item3?.Message ?? string.Empty),
+					new KeyValuePair<string, object>("Namespace", Contract.ForMachinesNamespace),
+					new KeyValuePair<string, object>("HashFunction", Contract.ContentSchemaHashFunction),
+					new KeyValuePair<string, object>("Digest", Convert.ToBase64String(Contract.ContentSchemaDigest)));
+				return;
 			}
-
-			if (Schema is null)
+			else if (SchemaResult.Item1 is null)
 			{
-				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(
-					Contract.ForMachinesNamespace,
-					new SchemaDigest(Contract.ContentSchemaHashFunction,
-					Contract.ContentSchemaDigest));
-
-				await GetLocalSchema.Raise(this, e, false);
-
-				if (!(e.XmlSchema is null))
-				{
-					SchemaBin = e.XmlSchema;
-					Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
-				}
-				else
-				{
-					try
-					{
-						SchemaBin = await this.GetSchemaAsync(Contract.ForMachinesNamespace,
-							new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest));
-						Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
-					}
-					catch (Exception ex)
-					{
-						await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State,
-							new KeyValuePair<string, object>("Error", ex.Message));
-						return;
-					}
-				}
-
-				if (!(Schema is null))
-				{
-					lock (this.schemas)
-					{
-						this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
-					}
-				}
+				await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State);
+				return;
 			}
-
-			if (!(Schema is null))
+			else
+			{
+				Schema = SchemaResult.Item1;
 				Schemas[Contract.ForMachinesNamespace] = Schema;
+			}
 
 			string[] Namespaces = new string[Schemas.Count];
 			Schemas.Keys.CopyTo(Namespaces, 0);
@@ -4885,70 +4854,25 @@ namespace Waher.Networking.XMPP.Contracts
 				if (Schemas.TryGetValue(Namespace, out Schema) && !(Schema is null))
 					continue;
 
-				TaskCompletionSource<ContractStatus> T = new TaskCompletionSource<ContractStatus>();
-				SchemaDigest SchemaDigest;
+				SchemaResult = await this.LoadSchema(this.componentAddress, Namespace, null, null);
 
-				if (Namespace == Contract.ForMachinesNamespace)
-					SchemaDigest = new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest);
-				else
-					SchemaDigest = null;
-
-				await this.GetSchema(ContractComponent, Namespace, SchemaDigest, (_, e) =>
+				if (SchemaResult.Item2.HasValue)
 				{
-					if (e.Ok)
-					{
-						try
-						{
-							SchemaBin = e.Schema;
-							using (MemoryStream ms = new MemoryStream(SchemaBin))
-							{
-								Schema = XSL.LoadSchema(ms, string.Empty);
-							}
-
-							Schemas[Namespace] = Schema;
-
-							if (Namespace == Contract.ForMachinesNamespace)
-							{
-								byte[] Digest = Hashes.ComputeHash(Contract.ContentSchemaHashFunction, SchemaBin);
-
-								if (Convert.ToBase64String(Digest) != Convert.ToBase64String(Contract.ContentSchemaDigest))
-								{
-									T.TrySetResult(ContractStatus.FraudulentSchema);
-									return Task.CompletedTask;
-								}
-
-								lock (this.schemas)
-								{
-									this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
-								}
-							}
-							else
-							{
-								lock (this.schemas)
-								{
-									this.schemas[Namespace] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
-								}
-							}
-
-							T.TrySetResult(ContractStatus.Valid);
-						}
-						catch (Exception)
-						{
-							T.TrySetResult(ContractStatus.CorruptSchema);
-						}
-					}
-					else
-						T.TrySetResult(ContractStatus.NoSchemaAccess);
-
-					return Task.CompletedTask;
-				}, null);
-
-				ContractStatus Temp = await T.Task;
-				if (Temp != ContractStatus.Valid)
-				{
-					await this.ReturnStatus(Temp, Callback, State,
+					await this.ReturnStatus(SchemaResult.Item2.Value, Callback, State,
+						new KeyValuePair<string, object>("Error", SchemaResult.Item3?.Message ?? string.Empty),
 						new KeyValuePair<string, object>("Namespace", Namespace));
 					return;
+				}
+				else if (SchemaResult.Item1 is null)
+				{
+					await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State,
+						new KeyValuePair<string, object>("Namespace", Namespace));
+					return;
+				}
+				else
+				{
+					Schema = SchemaResult.Item1;
+					Schemas[Namespace] = Schema;
 				}
 			}
 
@@ -5165,12 +5089,84 @@ namespace Waher.Networking.XMPP.Contracts
 			}, State);
 		}
 
+		private async Task<Tuple<XmlSchema, ContractStatus?, Exception>> LoadSchema(string ContractComponent, string Namespace,
+			HashFunction? HashFunction, byte[] SchemaDigest)
+		{
+			string SchemaKey = SchemaDigest is null ? Namespace : Namespace + "#" + Convert.ToBase64String(SchemaDigest);
+			byte[] SchemaBin;
+			XmlSchema Schema;
+
+			lock (this.schemas)
+			{
+				if (this.schemas.TryGetValue(SchemaKey, out Tuple<byte[], XmlSchema, DateTime> P) &&
+					P.Item3 >= DateTime.UtcNow)
+				{
+					return new Tuple<XmlSchema, ContractStatus?, Exception>(P.Item2, null, null);
+				}
+			}
+
+			SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(Namespace,
+				SchemaDigest is null ? null : new SchemaDigest(HashFunction.Value, SchemaDigest));
+
+			await GetLocalSchema.Raise(this, e, false);
+
+			if (!(e.XmlSchema is null))
+			{
+				SchemaBin = e.XmlSchema;
+				Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+
+				lock (this.schemas)
+				{
+					this.schemas[SchemaKey] = new Tuple<byte[], XmlSchema, DateTime>(SchemaBin, Schema, DateTime.UtcNow.AddDays(CacheSchemaDays));
+				}
+
+				return new Tuple<XmlSchema, ContractStatus?, Exception>(Schema, null, null);
+			}
+
+			if (string.IsNullOrEmpty(ContractComponent))
+				ContractComponent = this.componentAddress;
+
+			try
+			{
+				SchemaBin = await this.GetSchemaAsync(ContractComponent, Namespace,
+					SchemaDigest is null ? null : new SchemaDigest(HashFunction.Value, SchemaDigest));
+			}
+			catch (Exception ex)
+			{
+				return new Tuple<XmlSchema, ContractStatus?, Exception>(null, ContractStatus.NoSchemaAccess, ex);
+			}
+
+			if (!(SchemaDigest is null))
+			{
+				byte[] Digest = Hashes.ComputeHash(HashFunction.Value, SchemaBin);
+
+				if (Convert.ToBase64String(Digest) != Convert.ToBase64String(SchemaDigest))
+					return new Tuple<XmlSchema, ContractStatus?, Exception>(null, ContractStatus.FraudulentSchema, null);
+			}
+
+			try
+			{
+				Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+			}
+			catch (Exception ex)
+			{
+				return new Tuple<XmlSchema, ContractStatus?, Exception>(null, ContractStatus.CorruptSchema, ex);
+			}
+
+			lock (this.schemas)
+			{
+				this.schemas[SchemaKey] = new Tuple<byte[], XmlSchema, DateTime>(SchemaBin, Schema, DateTime.UtcNow.AddDays(CacheSchemaDays));
+			}
+
+			return new Tuple<XmlSchema, ContractStatus?, Exception>(Schema, null, null);
+		}
+
 		/// <summary>
 		/// Event raised when a local schema reference is requested.
 		/// </summary>
 		public static event EventHandlerAsync<SchemaReferenceEventArgs> GetLocalSchema = null;
 
-		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
+		private readonly Dictionary<string, Tuple<byte[], XmlSchema, DateTime>> schemas = new Dictionary<string, Tuple<byte[], XmlSchema, DateTime>>();
 
 		private Task ReturnStatus(ContractStatus Status, EventHandlerAsync<ContractValidationEventArgs> Callback, object State,
 			params KeyValuePair<string, object>[] Tags)
@@ -5249,7 +5245,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateIdentityAttachments">If the attachments associated with identities
 		/// signing the contract should be verified.</param>
 		/// <returns>Validation result.</returns>
-		public async Task<ContractValidationEventArgs> ValidateAsync(Contract Contract, 
+		public async Task<ContractValidationEventArgs> ValidateAsync(Contract Contract,
 			bool ValidateState, bool ValidateAttachments,
 			bool ValidateIdentities, bool ValidateIdentityAttachments)
 		{

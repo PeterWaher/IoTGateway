@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions
+namespace Waher.Script.Persistence.Functions
 {
 	/// <summary>
 	/// Gets the current count of a counter

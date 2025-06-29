@@ -93,7 +93,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			//     NrFail:=0;
 			//     foreach x in 1..100000 do
 			//     (
-			//         Bin:=Base64Decode(Base64Encode(Gateway.NextBytes(32)));
+			//         Bin:=Base64UrlDecode(Base64UrlEncode(Gateway.NextBytes(32)));
 			//         H:=Histogram([foreach x in Bin : x],0,256,12);
 			//         if (Min(H[1])>0) then NrPass++ else NrFail++
 			//     );
@@ -102,12 +102,12 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 			/////////////////////////////////////////////////////////////////////
 		}
 
-	/// <summary>
-	/// Evaluates the function.
-	/// </summary>
-	/// <param name="Variables">Variables collection.</param>
-	/// <returns>Function result.</returns>
-	public override IElement Evaluate(Variables Variables)
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement Evaluate(Variables Variables)
 		{
 			return new StringValue(CreateRandomPassword(32, 12));
 		}

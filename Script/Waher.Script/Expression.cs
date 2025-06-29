@@ -439,9 +439,8 @@ namespace Waher.Script
 							if (!(this.AssertOperandNotNull(this.ParseIf()) is In In))
 								throw new SyntaxException("IN statement expected", this.pos, this.script);
 
-							VariableReference Ref = In.LeftOperand as VariableReference;
-							if (Ref is null)
-								throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
+							if (!(In.LeftOperand is VariableReference Ref))
+								throw new SyntaxException("Variable reference expected", In.LeftOperand.Start, this.script);
 
 							this.SkipWhiteSpace();
 							if (this.PeekNextChar() == ':')
@@ -468,7 +467,7 @@ namespace Waher.Script
 
 								Ref = In.LeftOperand as VariableReference;
 								if (Ref is null)
-									throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
+									throw new SyntaxException("Variable reference expected", In.LeftOperand.Start, this.script);
 
 								this.SkipWhiteSpace();
 								if (this.PeekNextChar() == ':')

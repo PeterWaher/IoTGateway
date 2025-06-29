@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -421,6 +422,99 @@ namespace Waher.Networking.XMPP.Geo
 
 		#endregion
 
+		#region Event Notifications
+
+		private async Task AddedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			string SubscriptionId = XML.Attribute(e.Content, "id");
+			GeoObjectReference Ref = ParseObjectReferenceFirstChild(e.Content);
+
+			if (!(Ref is null))
+				await this.ObjectAdded.Raise(this, new GeoObjectSubscriptionEventArgs(e, SubscriptionId, Ref));
+		}
+
+		/// <summary>
+		/// Event raised when object hass been added.
+		/// </summary>
+		public event EventHandlerAsync<GeoObjectSubscriptionEventArgs> ObjectAdded;
+
+		private async Task UpdatedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			string SubscriptionId = XML.Attribute(e.Content, "id");
+			GeoObjectReference Ref = ParseObjectReferenceFirstChild(e.Content);
+
+			if (!(Ref is null))
+				await this.ObjectUpdated.Raise(this, new GeoObjectSubscriptionEventArgs(e, SubscriptionId, Ref));
+		}
+
+		/// <summary>
+		/// Event raised when object hass been updated.
+		/// </summary>
+		public event EventHandlerAsync<GeoObjectSubscriptionEventArgs> ObjectUpdated;
+
+		private async Task RemovedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			string SubscriptionId = XML.Attribute(e.Content, "id");
+			GeoObjectReference Ref = ParseObjectReferenceFirstChild(e.Content);
+
+			if (!(Ref is null))
+				await this.ObjectRemoved.Raise(this, new GeoObjectSubscriptionEventArgs(e, SubscriptionId, Ref));
+		}
+
+		/// <summary>
+		/// Event raised when object hass been updated.
+		/// </summary>
+		public event EventHandlerAsync<GeoObjectSubscriptionEventArgs> ObjectRemoved;
+
+		private static GeoObjectReference ParseObjectReferenceFirstChild(XmlElement ParentXml)
+		{
+			if (ParentXml is null)
+				return null;
+
+			foreach (XmlNode Node in ParentXml.ChildNodes)
+			{
+				if (Node is XmlElement E &&
+					E.LocalName == "ref" &&
+					IsNamespaceGeoSpatial(E.NamespaceURI))
+				{
+					return ParseObjectReference(E);
+				}
+			}
+
+			return null;
+		}
+
+		private static GeoObjectReference ParseObjectReference(XmlElement Xml)
+		{
+			GeoObjectReference Result = new GeoObjectReference()
+			{
+				GeoId = XML.Attribute(Xml, "id"),
+				Creator = Xml.HasAttribute("creator") ? XML.Attribute(Xml, "creator") : null,
+				Position = new GeoPosition(
+					XML.Attribute(Xml, "lat", 0.0),
+					XML.Attribute(Xml, "lon", 0.0),
+					Xml.HasAttribute("alt") ? XML.Attribute(Xml, "alt", 0.0) : (double?)null),
+				TimeToLive = Xml.HasAttribute("ttl") ? XML.Attribute(Xml, "ttl", 0) : (int?)null,
+				Created = XML.Attribute(Xml, "created", DateTime.MinValue),
+				Updated = Xml.HasAttribute("updated") ? XML.Attribute(Xml, "updated", DateTime.MinValue) : (DateTime?)null,
+				From = Xml.HasAttribute("from") ? XML.Attribute(Xml, "from", DateTime.MinValue) : (DateTime?)null,
+				To = Xml.HasAttribute("to") ? XML.Attribute(Xml, "to", DateTime.MinValue) : (DateTime?)null
+			};
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					Result.Definition = E;
+					break;
+				}
+			}
+
+			return Result;
+		}
+
+		#endregion
+
 		#region publish
 
 		public async Task Publish(string GeoId, GeoPosition Location, int? Ttl,
@@ -458,25 +552,6 @@ namespace Waher.Networking.XMPP.Geo
 		}
 
 		public async Task SearchAsync()
-		{
-			// TODO
-		}
-
-		#endregion
-
-		#region Event Notifications
-
-		private async Task AddedMessageHandler(object Sender, MessageEventArgs e)
-		{
-			// TODO
-		}
-
-		private async Task UpdatedMessageHandler(object Sender, MessageEventArgs e)
-		{
-			// TODO
-		}
-
-		private async Task RemovedMessageHandler(object Sender, MessageEventArgs e)
 		{
 			// TODO
 		}

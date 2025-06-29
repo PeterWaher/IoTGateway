@@ -462,6 +462,9 @@
 	<Assembly fileName="Waher.Runtime.Geo.dll"/>
 	<Assembly fileName="Waher.Runtime.Geo.pdb"/>
 	<Assembly fileName="Waher.Runtime.Geo.xml"/>
+	<Assembly fileName="Waher.Runtime.HashStore.dll"/>
+	<Assembly fileName="Waher.Runtime.HashStore.pdb"/>
+	<Assembly fileName="Waher.Runtime.HashStore.xml"/>
 	<Assembly fileName="Waher.Runtime.Inventory.dll" />
 	<Assembly fileName="Waher.Runtime.Inventory.pdb" />
 	<Assembly fileName="Waher.Runtime.Inventory.xml" />

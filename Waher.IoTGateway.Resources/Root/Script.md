@@ -2007,12 +2007,16 @@ The following functions are available in the `Waher.Script.Persistence` library.
 
 | Function                                                 | Description | Example |
 |----------------------------------------------------------|-------------|---------|
+| `DecCounter(CounterName[,Amount])`                       | Decrements a counter, given its name, and returns the decremented count. | `DecCounter("NrTests")` |
 | `DeleteObject(Obj)`                                      | Deletes an object from the underlying persistence layer. | `DeleteObject(Obj)` |
 | `FindObjects(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `FindObjects(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
 | `Generalize(Object)`                                     | Creates a generalized representation of the data in the object `Object`. This generalized representation can be more easily serialized, to JSON for instance, or to an object database. | `generalize(Obj)` |
+| `GetCounter(CounterName)`                                | Gets the current count of a counter, given its name. | `GetCounter("NrTests")` |
 | `GetSetting([Host,]Name,DefaultValue)`                   | Gets a runtime setting with name `Name`. If `Host` is provided, the function first tries to get the corresponding runtime host setting, and if one is not found, the corresponding runtime setting. If one is not found, the `DefaultValue` value is returned. `Host` can be a string, or an object with a host reference (implementing the `Waher.Content.IHostReference` interface), such as a HTTP Request object or similar. | `GetSetting("Name","Kilroy")` |
 | `GetHostSetting(Host,Name,DefaultValue)`                 | Gets a runtime host setting with name `Name`. `Host` defines the host. If a host runtime setting is not found, the `DefaultValue` value is returned. `Host` can be a string, or an object with a host reference (implementing the `Waher.Content.IHostReference` interface), such as a HTTP Request object or similar. | `GetHostSetting(Request,"Name","Kilroy")` |
 | `GetUserSetting(User,Name,DefaultValue)`                 | Gets a runtime user setting with name `Name`. `User` defines the user. If a user runtime setting is not found, the `DefaultValue` value is returned. `User` can be a string, or an object with a user reference (implementing the `Waher.Security.IUser` interface), or an origin reference (implementing the `Waher.Things.IRequestOrigin` interface). | `GetUserSetting(User,"Name","Kilroy")` |
+| `IncCounter(CounterName[,Amount])`                       | Increments a counter, given its name, and returns the incremented count. | `IncCounter("NrTests")` |
+| `PersistHash([Realm,[Expires,]]Hash)`                    | Persists a Hash digest in an optional realm. The function returns `true` if the hash was persisted and `false` if it was already persisted. The hash can be provided an expiry timestamp, after which the hash will be removed. | `PersistHash("Secrets",Sha2_256(Secret))` |
 | `Pivot(Result)`                                          | Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes column headers into account also. | `pivot(select Type, count(*) Nr from PersistedEvent group by Type)` |
 | `SaveNewObject(Obj)`                                     | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
 | `SetSetting([Host,]Name,Value)`                          | Sets a runtime setting with name `Name`. If `Host` is provided, the corresponding runtime host setting is set. `Host` can be a string, or an object with a host reference (implementing the `Waher.Content.IHostReference` interface), such as a HTTP Request object or similar. | `SetSetting("Name","Kilroy")` |
@@ -2020,6 +2024,7 @@ The following functions are available in the `Waher.Script.Persistence` library.
 | `SetUserSetting(User,Name,Value)`                        | Sets a runtime user setting with name `Name`. `User` defines the user. `User` can be a string, or an object with a user reference (implementing the `Waher.Security.IUser` interface), or an origin reference (implementing the `Waher.Things.IRequestOrigin` interface). | `SetHostSetting(Request,"Name","Kilroy")` |
 | `Specialize(Object)`                                     | Creates a specialized representation of the data in the object `Object`, which would be a generic object from the database, or similar. The specialized object would be represented using a proper object instance of the indicated type. | `specialize(Obj)` |
 | `UpdateObject(Obj)`                                      | Updates an object in the underlying persistence layer. | `UpdateObject(Obj)` |
+| `VerifyHash([Realm,]Hash)`                               | Verifies a Hash digest in an optional realm. The function returns `true` if the hash was found and `false` if not. | `VerifyHash("Secrets",Sha2_256(Secret))` |
 | `XPath(Expression)`                                      | Specifies an XPath-expression. | `XPath("Element/@Attr")` |
 
 In addition to this, the following XPATH/SPARQL extension functions are defined
@@ -2491,9 +2496,7 @@ The following functions are available in web pages hosted by the IoT Gateway:
 |-------------------------------------------------------|-------------|
 | `BareJID(JID)`                                        | Returns the Bare JID of `JID` |
 | `ClearCaches()`                                       | Clears internal caches. |
-| `DecCounter(CounterName[,Amount])`                    | Decrements a counter, given its name, and returns the decremented count. |
 | `FullJID(JID)`                                        | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
-| `GetCounter(CounterName)`                             | Gets the current count of a counter, given its name. |
 | `GetDomainSetting(Host,Key,DefaultValue)`             | Gets a domain setting. If the Host (which can be a string or implement `Waher.Content.IHostReference`, such as an HTTP Request object for instance) is an alternative domain, it will be treated as a host setting, otherwise a runtime setting. |
 | `GetNode(NodeId[,SourceId[,Partition[,JID]]])`        | Gets the node object of a node in the gateway (if not providing a `JID`), or a provisional reference node to a node hosted by a remote gateway identified by `JID`. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) Authorization to view the node is required, and depends on the execution context. |
 | `GetSources()`                                        | Gets available sources of things. |
@@ -2501,7 +2504,6 @@ The following functions are available in web pages hosted by the IoT Gateway:
 | `GetTabIDs(Pages)`                                    | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
 | `GetTabIDs(User)`                                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
 | `GetTabInformation(TabID)`                            | Gets information about a tab, the URI used, query parameters, session ID and session variables. If tab is not found, `null` is returned. |
-| `IncCounter(CounterName[,Amount])`                    | Increments a counter, given its name, and returns the incremented count. |
 | `LoadResourceFile(LocalResource[,ContentType])`       | Loads a file from its local resource name and decodes it, taking into consideration defined web folders. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. |
 | `PreprocessCssx(CSSX)`                                | Preprocesses a CSSX string `CSSX`, and returns it as a string. |
 | `PreprocessHtmlx(HTMLX)`                              | Preprocesses a HTMLX string `HTMLX`, and returns it as a string. |

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Collections;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Constants;
 using Waher.Script.Exceptions;
 using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
@@ -119,8 +120,15 @@ namespace Waher.Script.Operators.Membership
 								this.methods = Methods?.ToArray();
 								if (this.methods is null)
 								{
-									if (VectorIndex.TryGetIndexProperty(T, true, false, out this.property, out _))
-										this.nameIndex = new string[] { this.name };
+									if (VectorIndex.TryGetIndexProperty(T, true, false, out this.property,
+										out ParameterInfo[] IndexArguments) &&
+										(IndexArguments?.Length ?? 0) == 1)
+									{
+										if (IndexArguments[0].ParameterType == typeof(string))
+											this.nameIndex = new object[] { this.name };
+										else
+											this.nameIndex = new object[] { Expression.ConvertTo(this.name, IndexArguments[0].ParameterType, this) };
+									}
 								}
 							}
 							else
@@ -150,10 +158,7 @@ namespace Waher.Script.Operators.Membership
 				{
 					try
 					{
-						if (!(this.nameIndex is null))
-							Result = await WaitPossibleTask(this.property.GetValue(Instance, this.nameIndex));
-						else
-							Result = await WaitPossibleTask(this.property.GetValue(Instance, null));
+						Result = await WaitPossibleTask(this.property.GetValue(Instance, this.nameIndex));
 					}
 					catch (Exception ex)
 					{
@@ -211,7 +216,7 @@ namespace Waher.Script.Operators.Membership
 		private FieldInfo field = null;
 		private EventInfo _event = null;
 		private MethodLambda[] methods = null;
-		private string[] nameIndex = null;
+		private object[] nameIndex = null;
 		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
 
 		internal static readonly Type[] stringType = new Type[] { typeof(string) };
@@ -287,8 +292,19 @@ namespace Waher.Script.Operators.Membership
 					return Expression.Encapsulate(Methods.ToArray());
 			}
 
-			if (VectorIndex.TryGetIndexProperty(T, true, false, out Property, out _))
-				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, new string[] { Name })));
+			if (VectorIndex.TryGetIndexProperty(T, true, false, out Property,
+				out ParameterInfo[] IndexArguments) &&
+				(IndexArguments?.Length ?? 0) == 1)
+			{
+				object[] Index;
+
+				if (IndexArguments[0].ParameterType == typeof(string))
+					Index = new object[] { Name };
+				else
+					Index = new object[] { Expression.ConvertTo(Name, IndexArguments[0].ParameterType, Node) };
+
+				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, Index)));
+			}
 
 			if (Operand.IsScalar)
 				throw new ScriptRuntimeException("Member '" + Name + "' not found on type '" + T.FullName + "'.", Node);

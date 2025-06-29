@@ -16,8 +16,55 @@ namespace Waher.Script.Persistence.SQL
 		private IDictionary<string, object> dictionary;
 		private Type type;
 		private object obj;
-		private Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>> properties = null;
+		private Dictionary<string, PropertyRecord> properties = null;
 		private readonly bool readOnly;
+
+		private class PropertyRecord
+		{
+			public PropertyInfo Property;
+			public ParameterInfo[] IndexArguments;
+			public FieldInfo Field;
+			public int NrIndexParameters;
+			public bool IsStringIndex;
+
+			public PropertyRecord(PropertyInfo Property, FieldInfo Field)
+			{
+				this.Property = Property;
+				this.Field = Field;
+				this.IndexArguments = null;
+				this.NrIndexParameters = 0;
+				this.IsStringIndex = false;
+			}
+
+			public PropertyRecord(PropertyInfo Property, FieldInfo Field, ParameterInfo[] IndexArguments)
+			{
+				this.Property = Property;
+				this.Field = Field;
+				this.IndexArguments = IndexArguments;
+
+				if (IndexArguments is null)
+				{
+					this.NrIndexParameters = 0;
+					this.IsStringIndex = false;
+				}
+				else
+				{
+					this.NrIndexParameters = this.IndexArguments.Length;
+					this.IsStringIndex = this.NrIndexParameters == 1 &&
+						this.IndexArguments[0].ParameterType == typeof(string);
+				}
+			}
+
+			public object[] GetIndexArguments(string Name)
+			{
+				if (this.IsStringIndex)
+					return new object[] { Name };
+
+				object Converted = Expression.ConvertTo(Name, this.IndexArguments[0].ParameterType, null);
+
+				return new object[] { Converted };
+			}
+		}
 
 		/// <summary>
 		/// Object properties.
@@ -91,15 +138,15 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
+					this.properties = new Dictionary<string, PropertyRecord>();
 
-				if (this.properties.TryGetValue(Name, out Tuple<PropertyInfo, FieldInfo, bool> Rec))
+				if (this.properties.TryGetValue(Name, out PropertyRecord Rec))
 				{
-					if (Rec.Item3)
+					if (Rec.NrIndexParameters == 1)
 					{
 						try
 						{
-							ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name })); // TODO: Async
+							ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(this.obj, Rec.GetIndexArguments(Name))); // TODO: Async
 							return true;
 						}
 						catch (Exception)
@@ -137,9 +184,10 @@ namespace Waher.Script.Persistence.SQL
 
 				if (PI is null && FI is null)
 				{
-					if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
+					if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI,
+						out ParameterInfo[] IndexArguments))
 					{
-						this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+						this.properties[Name] = new PropertyRecord(PI, FI, IndexArguments);
 						return true;
 					}
 					else
@@ -150,7 +198,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 				else
 				{
-					this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
+					this.properties[Name] = new PropertyRecord(PI, FI);
 					return true;
 				}
 			}
@@ -164,7 +212,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a variable with the corresponding name was found.</returns>
 		public override bool TryGetVariable(string Name, out Variable Variable)
 		{
-			Tuple<PropertyInfo, FieldInfo, bool> Rec;
+			PropertyRecord Rec;
 
 			if (string.Compare(Name, "this", true) == 0)
 			{
@@ -181,7 +229,7 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
+					this.properties = new Dictionary<string, PropertyRecord>();
 
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
@@ -207,8 +255,11 @@ namespace Waher.Script.Persistence.SQL
 					{
 						if (this.dictionary is null)
 						{
-							if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
-								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+							if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI,
+								out ParameterInfo[] IndexArguments))
+							{
+								Rec = new PropertyRecord(PI, FI, IndexArguments);
+							}
 							else
 								Rec = null;
 						}
@@ -216,7 +267,7 @@ namespace Waher.Script.Persistence.SQL
 							Rec = null;
 					}
 					else
-						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
+						Rec = new PropertyRecord(PI, FI);
 
 					this.properties[Name] = Rec;
 				}
@@ -228,13 +279,13 @@ namespace Waher.Script.Persistence.SQL
 			{
 				Result = true;  // null may be a valid response. Check variable collections first.
 
-				if (Rec.Item1 is null)
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));    // TODO: Async
-				else if (Rec.Item3)
+				if (Rec.Property is null)
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Field.GetValue(this.obj));    // TODO: Async
+				else if (Rec.NrIndexParameters == 1)
 				{
 					try
 					{
-						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name })); // TODO: Async
+						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(this.obj, Rec.GetIndexArguments(Name))); // TODO: Async
 					}
 					catch (KeyNotFoundException)
 					{
@@ -243,7 +294,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 				else
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));    // TODO: Async
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(this.obj));    // TODO: Async
 
 				if (!(Value is null))
 				{
@@ -267,7 +318,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>If a property or variable with the corresponding name was found.</returns>
 		public bool TryGetValue(string Name, out object Value)
 		{
-			Tuple<PropertyInfo, FieldInfo, bool> Rec;
+			PropertyRecord Rec;
 
 			if (string.Compare(Name, "this", true) == 0)
 			{
@@ -281,7 +332,7 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
+					this.properties = new Dictionary<string, PropertyRecord>();
 
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
@@ -307,8 +358,11 @@ namespace Waher.Script.Persistence.SQL
 					{
 						if (this.dictionary is null)
 						{
-							if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
-								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+							if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI,
+								out ParameterInfo[] IndexArguments))
+							{
+								Rec = new PropertyRecord(PI, FI, IndexArguments);
+							}
 							else
 								Rec = null;
 						}
@@ -316,7 +370,7 @@ namespace Waher.Script.Persistence.SQL
 							Rec = null;
 					}
 					else
-						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
+						Rec = new PropertyRecord(PI, FI);
 
 					this.properties[Name] = Rec;
 				}
@@ -328,13 +382,13 @@ namespace Waher.Script.Persistence.SQL
 			{
 				Result = true;  // null may be a valid response. Check variable collections first.
 
-				if (Rec.Item1 is null)
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));    // TODO: Async
-				else if (Rec.Item3)
+				if (Rec.Property is null)
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Field.GetValue(this.obj));    // TODO: Async
+				else if (Rec.NrIndexParameters == 1)
 				{
 					try
 					{
-						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name })); // TODO: Async
+						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(this.obj, Rec.GetIndexArguments(Name))); // TODO: Async
 					}
 					catch (KeyNotFoundException)
 					{
@@ -343,7 +397,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 				else
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));    // TODO: Async
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Property.GetValue(this.obj));    // TODO: Async
 
 				if (!(Value is null))
 					return true;
@@ -379,7 +433,7 @@ namespace Waher.Script.Persistence.SQL
 			if (this.readOnly || string.Compare(Name, "this", true) == 0)
 				return base.Add(Name, Value);
 
-			Tuple<PropertyInfo, FieldInfo, bool> Rec;
+			PropertyRecord Rec;
 
 			if (!(this.dictionary is null))
 			{
@@ -390,7 +444,7 @@ namespace Waher.Script.Persistence.SQL
 			lock (this.variables)
 			{
 				if (this.properties is null)
-					this.properties = new Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>>();
+					this.properties = new Dictionary<string, PropertyRecord>();
 
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
@@ -414,13 +468,16 @@ namespace Waher.Script.Persistence.SQL
 
 					if (PI is null && FI is null)
 					{
-						if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
-							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
+						if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI,
+							out ParameterInfo[] IndexArguments))
+						{
+							Rec = new PropertyRecord(PI, FI, IndexArguments);
+						}
 						else
 							Rec = null;
 					}
 					else
-						Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, false);
+						Rec = new PropertyRecord(PI, FI);
 
 					this.properties[Name] = Rec;
 				}
@@ -431,34 +488,34 @@ namespace Waher.Script.Persistence.SQL
 				if (Value is IElement Element)
 					Value = Element.AssociatedObjectValue;
 
-				if (Rec.Item1 is null)
+				if (Rec.Property is null)
 				{
 					Type ValueType = Value?.GetType() ?? typeof(object);
-					Type FieldType = Rec.Item2.FieldType;
+					Type FieldType = Rec.Field.FieldType;
 
 					if (!FieldType.GetTypeInfo().IsAssignableFrom(ValueType.GetTypeInfo()))
 						Value = Expression.ConvertTo(Value, FieldType, null);
 
-					Rec.Item2.SetValue(this.obj, Value);
+					Rec.Field.SetValue(this.obj, Value);
 				}
 				else
 				{
-					if (!Rec.Item1.CanWrite)
+					if (!Rec.Property.CanWrite)
 						throw new InvalidOperationException("Property cannot be set.");
-					else if (!Rec.Item1.SetMethod.IsPublic)
+					else if (!Rec.Property.SetMethod.IsPublic)
 						throw new InvalidOperationException("Property not accessible.");
 					else
 					{
 						Type ValueType = Value?.GetType() ?? typeof(object);
-						Type PropertyType = Rec.Item1.PropertyType;
+						Type PropertyType = Rec.Property.PropertyType;
 
 						if (!PropertyType.GetTypeInfo().IsAssignableFrom(ValueType.GetTypeInfo()))
 							Value = Expression.ConvertTo(Value, PropertyType, null);
 
-						if (Rec.Item3)
-							Rec.Item1.SetValue(this.obj, Value, new object[] { Name });
+						if (Rec.NrIndexParameters == 1)
+							Rec.Property.SetValue(this.obj, Value, Rec.GetIndexArguments(Name));
 						else
-							Rec.Item1.SetValue(this.obj, Value);
+							Rec.Property.SetValue(this.obj, Value);
 					}
 				}
 

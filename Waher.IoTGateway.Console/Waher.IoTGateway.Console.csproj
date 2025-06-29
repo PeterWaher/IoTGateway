@@ -72,6 +72,7 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Counters\Waher.Runtime.Counters.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Geo\Waher.Runtime.Geo.csproj" />
+    <ProjectReference Include="..\Runtime\Waher.Runtime.HashStore\Waher.Runtime.HashStore.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\Runtime\Waher.Runtime.IO\Waher.Runtime.IO.csproj" />

@@ -37,6 +37,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		private bool controlFrame;
 		private bool closed = false;
 		private bool writingFragments = false;
+		private bool disposed = false;
 
 		internal WebSocket(WebSocketListener WebSocketListener, HttpRequest Request,
 			HttpResponse Response)
@@ -102,10 +103,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <summary>
 		/// Current client connection
 		/// </summary>
-		public BinaryTcpClient ClientConnection
-		{
-			get { return this.connection?.Client; }
-		}
+		public BinaryTcpClient ClientConnection => this.connection?.Client;
 
 		/// <summary>
 		/// Disposes the object.
@@ -121,16 +119,21 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		public async Task DisposeAsync()
 		{
-			this.payload?.Dispose();
-			this.payload = null;
-
-			if (!(this.connection is null))
+			if (!this.disposed)
 			{
-				await this.connection.DisposeAsync();
-				this.connection = null;
-			}
+				this.disposed = true;
 
-			await this.Disposed.Raise(this, EventArgs.Empty, false);
+				this.payload?.Dispose();
+				this.payload = null;
+
+				if (!(this.connection is null))
+				{
+					await this.connection.DisposeAsync();
+					this.connection = null;
+				}
+
+				await this.Disposed.Raise(this, EventArgs.Empty, false);
+			}
 		}
 
 		/// <summary>
@@ -468,7 +471,12 @@ namespace Waher.Networking.HTTP.WebSockets
 		private async Task BeginWriteRaw(bool ConstantBuffer, byte[] Frame, bool Last, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
 			if (Frame is null)
+			{
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, false));
+
 				throw new ArgumentException("Frame cannot be null.", nameof(Frame));
+			}
 
 			try
 			{
@@ -491,32 +499,39 @@ namespace Waher.Networking.HTTP.WebSockets
 
 				while (!(Frame is null))
 				{
-					if (this.http2)
+					try
 					{
-						if (!await this.http2Stream.TryWriteAllData(ConstantBuffer, Frame, 0, Frame.Length, Last, null))
+						if (this.http2)
 						{
-							lock (this.queue)
+							if (!await this.http2Stream.TryWriteAllData(ConstantBuffer, Frame, 0, Frame.Length, Last, null))
 							{
-								this.writing = false;
-								this.queue.Clear();
-							}
+								if (!(Callback is null))
+									await Callback.Raise(this, new DeliveryEventArgs(State, false));
 
-							try
-							{
-								await this.DisposeAsync();
+								await this.ClearQueue();
+
+								try
+								{
+									await this.DisposeAsync();
+								}
+								catch (Exception ex2)
+								{
+									Log.Exception(ex2);
+								}
+								return;
 							}
-							catch (Exception ex2)
-							{
-								Log.Exception(ex2);
-							}
-							return;
 						}
-					}
-					else
-						await this.httpResponse.WriteRawAsync(ConstantBuffer, Frame);
+						else
+							await this.httpResponse.WriteRawAsync(ConstantBuffer, Frame);
 
-					if (!(Callback is null))
-						await Callback.Raise(this, new DeliveryEventArgs(State, true));
+						if (!(Callback is null))
+							await Callback.Raise(this, new DeliveryEventArgs(State, true));
+					}
+					catch (Exception)
+					{
+						if (!(Callback is null))
+							await Callback.Raise(this, new DeliveryEventArgs(State, false));
+					}
 
 					lock (this.queue)
 					{
@@ -539,11 +554,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			{
 				Log.Exception(ex);
 
-				lock (this.queue)
-				{
-					this.writing = false;
-					this.queue.Clear();
-				}
+				await this.ClearQueue();
 
 				try
 				{
@@ -553,6 +564,24 @@ namespace Waher.Networking.HTTP.WebSockets
 				{
 					Log.Exception(ex2);
 				}
+			}
+		}
+
+		private async Task ClearQueue()
+		{
+			OutputRec[] Records;
+
+			lock (this.queue)
+			{
+				this.writing = false;
+				Records = this.queue.ToArray();
+				this.queue.Clear();
+			}
+
+			foreach (OutputRec Rec in Records)
+			{
+				if (!(Rec.Callback is null))
+					await Rec.Callback.Raise(this, new DeliveryEventArgs(Rec.State, false));
 			}
 		}
 
@@ -571,12 +600,13 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
 		/// <param name="MaxFrameLength">Maximum number of characters in each frame.</param>
-		public async Task Send(string Payload, int MaxFrameLength)
+		/// <returns>If able to send payload.</returns>
+		public async Task<bool> Send(string Payload, int MaxFrameLength)
 		{
 			int c = Payload.Length;
 
 			if (c <= MaxFrameLength)
-				await this.Send(Payload, false);
+				return await this.Send(Payload, false);
 			else
 			{
 				int i = 0;
@@ -585,8 +615,11 @@ namespace Waher.Networking.HTTP.WebSockets
 					int j = Math.Min(i + MaxFrameLength, c);
 					string s = Payload.Substring(i, j - i);
 					i = j;
-					await this.Send(s, i < c);
+					if (!await this.Send(s, i < c))
+						return false;
 				}
+
+				return true;
 			}
 		}
 
@@ -594,7 +627,8 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// Sends a text payload.
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
-		public Task Send(string Payload)
+		/// <returns>If able to send payload.</returns>
+		public Task<bool> Send(string Payload)
 		{
 			return this.Send(Payload, false, null, null);
 		}
@@ -604,7 +638,8 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
 		/// <param name="More">If text is fragmented, and more is to come.</param>
-		public Task Send(string Payload, bool More)
+		/// <returns>If able to send payload.</returns>
+		public Task<bool> Send(string Payload, bool More)
 		{
 			return this.Send(Payload, More, null, null);
 		}
@@ -616,20 +651,32 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="More">If text is fragmented, and more is to come.</param>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public async Task Send(string Payload, bool More, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		/// <returns>If able to send payload.</returns>
+		public async Task<bool> Send(string Payload, bool More, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
+			if (this.disposed || this.closed)
+			{
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, false));
+
+				return false;
+			}
+
 			byte[] Frame = this.CreateFrame(Payload, More);
 			await this.BeginWriteRaw(true, Frame, false, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
 			this.connection?.TransmitText(Payload);
+
+			return true;
 		}
 
 		/// <summary>
 		/// Sends a text payload.
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
-		public Task SendAsync(string Payload)
+		/// <returns>If able to send payload.</returns>
+		public Task<bool> SendAsync(string Payload)
 		{
 			return this.SendAsync(Payload, false);
 		}
@@ -639,15 +686,21 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Text to send.</param>
 		/// <param name="More">If text is fragmented, and more is to come.</param>
-		public async Task SendAsync(string Payload, bool More)
+		/// <returns>If able to send payload.</returns>
+		public async Task<bool> SendAsync(string Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.Send(Payload, More, (Sender, e) =>
+
+			if (!await this.Send(Payload, More, (Sender, e) =>
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;
-			}, null);
-			await Result.Task;
+			}, null))
+			{
+				return false;
+			}
+
+			return await Result.Task;
 		}
 
 		/// <summary>
@@ -655,23 +708,29 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
 		/// <param name="MaxFrameSize">Maximum number of bytes in each frame.</param>
-		public async Task Send(byte[] Payload, int MaxFrameSize)
+		/// <returns>If able to send payload.</returns>
+		public async Task<bool> Send(byte[] Payload, int MaxFrameSize)
 		{
 			int c = Payload.Length;
 
 			if (c <= MaxFrameSize)
-				await this.Send(Payload, false);
+				return await this.Send(Payload, false);
 			else
 			{
 				int i = 0;
+
 				while (i < c)
 				{
 					int j = Math.Min(i + MaxFrameSize, c);
 					byte[] Bin = new byte[j - i];
 					Array.Copy(Payload, i, Bin, 0, j - i);
 					i = j;
-					await this.Send(Bin, i < c);
+
+					if (!await this.Send(Bin, i < c))
+						return false;
 				}
+
+				return true;
 			}
 		}
 
@@ -679,7 +738,8 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// Sends a binary payload.
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
-		public Task Send(byte[] Payload)
+		/// <returns>If able to send payload.</returns>
+		public Task<bool> Send(byte[] Payload)
 		{
 			return this.Send(Payload, false, null, null);
 		}
@@ -689,7 +749,8 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
 		/// <param name="More">If the data is fragmented, and more is to come.</param>
-		public Task Send(byte[] Payload, bool More)
+		/// <returns>If able to send payload.</returns>
+		public Task<bool> Send(byte[] Payload, bool More)
 		{
 			return this.Send(Payload, More, null, null);
 		}
@@ -701,20 +762,32 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="More">If the data is fragmented, and more is to come.</param>
 		/// <param name="Callback">Method to call when callback has been sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public async Task Send(byte[] Payload, bool More, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
+		/// <returns>If able to send payload.</returns>
+		public async Task<bool> Send(byte[] Payload, bool More, EventHandlerAsync<DeliveryEventArgs> Callback, object State)
 		{
+			if (this.disposed || this.closed)
+			{
+				if (!(Callback is null))
+					await Callback.Raise(this, new DeliveryEventArgs(State, false));
+
+				return false;
+			}
+
 			byte[] Frame = this.CreateFrame(Payload, More);
 			await this.BeginWriteRaw(true, Frame, false, Callback, State);
 
 			this.connection?.Server?.DataTransmitted(Frame.Length);
 			this.connection?.TransmitBinary(true, Frame);
+
+			return true;
 		}
 
 		/// <summary>
 		/// Sends a binary payload.
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
-		public Task SendAsync(byte[] Payload)
+		/// <returns>If able to send payload.</returns>
+		public Task<bool> SendAsync(byte[] Payload)
 		{
 			return this.SendAsync(Payload, false);
 		}
@@ -724,15 +797,21 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// </summary>
 		/// <param name="Payload">Data to send.</param>
 		/// <param name="More">If the data is fragmented, and more is to come.</param>
-		public async Task SendAsync(byte[] Payload, bool More)
+		/// <returns>If able to send payload.</returns>
+		public async Task<bool> SendAsync(byte[] Payload, bool More)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			await this.Send(Payload, More, (Sender, e) =>
+
+			if (!await this.Send(Payload, More, (Sender, e) =>
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;
-			}, null);
-			await Result.Task;
+			}, null))
+			{
+				return false;
+			}
+
+			return await Result.Task;
 		}
 
 		private byte[] CreateFrame(string Payload, bool More)

@@ -407,7 +407,60 @@
 					<xs:documentation>Attachment reference parameter.</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name='recordSet' type='RecordSet'>
+				<xs:annotation>
+					<xs:documentation>Groups a set of parameters into a vector of sets of parameters.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name='RecordSet'>
+		<xs:annotation>
+			<xs:documentation>Contains a set of parameters that form a record.</xs:documentation>
+			<xs:documentation>The record can be repeated forming a set of records, or record set.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name='description' type='HumanReadableText' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Human-readable description of the record set.</xs:documentation>
+					<xs:documentation>Note: Multiple localized descriptions can be provided.</xs:documentation>
+					<xs:documentation>Note: Use the xml:lang attribute to specify language used.</xs:documentation>
+					<xs:documentation>Note: Descriptions are not required, if descriptions are available in the template.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='recordDefinition' type='Parameters' minOccurs='1' maxOccurs='1'>
+				<xs:annotation>
+					<xs:documentation>Defines a set of parameters forming one record in the record set.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name='record' type='Parameters' minOccurs='0' maxOccurs='unbounded'>
+				<xs:annotation>
+					<xs:documentation>Defines one record of data in the record set.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name='name' type='NonEmptyString' use='required'>
+			<xs:annotation>
+				<xs:documentation>The name of the record set.</xs:documentation>
+				<xs:documentation>Note: Names are case-insensitive in searches and references.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='exp' type='xs:string' use='optional'>
+			<xs:annotation>
+				<xs:documentation>Optional script expression validating the parameter.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='maxRecords' type='xs:positiveInteger' use='required'>
+			<xs:annotation>
+				<xs:documentation>Maximum number of records in the record set.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name='minRecords' type='xs:nonNegativeInteger' use='required'>
+			<xs:annotation>
+				<xs:documentation>Minimum number of records in the record set.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name='Parameter' abstract='true'>
@@ -1480,7 +1533,7 @@
 			<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed whitespace.</xs:documentation>
 			<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty element, is UTF-8 encoded before being signed.</xs:documentation>
 			<xs:documentation>The contract element never includes the xmlns attribute when calculating the signature.</xs:documentation>
-			<xs:documentation>Note: A client can choose to sign a contract on the same broker/provider as its legal identity is defined on, or on the broker/provider hosting the contract, if they are different. In the first case, the request is forwarded to the second provider hosting the contract, and the response is likewise forwarded back to the client. The first broker takes the opportunity to record the signature as well, in case the request is successful. In the second case, the first broker hosting the legal identity of a successful signature is simply informed by the  broker hosting the contract of the signature via the contractSigned notification message.</xs:documentation>
+			<xs:documentation>Note: A client can choose to sign a contract on the same broker/provider as its legal identity is defined on, or on the broker/provider hosting the contract, if they are different. In the first case, the request is forwarded to the second provider hosting the contract, and the response is likewise forwarded back to the client. The first broker takes the opportunity to record the signature as well, in case the request is successful. In the second case, the first broker hosting the legal identity of a successful signature is simply informed by the  broker hosting the contract of the signature via the contractSigned notification request.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:attribute name='id' type='xs:string' use='required'>
@@ -1510,12 +1563,15 @@
 
 	<xs:element name='contractSigned'>
 		<xs:annotation>
-			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been signed.</xs:documentation>
-			<xs:documentation>It is sent between Trust Providers if the smart contract and the legal identity are hosted on separate brokers. It is also sent to the creator and parts of a contract, if a new signature has been added.</xs:documentation>
+			<xs:documentation>This element is sent in a message stanza, if the recipient is a client, or an iq set stanza, if recipient is a broker.</xs:documentation>
+			<xs:documentation>Stanza is sent to inform the receiving end that a contract has been signed.</xs:documentation>
+			<xs:documentation>It is sent between Trust Providers if the smart contract and the legal identity are hosted on separate brokers.</xs:documentation>
+			<xs:documentation>It is also sent to the creator and parts of a contract, if a new signature has been added.</xs:documentation>
 			<xs:documentation>Note: To validate the signature, the contract, and possibly some keys, have to be retrieved and validated.</xs:documentation>
 			<xs:documentation>The signed contract is included in the message.</xs:documentation>
 			<xs:documentation>If a contract uses a template from another broker, this message will be sent to the broker hosting the template as well.</xs:documentation>
 			<xs:documentation>If contract reference parameters are available in the contract, the message will also be sent to the brokers hosting the corresponding referenced contracts.</xs:documentation>
+			<xs:documentation>If sent in an iq set stanza to another broker, the response may contain an authorizeJid element response, informing the sender of a JID that needs to be authorized to validate the contract.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
@@ -1543,6 +1599,19 @@
 			<xs:attribute name='signed' type='xs:boolean' use='optional' default='false'>
 				<xs:annotation>
 					<xs:documentation>If the signature resulted the contract to become signed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='authorizeJid'>
+		<xs:annotation>
+			<xs:documentation>When sent in a response to a broker request, contains information about a JID that will perform validation of the content that was sent.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='jid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Bare JID that will be used in validation of content that was sent.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
@@ -127,6 +128,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private static readonly string KeySettings = typeof(ContractsClient).FullName + ".";
 		private static readonly string ContractKeySettings = typeof(ContractsClient).Namespace + ".Contracts.";
+
+		private const int CacheSchemaDays = 7;
+
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
@@ -1654,7 +1658,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass to callback method.</param>
 		public Task Validate(LegalIdentity Identity, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
-			return this.Validate(Identity, true, Callback, State);
+			return this.Validate(Identity, true, true, Callback, State);
 		}
 
 		/// <summary>
@@ -1664,7 +1668,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task Validate(LegalIdentity Identity, bool ValidateState, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
+		public Task Validate(LegalIdentity Identity, bool ValidateState, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
+		{
+			return this.Validate(Identity, ValidateState, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If attachments should be validated.</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public async Task Validate(LegalIdentity Identity, bool ValidateState, bool ValidateAttachments,
+			EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
 		{
 			if (Identity is null)
 			{
@@ -1674,7 +1692,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (ValidateState && Identity.State != IdentityState.Approved)
 			{
-				await this.ReturnStatus(IdentityStatus.NotApproved, Callback, State);
+				await this.ReturnStatus(IdentityStatus.NotApproved, Callback, State,
+					new KeyValuePair<string, object>("State", Identity.State));
 				return;
 			}
 
@@ -1682,13 +1701,15 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Now.Date.AddDays(1) < Identity.From)    // To avoid Time-zone problems
 			{
-				await this.ReturnStatus(IdentityStatus.NotValidYet, Callback, State);
+				await this.ReturnStatus(IdentityStatus.NotValidYet, Callback, State,
+					new KeyValuePair<string, object>("From", Identity.From));
 				return;
 			}
 
 			if (Now.Date.AddDays(-1) > Identity.To)      // To avoid Time-zone problems
 			{
-				await this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State);
+				await this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State,
+					new KeyValuePair<string, object>("To", Identity.To));
 				return;
 			}
 
@@ -1720,23 +1741,28 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (!b.Value)
 				{
-					await this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State);
+					await this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State,
+						new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+						new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ClientSignature)));
 					return;
 				}
 			}
 			else
 			{
-				await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
+				await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State,
+					new KeyValuePair<string, object>("KeyName", Identity.ClientKeyName));
 				return;
 			}
 
-			if (Identity.State == IdentityState.Approved && ValidateState && !(Identity.Attachments is null))
+			if (Identity.State == IdentityState.Approved && ValidateState &&
+				ValidateAttachments && !(Identity.Attachments is null))
 			{
 				foreach (Attachment Attachment in Identity.Attachments)
 				{
 					if (string.IsNullOrEmpty(Attachment.Url))
 					{
-						await this.ReturnStatus(IdentityStatus.AttachmentLacksUrl, Callback, State);
+						await this.ReturnStatus(IdentityStatus.AttachmentLacksUrl, Callback, State,
+							new KeyValuePair<string, object>("AttachmentId", Attachment.Id));
 						return;
 					}
 
@@ -1747,7 +1773,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 						if (P.Key != Attachment.ContentType)
 						{
-							await this.ReturnStatus(IdentityStatus.AttachmentInconsistency, Callback, State);
+							await this.ReturnStatus(IdentityStatus.AttachmentInconsistency, Callback, State,
+								new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+								new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+								new KeyValuePair<string, object>("ExpectedContentType", Attachment.ContentType),
+								new KeyValuePair<string, object>("ContentType", P.Key));
 							return;
 						}
 
@@ -1758,20 +1788,29 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							if (!b.Value)
 							{
-								await this.ReturnStatus(IdentityStatus.AttachmentSignatureInvalid, Callback, State);
+								await this.ReturnStatus(IdentityStatus.AttachmentSignatureInvalid, Callback, State,
+									new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+									new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+									new KeyValuePair<string, object>("AttachmentSignatureBase64", Convert.ToBase64String(Attachment.Signature)));
 								return;
 							}
 						}
 						else
 						{
-							await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State);
+							await this.ReturnStatus(IdentityStatus.ClientKeyNotRecognized, Callback, State,
+								new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+								new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+								new KeyValuePair<string, object>("KeyName", Identity.ClientKeyName));
 							return;
 						}
 					}
 					catch (Exception ex)
 					{
 						this.client.Error("Attachment " + Attachment.Url + "unavailable: " + ex.Message);
-						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State);
+						await this.ReturnStatus(IdentityStatus.AttachmentUnavailable, Callback, State,
+							new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+							new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+							new KeyValuePair<string, object>("Error", ex.Message));
 						return;
 					}
 				}
@@ -1808,17 +1847,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (!HasOldPublicKey)
 					{
-						// TODO: Remove:
-						Log.Debug("Provider Signature Invalid (1).",
-							new KeyValuePair<string, object>("Identity", Identity.Id),
+						await this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
 							new KeyValuePair<string, object>("Provider", Identity.Provider),
 							new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
 							new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
 							new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
 							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
 							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
-
-						await this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
 						return;
 					}
 
@@ -1833,17 +1868,13 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							if (e.Key.Equals(e2.Key))
 							{
-								// TODO: Remove:
-								Log.Debug("Provider Signature Invalid (2).",
-									new KeyValuePair<string, object>("Identity", Identity.Id),
+								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
 									new KeyValuePair<string, object>("Provider", Identity.Provider),
 									new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
 									new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
 									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
 									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
 									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
-
-								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
 							}
 
 							Valid = e2.Key.Verify(Data, Identity.ServerSignature);
@@ -1852,26 +1883,28 @@ namespace Waher.Networking.XMPP.Contracts
 								return this.ReturnStatus(IdentityStatus.Valid, Callback, State);
 							else
 							{
-								// TODO: Remove:
-								Log.Debug("Provider Signature Invalid (3).",
-									new KeyValuePair<string, object>("Identity", Identity.Id),
+								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State,
 									new KeyValuePair<string, object>("Provider", Identity.Provider),
 									new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
 									new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
 									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
 									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
 									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ServerSignature)));
-
-								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
 							}
 						}
 						else
-							return this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
+						{
+							return this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State,
+								new KeyValuePair<string, object>("Provider", Identity.Provider));
+						}
 
 					}, State);
 				}
 				else
-					await this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State);
+				{
+					await this.ReturnStatus(IdentityStatus.NoProviderPublicKey, Callback, State,
+						new KeyValuePair<string, object>("Provider", Identity.Provider));
+				}
 
 			}, State);
 		}
@@ -1934,9 +1967,10 @@ namespace Waher.Networking.XMPP.Contracts
 				return null;
 		}
 
-		private async Task ReturnStatus(IdentityStatus Status, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State)
+		private async Task ReturnStatus(IdentityStatus Status, EventHandlerAsync<IdentityValidationEventArgs> Callback, object State,
+			params KeyValuePair<string, object>[] Tags)
 		{
-			await Callback.Raise(this, new IdentityValidationEventArgs(Status, State));
+			await Callback.Raise(this, new IdentityValidationEventArgs(Status, State, Tags));
 		}
 
 		/// <summary>
@@ -1944,9 +1978,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Identity">Legal identity to validate</param>
 		/// <returns>Status of validation.</returns>
-		public Task<IdentityStatus> ValidateAsync(LegalIdentity Identity)
+		public Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity)
 		{
-			return this.ValidateAsync(Identity, true);
+			return this.ValidateAsync(Identity, true, true);
 		}
 
 		/// <summary>
@@ -1955,13 +1989,26 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Identity">Legal identity to validate</param>
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <returns>Status of validation.</returns>
-		public async Task<IdentityStatus> ValidateAsync(LegalIdentity Identity, bool ValidateState)
+		public Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity, bool ValidateState)
 		{
-			TaskCompletionSource<IdentityStatus> Result = new TaskCompletionSource<IdentityStatus>();
+			return this.ValidateAsync(Identity, ValidateState, true);
+		}
 
-			await this.Validate(Identity, ValidateState, (Sender, e) =>
+		/// <summary>
+		/// Validates a legal identity.
+		/// </summary>
+		/// <param name="Identity">Legal identity to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If attachments should be validated.</param>
+		/// <returns>Status of validation.</returns>
+		public async Task<IdentityValidationEventArgs> ValidateAsync(LegalIdentity Identity,
+			bool ValidateState, bool ValidateAttachments)
+		{
+			TaskCompletionSource<IdentityValidationEventArgs> Result = new TaskCompletionSource<IdentityValidationEventArgs>();
+
+			await this.Validate(Identity, ValidateState, ValidateAttachments, (Sender, e) =>
 			{
-				Result.TrySetResult(e.Status);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 
@@ -4565,7 +4612,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="State">State object to pass to callback method.</param>
 		public Task Validate(Contract Contract, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
-			return this.Validate(Contract, true, Callback, State);
+			return this.Validate(Contract, true, true, true, true, Callback, State);
 		}
 
 		/// <summary>
@@ -4575,7 +4622,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
 		/// <param name="Callback">Method to call when validation is completed</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public async Task Validate(Contract Contract, bool ValidateState, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
+		public Task Validate(Contract Contract, bool ValidateState, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
+		{
+			return this.Validate(Contract, ValidateState, true, true, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If contract attachments should be validated.</param>
+		/// <param name="ValidateIdentities">If identities signing the contract should be validated.</param>
+		/// <param name="ValidateIdentityAttachments">If the attachments associated with identities
+		/// signing the contract should be verified.</param>
+		/// <param name="Callback">Method to call when validation is completed</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public async Task Validate(Contract Contract, bool ValidateState, bool ValidateAttachments,
+			bool ValidateIdentities, bool ValidateIdentityAttachments,
+			EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
 		{
 			if (Contract is null)
 			{
@@ -4588,7 +4653,8 @@ namespace Waher.Networking.XMPP.Contracts
 				Contract.State != ContractState.BeingSigned &&
 				Contract.State != ContractState.Signed)
 			{
-				await this.ReturnStatus(ContractStatus.NotApproved, Callback, State);
+				await this.ReturnStatus(ContractStatus.NotApproved, Callback, State,
+					new KeyValuePair<string, object>("State", Contract.State));
 				return;
 			}
 
@@ -4596,13 +4662,15 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Now.Date.AddDays(1) < Contract.From)    // To avoid Time-zone problems
 			{
-				await this.ReturnStatus(ContractStatus.NotValidYet, Callback, State);
+				await this.ReturnStatus(ContractStatus.NotValidYet, Callback, State,
+					new KeyValuePair<string, object>("From", Contract.From));
 				return;
 			}
 
 			if (Now.Date.AddDays(-1) > Contract.To)      // To avoid Time-zone problems
 			{
-				await this.ReturnStatus(ContractStatus.NotValidAnymore, Callback, State);
+				await this.ReturnStatus(ContractStatus.NotValidAnymore, Callback, State,
+					new KeyValuePair<string, object>("To", Contract.To));
 				return;
 			}
 
@@ -4655,18 +4723,31 @@ namespace Waher.Networking.XMPP.Contracts
 					foreach (Parameter Parameter in Contract.Parameters)
 						Parameter.Populate(Variables);
 
+					Dictionary<string, object> Tags = null;
+
 					foreach (Parameter Parameter in Contract.Parameters)
 					{
 						if (!await Parameter.IsParameterValid(Variables, this))
 						{
-							await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State);
-							return;
+							Tags ??= new Dictionary<string, object>();
+
+							Tags[Parameter.Name] = Parameter.ErrorText;
+							if (Parameter.ErrorReason.HasValue)
+								Tags[Parameter.Name + "_Reason"] = Parameter.ErrorReason.Value;
 						}
 					}
+
+					if (!(Tags is null))
+					{
+						await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State,
+							Tags.ToArray());
+						return;
+					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State);
+					await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State,
+						new KeyValuePair<string, object>("Error", ex.Message));
 					return;
 				}
 			}
@@ -4692,14 +4773,16 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Doc.LoadXml(Contract.ForMachines.OuterXml);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State);
+				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State,
+					new KeyValuePair<string, object>("Error", ex.Message));
 				return;
 			}
 
 			Dictionary<string, XmlSchema> Schemas = new Dictionary<string, XmlSchema>();
 			LinkedList<XmlNode> ToCheck = new LinkedList<XmlNode>();
+			XmlSchema Schema;
 
 			ToCheck.AddLast(Doc.DocumentElement);
 
@@ -4726,68 +4809,35 @@ namespace Waher.Networking.XMPP.Contracts
 			int NrSchemas = Schemas.Count;
 			if (NrSchemas == 0 || !Schemas.ContainsKey(Contract.ForMachinesNamespace))
 			{
-				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State);
+				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State,
+					new KeyValuePair<string, object>("Namespace", Contract.ForMachinesNamespace));
 				return;
 			}
 
-			string SchemaKey = Contract.ForMachinesNamespace + "#" + Convert.ToBase64String(Contract.ContentSchemaDigest);
-			byte[] SchemaBin;
-			XmlSchema Schema;
+			Tuple<XmlSchema, ContractStatus?, Exception> SchemaResult;
 
-			lock (this.schemas)
+			SchemaResult = await this.LoadSchema(this.componentAddress, Contract.ForMachinesNamespace,
+				Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest);
+
+			if (SchemaResult.Item2.HasValue)
 			{
-				if (this.schemas.TryGetValue(SchemaKey, out KeyValuePair<byte[], XmlSchema> P))
-				{
-					SchemaBin = P.Key;
-					Schema = P.Value;
-				}
-				else
-				{
-					SchemaBin = null;
-					Schema = null;
-				}
+				await this.ReturnStatus(SchemaResult.Item2.Value, Callback, State,
+					new KeyValuePair<string, object>("Error", SchemaResult.Item3?.Message ?? string.Empty),
+					new KeyValuePair<string, object>("Namespace", Contract.ForMachinesNamespace),
+					new KeyValuePair<string, object>("HashFunction", Contract.ContentSchemaHashFunction),
+					new KeyValuePair<string, object>("Digest", Convert.ToBase64String(Contract.ContentSchemaDigest)));
+				return;
 			}
-
-			if (Schema is null)
+			else if (SchemaResult.Item1 is null)
 			{
-				SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(
-					Contract.ForMachinesNamespace,
-					new SchemaDigest(Contract.ContentSchemaHashFunction,
-					Contract.ContentSchemaDigest));
-
-				await GetLocalSchema.Raise(this, e, false);
-
-				if (!(e.XmlSchema is null))
-				{
-					SchemaBin = e.XmlSchema;
-					Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
-				}
-				else
-				{
-					try
-					{
-						SchemaBin = await this.GetSchemaAsync(Contract.ForMachinesNamespace,
-							new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest));
-						Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
-					}
-					catch (Exception)
-					{
-						await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State);
-						return;
-					}
-				}
-
-				if (!(Schema is null))
-				{
-					lock (this.schemas)
-					{
-						this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
-					}
-				}
+				await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State);
+				return;
 			}
-
-			if (!(Schema is null))
+			else
+			{
+				Schema = SchemaResult.Item1;
 				Schemas[Contract.ForMachinesNamespace] = Schema;
+			}
 
 			string[] Namespaces = new string[Schemas.Count];
 			Schemas.Keys.CopyTo(Namespaces, 0);
@@ -4804,69 +4854,25 @@ namespace Waher.Networking.XMPP.Contracts
 				if (Schemas.TryGetValue(Namespace, out Schema) && !(Schema is null))
 					continue;
 
-				TaskCompletionSource<ContractStatus> T = new TaskCompletionSource<ContractStatus>();
-				SchemaDigest SchemaDigest;
+				SchemaResult = await this.LoadSchema(this.componentAddress, Namespace, null, null);
 
-				if (Namespace == Contract.ForMachinesNamespace)
-					SchemaDigest = new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest);
-				else
-					SchemaDigest = null;
-
-				await this.GetSchema(ContractComponent, Namespace, SchemaDigest, (_, e) =>
+				if (SchemaResult.Item2.HasValue)
 				{
-					if (e.Ok)
-					{
-						try
-						{
-							SchemaBin = e.Schema;
-							using (MemoryStream ms = new MemoryStream(SchemaBin))
-							{
-								Schema = XSL.LoadSchema(ms, string.Empty);
-							}
-
-							Schemas[Namespace] = Schema;
-
-							if (Namespace == Contract.ForMachinesNamespace)
-							{
-								byte[] Digest = Hashes.ComputeHash(Contract.ContentSchemaHashFunction, SchemaBin);
-
-								if (Convert.ToBase64String(Digest) != Convert.ToBase64String(Contract.ContentSchemaDigest))
-								{
-									T.TrySetResult(ContractStatus.FraudulentSchema);
-									return Task.CompletedTask;
-								}
-
-								lock (this.schemas)
-								{
-									this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
-								}
-							}
-							else
-							{
-								lock (this.schemas)
-								{
-									this.schemas[Namespace] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
-								}
-							}
-
-							T.TrySetResult(ContractStatus.Valid);
-						}
-						catch (Exception)
-						{
-							T.TrySetResult(ContractStatus.CorruptSchema);
-						}
-					}
-					else
-						T.TrySetResult(ContractStatus.NoSchemaAccess);
-
-					return Task.CompletedTask;
-				}, null);
-
-				ContractStatus Temp = await T.Task;
-				if (Temp != ContractStatus.Valid)
-				{
-					await this.ReturnStatus(Temp, Callback, State);
+					await this.ReturnStatus(SchemaResult.Item2.Value, Callback, State,
+						new KeyValuePair<string, object>("Error", SchemaResult.Item3?.Message ?? string.Empty),
+						new KeyValuePair<string, object>("Namespace", Namespace));
 					return;
+				}
+				else if (SchemaResult.Item1 is null)
+				{
+					await this.ReturnStatus(ContractStatus.NoSchemaAccess, Callback, State,
+						new KeyValuePair<string, object>("Namespace", Namespace));
+					return;
+				}
+				else
+				{
+					Schema = SchemaResult.Item1;
+					Schemas[Namespace] = Schema;
 				}
 			}
 
@@ -4877,9 +4883,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 				XSL.Validate(string.Empty, Doc, Contract.ForMachinesLocalName, Contract.ForMachinesNamespace, Schemas2);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				await this.ReturnStatus(ContractStatus.FraudulentMachineReadable, Callback, State);
+				await this.ReturnStatus(ContractStatus.FraudulentMachineReadable, Callback, State,
+					new KeyValuePair<string, object>("Error", ex.Message));
 				return;
 			}
 
@@ -4888,35 +4895,45 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 			Dictionary<string, LegalIdentity> Identities = new Dictionary<string, LegalIdentity>();
 
-			foreach (ClientSignature Signature in Contract.ClientSignatures)
+			if (ValidateIdentities)
 			{
-				if (Identities.ContainsKey(Signature.LegalId))
-					continue;
-
-				LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
-				if (Identity is null)
+				foreach (ClientSignature Signature in Contract.ClientSignatures)
 				{
-					await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State);
-					return;
-				}
+					if (Identities.ContainsKey(Signature.LegalId))
+						continue;
 
-				IdentityStatus Status = await this.ValidateAsync(Identity);
-				if (Status != IdentityStatus.Valid)
-				{
-					await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback, State);
-					return;
-				}
+					LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
+					if (Identity is null)
+					{
+						await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State,
+							new KeyValuePair<string, object>("LegalId", Signature.LegalId),
+							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Signature.DigitalSignature)));
+						return;
+					}
 
-				Identities[Signature.LegalId] = Identity;
+					IdentityValidationEventArgs e = await this.ValidateAsync(Identity, true, ValidateIdentityAttachments);
+					if (e.Status != IdentityStatus.Valid)
+					{
+						await this.ReturnStatus(ContractStatus.ClientIdentityInvalid, Callback,
+							State, e.Tags.Join(
+								new KeyValuePair<string, object>("IdentityStatus", e.Status),
+								new KeyValuePair<string, object>("LegalId", Identity.Id)));
+						return;
+					}
+
+					Identities[Signature.LegalId] = Identity;
+				}
 			}
 
-			if (!(Contract.Attachments is null))
+			if (ValidateAttachments && !(Contract.Attachments is null))
 			{
 				foreach (Attachment Attachment in Contract.Attachments)
 				{
 					if (string.IsNullOrEmpty(Attachment.Url))
 					{
-						await this.ReturnStatus(ContractStatus.AttachmentLacksUrl, Callback, State);
+						await this.ReturnStatus(ContractStatus.AttachmentLacksUrl, Callback, State,
+							new KeyValuePair<string, object>("AttachmentId", Attachment.Id));
 						return;
 					}
 
@@ -4928,7 +4945,11 @@ namespace Waher.Networking.XMPP.Contracts
 
 						if (P.Key != Attachment.ContentType)
 						{
-							await this.ReturnStatus(ContractStatus.AttachmentInconsistency, Callback, State);
+							await this.ReturnStatus(ContractStatus.AttachmentInconsistency, Callback, State,
+								new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+								new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+								new KeyValuePair<string, object>("ExpectedContentType", Attachment.ContentType),
+								new KeyValuePair<string, object>("ContentType", P.Key));
 							return;
 						}
 
@@ -4958,19 +4979,28 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							if (!IsValid.Value)
 							{
-								await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
+								await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State,
+									new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+									new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+									new KeyValuePair<string, object>("AttachmentSignatureBase64", Convert.ToBase64String(Attachment.Signature)));
 								return;
 							}
 						}
 						else
 						{
-							await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State);
+							await this.ReturnStatus(ContractStatus.AttachmentSignatureInvalid, Callback, State,
+								new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+								new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+								new KeyValuePair<string, object>("KeyName", Identity.ClientKeyName));
 							return;
 						}
 					}
-					catch (Exception)
+					catch (Exception ex)
 					{
-						await this.ReturnStatus(ContractStatus.AttachmentUnavailable, Callback, State);
+						await this.ReturnStatus(ContractStatus.AttachmentUnavailable, Callback, State,
+							new KeyValuePair<string, object>("AttachmentId", Attachment.Id),
+							new KeyValuePair<string, object>("AttachmentUrl", Attachment.Url),
+							new KeyValuePair<string, object>("Error", ex.Message));
 						return;
 					}
 				}
@@ -5007,17 +5037,13 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (!HasOldPublicKey)
 					{
-						// TODO: Remove:
-						Log.Debug("Provider Signature Invalid (4).",
-							new KeyValuePair<string, object>("Contract", Contract.ContractId),
+						await this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State,
 							new KeyValuePair<string, object>("Provider", Contract.Provider),
 							new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
 							new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
 							new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
 							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
 							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
-						
-						await this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
 						return;
 					}
 
@@ -5032,17 +5058,13 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							if (e.Key.Equals(e2.Key))
 							{
-								// TODO: Remove:
-								Log.Debug("Provider Signature Invalid (5).",
-									new KeyValuePair<string, object>("Contract", Contract.ContractId),
+								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State,
 									new KeyValuePair<string, object>("Provider", Contract.Provider),
 									new KeyValuePair<string, object>("LocalName", e.Key.LocalName),
 									new KeyValuePair<string, object>("Namespace", e.Key.Namespace),
 									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
 									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
 									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
-
-								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
 							}
 
 							Valid = e2.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
@@ -5050,29 +5072,93 @@ namespace Waher.Networking.XMPP.Contracts
 							if (Valid)
 								return this.ReturnStatus(ContractStatus.Valid, Callback, State);
 							else
-							{
-								// TODO: Remove:
-								Log.Debug("Provider Signature Invalid (6).",
-									new KeyValuePair<string, object>("Contract", Contract.ContractId),
-									new KeyValuePair<string, object>("Provider", Contract.Provider),
-									new KeyValuePair<string, object>("LocalName", e2.Key.LocalName),
-									new KeyValuePair<string, object>("Namespace", e2.Key.Namespace),
-									new KeyValuePair<string, object>("PublicKeyBase64", e.Key.PublicKeyBase64),
-									new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-									new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Contract.ServerSignature.DigitalSignature)));
-
 								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
-							}
 						}
 						else
-							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State);
+							return this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,
+								new KeyValuePair<string, object>("Provider", Contract.Provider));
 
 					}, State);
 				}
 				else
-					await this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State);
+				{
+					await this.ReturnStatus(ContractStatus.NoProviderPublicKey, Callback, State,
+						new KeyValuePair<string, object>("Provider", Contract.Provider));
+				}
 
 			}, State);
+		}
+
+		private async Task<Tuple<XmlSchema, ContractStatus?, Exception>> LoadSchema(string ContractComponent, string Namespace,
+			HashFunction? HashFunction, byte[] SchemaDigest)
+		{
+			string SchemaKey = SchemaDigest is null ? Namespace : Namespace + "#" + Convert.ToBase64String(SchemaDigest);
+			byte[] SchemaBin;
+			XmlSchema Schema;
+
+			lock (this.schemas)
+			{
+				if (this.schemas.TryGetValue(SchemaKey, out Tuple<byte[], XmlSchema, DateTime> P) &&
+					P.Item3 >= DateTime.UtcNow)
+				{
+					return new Tuple<XmlSchema, ContractStatus?, Exception>(P.Item2, null, null);
+				}
+			}
+
+			SchemaReferenceEventArgs e = new SchemaReferenceEventArgs(Namespace,
+				SchemaDigest is null ? null : new SchemaDigest(HashFunction.Value, SchemaDigest));
+
+			await GetLocalSchema.Raise(this, e, false);
+
+			if (!(e.XmlSchema is null))
+			{
+				SchemaBin = e.XmlSchema;
+				Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+
+				lock (this.schemas)
+				{
+					this.schemas[SchemaKey] = new Tuple<byte[], XmlSchema, DateTime>(SchemaBin, Schema, DateTime.UtcNow.AddDays(CacheSchemaDays));
+				}
+
+				return new Tuple<XmlSchema, ContractStatus?, Exception>(Schema, null, null);
+			}
+
+			if (string.IsNullOrEmpty(ContractComponent))
+				ContractComponent = this.componentAddress;
+
+			try
+			{
+				SchemaBin = await this.GetSchemaAsync(ContractComponent, Namespace,
+					SchemaDigest is null ? null : new SchemaDigest(HashFunction.Value, SchemaDigest));
+			}
+			catch (Exception ex)
+			{
+				return new Tuple<XmlSchema, ContractStatus?, Exception>(null, ContractStatus.NoSchemaAccess, ex);
+			}
+
+			if (!(SchemaDigest is null))
+			{
+				byte[] Digest = Hashes.ComputeHash(HashFunction.Value, SchemaBin);
+
+				if (Convert.ToBase64String(Digest) != Convert.ToBase64String(SchemaDigest))
+					return new Tuple<XmlSchema, ContractStatus?, Exception>(null, ContractStatus.FraudulentSchema, null);
+			}
+
+			try
+			{
+				Schema = XSL.LoadSchema(SchemaBin, SchemaKey);
+			}
+			catch (Exception ex)
+			{
+				return new Tuple<XmlSchema, ContractStatus?, Exception>(null, ContractStatus.CorruptSchema, ex);
+			}
+
+			lock (this.schemas)
+			{
+				this.schemas[SchemaKey] = new Tuple<byte[], XmlSchema, DateTime>(SchemaBin, Schema, DateTime.UtcNow.AddDays(CacheSchemaDays));
+			}
+
+			return new Tuple<XmlSchema, ContractStatus?, Exception>(Schema, null, null);
 		}
 
 		/// <summary>
@@ -5080,11 +5166,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public static event EventHandlerAsync<SchemaReferenceEventArgs> GetLocalSchema = null;
 
-		private readonly Dictionary<string, KeyValuePair<byte[], XmlSchema>> schemas = new Dictionary<string, KeyValuePair<byte[], XmlSchema>>();
+		private readonly Dictionary<string, Tuple<byte[], XmlSchema, DateTime>> schemas = new Dictionary<string, Tuple<byte[], XmlSchema, DateTime>>();
 
-		private Task ReturnStatus(ContractStatus Status, EventHandlerAsync<ContractValidationEventArgs> Callback, object State)
+		private Task ReturnStatus(ContractStatus Status, EventHandlerAsync<ContractValidationEventArgs> Callback, object State,
+			params KeyValuePair<string, object>[] Tags)
 		{
-			return Callback.Raise(this, new ContractValidationEventArgs(Status, State));
+			return Callback.Raise(this, new ContractValidationEventArgs(Status, State, Tags));
 		}
 
 		private static async Task<bool> IsHumanReadableWellDefined(HumanReadableText[] Texts)
@@ -5131,10 +5218,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a smart contract.
 		/// </summary>
 		/// <param name="Contract">Contract to validate</param>
-		/// <returns>Status of validation.</returns>
-		public Task<ContractStatus> ValidateAsync(Contract Contract)
+		/// <returns>Validation result.</returns>
+		public Task<ContractValidationEventArgs> ValidateAsync(Contract Contract)
 		{
-			return this.ValidateAsync(Contract, true);
+			return this.ValidateAsync(Contract, true, true, true, true);
 		}
 
 		/// <summary>
@@ -5142,14 +5229,32 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Contract">Contract to validate</param>
 		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
-		/// <returns>Status of validation.</returns>
-		public async Task<ContractStatus> ValidateAsync(Contract Contract, bool ValidateState)
+		/// <returns>Validation result.</returns>
+		public Task<ContractValidationEventArgs> ValidateAsync(Contract Contract, bool ValidateState)
 		{
-			TaskCompletionSource<ContractStatus> Result = new TaskCompletionSource<ContractStatus>();
+			return this.ValidateAsync(Contract, ValidateState, true, true, true);
+		}
 
-			await this.Validate(Contract, ValidateState, (Sender, e) =>
+		/// <summary>
+		/// Validates a smart contract.
+		/// </summary>
+		/// <param name="Contract">Contract to validate</param>
+		/// <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
+		/// <param name="ValidateAttachments">If contract attachments should be validated.</param>
+		/// <param name="ValidateIdentities">If identities signing the contract should be validated.</param>
+		/// <param name="ValidateIdentityAttachments">If the attachments associated with identities
+		/// signing the contract should be verified.</param>
+		/// <returns>Validation result.</returns>
+		public async Task<ContractValidationEventArgs> ValidateAsync(Contract Contract,
+			bool ValidateState, bool ValidateAttachments,
+			bool ValidateIdentities, bool ValidateIdentityAttachments)
+		{
+			TaskCompletionSource<ContractValidationEventArgs> Result = new TaskCompletionSource<ContractValidationEventArgs>();
+
+			await this.Validate(Contract, ValidateState, ValidateAttachments,
+				ValidateIdentities, ValidateIdentityAttachments, (Sender, e) =>
 			{
-				Result.TrySetResult(e.Status);
+				Result.TrySetResult(e);
 				return Task.CompletedTask;
 			}, null);
 

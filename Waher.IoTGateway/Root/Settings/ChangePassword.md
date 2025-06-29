@@ -54,7 +54,7 @@ if exists(Posted) then
 	PwdStat:=CharStat(Posted.Password);
 	IsSufficientlyRandomBase64:=
 	(
-		Bin:=Base64Decode(Posted.Password);
+		Bin:=Base64UrlDecode(Posted.Password);
 		H:=Histogram([foreach x in Bin : x],0,256,12);
 		Min(H[1])>0
 	) ??? false;

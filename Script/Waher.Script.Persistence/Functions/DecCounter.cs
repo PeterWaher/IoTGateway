@@ -1,38 +1,37 @@
 ﻿using System.Threading.Tasks;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions
+namespace Waher.Script.Persistence.Functions
 {
 	/// <summary>
-	/// Increments a counter
+	/// Decrements a counter
 	/// </summary>
-	public class IncCounter : FunctionMultiVariate
+	public class DecCounter : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Increments a counter
+		/// Decrements a counter
 		/// </summary>
 		/// <param name="Key">Counter Key.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public IncCounter(ScriptNode Key, int Start, int Length, Expression Expression)
+		public DecCounter(ScriptNode Key, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Key }, argumentTypes1Scalar, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// Increments a counter
+		/// Decrements a counter
 		/// </summary>
 		/// <param name="Key">Counter Key.</param>
 		/// <param name="Amount">Amount to increment</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public IncCounter(ScriptNode Key, ScriptNode Amount, int Start, int Length, Expression Expression)
+		public DecCounter(ScriptNode Key, ScriptNode Amount, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Key, Amount }, argumentTypes2Scalar, Start, Length, Expression)
 		{
 		}
@@ -40,7 +39,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(IncCounter);
+		public override string FunctionName => nameof(DecCounter);
 
 		/// <summary>
 		/// Default Argument names
@@ -85,11 +84,11 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 				if (Amount != N)
 					throw new ScriptRuntimeException("Amounts must be integers.", this);
 
-				Count = await Runtime.Counters.RuntimeCounters.IncrementCounter(Key, Amount);
+				Count = await Runtime.Counters.RuntimeCounters.DecrementCounter(Key, Amount);
 			}
 			else
 			{
-				Count = await Runtime.Counters.RuntimeCounters.IncrementCounter(Key);
+				Count = await Runtime.Counters.RuntimeCounters.DecrementCounter(Key);
 			}
 		
 			return new DoubleNumber(Count);

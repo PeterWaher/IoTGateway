@@ -235,19 +235,30 @@ namespace Waher.Security.LoginMonitor
 				}
 			}
 
-			lock (this.states)
-			{
-				if (this.states.TryGetValue(RemoteEndPoint, out RemoteEndpoint EP2))
-					return EP2;
-
-				EP.Intervals = Intervals;
-				this.states[RemoteEndPoint] = EP;
-			}
-
 			if (Created)
 				await Database.Insert(EP);
 			else if (Updated)
 				await Database.Update(EP);
+
+			RemoteEndpoint ToDelete = null;
+
+			lock (this.states)
+			{
+				if (this.states.TryGetValue(RemoteEndPoint, out RemoteEndpoint EP2) &&
+					EP2.ObjectId != EP.ObjectId)
+				{
+					ToDelete = EP;
+					EP = EP2;
+				}
+				else
+				{
+					EP.Intervals = Intervals;
+					this.states[RemoteEndPoint] = EP;
+				}
+			}
+
+			if (!(ToDelete is null))
+				await Database.Delete(ToDelete);
 
 			return EP;
 		}

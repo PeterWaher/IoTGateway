@@ -16,11 +16,11 @@ namespace Waher.Networking.XMPP.Geo
 			: base(e)
 		{
 			if (e.Ok &&
-				!(e.Response is null) &&
-				e.Response.LocalName == "unsubscribed" &&
-				e.Response.NamespaceURI == GeoClient.NamespaceGeoSpatialNeuroFoundationV1)
+				!(e.FirstElement is null) &&
+				e.FirstElement.LocalName == "unsubscribed" &&
+				GeoClient.IsNamespaceGeoSpatial(e.FirstElement.NamespaceURI))
 			{
-				this.SubscriptionId = XML.Attribute(e.Response, "id");
+				this.SubscriptionId = XML.Attribute(e.FirstElement, "id");
 			}
 			else
 				e.Ok = false;

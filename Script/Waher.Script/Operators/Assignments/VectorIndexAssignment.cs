@@ -72,17 +72,20 @@ namespace Waher.Script.Operators.Assignments
 			}
 			else if (Left.IsScalar)
 			{
-				object Object = Left.AssociatedObjectValue;
-				if (Object is null)
-					throw new ScriptRuntimeException("Vector is null.", this);
+				object Object = Left.AssociatedObjectValue
+					?? throw new ScriptRuntimeException("Vector is null.", this);
 
 				if (Object is IDictionary<string, IElement> ObjExNihilo)
 					ObjExNihilo[Index.AssociatedObjectValue?.ToString()] = Value;
 				else
 				{
 					Type T = Object.GetType();
-					if (!VectorIndex.TryGetIndexProperty(T, false, true, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
+					if (!VectorIndex.TryGetIndexProperty(T, false, true,
+						out PropertyInfo ItemProperty, out ParameterInfo[] Parameters) ||
+						(Parameters?.Length ?? 0) != 1)
+					{
 						throw new ScriptRuntimeException("Vector element assignment operates on vectors.", this);
+					}
 
 					if (Index.TryConvertTo(Parameters[0].ParameterType, out object IndexValue))
 						ItemProperty.SetValue(Object, Value.AssociatedObjectValue, new object[] { IndexValue });

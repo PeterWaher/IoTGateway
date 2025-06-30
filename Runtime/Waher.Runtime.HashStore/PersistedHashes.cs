@@ -51,7 +51,21 @@ namespace Waher.Runtime.HashStore
 		/// <param name="ExpiresUtc">When hash expires.</param>
 		/// <param name="Hash">Hash digest to persist</param>
 		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
-		public static async Task<bool> AddHash(string Realm, DateTime ExpiresUtc, byte[] Hash)
+		public static Task<bool> AddHash(string Realm, DateTime ExpiresUtc, byte[] Hash)
+		{
+			return AddHash(Realm, ExpiresUtc, Hash, null);
+		}
+
+		/// <summary>
+		/// Persists a hash.
+		/// </summary>
+		/// <param name="Realm">Realm of hash value.</param>
+		/// <param name="ExpiresUtc">When hash expires.</param>
+		/// <param name="Hash">Hash digest to persist</param>
+		/// <param name="AssociatedObject">Associated object value.</param>
+		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
+		public static async Task<bool> AddHash(string Realm, DateTime ExpiresUtc, byte[] Hash,
+			object AssociatedObject)
 		{
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("hashrealm:" + Realm))
 			{
@@ -67,7 +81,8 @@ namespace Waher.Runtime.HashStore
 				{
 					Realm = Realm,
 					ExpiresUtc = ExpiresUtc.ToUniversalTime(),
-					Hash = Hash
+					Hash = Hash,
+					AssociatedObject = AssociatedObject
 				};
 
 				await Database.Insert(Obj);
@@ -103,6 +118,37 @@ namespace Waher.Runtime.HashStore
 						new FilterFieldEqualTo("Hash", Hash)));
 
 				return !(Obj is null);
+			}
+		}
+
+		/// <summary>
+		/// Tries to get the associated object of a hash value that has been persisted 
+		/// in the database, using the default (empty) realm.
+		/// </summary>
+		/// <param name="Hash">Hash digest to verify</param>
+		/// <returns>Associated object, if found.</returns>
+		public static Task<object> TryGetAssociatedObject(byte[] Hash)
+		{
+			return TryGetAssociatedObject(string.Empty, Hash);
+		}
+
+		/// <summary>
+		/// Tries to get the associated object of a hash value that has been persisted 
+		/// in the database.
+		/// </summary>
+		/// <param name="Realm">Realm of hash value.</param>
+		/// <param name="Hash">Hash digest to verify</param>
+		/// <returns>Associated object, if found.</returns>
+		public static async Task<object> TryGetAssociatedObject(string Realm, byte[] Hash)
+		{
+			using (Semaphore Semaphore = await Semaphores.BeginRead("hashrealm:" + Realm))
+			{
+				PersistedHash Obj = await Database.FindFirstDeleteRest<PersistedHash>(
+					new FilterAnd(
+						new FilterFieldEqualTo("Realm", Realm),
+						new FilterFieldEqualTo("Hash", Hash)));
+
+				return Obj?.AssociatedObject;
 			}
 		}
 	}

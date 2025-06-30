@@ -42,6 +42,12 @@ namespace Waher.Runtime.HashStore.HashObjects
 		public byte[] Hash { get; set; }
 
 		/// <summary>
+		/// Associated object
+		/// </summary>
+		[DefaultValueNull]
+		public object AssociatedObject { get; set; }
+
+		/// <summary>
 		/// Number of days to archive hash.
 		/// </summary>
 		public int ArchiveDays

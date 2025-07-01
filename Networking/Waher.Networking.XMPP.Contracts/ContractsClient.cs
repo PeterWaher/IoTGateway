@@ -1697,16 +1697,16 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			DateTime Now = DateTime.Now;
+			DateTime UtcNow = DateTime.UtcNow;
 
-			if (Now.Date.AddDays(1) < Identity.From)    // To avoid Time-zone problems
+			if (UtcNow < Identity.From.ToUniversalTime())    // To avoid Time-zone problems
 			{
 				await this.ReturnStatus(IdentityStatus.NotValidYet, Callback, State,
 					new KeyValuePair<string, object>("From", Identity.From));
 				return;
 			}
 
-			if (Now.Date.AddDays(-1) > Identity.To)      // To avoid Time-zone problems
+			if (UtcNow > Identity.To.ToUniversalTime())      // To avoid Time-zone problems
 			{
 				await this.ReturnStatus(IdentityStatus.NotValidAnymore, Callback, State,
 					new KeyValuePair<string, object>("To", Identity.To));
@@ -4658,16 +4658,16 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			DateTime Now = DateTime.Now;
+			DateTime UtcNow = DateTime.UtcNow;
 
-			if (Now.Date.AddDays(1) < Contract.From)    // To avoid Time-zone problems
+			if (UtcNow < Contract.From.ToUniversalTime())
 			{
 				await this.ReturnStatus(ContractStatus.NotValidYet, Callback, State,
 					new KeyValuePair<string, object>("From", Contract.From));
 				return;
 			}
 
-			if (Now.Date.AddDays(-1) > Contract.To)      // To avoid Time-zone problems
+			if (UtcNow > Contract.To.ToUniversalTime())
 			{
 				await this.ReturnStatus(ContractStatus.NotValidAnymore, Callback, State,
 					new KeyValuePair<string, object>("To", Contract.To));

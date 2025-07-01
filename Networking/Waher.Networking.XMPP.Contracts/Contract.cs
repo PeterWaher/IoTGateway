@@ -1501,9 +1501,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (CheckCurrentTime)
 			{
-				DateTime Now = DateTime.Now;
+				DateTime UtcNow = DateTime.UtcNow;
 
-				if (Now < this.from || Now > this.to)
+				if (UtcNow < this.from.ToUniversalTime() || UtcNow > this.to.ToUniversalTime())
 					return false;
 			}
 

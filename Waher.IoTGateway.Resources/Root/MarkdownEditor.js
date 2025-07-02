@@ -208,7 +208,11 @@ function ClosePreview(TextArea)
 
 function MarkdownKeyDown(Control, Event)
 {
-	return MarkdownEditorKeyDown(Control, Event);
+	if (MarkdonwEditorKeyDownIsTabNavigation(Control, Event))    
+        return true;
+
+	if (!MarkdownEditorKeyDown(Control, Event))
+		return false
 }
 
 function ToggleSidePreview(Button, on)
@@ -366,6 +370,21 @@ function TryUpdatePreview(Button, ShowEditor)
 	xhttp.send(TextArea.value || " ");
 }
 
+function TabNavigationOn(Button)
+{
+	const container = GetTextArea(Button).parentElement;
+	const tabNavigation = container.querySelector(".MarkdownEditorTabNavigation")
+
+	return tabNavigation.hasAttribute("data-toggled")
+}
+
+function MarkdownEditorToggleTabNavigation(Control)
+{
+	const container = GetTextArea(Control).parentElement;
+	const button = container.querySelector(".MarkdownEditorTabNavigation")
+	button.toggleAttribute("data-toggled")
+}
+
 function GetTextArea(Button, HidePreview)
 {
 	if (Button.tagName === "TEXTAREA")
@@ -487,8 +506,6 @@ function InsertText(Button, text)
 		Start0 = End0;
 		End0 = Temp;
 	}
-
-	console.log(End, Start)
 
 	const CurrentText = TextArea.value;
 	SetTextAreaValue(TextArea, CurrentText.substring(0, Start) + text + CurrentText.substring(End, CurrentText.length));
@@ -825,22 +842,15 @@ function RaiseOnInput(TextArea)
 	}
 }
 
+function MarkdonwEditorKeyDownIsTabNavigation(Control, Event)
+{
+	return Event.keyCode === 9 && TabNavigationOn(Control)		
+}
+
 function MarkdownEditorKeyDown(Control, Event)
 {
 	if (Control.getAttribute("data-preview"))
 		InitMarkdownEditorPreview(Control);
-
-	if (!Event.altKey && !Event.ctrlKey && Event.shiftKey)
-	{
-		switch (Event.keyCode)
-		{
-			case 9:
-				MarkdownEditorTabKey(Control)
-				Event.preventDefault()
-				return false
-		}
-	}
-
 
 	if (Event.altKey && !Event.ctrlKey && !Event.shiftKey)
 	{
@@ -869,6 +879,10 @@ function MarkdownEditorKeyDown(Control, Event)
 			case 50:	// ALT+2
 				MarkdownEditorBottomPreviewAndEdit(Control);
 				return false;
+
+			case 84:	// ALT+T
+				MarkdownEditorToggleTabNavigation(Control);
+				return false
 		}
 	}
 	else if (Event.ctrlKey && !Event.altKey)
@@ -995,6 +1009,9 @@ function MarkdownEditorKeyDown(Control, Event)
 			case 112:	// F1
 				MarkdownEditorHelp(Control);
 				return false;
+			case 9:
+				MarkdownEditorTabKey(Control)
+				return false
 		}
 	}
 
@@ -1030,7 +1047,12 @@ function InitializeMarkdownEditor(container)
 	const textInput = container.nextElementSibling || container.parentElement.getElementsByTagName("TEXTAREA")[0]
 	textInput.setAttribute("data-visible", "")
 	container.appendChild(textInput)
-	textInput.addEventListener("keydown", e => MarkdownKeyDown(e.target, e))
+
+	if (!textInput.onkeydown)
+	{
+		textInput.addEventListener("keydown", e => { MarkdownKeyDown(e.target, e) === false && e.preventDefault() })
+	}
+	
 	
 	if (container.getAttribute("data-scale") === "true")
 	{

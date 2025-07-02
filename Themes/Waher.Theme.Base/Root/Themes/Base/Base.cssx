@@ -14,13 +14,17 @@ h1, h2, h3, h4, h5, h6
 img
 {
     max-width: 100%;
-    width: auto;
     height: 100%;
 }
 
 p
 {
     margin: 0.5em 0em 0.5em 0em;
+}
+
+p:empty
+{
+    margin: 0;
 }
 
 section
@@ -165,14 +169,15 @@ section a:active
 {
     overflow: hidden;
     position: relative;
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
 
 .native-carousel > * {
-    position: absolute;
+    grid-area: 1 / 1;
+    margin-inline: auto;
     pointer-events: none;
     transition: opacity 0.3s, transform 0.2s;
     opacity: 0;

@@ -26,7 +26,9 @@ namespace Waher.Script.Units.CompoundQuantities
 		/// </summary>
 		public Unit Reference => reference;
 
-		private static readonly Unit reference = new Unit(new AtomicUnit("W"), new AtomicUnit("h"));
+		private static readonly Unit reference = new Unit(Prefix.None,
+			new UnitFactor(new AtomicUnit("m"), 1), 
+			new UnitFactor(new AtomicUnit("s"), -1));
 
 		/// <summary>
 		/// Compound quantities. Must only use base quantity units.

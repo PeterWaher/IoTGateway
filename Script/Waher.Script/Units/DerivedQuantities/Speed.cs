@@ -27,7 +27,7 @@ namespace Waher.Script.Units.DerivedQuantities
 		/// </summary>
 		public Unit Reference => reference;
 
-		private static readonly Unit reference = new Unit(new AtomicUnit("knot"));
+		private static readonly Unit reference = new Unit(new AtomicUnit("mps"));
 
 		/// <summary>
 		/// Derived Units supported.
@@ -38,6 +38,12 @@ namespace Waher.Script.Units.DerivedQuantities
 			{
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
+					new KeyValuePair<string, PhysicalQuantity>("mps", new PhysicalQuantity(1, new Unit(Prefix.None,
+						new UnitFactor[]
+						{
+							new UnitFactor("m"),
+							new UnitFactor("s", -1)
+						}))),
 					new KeyValuePair<string, PhysicalQuantity>("knot", new PhysicalQuantity(0.514444, new Unit(Prefix.None,
 						new UnitFactor[]
 						{

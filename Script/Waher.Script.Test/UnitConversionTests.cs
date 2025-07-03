@@ -175,6 +175,7 @@ namespace Waher.Script.Test
 			Unit StatuteMilesPerHour = Unit.Parse("SM/h");
 			Unit MilesPerHours = Unit.Parse("mph");
 			Unit MetersPerSecond = Unit.Parse("m/s");
+			Unit MetersPerSecond2 = Unit.Parse("mps");
 			Unit KiloMetersPerHour = Unit.Parse("km/h");
 			Unit KiloMetersPerHour2 = Unit.Parse("kph");
 			Unit Knots = Unit.Parse("kt");
@@ -191,7 +192,15 @@ namespace Waher.Script.Test
 			Assert.AreEqual(7.2, x);
 			Assert.AreEqual(0, NrDec);
 
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond2, 0, KiloMetersPerHour, out x, out NrDec));
+			Assert.AreEqual(7.2, x);
+			Assert.AreEqual(0, NrDec);
+
 			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, 0, KiloMetersPerHour2, out x, out NrDec));
+			Assert.AreEqual(7.2, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond2, 0, KiloMetersPerHour2, out x, out NrDec));
 			Assert.AreEqual(7.2, x);
 			Assert.AreEqual(0, NrDec);
 
@@ -199,7 +208,15 @@ namespace Waher.Script.Test
 			Assert.AreEqual(2 / 3.6, x);
 			Assert.AreEqual(1, NrDec);
 
+			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour, 0, MetersPerSecond2, out x, out NrDec));
+			Assert.AreEqual(2 / 3.6, x);
+			Assert.AreEqual(1, NrDec);
+
 			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour2, 0, MetersPerSecond, out x, out NrDec));
+			Assert.AreEqual(2 / 3.6, x);
+			Assert.AreEqual(1, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour2, 0, MetersPerSecond2, out x, out NrDec));
 			Assert.AreEqual(2 / 3.6, x);
 			Assert.AreEqual(1, NrDec);
 
@@ -207,7 +224,15 @@ namespace Waher.Script.Test
 			Assert.AreEqual(2 * 0.514444, x);
 			Assert.AreEqual(0, NrDec);
 
+			Assert.IsTrue(Unit.TryConvert(2, Knots, 0, MetersPerSecond2, out x, out NrDec));
+			Assert.AreEqual(2 * 0.514444, x);
+			Assert.AreEqual(0, NrDec);
+
 			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, 0, Knots, out x, out NrDec));
+			Assert.AreEqual(2 / 0.514444, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond2, 0, Knots, out x, out NrDec));
 			Assert.AreEqual(2 / 0.514444, x);
 			Assert.AreEqual(0, NrDec);
 
@@ -217,6 +242,10 @@ namespace Waher.Script.Test
 
 			Assert.IsTrue(Unit.TryConvert(2, KiloMetersPerHour, 0, Knots, out x, out NrDec));
 			Assert.AreEqual(1.079914539882972, x);
+			Assert.AreEqual(0, NrDec);
+
+			Assert.IsTrue(Unit.TryConvert(2, MetersPerSecond, 0, MetersPerSecond2, out x, out NrDec));
+			Assert.AreEqual(2, x);
 			Assert.AreEqual(0, NrDec);
 		}
 

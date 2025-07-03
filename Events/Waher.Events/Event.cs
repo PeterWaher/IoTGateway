@@ -108,7 +108,7 @@ namespace Waher.Events
 			this.facility = Exception is IEventFacility EvFa && !string.IsNullOrEmpty(s = EvFa.Facility) ? s : Facility;
 			this.module = Exception is IEventModule Mod && !string.IsNullOrEmpty(s = Mod.Module) ? s : Module;
 			this.stackTrace = Log.CleanStackTrace(Exception.StackTrace);
-			this.tags = (Tags is null || Tags.Length == 0) && Exception is IEventTags Tgs ? Tgs.Tags : Tags;
+			this.tags = (Tags is null || Tags.Length == 0) && Exception is IEventTags Tgs ? Tgs.Tags.Join(Tags) : Tags;
 		}
 
 		/// <summary>

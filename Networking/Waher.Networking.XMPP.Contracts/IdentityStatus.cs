@@ -93,6 +93,11 @@
 		ProviderKeyNotRecognized,
 
 		/// <summary>
+		/// Response to a query was not received in a timely fashion.
+		/// </summary>
+		NoResponse,
+
+		/// <summary>
 		/// Legal identity valid
 		/// </summary>
 		Valid

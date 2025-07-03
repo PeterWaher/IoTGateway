@@ -400,6 +400,10 @@ namespace Waher.Networking.XMPP.Contracts
 								sb.Append("One or more of the client signatures are invalid.");
 								break;
 
+							case ContractStatus.ClientSignatureNotValidated:
+								sb.Append("Unable to validate a client signature.");
+								break;
+
 							case ContractStatus.ClientIdentityInvalid:
 								sb.Append("One or more of the legal identities used to sign the contract are invalid.");
 								break;
@@ -438,6 +442,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 							case ContractStatus.ProviderKeyNotRecognized:
 								sb.Append("Provider key not recognized.");
+								break;
+
+							case ContractStatus.NoResponse:
+								sb.Append("Response to query was not returned in a timely fashion.");
 								break;
 
 							default:

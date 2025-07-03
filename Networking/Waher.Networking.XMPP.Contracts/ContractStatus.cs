@@ -83,6 +83,11 @@
 		ClientSignatureInvalid,
 
 		/// <summary>
+		/// Unable to validate a client signature.
+		/// </summary>
+		ClientSignatureNotValidated,
+
+		/// <summary>
 		/// One or more of the legal identities used to sign the contract are invalid.
 		/// </summary>
 		ClientIdentityInvalid,
@@ -131,6 +136,11 @@
 		/// Provider key not recognized.
 		/// </summary>
 		ProviderKeyNotRecognized,
+
+		/// <summary>
+		/// Response to a query was not received in a timely fashion.
+		/// </summary>
+		NoResponse,
 
 		/// <summary>
 		/// Contract valid.

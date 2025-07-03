@@ -1743,7 +1743,9 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					await this.ReturnStatus(IdentityStatus.ClientSignatureInvalid, Callback, State,
 						new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-						new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ClientSignature)));
+						new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Identity.ClientSignature)),
+						new KeyValuePair<string, object>("ClientKeyName", Identity.ClientKeyName),
+						new KeyValuePair<string, object>("ClientPubKeyBase64", Convert.ToBase64String(Identity.ClientPubKey)));
 					return;
 				}
 			}
@@ -1899,6 +1901,11 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 
 					}, State);
+				}
+				else if (e.StanzaError is RecipientUnavailableException)
+				{
+					await this.ReturnStatus(IdentityStatus.NoResponse, Callback, State,
+						new KeyValuePair<string, object>("Provider", Identity.Provider));
 				}
 				else
 				{
@@ -2851,6 +2858,44 @@ namespace Waher.Networking.XMPP.Contracts
 					Result.TrySetResult(e.Identity);
 				else
 					Result.TrySetException(e.StanzaError ?? new Exception("Unable to verify signature."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return await Result.Task;
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="Signature">Digital signature of data</param>
+		/// <returns>Legal identity object, or Exception object.</returns>
+		public Task<KeyValuePair<LegalIdentity, Exception>> ValidateSignatureAsyncEx(string LegalId, byte[] Data, byte[] Signature)
+		{
+			return this.ValidateSignatureAsyncEx(this.GetTrustProvider(LegalId), LegalId, Data, Signature);
+		}
+
+		/// <summary>
+		/// Validates a signature of binary data.
+		/// </summary>
+		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
+		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="Signature">Digital signature of data</param>
+		/// <returns>Legal identity object, or Exception object.</returns>
+		public async Task<KeyValuePair<LegalIdentity, Exception>> ValidateSignatureAsyncEx(string Address, string LegalId, byte[] Data, byte[] Signature)
+		{
+			TaskCompletionSource<KeyValuePair<LegalIdentity, Exception>> Result = new TaskCompletionSource<KeyValuePair<LegalIdentity, Exception>>();
+
+			await this.ValidateSignature(Address, LegalId, Data, Signature, (Sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(new KeyValuePair<LegalIdentity, Exception>(e.Identity, null));
+				else
+					Result.TrySetResult(new KeyValuePair<LegalIdentity, Exception>(null, e.StanzaError ?? new Exception("Unable to verify signature.")));
 
 				return Task.CompletedTask;
 
@@ -4744,6 +4789,12 @@ namespace Waher.Networking.XMPP.Contracts
 						return;
 					}
 				}
+				catch (RecipientUnavailableException ex)
+				{
+					await this.ReturnStatus(ContractStatus.NoResponse, Callback, State,
+						new KeyValuePair<string, object>("Error", ex.Message));
+					return;
+				}
 				catch (Exception ex)
 				{
 					await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State,
@@ -4902,13 +4953,30 @@ namespace Waher.Networking.XMPP.Contracts
 					if (Identities.ContainsKey(Signature.LegalId))
 						continue;
 
-					LegalIdentity Identity = await this.ValidateSignatureAsync(Signature.LegalId, Data, Signature.DigitalSignature);
+					KeyValuePair<LegalIdentity, Exception> P = await this.ValidateSignatureAsyncEx(Signature.LegalId, Data, Signature.DigitalSignature);
+					LegalIdentity Identity = P.Key;
+
 					if (Identity is null)
 					{
-						await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State,
-							new KeyValuePair<string, object>("LegalId", Signature.LegalId),
-							new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
-							new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Signature.DigitalSignature)));
+						if (P.Value is RecipientUnavailableException)
+						{
+							await this.ReturnStatus(ContractStatus.NoResponse, Callback, State,
+								new KeyValuePair<string, object>("LegalId", Signature.LegalId));
+						}
+						else if (!(P.Value is null))
+						{
+							await this.ReturnStatus(ContractStatus.ClientSignatureNotValidated, Callback, State,
+								new KeyValuePair<string, object>("LegalId", Signature.LegalId),
+								new KeyValuePair<string, object>("Exception", P.Value.GetType().FullName),
+								new KeyValuePair<string, object>("Message", P.Value.Message));
+						}
+						else
+						{
+							await this.ReturnStatus(ContractStatus.ClientSignatureInvalid, Callback, State,
+								new KeyValuePair<string, object>("LegalId", Signature.LegalId),
+								new KeyValuePair<string, object>("DataBase64", Convert.ToBase64String(Data)),
+								new KeyValuePair<string, object>("SignatureBase64", Convert.ToBase64String(Signature.DigitalSignature)));
+						}
 						return;
 					}
 

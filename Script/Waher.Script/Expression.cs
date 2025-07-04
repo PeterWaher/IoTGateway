@@ -307,10 +307,45 @@ namespace Waher.Script
 		{
 			if (this.canSkipWhitespace)
 			{
-				char ch;
+				char ch, ch2;
 
-				while (this.pos < this.len && ((ch = this.script[this.pos]) <= ' ' || ch == 160))
-					this.pos++;
+				while (this.pos < this.len)
+				{
+					ch = this.script[this.pos];
+
+					if (ch <= ' ' || ch == 160)
+						this.pos++;
+					else if (ch == '/' &&
+						this.pos + 1 < this.len &&
+						((ch2 = this.script[this.pos + 1]) == '/' || ch2 == '*'))
+					{
+						this.pos += 2;
+
+						if (ch2 == '/')
+						{
+							while (this.pos < this.len &&
+								(ch = this.script[this.pos]) != '\n' && ch != '\r')
+							{
+								this.pos++;
+							}
+						}
+						else
+						{
+							while (this.pos < this.len &&
+								(this.script[this.pos] != '*' ||
+								this.pos + 1 == this.len ||
+								this.script[this.pos + 1] != '/'))
+							{
+								this.pos++;
+							}
+
+							if (this.pos + 1 < this.len)
+								this.pos += 2;
+						}
+					}
+					else
+						break;
+				}
 			}
 		}
 

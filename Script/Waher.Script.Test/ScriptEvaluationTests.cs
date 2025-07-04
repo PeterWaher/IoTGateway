@@ -1320,5 +1320,12 @@ namespace Waher.Script.Test
 			await Test("1 ym m", new PhysicalQuantity(1e-24, new Unit("m")));
 		}
 
+		[TestMethod]
+		public async Task Evaluation_Test_64_Comments()
+		{
+			await Test("a+// c \r\nb", a + b);
+			await Test("a+/*\r\nc * d\r\n*/b", a + b);
+		}
+
 	}
 }

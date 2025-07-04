@@ -101,6 +101,31 @@ The **null** object reference value is written `null`.
 
 =========================================================================================================================================================
 
+Whitepsace and Comments
+--------------------------
+
+Whitespace is ignored in script, except when it is used to separate tokens. This means that you 
+can use whitespace to make your script more readable. Whitespace includes not only the space
+character, but other characters as well, such as the tab character, and new-line characters.
+
+Comments in script are also considered whitespace, for the purpose of parsing. Comments can be
+written in two different ways: Either, by using the `//` character sequence, where all 
+characters until the next newline character are considered whitespace, or by using the `/*` and 
+`*/` character sequences, where all characters between the two sequences are considered 
+whitespace. The second method allows you to create comments that span multiple lines.
+
+For example, the following script is equivalent to the script `a+b+c`:
+
+```
+a    + // First term 
+   b + /* Second term
+        * is also added
+        */
+   c   // Third term
+```
+
+=========================================================================================================================================================
+
 Variable references, Constants and Namespaces
 -----------------------------------------------
 

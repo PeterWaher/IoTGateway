@@ -248,7 +248,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
 		public static async Task<Layout2DDocument> FromXml(XmlElement Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
-			if (Xml.LocalName != LocalName || Xml.NamespaceURI != Namespace)
+			if (!IsLayoutXml(Xml))
 				throw new ArgumentException("XML does not represent a 2D layout document.", nameof(Xml));
 
 			lock (elementTypes)
@@ -292,6 +292,26 @@ namespace Waher.Layout.Layout2D
 			Result.root = await Result.CreateElement(Xml, null);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Checks if an XML document contains a layout document.
+		/// </summary>
+		/// <param name="Xml">XML Definition</param>
+		public static bool IsLayoutXml(XmlDocument Xml)
+		{
+			return IsLayoutXml(Xml.DocumentElement);
+		}
+
+		/// <summary>
+		/// Checks if an XML element contains a layout document.
+		/// </summary>
+		/// <param name="Xml">XML Definition</param>
+		public static bool IsLayoutXml(XmlElement Xml)
+		{
+			return !(Xml is null) && 
+				Xml.LocalName == LocalName && 
+				Xml.NamespaceURI == Namespace;
 		}
 
 		/// <summary>

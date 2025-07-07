@@ -32,6 +32,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public string Title;
 		public bool Dynamic;
 		public byte[] DynamicContent;
+		public bool Converted;
 	}
 
 	/// <summary>
@@ -186,7 +187,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> RenderHtml(HtmlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
-			if (Info?.FileName is null)
+			if (Info?.FileName is null || !Info.Converted)
 				return false;
 
 			string FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
@@ -276,26 +277,35 @@ namespace Waher.Content.Markdown.Layout2D
 			string FileName = Path.Combine(LayoutFolder, Hash);
 			Result.FileName = FileName + "." + FileExtension;
 
-			if (!File.Exists(Result.FileName))
+			if (File.Exists(Result.FileName))
+				Result.Converted = true;
+			else
 			{
 				XmlDocument Doc = new XmlDocument();
 				Doc.LoadXml(Xml);
 
-				Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Session);
-				RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
-
-				KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
-				using (SKImage Img = P.Key)   // TODO: Maps
+				if (Layout2DDocument.IsLayoutXml(Doc))
 				{
-					using (SKData Data = Img.Encode(ImageFormat, Quality))
-					{
-						Result.DynamicContent = Data.ToArray();
-						Result.Dynamic = LayoutDoc.Dynamic;
+					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc, Session);
+					RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
 
-						if (!LayoutDoc.Dynamic)
-							await Files.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
+					KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
+					using (SKImage Img = P.Key)   // TODO: Maps
+					{
+						using (SKData Data = Img.Encode(ImageFormat, Quality))
+						{
+							Result.DynamicContent = Data.ToArray();
+							Result.Dynamic = LayoutDoc.Dynamic;
+
+							if (!LayoutDoc.Dynamic)
+								await Files.WriteAllBytesAsync(Result.FileName, Result.DynamicContent);
+						}
 					}
+
+					Result.Converted = true;
 				}
+				else
+					Result.Converted = false;
 			}
 
 			return Result;
@@ -329,7 +339,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> RenderMarkdown(MarkdownRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
-			if (Info?.FileName is null)
+			if (Info?.FileName is null || !Info.Converted)
 				return false;
 
 			if (Info.Dynamic)
@@ -353,6 +363,9 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> RenderText(TextRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
+			if (Info?.FileName is null || !Info.Converted)
+				return false;
+
 			Renderer.Output.AppendLine(Info.Title);
 
 			return true;
@@ -370,7 +383,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> RenderWpfXaml(WpfXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
-			if (Info?.FileName is null)
+			if (Info?.FileName is null || !Info.Converted)
 				return false;
 
 			XmlWriter Output = Renderer.XmlOutput;
@@ -409,7 +422,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> RenderXamarinFormsXaml(XamarinFormsXamlRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
-			if (Info?.FileName is null)
+			if (Info?.FileName is null || !Info.Converted)
 				return false;
 
 			XmlWriter Output = Renderer.XmlOutput;
@@ -443,7 +456,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> RenderLatex(LatexRenderer Renderer, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
-			if (Info?.FileName is null)
+			if (Info?.FileName is null || !Info.Converted)
 				return false;
 
 			if (Info.Dynamic)
@@ -481,10 +494,10 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables, DefaultFormat, DefaultQuality, DefaultFileExtension);
-			if (Info?.FileName is null)
+			if (Info?.FileName is null || !Info.Converted)
 				return null;
 
-			byte[] Data = await Runtime.IO.Files.ReadAllBytesAsync(Info.FileName);
+			byte[] Data = await Files.ReadAllBytesAsync(Info.FileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{
@@ -499,8 +512,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>How well the handler supports the content.</returns>
 		public Grade Supports(XmlDocument Xml)
 		{
-			return Xml.DocumentElement.LocalName == Layout2DDocument.LocalName &&
-				Xml.DocumentElement.NamespaceURI == Layout2DDocument.Namespace ? Grade.Excellent : Grade.NotAtAll;
+			return Layout2DDocument.IsLayoutXml(Xml) ? Grade.Excellent : Grade.NotAtAll;
 		}
 
 		/// <summary>

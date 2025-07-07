@@ -1,9 +1,10 @@
 using SkiaSharp;
-using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Content.Images;
 using Waher.Content.Xml.Text;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.IO;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Layout2D
@@ -42,13 +43,8 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
 		public async Task<bool> ConvertAsync(ConversionState State)
         {
-            string Xml;
-
-            using (StreamReader rd = new StreamReader(State.From))
-            {
-                Xml = rd.ReadToEnd();
-            }
-
+            byte[] Bin = await State.From.ReadAllAsync();
+            string Xml = Strings.GetString(Bin, Encoding.UTF8);
             string s = State.ToContentType;
             int i;
 
@@ -107,7 +103,13 @@ namespace Waher.Content.Markdown.Layout2D
             Variables Variables = new Variables();
             GraphInfo Graph = await XmlLayout.GetFileName("layout", Xml, Variables, Format, Quality, Extension);
 
-            if (Graph.Dynamic)
+            if (!Graph.Converted)
+            {
+                await State.To.WriteAsync(Bin, 0, Bin.Length);
+                State.ToContentType = State.FromContentType;
+                return true;
+			}
+			else if (Graph.Dynamic)
             {
                 await State.To.WriteAsync(Graph.DynamicContent, 0, Graph.DynamicContent.Length);
                 return true;

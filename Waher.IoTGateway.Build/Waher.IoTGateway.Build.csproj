@@ -55,6 +55,8 @@
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Transform\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Transform\Waher.Utility.Transform.csproj&quot;"/>
     <MSBuild Projects="..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
+		<MSBuild Projects="..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Upload\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Upload\Waher.Utility.Upload.csproj&quot;"/>
 
 		<MSBuild Projects="..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
 		<Exec Command="dotnet publish -o:&quot;..\WebServices\Waher.WebService.Tesseract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj&quot;"/>

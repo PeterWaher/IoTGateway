@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+		<Authors>Peter Waher</Authors>
+		<Company>Waher Data AB</Company>
+		<Product>Waher.IoTGateway</Product>
+		<Description>Command-line tool that allows you to update signed packages to a broker.</Description>
+		<Copyright>Copyright © Waher Data AB 2025. All rights reserved.</Copyright>
+		<PackageLicenseUrl></PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Utilities/Waher.Utility.Upload</PackageProjectUrl>
+		<PackageIconUrl></PackageIconUrl>
+		<RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<NeutralLanguage>English</NeutralLanguage>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageIcon>Icon_64x64.png</PackageIcon>
+		<RuntimeFrameworkVersion>8.0</RuntimeFrameworkVersion>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x86</RuntimeIdentifier>
+		<RuntimeIdentifier Condition="'$(OS)' == 'Unix'">osx-arm64</RuntimeIdentifier>
+		<SelfContained>true</SelfContained>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Console\Waher.Runtime.Console.csproj" />
+		<ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\Images\Icon_64x64.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\LICENSE.txt">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="System.Private.Uri" Version="4.3.2" />
+	</ItemGroup>
+
+</Project>

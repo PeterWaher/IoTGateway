@@ -199,6 +199,8 @@ namespace Waher.Networking
 		private void SetTcpEndPoints()
 		{
 			Socket UnderlyingSocket = this.tcpClient.Client;
+			if (UnderlyingSocket is null)
+				return;
 
 			if (this.remoteCertificate is null || !this.remoteCertificateValid)
 				this.remoteEndPoint = UnderlyingSocket.RemoteEndPoint.ToString();

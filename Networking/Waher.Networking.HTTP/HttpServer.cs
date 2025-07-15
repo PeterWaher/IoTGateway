@@ -28,6 +28,7 @@ using Waher.Script;
 using Waher.Security;
 using Waher.Networking.HTTP.HTTP2;
 using Waher.Runtime.IO;
+using Waher.Networking.HTTP.ScriptExtensions;
 
 namespace Waher.Networking.HTTP
 {
@@ -67,6 +68,7 @@ namespace Waher.Networking.HTTP
 		private bool clientCertificateSettingsLocked = false;
 #endif
 		private readonly Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, HttpReverseProxyResource> domainProxies = new Dictionary<string, HttpReverseProxyResource>(StringComparer.CurrentCultureIgnoreCase);
 		private TimeSpan sessionTimeout = TimeSpan.FromMinutes(20);
 		private TimeSpan requestTimeout = TimeSpan.FromMinutes(2);
 		private Cache<HttpRequest, RequestInfo> currentRequests;
@@ -95,6 +97,7 @@ namespace Waher.Networking.HTTP
 		private bool closed = false;
 #endif
 		private bool adaptToNetworkChanges;
+		private bool hasProxyDomains = false;
 
 		// HTTP/2 default settings
 
@@ -698,7 +701,7 @@ namespace Waher.Networking.HTTP
 				{
 					Log.Exception(ex);
 				}
-			} 
+			}
 
 			this.sessions?.Dispose();
 			this.sessions = null;
@@ -1007,11 +1010,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="EnablePush">If push promises are enabled.</param>
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
-		public void SetHttp2ConnectionSettings(int InitialStreamWindowSize, 
-			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+		public void SetHttp2ConnectionSettings(int InitialStreamWindowSize,
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams,
 			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Lock)
 		{
-			this.SetHttp2ConnectionSettings(true, InitialStreamWindowSize, 
+			this.SetHttp2ConnectionSettings(true, InitialStreamWindowSize,
 				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams,
 				HeaderTableSize, EnablePush, NoRfc7540Priorities, Lock);
 		}
@@ -1029,11 +1032,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="NoRfc7540Priorities">If RFC 7540 priorities are obsoleted.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
 		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialStreamWindowSize,
-			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams,
 			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Lock)
 		{
-			this.SetHttp2ConnectionSettings(Http2Enabled, InitialStreamWindowSize, 
-				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams, 
+			this.SetHttp2ConnectionSettings(Http2Enabled, InitialStreamWindowSize,
+				InitialConnectionWindowSize, MaxFrameSize, MaxConcurrentStreams,
 				HeaderTableSize, EnablePush, NoRfc7540Priorities, false, Lock);
 		}
 
@@ -1051,8 +1054,8 @@ namespace Waher.Networking.HTTP
 		/// <param name="Profiling">Enables HTTP/2 connection profiling for performance analysis.</param>
 		/// <param name="Lock">If settings are to be locked.</param>
 		public void SetHttp2ConnectionSettings(bool Http2Enabled, int InitialStreamWindowSize,
-			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams, 
-			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Profiling, 
+			int InitialConnectionWindowSize, int MaxFrameSize, int MaxConcurrentStreams,
+			int HeaderTableSize, bool EnablePush, bool NoRfc7540Priorities, bool Profiling,
 			bool Lock)
 		{
 			if (this.http2SettingsLocked)
@@ -1504,6 +1507,30 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Registers a domain proxy resource with the server.
+		/// </summary>
+		/// <param name="LocalDomain">Local domain</param>
+		/// <param name="DomainProxy">Domain proxy resource</param>
+		/// <returns>Registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public HttpResource RegisterDomainProxy(string LocalDomain, HttpReverseProxyResource DomainProxy)
+		{
+			lock (this.resources)
+			{
+				if (!this.domainProxies.ContainsKey(LocalDomain))
+					this.domainProxies[LocalDomain] = DomainProxy;
+				else
+					throw new Exception("Proxy domain already registered: " + LocalDomain);
+
+				this.hasProxyDomains = true;
+			}
+
+			DomainProxy.AddReference(this);
+
+			return DomainProxy;
+		}
+
+		/// <summary>
 		/// Registers a resource with the server.
 		/// </summary>
 		/// <param name="ResourceName">Resource Name.</param>
@@ -1658,6 +1685,114 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Unregisters a domain proxy resource from the server.
+		/// </summary>
+		/// <param name="LocalDomain">Local domain</param>
+		/// <param name="DomainProxy">Domain proxy resource</param>
+		/// <returns>Registered resource.</returns>
+		/// <returns>If the resource was found and removed.</returns>
+		public bool UnregisterDomainProxy(string LocalDomain, HttpReverseProxyResource DomainProxy)
+		{
+			if (DomainProxy is null)
+				return false;
+
+			lock (this.resources)
+			{
+				if (!this.domainProxies.TryGetValue(LocalDomain, out HttpReverseProxyResource DomainProxy2) && DomainProxy2 == DomainProxy)
+				{
+					if (this.domainProxies.Remove(LocalDomain))
+					{
+						DomainProxy.RemoveReference(this);
+						this.hasProxyDomains = this.domainProxies.Count > 0;
+						return true;
+					}
+				}
+
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="Request">Current Request object.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetResource(HttpRequest Request, out HttpResource Resource, out string SubPath)
+		{
+			if (this.hasProxyDomains && this.TryGetDomainProxy(Request.Host, out HttpReverseProxyResource DomainProxy))
+			{
+				Resource = DomainProxy;
+				SubPath = Request.SubPath;
+				return true;
+			}
+			else
+				return this.TryGetResource(Request.Header.Resource, true, out Resource, out SubPath);
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="Request">Current Request object.</param>
+		/// <param name="PermitResourceOverride">If resource overrides should be considered.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetResource(HttpRequest Request, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
+		{
+			if (this.hasProxyDomains && this.TryGetDomainProxy(Request.Host, out HttpReverseProxyResource DomainProxy))
+			{
+				Resource = DomainProxy;
+				SubPath = Request.SubPath;
+				return true;
+			}
+			else
+				return this.TryGetResource(Request.Header.Resource, PermitResourceOverride, out Resource, out SubPath);
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="RequestHeader">Current Request headers.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetResource(HttpRequestHeader RequestHeader, out HttpResource Resource, out string SubPath)
+		{
+			if (this.hasProxyDomains && !(RequestHeader.Host is null) &&
+				this.TryGetDomainProxy(RequestHeader.Host.Value, out HttpReverseProxyResource DomainProxy))
+			{
+				Resource = DomainProxy;
+				SubPath = RequestHeader.ResourcePart;
+				return true;
+			}
+			else
+				return this.TryGetResource(RequestHeader.Resource, true, out Resource, out SubPath);
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="RequestHeader">Current Request headers.</param>
+		/// <param name="PermitResourceOverride">If resource overrides should be considered.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <param name="SubPath">Trailing end of full resource name, relative to the best resource that was found.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetResource(HttpRequestHeader RequestHeader, bool PermitResourceOverride, out HttpResource Resource, out string SubPath)
+		{
+			if (this.hasProxyDomains && !(RequestHeader.Host is null) &&
+				this.TryGetDomainProxy(RequestHeader.Host.Value, out HttpReverseProxyResource DomainProxy))
+			{
+				Resource = DomainProxy;
+				SubPath = RequestHeader.ResourcePart;
+				return true;
+			}
+			else
+				return this.TryGetResource(RequestHeader.Resource, PermitResourceOverride, out Resource, out SubPath);
+		}
+
+		/// <summary>
 		/// Tries to get a resource from the server.
 		/// </summary>
 		/// <param name="ResourceName">Full resource name.</param>
@@ -1711,6 +1846,26 @@ namespace Waher.Networking.HTTP
 			Resource = null;
 
 			return false;
+		}
+
+		/// <summary>
+		/// Tries to get a resource from the server.
+		/// </summary>
+		/// <param name="LocalDomain">Local domain name.</param>
+		/// <param name="Resource">Resource matching the full resource name.</param>
+		/// <returns>If a resource was found matching the full resource name.</returns>
+		public bool TryGetDomainProxy(string LocalDomain, out HttpReverseProxyResource Resource)
+		{
+			lock (this.resources)
+			{
+				if (!this.hasProxyDomains)
+				{
+					Resource = null;
+					return false;
+				}
+				else
+					return this.domainProxies.TryGetValue(LocalDomain, out Resource);
+			}
 		}
 
 		internal string CheckResourceOverride(string ResourceName)

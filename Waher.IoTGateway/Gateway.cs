@@ -1235,32 +1235,65 @@ namespace Waher.IoTGateway
 				{
 					foreach (XmlNode N in ReverseProxy.ChildNodes)
 					{
-						if (N is XmlElement E && E.LocalName == "ProxyResource")
-						{
-							string LocalResource = XML.Attribute(E, "localResource");
-							string RemoteDomain = XML.Attribute(E, "remoteDomain");
-							string RemoteFolder = XML.Attribute(E, "remoteFolder");
-							bool Encrypted = XML.Attribute(E, "encrypted", false);
-							int RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
-							bool UseSession = XML.Attribute(E, "useSession", false);
-							int TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
+						if (!(N is XmlElement E))
+							continue;
 
-							try
-							{
-								webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
-									TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
-							}
-							catch (Exception ex)
-							{
-								Log.Error("Unable to register reverse proxy: " + ex.Message,
-									new KeyValuePair<string, object>("LocalResource", LocalResource),
-									new KeyValuePair<string, object>("RemoteDomain", RemoteDomain),
-									new KeyValuePair<string, object>("Encrypted", Encrypted),
-									new KeyValuePair<string, object>("RemotePort", RemotePort),
-									new KeyValuePair<string, object>("RemoteFolder", RemoteFolder),
-									new KeyValuePair<string, object>("UseSession", UseSession),
-									new KeyValuePair<string, object>("TimeoutMs", TimeoutMs));
-							}
+						switch (E.LocalName)
+						{
+							case "ProxyResource":
+								string LocalResource = XML.Attribute(E, "localResource");
+								string RemoteDomain = XML.Attribute(E, "remoteDomain");
+								string RemoteFolder = XML.Attribute(E, "remoteFolder");
+								bool Encrypted = XML.Attribute(E, "encrypted", false);
+								int RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
+								bool UseSession = XML.Attribute(E, "useSession", false);
+								int TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
+
+								try
+								{
+									webServer.Register(new HttpReverseProxyResource(LocalResource, RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+										TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+								}
+								catch (Exception ex)
+								{
+									Log.Error("Unable to register reverse proxy: " + ex.Message,
+										new KeyValuePair<string, object>("LocalResource", LocalResource),
+										new KeyValuePair<string, object>("RemoteDomain", RemoteDomain),
+										new KeyValuePair<string, object>("Encrypted", Encrypted),
+										new KeyValuePair<string, object>("RemotePort", RemotePort),
+										new KeyValuePair<string, object>("RemoteFolder", RemoteFolder),
+										new KeyValuePair<string, object>("UseSession", UseSession),
+										new KeyValuePair<string, object>("TimeoutMs", TimeoutMs));
+								}
+								break;
+
+							case "ProxyDomain":
+								string LocalDomain = XML.Attribute(E, "localDomain");
+								RemoteDomain = XML.Attribute(E, "remoteDomain");
+								RemoteFolder = XML.Attribute(E, "remoteFolder");
+								Encrypted = XML.Attribute(E, "encrypted", false);
+								RemotePort = XML.Attribute(E, "remotePort", Encrypted ? HttpServer.DefaultHttpsPort : HttpServer.DefaultHttpPort);
+								UseSession = XML.Attribute(E, "useSession", false);
+								TimeoutMs = XML.Attribute(E, "timeoutMs", 10000);
+
+								try
+								{
+									webServer.RegisterDomainProxy(LocalDomain, new HttpReverseProxyResource(
+										"/", RemoteDomain, RemotePort, RemoteFolder, Encrypted,
+										TimeSpan.FromMilliseconds(TimeoutMs), UseSession));
+								}
+								catch (Exception ex)
+								{
+									Log.Error("Unable to register reverse proxy: " + ex.Message,
+										new KeyValuePair<string, object>("LocalDomain", LocalDomain),
+										new KeyValuePair<string, object>("RemoteDomain", RemoteDomain),
+										new KeyValuePair<string, object>("Encrypted", Encrypted),
+										new KeyValuePair<string, object>("RemotePort", RemotePort),
+										new KeyValuePair<string, object>("RemoteFolder", RemoteFolder),
+										new KeyValuePair<string, object>("UseSession", UseSession),
+										new KeyValuePair<string, object>("TimeoutMs", TimeoutMs));
+								}
+								break;
 						}
 					}
 				}

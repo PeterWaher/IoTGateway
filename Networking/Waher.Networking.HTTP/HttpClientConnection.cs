@@ -1265,7 +1265,7 @@ namespace Waher.Networking.HTTP
 						else if (EndHeaders && Stream.Headers.Method == "CONNECT")
 						{
 							if (Stream.Protocol != "websocket" ||
-								!this.server.TryGetResource(Stream.Headers.Resource, out HttpResource Resource, out string SubPath) ||
+								!this.server.TryGetResource(Stream.Headers, out HttpResource Resource, out string SubPath) ||
 								!(Resource is WebSocketListener WebSocketListener) ||
 								(!string.IsNullOrEmpty(SubPath) && !Resource.HandlesSubPaths))
 							{
@@ -2115,7 +2115,7 @@ namespace Waher.Networking.HTTP
 						new KeyValuePair<string, string>("Retry-After", "300"));    // Try again in 5 minutes.
 					Result = false;
 				}
-				else if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
+				else if (this.server.TryGetResource(Request, true, out HttpResource Resource, out string SubPath))
 				{
 					Request.Resource = Resource;
 					Request.SubPath = SubPath;

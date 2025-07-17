@@ -12,6 +12,7 @@
 	if (Expression === "")
 		return;
 
+	repeadIndex = 0
 	Expressions[Tag] = Expression;
 
 	var Div = document.getElementById("Results");
@@ -155,4 +156,28 @@ function GraphClicked(Image, Event, Tag)
 	xhttp.send();
 }
 
+document.addEventListener("keydown", e => {
+	var Script = document.getElementById("script");
+	if (Script.value === "")
+		repeadIndex = -1
+
+	if (e.key === "ArrowUp")
+		repeadIndex++
+	else if (e.key === "ArrowDown")
+		repeadIndex--
+	else
+		return
+
+	repeadIndex = Math.max(repeadIndex, -1)
+	const elements = document.querySelectorAll("[data-tag]");
+	repeadIndex = Math.min(repeadIndex, elements.length - 1)
+	
+	if (elements.length < 1 || repeadIndex === -1)
+		return;
+
+	SetScript(elements[repeadIndex])
+	e.preventDefault()
+})
+
 var Expressions = {};
+let repeadIndex = 0

@@ -238,7 +238,7 @@
 				</xs:element>
 				<xs:element name="ReverseProxy" minOccurs="0" maxOccurs="1">
 					<xs:complexType>
-						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
 							<xs:element name="ProxyResource">
 								<xs:complexType>
 									<xs:attribute name="localResource" type="xs:string" use="required"/>
@@ -250,7 +250,18 @@
 									<xs:attribute name="timeoutMs" type="xs:positiveInteger" use="optional" default="10000"/>
 								</xs:complexType>
 							</xs:element>
-						</xs:sequence>
+							<xs:element name="ProxyDomain">
+								<xs:complexType>
+									<xs:attribute name="localDomain" type="xs:string" use="required"/>
+									<xs:attribute name="remoteDomain" type="xs:string" use="required"/>
+									<xs:attribute name="remoteFolder" type="xs:string" use="required"/>
+									<xs:attribute name="remotePort" type="PortNumber" use="optional"/>
+									<xs:attribute name="encrypted" type="xs:boolean" use="optional" default="false"/>
+									<xs:attribute name="useSession" type="xs:boolean" use="optional" default="false"/>
+									<xs:attribute name="timeoutMs" type="xs:positiveInteger" use="optional" default="10000"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:choice>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="ExportExceptions" minOccurs="0" maxOccurs="1">

@@ -244,7 +244,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						false, MaxChunkSize, new KeyValuePair<string, string>("Retry-After", "300"));
 					Result = false;
 				}
-				else if (this.server.TryGetResource(Request.Header.Resource, true, out HttpResource Resource, out string SubPath))
+				else if (this.server.TryGetResource(Request, true, out HttpResource Resource, out string SubPath))
 				{
 					Request.Resource = Resource;
 

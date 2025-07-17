@@ -592,7 +592,7 @@ namespace Waher.IoTGateway.WebResources
 
 					return;
 				}
-				else if (Gateway.XmppClient.State != XmppState.Connected)
+				else if (Gateway.XmppClient is null || Gateway.XmppClient.State != XmppState.Connected)
 					Reschedule = true;
 				else
 				{

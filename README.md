@@ -579,6 +579,7 @@ The [Utilities](Utilities) folder contains applications that help the developer 
 | **Waher.Utility.TextDiff**         | .NET 8.0   |       | The [Waher.Utility.TextDiff](Utilities/Waher.Utility.TextDiff) is a command-line tool that compares two text files and outputs the differences between them. |
 | **Waher.Utility.Transform**        | .NET 8.0   |       | The [Waher.Utility.Transform](Utilities/Waher.Utility.Transform) is a command-line tool that transforms an XML file utilizing an XSL Transform (XSLT). |
 | **Waher.Utility.Translate**        | .NET 8.0   |       | The [Waher.Utility.Translate](Utilities/Waher.Utility.Translate) is a command-line tool that helps translating resource strings from one language to another. It uses an internal database to check for updates, and performs translations only of new or updated strings accordingly. |
+| **Waher.Utility.Upload**           | .NET 8.0   |       | The [Waher.Utility.Upload](Utilities/Waher.Utility.Upload) is a command-line tool that allows you to update signed packages to a broker. |
 
 Web Services
 ----------------------

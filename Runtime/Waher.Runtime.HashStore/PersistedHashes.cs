@@ -25,7 +25,7 @@ namespace Waher.Runtime.HashStore
 		/// <summary>
 		/// Persists a hash, using the default (empty) realm.
 		/// </summary>
-		/// <param name="ExpiresUtc">When hash expires.</param>
+		/// <param name="ExpiresUtc">When hash expires (in UTC).</param>
 		/// <param name="Hash">Hash digest to persist</param>
 		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
 		public static Task<bool> AddHash(DateTime ExpiresUtc, byte[] Hash)
@@ -48,7 +48,7 @@ namespace Waher.Runtime.HashStore
 		/// Persists a hash.
 		/// </summary>
 		/// <param name="Realm">Realm of hash value.</param>
-		/// <param name="ExpiresUtc">When hash expires.</param>
+		/// <param name="ExpiresUtc">When hash expires (in UTC).</param>
 		/// <param name="Hash">Hash digest to persist</param>
 		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
 		public static Task<bool> AddHash(string Realm, DateTime ExpiresUtc, byte[] Hash)
@@ -60,7 +60,19 @@ namespace Waher.Runtime.HashStore
 		/// Persists a hash.
 		/// </summary>
 		/// <param name="Realm">Realm of hash value.</param>
-		/// <param name="ExpiresUtc">When hash expires.</param>
+		/// <param name="Hash">Hash digest to persist</param>
+		/// <param name="AssociatedObject">Associated object value.</param>
+		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>
+		public static Task<bool> AddHash(string Realm, byte[] Hash, object AssociatedObject)
+		{
+			return AddHash(Realm, DateTime.MaxValue, Hash, AssociatedObject);
+		}
+
+		/// <summary>
+		/// Persists a hash.
+		/// </summary>
+		/// <param name="Realm">Realm of hash value.</param>
+		/// <param name="ExpiresUtc">When hash expires (in UTC).</param>
 		/// <param name="Hash">Hash digest to persist</param>
 		/// <param name="AssociatedObject">Associated object value.</param>
 		/// <returns>If hash digest was stored (true), or if the hash already existed (false).</returns>

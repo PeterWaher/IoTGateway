@@ -1744,7 +1744,7 @@ namespace Waher.Networking.HTTP
 			if (this.hasProxyDomains && this.TryGetDomainProxy(Request.Host, out HttpReverseProxyResource DomainProxy))
 			{
 				Resource = DomainProxy;
-				SubPath = Request.SubPath;
+				SubPath = Request.Header.Resource;
 				return true;
 			}
 			else
